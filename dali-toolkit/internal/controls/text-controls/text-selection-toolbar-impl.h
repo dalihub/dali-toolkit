@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
+#include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
 
@@ -89,6 +90,18 @@ public:
    */
   void ScrollTo( const Vector2& position );
 
+  /**
+   * Sets the scroll bar padding.
+   *
+   * @param[in] padding The padding value.
+   */
+  void SetScrollBarPadding( const Vector2& padding );
+
+  /**
+   * @return The padding value.
+   */
+  const Vector2& GetScrollBarPadding() const;
+
 private: // From Control
 
   /**
@@ -136,6 +149,13 @@ private: // Implementation
   void SetUp();
 
   /**
+   * @brief Enable or disable the scroll-bar
+   *
+   * @param[in] enable True if the scroll-bar is required
+   */
+  void SetUpScrollBar( bool enable );
+
+  /**
    * Toolbar has started to scroll
    * @param[in] position current scroll view position
    */
@@ -168,11 +188,12 @@ private: // Data
   Layer mToolbarLayer;                                ///< The layer used to house the toolbar.
   Toolkit::TableView mTableOfButtons;                 ///< Actor which holds all the buttons, sensitivity can be set on buttons via this actor
   Toolkit::ScrollView mScrollView;                    ///< Provides scrolling of Toolbar when content does not fit.
+  Toolkit::ScrollBar mScrollBar;                      ///< An horizontal scroll bar for the text's popup options.
   RulerPtr mRulerX;                                   ///< Ruler to clamp horizontal scrolling. Updates on Relayout
   Size mMaxSize;                                      ///< Max size of the Toolbar
+  Vector2 mScrollBarPadding;                          ///< The padding used to position the scroll indicator.
   unsigned int mIndexInTable;                         ///< Index in table to add option
   Dali::Vector< unsigned int > mDividerIndexes;       ///< Vector of indexes in the Toolbar that contain dividers.
-
 };
 
 } // namespace Internal

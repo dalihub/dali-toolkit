@@ -122,6 +122,7 @@
     "TextSelectionToolbar":
     {
       "enableOvershoot":true,
+      "enableScrollBar":true,
       "scrollView":
       {
         "overshootAnimationSpeed":360.0,
@@ -139,6 +140,12 @@
       "overshootEffectColor":"B018",
       "overshootAnimationSpeed":360.0,
       "overshootSize":[720.0,130.0]
+    },
+    "ScrollBar":
+    {
+      "indicatorShowDuration":0.25,
+      "indicatorHideDuration":0.25,
+      "color":[0.0,0.72,0.9,0.7]
     },
     "TextEditor":
     {

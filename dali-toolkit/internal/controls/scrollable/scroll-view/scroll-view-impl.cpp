@@ -658,7 +658,8 @@ ScrollView::ScrollView()
   mAlterChild(false),
   mDefaultMaxOvershoot(true),
   mCanScrollHorizontal(true),
-  mCanScrollVertical(true)
+  mCanScrollVertical(true),
+  mTransientScrollBar(true)
 {
 }
 
@@ -1957,24 +1958,33 @@ void ScrollView::OnChildAdd(Actor& child)
   ScrollBase::OnChildAdd( child );
 
   Dali::Toolkit::ScrollBar scrollBar = Dali::Toolkit::ScrollBar::DownCast(child);
-  if(scrollBar)
+  if( scrollBar )
   {
-    mInternalActor.Add(scrollBar);
-    if(scrollBar.GetScrollDirection() == Toolkit::ScrollBar::Horizontal)
+    mScrollBar = scrollBar;
+    scrollBar.SetName("ScrollBar");
+
+    mInternalActor.Add( scrollBar );
+    if( scrollBar.GetScrollDirection() == Toolkit::ScrollBar::Horizontal )
     {
-      scrollBar.SetScrollPropertySource(Self(),
-                                        Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_X,
-                                        Toolkit::Scrollable::Property::SCROLL_POSITION_MIN_X,
-                                        Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_MAX_X,
-                                        Toolkit::ScrollView::Property::SCROLL_DOMAIN_SIZE_X);
+      scrollBar.SetScrollPropertySource( Self(),
+                                         Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_X,
+                                         Toolkit::Scrollable::Property::SCROLL_POSITION_MIN_X,
+                                         Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_MAX_X,
+                                         Toolkit::ScrollView::Property::SCROLL_DOMAIN_SIZE_X );
     }
     else
     {
-      scrollBar.SetScrollPropertySource(Self(),
-                                        Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_Y,
-                                        Toolkit::Scrollable::Property::SCROLL_POSITION_MIN_Y,
-                                        Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_MAX_Y,
-                                        Toolkit::ScrollView::Property::SCROLL_DOMAIN_SIZE_Y);
+      scrollBar.SetScrollPropertySource( Self(),
+                                         Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_Y,
+                                         Toolkit::Scrollable::Property::SCROLL_POSITION_MIN_Y,
+                                         Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_MAX_Y,
+                                         Toolkit::ScrollView::Property::SCROLL_DOMAIN_SIZE_Y );
+    }
+
+    if( mTransientScrollBar )
+    {
+      scrollBar.SetVisible( false );
+      scrollBar.HideIndicator();
     }
   }
   else if(mAlterChild)
@@ -2473,6 +2483,19 @@ void ScrollView::OnPan( const PanGesture& gesture )
       self.SetProperty( Toolkit::ScrollView::Property::START_PAGE_POSITION, Vector3(gesture.position.x, gesture.position.y, 0.0f) );
 
       UpdateMainInternalConstraint();
+      Toolkit::ScrollBar scrollBar = mScrollBar.GetHandle();
+      if( scrollBar && mTransientScrollBar )
+      {
+        Vector3 size = Self().GetCurrentSize();
+        const Toolkit::RulerDomain& rulerDomainX = mRulerX->GetDomain();
+        const Toolkit::RulerDomain& rulerDomainY = mRulerY->GetDomain();
+
+        if( ( rulerDomainX.max > size.width ) || ( rulerDomainY.max > size.height ) )
+        {
+          scrollBar.SetVisible( true );
+          scrollBar.ShowIndicator();
+        }
+      }
       break;
     }
 
@@ -2506,6 +2529,12 @@ void ScrollView::OnPan( const PanGesture& gesture )
         if( mScrollMainInternalPrePositionConstraint )
         {
           mScrollMainInternalPrePositionConstraint.Remove();
+        }
+
+        Toolkit::ScrollBar scrollBar = mScrollBar.GetHandle();
+        if( scrollBar && mTransientScrollBar )
+        {
+          scrollBar.HideIndicator();
         }
       }
       else
