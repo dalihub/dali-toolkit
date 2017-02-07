@@ -39,7 +39,7 @@ class TextEditor;
 /**
  * @brief A control which provides a multi-line editable text editor.
  *
- *  * Signals
+ * Signals
  * | %Signal Name         | Method                         |                    |
  * |----------------------|--------------------------------|--------------------|
  * | textChanged          | @ref TextChangedSignal()       | @SINCE_1_1.37      |
@@ -51,7 +51,7 @@ class DALI_IMPORT_API TextEditor : public Control
 public:
 
   /**
-   * @brief The start and end property ranges for this control.
+   * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_1.37
    */
   enum PropertyRange
@@ -61,13 +61,13 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the TextEditor class.
+   * @brief Enumeration for the instance of properties belonging to the TextEditor class.
    * @SINCE_1_1.37
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the TextEditor class.
+     * @brief Enumeration for the instance of properties belonging to the TextEditor class.
      * @SINCE_1_1.37
      */
     enum
@@ -123,8 +123,7 @@ public:
   struct InputStyle
   {
   /**
-   * @brief Mask used by the signal InputStyleChangedSignal().
-   *
+   * @brief Enumeration for mask used by the signal InputStyleChangedSignal().
    * @SINCE_1_2_2
    */
     enum Mask
@@ -157,10 +156,10 @@ public:
   typedef Signal<void ( TextEditor, InputStyle::Mask ) > InputStyleChangedSignalType;
 
   /**
-   * @brief Create the TextEditor control.
+   * @brief Creates the TextEditor control.
    *
    * @SINCE_1_1.37
-   * @return A handle to the TextEditor control.
+   * @return A handle to the TextEditor control
    */
   static TextEditor New();
 
@@ -175,7 +174,7 @@ public:
    * @brief Copy constructor.
    *
    * @SINCE_1_1.37
-   * @param[in] handle The handle to copy from.
+   * @param[in] handle The handle to copy from
    */
   TextEditor( const TextEditor& handle );
 
@@ -183,8 +182,8 @@ public:
    * @brief Assignment operator.
    *
    * @SINCE_1_1.37
-   * @param[in] handle The handle to copy from.
-   * @return A reference to this.
+   * @param[in] handle The handle to copy from
+   * @return A reference to this
    */
   TextEditor& operator=( const TextEditor& handle );
 
@@ -197,14 +196,14 @@ public:
   ~TextEditor();
 
   /**
-   * @brief Downcast a handle to TextEditor.
+   * @brief Downcasts a handle to TextEditor.
    *
-   * If the BaseHandle points is a TextEditor the downcast returns a valid handle.
-   * If not the returned handle is left empty.
+   * If the BaseHandle points is a TextEditor, the downcast returns a valid handle.
+   * If not, the returned handle is left empty.
    *
    * @SINCE_1_1.37
-   * @param[in] handle Handle to an object.
-   * @return handle to a TextEditor or an empty handle.
+   * @param[in] handle Handle to an object
+   * @return Handle to a TextEditor or an empty handle
    */
   static TextEditor DownCast( BaseHandle handle );
 
@@ -219,7 +218,7 @@ public:
    * @endcode
    *
    * @SINCE_1_1.37
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   TextChangedSignalType& TextChangedSignal();
 
@@ -233,7 +232,7 @@ public:
    * @endcode
    *
    * @SINCE_1_2_2
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   InputStyleChangedSignalType& InputStyleChangedSignal();
 
@@ -244,7 +243,7 @@ public: // Not intended for application developers
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_1.37
-   * @param[in] implementation The Control implementation.
+   * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL TextEditor( Internal::TextEditor& implementation );
 
@@ -253,7 +252,7 @@ public: // Not intended for application developers
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @SINCE_1_1.37
-   * @param[in]  internal  A pointer to the internal CustomActor.
+   * @param[in] internal A pointer to the internal CustomActor
    */
   explicit DALI_INTERNAL TextEditor( Dali::Internal::CustomActor* internal );
 };

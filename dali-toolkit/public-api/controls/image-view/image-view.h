@@ -52,7 +52,7 @@ class DALI_IMPORT_API ImageView : public Control
 public:
 
   /**
-   * @brief The start and end property ranges for this control.
+   * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
    */
   enum PropertyRange
@@ -65,13 +65,13 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the ImageView class.
+   * @brief Enumeration for the instance of properties belonging to the ImageView class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the ImageView class.
+     * @brief Enumeration for the instance of properties belonging to the ImageView class.
      * @SINCE_1_0.0
      */
     enum
@@ -80,19 +80,19 @@ public:
 
       /**
        * @DEPRECATED_1_1.16. Use IMAGE instead.
-       * @brief name "resourceUrl", type string
+       * @brief name "resourceUrl", type string.
        * @SINCE_1_0.0
        */
       RESOURCE_URL = PROPERTY_START_INDEX,
 
       /**
-       * @brief name "image", type string if it is a url, map otherwise
+       * @brief name "image", type string if it is a url, map otherwise.
        * @SINCE_1_0.0
        */
       IMAGE,
 
       /**
-       * @brief name "preMultipliedAlpha", type Boolean
+       * @brief name "preMultipliedAlpha", type Boolean.
        * @SINCE_1_1.18
        * @pre image must be initialized.
        */
@@ -102,7 +102,7 @@ public:
       // Animatable properties
 
       /**
-       * @brief name "pixelArea", type Vector4
+       * @brief name "pixelArea", type Vector4.
        * @details Pixel area is a relative value with the whole image area as [0.0, 0.0, 1.0, 1.0].
        * @SINCE_1_1.18
        */
@@ -113,7 +113,7 @@ public:
 public:
 
   /**
-   * @brief Create an uninitialized ImageView.
+   * @brief Creates an uninitialized ImageView.
    * @SINCE_1_0.0
    */
   ImageView();
@@ -122,48 +122,47 @@ public:
    * @brief Create an initialized ImageView.
    *
    * @SINCE_1_0.0
-   * @return A handle to a newly allocated Dali ImageView.
+   * @return A handle to a newly allocated Dali ImageView
    *
    * @note ImageView will not display anything.
    */
   static ImageView New();
 
   /**
-   * @brief Create an initialized ImageView from an Image instance.
+   * @brief Creates an initialized ImageView from an Image instance.
    *
    * If the handle is empty, ImageView will not display anything.
    *
    * @SINCE_1_0.0
-   * @param[in] image The Image instance to display.
-   * @return A handle to a newly allocated ImageView.
+   * @param[in] image The Image instance to display
+   * @return A handle to a newly allocated ImageView
    */
   static ImageView New( Image image );
 
   /**
-   * @brief Create an initialized ImageView from an URL to an image resource.
+   * @brief Creates an initialized ImageView from an URL to an image resource.
    *
    * If the string is empty, ImageView will not display anything.
    *
    * @SINCE_1_0.0
    * @REMARK_INTERNET
    * @REMARK_STORAGE
-   * @param[in] url The url of the image resource to display.
-   * @return A handle to a newly allocated ImageView.
+   * @param[in] url The url of the image resource to display
+   * @return A handle to a newly allocated ImageView
    */
   static ImageView New( const std::string& url );
 
   /**
-   * @brief Create an initialized ImageView from a URL to an image resource.
+   * @brief Creates an initialized ImageView from a URL to an image resource.
    *
    * If the string is empty, ImageView will not display anything.
    *
    * @SINCE_1_1.10
    * @REMARK_INTERNET
    * @REMARK_STORAGE
-   * @param[in] url The url of the image resource to display.
-   * @param [in] size The width and height to which to fit the loaded image.
-   * @return A handle to a newly allocated ImageView.
-   *
+   * @param[in] url The url of the image resource to display
+   * @param [in] size The width and height to which to fit the loaded image
+   * @return A handle to a newly allocated ImageView
    * @note A valid size is preferable for efficiency.
    *       However, do not set a size that is bigger than the actual image size, as up-scaling is not available.
    *       The content of the area not covered by the actual image is undefined and will not be cleared.
@@ -171,7 +170,7 @@ public:
   static ImageView New( const std::string& url, ImageDimensions size );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -190,20 +189,20 @@ public:
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] imageView The ImageView to assign from.
-   * @return The updated ImageView.
+   * @param[in] imageView The ImageView to assign from
+   * @return The updated ImageView
    */
   ImageView& operator=( const ImageView& imageView );
 
   /**
-   * @brief Downcast a handle to ImageView handle.
+   * @brief Downcasts a handle to ImageView handle.
    *
-   * If handle points to a ImageView the downcast produces valid
-   * handle. If not the returned handle is left uninitialized.
+   * If handle points to a ImageView, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
-   * @return handle to a ImageView or an uninitialized handle
+   * @return Handle to a ImageView or an uninitialized handle
    */
   static ImageView DownCast( BaseHandle handle );
 
@@ -224,7 +223,7 @@ public:
    * @SINCE_1_1.4
    * @REMARK_INTERNET
    * @REMARK_STORAGE
-   * @param[in] url The URL to the image resource to display.
+   * @param[in] url The URL to the image resource to display
    */
   void SetImage( const std::string& url );
 
@@ -236,8 +235,8 @@ public:
    * @SINCE_1_1.10
    * @REMARK_INTERNET
    * @REMARK_STORAGE
-   * @param[in] url The URL to the image resource to display.
-   * @param [in] size The width and height to fit the loaded image to.
+   * @param[in] url The URL to the image resource to display
+   * @param [in] size The width and height to fit the loaded image to
    */
   void SetImage( const std::string& url, ImageDimensions size );
 
@@ -247,7 +246,7 @@ public:
    * A valid handle will be returned only if this instance was created with New(Image) or SetImage(Image) was called.
    *
    * @SINCE_1_0.0
-   * @return The Image instance currently used by the ImageView.
+   * @return The Image instance currently used by the ImageView
    */
   Image GetImage() const;
 
@@ -258,7 +257,7 @@ public: // Not intended for application developers
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_0.0
-   * @param[in]  implementation  The ImageView implementation.
+   * @param[in] implementation The ImageView implementation
    */
   DALI_INTERNAL ImageView( Internal::ImageView& implementation );
 
@@ -267,7 +266,7 @@ public: // Not intended for application developers
    * @brief Allows the creation of this ImageView from an Internal::CustomActor pointer.
    *
    * @SINCE_1_0.0
-   * @param[in]  internal  A pointer to the internal CustomActor.
+   * @param[in] internal A pointer to the internal CustomActor
    */
   DALI_INTERNAL ImageView( Dali::Internal::CustomActor* internal );
 

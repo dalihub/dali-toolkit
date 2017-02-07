@@ -72,15 +72,15 @@ public:
   typedef Signal< void ( Actor ) > FocusedActorEnterKeySignalType;
 
   /**
-   * @brief Create a KeyboardFocusManager handle; this can be initialised with KeyboardFocusManager::New().
+   * @brief Creates a KeyboardFocusManager handle; this can be initialized with KeyboardFocusManager::New().
    *
-   * Calling member functions with an uninitialised handle is not allowed.
+   * Calling member functions with an uninitialized handle is not allowed.
    * @SINCE_1_0.0
    */
   KeyboardFocusManager();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -88,15 +88,15 @@ public:
   ~KeyboardFocusManager();
 
   /**
-   * @brief Get the singleton of KeyboardFocusManager object.
+   * @brief Gets the singleton of KeyboardFocusManager object.
    *
    * @SINCE_1_0.0
-   * @return A handle to the KeyboardFocusManager control.
+   * @return A handle to the KeyboardFocusManager control
    */
   static KeyboardFocusManager Get();
 
   /**
-   * @brief Move the keyboard focus to the given actor.
+   * @brief Moves the keyboard focus to the given actor.
    *
    * Only one actor can be focused at the same time.  The actor must
    * be in the stage already and keyboard focusable.
@@ -110,16 +110,16 @@ public:
   bool SetCurrentFocusActor(Actor actor);
 
   /**
-   * @brief Get the current focused actor.
+   * @brief Gets the current focused actor.
    *
    * @SINCE_1_0.0
-   * @return A handle to the current focused actor or an empty handle if no actor is focused.
+   * @return A handle to the current focused actor or an empty handle if no actor is focused
    * @pre The KeyboardFocusManager has been initialized.
    */
   Actor GetCurrentFocusActor();
 
   /**
-   * @brief Move the focus to the next focusable actor in the focus
+   * @brief Moves the focus to the next focusable actor in the focus
    * chain in the given direction (according to the focus traversal
    * order).
    *
@@ -131,7 +131,7 @@ public:
   bool MoveFocus(Control::KeyboardFocus::Direction direction);
 
   /**
-   * @brief Clear the focus from the current focused actor if any, so
+   * @brief Clears the focus from the current focused actor if any, so
    * that no actor is focused in the focus chain.
    *
    * It will emit focus changed signal without current focused actor.
@@ -141,7 +141,7 @@ public:
   void ClearFocus();
 
   /**
-   * @brief Set whether the focus movement should be looped within the same focus group.
+   * @brief Sets whether the focus movement should be looped within the same focus group.
    *
    * The focus movement is not looped by default.
    * @SINCE_1_0.0
@@ -151,7 +151,7 @@ public:
   void SetFocusGroupLoop(bool enabled);
 
   /**
-   * @brief Get whether the focus movement should be looped within the same focus group.
+   * @brief Gets whether the focus movement should be looped within the same focus group.
    *
    * @SINCE_1_0.0
    * @return Whether the focus movement should be looped
@@ -160,25 +160,25 @@ public:
   bool GetFocusGroupLoop() const;
 
   /**
-   * @brief Set whether an actor is a focus group that can limit the
+   * @brief Sets whether an actor is a focus group that can limit the
    * scope of focus movement to its child actors in the focus chain.
    *
    * Layout controls set themselves as focus groups by default.
    *
    * @SINCE_1_0.0
-   * @param actor The actor to be set as a focus group.
-   * @param isFocusGroup Whether to set the actor as a focus group or not.
+   * @param actor The actor to be set as a focus group
+   * @param isFocusGroup Whether to set the actor as a focus group or not
    * @pre The KeyboardFocusManager has been initialized.
    * @pre The Actor has been initialized.
    */
   void SetAsFocusGroup(Actor actor, bool isFocusGroup);
 
   /**
-   * @brief Check whether the actor is set as a focus group or not.
+   * @brief Checks whether the actor is set as a focus group or not.
    *
    * @SINCE_1_0.0
-   * @param actor The actor to be checked.
-   * @return Whether the actor is set as a focus group.
+   * @param actor The actor to be checked
+   * @return Whether the actor is set as a focus group
    * @pre The KeyboardFocusManager has been initialized.
    * @pre The Actor has been initialized.
    */
@@ -195,7 +195,7 @@ public:
   Actor GetFocusGroup(Actor actor);
 
   /**
-   * @brief Set the focus indicator actor.
+   * @brief Sets the focus indicator actor.
    *
    * This will replace the default focus indicator actor in
    * KeyboardFocusManager and will be added to the focused actor as a
@@ -209,7 +209,7 @@ public:
   void SetFocusIndicatorActor(Actor indicator);
 
   /**
-   * @brief Get the focus indicator actor.
+   * @brief Gets the focus indicator actor.
    *
    * @SINCE_1_0.0
    * @return A handle to the focus indicator actor
@@ -226,7 +226,7 @@ public: // Signals
    * focus towards the given direction, but applications might want to
    * change that. By connecting with this signal, they can check the
    * proposed actor to focus and return a different actor if they
-   * wish.  This signal is only emitted when the navigation key is
+   * wish. This signal is only emitted when the navigation key is
    * pressed and KeyboardFocusManager tries to move the focus
    * automatically. It won't be emitted for focus movement by calling
    * SetCurrentFocusActor directly.
@@ -236,7 +236,7 @@ public: // Signals
    *   Actor YourCallbackName(Actor currentFocusedActor, Actor proposedActorToFocus, Control::KeyboardFocus::Direction direction);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   PreFocusChangeSignalType& PreFocusChangeSignal();
@@ -249,7 +249,7 @@ public: // Signals
    *   void YourCallbackName(Actor originalFocusedActor, Actor currentFocusedActor);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   FocusChangedSignalType& FocusChangedSignal();
@@ -267,7 +267,7 @@ public: // Signals
    *   void YourCallbackName(Actor currentFocusedActor, bool forward);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   FocusGroupChangedSignalType& FocusGroupChangedSignal();
@@ -280,7 +280,7 @@ public: // Signals
    *   void YourCallbackName(Actor enterPressedActor);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   FocusedActorEnterKeySignalType& FocusedActorEnterKeySignal();
@@ -292,7 +292,7 @@ public: // Signals
    * @brief Creates a new handle from the implementation.
    *
    * @SINCE_1_0.0
-   * @param[in] impl A pointer to the object.
+   * @param[in] impl A pointer to the object
    */
   explicit DALI_INTERNAL KeyboardFocusManager(Internal::KeyboardFocusManager *impl);
 

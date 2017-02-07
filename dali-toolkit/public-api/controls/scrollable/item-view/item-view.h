@@ -48,8 +48,8 @@ typedef IntrusivePtr<ItemLayout> ItemLayoutPtr;
 /**
  * @brief ItemView is a scrollable layout container.
  *
- * Multiple ItemLayouts may be provided, to determine the logical position of each item a layout.
- * Actors are provided from an external ItemFactory, to display the currently visible items.
+ * Multiple ItemLayouts may be provided to determine the logical position of each item layout.
+ * Actors are provided from an external ItemFactory to display the currently visible items.
  *
  * Signals
  * | %Signal Name                    | Method                                     |
@@ -69,7 +69,7 @@ class DALI_IMPORT_API ItemView : public Scrollable
 public:
 
   /**
-   * @brief The start and end property ranges for this control.
+   * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_1.18
    */
   enum PropertyRange
@@ -117,7 +117,7 @@ public:
 public:
 
   /**
-   * @brief Create an uninitialized ItemView; this can be initialized with ItemView::New().
+   * @brief Creates an uninitialized ItemView; this can be initialized with ItemView::New().
    *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    * @SINCE_1_0.0
@@ -140,7 +140,7 @@ public:
   ItemView& operator=( const ItemView& itemView );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -148,19 +148,19 @@ public:
   ~ItemView();
 
   /**
-   * @brief Create an initialized ItemView.
+   * @brief Creates an initialized ItemView.
    *
    * @SINCE_1_0.0
-   * @param[in] factory The factory which provides ItemView with items.
-   * @return A handle to a newly allocated Dali resource.
+   * @param[in] factory The factory which provides ItemView with items
+   * @return A handle to a newly allocated Dali resource
    */
   static ItemView New(ItemFactory& factory);
 
   /**
-   * @brief Downcast a handle to ItemView handle.
+   * @brief Downcasts a handle to ItemView handle.
    *
-   * If handle points to a ItemView the downcast produces valid
-   * handle. If not the returned handle is left uninitialized.
+   * If handle points to a ItemView, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
@@ -169,75 +169,75 @@ public:
   static ItemView DownCast( BaseHandle handle );
 
   /**
-   * @brief Query the number of layouts.
+   * @brief Queries the number of layouts.
    *
    * @SINCE_1_0.0
-   * @return The number of layouts.
+   * @return The number of layouts
    */
   unsigned int GetLayoutCount() const;
 
   /**
-   * @brief Add a layout.
+   * @brief Adds a layout.
    *
    * @SINCE_1_0.0
-   * @param[in] layout The layout.
+   * @param[in] layout The layout
    */
   void AddLayout(ItemLayout& layout);
 
   /**
-   * @brief Remove a layout.
+   * @brief Removes a layout.
    *
    * @SINCE_1_0.0
-   * @param[in] layoutIndex The index of one of the ItemView layouts.
+   * @param[in] layoutIndex The index of one of the ItemView layouts
    * @pre layoutIndex is less than GetLayoutCount().
    */
   void RemoveLayout(unsigned int layoutIndex);
 
   /**
-   * @brief Retrieve a layout.
+   * @brief Retrieves a layout.
    *
    * @SINCE_1_0.0
-   * @param[in] layoutIndex The index of the layout to retrieve.
+   * @param[in] layoutIndex The index of the layout to retrieve
    * @return The layout
    * @pre layoutIndex is less than GetLayoutCount().
    */
   ItemLayoutPtr GetLayout(unsigned int layoutIndex) const;
 
   /**
-   * @brief Retrieve the currently active layout, if any.
+   * @brief Retrieves the currently active layout, if any.
    *
    * @SINCE_1_0.0
-   * @return The layout, or an uninitialized pointer if no layout is active.
+   * @return The layout, or an uninitialized pointer if no layout is active
    */
   ItemLayoutPtr GetActiveLayout() const;
 
   /**
-   * @brief Retrieve the current layout-position of an item in the ItemView.
+   * @brief Retrieves the current layout-position of an item in the ItemView.
    *
    * @SINCE_1_0.0
-   * @param[in] itemId The item identifier.
-   * @return The current layout-position.
+   * @param[in] itemId The item identifier
+   * @return The current layout-position
    */
   float GetCurrentLayoutPosition(ItemId itemId) const;
 
   /**
-   * @brief Activate one of the layouts; this will resize the ItemView
+   * @brief Activates one of the layouts; this will resize the ItemView
    * & relayout actors within the ItemView.
    *
    * This is done by applying constraints from the new layout, and
    * removing constraints from the previous layout.
    *
    * @SINCE_1_0.0
-   * @param[in] layoutIndex The index of one of the ItemView layouts.
-   * @param[in] targetSize The target ItemView & layout size.
-   * @param[in] durationSeconds The time taken to relayout in seconds (zero for immediate).
+   * @param[in] layoutIndex The index of one of the ItemView layouts
+   * @param[in] targetSize The target ItemView & layout size
+   * @param[in] durationSeconds The time taken to relayout in seconds (zero for immediate)
    * @pre layoutIndex is less than GetLayoutCount().
    * @pre durationSeconds is greater or equal to zero.
    */
   void ActivateLayout(unsigned int layoutIndex, Vector3 targetSize, float durationSeconds);
 
   /**
-   * @brief Deactivate the current layout, if any.
+   * @brief Deactivates the current layout, if any.
    *
    * The constraints applied by the layout will be removed.
    * @SINCE_1_0.0
@@ -245,8 +245,8 @@ public:
   void DeactivateCurrentLayout();
 
   /**
-   * @brief Set the minimum swipe speed in pixels per second; A pan
-   * gesture must exceed this to trigger a swipe.
+   * @brief Sets the minimum swipe speed in pixels per second;
+   *  A pan gesture must exceed this to trigger a swipe.
    *
    * @SINCE_1_0.0
    * @param[in] speed The minimum swipe speed
@@ -254,7 +254,7 @@ public:
   void SetMinimumSwipeSpeed(float speed);
 
   /**
-   * @brief Get the minimum swipe speed in pixels per second.
+   * @brief Gets the minimum swipe speed in pixels per second.
    *
    * @SINCE_1_0.0
    * @return The minimum swipe speed
@@ -262,16 +262,16 @@ public:
   float GetMinimumSwipeSpeed() const;
 
   /**
-   * @brief Set the minimum swipe distance in actor coordinates; A pan
-   * gesture must exceed this to trigger a swipe.
+   * @brief Sets the minimum swipe distance in actor coordinates;
+   *  A pan gesture must exceed this to trigger a swipe.
    *
    * @SINCE_1_0.0
-   * @param[in] distance The minimum swipe distance.
+   * @param[in] distance The minimum swipe distance
    */
   void SetMinimumSwipeDistance(float distance);
 
   /**
-   * @brief Get the minimum swipe distance in actor coordinates.
+   * @brief Gets the minimum swipe distance in actor coordinates.
    *
    * @SINCE_1_0.0
    * @return The minimum swipe distance

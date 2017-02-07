@@ -73,7 +73,7 @@ class DALI_IMPORT_API Control : public CustomActor
 public:
 
   /**
-   * @brief The start and end property ranges for control.
+   * @brief Enumeration for the start and end property ranges for control.
    * @SINCE_1_0.0
    */
   enum PropertyRange
@@ -84,44 +84,44 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the Control class.
+   * @brief Enumeration for the instance of properties belonging to the Control class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the Control class.
+     * @brief Enumeration for the instance of properties belonging to the Control class.
      * @SINCE_1_0.0
      */
     enum
     {
       /**
-       * @brief name "styleName", type std::string
+       * @brief name "styleName", type std::string.
        * @SINCE_1_0.0
        * @see SetStyleName
        */
       STYLE_NAME = PROPERTY_START_INDEX,
       /**
        * @DEPRECATED_1_1.3
-       * @brief name "background-color", mutually exclusive with BACKGROUND_IMAGE & BACKGROUND,  type Vector4
+       * @brief name "background-color", mutually exclusive with BACKGROUND_IMAGE & BACKGROUND, type Vector4.
        * @SINCE_1_0.0
        * @see SetStyleName
        */
       BACKGROUND_COLOR,
       /**
        * @DEPRECATED_1_1.3
-       * @brief name "background-image", mutually exclusive with BACKGROUND_COLOR & BACKGROUND,  type Map
+       * @brief name "background-image", mutually exclusive with BACKGROUND_COLOR & BACKGROUND, type Map.
        * @SINCE_1_0.0
        */
       BACKGROUND_IMAGE,
       /**
-       * @brief name "keyInputFocus", type bool
+       * @brief name "keyInputFocus", type bool.
        * @SINCE_1_0.0
        * @see SetKeyInputFocus
        */
       KEY_INPUT_FOCUS,
       /**
-       * @brief name "background",       mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE,                   type Map
+       * @brief name "background", mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE, type Map.
        * @SINCE_1_1.3
        */
       BACKGROUND,
@@ -135,7 +135,7 @@ public:
   struct KeyboardFocus
   {
     /**
-     * @brief Keyboard focus direction
+     * @brief Keyboard focus direction.
      * @SINCE_1_0.0
      */
     enum Direction
@@ -158,15 +158,15 @@ public:
 public: // Creation & Destruction
 
   /**
-   * @brief Create a new instance of a Control.
+   * @brief Creates a new instance of a Control.
    *
    * @SINCE_1_0.0
-   * @return A handle to a new Control.
+   * @return A handle to a new Control
    */
   static Control New();
 
   /**
-   * @brief Create an uninitialized Control handle.
+   * @brief Creates an uninitialized Control handle.
    *
    * Only derived versions can be instantiated.  Calling member
    * functions with an uninitialized Dali::Object is not allowed.
@@ -199,17 +199,17 @@ public: // operators
    * Changes this handle to point to another real object.
    * @SINCE_1_0.0
    * @param[in] handle Object to assign this to
-   * @return reference to this
+   * @return Reference to this
    */
   Control& operator=( const Control& handle );
 
 public:
 
   /**
-   * @brief Downcast a handle to Control handle.
+   * @brief Downcasts a handle to Control handle.
    *
-   * If handle points to a Control the downcast produces valid
-   * handle. If not the returned handle is left uninitialized.
+   * If handle points to a Control, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
@@ -240,7 +240,7 @@ public:
    * As the key input focus mechanism works like a stack, the top most control receives all the key events, and passes on the
    * unhandled events to the controls below in the stack. A control in the stack will regain key input focus when there are no more
    * controls above it in the focus stack.
-   * To query for the conrol which is on top of the focus stack use Dali::Toolkit::KeyInputFocusManager::GetCurrentKeyboardFocusActor().
+   * To query for the control which is on top of the focus stack use Dali::Toolkit::KeyInputFocusManager::GetCurrentKeyboardFocusActor().
    */
   bool HasKeyInputFocus();
 
@@ -259,7 +259,7 @@ public:
    * @brief Retrieves the pinch gesture detector of the control.
    *
    * @SINCE_1_0.0
-   * @return The pinch gesture detector.
+   * @return The pinch gesture detector
    * @note Will return an empty handle if the control does not handle the gesture itself.
    */
   PinchGestureDetector GetPinchGestureDetector() const;
@@ -268,7 +268,7 @@ public:
    * @brief Retrieves the pan gesture detector of the control.
    *
    * @SINCE_1_0.0
-   * @return The pan gesture detector.
+   * @return The pan gesture detector
    * @note Will return an empty handle if the control does not handle the gesture itself.
    */
   PanGestureDetector GetPanGestureDetector() const;
@@ -277,7 +277,7 @@ public:
    * @brief Retrieves the tap gesture detector of the control.
    *
    * @SINCE_1_0.0
-   * @return The tap gesture detector.
+   * @return The tap gesture detector
    * @note Will return an empty handle if the control does not handle the gesture itself.
    */
   TapGestureDetector GetTapGestureDetector() const;
@@ -286,7 +286,7 @@ public:
    * @brief Retrieves the long press gesture detector of the control.
    *
    * @SINCE_1_0.0
-   * @return The long press gesture detector.
+   * @return The long press gesture detector
    * @note Will return an empty handle if the control does not handle the gesture itself.
    */
   LongPressGestureDetector GetLongPressGestureDetector() const;
@@ -297,14 +297,14 @@ public:
    * @brief Sets the name of the style to be applied to the control.
    *
    * @SINCE_1_0.0
-   * @param[in] styleName A string matching a style described in a stylesheet.
+   * @param[in] styleName A string matching a style described in a stylesheet
    */
   void SetStyleName( const std::string& styleName );
 
   /**
    * @brief Retrieves the name of the style to be applied to the control (if any).
    * @SINCE_1_0.0
-   * @return A string matching a style or an empty string.
+   * @return A string matching a style, or an empty string
    */
   const std::string& GetStyleName() const;
 
@@ -316,7 +316,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] color The required background color of the control
    *
-   * @note if SetBackgroundImage is called later, this background color is removed.
+   * @note If SetBackgroundImage is called later, this background color is removed.
    *
    * @note The background color fully blends with the actor color.
    */
@@ -328,7 +328,7 @@ public:
    * @brief Retrieves the background color of the control.
    *
    * @SINCE_1_0.0
-   * @return The background color of the control.
+   * @return The background color of the control
    */
   Vector4 GetBackgroundColor() const DALI_DEPRECATED_API;
 
@@ -338,7 +338,7 @@ public:
    * @brief Sets an image as the background of the control.
    *
    * @SINCE_1_0.0
-   * @param[in] image The image to set as the background.
+   * @param[in] image The image to set as the background
    */
   void SetBackgroundImage( Image image ) DALI_DEPRECATED_API;
 
@@ -360,7 +360,7 @@ public:
    * The return value of True, indicates that the event should be consumed.
    * Otherwise the signal will be emitted on the next parent of the actor.
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Control has been initialized.
    */
   KeyEventSignalType& KeyEventSignal();
@@ -375,7 +375,7 @@ public:
    * The return value of True, indicates that the event should be consumed.
    * Otherwise the signal will be emitted on the next parent of the actor.
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Control has been initialized.
    */
   KeyInputFocusSignalType& KeyInputFocusGainedSignal();
@@ -392,7 +392,7 @@ public:
    * The return value of True, indicates that the event should be consumed.
    * Otherwise the signal will be emitted on the next parent of the actor.
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Control has been initialized.
    */
   KeyInputFocusSignalType& KeyInputFocusLostSignal();
@@ -400,12 +400,11 @@ public:
 public: // Intended for control developers
 
   /**
-   * @brief Create an initialised Control.
+   * @brief Creates an initialized Control.
    *
    * @SINCE_1_0.0
-   * @param[in] implementation The implementation for this control.
-   * @return A handle to a newly allocated Dali resource.
-   *
+   * @param[in] implementation The implementation for this control
+   * @return A handle to a newly allocated Dali resource
    * @note Should NOT be called to create a handle from the implementation. As stated, this allocates a NEW Dali resource.
    */
   explicit Control(Internal::Control& implementation);
@@ -415,7 +414,7 @@ public: // Intended for control developers
    * using an Internal CustomActor pointer.
    *
    * @SINCE_1_0.0
-   * @param [in] internal A pointer to a newly allocated Dali resource
+   * @param[in] internal A pointer to a newly allocated Dali resource
    */
   explicit Control(Dali::Internal::CustomActor* internal);
 
@@ -425,11 +424,11 @@ public: // Templates for Deriving Classes
    * @internal
    * @brief Template to allow deriving controls to DownCast handles to deriving handle classes.
    *
-   * @tparam     T       The handle class
-   * @tparam     I       The implementation class
+   * @tparam     T      The handle class
+   * @tparam     I      The implementation class
    * @SINCE_1_0.0
-   * @param[in]  handle  Handle to an object
-   * @return Handle to a class T or an uninitialized handle.
+   * @param[in] handle Handle to an object
+   * @return Handle to a class T or an uninitialized handle
    * @see DownCast(BaseHandle)
    */
   template<typename T, typename I>
@@ -458,9 +457,9 @@ public: // Templates for Deriving Classes
    * @brief Template to allow deriving controls to verify whether the Internal::CustomActor* is actually an
    * implementation of their class.
    *
-   * @tparam     I         The implementation class
+   * @tparam     I       The implementation class
    * @SINCE_1_0.0
-   * @param[in]  internal  Pointer to the Internal::CustomActor
+   * @param[in] internal Pointer to the Internal::CustomActor
    */
   template<typename I>
   DALI_INTERNAL void VerifyCustomActorPointer(Dali::Internal::CustomActor* internal)

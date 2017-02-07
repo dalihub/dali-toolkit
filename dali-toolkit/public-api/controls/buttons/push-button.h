@@ -43,7 +43,7 @@ class PushButton;
 /**
  * @brief A PushButton changes its appearance when is pressed and returns to its original when is released.
  *
- * By default a PushButton emits a Button::PressedSignal() signal when the button is pressed, a Button::ClickedSignal() signal when it's clicked
+ * By default, a PushButton emits a Button::PressedSignal() signal when the button is pressed, a Button::ClickedSignal() signal when it's clicked.
  * and a Button::ReleasedSignal() signal when it's released or having pressed it, the touch point leaves the boundary of the button.
  *
  * Usage example: -
@@ -82,7 +82,7 @@ class PushButton;
  * }
  * @endcode
  *
- * See Button for more detail on signals and modifying appearance via properties.
+ * See Button for more details on signals and modifying appearance via properties.
  * @SINCE_1_0.0
  */
 class DALI_IMPORT_API PushButton : public Button
@@ -90,7 +90,7 @@ class DALI_IMPORT_API PushButton : public Button
 public:
 
   /**
-   * @brief The start and end property ranges for this control.
+   * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
    */
   enum PropertyRange
@@ -100,13 +100,13 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the PushButton class.
+   * @brief Enumeration for the instance of properties belonging to the PushButton class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the PushButton class.
+     * @brief Enumeration for the instance of properties belonging to the PushButton class.
      * @SINCE_1_0.0
      */
     enum
@@ -122,7 +122,7 @@ public:
 public:
 
   /**
-   * @brief Create an uninitialized PushButton; this can be initialized with PushButton::New().
+   * @brief Creates an uninitialized PushButton; this can be initialized with PushButton::New().
    *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    * @SINCE_1_0.0
@@ -145,7 +145,7 @@ public:
   PushButton& operator=( const PushButton& pushButton );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -153,18 +153,18 @@ public:
   ~PushButton();
 
   /**
-   * @brief Create an initialized PushButton.
+   * @brief Creates an initialized PushButton.
    *
    * @SINCE_1_0.0
-   * @return A handle to a newly allocated Dali resource.
+   * @return A handle to a newly allocated Dali resource
    */
   static PushButton New();
 
   /**
-   * @brief Downcast a handle to PushButton handle.
+   * @brief Downcasts a handle to PushButton handle.
    *
-   * If handle points to a PushButton the downcast produces valid
-   * handle. If not the returned handle is left uninitialized.
+   * If handle points to a PushButton, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
@@ -183,7 +183,7 @@ public:
    * @brief Sets the unselected image with an Actor.
    *
    * @SINCE_1_0.0
-   * @param[in] image The Actor to use.
+   * @param[in] image The Actor to use
    */
   void SetButtonImage( Actor image ) DALI_DEPRECATED_API;
 
@@ -195,7 +195,7 @@ public:
    * @brief Sets the background image with an Actor.
    *
    * @SINCE_1_0.0
-   * @param[in] image The Actor to use.
+   * @param[in] image The Actor to use
    */
   void SetBackgroundImage( Actor image ) DALI_DEPRECATED_API;
 
@@ -207,7 +207,7 @@ public:
    * @brief Sets the selected image with an Actor.
    *
    * @SINCE_1_0.0
-   * @param[in] image The Actor to use.
+   * @param[in] image The Actor to use
    */
   void SetSelectedImage( Actor image ) DALI_DEPRECATED_API;
 
@@ -219,7 +219,7 @@ public:
    * @brief Sets the selected background image with an Actor.
    *
    * @SINCE_1_0.0
-   * @param[in] image The Actor to use.
+   * @param[in] image The Actor to use
    */
   void SetSelectedBackgroundImage( Actor image ) DALI_DEPRECATED_API;
 
@@ -231,7 +231,7 @@ public:
    * @brief Sets the disabled background image with an Actor.
    *
    * @SINCE_1_0.0
-   * @param[in] image The Actor to use.
+   * @param[in] image The Actor to use
    */
   void SetDisabledBackgroundImage( Actor image ) DALI_DEPRECATED_API;
 
@@ -243,7 +243,7 @@ public:
    * @brief Sets the disabled image with an Actor.
    *
    * @SINCE_1_0.0
-   * @param[in] image The Actor to use.
+   * @param[in] image The Actor to use
    */
   void SetDisabledImage( Actor image ) DALI_DEPRECATED_API;
 
@@ -255,7 +255,7 @@ public:
    * @brief Sets the disabled selected image with an Actor.
    *
    * @SINCE_1_0.0
-   * @param[in] image The Actor to use.
+   * @param[in] image The Actor to use
    */
   void SetDisabledSelectedImage( Actor image ) DALI_DEPRECATED_API;
 
@@ -267,7 +267,7 @@ public: // Not intended for application developers
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_0.0
-   * @param[in]  implementation  The Control implementation.
+   * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL PushButton( Internal::PushButton& implementation );
 
@@ -276,7 +276,7 @@ public: // Not intended for application developers
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @SINCE_1_0.0
-   * @param[in]  internal  A pointer to the internal CustomActor.
+   * @param[in] internal A pointer to the internal CustomActor
    */
   DALI_INTERNAL PushButton( Dali::Internal::CustomActor* internal );
 };

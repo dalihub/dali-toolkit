@@ -64,19 +64,19 @@ class DALI_IMPORT_API StyleManager : public BaseHandle
 {
 public:
 
-  /// @brief Style Changed signal. Emitted after controls have been updated
+  /// @brief Style Changed signal. Emitted after controls have been updated.
   typedef Signal< void ( StyleManager, StyleChange::Type ) >  StyleChangedSignalType;
 
   /**
-   * @brief Create a StyleManager handle; this can be initialised with StyleManager::Get()
+   * @brief Creates a StyleManager handle; this can be initialized with StyleManager::Get().
    *
-   * Calling member functions with an uninitialised handle is not allowed.
+   * Calling member functions with an uninitialized handle is not allowed.
    * @SINCE_1_1.32
    */
   StyleManager();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_1.32
@@ -84,15 +84,15 @@ public:
   ~StyleManager();
 
   /**
-   * @brief Get the singleton of StyleManager object.
+   * @brief Gets the singleton of StyleManager object.
    *
    * @SINCE_1_1.32
-   * @return A handle to the StyleManager control.
+   * @return A handle to the StyleManager control
    */
   static StyleManager Get();
 
   /**
-   * @brief Apply a new theme to the application. This will be merged
+   * @brief Applies a new theme to the application. This will be merged
    * on top of the default Toolkit theme.
    *
    * If the application theme file doesn't style all controls that the
@@ -102,16 +102,16 @@ public:
    * On application startup, it is suggested that the theme file name is
    * passed to Application::New instead of using this API to prevent
    * controls being styled more than once.
-   * @sa Application::New()
+   * @sa Application::New().
    *
    * @SINCE_1_1.32
    * @param[in] themeFile If a relative path is specified, then this is relative
-   * to the directory returned by app_get_resource_path().
+   * to the directory returned by app_get_resource_path()
    */
   void ApplyTheme( const std::string& themeFile );
 
   /**
-   * @brief Apply the default Toolkit theme.
+   * @brief Applies the default Toolkit theme.
    *
    * Request that any application specific styling is removed
    * and that the default Toolkit theme is re-applied.
@@ -121,7 +121,7 @@ public:
   void ApplyDefaultTheme();
 
   /**
-   * @brief Set a constant for use when building styles
+   * @brief Sets a constant for use when building styles.
    *
    * A constant is used in JSON files e.g. "myImage":"{RELATIVE_PATH}/image.jpg"
    * where the string "{RELATIVE_PATH}" is substituted with the value.
@@ -133,25 +133,25 @@ public:
   void SetStyleConstant( const std::string& key, const Property::Value& value );
 
   /**
-   * @brief Return the style constant set for a specific key
+   * @brief Returns the style constant set for a specific key.
    *
    * @SINCE_1_1.32
    * @param[in] key The key of the constant
    * @param[out] valueOut The value of the constant if it exists
    *
-   * @return If the constant for key exists then return the constant in valueOut and return true
+   * @return If the constant for key exists, then return the constant in valueOut and return true
    */
   bool GetStyleConstant( const std::string& key, Property::Value& valueOut );
 
   /**
-   * @brief Apply the specified style to the control.
+   * @brief Applies the specified style to the control.
    *
    * @SINCE_1_1.32
-   * @param[in] control The control to which to apply the style.
+   * @param[in] control The control to which to apply the style
    * @param[in] jsonFileName The name of the JSON style file to apply. If a
    * relative path is specified, then this is relative to the directory
-   * returned by app_get_resource_path().
-   * @param[in] styleName The name of the style within the JSON file to apply.
+   * returned by app_get_resource_path()
+   * @param[in] styleName The name of the style within the JSON file to apply
    */
   void ApplyStyle( Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName );
 
@@ -166,7 +166,7 @@ public: // Signals
    * @code
    *   void YourCallbackName( StyleManager styleManager, StyleChange change );
    * @endcode
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   StyleChangedSignalType& StyleChangedSignal();
 
@@ -178,7 +178,7 @@ public:
    *
    * @note Not intended for application developers
    * @SINCE_1_1.32
-   * @param[in] impl A pointer to the object.
+   * @param[in] impl A pointer to the object
    */
   explicit DALI_INTERNAL StyleManager( Internal::StyleManager *impl );
 
