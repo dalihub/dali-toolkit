@@ -235,6 +235,7 @@ void ScrollBar::CreateDefaultIndicatorActor()
   indicator.SetParentOrigin( ParentOrigin::TOP_LEFT );
   indicator.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   indicator.SetStyleName( "ScrollBarIndicator" );
+  indicator.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
   SetScrollIndicator(indicator);
 }
 

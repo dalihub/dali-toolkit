@@ -42,6 +42,8 @@ namespace Internal
 namespace
 {
 
+const Dali::Vector2 DEFAULT_SCROLL_BAR_PADDING( 8.0f, 6.0f );
+
 BaseHandle Create()
 {
   return Toolkit::TextSelectionToolbar::New();
@@ -53,6 +55,8 @@ DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextSelectionToolbar, Toolkit::Control, C
 
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "maxSize",  VECTOR2, MAX_SIZE )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "enableOvershoot",  BOOLEAN, ENABLE_OVERSHOOT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "enableScrollBar", BOOLEAN, ENABLE_SCROLL_BAR )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "scrollBarPadding", VECTOR2, SCROLL_BAR_PADDING )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionToolbar, "scrollView",  MAP, SCROLL_VIEW )
 
 DALI_TYPE_REGISTRATION_END()
@@ -98,6 +102,16 @@ void TextSelectionToolbar::SetProperty( BaseObject* object, Property::Index inde
         impl.mScrollView.SetOvershootEnabled( value.Get< bool >() );
         break;
       }
+      case Toolkit::TextSelectionToolbar::Property::ENABLE_SCROLL_BAR:
+      {
+        impl.SetUpScrollBar( value.Get< bool >() );
+        break;
+      }
+      case Toolkit::TextSelectionToolbar::Property::SCROLL_BAR_PADDING:
+      {
+        impl.SetScrollBarPadding( value.Get< Vector2 >() );
+        break;
+      }
       case Toolkit::TextSelectionToolbar::Property::SCROLL_VIEW:
       {
         // Get a Property::Map from the property if possible.
@@ -134,6 +148,16 @@ Property::Value TextSelectionToolbar::GetProperty( BaseObject* object, Property:
         value = impl.mScrollView.IsOvershootEnabled();
         break;
       }
+      case Toolkit::TextSelectionToolbar::Property::ENABLE_SCROLL_BAR:
+      {
+        value = impl.mScrollBar ? true : false;
+        break;
+      }
+      case Toolkit::TextSelectionToolbar::Property::SCROLL_BAR_PADDING:
+      {
+        value = impl.GetScrollBarPadding();
+        break;
+      }
     } // switch
   }
   return value;
@@ -149,6 +173,12 @@ void TextSelectionToolbar::OnRelayout( const Vector2& size, RelayoutContainer& c
   float width = std::max ( mTableOfButtons.GetNaturalSize().width, size.width );
   mRulerX->SetDomain( RulerDomain( 0.0, width, true ) );
   mScrollView.SetRulerX( mRulerX );
+
+  if( mScrollBar )
+  {
+    float barWidth = std::min( mTableOfButtons.GetNaturalSize().width, size.width ) - 2.f * mScrollBarPadding.x;
+    mScrollBar.SetSize( Vector2( 0.0f, barWidth ) );
+  }
 }
 
 void TextSelectionToolbar::SetPopupMaxSize( const Size& maxSize )
@@ -216,6 +246,29 @@ void TextSelectionToolbar::SetUp()
   self.Add( mToolbarLayer );
 }
 
+void TextSelectionToolbar::SetUpScrollBar( bool enable )
+{
+  if( enable )
+  {
+    if( ! mScrollBar )
+    {
+      mScrollBar = Toolkit::ScrollBar::New( Toolkit::ScrollBar::Horizontal );
+      mScrollBar.SetName( "Text popup scroll bar" );
+      mScrollBar.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
+      mScrollBar.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      mScrollBar.SetPosition( mScrollBarPadding.x, -mScrollBarPadding.y );
+      mScrollBar.SetResizePolicy( Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH );
+      mScrollBar.SetOrientation( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) );
+      mScrollBar.GetPanGestureDetector().DetachAll();
+      mScrollView.Add( mScrollBar );
+    }
+  }
+  else
+  {
+    UnparentAndReset( mScrollBar );
+  }
+}
+
 void TextSelectionToolbar::OnScrollStarted( const Vector2& position )
 {
   mTableOfButtons.SetSensitive( false );
@@ -254,6 +307,17 @@ void TextSelectionToolbar::RaiseAbove( Layer target )
   mToolbarLayer.RaiseAbove( target );
 }
 
+void TextSelectionToolbar::SetScrollBarPadding( const Vector2& padding )
+{
+  mScrollBarPadding = padding;
+  if( mScrollBar )
+  {
+    mScrollBar.SetPosition( mScrollBarPadding.x, -mScrollBarPadding.y );
+  }
+
+  RelayoutRequest();
+}
+
 void TextSelectionToolbar::ConfigureScrollview( const Property::Map& properties )
 {
   // Set any properties specified for the label by iterating through all property key-value pairs.
@@ -274,10 +338,15 @@ void TextSelectionToolbar::ConfigureScrollview( const Property::Map& properties 
   RelayoutRequest();
 }
 
+const Vector2& TextSelectionToolbar::GetScrollBarPadding() const
+{
+  return mScrollBarPadding;
+}
 
 TextSelectionToolbar::TextSelectionToolbar()
 : Control( ControlBehaviour( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ) ),
   mMaxSize (),
+  mScrollBarPadding( DEFAULT_SCROLL_BAR_PADDING ),
   mIndexInTable( 0 ),
   mDividerIndexes()
 {
