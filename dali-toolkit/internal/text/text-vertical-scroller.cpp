@@ -45,7 +45,8 @@ TextVerticalScrollerPtr TextVerticalScroller::New()
 }
 
 TextVerticalScroller::TextVerticalScroller()
-: mDuration( DEFAULT_VERTICAL_SCROLL_DURATION )
+: mDuration( DEFAULT_VERTICAL_SCROLL_DURATION ),
+  mScrollTo( 0.0f )
 {
 }
 
