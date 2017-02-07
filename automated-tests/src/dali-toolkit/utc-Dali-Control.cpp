@@ -24,6 +24,9 @@
 
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/align-enums.h>
+
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -718,6 +721,44 @@ int UtcDaliControlAutoClippingWhenAlreadyOnStageN(void)
   Property::Value* colorValue = map->Find(ColorVisual::Property::MIX_COLOR );
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_EQUALS( colorValue->Get< Vector4 >(), Color::RED, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlSetTransformSize(void)
+{
+  ToolkitTestApplication application;
+  Control control = Control::New();
+
+  Property::Map transformMap;
+  transformMap.Add( DevelVisual::Transform::Property::OFFSET, Vector2( 10, 10 ) )
+              .Add( DevelVisual::Transform::Property::ANCHOR_POINT, Align::BOTTOM_END )
+              .Add( DevelVisual::Transform::Property::ORIGIN, Align::BOTTOM_END )
+              .Add( DevelVisual::Transform::Property::SIZE, Vector2( 10, 20 ) );
+
+  control.SetProperty( Control::Property::BACKGROUND, Property::Map().Add( Visual::Property::TYPE, Visual::COLOR )
+                                                                     .Add( DevelVisual::Property::TRANSFORM, transformMap ) );
+
+  tet_infoline( "Test to ensure that the control background transform does not get overwritten when adding to the stage" );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  // Ensure the transform property still matches what we set
+  Property::Value value = control.GetProperty( Control::Property::BACKGROUND );
+  Property::Map* map = value.GetMap();
+  DALI_TEST_CHECK( map );
+  Property::Value* transformValue = map->Find( DevelVisual::Property::TRANSFORM );
+  DALI_TEST_CHECK( transformValue );
+
+  Property::Map* retMap = transformValue->GetMap();
+  DALI_TEST_CHECK( retMap );
+  DALI_TEST_EQUALS( retMap->Find( DevelVisual::Transform::Property::OFFSET )->Get< Vector2 >(), Vector2( 10, 10 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( retMap->Find( DevelVisual::Transform::Property::ANCHOR_POINT )->Get< int >(), (int)Align::BOTTOM_END, TEST_LOCATION );
+  DALI_TEST_EQUALS( retMap->Find( DevelVisual::Transform::Property::ORIGIN )->Get< int >(), (int)Align::BOTTOM_END, TEST_LOCATION );
+  DALI_TEST_EQUALS( retMap->Find( DevelVisual::Transform::Property::SIZE )->Get< Vector2 >(), Vector2( 10, 20 ), TEST_LOCATION );
 
   END_TEST;
 }

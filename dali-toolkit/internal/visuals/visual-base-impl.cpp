@@ -146,7 +146,7 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
 void Visual::Base::SetTransformAndSize( const Property::Map& transform, Size controlSize )
 {
   mImpl->mControlSize = controlSize;
-  mImpl->mTransform.SetPropertyMap( transform );
+  mImpl->mTransform.UpdatePropertyMap( transform );
 
 #if defined(DEBUG_ENABLED)
   std::ostringstream oss;
