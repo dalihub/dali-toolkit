@@ -39,7 +39,7 @@ class TextField;
 /**
  * @brief A control which provides a single-line editable text field.
  *
- *  * Signals
+ * Signals
  * | %Signal Name         | Method                         |                    |
  * |----------------------|--------------------------------|--------------------|
  * | textChanged          | @ref TextChangedSignal()       | @SINCE_1_0.0       |
@@ -61,13 +61,13 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the TextField class.
+   * @brief Enumeration for the instance of properties belonging to the TextField class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the TextField class.
+     * @brief Enumeration for the instance of properties belonging to the TextField class.
      * @SINCE_1_0.0
      */
     enum
@@ -123,7 +123,7 @@ public:
   };
 
   /**
-   * @brief Specifies how the text is truncated when it does not fit
+   * @brief Enumeration for specifying how the text is truncated when it does not fit.
    *
    * The default value is \e EXCEED_POLICY_CLIP.
    * @SINCE_1_0.0
@@ -181,9 +181,9 @@ public:
   typedef Signal<void ( TextField, InputStyle::Mask ) > InputStyleChangedSignalType;
 
   /**
-   * @brief Create the TextField control.
+   * @brief Creates the TextField control.
    * @SINCE_1_0.0
-   * @return A handle to the TextField control.
+   * @return A handle to the TextField control
    */
   static TextField New();
 
@@ -197,7 +197,7 @@ public:
    * @brief Copy constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] handle The handle to copy from.
+   * @param[in] handle The handle to copy from
    */
   TextField( const TextField& handle );
 
@@ -205,8 +205,8 @@ public:
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] handle The handle to copy from.
-   * @return A reference to this.
+   * @param[in] handle The handle to copy from
+   * @return A reference to this
    */
   TextField& operator=( const TextField& handle );
 
@@ -219,14 +219,14 @@ public:
   ~TextField();
 
   /**
-   * @brief Downcast a handle to TextField.
+   * @brief Downcasts a handle to TextField.
    *
-   * If the BaseHandle points is a TextField the downcast returns a valid handle.
-   * If not the returned handle is left empty.
+   * If the BaseHandle points is a TextField, the downcast returns a valid handle.
+   * If not, the returned handle is left empty.
    *
    * @SINCE_1_0.0
-   * @param[in] handle Handle to an object.
-   * @return handle to a TextField or an empty handle.
+   * @param[in] handle Handle to an object
+   * @return Handle to a TextField or an empty handle
    */
   static TextField DownCast( BaseHandle handle );
 
@@ -252,7 +252,7 @@ public:
    *   void YourCallbackName( TextField textField );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   MaxLengthReachedSignalType& MaxLengthReachedSignal();
 
@@ -266,7 +266,7 @@ public:
    * @endcode
    *
    * @SINCE_1_2_2
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   InputStyleChangedSignalType& InputStyleChangedSignal();
 
@@ -276,7 +276,7 @@ public: // Not intended for application developers
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_0.0
-   * @param[in] implementation The Control implementation.
+   * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL TextField( Internal::TextField& implementation );
 
@@ -284,7 +284,7 @@ public: // Not intended for application developers
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @SINCE_1_0.0
-   * @param[in]  internal  A pointer to the internal CustomActor.
+   * @param[in] internal A pointer to the internal CustomActor
    */
   explicit DALI_INTERNAL TextField( Dali::Internal::CustomActor* internal );
 };

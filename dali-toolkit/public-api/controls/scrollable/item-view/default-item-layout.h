@@ -32,14 +32,14 @@ namespace Toolkit
  */
 
 /**
- * @brief Default item layout mode.
+ * @brief Enumeration for default item layout mode.
  * @SINCE_1_0.0
  */
 namespace DefaultItemLayout
 {
 
 /**
- * @brief The type of DefaultItemLayout
+ * @brief Enumeration for the type of DefaultItemLayout
  * @SINCE_1_0.0
  */
 enum Type
@@ -54,9 +54,8 @@ enum Type
  * @brief Creates a built-in default item-layout.
  *
  * @SINCE_1_0.0
- * @param[in]  type  The type of layout required.
- *
- * @return An ItemLayoutPtr to the newly created layout.
+ * @param[in] type The type of layout required
+ * @return An ItemLayoutPtr to the newly created layout
  */
 DALI_IMPORT_API ItemLayoutPtr New( Type type );
 

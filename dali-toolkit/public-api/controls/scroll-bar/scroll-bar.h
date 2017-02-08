@@ -56,7 +56,7 @@ public:
   // Properties
 
   /**
-   * @brief The start and end property ranges for this control.
+   * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
    */
   enum PropertyRange
@@ -66,67 +66,67 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the ScrollBar class.
+   * @brief Enumeration for the instance of properties belonging to the ScrollBar class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the ScrollBar class.
+     * @brief Enumeration for the instance of properties belonging to the ScrollBar class.
      * @SINCE_1_0.0
      */
     enum
     {
       /**
-       * @brief name "scrollDirection", type std::string
-       * @see SetScrollDirection()
+       * @brief name "scrollDirection", type std::string.
        * @SINCE_1_0.0
+       * @see SetScrollDirection()
        */
       SCROLL_DIRECTION = PROPERTY_START_INDEX,
       /**
-       * @brief name "indicatorHeightPolicy", type std::string
-       * @see SetIndicatorHeightPolicy()
+       * @brief name "indicatorHeightPolicy", type std::string.
        * @SINCE_1_0.0
+       * @see SetIndicatorHeightPolicy()
        */
       INDICATOR_HEIGHT_POLICY,
       /**
-       * @brief name "indicatorFixedHeight", type float
-       * @see SetIndicatorFixedHeight()
+       * @brief name "indicatorFixedHeight", type float.
        * @SINCE_1_0.0
+       * @see SetIndicatorFixedHeight()
        */
       INDICATOR_FIXED_HEIGHT,
       /**
-       * @brief name "indicatorShowDuration", type float
-       * @see SetIndicatorShowDuration()
+       * @brief name "indicatorShowDuration", type float.
        * @SINCE_1_0.0
+       * @see SetIndicatorShowDuration()
        */
       INDICATOR_SHOW_DURATION,
       /**
-       * @brief name "indicatorHideDuration", type float
-       * @see SetIndicatorHideDuration()
+       * @brief name "indicatorHideDuration", type float.
        * @SINCE_1_0.0
+       * @see SetIndicatorHideDuration()
        */
       INDICATOR_HIDE_DURATION,
       /**
-       * @brief name "scrollPositionIntervals", type Property::Array
-       * @see SetScrollPositionIntervals()
+       * @brief name "scrollPositionIntervals", type Property::Array.
        * @SINCE_1_0.0
+       * @see SetScrollPositionIntervals()
        */
       SCROLL_POSITION_INTERVALS,
       /**
-       * @brief name "indicatorMinimumHeight", type float
+       * @brief name "indicatorMinimumHeight", type float.
        * The minimum height for a variable size indicator.
        * @SINCE_1_1.36
        */
       INDICATOR_MINIMUM_HEIGHT,
       /**
-       * @brief name "indicatorStartPadding", type float
+       * @brief name "indicatorStartPadding", type float.
        * The padding at the start of the indicator. For example, the top if scrollDirection is Vertical.
        * @SINCE_1_1.36
        */
       INDICATOR_START_PADDING,
       /**
-       * @brief name "indicatorEndPadding", type float
+       * @brief name "indicatorEndPadding", type float.
        * The padding at the end of the indicator. For example, the bottom if scrollDirection is Vertical.
        * @SINCE_1_1.36
        */
@@ -162,7 +162,7 @@ public:
   };
 
   /**
-   * @brief Create an uninitialized ScrollBar; this can be initialized with ScrollBar::New()
+   * @brief Creates an uninitialized ScrollBar; this can be initialized with ScrollBar::New()
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    * @SINCE_1_0.0
    */
@@ -184,7 +184,7 @@ public:
   ScrollBar& operator=( const ScrollBar& scrollBar );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -192,35 +192,34 @@ public:
   ~ScrollBar();
 
   /**
-   * @brief Create an initialized ScrollBar
+   * @brief Creates an initialized ScrollBar.
    * @SINCE_1_0.0
-   * @param[in] direction The direction of scroll bar (either vertically or horizontally).
-   * @return A pointer to the created ScrollBar.
+   * @param[in] direction The direction of scroll bar (either vertically or horizontally)
+   * @return A pointer to the created ScrollBar
    */
   static ScrollBar New(Direction direction = Vertical);
 
   /**
-   * @brief Downcast a handle to ScrollBar handle.
+   * @brief Downcasts a handle to ScrollBar handle.
    *
-   * If handle points to a ScrollBar the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a ScrollBar, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
-   * @return handle to a ScrollBar or an uninitialized handle
+   * @return Handle to a ScrollBar or an uninitialized handle
    */
   static ScrollBar DownCast( BaseHandle handle );
 
   /**
-   * @brief Set the source of the scroll position properties.
-   *
-   * * @pre The handle to the object owing the scroll properties has been initialised and the property index must be vaild.
+   * @brief Sets the source of the scroll position properties.
    *
    * @SINCE_1_0.0
-   * @param[in] handle The handle of the object owing the scroll properties.
-   * @param[in] propertyScrollPosition The index of the scroll position property (The scroll position, type float).
-   * @param[in] propertyMinScrollPosition The index of the minimum scroll position property (The minimum scroll position, type float).
-   * @param[in] propertyMaxScrollPosition The index of the maximum scroll position property (The maximum scroll position, type float).
-   * @param[in] propertyScrollContentSize The index of the scroll content size property (The size of the scrollable content in actor coordinates, type float).
+   * @param[in] handle The handle of the object owing the scroll properties
+   * @param[in] propertyScrollPosition The index of the scroll position property (The scroll position, type float)
+   * @param[in] propertyMinScrollPosition The index of the minimum scroll position property (The minimum scroll position, type float)
+   * @param[in] propertyMaxScrollPosition The index of the maximum scroll position property (The maximum scroll position, type float)
+   * @param[in] propertyScrollContentSize The index of the scroll content size property (The size of the scrollable content in actor coordinates, type float)
+   * @pre The handle to the object owing the scroll properties has been initialised and the property index must be valid.
    */
   void SetScrollPropertySource( Handle handle, Dali::Property::Index propertyScrollPosition, Dali::Property::Index propertyMinScrollPosition, Dali::Property::Index propertyMaxScrollPosition, Dali::Property::Index propertyScrollContentSize );
 
@@ -228,9 +227,8 @@ public:
    * @brief Sets the indicator of scroll bar.
    *
    * @SINCE_1_0.0
-   * @param[in] indicator The indicator that moves to indicate the current scroll position.
-   * @pre The scroll bar actor has been initialised.
-   *
+   * @param[in] indicator The indicator that moves to indicate the current scroll position
+   * @pre The scroll bar actor has been initialized.
    */
   void SetScrollIndicator( Actor indicator );
 
@@ -238,9 +236,8 @@ public:
    * @brief Gets the indicator of scroll bar.
    *
    * @SINCE_1_0.0
-   * @return The indicator indicates the current scroll position of the scrollable content.
-   * @pre The scroll bar actor has been initialised.
-   *
+   * @return The indicator indicates the current scroll position of the scrollable content
+   * @pre The scroll bar actor has been initialized.
    */
   Actor GetScrollIndicator();
 
@@ -250,8 +247,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] positions List of values to receive notifications for when the current scroll position crosses them
-   * @pre The scroll bar actor has been initialised.
-   *
+   * @pre The scroll bar actor has been initialized.
    */
   void SetScrollPositionIntervals( const Dali::Vector<float>& positions );
 
@@ -261,7 +257,7 @@ public:
    *
    * @SINCE_1_0.0
    * @return The list of values to receive notifications for when the current scroll position crosses them
-   * @pre The scroll bar actor has been initialised.
+   * @pre The scroll bar actor has been initialized.
    *
    */
   Dali::Vector<float> GetScrollPositionIntervals() const;
@@ -270,9 +266,8 @@ public:
    * @brief Sets the direction of scroll bar to scroll either vertically or horizontally.
    *
    * @SINCE_1_0.0
-   * @param[in] direction The direction of scroll bar (either vertically or horizontally).
-   * @pre The scroll bar actor has been initialised.
-   *
+   * @param[in] direction The direction of scroll bar (either vertically or horizontally)
+   * @pre The scroll bar actor has been initialized.
    */
   void SetScrollDirection( Direction direction );
 
@@ -280,7 +275,7 @@ public:
    * @brief Gets the direction of scroll bar.
    *
    * @SINCE_1_0.0
-   * @return The direction of scroll bar.
+   * @return The direction of scroll bar
    */
   Direction GetScrollDirection() const;
 
@@ -289,8 +284,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] policy The height policy of scroll indicator
-   * @pre The scroll bar actor has been initialised.
-   *
+   * @pre The scroll bar actor has been initialized.
    */
   void SetIndicatorHeightPolicy( IndicatorHeightPolicy policy );
 
@@ -306,12 +300,12 @@ public:
    * @brief Sets the fixed height of scroll indicator.
    *
    * Normally the height of scroll indicator is changed dynamically according to the length of scroll content.
-   * However, when the height policy of scroll indicator is set to be fixed, the height will keep fixed
+   * However, when the height policy of scroll indicator is set to be fixed, the height will be kept fixed
    * regardless of the length of scroll content.
    *
    * @SINCE_1_0.0
    * @param[in] height The fixed height of the scroll indicator
-   * @pre The scroll bar actor has been initialised.
+   * @pre The scroll bar actor has been initialized.
    *
    */
   void SetIndicatorFixedHeight( float height );
@@ -324,7 +318,7 @@ public:
   float GetIndicatorFixedHeight() const;
 
   /**
-   * @brief Sets the duration in second for the scroll indicator to become fully visible
+   * @brief Sets the duration in seconds for the scroll indicator to become fully visible.
    *
    * @SINCE_1_0.0
    * @param[in] durationSeconds The duration for the scroll indicator to become fully visible
@@ -334,14 +328,14 @@ public:
   void SetIndicatorShowDuration( float durationSeconds );
 
   /**
-   * @brief Gets the duration in second for the scroll indicator to become fully visible
+   * @brief Gets the duration in seconds for the scroll indicator to become fully visible.
    * @SINCE_1_0.0
    * @return The duration for the scroll indicator to become fully visible
    */
   float GetIndicatorShowDuration() const;
 
   /**
-   * @brief Sets the duration in second for the scroll indicator to become fully invisible
+   * @brief Sets the duration in seconds for the scroll indicator to become fully invisible.
    *
    * @SINCE_1_0.0
    * @param[in] durationSeconds The duration for the scroll indicator to become fully invisible
@@ -351,20 +345,20 @@ public:
   void SetIndicatorHideDuration( float durationSeconds );
 
   /**
-   * @brief Gets the duration in second for the scroll indicator to become fully invisible
+   * @brief Gets the duration in seconds for the scroll indicator to become fully invisible.
    * @SINCE_1_0.0
    * @return The duration for the scroll indicator to become fully invisible
    */
   float GetIndicatorHideDuration() const;
 
   /**
-   * @brief Shows the scroll indicator
+   * @brief Shows the scroll indicator.
    * @SINCE_1_0.0
    */
   void ShowIndicator();
 
   /**
-   * @brief Hides the scroll indicator
+   * @brief Hides the scroll indicator.
    * @SINCE_1_0.0
    */
   void HideIndicator();
@@ -381,7 +375,7 @@ public: // Signals
    *   void YourCallbackName();
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   ScrollBar::PanFinishedSignalType& PanFinishedSignal();
@@ -397,7 +391,7 @@ public: // Signals
    *   void YourCallbackName(float currentScrollPosition);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   ScrollBar::ScrollPositionIntervalReachedSignalType& ScrollPositionIntervalReachedSignal();
@@ -408,14 +402,14 @@ public: // Not intended for application developers
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_0.0
-   * @param[in]  implementation  The Control implementation.
+   * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL ScrollBar( Internal::ScrollBar& implementation );
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    * @SINCE_1_0.0
-   * @param[in]  internal  A pointer to the internal CustomActor.
+   * @param[in] internal A pointer to the internal CustomActor
    */
   explicit DALI_INTERNAL ScrollBar( Dali::Internal::CustomActor* internal );
   /// @endcond

@@ -48,11 +48,11 @@ typedef IntrusivePtr<ItemLayout> ItemLayoutPtr; ///< Pointer to a Dali::Toolkit:
 struct ItemRange
 {
   /**
-   * @brief Create a range of item identifiers.
+   * @brief Creates a range of item identifiers.
    *
    * @SINCE_1_0.0
-   * @param[in] beginItem The first item within the range.
-   * @param[in] endItem The past-the-end item.
+   * @param[in] beginItem The first item within the range
+   * @param[in] endItem The past-the-end item
    */
   ItemRange(unsigned int beginItem, unsigned int endItem)
   : begin(beginItem),
@@ -64,7 +64,7 @@ struct ItemRange
    * @brief Copy Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] copy ItemRange we should copy from.
+   * @param[in] copy ItemRange we should copy from
    */
   ItemRange(const ItemRange& copy)
   : begin(copy.begin),
@@ -76,8 +76,8 @@ struct ItemRange
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] range The Range to assign from.
-   * @return The updated range.
+   * @param[in] range The Range to assign from
+   * @return The updated range
    */
   ItemRange& operator=(const ItemRange& range)
   {
@@ -90,11 +90,11 @@ struct ItemRange
   }
 
   /**
-   * @brief Test whether an item is within the range.
+   * @brief Tests whether an item is within the range.
    *
    * @SINCE_1_0.0
-   * @param[in] itemId The item identifier.
-   * @return True if the item is within the range.
+   * @param[in] itemId The item identifier
+   * @return true if the item is within the range
    */
   bool Within(unsigned int itemId)
   {
@@ -103,11 +103,11 @@ struct ItemRange
   }
 
   /**
-   * @brief Create the intersection of two ranges.
+   * @brief Creates the intersection of two ranges.
    *
    * @SINCE_1_0.0
-   * @param[in] second The second range.
-   * @return The intersection.
+   * @param[in] second The second range
+   * @return The intersection
    */
   ItemRange Intersection(const ItemRange& second)
   {

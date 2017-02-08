@@ -41,7 +41,7 @@ class CheckBoxButton;
 /**
  * @brief CheckBoxButton provides a check box button which user can check or uncheck.
  *
- * By default a CheckBoxButton emits a Button::ClickedSignal() signal when the button changes its state to selected or unselected.
+ * By default, a CheckBoxButton emits a Button::ClickedSignal() signal when the button changes its state to selected or unselected.
  *
  * The button's appearance could be modified by Button::SetUnselectedImage, Button::SetBackgroundImage,
  * Button::SetSelectedImage, Button::SetSelectedBackgroundImage, Button::SetDisabledBackgroundImage,
@@ -83,7 +83,7 @@ class DALI_IMPORT_API CheckBoxButton : public Button
 public:
 
   /**
-   * @brief Create an uninitialized CheckBoxButton; this can be initialized with CheckBoxButton::New().
+   * @brief Creates an uninitialized CheckBoxButton; this can be initialized with CheckBoxButton::New().
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    * @SINCE_1_0.0
    */
@@ -105,7 +105,7 @@ public:
   CheckBoxButton& operator=( const CheckBoxButton& checkBox );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -113,20 +113,20 @@ public:
   ~CheckBoxButton();
 
   /**
-   * @brief Create an initialized CheckBoxButton.
+   * @brief Creates an initialized CheckBoxButton.
    * @SINCE_1_0.0
-   * @return A handle to a newly allocated Dali resource.
+   * @return A handle to a newly allocated Dali resource
    */
   static CheckBoxButton New();
 
   /**
-   * @brief Downcast a handle to CheckBoxButton handle.
+   * @brief Downcasts a handle to CheckBoxButton handle.
    *
-   * If handle points to a CheckBoxButton the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a CheckBoxButton, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
-   * @return handle to a CheckBoxButton or an uninitialized handle
+   * @return Handle to a CheckBoxButton or an uninitialized handle
    */
   static CheckBoxButton DownCast( BaseHandle handle );
 
@@ -136,14 +136,14 @@ public: // Not intended for application developers
   /**
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_0.0
-   * @param[in]  implementation  The Control implementation.
+   * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL CheckBoxButton( Internal::CheckBoxButton& implementation );
 
   /**
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    * @SINCE_1_0.0
-   * @param[in]  internal  A pointer to the internal CustomActor.
+   * @param[in] internal A pointer to the internal CustomActor
    */
   DALI_INTERNAL CheckBoxButton( Dali::Internal::CustomActor* internal );
   /// @endcond

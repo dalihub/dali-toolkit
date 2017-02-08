@@ -43,22 +43,22 @@ namespace Toolkit
  */
 
 /**
- * @brief Move Actor constraint.
+ * @brief Moves Actor constraint.
  *
  * Moves an Actor in accordance to scroll position.
+ * @SINCE_1_0.0
  * @param[in] current Current position
  * @param[in] inputs The position input that Actor will move
- * @SINCE_1_0.0
  */
 DALI_IMPORT_API void MoveActorConstraint( Vector3& current, const PropertyInputContainer& inputs );
 
 /**
- * @brief Wrap Actor constraint.
+ * @brief Wraps Actor constraint.
  *
  * Wraps an Actors position in accordance to min/max bounds of domain.
+ * @SINCE_1_0.0
  * @param[in] position Position to be wrapped
  * @param[in] inputs The input that Actor's position will be wrapped
- * @SINCE_1_0.0
  */
 DALI_IMPORT_API void WrapActorConstraint( Vector3& position, const PropertyInputContainer& inputs );
 

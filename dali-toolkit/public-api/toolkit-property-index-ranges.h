@@ -28,7 +28,7 @@ namespace Toolkit
 {
 
 /**
- * @brief The start and end property ranges.
+ * @brief Enumeration for the start and end property ranges.
  * @SINCE_1_1.45
  */
 enum PropertyRanges
