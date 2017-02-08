@@ -28,13 +28,13 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/builder/json-parser.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali-toolkit/internal/builder/builder-declarations.h>
+#include <dali-toolkit/internal/builder/style.h>
 
 // Warning messages usually displayed
 #define DALI_SCRIPT_WARNING(format, args...) \
@@ -150,6 +150,24 @@ public:
   bool ApplyStyle( const std::string& styleName, Handle& handle );
 
   /**
+   * Lookup the stylename in builder. If it's found in the parse tree,
+   * then return true.
+   * @param[in] styleName The style name to search for
+   * @return true if the stylename exists
+   */
+  bool LookupStyleName( const std::string& styleName );
+
+  /**
+   * Lookup the stylename in the recorded Styles - if it exists,
+   * performs a shallow copy to the passed in style and returns true.
+   * Otherwise it returns false.
+
+   * @param[in] styleName The stylename to search for
+   * @return A const pointer to the style object
+   */
+  const StylePtr GetStyle( const std::string& styleName );
+
+  /**
    * @copydoc Toolkit::Builder::AddActors
    */
   void AddActors( Actor toActor );
@@ -215,6 +233,7 @@ public:
    */
   void EmitQuitSignal();
 
+
 protected:
 
   virtual ~Builder();
@@ -263,10 +282,24 @@ private:
                                 Dali::Handle&      handle,
                                 const Replacement& constant );
 
+  void RecordStyles( const char*        styleName,
+                     const TreeNode&    node,
+                     Dali::Handle&      handle,
+                     const Replacement& replacements );
+
+  void RecordStyle( StylePtr           style,
+                    const TreeNode&    node,
+                    Dali::Handle&      handle,
+                    const Replacement& replacements );
+
   void ApplyProperties( const TreeNode&    root,
                         const TreeNode&    node,
                         Dali::Handle&      handle,
                         const Replacement& constant );
+
+  void ApplySignals( const TreeNode& root,
+                     const TreeNode& node,
+                     Dali::Handle& handle );
 
   void ApplyStylesByActor( const TreeNode&    root,
                            const TreeNode&    node,
@@ -276,6 +309,13 @@ private:
   void SetProperties( const TreeNode&    node,
                       Handle&            handle,
                       const Replacement& constant );
+
+  bool MapToTargetProperty( Handle&            propertyObject,
+                            const std::string& key,
+                            const TreeNode&    node,
+                            const Replacement& constant,
+                            Property::Index&   index,
+                            Property::Value&   value );
 
   /**
    * Find the key in the mapping table, if it's present, then generate
@@ -337,6 +377,7 @@ private:
   SlotDelegate<Builder>               mSlotDelegate;
   Property::Map                       mReplacementMap;
   MappingsLut                         mCompleteMappings;
+  Dictionary<StylePtr>                mStyles; // State based styles
   Toolkit::Builder::BuilderSignalType mQuitSignal;
 };
 

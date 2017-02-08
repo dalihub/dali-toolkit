@@ -8,6 +8,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/builder-signals.cpp \
    $(toolkit_src_dir)/builder/json-parser-state.cpp \
    $(toolkit_src_dir)/builder/json-parser-impl.cpp \
+   $(toolkit_src_dir)/builder/style.cpp \
    $(toolkit_src_dir)/builder/tree-node-manipulator.cpp \
    $(toolkit_src_dir)/builder/replacement.cpp \
    $(toolkit_src_dir)/visuals/visual-base-impl.cpp \

@@ -217,6 +217,12 @@ static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   return connected;
 }
 
+const Scripting::StringEnum ControlStateTable[] = {
+  { "NORMAL",   Toolkit::DevelControl::NORMAL   },
+  { "FOCUSED",  Toolkit::DevelControl::FOCUSED  },
+  { "DISABLED", Toolkit::DevelControl::DISABLED },
+}; const unsigned int ControlStateTableCount = sizeof( ControlStateTable ) / sizeof( ControlStateTable[0] );
+
 // Setup signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Control, CustomActor, Create );
 
@@ -246,6 +252,8 @@ public:
   // Construction & Destruction
   Impl(Control& controlImpl)
   : mControlImpl( controlImpl ),
+    mState( Toolkit::DevelControl::NORMAL ),
+    mSubState(""),
     mStyleName(""),
     mBackgroundColor(Color::TRANSPARENT),
     mStartingPinchScale( NULL ),
@@ -311,6 +319,27 @@ public:
           controlImpl.SetStyleName( value.Get< std::string >() );
           break;
         }
+
+        case Toolkit::DevelControl::Property::STATE:
+        {
+          Toolkit::DevelControl::State state( DevelControl::NORMAL );
+
+          if( Scripting::GetEnumerationProperty< Toolkit::DevelControl::State >( value, ControlStateTable, ControlStateTableCount, state ) )
+          {
+            controlImpl.mImpl->SetState( state );
+          }
+        }
+        break;
+
+        case Toolkit::DevelControl::Property::SUB_STATE:
+        {
+          std::string subState;
+          if( value.Get( subState ) )
+          {
+            controlImpl.mImpl->SetSubState( subState );
+          }
+        }
+        break;
 
         case Toolkit::Control::Property::BACKGROUND_COLOR:
         {
@@ -411,6 +440,12 @@ public:
           break;
         }
 
+        case Toolkit::DevelControl::Property::STATE:
+        {
+          value = Scripting::GetEnumerationName< Toolkit::DevelControl::State >( controlImpl.mImpl->mState, ControlStateTable, ControlStateTableCount );
+          break;
+        }
+
         case Toolkit::Control::Property::BACKGROUND_COLOR:
         {
           DALI_LOG_WARNING( "BACKGROUND_COLOR property is deprecated. Use BACKGROUND property instead\n" );
@@ -467,9 +502,48 @@ public:
     return value;
   }
 
+  void SetState( DevelControl::State state )
+  {
+    if( mState != state )
+    {
+      mState = state;
+
+      // Trigger state change and transitions
+      // Apply new style, if stylemanager is available
+      Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+      if( styleManager )
+      {
+        const StylePtr stylePtr = GetImpl( styleManager ).GetRecordedStyle( Toolkit::Control( mControlImpl.GetOwner() ) );
+        if( stylePtr )
+        {
+          for( int i=mVisuals.Count()-1; i >= 0; i-- )
+          {
+            mControlImpl.UnregisterVisual( mVisuals[i]->index );
+          }
+
+          Dali::CustomActor handle( mControlImpl.GetOwner() );
+          stylePtr->ApplyVisualsAndPropertiesRecursively( handle );
+        }
+      }
+    }
+  }
+
+  void SetSubState( const std::string& state )
+  {
+    if( mSubState != state )
+    {
+      mSubState = state;
+      // Trigger transitions
+
+    }
+  }
+
   // Data
 
   Control& mControlImpl;
+  DevelControl::State mState;
+  std::string mSubState;
+
   RegisteredVisualContainer mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
   std::string mStyleName;
   Vector4 mBackgroundColor;                       ///< The color of the background visual
@@ -498,6 +572,8 @@ public:
   static const PropertyRegistration PROPERTY_4;
   static const PropertyRegistration PROPERTY_5;
   static const PropertyRegistration PROPERTY_6;
+  static const PropertyRegistration PROPERTY_7;
+  static const PropertyRegistration PROPERTY_8;
 };
 
 // Properties registered without macro to use specific member variables.
@@ -507,6 +583,8 @@ const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgro
 const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",   Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "tooltip",         Toolkit::DevelControl::Property::TOOLTIP,     Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "state",           Toolkit::DevelControl::Property::STATE,       Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_8( typeRegistration, "subState",        Toolkit::DevelControl::Property::SUB_STATE,   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
