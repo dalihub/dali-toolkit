@@ -1371,15 +1371,16 @@ Vector3 Controller::GetNaturalSize()
                                                                            BIDI_INFO         |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
+
+    // Set the update info to relayout the whole text.
+    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
+    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
+
     // Make sure the model is up-to-date before layouting
     mImpl->UpdateModel( onlyOnceOperations );
 
     // Layout the text for the new width.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT );
-
-    // Set the update info to relayout the whole text.
-    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
-    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
 
     // Store the actual control's size to restore later.
     const Size actualControlSize = mImpl->mVisualModel->mControlSize;
@@ -1443,16 +1444,17 @@ float Controller::GetHeightForWidth( float width )
                                                                            BIDI_INFO         |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
+
+    // Set the update info to relayout the whole text.
+    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
+    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
+
     // Make sure the model is up-to-date before layouting
     mImpl->UpdateModel( onlyOnceOperations );
 
 
     // Layout the text for the new width.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT );
-
-    // Set the update info to relayout the whole text.
-    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
-    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mLogicalModel->mText.Count();
 
     // Store the actual control's width.
     const float actualControlWidth = mImpl->mVisualModel->mControlSize.width;
@@ -2461,7 +2463,8 @@ bool Controller::RemoveText( int cursorOffset,
       numberOfCharacters = currentText.Count() - cursorIndex;
     }
 
-    if( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters )
+    if( mImpl->mEventData->mPreEditFlag || // If the preedit flag is enabled, it means two (or more) of them came together i.e. when two keys have been pressed at the same time.
+        ( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters ) )
     {
       // Mark the paragraphs to be updated.
       mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
