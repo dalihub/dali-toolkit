@@ -33,6 +33,10 @@ namespace
 {
 const char* defaultTheme =
 "{\n"
+"  \"constants\":\n"
+"  {\n"
+"    \"CONFIG_SCRIPT_LOG_LEVEL\":\"NoLogging\"\n"
+"  },\n"
 "  \"styles\":\n"
 "  {\n"
 "    \"textlabel\":\n"
@@ -258,6 +262,10 @@ int UtcDaliStyleManagerApplyTheme(void)
 
   const char* json1 =
     "{\n"
+    "  \"constants\":\n"
+    "  {\n"
+    "    \"CONFIG_SCRIPT_LOG_LEVEL\":\"Verbose\"\n"
+    "  },\n"
     "  \"styles\":\n"
     "  {\n"
     "    \"testbutton\":\n"
@@ -362,6 +370,10 @@ int UtcDaliStyleManagerApplyDefaultTheme(void)
 
   const char* defaultTheme =
     "{\n"
+    "  \"constants\":\n"
+    "  {\n"
+    "    \"CONFIG_SCRIPT_LOG_LEVEL\":\"Concise\"\n"
+    "  },\n"
     "  \"styles\":\n"
     "  {\n"
     "    \"testbutton\":\n"
@@ -505,6 +517,10 @@ int UtcDaliStyleManagerApplyStyle(void)
 
   const char* json1 =
     "{\n"
+    "  \"constants\":\n"
+    "  {\n"
+    "    \"CONFIG_SCRIPT_LOG_LEVEL\":\"General\"\n"
+    "  },\n"
     "  \"styles\":\n"
     "  {\n"
     "    \"testbutton\":\n"
@@ -569,6 +585,107 @@ int UtcDaliStyleManagerApplyStyle(void)
   fgColor = testButton2.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR);
   DALI_TEST_EQUALS( bgColor, themedBgColor, 0.001, TEST_LOCATION );
   DALI_TEST_EQUALS( fgColor, themedFgColor, 0.001, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerIncludeStyleP(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliStyleManagerIncludeStyle - test that style sheet inclusion works" );
+
+  const char* json1 =
+    "{\n"
+    "  \"includes\":\n"
+    "  [\n"
+    "     \"src/dali-toolkit-styling/theme2.json\"\n"
+    "  ],\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"foregroundColor\":[0.0,0.0,1.0,1.0]\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  // Add 2 buttons
+  Test::TestButton testButton = Test::TestButton::New();
+  Test::TestButton testButton2 = Test::TestButton::New();
+  Stage::GetCurrent().Add( testButton );
+  Stage::GetCurrent().Add( testButton2 );
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  StyleManager styleManager = StyleManager::Get();
+
+  styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
+
+  tet_infoline("Apply the style");
+
+  std::string themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+
+  styleManager.ApplyTheme(themeFile);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Property::Value themedBgColor( testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR) );
+  Property::Value themedFgColor( testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR) );
+
+  DALI_TEST_EQUALS( themedBgColor, Property::Value(Color::YELLOW), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( themedFgColor, Property::Value(Color::BLUE), 0.001, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerIncludeStyleN(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliStyleManagerIncludeStyle - test that style sheet inclusion works, but included stylesheet is bad json" );
+
+  const char* json1 =
+    "{\n"
+    "  \"includes\":\n"
+    "  [\n"
+    "     \"src/dali-toolkit-styling/theme3.json\"\n"
+    "  ],\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"foregroundColor\":[0.0,0.0,1.0,1.0]\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  // Add 2 buttons
+  Test::TestButton testButton = Test::TestButton::New();
+  Test::TestButton testButton2 = Test::TestButton::New();
+  Stage::GetCurrent().Add( testButton );
+  Stage::GetCurrent().Add( testButton2 );
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  StyleManager styleManager = StyleManager::Get();
+
+  styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
+
+  tet_infoline("Apply the style");
+
+  std::string themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+
+  try
+  {
+    styleManager.ApplyTheme(themeFile);
+  }
+  catch( Dali::DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "!\"Cannot parse JSON\"", TEST_LOCATION );
+  }
 
   END_TEST;
 }
