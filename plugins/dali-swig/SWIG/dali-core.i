@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,6 +188,7 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %include <dali/public-api/math/random.h>
 %include <dali/public-api/math/angle-axis.h>
 %include <dali/public-api/math/viewport.h>
+%include <dali/public-api/math/math-utils.h>
 
 %include <dali/public-api/object/property-index-ranges.h>
 %include <dali/public-api/object/property.h>
@@ -284,10 +285,8 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 
 %template(StringValuePair) std::pair<std::string, Dali::Property::Value>;
 %template(TouchPointContainer) std::vector<Dali::TouchPoint>;
-%template(RectDouble) Dali::Rect<double>;
-%template(RectInteger)  Dali::Rect<int>;
-%template(RectUnsignedInteger)  Dali::Rect<unsigned int>;
-%template(RectFloat)  Dali::Rect<float>;
+%template(Rectangle)  Dali::Rect<int>;
+%template(PaddingType)  Dali::Rect<float>;
 %template(VectorInteger) Dali::Vector<int>;
 %template(VectorFloat) Dali::Vector<float>;
 %template(VectorUnsignedChar) Dali::Vector<unsigned char>;

@@ -32,6 +32,8 @@
 
 %typemap(cscode) Dali::Toolkit::Control::Property %{
   public static readonly int TOOLTIP = NDalicManualPINVOKE.View_Property_TOOLTIP_get();
+  public static readonly int STATE = NDalicManualPINVOKE.View_Property_STATE_get();
+  public static readonly int SUB_STATE = NDalicManualPINVOKE.View_Property_SUB_STATE_get();
 %}
 
 %typemap(cscode) Dali::Toolkit::ItemView::Property %{

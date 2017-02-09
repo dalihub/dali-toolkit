@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -471,14 +471,10 @@ DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Image)>, Ima
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::ResourceImage)>, ResourceImageSignal);
 DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::ResourceImage)>, ResourceImageSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Rect<int>, RectInteger);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Rect<int>, RectInteger);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Rect<double>, RectDouble);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Rect<double>, RectDouble);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Rect<float>, RectFloat);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Rect<float>, RectFloat);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Rect<unsigned int>, RectUnsignedInteger);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Rect<unsigned int>, RectUnsignedInteger);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Rect<int>, Rectangle);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Rect<int>, Rectangle);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Rect<float>, PaddingType);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Rect<float>, PaddingType);
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( std, vector<Dali::TouchPoint>, TouchPointContainer);
 DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( std, vector<Dali::TouchPoint>, TouchPointContainer);
 

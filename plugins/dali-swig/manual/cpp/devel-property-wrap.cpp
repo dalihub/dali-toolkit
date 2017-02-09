@@ -51,6 +51,24 @@ SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_TOOLTIP_get() {
   return jresult;
 }
 
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_STATE_get() {
+  int jresult ;
+  int result;
+
+  result = (int)Dali::Toolkit::DevelControl::Property::STATE;
+  jresult = (int)result;
+  return jresult;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_SUB_STATE_get() {
+  int jresult ;
+  int result;
+
+  result = (int)Dali::Toolkit::DevelControl::Property::SUB_STATE;
+  jresult = (int)result;
+  return jresult;
+}
+
 SWIGEXPORT int SWIGSTDCALL CSharp_ItemView_Property_LAYOUT_get() {
   int jresult ;
   int result;

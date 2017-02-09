@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -267,7 +267,8 @@ using namespace Dali::Toolkit;
 %include events/pangesture-event.i
 %include events/propertynotification-event.i
 %include events/longpressgesture-event.i
-%include events/rectinteger.i
+%include events/rectangle.i
+%include events/padding.i
 %include events/resourceimage-event.i
 %include events/scrollable-event.i
 %include events/scrollbar-event.i
