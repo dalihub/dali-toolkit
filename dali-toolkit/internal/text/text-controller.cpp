@@ -1711,17 +1711,14 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       textChanged = BackspaceKeyEvent();
     }
-    else if( IsKey( keyEvent,  Dali::DALI_KEY_POWER ) )
-    {
-      mImpl->ChangeState( EventData::INTERRUPTED ); // State is not INACTIVE as expect to return to edit mode.
-      // Avoids calling the InsertText() method which can delete selected text
-    }
-    else if( IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
+    else if( IsKey( keyEvent, Dali::DALI_KEY_POWER ) ||
+             IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
              IsKey( keyEvent, Dali::DALI_KEY_HOME ) )
     {
+      // Power key/Menu/Home key behaviour does not allow edit mode to resume.
       mImpl->ChangeState( EventData::INACTIVE );
-      // Menu/Home key behaviour does not allow edit mode to resume like Power key
-      // Avoids calling the InsertText() method which can delete selected text
+
+      // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
     }
     else if( Dali::DALI_KEY_SHIFT_LEFT == keyCode )
     {
