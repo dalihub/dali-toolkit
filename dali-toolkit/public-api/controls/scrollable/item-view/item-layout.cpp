@@ -38,7 +38,6 @@ struct ItemLayout::Impl
   Vector3 mItemSize;                              ///< The size of an item in the layout
   ControlOrientation::Type mOrientation;          ///< the orientation of the layout.
   Property::Map mProperties;
-  bool mHasLayoutChanged;
 };
 
 ItemLayout::ItemLayout()
@@ -156,23 +155,12 @@ void ItemLayout::SetLayoutProperties(const Property::Map& properties)
       }
     }
   }
-  mImpl->mHasLayoutChanged = true;
   mImpl->mProperties = properties;
 }
 
 Property::Map ItemLayout::GetLayoutProperties()
 {
   return mImpl->mProperties;
-}
-
-bool ItemLayout::HasLayoutChanged()
-{
-  return mImpl->mHasLayoutChanged;
-}
-
-void ItemLayout::ResetLayoutChangedFlag()
-{
-  mImpl->mHasLayoutChanged = false;
 }
 
 } // namespace Toolkit

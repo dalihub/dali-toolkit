@@ -45,10 +45,10 @@ namespace MyCSharpExample
 
         // List of items
         private Item[] mViewList = {
-            new Item("PushButton", true),  new Item("DropDown", false),    new Item("Toggle", false),
+            new Item("PushButton", true),  new Item("DropDown", false),    new Item("Toggle", true),
             new Item("InputField", false),  new Item("AnimateGif", false),  new Item("Loading", false),
             new Item("ProgressBar", false), new Item("CheckBox", false),    new Item("RadioButton", true),
-            new Item("Tooltip", false),     new Item("Popup", true),       new Item("Toast", true),
+            new Item("Tooltip", true),     new Item("Popup", true),       new Item("Toast", true),
             new Item("ItemView", false),    new Item("CheckBox", true)
         };
 
@@ -154,7 +154,28 @@ namespace MyCSharpExample
                 }
                 if (item.name.CompareTo("Toggle") == 0)
                 {
+                    ToggleButton toggleButton = new ToggleButton();
+                    Dali.Property.Array array = new Dali.Property.Array();
+                    array.Add( new Dali.Property.Value("./images/star-highlight.png") );
+                    array.Add( new Dali.Property.Value("./images/star-mod.png") );
+                    array.Add( new Dali.Property.Value("./images/star-dim.png") );
+                    toggleButton.StateVisuals = array;
 
+                    Dali.Property.Array tooltips = new Dali.Property.Array();
+                    tooltips.Add( new Dali.Property.Value("State A") );
+                    tooltips.Add( new Dali.Property.Value("State B") );
+                    tooltips.Add( new Dali.Property.Value("State C") );
+                    toggleButton.Tooltips = tooltips;
+
+                    toggleButton.WidthResizePolicy  = "FILL_TO_PARENT";
+                    toggleButton.HeightResizePolicy = "FILL_TO_PARENT";
+                    toggleButton.Clicked += (obj, e) =>
+                    {
+                        Console.WriteLine("Toggle button state changed.");
+                        return true;
+                    };
+
+                    _contentContainer.AddChild(toggleButton, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
                 }
                 if (item.name.CompareTo("InputField") == 0)
                 {
@@ -203,7 +224,49 @@ namespace MyCSharpExample
                 }
                 if (item.name.CompareTo("Tooltip") == 0)
                 {
+                    TableView tableView = new TableView(2, 1);
+                    tableView.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
+                    tableView.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.HEIGHT);
 
+                    // Create two push buttons and add them to a table view
+                    PushButton buttonWithSimpleTooltip = new PushButton();
+                    buttonWithSimpleTooltip.LabelText = "Tooltip with text only";
+                    buttonWithSimpleTooltip.UnselectedColor = new Vector4(0.5f,0.5f,0.7f,1.0f);
+                    buttonWithSimpleTooltip.SelectedColor = new Vector4(0.7f,0.5f,0.7f,1.0f);
+                    buttonWithSimpleTooltip.WidthResizePolicy = "FILL_TO_PARENT";
+                    tableView.AddChild(buttonWithSimpleTooltip, new TableView.CellPosition(0, 0));
+
+                    PushButton buttonWithIconTooltip = new PushButton();
+                    buttonWithIconTooltip.LabelText = "Tooltip with Text and Icon";
+                    buttonWithIconTooltip.WidthResizePolicy = "FILL_TO_PARENT";
+                    buttonWithIconTooltip.UnselectedColor = new Vector4(0.5f,0.5f,0.7f,1.0f);
+                    buttonWithIconTooltip.SelectedColor = new Vector4(0.7f,0.5f,0.7f,1.0f);
+                    tableView.AddChild(buttonWithIconTooltip, new TableView.CellPosition(1, 0));
+
+                    // Add a simple text only tooltip to the first push button
+                    buttonWithSimpleTooltip.TooltipText = "Simple Tooltip";
+
+                    // Create a property map for a tooltip with one icon and one text
+                    Property.Array iconTooltipContent = new Property.Array();
+
+                    Property.Map iconVisual = new Property.Map();
+                    iconVisual.Add( Dali.Constants.Visual.Property.Type, new Property.Value((int)Dali.Constants.Visual.Type.Image) )
+                              .Add( Dali.Constants.ImageVisualProperty.URL, new Property.Value("./images/star-highlight.png") );
+                    iconTooltipContent.Add(new Property.Value(iconVisual));
+
+                    Property.Map textVisual = new Property.Map();
+                    textVisual.Add( Dali.Constants.Visual.Property.Type, new Property.Value((int)Dali.Constants.Visual.Type.Text) )
+                              .Add( Dali.Constants.TextVisualProperty.Text, new Property.Value("Tooltip with Icon") );
+                    iconTooltipContent.Add(new Property.Value(textVisual));
+
+                    Property.Map iconTooltip = new Property.Map();
+                    iconTooltip.Add( Dali.Constants.Tooltip.Property.Content, new Property.Value(iconTooltipContent) )
+                               .Add( Dali.Constants.Tooltip.Property.Tail, new Property.Value(true) );
+
+                    // Add the tooltip with icon and text to the second push button
+                    buttonWithIconTooltip.Tooltip = iconTooltip;
+
+                    _contentContainer.AddChild(tableView, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
                 }
                 if (item.name.CompareTo("Popup") == 0)
                 {

@@ -304,6 +304,9 @@ Renders a raster image ( jpg, png etc.) into the visual's quad geometry.
 | Dali::Toolkit::ImageVisual::Property::SAMPLING_MODE  | samplingMode  | INTEGER or STRING | No       | Filtering options, used when resizing images to sample original pixels. [More info](@ref resourceimagescaling-scaling)   |
 | Dali::Toolkit::ImageVisual::Property::DESIRED_WIDTH  | desiredWidth  | INT               | No       | The desired image width. Will use actual image width if not specified.                                                   |
 | Dali::Toolkit::ImageVisual::Property::DESIRED_HEIGHT | desiredHeight | INT               | No       | The desired image height. Will use actual image height if not specified.                                                 |
+| Dali::Toolkit::ImageVisual::Property::PIXEL_AREA     | pixelArea     | VECTOR4           | No       | The image area to be displayed, default value is [0.0, 0.0, 1.0, 1.0]                                                    |
+| Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U    | wrapModeU     | INTEGER or STRING | No       | Wrap mode for u coordinate, valid values are CLAMP_TO_EDGE(default), REPEAT, MIRRORED_REPEAT                               |
+| Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V    | wrapModeV     | INTEGER or STRING | No       | Wrap mode for v coordinate, valid values are CLAMP_TO_EDGE(default), REPEAT, MIRRORED_REPEAT                               |
 
 #### Usage
 
@@ -455,9 +458,12 @@ Renders an animated image into the visual's quad geometry. Currently, only the G
 
 **VisualType:** Dali::Toolkit::Visual::IMAGE, "IMAGE"
 
-| Property                                  | String | Type    | Required | Description                      |
-|-------------------------------------------|--------|:-------:|:--------:|----------------------------------|
-| Dali::Toolkit::ImageVisual::Property::URL | url    | STRING  | Yes      | The URL of the animated image.    |
+| Property                                          | String     | Type              | Required | Description                                                                                  |
+|---------------------------------------------------|------------|:-----------------:|:--------:|----------------------------------------------------------------------------------------------|
+| Dali::Toolkit::ImageVisual::Property::URL         | url        | STRING            | Yes      | The URL of the animated image.                                                               |
+| Dali::Toolkit::ImageVisual::Property::PIXEL_AREA  | pixelArea  | VECTOR4           | No       | The image area to be displayed, default value is [0.0, 0.0, 1.0, 1.0]                        |
+| Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U | wrapModeU  | INTEGER or STRING | No       | Wrap mode for u coordinate, valid values are CLAMP_TO_EDGE(default), REPEAT, MIRRORED_REPEAT |
+| Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V | wrapModeV  | INTEGER or STRING | No       | Wrap mode for v coordinate, valid values are CLAMP_TO_EDGE(default), REPEAT, MIRRORED_REPEAT |
 
 #### Usage
 

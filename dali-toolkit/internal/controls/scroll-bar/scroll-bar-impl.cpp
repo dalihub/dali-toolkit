@@ -234,7 +234,7 @@ void ScrollBar::CreateDefaultIndicatorActor()
   Toolkit::ImageView indicator = Toolkit::ImageView::New( DEFAULT_INDICATOR_IMAGE_PATH );
   indicator.SetParentOrigin( ParentOrigin::TOP_LEFT );
   indicator.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-
+  indicator.SetStyleName( "ScrollBarIndicator" );
   SetScrollIndicator(indicator);
 }
 
@@ -249,6 +249,13 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
       Self().Remove( mIndicator );
     }
     mIndicator = indicator;
+
+    Toolkit::Control control = Toolkit::Control::DownCast( mIndicator );
+    if( control )
+    {
+      control.SetStyleName( "ScrollBarIndicator" );
+    }
+
     mIndicatorFirstShow = true;
     Self().Add( mIndicator );
 

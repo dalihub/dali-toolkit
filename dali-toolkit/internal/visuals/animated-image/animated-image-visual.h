@@ -44,10 +44,24 @@ typedef IntrusivePtr< AnimatedImageVisual > AnimatedImageVisualPtr;
  *
  * The following property is essential
  *
- * | %Property Name           | Type             |
- * |--------------------------|------------------|
- * | url                      | STRING           |
+ * | %Property Name     | Type              |
+ * |------------------- |-------------------|
+ * | url                | STRING            |
+ * | pixelArea          | VECTOR4           |
+ * | wrapModeU          | INTEGER OR STRING |
+ * | wrapModeV          | INTEGER OR STRING |
  *
+ * where pixelArea is a rectangular area.
+ * In its Vector4 value, the first two elements indicate the top-left position of the area,
+ * and the last two elements are the area width and height respectively.
+ * If not specified, the default value is [0.0, 0.0, 1.0, 1.0], i.e. the entire area of the image.
+ *
+ * where wrapModeU and wrapModeV separately decide how the texture should be sampled when the u and v coordinate exceeds the range of 0.0 to 1.0.
+ * Its value should be one of the following wrap mode:
+ *   "DEFAULT"
+ *   "CLAMP_TO_EDGE"
+ *   "REPEAT"
+ *   "MIRRORED_REPEAT"
  */
 
 class AnimatedImageVisual : public Visual::Base, public ConnectionTracker
@@ -143,9 +157,13 @@ private:
   Timer mFrameDelayTimer;
   Dali::Vector<Vector4> mTextureRectContainer;
   Dali::Vector<uint32_t> mFrameDelayContainer;
+  Vector4 mPixelArea;
   std::string  mImageUrl;
+
   ImageDimensions mImageSize;
   uint32_t mCurrentFrameIndex;
+  Dali::WrapMode::Type mWrapModeU:3;
+  Dali::WrapMode::Type mWrapModeV:3;
 };
 
 } // namespace Internal

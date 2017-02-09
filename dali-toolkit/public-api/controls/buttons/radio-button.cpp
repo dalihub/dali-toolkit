@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ RadioButton RadioButton::New()
 RadioButton RadioButton::New( const std::string& label )
 {
   RadioButton radioButton = Internal::RadioButton::New();
-  radioButton.SetLabelText( label );
+  radioButton.SetProperty( Toolkit::Button::Property::LABEL, label );
   return radioButton;
 }
 

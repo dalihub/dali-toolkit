@@ -15,6 +15,7 @@
  *
  */
 %apply unsigned int& OUTPUT { unsigned int& volume };
+%feature("director") Dali::Toolkit::ItemFactory;
 
 %ignore *::AccessibilityManager(Internal::AccessibilityManager*);
 %ignore *::Alignment(Internal::Alignment&);
@@ -74,6 +75,8 @@
 %ignore *::Base(Dali::Internal::Visual::Base*);
 %ignore *::GetExtension();
 %ignore *::GetControlExtension();
+%ignore *::ToggleButton(Internal::ToggleButton&);
+%ignore *::ToggleButton(Dali::Internal::CustomActor*);
 
 %ignore *::Button::SetAnimationTime(float animationTime);
 %ignore *::Button::SetAutoRepeating(bool);
@@ -93,6 +96,8 @@
 %ignore *::Button::SetSelectedImage(Dali::Image);
 %ignore *::Button::SetTogglableButton(bool);
 %ignore *::Button::SetUnselectedImage(const std::string &);
+%ignore Dali::Toolkit::DevelVisual::Type;
+%ignore Dali::Toolkit::DevelVisual::Property::Type;
 
 %rename(View) Dali::Toolkit::Control;
 %rename(ViewImpl) Dali::Toolkit::Internal::Control;
@@ -111,14 +116,48 @@
 %rename(IndicatorHeightPolicyType) Dali::Toolkit::ScrollBar::IndicatorHeightPolicy;
 %rename(ExceedPolicyType) Dali::Toolkit::TextField::ExceedPolicy;
 %rename(ToolkitPropertyRange) Dali::Toolkit::PropertyRanges;
+%rename(TooltipPositionType) Dali::Toolkit::Tooltip::Position::Type;
 %rename(VisualType) Dali::Toolkit::Visual::Type;
-%rename(VisualShaderType) Dali::Toolkit::Visual::Shader::Property;
+%rename(VisualTransformPropertyType) Dali::Toolkit::DevelVisual::Transform::Property::Type;
+%rename(VISUAL_SHADER_VERTEX) Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER;
+%rename(VISUAL_SHADER_FRAGMENT) Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER;
+%rename(VISUAL_SHADER_SUBDIVIDE_GRID_X) Dali::Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X;
+%rename(VISUAL_SHADER_SUBDIVIDE_GRID_Y) Dali::Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y;
+%rename(VISUAL_SHADER_HINTS) Dali::Toolkit::Visual::Shader::Property::HINTS;
+%rename(BORDER_VISUAL_COLOR) Dali::Toolkit::BorderVisual::Property::COLOR;
+%rename(BORDER_VISUAL_SIZE) Dali::Toolkit::BorderVisual::Property::SIZE;
+%rename(BORDER_VISUAL_ANTI_ALIASING) Dali::Toolkit::BorderVisual::Property::ANTI_ALIASING;
+%rename(COLOR_VISUAL_MIX_COLOR) Dali::Toolkit::ColorVisual::Property::MIX_COLOR;
 %rename(GradientVisualUnitsType) Dali::Toolkit::GradientVisual::Units::Type;
 %rename(GradientVisualSpreadMethodType) Dali::Toolkit::GradientVisual::SpreadMethod::Type;
+%rename(GRADIENT_VISUAL_START_POSITION) Dali::Toolkit::GradientVisual::Property::START_POSITION;
+%rename(GRADIENT_VISUAL_END_POSITION) Dali::Toolkit::GradientVisual::Property::END_POSITION;
+%rename(GRADIENT_VISUAL_CENTER) Dali::Toolkit::GradientVisual::Property::CENTER;
+%rename(GRADIENT_VISUAL_RADIUS) Dali::Toolkit::GradientVisual::Property::RADIUS;
+%rename(GRADIENT_VISUAL_STOP_OFFSET) Dali::Toolkit::GradientVisual::Property::STOP_OFFSET;
+%rename(GRADIENT_VISUAL_STOP_COLOR) Dali::Toolkit::GradientVisual::Property::STOP_COLOR;
+%rename(GRADIENT_VISUAL_UNITS) Dali::Toolkit::GradientVisual::Property::UNITS;
+%rename(GRADIENT_VISUAL_SPREAD_METHOD) Dali::Toolkit::GradientVisual::Property::SPREAD_METHOD;
 %rename(MeshVisualShadingModeValue) Dali::Toolkit::MeshVisual::ShadingMode::Value;
+%rename(MESH_VISUAL_OBJECT_URL) Dali::Toolkit::MeshVisual::Property::OBJECT_URL;
+%rename(MESH_VISUAL_MATERIAL_URL) Dali::Toolkit::MeshVisual::Property::MATERIAL_URL;
+%rename(MESH_VISUAL_TEXTURES_PATH) Dali::Toolkit::MeshVisual::Property::TEXTURES_PATH;
+%rename(MESH_VISUAL_SHADING_MODE) Dali::Toolkit::MeshVisual::Property::SHADING_MODE;
+%rename(MESH_VISUAL_USE_MIPMAPPING) Dali::Toolkit::MeshVisual::Property::USE_MIPMAPPING;
+%rename(MESH_VISUAL_USE_SOFT_NORMALS) Dali::Toolkit::MeshVisual::Property::USE_SOFT_NORMALS;
+%rename(MESH_VISUAL_LIGHT_POSITION) Dali::Toolkit::MeshVisual::Property::LIGHT_POSITION;
 %rename(PrimitiveVisualShapeType) Dali::Toolkit::PrimitiveVisual::Shape::Type;
-%rename(PRIMITIVE_VISUAL_COLOR) Dali::Toolkit::PrimitiveVisual::Property::COLOR;
+%rename(PRIMITIVE_VISUAL_SHAPE) Dali::Toolkit::PrimitiveVisual::Property::SHAPE;
 %rename(PRIMITIVE_VISUAL_MIX_COLOR) Dali::Toolkit::PrimitiveVisual::Property::MIX_COLOR;
+%rename(PRIMITIVE_VISUAL_SLICES) Dali::Toolkit::PrimitiveVisual::Property::SLICES;
+%rename(PRIMITIVE_VISUAL_STACKS) Dali::Toolkit::PrimitiveVisual::Property::STACKS;
+%rename(PRIMITIVE_VISUAL_SCALE_TOP_RADIUS) Dali::Toolkit::PrimitiveVisual::Property::SCALE_TOP_RADIUS;
+%rename(PRIMITIVE_VISUAL_SCALE_BOTTOM_RADIUS) Dali::Toolkit::PrimitiveVisual::Property::SCALE_BOTTOM_RADIUS;
+%rename(PRIMITIVE_VISUAL_SCALE_HEIGHT) Dali::Toolkit::PrimitiveVisual::Property::SCALE_HEIGHT;
+%rename(PRIMITIVE_VISUAL_SCALE_RADIUS) Dali::Toolkit::PrimitiveVisual::Property::SCALE_RADIUS;
+%rename(PRIMITIVE_VISUAL_SCALE_DIMENSIONS) Dali::Toolkit::PrimitiveVisual::Property::SCALE_DIMENSIONS;
+%rename(PRIMITIVE_VISUAL_BEVEL_PERCENTAGE) Dali::Toolkit::PrimitiveVisual::Property::BEVEL_PERCENTAGE;
+%rename(PRIMITIVE_VISUAL_BEVEL_SMOOTHNESS) Dali::Toolkit::PrimitiveVisual::Property::BEVEL_SMOOTHNESS;
 %rename(PRIMITIVE_VISUAL_LIGHT_POSITION) Dali::Toolkit::PrimitiveVisual::Property::LIGHT_POSITION;
 %rename(VISUAL_PROPERTY_TYPE) Dali::Toolkit::Visual::Property::TYPE;
 %rename(VISUAL_PROPERTY_SHADER) Dali::Toolkit::Visual::Property::SHADER;
@@ -134,26 +173,30 @@
 %rename(IMAGE_VISUAL_WRAP_MODE_U) Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U;
 %rename(IMAGE_VISUAL_WRAP_MODE_V) Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V;
 %rename(COLOR_VISUAL_MIX_COLOR) Dali::Toolkit::Color::Visual::Property::MIX_COLOR;
-%rename(TEXT_VISUAL_RENDERING_BACKEND) Dali::Toolkit::Text::Visual::Property::RENDERING_BACKEND;
-%rename(TEXT_VISUAL_TEXT) Dali::Toolkit::Text::Visual::Property::TEXT;
-%rename(TEXT_VISUAL_FONT_FAMILY) Dali::Toolkit::Text::Visual::Property::FONT_FAMILY;
-%rename(TEXT_VISUAL_FONT_STYLE) Dali::Toolkit::Text::Visual::Property::FONT_STYLE;
-%rename(TEXT_VISUAL_POINT_SIZE) Dali::Toolkit::Text::Visual::Property::POINT_SIZE;
-%rename(TEXT_VISUAL_MULTI_LINE) Dali::Toolkit::Text::Visual::Property::MULTI_LINE;
-%rename(TEXT_VISUAL_HORIZONTAL_ALIGNMENT) Dali::Toolkit::Text::Visual::Property::HORIZONTAL_ALIGNMENT;
-%rename(TEXT_VISUAL_VERTICAL_ALIGNMENT) Dali::Toolkit::Text::Visual::Property::VERTICAL_ALIGNMENT;
-%rename(TEXT_VISUAL_TEXT_COLOR) Dali::Toolkit::Text::Visual::Property::TEXT_COLOR;
-%rename(TEXT_VISUAL_ENABLE_MARKUP) Dali::Toolkit::Text::Visual::Property::ENABLE_MARKUP;
-%rename(TEXT_VISUAL_ENABLE_AUTO_SCROLL) Dali::Toolkit::Text::Visual::Property::ENABLE_AUTO_SCROLL;
-%rename(TEXT_VISUAL_AUTO_SCROLL_SPEED) Dali::Toolkit::Text::Visual::Property::AUTO_SCROLL_SPEED;
-%rename(TEXT_VISUAL_AUTO_SCROLL_LOOP_COUNT) Dali::Toolkit::Text::Visual::Property::AUTO_SCROLL_LOOP_COUNT;
-%rename(TEXT_VISUAL_AUTO_SCROLL_GAP) Dali::Toolkit::Text::Visual::Property::AUTO_SCROLL_GAP;
-%rename(TEXT_VISUAL_LINE_SPACING) Dali::Toolkit::Text::Visual::Property::LINE_SPACING;
-%rename(TEXT_VISUAL_UNDERLINE) Dali::Toolkit::Text::Visual::Property::UNDERLINE;
-%rename(TEXT_VISUAL_SHADOW) Dali::Toolkit::Text::Visual::Property::SHADOW;
-%rename(TEXT_VISUAL_EMBOSS) Dali::Toolkit::Text::Visual::Property::EMBOSS;
-%rename(TEXT_VISUAL_OUTLINE) Dali::Toolkit::Text::Visual::Property::OUTLINE;
-%rename(TEXT_VISUAL_BATCHING_ENABLED) Dali::Toolkit::Text::Visual::Property::BATCHING_ENABLED;
+%rename(TEXT_VISUAL_TEXT) Dali::Toolkit::TextVisual::Property::TEXT;
+%rename(TEXT_VISUAL_FONT_FAMILY) Dali::Toolkit::TextVisual::Property::FONT_FAMILY;
+%rename(TEXT_VISUAL_FONT_STYLE) Dali::Toolkit::TextVisual::Property::FONT_STYLE;
+%rename(TEXT_VISUAL_POINT_SIZE) Dali::Toolkit::TextVisual::Property::POINT_SIZE;
+%rename(TEXT_VISUAL_MULTI_LINE) Dali::Toolkit::TextVisual::Property::MULTI_LINE;
+%rename(TEXT_VISUAL_HORIZONTAL_ALIGNMENT) Dali::Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT;
+%rename(TEXT_VISUAL_VERTICAL_ALIGNMENT) Dali::Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT;
+%rename(TEXT_VISUAL_TEXT_COLOR) Dali::Toolkit::TextVisual::Property::TEXT_COLOR;
+%rename(TEXT_VISUAL_ENABLE_MARKUP) Dali::Toolkit::TextVisual::Property::ENABLE_MARKUP;
+%rename(TOOLTIP_CONTENT) Dali::Toolkit::Tooltip::Property::CONTENT;
+%rename(TOOLTIP_LAYOUT) Dali::Toolkit::Tooltip::Property::LAYOUT;
+%rename(TOOLTIP_WAIT_TIME) Dali::Toolkit::Tooltip::Property::WAIT_TIME;
+%rename(TOOLTIP_BACKGROUND) Dali::Toolkit::Tooltip::Property::BACKGROUND;
+%rename(TOOLTIP_TAIL) Dali::Toolkit::Tooltip::Property::TAIL;
+%rename(TOOLTIP_POSITION) Dali::Toolkit::Tooltip::Property::POSITION;
+%rename(TOOLTIP_HOVER_POINT_OFFSET) Dali::Toolkit::Tooltip::Property::HOVER_POINT_OFFSET;
+%rename(TOOLTIP_MOVEMENT_THRESHOLD) Dali::Toolkit::Tooltip::Property::MOVEMENT_THRESHOLD;
+%rename(TOOLTIP_DISAPPEAR_ON_MOVEMENT) Dali::Toolkit::Tooltip::Property::DISAPPEAR_ON_MOVEMENT;
+%rename(TOOLTIP_CONTENT) Dali::Toolkit::Tooltip::Property::CONTENT;
+%rename(TOOLTIP_BACKGROUND_VISUAL) Dali::Toolkit::Tooltip::Background::Property::VISUAL;
+%rename(TOOLTIP_BACKGROUND_BORDER) Dali::Toolkit::Tooltip::Background::Property::BORDER;
+%rename(TOOLTIP_TAIL_VISIBILITY) Dali::Toolkit::Tooltip::Tail::Property::VISIBILITY;
+%rename(TOOLTIP_TAIL_ABOVE_VISUAL) Dali::Toolkit::Tooltip::Tail::Property::ABOVE_VISUAL;
+%rename(TOOLTIP_TAIL_BELOW_VISUAL) Dali::Toolkit::Tooltip::Tail::Property::BELOW_VISUAL;
 
 %csconstvalue("PropertyRanges.PROPERTY_REGISTRATION_START_INDEX") PROPERTY_START_INDEX;
 %csconstvalue("View.PropertyRange.PROPERTY_START_INDEX+1000") PROPERTY_END_INDEX;
@@ -181,6 +224,7 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
 
 %include <dali-toolkit/public-api/visuals/visual-properties.h>
+%include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 %include <dali-toolkit/public-api/visuals/border-visual-properties.h>
 %include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 %include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>
@@ -192,6 +236,8 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/devel-api/builder/builder.h>
 
 %include <dali-toolkit/devel-api/visual-factory/transition-data.h>
+
+%include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>
 
 %include <dali-toolkit/public-api/controls/control-impl.h>
 %include <dali-toolkit/public-api/controls/control.h>
@@ -236,6 +282,7 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
 %include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
 %include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
+%include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 
 %include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 %include <dali-toolkit/devel-api/visual-factory/visual-factory.h>

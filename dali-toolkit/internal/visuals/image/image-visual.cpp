@@ -22,7 +22,6 @@
 #include <cstring> // for strncasecmp
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/native-image.h>
-#include <dali/devel-api/images/atlas.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/devel-api/scripting/enum-helper.h>
@@ -58,8 +57,6 @@ const char * const IMAGE_FITTING_MODE( "fittingMode" );
 const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
 const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
 const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
-const char * const IMAGE_WRAP_MODE_U("wrapModeU");
-const char * const IMAGE_WRAP_MODE_V("wrapModeV");
 const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
 const char * const BATCHING_ENABLED( "batchingEnabled" );
 
@@ -90,9 +87,6 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, CLAMP_TO_EDGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, REPEAT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, MIRRORED_REPEAT )
 DALI_ENUM_TO_STRING_TABLE_END( WRAP_MODE )
-
-const std::string PIXEL_AREA_UNIFORM_NAME = "pixelArea";
-const std::string WRAP_MODE_UNIFORM_NAME = "wrapMode";
 
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 

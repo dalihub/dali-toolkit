@@ -204,12 +204,7 @@ void Scrollable::SetProperty( BaseObject* object, Property::Index index, const P
       }
       case Toolkit::Scrollable::Property::OVERSHOOT_SIZE:
       {
-        Vector2 input;
-        if( value.Get( input ) )
-        {
-          scrollableImpl.mOvershootSize = input;
-        }
-        scrollableImpl.EnableScrollOvershoot( scrollableImpl.IsOvershootEnabled() );
+        scrollableImpl.SetOvershootSize( value.Get<Vector2>() );
         break;
       }
       case Toolkit::Scrollable::Property::SCROLL_TO_ALPHA_FUNCTION:

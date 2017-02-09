@@ -220,7 +220,7 @@ public:
   /**
    * @brief Move the focus to prev focused actor
    *
-   * @SINCE_1_2.17
+   * @SINCE_1_2.19
    */
   void MoveFocusBackward();
 

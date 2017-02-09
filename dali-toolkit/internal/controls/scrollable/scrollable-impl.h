@@ -112,6 +112,12 @@ public:
    */
   const Vector2& GetOvershootSize() const;
 
+  /**
+   * Set the size of the overshoot effect.
+   * @parm[in] size The size of the overshoot effect
+   */
+  virtual void SetOvershootSize( const Vector2& size ) = 0;
+
 private:
 
   /**

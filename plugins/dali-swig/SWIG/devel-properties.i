@@ -15,6 +15,17 @@
  *
  */
 
+%pragma(csharp) modulecode=%{
+  public static readonly int VISUAL_PROPERTY_TRANSFORM = NDalicManualPINVOKE.Visual_Property_TRANSFORM_get();
+  public static readonly int VISUAL_PROPERTY_PREMULTIPLIED_ALPHA = NDalicManualPINVOKE.Visual_Property_PREMULTIPLIED_ALPHA_get();
+  public static readonly int VISUAL_PROPERTY_MIX_COLOR = NDalicManualPINVOKE.Visual_Property_MIX_COLOR_get();
+%}
+
+%typemap(cscode) Dali::Toolkit::Visual::Type %{
+  ,
+  TEXT
+%}
+
 %typemap(cscode) Dali::Actor::Property %{
   public static readonly int BATCH_PARENT = NDalicManualPINVOKE.Actor_Property_BATCH_PARENT_get();
   public static readonly int SIBLING_ORDER = NDalicManualPINVOKE.Actor_Property_SIBLING_ORDER_get();

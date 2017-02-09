@@ -28,7 +28,7 @@ namespace Dali
         public delegate void OnSizeSetDelegate(Vector3 targetSize);
         public delegate void OnSizeAnimationDelegate(Animation animation, Vector3 targetSize);
         public delegate bool OnTouchEventDelegate(TouchEvent touchEvent);
-        public delegate bool OnHoverEventDelegate(HoverEvent hoverEvent);
+        public delegate bool OnHoverDelegate(Hover hover);
         public delegate bool OnKeyEventDelegate(KeyEvent keyEvent);
         public delegate bool OnWheelEventDelegate(WheelEvent wheelEvent);
         public delegate void OnRelayoutDelegate(Vector2 size, RelayoutContainer container);
@@ -69,7 +69,7 @@ namespace Dali
         public OnSizeSetDelegate OnSizeSet;
         public OnSizeAnimationDelegate OnSizeAnimation;
         public OnTouchEventDelegate OnTouchEvent;
-        public OnHoverEventDelegate OnHoverEvent;
+        public OnHoverDelegate OnHover;
         public OnKeyEventDelegate OnKeyEvent;
         public OnWheelEventDelegate OnWheelEvent;
         public OnRelayoutDelegate OnRelayout;
@@ -256,7 +256,7 @@ namespace Dali
             Delegate5 = new DelegateViewWrapperImpl_5(DirectorOnSizeSet);
             Delegate6 = new DelegateViewWrapperImpl_6(DirectorOnSizeAnimation);
             Delegate7 = new DelegateViewWrapperImpl_7(DirectorOnTouchEvent);
-            Delegate8 = new DelegateViewWrapperImpl_8(DirectorOnHoverEvent);
+            Delegate8 = new DelegateViewWrapperImpl_8(DirectorOnHover);
             Delegate9 = new DelegateViewWrapperImpl_9(DirectorOnKeyEvent);
             Delegate10 = new DelegateViewWrapperImpl_10(DirectorOnWheelEvent);
             Delegate11 = new DelegateViewWrapperImpl_11(DirectorOnRelayout);
@@ -330,9 +330,9 @@ namespace Dali
             return OnTouchEvent(new TouchEvent(arg0, false));
         }
 
-        private bool DirectorOnHoverEvent(global::System.IntPtr arg0)
+        private bool DirectorOnHover(global::System.IntPtr arg0)
         {
-            return OnHoverEvent(new HoverEvent(arg0, false));
+            return OnHover(new Hover(arg0, false));
         }
 
         private bool DirectorOnKeyEvent(global::System.IntPtr arg0)

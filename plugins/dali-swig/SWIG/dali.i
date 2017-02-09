@@ -75,12 +75,15 @@
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
+#include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+
+#include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>
 
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-view-declarations.h>
 
@@ -226,8 +229,6 @@
 };
 
 
-
-
 %ignore operator<<;
 %ignore *::GetImplementation();
 %ignore *::GetImplementation(Dali::BaseHandle&);
@@ -246,6 +247,8 @@ using namespace Dali::Toolkit;
 
 %include signal-parameters.i
 %include signals.i
+
+%include doxygen.i
 
 %include events/actor-event.i
 %include events/accessibilitymanager-event.i
@@ -283,6 +286,9 @@ using namespace Dali::Toolkit;
 %include property-value.i
 %include dali-operator.i
 %include devel-properties.i
+
+%include gestures/hover.i
+
 
 %include dali-core.i
 %include dali-adaptor.i

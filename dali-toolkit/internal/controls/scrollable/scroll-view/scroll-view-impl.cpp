@@ -1781,6 +1781,15 @@ void ScrollView::RemoveOverlay(Actor actor)
   mInternalActor.Remove( actor );
 }
 
+void ScrollView::SetOvershootSize( const Vector2& size )
+{
+  mOvershootSize = size;
+  if( IsOvershootEnabled() && mOvershootIndicator )
+  {
+    mOvershootIndicator->AttachToScrollable(*this);
+  }
+}
+
 void ScrollView::SetOvershootEffectColor( const Vector4& color )
 {
   mOvershootEffectColor = color;

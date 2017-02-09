@@ -48,14 +48,29 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *
  * The following properties are optional
  *
- * | %Property Name     | Type             |
- * |--------------------|------------------|
- * | url                | STRING           |
- * | fittingMode        | STRING           |
- * | samplingMode       | STRING           |
- * | desiredWidth       | INT              |
- * | desiredHeight      | INT              |
- * | synchronousLoading | BOOLEAN          |
+ * | %Property Name     | Type              |
+ * |--------------------|-------------------|
+ * | url                | STRING            |
+ * | fittingMode        | INTEGER OR STRING |
+ * | samplingMode       | INTEGER OR STRING |
+ * | desiredWidth       | INTEGER           |
+ * | desiredHeight      | INTEGER           |
+ * | synchronousLoading | BOOLEAN           |
+ * | pixelArea          | VECTOR4           |
+ * | wrapModeU          | INTEGER OR STRING |
+ * | wrapModeV          | INTEGER OR STRING |
+ *
+ * where pixelArea is a rectangular area.
+ * In its Vector4 value, the first two elements indicate the top-left position of the area,
+ * and the last two elements are the area width and height respectively.
+ * If not specified, the default value is [0.0, 0.0, 1.0, 1.0], i.e. the entire area of the image.
+ *
+ * where wrapModeU and wrapModeV separately decide how the texture should be sampled when the u and v coordinate exceeds the range of 0.0 to 1.0.
+ * Its value should be one of the following wrap mode:
+ *   "DEFAULT"
+ *   "CLAMP_TO_EDGE"
+ *   "REPEAT"
+ *   "MIRRORED_REPEAT"
  *
  * where imageFittingMode should be one of the following fitting modes:
  *   "SHRINK_TO_FIT"

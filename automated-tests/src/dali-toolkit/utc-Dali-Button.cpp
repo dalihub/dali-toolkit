@@ -504,6 +504,47 @@ int UtcDaliButtonSetLabelStringWithPropertyMapP(void)
   END_TEST;
 }
 
+int UtcDaliButtonSetLabelStringWithPropertyMapStringsP(void)
+{
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+
+  tet_infoline(" UtcDaliButtonSetLabelStringWithPropertyMapStringsP Setting Button text using String then replacing with Enum then string");
+
+  Property::Map textVisualMapInitial;
+  textVisualMapInitial["visualType"] = "TEXT";
+  textVisualMapInitial["pointSize"] =  15.0f;
+  textVisualMapInitial["text"] = "button label initial";
+
+  button.SetProperty( Button::Property::LABEL, textVisualMapInitial );
+
+  DALI_TEST_EQUALS( GetButtonText( button ), "button label initial", TEST_LOCATION );
+
+  tet_infoline(" UtcDaliButtonSetLabelStringWithPropertyMapStringsP Intermediate part of test");
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Toolkit::DevelVisual::TEXT );
+  propertyMap.Insert( Toolkit::TextVisual::Property::TEXT,  "error if this is the final text" );
+  propertyMap.Insert( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );
+
+  button.SetProperty( Button::Property::LABEL, propertyMap );
+
+  DALI_TEST_EQUALS( GetButtonText( button ), "error if this is the final text", TEST_LOCATION );
+
+  tet_infoline(" UtcDaliButtonSetLabelStringWithPropertyMapStringsP Final part of test");
+
+  Property::Map textVisualMap;
+  textVisualMap["visualType"] = "TEXT";
+  textVisualMap["pointSize"] =  15.0f;
+  textVisualMap["text"] = "Button Label";
+
+  button.SetProperty( Toolkit::Button::Property::LABEL, textVisualMap );
+
+  DALI_TEST_EQUALS( GetButtonText( button ), "Button Label", TEST_LOCATION );
+  END_TEST;
+}
+
 int UtcDaliButtonSetLabelWithStringP(void)
 {
   ToolkitTestApplication application;

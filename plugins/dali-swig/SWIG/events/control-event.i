@@ -191,10 +191,10 @@
       * @brief Event arguments that passed via Hover signal
       *
       */
-    public class HoverEventArgs : EventArgs
+    public class HoverArgs : EventArgs
     {
     private View _view;
-    private HoverEvent _hoverEvent;
+    private Hover _hover;
 
       /**
         * @brief View - is the view that is being hovered
@@ -213,19 +213,19 @@
       }
 
       /**
-        * @brief HoverEvent - contains touch points that represent the points
+        * @brief Hover - contains touch points that represent the points
         * that are currently being hovered or the points where a hover has stopped
         *
         */
-      public HoverEvent HoverEvent
+      public Hover Hover
       {
         get
         {
-          return _hoverEvent;
+          return _hover;
         }
         set
         {
-          _hoverEvent = value;
+          _hover = value;
         }
       }
     }
@@ -348,9 +348,9 @@
     private TouchCallbackDelegate _viewTouchDataCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate bool HoverEventCallbackDelegate(IntPtr view, IntPtr hoverEvent);
-    private DaliEventHandlerWithReturnType<object,HoverEventArgs,bool> _viewHoverEventHandler;
-    private HoverEventCallbackDelegate _viewHoverEventCallbackDelegate;
+    private delegate bool HoverCallbackDelegate(IntPtr view, IntPtr hover);
+    private DaliEventHandlerWithReturnType<object,HoverArgs,bool> _viewHoverHandler;
+    private HoverCallbackDelegate _viewHoverCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate bool WheelEventCallbackDelegate(IntPtr view, IntPtr wheelEvent);
@@ -369,7 +369,7 @@
 
     /**
      * @brief Event for KeyInputFocusGained signal which can be used to subscribe/unsubscribe the event handler
-     * (in the type of KeyInputFocusGainedEventHandler-DaliEventHandler<object,KeyInputFocusGainedEventArgs>) 
+     * (in the type of KeyInputFocusGainedEventHandler-DaliEventHandler<object,KeyInputFocusGainedEventArgs>)
      * provided by the user. KeyInputFocusGained signal is emitted when the control gets Key Input Focus.
      */
     public event DaliEventHandler<object,KeyInputFocusGainedEventArgs> KeyInputFocusGained
@@ -628,22 +628,22 @@
 
     /**
       * @brief Event for Hovered signal which can be used to subscribe/unsubscribe the event handler
-      * (in the type of HoverEventHandler-DaliEventHandlerWithReturnType<object,HoverEventArgs,bool>)
+      * (in the type of HoverHandler-DaliEventHandlerWithReturnType<object,HoverArgs,bool>)
       * provided by the user. Hovered signal is emitted when hover input is received.
       */
-    public event DaliEventHandlerWithReturnType<object,HoverEventArgs,bool> Hovered
+    public event DaliEventHandlerWithReturnType<object,HoverArgs,bool> Hovered
     {
       add
       {
         lock(this)
         {
           // Restricted to only one listener
-          if (_viewHoverEventHandler == null)
+          if (_viewHoverHandler == null)
           {
-            _viewHoverEventHandler += value;
+            _viewHoverHandler += value;
 
-            _viewHoverEventCallbackDelegate = new HoverEventCallbackDelegate(OnHoverEvent);
-            this.HoveredSignal().Connect(_viewHoverEventCallbackDelegate);
+            _viewHoverCallbackDelegate = new HoverCallbackDelegate(OnHover);
+            this.HoveredSignal().Connect(_viewHoverCallbackDelegate);
           }
         }
       }
@@ -652,29 +652,29 @@
       {
         lock(this)
         {
-          if (_viewHoverEventHandler != null)
+          if (_viewHoverHandler != null)
           {
-            this.HoveredSignal().Disconnect(_viewHoverEventCallbackDelegate);
+            this.HoveredSignal().Disconnect(_viewHoverCallbackDelegate);
           }
 
-          _viewHoverEventHandler -= value;
+          _viewHoverHandler -= value;
         }
       }
     }
 
     // Callback for View Hover signal
-    private bool OnHoverEvent(IntPtr view, IntPtr hoverEvent)
+    private bool OnHover(IntPtr view, IntPtr hover)
     {
-      HoverEventArgs e = new HoverEventArgs();
+      HoverArgs e = new HoverArgs();
 
-      // Populate all members of "e" (HoverEventArgs) with real data
+      // Populate all members of "e" (HoverArgs) with real data
       e.View = View.GetViewFromPtr(view);
-      e.HoverEvent = Dali.HoverEvent.GetHoverEventFromPtr(hoverEvent);
+      e.Hover = Dali.Hover.GetHoverFromPtr(hover);
 
-      if (_viewHoverEventHandler != null)
+      if (_viewHoverHandler != null)
       {
         //here we send all data to user event handlers
-        return _viewHoverEventHandler(this, e);
+        return _viewHoverHandler(this, e);
       }
 
       return false;
@@ -852,6 +852,14 @@
         GetProperty( View.Property.TOOLTIP).Get(  temp );
         return temp;
       }
+      set
+      {
+        SetProperty( View.Property.TOOLTIP, new Dali.Property.Value( value ) );
+      }
+    }
+
+    public string TooltipText
+    {
       set
       {
         SetProperty( View.Property.TOOLTIP, new Dali.Property.Value( value ) );

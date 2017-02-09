@@ -30,7 +30,7 @@ namespace Dali
             viewWrapperImpl.OnSizeSet = new ViewWrapperImpl.OnSizeSetDelegate(OnSizeSet);
             viewWrapperImpl.OnSizeAnimation = new ViewWrapperImpl.OnSizeAnimationDelegate(OnSizeAnimation);
             viewWrapperImpl.OnTouchEvent = new ViewWrapperImpl.OnTouchEventDelegate(OnTouchEvent);
-            viewWrapperImpl.OnHoverEvent = new ViewWrapperImpl.OnHoverEventDelegate(OnHoverEvent);
+            viewWrapperImpl.OnHover = new ViewWrapperImpl.OnHoverDelegate(OnHover);
             viewWrapperImpl.OnKeyEvent = new ViewWrapperImpl.OnKeyEventDelegate(OnKeyEvent);
             viewWrapperImpl.OnWheelEvent = new ViewWrapperImpl.OnWheelEventDelegate(OnWheelEvent);
             viewWrapperImpl.OnRelayout = new ViewWrapperImpl.OnRelayoutDelegate(OnRelayout);
@@ -469,11 +469,11 @@ namespace Dali
         /**
          * @brief Called after a hover-event is received by the owning actor.
          *
-         * @param[in] event The hover event
-         * @return True if the event should be consumed.
+         * @param[in] hover The hover event
+         * @return True if the hover event should be consumed.
          * @note CustomViewBehaviour.REQUIRES_HOVER_EVENTS must be enabled during construction. See CustomView(ViewWrapperImpl.CustomViewBehaviour behaviour).
          */
-        public virtual bool OnHoverEvent(HoverEvent hoverEvent)
+        public virtual bool OnHover(Hover hover)
         {
             return false; // Do not consume
         }
