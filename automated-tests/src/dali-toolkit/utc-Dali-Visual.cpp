@@ -286,19 +286,6 @@ int UtcDaliVisualSize(void)
   svgVisual2.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 100.f), TEST_LOCATION ); // Natural size should still be 100, 100
 
-  // Batch Image visual
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  Vector2 testSize(80.f, 160.f);
-  platform.SetClosestImageSize(testSize);
-  propertyMap.Clear();
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
-  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-  propertyMap.Insert( "batchingEnabled", true );
-  Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
-  batchImageVisual.SetTransformAndSize(DefaultTransform(), controlSize );
-  batchImageVisual.GetNaturalSize( naturalSize );
-  DALI_TEST_EQUALS( naturalSize, Vector2( 80.0f, 160.0f ), TEST_LOCATION );
-
   // Text visual.
 
   // Load some fonts to get the same metrics on different platforms.
@@ -957,45 +944,6 @@ int UtcDaliVisualGetPropertyMap9(void)
   END_TEST;
 }
 
-int UtcDaliVisualGetPropertyMapBatchImageVisual(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetPropertyMapBatchImageVisual:" );
-
-  VisualFactory factory = VisualFactory::Get();
-  Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
-  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
-  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, 20 );
-  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, 30 );
-
-  Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
-  DALI_TEST_CHECK( batchImageVisual );
-
-  Property::Map resultMap;
-  batchImageVisual.CreatePropertyMap( resultMap );
-
-  // Check the property values from the returned map from visual
-  Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
-
-  value = resultMap.Find( ImageVisual::Property::URL, Property::STRING );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == TEST_IMAGE_FILE_NAME );
-
-  value = resultMap.Find( ImageVisual::Property::DESIRED_WIDTH, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == 20 );
-
-  value = resultMap.Find( ImageVisual::Property::DESIRED_HEIGHT, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == 30 );
-
-  END_TEST;
-}
-
 //Text shape visual
 int UtcDaliVisualGetPropertyMap10(void)
 {
@@ -1113,36 +1061,6 @@ int UtcDaliVisualGetPropertyMap11(void)
   value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
-
-  END_TEST;
-}
-
-int UtcDaliVisualGetPropertyMapBatchImageVisualNoAtlas(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetPropertyMapBatchImageVisualNoAtlas:" );
-
-  VisualFactory factory = VisualFactory::Get();
-  Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
-  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
-  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-
-  // Set the desired size to be larger than the atlas limit of 1024x1024.
-  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, 2048 );
-  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, 2048 );
-
-  // Create the visual.
-  Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
-
-  DALI_TEST_CHECK( batchImageVisual );
-
-  DummyControl dummyControl = DummyControl::New(true);
-  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
-  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, batchImageVisual );
-  Stage::GetCurrent().Add( dummyControl );
-
-  DALI_TEST_CHECK( dummyControl.GetRendererCount() == 1u );
 
   END_TEST;
 }

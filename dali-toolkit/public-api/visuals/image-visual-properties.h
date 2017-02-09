@@ -105,15 +105,6 @@ enum
   BORDER_ONLY,
 
   /**
-   * @brief This enables Image visuals to automatically be converted to Batch-Image visuals.
-   * @details Name "batchingEnabled", type Property::BOOLEAN.
-   * @SINCE_1_2.0
-   * @note Optional. If not specified, the default is false.
-   * @note For Image visuals only. Not to be used with NPatch or SVG images.
-   */
-  BATCHING_ENABLED,
-
-  /**
    * @brief The image area to be displayed.
    * @details Name "pixelArea", type Property::VECTOR4.
    *          It is a rectangular area.
