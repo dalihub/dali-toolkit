@@ -731,7 +731,7 @@ void TextLabel::RenderText()
   {
     renderableActor = mRenderer->Render( mController->GetView(),
                                          alignmentOffset,
-                                         DepthIndex::TEXT );
+                                         DepthIndex::CONTENT );
   }
 
   if( renderableActor != mRenderableActor )
