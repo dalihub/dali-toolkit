@@ -84,7 +84,7 @@ const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
     void main()\n
     {\n
       mediump vec2 scale        = vec2( length( uModelMatrix[ 0 ].xyz ), length( uModelMatrix[ 1 ].xyz ) );\n
-      mediump vec2 size         = uSize.xy * scale;\n
+      mediump vec2 size         = uSize.xy;\n
       \n
       mediump vec2 fixedFactor  = vec2( uFixed[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uFixed[ int( ( aPosition.y  + 1.0 ) * 0.5 ) ].y );\n
       mediump vec2 stretch      = floor( aPosition * 0.5 );\n
@@ -92,7 +92,7 @@ const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
       \n
       mediump vec4 vertexPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );\n
       vertexPosition.xy -= size * vec2( 0.5, 0.5 );\n
-      vertexPosition.xy =  vertexPosition.xy / scale;\n
+      vertexPosition.xy =  vertexPosition.xy;\n
       \n
       vertexPosition = uMvpMatrix * vertexPosition;\n
       \n
