@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -980,7 +980,7 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
     Property::Map visualTransform;
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, size )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 0.0f, 0.0f, 1.0f, 1.0f) );  // Use relative size
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) );
 
     currentBackGroundVisual.SetTransformAndSize( visualTransform, size );
   }
@@ -993,7 +993,8 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, visualSize )
                    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, visualPosition )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f) )  // Use absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
                    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
                    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, visualAnchorPoint );
 
@@ -1023,7 +1024,8 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
       Property::Map textVisualTransform;
       textVisualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, preSize )
                          .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, labelPosition )
-                         .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f,1.0f ) ) // Use absolute size
+                         .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                         .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
                          .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
                          .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, visualAnchorPoint );
 

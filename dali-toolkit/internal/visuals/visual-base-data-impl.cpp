@@ -59,6 +59,11 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, BOTTOM_CENTER )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, BOTTOM_END )
 DALI_ENUM_TO_STRING_TABLE_END( ALIGN )
 
+DALI_ENUM_TO_STRING_TABLE_BEGIN( POLICY )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual::Transform::Policy, RELATIVE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual::Transform::Policy, ABSOLUTE )
+DALI_ENUM_TO_STRING_TABLE_END( POLICY )
+
 Dali::Vector2 PointToVector2( Toolkit::Align::Type point, Toolkit::Direction::Type direction )
 {
   static const float pointToVector2[] = { 0.0f,0.0f,
@@ -78,6 +83,33 @@ Dali::Vector2 PointToVector2( Toolkit::Align::Type point, Toolkit::Direction::Ty
   }
 
   return result;
+}
+
+bool GetPolicyFromValue( const Property::Value& value, Vector2& policy )
+{
+  bool success = false;
+  if( value.Get( policy ) )
+  {
+    success = true;
+  }
+  else
+  {
+    Property::Array* array = value.GetArray();
+    if( array && array->Size() == 2 )
+    {
+      DevelVisual::Transform::Policy::Type xPolicy = static_cast< DevelVisual::Transform::Policy::Type >( -1 ); // Assign an invalid value so definitely changes
+      DevelVisual::Transform::Policy::Type yPolicy = static_cast< DevelVisual::Transform::Policy::Type >( -1 ); // Assign an invalid value so definitely changes
+
+      if( Scripting::GetEnumerationProperty< DevelVisual::Transform::Policy::Type >( array->GetElementAt( 0 ), POLICY_TABLE, POLICY_TABLE_COUNT, xPolicy ) &&
+          Scripting::GetEnumerationProperty< DevelVisual::Transform::Policy::Type >( array->GetElementAt( 1 ), POLICY_TABLE, POLICY_TABLE_COUNT, yPolicy ) )
+      {
+        policy.x = xPolicy;
+        policy.y = yPolicy;
+        success = true;
+      }
+    }
+  }
+  return success;
 }
 
 } // unnamed namespace
@@ -253,9 +285,24 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap( const Property:
           Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mAnchorPoint );
           break;
         }
-        case Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE:
+        case Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY:
         {
-          keyValue.second.Get( mOffsetSizeMode );
+          Vector2 policy;
+          if( GetPolicyFromValue( keyValue.second, policy ) )
+          {
+            mOffsetSizeMode.x = policy.x;
+            mOffsetSizeMode.y = policy.y;
+          }
+          break;
+        }
+        case Toolkit::DevelVisual::Transform::Property::SIZE_POLICY:
+        {
+          Vector2 policy;
+          if( GetPolicyFromValue( keyValue.second, policy ) )
+          {
+            mOffsetSizeMode.z = policy.x;
+            mOffsetSizeMode.w = policy.y;
+          }
           break;
         }
       }
@@ -272,23 +319,29 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap( const Property:
       }
       else if( keyValue.first == "origin" )
       {
-        Toolkit::Align::Type align(Toolkit::Align::CENTER);
-        if( Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, align ) )
-        {
-          mOrigin = align;
-        }
+        Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mOrigin );
       }
       else if( keyValue.first == "anchorPoint" )
       {
-        Toolkit::Align::Type align(Toolkit::Align::CENTER);
-        if( Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, align ) )
+        Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mAnchorPoint );
+      }
+      else if( keyValue.first == "offsetPolicy" )
+      {
+        Vector2 policy;
+        if( GetPolicyFromValue( keyValue.second, policy ) )
         {
-          mAnchorPoint = align;
+          mOffsetSizeMode.x = policy.x;
+          mOffsetSizeMode.y = policy.y;
         }
       }
-      else if( keyValue.first == "offsetSizeMode" )
+      else if( keyValue.first == "sizePolicy" )
       {
-        keyValue.second.Get( mOffsetSizeMode );
+        Vector2 policy;
+        if( GetPolicyFromValue( keyValue.second, policy ) )
+        {
+          mOffsetSizeMode.z = policy.x;
+          mOffsetSizeMode.w = policy.y;
+        }
       }
     }
   }
@@ -301,7 +354,8 @@ void Internal::Visual::Base::Impl::Transform::GetPropertyMap( Property::Map& map
      .Add( Toolkit::DevelVisual::Transform::Property::SIZE, mSize )
      .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, mOrigin )
      .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, mAnchorPoint )
-     .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, mOffsetSizeMode );
+     .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( mOffsetSizeMode.x, mOffsetSizeMode.y ) )
+     .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( mOffsetSizeMode.z, mOffsetSizeMode.w ) );
 }
 
 void Internal::Visual::Base::Impl::Transform::RegisterUniforms( Dali::Renderer renderer, Toolkit::Direction::Type direction )

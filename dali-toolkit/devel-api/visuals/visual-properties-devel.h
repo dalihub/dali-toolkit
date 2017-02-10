@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,10 +91,24 @@ enum Type
   OPACITY = SHADER + 4
 };
 
-} //namespace Property
+} // namespace Property
 
 namespace Transform
 {
+
+/**
+ * @brief Policies used by the transform for the offset or size.
+ */
+namespace Policy
+{
+
+enum Type
+{
+  RELATIVE = 0,   ///< Relative to the control (percentage [0.0f to 1.0f] of the control).
+  ABSOLUTE = 1    ///< Absolute value in world units.
+};
+
+} // namespace Policy
 
 namespace Property
 {
@@ -102,16 +116,16 @@ namespace Property
 enum Type
 {
   /**
-   * @brief Offset of the visual. It can be either relative (percentage of the parent)
-   * or absolute (in world units).
+   * @brief Offset of the visual, which can be either relative (percentage [0.0f to 1.0f] of the parent) or absolute (in world units).
    * @details Name "offset", type Property::VECTOR2
+   * @see OFFSET_POLICY
    */
   OFFSET,
 
   /**
-   * @brief Size of the visual. It can be either relative (percentage of the parent)
-   * or absolute (in world units).
+   * @brief Size of the visual, which can be either relative (percentage [0.0f to 1.0f] of the parent) or absolute (in world units).
    * @details Name "size", type Property::VECTOR2
+   * @see SIZE_POLICY
    */
   SIZE,
 
@@ -130,15 +144,50 @@ enum Type
   ANCHOR_POINT,
 
   /**
-   * @brief Indicates which components of the offset and size are relative
-   * (percentage of the parent) or absolute (in world units).
-   * 0 indicates the component is relative, and 1 absolute.
-   * @details Name "offsetSizeMode", type Property::VECTOR4
+   * @brief Whether the x or y OFFSET values are relative (percentage [0.0f to 1.0f] of the control) or absolute (in world units).
+   * @details Name "offsetPolicy", type Vector2 or Property::ARRAY of Property::STRING.
+   *          If Property::ARRAY then 2 strings expected for the x and y.
+   *
+   * C++:
+   * @code
+   * control.SetProperty( ..., // Some visual based property
+   *                      Property::Map().Add( ... ) // Properties to set up visual
+   *                                     .Add( DevelVisual::Property::TRANSFORM,
+   *                                           Property::Array().Add( DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( Policy::ABSOLUTE, Policy::RELATIVE ) ) )
+   *                                                            .Add( DevelVisual::Transform::Property::OFFSET, Vector2( 10, 1.0f ) ) );
+   * @endcode
+   *
+   * JSON:
+   * @code
+   * {
+   *   ...
+   *   "transition":
+   *   {
+   *     "offsetPolicy" : [ "ABSOLUTE", "RELATIVE" ],
+   *     "offset" : [ 10, 1.0 ]
+   *   }
+   *   ...
+   * }
+   *
+   * @endcode
+   * @see Policy::Type
+   * @note By default, both the x and the y offset is RELATIVE.
    */
-  OFFSET_SIZE_MODE
+  OFFSET_POLICY,
+
+  /**
+   * @brief Whether the width or height SIZE values are relative (percentage [0.0f to 1.0f] of the control) or absolute (in world units).
+   * @details Name "sizePolicy", type Vector2 or Property::ARRAY of Property::STRING.
+   *          If Property::ARRAY then 2 strings expected for the width and height.
+   *
+   * @see Policy::Type
+   * @see OFFSET_POLICY for example
+   * @note By default, both the width and the height is RELATIVE to the control's size.
+   */
+  SIZE_POLICY,
 };
 
-} //namespace Property
+} // namespace Property
 
 } // namespace Transform
 

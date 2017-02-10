@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_VISUAL_BASE_H
 #define DALI_TOOLKIT_VISUAL_BASE_H
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,27 +52,23 @@ namespace Visual
  * | transform               | MAP              |
  *
  * where \b customShader is a map with at least one of the following properties:
- * | %Property Name          | Type             | Required | Default | Description |
- * |-------------------------|------------------|----------|---------|-------------|
- * | vertexShader            | STRING           | No | "" | Vertex shader code|
- * | fragmentShader          | STRING           | No | "" | Fragment shader code|
- * | subdivideGridX          | INTEGER          | No | 1 | How to subdivide the grid along X |
- * | subdivideGridY          | INTEGER          | No | 1 | How to subdivide the grid along Y |
- * | shaderHints             | INTEGER or ARRAY of STRING | No | NONE | Bitmask of hints @sa Dali::Shader::Hint |
+ * | %Property Name          | Type                       | Required | Default | Description                             |
+ * |-------------------------|----------------------------|----------|---------|-----------------------------------------|
+ * | vertexShader            | STRING                     | No       | ""      | Vertex shader code                      |
+ * | fragmentShader          | STRING                     | No       | ""      | Fragment shader code                    |
+ * | subdivideGridX          | INTEGER                    | No       | 1       | How to subdivide the grid along X       |
+ * | subdivideGridY          | INTEGER                    | No       | 1       | How to subdivide the grid along Y       |
+ * | shaderHints             | INTEGER or ARRAY of STRING | No       | NONE    | Bitmask of hints @sa Dali::Shader::Hint |
  *
  * and \b transform is a map with the following properties:
- * | %Property Name          | Type             | Required | Default |Description |
- * |-------------------------|------------------|----------|---------|------------|
- * | offset                  | VECTOR2          | No | (0,0) | Offset of visual from origin |
- * | size                    | VECTOR2          | No | (1,1) | size of visual |
- * | origin                  | INTEGER or STRING | No | CENTER | origin of the visual @sa Dali::Toolkit::Align |
- * | anchorPoint             | INTEGER or STRING | No | CENTER | anchor point of the visual @sa Dali::Toolkit::Align |
- * | offsetSizeMode          | VECTOR4          | No | (0,0,0,0) | See below |
- *
- *
- * offsetSizeMode describes whether the offset and the size are
- * relative or absolute by using 0 or 1 respectively in the corresponding
- * components (offsetSizeMode.xy for offset.xy; offsetSizeMode.zw for size.xy).
+ * | %Property Name          | Type              | Required | Default                | Description                                         |
+ * |-------------------------|-------------------|----------|------------------------|-----------------------------------------------------|
+ * | offset                  | VECTOR2           | No       | (0,0)                  | Offset of visual from origin                        |
+ * | size                    | VECTOR2           | No       | (1,1)                  | size of visual                                      |
+ * | origin                  | INTEGER or STRING | No       | CENTER                 | origin of the visual @sa Dali::Toolkit::Align       |
+ * | anchorPoint             | INTEGER or STRING | No       | CENTER                 | anchor point of the visual @sa Dali::Toolkit::Align |
+ * | offsetPolicy            | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::DevelVisual::Transform::Policy   |
+ * | sizePolicy              | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::DevelVisual::Transform::Policy   |
  *
  * Relative means that the component describes a factor of the parent control size;
  * size.x = 1 means full width; size.y = 0.5 means half height.

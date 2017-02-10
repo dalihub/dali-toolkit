@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,9 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
     Property::Map visualTransform;
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, trackSize )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );  // Use Absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) );
+
     trackVisual.SetTransformAndSize( visualTransform, trackSize );
   }
 
@@ -151,7 +153,8 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
     Property::Map visualTransform;
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2( mDomain.from.x + mSecondaryProgressValue * ( mDomain.to.x - mDomain.from.x ), trackSize.height  ) )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) )  // Use Absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
                    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
                    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
     secondProgressVisual.SetTransformAndSize( visualTransform, trackSize );
@@ -162,7 +165,8 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
     Property::Map visualTransform;
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2( mDomain.from.x + mProgressValue * ( mDomain.to.x - mDomain.from.x ), trackSize.height ) )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) )  // Use Absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
                    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
                    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
     progressVisual.SetTransformAndSize( visualTransform, trackSize );
@@ -173,8 +177,8 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
     Property::Map visualTransform;
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, trackSize )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );  // Use Absolute size
-
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) );
     labelVisual.SetTransformAndSize( visualTransform, trackSize );
   }
 
@@ -183,7 +187,8 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
     Property::Map visualTransform;
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, trackSize )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );  // Use Absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) );
     indeterminateVisual.SetTransformAndSize( visualTransform, trackSize );
   }
 

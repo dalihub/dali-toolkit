@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,8 @@ Property::Map DefaultTransform()
     .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
     .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
     .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
+    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::DevelVisual::Transform::Policy::RELATIVE, Toolkit::DevelVisual::Transform::Policy::RELATIVE ) )
+    .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::DevelVisual::Transform::Policy::RELATIVE, Toolkit::DevelVisual::Transform::Policy::RELATIVE ) );
   return transformMap;
 }
 
