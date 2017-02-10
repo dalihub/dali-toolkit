@@ -123,6 +123,7 @@ devel_api_super_blur_view_header_files = \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.h
 
 devel_api_text_controls_header_files = \
+  $(devel_api_src_dir)/controls/text-controls/text-editor-devel.h \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.h \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.h
 

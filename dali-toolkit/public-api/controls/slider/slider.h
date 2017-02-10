@@ -37,7 +37,7 @@ class Slider;
  */
 
 /**
- * @brief Slider is a control to enable sliding an indicator between two values
+ * @brief Slider is a control to enable sliding an indicator between two values.
  *
  * Signals
  * | %Signal Name      | Method                        |
@@ -54,7 +54,7 @@ public:
   // Properties
 
   /**
-   * @brief The start and end property ranges for this control.
+   * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_1.39
    */
   enum PropertyRange
@@ -64,104 +64,104 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the Slider class.
+   * @brief Enumeration for the instance of properties belonging to the Slider class.
    * @SINCE_1_1.39
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the Slider class.
+     * @brief Enumeration for the instance of properties belonging to the Slider class.
      * @SINCE_1_1.39
      */
     enum
     {
 
       /**
-       * @brief name "lowerBound", type float
+       * @brief name "lowerBound", type float.
        * @SINCE_1_1.39
        */
       LOWER_BOUND = PROPERTY_START_INDEX,
 
       /**
-       * @brief name "upperBound", type float
+       * @brief name "upperBound", type float.
        * @SINCE_1_1.39
        */
       UPPER_BOUND,
 
       /**
-       * @brief name "value", type float
+       * @brief name "value", type float.
        * @SINCE_1_1.39
        */
       VALUE,
 
       /**
-       * @brief name "trackVisual", type string if it is a url, map otherwise
+       * @brief name "trackVisual", type string if it is a url, map otherwise.
        * @SINCE_1_1.39
        */
       TRACK_VISUAL,
 
       /**
-       * @brief name "handleVisual", type string if it is a url, map otherwise
+       * @brief name "handleVisual", type string if it is a url, map otherwise.
        * @SINCE_1_1.39
        */
       HANDLE_VISUAL,
 
       /**
-       * @brief name "progressVisual", type string if it is a url, map otherwise
+       * @brief name "progressVisual", type string if it is a url, map otherwise.
        * @SINCE_1_1.39
        */
       PROGRESS_VISUAL,
 
       /**
-       * @brief name "popupVisual", type string if it is a url, map otherwise
+       * @brief name "popupVisual", type string if it is a url, map otherwise.
        * @SINCE_1_1.39
        */
       POPUP_VISUAL,
 
       /**
-       * @brief name "popupArrowVisual", type string if it is a url, map otherwise
+       * @brief name "popupArrowVisual", type string if it is a url, map otherwise.
        * @SINCE_1_1.39
        */
       POPUP_ARROW_VISUAL,
 
       /**
-       * @brief name "disabledColor", type Vector4
+       * @brief name "disabledColor", type Vector4.
        * @SINCE_1_1.39
        */
       DISABLED_COLOR,
 
       /**
-       * @brief name "valuePrecision", type int
+       * @brief name "valuePrecision", type int.
        * @SINCE_1_1.39
        */
       VALUE_PRECISION,
 
       /**
-       * @brief name "showPopup", type bool
+       * @brief name "showPopup", type bool.
        * @SINCE_1_1.39
        */
       SHOW_POPUP,
 
       /**
-       * @brief name "showValue", type bool
+       * @brief name "showValue", type bool.
        * @SINCE_1_1.39
        */
       SHOW_VALUE,
 
       /**
-       * @brief name "marks", type Property::Array<float>
+       * @brief name "marks", type Property::Array<float>.
        * @SINCE_1_1.39
        */
       MARKS,
 
       /**
-       * @brief name "snapToMarks", type bool
+       * @brief name "snapToMarks", type bool.
        * @SINCE_1_1.39
        */
       SNAP_TO_MARKS,
 
       /**
-       * @brief name "markTolerance", type float
+       * @brief name "markTolerance", type float.
        * @SINCE_1_1.39
        */
       MARK_TOLERANCE,
@@ -211,10 +211,10 @@ public:
   ~Slider();
 
   /**
-   * @brief Downcast an Object handle to Slider.
+   * @brief Downcasts an Object handle to Slider.
    *
-   * If handle points to a Slider the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * If handle points to a Slider, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    * @SINCE_1_1.39
    * @param[in] handle Handle to an object
    * @return handle to a Slider or an uninitialized handle
@@ -278,7 +278,7 @@ public: // Not intended for application developers
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_1.39
-   * @param[in]  implementation  The Control implementation
+   * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL Slider(Internal::Slider& implementation);
 
@@ -286,7 +286,7 @@ public: // Not intended for application developers
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @SINCE_1_1.39
-   * @param[in]  internal  A pointer to the internal CustomActor
+   * @param[in] internal A pointer to the internal CustomActor
    */
   explicit DALI_INTERNAL Slider( Dali::Internal::CustomActor* internal );
   /// @endcond

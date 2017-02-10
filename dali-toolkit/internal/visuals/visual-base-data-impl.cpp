@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/internal/helpers/property-helper.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
@@ -116,7 +117,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap( const Property:
   Property::Value* vertexShaderValue = shaderMap.Find( Toolkit::Visual::Shader::Property::VERTEX_SHADER, CUSTOM_VERTEX_SHADER );
   if( vertexShaderValue )
   {
-    if( !vertexShaderValue->Get( mVertexShader ) )
+    if( ! GetStringFromProperty( *vertexShaderValue, mVertexShader ) )
     {
       DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string\n", CUSTOM_VERTEX_SHADER );
     }
@@ -125,7 +126,7 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap( const Property:
   Property::Value* fragmentShaderValue = shaderMap.Find( Toolkit::Visual::Shader::Property::FRAGMENT_SHADER, CUSTOM_FRAGMENT_SHADER );
   if( fragmentShaderValue )
   {
-    if( !fragmentShaderValue->Get( mFragmentShader ) )
+    if( ! GetStringFromProperty( *fragmentShaderValue, mFragmentShader ) )
     {
       DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string\n", CUSTOM_FRAGMENT_SHADER );
     }

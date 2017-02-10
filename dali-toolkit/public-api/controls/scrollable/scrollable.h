@@ -55,7 +55,7 @@ class DALI_IMPORT_API Scrollable : public Control
 public:
 
   /**
-   * @brief The start and end property ranges for this control.
+   * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
    */
   enum PropertyRange
@@ -68,13 +68,13 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the Scrollable class.
+   * @brief Enumeration for the instance of properties belonging to the Scrollable class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the Scrollable class.
+     * @brief Enumeration for the instance of properties belonging to the Scrollable class.
      * @SINCE_1_0.0
      */
     enum
@@ -128,13 +128,13 @@ public:
    *
    * Changes this handle to point to another real object.
    * @SINCE_1_0.0
-   * @param[in] handle to copy from
+   * @param[in] handle Handle to copy from
    * @return A reference to this
    */
   Scrollable& operator=( const Scrollable& handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -142,10 +142,10 @@ public:
   ~Scrollable();
 
   /**
-   * @brief Downcast a handle to Scrollable handle.
+   * @brief Downcasts a handle to Scrollable handle.
    *
-   * If handle points to a Scrollable the downcast produces valid
-   * handle. If not the returned handle is left uninitialized.
+   * If handle points to a Scrollable, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
@@ -170,33 +170,33 @@ public:
   void SetOvershootEnabled(bool enable);
 
   /**
-   * @brief Set the color of the overshoot effect.
+   * @brief Sets the color of the overshoot effect.
    *
    * @SINCE_1_0.0
-   * @param[in] color The color of the overshoot effect.
+   * @param[in] color The color of the overshoot effect
    */
   void SetOvershootEffectColor( const Vector4& color );
 
   /**
-   * @brief Get the color of the overshoot effect.
+   * @brief Gets the color of the overshoot effect.
    * @SINCE_1_0.0
-   * @return The color of the overshoot effect.
+   * @return The color of the overshoot effect
    */
   Vector4 GetOvershootEffectColor() const;
 
   /**
-   * @brief Set the speed of overshoot animation in pixels per second.
+   * @brief Sets the speed of overshoot animation in pixels per second.
    *
    * When the speed is not greater than 0, the overshoot is set instantly with no animation.
    * @SINCE_1_0.0
-   * @param[in] pixelsPerSecond The speed of the overshoot animation.
+   * @param[in] pixelsPerSecond The speed of the overshoot animation
    */
   void SetOvershootAnimationSpeed( float pixelsPerSecond );
 
   /**
-   * @brief Get the speed of overshoot animation in pixels per second.
+   * @brief Gets the speed of overshoot animation in pixels per second.
    * @SINCE_1_0.0
-   * @return The speed of the overshoot animation.
+   * @return The speed of the overshoot animation
    */
   float GetOvershootAnimationSpeed() const;
 
@@ -210,7 +210,7 @@ public: // Signals
    *   void YourCallbackName(const Vector2& currentScrollPosition);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   ScrollStartedSignalType& ScrollStartedSignal();
@@ -223,7 +223,7 @@ public: // Signals
    *   void YourCallbackName(const Vector2& currentScrollPosition);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   ScrollUpdatedSignalType& ScrollUpdatedSignal();
@@ -236,7 +236,7 @@ public: // Signals
    *   void YourCallbackName(const Vector2& currentScrollPosition);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   ScrollCompletedSignalType& ScrollCompletedSignal();
@@ -248,7 +248,7 @@ public: // Not intended for application developers
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_0.0
-   * @param[in]  implementation  The Control implementation.
+   * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL Scrollable(Internal::Scrollable& implementation);
 
@@ -256,7 +256,7 @@ public: // Not intended for application developers
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @SINCE_1_0.0
-   * @param[in]  internal  A pointer to the internal CustomActor.
+   * @param[in] internal A pointer to the internal CustomActor
    */
   explicit DALI_INTERNAL Scrollable( Dali::Internal::CustomActor* internal );
   /// @endcond

@@ -104,7 +104,7 @@ public:
   AsyncImageLoader();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    * @SINCE_1_2_14
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
@@ -129,18 +129,18 @@ public:
   AsyncImageLoader& operator=( const AsyncImageLoader& handle );
 
   /**
-   * @brief Create a new loader to load the image asynchronously in a worker thread.
+   * @brief Creates a new loader to load the image asynchronously in a worker thread.
    * @SINCE_1_2_14
    *
-   * @return The image loader.
+   * @return The image loader
    */
   static AsyncImageLoader New();
 
   /**
-   * @brief Downcast a handle to AsyncImageLoader handle.
+   * @brief Downcasts a handle to AsyncImageLoader handle.
    *
-   * If the handle points to an AsyncImageLoader object the downcast produces
-   * a valid handle. If not, the returned handle is left uninitialized.
+   * If the handle points to an AsyncImageLoader object, the downcast produces a valid handle.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_2_14
    * @param[in] handle A handle to an object
@@ -149,7 +149,7 @@ public:
   static AsyncImageLoader DownCast( BaseHandle handle );
 
   /**
-   * @brief Start an image loading task.
+   * @brief Starts an image loading task.
    * Note: When using this method, the following defaults will be used:
    * fittingMode = FittingMode::DEFAULT
    * samplingMode = SamplingMode::BOX_THEN_LINEAR
@@ -158,14 +158,13 @@ public:
    * @SINCE_1_2_14
    * @REMARK_INTERNET
    * @REMARK_STORAGE
-   *
-   * @param[in] url The URL of the image file to load.
-   * @return The loading task id.
+   * @param[in] url The URL of the image file to load
+   * @return The loading task id
    */
   uint32_t Load( const std::string& url );
 
   /**
-   * @brief Start an image loading task.
+   * @brief Starts an image loading task.
    * Note: When using this method, the following defaults will be used:
    * fittingMode = FittingMode::DEFAULT
    * samplingMode = SamplingMode::BOX_THEN_LINEAR
@@ -174,25 +173,23 @@ public:
    * @SINCE_1_2_14
    * @REMARK_INTERNET
    * @REMARK_STORAGE
-   *
-   * @param[in] url The URL of the image file to load.
-   * @param[in] dimensions The width and height to fit the loaded image to.
-   * @return The loading task id.
+   * @param[in] url The URL of the image file to load
+   * @param[in] dimensions The width and height to fit the loaded image to
+   * @return The loading task id
    */
   uint32_t Load( const std::string& url, ImageDimensions dimensions );
 
   /**
-   * @brief Start an image loading task.
+   * @brief Starts an image loading task.
    * @SINCE_1_2_14
    * @REMARK_INTERNET
    * @REMARK_STORAGE
-   *
-   * @param[in] url The URL of the image file to load.
-   * @param[in] dimensions The width and height to fit the loaded image to.
-   * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
-   * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
-   * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
-   * @return The loading task id.
+   * @param[in] url The URL of the image file to load
+   * @param[in] dimensions The width and height to fit the loaded image to
+   * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
+   * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
+   * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
+   * @return The loading task id
    */
   uint32_t Load( const std::string& url,
                  ImageDimensions dimensions,
@@ -201,7 +198,7 @@ public:
                  bool orientationCorrection );
 
   /**
-   * @brief Cancel a image loading task if it is still queueing in the work thread.
+   * @brief Cancels an image loading task if it is still queueing in the work thread.
    * @SINCE_1_2_14
    *
    * @param[in] loadingTaskId The task id returned when invoking the load call.
@@ -210,21 +207,20 @@ public:
   bool Cancel( uint32_t loadingTaskId );
 
   /**
-   * @brief Cancel all the loading tasks in the queue
+   * @brief Cancels all the loading tasks in the queue.
    * @SINCE_1_2_14
    */
   void CancelAll();
 
   /**
-   * @brief Signal emit for connected callback functions to get access to the loaded pixel data.
+   * @brief Signal emitted for connected callback functions to get access to the loaded pixel data.
    *
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName( uint32_t id, PixelData pixelData );
    * @endcode
    * @SINCE_1_2_14
-   *
-   * @return A reference to a signal object to Connect() with.
+   * @return A reference to a signal object to Connect() with
    */
   ImageLoadedSignalType& ImageLoadedSignal();
 
@@ -236,8 +232,7 @@ public: // Not intended for developer use
    *
    * @note Not intended for application developers
    * @SINCE_1_2_14
-   *
-   * @param[in] impl A pointer to the object.
+   * @param[in] impl A pointer to the object
    */
   explicit DALI_INTERNAL AsyncImageLoader( Internal::AsyncImageLoader* impl );
   /// @endcond

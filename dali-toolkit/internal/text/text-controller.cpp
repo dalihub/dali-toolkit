@@ -1344,15 +1344,16 @@ Vector3 Controller::GetNaturalSize()
                                                                            BIDI_INFO         |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
+
+    // Set the update info to relayout the whole text.
+    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
+    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
+
     // Make sure the model is up-to-date before layouting
     mImpl->UpdateModel( onlyOnceOperations );
 
     // Layout the text for the new width.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT );
-
-    // Set the update info to relayout the whole text.
-    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
-    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
 
     // Store the actual control's size to restore later.
     const Size actualControlSize = mImpl->mModel->mVisualModel->mControlSize;
@@ -1416,16 +1417,17 @@ float Controller::GetHeightForWidth( float width )
                                                                            BIDI_INFO         |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
+
+    // Set the update info to relayout the whole text.
+    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
+    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
+
     // Make sure the model is up-to-date before layouting
     mImpl->UpdateModel( onlyOnceOperations );
 
 
     // Layout the text for the new width.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT );
-
-    // Set the update info to relayout the whole text.
-    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
-    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
 
     // Store the actual control's width.
     const float actualControlWidth = mImpl->mModel->mVisualModel->mControlSize.width;
@@ -1465,6 +1467,18 @@ float Controller::GetHeightForWidth( float width )
 const ModelInterface* const Controller::GetTextModel() const
 {
   return mImpl->mModel.Get();
+}
+
+float Controller::GetScrollAmountByUserInput()
+{
+  float scrollAmount = 0.0f;
+
+  if (NULL != mImpl->mEventData && mImpl->mEventData->mCheckScrollAmount)
+  {
+    scrollAmount = mImpl->mModel->mScrollPosition.y -  mImpl->mModel->mScrollPositionLast.y;
+    mImpl->mEventData->mCheckScrollAmount = false;
+  }
+  return scrollAmount;
 }
 
 // public : Relayout.
@@ -1538,6 +1552,7 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
 
   // Do not re-do any operation until something changes.
   mImpl->mOperationsPending = NO_OPERATION;
+  mImpl->mModel->mScrollPositionLast = mImpl->mModel->mScrollPosition;
 
   // Whether the text control is editable
   const bool isEditable = NULL != mImpl->mEventData;
@@ -1686,6 +1701,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
              ( Dali::DALI_KEY_CURSOR_UP    == keyCode ) ||
              ( Dali::DALI_KEY_CURSOR_DOWN  == keyCode ) )
     {
+      mImpl->mEventData->mCheckScrollAmount = true;
+
       Event event( Event::CURSOR_KEY_EVENT );
       event.p1.mInt = keyCode;
       mImpl->mEventData->mEventQueue.push_back( event );
@@ -1694,17 +1711,14 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       textChanged = BackspaceKeyEvent();
     }
-    else if( IsKey( keyEvent,  Dali::DALI_KEY_POWER ) )
-    {
-      mImpl->ChangeState( EventData::INTERRUPTED ); // State is not INACTIVE as expect to return to edit mode.
-      // Avoids calling the InsertText() method which can delete selected text
-    }
-    else if( IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
+    else if( IsKey( keyEvent, Dali::DALI_KEY_POWER ) ||
+             IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
              IsKey( keyEvent, Dali::DALI_KEY_HOME ) )
     {
+      // Power key/Menu/Home key behaviour does not allow edit mode to resume.
       mImpl->ChangeState( EventData::INACTIVE );
-      // Menu/Home key behaviour does not allow edit mode to resume like Power key
-      // Avoids calling the InsertText() method which can delete selected text
+
+      // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
     }
     else if( Dali::DALI_KEY_SHIFT_LEFT == keyCode )
     {
@@ -2444,7 +2458,8 @@ bool Controller::RemoveText( int cursorOffset,
       numberOfCharacters = currentText.Count() - cursorIndex;
     }
 
-    if( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters )
+    if( mImpl->mEventData->mPreEditFlag || // If the preedit flag is enabled, it means two (or more) of them came together i.e. when two keys have been pressed at the same time.
+        ( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters ) )
     {
       // Mark the paragraphs to be updated.
       mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
@@ -2792,6 +2807,8 @@ void Controller::TextInsertedEvent()
     return;
   }
 
+  mImpl->mEventData->mCheckScrollAmount = true;
+
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
@@ -2807,6 +2824,8 @@ void Controller::TextDeletedEvent()
   {
     return;
   }
+
+  mImpl->mEventData->mCheckScrollAmount = true;
 
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
@@ -2834,6 +2853,7 @@ void Controller::SelectEvent( float x, float y, bool selectAll )
       mImpl->mEventData->mEventQueue.push_back( event );
     }
 
+    mImpl->mEventData->mCheckScrollAmount = true;
     mImpl->RequestRelayout();
   }
 }

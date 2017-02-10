@@ -90,7 +90,7 @@ class DALI_IMPORT_API Button : public Control
 public:
 
   /**
-   * @brief The start and end property ranges for this control.
+   * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
    */
   enum PropertyRange
@@ -100,13 +100,13 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the Button class.
+   * @brief Enumeration for the instance of properties belonging to the Button class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the Button class.
+     * @brief Enumeration for the instance of properties belonging to the Button class.
      * @SINCE_1_0.0
      */
     enum
@@ -209,7 +209,7 @@ public:
 public:
 
   /**
-   * @brief Create an uninitialized Button.
+   * @brief Creates an uninitialized Button.
    *
    * Only derived versions can be instantiated.  Calling member
    * functions with an uninitialized Dali::Object is not allowed.
@@ -233,10 +233,10 @@ public:
   Button& operator=( const Button& button );
 
   /**
-   * @brief Downcast a handle to Button handle.
+   * @brief Downcasts a handle to Button handle.
    *
-   * If handle points to a Button the downcast produces valid
-   * handle. If not the returned handle is left uninitialized.
+   * If handle points to a Button, the downcast produces valid handle.
+   * If not the returned handle is left uninitialized.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
@@ -245,7 +245,7 @@ public:
   static Button DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -262,7 +262,7 @@ public:
    * No signals are emitted when the \e disabled property is set.
    *
    * @SINCE_1_0.0
-   * @param[in] disabled property.
+   * @param[in] disabled Disabled property
    */
   void SetDisabled( bool disabled ) DALI_DEPRECATED_API;
 
@@ -271,7 +271,7 @@ public:
    *
    * @brief Returns if the button is disabled.
    * @SINCE_1_0.0
-   * @return \e true if the button is \e disabled.
+   * @return \e true if the button is \e disabled
    */
   bool IsDisabled() const DALI_DEPRECATED_API;
 
@@ -284,7 +284,7 @@ public:
    * but no signal is emitted.
    *
    * @SINCE_1_0.0
-   * @param[in] autoRepeating \e autorepeating property.
+   * @param[in] autoRepeating \e autorepeating property
    */
   void SetAutoRepeating( bool autoRepeating ) DALI_DEPRECATED_API;
 
@@ -293,7 +293,7 @@ public:
    *
    * @brief Returns if the autorepeating property is set.
    * @SINCE_1_0.0
-   * @return \e true if the \e autorepeating property is set.
+   * @return \e true if the \e autorepeating property is set
    */
   bool IsAutoRepeating() const DALI_DEPRECATED_API;
 
@@ -302,10 +302,10 @@ public:
    *
    * @brief Sets the initial autorepeating delay.
    *
-   * By default this value is set to 0.15 seconds.
+   * By default, this value is set to 0.15 seconds.
    *
    * @SINCE_1_0.0
-   * @param[in] initialAutoRepeatingDelay in seconds.
+   * @param[in] initialAutoRepeatingDelay in seconds
    * @pre initialAutoRepeatingDelay must be greater than zero.
    */
   void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay ) DALI_DEPRECATED_API;
@@ -315,7 +315,7 @@ public:
    *
    * @brief Gets the initial autorepeating delay in seconds.
    * @SINCE_1_0.0
-   * @return the initial autorepeating delay in seconds.
+   * @return The initial autorepeating delay in seconds
    */
   float GetInitialAutoRepeatingDelay() const DALI_DEPRECATED_API;
 
@@ -324,10 +324,10 @@ public:
    *
    * @brief Sets the next autorepeating delay.
    *
-   * By default this value is set to 0.05 seconds.
+   * By default, this value is set to 0.05 seconds.
    *
    * @SINCE_1_0.0
-   * @param[in] nextAutoRepeatingDelay in seconds.
+   * @param[in] nextAutoRepeatingDelay in seconds
    * @pre nextAutoRepeatingDelay must be greater than zero.
    */
   void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay ) DALI_DEPRECATED_API;
@@ -337,7 +337,7 @@ public:
    *
    * @brief Gets the next autorepeating delay in seconds.
    * @SINCE_1_0.0
-   * @return the next autorepeating delay in seconds.
+   * @return The next autorepeating delay in seconds
    */
   float GetNextAutoRepeatingDelay() const DALI_DEPRECATED_API;
 
@@ -349,7 +349,7 @@ public:
    * If the \e togglable property is set to \e true, then the \e autorepeating property is set to false.
    *
    * @SINCE_1_0.0
-   * @param[in] togglable property.
+   * @param[in] togglable Togglable property
    */
   void SetTogglableButton( bool togglable ) DALI_DEPRECATED_API;
 
@@ -358,7 +358,7 @@ public:
    *
    * @brief Returns if the togglable property is set.
    * @SINCE_1_0.0
-   * @return \e true if the \e togglable property is set.
+   * @return \e true if the \e togglable property is set
    */
   bool IsTogglableButton() const DALI_DEPRECATED_API;
 
@@ -372,7 +372,7 @@ public:
    * Emits a Button::StateChangedSignal() signal.
    *
    * @SINCE_1_0.0
-   * @param[in] selected property.
+   * @param[in] selected Selected property
    */
   void SetSelected( bool selected ) DALI_DEPRECATED_API;
 
@@ -381,7 +381,7 @@ public:
    *
    * @brief Returns if the selected property is set and the button is togglable.
    * @SINCE_1_0.0
-   * @return \e true if the button is \e selected.
+   * @return \e true if the button is \e selected
    */
   bool IsSelected() const DALI_DEPRECATED_API;
 
@@ -391,7 +391,7 @@ public:
    * @brief Sets the animation time.
    *
    * @SINCE_1_0.0
-   * @param[in] animationTime The animation time in seconds.
+   * @param[in] animationTime The animation time in seconds
    */
   void SetAnimationTime( float animationTime ) DALI_DEPRECATED_API;
 
@@ -401,7 +401,7 @@ public:
    * @brief Retrieves button's animation time.
    *
    * @SINCE_1_0.0
-   * @return The animation time in seconds.
+   * @return The animation time in seconds
    */
   float GetAnimationTime() const DALI_DEPRECATED_API;
 
@@ -411,7 +411,7 @@ public:
    * @brief Sets the button's label.
    *
    * @SINCE_1_0.0
-   * @param[in] label The label text.
+   * @param[in] label The label text
    */
   void SetLabelText( const std::string& label ) DALI_DEPRECATED_API;
 
@@ -421,7 +421,7 @@ public:
    * @brief Gets the label.
    *
    * @SINCE_1_0.0
-   * @return The label text.
+   * @return The label text
    */
   std::string GetLabelText() const DALI_DEPRECATED_API;
 
@@ -431,7 +431,7 @@ public:
    * @brief Sets the unselected button image.
    *
    * @SINCE_1_0.0
-   * @param[in] filename The button image.
+   * @param[in] filename The button image
    */
   void SetUnselectedImage( const std::string& filename ) DALI_DEPRECATED_API;
 
@@ -442,7 +442,7 @@ public:
    * @brief Sets the background image.
    *
    * @SINCE_1_0.0
-   * @param[in] filename The background image.
+   * @param[in] filename The background image
    */
   void SetBackgroundImage( const std::string& filename ) DALI_DEPRECATED_API;
 
@@ -452,7 +452,7 @@ public:
    * @brief Sets the selected image.
    *
    * @SINCE_1_0.0
-   * @param[in] filename The selected image.
+   * @param[in] filename The selected image
    */
   void SetSelectedImage( const std::string& filename ) DALI_DEPRECATED_API;
 
@@ -463,7 +463,7 @@ public:
    * @brief Sets the selected background image.
    *
    * @SINCE_1_0.0
-   * @param[in] filename The selected background image.
+   * @param[in] filename The selected background image
    */
   void SetSelectedBackgroundImage( const std::string& filename ) DALI_DEPRECATED_API;
 
@@ -474,7 +474,7 @@ public:
    * @brief Sets the disabled background image.
    *
    * @SINCE_1_0.0
-   * @param[in] filename The disabled background image.
+   * @param[in] filename The disabled background image
    */
   void SetDisabledBackgroundImage( const std::string& filename ) DALI_DEPRECATED_API;
 
@@ -484,7 +484,7 @@ public:
    * @brief Sets the disabled button image.
    *
    * @SINCE_1_0.0
-   * @param[in] filename The disabled button image.
+   * @param[in] filename The disabled button image
    */
   void SetDisabledImage( const std::string& filename ) DALI_DEPRECATED_API;
 
@@ -495,17 +495,17 @@ public:
    * @brief Sets the disabled selected button image.
    *
    * @SINCE_1_0.0
-   * @param[in] filename The disabled selected button image.
+   * @param[in] filename The disabled selected button image
    */
   void SetDisabledSelectedImage( const std::string& filename ) DALI_DEPRECATED_API;
 
   /**
-   * @DEPRECATED_1_0.50. Instead, use SetLabelText.
+   * @DEPRECATED_1_0.50. Instead, use SetLabelText
    *
    * @brief Sets the label with an actor.
    *
    * @SINCE_1_0.0
-   * @param[in]  label The actor to use as a label
+   * @param[in] label The actor to use as a label
    */
   void SetLabel( Actor label ) DALI_DEPRECATED_API;
 
@@ -515,7 +515,7 @@ public:
    * @brief Sets the button image.
    *
    * @SINCE_1_0.0
-   * @param[in]  image The button image.
+   * @param[in] image The button image
    */
   void SetButtonImage( Image image ) DALI_DEPRECATED_API;
 
@@ -525,7 +525,7 @@ public:
    * @brief Sets the selected image.
    *
    * @SINCE_1_0.0
-   * @param[in]  image The selected image.
+   * @param[in] image The selected image
    */
   void SetSelectedImage( Image image ) DALI_DEPRECATED_API;
 
@@ -536,7 +536,7 @@ public:
    *
    * @SINCE_1_0.0
    * @remarks Avoid using this method as it's a legacy code.
-   * @return     An actor with the button image.
+   * @return An actor with the button image
    */
   Actor GetButtonImage() const DALI_DEPRECATED_API;
 
@@ -547,14 +547,14 @@ public:
    *
    * @SINCE_1_0.0
    * @remarks Avoid using this method as it's a legacy code.
-   * @return     An actor with the selected image.
+   * @return An actor with the selected image
    */
   Actor GetSelectedImage() const DALI_DEPRECATED_API;
 
 public: //Signals
 
   /**
-   * @brief Button signal type
+   * @brief Button signal type.
    * @SINCE_1_0.0
    */
   typedef Signal< bool ( Button ) > ButtonSignalType;
@@ -567,7 +567,7 @@ public: //Signals
    *   bool YourCallbackName( Button button );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   ButtonSignalType& PressedSignal();
 
@@ -579,7 +579,7 @@ public: //Signals
    *   bool YourCallbackName( Button button );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   ButtonSignalType& ReleasedSignal();
 
@@ -591,7 +591,7 @@ public: //Signals
    *   bool YourCallbackName( Button button );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   ButtonSignalType& ClickedSignal();
 
@@ -605,7 +605,7 @@ public: //Signals
    *   bool YourCallbackName( Button button );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   ButtonSignalType& StateChangedSignal();
 
@@ -616,7 +616,7 @@ public: // Not intended for application developers
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_0.0
-   * @param[in]  implementation  The Control implementation.
+   * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL Button( Internal::Button& implementation );
 
@@ -624,7 +624,7 @@ public: // Not intended for application developers
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @SINCE_1_0.0
-   * @param[in]  internal  A pointer to the internal CustomActor.
+   * @param[in] internal A pointer to the internal CustomActor
    */
   DALI_INTERNAL Button( Dali::Internal::CustomActor* internal );
   /// @endcond

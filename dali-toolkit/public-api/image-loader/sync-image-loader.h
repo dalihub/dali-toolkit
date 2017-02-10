@@ -49,7 +49,7 @@ namespace SyncImageLoader
  */
 
 /**
- * @brief Load an image synchronously.
+ * @brief Loads an image synchronously.
  * Note: When using this method, the following defaults will be used:
  * fittingMode = FittingMode::DEFAULT
  * samplingMode = SamplingMode::BOX_THEN_LINEAR
@@ -58,14 +58,13 @@ namespace SyncImageLoader
  * @SINCE_1_2_14
  * @REMARK_INTERNET
  * @REMARK_STORAGE
- *
- * @param[in] url The URL of the image file to load.
- * @return A PixelData object containing the image, or an invalid object on failure.
+ * @param[in] url The URL of the image file to load
+ * @return A PixelData object containing the image, or an invalid object on failure
  */
 DALI_IMPORT_API PixelData Load( const std::string& url );
 
 /**
- * @brief Load an image synchronously by specifying the target dimensions.
+ * @brief Loads an image synchronously by specifying the target dimensions.
  * Note: When using this method, the following defaults will be used:
  * fittingMode = FittingMode::DEFAULT
  * samplingMode = SamplingMode::BOX_THEN_LINEAR
@@ -74,25 +73,23 @@ DALI_IMPORT_API PixelData Load( const std::string& url );
  * @SINCE_1_2_14
  * @REMARK_INTERNET
  * @REMARK_STORAGE
- *
- * @param[in] url The URL of the image file to load.
- * @param[in] dimensions The width and height to fit the loaded image to.
- * @return A PixelData object containing the image, or an invalid object on failure.
+ * @param[in] url The URL of the image file to load
+ * @param[in] dimensions The width and height to fit the loaded image to
+ * @return A PixelData object containing the image, or an invalid object on failure
  */
 DALI_IMPORT_API PixelData Load( const std::string& url, ImageDimensions dimensions );
 
 /**
- * @brief Load an image synchronously by specifying the target dimensions and options.
+ * @brief Loads an image synchronously by specifying the target dimensions and options.
  * @SINCE_1_2_14
  * @REMARK_INTERNET
  * @REMARK_STORAGE
- *
- * @param[in] url The URL of the image file to load.
- * @param[in] dimensions The width and height to fit the loaded image to.
- * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
- * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
- * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
- * @return A PixelData object containing the image, or an invalid object on failure.
+ * @param[in] url The URL of the image file to load
+ * @param[in] dimensions The width and height to fit the loaded image to
+ * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
+ * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
+ * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
+ * @return A PixelData object containing the image, or an invalid object on failure
  */
 DALI_IMPORT_API PixelData Load( const std::string& url,
                 ImageDimensions dimensions,

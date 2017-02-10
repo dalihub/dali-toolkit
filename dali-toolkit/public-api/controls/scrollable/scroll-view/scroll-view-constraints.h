@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SCROLL_VIEW_CONSTRAINTS_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,22 +43,20 @@ namespace Toolkit
  */
 
 /**
- * @brief Move Actor constraint.
+ * @brief Moves an Actor in accordance with the scroll position.
  *
- * Moves an Actor in accordance to scroll position.
+ * @SINCE_1_0.0
  * @param[in] current Current position
  * @param[in] inputs The position input that Actor will move
- * @SINCE_1_0.0
  */
 DALI_IMPORT_API void MoveActorConstraint( Vector3& current, const PropertyInputContainer& inputs );
 
 /**
- * @brief Wrap Actor constraint.
+ * @brief Wraps an Actor's position in accordance with the min/max bounds of domain.
  *
- * Wraps an Actors position in accordance to min/max bounds of domain.
+ * @SINCE_1_0.0
  * @param[in] position Position to be wrapped
  * @param[in] inputs The input that Actor's position will be wrapped
- * @SINCE_1_0.0
  */
 DALI_IMPORT_API void WrapActorConstraint( Vector3& position, const PropertyInputContainer& inputs );
 

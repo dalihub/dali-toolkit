@@ -121,17 +121,6 @@ Toolkit::Visual::Base GetVisualByName(
   return visualHandle;
 }
 
-void SetDefaultTransform( Property::Map& propertyMap )
-{
-  propertyMap.Clear();
-  propertyMap
-    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
-}
-
 /**
  * Creates control through type registry
  */
@@ -1212,9 +1201,7 @@ void Control::OnSizeSet(const Vector3& targetSize)
   if( visual )
   {
     Vector2 size( targetSize );
-    Property::Map transformMap;
-    SetDefaultTransform( transformMap );
-    visual.SetTransformAndSize( transformMap, size );
+    visual.SetTransformAndSize( Property::Map(), size ); // Send an empty map as we do not want to modify the visual's set transform
   }
 }
 
@@ -1253,10 +1240,7 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
   Toolkit::Visual::Base visual = GetVisual( Toolkit::Control::Property::BACKGROUND );
   if( visual )
   {
-    Vector2 controlSize( size );
-    Property::Map transformMap;
-    SetDefaultTransform( transformMap );
-    visual.SetTransformAndSize( transformMap, controlSize );
+    visual.SetTransformAndSize( Property::Map(), size ); // Send an empty map as we do not want to modify the visual's set transform
   }
 }
 

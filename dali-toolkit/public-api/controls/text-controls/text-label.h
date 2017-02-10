@@ -68,7 +68,7 @@ class DALI_IMPORT_API TextLabel : public Control
 public:
 
   /**
-   * @brief The start and end property ranges for this control.
+   * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
    */
   enum PropertyRange
@@ -78,146 +78,146 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the TextLabel class.
+   * @brief Enumeration for the instance of properties belonging to the TextLabel class.
    * @SINCE_1_0.0
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the TextLabel class.
+     * @brief Enumeration for the instance of properties belonging to the TextLabel class.
      * @SINCE_1_0.0
      */
     enum
     {
       /**
-       * @brief The type of rendering e.g. bitmap-based
-       * @details name "renderingBackend", type INT, default RENDERING_SHARED_ATLAS
+       * @brief The type of rendering e.g. bitmap-based.
+       * @details name "renderingBackend", type INT, default RENDERING_SHARED_ATLAS.
        * @SINCE_1_0.0
        */
       RENDERING_BACKEND = PROPERTY_START_INDEX,
 
       /**
-       * @brief The text to display in UTF-8 format,
-       * @details name "text", type STRING
+       * @brief The text to display in UTF-8 format.
+       * @details name "text", type STRING.
        * @SINCE_1_0.0
        */
       TEXT,
 
       /**
-       * @brief The requested font family to use,
-       * @details name "fontFamily", type STRING
+       * @brief The requested font family to use.
+       * @details name "fontFamily", type STRING.
        * @SINCE_1_0.0
        */
       FONT_FAMILY,
 
       /**
-       * @brief The requested font style to use,
-       * @details name "fontStyle", type STRING or MAP
+       * @brief The requested font style to use.
+       * @details name "fontStyle", type STRING or MAP.
        * @SINCE_1_2.13
        */
       FONT_STYLE,
 
       /**
-       * @brief The size of font in points
-       * @details name "pointSize", type FLOAT
+       * @brief The size of font in points.
+       * @details name "pointSize", type FLOAT.
        * @SINCE_1_0.0
        */
       POINT_SIZE,
 
       /**
-       * @brief The single-line or multi-line layout option
-       * @details name "multiLine", type BOOLEAN, default false
+       * @brief The single-line or multi-line layout option.
+       * @details name "multiLine", type BOOLEAN, default false.
        * @SINCE_1_0.0
        */
       MULTI_LINE,
 
       /**
-       * @brief The line horizontal alignment
-       * @details name "horizontalAlignment", type STRING,  values "BEGIN", "CENTER", "END", default BEGIN
+       * @brief The line horizontal alignment.
+       * @details name "horizontalAlignment", type STRING, values "BEGIN", "CENTER", "END", default BEGIN.
        * @SINCE_1_0.0
        */
       HORIZONTAL_ALIGNMENT,
 
       /**
-       * @brief The line vertical alignment
-       * @details name "verticalAlignment", type STRING,  values "TOP",   "CENTER", "BOTTOM" @SINCE_1_0.0, default TOP
+       * @brief The line vertical alignment.
+       * @details name "verticalAlignment", type STRING,  values "TOP",   "CENTER", "BOTTOM" @SINCE_1_0.0, default TOP.
        * @SINCE_1_0.0
        */
       VERTICAL_ALIGNMENT,
 
       /**
-       * @brief The color of the text
-       * @details name "textColor", type VECTOR4
+       * @brief The color of the text.
+       * @details name "textColor", type VECTOR4.
        * @SINCE_1_0.0
        */
       TEXT_COLOR,
 
       /**
-       * @brief The drop shadow offset 0 indicates no shadow
-       * @details name "shadowOffset", type VECTOR2
        * @DEPRECATED_1_1.37 Use SHADOW instead
+       * @brief The drop shadow offset 0 indicates no shadow.
+       * @details name "shadowOffset", type VECTOR2.
        */
       SHADOW_OFFSET,
 
       /**
-       * @brief The color of a drop shadow
-       * @details name "shadowColor", type VECTOR4
        * @DEPRECATED_1_1.37 Use SHADOW instead
+       * @brief The color of a drop shadow.
+       * @details name "shadowColor", type VECTOR4
        */
       SHADOW_COLOR,
 
       /**
-       * @brief The underline enabled flag
-       * @details name "underlineEnabled", type BOOLEAN
        * @DEPRECATED_1_1.37 Use UNDERLINE instead
+       * @brief The underline enabled flag.
+       * @details name "underlineEnabled", type BOOLEAN.
        */
       UNDERLINE_ENABLED,
 
       /**
-       * @brief The color of the underline
-       * @details name "underlineColor", type VECTOR4
        * @DEPRECATED_1_1.37 Use UNDERLINE instead
+       * @brief The color of the underline.
+       * @details name "underlineColor", type VECTOR4.
        */
       UNDERLINE_COLOR,
 
       /**
-       * @brief Overrides the underline height from font metrics
-       * @details name "underlineHeight", type FLOAT
        * @DEPRECATED_1_1.37 Use UNDERLINE instead
+       * @brief Overrides the underline height from font metrics.
+       * @details name "underlineHeight", type FLOAT.
        */
       UNDERLINE_HEIGHT,
 
       /**
-       * @brief  Whether the mark-up processing is enabled
-       * @details name "enableMarkup", type BOOLEAN
+       * @brief Whether the mark-up processing is enabled.
+       * @details name "enableMarkup", type BOOLEAN.
        * @SINCE_1_0.0
        */
       ENABLE_MARKUP,
 
       /**
-       * @brief  Start or stop auto scrolling,
-       * @details name "enableAutoScroll", type BOOLEAN, default is false
+       * @brief Starts or stops auto scrolling.
+       * @details name "enableAutoScroll", type BOOLEAN, default is false.
        * @SINCE_1_1.35
        */
       ENABLE_AUTO_SCROLL,
 
       /**
-       * @brief Sets the speed of scrolling in pixels per second,
-       * @details name "autoScrollSpeed", type INT, default in style sheet
+       * @brief Sets the speed of scrolling in pixels per second.
+       * @details name "autoScrollSpeed", type INT, default in style sheet.
        * @SINCE_1_1.35
        */
       AUTO_SCROLL_SPEED,
 
       /**
-       * @brief  Number of complete loops when scrolling enabled
-       * @details name "autoScrollLoopCount", type INT, default in style sheet
+       * @brief Number of complete loops when scrolling enabled.
+       * @details name "autoScrollLoopCount", type INT, default in style sheet.
        * @SINCE_1_1.35
        */
       AUTO_SCROLL_LOOP_COUNT,
 
       /**
-       * @brief  Gap before before scrolling wraps
-       * @details name "autoScrollGap", type INT, default in style sheet but can be overridden to prevent same text being show at start and end.
+       * @brief Gap before scrolling wraps.
+       * @details name "autoScrollGap", type INT, default in style sheet but can be overridden to prevent same text being shown at start and end.
        * @SINCE_1_1.35
        */
       AUTO_SCROLL_GAP,
@@ -260,19 +260,19 @@ public:
   };
 
   /**
-   * @brief Create the TextLabel control.
+   * @brief Creates the TextLabel control.
    *
    * @SINCE_1_0.0
-   * @return A handle to the TextLabel control.
+   * @return A handle to the TextLabel control
    */
   static TextLabel New();
 
   /**
-   * @brief Create the TextLabel control.
+   * @brief Creates the TextLabel control.
    *
    * @SINCE_1_0.0
-   * @param[in] text The text to display.
-   * @return A handle to the TextLabel control.
+   * @param[in] text The text to display
+   * @return A handle to the TextLabel control
    */
   static TextLabel New( const std::string& text );
 
@@ -286,7 +286,7 @@ public:
    * @brief Copy constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] handle The handle to copy from.
+   * @param[in] handle The handle to copy from
    */
   TextLabel( const TextLabel& handle );
 
@@ -294,13 +294,13 @@ public:
    * @brief Assignment operator.
    *
    * @SINCE_1_0.0
-   * @param[in] handle The handle to copy from.
-   * @return A reference to this.
+   * @param[in] handle The handle to copy from
+   * @return A reference to this
    */
   TextLabel& operator=( const TextLabel& handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -308,14 +308,14 @@ public:
   ~TextLabel();
 
   /**
-   * @brief Downcast a handle to TextLabel.
+   * @brief Downcasts a handle to TextLabel.
    *
-   * If the BaseHandle points is a TextLabel the downcast returns a valid handle.
-   * If not the returned handle is left empty.
+   * If the BaseHandle points is a TextLabel, the downcast returns a valid handle.
+   * If not, the returned handle is left empty.
    *
    * @SINCE_1_0.0
    * @param[in] handle Handle to an object
-   * @return handle to a TextLabel or an empty handle
+   * @return Handle to a TextLabel or an empty handle
    */
   static TextLabel DownCast( BaseHandle handle );
 
@@ -326,7 +326,7 @@ public: // Not intended for application developers
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_0.0
-   * @param[in] implementation The Control implementation.
+   * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL TextLabel( Internal::TextLabel& implementation );
 
@@ -334,7 +334,7 @@ public: // Not intended for application developers
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @SINCE_1_0.0
-   * @param[in]  internal  A pointer to the internal CustomActor.
+   * @param[in] internal A pointer to the internal CustomActor
    */
   explicit DALI_INTERNAL TextLabel( Dali::Internal::CustomActor* internal );
   /// @endcond
