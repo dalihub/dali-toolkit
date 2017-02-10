@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,21 @@ TestNativeImage::TestNativeImage(int width, int height)
 }
 
 TestNativeImage::~TestNativeImage()
+{
+}
+
+
+TestNativeImageNoExtPointer TestNativeImageNoExt::New(int width, int height)
+{
+  return new TestNativeImageNoExt(width, height);
+}
+
+TestNativeImageNoExt::TestNativeImageNoExt(int width, int height)
+: mWidth(width), mHeight(height), mExtensionCreateCalls(0), mExtensionDestroyCalls(0), mTargetTextureCalls(0),createResult(true)
+{
+}
+
+TestNativeImageNoExt::~TestNativeImageNoExt()
 {
 }
 
