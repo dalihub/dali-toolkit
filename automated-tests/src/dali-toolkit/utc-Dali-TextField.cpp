@@ -1865,3 +1865,113 @@ int utcDaliTextFieldStyleWhilstSelected(void)
 
   END_TEST;
 }
+
+int utcDaliTextFieldCursorVisibility(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldCursorVisibility");
+
+  // Load a font.
+
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 93u, 93u );
+
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf" );
+
+  // Checks if the right number of actors are created.
+
+  TextField field = TextField::New();
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
+  DALI_TEST_CHECK( field );
+
+  field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
+  field.SetProperty( TextField::Property::TEXT, "<font family='TizenSans' size='18'>Hello <font family='TizenSansHebrew' size='18'>שלום עולם</font> world</font>" );
+
+  Stage::GetCurrent().Add( field );
+
+  field.SetSize( 300.f, 30.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check there are the expected number of children ( stencil ).
+  DALI_TEST_EQUALS( field.GetChildCount(), 1u, TEST_LOCATION );
+
+  Actor stencil = field.GetChildAt( 0u );
+  DALI_TEST_EQUALS( stencil.GetChildCount(), 1u, TEST_LOCATION ); // The text renderer.
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 56.0f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 56.0f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Actor layer = field.GetChildAt( 1u );
+  DALI_TEST_CHECK( layer.IsLayer() );
+
+  DALI_TEST_EQUALS( layer.GetChildCount(), 2u, TEST_LOCATION ); // The two cursors.
+  DALI_TEST_EQUALS( stencil.GetChildCount(), 1u, TEST_LOCATION ); // The text renderer.
+
+  Control cursor = Control::DownCast( layer.GetChildAt( 0u ) );
+  DALI_TEST_CHECK( cursor );
+
+  Vector3 size = cursor.GetCurrentSize();
+  Vector3 position = cursor.GetCurrentPosition();
+
+  DALI_TEST_EQUALS( position, Vector3(56.f, 0.f, 0.f), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( size, Vector3(1.f, 14.f, 0.f), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Change the size of the control (with a height smaller than the size of the cursor).
+  field.SetSize( 300.f, 20.f );
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 56.0f, 15.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 56.0f, 15.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  size = cursor.GetCurrentSize();
+  position = cursor.GetCurrentPosition();
+
+  // Checks the size of the cursor fits the control's height.
+  DALI_TEST_EQUALS( position, Vector3(56.f, 0.f, 0.f), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( size, Vector3(1.f, 5.f, 0.f), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Change the size of the control (with a height smaller than the size of the secondary cursor).
+  field.SetSize( 300.f, 10.f );
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 56.0f, 5.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 56.0f, 5.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Control cursor2 = Control::DownCast( layer.GetChildAt( 1u ) );
+  DALI_TEST_CHECK( cursor2 );
+
+  size = cursor2.GetCurrentSize();
+  position = cursor2.GetCurrentPosition();
+
+  // Checks the size of the cursor fits the control's height.
+  DALI_TEST_EQUALS( position, Vector3(155.f, 0.f, 0.f), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( size, Vector3(1.f, 10.f, 0.f), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  END_TEST;
+}

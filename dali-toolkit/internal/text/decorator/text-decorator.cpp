@@ -285,30 +285,60 @@ struct Decorator::Impl : public ConnectionTracker
     if( mPrimaryCursor )
     {
       const CursorImpl& cursor = mCursor[PRIMARY_CURSOR];
+      const float cursorBottom = cursor.position.y + cursor.cursorHeight;
+
       mPrimaryCursorVisible = ( ( mControlSize.width - ( cursor.position.x + mCursorWidth ) > -Math::MACHINE_EPSILON_1000 ) &&
                                 ( cursor.position.x > -Math::MACHINE_EPSILON_1000 ) &&
-                                ( mControlSize.height - ( cursor.position.y + cursor.cursorHeight ) > -Math::MACHINE_EPSILON_1000 ) &&
-                                ( cursor.position.y > -Math::MACHINE_EPSILON_1000 ) );
+                                ( cursor.position.y < mControlSize.height ) &&
+                                ( cursorBottom > -Math::MACHINE_EPSILON_1000 ) );
+
       if( mPrimaryCursorVisible )
       {
-        mPrimaryCursor.SetPosition( cursor.position.x,
-                                    cursor.position.y );
-        mPrimaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
+        Size size( mCursorWidth, cursor.cursorHeight );
+        Vector2 position( cursor.position.x, cursor.position.y );
+        if( cursor.position.y < Math::MACHINE_EPSILON_1000 )
+        {
+          size.height += cursor.position.y;
+          position.y = 0.f;
+        }
+        if( cursorBottom > mControlSize.height )
+        {
+          size.height -= ( cursorBottom - mControlSize.height );
+        }
+
+        mPrimaryCursor.SetPosition( position.x, position.y );
+
+        mPrimaryCursor.SetSize( size );
       }
       mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
     }
+
     if( mSecondaryCursor )
     {
       const CursorImpl& cursor = mCursor[SECONDARY_CURSOR];
+      const float cursorBottom = cursor.position.y + cursor.cursorHeight;
+
       mSecondaryCursorVisible = ( ( mControlSize.width - ( cursor.position.x + mCursorWidth ) > -Math::MACHINE_EPSILON_1000 ) &&
                                   ( cursor.position.x > -Math::MACHINE_EPSILON_1000 ) &&
-                                  ( mControlSize.height - ( cursor.position.y + cursor.cursorHeight ) > -Math::MACHINE_EPSILON_1000 ) &&
-                                  ( cursor.position.y > -Math::MACHINE_EPSILON_1000 ) );
+                                  ( cursor.position.y < mControlSize.height ) &&
+                                  ( cursorBottom > -Math::MACHINE_EPSILON_1000 ) );
+
       if( mSecondaryCursorVisible )
       {
-        mSecondaryCursor.SetPosition( cursor.position.x,
-                                      cursor.position.y );
-        mSecondaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
+        Size size( mCursorWidth, cursor.cursorHeight );
+        Vector2 position( cursor.position.x, cursor.position.y );
+        if( cursor.position.y < Math::MACHINE_EPSILON_1000 )
+        {
+          size.height += cursor.position.y;
+          position.y = 0.f;
+        }
+        if( cursorBottom > mControlSize.height )
+        {
+          size.height -= ( cursorBottom - mControlSize.height );
+        }
+
+        mSecondaryCursor.SetPosition( position.x, position.y );
+        mSecondaryCursor.SetSize( size );
       }
       mSecondaryCursor.SetVisible( mSecondaryCursorVisible && mCursorBlinkStatus );
     }
