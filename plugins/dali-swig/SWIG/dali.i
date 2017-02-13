@@ -265,6 +265,7 @@ using namespace Dali::Toolkit;
 %include events/pinchgesture-event.i
 %include events/pageturnview-event.i
 %include events/pangesture-event.i
+%include events/progress-bar-event.i
 %include events/propertynotification-event.i
 %include events/longpressgesture-event.i
 %include events/rectangle.i
