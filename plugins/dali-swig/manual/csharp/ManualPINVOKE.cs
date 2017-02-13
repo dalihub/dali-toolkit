@@ -104,7 +104,7 @@ namespace Dali
         public static extern global::System.IntPtr new_ViewWrapperImpl(int jarg1);
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ViewWrapperImpl_New")]
-        public static extern global::System.IntPtr ViewWrapperImpl_New(global::System.Runtime.InteropServices.HandleRef jarg1);
+        public static extern global::System.IntPtr ViewWrapperImpl_New(string jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_delete_ViewWrapperImpl")]
         public static extern void delete_ViewWrapperImpl(global::System.Runtime.InteropServices.HandleRef jarg1);
@@ -116,7 +116,7 @@ namespace Dali
         public static extern global::System.IntPtr GetControlWrapperImpl__SWIG_0(global::System.Runtime.InteropServices.HandleRef jarg1);
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ViewWrapper_New")]
-        public static extern global::System.IntPtr ViewWrapper_New(global::System.Runtime.InteropServices.HandleRef jarg1);
+        public static extern global::System.IntPtr ViewWrapper_New(string jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_new_ViewWrapper__SWIG_0")]
         public static extern global::System.IntPtr new_ViewWrapper__SWIG_0();

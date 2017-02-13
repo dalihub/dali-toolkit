@@ -19,7 +19,7 @@ namespace Dali
 {
     public class CustomView : ViewWrapper
     {
-        public CustomView(ViewWrapperImpl.CustomViewBehaviour behaviour) : base(new ViewWrapperImpl(behaviour))
+        public CustomView(string typeName, ViewWrapperImpl.CustomViewBehaviour behaviour) : base(typeName, new ViewWrapperImpl(behaviour))
         {
             // Registering CustomView virtual functions to viewWrapperImpl delegates.
             viewWrapperImpl.OnStageConnection = new ViewWrapperImpl.OnStageConnectionDelegate(OnStageConnection);

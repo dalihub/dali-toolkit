@@ -39,8 +39,9 @@ namespace MyCSharpExample
 
     public void Initialize(object source, NUIApplicationInitEventArgs e)
     {
-
       OperatorTests();
+
+      CustomViewPropertyTest();
 
       Handle handle = new Handle();
       int myPropertyIndex = handle.RegisterProperty("myProperty", new Property.Value(10.0f), Property.AccessMode.READ_WRITE);
@@ -337,6 +338,52 @@ namespace MyCSharpExample
     }
 
   }
+
+    public void CustomViewPropertyTest()
+    {
+        // Create a Spin control
+        Spin spin = new Spin();
+
+        // Background property
+        Property.Map background = new Property.Map();
+        background.Add( Dali.Constants.Visual.Property.Type, new Property.Value((int)Dali.Constants.Visual.Type.Color) )
+                  .Add( Dali.Constants.ColorVisualProperty.MixColor, new Property.Value(Color.Red) );
+        spin.Background = background;
+
+        background = spin.Background;
+        Vector4 backgroundColor = new Vector4();
+        background.Find(Dali.Constants.ColorVisualProperty.MixColor).Get(backgroundColor);
+        if( backgroundColor == Color.Red )
+        {
+            Console.WriteLine ("Custom View Background property : test passed");
+        }
+        else
+        {
+            Console.WriteLine ("Custom View Background property : test failed");
+        }
+
+        // BackgroundColor property
+        spin.BackgroundColor = Color.Yellow;
+        if(spin.BackgroundColor == Color.Yellow)
+        {
+            Console.WriteLine ("Custom View BackgroundColor property : test passed");
+        }
+        else
+        {
+            Console.WriteLine ("Custom View BackgroundColor property : test failed");
+        }
+
+        // StyleName property
+        spin.StyleName = "MyCustomStyle";
+        if(spin.StyleName == "MyCustomStyle")
+        {
+            Console.WriteLine ("Custom View StyleName property : test passed");
+        }
+        else
+        {
+            Console.WriteLine ("Custom View StyleName property : test failed");
+        }
+    }
 
     public void MainLoop()
     {

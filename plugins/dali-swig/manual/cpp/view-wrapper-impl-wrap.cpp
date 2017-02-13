@@ -649,15 +649,21 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_new_ViewWrapperImpl(int jarg1) {
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_ViewWrapperImpl_New(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_ViewWrapperImpl_New(char * jarg1, void * jarg2) {
   void * jresult ;
-  Dali::Toolkit::Internal::ControlWrapper *arg1 = (Dali::Toolkit::Internal::ControlWrapper *) 0 ;
+  std::string arg1 ;
+  Dali::Toolkit::Internal::ControlWrapper *arg2 = (Dali::Toolkit::Internal::ControlWrapper *) 0 ;
   Dali::Toolkit::ControlWrapper result;
 
-  arg1 = (Dali::Toolkit::Internal::ControlWrapper *)jarg1;
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  (&arg1)->assign(jarg1);
+  arg2 = (Dali::Toolkit::Internal::ControlWrapper *)jarg2;
   {
     try {
-      result = Dali::Toolkit::Internal::ControlWrapper::New(arg1);
+      result = Dali::Toolkit::Internal::ControlWrapper::New(arg1,arg2);
     } catch (std::out_of_range& e) {
       {
         SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0;
@@ -745,19 +751,25 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_GetControlWrapperImpl__SWIG_0(void * j
 }
 
 
-SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_ViewWrapper_New(void * jarg1) {
+SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_ViewWrapper_New(char * jarg1, void * jarg2) {
   void * jresult ;
-  Dali::Toolkit::Internal::ControlWrapper *arg1 = 0 ;
+  std::string arg1 ;
+  Dali::Toolkit::Internal::ControlWrapper *arg2 = 0 ;
   Dali::Toolkit::ControlWrapper result;
 
-  arg1 = (Dali::Toolkit::Internal::ControlWrapper *)jarg1;
-  if (!arg1) {
+  if (!jarg1) {
+    SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "null string", 0);
+    return 0;
+  }
+  (&arg1)->assign(jarg1);
+  arg2 = (Dali::Toolkit::Internal::ControlWrapper *)jarg2;
+  if (!arg2) {
     SWIG_CSharpSetPendingExceptionArgument(SWIG_CSharpArgumentNullException, "Dali::Toolkit::Internal::ControlWrapper & type is null", 0);
     return 0;
   }
   {
     try {
-      result = Dali::Toolkit::ControlWrapper::New(*arg1);
+      result = Dali::Toolkit::ControlWrapper::New(arg1,*arg2);
     } catch (std::out_of_range& e) {
       {
         SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0;

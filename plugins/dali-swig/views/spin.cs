@@ -52,9 +52,10 @@ public class Spin : CustomView
     {
       // ViewRegistry registers control type with DALi type registery
       // also uses introspection to find any properties that need to be registered with type registry
-      ViewRegistry.Instance.Register("Spin", CreateInstance, typeof(Spin) );
+      ViewRegistry.Instance.Register(CreateInstance, typeof(Spin) );
     }
-    public Spin() : base(ViewWrapperImpl.CustomViewBehaviour.REQUIRES_KEYBOARD_NAVIGATION_SUPPORT | ViewWrapperImpl.CustomViewBehaviour.DISABLE_STYLE_CHANGE_SIGNALS)
+
+    public Spin() : base(typeof(Spin).Name, ViewWrapperImpl.CustomViewBehaviour.REQUIRES_KEYBOARD_NAVIGATION_SUPPORT | ViewWrapperImpl.CustomViewBehaviour.DISABLE_STYLE_CHANGE_SIGNALS)
     {
 
     }

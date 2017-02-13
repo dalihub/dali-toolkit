@@ -141,9 +141,9 @@ namespace Dali
             DirectorConnect();
         }
 
-        public static ViewWrapper New(ViewWrapperImpl viewWrapper)
+        public static ViewWrapper New(string typeName, ViewWrapperImpl viewWrapper)
         {
-            ViewWrapper ret = new ViewWrapper(NDalicManualPINVOKE.ViewWrapperImpl_New(ViewWrapperImpl.getCPtr(viewWrapper)), true);
+            ViewWrapper ret = new ViewWrapper(NDalicManualPINVOKE.ViewWrapperImpl_New(typeName, ViewWrapperImpl.getCPtr(viewWrapper)), true);
             if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
             return ret;
         }
