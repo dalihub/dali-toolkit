@@ -111,7 +111,6 @@ const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
       vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
       vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
 
-      mediump vec2 scale        = vec2( length( uModelMatrix[ 0 ].xyz ), length( uModelMatrix[ 1 ].xyz ) );\n
       mediump vec2 size         = visualSize.xy;\n
       \n
       mediump vec2 fixedFactor  = vec2( uFixed[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uFixed[ int( ( aPosition.y  + 1.0 ) * 0.5 ) ].y );\n
