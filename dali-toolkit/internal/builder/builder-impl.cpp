@@ -1258,7 +1258,7 @@ void Builder::RecordStyle( StylePtr           style,
       }
       else
       {
-        DALI_LOG_WARNING( "RecordState() Node \"%s\" is not a JSON array or object\n", key.c_str() );
+        DALI_LOG_WARNING( "RecordStyle() Node \"%s\" is not a JSON array or object\n", key.c_str() );
       }
     }
     else if( key == KEYNAME_TYPE ||

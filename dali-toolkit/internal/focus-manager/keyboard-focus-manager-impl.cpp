@@ -38,6 +38,7 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 
 namespace Dali
 {
@@ -162,15 +163,30 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
       actor.Add( GetFocusIndicatorActor() );
     }
     // Send notification for the change of focus actor
+    Actor currentFocusedActor = GetCurrentFocusActor();
+
     if( !mFocusChangedSignal.Empty() )
     {
-      mFocusChangedSignal.Emit(GetCurrentFocusActor(), actor);
+      mFocusChangedSignal.Emit(currentFocusedActor, actor);
+    }
+
+    Toolkit::Control currentlyFocusedControl = Toolkit::Control::DownCast(currentFocusedActor);
+    if( currentlyFocusedControl )
+    {
+      // Do we need it to remember if it was previously DISABLED?
+      currentlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::NORMAL );
     }
 
     DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
 
     // Save the current focused actor
     mCurrentFocusActor = actorID;
+
+    Toolkit::Control newlyFocusedControl = Toolkit::Control::DownCast(actor);
+    if( newlyFocusedControl )
+    {
+      newlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::FOCUSED );
+    }
 
     // Push Current Focused Actor to FocusHistory
     mFocusHistory.PushBack( &actor.GetBaseObject() );
@@ -404,17 +420,23 @@ void KeyboardFocusManager::DoKeyboardEnter(Actor actor)
 void KeyboardFocusManager::ClearFocus()
 {
   Actor actor = GetCurrentFocusActor();
-  if(actor)
+  if( actor )
   {
-    if(mFocusIndicatorActor)
+    if( mFocusIndicatorActor )
     {
-      actor.Remove(mFocusIndicatorActor);
+      actor.Remove( mFocusIndicatorActor );
     }
 
     // Send notification for the change of focus actor
     if( !mFocusChangedSignal.Empty() )
     {
-      mFocusChangedSignal.Emit(actor, Actor());
+      mFocusChangedSignal.Emit( actor, Actor() );
+    }
+
+    Toolkit::Control currentlyFocusedControl = Toolkit::Control::DownCast( actor );
+    if( currentlyFocusedControl )
+    {
+      currentlyFocusedControl.SetProperty( DevelControl::Property::STATE, DevelControl::NORMAL );
     }
   }
 

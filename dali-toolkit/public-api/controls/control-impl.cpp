@@ -54,6 +54,7 @@
 
 namespace Dali
 {
+extern bool CaseInsensitiveStringCompare( const std::string& a, const std::string& b );
 
 namespace Toolkit
 {
@@ -322,7 +323,7 @@ public:
 
         case Toolkit::DevelControl::Property::STATE:
         {
-          Toolkit::DevelControl::State state( DevelControl::NORMAL );
+          Toolkit::DevelControl::State state( controlImpl.mImpl->mState );
 
           if( Scripting::GetEnumerationProperty< Toolkit::DevelControl::State >( value, ControlStateTable, ControlStateTableCount, state ) )
           {
@@ -506,6 +507,8 @@ public:
   {
     if( mState != state )
     {
+      // If mState was Disabled, and new state is Focused, should probably
+      // store that fact, e.g. in another property that FocusManager can access.
       mState = state;
 
       // Trigger state change and transitions
