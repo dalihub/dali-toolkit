@@ -284,49 +284,6 @@ Geometry VisualFactoryCache::CreateGridGeometry( Uint16Pair gridSize )
   return geometry;
 }
 
-Geometry VisualFactoryCache::CreateBatchQuadGeometry( Vector4 texCoords )
-{
-  const float halfWidth = 0.5f;
-  const float halfHeight = 0.5f;
-  struct QuadVertex {
-    QuadVertex( const Vector2& vertexPosition, const Vector2& vertexTexCoords )
-      : position( vertexPosition ),
-        texCoords( vertexTexCoords )
-    {}
-    Vector2 position;
-    Vector2 texCoords;
-  };
-
-  // special case, when texture takes whole space
-  if( texCoords == Vector4::ZERO )
-  {
-    texCoords = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
-  }
-
-  QuadVertex quadVertexData[6] =
-  {
-    QuadVertex( Vector2(-halfWidth,   -halfHeight ),   Vector2(texCoords.x, texCoords.y) ),
-    QuadVertex( Vector2( halfWidth,   -halfHeight ),   Vector2(texCoords.z, texCoords.y) ),
-    QuadVertex( Vector2(-halfWidth,    halfHeight ),   Vector2(texCoords.x, texCoords.w) ),
-    QuadVertex( Vector2( halfWidth,   -halfHeight ),   Vector2(texCoords.z, texCoords.y) ),
-    QuadVertex( Vector2(-halfWidth,    halfHeight ),   Vector2(texCoords.x, texCoords.w) ),
-    QuadVertex( Vector2( halfWidth,    halfHeight ),   Vector2(texCoords.z, texCoords.w) ),
-  };
-
-  Property::Map vertexFormat;
-  vertexFormat[ "aPosition" ] = Property::VECTOR2;
-  vertexFormat[ "aTexCoord" ] = Property::VECTOR2;
-  PropertyBuffer vertexBuffer = PropertyBuffer::New( vertexFormat );
-  vertexBuffer.SetData( quadVertexData, 6 );
-
-  // create geometry as normal, single quad
-  Geometry geometry = Geometry::New();
-  geometry.AddVertexBuffer( vertexBuffer );
-  geometry.SetType( Geometry::TRIANGLES );
-
-  return geometry;
-}
-
 Image VisualFactoryCache::GetBrokenVisualImage()
 {
   return ResourceImage::New( BROKEN_VISUAL_IMAGE_URL );

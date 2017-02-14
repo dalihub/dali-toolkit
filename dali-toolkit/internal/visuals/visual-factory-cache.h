@@ -64,7 +64,6 @@ public:
     GRADIENT_SHADER_RADIAL_USER_SPACE,
     GRADIENT_SHADER_RADIAL_BOUNDING_BOX,
     IMAGE_SHADER,
-    BATCH_IMAGE_SHADER,
     IMAGE_SHADER_ATLAS_DEFAULT_WRAP,
     IMAGE_SHADER_ATLAS_CUSTOM_WRAP,
     NINE_PATCH_SHADER,
@@ -132,13 +131,6 @@ public:
    * @return The created grid geometry.
    */
   static Geometry CreateGridGeometry( Uint16Pair gridSize );
-
-  /**
-   * Create the batchable geometry
-   * @param[in] texCoords The texture atlas rect coordinates
-   * @return The created batchable geometry
-   */
-  static Geometry CreateBatchQuadGeometry( Vector4 texCoords );
 
   /**
    * @brief Returns an image to be used when a visual has failed to correctly render
