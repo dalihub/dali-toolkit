@@ -33,29 +33,11 @@
 extern "C" {
 #endif
 
-SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_BATCH_PARENT_get() {
-  int jresult ;
-  int result;
-
-  result = (int)Dali::DevelActor::Property::BATCH_PARENT;
-  jresult = (int)result;
-  return jresult;
-}
-
 SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_SIBLING_ORDER_get() {
   int jresult ;
   int result;
 
   result = (int)Dali::DevelActor::Property::SIBLING_ORDER;
-  jresult = (int)result;
-  return jresult;
-}
-
-SWIGEXPORT int SWIGSTDCALL CSharp_Renderer_Property_BATCHING_ENABLED_get() {
-  int jresult ;
-  int result;
-
-  result = (int)Dali::DevelRenderer::Property::BATCHING_ENABLED;
   jresult = (int)result;
   return jresult;
 }

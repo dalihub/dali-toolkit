@@ -85,20 +85,6 @@
       }
     }
 
-    public bool BatchParent
-    {
-      get
-      {
-        bool temp = false;
-        GetProperty( Actor.Property.BATCH_PARENT).Get( ref temp );
-        return temp;
-      }
-      set
-      {
-        SetProperty( Actor.Property.BATCH_PARENT, new Dali.Property.Value( value ) );
-      }
-    }
-
     public int SiblingOrder
     {
       get
