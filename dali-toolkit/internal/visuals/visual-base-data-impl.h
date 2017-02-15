@@ -122,6 +122,7 @@ struct Base::Impl
   Size            mControlSize;
   float           mDepthIndex;
   Property::Index mMixColorIndex;
+  Property::Index mOpacityIndex;
   int             mFlags;
 };
 

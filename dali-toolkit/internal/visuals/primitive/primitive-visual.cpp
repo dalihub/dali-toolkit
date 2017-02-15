@@ -166,11 +166,11 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   precision mediump float;\n
   varying   mediump vec3  vIllumination;\n
   uniform   lowp    vec4  uColor;\n
-  uniform   lowp    vec4  mixColor;\n
-
+  uniform   lowp    vec3  mixColor;\n
+  uniform   lowp    float opacity;\n
   void main()\n
   {\n
-    vec4 baseColor = mixColor * uColor;\n
+      vec4 baseColor = vec4(mixColor, opacity) * uColor;\n
     gl_FragColor = vec4( vIllumination.rgb * baseColor.rgb, baseColor.a );\n
   }\n
 );
@@ -225,7 +225,16 @@ void PrimitiveVisual::DoSetProperties( const Property::Map& propertyMap )
     Vector4 color;
     if( colorValue->Get( color ) )
     {
-      SetMixColor( color );
+      Property::Type type = colorValue->GetType();
+      if( type == Property::VECTOR4 )
+      {
+        SetMixColor( color );
+      }
+      else if( type == Property::VECTOR3 )
+      {
+        Vector3 color3(color);
+        SetMixColor( color3 );
+      }
     }
   }
 
@@ -455,7 +464,7 @@ void PrimitiveVisual::InitializeRenderer()
   // Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 
-  mImpl->mMixColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::PrimitiveVisual::Property::MIX_COLOR, MIX_COLOR, mImpl->mMixColor );
+  mImpl->mMixColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::PrimitiveVisual::Property::MIX_COLOR, MIX_COLOR, Vector3(mImpl->mMixColor) );
 }
 
 void PrimitiveVisual::UpdateShaderUniforms()
