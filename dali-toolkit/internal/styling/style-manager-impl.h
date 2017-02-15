@@ -29,6 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
+#include <dali-toolkit/internal/builder/style.h>
 
 namespace Dali
 {
@@ -67,7 +68,7 @@ protected:
 
 public: // Public API
 
-/**
+  /**
    * @copydoc Toolkit::StyleManager::ApplyTheme
    */
   void ApplyTheme( const std::string& themeFile );
@@ -110,6 +111,13 @@ public: // Public API
    * @copydoc Toolkit::StyleManager::ApplyStyle
    */
   void ApplyStyle( Toolkit::Control control, const std::string& jsonFileName, const std::string& styleName );
+
+  /**
+   * Get the state/style information for the given control
+   * @param[in] control The control to get state information for
+   * @return The style information (or empty ptr if not found)
+   */
+  const StylePtr GetRecordedStyle( Toolkit::Control control );
 
 public:
   // SIGNALS
@@ -162,24 +170,6 @@ private:
    * @return Return true if file was loaded
    */
   bool LoadJSON( Toolkit::Builder builder, const std::string& jsonFileName );
-
-  /**
-   * @brief Collect qualifiers (e.g. Landscape, portrait etc) for a given style
-   *
-   * @param[in,out] qualifiersOut The list to populate with qualifiers
-   */
-  void CollectQualifiers( StringList& qualifiersOut );
-
-  /**
-   * @brief Construct a qualified style name out of qualifiers
-   *
-   * A qualifed style name will be in the format: style-qualifier0-qualifier1-qualifierN
-   *
-   * @param[in] styleName The root name of the style
-   * @param[in] qualifiers List of qualifier names
-   * @param[out] qualifiedStyleOut The qualified style name
-   */
-  void BuildQualifiedStyleName( const std::string& styleName, const StringList& qualifiers, std::string& qualifiedStyleOut );
 
   /**
    * @brief Apply a style to the control using the given builder

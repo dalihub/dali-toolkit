@@ -34,6 +34,7 @@
 #include <dali-toolkit/devel-api/builder/json-parser.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
 #include <dali-toolkit/internal/builder/builder-declarations.h>
+#include <dali-toolkit/internal/builder/style.h>
 
 // Warning messages usually displayed
 #define DALI_SCRIPT_WARNING(format, args...) \
@@ -149,6 +150,24 @@ public:
   bool ApplyStyle( const std::string& styleName, Handle& handle );
 
   /**
+   * Lookup the stylename in builder. If it's found in the parse tree,
+   * then return true.
+   * @param[in] styleName The style name to search for
+   * @return true if the stylename exists
+   */
+  bool LookupStyleName( const std::string& styleName );
+
+  /**
+   * Lookup the stylename in the recorded Styles - if it exists,
+   * performs a shallow copy to the passed in style and returns true.
+   * Otherwise it returns false.
+
+   * @param[in] styleName The stylename to search for
+   * @return A const pointer to the style object
+   */
+  const StylePtr GetStyle( const std::string& styleName );
+
+  /**
    * @copydoc Toolkit::Builder::AddActors
    */
   void AddActors( Actor toActor );
@@ -214,56 +233,128 @@ public:
    */
   void EmitQuitSignal();
 
+
 protected:
 
   virtual ~Builder();
 
 private:
-  // Undefined
-  Builder(const Builder&);
-  Builder& operator=(const Builder& rhs);
-
-  void SetupTask( RenderTask& task, const Toolkit::TreeNode& node, const Replacement& replacement );
-
-  void SetCustomProperties( const TreeNode& node, Handle& handle, const Replacement& constant, const std::string& childName, Property::AccessMode accessMode );
-
-private:
-  Toolkit::JsonParser mParser;
-
-  typedef std::map<const std::string, FrameBufferImage> ImageLut;
-  ImageLut mFrameBufferImageLut;
-
-  typedef std::map<const std::string, Path> PathLut;
-  PathLut mPathLut;
-
-  typedef struct{ std::string name; Dali::PathConstrainer pathConstrainer; } PathConstrainerEntry;
-  typedef std::vector<PathConstrainerEntry> PathConstrainerLut;
-  PathConstrainerLut mPathConstrainerLut;
-
+  typedef std::vector<const char*> KeyStack;
+  typedef std::vector< TreeNode::KeyNodePair > MappingsLut;
   typedef struct{ std::string name; Dali::LinearConstrainer linearConstrainer; } LinearConstrainerEntry;
   typedef std::vector<LinearConstrainerEntry> LinearConstrainerLut;
-  LinearConstrainerLut mLinearConstrainerLut;
+  typedef struct{ std::string name; Dali::PathConstrainer pathConstrainer; } PathConstrainerEntry;
+  typedef std::vector<PathConstrainerEntry> PathConstrainerLut;
+  typedef std::map<const std::string, Path> PathLut;
+  typedef std::map<const std::string, FrameBufferImage> ImageLut;
 
-  SlotDelegate<Builder> mSlotDelegate;
+private:
+  // Undefined
+  Builder(const Builder&);
 
-  Property::Map mReplacementMap;
-
-  typedef std::vector< TreeNode::KeyNodePair > MappingsLut;
-  MappingsLut mCompleteMappings;
-
-  BaseHandle Create( const std::string& templateName, const Replacement& constant );
-
-  BaseHandle DoCreate( const TreeNode& root, const TreeNode& node, Actor parent, const Replacement& replacements );
+  // Undefined
+  Builder& operator=(const Builder& rhs);
 
   void LoadConstants( const TreeNode& root, Property::Map& intoMap );
 
-  void LoadIncludes( const std::string& data );
+  Animation CreateAnimation( const std::string& animationName,
+                             const Replacement& replacement,
+                             Dali::Actor        sourceActor );
 
-  bool ApplyStyle( const std::string& styleName, Handle& handle, const Replacement& replacement);
+  BaseHandle Create( const std::string& templateName,
+                     const Replacement& constant );
 
-  Animation CreateAnimation( const std::string& animationName, const Replacement& replacement, Dali::Actor sourceActor );
+  BaseHandle DoCreate( const TreeNode&    root,
+                       const TreeNode&    node,
+                       Actor              parent,
+                       const Replacement& replacements );
 
-  typedef std::vector<const char*> KeyStack;
+  void SetupTask( RenderTask&              task,
+                  const Toolkit::TreeNode& node,
+                  const Replacement&       replacement );
+
+  bool ApplyStyle( const std::string& styleName,
+                   Handle&            handle,
+                   const Replacement& replacement);
+
+  void ApplyAllStyleProperties( const TreeNode&    root,
+                                const TreeNode&    node,
+                                Dali::Handle&      handle,
+                                const Replacement& constant );
+
+  void RecordStyles( const char*        styleName,
+                     const TreeNode&    node,
+                     Dali::Handle&      handle,
+                     const Replacement& replacements );
+
+  void RecordStyle( StylePtr           style,
+                    const TreeNode&    node,
+                    Dali::Handle&      handle,
+                    const Replacement& replacements );
+
+  void ApplyProperties( const TreeNode&    root,
+                        const TreeNode&    node,
+                        Dali::Handle&      handle,
+                        const Replacement& constant );
+
+  void ApplySignals( const TreeNode& root,
+                     const TreeNode& node,
+                     Dali::Handle& handle );
+
+  void ApplyStylesByActor( const TreeNode&    root,
+                           const TreeNode&    node,
+                           Dali::Handle&      handle,
+                           const Replacement& constant );
+
+  void SetProperties( const TreeNode&    node,
+                      Handle&            handle,
+                      const Replacement& constant );
+
+  bool MapToTargetProperty( Handle&            propertyObject,
+                            const std::string& key,
+                            const TreeNode&    node,
+                            const Replacement& constant,
+                            Property::Index&   index,
+                            Property::Value&   value );
+
+  /**
+   * Find the key in the mapping table, if it's present, then generate
+   * a property value for it (of the given type if available),
+   * recursing as necessary, and stopping if any cycles are detected.
+   *
+   * @param[in] mappingRoot The JSON node containing the mappings
+   * @param[in] theKey The key to search for
+   * @param[in] propertyType The property type if known, or NONE
+   * @param[in,out] value The string value to test and write back to.
+   */
+  bool GetPropertyMap( const TreeNode&  mappingRoot,
+                       const char*      theKey,
+                       Property::Type   propertyType,
+                       Property::Value& value );
+
+  void SetCustomProperties( const TreeNode&      node,
+                            Handle&              handle,
+                            const Replacement&   constant,
+                            const std::string&   childName,
+                            Property::AccessMode accessMode );
+
+  /**
+   * Find the key in the mapping table, if it's present, then generate
+   * a property value for it (of the given type if available),
+   * recursing as necessary, and stopping if any cycles are detected.
+   *
+   * @param[in] mappingRoot The JSON node containing the mappings
+   * @param[in] theKey The key to search for
+   * @param[in,out] keyStack the stack of visited keys
+   * @param[in] propertyType The property type if known, or NONE
+   * @param[in,out] value The string value to test and write back to.
+   */
+  bool RecursePropertyMap( const TreeNode&  mappingRoot,
+                           KeyStack&        keyStack,
+                           const char*      theKey,
+                           Property::Type   propertyType,
+                           Property::Value& value );
+
 
   /**
    * Tests if the value is a string delimited by <>. If it is, then it attempts to
@@ -273,40 +364,20 @@ private:
    * @param[in,out] value The string value to test and write back to.
    * @return true if the value was converted, false otherwise.
    */
-  bool ConvertChildValue( const TreeNode& mappingRoot, KeyStack& keyStack, Property::Value& value );
+  bool ConvertChildValue( const TreeNode& mappingRoot,
+                          KeyStack& keyStack,
+                          Property::Value& value );
 
-  /**
-   * Find the key in the mapping table, if it's present, then generate a property value for it (of the given type if available), recursing as necessary, and stopping if any cycles
-   * are detected.
-   * @param[in] mappingRoot The JSON node containing the mappings
-   * @param[in] theKey The key to search for
-   * @param[in,out] keyStack the stack of visited keys
-   * @param[in] propertyType The property type if known, or NONE
-   * @param[in,out] value The string value to test and write back to.
-   */
-  bool RecursePropertyMap( const TreeNode& mappingRoot, KeyStack& keyStack, const char* theKey, Property::Type propertyType, Property::Value& value );
-
-  /**
-   * Find the key in the mapping table, if it's present, then generate a property value for it (of the given type if available), recursing as necessary, and stopping if any cycles
-   * are detected.
-   * @param[in] mappingRoot The JSON node containing the mappings
-   * @param[in] theKey The key to search for
-   * @param[in] propertyType The property type if known, or NONE
-   * @param[in,out] value The string value to test and write back to.
-   */
-  bool GetPropertyMap( const TreeNode& mappingRoot, const char* theKey, Property::Type propertyType, Property::Value& value );
-
-  void ApplyProperties( const TreeNode& root, const TreeNode& node,
-                        Dali::Handle& handle, const Replacement& constant );
-
-  void ApplyStylesByActor( const TreeNode& root, const TreeNode& node,
-                           Dali::Handle& handle, const Replacement& constant );
-
-  void ApplyAllStyleProperties( const TreeNode& root, const TreeNode& node,
-                                Dali::Handle& handle, const Replacement& constant );
-
-  void SetProperties( const TreeNode& node, Handle& handle, const Replacement& constant );
-
+private:
+  Toolkit::JsonParser                 mParser;
+  ImageLut                            mFrameBufferImageLut;
+  PathLut                             mPathLut;
+  PathConstrainerLut                  mPathConstrainerLut;
+  LinearConstrainerLut                mLinearConstrainerLut;
+  SlotDelegate<Builder>               mSlotDelegate;
+  Property::Map                       mReplacementMap;
+  MappingsLut                         mCompleteMappings;
+  Dictionary<StylePtr>                mStyles; // State based styles
   Toolkit::Builder::BuilderSignalType mQuitSignal;
 };
 

@@ -25,6 +25,7 @@
 #include <dali/public-api/adaptor-framework/application.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
@@ -291,7 +292,7 @@ bool StyleManager::LoadJSON( Toolkit::Builder builder, const std::string& jsonFi
   }
 }
 
-void StyleManager::CollectQualifiers( StringList& qualifiersOut )
+static void CollectQualifiers( std::vector<std::string>& qualifiersOut )
 {
   // Append the relevant qualifier for orientation
   int orientation = 0; // Get the orientation from the system
@@ -313,11 +314,24 @@ void StyleManager::CollectQualifiers( StringList& qualifiersOut )
   }
 }
 
-void StyleManager::BuildQualifiedStyleName( const std::string& styleName, const StringList& qualifiers, std::string& qualifiedStyleOut )
+/**
+ * @brief Construct a qualified style name out of qualifiers
+ *
+ * A qualifed style name will be in the format: style-qualifier0-qualifier1-qualifierN
+ *
+ * @param[in] styleName The root name of the style
+ * @param[in] qualifiers List of qualifier names
+ * @param[out] qualifiedStyleOut The qualified style name
+ */
+static void BuildQualifiedStyleName(
+  const std::string& styleName,
+  const std::vector<std::string>& qualifiers,
+  std::string& qualifiedStyleOut )
 {
   qualifiedStyleOut.append( styleName );
 
-  for( StringList::const_iterator it = qualifiers.begin(), itEnd = qualifiers.end(); it != itEnd; ++it )
+  for( std::vector<std::string>::const_iterator it = qualifiers.begin(),
+         itEnd = qualifiers.end(); it != itEnd; ++it )
   {
     const std::string& str = *it;
 
@@ -326,9 +340,9 @@ void StyleManager::BuildQualifiedStyleName( const std::string& styleName, const 
   }
 }
 
-void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control control )
+static bool GetStyleNameForControl( Toolkit::Builder builder, Toolkit::Control control, std::string& styleName)
 {
-  std::string styleName = control.GetStyleName();
+  styleName = control.GetStyleName();
 
   if( styleName.empty() )
   {
@@ -336,22 +350,43 @@ void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control contro
   }
 
   // Apply the style after choosing the correct actual style (e.g. landscape or portrait)
-  StringList qualifiers;
+  std::vector<std::string> qualifiers;
   CollectQualifiers( qualifiers );
 
-  while( true )
+  bool found = 0;
+  std::string qualifiedStyleName;
+  do
   {
-    std::string qualifiedStyleName;
+    qualifiedStyleName.clear();
     BuildQualifiedStyleName( styleName, qualifiers, qualifiedStyleName );
 
     // Break if style found or we have tried the root style name (qualifiers is empty)
-    if( builder.ApplyStyle( qualifiedStyleName, control ) || qualifiers.size() == 0 )
+    if( GetImpl(builder).LookupStyleName( qualifiedStyleName ) )
+    {
+      found = true;
+      break;
+    }
+    if( qualifiers.size() == 0 )
     {
       break;
     }
-
     // Remove the last qualifier in an attempt to find a style that is valid
     qualifiers.pop_back();
+  } while (!found);
+
+  if(found)
+  {
+    styleName = qualifiedStyleName;
+  }
+  return found;
+}
+
+void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control control )
+{
+  std::string styleName = control.GetStyleName();
+  if( GetStyleNameForControl( builder, control, styleName ) )
+  {
+    builder.ApplyStyle( styleName, control );
   }
 
   if( mDefaultFontSize >= 0 )
@@ -361,6 +396,21 @@ void StyleManager::ApplyStyle( Toolkit::Builder builder, Toolkit::Control contro
     fontSizeQualifier << styleName << FONT_SIZE_QUALIFIER << mDefaultFontSize;
     builder.ApplyStyle( fontSizeQualifier.str(), control );
   }
+}
+
+const StylePtr StyleManager::GetRecordedStyle( Toolkit::Control control )
+{
+  if( mThemeBuilder )
+  {
+    std::string styleName = control.GetStyleName();
+
+    if( GetStyleNameForControl( mThemeBuilder, control, styleName ) )
+    {
+      const StylePtr style = GetImpl(mThemeBuilder).GetStyle( styleName );
+      return style;
+    }
+  }
+  return StylePtr(NULL);
 }
 
 Toolkit::Builder StyleManager::FindCachedBuilder( const std::string& key )
