@@ -54,7 +54,9 @@ Alternatively a font may be requested using either or all of FONT_FAMILY, FONT_S
 // C++
 
 label.SetProperty( TextLabel::Property::FONT_FAMILY, "FreeSerif" );
-label.SetProperty( TextLabel::Property::FONT_STYLE,  "{\"weight\":\"bold\",\"slant\":\"italic\"}" );
+label.SetProperty( TextLabel::Property::FONT_STYLE,
+                   Property::Map().Add( "weight", "bold" )
+                                  .Add( "slant", "italic" ) );
 label.SetProperty( TextLabel::Property::POINT_SIZE,  12.0f );
 ~~~
 
@@ -62,7 +64,10 @@ label.SetProperty( TextLabel::Property::POINT_SIZE,  12.0f );
 // JavaScript
 
 label.fontFamily = "FreeSerif";
-label.fontStyle = "{\"weight\":\"bold\",\"slant\":\"italic\"}";
+label.fontStyle = {
+                    "weight" : "bold",
+                    "slant"  : "italic"
+                  };
 label.pointSize = 12;
 ~~~
 
@@ -92,7 +97,11 @@ To change the font for standard text controls, this JSON syntax can be used:
     "textlabel":
     {
       "fontFamily":"FreeSerif",
-      "fontStyle":"{\"weight\":\"bold\",\"slant\":\"italic\"}",
+      "fontStyle":
+      {
+        "weight":"bold",
+        "slant":"italic"
+      },
       "pointSize":8
     }
   }
@@ -126,7 +135,11 @@ in the style sheet are applied after the base section ("textlabel"), so take pre
     "textlabel":
     {
       "fontFamily":"FreeSerif",
-      "fontStyle":"{\"weight\":\"bold\",\"slant\":\"italic\"}",
+      "fontStyle":
+      {
+        "weight":"bold",
+        "slant":"italic"
+      },
     },
 
     "textlabelFontSize0":
@@ -153,7 +166,11 @@ in the style sheet are applied after the base section ("textlabel"), so take pre
     "customLabel":
     {
       "fontFamily":"TimesNewRoman",
-      "fontStyle":"{\"weight\":\"regular\",\"slant\":\"regular\"}",
+      "fontStyle":
+      {
+        "weight":"regular",
+        "slant":"regular"
+      },
     },
     "customLabelFontSize0":
     {
