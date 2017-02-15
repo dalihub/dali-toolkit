@@ -187,14 +187,8 @@ namespace Dali
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_MakeCallback")]
         public static extern global::System.IntPtr MakeCallback(global::System.Runtime.InteropServices.HandleRef jarg1);
 
-        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Actor_Property_BATCH_PARENT_get")]
-        public static extern int Actor_Property_BATCH_PARENT_get();
-
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Actor_Property_SIBLING_ORDER_get")]
         public static extern int Actor_Property_SIBLING_ORDER_get();
-
-        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Renderer_Property_BATCHING_ENABLED_get")]
-        public static extern int Renderer_Property_BATCHING_ENABLED_get();
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_TOOLTIP_get")]
         public static extern int View_Property_TOOLTIP_get();

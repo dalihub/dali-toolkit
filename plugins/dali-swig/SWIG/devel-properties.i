@@ -27,28 +27,7 @@
 %}
 
 %typemap(cscode) Dali::Actor::Property %{
-  public static readonly int BATCH_PARENT = NDalicManualPINVOKE.Actor_Property_BATCH_PARENT_get();
   public static readonly int SIBLING_ORDER = NDalicManualPINVOKE.Actor_Property_SIBLING_ORDER_get();
-%}
-
-%typemap(cscode) Dali::Renderer::Property %{
-  public static readonly int BATCHING_ENABLED = NDalicManualPINVOKE.Renderer_Property_BATCHING_ENABLED_get();
-%}
-
-%typemap(cscode) Dali::Renderer %{
-  public bool BatchingEnabled
-  {
-    get
-    {
-      bool temp = false;
-      GetProperty( Renderer.Property.BATCHING_ENABLED).Get( ref temp );
-      return temp;
-    }
-    set
-    {
-      SetProperty( Renderer.Property.BATCHING_ENABLED, new Dali.Property.Value( value ) );
-    }
-  }
 %}
 
 %typemap(cscode) Dali::Toolkit::Control::Property %{
