@@ -345,7 +345,7 @@ bool Builder::LookupStyleName( const std::string& styleName )
 
 const StylePtr Builder::GetStyle( const std::string& styleName )
 {
-  const StylePtr* style = mStyles.FindCaseInsensitiveC( styleName );
+  const StylePtr* style = mStyles.FindConst( styleName );
 
   if( style==NULL )
   {
@@ -1092,7 +1092,7 @@ void Builder::ApplyAllStyleProperties( const TreeNode& root, const TreeNode& nod
   StylePtr* matchedStyle = NULL;
   if( styleName )
   {
-    matchedStyle = mStyles.FindCaseInsensitive( styleName );
+    matchedStyle = mStyles.Find( styleName );
     if( ! matchedStyle )
     {
       OptionalChild styleNodes = IsChild(root, KEYNAME_STYLES);
@@ -1180,7 +1180,7 @@ void Builder::RecordStyle( StylePtr           style,
           continue;
         }
 
-        StylePtr* stylePtr = style->subStates.FindCaseInsensitive( stateName );
+        StylePtr* stylePtr = style->subStates.Find( stateName );
         if( stylePtr )
         {
           StylePtr style(*stylePtr);
@@ -1203,12 +1203,12 @@ void Builder::RecordStyle( StylePtr           style,
         Dali::Property::Value property(Property::MAP);
         if( DeterminePropertyFromNode( visual.second, Property::MAP, property, replacements ) )
         {
-          Property::Map* mapPtr = style->visuals.FindCaseInsensitive( visual.first );
+          Property::Map* mapPtr = style->visuals.Find( visual.first );
           if( mapPtr )
           {
             // Override existing visuals
             mapPtr->Clear();
-            mapPtr->Merge(*property.GetMap());
+            mapPtr->Merge( *property.GetMap() );
           }
           else
           {
@@ -1219,47 +1219,15 @@ void Builder::RecordStyle( StylePtr           style,
     }
     else if( key == KEYNAME_ENTRY_TRANSITION )
     {
-      Dali::Property::Value property(Property::MAP);
-      if( DeterminePropertyFromNode( keyValue.second, Property::MAP, property, replacements ) )
-      {
-        style->entryTransition = Toolkit::TransitionData::New( *property.GetMap() );
-      }
+      RecordTransitionData( keyValue, style->entryTransition, replacements );
     }
     else if( key == KEYNAME_EXIT_TRANSITION )
     {
-      Dali::Property::Value property(Property::MAP);
-      if( DeterminePropertyFromNode( keyValue.second, Property::MAP, property, replacements ) )
-      {
-        style->exitTransition = Toolkit::TransitionData::New( *property.GetMap() );
-      }
+      RecordTransitionData( keyValue, style->exitTransition, replacements );
     }
     else if( key == KEYNAME_TRANSITIONS )
     {
-      //@todo add new transitions to style.transitions
-      //      override existing transitions. A transition matches on target & property name
-      const TreeNode& node = keyValue.second;
-      if( node.GetType() == TreeNode::ARRAY )
-      {
-        Dali::Property::Value property(Property::ARRAY);
-        if( DeterminePropertyFromNode( node, Property::ARRAY, property, replacements ) )
-        {
-          style->transitions = *property.GetArray();
-        }
-      }
-      else if( node.GetType() == TreeNode::OBJECT )
-      {
-        Dali::Property::Value property(Property::MAP);
-        if( DeterminePropertyFromNode( node, Property::MAP, property, replacements ) )
-        {
-          Property::Array propertyArray;
-          propertyArray.Add( property );
-          style->transitions = propertyArray;
-        }
-      }
-      else
-      {
-        DALI_LOG_WARNING( "RecordStyle() Node \"%s\" is not a JSON array or object\n", key.c_str() );
-      }
+      RecordTransitions( keyValue, style->transitions, replacements );
     }
     else if( key == KEYNAME_TYPE ||
              key == KEYNAME_ACTORS ||
@@ -1289,6 +1257,63 @@ void Builder::RecordStyle( StylePtr           style,
     }
   }
 }
+
+void Builder::RecordTransitions(
+  const TreeNode::KeyNodePair& keyValue,
+  Property::Array& value,
+  const Replacement& replacements )
+{
+  //@todo add new transitions to style.transitions
+  //      override existing transitions. A transition matches on target & property name
+  const TreeNode& node = keyValue.second;
+  if( node.GetType() == TreeNode::ARRAY )
+  {
+    Dali::Property::Value property(Property::ARRAY);
+    if( DeterminePropertyFromNode( node, Property::ARRAY, property, replacements ) )
+    {
+      value = *property.GetArray();
+    }
+  }
+  else if( node.GetType() == TreeNode::OBJECT )
+  {
+    Dali::Property::Value property(Property::MAP);
+    if( DeterminePropertyFromNode( node, Property::MAP, property, replacements ) )
+    {
+      Property::Array propertyArray;
+      propertyArray.Add( property );
+      value = propertyArray;
+    }
+  }
+  else
+  {
+    DALI_LOG_WARNING( "RecordStyle() Node \"%s\" is not a JSON array or object\n", keyValue.first );
+  }
+}
+
+void Builder::RecordTransitionData(
+  const TreeNode::KeyNodePair& keyValue,
+  Toolkit::TransitionData& transitionData,
+  const Replacement& replacements )
+{
+  const TreeNode& node = keyValue.second;
+  if( node.GetType() == TreeNode::ARRAY )
+  {
+    Dali::Property::Value property(Property::ARRAY);
+    if( DeterminePropertyFromNode( keyValue.second, Property::ARRAY, property, replacements ) )
+    {
+      transitionData = Toolkit::TransitionData::New( *property.GetArray() );
+    }
+  }
+  else if( node.GetType() == TreeNode::OBJECT )
+  {
+    Dali::Property::Value property(Property::MAP);
+    if( DeterminePropertyFromNode( keyValue.second, Property::MAP, property, replacements ) )
+    {
+      transitionData = Toolkit::TransitionData::New( *property.GetMap() );
+    }
+  }
+}
+
 
 // Set properties from node on handle.
 void Builder::ApplyProperties( const TreeNode& root, const TreeNode& node,

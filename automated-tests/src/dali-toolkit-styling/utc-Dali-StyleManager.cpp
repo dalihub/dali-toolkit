@@ -17,6 +17,8 @@
 #include <dali/devel-api/adaptor-framework/style-monitor.h>
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
@@ -34,345 +36,7 @@ using namespace Dali::Toolkit;
 
 namespace
 {
-const char* defaultTheme =
-"{\n"
-"  \"constants\":\n"
-"  {\n"
-"    \"CONFIG_SCRIPT_LOG_LEVEL\":\"NoLogging\"\n"
-"  },\n"
-"  \"styles\":\n"
-"  {\n"
-"    \"textlabel\":\n"
-"    {\n"
-"      \"pointSize\":18\n"
-"    },\n"
-"\n"
-"    \"textlabelFontSize0\":\n"
-"    {\n"
-"      \"pointSize\":8\n"
-"    },\n"
-"    \"textlabelFontSize1\":\n"
-"    {\n"
-"      \"pointSize\":10\n"
-"    },\n"
-"    \"textlabelFontSize2\":\n"
-"    {\n"
-"      \"pointSize\":15\n"
-"    },\n"
-"    \"textlabelFontSize3\":\n"
-"    {\n"
-"      \"pointSize\":19\n"
-"    },\n"
-"    \"textlabelFontSize4\":\n"
-"    {\n"
-"      \"pointSize\":25\n"
-"    },\n"
-"\n"
-"    \"textfield\":\n"
-"    {\n"
-"      \"pointSize\":18,\n"
-"      \"primaryCursorColor\":[0.0,0.72,0.9,1.0],\n"
-"      \"secondaryCursorColor\":[0.0,0.72,0.9,1.0],\n"
-"      \"cursorWidth\":3,\n"
-"      \"selectionHighlightColor\":[0.75,0.96,1.0,1.0],\n"
-"      \"grabHandleImage\" : \"{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png\",\n"
-"      \"selectionHandleImageLeft\" : {\"filename\":\"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png\" },\n"
-"      \"selectionHandleImageRight\": {\"filename\":\"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png\" }\n"
-"    },\n"
-"\n"
-"    \"textfieldFontSize0\":\n"
-"    {\n"
-"      \"pointSize\":10\n"
-"    },\n"
-"    \"textfieldFontSize1\":\n"
-"    {\n"
-"      \"pointSize\":10\n"
-"    },\n"
-"    \"textfieldFontSize2\":\n"
-"    {\n"
-"      \"pointSize\":10\n"
-"    },\n"
-"    \"textfieldFontSize3\":\n"
-"    {\n"
-"      \"pointSize\":10\n"
-"    },\n"
-"    \"textfieldFontSize4\":\n"
-"    {\n"
-"      \"pointSize\":10\n"
-"    },\n"
-"    \"textselectionpopup\":\n"
-"    {\n"
-"      \"popupMaxSize\":[656,72],\n"
-"      \"optionDividerSize\":[2,0],\n"
-"      \"popupDividerColor\":[0.23,0.72,0.8,0.11],\n"
-"      \"popupIconColor\":[1.0,1.0,1.0,1.0],\n"
-"      \"popupPressedColor\":[0.24,0.72,0.8,0.11],\n"
-"      \"background\": {\n"
-"        \"rendererType\": \"nPatch\",\n"
-"        \"imageUrl\": \"{DALI_IMAGE_DIR}selection-popup-bg.9.png\"\n"
-"        },\n"
-"      \"popupFadeInDuration\":0.25,\n"
-"      \"popupFadeOutDuration\":0.25\n"
-"    },\n"
-"    \"textselectionpopupbutton\":\n"
-"    {\n"
-"      \"label\":\n"
-"      {\n"
-"        \"pointSize\":8,\n"
-"        \"fontStyle\":\"{\\\\""weight\\\\"":\\\\""light\\\\""}\"\n"
-"      }\n"
-"    },\n"
-"    \"textselectiontoolbar\":\n"
-"    {\n"
-"      \"enableOvershoot\":true,\n"
-"      \"scrollView\":\n"
-"      {\n"
-"        \"overshootAnimationSpeed\":360.0,\n"
-"        \"overshootSize\":[720.0,130.0]\n"
-"      }\n"
-"    },\n"
-"    \"scrollview\":\n"
-"    {\n"
-"      \"overshootEffectColor\":\"B018\",\n"
-"      \"overshootAnimationSpeed\":360.0,\n"
-"      \"overshootSize\":[720.0,130.0]\n"
-"    },\n"
-"    \"itemview\":\n"
-"    {\n"
-"      \"overshootEffectColor\":\"B018\",\n"
-"      \"overshootAnimationSpeed\":360.0,\n"
-"      \"overshootSize\":[720.0,130.0]\n"
-"    },\n"
-"    \"texteditor\":\n"
-"    {\n"
-"      \"pointSize\":18,\n"
-"      \"primaryCursorColor\":[0.0,0.72,0.9,1.0],\n"
-"      \"secondaryCursorColor\":[0.0,0.72,0.9,1.0],\n"
-"      \"cursorWidth\":3,\n"
-"      \"selectionHighlightColor\":[0.75,0.96,1.0,1.0],\n"
-"      \"grabHandleImage\" : \"{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png\",\n"
-"      \"selectionHandleImageLeft\" : {\"filename\":\"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png\" },\n"
-"      \"selectionHandleImageRight\": {\"filename\":\"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png\" }\n"
-"    },\n"
-"    \"ComplexControl\":\n"
-"    {\n"
-"      \"states\":\n"
-"      {\n"
-"        \"NORMAL\":\n"
-"        {\n"
-"          \"states\":\n"
-"          {\n"
-"            \"SELECTED\":\n"
-"            {\n"
-"              \"visuals\":\n"
-"              {\n"
-"                \"foregroundVisual\":\n"
-"                {\n"
-"                  \"visualType\":\"GRADIENT\",\n"
-"                  \"startPosition\": [-1, -1],\n"
-"                  \"endPosition\": [1, 1],\n"
-"                  \"spreadMethod\": \"REPEAT\",\n"
-"                  \"stopOffset\": [0.2, 0.8],\n"
-"                  \"stopColor\": [ [ 1,0,0,1], [0,1,0,1] ]\n"
-"                }\n"
-"              }\n"
-"            },\n"
-"            \"UNSELECTED\":\n"
-"            {\n"
-"              \"visuals\":\n"
-"              {\n"
-"                \"foregroundVisual\":\n"
-"                {\n"
-"                  \"visualType\":\"COLOR\",\n"
-"                  \"mixColor\": [ 1,0,0,1]\n"
-"                }\n"
-"              }\n"
-"            }\n"
-"          },\n"
-"          \"transitions\":\n"
-"          {\n"
-"            \"visualName\":\"*\",\n"
-"            \"effect\":\"CROSSFADE\",\n"
-"            \"animator\":\n"
-"            {\n"
-"              \"alphaFunction\":\"EASE_IN_OUT\",\n"
-"              \"duration\":0.3\n"
-"            }\n"
-"          }\n"
-"        },\n"
-"        \"FOCUSED\":\n"
-"        {\n"
-"          \"visuals\":\n"
-"          {\n"
-"            \"foregroundVisual\":\n"
-"            {\n"
-"              \"visualType\":\"GRADIENT\",\n"
-"              \"startPosition\": [-1, -1],\n"
-"              \"endPosition\": [1, 1],\n"
-"              \"spreadMethod\": \"REPEAT\",\n"
-"              \"stopOffset\": [0.3, 0.9],\n"
-"              \"stopColor\": [ [ 0,0,1,1], [0,1,1,1] ]\n"
-"            },\n"
-"            \"focusVisual\":\n"
-"            {\n"
-"              \"visualType\":\"IMAGE\",\n"
-"              \"url\": \"focus.png\"\n"
-"            }\n"
-"          },\n"
-"          \"entryTransition\":\n"
-"          {\n"
-"            \"target\":\"focusVisual\",\n"
-"            \"property\":\"mixColor\",\n"
-"            \"initialValue\":[0,0,0,0],\n"
-"            \"targetValue\":[1,1,1,1],\n"
-"            \"animator\":\n"
-"            {\n"
-"              \"alphaFunction\":\"EASE_IN_OUT_SINE\",\n"
-"              \"timePeriod\": \n"
-"              {\n"
-"                \"duration\":0.5,\n"
-"                \"delay\":0\n"
-"              }\n"
-"            }\n"
-"          },\n"
-"          \"exitTransition\":\n"
-"          {\n"
-"            \"target\":\"focusVisual\",\n"
-"            \"property\":\"mixColor\",\n"
-"            \"initialValue\":[1,1,1,1],\n"
-"            \"targetValue\":[0,0,0,0],\n"
-"            \"animator\":\n"
-"            {\n"
-"              \"alphaFunction\":\"EASE_IN_OUT_SINE\",\n"
-"              \"timePeriod\": \n"
-"              {\n"
-"                \"duration\":0.5,\n"
-"                \"delay\":0\n"
-"              }\n"
-"            }\n"
-"          }\n"
-"        },\n"
-"        \"DISABLED\":\n"
-"        {\n"
-"          \"visuals\":\n"
-"          {\n"
-"            \"foregroundVisual\":\n"
-"            {\n"
-"              \"visualType\":\"COLOR\",\n"
-"              \"mixColor\": [1,0,0,1]\n"
-"            }\n"
-"          }\n"
-"        }\n"
-"      },\n"
-"      \"transitions\":\n"
-"      [\n"
-"        {\n"
-"          \"effect\":\"CROSSFADE\",\n"
-"          \"animator\":\n"
-"          {\n"
-"            \"alphaFunction\":\"EASE_IN_OUT\",\n"
-"            \"duration\":0.3\n"
-"          }\n"
-"        }\n"
-"      ]\n"
-"    },\n"
-"    \"BasicControl\":\n"
-"    {\n"
-"      \"states\":\n"
-"      {\n"
-"        \"NORMAL\":\n"
-"        {\n"
-"          \"visuals\":\n"
-"          {\n"
-"            \"foregroundVisual\":\n"
-"            {\n"
-"              \"visualType\":\"GRADIENT\",\n"
-"              \"startPosition\": [-1, -1],\n"
-"              \"endPosition\": [1, 1],\n"
-"              \"spreadMethod\": \"REPEAT\",\n"
-"              \"stopOffset\": [0.2, 0.8],\n"
-"              \"stopColor\": [ [ 1,0,0,1], [0,1,0,1] ]\n"
-"            }\n"
-"          }\n"
-"        },\n"
-"        \"FOCUSED\":\n"
-"        {\n"
-"          \"visuals\":\n"
-"          {\n"
-"            \"foregroundVisual\":\n"
-"            {\n"
-"              \"visualType\":\"GRADIENT\",\n"
-"              \"startPosition\": [-1, -1],\n"
-"              \"endPosition\": [1, 1],\n"
-"              \"spreadMethod\": \"REPEAT\",\n"
-"              \"stopOffset\": [0.3, 0.9],\n"
-"              \"stopColor\": [ [ 0,0,1,1], [0,1,1,1] ]\n"
-"            },\n"
-"            \"focusVisual\":\n"
-"            {\n"
-"              \"visualType\":\"IMAGE\",\n"
-"              \"url\": \"focus.png\"\n"
-"            }\n"
-"          },\n"
-"          \"entryTransition\":\n"
-"          {\n"
-"            \"target\":\"focusVisual\",\n"
-"            \"property\":\"mixColor\",\n"
-"            \"initialValue\":[0,0,0,0],\n"
-"            \"targetValue\":[1,1,1,1],\n"
-"            \"animator\":\n"
-"            {\n"
-"              \"alphaFunction\":\"EASE_IN_OUT_SINE\",\n"
-"              \"timePeriod\": \n"
-"              {\n"
-"                \"duration\":0.5,\n"
-"                \"delay\":0\n"
-"              }\n"
-"            }\n"
-"          },\n"
-"          \"exitTransition\":\n"
-"          {\n"
-"            \"target\":\"focusVisual\",\n"
-"            \"property\":\"mixColor\",\n"
-"            \"initialValue\":[1,1,1,1],\n"
-"            \"targetValue\":[0,0,0,0],\n"
-"            \"animator\":\n"
-"            {\n"
-"              \"alphaFunction\":\"EASE_IN_OUT_SINE\",\n"
-"              \"timePeriod\": \n"
-"              {\n"
-"                \"duration\":0.5,\n"
-"                \"delay\":0\n"
-"              }\n"
-"            }\n"
-"          }\n"
-"        },\n"
-"        \"DISABLED\":\n"
-"        {\n"
-"          \"visuals\":\n"
-"          {\n"
-"            \"foregroundVisual\":\n"
-"            {\n"
-"              \"visualType\":\"COLOR\",\n"
-"              \"mixColor\": [1,0,0,1]\n"
-"            }\n"
-"          }\n"
-"        }\n"
-"      },\n"
-"      \"transitions\":\n"
-"      [\n"
-"        {\n"
-"          \"effect\":\"CROSSFADE\",\n"
-"          \"animator\":\n"
-"          {\n"
-"            \"alphaFunction\":\"EASE_IN_OUT\",\n"
-"            \"duration\":0.3\n"
-"          }\n"
-"        }\n"
-"      ]\n"
-"    }\n"
-"  }\n"
-"}\n";
+std::string defaultTheme;
 
 } // anonymous namespace
 
@@ -382,6 +46,9 @@ const char* defaultTheme =
 void dali_style_manager_startup(void)
 {
   test_return_value = TET_UNDEF;
+
+  std::ifstream t("src/dali-toolkit-styling/default-theme.json");
+  defaultTheme = std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 }
 
 void dali_style_manager_cleanup(void)
@@ -1200,7 +867,7 @@ int UtcDaliStyleManagerStyleChangedSignalFontSizeTextEditor(void)
 }
 
 
-int UtcDaliStyleManagerVisualTransitionParsing(void)
+int UtcDaliStyleManagerSetState01(void)
 {
   tet_infoline("Instantiate dummy control and test state/visual/transition capture" );
   Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
@@ -1244,8 +911,7 @@ int UtcDaliStyleManagerVisualTransitionParsing(void)
   END_TEST;
 }
 
-
-int UtcDaliStyleManagerVisualTransitionParsing02(void)
+int UtcDaliStyleManagerSetState02(void)
 {
   tet_infoline("Instantiate dummy control and test state/visual/transition capture" );
   Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
@@ -1258,25 +924,130 @@ int UtcDaliStyleManagerVisualTransitionParsing02(void)
   StyleManager styleManager = StyleManager::Get();
 
   DummyControl actor = DummyControl::New(true);
-  actor.SetProperty(DevelControl::Property::STATE, "FOCUSED");
+  actor.SetStyleName("BasicControl");
+  Stage::GetCurrent().Add(actor);
 
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+
+  int state = actor.GetProperty<int>( DevelControl::Property::STATE );
+  DALI_TEST_EQUALS( state, (int) DevelControl::NORMAL, TEST_LOCATION );
+
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
+  Visual::Base visual1 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+
+  actor.SetProperty( DevelControl::Property::STATE,
+                     Property::Map().Add( "state", "FOCUSED" ).Add("withTransitions", false));
+
+  state = actor.GetProperty<int>( DevelControl::Property::STATE );
+  DALI_TEST_EQUALS( state, (int) DevelControl::FOCUSED, TEST_LOCATION );
+
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOCUS_VISUAL), true, TEST_LOCATION);
+
+  Visual::Base visual2 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+  DALI_TEST_CHECK( visual1 != visual2 );
+
+  actor.SetProperty( DevelControl::Property::STATE,
+                     Property::Map().Add( "state", "DISABLED" ).Add("withTransitions", false));
+
+  state = actor.GetProperty<int>( DevelControl::Property::STATE );
+  DALI_TEST_EQUALS( state, (int) DevelControl::DISABLED, TEST_LOCATION );
+
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
+
+  Visual::Base visual3 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+  Visual::Base focusVisual = dummyImpl.GetVisual(DummyControl::Property::FOCUS_VISUAL);
+  DALI_TEST_CHECK( !focusVisual );
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOCUS_VISUAL), false, TEST_LOCATION);
+
+  DALI_TEST_CHECK( visual1 != visual3 );
+  DALI_TEST_CHECK( visual2 != visual3 );
+
+  actor.SetProperty( DevelControl::Property::STATE,
+                     Property::Map().Add( "state", "NORMAL" ).Add("withTransitions", false));
+
+  state = actor.GetProperty<int>( DevelControl::Property::STATE );
+  DALI_TEST_EQUALS( state, (int) DevelControl::NORMAL, TEST_LOCATION );
+
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
+
+  visual1 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+  DALI_TEST_CHECK( visual1 );
+
+  focusVisual = dummyImpl.GetVisual(DummyControl::Property::FOCUS_VISUAL);
+  DALI_TEST_CHECK( !focusVisual );
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOCUS_VISUAL), false, TEST_LOCATION);
+
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerSetSubState(void)
+{
+  tet_infoline("Instantiate dummy control and test state/visual/transition capture" );
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
+                                          defaultTheme );
+
+  ToolkitTestApplication application;
+
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  Dali::StyleMonitor styleMonitor = Dali::StyleMonitor::Get();
+  StyleManager styleManager = StyleManager::Get();
+
+  DummyControl actor = DummyControl::New(true);
+  actor.SetProperty(DevelControl::Property::STATE, "NORMAL");
+  actor.SetProperty(DevelControl::Property::SUB_STATE, "SELECTED");
   actor.SetStyleName("ComplexControl");
   Stage::GetCurrent().Add(actor);
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
 
-  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
-  Visual::Base visual1 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
-  DALI_TEST_CHECK( visual1 );
-  Property::Map map;
-  visual1.CreatePropertyMap( map );
-  Property::Value* value = map.Find( Visual::Property::TYPE );
-  DALI_TEST_CHECK( value );
+  {
+    DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
+    Visual::Base visual = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+    DALI_TEST_CHECK( visual );
+    Property::Map map;
+    visual.CreatePropertyMap( map );
+    Property::Value* value = map.Find( Visual::Property::TYPE );
+    DALI_TEST_CHECK( value );
 
-  int visualType;
-  value->Get( visualType );
+    int visualType;
+    value->Get( visualType );
+    DALI_TEST_EQUALS( visualType, (int)Toolkit::Visual::GRADIENT, TEST_LOCATION );
+  }
 
-  DALI_TEST_EQUALS( visualType, (int)Toolkit::Visual::GRADIENT, TEST_LOCATION );
+  actor.SetProperty(DevelControl::Property::SUB_STATE, "UNSELECTED");
 
+  {
+    DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
+    Visual::Base visual = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+    DALI_TEST_CHECK( visual );
+    Property::Map map;
+    visual.CreatePropertyMap( map );
+    Property::Value* value = map.Find( Visual::Property::TYPE );
+    DALI_TEST_CHECK( value );
+
+    int visualType;
+    value->Get( visualType );
+    DALI_TEST_EQUALS( visualType, (int)Toolkit::Visual::COLOR, TEST_LOCATION );
+  }
+
+  actor.SetProperty(DevelControl::Property::SUB_STATE, "SELECTED");
+
+  {
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+    DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
+    Visual::Base visual = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+    DALI_TEST_CHECK( visual );
+    Property::Map map;
+    visual.CreatePropertyMap( map );
+    Property::Value* value = map.Find( Visual::Property::TYPE );
+    DALI_TEST_CHECK( value );
+
+    int visualType;
+    value->Get( visualType );
+    DALI_TEST_EQUALS( visualType, (int)Toolkit::Visual::GRADIENT, TEST_LOCATION );
+  }
   END_TEST;
 }
