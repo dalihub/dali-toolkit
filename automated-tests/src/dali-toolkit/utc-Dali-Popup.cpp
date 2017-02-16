@@ -916,11 +916,11 @@ int UtcDaliPopupPropertyContextualMode(void)
   // Test all contextual modes.
   const char* mode[5] = { "NON_CONTEXTUAL", "ABOVE", "RIGHT", "BELOW", "LEFT" };
   Vector2 offsetValues[5];
-  offsetValues[0] = Vector2( 0.0f, 0.0f );
-  offsetValues[1] = Vector2( 0.0f, -10.0f );
-  offsetValues[2] = Vector2( 10.0f, 0.0f );
-  offsetValues[3] = Vector2( 0.0f, 10.0f );
-  offsetValues[4] = Vector2( -10.0f, 0.0f );
+  offsetValues[0] = Vector2( 0.375f, 0.0f );
+  offsetValues[1] = Vector2( -0.125f, -10.5f );
+  offsetValues[2] = Vector2( 10.875f, -0.5f );
+  offsetValues[3] = Vector2( -0.125f, 10.5f );
+  offsetValues[4] = Vector2( -10.875f, -0.5f );
 
   for( int i = 0; i < 5; ++i )
   {
