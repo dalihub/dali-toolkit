@@ -251,12 +251,6 @@ void ScrollBar::SetScrollIndicator( Actor indicator )
     }
     mIndicator = indicator;
 
-    Toolkit::Control control = Toolkit::Control::DownCast( mIndicator );
-    if( control )
-    {
-      control.SetStyleName( "ScrollBarIndicator" );
-    }
-
     mIndicatorFirstShow = true;
     Self().Add( mIndicator );
 

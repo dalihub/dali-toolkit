@@ -252,13 +252,20 @@ void TextSelectionToolbar::SetUpScrollBar( bool enable )
   {
     if( ! mScrollBar )
     {
+      Toolkit::ImageView indicator = Toolkit::ImageView::New();
+      indicator.SetParentOrigin( ParentOrigin::TOP_LEFT );
+      indicator.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      indicator.SetStyleName( "TextSelectionScrollIndicator" );
+
       mScrollBar = Toolkit::ScrollBar::New( Toolkit::ScrollBar::Horizontal );
       mScrollBar.SetName( "Text popup scroll bar" );
+      mScrollBar.SetStyleName( "TextSelectionScrollBar" );
       mScrollBar.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
       mScrollBar.SetAnchorPoint( AnchorPoint::TOP_LEFT );
       mScrollBar.SetPosition( mScrollBarPadding.x, -mScrollBarPadding.y );
       mScrollBar.SetResizePolicy( Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH );
       mScrollBar.SetOrientation( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) );
+      mScrollBar.SetScrollIndicator( indicator );
       mScrollBar.GetPanGestureDetector().DetachAll();
       mScrollView.Add( mScrollBar );
     }
