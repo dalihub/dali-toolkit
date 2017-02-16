@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ using namespace Dali;
 namespace
 {
 
+const char* DEFAULT_INDICATOR_IMAGE_PATH = DALI_IMAGE_DIR "popup_scroll.9.png";
 const float DEFAULT_SLIDER_DEPTH(1.0f);
 const float DEFAULT_INDICATOR_SHOW_DURATION(0.5f);
 const float DEFAULT_INDICATOR_HIDE_DURATION(0.5f);
@@ -230,16 +231,12 @@ void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index property
 
 void ScrollBar::CreateDefaultIndicatorActor()
 {
-  Toolkit::ImageView indicator = Toolkit::ImageView::New();
+  Toolkit::ImageView indicator = Toolkit::ImageView::New( DEFAULT_INDICATOR_IMAGE_PATH );
   indicator.SetParentOrigin( ParentOrigin::TOP_LEFT );
   indicator.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  indicator.SetStyleName( "ScrollBarIndicator" );
-  mIndicator = indicator;
-  Self().Add( mIndicator );
 
-  EnableGestureDetection( Gesture::Type( Gesture::Pan ) );
-  PanGestureDetector detector( GetPanGestureDetector() );
-  detector.Attach( mIndicator );
+  indicator.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+  SetScrollIndicator(indicator);
 }
 
 void ScrollBar::SetScrollIndicator( Actor indicator )

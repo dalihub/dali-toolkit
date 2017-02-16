@@ -124,15 +124,7 @@
     "ScrollBar":
     {
       "indicatorShowDuration":0.25,
-      "indicatorHideDuration":0.25
-    },
-    "ScrollBarIndicator":
-    {
-      "image":
-      {
-        "visualType":"IMAGE",
-        "url":"{DALI_IMAGE_DIR}popup_scroll.9.png"
-      },
+      "indicatorHideDuration":0.25,
       "color":[0.0,0.72,0.9,0.7]
     },
     "TextEditor":
