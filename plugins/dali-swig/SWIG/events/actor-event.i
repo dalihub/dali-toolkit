@@ -37,6 +37,22 @@
        return (IntPtr)swigCPtr;
     }
 
+    public Position CurrentPosition
+    {
+      get
+      {
+        return GetCurrentPosition();
+      }
+    }
+
+    public Size3D CurrentSize
+    {
+      get
+      {
+        return GetCurrentSize();
+      }
+    }
+
     public Actor Parent
     {
       get
