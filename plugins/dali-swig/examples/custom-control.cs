@@ -31,7 +31,21 @@ namespace MyCSharpExample
         private int _myRating;
         private bool _myDragEnabled;
 
-        public StarRating() : base(ViewWrapperImpl.CustomViewBehaviour.VIEW_BEHAVIOUR_DEFAULT)
+        // Called by DALi Builder if it finds a StarRating control in a JSON file
+        static CustomView CreateInstance()
+        {
+          return new StarRating();
+        }
+
+        // static constructor registers the control type (only runs once)
+        static StarRating()
+        {
+          // ViewRegistry registers control type with DALi type registery
+          // also uses introspection to find any properties that need to be registered with type registry
+          ViewRegistry.Instance.Register(CreateInstance, typeof(StarRating) );
+        }
+
+        public StarRating() : base(typeof(StarRating).Name, ViewWrapperImpl.CustomViewBehaviour.VIEW_BEHAVIOUR_DEFAULT)
         {
         }
 
@@ -62,7 +76,7 @@ namespace MyCSharpExample
             UpdateStartImages(_myRating);
 
             // Enable pan gesture detection
-            EnableGestureDetection(Gesture.Type.Pan);
+            EnableGestureDetection(Gesture.GestureType.Pan);
             _myDragEnabled = true; // Allow dragging by default (can be disabled)
         }
 
@@ -72,18 +86,18 @@ namespace MyCSharpExample
             // Only handle pan gesture if dragging is allowed
             if(_myDragEnabled)
             {
-                switch (gesture.state)
+                switch (gesture.State)
                 {
-                    case Gesture.State.Started:
+                    case Gesture.StateType.Started:
                     {
                         _gestureDisplacement = new Vector3(0.0f, 0.0f, 0.0f);
                         _currentValue = 0;
                         break;
                     }
-                    case Gesture.State.Continuing:
+                    case Gesture.StateType.Continuing:
                     {
                         // Calculate the rating according to pan desture displacement
-                        _gestureDisplacement.X += gesture.displacement.X;
+                        _gestureDisplacement.X += gesture.Displacement.X;
                         int delta = (int)Math.Ceiling(_gestureDisplacement.X / 40.0f);
                         _currentValue = _myRating + delta;
 
@@ -229,6 +243,8 @@ namespace MyCSharpExample
         [STAThread]
         static void Main(string[] args)
         {
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor (typeof(MyCSharpExample.StarRating).TypeHandle);
+
             Example example = new Example(Application.NewApplication());
             example.MainLoop ();
         }

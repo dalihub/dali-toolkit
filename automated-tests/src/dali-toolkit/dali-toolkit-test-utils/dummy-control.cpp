@@ -74,6 +74,12 @@ Dali::PropertyRegistration dummyControlVisualProperty01(
 Dali::PropertyRegistration dummyControlVisualProperty02(
   typeRegistration, "testVisual", Dali::Toolkit::DummyControl::Property::TEST_VISUAL2, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
 
+Dali::PropertyRegistration dummyControlVisualProperty03(
+  typeRegistration, "foregroundVisual", Dali::Toolkit::DummyControl::Property::FOREGROUND_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
+
+Dali::PropertyRegistration dummyControlVisualProperty04(
+  typeRegistration, "focusVisual", Dali::Toolkit::DummyControl::Property::FOCUS_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
+
 }
 
 DummyControl DummyControlImpl::New()
@@ -144,6 +150,26 @@ Animation DummyControlImpl::CreateTransition( const Toolkit::TransitionData& tra
 
 void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value )
 {
+  Toolkit::DummyControl control = Toolkit::DummyControl::DownCast( Dali::BaseHandle( object ) );
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(control.GetImplementation());
+
+  switch(index)
+  {
+    case Toolkit::DummyControl::Property::TEST_VISUAL:
+    case Toolkit::DummyControl::Property::TEST_VISUAL2:
+    case Toolkit::DummyControl::Property::FOREGROUND_VISUAL:
+    case Toolkit::DummyControl::Property::FOCUS_VISUAL:
+    {
+      Property::Map* map = value.GetMap();
+      if( map != NULL )
+      {
+        VisualFactory visualFactory = VisualFactory::Get();
+        Visual::Base visual = visualFactory.CreateVisual(*map);
+        dummyImpl.RegisterVisual(index, visual);
+      }
+      break;
+    }
+  }
 }
 
 Property::Value DummyControlImpl::GetProperty( BaseObject* object, Dali::Property::Index propertyIndex )

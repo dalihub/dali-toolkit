@@ -45,9 +45,12 @@ public:
   /**
    * @brief Create a new instance of a ControlWrapper.
    *
+   * @param[in] typeName The name of the type that is registered with this control
+   * @param[in] implementation The implementation of this control
+   *
    * @return A handle to a new ControlWrapper.
    */
-  static ControlWrapper New( Internal::ControlWrapper& implementation );
+  static ControlWrapper New( const std::string& typeName, Internal::ControlWrapper& implementation );
 
   /**
    * @brief Creates an empty ControlWrapper handle.

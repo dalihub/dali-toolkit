@@ -98,6 +98,7 @@
 %ignore *::Button::SetUnselectedImage(const std::string &);
 %ignore Dali::Toolkit::DevelVisual::Type;
 %ignore Dali::Toolkit::DevelVisual::Property::Type;
+%ignore Dali::Toolkit::AccessibilityManager::AccessibilityActionScrollSignalType;
 
 %rename(View) Dali::Toolkit::Control;
 %rename(ViewImpl) Dali::Toolkit::Internal::Control;
@@ -296,7 +297,6 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %template(ItemContainer) std::vector<std::pair<unsigned int, Dali::Actor>>;
 %template(ActorContainer) std::vector<Dali::Actor>;
 %template(AccessibilityActionSignal) Dali::Signal<bool(Dali::Toolkit::AccessibilityManager&)>;
-%template(AccessibilityActionScrollSignal) Dali::Signal<bool(Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent&)>;
 %template(AccessibilityFocusOvershotSignal) Dali::Signal<void(Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOvershotDirection)>;
 %template(FocusChangedSignal) Dali::Signal<void(Dali::Actor, Dali::Actor)>;
 %template(FocusGroupChangedSignal) Dali::Signal<void(Dali::Actor, bool)>;
@@ -309,7 +309,7 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %template(ScrollableSignal) Dali::Signal< void(const Dali::Vector2&)>;
 %template(TextEditorSignal) Dali::Signal<void(Dali::Toolkit::TextEditor)>;
 %template(TextFieldSignal) Dali::Signal<void(Dali::Toolkit::TextField)>;
-%template(ControlKeyEventSignal) Dali::Signal<bool(Dali::Toolkit::Control, const Dali::KeyEvent&)>;
+%template(ControlKeySignal) Dali::Signal<bool(Dali::Toolkit::Control, const Dali::KeyEvent&)>;
 %template(KeyInputFocusSignal) Dali::Signal<void(Dali::Toolkit::Control)>;
 %template(VideoViewSignal) Dali::Signal<void(Dali::Toolkit::VideoView&)>;
 %template(SliderValueChangedSignal) Dali::Signal<bool(Dali::Toolkit::Slider, float)>;

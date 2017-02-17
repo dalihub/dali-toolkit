@@ -15,18 +15,18 @@
  */
 using System;
 
-namespace Dali 
+namespace Dali
 {
   namespace Constants
   {
 
-    public enum TextureType 
+    public enum TextureType
     {
       Texture2D     = Dali.TextureType.TEXTURE_2D,   ///< One 2D image                            @SINCE_1_1.43
       TextureCube   = Dali.TextureType.TEXTURE_CUBE  ///< Six 2D images arranged in a cube-shape  @SINCE_1_1.43
     }
 
-    public enum ViewMode 
+    public enum ViewMode
     {
       Mono              = Dali.ViewMode.MONO,                          ///< Monoscopic (single camera). This is the default @SINCE_1_0.0
       StereoHorizontal  = Dali.ViewMode.STEREO_HORIZONTAL, ///< Stereoscopic. Frame buffer is split horizontally with the left and right camera views in their respective sides. @SINCE_1_0.0
@@ -161,7 +161,6 @@ namespace Dali
       public static readonly int DesiredHeight = NDalic.IMAGE_VISUAL_DESIRED_HEIGHT;
       public static readonly int SynchronousLoading = NDalic.IMAGE_VISUAL_SYNCHRONOUS_LOADING;
       public static readonly int BorderOnly = NDalic.IMAGE_VISUAL_BORDER_ONLY;
-      public static readonly int BatchingEnabled = NDalic.IMAGE_VISUAL_BATCHING_ENABLED;
       public static readonly int PixelArea = NDalic.IMAGE_VISUAL_PIXEL_AREA;
       public static readonly int WrapModeU = NDalic.IMAGE_VISUAL_WRAP_MODE_U;
       public static readonly int WrapModeV = NDalic.IMAGE_VISUAL_WRAP_MODE_V;

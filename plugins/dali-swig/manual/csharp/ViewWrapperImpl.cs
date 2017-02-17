@@ -27,10 +27,10 @@ namespace Dali
         public delegate void OnPropertySetDelegate(int index, Property.Value propertyValue);
         public delegate void OnSizeSetDelegate(Vector3 targetSize);
         public delegate void OnSizeAnimationDelegate(Animation animation, Vector3 targetSize);
-        public delegate bool OnTouchEventDelegate(TouchEvent touchEvent);
+        public delegate bool OnTouchDelegate(Touch touch);
         public delegate bool OnHoverDelegate(Hover hover);
-        public delegate bool OnKeyEventDelegate(KeyEvent keyEvent);
-        public delegate bool OnWheelEventDelegate(WheelEvent wheelEvent);
+        public delegate bool OnKeyDelegate(Key key);
+        public delegate bool OnWheelDelegate(Wheel wheel);
         public delegate void OnRelayoutDelegate(Vector2 size, RelayoutContainer container);
         public delegate void OnSetResizePolicyDelegate(ResizePolicyType policy, DimensionType dimension);
         public delegate Vector3 GetNaturalSizeDelegate();
@@ -46,7 +46,7 @@ namespace Dali
         public delegate void OnStyleChangeDelegate(StyleManager styleManager, StyleChangeType change);
         public delegate bool OnAccessibilityActivatedDelegate();
         public delegate bool OnAccessibilityPanDelegate(PanGesture gestures);
-        public delegate bool OnAccessibilityTouchDelegate(TouchEvent touchEvent);
+        public delegate bool OnAccessibilityTouchDelegate(Touch touch);
         public delegate bool OnAccessibilityValueChangeDelegate(bool isIncrease);
         public delegate bool OnAccessibilityZoomDelegate();
         public delegate void OnKeyInputFocusGainedDelegate();
@@ -68,10 +68,10 @@ namespace Dali
         public OnPropertySetDelegate OnPropertySet;
         public OnSizeSetDelegate OnSizeSet;
         public OnSizeAnimationDelegate OnSizeAnimation;
-        public OnTouchEventDelegate OnTouchEvent;
+        public OnTouchDelegate OnTouch;
         public OnHoverDelegate OnHover;
-        public OnKeyEventDelegate OnKeyEvent;
-        public OnWheelEventDelegate OnWheelEvent;
+        public OnKeyDelegate OnKey;
+        public OnWheelDelegate OnWheel;
         public OnRelayoutDelegate OnRelayout;
         public OnSetResizePolicyDelegate OnSetResizePolicy;
         public GetNaturalSizeDelegate GetNaturalSize;
@@ -141,9 +141,9 @@ namespace Dali
             DirectorConnect();
         }
 
-        public static ViewWrapper New(ViewWrapperImpl viewWrapper)
+        public static ViewWrapper New(string typeName, ViewWrapperImpl viewWrapper)
         {
-            ViewWrapper ret = new ViewWrapper(NDalicManualPINVOKE.ViewWrapperImpl_New(ViewWrapperImpl.getCPtr(viewWrapper)), true);
+            ViewWrapper ret = new ViewWrapper(NDalicManualPINVOKE.ViewWrapperImpl_New(typeName, ViewWrapperImpl.getCPtr(viewWrapper)), true);
             if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
             return ret;
         }
@@ -255,10 +255,10 @@ namespace Dali
             Delegate4 = new DelegateViewWrapperImpl_4(DirectorOnPropertySet);
             Delegate5 = new DelegateViewWrapperImpl_5(DirectorOnSizeSet);
             Delegate6 = new DelegateViewWrapperImpl_6(DirectorOnSizeAnimation);
-            Delegate7 = new DelegateViewWrapperImpl_7(DirectorOnTouchEvent);
+            Delegate7 = new DelegateViewWrapperImpl_7(DirectorOnTouch);
             Delegate8 = new DelegateViewWrapperImpl_8(DirectorOnHover);
-            Delegate9 = new DelegateViewWrapperImpl_9(DirectorOnKeyEvent);
-            Delegate10 = new DelegateViewWrapperImpl_10(DirectorOnWheelEvent);
+            Delegate9 = new DelegateViewWrapperImpl_9(DirectorOnKey);
+            Delegate10 = new DelegateViewWrapperImpl_10(DirectorOnWheel);
             Delegate11 = new DelegateViewWrapperImpl_11(DirectorOnRelayout);
             Delegate12 = new DelegateViewWrapperImpl_12(DirectorOnSetResizePolicy);
             Delegate13 = new DelegateViewWrapperImpl_13(DirectorGetNaturalSize);
@@ -325,9 +325,9 @@ namespace Dali
             OnSizeAnimation(new Animation(animation, false), new Vector3(targetSize, false));
         }
 
-        private bool DirectorOnTouchEvent(global::System.IntPtr arg0)
+        private bool DirectorOnTouch(global::System.IntPtr arg0)
         {
-            return OnTouchEvent(new TouchEvent(arg0, false));
+            return OnTouch(new Touch(arg0, false));
         }
 
         private bool DirectorOnHover(global::System.IntPtr arg0)
@@ -335,14 +335,14 @@ namespace Dali
             return OnHover(new Hover(arg0, false));
         }
 
-        private bool DirectorOnKeyEvent(global::System.IntPtr arg0)
+        private bool DirectorOnKey(global::System.IntPtr arg0)
         {
-            return OnKeyEvent(new KeyEvent(arg0, false));
+            return OnKey(new Key(arg0, false));
         }
 
-        private bool DirectorOnWheelEvent(global::System.IntPtr arg0)
+        private bool DirectorOnWheel(global::System.IntPtr arg0)
         {
-            return OnWheelEvent(new WheelEvent(arg0, false));
+            return OnWheel(new Wheel(arg0, false));
         }
 
         private void DirectorOnRelayout(global::System.IntPtr size, global::System.IntPtr container)
@@ -424,9 +424,9 @@ namespace Dali
             return OnAccessibilityPan(new PanGesture(gesture, false));
         }
 
-        private bool DirectorOnAccessibilityTouch(global::System.IntPtr touchEvent)
+        private bool DirectorOnAccessibilityTouch(global::System.IntPtr touch)
         {
-            return OnAccessibilityTouch(new TouchEvent(touchEvent, false));
+            return OnAccessibilityTouch(new Touch(touch, false));
         }
 
         private bool DirectorOnAccessibilityValueChange(bool isIncrease)
@@ -521,7 +521,7 @@ namespace Dali
         public delegate void DelegateViewWrapperImpl_24(global::System.IntPtr styleManager, int change);
         public delegate bool DelegateViewWrapperImpl_25();
         public delegate bool DelegateViewWrapperImpl_26(global::System.IntPtr gesture);
-        public delegate bool DelegateViewWrapperImpl_27(global::System.IntPtr touchEvent);
+        public delegate bool DelegateViewWrapperImpl_27(global::System.IntPtr touch);
         public delegate bool DelegateViewWrapperImpl_28(bool isIncrease);
         public delegate bool DelegateViewWrapperImpl_29();
         public delegate void DelegateViewWrapperImpl_30();

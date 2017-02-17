@@ -20,7 +20,7 @@ $typeTable =  [
         ["VECTOR4",     "Vector4",          "",     "Vector4 temp = new Vector4(0.0f,0.0f,0.0f,0.0f);"],
         ["MATRIX3",     "Matrix3",          "",     "Matrix3 temp = new Matrix3();"],
         ["MATRIX",      "Matrix",           "",     "Matrix temp = new Matrix();"  ],
-        ["RECTANGLE",   "RectInteger",      "",     "RectInteger temp = new RectInteger(0,0,0,0);"],
+        ["RECTANGLE",   "Rectangle",      "",     "Rectangle temp = new Rectangle(0,0,0,0);"],
         ["ROTATION",    "Quaternion",       "",    "Quaternion temp = new Quaternion();"],
         ["STRING",      "string",           "out",  "string temp;"],
         ["ARRAY",       "Dali.Property.Array",   "",     "Dali.Property.Array temp = new Dali.Property.Array();"],

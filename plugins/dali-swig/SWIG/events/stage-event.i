@@ -33,26 +33,26 @@ using System.Runtime.InteropServices;
     */
   public class TouchEventArgs : EventArgs
   {
-     private TouchData _touchData;
+     private Touch _touch;
 
      /**
-       * @brief TouchData - contains the information of touch points
+       * @brief Touch - contains the information of touch points
        *
        */
-     public TouchData TouchData
+     public Touch Touch
      {
         get
         {
-           return _touchData;
+           return _touch;
         }
         set
         {
-           _touchData = value;
+           _touch = value;
         }
      }
   }
 
-  private event EventHandler<TouchEventArgs> _stageTouchEventHandler;
+  private event EventHandler<TouchEventArgs> _stageTouchHandler;
   private EventCallbackDelegateType1<IntPtr> _stageTouchCallbackDelegate;
 
   /**
@@ -61,13 +61,13 @@ using System.Runtime.InteropServices;
     * (i.e. the down & up touch events only).
     *
     */
-  public event EventHandler<TouchEventArgs> TouchEvent
+  public event EventHandler<TouchEventArgs> Touch
   {
      add
      {
         lock(this)
         {
-          _stageTouchEventHandler += value;
+          _stageTouchHandler += value;
           _stageTouchCallbackDelegate = OnStageTouch;
           this.TouchSignal().Connect(_stageTouchCallbackDelegate);
         }
@@ -76,11 +76,11 @@ using System.Runtime.InteropServices;
      {
         lock(this)
         {
-           if (_stageTouchEventHandler != null)
+           if (_stageTouchHandler != null)
            {
               this.TouchSignal().Disconnect(_stageTouchCallbackDelegate);
            }
-           _stageTouchEventHandler -= value;
+           _stageTouchHandler -= value;
         }
      }
   }
@@ -91,56 +91,55 @@ using System.Runtime.InteropServices;
 
     if( data != null )
     {
-      e.TouchData = TouchData.GetTouchDataFromPtr( data );
+      e.Touch = Dali.Touch.GetTouchFromPtr( data );
     }
 
-    if (_stageTouchEventHandler != null)
+    if (_stageTouchHandler != null)
     {
-      _stageTouchEventHandler(this, e);
+      _stageTouchHandler(this, e);
     }
   }
 
-
   /**
-    * @brief WheelEvent arguments that passed via Wheel signal
+    * @brief Wheel arguments that passed via Wheel signal
     *
     */
   public class WheelEventArgs : EventArgs
   {
-     private WheelEvent _wheelEvent;
+     private Wheel _wheel;
 
      /**
-       * @brief WheelEvent - store a wheel rolling type MOUSE_WHEEL or CUSTOM_WHEEL
+       * @brief Wheel - store a wheel rolling type MOUSE_WHEEL or CUSTOM_WHEEL
        *
        */
-     public WheelEvent WheelEvent
+     public Wheel Wheel
      {
         get
         {
-           return _wheelEvent;
+           return _wheel;
         }
         set
         {
-           _wheelEvent = value;
+           _wheel = value;
         }
      }
   }
 
-  private event EventHandler<WheelEventArgs> _stageWheelEventHandler;
+  private event EventHandler<WheelEventArgs> _stageWheelHandler;
   private EventCallbackDelegateType1<IntPtr> _stageWheelCallbackDelegate;
 
   /**
-    * @brief Event for WheelEvent signal which can be used to subscribe/unsubscribe the event handler
-    * WheelEvent signal is emitted is emitted when wheel event is received.
+    * @brief Event for Wheel signal which can be used to subscribe/unsubscribe the event handler
+    * Wheel signal is emitted is emitted when wheel event is received.
     *
     */
-  public event EventHandler<WheelEventArgs> WheelEvent
+  public event EventHandler<WheelEventArgs> Wheel
   {
      add
      {
         lock(this)
         {
-          _stageWheelEventHandler += value;
+          _stageWheelHandler += value;
           _stageWheelCallbackDelegate = OnStageWheel;
           this.WheelEventSignal().Connect(_stageWheelCallbackDelegate);
         }
@@ -149,11 +148,11 @@ using System.Runtime.InteropServices;
      {
         lock(this)
         {
-           if (_stageWheelEventHandler != null)
+           if (_stageWheelHandler != null)
            {
               this.WheelEventSignal().Disconnect(_stageWheelCallbackDelegate);
            }
-           _stageWheelEventHandler -= value;
+           _stageWheelHandler -= value;
         }
      }
   }
@@ -164,55 +163,55 @@ using System.Runtime.InteropServices;
 
     if( data != null )
     {
-      e.WheelEvent = Dali.WheelEvent.GetWheelEventFromPtr( data );
+      e.Wheel = Dali.Wheel.GetWheelFromPtr( data );
     }
 
-    if (_stageWheelEventHandler != null)
+    if (_stageWheelHandler != null)
     {
-      _stageWheelEventHandler(this, e);
+      _stageWheelHandler(this, e);
     }
   }
 
   /**
-    * @brief Event arguments that passed via KeyEvent signal
+    * @brief Event arguments that passed via Key signal
     *
     */
   public class KeyEventArgs : EventArgs
   {
-     private KeyEvent _keyEvent;
+     private Key _key;
 
      /**
-       * @brief KeyEvent - is the keyevent sent to Stage.
+       * @brief Key - is the keyevent sent to Stage.
        *
        */
-     public KeyEvent KeyEvent
+     public Key Key
      {
         get
         {
-           return _keyEvent;
+           return _key;
         }
         set
         {
-           _keyEvent = value;
+           _key = value;
         }
      }
   }
 
-  private event EventHandler<KeyEventArgs> _stageKeyEventHandler;
+  private event EventHandler<KeyEventArgs> _stageKeyHandler;
   private EventCallbackDelegateType1<IntPtr> _stageKeyCallbackDelegate;
 
   /**
-    * @brief Event for KeyEvent signal which can be used to subscribe/unsubscribe the event handler
-    * KeyEvent signal is emitted is emitted when key event is received.
+    * @brief Event for Key signal which can be used to subscribe/unsubscribe the event handler
+    * Key signal is emitted is emitted when key event is received.
     *
     */
-  public event EventHandler<KeyEventArgs> KeyEvent
+  public event EventHandler<KeyEventArgs> Key
   {
      add
      {
         lock(this)
         {
-            _stageKeyEventHandler += value;
+            _stageKeyHandler += value;
             _stageKeyCallbackDelegate = OnStageKey;
             this.KeyEventSignal().Connect(_stageKeyCallbackDelegate);
         }
@@ -221,11 +220,11 @@ using System.Runtime.InteropServices;
      {
         lock(this)
         {
-           if (_stageKeyEventHandler != null)
+           if (_stageKeyHandler != null)
            {
               this.KeyEventSignal().Disconnect(_stageKeyCallbackDelegate);
            }
-           _stageKeyEventHandler -= value;
+           _stageKeyHandler -= value;
         }
      }
   }
@@ -237,13 +236,13 @@ using System.Runtime.InteropServices;
 
     if( data != null )
     {
-      e.KeyEvent = Dali.KeyEvent.GetKeyEventFromPtr( data );
+      e.Key = Dali.Key.GetKeyFromPtr( data );
     }
 
-    if (_stageKeyEventHandler != null)
+    if (_stageKeyHandler != null)
     {
       //here we send all data to user event handlers
-      _stageKeyEventHandler(this, e);
+      _stageKeyHandler(this, e);
     }
   }
 

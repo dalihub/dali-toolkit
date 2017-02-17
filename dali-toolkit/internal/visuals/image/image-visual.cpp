@@ -58,7 +58,6 @@ const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
 const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
 const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
 const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
-const char * const BATCHING_ENABLED( "batchingEnabled" );
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN( FITTING_MODE )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1000,7 +1000,7 @@ int UtcDaliImageViewSetImageNativeImage(void)
   DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
 
   std::stringstream params;
-  params << GL_TEXTURE_2D << ", " << 23;
+  params << GL_TEXTURE_EXTERNAL_OES << ", " << 23;
   DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
 
   END_TEST;
@@ -1050,7 +1050,7 @@ int UtcDaliImageViewSetImageBufferImageToNativeImage(void)
   DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
 
   std::stringstream nextTextureParams;
-  nextTextureParams << GL_TEXTURE_2D << ", " << 24;
+  nextTextureParams << GL_TEXTURE_EXTERNAL_OES << ", " << 24;
   DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", nextTextureParams.str()) );
 
   END_TEST;
@@ -1082,7 +1082,7 @@ int UtcDaliImageViewSetImageNativeImageToBufferImage(void)
   DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
 
   std::stringstream params;
-  params << GL_TEXTURE_2D << ", " << 23;
+  params << GL_TEXTURE_EXTERNAL_OES << ", " << 23;
   DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
 
   width = 200;
@@ -1149,7 +1149,7 @@ int UtcDaliImageViewSetImageNativeImageWithCustomShader(void)
   DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
 
   std::stringstream params;
-  params << GL_TEXTURE_2D << ", " << 23;
+  params << GL_TEXTURE_EXTERNAL_OES << ", " << 23;
   DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", params.str()) );
 
   END_TEST;
@@ -1214,7 +1214,7 @@ int UtcDaliImageViewSetImageBufferImageWithCustomShaderToNativeImage(void)
   DALI_TEST_CHECK( gl.GetTextureTrace().FindMethod("BindTexture") );
 
   std::stringstream nativeImageParams;
-  nativeImageParams << GL_TEXTURE_2D << ", " << 24;
+  nativeImageParams << GL_TEXTURE_EXTERNAL_OES << ", " << 24;
   DALI_TEST_CHECK( gl.GetTextureTrace().FindMethodAndParams("BindTexture", nativeImageParams.str()) );
 
 

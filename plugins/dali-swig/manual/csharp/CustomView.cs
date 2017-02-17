@@ -19,7 +19,7 @@ namespace Dali
 {
     public class CustomView : ViewWrapper
     {
-        public CustomView(ViewWrapperImpl.CustomViewBehaviour behaviour) : base(new ViewWrapperImpl(behaviour))
+        public CustomView(string typeName, ViewWrapperImpl.CustomViewBehaviour behaviour) : base(typeName, new ViewWrapperImpl(behaviour))
         {
             // Registering CustomView virtual functions to viewWrapperImpl delegates.
             viewWrapperImpl.OnStageConnection = new ViewWrapperImpl.OnStageConnectionDelegate(OnStageConnection);
@@ -29,10 +29,10 @@ namespace Dali
             viewWrapperImpl.OnPropertySet = new ViewWrapperImpl.OnPropertySetDelegate(OnPropertySet);
             viewWrapperImpl.OnSizeSet = new ViewWrapperImpl.OnSizeSetDelegate(OnSizeSet);
             viewWrapperImpl.OnSizeAnimation = new ViewWrapperImpl.OnSizeAnimationDelegate(OnSizeAnimation);
-            viewWrapperImpl.OnTouchEvent = new ViewWrapperImpl.OnTouchEventDelegate(OnTouchEvent);
+            viewWrapperImpl.OnTouch = new ViewWrapperImpl.OnTouchDelegate(OnTouch);
             viewWrapperImpl.OnHover = new ViewWrapperImpl.OnHoverDelegate(OnHover);
-            viewWrapperImpl.OnKeyEvent = new ViewWrapperImpl.OnKeyEventDelegate(OnKeyEvent);
-            viewWrapperImpl.OnWheelEvent = new ViewWrapperImpl.OnWheelEventDelegate(OnWheelEvent);
+            viewWrapperImpl.OnKey = new ViewWrapperImpl.OnKeyDelegate(OnKey);
+            viewWrapperImpl.OnWheel = new ViewWrapperImpl.OnWheelDelegate(OnWheel);
             viewWrapperImpl.OnRelayout = new ViewWrapperImpl.OnRelayoutDelegate(OnRelayout);
             viewWrapperImpl.OnSetResizePolicy = new ViewWrapperImpl.OnSetResizePolicyDelegate(OnSetResizePolicy);
             viewWrapperImpl.GetNaturalSize = new ViewWrapperImpl.GetNaturalSizeDelegate(GetNaturalSize);
@@ -89,7 +89,7 @@ namespace Dali
          * @endcode
          * @param[in]  type  The gesture type(s) to enable.
          */
-        public void EnableGestureDetection(Gesture.Type type)
+        public void EnableGestureDetection(Gesture.GestureType type)
         {
             viewWrapperImpl.EnableGestureDetection(type);
         }
@@ -101,7 +101,7 @@ namespace Dali
          * @param[in]  type  The gesture type(s) to disable.
          * @see EnableGetureDetection
          */
-        public void DisableGestureDetection(Gesture.Type type)
+        public void DisableGestureDetection(Gesture.GestureType type)
         {
             viewWrapperImpl.DisableGestureDetection(type);
         }
@@ -171,12 +171,12 @@ namespace Dali
         /**
          * @brief Called by the KeyInputFocusManager to emit key event signals.
          *
-         * @param[in] keyEvent The key event.
+         * @param[in] key The key event.
          * @return True if the event was consumed.
          */
-        public bool EmitKeyEventSignal(KeyEvent keyEvent)
+        public bool EmitKeyEventSignal(Key key)
         {
-            return viewWrapperImpl.EmitKeyEventSignal(keyEvent);
+            return viewWrapperImpl.EmitKeyEventSignal(key);
         }
 
         /**
@@ -457,11 +457,11 @@ namespace Dali
          *
          * @brief Called after a touch-event is received by the owning actor.
          *
-         * @param[in] event The touch event
+         * @param[in] touch The touch event
          * @return True if the event should be consumed.
          * @note CustomViewBehaviour.REQUIRES_TOUCH_EVENTS must be enabled during construction. See CustomView(ViewWrapperImpl.CustomViewBehaviour behaviour).
          */
-        public virtual bool OnTouchEvent(TouchEvent touchEvent)
+        public virtual bool OnTouch(Touch touch)
         {
             return false; // Do not consume
         }
@@ -481,10 +481,10 @@ namespace Dali
         /**
          * @brief Called after a key-event is received by the actor that has had its focus set.
          *
-         * @param[in] event the Key Event
+         * @param[in] key the Key Event
          * @return True if the event should be consumed.
          */
-        public virtual bool OnKeyEvent(KeyEvent keyEvent)
+        public virtual bool OnKey(Key key)
         {
             return false; // Do not consume
         }
@@ -492,11 +492,11 @@ namespace Dali
         /**
          * @brief Called after a wheel-event is received by the owning actor.
          *
-         * @param[in] event The wheel event
+         * @param[in] wheel The wheel event
          * @return True if the event should be consumed.
          * @note CustomViewBehaviour.REQUIRES_WHEEL_EVENTS must be enabled during construction. See CustomView(ViewWrapperImpl.CustomViewBehaviour behaviour).
          */
-        public virtual bool OnWheelEvent(WheelEvent wheelEvent)
+        public virtual bool OnWheel(Wheel wheel)
         {
             return false; // Do not consume
         }
@@ -657,10 +657,10 @@ namespace Dali
          * @brief This method should be overridden by deriving classes when they wish to respond the accessibility
          * touch event.
          *
-         * @param[in] touchEvent The touch event.
+         * @param[in] touch The touch event.
          * @return true if the touch event has been consumed by this control
          */
-        public virtual bool OnAccessibilityTouch(TouchEvent touchEvent)
+        public virtual bool OnAccessibilityTouch(Touch touch)
         {
             return false;
         }

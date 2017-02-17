@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,15 +66,15 @@
 %}
 %enddef
 
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_VIDEOVIEWSIGNAL( NameSpace, ClassName )
+%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( NameSpace, ClassName, NewClassName )
 %typemap(csfinalize) NameSpace::ClassName %{
-  ~VideoViewSignal() {
+  ~NewClassName() {
     DisposeQueue.Instance.Add(this);
   }
 %}
 %enddef
 
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_VIDEOVIEWSIGNAL( NameSpace, ClassName )
+%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( NameSpace, ClassName, NewClassName )
 %typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
     if (!Stage.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
@@ -85,7 +85,7 @@
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          NDalicPINVOKE.delete_VideoViewSignal(swigCPtr);
+          NDalicPINVOKE.delete_##NewClassName(swigCPtr);
         }
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
@@ -95,16 +95,8 @@
 %}
 %enddef
 
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_APPLICATIONSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~ApplicationSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_APPLICATIONSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
+%define DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION_RENAME( NameSpace, ClassName, NewClassName )
+%typemap(csdestruct_derived, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
     if (!Stage.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
@@ -114,214 +106,12 @@
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          NDalicPINVOKE.delete_ApplicationSignal(swigCPtr);
+          NDalicPINVOKE.delete_##NewClassName(swigCPtr);
         }
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
       global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_APPLICATIONCONTROLSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~ApplicationControlSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_APPLICATIONCONTROLSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_ApplicationControlSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_IMAGESIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~ImageSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_IMAGESIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_ImageSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RESOURCESIMAGESIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~ResourceImageSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RESOURCESIMAGESIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_ResourceImageSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RECTINT( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~RectInteger() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RECTINT( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_RectInteger(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RECTDOUBLE( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~RectDouble() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RECTDOUBLE( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_RectDouble(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RECTFLOAT( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~RectFloat() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RECTFLOAT( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_RectFloat(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RECTUNSIGNEDINT( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~RectUnsignedInteger() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RECTUNSIGNEDINT( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_RectUnsignedInteger(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
+      base.Dispose();
     }
   }
 %}
@@ -347,35 +137,6 @@
         if (swigCMemOwn) {
           swigCMemOwn = false;
           NDalicPINVOKE.delete_StringValuePair(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TOUCHCONTAINER( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~TouchPointContainer() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_TOUCHCONTAINER( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_TouchPointContainer(swigCPtr);
         }
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
@@ -414,209 +175,6 @@
 %}
 %enddef
 
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ACCESSIBILITYACTIONSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~AccessibilityActionSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ACCESSIBILITYACTIONSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_AccessibilityActionSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ACCESSIBILITYACTIONSCROLLSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~AccessibilityActionScrollSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ACCESSIBILITYACTIONSCROLLSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_AccessibilityActionScrollSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ACCESSIBILITYFOCUSSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~AccessibilityFocusOvershotSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ACCESSIBILITYFOCUSSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_AccessibilityFocusOvershotSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_VECTORINT( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~VectorInteger() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_VECTORINT( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_VectorInteger(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_VECTORFLOAT( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~VectorFloat() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_VECTORFLOAT( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_VectorFloat(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_VECTORUNSIGNEDCHAR( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~VectorUnsignedChar() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_VECTORUNSIGNEDCHAR( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_VectorUnsignedChar(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_VECTORUINT16PAIR( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~VectorUint16Pair() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_VECTORUINT16PAIR( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_VectorUint16Pair(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
 %define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TIMERSIGNALTYPE( NameSpace, ClassName )
 %typemap(csfinalize) NameSpace::ClassName %{
   ~TimerSignalType() {
@@ -637,499 +195,6 @@
         if (swigCMemOwn) {
           swigCMemOwn = false;
           NDalicPINVOKE.delete_TimerSignalType(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ACTOR( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~ActorSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ACTOR( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_ActorSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ANIMATIONSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~AnimationSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ANIMATIONSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_AnimationSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_BUTTON( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~ButtonSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_BUTTON( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_ButtonSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_PAGETURNSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~PageTurnSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_PAGETURNSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_PageTurnSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_PAGEVIEWSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~PagePanSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_PAGEVIEWSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_PagePanSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_PANGESTURESIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~PanGestureDetectedSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_PANGESTURESIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_PanGestureDetectedSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_PINCHGESTURESIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~PinchGestureDetectedSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_PINCHGESTURESIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_PinchGestureDetectedSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENDERTASKSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~RenderTaskSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENDERTASKSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_RenderTaskSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_SCROLLABLESIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~ScrollableSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_SCROLLABLESIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_ScrollableSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_SCROLLVIEWSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~ScrollViewSnapStartedSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_SCROLLVIEWSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_ScrollViewSnapStartedSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_SLIDERVALUECHANGEDSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~SliderValueChangedSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_SLIDERVALUECHANGEDSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_SliderValueChangedSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_SLIDERMARKCHANGEDSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~SliderMarkReachedSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_SLIDERMARKCHANGEDSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_SliderMarkReachedSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_STAGESIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~StageWheelEventSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_STAGESIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_StageWheelEventSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_STYLECHANGEDSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~StyleChangedSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_STYLECHANGEDSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_StyleChangedSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TAPGESTURESIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~TapGestureDetectedSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_TAPGESTURESIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_TapGestureDetectedSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TEXTFIELDSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~TextFieldSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_TEXTFIELDSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_TextFieldSignal(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TEXTEDITORSIGNAL( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~TextEditorSignal() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_TEXTEDITORSIGNAL( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_TextEditorSignal(swigCPtr);
         }
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
@@ -1205,12 +270,14 @@ DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, LongPressGesture );
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, LongPressGestureDetector );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, LongPressGestureDetector );
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, KeyEvent );
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, KeyEvent );
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, KeyEvent, Key );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, KeyEvent, Key );
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, HoverEvent, Hover );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, HoverEvent, Hover );
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, TouchEvent );
 DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, TouchEvent );
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, WheelEvent );
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, WheelEvent );
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, WheelEvent, Wheel );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, WheelEvent, Wheel );
 
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, Renderer );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, Renderer );
@@ -1295,8 +362,8 @@ DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, PathConstrainer );
 
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, TouchPoint );
 DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, TouchPoint );
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, TouchData );
-DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, TouchData );
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, TouchData, Touch );
+DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION_RENAME( Dali, TouchData, Touch );
 
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, Application );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali, Application );
@@ -1391,45 +458,41 @@ DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, VideoView );
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, VisualFactory );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, VisualFactory );
 
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_APPLICATIONSIGNAL( Dali, Signal<void(Dali::Application&)>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_APPLICATIONSIGNAL( Dali, Signal<void(Dali::Application&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_APPLICATIONCONTROLSIGNAL( Dali, Signal<void(Dali::Application&, void*)>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_APPLICATIONCONTROLSIGNAL( Dali, Signal<void(Dali::Application&, void*)>);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Application&)>, ApplicationSignal);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Application&)>, ApplicationSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Application&, void*)>, ApplicationControlSignal);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Application&, void*)>, ApplicationControlSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_VIDEOVIEWSIGNAL( Dali, Signal<void(Dali::Toolkit::VideoView&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_VIDEOVIEWSIGNAL( Dali, Signal<void(Dali::Toolkit::VideoView&)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::VideoView&)>, VideoViewSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::VideoView&)>, VideoViewSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_IMAGESIGNAL( Dali, Signal<void(Dali::Image)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_IMAGESIGNAL( Dali, Signal<void(Dali::Image)>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RESOURCESIMAGESIGNAL( Dali, Signal<void(Dali::ResourceImage)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RESOURCESIMAGESIGNAL( Dali, Signal<void(Dali::ResourceImage)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Image)>, ImageSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Image)>, ImageSignal);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::ResourceImage)>, ResourceImageSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::ResourceImage)>, ResourceImageSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RECTINT( Dali, Rect<int>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RECTINT( Dali, Rect<int>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RECTDOUBLE( Dali, Rect<double>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RECTDOUBLE( Dali, Rect<double>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RECTFLOAT( Dali, Rect<float>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RECTFLOAT( Dali, Rect<float>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RECTUNSIGNEDINT( Dali, Rect<unsigned int>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RECTUNSIGNEDINT( Dali, Rect<unsigned int>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TOUCHCONTAINER( std, vector<Dali::TouchPoint>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_TOUCHCONTAINER( std, vector<Dali::TouchPoint>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Rect<int>, Rectangle);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Rect<int>, Rectangle);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Rect<float>, PaddingType);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Rect<float>, PaddingType);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( std, vector<Dali::TouchPoint>, TouchPointContainer);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( std, vector<Dali::TouchPoint>, TouchPointContainer);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_VECTORINT( Dali, Vector<int>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_VECTORINT( Dali, Vector<int>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_VECTORFLOAT( Dali, Vector<float>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_VECTORFLOAT( Dali, Vector<float>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_VECTORUNSIGNEDCHAR( Dali, Vector<unsigned char>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_VECTORUNSIGNEDCHAR( Dali, Vector<unsigned char>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_VECTORUINT16PAIR( Dali, Vector<Dali::Uint16Pair>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_VECTORUINT16PAIR( Dali, Vector<Dali::Uint16Pair>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Vector<int>, VectorInteger);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Vector<int>, VectorInteger);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Vector<float>, VectorFloat);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Vector<float>, VectorFloat);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Vector<unsigned char>, VectorUnsignedChar);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Vector<unsigned char>, VectorUnsignedChar);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Vector<Dali::Uint16Pair>, VectorUint16Pair);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Vector<Dali::Uint16Pair>, VectorUint16Pair);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ACCESSIBILITYACTIONSIGNAL( Dali, Signal<bool(Dali::Toolkit::AccessibilityManager&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ACCESSIBILITYACTIONSIGNAL( Dali, Signal<bool(Dali::Toolkit::AccessibilityManager&)>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ACCESSIBILITYACTIONSCROLLSIGNAL( Dali, Signal<bool(Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ACCESSIBILITYACTIONSCROLLSIGNAL( Dali, Signal<bool(Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent&)>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ACCESSIBILITYFOCUSSIGNAL( Dali, Signal<void(Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOvershotDirection)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ACCESSIBILITYFOCUSSIGNAL( Dali, Signal<void(Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOvershotDirection)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::AccessibilityManager&)>, AccessibilityActionSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::AccessibilityManager&)>, AccessibilityActionSignal);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent&)>, AccessibilityActionScrollSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::AccessibilityManager&, const Dali::TouchEvent&)>, AccessibilityActionScrollSignal);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOvershotDirection)>, AccessibilityFocusOvershotSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Actor, Dali::Toolkit::AccessibilityManager::FocusOvershotDirection)>, AccessibilityFocusOvershotSignal);
 //DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_STRINGVALUEPAIR( Dali, pair<std::string, Dali::Property::Value>);
 //DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_STRINGVALUEPAIR( Dali, pair<std::string, Dali::Property::Value>);
 //DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_BOOLSIGNAL( Dali, Signal<bool()>);
@@ -1437,51 +500,144 @@ DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ACCESSIBILITYFOCUSSIGNAL( Dali, Signal<void(
 //DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TIMERSIGNALTYPE( Dali, Signal<bool()>);
 //DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_TIMERSIGNALTYPE( Dali, Signal<bool()>);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ACTOR( Dali, Signal<void (Dali::Actor)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ACTOR( Dali, Signal<void (Dali::Actor)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor)>, ActorSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor)>, ActorSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ANIMATIONSIGNAL( Dali, Signal<void(Dali::Animation&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ANIMATIONSIGNAL( Dali, Signal<void(Dali::Animation&)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Animation&)>, AnimationSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Animation&)>, AnimationSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_BUTTON( Dali, Signal<bool(Dali::Toolkit::Button)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_BUTTON( Dali, Signal<bool(Dali::Toolkit::Button)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::Button)>, ButtonSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::Button)>, ButtonSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_PAGETURNSIGNAL( Dali, Signal<void(Dali::Toolkit::PageTurnView, unsigned int, bool)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_PAGETURNSIGNAL( Dali, Signal<void(Dali::Toolkit::PageTurnView, unsigned int, bool)>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_PAGEVIEWSIGNAL( Dali, Signal<void(Dali::Toolkit::PageTurnView)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_PAGEVIEWSIGNAL( Dali, Signal<void(Dali::Toolkit::PageTurnView)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::PageTurnView, unsigned int, bool)>, PageTurnSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::PageTurnView, unsigned int, bool)>, PageTurnSignal);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::PageTurnView)>, PagePanSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::PageTurnView)>, PagePanSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_PANGESTURESIGNAL( Dali, Signal<void (Dali::Actor, const Dali::PanGesture&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_PANGESTURESIGNAL( Dali, Signal<void (Dali::Actor, const Dali::PanGesture&)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor, const Dali::PanGesture&)>, PanGestureDetectedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor, const Dali::PanGesture&)>, PanGestureDetectedSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_PINCHGESTURESIGNAL( Dali, Signal<void (Dali::Actor, const Dali::PinchGesture&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_PINCHGESTURESIGNAL( Dali, Signal<void (Dali::Actor, const Dali::PinchGesture&)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor, const Dali::PinchGesture&)>, PinchGestureDetectedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor, const Dali::PinchGesture&)>, PinchGestureDetectedSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENDERTASKSIGNAL( Dali, Signal<void(Dali::RenderTask&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENDERTASKSIGNAL( Dali, Signal<void(Dali::RenderTask&)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::RenderTask&)>, RenderTaskSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::RenderTask&)>, RenderTaskSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_SCROLLABLESIGNAL( Dali, Signal< void(const Dali::Vector2&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_SCROLLABLESIGNAL( Dali, Signal< void(const Dali::Vector2&)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal< void(const Dali::Vector2&)>, ScrollableSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal< void(const Dali::Vector2&)>, ScrollableSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_SCROLLVIEWSIGNAL( Dali, Signal< void(const Dali::Toolkit::ScrollView::SnapEvent&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_SCROLLVIEWSIGNAL( Dali, Signal< void(const Dali::Toolkit::ScrollView::SnapEvent&)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal< void(const Dali::Toolkit::ScrollView::SnapEvent&)>, ScrollViewSnapStartedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal< void(const Dali::Toolkit::ScrollView::SnapEvent&)>, ScrollViewSnapStartedSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_SLIDERVALUECHANGEDSIGNAL( Dali, Signal<bool(Dali::Toolkit::Slider, float)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_SLIDERVALUECHANGEDSIGNAL( Dali, Signal<bool(Dali::Toolkit::Slider, float)>);
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_SLIDERMARKCHANGEDSIGNAL( Dali, Signal<bool(Dali::Toolkit::Slider, int)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_SLIDERMARKCHANGEDSIGNAL( Dali, Signal<bool(Dali::Toolkit::Slider, int)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::Slider, float)>, SliderValueChangedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::Slider, float)>, SliderValueChangedSignal);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::Slider, int)>, SliderMarkReachedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::Slider, int)>, SliderMarkReachedSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_STAGESIGNAL( Dali, Signal<void (const Dali::WheelEvent&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_STAGESIGNAL( Dali, Signal<void (const Dali::WheelEvent&)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void (const Dali::WheelEvent&)>, StageWheelSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void (const Dali::WheelEvent&)>, StageWheelSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_STYLECHANGEDSIGNAL( Dali, Signal<void(Dali::Toolkit::StyleManager, Dali::StyleChange::Type)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_STYLECHANGEDSIGNAL( Dali, Signal<void(Dali::Toolkit::StyleManager, Dali::StyleChange::Type)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::StyleManager, Dali::StyleChange::Type)>, StyleChangedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::StyleManager, Dali::StyleChange::Type)>,StyleChangedSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TAPGESTURESIGNAL( Dali, Signal<void (Dali::Actor, const Dali::TapGesture&)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_TAPGESTURESIGNAL( Dali, Signal<void (Dali::Actor, const Dali::TapGesture&)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor, const Dali::TapGesture&)>, TapGestureDetectedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor, const Dali::TapGesture&)>, TapGestureDetectedSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TEXTEDITORSIGNAL( Dali, Signal<void(Dali::Toolkit::TextEditor)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_TEXTEDITORSIGNAL( Dali, Signal<void(Dali::Toolkit::TextEditor)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::TextEditor)>, TextEditorSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::TextEditor)>, TextEditorSignal);
 
-DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TEXTFIELDSIGNAL( Dali, Signal<void(Dali::Toolkit::TextField)>);
-DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_TEXTFIELDSIGNAL( Dali, Signal<void(Dali::Toolkit::TextField)>);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::TextField)>, TextFieldSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::TextField)>, TextFieldSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( std, vector<Dali::Actor>, ActorContainer);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( std, vector<Dali::Actor>, ActorContainer);
+
+//DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ITEM( std, pair<unsigned int, Dali::Actor));
+//DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ITEM( std, pair<unsigned int, Dali::Actor>);
+
+//DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_ITEMCONTAINER( std, vector<std::pair<unsigned int, Dali::Actor>>);
+//DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_ITEMCONTAINER( std, vector<std::pair<unsigned int, Dali::Actor>>);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( std, vector<unsigned int>, ItemIdContainer);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( std, vector<unsigned int>, ItemIdContainer);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Actor, Dali::Actor)>, FocusChangedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Actor, Dali::Actor)>, FocusChangedSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Actor, bool)>, FocusGroupChangedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Actor, bool)>, FocusGroupChangedSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void (Dali::Toolkit::GaussianBlurView)>, GaussianBlurViewSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void (Dali::Toolkit::GaussianBlurView)>, GaussianBlurViewSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::Control, const Dali::KeyEvent&)>, ControlKeySignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<bool(Dali::Toolkit::Control, const Dali::KeyEvent&)>, ControlKeySignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void (const Dali::KeyEvent&)>, KeyEventSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void (const Dali::KeyEvent&)>, KeyEventSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::Control)>, KeyInputFocusSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::Control)>, KeyInputFocusSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, IntrusivePtr<Dali::Toolkit::Ruler>, RulerPtr);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, IntrusivePtr<Dali::Toolkit::Ruler>, RulerPtr);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void()>, VoidSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void()>, VoidSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(float)>, FloatSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(float)>, FloatSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(const Dali::RefObject*)>, ObjectDestroyedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(const Dali::RefObject*)>, ObjectDestroyedSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::BaseHandle)>, ObjectCreatedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::BaseHandle)>, ObjectCreatedSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::PropertyNotification&)>, PropertyNotifySignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::PropertyNotification&)>, PropertyNotifySignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor, const Dali::LongPressGesture&)>, LongPressGestureDetectedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor, const Dali::LongPressGesture&)>, LongPressGestureDetectedSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<bool (Dali::Actor, const Dali::HoverEvent&)>, ActorHoverSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<bool (Dali::Actor, const Dali::HoverEvent&)>, ActorHoverSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<bool (Dali::Actor, const Dali::TouchData&)>, ActorTouchDataSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<bool (Dali::Actor, const Dali::TouchData&)>, ActorTouchDataSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<bool (Dali::Actor, const Dali::WheelEvent&)>, ActorWheelSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<bool (Dali::Actor, const Dali::WheelEvent&)>, ActorWheelSignal);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void (const Dali::TouchData&)>, TouchSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void (const Dali::TouchData&)>, TouchSignal);
+
+//DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, (std::pair< Dali::Radian, Dali::Radian >), AngleThresholdPair);
+//DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, (std::pair< Dali::Radian, Dali::Radian >), AngleThresholdPair);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, ApplicationExtensions );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, ApplicationExtensions );
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, SlotObserver );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, SlotObserver );
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, SignalObserver );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, SignalObserver );
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, AnimatablePropertyComponentRegistration );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, AnimatablePropertyComponentRegistration );
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, AnimatablePropertyRegistration );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, AnimatablePropertyRegistration );
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, AsyncImageLoader );
+DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, AsyncImageLoader );
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, ChildPropertyRegistration );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, ChildPropertyRegistration );
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, ClampState2D );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali::Toolkit, ClampState2D );
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, DaliException );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, DaliException );

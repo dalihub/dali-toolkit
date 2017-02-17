@@ -33,15 +33,6 @@
 extern "C" {
 #endif
 
-SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_BATCH_PARENT_get() {
-  int jresult ;
-  int result;
-
-  result = (int)Dali::DevelActor::Property::BATCH_PARENT;
-  jresult = (int)result;
-  return jresult;
-}
-
 SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_SIBLING_ORDER_get() {
   int jresult ;
   int result;
@@ -51,20 +42,29 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_SIBLING_ORDER_get() {
   return jresult;
 }
 
-SWIGEXPORT int SWIGSTDCALL CSharp_Renderer_Property_BATCHING_ENABLED_get() {
-  int jresult ;
-  int result;
-
-  result = (int)Dali::DevelRenderer::Property::BATCHING_ENABLED;
-  jresult = (int)result;
-  return jresult;
-}
-
 SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_TOOLTIP_get() {
   int jresult ;
   int result;
 
   result = (int)Dali::Toolkit::DevelControl::Property::TOOLTIP;
+  jresult = (int)result;
+  return jresult;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_STATE_get() {
+  int jresult ;
+  int result;
+
+  result = (int)Dali::Toolkit::DevelControl::Property::STATE;
+  jresult = (int)result;
+  return jresult;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_SUB_STATE_get() {
+  int jresult ;
+  int result;
+
+  result = (int)Dali::Toolkit::DevelControl::Property::SUB_STATE;
   jresult = (int)result;
   return jresult;
 }

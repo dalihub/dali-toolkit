@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,9 @@
 #include <test-button.h>
 #include <test-animation-data.h>
 #include <toolkit-style-monitor.h>
+#include <dummy-control.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -33,6 +36,10 @@ namespace
 {
 const char* defaultTheme =
 "{\n"
+"  \"constants\":\n"
+"  {\n"
+"    \"CONFIG_SCRIPT_LOG_LEVEL\":\"NoLogging\"\n"
+"  },\n"
 "  \"styles\":\n"
 "  {\n"
 "    \"textlabel\":\n"
@@ -146,11 +153,229 @@ const char* defaultTheme =
 "      \"grabHandleImage\" : \"{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png\",\n"
 "      \"selectionHandleImageLeft\" : {\"filename\":\"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png\" },\n"
 "      \"selectionHandleImageRight\": {\"filename\":\"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png\" }\n"
+"    },\n"
+"    \"ComplexControl\":\n"
+"    {\n"
+"      \"states\":\n"
+"      {\n"
+"        \"NORMAL\":\n"
+"        {\n"
+"          \"states\":\n"
+"          {\n"
+"            \"SELECTED\":\n"
+"            {\n"
+"              \"visuals\":\n"
+"              {\n"
+"                \"foregroundVisual\":\n"
+"                {\n"
+"                  \"visualType\":\"GRADIENT\",\n"
+"                  \"startPosition\": [-1, -1],\n"
+"                  \"endPosition\": [1, 1],\n"
+"                  \"spreadMethod\": \"REPEAT\",\n"
+"                  \"stopOffset\": [0.2, 0.8],\n"
+"                  \"stopColor\": [ [ 1,0,0,1], [0,1,0,1] ]\n"
+"                }\n"
+"              }\n"
+"            },\n"
+"            \"UNSELECTED\":\n"
+"            {\n"
+"              \"visuals\":\n"
+"              {\n"
+"                \"foregroundVisual\":\n"
+"                {\n"
+"                  \"visualType\":\"COLOR\",\n"
+"                  \"mixColor\": [ 1,0,0,1]\n"
+"                }\n"
+"              }\n"
+"            }\n"
+"          },\n"
+"          \"transitions\":\n"
+"          {\n"
+"            \"visualName\":\"*\",\n"
+"            \"effect\":\"CROSSFADE\",\n"
+"            \"animator\":\n"
+"            {\n"
+"              \"alphaFunction\":\"EASE_IN_OUT\",\n"
+"              \"duration\":0.3\n"
+"            }\n"
+"          }\n"
+"        },\n"
+"        \"FOCUSED\":\n"
+"        {\n"
+"          \"visuals\":\n"
+"          {\n"
+"            \"foregroundVisual\":\n"
+"            {\n"
+"              \"visualType\":\"GRADIENT\",\n"
+"              \"startPosition\": [-1, -1],\n"
+"              \"endPosition\": [1, 1],\n"
+"              \"spreadMethod\": \"REPEAT\",\n"
+"              \"stopOffset\": [0.3, 0.9],\n"
+"              \"stopColor\": [ [ 0,0,1,1], [0,1,1,1] ]\n"
+"            },\n"
+"            \"focusVisual\":\n"
+"            {\n"
+"              \"visualType\":\"IMAGE\",\n"
+"              \"url\": \"focus.png\"\n"
+"            }\n"
+"          },\n"
+"          \"entryTransition\":\n"
+"          {\n"
+"            \"target\":\"focusVisual\",\n"
+"            \"property\":\"mixColor\",\n"
+"            \"initialValue\":[0,0,0,0],\n"
+"            \"targetValue\":[1,1,1,1],\n"
+"            \"animator\":\n"
+"            {\n"
+"              \"alphaFunction\":\"EASE_IN_OUT_SINE\",\n"
+"              \"timePeriod\": \n"
+"              {\n"
+"                \"duration\":0.5,\n"
+"                \"delay\":0\n"
+"              }\n"
+"            }\n"
+"          },\n"
+"          \"exitTransition\":\n"
+"          {\n"
+"            \"target\":\"focusVisual\",\n"
+"            \"property\":\"mixColor\",\n"
+"            \"initialValue\":[1,1,1,1],\n"
+"            \"targetValue\":[0,0,0,0],\n"
+"            \"animator\":\n"
+"            {\n"
+"              \"alphaFunction\":\"EASE_IN_OUT_SINE\",\n"
+"              \"timePeriod\": \n"
+"              {\n"
+"                \"duration\":0.5,\n"
+"                \"delay\":0\n"
+"              }\n"
+"            }\n"
+"          }\n"
+"        },\n"
+"        \"DISABLED\":\n"
+"        {\n"
+"          \"visuals\":\n"
+"          {\n"
+"            \"foregroundVisual\":\n"
+"            {\n"
+"              \"visualType\":\"COLOR\",\n"
+"              \"mixColor\": [1,0,0,1]\n"
+"            }\n"
+"          }\n"
+"        }\n"
+"      },\n"
+"      \"transitions\":\n"
+"      [\n"
+"        {\n"
+"          \"effect\":\"CROSSFADE\",\n"
+"          \"animator\":\n"
+"          {\n"
+"            \"alphaFunction\":\"EASE_IN_OUT\",\n"
+"            \"duration\":0.3\n"
+"          }\n"
+"        }\n"
+"      ]\n"
+"    },\n"
+"    \"BasicControl\":\n"
+"    {\n"
+"      \"states\":\n"
+"      {\n"
+"        \"NORMAL\":\n"
+"        {\n"
+"          \"visuals\":\n"
+"          {\n"
+"            \"foregroundVisual\":\n"
+"            {\n"
+"              \"visualType\":\"GRADIENT\",\n"
+"              \"startPosition\": [-1, -1],\n"
+"              \"endPosition\": [1, 1],\n"
+"              \"spreadMethod\": \"REPEAT\",\n"
+"              \"stopOffset\": [0.2, 0.8],\n"
+"              \"stopColor\": [ [ 1,0,0,1], [0,1,0,1] ]\n"
+"            }\n"
+"          }\n"
+"        },\n"
+"        \"FOCUSED\":\n"
+"        {\n"
+"          \"visuals\":\n"
+"          {\n"
+"            \"foregroundVisual\":\n"
+"            {\n"
+"              \"visualType\":\"GRADIENT\",\n"
+"              \"startPosition\": [-1, -1],\n"
+"              \"endPosition\": [1, 1],\n"
+"              \"spreadMethod\": \"REPEAT\",\n"
+"              \"stopOffset\": [0.3, 0.9],\n"
+"              \"stopColor\": [ [ 0,0,1,1], [0,1,1,1] ]\n"
+"            },\n"
+"            \"focusVisual\":\n"
+"            {\n"
+"              \"visualType\":\"IMAGE\",\n"
+"              \"url\": \"focus.png\"\n"
+"            }\n"
+"          },\n"
+"          \"entryTransition\":\n"
+"          {\n"
+"            \"target\":\"focusVisual\",\n"
+"            \"property\":\"mixColor\",\n"
+"            \"initialValue\":[0,0,0,0],\n"
+"            \"targetValue\":[1,1,1,1],\n"
+"            \"animator\":\n"
+"            {\n"
+"              \"alphaFunction\":\"EASE_IN_OUT_SINE\",\n"
+"              \"timePeriod\": \n"
+"              {\n"
+"                \"duration\":0.5,\n"
+"                \"delay\":0\n"
+"              }\n"
+"            }\n"
+"          },\n"
+"          \"exitTransition\":\n"
+"          {\n"
+"            \"target\":\"focusVisual\",\n"
+"            \"property\":\"mixColor\",\n"
+"            \"initialValue\":[1,1,1,1],\n"
+"            \"targetValue\":[0,0,0,0],\n"
+"            \"animator\":\n"
+"            {\n"
+"              \"alphaFunction\":\"EASE_IN_OUT_SINE\",\n"
+"              \"timePeriod\": \n"
+"              {\n"
+"                \"duration\":0.5,\n"
+"                \"delay\":0\n"
+"              }\n"
+"            }\n"
+"          }\n"
+"        },\n"
+"        \"DISABLED\":\n"
+"        {\n"
+"          \"visuals\":\n"
+"          {\n"
+"            \"foregroundVisual\":\n"
+"            {\n"
+"              \"visualType\":\"COLOR\",\n"
+"              \"mixColor\": [1,0,0,1]\n"
+"            }\n"
+"          }\n"
+"        }\n"
+"      },\n"
+"      \"transitions\":\n"
+"      [\n"
+"        {\n"
+"          \"effect\":\"CROSSFADE\",\n"
+"          \"animator\":\n"
+"          {\n"
+"            \"alphaFunction\":\"EASE_IN_OUT\",\n"
+"            \"duration\":0.3\n"
+"          }\n"
+"        }\n"
+"      ]\n"
 "    }\n"
 "  }\n"
 "}\n";
 
 } // anonymous namespace
+
 
 
 
@@ -258,6 +483,10 @@ int UtcDaliStyleManagerApplyTheme(void)
 
   const char* json1 =
     "{\n"
+    "  \"constants\":\n"
+    "  {\n"
+    "    \"CONFIG_SCRIPT_LOG_LEVEL\":\"Verbose\"\n"
+    "  },\n"
     "  \"styles\":\n"
     "  {\n"
     "    \"testbutton\":\n"
@@ -362,6 +591,10 @@ int UtcDaliStyleManagerApplyDefaultTheme(void)
 
   const char* defaultTheme =
     "{\n"
+    "  \"constants\":\n"
+    "  {\n"
+    "    \"CONFIG_SCRIPT_LOG_LEVEL\":\"Concise\"\n"
+    "  },\n"
     "  \"styles\":\n"
     "  {\n"
     "    \"testbutton\":\n"
@@ -505,6 +738,10 @@ int UtcDaliStyleManagerApplyStyle(void)
 
   const char* json1 =
     "{\n"
+    "  \"constants\":\n"
+    "  {\n"
+    "    \"CONFIG_SCRIPT_LOG_LEVEL\":\"General\"\n"
+    "  },\n"
     "  \"styles\":\n"
     "  {\n"
     "    \"testbutton\":\n"
@@ -569,6 +806,107 @@ int UtcDaliStyleManagerApplyStyle(void)
   fgColor = testButton2.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR);
   DALI_TEST_EQUALS( bgColor, themedBgColor, 0.001, TEST_LOCATION );
   DALI_TEST_EQUALS( fgColor, themedFgColor, 0.001, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerIncludeStyleP(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliStyleManagerIncludeStyle - test that style sheet inclusion works" );
+
+  const char* json1 =
+    "{\n"
+    "  \"includes\":\n"
+    "  [\n"
+    "     \"src/dali-toolkit-styling/theme2.json\"\n"
+    "  ],\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"foregroundColor\":[0.0,0.0,1.0,1.0]\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  // Add 2 buttons
+  Test::TestButton testButton = Test::TestButton::New();
+  Test::TestButton testButton2 = Test::TestButton::New();
+  Stage::GetCurrent().Add( testButton );
+  Stage::GetCurrent().Add( testButton2 );
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  StyleManager styleManager = StyleManager::Get();
+
+  styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
+
+  tet_infoline("Apply the style");
+
+  std::string themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+
+  styleManager.ApplyTheme(themeFile);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Property::Value themedBgColor( testButton.GetProperty(Test::TestButton::Property::BACKGROUND_COLOR) );
+  Property::Value themedFgColor( testButton.GetProperty(Test::TestButton::Property::FOREGROUND_COLOR) );
+
+  DALI_TEST_EQUALS( themedBgColor, Property::Value(Color::YELLOW), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( themedFgColor, Property::Value(Color::BLUE), 0.001, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerIncludeStyleN(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliStyleManagerIncludeStyle - test that style sheet inclusion works, but included stylesheet is bad json" );
+
+  const char* json1 =
+    "{\n"
+    "  \"includes\":\n"
+    "  [\n"
+    "     \"src/dali-toolkit-styling/theme3.json\"\n"
+    "  ],\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "    \"testbutton\":\n"
+    "    {\n"
+    "      \"foregroundColor\":[0.0,0.0,1.0,1.0]\n"
+    "    }\n"
+    "  }\n"
+    "}\n";
+
+  // Add 2 buttons
+  Test::TestButton testButton = Test::TestButton::New();
+  Test::TestButton testButton2 = Test::TestButton::New();
+  Stage::GetCurrent().Add( testButton );
+  Stage::GetCurrent().Add( testButton2 );
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  StyleManager styleManager = StyleManager::Get();
+
+  styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
+
+  tet_infoline("Apply the style");
+
+  std::string themeFile("ThemeOne");
+  Test::StyleMonitor::SetThemeFileOutput(themeFile, json1);
+
+  try
+  {
+    styleManager.ApplyTheme(themeFile);
+  }
+  catch( Dali::DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "!\"Cannot parse JSON\"", TEST_LOCATION );
+  }
 
   END_TEST;
 }
@@ -857,6 +1195,88 @@ int UtcDaliStyleManagerStyleChangedSignalFontSizeTextEditor(void)
 
   DALI_TEST_EQUALS( pointSize, 25.0f, 0.001, TEST_LOCATION );
 
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerVisualTransitionParsing(void)
+{
+  tet_infoline("Instantiate dummy control and test state/visual/transition capture" );
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
+                                          defaultTheme );
+
+  ToolkitTestApplication application;
+
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  Dali::StyleMonitor styleMonitor = Dali::StyleMonitor::Get();
+  StyleManager styleManager = StyleManager::Get();
+
+  DummyControl actor = DummyControl::New(true);
+  actor.SetStyleName("BasicControl");
+  Stage::GetCurrent().Add(actor);
+
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
+  Visual::Base visual1 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+
+  actor.SetProperty( DevelControl::Property::STATE, DevelControl::FOCUSED );
+
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOCUS_VISUAL), true, TEST_LOCATION);
+
+  Visual::Base visual2 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+  DALI_TEST_CHECK( visual1 != visual2 );
+
+  actor.SetProperty( DevelControl::Property::STATE, DevelControl::DISABLED );
+
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
+
+  Visual::Base visual3 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+  Visual::Base focusVisual = dummyImpl.GetVisual(DummyControl::Property::FOCUS_VISUAL);
+  DALI_TEST_CHECK( !focusVisual );
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOCUS_VISUAL), false, TEST_LOCATION);
+
+  DALI_TEST_CHECK( visual1 != visual3 );
+  DALI_TEST_CHECK( visual2 != visual3 );
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerVisualTransitionParsing02(void)
+{
+  tet_infoline("Instantiate dummy control and test state/visual/transition capture" );
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
+                                          defaultTheme );
+
+  ToolkitTestApplication application;
+
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  Dali::StyleMonitor styleMonitor = Dali::StyleMonitor::Get();
+  StyleManager styleManager = StyleManager::Get();
+
+  DummyControl actor = DummyControl::New(true);
+  actor.SetProperty(DevelControl::Property::STATE, "FOCUSED");
+
+  actor.SetStyleName("ComplexControl");
+  Stage::GetCurrent().Add(actor);
+
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
+  Visual::Base visual1 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+  DALI_TEST_CHECK( visual1 );
+  Property::Map map;
+  visual1.CreatePropertyMap( map );
+  Property::Value* value = map.Find( Visual::Property::TYPE );
+  DALI_TEST_CHECK( value );
+
+  int visualType;
+  value->Get( visualType );
+
+  DALI_TEST_EQUALS( visualType, (int)Toolkit::Visual::GRADIENT, TEST_LOCATION );
 
   END_TEST;
 }
