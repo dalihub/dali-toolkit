@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ ImageView ImageView::New()
 
 ImageView ImageView::New( Image image )
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: New() is deprecated and will be removed from next release. use New( const std::string& ) instead.\n" );
+  DALI_LOG_WARNING("DEPRECATION WARNING: New( Image ) is due to be deprecated in the next release. If simply loading from a URL, then use New( const std::string& ) instead.\n" );
 
   ImageView imageView = Internal::ImageView::New();
   imageView.SetImage( image );
@@ -89,7 +89,7 @@ ImageView ImageView::DownCast( BaseHandle handle )
 
 void ImageView::SetImage( Image image )
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetImage() is deprecated and will be removed from next release. Use SetImage( const std::string& ) instead.\n" );
+  DALI_LOG_WARNING("DEPRECATION WARNING: SetImage( Image ) is due to be deprecated in the next release. If simply loading from a URL, then use SetImage( const std::string& ) instead.\n" );
 
   Dali::Toolkit::GetImpl( *this ).SetImage( image );
 }
@@ -106,7 +106,7 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
 
 Image ImageView::GetImage() const
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetImage() is deprecated and will be removed from next release.\n" );
+  DALI_LOG_WARNING("DEPRECATION WARNING: GetImage() is due to be deprecated in the next release.\n" );
 
   return Dali::Toolkit::GetImpl( *this ).GetImage();
 }
