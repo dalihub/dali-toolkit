@@ -125,7 +125,12 @@
       "popupPressedColor":[0.24,0.72,0.8,0.11],
       "background": {
         "rendererType": "image",
-        "url": "{DALI_IMAGE_DIR}selection-popup-bg.9.png"
+        "url": "{DALI_IMAGE_DIR}selection-popup-background.9.png"
+        },
+      "backgroundBorder": {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}selection-popup-border.9.png",
+        "mixColor":[0.24,0.72,0.8,1.0]
         },
       "popupFadeInDuration":0.25,
       "popupFadeOutDuration":0.25

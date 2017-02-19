@@ -75,23 +75,114 @@ public:
   {
     enum
     {
-      POPUP_MAX_SIZE =  PROPERTY_START_INDEX,   ///< name "popupMaxSize",                  maximum size the Popup can be,                  type VECTOR2
-      POPUP_MIN_SIZE,                           ///< name "popupMinSize",                  minimum size the Popup can be,                  type VECTOR2
-      OPTION_MAX_SIZE,                          ///< name "optionMaxSize",                 maximum size an option can be,                  type VECTOR2
-      OPTION_MIN_SIZE,                          ///< name "optionMinSize",                 minimum size an option can be,                  type VECTOR2
-      OPTION_DIVIDER_SIZE,                      ///< name "optionDividerSize",             size of the divider between options             type VECTOR2
-      POPUP_CLIPBOARD_BUTTON_ICON_IMAGE,        ///< name "popupClipboardButtonImage",     The image to use as the popup clipboard icon,   type STRING
-      POPUP_CUT_BUTTON_ICON_IMAGE,              ///< name "popupCutButtonImage",           The image to use as the popup cut icon,         type STRING
-      POPUP_COPY_BUTTON_ICON_IMAGE,             ///< name "popupCopyButtonImage",          The image to use as the popup copy icon,        type STRING
-      POPUP_PASTE_BUTTON_ICON_IMAGE,            ///< name "popupPasteButtonImage",         The image to use as the popup paste icon,       type STRING
-      POPUP_SELECT_BUTTON_ICON_IMAGE,           ///< name "popupSelectButtonImage",        The image to use as the popup select icon,      type STRING
-      POPUP_SELECT_ALL_BUTTON_ICON_IMAGE,       ///< name "popupSelectAllButtonImage",     The image to use as the popup select all icon,  type STRING
-      POPUP_DIVIDER_COLOR,                      ///< name "popupDividerColor",             The color of the divider between options,       type VECTOR4
-      POPUP_ICON_COLOR,                         ///< name "popupIconColor",                The color of the icons (if supplied),           type VECTOR4
-      POPUP_PRESSED_COLOR,                      ///< name "popupPressedColor",             The color of the option when pressed,           type VECTOR4
-      POPUP_PRESSED_IMAGE,                      ///< name "popupPressedImage",             The image to use for the option when pressed,   type STRING
-      POPUP_FADE_IN_DURATION,                   ///< name "popupFadeInDuration",           The duration of the fade-in animation,          type FLOAT
-      POPUP_FADE_OUT_DURATION,                  ///< name "popupFadeOutDuration",          The duration of the fade-out animation,         type FLOAT
+      /**
+       * @brief The maximum size the Popup can be.
+       * @details Name "popupMaxSize", type Vector2.
+       */
+      POPUP_MAX_SIZE =  PROPERTY_START_INDEX,
+
+      /**
+       * @brief The minimum size the Popup can be.
+       * @details Name "popupMinSize", type Vector2.
+       */
+      POPUP_MIN_SIZE,
+
+      /**
+       * @brief The maximum size an option can be.
+       * @details Name "optionMaxSize", type Vector2.
+       */
+      OPTION_MAX_SIZE,
+
+      /**
+       * @brief The minimum size an option can be.
+       * @details Name "optionMinSize", type Vector2.
+       */
+      OPTION_MIN_SIZE,
+
+      /**
+       * @brief The size of the divider between options.
+       * @details Name "optionDividerSize", type Vector2.
+       */
+      OPTION_DIVIDER_SIZE,
+
+      /**
+       * @brief The image to use as the popup clipboard icon.
+       * @details Name "popupClipboardButtonImage", type string.
+       */
+      POPUP_CLIPBOARD_BUTTON_ICON_IMAGE,
+
+      /**
+       * @brief The image to use as the popup cut icon.
+       * @details Name "popupCutButtonImage", type string.
+       */
+      POPUP_CUT_BUTTON_ICON_IMAGE,
+
+      /**
+       * @brief The image to use as the popup copy icon.
+       * @details Name "popupCopyButtonImage", type string.
+       */
+      POPUP_COPY_BUTTON_ICON_IMAGE,
+
+      /**
+       * @brief The image to use as the popup paste icon.
+       * @details Name "popupPasteButtonImage", type string.
+       */
+      POPUP_PASTE_BUTTON_ICON_IMAGE,
+
+      /**
+       * @brief The image to use as the popup select icon.
+       * @details Name "popupSelectButtonImage", type string.
+       */
+      POPUP_SELECT_BUTTON_ICON_IMAGE,
+
+      /**
+       * @brief The image to use as the popup select all icon.
+       * @details Name "popupSelectAllButtonImage", type string.
+       */
+      POPUP_SELECT_ALL_BUTTON_ICON_IMAGE,
+
+      /**
+       * @brief The color of the divider between options.
+       * @details Name "popupDividerColor", type Vector4.
+       */
+      POPUP_DIVIDER_COLOR,
+
+      /**
+       * @brief The color of the icons (if supplied).
+       * @details Name "popupIconColor", type Vector4.
+       */
+      POPUP_ICON_COLOR,
+
+      /**
+       * @brief The color of the option when pressed.
+       * @details Name "popupPressedColor", type Vector4.
+       */
+      POPUP_PRESSED_COLOR,
+
+      /**
+       * @brief The image to use for the option when pressed.
+       * @details Name "popupPressedImage", type string.
+       */
+      POPUP_PRESSED_IMAGE,
+
+      /**
+       * @brief The duration of the fade-in animation.
+       * @details Name "popupFadeInDuration", type float.
+       */
+      POPUP_FADE_IN_DURATION,
+
+      /**
+       * @brief The duration of the fade-out animation.
+       * @details Name "popupFadeOutDuration", type float.
+       */
+      POPUP_FADE_OUT_DURATION,
+
+      /**
+       * @brief The popup background can have a separate border with a different color.
+       * @details Name "backgroundBorder", type Property::Map.
+       * @note Optional.
+       */
+      BACKGROUND_BORDER
     };
   };
 
