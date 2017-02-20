@@ -25,7 +25,7 @@
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/images/resource-image.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -520,8 +520,9 @@ void Slider::CreatePopupImage( const std::string& filename )
 {
   if( mPopup && ( filename.size() > 0 ) )
   {
-    Image image = ResourceImage::New( filename );
-    mPopup.SetImage( image );
+    Property::Map map;
+    map[Toolkit::ImageVisual::Property::URL] = filename;
+    mPopup.SetProperty( Toolkit::ImageView::Property::IMAGE, map );
   }
 }
 
@@ -557,8 +558,9 @@ void Slider::CreatePopupArrowImage( const std::string& filename )
 {
   if( mPopupArrow && ( filename.size() > 0 ) )
   {
-    Image image = ResourceImage::New( filename );
-    mPopupArrow.SetImage( image );
+    Property::Map map;
+    map[Toolkit::ImageVisual::Property::URL] = filename;
+    mPopupArrow.SetProperty( Toolkit::ImageView::Property::IMAGE, map );
   }
 }
 
