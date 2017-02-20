@@ -166,10 +166,16 @@ public:
   Renderer GetRenderer();
 
   /**
-   * Sets the mix color of the visual.
+   * Sets the mix color ( including opacity )  of the visual.
    * @param[in] mixColor The new mix color
    */
   void SetMixColor( const Vector4& color );
+
+  /**
+   * Sets the mix color of the visual.
+   * @param[in] mixColor The new mix color
+   */
+  void SetMixColor( const Vector3& color );
 
   /**
    * Gets the mix color of the visual.
@@ -285,10 +291,62 @@ private:
    * @param[in] transition The transition to use or set up.
    * @param[in] animator The animation data to use
    * @param[in] index The property index on the renderer to animate
+   * @param[in] initialValue The optional initial value
+   * @param[in] targetValue The target value to use
    */
   void SetupTransition( Dali::Animation& transition,
                         Internal::TransitionData::Animator& animator,
-                        Property::Index index );
+                        Property::Index index,
+                        Property::Value& initialValue,
+                        Property::Value& targetValue );
+
+  /**
+   * Animate the opacity property - Special handling to
+   * ensure that the blend mode is set to ON whilst animating,
+   * and set back to AUTO if it's opaque at the end of the
+   * animation.
+   *
+   * @param[in] transition The transition to use or set up.
+   * @param[in] animator The animation data to use
+   */
+  void AnimateOpacityProperty( Dali::Animation& transition,
+                               Internal::TransitionData::Animator& animator );
+
+  /**
+   * Animate the renderer property - no special handling
+   *
+   * @param[in] transition The transition to use or set up.
+   * @param[in] animator The animation data to use
+   */
+  void AnimateRendererProperty( Dali::Animation& transition,
+                                Internal::TransitionData::Animator& animator );
+
+  /**
+   * Animate the mix color property.
+   *
+   * If the animator is a vec3, then it only animates the color
+   * channels without animating the opacity.  If it's a vec4, then it
+   * runs 2 animators, one for the the vec3 mixColor, and one for the
+   * opacity. (They are separate uniforms in the shader )
+   *
+   * @param[in] transition The transition to use or set up.
+   * @param[in] animator The animation data to use
+   */
+  void AnimateMixColorProperty( Dali::Animation& transition,
+                                Internal::TransitionData::Animator& animator );
+
+  /**
+   * Set up the right blend mode if the opacity is being animated.
+   * Also ensure that when the animation finishes, the blend mode is
+   * set to the appropriate value. It also uses the target value as
+   * set into mMixColor.
+   *
+   * @param[in] transition The transition to listen to
+   * @param[in] isInitialOpaque Whether the initial value is opaque
+   * @param[in] animating If the transition animates the value.
+   */
+  void SetupBlendMode( Dali::Animation& transition,
+                       bool isInitialOpaque, bool animating );
 
   /**
    * When a mix color animation has finished, ensure the blend mode is set back
