@@ -299,6 +299,8 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 %include <dali-toolkit/public-api/text/rendering-backend.h>
 
+%include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
+
 %template(ItemIdContainer) std::vector<unsigned int>;
 %template(Item) std::pair<unsigned int, Dali::Actor>;
 %template(ItemContainer) std::vector<std::pair<unsigned int, Dali::Actor>>;
