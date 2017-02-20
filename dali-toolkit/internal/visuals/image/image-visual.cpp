@@ -296,13 +296,6 @@ void ImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
     }
   }
 
-  NativeImage nativeImage = NativeImage::DownCast( mImage );
-
-  if( nativeImage )
-  {
-    SetNativeFragmentShaderCode( nativeImage );
-  }
-
   // if actor is on stage, create new renderer and apply to actor
   if( actor && actor.OnStage() )
   {
@@ -561,6 +554,13 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 void ImageVisual::InitializeRenderer( const Image& image )
 {
   mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
+
+  NativeImage nativeImage = NativeImage::DownCast( image );
+
+  if( nativeImage )
+  {
+    SetNativeFragmentShaderCode( nativeImage );
+  }
 
   mImpl->mRenderer = CreateRenderer();
 
