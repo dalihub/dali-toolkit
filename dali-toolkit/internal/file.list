@@ -79,6 +79,7 @@ toolkit_src_files = \
    \
    $(toolkit_src_dir)/focus-manager/keyboard-focus-manager-impl.cpp \
    $(toolkit_src_dir)/focus-manager/keyinput-focus-manager-impl.cpp \
+   $(toolkit_src_dir)/helpers/color-conversion.cpp \
    $(toolkit_src_dir)/filters/blur-two-pass-filter.cpp \
    $(toolkit_src_dir)/filters/emboss-filter.cpp \
    $(toolkit_src_dir)/filters/image-filter.cpp \
