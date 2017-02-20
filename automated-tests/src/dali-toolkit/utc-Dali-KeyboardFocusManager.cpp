@@ -609,6 +609,10 @@ int UtcDaliKeyboardFocusManagerSignalFocusedActorActivated(void)
 
   Integration::KeyEvent returnEvent("Return", "", 0, 0, 0, Integration::KeyEvent::Up);
 
+  // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
+  // It makes mIsFocusIndicatorEnabled true
+  application.ProcessEvent(returnEvent);
+
   // Create the first button and add it to the stage
   PushButton firstPushButton = PushButton::New();
   firstPushButton.SetKeyboardFocusable(true);
@@ -663,6 +667,10 @@ int UtcDaliKeyboardFocusManagerSignalFocusGroupChanged(void)
 
   Integration::KeyEvent tabEvent("Tab", "", 0, 0, 0, Integration::KeyEvent::Down);
   Integration::KeyEvent shiftTabEvent("Tab", "", 0, 1, 0, Integration::KeyEvent::Down);
+
+  // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
+  // It makes mIsFocusIndicatorEnabled true
+  application.ProcessEvent(tabEvent);
 
   // Send the tab event to change focus group in the forward direction
   application.ProcessEvent(tabEvent);
@@ -786,6 +794,10 @@ int UtcDaliKeyboardFocusManagerChangeFocusDirectionByKeyEvents(void)
   Integration::KeyEvent downEvent("Down", "", 0, 0, 0, Integration::KeyEvent::Down);
   Integration::KeyEvent pageUpEvent("Prior", "", 0, 0, 0, Integration::KeyEvent::Down);
   Integration::KeyEvent pageDownEvent("Next", "", 0, 0, 0, Integration::KeyEvent::Down);
+
+  // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
+  // It makes mIsFocusIndicatorEnabled true
+  application.ProcessEvent(leftEvent);
 
   // Create a 2x2 table view and try to move focus inside it
   TableView tableView = TableView::New( 2, 2 );
