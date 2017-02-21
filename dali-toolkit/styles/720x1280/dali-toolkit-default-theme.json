@@ -129,6 +129,20 @@
         "overshootSize":[720.0,130.0]
       }
     },
+    "TextSelectionScrollBar":
+    {
+      "indicatorShowDuration":0.25,
+      "indicatorHideDuration":0.25
+    },
+    "TextSelectionScrollIndicator":
+    {
+      "image":
+      {
+        "visualType":"IMAGE",
+        "url":"{DALI_IMAGE_DIR}text_selection_scroll_indicator.9.png"
+      },
+      "color":[0.0,0.72,0.9,0.7]
+    },
     "ScrollView":
     {
       "overshootEffectColor":"B018",
