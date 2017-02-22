@@ -25,6 +25,13 @@
 using namespace Dali;
 using namespace Toolkit;
 
+namespace
+{
+
+const char* TEST_IMAGE_FILE_NAME = "selection-popup-border.9.png";
+
+}
+
 void dali_textselectionpopup_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -103,6 +110,33 @@ int UtcDaliToolkitTextSelectionPopupDownCastP(void)
   TextSelectionPopup cast = TextSelectionPopup::DownCast( textSelectionPopup );
 
   DALI_TEST_CHECK( cast );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextSelectionPopupBackgroundBorderP(void)
+{
+  ToolkitTestApplication application;
+  TextSelectionPopup textSelectionPopup;
+  textSelectionPopup = TextSelectionPopup::New( NULL );
+
+  textSelectionPopup.SetProperty( TextSelectionPopup::Property::BACKGROUND_BORDER,
+                                  Property::Map().Add( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME ) );
+
+  Property::Value value = textSelectionPopup.GetProperty( TextSelectionPopup::Property::BACKGROUND_BORDER );
+
+  Property::Map map;
+  value.Get( map );
+
+  Property::Value* returnValue = map.Find( Dali::Toolkit::ImageVisual::Property::URL );
+  DALI_TEST_CHECK( NULL != returnValue );
+
+  if( returnValue )
+  {
+    std::string url;
+    returnValue->Get( url );
+    DALI_TEST_EQUALS( TEST_IMAGE_FILE_NAME, url, TEST_LOCATION );
+  }
 
   END_TEST;
 }
