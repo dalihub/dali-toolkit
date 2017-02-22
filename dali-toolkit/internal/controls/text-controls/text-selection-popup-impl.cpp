@@ -35,6 +35,7 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
+#include <dali-toolkit/internal/helpers/color-conversion.h>
 
 namespace Dali
 {
@@ -47,7 +48,7 @@ namespace Internal
 
 namespace
 {
-// todo Move this to adaptor??
+
 #define GET_LOCALE_TEXT(string) dgettext("dali-toolkit", string)
 
 const std::string TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME( "TextSelectionPopupButton" );
@@ -113,6 +114,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupPressedColor", VE
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupPressedImage", STRING, POPUP_PRESSED_IMAGE )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupFadeInDuration", FLOAT, POPUP_FADE_IN_DURATION )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupFadeOutDuration", FLOAT, POPUP_FADE_OUT_DURATION )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "backgroundBorder", MAP, BACKGROUND_BORDER )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -232,6 +234,12 @@ void TextSelectionPopup::SetProperty( BaseObject* object, Property::Index index,
         impl.mFadeOutDuration = value.Get < float >();
         break;
       }
+      case Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER:
+      {
+        Property::Map map = value.Get<Property::Map>();
+        impl.CreateBackgroundBorder( map );
+        break;
+      }
     } // switch
   } // TextSelectionPopup
 }
@@ -335,6 +343,11 @@ Property::Value TextSelectionPopup::GetProperty( BaseObject* object, Property::I
       case Toolkit::TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION:
       {
         value = impl.mFadeOutDuration;
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER:
+      {
+        value = impl.mBackgroundBorderProperties;
         break;
       }
     } // switch
@@ -824,6 +837,34 @@ std::string TextSelectionPopup::GetPressedImage() const
      mToolbar.ScrollTo( Vector2( mPopupMaxSize.x, 0.f ) );
    }
  }
+
+void TextSelectionPopup::CreateBackgroundBorder( Property::Map& propertyMap )
+{
+  // Removes previous image if necessary
+  UnparentAndReset( mBackgroundBorder );
+
+  mBackgroundBorderProperties = propertyMap;
+
+  if( ! propertyMap.Empty() )
+  {
+    mBackgroundBorder = Dali::Toolkit::ImageView::New();
+    mBackgroundBorder.SetProperty( Dali::Toolkit::ImageView::Property::IMAGE, propertyMap );
+    mBackgroundBorder.SetParentOrigin( ParentOrigin::CENTER );
+    mBackgroundBorder.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+
+    Property::Value* colorValue = propertyMap.Find( "borderColor" );
+    if( colorValue )
+    {
+      Vector4 color;
+      if( ConvertPropertyToColor( *colorValue, color ) )
+      {
+        mBackgroundBorder.SetColor( color );
+      }
+    }
+
+    Self().Add( mBackgroundBorder );
+  }
+}
 
 TextSelectionPopup::TextSelectionPopup( TextSelectionPopupCallbackInterface* callbackInterface )
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),

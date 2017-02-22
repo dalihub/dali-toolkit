@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,14 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/object/property-map.h>
 
 namespace Dali
 {
@@ -247,6 +249,13 @@ private: // Implementation
   void AddPopupOptionsToToolbar(  bool showIcons, bool showCaptions );
 
   /**
+   * Creates the background-border image
+   *
+   * @param[in] propertyMap The properties describing the background-border
+   */
+  void CreateBackgroundBorder( Property::Map& propertyMap );
+
+  /**
    * Construct a new TextField.
    */
   TextSelectionPopup( TextSelectionPopupCallbackInterface* callbackInterface );
@@ -276,6 +285,9 @@ private: // Data
   Image mClipboardIconImage;
   Image mSelectIconImage;
   Image mSelectAllIconImage;
+
+  Dali::Toolkit::ImageView mBackgroundBorder; ///< The popup background can have a separate border with a different color
+  Property::Map mBackgroundBorderProperties;  ///< The properties used to create mBackgroundBorder
 
   Size mPopupMaxSize;                   // Maximum size of the Popup
   Size mOptionMaxSize;                  // Maximum size of an Option button
