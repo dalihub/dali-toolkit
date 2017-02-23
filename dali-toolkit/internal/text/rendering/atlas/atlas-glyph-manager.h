@@ -149,15 +149,6 @@ public:
   TextureSet GetTextures( uint32_t atlasId ) const;
 
   /**
-   * @brief Get the shader used by an atlas
-   *
-   * @param[in] atlasId Id of an atlas
-   *
-   * @return The shader used by the atlas
-   */
-  Shader GetShader( uint32_t atlasId ) const;
-
-  /**
    * @brief Get Glyph Manager metrics
    *
    * @return const reference to glyph manager metrics

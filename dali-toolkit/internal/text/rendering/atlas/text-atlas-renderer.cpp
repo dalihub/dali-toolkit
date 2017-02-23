@@ -41,6 +41,50 @@ namespace
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_RENDERING");
 #endif
 
+#define MAKE_SHADER(A)#A
+
+const char* VERTEX_SHADER = MAKE_SHADER(
+attribute mediump vec2    aPosition;
+attribute mediump vec2    aTexCoord;
+attribute mediump vec4    aColor;
+uniform   mediump vec2    uOffset;
+uniform   mediump mat4    uMvpMatrix;
+varying   mediump vec2    vTexCoord;
+varying   mediump vec4    vColor;
+
+void main()
+{
+  mediump vec4 position = vec4( aPosition.xy + uOffset, 0.0, 1.0 );
+  gl_Position = uMvpMatrix * position;
+  vTexCoord = aTexCoord;
+  vColor = aColor;
+}
+);
+
+const char* FRAGMENT_SHADER_L8 = MAKE_SHADER(
+uniform lowp    vec4      uColor;
+uniform         sampler2D sTexture;
+varying mediump vec2      vTexCoord;
+varying mediump vec4      vColor;
+
+void main()
+{
+  mediump vec4 color = texture2D( sTexture, vTexCoord );
+  gl_FragColor = vec4( vColor.rgb * uColor.rgb, vColor.a * uColor.a * color.r );
+}
+);
+
+const char* FRAGMENT_SHADER_RGBA = MAKE_SHADER(
+uniform lowp    vec4      uColor;
+uniform         sampler2D sTexture;
+varying mediump vec2      vTexCoord;
+
+void main()
+{
+  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;
+}
+);
+
 const float ZERO( 0.0f );
 const float HALF( 0.5f );
 const float ONE( 1.0f );
@@ -289,7 +333,28 @@ struct AtlasRenderer::Impl
           }
 
           // Create a new image for the glyph
-          PixelData bitmap = mFontClient.CreateBitmap( glyph.fontId, glyph.index );
+          PixelData bitmap;
+
+          // Whether the current glyph is a color one.
+          const bool isColorGlyph = mFontClient.IsColorGlyph( glyph.fontId, glyph.index );
+
+          // Retrieve the emoji's bitmap.
+          TextAbstraction::FontClient::GlyphBufferData glyphBufferData;
+          glyphBufferData.width = isColorGlyph ? glyph.width : 0;   // Desired width and height.
+          glyphBufferData.height = isColorGlyph ? glyph.height : 0;
+
+          mFontClient.CreateBitmap( glyph.fontId,
+                                    glyph.index,
+                                    glyphBufferData );
+
+          // Create the pixel data.
+          bitmap = PixelData::New( glyphBufferData.buffer,
+                                   glyph.width * glyph.height * GetBytesPerPixel( glyphBufferData.format ),
+                                   glyph.width,
+                                   glyph.height,
+                                   glyphBufferData.format,
+                                   PixelData::DELETE_ARRAY );
+
           if( bitmap )
           {
             MaxBlockSize& blockSize = mBlockSizes[currentBlockSize];
@@ -337,21 +402,6 @@ struct AtlasRenderer::Impl
         newTextCache.PushBack( textCacheEntry );
 
         AtlasManager::Vertex2D* verticesBuffer = newMesh.mVertices.Begin();
-
-        // Adjust the vertices if the fixed-size font should be down-scaled
-        if( glyph.scaleFactor > 0 )
-        {
-          for( unsigned int index = 0u, size = newMesh.mVertices.Count();
-               index < size;
-               ++index )
-          {
-            AtlasManager::Vertex2D& vertex = *( verticesBuffer + index );
-
-            // Set the position of the vertex.
-            vertex.mPosition.x = position.x + ( ( vertex.mPosition.x - position.x ) * glyph.scaleFactor );
-            vertex.mPosition.y = position.y + ( ( vertex.mPosition.y - position.y ) * glyph.scaleFactor );
-          }
-        }
 
         // Get the color of the character.
         const ColorIndex colorIndex = useDefaultColor ? 0u : *( colorIndicesBuffer + i );
@@ -408,7 +458,7 @@ struct AtlasRenderer::Impl
       {
         MeshRecord& meshRecord = *it;
 
-        Actor actor = CreateMeshActor( meshRecord, textSize );
+        Actor actor = CreateMeshActor( meshRecord, textSize, STYLE_NORMAL );
 
         // Whether the actor has renderers.
         const bool hasRenderer = actor.GetRendererCount() > 0u;
@@ -428,7 +478,7 @@ struct AtlasRenderer::Impl
             vertex.mColor = shadowColor;
           }
 
-          Actor shadowActor = CreateMeshActor( meshRecord, textSize );
+          Actor shadowActor = CreateMeshActor( meshRecord, textSize, STYLE_DROP_SHADOW );
 #if defined(DEBUG_ENABLED)
           shadowActor.SetName( "Text Shadow renderable actor" );
 #endif
@@ -479,7 +529,7 @@ struct AtlasRenderer::Impl
     mTextCache.Resize( 0 );
   }
 
-  Actor CreateMeshActor( const MeshRecord& meshRecord, const Vector2& actorSize )
+  Actor CreateMeshActor( const MeshRecord& meshRecord, const Vector2& actorSize, Style style )
   {
     PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat );
     quadVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &meshRecord.mMesh.mVertices[ 0 ] ), meshRecord.mMesh.mVertices.Size() );
@@ -489,7 +539,29 @@ struct AtlasRenderer::Impl
     quadGeometry.SetIndexBuffer( &meshRecord.mMesh.mIndices[0],  meshRecord.mMesh.mIndices.Size() );
 
     TextureSet textureSet( mGlyphManager.GetTextures( meshRecord.mAtlasId ) );
-    Shader shader( mGlyphManager.GetShader( meshRecord.mAtlasId ) );
+
+    // Choose the shader to use.
+    const bool isColorShader = ( STYLE_DROP_SHADOW != style ) && ( Pixel::BGRA8888 == mGlyphManager.GetPixelFormat( meshRecord.mAtlasId ) );
+    Shader shader;
+    if( isColorShader )
+    {
+      // The glyph is an emoji and is not a shadow.
+      if( !mShaderRgba )
+      {
+        mShaderRgba = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_RGBA );
+      }
+      shader = mShaderRgba;
+    }
+    else
+    {
+      // The glyph is text or a shadow.
+      if( !mShaderL8 )
+      {
+        mShaderL8 = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_L8 );
+      }
+      shader = mShaderL8;
+    }
+
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, shader );
     renderer.SetTextures( textureSet );
     renderer.SetProperty( Dali::Renderer::Property::BLEND_MODE, BlendMode::ON );
@@ -722,11 +794,13 @@ struct AtlasRenderer::Impl
 
   Actor mActor;                                       ///< The actor parent which renders the text
   AtlasGlyphManager mGlyphManager;                    ///< Glyph Manager to handle upload and caching
-  TextAbstraction::FontClient mFontClient;            ///> The font client used to supply glyph information
-  std::vector< MaxBlockSize > mBlockSizes;            ///> Maximum size needed to contain a glyph in a block within a new atlas
-  Vector< TextCacheEntry > mTextCache;                ///> Caches data from previous render
-  Property::Map mQuadVertexFormat;                    ///> Describes the vertex format for text
-  int mDepth;                                         ///> DepthIndex passed by control when connect to stage
+  TextAbstraction::FontClient mFontClient;            ///< The font client used to supply glyph information
+  Shader mShaderL8;                                   ///< The shader for glyphs and emoji's shadows.
+  Shader mShaderRgba;                                 ///< The shader for emojis.
+  std::vector< MaxBlockSize > mBlockSizes;            ///< Maximum size needed to contain a glyph in a block within a new atlas
+  Vector< TextCacheEntry > mTextCache;                ///< Caches data from previous render
+  Property::Map mQuadVertexFormat;                    ///< Describes the vertex format for text
+  int mDepth;                                         ///< DepthIndex passed by control when connect to stage
 };
 
 Text::RendererPtr AtlasRenderer::New()

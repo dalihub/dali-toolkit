@@ -111,11 +111,6 @@ TextureSet AtlasGlyphManager::GetTextures( uint32_t atlasId ) const
   return GetImplementation(*this).GetTextures( atlasId );
 }
 
-Shader AtlasGlyphManager::GetShader( uint32_t atlasId ) const
-{
-  return GetImplementation(*this).GetShader( atlasId );
-}
-
 const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
 {
   return GetImplementation(*this).GetMetrics();
