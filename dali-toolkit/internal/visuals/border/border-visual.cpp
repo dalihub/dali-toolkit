@@ -226,6 +226,11 @@ void BorderVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::BorderVisual::Property::ANTI_ALIASING, mAntiAliasing );
 }
 
+void BorderVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  // Do nothing
+}
+
 void BorderVisual::OnSetTransform()
 {
   if( mImpl->mRenderer )

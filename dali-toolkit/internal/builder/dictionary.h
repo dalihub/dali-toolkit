@@ -36,6 +36,23 @@ namespace Internal
  *
  * It enables lookup of keys via case-insensitive match.
  */
+
+
+typedef std::vector<std::string> DictionaryKeys;
+inline void Merge( DictionaryKeys& toDict, const DictionaryKeys& fromDict )
+{
+  for( DictionaryKeys::const_iterator fromIter = fromDict.begin(); fromIter != fromDict.end(); ++fromIter )
+  {
+    const std::string& fromKey = (*fromIter);
+    DictionaryKeys::iterator toIter = std::find( toDict.begin(), toDict.end(), fromKey );
+    if( toIter == toDict.end() )
+    {
+      toDict.push_back( fromKey );
+    }
+  }
+}
+
+
 template<typename EntryType>
 class Dictionary
 {
@@ -61,7 +78,6 @@ public:
    * Only allow const iteration over the dictionary
    */
   typedef typename Elements::const_iterator iterator;
-
 
   /**
    * Constructor
@@ -102,6 +118,53 @@ public:
       result=Add(theName, entry);
     }
     return result;
+  }
+
+  /**
+   * Remove a key value pair from the dictionary.
+   */
+  void Remove( const std::string& name )
+  {
+    for( typename Elements::iterator iter = container.begin(); iter != container.end(); ++iter )
+    {
+      if( iter->key == name )
+      {
+        container.erase( iter );
+        break;
+      }
+    }
+  }
+
+  /**
+   * Remove a key value pair from the dictionary.
+   */
+  void Remove( const char* name )
+  {
+    if( name != NULL )
+    {
+      std::string theName(name);
+      Remove(theName);
+    }
+  }
+
+  void Merge( const Dictionary<EntryType>& dictionary )
+  {
+    for( typename Elements::const_iterator fromIter = dictionary.container.begin(); fromIter != dictionary.container.end(); ++fromIter )
+    {
+      bool found=false;
+      for( typename Elements::iterator toIter = container.begin(); toIter != container.end(); ++toIter )
+      {
+        if( fromIter->key == toIter->key )
+        {
+          found=true;
+          toIter->entry = fromIter->entry;
+        }
+      }
+      if( !found )
+      {
+        container.push_back( Element(fromIter->key, fromIter->entry) );
+      }
+    }
   }
 
   /**
@@ -186,6 +249,20 @@ public:
   typename Elements::const_iterator End() const
   {
     return container.end();
+  }
+
+  void GetKeys( DictionaryKeys& keys ) const
+  {
+    keys.clear();
+    for( typename Elements::const_iterator iter = container.begin(); iter != container.end(); ++iter )
+    {
+      keys.push_back( (*iter).key );
+    }
+  }
+
+  void Clear()
+  {
+    container.clear();
   }
 };
 

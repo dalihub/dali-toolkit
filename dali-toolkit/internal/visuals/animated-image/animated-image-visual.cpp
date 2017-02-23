@@ -113,6 +113,11 @@ void AnimatedImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
 }
 
+void AnimatedImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  // Do nothing
+}
+
 void AnimatedImageVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   // url already passed in from constructor

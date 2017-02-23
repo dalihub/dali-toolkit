@@ -789,6 +789,22 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
 }
 
+void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
+  if( !mImageUrl.empty() )
+  {
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth() );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight() );
+  }
+  else if( mImage )
+  {
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, static_cast<int>(mImage.GetWidth()) );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, static_cast<int>(mImage.GetHeight()) );
+  }
+}
+
 void ImageVisual::OnSetTransform()
 {
   if( mImpl->mRenderer )

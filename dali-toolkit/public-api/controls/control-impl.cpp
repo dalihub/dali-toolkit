@@ -40,8 +40,10 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
@@ -535,13 +537,233 @@ public:
     return value;
   }
 
-  void SetState( DevelControl::State state, bool withTransitions=true )
+
+  void CopyInstancedProperties( RegisteredVisualContainer& visuals, Dictionary<Property::Map>& instancedProperties )
   {
-    if( mState != state )
+    for(RegisteredVisualContainer::Iterator iter = visuals.Begin(); iter!= visuals.End(); iter++)
+    {
+      if( (*iter)->visual )
+      {
+        Property::Map instanceMap;
+        Toolkit::GetImplementation((*iter)->visual).CreateInstancePropertyMap(instanceMap);
+        instancedProperties.Add( (*iter)->visual.GetName(), instanceMap );
+      }
+    }
+  }
+
+  template<typename T>
+  void Remove( Dictionary<T>& keyValues, const std::string& name )
+  {
+    keyValues.Remove(name);
+  }
+
+  void Remove( DictionaryKeys& keys, const std::string& name )
+  {
+    DictionaryKeys::iterator iter = std::find( keys.begin(), keys.end(), name );
+    if( iter != keys.end())
+    {
+      keys.erase(iter);
+    }
+  }
+
+  void FindChangableVisuals( Dictionary<Property::Map>& stateVisualsToAdd,
+                             Dictionary<Property::Map>& stateVisualsToChange,
+                             DictionaryKeys& stateVisualsToRemove)
+  {
+    DictionaryKeys copyOfStateVisualsToRemove = stateVisualsToRemove;
+
+    for( DictionaryKeys::iterator iter = copyOfStateVisualsToRemove.begin();
+         iter != copyOfStateVisualsToRemove.end(); ++iter )
+    {
+      const std::string& visualName = (*iter);
+      Property::Map* toMap = stateVisualsToAdd.Find( visualName );
+      if( toMap )
+      {
+        stateVisualsToChange.Add( visualName, *toMap );
+        stateVisualsToAdd.Remove( visualName );
+        Remove( stateVisualsToRemove, visualName );
+      }
+    }
+  }
+
+  void RemoveVisual( RegisteredVisualContainer& visuals, const std::string& visualName )
+  {
+    Actor self( mControlImpl.Self() );
+
+    for ( RegisteredVisualContainer::Iterator visualIter = visuals.Begin();
+          visualIter != visuals.End(); ++visualIter )
+    {
+      Toolkit::Visual::Base visual = (*visualIter)->visual;
+      if( visual && visual.GetName() == visualName )
+      {
+        Toolkit::GetImplementation(visual).SetOffStage( self );
+        (*visualIter)->visual.Reset();
+        visuals.Erase( visualIter );
+        break;
+      }
+    }
+  }
+
+  void RemoveVisuals( RegisteredVisualContainer& visuals, DictionaryKeys& removeVisuals )
+  {
+    Actor self( mControlImpl.Self() );
+    for( DictionaryKeys::iterator iter = removeVisuals.begin(); iter != removeVisuals.end(); ++iter )
+    {
+      const std::string visualName = *iter;
+      RemoveVisual( visuals, visualName );
+    }
+  }
+
+  Toolkit::Visual::Type GetVisualTypeFromMap( const Property::Map& map )
+  {
+    Property::Value* typeValue = map.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE  );
+    Toolkit::Visual::Type type = Toolkit::Visual::IMAGE;
+    if( typeValue )
+    {
+      Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, type );
+    }
+    return type;
+  }
+
+  /**
+   * Go through the list of visuals that are common to both states.
+   * If they are different types, or are both image types with different
+   * URLs, then the existing visual needs moving and the new visual creating
+   */
+  void RecreateChangedVisuals( Dictionary<Property::Map>& stateVisualsToChange,
+                               Dictionary<Property::Map>& instancedProperties )
+  {
+    Dali::CustomActor handle( mControlImpl.GetOwner() );
+    for( Dictionary<Property::Map>::iterator iter = stateVisualsToChange.Begin();
+         iter != stateVisualsToChange.End(); ++iter )
+    {
+      const std::string& visualName = (*iter).key;
+      const Property::Map& toMap = (*iter).entry;
+
+      // is it a candidate for re-creation?
+      bool recreate = false;
+
+      Toolkit::Visual::Base visual = GetVisualByName( mVisuals, visualName );
+      if( visual )
+      {
+        Property::Map fromMap;
+        visual.CreatePropertyMap( fromMap );
+
+        Toolkit::Visual::Type fromType = GetVisualTypeFromMap( fromMap );
+        Toolkit::Visual::Type toType = GetVisualTypeFromMap( toMap );
+
+        if( fromType != toType )
+        {
+          recreate = true;
+        }
+        else
+        {
+          if( fromType == Toolkit::Visual::IMAGE )
+          {
+            Property::Value* fromUrl = fromMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
+            Property::Value* toUrl = toMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
+
+            if( fromUrl && toUrl )
+            {
+              std::string fromUrlString;
+              std::string toUrlString;
+              fromUrl->Get(fromUrlString);
+              toUrl->Get(toUrlString);
+
+              if( fromUrlString != toUrlString )
+              {
+                recreate = true;
+              }
+            }
+          }
+        }
+
+        const Property::Map* instancedMap = instancedProperties.FindConst( visualName );
+        if( recreate || instancedMap )
+        {
+          RemoveVisual( mVisuals, visualName );
+          Style::ApplyVisual( handle, visualName, toMap, instancedMap );
+        }
+        else
+        {
+          // @todo check to see if we can apply toMap without recreating the visual
+          // e.g. by setting only animatable properties
+          // For now, recreate all visuals, but merge in instance data.
+          RemoveVisual( mVisuals, visualName );
+          Style::ApplyVisual( handle, visualName, toMap, instancedMap );
+        }
+      }
+    }
+  }
+
+  void ReplaceStateVisualsAndProperties( const StylePtr oldState, const StylePtr newState, const std::string& subState )
+  {
+    // Collect all old visual names
+    DictionaryKeys stateVisualsToRemove;
+    if( oldState )
+    {
+      oldState->visuals.GetKeys( stateVisualsToRemove );
+      if( ! subState.empty() )
+      {
+        const StylePtr* oldSubState = oldState->subStates.FindConst(subState);
+        if( oldSubState )
+        {
+          DictionaryKeys subStateVisualsToRemove;
+          (*oldSubState)->visuals.GetKeys( subStateVisualsToRemove );
+          Merge( stateVisualsToRemove, subStateVisualsToRemove );
+        }
+      }
+    }
+
+    // Collect all new visual properties
+    Dictionary<Property::Map> stateVisualsToAdd;
+    if( newState )
+    {
+      stateVisualsToAdd = newState->visuals;
+      if( ! subState.empty() )
+      {
+        const StylePtr* newSubState = newState->subStates.FindConst(subState);
+        if( newSubState )
+        {
+          stateVisualsToAdd.Merge( (*newSubState)->visuals );
+        }
+      }
+    }
+
+    // If a name is in both add/remove, move it to change list.
+    Dictionary<Property::Map> stateVisualsToChange;
+    FindChangableVisuals( stateVisualsToAdd, stateVisualsToChange, stateVisualsToRemove);
+
+    // Copy instanced properties (e.g. text label) of current visuals
+    Dictionary<Property::Map> instancedProperties;
+    CopyInstancedProperties( mVisuals, instancedProperties );
+
+    // For each visual in remove list, remove from mVisuals
+    RemoveVisuals( mVisuals, stateVisualsToRemove );
+
+    // For each visual in add list, create and add to mVisuals
+    Dali::CustomActor handle( mControlImpl.GetOwner() );
+    Style::ApplyVisuals( handle, stateVisualsToAdd, instancedProperties );
+
+    // For each visual in change list, if it requires a new visual,
+    // remove old visual, create and add to mVisuals
+    RecreateChangedVisuals( stateVisualsToChange, instancedProperties );
+  }
+
+  void SetState( DevelControl::State newState, bool withTransitions=true )
+  {
+    DevelControl::State oldState = mState;
+    Dali::CustomActor handle( mControlImpl.GetOwner() );
+    DALI_LOG_INFO(gLogFilter, Debug::Concise, "Control::Impl::SetState: %s\n",
+                  (mState == DevelControl::NORMAL ? "NORMAL" :(
+                    mState == DevelControl::FOCUSED ?"FOCUSED" : (
+                      mState == DevelControl::DISABLED?"DISABLED":"NONE" ))));
+
+    if( mState != newState )
     {
       // If mState was Disabled, and new state is Focused, should probably
       // store that fact, e.g. in another property that FocusManager can access.
-      mState = state;
+      mState = newState;
 
       // Trigger state change and transitions
       // Apply new style, if stylemanager is available
@@ -549,15 +771,19 @@ public:
       if( styleManager )
       {
         const StylePtr stylePtr = GetImpl( styleManager ).GetRecordedStyle( Toolkit::Control( mControlImpl.GetOwner() ) );
+
         if( stylePtr )
         {
-          for( int i=mVisuals.Count()-1; i >= 0; i-- )
-          {
-            mControlImpl.UnregisterVisual( mVisuals[i]->index );
-          }
+          std::string oldStateName = Scripting::GetEnumerationName< Toolkit::DevelControl::State >( oldState, ControlStateTable, ControlStateTableCount );
+          std::string newStateName = Scripting::GetEnumerationName< Toolkit::DevelControl::State >( newState, ControlStateTable, ControlStateTableCount );
 
-          Dali::CustomActor handle( mControlImpl.GetOwner() );
-          stylePtr->ApplyVisualsAndPropertiesRecursively( handle );
+          const StylePtr* newStateStyle = stylePtr->subStates.Find( newStateName );
+          const StylePtr* oldStateStyle = stylePtr->subStates.Find( oldStateName );
+          if( oldStateStyle && newStateStyle )
+          {
+            // Only change if both state styles exist
+            ReplaceStateVisualsAndProperties( *oldStateStyle, *newStateStyle, mSubStateName );
+          }
         }
       }
     }
@@ -584,30 +810,12 @@ public:
           {
             StylePtr stateStyle(*state);
 
-            // Unregister existing visuals of this substate
-            const StylePtr* subState = stateStyle->subStates.Find( mSubStateName );
-            if( subState )
+            const StylePtr* newStateStyle = stateStyle->subStates.Find( subStateName );
+            const StylePtr* oldStateStyle = stateStyle->subStates.Find( mSubStateName );
+            if( oldStateStyle && newStateStyle )
             {
-              StylePtr subStateStyle(*subState);
-
-              for( Dictionary<Property::Map>::iterator iter = subStateStyle->visuals.Begin(); iter != subStateStyle->visuals.End(); ++iter )
-              {
-                const std::string& visualName = (*iter).key;
-                Dali::Property::Index index = handle.GetPropertyIndex( visualName );
-                if( index != Property::INVALID_INDEX )
-                {
-                  mControlImpl.UnregisterVisual( index );
-                }
-              }
-            }
-
-            // Register visuals of the new substate
-            const StylePtr* newSubState = stateStyle->subStates.Find( subStateName );
-            if( newSubState )
-            {
-              StylePtr newSubStateStyle(*newSubState);
-              newSubStateStyle->ApplyVisuals( handle );
-              newSubStateStyle->ApplyProperties( handle );
+              std::string empty;
+              ReplaceStateVisualsAndProperties( *oldStateStyle, *newStateStyle, empty );
             }
           }
         }

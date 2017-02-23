@@ -153,6 +153,11 @@ void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const
   }
 }
 
+void WireframeVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  // Do nothing
+}
+
 void WireframeVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   Property::Value* mixValue = propertyMap.Find( Toolkit::DevelVisual::Property::MIX_COLOR, MIX_COLOR );
