@@ -2014,5 +2014,12 @@ int utcDaliTextFieldStyleWhilstSelected(void)
   DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
 
+  // Press Escape to increase coverage
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up ) );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( !field.HasKeyInputFocus() );
+
   END_TEST;
 }
