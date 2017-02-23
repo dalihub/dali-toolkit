@@ -58,8 +58,6 @@ public:
    */
   void ApplyVisualsAndPropertiesRecursively( Handle handle ) const;
 
-
-private:
   /**
    * Apply the visuals of the style to the control pointed at by
    * handle.
