@@ -1189,10 +1189,12 @@ void ItemView::OnPan( const PanGesture& gesture )
         mScrollAnimation.AnimateTo( Property(self, Toolkit::ItemView::Property::SCROLL_SPEED), 0.0f, AlphaFunction::EASE_OUT );
 
         mIsFlicking = true;
+
         // Check whether it has already scrolled to the end
-        if(fabs(currentLayoutPosition - firstItemScrollPosition) > Math::MACHINE_EPSILON_0)
+        if( fabs(currentLayoutPosition - firstItemScrollPosition) < Math::MACHINE_EPSILON_0 )
         {
-          AnimateScrollOvershoot(0.0f);
+          AnimateScrollOvershoot( 0.0f );
+          RemoveAnimation( mScrollAnimation );
         }
       }
 

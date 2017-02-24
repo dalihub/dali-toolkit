@@ -24,6 +24,7 @@ SET(TC_SOURCES
  utc-Dali-DebugRendering.cpp
  utc-Dali-ItemView-internal.cpp
  utc-Dali-PropertyHelper.cpp
+ utc-Dali-ColorConversion.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)

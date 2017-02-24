@@ -98,7 +98,12 @@
       "popupPressedColor":[0.24,0.72,0.8,0.11],
       "background": {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}selection-popup-bg.9.png"
+        "url": "{DALI_IMAGE_DIR}selection-popup-background.9.png"
+        },
+      "backgroundBorder": {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}selection-popup-border.9.png",
+        "mixColor":[0.24,0.72,0.8,1.0]
         },
       "popupFadeInDuration":0.25,
       "popupFadeOutDuration":0.25
@@ -130,6 +135,20 @@
         "overshootAnimationSpeed":360.0,
         "overshootSize":[720.0,130.0]
       }
+    },
+    "TextSelectionScrollBar":
+    {
+      "indicatorShowDuration":0.25,
+      "indicatorHideDuration":0.25
+    },
+    "TextSelectionScrollIndicator":
+    {
+      "image":
+      {
+        "visualType":"IMAGE",
+        "url":"{DALI_IMAGE_DIR}text_selection_scroll_indicator.9.png"
+      },
+      "color":[0.0,0.72,0.9,0.7]
     },
     "ScrollView":
     {

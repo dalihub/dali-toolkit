@@ -128,12 +128,13 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
     uniform sampler2D sTexture;\n
     uniform mediump vec4 uAtlasRect;\n
     uniform lowp vec4 uColor;\n
-    uniform lowp vec4 mixColor;\n
+    uniform lowp vec3 mixColor;\n
+    uniform lowp float opacity;\n
     \n
     void main()\n
     {\n
       mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-      gl_FragColor = texture2D( sTexture, texCoord ) * uColor * mixColor;\n
+      gl_FragColor = texture2D( sTexture, texCoord ) * uColor * vec4( mixColor, opacity );\n
     }\n
 );
 

@@ -28,6 +28,7 @@
 
 %typemap(cscode) Dali::Actor::Property %{
   public static readonly int SIBLING_ORDER = NDalicManualPINVOKE.Actor_Property_SIBLING_ORDER_get();
+  public static readonly int OPACITY = NDalicManualPINVOKE.Actor_Property_OPACITY_get();
 %}
 
 %typemap(cscode) Dali::Toolkit::Control::Property %{

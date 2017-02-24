@@ -90,6 +90,7 @@ Internal::Visual::Base::Impl::Impl()
   mControlSize( Vector2::ZERO ),
   mDepthIndex( 0.0f ),
   mMixColorIndex( Property::INVALID_INDEX ),
+  mOpacityIndex( Property::INVALID_INDEX ),
   mFlags( 0 )
 {
 }

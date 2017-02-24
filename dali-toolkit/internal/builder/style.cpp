@@ -15,6 +15,7 @@
  */
 
 #include <dali/public-api/object/handle.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/builder/style.h>
@@ -23,8 +24,12 @@ namespace Dali
 {
 namespace Toolkit
 {
+
 namespace Internal
 {
+
+extern const Dali::Scripting::StringEnum ControlStateTable[];
+extern const unsigned int ControlStateTableCount;
 
 StylePtr Style::New()
 {
@@ -40,12 +45,15 @@ void Style::ApplyVisualsAndPropertiesRecursively( Handle handle ) const
   Toolkit::Control control = Toolkit::Control::DownCast(handle);
   if( control )
   {
-    Property::Value value = control.GetProperty(DevelControl::Property::STATE);
     std::string stateName;
-    if( value.Get( stateName ) )
+    Property::Value value = control.GetProperty(DevelControl::Property::STATE);
+    Dali::Toolkit::DevelControl::State state = static_cast<Dali::Toolkit::DevelControl::State>(value.Get<int>());
+    stateName = Scripting::GetEnumerationName< Toolkit::DevelControl::State >( state, ControlStateTable, ControlStateTableCount );
+
+    if( ! stateName.empty() )
     {
       // Look up state in states table:
-      const StylePtr* stylePtr = subStates.FindCaseInsensitiveC( stateName );
+      const StylePtr* stylePtr = subStates.FindConst( stateName );
       if( stylePtr )
       {
         const StylePtr statePtr(*stylePtr);
@@ -59,7 +67,7 @@ void Style::ApplyVisualsAndPropertiesRecursively( Handle handle ) const
         std::string subStateName;
         if( value.Get( subStateName ) && ! subStateName.empty() )
         {
-          const StylePtr* stylePtr = statePtr->subStates.FindCaseInsensitiveC( subStateName );
+          const StylePtr* stylePtr = statePtr->subStates.FindConst( subStateName );
           if( stylePtr )
           {
             const StylePtr subStatePtr(*stylePtr);
@@ -103,7 +111,6 @@ void Style::ApplyProperties( Handle handle ) const
 Style::Style()
 {
 }
-
 Style::~Style()
 {
 }

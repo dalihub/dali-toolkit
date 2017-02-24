@@ -106,45 +106,9 @@ public:
 
   /**
    * Find the element in the dictionary pointed at by key, and
-   * return a pointer to it, or NULL.
-   */
-  EntryType* Find( const std::string& key ) const
-  {
-    EntryType* result=NULL;
-
-    if( ! key.empty() )
-    {
-      for( typename Elements::iterator iter = container.begin(); iter != container.end(); ++iter )
-      {
-        if( iter->key == key )
-        {
-          result = &(iter->entry);
-          break;
-        }
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Find the element in the dictionary pointed at by key, and
-   * return a pointer to it, or NULL
-   */
-  EntryType* Find( const char* key ) const
-  {
-    if( key != NULL )
-    {
-      std::string theKey(key);
-      return Find(theKey);
-    }
-    return NULL;
-  }
-
-  /**
-   * Find the element in the dictionary pointed at by key using a case
    * insensitive search, and return a const pointer to it, or NULL
    */
-  const EntryType* FindCaseInsensitiveC( const std::string& key ) const
+  const EntryType* FindConst( const std::string& key ) const
   {
     if( ! key.empty() )
     {
@@ -164,7 +128,7 @@ public:
    * Find the element in the dictionary pointed at by key using a case
    * insensitive search, and return a non-const pointer to it, or NULL
    */
-  EntryType* FindCaseInsensitive( const std::string& key ) const
+  EntryType* Find( const std::string& key ) const
   {
     EntryType* result = NULL;
     if( ! key.empty() )
@@ -185,12 +149,12 @@ public:
    * Find the element in the dictionary pointed at by key using a case
    * insensitive search, and return a const pointer to it, or NULL
    */
-  const EntryType* FindCaseInsensitiveC( const char* key ) const
+  const EntryType* FindConst( const char* key ) const
   {
     if( key != NULL )
     {
       std::string theKey(key);
-      return FindCaseInsensitiveC( theKey );
+      return FindConst( theKey );
     }
     return NULL;
   }
@@ -199,16 +163,15 @@ public:
    * Find the element in the dictionary pointed at by key using a case
    * insensitive search, and return a non-const pointer to it, or NULL
    */
-  EntryType* FindCaseInsensitive( const char* key ) const
+  EntryType* Find( const char* key ) const
   {
     if( key != NULL )
     {
       std::string theKey(key);
-      return FindCaseInsensitive( theKey );
+      return Find( theKey );
     }
     return NULL;
   }
-
   /**
    * Return an iterator pointing at the first entry in the dictionary
    */

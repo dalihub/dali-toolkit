@@ -70,11 +70,12 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
-  uniform lowp vec4 mixColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = mixColor*uColor;\n
+    gl_FragColor = vec4(mixColor, opacity)*uColor;\n
   }\n
 );
 }
@@ -105,7 +106,16 @@ void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
     Vector4 color;
     if( colorValue->Get( color ) )
     {
-      SetMixColor( color );
+      Property::Type type = colorValue->GetType();
+      if( type == Property::VECTOR4 )
+      {
+        SetMixColor( color );
+      }
+      else if( type == Property::VECTOR3 )
+      {
+        Vector3 color3(color);
+        SetMixColor( color3 );
+      }
     }
     else
     {
@@ -152,7 +162,8 @@ void ColorVisual::InitializeRenderer()
   // ColorVisual has it's own index key for mix color - use this instead
   // of using the new base index to avoid changing existing applications
   // String keys will get to this property.
-  mImpl->mMixColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR, mImpl->mMixColor );
+  mImpl->mMixColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR, Vector3(mImpl->mMixColor) );
+
   if( mImpl->mMixColor.a < 1.f )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );

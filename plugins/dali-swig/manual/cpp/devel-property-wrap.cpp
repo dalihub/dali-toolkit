@@ -42,6 +42,15 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_SIBLING_ORDER_get() {
   return jresult;
 }
 
+SWIGEXPORT float SWIGSTDCALL CSharp_Actor_Property_OPACITY_get() {
+  int jresult ;
+  int result;
+
+  result = (float)Dali::DevelActor::Property::OPACITY;
+  jresult = (int)result;
+  return jresult;
+}
+
 SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_TOOLTIP_get() {
   int jresult ;
   int result;

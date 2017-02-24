@@ -19,8 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
-#include <dali/devel-api/adaptor-framework/physical-keyboard.h>
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
@@ -228,12 +226,6 @@ private:
    */
   void OnTouch( const TouchData& touch );
 
-  /**
-   * Change the keyboard focus status when keyboard focus feature turned on or off.
-   * @return Whether the status is changed or not.
-   */
-  void OnPhysicalKeyboardStatusChanged(PhysicalKeyboard keyboard);
-
 private:
 
   // Undefined
@@ -253,8 +245,6 @@ private:
   Actor mFocusIndicatorActor; ///< The focus indicator actor shared by all the keyboard focusable actors for highlight
 
   bool mFocusGroupLoopEnabled:1; ///< Whether the focus movement is looped within the same focus group
-
-  bool mIsKeyboardFocusEnabled:1; ///< Whether keyboard focus feature turned on/off
 
   bool mIsFocusIndicatorEnabled:1; ///< Whether indicator should be shown / hidden. It could be enabled when keyboard focus feature enabled and navigation keys or 'Tab' key pressed.
 

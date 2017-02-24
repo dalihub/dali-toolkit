@@ -32,12 +32,24 @@ namespace Toolkit
  * @{
  */
 
+/**
+ * @brief GradientVisual is to render a smooth transition of colors to the control's quad.
+ * @SINCE_1_1.45
+ */
 namespace GradientVisual
 {
 
+/**
+ * @brief GradientVisual Property
+ * @SINCE_1_1.45
+ */
 namespace Property
 {
 
+/**
+ * @brief GradientVisual Property
+ * @SINCE_1_1.45
+ */
 enum
 {
   /**
@@ -109,6 +121,14 @@ enum
 
 } // namespace Property
 
+/**
+ * @brief The type of coordinate system for certain attributes of the points in a gradient.
+ *
+ * This applies to the:
+ * - Start (x1, y1) and End (x2 and y2) points of a line if using a linear gradient.
+ * - Center point (cx, cy) and radius (r) of a circle if using a radial gradient.
+ * @SINCE_1_1.45
+ */
 namespace Units
 {
 
@@ -118,6 +138,7 @@ namespace Units
  * This applies to the:
  * - Start (x1, y1) and End (x2 and y2) points of a line if using a linear gradient.
  * - Center point (cx, cy) and radius (r) of a circle if using a radial gradient.
+ * @SINCE_1_1.45
  */
 enum Type
 {
@@ -127,11 +148,16 @@ enum Type
 
 } // namespace Units
 
+/**
+ * @brief Policies that define what happens if the gradient starts or ends inside the bounds of the target rectangle.
+ * @SINCE_1_1.45
+ */
 namespace SpreadMethod
 {
 
 /**
  * @brief Policies that define what happens if the gradient starts or ends inside the bounds of the target rectangle.
+ * @SINCE_1_1.45
  */
 enum Type
 {

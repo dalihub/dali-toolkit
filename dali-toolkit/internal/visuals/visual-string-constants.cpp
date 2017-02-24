@@ -66,6 +66,7 @@ const char * const PREMULTIPLIED_ALPHA( "premultipliedAlpha" );
 
 // Mix color
 const char * const MIX_COLOR( "mixColor" );
+const char * const OPACITY( "opacity" );
 
 // Image visual
 const char * const IMAGE_URL_NAME( "url" );

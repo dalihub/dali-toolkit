@@ -283,6 +283,7 @@ using namespace Dali::Toolkit;
 %include events/videoview-event.i
 
 %include alphafunction.i
+%include rotation.i
 %include name-changed.i
 %include property-value.i
 %include dali-operator.i

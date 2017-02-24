@@ -32,6 +32,10 @@ namespace Toolkit
  * @{
  */
 
+/**
+ * @brief All the visual types
+ * @SINCE_1_1.45
+ */
 namespace Visual
 {
 
@@ -50,9 +54,17 @@ enum Type
   WIREFRAME ///< Renders a simple wire-frame outlining a quad. @SINCE_1_2_2
 };
 
+/**
+ * @brief Visual Property
+ * @SINCE_1_1.45
+ */
 namespace Property
 {
 
+/**
+ * @brief Visual Property
+ * @SINCE_1_1.45
+ */
 enum
 {
   /**
@@ -77,12 +89,24 @@ enum
 
 } // namespace Property
 
+/**
+ * @brief Shader for Visuals
+ * @SINCE_1_1.45
+ */
 namespace Shader
 {
 
+/**
+ * @brief Shader Property
+ * @SINCE_1_1.45
+ */
 namespace Property
 {
 
+/**
+ * @brief The type of Shader
+ * @SINCE_1_1.45
+ */
 enum
 {
   /**

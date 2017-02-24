@@ -21,12 +21,14 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/buttons/push-button.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-toolbar.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/object/property-map.h>
 
 namespace Dali
 {
@@ -240,6 +242,13 @@ private: // Implementation
   std::size_t GetNumberOfEnabledOptions();
 
   void AddPopupOptionsToToolbar(  bool showIcons, bool showCaptions );
+
+  /**
+   * Creates the background-border image
+   *
+   * @param[in] propertyMap The properties describing the background-border
+   */
+  void CreateBackgroundBorder( Property::Map& propertyMap );
 
   /**
    * Construct a new TextField.

@@ -22,6 +22,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -254,10 +255,12 @@ int UtcDaliTransitionDataMap1P(void)
 
   Renderer renderer = actor.GetRendererAt(0);
   Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index opacityIndex = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::OPACITY );
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(mixColorIndex), Color::MAGENTA, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
 
   anim.Play();
 
@@ -265,14 +268,18 @@ int UtcDaliTransitionDataMap1P(void)
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(mixColorIndex), (Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
 
   application.Render(500); // End of anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(mixColorIndex), Color::RED, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::RED), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
 
   END_TEST;
 }
+
+
 
 int UtcDaliTransitionDataMap2P(void)
 {
@@ -282,7 +289,6 @@ int UtcDaliTransitionDataMap2P(void)
 
   Property::Map map;
   map["target"] = "visual1";
-  //Control::CONTROL_PROPERTY_END_INDEX + 1
   map["property"] = ColorVisual::Property::MIX_COLOR;
   map["initialValue"] = Color::MAGENTA;
   map["targetValue"] = Color::RED;
@@ -316,10 +322,12 @@ int UtcDaliTransitionDataMap2P(void)
 
   Renderer renderer = actor.GetRendererAt(0);
   Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index opacityIndex = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::OPACITY );
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(mixColorIndex), Color::MAGENTA, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
 
   anim.Play();
 
@@ -328,14 +336,88 @@ int UtcDaliTransitionDataMap2P(void)
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(mixColorIndex), (Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
 
   application.Render(500); // End of anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector4>(mixColorIndex), Color::RED, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::RED), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
+
+
+int UtcDaliTransitionDataMap2Pb(void)
+{
+  TestApplication application;
+
+  tet_printf("Testing animation of a visual property using programmatic maps\n");
+
+  Property::Map map;
+  map["target"] = "visual1";
+  map["property"] = PrimitiveVisual::Property::MIX_COLOR;
+  map["initialValue"] = Color::MAGENTA;
+  map["targetValue"] = Color::RED;
+  map["animator"] = Property::Map()
+    .Add("alphaFunction", "LINEAR")
+    .Add("timePeriod", Property::Map()
+         .Add("delay", 0.5f)
+         .Add("duration", 1.0f));
+
+  Dali::Toolkit::TransitionData transition = TransitionData::New( map );
+
+  DummyControl actor = DummyControl::New();
+  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  actor.SetName("Actor1");
+  actor.SetColor(Color::CYAN);
+  Stage::GetCurrent().Add(actor);
+
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+
+  Property::Map visualMap;
+  visualMap[Visual::Property::TYPE] = Visual::PRIMITIVE;
+  visualMap[PrimitiveVisual::Property::MIX_COLOR] = Color::MAGENTA;
+  visualMap[ PrimitiveVisual::Property::SHAPE  ] = PrimitiveVisual::Shape::SPHERE;
+  visualMap[ PrimitiveVisual::Property::SLICES ] = 10;
+  visualMap[ PrimitiveVisual::Property::STACKS ] = 10;
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual( visualMap );
+  visual.SetName( "visual1" );
+
+  Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
+  dummyImpl.RegisterVisual( visualIndex, visual );
+
+  Animation anim = dummyImpl.CreateTransition( transition );
+  DALI_TEST_CHECK( anim );
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, PrimitiveVisual::Property::MIX_COLOR );
+  Property::Index opacityIndex = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::OPACITY );
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
+
+  anim.Play();
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render(500); // Start animation
+  application.Render(500); // Halfway thru anim
+  application.SendNotification();
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
+
+  application.Render(500); // End of anim
+  application.SendNotification();
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::RED), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 
 int UtcDaliTransitionDataMap3P(void)
 {
@@ -464,6 +546,146 @@ int UtcDaliTransitionDataMap4P(void)
   END_TEST;
 }
 
+int UtcDaliTransitionDataMap5P(void)
+{
+  TestApplication application;
+
+  tet_printf("Testing animation visual opacity using stylesheet equivalent maps\n");
+
+  Property::Map map;
+  map["target"] = "visual1";
+  map["property"] = "opacity";
+  map["initialValue"] = 0.0f;
+  map["targetValue"] = 1.0f;
+  map["animator"] = Property::Map()
+    .Add("alphaFunction", "EASE_IN_OUT")
+    .Add("timePeriod", Property::Map()
+         .Add("delay", 0.5f)
+         .Add("duration", 1.0f));
+
+  Dali::Toolkit::TransitionData transition = TransitionData::New( map );
+
+  DummyControl actor = DummyControl::New();
+  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  actor.SetName("Actor1");
+  actor.SetColor(Color::CYAN);
+  Stage::GetCurrent().Add(actor);
+
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+
+  Property::Map visualMap;
+  visualMap[Visual::Property::TYPE] = Visual::COLOR;
+  visualMap[ColorVisual::Property::MIX_COLOR] = Color::MAGENTA;
+  Visual::Base visual = VisualFactory::Get().CreateVisual( visualMap );
+  visual.SetName( "visual1" );
+
+  Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
+  dummyImpl.RegisterVisual( visualIndex, visual );
+
+  Animation anim = dummyImpl.CreateTransition( transition );
+  DALI_TEST_CHECK( anim );
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index opacityIndex = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::OPACITY );
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 0.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
+
+  anim.Play();
+
+  application.SendNotification();
+  application.Render(500); // Start animation
+  application.Render(500); // Halfway thru anim
+  application.SendNotification();
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 0.5f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
+
+  application.Render(501); // End of anim
+  application.SendNotification();
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::AUTO, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliTransitionDataMap6P(void)
+{
+  TestApplication application;
+
+  tet_printf("Testing animation visual opacity using stylesheet equivalent maps\n");
+
+  Property::Map map;
+  map["target"] = "visual1";
+  map["property"] = "opacity";
+  map["targetValue"] = 0.0f;
+  map["animator"] = Property::Map()
+    .Add("alphaFunction", "EASE_IN_OUT")
+    .Add("timePeriod", Property::Map()
+         .Add("delay", 0.5f)
+         .Add("duration", 1.0f));
+
+  Dali::Toolkit::TransitionData transition = TransitionData::New( map );
+
+  DummyControl actor = DummyControl::New();
+  actor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  actor.SetName("Actor1");
+  actor.SetColor(Color::CYAN);
+  Stage::GetCurrent().Add(actor);
+
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+
+  Property::Map visualMap;
+  visualMap[Visual::Property::TYPE] = Visual::COLOR;
+  visualMap[ColorVisual::Property::MIX_COLOR] = Color::MAGENTA;
+  Visual::Base visual = VisualFactory::Get().CreateVisual( visualMap );
+  visual.SetName( "visual1" );
+
+  Property::Index visualIndex = Control::CONTROL_PROPERTY_END_INDEX + 1;
+  dummyImpl.RegisterVisual( visualIndex, visual );
+
+  Animation anim = dummyImpl.CreateTransition( transition );
+  DALI_TEST_CHECK( anim );
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index opacityIndex = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::OPACITY );
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
+
+  // Note, This should be testing for AUTO
+  // this is the same problem as C# target value being set before Play is called.
+  // @todo How was this solved?
+  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
+
+  anim.Play();
+
+  application.SendNotification();
+  application.Render(500); // Start animation
+  application.Render(500); // Halfway thru anim
+  application.SendNotification();
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 0.5f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
+
+  application.Render(500); // End of anim
+  application.SendNotification();
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 0.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliTransitionDataMap1N(void)
 {
@@ -506,8 +728,8 @@ int UtcDaliTransitionDataMapN3(void)
   Property::Map map;
   map["target"] = "visual1";
   map["property"] = "mixColor";
-  map["initialValue"] = Color::MAGENTA;
-  map["targetValue"] = Color::RED;
+  map["initialValue"] = Vector3(Color::MAGENTA);
+  map["targetValue"] = Vector3(Color::RED);
   map["animator"] = Property::Map()
     .Add("alphaFunction", "EASE_OUT_BACK")
     .Add("timePeriod", Property::Map()
@@ -526,7 +748,7 @@ int UtcDaliTransitionDataMapN3(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   Property::Map visualMap;
   visualMap[Visual::Property::TYPE] = Visual::COLOR;
-  visualMap[ColorVisual::Property::MIX_COLOR] = Color::MAGENTA;
+  visualMap[ColorVisual::Property::MIX_COLOR] = Vector3(Color::MAGENTA);
   Visual::Base visual = VisualFactory::Get().CreateVisual( visualMap );
   visual.SetName( "visual1" );
 
@@ -548,8 +770,8 @@ int UtcDaliTransitionDataMapN4(void)
   Property::Map map;
   map["target"] = "visual1";
   map["property"] = "mixColor";
-  map["initialValue"] = Color::MAGENTA;
-  map["targetValue"] = Color::RED;
+  map["initialValue"] = Vector3(Color::MAGENTA);
+  map["targetValue"] = Vector3(Color::RED);
   map["animator"] = Property::Map()
     .Add("alphaFunction", Vector3(.1f,1.0f,0.5f))
     .Add("timePeriod", Property::Map()
@@ -583,9 +805,11 @@ int UtcDaliTransitionDataMapN4(void)
 
   Renderer renderer = actor.GetRendererAt(0);
   Property::Index mixColorIdx = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index opacityIdx = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::OPACITY );
 
   tet_printf( "Test that the property has been set to target value\n");
-  DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(mixColorIdx), Color::RED, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(mixColorIdx), Vector3(Color::RED), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<float>(opacityIdx), 1.0f, 0.001, TEST_LOCATION);
 
   END_TEST;
 }
@@ -636,7 +860,7 @@ int UtcDaliTransitionDataMapN5(void)
   Property::Index mixColorIdx = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
 
   tet_printf( "Test that the property has been set to target value\n");
-  DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(mixColorIdx), Color::RED, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(mixColorIdx), Vector3(Color::RED), 0.001, TEST_LOCATION);
 
   END_TEST;
 }
@@ -685,9 +909,11 @@ int UtcDaliTransitionDataMapN6(void)
 
   Renderer renderer = actor.GetRendererAt(0);
   Property::Index mixColorIdx = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index opacityIdx = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::OPACITY );
 
   tet_printf( "Test that the property has been set to target value\n");
-  DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(mixColorIdx), Color::RED, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(mixColorIdx), Vector3(Color::RED), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<float>(opacityIdx), 1.0f, 0.001, TEST_LOCATION);
 
   END_TEST;
 }
@@ -852,7 +1078,8 @@ int UtcDaliTransitionDataGetAnimatorP(void)
 
   Property::Map map8;
   map8["target"] = "Visual1";
-  map8["property"] = "colorAlpha";
+  map8["property"] = "opacity";
+  map8["initialValue"] = 0.0f;
   map8["targetValue"] = 1.0f;
   map8["animator"] = Property::Map()
     .Add("alphaFunction", "EASE_IN")

@@ -19,7 +19,6 @@ namespace Dali
 {
   namespace Constants
   {
-
     public enum TextureType
     {
       Texture2D     = Dali.TextureType.TEXTURE_2D,   ///< One 2D image                            @SINCE_1_1.43
@@ -95,6 +94,31 @@ namespace Dali
       public static readonly Dali.Vector3 Zero = Dali.Vector3.ZERO;
     }
 
+    public struct Direction
+    {
+      public enum Type
+      {
+        LeftToRight = Dali.DirectionType.LEFT_TO_RIGHT,
+        RightToLeft = Dali.DirectionType.RIGHT_TO_LEFT
+      }
+    }
+
+    public struct Align
+    {
+      public enum Type
+      {
+        TopBegin = Dali.AlignType.TOP_BEGIN,
+        TopCenter = Dali.AlignType.TOP_CENTER,
+        TopEnd = Dali.AlignType.TOP_END,
+        CenterBegin = Dali.AlignType.CENTER_BEGIN,
+        Center = Dali.AlignType.CENTER,
+        CenterEnd = Dali.AlignType.CENTER_END,
+        BottomBegin = Dali.AlignType.BOTTOM_BEGIN,
+        BottomCenter = Dali.AlignType.BOTTOM_CENTER,
+        BottomEnd = Dali.AlignType.BOTTOM_END
+      }
+    }
+
     public struct Visual
     {
       public enum Type
@@ -115,7 +139,7 @@ namespace Dali
         public static readonly int Shader = NDalic.VISUAL_PROPERTY_SHADER;
         public static readonly int Transform = NDalic.VISUAL_PROPERTY_TRANSFORM;
         public static readonly int PremultipliedAlpha = NDalic.VISUAL_PROPERTY_PREMULTIPLIED_ALPHA;
-        public static readonly int MixCOlor = NDalic.VISUAL_PROPERTY_MIX_COLOR;
+        public static readonly int MixColor = NDalic.VISUAL_PROPERTY_MIX_COLOR;
       }
 
       public struct ShaderProperty
@@ -234,6 +258,5 @@ namespace Dali
         public static readonly int BelowVisual = NDalic.TOOLTIP_TAIL_BELOW_VISUAL;
       }
     }
-
   } // namespace Constants
 } // namesapce Dali

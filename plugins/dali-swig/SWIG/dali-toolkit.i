@@ -118,6 +118,8 @@
 %rename(ExceedPolicyType) Dali::Toolkit::TextField::ExceedPolicy;
 %rename(ToolkitPropertyRange) Dali::Toolkit::PropertyRanges;
 %rename(TooltipPositionType) Dali::Toolkit::Tooltip::Position::Type;
+%rename(DirectionType) Dali::Toolkit::Direction::Type;
+%rename(AlignType) Dali::Toolkit::Align::Type;
 %rename(VisualType) Dali::Toolkit::Visual::Type;
 %rename(VisualTransformPropertyType) Dali::Toolkit::DevelVisual::Transform::Property::Type;
 %rename(VISUAL_SHADER_VERTEX) Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER;
@@ -216,6 +218,8 @@
 %csconstvalue("1 << 5") REQUIRES_KEYBOARD_NAVIGATION_SUPPORT;
 %csconstvalue("1 << 6") DISABLE_STYLE_CHANGE_SIGNALS;
 
+%typemap(csclassmodifiers) Dali::Toolkit::Alignment "internal class"
+
 typedef unsigned int ItemId;
 typedef std::vector<ItemId> ItemIdContainer;
 typedef std::pair<ItemId, Actor> Item;
@@ -284,6 +288,8 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
 %include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
 %include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
+
+%include <dali-toolkit/devel-api/align-enums.h>
 
 %include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 %include <dali-toolkit/devel-api/visual-factory/visual-factory.h>

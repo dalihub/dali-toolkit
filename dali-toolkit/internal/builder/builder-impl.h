@@ -292,6 +292,14 @@ private:
                     Dali::Handle&      handle,
                     const Replacement& replacements );
 
+  void RecordTransitions( const TreeNode::KeyNodePair& keyValue,
+                          Property::Array& transitions,
+                          const Replacement& replacements );
+
+  void RecordTransitionData( const TreeNode::KeyNodePair& keyNode,
+                             Toolkit::TransitionData& transitionData,
+                             const Replacement& replacements );
+
   void ApplyProperties( const TreeNode&    root,
                         const TreeNode&    node,
                         Dali::Handle&      handle,

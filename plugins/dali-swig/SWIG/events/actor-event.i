@@ -37,6 +37,22 @@
        return (IntPtr)swigCPtr;
     }
 
+    public Position CurrentPosition
+    {
+      get
+      {
+        return GetCurrentPosition();
+      }
+    }
+
+    public Size3D CurrentSize
+    {
+      get
+      {
+        return GetCurrentSize();
+      }
+    }
+
     public Actor Parent
     {
       get
@@ -51,19 +67,21 @@
       {
         return IsVisible();
       }
-    }
+   }
 
-   public float Opacity
-   {
-      set
-      {
-        SetOpacity(value);
-      }
+    public float Opacity
+    {
       get
       {
-        return GetCurrentOpacity();
+        float temp = 0;
+        GetProperty( Actor.Property.OPACITY ).Get( ref temp );
+        return temp;
       }
-   }
+      set
+      {
+        SetProperty( Actor.Property.OPACITY, new Dali.Property.Value( value ) );
+      }
+    }
 
     public bool StateFocusEnable
     {
@@ -90,7 +108,7 @@
       get
       {
         int temp = 0;
-        GetProperty( Actor.Property.SIBLING_ORDER).Get( ref temp );
+        GetProperty( Actor.Property.SIBLING_ORDER ).Get( ref temp );
         return temp;
       }
       set

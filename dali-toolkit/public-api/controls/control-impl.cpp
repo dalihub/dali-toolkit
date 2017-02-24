@@ -59,6 +59,22 @@ extern bool CaseInsensitiveStringCompare( const std::string& a, const std::strin
 namespace Toolkit
 {
 
+namespace Internal
+{
+
+extern const Dali::Scripting::StringEnum ControlStateTable[];
+extern const unsigned int ControlStateTableCount;
+
+
+// Not static or anonymous - shared with other translation units
+const Scripting::StringEnum ControlStateTable[] = {
+  { "NORMAL",   Toolkit::DevelControl::NORMAL   },
+  { "FOCUSED",  Toolkit::DevelControl::FOCUSED  },
+  { "DISABLED", Toolkit::DevelControl::DISABLED },
+}; const unsigned int ControlStateTableCount = sizeof( ControlStateTable ) / sizeof( ControlStateTable[0] );
+
+} // Internal namespace
+
 namespace
 {
 
@@ -218,12 +234,6 @@ static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   return connected;
 }
 
-const Scripting::StringEnum ControlStateTable[] = {
-  { "NORMAL",   Toolkit::DevelControl::NORMAL   },
-  { "FOCUSED",  Toolkit::DevelControl::FOCUSED  },
-  { "DISABLED", Toolkit::DevelControl::DISABLED },
-}; const unsigned int ControlStateTableCount = sizeof( ControlStateTable ) / sizeof( ControlStateTable[0] );
-
 // Setup signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Control, CustomActor, Create );
 
@@ -254,7 +264,7 @@ public:
   Impl(Control& controlImpl)
   : mControlImpl( controlImpl ),
     mState( Toolkit::DevelControl::NORMAL ),
-    mSubState(""),
+    mSubStateName(""),
     mStyleName(""),
     mBackgroundColor(Color::TRANSPARENT),
     mStartingPinchScale( NULL ),
@@ -323,11 +333,27 @@ public:
 
         case Toolkit::DevelControl::Property::STATE:
         {
-          Toolkit::DevelControl::State state( controlImpl.mImpl->mState );
-
-          if( Scripting::GetEnumerationProperty< Toolkit::DevelControl::State >( value, ControlStateTable, ControlStateTableCount, state ) )
+          bool withTransitions=true;
+          const Property::Value* valuePtr=&value;
+          Property::Map* map = value.GetMap();
+          if(map)
           {
-            controlImpl.mImpl->SetState( state );
+            Property::Value* value2 = map->Find("withTransitions");
+            if( value2 )
+            {
+              withTransitions = value2->Get<bool>();
+            }
+
+            valuePtr = map->Find("state");
+          }
+
+          if( valuePtr )
+          {
+            Toolkit::DevelControl::State state( controlImpl.mImpl->mState );
+            if( Scripting::GetEnumerationProperty< Toolkit::DevelControl::State >( *valuePtr, ControlStateTable, ControlStateTableCount, state ) )
+            {
+              controlImpl.mImpl->SetState( state, withTransitions );
+            }
           }
         }
         break;
@@ -443,7 +469,13 @@ public:
 
         case Toolkit::DevelControl::Property::STATE:
         {
-          value = Scripting::GetEnumerationName< Toolkit::DevelControl::State >( controlImpl.mImpl->mState, ControlStateTable, ControlStateTableCount );
+          value = controlImpl.mImpl->mState;
+          break;
+        }
+
+        case Toolkit::DevelControl::Property::SUB_STATE:
+        {
+          value = controlImpl.mImpl->mSubStateName;
           break;
         }
 
@@ -503,7 +535,7 @@ public:
     return value;
   }
 
-  void SetState( DevelControl::State state )
+  void SetState( DevelControl::State state, bool withTransitions=true )
   {
     if( mState != state )
     {
@@ -531,13 +563,57 @@ public:
     }
   }
 
-  void SetSubState( const std::string& state )
+  void SetSubState( const std::string& subStateName, bool withTransitions=true )
   {
-    if( mSubState != state )
+    if( mSubStateName != subStateName )
     {
-      mSubState = state;
-      // Trigger transitions
+      // Get existing sub-state visuals, and unregister them
+      Dali::CustomActor handle( mControlImpl.GetOwner() );
 
+      Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+      if( styleManager )
+      {
+        const StylePtr stylePtr = GetImpl( styleManager ).GetRecordedStyle( Toolkit::Control( mControlImpl.GetOwner() ) );
+        if( stylePtr )
+        {
+          // Stringify state
+          std::string stateName = Scripting::GetEnumerationName< Toolkit::DevelControl::State >( mState, ControlStateTable, ControlStateTableCount );
+
+          const StylePtr* state = stylePtr->subStates.Find( stateName );
+          if( state )
+          {
+            StylePtr stateStyle(*state);
+
+            // Unregister existing visuals of this substate
+            const StylePtr* subState = stateStyle->subStates.Find( mSubStateName );
+            if( subState )
+            {
+              StylePtr subStateStyle(*subState);
+
+              for( Dictionary<Property::Map>::iterator iter = subStateStyle->visuals.Begin(); iter != subStateStyle->visuals.End(); ++iter )
+              {
+                const std::string& visualName = (*iter).key;
+                Dali::Property::Index index = handle.GetPropertyIndex( visualName );
+                if( index != Property::INVALID_INDEX )
+                {
+                  mControlImpl.UnregisterVisual( index );
+                }
+              }
+            }
+
+            // Register visuals of the new substate
+            const StylePtr* newSubState = stateStyle->subStates.Find( subStateName );
+            if( newSubState )
+            {
+              StylePtr newSubStateStyle(*newSubState);
+              newSubStateStyle->ApplyVisuals( handle );
+              newSubStateStyle->ApplyProperties( handle );
+            }
+          }
+        }
+      }
+
+      mSubStateName = subStateName;
     }
   }
 
@@ -545,7 +621,7 @@ public:
 
   Control& mControlImpl;
   DevelControl::State mState;
-  std::string mSubState;
+  std::string mSubStateName;
 
   RegisteredVisualContainer mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
   std::string mStyleName;

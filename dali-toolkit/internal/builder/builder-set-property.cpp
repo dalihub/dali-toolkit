@@ -19,13 +19,13 @@
 #include <sstream>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
-#include <dali/devel-api/adaptor-framework/color-controller.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/internal/builder/builder-get-is.inl.h>
 #include <dali-toolkit/internal/builder/replacement.h>
 #include <dali-toolkit/internal/builder/builder-set-property.h>
+#include <dali-toolkit/internal/helpers/color-conversion.h>
 
 namespace Dali
 {
@@ -35,29 +35,6 @@ namespace Toolkit
 
 namespace Internal
 {
-
-
-namespace
-{
-
-/**
- * Converts a HTML style 'color' hex string ("#FF0000" for bright red) to a Vector4.
- * The Vector4 alpha component will be set to 1.0f
- * @param hexString The HTML style hex string
- * @return a Vector4 containing the new color value
- */
-Vector4 HexStringToVector4( const char* s )
-{
-  unsigned int value(0u);
-  std::istringstream( s ) >> std::hex >> value;
-  return Vector4( ((value >> 16 ) & 0xff ) / 255.0f,
-                  ((value >> 8 ) & 0xff ) / 255.0f,
-                  (value & 0xff ) / 255.0f,
-                  1.0f );
-}
-
-} // anon namespace
-
 
 /**
  * A property value type can be forced when its unknown by a disambiguation convention in the json
@@ -194,17 +171,9 @@ bool DeterminePropertyFromNode( const TreeNode& node, Property::Type type, Prope
       }
       else if( OptionalString s = replacer.IsString(node) )
       {
-        if( (*s)[0] == '#' && 7 == (*s).size() )
-        {
-          value = HexStringToVector4( &(*s)[1] );
-          done = true;
-        }
-        else if( Dali::ColorController::Get() )
-        {
-          Vector4 color;
-          done = Dali::ColorController::Get().RetrieveColor( *s, color );
-          value = color;
-        }
+        Vector4 color;
+        done = ConvertStringToColor( *s, color );
+        value = color;
       }
       else if( TreeNode::OBJECT == node.GetType() )
       {

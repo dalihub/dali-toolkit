@@ -609,6 +609,10 @@ int UtcDaliKeyboardFocusManagerSignalFocusedActorActivated(void)
 
   Integration::KeyEvent returnEvent("Return", "", 0, 0, 0, Integration::KeyEvent::Up);
 
+  // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
+  // It makes mIsFocusIndicatorEnabled true
+  application.ProcessEvent(returnEvent);
+
   // Create the first button and add it to the stage
   PushButton firstPushButton = PushButton::New();
   firstPushButton.SetKeyboardFocusable(true);
@@ -663,6 +667,10 @@ int UtcDaliKeyboardFocusManagerSignalFocusGroupChanged(void)
 
   Integration::KeyEvent tabEvent("Tab", "", 0, 0, 0, Integration::KeyEvent::Down);
   Integration::KeyEvent shiftTabEvent("Tab", "", 0, 1, 0, Integration::KeyEvent::Down);
+
+  // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
+  // It makes mIsFocusIndicatorEnabled true
+  application.ProcessEvent(tabEvent);
 
   // Send the tab event to change focus group in the forward direction
   application.ProcessEvent(tabEvent);
@@ -786,6 +794,10 @@ int UtcDaliKeyboardFocusManagerChangeFocusDirectionByKeyEvents(void)
   Integration::KeyEvent downEvent("Down", "", 0, 0, 0, Integration::KeyEvent::Down);
   Integration::KeyEvent pageUpEvent("Prior", "", 0, 0, 0, Integration::KeyEvent::Down);
   Integration::KeyEvent pageDownEvent("Next", "", 0, 0, 0, Integration::KeyEvent::Down);
+
+  // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
+  // It makes mIsFocusIndicatorEnabled true
+  application.ProcessEvent(leftEvent);
 
   // Create a 2x2 table view and try to move focus inside it
   TableView tableView = TableView::New( 2, 2 );
@@ -952,7 +964,7 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == Actor());
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
-  DALI_TEST_EQUALS(first.GetProperty<std::string>(DevelControl::Property::STATE), "FOCUSED", TEST_LOCATION );
+  DALI_TEST_EQUALS(first.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
   focusChangedCallback.Reset();
 
   // Move the focus towards right
@@ -971,8 +983,8 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == first);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == second);
-  DALI_TEST_EQUALS(first.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(second.GetProperty<std::string>(DevelControl::Property::STATE), "FOCUSED", TEST_LOCATION );
+  DALI_TEST_EQUALS(first.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(second.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
   focusChangedCallback.Reset();
 
   // Move the focus towards up
@@ -1011,8 +1023,8 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == second);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
 
-  DALI_TEST_EQUALS(first.GetProperty<std::string>(DevelControl::Property::STATE), "FOCUSED", TEST_LOCATION );
-  DALI_TEST_EQUALS(second.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
+  DALI_TEST_EQUALS(first.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS(second.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
 
   focusChangedCallback.Reset();
 
@@ -1022,8 +1034,8 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == first);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == second);
-  DALI_TEST_EQUALS(first.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(second.GetProperty<std::string>(DevelControl::Property::STATE), "FOCUSED", TEST_LOCATION );
+  DALI_TEST_EQUALS(first.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(second.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
 
   focusChangedCallback.Reset();
 
@@ -1034,10 +1046,10 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == second);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == fourth);
 
-  DALI_TEST_EQUALS(first.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(second.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(third.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(fourth.GetProperty<std::string>(DevelControl::Property::STATE), "FOCUSED", TEST_LOCATION );
+  DALI_TEST_EQUALS(first.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(second.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(third.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(fourth.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
 
   focusChangedCallback.Reset();
 
@@ -1048,10 +1060,10 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == fourth);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == third);
 
-  DALI_TEST_EQUALS(first.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(second.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(third.GetProperty<std::string>(DevelControl::Property::STATE), "FOCUSED", TEST_LOCATION );
-  DALI_TEST_EQUALS(fourth.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
+  DALI_TEST_EQUALS(first.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(second.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(third.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS(fourth.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
 
   focusChangedCallback.Reset();
 
@@ -1061,10 +1073,10 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
   DALI_TEST_CHECK(focusChangedCallback.mSignalVerified);
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == third);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == first);
-  DALI_TEST_EQUALS(first.GetProperty<std::string>(DevelControl::Property::STATE), "FOCUSED", TEST_LOCATION );
-  DALI_TEST_EQUALS(second.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(third.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(fourth.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
+  DALI_TEST_EQUALS(first.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS(second.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(third.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(fourth.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
   focusChangedCallback.Reset();
 
   // Move the focus towards left. The focus move will fail as no way to move it upwards
@@ -1074,10 +1086,10 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
   DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == first);
   DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
   DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::KeyboardFocus::LEFT);
-  DALI_TEST_EQUALS(first.GetProperty<std::string>(DevelControl::Property::STATE), "FOCUSED", TEST_LOCATION );
-  DALI_TEST_EQUALS(second.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(third.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(fourth.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
+  DALI_TEST_EQUALS(first.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS(second.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(third.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(fourth.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
 
   preFocusChangeCallback.Reset();
   DALI_TEST_CHECK(!focusChangedCallback.mSignalVerified);
@@ -1093,19 +1105,19 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
   DALI_TEST_CHECK(focusChangedCallback.mOriginalFocusedActor == first);
   DALI_TEST_CHECK(focusChangedCallback.mCurrentFocusedActor == fourth);
 
-  DALI_TEST_EQUALS(first.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(second.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(third.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(fourth.GetProperty<std::string>(DevelControl::Property::STATE), "FOCUSED", TEST_LOCATION );
+  DALI_TEST_EQUALS(first.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(second.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(third.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(fourth.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::FOCUSED, TEST_LOCATION );
 
   focusChangedCallback.Reset();
 
   // Clear the focus
   manager.ClearFocus();
-  DALI_TEST_EQUALS(first.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(second.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(third.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
-  DALI_TEST_EQUALS(fourth.GetProperty<std::string>(DevelControl::Property::STATE), "NORMAL", TEST_LOCATION );
+  DALI_TEST_EQUALS(first.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(second.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(third.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
+  DALI_TEST_EQUALS(fourth.GetProperty<int>(DevelControl::Property::STATE), (int)DevelControl::NORMAL, TEST_LOCATION );
 
 
   END_TEST;

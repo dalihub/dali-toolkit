@@ -32,12 +32,24 @@ namespace Toolkit
  * @{
  */
 
+/**
+ * @brief PrimitiveVisual is to render a simple 3D shape, such as a cube or sphere.
+ * @SINCE_1_1.45
+ */
 namespace PrimitiveVisual
 {
 
+/**
+ * @brief PrimitiveVisual Property
+ * @SINCE_1_1.45
+ */
 namespace Property
 {
 
+/**
+ * @brief PrimitiveVisual Property
+ * @SINCE_1_1.45
+ */
 enum
 {
   /**
@@ -182,11 +194,16 @@ enum
 
 } // namespace Property
 
+/**
+ * @brief The primitive shape to render as a PrimitiveVisual.
+ * @SINCE_1_1.45
+ */
 namespace Shape
 {
 
 /**
- * @brief The primitive shape to render.
+ * @brief The primitive shape to render as a PrimitiveVisual.
+ * @SINCE_1_1.45
  */
 enum Type
 {

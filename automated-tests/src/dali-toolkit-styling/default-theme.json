@@ -1,0 +1,338 @@
+{
+  "constants":
+  {
+    "CONFIG_SCRIPT_LOG_LEVEL":"NoLogging"
+  },
+  "styles":
+  {
+    "textlabel":
+    {
+      "pointSize":18
+    },
+
+    "textlabelFontSize0":
+    {
+      "pointSize":8
+    },
+    "textlabelFontSize1":
+    {
+      "pointSize":10
+    },
+    "textlabelFontSize2":
+    {
+      "pointSize":15
+    },
+    "textlabelFontSize3":
+    {
+      "pointSize":19
+    },
+    "textlabelFontSize4":
+    {
+      "pointSize":25
+    },
+
+    "textfield":
+    {
+      "pointSize":18,
+      "primaryCursorColor":[0.0,0.72,0.9,1.0],
+      "secondaryCursorColor":[0.0,0.72,0.9,1.0],
+      "cursorWidth":3,
+      "selectionHighlightColor":[0.75,0.96,1.0,1.0],
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
+    },
+
+    "textfieldFontSize0":
+    {
+      "pointSize":10
+    },
+    "textfieldFontSize1":
+    {
+      "pointSize":10
+    },
+    "textfieldFontSize2":
+    {
+      "pointSize":10
+    },
+    "textfieldFontSize3":
+    {
+      "pointSize":10
+    },
+    "textfieldFontSize4":
+    {
+      "pointSize":10
+    },
+    "textselectionpopup":
+    {
+      "popupMaxSize":[656,72],
+      "optionDividerSize":[2,0],
+      "popupDividerColor":[0.23,0.72,0.8,0.11],
+      "popupIconColor":[1.0,1.0,1.0,1.0],
+      "popupPressedColor":[0.24,0.72,0.8,0.11],
+      "background": {
+        "rendererType": "nPatch",
+        "imageUrl": "{DALI_IMAGE_DIR}selection-popup-bg.9.png"
+        },
+      "popupFadeInDuration":0.25,
+      "popupFadeOutDuration":0.25
+    },
+    "textselectionpopupbutton":
+    {
+      "label":
+      {
+        "pointSize":8,
+        "fontStyle": { "weight":"light" }
+      }
+    },
+    "textselectiontoolbar":
+    {
+      "enableOvershoot":true,
+      "scrollView":
+      {
+        "overshootAnimationSpeed":360.0,
+        "overshootSize":[720.0,130.0]
+      }
+    },
+    "scrollview":
+    {
+      "overshootEffectColor":"B018",
+      "overshootAnimationSpeed":360.0,
+      "overshootSize":[720.0,130.0]
+    },
+    "itemview":
+    {
+      "overshootEffectColor":"B018",
+      "overshootAnimationSpeed":360.0,
+      "overshootSize":[720.0,130.0]
+    },
+    "texteditor":
+    {
+      "pointSize":18,
+      "primaryCursorColor":[0.0,0.72,0.9,1.0],
+      "secondaryCursorColor":[0.0,0.72,0.9,1.0],
+      "cursorWidth":3,
+      "selectionHighlightColor":[0.75,0.96,1.0,1.0],
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" }
+    },
+    "ComplexControl":
+    {
+      "states":
+      {
+        "NORMAL":
+        {
+          "states":
+          {
+            "SELECTED":
+            {
+              "visuals":
+              {
+                "foregroundVisual":
+                {
+                  "visualType":"GRADIENT",
+                  "startPosition": [-1, -1],
+                  "endPosition": [1, 1],
+                  "spreadMethod": "REPEAT",
+                  "stopOffset": [0.2, 0.8],
+                  "stopColor": [ [ 1,0,0,1], [0,1,0,1] ]
+                }
+              }
+            },
+            "UNSELECTED":
+            {
+              "visuals":
+              {
+                "foregroundVisual":
+                {
+                  "visualType":"COLOR",
+                  "mixColor": [ 1,0,0,1]
+                }
+              }
+            }
+          },
+          "transitions":
+          {
+            "visualName":"*",
+            "effect":"CROSSFADE",
+            "animator":
+            {
+              "alphaFunction":"EASE_IN_OUT",
+              "duration":0.3
+            }
+          }
+        },
+        "FOCUSED":
+        {
+          "visuals":
+          {
+            "foregroundVisual":
+            {
+              "visualType":"GRADIENT",
+              "startPosition": [-1, -1],
+              "endPosition": [1, 1],
+              "spreadMethod": "REPEAT",
+              "stopOffset": [0.3, 0.9],
+              "stopColor": [ [ 0,0,1,1], [0,1,1,1] ]
+            },
+            "focusVisual":
+            {
+              "visualType":"IMAGE",
+              "url": "focus.png"
+            }
+          },
+          "entryTransition":
+          {
+            "target":"focusVisual",
+            "property":"mixColor",
+            "initialValue":[0,0,0,0],
+            "targetValue":[1,1,1,1],
+            "animator":
+            {
+              "alphaFunction":"EASE_IN_OUT_SINE",
+              "timePeriod":
+              {
+                "duration":0.5,
+                "delay":0
+              }
+            }
+          },
+          "exitTransition":
+          {
+            "target":"focusVisual",
+            "property":"mixColor",
+            "initialValue":[1,1,1,1],
+            "targetValue":[0,0,0,0],
+            "animator":
+            {
+              "alphaFunction":"EASE_IN_OUT_SINE",
+              "timePeriod":
+              {
+                "duration":0.5,
+                "delay":0
+              }
+            }
+          }
+        },
+        "DISABLED":
+        {
+          "visuals":
+          {
+            "foregroundVisual":
+            {
+              "visualType":"COLOR",
+              "mixColor": [1,0,0,1]
+            }
+          }
+        }
+      },
+      "transitions":
+      [
+        {
+          "effect":"CROSSFADE",
+          "animator":
+          {
+            "alphaFunction":"EASE_IN_OUT",
+            "duration":0.3
+          }
+        }
+      ]
+    },
+    "BasicControl":
+    {
+      "states":
+      {
+        "NORMAL":
+        {
+          "visuals":
+          {
+            "foregroundVisual":
+            {
+              "visualType":"GRADIENT",
+              "startPosition": [-1, -1],
+              "endPosition": [1, 1],
+              "spreadMethod": "REPEAT",
+              "stopOffset": [0.2, 0.8],
+              "stopColor": [ [ 1,0,0,1], [0,1,0,1] ]
+            }
+          }
+        },
+        "FOCUSED":
+        {
+          "visuals":
+          {
+            "foregroundVisual":
+            {
+              "visualType":"GRADIENT",
+              "startPosition": [-1, -1],
+              "endPosition": [1, 1],
+              "spreadMethod": "REPEAT",
+              "stopOffset": [0.3, 0.9],
+              "stopColor": [ [ 0,0,1,1], [0,1,1,1] ]
+            },
+            "focusVisual":
+            {
+              "visualType":"IMAGE",
+              "url": "focus.png"
+            }
+          },
+          "entryTransition":
+          {
+            "target":"focusVisual",
+            "property":"mixColor",
+            "initialValue":[0,0,0,0],
+            "targetValue":[1,1,1,1],
+            "animator":
+            {
+              "alphaFunction":"EASE_IN_OUT_SINE",
+              "timePeriod":
+              {
+                "duration":0.5,
+                "delay":0
+              }
+            }
+          },
+          "exitTransition":
+          {
+            "target":"focusVisual",
+            "property":"mixColor",
+            "initialValue":[1,1,1,1],
+            "targetValue":[0,0,0,0],
+            "animator":
+            {
+              "alphaFunction":"EASE_IN_OUT_SINE",
+              "timePeriod":
+              {
+                "duration":0.5,
+                "delay":0
+              }
+            }
+          }
+        },
+        "DISABLED":
+        {
+          "visuals":
+          {
+            "foregroundVisual":
+            {
+              "visualType":"COLOR",
+              "mixColor": [1,0,0,1]
+            }
+          }
+        }
+      },
+      "transitions":
+      [
+        {
+          "effect":"CROSSFADE",
+          "animator":
+          {
+            "alphaFunction":"EASE_IN_OUT",
+            "duration":0.3
+          }
+        }
+      ]
+    }
+  }
+}

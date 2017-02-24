@@ -32,12 +32,24 @@ namespace Toolkit
  * @{
  */
 
+/**
+ * @brief MeshVisual is to render a mesh using a .obj file, optionally with textures provided by a mtl file.
+ * @SINCE_1_1.45
+ */
 namespace MeshVisual
 {
 
+/**
+ * @brief MeshVisual Property
+ * @SINCE_1_1.45
+ */
 namespace Property
 {
 
+/**
+ * @brief MeshVisual Property
+ * @SINCE_1_1.45
+ */
 enum
 {
   /**
@@ -103,9 +115,17 @@ enum
 
 } // namespace Property
 
+/**
+ * @brief The shading mode used by MeshVisual.
+ * @SINCE_1_1.45
+ */
 namespace ShadingMode
 {
 
+/**
+ * @brief The shading mode used by MeshVisual.
+ * @SINCE_1_1.45
+ */
 enum Value
 {
   TEXTURELESS_WITH_DIFFUSE_LIGHTING, ///< *Simplest*. One color that is lit by ambient and diffuse lighting. @SINCE_1_1.45

@@ -330,10 +330,13 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
   DummyControl actor = DummyControl::New();
   TestVisualRender( application, actor, visual );
 
-  Vector4 actualValue(Vector4::ZERO);
+  Vector3 actualValue(Vector4::ZERO);
+  float opacity=0.0f;
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, testColor, TEST_LOCATION );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector3>( "mixColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "opacity", opacity ) );
+  DALI_TEST_EQUALS( actualValue, Vector3(testColor), TEST_LOCATION );
+  DALI_TEST_EQUALS( opacity, testColor.a, TEST_LOCATION );
 
   END_TEST;
 }
@@ -356,10 +359,13 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
   DummyControl actor = DummyControl::New();
   TestVisualRender( application, actor, visual );
 
-  Vector4 actualValue(Vector4::ZERO);
+  Vector3 actualValue;
+  float opacity;
   TestGlAbstraction& gl = application.GetGlAbstraction();
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "mixColor", actualValue ) );
-  DALI_TEST_EQUALS( actualValue, testColor, TEST_LOCATION );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector3>( "mixColor", actualValue ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "opacity", opacity ) );
+  DALI_TEST_EQUALS( actualValue, Vector3(testColor), TEST_LOCATION );
+  DALI_TEST_EQUALS( opacity, testColor.a, TEST_LOCATION );
 
   Stage::GetCurrent().Remove(actor);
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
