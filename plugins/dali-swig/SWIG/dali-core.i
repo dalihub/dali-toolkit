@@ -23,8 +23,6 @@
 %apply float& OUTPUT { float& viewportX };
 %apply float& OUTPUT { float& viewportY };
 
-#if defined(SWIGCSHARP)
-
 %include arrays_csharp.i
 %apply unsigned char INPUT[] { unsigned char* pixelBuffer}
 %apply unsigned char INPUT[] { unsigned char* buffer}
@@ -37,8 +35,6 @@
 %apply unsigned char OUTPUT[] { unsigned char* ValueOfIndex}
 %apply unsigned short INPUT[] { unsigned short* indices}
 %apply float INPUT[] { float* array }
-
-#endif
 
 %ignore *::Animation(Internal::Animation*);
 %ignore *::Actor(Internal::Actor*);
@@ -163,7 +159,6 @@
 %rename(Y) Dali::Vector4::y;
 %rename(Z) Dali::Vector4::z;
 %rename(W) Dali::Vector4::w;
-
 
 typedef std::pair<std::string, Dali::Property::Value> StringValuePair;
 typedef std::vector<Dali::TouchPoint> TouchPointContainer;
@@ -292,7 +287,6 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %template(VectorUnsignedChar) Dali::Vector<unsigned char>;
 %template(VectorUint16Pair) Dali::Vector<Dali::Uint16Pair>;
 %template(VoidSignal) Dali::Signal<void()>;
-%template(BoolSignal) Dali::Signal<bool()>;
 %template(FloatSignal) Dali::Signal<void(float)>;
 %template(ObjectCreatedSignal) Dali::Signal<void(Dali::BaseHandle)>;
 %template(ObjectDestroyedSignal) Dali::Signal<void(const Dali::RefObject*)>;

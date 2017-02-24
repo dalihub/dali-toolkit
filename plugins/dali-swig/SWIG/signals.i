@@ -220,6 +220,13 @@
  Macros for signals with return values
 *****************/
 
+// 0 param signals ( with return )
+%define DALI_SIGNAL_0_PARAM_RETURN( returnType )
+
+  SIGNAL_TYPEMAP_HELPER( returnType (*func) () );
+  SIGNAL_TEMPLATE_HELPER_0( returnType, return);
+%enddef
+
 // 1 param signals ( with return )
 %define DALI_SIGNAL_1_PARAM_RETURN( returnType, argumentType1 )
 
@@ -248,6 +255,9 @@ namespace Dali
 {
 // Signal< void () >
 DALI_SIGNAL_0_PARAM();
+
+// Signal< bool () >
+DALI_SIGNAL_0_PARAM_RETURN( bool );
 
 // Signal< void (Actor) >
 DALI_SIGNAL_1_PARAM( Dali::Actor );
