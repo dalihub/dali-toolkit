@@ -1550,6 +1550,23 @@ bool Controller::GetTextScrollInfo( float& scrollPosition, float& controlHeight,
   return isScrolled;
 }
 
+void Controller::SetHiddenInputOption(const Property::Map& options )
+{
+  if( NULL == mImpl->mHiddenInput )
+  {
+    mImpl->mHiddenInput = new HiddenText( this );
+  }
+  mImpl->mHiddenInput->SetProperties(options);
+}
+
+void Controller::GetHiddenInputOption(Property::Map& options )
+{
+  if( NULL != mImpl->mHiddenInput )
+  {
+    mImpl->mHiddenInput->GetProperties(options);
+  }
+}
+
 // public : Relayout.
 
 Controller::UpdateTextType Controller::Relayout( const Size& size )
@@ -2299,6 +2316,15 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
       break;
     }
   }
+}
+
+void Controller::DisplayTimeExpired()
+{
+  mImpl->mEventData->mUpdateCursorPosition = true;
+  // Apply modifications to the model
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+
+  mImpl->RequestRelayout();
 }
 
 // private : Update.
