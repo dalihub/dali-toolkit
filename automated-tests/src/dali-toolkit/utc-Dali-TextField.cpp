@@ -118,15 +118,9 @@ static Dali::Toolkit::TextField::InputStyle::Mask gInputStyleMask;
 
 static void LoadBitmapResource(TestPlatformAbstraction& platform, int width, int height)
 {
-  Integration::ResourceRequest* request = platform.GetRequest();
   Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
   Integration::ResourcePointer resource(bitmap);
   bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, width, height, width, height);
-
-  if(request)
-  {
-    platform.SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
-  }
 }
 
 static void LoadMarkerImages(ToolkitTestApplication& app, TextField textField)
