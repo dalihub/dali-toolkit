@@ -2198,6 +2198,12 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
     mEventData->mUpdateRightSelectionPosition = true;
     mEventData->mUpdateHighlightBox = true;
 
+    // It may happen an IMF commit event arrives before the selection event
+    // if the IMF manager is in pre-edit state. The commit event will set the
+    // mEventData->mUpdateCursorPosition flag to true. If it's not set back
+    // to false, the highlight box won't be updated.
+    mEventData->mUpdateCursorPosition = false;
+
     mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
   }
   else
