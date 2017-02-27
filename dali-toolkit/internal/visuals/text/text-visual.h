@@ -60,7 +60,6 @@ typedef IntrusivePtr< TextVisual > TextVisualPtr;
  * | underline           | STRING  |
  * | shadow              | STRING  |
  * | outline             | STRING  |
- * | batchingEnabled     | BOOLEAN |
  *
  */
 class TextVisual : public Visual::Base

@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    1.2.25
+Version:    1.2.28
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-2-Clause and MIT
@@ -22,7 +22,7 @@ BuildRequires:  dali-adaptor-devel
 
 #need libtzplatform-config for directory if tizen version is 3.x
 
-%if "%{tizen_version_major}" == "3"
+%if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
 %endif
 

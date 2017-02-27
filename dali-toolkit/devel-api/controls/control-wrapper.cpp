@@ -31,9 +31,9 @@ namespace Toolkit
 // ControlWrapper
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ControlWrapper ControlWrapper::New( Internal::ControlWrapper& implementation )
+ControlWrapper ControlWrapper::New( const std::string& typeName, Internal::ControlWrapper& implementation )
 {
-  return Internal::ControlWrapper::New( &implementation );
+  return Internal::ControlWrapper::New( typeName, &implementation );
 }
 
 ControlWrapper::ControlWrapper()

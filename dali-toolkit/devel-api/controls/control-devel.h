@@ -30,6 +30,13 @@ namespace Toolkit
 namespace DevelControl
 {
 
+enum State
+{
+  NORMAL,
+  FOCUSED,
+  DISABLED
+};
+
 namespace Property
 {
 
@@ -53,6 +60,22 @@ enum
    * @see Toolkit::Tooltip
    */
   TOOLTIP = BACKGROUND + 1,
+
+  /**
+   * @brief The current state of the control.
+   * @details Name "state", type DevelControl::State ( Property::INTEGER ) or Property::STRING
+   *
+   * @see DevelControl::State
+   */
+  STATE = BACKGROUND + 2,
+
+  /**
+   * @brief The current sub state of the control.
+   * @details Name "subState", type Property::INTEGER or Property::STRING. The enumeration used is dependent on the derived control.
+   *
+   * @see DevelControl::State
+   */
+  SUB_STATE = BACKGROUND + 3
 };
 
 } // namespace Property

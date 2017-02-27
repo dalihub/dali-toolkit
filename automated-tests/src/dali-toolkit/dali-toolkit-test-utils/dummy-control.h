@@ -46,7 +46,9 @@ public:
     enum Type
     {
       TEST_VISUAL = PROPERTY_START_INDEX,
-      TEST_VISUAL2
+      TEST_VISUAL2,
+      FOREGROUND_VISUAL,
+      FOCUS_VISUAL
     };
   };
 
@@ -89,7 +91,7 @@ public:
   void RegisterVisual( Property::Index index, Toolkit::Visual::Base visual, bool enabled );
   void UnregisterVisual( Property::Index index );
   void EnableVisual( Property::Index index, bool enabled );
-  bool IsVisualEnabled( Property::Index indepx );
+  bool IsVisualEnabled( Property::Index index );
 
   Toolkit::Visual::Base GetVisual( Property::Index index );
   Animation CreateTransition( const Toolkit::TransitionData& transition );

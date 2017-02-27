@@ -58,7 +58,6 @@ const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
 const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
 const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
 const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
-const char * const BATCHING_ENABLED( "batchingEnabled" );
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN( FITTING_MODE )
@@ -126,12 +125,13 @@ const char* FRAGMENT_SHADER_NO_ATLAS = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
-  uniform lowp vec4 mixColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
   \n
   lowp vec4 visualMixColor()\n
   {\n
-    return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
   }\n
   void main()\n
   {\n
@@ -144,12 +144,13 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
     uniform sampler2D sTexture;\n
     uniform mediump vec4 uAtlasRect;\n
     uniform lowp vec4 uColor;\n
-    uniform lowp vec4 mixColor;\n
+    uniform lowp vec3 mixColor;\n
+    uniform lowp float opacity;\n
     uniform lowp float preMultipliedAlpha;\n
     \n
     lowp vec4 visualMixColor()\n
     {\n
-        return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+        return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
     }\n
     \n
     void main()\n
@@ -166,7 +167,8 @@ const char* FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP = DALI_COMPOSE_SHADER(
     // WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
     uniform lowp vec2 wrapMode;\n
     uniform lowp vec4 uColor;\n
-    uniform lowp vec4 mixColor;\n
+    uniform lowp vec3 mixColor;\n
+    uniform lowp float opacity;\n
     uniform lowp float preMultipliedAlpha;\n
     \n
     mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp float wrap )\n
@@ -181,7 +183,7 @@ const char* FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP = DALI_COMPOSE_SHADER(
     \n
     lowp vec4 visualMixColor()\n
     {\n
-      return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+      return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
     }\n
     \n
     void main()\n

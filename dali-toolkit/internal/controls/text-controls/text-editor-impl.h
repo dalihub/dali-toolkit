@@ -28,6 +28,7 @@
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/text-vertical-scroller.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 
 namespace Dali
@@ -227,6 +228,13 @@ private: // Implementation
   void OnIdleSignal();
 
   /**
+   * @brief set RenderActor's position with new scrollPosition
+   *
+   * Apply updated scroll position or start scroll animation if VerticalScrollAnimation is enabled
+   */
+  void ApplyScrollPosition();
+
+  /**
    * Construct a new TextEditor.
    */
   TextEditor();
@@ -257,6 +265,7 @@ private: // Data
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
+  Text::TextVerticalScrollerPtr mTextVerticalScroller;
   Toolkit::Control mStencil;
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
@@ -264,8 +273,10 @@ private: // Data
   CallbackBase* mIdleCallback;
 
   float mAlignmentOffset;
+  float mScrollAnimationDuration;
   int mRenderingBackend;
   bool mHasBeenStaged:1;
+  bool mScrollAnimationEnabled:1;
 };
 
 } // namespace Internal

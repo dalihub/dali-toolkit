@@ -106,6 +106,7 @@ Model::Model()
 : mLogicalModel(),
   mVisualModel(),
   mScrollPosition(),
+  mScrollPositionLast(),
   mHorizontalAlignment( Layout::HORIZONTAL_ALIGN_BEGIN ),
   mVerticalAlignment( Layout::VERTICAL_ALIGN_TOP ),
   mAlignmentOffset( 0.0f ),

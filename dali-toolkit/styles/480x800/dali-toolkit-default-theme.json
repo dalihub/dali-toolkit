@@ -124,7 +124,12 @@
       "popupPressedColor":[0.24,0.72,0.8,0.11],
       "background": {
         "visualType": "IMAGE",
-        "url": "{DALI_IMAGE_DIR}selection-popup-bg.9.png"
+        "url": "{DALI_IMAGE_DIR}selection-popup-background.9.png"
+        },
+      "backgroundBorder": {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}selection-popup-border.9.png",
+        "mixColor":[0.24,0.72,0.8,1.0]
         },
       "popupFadeInDuration":0.25,
       "popupFadeOutDuration":0.25
@@ -150,11 +155,27 @@
     "TextSelectionToolbar":
     {
       "enableOvershoot":true,
+      "enableScrollBar":true,
       "scrollView":
       {
         "overshootAnimationSpeed":120.0,
         "overshootSize":[480.0,42.0]
       }
+    },
+    "TextSelectionScrollBar":
+    {
+      "indicatorShowDuration":0.25,
+      "indicatorHideDuration":0.25
+    },
+    "TextSelectionScrollIndicator":
+    {
+      "image":
+      {
+        "visualType":"IMAGE",
+        "url":"{DALI_IMAGE_DIR}text_selection_scroll_indicator.9.png" // designed for HD resolution
+      },
+      "color":[0.0,0.72,0.9,0.7],
+      "scale":[0.625,1.0,1.0] // Note: This reduces height for WVGA resolution
     },
     "ScrollView":
     {
@@ -167,6 +188,19 @@
       "overshootEffectColor":"B018",
       "overshootAnimationSpeed":120.0,
       "overshootSize":[480.0,42.0]
+    },
+    "ScrollBar":
+    {
+      "indicatorShowDuration":0.25,
+      "indicatorHideDuration":0.25
+    },
+    "ScrollBarIndicator":
+    {
+      "image":
+      {
+        "visualType":"IMAGE",
+        "url":"{DALI_IMAGE_DIR}popup_scroll.9.png"
+      }
     },
     "TextEditor":
     {
@@ -229,19 +263,52 @@
     },
     "ProgressBar":
     {
-      "progressValue": 0,
       "trackVisual":{
-        "url":"{DALI_IMAGE_DIR}progress-skin.9.png",
-        "size":[24,24]
+        "visualType":"IMAGE",
+        "url":"{DALI_IMAGE_DIR}progress-bar-skin-track.9.png"
       },
       "progressVisual":{
-        "url":"{DALI_IMAGE_DIR}progress-skin-progress.9.png",
-        "size":[24,24]
-      }
-    },
-    "ProgressBarValueTextLabel":
-    {
-      "textColor":[0.8,0.8,1,1]
+        "visualType":"IMAGE",
+        "url":"{DALI_IMAGE_DIR}progress-bar-skin-progress.9.png"
+      },
+      "secondaryProgressVisual":{
+        "visualType":"IMAGE",
+        "url":"{DALI_IMAGE_DIR}progress-bar-skin-secondary-progress.9.png"
+      },
+      "indeterminateVisual":{
+        "visualType":"IMAGE",
+        "pixelArea":[0.0, 0.0, 10.0, 1.0],
+        "wrapModeU":"REPEAT",
+        "url":"{DALI_IMAGE_DIR}progress-bar-skin-indeterminate.png"
+      },
+      "indeterminateVisualAnimation":
+      [
+        {
+          "target":"indeterminateVisual",
+          "property":"pixelArea",
+          "initialValue":[0.0, 0.0, 10.0, 1.0],
+          "targetValue":[-1.0, 0.0, 10.0, 1.0],
+          "animator":
+          {
+            "alphaFunction":"DEFAULT",
+            "timePeriod":
+            {
+              "duration":0.8,
+              "delay":0
+            }
+          }
+        }
+      ],
+      "labelVisual":{
+        "visualType": "TEXT",
+        "textColor": [ 1.0, 1.0, 1.0, 1.0 ],
+        "pointSize" : 12.0, // Point size must always be provided to Text Visual
+        "horizontalAlignment": "CENTER",
+        "verticalAlignment": "CENTER"
+      },
+      "progressValue": 0.0,
+      "secondaryProgressValue":0.0,
+      "indeterminate": false
     },
     "Button":
     {
@@ -283,6 +350,10 @@
          "visualType": "IMAGE",
          "url": "{DALI_IMAGE_DIR}button-disabled.9.png"
        }
+    },
+    "ToggleButton":
+    {
+      "styles":["Button"]
     },
     "CheckBoxButton":
     {

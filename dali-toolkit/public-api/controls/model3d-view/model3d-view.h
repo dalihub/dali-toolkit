@@ -35,7 +35,7 @@ class Model3dView;
  * @brief Model3dView is a control for displaying 3d geometry.
  *
  * All the geometry loaded with the control is automatically centered and scaled to fit
- * the size of all the other controls. So the max is (0.5,0.5) and the min is (-0.5,-0.5)
+ * the size of all the other controls. So the max is (0.5,0.5) and the min is (-0.5,-0.5).
  *
  * @SINCE_1_1.4
  */
@@ -44,7 +44,7 @@ class DALI_IMPORT_API Model3dView : public Control
 public:
 
   /**
-   * @brief The start and end property ranges for this control.
+   * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_1.4
    */
   enum PropertyRange
@@ -57,13 +57,13 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the TextLabel class.
+   * @brief Enumeration for the instance of properties belonging to the TextLabel class.
    * @SINCE_1_1.4
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the TextLabel class.
+     * @brief Enumeration for the instance of properties belonging to the TextLabel class.
      * @SINCE_1_1.4
      */
     enum
@@ -88,36 +88,36 @@ public:
   };
 
   /**
-   * @brief Create a new instance of a Model3dView control.
+   * @brief Creates a new instance of a Model3dView control.
    *
    * @SINCE_1_1.4
-   * @return A handle to the new Model3dView control.
+   * @return A handle to the new Model3dView control
    */
   static Model3dView New();
 
   /**
-   * @brief Create a new instance of a Model3dView control.
+   * @brief Creates a new instance of a Model3dView control.
    *
    * @SINCE_1_1.4
    * @param[in] objUrl The path to the geometry file
    * @param[in] mtlUrl The path to the material file
    * @param[in] imagesUrl The path to the images directory
-   * @return A handle to the new Model3dView control.
+   * @return A handle to the new Model3dView control
    */
   static Model3dView New( const std::string& objUrl, const std::string& mtlUrl, const std::string& imagesUrl );
 
 
   /**
-   * @brief Create an uninitialized Model3dView
+   * @brief Creates an uninitialized Model3dView.
    *
-   * Only derived versions can be instantiated.  Calling member
+   * Only derived versions can be instantiated. Calling member
    * functions with an uninitialized Dali::Object is not allowed.
    * @SINCE_1_1.4
    */
   Model3dView();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_1.4
@@ -140,14 +140,14 @@ public:
   Model3dView& operator=( const Model3dView& model3dView );
 
   /**
-   * @brief Downcast an Object handle to Model3dView.
+   * @brief Downcasts an Object handle to Model3dView.
    *
-   * If handle points to a Model3dView the downcast produces valid
-   * handle. If not the returned handle is left uninitialized.
+   * If handle points to a Model3dView, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_1.4
    * @param[in] handle Handle to an object
-   * @return handle to a Model3dView or an uninitialized handle
+   * @return Handle to a Model3dView or an uninitialized handle
    */
   static Model3dView DownCast( BaseHandle handle );
 
@@ -158,7 +158,7 @@ public: // Not intended for application developers
    * @brief Creates a handle using the Toolkit::Internal implementation.
    *
    * @SINCE_1_1.4
-   * @param[in]  implementation  The Control implementation.
+   * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL Model3dView( Internal::Model3dView& implementation );
 
@@ -166,7 +166,7 @@ public: // Not intended for application developers
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    *
    * @SINCE_1_1.4
-   * @param[in]  internal  A pointer to the internal CustomActor.
+   * @param[in] internal A pointer to the internal CustomActor
    */
   DALI_INTERNAL Model3dView( Dali::Internal::CustomActor* internal );
   /// @endcond

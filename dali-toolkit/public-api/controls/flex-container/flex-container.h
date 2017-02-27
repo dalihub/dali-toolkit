@@ -93,9 +93,9 @@ class FlexContainer;
  * "type":"ImageView",
  * "image":"image.png",
  *   "properties": {
- *     "flex":1,                        // property to make the item to receive the specified proportion of the free space in the container.
- *     "alignSelf":"flexStart",         // property to specify how the item will align along the cross axis.
- *     "flexMargin":[10, 10, 10, 10]    // property to specify the space around the item.
+ *     "flex":1,                        // Property to make the item to receive the specified proportion of the free space in the container.
+ *     "alignSelf":"flexStart",         // Property to specify how the item will align along the cross axis.
+ *     "flexMargin":[10, 10, 10, 10]    // Property to specify the space around the item.
  *   }
  * @endcode
  * @SINCE_1_1.35
@@ -106,7 +106,7 @@ class DALI_IMPORT_API FlexContainer : public Control
 public:
 
   /**
-   * @brief The direction of the main axis in the flex container. This determines
+   * @brief Enumeration for the direction of the main axis in the flex container. This determines
    * the direction that flex items are laid out in the flex container.
    * @SINCE_1_1.35
    */
@@ -119,7 +119,7 @@ public:
   };
 
   /**
-   * @brief The primary direction in which content is ordered in the flex container
+   * @brief Enumeration for the primary direction in which content is ordered in the flex container
    * and on which sides the “start” and “end” are.
    * @SINCE_1_1.35
    */
@@ -131,7 +131,7 @@ public:
   };
 
   /**
-   * @brief Alignment of the flex items when the items do not use all available
+   * @brief Enumeration for the alignment of the flex items when the items do not use all available
    * space on the main-axis.
    * @SINCE_1_1.35
    */
@@ -145,8 +145,8 @@ public:
   };
 
   /**
-   * @brief Alignment of the flex items or lines when the items or lines do not
-   * use all available space on the cross-axis.
+   * @brief Enumeration for the alignment of the flex items or lines when the items or lines do not
+   * use all the available space on the cross-axis.
    * @SINCE_1_1.35
    */
   enum Alignment
@@ -159,7 +159,7 @@ public:
   };
 
   /**
-   * @brief The wrap type of the flex container when there is no enough room for
+   * @brief Enumeration for the wrap type of the flex container when there is no enough room for
    * all the items on one flex line.
    * @SINCE_1_1.35
    */
@@ -172,7 +172,7 @@ public:
 public:
 
   /**
-   * @brief The start and end property ranges for this control.
+   * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_1.35
    */
   enum PropertyRange
@@ -185,13 +185,13 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the FlexContainer class.
+   * @brief Enumeration for the instance of properties belonging to the FlexContainer class.
    * @SINCE_1_1.35
    */
   struct Property
   {
     /**
-     * @brief An enumeration of properties belonging to the FlexContainer class.
+     * @brief Enumeration for the instance of properties belonging to the FlexContainer class.
      * @SINCE_1_1.35
      */
     enum
@@ -207,13 +207,13 @@ public:
   };
 
   /**
-   * @brief An enumeration of child properties belonging to the FlexContainer class.
+   * @brief Enumeration for the instance of child properties belonging to the FlexContainer class.
    * @SINCE_1_1.35
    */
   struct ChildProperty
   {
     /**
-     * @brief An enumeration of child properties belonging to the FlexContainer class.
+     * @brief Enumeration for the instance of child properties belonging to the FlexContainer class.
      * @SINCE_1_1.35
      */
     enum
@@ -226,14 +226,14 @@ public:
   };
 
   /**
-   * @brief Create a FlexContainer handle; this can be initialised with FlexContainer::New()
-   * Calling member functions with an uninitialised handle is not allowed.
+   * @brief Creates a FlexContainer handle; this can be initialized with FlexContainer::New()
+   * Calling member functions with an uninitialized handle is not allowed.
    * @SINCE_1_1.35
    */
   FlexContainer();
 
   /**
-   * @brief Copy constructor. Creates another handle that points to the same real object
+   * @brief Copy constructor. Creates another handle that points to the same real object.
    * @SINCE_1_1.35
    *
    * @param[in] handle The handle to copy from
@@ -241,7 +241,7 @@ public:
   FlexContainer( const FlexContainer& handle );
 
   /**
-   * @brief Assignment operator. Changes this handle to point to another real object
+   * @brief Assignment operator. Changes this handle to point to another real object.
    * @SINCE_1_1.35
    * @param[in] handle Handle to an object
    * @return A reference to this
@@ -249,7 +249,7 @@ public:
   FlexContainer& operator=( const FlexContainer& handle );
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * @details This is non-virtual since derived Handle types must not contain data or virtual methods.
    *
@@ -258,23 +258,23 @@ public:
   ~FlexContainer();
 
   /**
-   * @brief Create the FlexContainer control.
+   * @brief Creates the FlexContainer control.
    * @SINCE_1_1.35
    *
-   * @return A handle to the FlexContainer control.
+   * @return A handle to the FlexContainer control
    */
   static FlexContainer New();
 
   /**
-   * @brief Downcast an Object handle to FlexContainer.
+   * @brief Downcasts an Object handle to FlexContainer.
    *
-   * @details If handle points to a FlexContainer the downcast produces
-   * valid handle. If not the returned handle is left uninitialized.
+   * @details If handle points to a FlexContainer, the downcast produces valid handle.
+   * If not, the returned handle is left uninitialized.
    *
    * @SINCE_1_1.35
    *
    * @param[in] handle Handle to an object
-   * @return handle to a FlexContainer or an uninitialized handle
+   * @return Handle to a FlexContainer or an uninitialized handle
    */
   static FlexContainer DownCast( BaseHandle handle );
 
@@ -286,7 +286,7 @@ public: // Not intended for application developers
    * @brief Creates a handle using the Toolkit::Internal implementation.
    * @SINCE_1_1.35
    *
-   * @param[in] implementation The Control implementation.
+   * @param[in] implementation The Control implementation
    */
   DALI_INTERNAL FlexContainer( Internal::FlexContainer& implementation );
 
@@ -294,7 +294,7 @@ public: // Not intended for application developers
    * @brief Allows the creation of this Control from an Internal::CustomActor pointer.
    * @SINCE_1_1.35
    *
-   * @param[in] internal A pointer to the internal CustomActor.
+   * @param[in] internal A pointer to the internal CustomActor
    */
   explicit DALI_INTERNAL FlexContainer( Dali::Internal::CustomActor* internal );
   /// @endcond

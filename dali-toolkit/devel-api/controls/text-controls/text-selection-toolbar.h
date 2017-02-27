@@ -64,6 +64,8 @@ public:
     {
       MAX_SIZE =  PROPERTY_START_INDEX, ///< name "maxSize",                 The maximum size the Popup can be,              type VECTOR2
       ENABLE_OVERSHOOT,                 ///< name "enableOvershoot",         Whether the overshoot image is enabled,         type BOOLEAN
+      ENABLE_SCROLL_BAR,                ///< name "enableScrollBar",         Whether the scroll-bar is enabled,              type BOOLEAN
+      SCROLL_BAR_PADDING,               ///< name "scrollBarPadding",        The padding used to position the scroll bar,    type VECTOR2
       SCROLL_VIEW,                      ///< name "scrollView",              Properties to set on scroll view                type Property::Map
     };
   };

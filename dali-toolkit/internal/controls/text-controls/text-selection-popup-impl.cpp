@@ -36,6 +36,8 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/internal/helpers/color-conversion.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 namespace Dali
 {
@@ -48,7 +50,7 @@ namespace Internal
 
 namespace
 {
-// todo Move this to adaptor??
+
 #define GET_LOCALE_TEXT(string) dgettext("dali-toolkit", string)
 
 const std::string TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME( "TextSelectionPopupButton" );
@@ -111,6 +113,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupPressedColor", VE
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupPressedImage", STRING, POPUP_PRESSED_IMAGE )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupFadeInDuration", FLOAT, POPUP_FADE_IN_DURATION )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "popupFadeOutDuration", FLOAT, POPUP_FADE_OUT_DURATION )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextSelectionPopup, "backgroundBorder", MAP, BACKGROUND_BORDER )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -230,6 +233,12 @@ void TextSelectionPopup::SetProperty( BaseObject* object, Property::Index index,
         impl.mFadeOutDuration = value.Get < float >();
         break;
       }
+      case Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER:
+      {
+        Property::Map map = value.Get<Property::Map>();
+        impl.CreateBackgroundBorder( map );
+        break;
+      }
     } // switch
   } // TextSelectionPopup
 }
@@ -333,6 +342,17 @@ Property::Value TextSelectionPopup::GetProperty( BaseObject* object, Property::I
       case Toolkit::TextSelectionPopup::Property::POPUP_FADE_OUT_DURATION:
       {
         value = impl.mFadeOutDuration;
+        break;
+      }
+      case Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER:
+      {
+        Property::Map map;
+        Toolkit::Visual::Base visual = impl.GetVisual( Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER );
+        if( visual )
+        {
+          visual.CreatePropertyMap( map );
+        }
+        value = map;
         break;
       }
     } // switch
@@ -795,6 +815,23 @@ std::string TextSelectionPopup::GetPressedImage() const
      }
    }
  }
+
+void TextSelectionPopup::CreateBackgroundBorder( Property::Map& propertyMap )
+{
+  // Removes previous image if necessary
+  UnregisterVisual( Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER );
+
+  if( ! propertyMap.Empty() )
+  {
+    Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( propertyMap );
+
+    if( visual )
+    {
+      RegisterVisual( Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER, visual );
+      visual.SetDepthIndex( DepthIndex::CONTENT );
+    }
+  }
+}
 
 TextSelectionPopup::TextSelectionPopup( TextSelectionPopupCallbackInterface* callbackInterface )
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),

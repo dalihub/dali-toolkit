@@ -15,18 +15,17 @@
  */
 using System;
 
-namespace Dali 
+namespace Dali
 {
   namespace Constants
   {
-
-    public enum TextureType 
+    public enum TextureType
     {
       Texture2D     = Dali.TextureType.TEXTURE_2D,   ///< One 2D image                            @SINCE_1_1.43
       TextureCube   = Dali.TextureType.TEXTURE_CUBE  ///< Six 2D images arranged in a cube-shape  @SINCE_1_1.43
     }
 
-    public enum ViewMode 
+    public enum ViewMode
     {
       Mono              = Dali.ViewMode.MONO,                          ///< Monoscopic (single camera). This is the default @SINCE_1_0.0
       StereoHorizontal  = Dali.ViewMode.STEREO_HORIZONTAL, ///< Stereoscopic. Frame buffer is split horizontally with the left and right camera views in their respective sides. @SINCE_1_0.0
@@ -95,6 +94,31 @@ namespace Dali
       public static readonly Dali.Vector3 Zero = Dali.Vector3.ZERO;
     }
 
+    public struct Direction
+    {
+      public enum Type
+      {
+        LeftToRight = Dali.DirectionType.LEFT_TO_RIGHT,
+        RightToLeft = Dali.DirectionType.RIGHT_TO_LEFT
+      }
+    }
+
+    public struct Align
+    {
+      public enum Type
+      {
+        TopBegin = Dali.AlignType.TOP_BEGIN,
+        TopCenter = Dali.AlignType.TOP_CENTER,
+        TopEnd = Dali.AlignType.TOP_END,
+        CenterBegin = Dali.AlignType.CENTER_BEGIN,
+        Center = Dali.AlignType.CENTER,
+        CenterEnd = Dali.AlignType.CENTER_END,
+        BottomBegin = Dali.AlignType.BOTTOM_BEGIN,
+        BottomCenter = Dali.AlignType.BOTTOM_CENTER,
+        BottomEnd = Dali.AlignType.BOTTOM_END
+      }
+    }
+
     public struct Visual
     {
       public enum Type
@@ -115,7 +139,7 @@ namespace Dali
         public static readonly int Shader = NDalic.VISUAL_PROPERTY_SHADER;
         public static readonly int Transform = NDalic.VISUAL_PROPERTY_TRANSFORM;
         public static readonly int PremultipliedAlpha = NDalic.VISUAL_PROPERTY_PREMULTIPLIED_ALPHA;
-        public static readonly int MixCOlor = NDalic.VISUAL_PROPERTY_MIX_COLOR;
+        public static readonly int MixColor = NDalic.VISUAL_PROPERTY_MIX_COLOR;
       }
 
       public struct ShaderProperty
@@ -161,7 +185,6 @@ namespace Dali
       public static readonly int DesiredHeight = NDalic.IMAGE_VISUAL_DESIRED_HEIGHT;
       public static readonly int SynchronousLoading = NDalic.IMAGE_VISUAL_SYNCHRONOUS_LOADING;
       public static readonly int BorderOnly = NDalic.IMAGE_VISUAL_BORDER_ONLY;
-      public static readonly int BatchingEnabled = NDalic.IMAGE_VISUAL_BATCHING_ENABLED;
       public static readonly int PixelArea = NDalic.IMAGE_VISUAL_PIXEL_AREA;
       public static readonly int WrapModeU = NDalic.IMAGE_VISUAL_WRAP_MODE_U;
       public static readonly int WrapModeV = NDalic.IMAGE_VISUAL_WRAP_MODE_V;
@@ -235,6 +258,5 @@ namespace Dali
         public static readonly int BelowVisual = NDalic.TOOLTIP_TAIL_BELOW_VISUAL;
       }
     }
-
   } // namespace Constants
 } // namesapce Dali

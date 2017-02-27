@@ -25,6 +25,13 @@
 using namespace Dali;
 using namespace Toolkit;
 
+namespace
+{
+
+const char* TEST_IMAGE_FILE_NAME = "selection-popup-border.9.png";
+
+}
+
 void dali_textselectionpopup_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -107,11 +114,37 @@ int UtcDaliToolkitTextSelectionPopupDownCastP(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextSelectionPopupBackgroundBorderP(void)
+{
+  ToolkitTestApplication application;
+  TextSelectionPopup textSelectionPopup;
+  textSelectionPopup = TextSelectionPopup::New( NULL );
+
+  textSelectionPopup.SetProperty( TextSelectionPopup::Property::BACKGROUND_BORDER,
+                                  Property::Map().Add( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME ) );
+
+  Property::Value value = textSelectionPopup.GetProperty( TextSelectionPopup::Property::BACKGROUND_BORDER );
+
+  Property::Map map;
+  value.Get( map );
+
+  Property::Value* returnValue = map.Find( Dali::Toolkit::ImageVisual::Property::URL );
+  DALI_TEST_CHECK( NULL != returnValue );
+
+  if( returnValue )
+  {
+    std::string url;
+    returnValue->Get( url );
+    DALI_TEST_EQUALS( TEST_IMAGE_FILE_NAME, url, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
 // TextSelectionToolBar is used TextSelectionPopup, below tests it individually
 
 int UtcDaliToolkitTextSelectionToolBarP(void)
 {
-
   // Creates Toolbar, adds 2 options and a divider then resizes divider
   ToolkitTestApplication application;
 
@@ -136,6 +169,30 @@ int UtcDaliToolkitTextSelectionToolBarP(void)
 
   Size newSize =  Size(3.0f, 0.0f);
   toolbar.ResizeDividers( newSize );
+
+  DALI_TEST_CHECK( toolbar );
+  END_TEST;
+}
+
+int UtcDaliToolkitTextSelectionToolBarScrollBarP(void)
+{
+  // Creates Toolbar, adds 2 options and a divider then resizes divider
+  ToolkitTestApplication application;
+
+  TextSelectionToolbar toolbar = TextSelectionToolbar::New();
+
+  toolbar.SetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE, Size( 100.0f, 60.0f) );
+
+  Toolkit::PushButton option = Toolkit::PushButton::New();
+  option.SetName( "test-option" );
+  option.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  toolbar.AddOption( option );
+
+  // Add a scroll-bar
+  toolbar.SetProperty( Toolkit::TextSelectionToolbar::Property::ENABLE_SCROLL_BAR, true );
+
+  bool enabled = toolbar.GetProperty<bool>( Toolkit::TextSelectionToolbar::Property::ENABLE_SCROLL_BAR );
+  DALI_TEST_CHECK( enabled );
 
   DALI_TEST_CHECK( toolbar );
   END_TEST;

@@ -54,9 +54,26 @@
 
 namespace Dali
 {
+extern bool CaseInsensitiveStringCompare( const std::string& a, const std::string& b );
 
 namespace Toolkit
 {
+
+namespace Internal
+{
+
+extern const Dali::Scripting::StringEnum ControlStateTable[];
+extern const unsigned int ControlStateTableCount;
+
+
+// Not static or anonymous - shared with other translation units
+const Scripting::StringEnum ControlStateTable[] = {
+  { "NORMAL",   Toolkit::DevelControl::NORMAL   },
+  { "FOCUSED",  Toolkit::DevelControl::FOCUSED  },
+  { "DISABLED", Toolkit::DevelControl::DISABLED },
+}; const unsigned int ControlStateTableCount = sizeof( ControlStateTable ) / sizeof( ControlStateTable[0] );
+
+} // Internal namespace
 
 namespace
 {
@@ -119,17 +136,6 @@ Toolkit::Visual::Base GetVisualByName(
     }
   }
   return visualHandle;
-}
-
-void SetDefaultTransform( Property::Map& propertyMap )
-{
-  propertyMap.Clear();
-  propertyMap
-    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4::ZERO );
 }
 
 /**
@@ -257,6 +263,8 @@ public:
   // Construction & Destruction
   Impl(Control& controlImpl)
   : mControlImpl( controlImpl ),
+    mState( Toolkit::DevelControl::NORMAL ),
+    mSubStateName(""),
     mStyleName(""),
     mBackgroundColor(Color::TRANSPARENT),
     mStartingPinchScale( NULL ),
@@ -322,6 +330,43 @@ public:
           controlImpl.SetStyleName( value.Get< std::string >() );
           break;
         }
+
+        case Toolkit::DevelControl::Property::STATE:
+        {
+          bool withTransitions=true;
+          const Property::Value* valuePtr=&value;
+          Property::Map* map = value.GetMap();
+          if(map)
+          {
+            Property::Value* value2 = map->Find("withTransitions");
+            if( value2 )
+            {
+              withTransitions = value2->Get<bool>();
+            }
+
+            valuePtr = map->Find("state");
+          }
+
+          if( valuePtr )
+          {
+            Toolkit::DevelControl::State state( controlImpl.mImpl->mState );
+            if( Scripting::GetEnumerationProperty< Toolkit::DevelControl::State >( *valuePtr, ControlStateTable, ControlStateTableCount, state ) )
+            {
+              controlImpl.mImpl->SetState( state, withTransitions );
+            }
+          }
+        }
+        break;
+
+        case Toolkit::DevelControl::Property::SUB_STATE:
+        {
+          std::string subState;
+          if( value.Get( subState ) )
+          {
+            controlImpl.mImpl->SetSubState( subState );
+          }
+        }
+        break;
 
         case Toolkit::Control::Property::BACKGROUND_COLOR:
         {
@@ -422,6 +467,18 @@ public:
           break;
         }
 
+        case Toolkit::DevelControl::Property::STATE:
+        {
+          value = controlImpl.mImpl->mState;
+          break;
+        }
+
+        case Toolkit::DevelControl::Property::SUB_STATE:
+        {
+          value = controlImpl.mImpl->mSubStateName;
+          break;
+        }
+
         case Toolkit::Control::Property::BACKGROUND_COLOR:
         {
           DALI_LOG_WARNING( "BACKGROUND_COLOR property is deprecated. Use BACKGROUND property instead\n" );
@@ -478,9 +535,94 @@ public:
     return value;
   }
 
+  void SetState( DevelControl::State state, bool withTransitions=true )
+  {
+    if( mState != state )
+    {
+      // If mState was Disabled, and new state is Focused, should probably
+      // store that fact, e.g. in another property that FocusManager can access.
+      mState = state;
+
+      // Trigger state change and transitions
+      // Apply new style, if stylemanager is available
+      Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+      if( styleManager )
+      {
+        const StylePtr stylePtr = GetImpl( styleManager ).GetRecordedStyle( Toolkit::Control( mControlImpl.GetOwner() ) );
+        if( stylePtr )
+        {
+          for( int i=mVisuals.Count()-1; i >= 0; i-- )
+          {
+            mControlImpl.UnregisterVisual( mVisuals[i]->index );
+          }
+
+          Dali::CustomActor handle( mControlImpl.GetOwner() );
+          stylePtr->ApplyVisualsAndPropertiesRecursively( handle );
+        }
+      }
+    }
+  }
+
+  void SetSubState( const std::string& subStateName, bool withTransitions=true )
+  {
+    if( mSubStateName != subStateName )
+    {
+      // Get existing sub-state visuals, and unregister them
+      Dali::CustomActor handle( mControlImpl.GetOwner() );
+
+      Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+      if( styleManager )
+      {
+        const StylePtr stylePtr = GetImpl( styleManager ).GetRecordedStyle( Toolkit::Control( mControlImpl.GetOwner() ) );
+        if( stylePtr )
+        {
+          // Stringify state
+          std::string stateName = Scripting::GetEnumerationName< Toolkit::DevelControl::State >( mState, ControlStateTable, ControlStateTableCount );
+
+          const StylePtr* state = stylePtr->subStates.Find( stateName );
+          if( state )
+          {
+            StylePtr stateStyle(*state);
+
+            // Unregister existing visuals of this substate
+            const StylePtr* subState = stateStyle->subStates.Find( mSubStateName );
+            if( subState )
+            {
+              StylePtr subStateStyle(*subState);
+
+              for( Dictionary<Property::Map>::iterator iter = subStateStyle->visuals.Begin(); iter != subStateStyle->visuals.End(); ++iter )
+              {
+                const std::string& visualName = (*iter).key;
+                Dali::Property::Index index = handle.GetPropertyIndex( visualName );
+                if( index != Property::INVALID_INDEX )
+                {
+                  mControlImpl.UnregisterVisual( index );
+                }
+              }
+            }
+
+            // Register visuals of the new substate
+            const StylePtr* newSubState = stateStyle->subStates.Find( subStateName );
+            if( newSubState )
+            {
+              StylePtr newSubStateStyle(*newSubState);
+              newSubStateStyle->ApplyVisuals( handle );
+              newSubStateStyle->ApplyProperties( handle );
+            }
+          }
+        }
+      }
+
+      mSubStateName = subStateName;
+    }
+  }
+
   // Data
 
   Control& mControlImpl;
+  DevelControl::State mState;
+  std::string mSubStateName;
+
   RegisteredVisualContainer mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
   std::string mStyleName;
   Vector4 mBackgroundColor;                       ///< The color of the background visual
@@ -509,6 +651,8 @@ public:
   static const PropertyRegistration PROPERTY_4;
   static const PropertyRegistration PROPERTY_5;
   static const PropertyRegistration PROPERTY_6;
+  static const PropertyRegistration PROPERTY_7;
+  static const PropertyRegistration PROPERTY_8;
 };
 
 // Properties registered without macro to use specific member variables.
@@ -518,6 +662,8 @@ const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgro
 const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",   Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "tooltip",         Toolkit::DevelControl::Property::TOOLTIP,     Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "state",           Toolkit::DevelControl::Property::STATE,       Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_8( typeRegistration, "subState",        Toolkit::DevelControl::Property::SUB_STATE,   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
@@ -1212,9 +1358,7 @@ void Control::OnSizeSet(const Vector3& targetSize)
   if( visual )
   {
     Vector2 size( targetSize );
-    Property::Map transformMap;
-    SetDefaultTransform( transformMap );
-    visual.SetTransformAndSize( transformMap, size );
+    visual.SetTransformAndSize( Property::Map(), size ); // Send an empty map as we do not want to modify the visual's set transform
   }
 }
 
@@ -1253,10 +1397,7 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
   Toolkit::Visual::Base visual = GetVisual( Toolkit::Control::Property::BACKGROUND );
   if( visual )
   {
-    Vector2 controlSize( size );
-    Property::Map transformMap;
-    SetDefaultTransform( transformMap );
-    visual.SetTransformAndSize( transformMap, controlSize );
+    visual.SetTransformAndSize( Property::Map(), size ); // Send an empty map as we do not want to modify the visual's set transform
   }
 }
 

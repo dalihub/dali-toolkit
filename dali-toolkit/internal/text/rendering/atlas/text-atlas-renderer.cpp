@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
 

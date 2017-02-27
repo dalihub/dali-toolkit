@@ -23,7 +23,8 @@
 #include "dali-toolkit/devel-api/builder/tree-node.h"
 #include "dali-toolkit/internal/builder/tree-node-manipulator.h"
 
-namespace
+
+namespace Dali
 {
 
 bool CaseInsensitiveCharacterCompare( unsigned char a, unsigned char b )
@@ -44,12 +45,6 @@ bool CaseInsensitiveStringCompare( const std::string& a, const std::string& b )
   }
   return result;
 }
-
-} // anonymous namespace
-
-
-namespace Dali
-{
 
 namespace Toolkit
 {

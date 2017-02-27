@@ -49,9 +49,9 @@ namespace ImageViewExample
       Log("Customized Application Initialize event handler");
       stage = Stage.Instance;
       stage.BackgroundColor = Color.Cyan;
-      stage.TouchEvent += OnStageTouched;
-      stage.WheelEvent += OnStageWheelMoved;
-      stage.KeyEvent += OnStageKeyPressed;
+      stage.Touch += OnStageTouched;
+      stage.Wheel += OnStageWheelMoved;
+      stage.Key += OnStageKeyPressed;
       //stage.EventProcessingFinished += OnStageEventProcessingFinished;
 
       layer = stage.GetDefaultLayer();
@@ -202,21 +202,21 @@ namespace ImageViewExample
     public void OnStageKeyPressed(object sender, Stage.KeyEventArgs e)
     {
       Log("OnStageKeyEventOccured()!");
-      Log("keyPressedName=" + e.KeyEvent.keyPressedName);
-      Log("state=" + e.KeyEvent.state);
+      Log("keyPressedName=" + e.Key.KeyPressedName);
+      Log("state=" + e.Key.State);
     }
 
     public void OnStageWheelMoved(object sender, Stage.WheelEventArgs e)
     {
       Log("OnStageWheelEventOccured()!");
-      Log("direction=" + e.WheelEvent.direction);
-      Log("type=" + e.WheelEvent.type);
+      Log("direction=" + e.Wheel.Direction);
+      Log("type=" + e.Wheel.Type);
     }
 
     // Callback for stage touched signal handling
     public void OnStageTouched(object sender, Stage.TouchEventArgs e)
     {
-      Log("OnStageTouched()! e.TouchData.GetState(0)=" + e.TouchData.GetState(0) );
+      Log("OnStageTouched()! e.TouchData.GetState(0)=" + e.Touch.GetState(0));
     }
 
     public void MainLoop()

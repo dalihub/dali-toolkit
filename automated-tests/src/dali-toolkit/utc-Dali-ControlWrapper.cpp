@@ -23,6 +23,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 
 #include <dali.h>
+#include <dali/public-api/dali-core.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
@@ -216,7 +217,11 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
   bool mNego;
   unsigned int mDepth;
 };
+
 }
+
+static std::string customControlTypeName = "TestCustomControl";
+static TypeRegistration customControl( customControlTypeName, typeid(Dali::Toolkit::Control), NULL );
 
 int UtcDaliControlWrapperConstructor(void)
 {
@@ -227,9 +232,10 @@ int UtcDaliControlWrapperConstructor(void)
 
   DALI_TEST_CHECK( !ControlWrapper::DownCast( controlWrapper ) );
 
-  controlWrapper = ControlWrapper::New( *controlWrapperImpl );
+  controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
   DALI_TEST_CHECK( ControlWrapper::DownCast( controlWrapper ) );
+
   END_TEST;
 }
 
@@ -237,7 +243,7 @@ int UtcDaliControlWrapperDestructor(void)
 {
   TestApplication application;
 
-  ControlWrapper control = ControlWrapper::New( *( new Toolkit::Internal::ControlWrapper( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT ) ) );
+  ControlWrapper control = ControlWrapper::New( customControlTypeName, *( new Toolkit::Internal::ControlWrapper( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT ) ) );
 
   ControlWrapper control2( control );
 
@@ -259,7 +265,7 @@ int UtcDaliControlWrapperRelayoutRequest(void)
   DALI_TEST_EQUALS( gOnRelayout, false, TEST_LOCATION );
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
-  ControlWrapper controlWrapper = ControlWrapper::New( *controlWrapperImpl );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
   Stage::GetCurrent().Add( controlWrapper );
 
@@ -283,7 +289,7 @@ int UtcDaliControlWrapperImplGetHeightForWidthBase(void)
   TestApplication application;
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
-  ControlWrapper controlWrapper = ControlWrapper::New( *controlWrapperImpl );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
   float width = 300.0f;
   float v = 0.0f;
@@ -303,7 +309,7 @@ int UtcDaliControlWrapperGetWidthForHeightBase(void)
   TestApplication application;
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
-  ControlWrapper controlWrapper = ControlWrapper::New( *controlWrapperImpl );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
   float height = 300.0f;
   float v = 0.0f;
@@ -323,7 +329,7 @@ int UtcDaliControlWrapperCalculateChildSizeBase(void)
   TestApplication application;
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
-  ControlWrapper controlWrapper = ControlWrapper::New( *controlWrapperImpl );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
   Actor child = Actor::New();
   child.SetResizePolicy( Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS );
@@ -344,7 +350,7 @@ int UtcDaliControlWrapperRelayoutDependentOnChildrenBase(void)
   TestApplication application;
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
-  ControlWrapper controlWrapper = ControlWrapper::New( *controlWrapperImpl );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
   bool v = false;
 
@@ -371,7 +377,7 @@ int UtcDaliControlWrapperRegisterVisualToSelf(void)
 
   {
     Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
-    ControlWrapper controlWrapper = ControlWrapper::New( *controlWrapperImpl );
+    ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
     objectDestructionTracker.Start( controlWrapper );
 
@@ -404,7 +410,7 @@ int UtcDaliControlWrapperRegisterDisabledVisual(void)
   ToolkitTestApplication application;
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
-  ControlWrapper controlWrapper = ControlWrapper::New( *controlWrapperImpl );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
   Property::Index TEST_PROPERTY = 1;
 
@@ -446,7 +452,7 @@ int UtcDaliControlWrapperRegisterUnregisterVisual(void)
   ToolkitTestApplication application;
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
-  ControlWrapper controlWrapper = ControlWrapper::New( *controlWrapperImpl );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
   Property::Index index = 1;
 
@@ -491,7 +497,7 @@ int UtcDaliControlWrapperTransitionDataMap1N(void)
   Dali::Toolkit::TransitionData transition = TransitionData::New( map );
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
-  ControlWrapper controlWrapper = ControlWrapper::New( *controlWrapperImpl );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
   //DummyControl actor = DummyControl::New();
   controlWrapper.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
@@ -544,10 +550,56 @@ int UtcDaliControlWrapperApplyThemeStyle(void)
   ToolkitTestApplication application;
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
-  ControlWrapper controlWrapper = ControlWrapper::New( *controlWrapperImpl );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
   controlWrapperImpl->ApplyThemeStyle();
 
   DALI_TEST_CHECK( true );
+  END_TEST;
+}
+
+int UtcDaliControlWrapperTestControlProperties(void)
+{
+  ToolkitTestApplication application;
+
+  Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
+
+  Stage::GetCurrent().Add( controlWrapper );
+
+  // "background" property
+  Property::Map rendererMap;
+  rendererMap[Visual::Property::TYPE] = Visual::COLOR;
+  rendererMap[ColorVisual::Property::MIX_COLOR] = Color::RED;
+  controlWrapper.SetProperty( Control::Property::BACKGROUND, rendererMap );
+  Property::Value propertyValue = controlWrapper.GetProperty( Control::Property::BACKGROUND );
+  Property::Map* resultMap = propertyValue.GetMap();
+  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE ) );
+  DALI_TEST_EQUALS( resultMap->Find( Visual::Property::TYPE )->Get<int>(), (int)Visual::COLOR, TEST_LOCATION );
+  DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR ) );
+  DALI_TEST_EQUALS( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>(), Color::RED, TEST_LOCATION );
+
+  // "keyInputFocus" property
+  controlWrapper.SetProperty( Control::Property::KEY_INPUT_FOCUS, true );
+  DALI_TEST_EQUALS( true, controlWrapper.GetProperty( Control::Property::KEY_INPUT_FOCUS ).Get< bool >(), TEST_LOCATION );
+
+  // "styleName" property
+  controlWrapper.SetProperty( Control::Property::STYLE_NAME, "MyCustomStyle" );
+  DALI_TEST_EQUALS( "MyCustomStyle", controlWrapper.GetProperty( Control::Property::STYLE_NAME ).Get< std::string >(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlWrapperTypeRegistryCreation(void)
+{
+  ToolkitTestApplication application;
+
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( "ControlWrapper" );
+  DALI_TEST_CHECK( typeInfo )
+
+  // Check that we can't create a ControlWrapper instance
+  BaseHandle baseHandle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( !baseHandle )
+
   END_TEST;
 }

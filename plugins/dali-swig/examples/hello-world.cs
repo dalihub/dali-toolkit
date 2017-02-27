@@ -39,7 +39,7 @@ namespace MyCSharpExample
       Console.WriteLine("Customized Application Initialize event handler");
       Stage stage = Stage.Instance;
       stage.BackgroundColor = Color.White;
-      stage.TouchEvent += OnStageTouched;
+      stage.Touch += OnStageTouched;
 
       // Add a _text label to the stage
       _text = new TextLabel("Hello Mono World");
@@ -66,7 +66,7 @@ namespace MyCSharpExample
     public void OnStageTouched(object sender, Stage.TouchEventArgs e)
     {
       // Only animate the _text label when touch down happens
-      if( e.TouchData.GetState(0) == PointStateType.DOWN )
+      if( e.Touch.GetState(0) == PointStateType.DOWN )
       {
         Console.WriteLine("Customized Stage Touch event handler");
         // Create a new _animation
@@ -81,14 +81,14 @@ namespace MyCSharpExample
           StartTime = 0,
           EndTime = 500,
           TargetProperty = "Orientation",
-          Destination = new Quaternion( new Radian( new Degree( 180.0f ) ), Vect3.Xaxis)
+          Destination = new Rotation( new Radian( new Degree( 180.0f ) ), Vect3.Xaxis)
         };
         _animation.AnimateTo(_text);
 
         _animation.StartTime = 500;
         _animation.EndTime = 1000;
         _animation.TargetProperty = "Orientation";
-        _animation.Destination = new Quaternion( new Radian( new Degree( 0.0f ) ), Vect3.Xaxis );
+        _animation.Destination = new Rotation( new Radian( new Degree( 0.0f ) ), Vect3.Xaxis );
         _animation.AnimateTo(_text);
 
         _animation.StartTime = 1000;

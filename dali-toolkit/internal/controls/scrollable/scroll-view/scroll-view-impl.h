@@ -22,9 +22,11 @@
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/property-notification.h>
+#include <dali/devel-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-base-impl.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
@@ -937,6 +939,7 @@ private:
   Constraint mScrollMainInternalPrePositionMaxConstraint;
 
   ScrollOvershootIndicatorPtr mOvershootIndicator;
+  WeakHandle<Toolkit::ScrollBar> mScrollBar;
 
   Toolkit::ScrollView::SnapStartedSignalType mSnapStartedSignal;
 
@@ -954,6 +957,7 @@ private:
   bool mDefaultMaxOvershoot:1;            ///< Whether to use default max overshoot or application defined one
   bool mCanScrollHorizontal:1;            ///< Local value of our property to check against
   bool mCanScrollVertical:1;              ///< Local value of our property to check against
+  bool mTransientScrollBar:1;             ///< True if scroll-bar should be automatically show/hidden during/after panning
 };
 
 } // namespace Internal

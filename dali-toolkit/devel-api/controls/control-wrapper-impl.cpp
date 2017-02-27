@@ -18,8 +18,13 @@
 // CLASS HEADER
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/handle-devel.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
@@ -34,11 +39,26 @@ namespace Toolkit
 namespace Internal
 {
 
+namespace
+{
+
+BaseHandle Create()
+{
+  // empty handle as we cannot create control wrapper
+  return BaseHandle();
+}
+
+// Setup type-registry.
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ControlWrapper, Toolkit::Control, Create )
+DALI_TYPE_REGISTRATION_END()
+
+}
+
 /*
  * Implementation.
  */
 
-Dali::Toolkit::ControlWrapper ControlWrapper::New( ControlWrapper* controlWrapper )
+Dali::Toolkit::ControlWrapper ControlWrapper::New( const std::string& typeName, ControlWrapper* controlWrapper )
 {
   ControlWrapperPtr wrapper( controlWrapper );
 
@@ -48,6 +68,19 @@ Dali::Toolkit::ControlWrapper ControlWrapper::New( ControlWrapper* controlWrappe
   // Second-phase initialisation of the implementation.
   // This can only be done after the CustomActor connection has been made.
   wrapper->Initialize();
+
+  // Different types of C# custom view registered themselves using type registry,
+  // but their type names are registered per type not per instance, so they still
+  // have the same wrong type name in native side when type registry queries the
+  // unique type name of each instance using typeid() because of the binding.
+  // Therefore, we have to link each instance with its correct type info if already
+  // pre-registered.
+
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeName );
+  if(typeInfo)
+  {
+    Dali::DevelHandle::SetTypeInfo( handle, typeInfo );
+  }
 
   return handle;
 }

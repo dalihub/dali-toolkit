@@ -110,7 +110,7 @@ const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
       vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
 
       mediump vec2 scale        = vec2( length( uModelMatrix[ 0 ].xyz ), length( uModelMatrix[ 1 ].xyz ) );\n
-      mediump vec2 size         = visualSize.xy * scale;\n
+      mediump vec2 size         = visualSize.xy;\n
       \n
       mediump vec2 fixedFactor  = vec2( uFixed[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uFixed[ int( ( aPosition.y  + 1.0 ) * 0.5 ) ].y );\n
       mediump vec2 stretch      = floor( aPosition * 0.5 );\n
@@ -118,7 +118,7 @@ const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
       \n
       mediump vec4 vertexPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );
       vertexPosition.xy -= size * vec2( 0.5, 0.5 );\n
-      vertexPosition.xy =  vertexPosition.xy / scale + anchorPoint*size + (visualOffset + origin)*uSize.xy;\
+      vertexPosition.xy =  vertexPosition.xy + anchorPoint*size + (visualOffset + origin)*uSize.xy;\
       \n
       vertexPosition = uMvpMatrix * vertexPosition;\n
       \n
@@ -132,11 +132,12 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
-  uniform lowp vec4 mixColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
   lowp vec4 visualMixColor()\n
   {\n
-    return vec4( mixColor.rgb * mix( 1.0, mixColor.a, preMultipliedAlpha ), mixColor.a );\n
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
   }\n
   void main()\n
   {\n

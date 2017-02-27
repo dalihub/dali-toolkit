@@ -71,7 +71,7 @@ public:
   typedef Signal< bool ( AccessibilityManager&, const Dali::TouchEvent& )> AccessibilityActionScrollSignalType; ///< Scroll signal type @SINCE_1_0.0
 
   /**
-   * @brief Accessibility needs four information which will be read by screen-reader.
+   * @brief Enumeration for accessibility that needs four information which will be read by screen-reader.
    *
    * Reading order : Label -> Trait -> Optional (Value and Hint)
    * @SINCE_1_0.0
@@ -86,7 +86,7 @@ public:
   };
 
    /**
-    * @brief Overshoot direction.
+    * @brief Enumeration for overshoot direction.
     * @SINCE_1_0.0
     */
   enum FocusOvershotDirection
@@ -110,15 +110,15 @@ public:
   typedef Signal< void ( Actor ) > FocusedActorActivatedSignalType;
 
   /**
-   * @brief Create a AccessibilityManager handle; this can be initialised with AccessibilityManager::New().
+   * @brief Creates an AccessibilityManager handle; this can be initialised with AccessibilityManager::New().
    *
-   * Calling member functions with an uninitialised handle is not allowed.
+   * Calling member functions with an uninitialized handle is not allowed.
    * @SINCE_1_0.0
    */
   AccessibilityManager();
 
   /**
-   * @brief Destructor
+   * @brief Destructor.
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    * @SINCE_1_0.0
@@ -126,18 +126,18 @@ public:
   ~AccessibilityManager();
 
   /**
-   * @brief Get the singleton of AccessibilityManager object.
+   * @brief Gets the singleton of AccessibilityManager object.
    *
    * @SINCE_1_0.0
-   * @return A handle to the AccessibilityManager control.
+   * @return A handle to the AccessibilityManager control
    */
   static AccessibilityManager Get();
 
   /**
-   * @brief Set the information of the specified actor's accessibility attribute.
+   * @brief Sets the information of the specified actor's accessibility attribute.
    *
    * @SINCE_1_0.0
-   * @param actor The actor the text to be set with
+   * @param actor The actor, the text to be set with
    * @param type The attribute type the text to be set with
    * @param text The text for the actor's accessibility information
    * @pre The AccessibilityManager has been initialized.
@@ -146,7 +146,7 @@ public:
   void SetAccessibilityAttribute(Actor actor, AccessibilityAttribute type, const std::string& text);
 
   /**
-   * @brief Get the text of the specified actor's accessibility attribute.
+   * @brief Gets the text of the specified actor's accessibility attribute.
    *
    * @SINCE_1_0.0
    * @param actor The actor to be queried
@@ -158,10 +158,10 @@ public:
   std::string GetAccessibilityAttribute(Actor actor, AccessibilityAttribute type) const;
 
   /**
-   * @brief Set the focus order of the actor.
+   * @brief Sets the focus order of the actor.
    *
-   * The focus order of each actor in the focus chain is unique. If
-   * there is another actor assigned with the same focus order
+   * The focus order of each actor in the focus chain is unique.
+   * If there is another actor assigned with the same focus order
    * already, the new actor will be inserted to the focus chain with
    * that focus order, and the focus order of the original actor and
    * all the actors followed in the focus chain will be increased
@@ -179,7 +179,7 @@ public:
   void SetFocusOrder(Actor actor, const unsigned int order);
 
   /**
-   * @brief Get the focus order of the actor.
+   * @brief Gets the focus order of the actor.
    *
    * When the focus order is 0, it means the focus order of the actor
    * is undefined.
@@ -210,7 +210,7 @@ public:
   unsigned int GenerateNewFocusOrder() const;
 
   /**
-   * @brief Get the actor that has the specified focus order.
+   * @brief Gets the actor that has the specified focus order.
    *
    * It will return an empty handle if no actor in the stage
    * has the specified focus order.
@@ -219,15 +219,15 @@ public:
    * @param order The focus order of the actor
    *
    * @return The actor that has the specified focus order or an empty
-   * handle if no actor in the stage has the specified focus order.
+   * handle if no actor in the stage has the specified focus order
    * @pre The AccessibilityManager has been initialized.
    */
   Actor GetActorByFocusOrder(const unsigned int order);
 
   /**
-   * @brief Move the focus to the specified actor.
+   * @brief Moves the focus to the specified actor.
    *
-   * Only one actor can be focused at the same time.  The actor must
+   * Only one actor can be focused at the same time. The actor must
    * have a defined focus order and must be focusable, visible and in
    * the stage.
    *
@@ -240,38 +240,38 @@ public:
   bool SetCurrentFocusActor(Actor actor);
 
   /**
-   * @brief Get the current focused actor.
+   * @brief Gets the current focused actor.
    *
    * @SINCE_1_0.0
-   * @return A handle to the current focused actor or an empty handle if no actor is focused.
+   * @return A handle to the current focused actor or an empty handle if no actor is focused
    * @pre The AccessibilityManager has been initialized.
    */
   Actor GetCurrentFocusActor();
 
   /**
-   * @brief Get the focus group of current focused actor.
+   * @brief Gets the focus group of current focused actor.
    *
    * @SINCE_1_0.0
    * @return A handle to the immediate parent of the current focused
    * actor which is also a focus group, or an empty handle if no actor
-   * is focused.
+   * is focused
    * @pre The AccessibilityManager has been initialized.
    *
    */
   Actor GetCurrentFocusGroup();
 
   /**
-   * @brief Get the focus order of currently focused actor.
+   * @brief Gets the focus order of currently focused actor.
    * @SINCE_1_0.0
    * @return The focus order of the currently focused actor or 0 if no
-   * actor is in focus.
+   * actor is in focus
    * @pre The AccessibilityManager has been initialized.
    *
    */
   unsigned int GetCurrentFocusOrder();
 
   /**
-   * @brief Move the focus to the next focusable actor in the focus
+   * @brief Moves the focus to the next focusable actor in the focus
    * chain (according to the focus traversal order).
    *
    * When the focus movement is wrapped around, the focus will be moved
@@ -284,7 +284,7 @@ public:
   bool MoveFocusForward();
 
   /**
-   * @brief Move the focus to the previous focusable actor in the
+   * @brief Moves the focus to the previous focusable actor in the
    * focus chain (according to the focus traversal order).
    *
    * When the focus movement is wrapped around, the focus will be
@@ -298,7 +298,7 @@ public:
   bool MoveFocusBackward();
 
   /**
-   * @brief Clear the focus from the current focused actor if any, so
+   * @brief Clears the focus from the current focused actor if any, so
    * that no actor is focused in the focus chain.
    *
    * It will emit focus changed signal without current focused actor.
@@ -308,41 +308,41 @@ public:
   void ClearFocus();
 
   /**
-   * @brief Clear the every registered focusable actor from focus-manager.
+   * @brief Clears every registered focusable actor from focus-manager.
    * @SINCE_1_0.0
    * @pre The AccessibilityManager has been initialized.
    */
   void Reset();
 
   /**
-   * @brief Set whether an actor is a focus group that can limit the
+   * @brief Sets whether an actor is a focus group that can limit the
    * scope of focus movement to its child actors in the focus chain.
    *
    * @SINCE_1_0.0
-   * @param actor The actor to be set as a focus group.
-   * @param isFocusGroup Whether to set the actor to be a focus group or not.
+   * @param actor The actor to be set as a focus group
+   * @param isFocusGroup Whether to set the actor to be a focus group or not
    * @pre The AccessibilityManager has been initialized.
    * @pre The Actor has been initialized.
    */
   void SetFocusGroup(Actor actor, bool isFocusGroup);
 
   /**
-   * @brief Check whether the actor is set as a focus group or not.
+   * @brief Checks whether the actor is set as a focus group or not.
    *
    * @SINCE_1_0.0
-   * @param actor The actor to be checked.
-   * @return Whether the actor is set as a focus group.
+   * @param actor The actor to be checked
+   * @return Whether the actor is set as a focus group
    * @pre The AccessibilityManager has been initialized.
    * @pre The Actor has been initialized.
    */
   bool IsFocusGroup(Actor actor) const;
 
   /**
-   * @brief Set whether the group mode is enabled or not.
+   * @brief Sets whether the group mode is enabled or not.
    *
    * When the group mode is enabled, the focus movement will be limited to the child actors
    * of the current focus group including the current focus group itself. The current focus
-   * group is the closest ancestor of the current focused actor that set as a focus group.
+   * group is the closest ancestor of the current focused actor that is set as a focus group.
    * @SINCE_1_0.0
    * @param enabled Whether the group mode is enabled or not
    * @pre The AccessibilityManager has been initialized.
@@ -350,7 +350,7 @@ public:
   void SetGroupMode(bool enabled);
 
   /**
-   * @brief Get whether the group mode is enabled or not.
+   * @brief Gets whether the group mode is enabled or not.
    *
    * @SINCE_1_0.0
    * @return Whether the group mode is enabled or not.
@@ -359,7 +359,7 @@ public:
   bool GetGroupMode() const;
 
   /**
-   * @brief Set whether focus will be moved to the beginning of the
+   * @brief Sets whether focus will be moved to the beginning of the
    * focus chain when it reaches the end or vice versa.
    *
    * When both the wrap mode and the group mode are enabled, focus will be
@@ -371,7 +371,7 @@ public:
   void SetWrapMode(bool wrapped);
 
   /**
-   * @brief Get whether the wrap mode is enabled or not.
+   * @brief Gets whether the wrap mode is enabled or not.
    *
    * @SINCE_1_0.0
    * @return Whether the wrap mode is enabled or not.
@@ -380,7 +380,7 @@ public:
   bool GetWrapMode() const;
 
   /**
-   * @brief Set the focus indicator actor.
+   * @brief Sets the focus indicator actor.
    *
    * This will replace the default focus indicator actor in
    * AccessibilityManager and will be added to the focused actor as a
@@ -394,7 +394,7 @@ public:
   void SetFocusIndicatorActor(Actor indicator);
 
   /**
-   * @brief Get the focus indicator actor.
+   * @brief Gets the focus indicator actor.
    *
    * @SINCE_1_0.0
    * @return A handle to the focus indicator actor
@@ -414,7 +414,7 @@ public:
   /**
    * @brief Returns the current position of the read action.
    * @SINCE_1_0.0
-   * @return The current event position.
+   * @return The current event position
    */
   Vector2 GetReadPosition() const;
 
@@ -428,7 +428,7 @@ public:
    *   void YourCallbackName(Actor originalFocusedActor, Actor currentFocusedActor);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   FocusChangedSignalType& FocusChangedSignal();
@@ -441,7 +441,7 @@ public:
    *   void YourCallbackName(Actor currentFocusedActor, FocusOvershotDirection direction);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   FocusOvershotSignalType& FocusOvershotSignal();
@@ -454,7 +454,7 @@ public:
    *   void YourCallbackName(Actor activatedActor);
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    * @pre The Object has been initialized.
    */
   FocusedActorActivatedSignalType& FocusedActorActivatedSignal();
@@ -469,7 +469,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& StatusChangedSignal();
 
@@ -482,7 +482,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionNextSignal();
 
@@ -495,7 +495,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionPreviousSignal();
 
@@ -508,7 +508,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionActivateSignal();
 
@@ -521,7 +521,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionReadSignal();
 
@@ -534,7 +534,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionOverSignal();
 
@@ -547,7 +547,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionReadNextSignal();
 
@@ -560,7 +560,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionReadPreviousSignal();
 
@@ -573,7 +573,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionUpSignal();
 
@@ -586,7 +586,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionDownSignal();
 
@@ -599,7 +599,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionClearFocusSignal();
 
@@ -612,7 +612,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionBackSignal();
 
@@ -625,7 +625,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionScrollUpSignal();
 
@@ -638,7 +638,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionScrollDownSignal();
 
@@ -651,7 +651,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionPageLeftSignal();
 
@@ -664,7 +664,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionPageRightSignal();
 
@@ -677,7 +677,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionPageUpSignal();
 
@@ -690,7 +690,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionPageDownSignal();
 
@@ -703,7 +703,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionMoveToFirstSignal();
 
@@ -716,7 +716,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionMoveToLastSignal();
 
@@ -742,7 +742,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionReadFromNextSignal();
 
@@ -755,7 +755,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionZoomSignal();
 
@@ -768,7 +768,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionReadIndicatorInformationSignal();
 
@@ -781,7 +781,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionReadPauseResumeSignal();
 
@@ -794,7 +794,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionSignalType& ActionStartStopSignal();
 
@@ -807,7 +807,7 @@ public:
    *   bool YourCallback( AccessibilityManager& manager, const TouchEvent& event );
    * @endcode
    * @SINCE_1_0.0
-   * @return The signal to connect to.
+   * @return The signal to connect to
    */
   AccessibilityActionScrollSignalType& ActionScrollSignal();
 

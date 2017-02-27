@@ -38,6 +38,7 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 
 namespace Dali
 {
@@ -117,17 +118,14 @@ KeyboardFocusManager::KeyboardFocusManager()
   mCurrentFocusActor( 0 ),
   mFocusIndicatorActor(),
   mFocusGroupLoopEnabled( false ),
-  mIsKeyboardFocusEnabled( false ),
   mIsFocusIndicatorEnabled( false ),
   mIsWaitingKeyboardFocusChangeCommit( false ),
   mFocusHistory(),
   mSlotDelegate( this )
 {
-  OnPhysicalKeyboardStatusChanged(PhysicalKeyboard::Get());
-
+  // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorEnabled.
   Toolkit::KeyInputFocusManager::Get().UnhandledKeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
   Stage::GetCurrent().TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
-  PhysicalKeyboard::Get().StatusChangedSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnPhysicalKeyboardStatusChanged);
 }
 
 KeyboardFocusManager::~KeyboardFocusManager()
@@ -155,22 +153,35 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
   // Check whether the actor is in the stage and is keyboard focusable.
   if( actor && actor.IsKeyboardFocusable() )
   {
-    mIsFocusIndicatorEnabled = true;
-    // Draw the focus indicator upon the focused actor when PhysicalKeyboard is attached
-    if( mIsKeyboardFocusEnabled )
+    if( mIsFocusIndicatorEnabled )
     {
       actor.Add( GetFocusIndicatorActor() );
     }
     // Send notification for the change of focus actor
+    Actor currentFocusedActor = GetCurrentFocusActor();
+
     if( !mFocusChangedSignal.Empty() )
     {
-      mFocusChangedSignal.Emit(GetCurrentFocusActor(), actor);
+      mFocusChangedSignal.Emit(currentFocusedActor, actor);
+    }
+
+    Toolkit::Control currentlyFocusedControl = Toolkit::Control::DownCast(currentFocusedActor);
+    if( currentlyFocusedControl )
+    {
+      // Do we need it to remember if it was previously DISABLED?
+      currentlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::NORMAL );
     }
 
     DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
 
     // Save the current focused actor
     mCurrentFocusActor = actorID;
+
+    Toolkit::Control newlyFocusedControl = Toolkit::Control::DownCast(actor);
+    if( newlyFocusedControl )
+    {
+      newlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::FOCUSED );
+    }
 
     // Push Current Focused Actor to FocusHistory
     mFocusHistory.PushBack( &actor.GetBaseObject() );
@@ -404,17 +415,23 @@ void KeyboardFocusManager::DoKeyboardEnter(Actor actor)
 void KeyboardFocusManager::ClearFocus()
 {
   Actor actor = GetCurrentFocusActor();
-  if(actor)
+  if( actor )
   {
-    if(mFocusIndicatorActor)
+    if( mFocusIndicatorActor )
     {
-      actor.Remove(mFocusIndicatorActor);
+      actor.Remove( mFocusIndicatorActor );
     }
 
     // Send notification for the change of focus actor
     if( !mFocusChangedSignal.Empty() )
     {
-      mFocusChangedSignal.Emit(actor, Actor());
+      mFocusChangedSignal.Emit( actor, Actor() );
+    }
+
+    Toolkit::Control currentlyFocusedControl = Toolkit::Control::DownCast( actor );
+    if( currentlyFocusedControl )
+    {
+      currentlyFocusedControl.SetProperty( DevelControl::Property::STATE, DevelControl::NORMAL );
     }
   }
 
@@ -507,39 +524,8 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
   return mFocusIndicatorActor;
 }
 
-void KeyboardFocusManager::OnPhysicalKeyboardStatusChanged(PhysicalKeyboard keyboard)
-{
-  mIsKeyboardFocusEnabled = keyboard.IsAttached();
-
-  if(mIsKeyboardFocusEnabled)
-  {
-    // Show indicator when keyboard focus turned on if there is focused actor.
-    Actor actor = GetCurrentFocusActor();
-    if(actor)
-    {
-      actor.Add( GetFocusIndicatorActor() );
-    }
-    mIsFocusIndicatorEnabled = true;
-  }
-  else
-  {
-    // Hide indicator when keyboard focus turned off
-    Actor actor = GetCurrentFocusActor();
-    if( actor && mFocusIndicatorActor )
-    {
-      actor.Remove( mFocusIndicatorActor );
-    }
-    mIsFocusIndicatorEnabled = false;
-  }
-}
-
 void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 {
-  if(!mIsKeyboardFocusEnabled)
-  {
-    return;
-  }
-
   AccessibilityAdaptor accessibilityAdaptor = AccessibilityAdaptor::Get();
   bool isAccessibilityEnabled = accessibilityAdaptor.IsEnabled();
 

@@ -50,34 +50,34 @@ public:
   DALI_EXPORT_API virtual ~ItemFactory() {};
 
   /**
-   * @brief Query the number of items available from the factory.
+   * @brief Queries the number of items available from the factory.
    *
    * The maximum available item has an ID of GetNumberOfItems() - 1.
    * @SINCE_1_0.0
-   * @return the number of items
+   * @return The number of items
    */
   virtual unsigned int GetNumberOfItems() = 0;
 
   /**
-   * @brief Create an Actor to represent a visible item.
+   * @brief Creates an Actor to represent a visible item.
    *
    * @SINCE_1_0.0
-   * @param[in] itemId The ID of the newly visible item.
-   * @return An actor, or an uninitialized pointer if the ID is out of range.
+   * @param[in] itemId The ID of the newly visible item
+   * @return An actor, or an uninitialized pointer if the ID is out of range
    */
   virtual Actor NewItem(unsigned int itemId) = 0;
 
   /**
-   * @brief Notify the factory the actor representing the item is removed from ItemView.
+   * @brief Notifies the factory the actor representing the item is removed from ItemView.
    *
    * @SINCE_1_0.0
-   * @param[in] itemId The ID of the released item.
-   * @param[in] actor The actor that represents the released item.
+   * @param[in] itemId The ID of the released item
+   * @param[in] actor The actor that represents the released item
    */
   virtual void ItemReleased(unsigned int itemId, Actor actor) {};
 
   /**
-   * @brief Retrieve the extension for this control.
+   * @brief Retrieves the extension for this control.
    *
    * @SINCE_1_0.0
    * @return The extension if available, NULL otherwise

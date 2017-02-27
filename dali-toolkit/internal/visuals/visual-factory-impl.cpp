@@ -32,7 +32,6 @@
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
-#include <dali-toolkit/internal/visuals/image/batch-image-visual.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/internal/visuals/mesh/mesh-visual.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
@@ -57,7 +56,6 @@ namespace Internal
 namespace
 {
 
-const char * const BATCHING_ENABLED( "batchingEnabled" );
 BaseHandle Create()
 {
   BaseHandle handle = Toolkit::VisualFactory::Get();
@@ -138,21 +136,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
         }
         else // Regular image
         {
-          bool batchingEnabled( false );
-          Property::Value* batchingEnabledValue = propertyMap.Find( Toolkit::ImageVisual::Property::BATCHING_ENABLED, BATCHING_ENABLED );
-          if( batchingEnabledValue  )
-          {
-            batchingEnabledValue->Get( batchingEnabled );
-          }
-
-          if( batchingEnabled )
-          {
-            visualPtr = BatchImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
-          }
-          else
-          {
-            visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
-          }
+          visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
         }
       }
 

@@ -25,6 +25,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/adaptor-framework/virtual-keyboard.h>
+#include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -33,6 +34,7 @@
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
@@ -122,6 +124,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "emboss",                      
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputEmboss",                          MAP,       INPUT_EMBOSS                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "outline",                              MAP,       OUTLINE                              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputOutline",                         MAP,       INPUT_OUTLINE                        )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScroll",                   BOOLEAN,   SMOOTH_SCROLL                        )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScrollDuration",           FLOAT,     SMOOTH_SCROLL_DURATION               )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -590,6 +594,26 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL:
+      {
+        const bool enable = value.Get< bool >();
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor SMOOTH_SCROLL %d\n", enable );
+
+        impl.mScrollAnimationEnabled = enable;
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL_DURATION:
+      {
+        const float duration = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor SMOOTH_SCROLL_DURATION %f\n", duration );
+
+        impl.mScrollAnimationDuration = duration;
+        if ( impl.mTextVerticalScroller )
+        {
+          impl.mTextVerticalScroller->SetDuration( duration );
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -891,6 +915,16 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         GetOutlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
         break;
       }
+      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL:
+      {
+        value = impl.mScrollAnimationEnabled;
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL_DURATION:
+      {
+        value = impl.mScrollAnimationDuration;
+        break;
+      }
     } //switch
   }
 
@@ -1094,7 +1128,7 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
     {
       renderableActor = mRenderer->Render( mController->GetView(),
                                            mAlignmentOffset,
-                                           DepthIndex::TEXT );
+                                           DepthIndex::CONTENT );
     }
 
     if( renderableActor != mRenderableActor )
@@ -1106,10 +1140,6 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
 
   if( mRenderableActor )
   {
-    const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
-
-    mRenderableActor.SetPosition( scrollOffset.x + mAlignmentOffset, scrollOffset.y );
-
     // Make sure the actors are parented correctly with/without clipping
     Actor self = mStencil ? mStencil : Self();
 
@@ -1123,6 +1153,8 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
     mClippingDecorationActors.clear();
 
     self.Add( mRenderableActor );
+
+    ApplyScrollPosition();
   }
 }
 
@@ -1397,12 +1429,42 @@ void TextEditor::OnIdleSignal()
   mIdleCallback = NULL;
 }
 
+void TextEditor::ApplyScrollPosition()
+{
+  const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
+  float scrollAmount = 0.0f;
+
+  if ( mScrollAnimationEnabled )
+  {
+    scrollAmount = mController->GetScrollAmountByUserInput();
+  }
+  if ( mTextVerticalScroller )
+  {
+    mTextVerticalScroller->CheckStartAnimation( mRenderableActor, scrollOffset.x + mAlignmentOffset, scrollOffset.y - scrollAmount, scrollAmount );
+  }
+  else if ( Equals( scrollAmount, 0.0f, Math::MACHINE_EPSILON_1 ))
+  {
+    mRenderableActor.SetPosition( scrollOffset.x + mAlignmentOffset, scrollOffset.y - scrollAmount );
+  }
+  else
+  {
+    mTextVerticalScroller = Text::TextVerticalScroller::New();
+    if ( !Equals( mScrollAnimationDuration, 0.0f, Math::MACHINE_EPSILON_1 ))
+    {
+      mTextVerticalScroller->SetDuration( mScrollAnimationDuration );
+    }
+    mTextVerticalScroller->CheckStartAnimation( mRenderableActor, scrollOffset.x + mAlignmentOffset, scrollOffset.y - scrollAmount, scrollAmount );
+  }
+}
+
 TextEditor::TextEditor()
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIdleCallback( NULL ),
   mAlignmentOffset( 0.f ),
+  mScrollAnimationDuration( 0.f ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
-  mHasBeenStaged( false )
+  mHasBeenStaged( false ),
+  mScrollAnimationEnabled( false )
 {
 }
 

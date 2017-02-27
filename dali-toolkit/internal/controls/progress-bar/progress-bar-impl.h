@@ -18,14 +18,12 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali/public-api/animation/animation.h>
 #include <dali-toolkit/devel-api/controls/progress-bar/progress-bar.h>
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 
 namespace Dali
 {
@@ -63,7 +61,6 @@ public:
    *
    * @param[in] value The value to set. Will be clamped to [lowerBound .. upperBound]
    */
-
   void SetProgressValue( float value );
 
   /**
@@ -73,13 +70,61 @@ public:
    */
   float GetProgressValue() const;
 
+  /**
+   * Set the secondary progress value of the ProgressBar
+   *
+   * @param[in] value The secondary progress value to set. Will be clamped to [lowerBound .. upperBound]
+   */
+  void SetSecondaryProgressValue( float value );
+
+  /**
+   * Get the secondary progress value of the ProgressBar
+   *
+   * @return The current secondary progress value of the ProgressBar
+   */
+  float GetSecondaryProgressValue() const;
+
+  /**
+   * Set the indeterminate state of the ProgressBar
+   *
+   * @param[in] value The value to set.
+   */
+  void SetIndeterminate( bool value );
+
+  /**
+   * Get the indeterminate state value of the ProgressBar
+   *
+   * @return The current determined state of the ProgressBar
+   */
+  bool GetIndeterminate() const;
+
+  /**
+   * Set the indeterminate visual transition of the ProgressBar
+   *
+   * @param[in] Transition data map to set.
+   */
+  void SetIndeterminateVisualTransition( Property::Map transtion );
+
+  /**
+   * Get the indeterminate visual transition data map of the ProgressBar
+   *
+   * @return The current indeterminate visual transition data map of the ProgressBar
+   */
+  Property::Map GetIndeterminateVisualTransition() const;
+
+  /**
+   * Play the indeterminate visual transition
+   */
+  void PlayIndeterminateVisualTransition();
+
 public:
   //Signals
 
   /**
-   * @copydoc Toolkit::ProgressBar::ValueChangedSignal()
+   * @copydoc toolkit::progressbar::valuechangedsignal()
    */
   Toolkit::ProgressBar::ValueChangedSignalType& ValueChangedSignal();
+
 
   /**
    * Connects a callback function with the object's signals.
@@ -168,73 +213,29 @@ private:
   Domain CalcDomain( const Vector2& currentSize );
 
   /**
-   * Create the track for the ProgressBar
-   *
-   * @return The track actor
+   * Set indeterminate visual transition animation
    */
-  Toolkit::ImageView CreateTrack();
+  void SetIndeterminateVisualTransition( Toolkit::TransitionData transtion );
 
   /**
-   * Create the progress track for the ProgressBar
-   *
-   * @return The track actor
+   * Convert value to transition data
    */
-  Toolkit::ImageView CreateProgress();
+  Toolkit::TransitionData ConvertPropertyToTransition( const Property::Value& value );
 
   /**
-   * Create all the children
+   * Update progress bar label when progress value is changed
    */
-  void CreateChildren();
+  void CreateVisualsForComponent( Property::Index index, const Property::Value& value, const float visualDepth );
 
   /**
-   * Set value choosing whether to fire signals or not
-   *
-   * @paramp[in] value The value to set
-   * @param[in] raiseSignals Configure signals to be raised or not.
+   * Update progress bar label when progress value is changed
    */
-  void DisplayValue( float value, bool raiseSignals );
+  bool GetPropertyMapForVisual( Property::Index visualIndex, Property::Map& retreivedMap ) const;
 
   /**
-   * Create the image for the track
-   *
-   * @param[in] filename The track image
+   * Check if we should start animating
    */
-  void SetTrackVisual( const std::string& filename );
-
-  /**
-   * @brief Set the track visual from an Dali::Property::Map
-   *
-   * @param[in] map The Dali::Property::Map to use for to display
-   */
-  void SetTrackVisual( Dali::Property::Map map );
-
-  /**
-   * @brief Return the track image.
-   *
-   * @return The track image.
-   */
-  std::string GetTrackVisual();
-
-  /**
-   * Create the image for the progress bar
-   *
-   * @param[in] filename The progress bar image
-   */
-  void SetProgressVisual( const std::string& filename );
-
-  /**
-   * @brief Set the progress visual from an Dali::Property::Map
-   *
-   * @param[in] map The Dali::Property::Map to use for to display
-   */
-  void SetProgressVisual( Dali::Property::Map map );
-
-  /**
-   * @brief Return the progress bar image.
-   *
-   * @return The progress bar image if it exists.
-   */
-  std::string GetProgressVisual();
+  virtual void OnStageConnection( int depth );
 
 private:
 
@@ -246,23 +247,15 @@ private:
 
 private:
 
-  Domain mDomain;                           ///< Current domain of the handle
+  Domain mDomain;                                                     ///< Current domain of the handle
 
-  Toolkit::ImageView mTrack;                ///< Track image
-  Toolkit::ImageView mProgress;             ///< Progress bar
-  Toolkit::TextLabel mValueTextLabel;       ///< Text value to show progress percentage
-  Toolkit::ProgressBar::ValueChangedSignalType mValueChangedSignal;       ///< Signal emitted when the value is changed
+  Animation mIndeterminateVisualAni;                                  ///< Animation for indetrminate visual. Transition animation.
+  Toolkit::ProgressBar::ValueChangedSignalType mValueChangedSignal;   ///< Signal emitted when the value is changed
 
-  std::string mTrackVisual;           ///< Image for track image
-  std::string mProgressVisual;        ///< Image for progress bar image
-
-  Property::Map mTrackMap;         ///< the Property::Map if the image came from a Property::Map, empty otherwise
-  Property::Map mProgressMap;      ///< the Property::Map if the image came from a Property::Map, empty otherwise
-
-  Vector2 mTrackVisualSize;      ///< Size of the track image used
-  Vector2 mProgressVisualSize;   ///< Size of progress image used
-
-  float mValue;             ///< Current value of ProgressBar
+  Toolkit::TransitionData mIndeterminateVisualTransition;             ///< Transition data map for mIndeterminateVisualAni
+  float mProgressValue;                                               ///< Current value of ProgressBar
+  float mSecondaryProgressValue;                                      ///< Current loading value of ProgressBar
+  bool mIndeterminate;                                                ///< Whether the progress state is determined or not
 };
 
 } // namespace Internal

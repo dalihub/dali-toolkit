@@ -98,7 +98,7 @@ namespace Dali
   ///
   ///  static Spin()
   ///  {
-  ///     ViewRegistry.Instance.RegisterControl("Spin", CreateInstance, typeof(Spin) );
+  ///     ViewRegistry.Instance.Register(CreateInstance, typeof(Spin) );
   ///  }
   ///
   ///  The control should also provide a CreateInstance function, which gets passed to the ViewRegistry
@@ -293,17 +293,17 @@ namespace Dali
     /// {
     ///   ViewRegistry registers control type with DALi type registery
     ///   also uses introspection to find any properties that need to be registered with type registry
-    ///   ViewRegistry.Instance.Register("Spin", CreateInstance, typeof(Spin) );
+    ///   ViewRegistry.Instance.Register(CreateInstance, typeof(Spin) );
     /// }
     ///
     /// </summary>
-    public void Register(string viewName, Func< CustomView > createFunction, System.Type viewType )
+    public void Register(Func< CustomView > createFunction, System.Type viewType )
     {
       // add the mapping between the view name and it's create function
-      _constructorMap.Add (viewName, createFunction);
+      _constructorMap.Add (viewType.Name, createFunction);
 
       // Call into DALi C++ to register the control with the type registry
-      TypeRegistration.RegisterControl( viewName, _createCallback );
+      TypeRegistration.RegisterControl( viewType.Name, _createCallback );
 
       // Cycle through each property in the class
       foreach (System.Reflection.PropertyInfo propertyInfo in viewType.GetProperties())
@@ -324,14 +324,14 @@ namespace Dali
               ScriptableProperty scriptableProp = attr as ScriptableProperty;
 
               // we get the start property index, based on the type and it's heirachy, e.g. DateView (70,000)-> Spin (60,000) -> View (50,000)
-              int propertyIndex =  _propertyRangeManager.GetPropertyIndex( viewName, viewType, scriptableProp.type );
+              int propertyIndex =  _propertyRangeManager.GetPropertyIndex( viewType.Name, viewType, scriptableProp.type );
 
               // get the enum for the property type... E.g. registering a string property returns Dali.PropertyType.String
               Dali.Property.Type propertyType = GetDaliPropertyType( propertyInfo.PropertyType.Name );
 
               // Example   RegisterProperty("spin","maxValue", 50001, FLOAT, set, get );
               // Native call to register the property
-              TypeRegistration.RegisterProperty (viewName, propertyInfo.Name , propertyIndex, propertyType, _setPropertyCallback, _getPropertyCallback);
+              TypeRegistration.RegisterProperty (viewType.Name, propertyInfo.Name , propertyIndex, propertyType, _setPropertyCallback, _getPropertyCallback);
             }
           }
           // Console.WriteLine ("property name = " + propertyInfo.Name);

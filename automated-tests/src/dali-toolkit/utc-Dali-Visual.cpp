@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,9 +119,21 @@ static void TestMixColor( Visual::Base visual, Property::Index mixColorIndex, co
   visual.CreatePropertyMap(map);
   Property::Value* value = map.Find( mixColorIndex );
   DALI_TEST_CHECK( value );
-  Vector4 mixColor;
-  DALI_TEST_CHECK( value->Get( mixColor ) );
-  DALI_TEST_EQUALS( mixColor, testColor, 0.001, TEST_LOCATION );
+  Vector3 mixColor1;
+  DALI_TEST_CHECK( value->Get( mixColor1 ) );
+  DALI_TEST_EQUALS( mixColor1, Vector3(testColor), 0.001, TEST_LOCATION );
+
+  value = map.Find( DevelVisual::Property::MIX_COLOR );
+  DALI_TEST_CHECK( value );
+  Vector4 mixColor2;
+  DALI_TEST_CHECK( value->Get( mixColor2 ) );
+  DALI_TEST_EQUALS( mixColor2, testColor, 0.001, TEST_LOCATION );
+
+  value = map.Find( DevelVisual::Property::OPACITY );
+  DALI_TEST_CHECK( value );
+  float opacity;
+  DALI_TEST_CHECK( value->Get( opacity ) );
+  DALI_TEST_EQUALS( opacity, testColor.a, 0.001, TEST_LOCATION );
 }
 
 
@@ -285,19 +297,6 @@ int UtcDaliVisualSize(void)
   Visual::Base svgVisual2 = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions(200, 200) );
   svgVisual2.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 100.f), TEST_LOCATION ); // Natural size should still be 100, 100
-
-  // Batch Image visual
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  Vector2 testSize(80.f, 160.f);
-  platform.SetClosestImageSize(testSize);
-  propertyMap.Clear();
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
-  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-  propertyMap.Insert( "batchingEnabled", true );
-  Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
-  batchImageVisual.SetTransformAndSize(DefaultTransform(), controlSize );
-  batchImageVisual.GetNaturalSize( naturalSize );
-  DALI_TEST_EQUALS( naturalSize, Vector2( 80.0f, 160.0f ), TEST_LOCATION );
 
   // Text visual.
 
@@ -957,45 +956,6 @@ int UtcDaliVisualGetPropertyMap9(void)
   END_TEST;
 }
 
-int UtcDaliVisualGetPropertyMapBatchImageVisual(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetPropertyMapBatchImageVisual:" );
-
-  VisualFactory factory = VisualFactory::Get();
-  Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
-  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
-  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, 20 );
-  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, 30 );
-
-  Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
-  DALI_TEST_CHECK( batchImageVisual );
-
-  Property::Map resultMap;
-  batchImageVisual.CreatePropertyMap( resultMap );
-
-  // Check the property values from the returned map from visual
-  Property::Value* value = resultMap.Find( Visual::Property::TYPE, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
-
-  value = resultMap.Find( ImageVisual::Property::URL, Property::STRING );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == TEST_IMAGE_FILE_NAME );
-
-  value = resultMap.Find( ImageVisual::Property::DESIRED_WIDTH, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == 20 );
-
-  value = resultMap.Find( ImageVisual::Property::DESIRED_HEIGHT, Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == 30 );
-
-  END_TEST;
-}
-
 //Text shape visual
 int UtcDaliVisualGetPropertyMap10(void)
 {
@@ -1117,36 +1077,6 @@ int UtcDaliVisualGetPropertyMap11(void)
   END_TEST;
 }
 
-int UtcDaliVisualGetPropertyMapBatchImageVisualNoAtlas(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetPropertyMapBatchImageVisualNoAtlas:" );
-
-  VisualFactory factory = VisualFactory::Get();
-  Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
-  propertyMap.Insert( ImageVisual::Property::BATCHING_ENABLED, true );
-  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
-
-  // Set the desired size to be larger than the atlas limit of 1024x1024.
-  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, 2048 );
-  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, 2048 );
-
-  // Create the visual.
-  Visual::Base batchImageVisual = factory.CreateVisual( propertyMap );
-
-  DALI_TEST_CHECK( batchImageVisual );
-
-  DummyControl dummyControl = DummyControl::New(true);
-  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
-  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, batchImageVisual );
-  Stage::GetCurrent().Add( dummyControl );
-
-  DALI_TEST_CHECK( dummyControl.GetRendererCount() == 1u );
-
-  END_TEST;
-}
-
 int UtcDaliVisualAnimateBorderVisual01(void)
 {
   ToolkitTestApplication application;
@@ -1201,12 +1131,13 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   DALI_TEST_EQUALS( color, testColor, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("borderColor", testColor ), true, TEST_LOCATION );
 
-  color = renderer.GetProperty<Vector4>( mixColorIndex );
+  color = renderer.GetProperty<Vector3>( mixColorIndex );
   testColor = Vector4( 1,1,1,0.4f );
-  DALI_TEST_EQUALS( color, testColor, 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("mixColor", testColor ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3(color), Vector3(testColor), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(testColor) ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", testColor.a ) , true, TEST_LOCATION );
 
-  application.Render(2000u); // halfway point between blue and white
+  application.Render(2000u);
 
   color = renderer.GetProperty<Vector4>( borderColorIndex );
   DALI_TEST_EQUALS( color, Color::WHITE, TEST_LOCATION );
@@ -1215,7 +1146,8 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   color = renderer.GetProperty<Vector4>( mixColorIndex );
   testColor = Vector4(1,1,1,0);
   DALI_TEST_EQUALS( color, testColor, TEST_LOCATION );
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("mixColor", testColor ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(testColor) ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", testColor.a ), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1287,31 +1219,31 @@ int UtcDaliVisualAnimateColorVisual(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
+  Property::Index mixColorIndex = DevelHandle::GetPropertyIndex( renderer, ColorVisual::Property::MIX_COLOR );
 
   Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
 
   Animation animation = Animation::New(4.0f);
-  animation.AnimateTo( Property(renderer, index), Color::WHITE );
+  animation.AnimateTo( Property(renderer, mixColorIndex), Vector3(Color::WHITE) );
   animation.Play();
 
   application.SendNotification();
   application.Render(0);
   application.Render(2000u); // halfway point
 
-  Vector4 color = renderer.GetProperty<Vector4>( index );
-  Vector4 testColor = (Color::BLUE + Color::WHITE)*0.5f;
+  Vector3 color = renderer.GetProperty<Vector3>( mixColorIndex );
+  Vector3 testColor = Vector3(Color::BLUE + Color::WHITE)*0.5f;
   DALI_TEST_EQUALS( color, testColor, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("mixColor", testColor ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", testColor ), true, TEST_LOCATION );
 
   application.Render(2000u); // halfway point between blue and white
 
-  color = renderer.GetProperty<Vector4>( index );
-  DALI_TEST_EQUALS( color, Color::WHITE, TEST_LOCATION );
+  color = renderer.GetProperty<Vector3>( mixColorIndex );
+  DALI_TEST_EQUALS( color, Vector3(Color::WHITE), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("mixColor", Color::WHITE ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(Color::WHITE) ), true, TEST_LOCATION );
 
   blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
@@ -1379,14 +1311,16 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(0.5f, 0.5f, 0.5f, 1.0f )), true, TEST_LOCATION );
 
     Vector4 halfwayColor = (INITIAL_MIX_COLOR + TARGET_MIX_COLOR)*0.5;
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("mixColor", halfwayColor ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(halfwayColor) ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", halfwayColor.a ), true, TEST_LOCATION );
 
     application.Render(2001u); // go past end
     application.SendNotification(); // Trigger signals
 
     DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::WHITE, TEST_LOCATION );
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Color::WHITE ), true, TEST_LOCATION );
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("mixColor", TARGET_MIX_COLOR ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(TARGET_MIX_COLOR) ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", TARGET_MIX_COLOR.a ), true, TEST_LOCATION );
 
     blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
     DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
@@ -1457,20 +1391,133 @@ int UtcDaliVisualAnimateImageVisualMixColor(void)
   application.SendNotification();
   application.Render(0);
   application.Render(2000u); // halfway point
+  Vector4 testColor(1.0f, 0.0f, 0.5f, 0.75f );
 
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(0.5f, 0.5f, 0.5f, 1.0f )), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("mixColor", Vector4(1.0f, 0.0f, 0.5f, 0.75f )), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(testColor)), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", testColor.a), true, TEST_LOCATION );
 
   application.Render(2000u); // halfway point between blue and white
 
   DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::WHITE, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Color::WHITE ), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("mixColor", TARGET_MIX_COLOR), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(TARGET_MIX_COLOR)), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", TARGET_MIX_COLOR.a), true, TEST_LOCATION );
 
   TestMixColor( visual, DevelVisual::Property::MIX_COLOR, TARGET_MIX_COLOR );
 
   blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliVisualAnimateImageVisualOpacity(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimateImageVisual mix color" );
+
+  application.GetPlatform().SetClosestImageSize( Vector2(100, 100) );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert("opacity", 0.5f);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  actor.SetSize(2000, 2000);
+  actor.SetParentOrigin(ParentOrigin::CENTER);
+  actor.SetColor(Color::BLACK);
+  Stage::GetCurrent().Add(actor);
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = actor.GetRendererAt(0);
+  tet_infoline("Test that the renderer has the opacity property");
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::OPACITY );
+  DALI_TEST_CHECK( index != Property::INVALID_INDEX );
+
+
+  Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+  DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
+
+  {
+    tet_infoline( "Test that the opacity can be increased to full via animation, and that the blend mode is set appropriately at the start and end of the animation." );
+
+    Property::Map map;
+    map["target"] = "testVisual";
+    map["property"] = "opacity";
+    map["targetValue"] = 1.0f;
+    map["animator"] = Property::Map()
+      .Add("alphaFunction", "LINEAR")
+      .Add("timePeriod", Property::Map()
+           .Add("delay", 0.0f)
+           .Add("duration", 4.0f));
+
+    Dali::Toolkit::TransitionData transition = TransitionData::New( map );
+    Animation animation = dummyImpl.CreateTransition( transition );
+    animation.Play();
+
+    application.SendNotification();
+    application.Render(0);
+    application.Render(2000u); // halfway point
+    application.SendNotification();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", 0.75f), true, TEST_LOCATION );
+
+    application.Render(2001u); // end
+    application.SendNotification();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", 1.0f), true, TEST_LOCATION );
+
+    blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
+  }
+
+
+  {
+    tet_infoline( "Test that the opacity can be reduced via animation, and that the blend mode is set appropriately at the start and end of the animation." );
+
+    Property::Map map;
+    map["target"] = "testVisual";
+    map["property"] = DevelVisual::Property::OPACITY;
+    map["targetValue"] = 0.1f;
+    map["animator"] = Property::Map()
+      .Add("alphaFunction", "LINEAR")
+      .Add("timePeriod", Property::Map()
+           .Add("delay", 0.0f)
+           .Add("duration", 4.0f));
+
+    Dali::Toolkit::TransitionData transition = TransitionData::New( map );
+    Animation animation = dummyImpl.CreateTransition( transition );
+    animation.Play();
+
+    blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render(0);
+    application.Render(2000u); // halfway point
+    application.SendNotification();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", 0.55f), true, TEST_LOCATION );
+
+    application.Render(2016u); // end
+    application.SendNotification();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", 0.1f), true, TEST_LOCATION );
+
+    blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+    DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
+  }
+
 
   END_TEST;
 }
@@ -1695,6 +1742,7 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
 
   //Set a new transform
   transform.Clear();
+  transform = DefaultTransform();
   transform.Insert( DevelVisual::Transform::Property::OFFSET, Vector2(20.0f, 20.0f) );
   transform.Insert( DevelVisual::Transform::Property::SIZE, Vector2(100.0f, 100.0f) );
   transform.Insert( DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4(0.0f, 0.0f, 1.0f,1.0f) );
@@ -2083,8 +2131,8 @@ int UtcDaliVisualTextVisualRender(void)
   Renderer renderer = dummyControl.GetRendererAt(0u);
   Property::Index index = renderer.GetPropertyIndex("size");
 
-  tet_infoline( "Test that the TextVisual overrides anything set by developer" );
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(index), Vector2( 1.0, 1.0 ), 0.001f, TEST_LOCATION );
+  tet_infoline( "Test that the TextVisual has NOT overridden what was set by developer" );
+  DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(index), Vector2( 0.5f, 0.5f ), 0.001f, TEST_LOCATION );
 
   END_TEST;
 }

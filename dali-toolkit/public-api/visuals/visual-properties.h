@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,10 @@ namespace Toolkit
  * @{
  */
 
+/**
+ * @brief All the visual types
+ * @SINCE_1_1.45
+ */
 namespace Visual
 {
 
@@ -50,9 +54,17 @@ enum Type
   WIREFRAME ///< Renders a simple wire-frame outlining a quad. @SINCE_1_2_2
 };
 
+/**
+ * @brief Visual Property
+ * @SINCE_1_1.45
+ */
 namespace Property
 {
 
+/**
+ * @brief Visual Property
+ * @SINCE_1_1.45
+ */
 enum
 {
   /**
@@ -77,17 +89,30 @@ enum
 
 } // namespace Property
 
+/**
+ * @brief Shader for Visuals
+ * @SINCE_1_1.45
+ */
 namespace Shader
 {
 
+/**
+ * @brief Shader Property
+ * @SINCE_1_1.45
+ */
 namespace Property
 {
 
+/**
+ * @brief The type of Shader
+ * @SINCE_1_1.45
+ */
 enum
 {
   /**
    * @brief The vertex shader.
-   * @details Name "vertexShader", type Property::STRING.
+   * @details Name "vertexShader", type Property::STRING or Property::ARRAY of Property::STRING.
+   *          A Property::ARRAY of Property::STRING values can be used to split the shader string over multiple lines.
    * @SINCE_1_1.45
    * @note Optional
    * @note If not supplied, the visual's already set vertex shader is used.
@@ -96,7 +121,8 @@ enum
 
   /**
    * @brief The fragment shader.
-   * @details Name "fragmentShader", type Property::STRING.
+   * @details Name "fragmentShader", type Property::STRING or Property::ARRAY of Property::STRING.
+   *          A Property::ARRAY of Property::STRING values can be used to split the shader string over multiple lines.
    * @SINCE_1_1.45
    * @note Optional
    * @note If not supplied, the visual's already set fragment shader is used.

@@ -128,12 +128,13 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
     uniform sampler2D sTexture;\n
     uniform mediump vec4 uAtlasRect;\n
     uniform lowp vec4 uColor;\n
-    uniform lowp vec4 mixColor;\n
+    uniform lowp vec3 mixColor;\n
+    uniform lowp float opacity;\n
     \n
     void main()\n
     {\n
       mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-      gl_FragColor = texture2D( sTexture, texCoord ) * uColor * mixColor;\n
+      gl_FragColor = texture2D( sTexture, texCoord ) * uColor * vec4( mixColor, opacity );\n
     }\n
 );
 
@@ -313,7 +314,7 @@ void TextVisual::DoSetOnStage( Actor& actor )
   }
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
-  mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::TEXT );
+  mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT );
 
   UpdateRenderer( true ); // Renderer needs textures and to be added to control
 }

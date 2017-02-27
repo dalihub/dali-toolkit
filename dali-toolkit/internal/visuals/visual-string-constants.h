@@ -56,6 +56,7 @@ extern const char * const PREMULTIPLIED_ALPHA;
 
 // Mix color
 extern const char * const MIX_COLOR;
+extern const char * const OPACITY;
 
 // Image visual
 extern const char * const IMAGE_URL_NAME;

@@ -64,9 +64,13 @@ public:
 
   /**
    * Create a new ControlWrapper.
+   *
+   * @param[in] typeName The name of the type that is registered with this control
+   * @param[in] controlWrapper The implementation of this control
+   *
    * @return A public handle to the newly allocated ControlWrapper.
    */
-  static Dali::Toolkit::ControlWrapper New( ControlWrapper* controlWrapper );
+  static Dali::Toolkit::ControlWrapper New( const std::string& typeName, ControlWrapper* controlWrapper );
 
 public: // From CustomActorImpl
 
