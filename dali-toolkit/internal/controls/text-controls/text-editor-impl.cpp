@@ -1259,7 +1259,12 @@ bool TextEditor::OnKeyEvent( const KeyEvent& event )
 
   if( Dali::DALI_KEY_ESCAPE == event.keyCode ) // Make a Dali key code for this
   {
-    ClearKeyInputFocus();
+    // Make sure ClearKeyInputFocus when only key is up
+    if( event.state == KeyEvent::Up )
+    {
+      ClearKeyInputFocus();
+    }
+
     return true;
   }
 

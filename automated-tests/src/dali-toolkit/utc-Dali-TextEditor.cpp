@@ -1603,5 +1603,12 @@ int utcDaliTextEditorEvent05(void)
   DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION ), 0.1f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::SMOOTH_SCROLL ), true, TEST_LOCATION );
 
+  // Press Escape to increase coverage
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up ) );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( !editor.HasKeyInputFocus() );
+
   END_TEST;
 }
