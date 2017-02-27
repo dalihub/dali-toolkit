@@ -1773,15 +1773,7 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
     EventData::State state( mImpl->mEventData->mState );
     bool relayoutNeeded( false );   // to avoid unnecessary relayouts when tapping an empty text-field
 
-    if( mImpl->IsClipboardVisible() )
-    {
-      if( EventData::INACTIVE == state || EventData::EDITING == state)
-      {
-        mImpl->ChangeState( EventData::EDITING_WITH_GRAB_HANDLE );
-      }
-      relayoutNeeded = true;
-    }
-    else if( 1u == tapCount )
+    if( 1u == tapCount )
     {
       if( EventData::EDITING_WITH_POPUP == state || EventData::EDITING_WITH_PASTE_POPUP == state )
       {
@@ -1882,7 +1874,7 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
 
         mImpl->RequestRelayout();
       }
-      else if( !mImpl->IsClipboardVisible() )
+      else
       {
         // Reset the imf manger to commit the pre-edit before selecting the text.
         mImpl->ResetImfManager();
