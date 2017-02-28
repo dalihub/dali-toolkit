@@ -34,6 +34,7 @@
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
+#include <dali-toolkit/internal/controls/scroll-bar/scroll-bar-impl.h>
 
 //#define ENABLED_SCROLL_STATE_LOGGING
 
@@ -1983,8 +1984,8 @@ void ScrollView::OnChildAdd(Actor& child)
 
     if( mTransientScrollBar )
     {
-      scrollBar.SetVisible( false );
-      scrollBar.HideIndicator();
+      // Show the scroll-indicator for a brief period
+      GetImpl(scrollBar).ShowTransientIndicator();
     }
   }
   else if(mAlterChild)
@@ -2492,7 +2493,6 @@ void ScrollView::OnPan( const PanGesture& gesture )
 
         if( ( rulerDomainX.max > size.width ) || ( rulerDomainY.max > size.height ) )
         {
-          scrollBar.SetVisible( true );
           scrollBar.ShowIndicator();
         }
       }

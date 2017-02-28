@@ -117,7 +117,8 @@
     "TextSelectionScrollBar":
     {
       "indicatorShowDuration":0.25,
-      "indicatorHideDuration":0.25
+      "indicatorHideDuration":0.25,
+      "indicatorTransientDuration":1.0
     },
     "TextSelectionScrollIndicator":
     {

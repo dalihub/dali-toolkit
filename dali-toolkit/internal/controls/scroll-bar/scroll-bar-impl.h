@@ -146,7 +146,12 @@ public:
   /**
    * @copydoc Toolkit::ScrollBar::HideIndicator()
    */
- void HideIndicator();
+  void HideIndicator();
+
+  /**
+   * @brief Shows indicator until the transient duration has expired
+   */
+  void ShowTransientIndicator();
 
  /**
   * @copydoc Toolkit::ScrollBar::PanFinishedSignal()
@@ -278,6 +283,7 @@ private:
 
   float mIndicatorShowDuration;                                      ///< The duration of scroll indicator show animation
   float mIndicatorHideDuration;                                      ///< The duration of scroll indicator hide animation
+  float mTransientIndicatorDuration;                                 ///< The duration before hiding transient indicator
 
   float mScrollStart;                                                ///< Scroll Start position (start of drag)
   Vector3 mGestureDisplacement;                                      ///< Gesture Displacement.
