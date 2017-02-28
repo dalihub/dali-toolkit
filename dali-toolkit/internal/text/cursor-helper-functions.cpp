@@ -43,7 +43,7 @@ struct FindWordData
   : textBuffer( textBuffer ),
     totalNumberOfCharacters( totalNumberOfCharacters ),
     hitCharacter( hitCharacter ),
-    foundIndex( 0u ),
+    foundIndex( 0 ),
     isWhiteSpace( isWhiteSpace ),
     isNewParagraph( isNewParagraph )
   {}
@@ -136,10 +136,17 @@ namespace Text
 {
 
 LineIndex GetClosestLine( VisualModelPtr visualModel,
-                          float visualY )
+                          float visualY,
+                          bool& matchedLine )
 {
   float totalHeight = 0.f;
-  LineIndex lineIndex = 0u;
+  LineIndex lineIndex = 0;
+  matchedLine = false;
+
+  if( visualY < 0.f )
+  {
+    return 0;
+  }
 
   const Vector<LineRun>& lines = visualModel->mLines;
 
@@ -156,16 +163,17 @@ LineIndex GetClosestLine( VisualModelPtr visualModel,
 
     if( visualY < totalHeight )
     {
+      matchedLine = true;
       return lineIndex;
     }
   }
 
-  if( lineIndex == 0u )
+  if( lineIndex == 0 )
   {
     return 0;
   }
 
-  return lineIndex-1;
+  return lineIndex - 1u;
 }
 
 float CalculateLineOffset( const Vector<LineRun>& lines,
@@ -192,11 +200,16 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
                                       LogicalModelPtr logicalModel,
                                       MetricsPtr metrics,
                                       float visualX,
-                                      float visualY )
+                                      float visualY,
+                                      CharacterHitTest::Mode mode,
+                                      bool& matchedCharacter )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "GetClosestCursorIndex, closest visualX %f visualY %f\n", visualX, visualY );
 
-  CharacterIndex logicalIndex = 0u;
+  // Whether there is a hit on a glyph.
+  matchedCharacter = false;
+
+  CharacterIndex logicalIndex = 0;
 
   const Length totalNumberOfGlyphs = visualModel->mGlyphs.Count();
   const Length totalNumberOfLines  = visualModel->mLines.Count();
@@ -206,9 +219,19 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
     return logicalIndex;
   }
 
+  // Whether there is a hit on a line.
+  bool matchedLine = false;
+
   // Find which line is closest.
   const LineIndex lineIndex = Text::GetClosestLine( visualModel,
-                                                    visualY );
+                                                    visualY,
+                                                    matchedLine );
+
+  if( !matchedLine && ( CharacterHitTest::TAP == mode ) )
+  {
+    // Return the first or the last character if the touch point doesn't hit a line.
+    return ( visualY < 0.f ) ? 0 : logicalModel->mText.Count();
+  }
 
   // Convert from text's coords to line's coords.
   const LineRun& line = *( visualModel->mLines.Begin() + lineIndex );
@@ -241,12 +264,12 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
   // The character's direction buffer.
   const CharacterDirection* const directionsBuffer = bidiLineFetched ? logicalModel->mCharacterDirections.Begin() : NULL;
 
-  // Whether there is a hit on a glyph.
-  bool matched = false;
+  // Whether the touch point if before the first glyph.
+  bool isBeforeFirstGlyph = false;
 
   // Traverses glyphs in visual order. To do that use the visual to logical conversion table.
   CharacterIndex visualIndex = startCharacter;
-  Length numberOfVisualCharacters = 0u;
+  Length numberOfVisualCharacters = 0;
   for( ; visualIndex < endCharacter; ++visualIndex )
   {
     // The character in logical order.
@@ -257,7 +280,7 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
     const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + characterLogicalOrderIndex );
     ++numberOfVisualCharacters;
 
-    if( 0u != numberOfGlyphs )
+    if( 0 != numberOfGlyphs )
     {
       // Get the first character/glyph of the group of glyphs.
       const CharacterIndex firstVisualCharacterIndex = 1u + visualIndex - numberOfVisualCharacters;
@@ -275,6 +298,17 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
       // Get the position of the first glyph.
       const Vector2& position = *( positionsBuffer + firstLogicalGlyphIndex );
 
+      if( startCharacter == visualIndex )
+      {
+        const float glyphPosition = -glyphMetrics.xBearing + position.x;
+
+        if( visualX < glyphPosition )
+        {
+          isBeforeFirstGlyph = true;
+          break;
+        }
+      }
+
       // Whether the glyph can be split, like Latin ligatures fi, ff or Arabic (ل + ا).
       Length numberOfCharacters = *( charactersPerGlyphBuffer + firstLogicalGlyphIndex );
       if( direction != LTR )
@@ -284,7 +318,7 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
         // number of glyphs in the table is found first.
         // Jump the number of characters to the next glyph is needed.
 
-        if( 0u == numberOfCharacters )
+        if( 0 == numberOfCharacters )
         {
           // TODO: This is a workaround to fix an issue with complex characters in the arabic
           // script like i.e. رّ or الأَبْجَدِيَّة العَرَبِيَّة
@@ -298,7 +332,7 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
 
           // Find the number of characters.
           for( GlyphIndex index = firstLogicalGlyphIndex + 1u;
-               ( 0u == numberOfCharacters ) && ( index < totalNumberOfGlyphs ) ;
+               ( 0 == numberOfCharacters ) && ( index < totalNumberOfGlyphs );
                ++index )
           {
             numberOfCharacters = *( charactersPerGlyphBuffer + index );
@@ -322,7 +356,7 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
       const Length numberOfBlocks = isInterglyphIndex ? numberOfCharacters : 1u;
       const float glyphAdvance = glyphMetrics.advance / static_cast<float>( numberOfBlocks );
 
-      CharacterIndex index = 0u;
+      CharacterIndex index = 0;
       for( ; index < numberOfBlocks; ++index )
       {
         // Find the mid-point of the area containing the glyph
@@ -330,31 +364,39 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
 
         if( visualX < glyphCenter )
         {
-          matched = true;
+          matchedCharacter = true;
           break;
         }
       }
 
-      if( matched )
+      if( matchedCharacter )
       {
         // If the glyph is shaped from more than one character, it matches the character of the glyph.
         visualIndex = firstVisualCharacterIndex + index;
         break;
       }
 
-      numberOfVisualCharacters = 0u;
+      numberOfVisualCharacters = 0;
     }
-  }
+  } // for characters in visual order.
 
   // The number of characters of the whole text.
   const Length totalNumberOfCharacters = logicalModel->mText.Count();
 
   // Return the logical position of the cursor in characters.
 
-  if( !matched )
+  if( !matchedCharacter )
   {
-    // If no character is matched, then the last character (in visual order) of the line is used.
-    visualIndex = endCharacter;
+    if( isBeforeFirstGlyph )
+    {
+      // If no character is matched, then the first character (in visual order) of the line is used.
+      visualIndex = startCharacter;
+    }
+    else
+    {
+      // If no character is matched, then the last character (in visual order) of the line is used.
+      visualIndex = endCharacter;
+    }
   }
 
   // Get the paragraph direction.
@@ -607,7 +649,7 @@ void GetCursorPosition( GetCursorPositionParameters& parameters,
         isCurrentRightToLeft = *( directionsBuffer + index );
       }
 
-      Length numberOfGlyphAdvance = ( isFirstPositionOfLine ? 0u : 1u ) + characterIndex - firstIndex;
+      Length numberOfGlyphAdvance = ( isFirstPositionOfLine ? 0 : 1u ) + characterIndex - firstIndex;
       if( isCurrentRightToLeft )
       {
         numberOfGlyphAdvance = primaryNumberOfCharacters - numberOfGlyphAdvance;
@@ -688,9 +730,9 @@ bool FindSelectionIndices( VisualModelPtr visualModel,
                            float visualX,
                            float visualY,
                            CharacterIndex& startIndex,
-                           CharacterIndex& endIndex )
+                           CharacterIndex& endIndex,
+                           CharacterIndex& noTextHitIndex )
 {
-
 /*
   Hit character                                           Select
 |-------------------------------------------------------|------------------------------------------|
@@ -701,22 +743,32 @@ bool FindSelectionIndices( VisualModelPtr visualModel,
 | On a new paragraph character                          | The word or group of white spaces before |
 |-------------------------------------------------------|------------------------------------------|
 */
-
-  CharacterIndex hitCharacter = Text::GetClosestCursorIndex( visualModel,
-                                                             logicalModel,
-                                                             metrics,
-                                                             visualX,
-                                                             visualY );
-
   const Length totalNumberOfCharacters = logicalModel->mText.Count();
+  startIndex = 0;
+  endIndex = 0;
+  noTextHitIndex = 0;
 
-  DALI_ASSERT_DEBUG( ( hitCharacter <= totalNumberOfCharacters ) && "GetClosestCursorIndex returned out of bounds index" );
-
-  if( 0u == totalNumberOfCharacters )
+  if( 0 == totalNumberOfCharacters )
   {
     // Nothing to do if the model is empty.
     return false;
   }
+
+  bool matchedCharacter = false;
+  CharacterIndex hitCharacter = Text::GetClosestCursorIndex( visualModel,
+                                                             logicalModel,
+                                                             metrics,
+                                                             visualX,
+                                                             visualY,
+                                                             CharacterHitTest::TAP,
+                                                             matchedCharacter );
+
+  if( !matchedCharacter )
+  {
+    noTextHitIndex = hitCharacter;
+  }
+
+  DALI_ASSERT_DEBUG( ( hitCharacter <= totalNumberOfCharacters ) && "GetClosestCursorIndex returned out of bounds index" );
 
   if( hitCharacter >= totalNumberOfCharacters )
   {
@@ -753,7 +805,7 @@ bool FindSelectionIndices( VisualModelPtr visualModel,
   {
     // Find the first character before the hit one which is not a new paragraph character.
 
-    if( hitCharacter > 0u )
+    if( hitCharacter > 0 )
     {
       endIndex = hitCharacter - 1u;
       for( ; endIndex > 0; --endIndex )
@@ -786,13 +838,13 @@ bool FindSelectionIndices( VisualModelPtr visualModel,
     {
       // Select the word before or after the white space
 
-      if( 0u == hitCharacter )
+      if( 0 == hitCharacter )
       {
         data.isWhiteSpace = false;
         FindEndOfWord( data );
         endIndex = data.foundIndex;
       }
-      else if( hitCharacter > 0u )
+      else if( hitCharacter > 0 )
       {
         // Find the start of the word.
         data.hitCharacter = hitCharacter - 1u;
@@ -805,7 +857,7 @@ bool FindSelectionIndices( VisualModelPtr visualModel,
     }
   }
 
-  return true;
+  return matchedCharacter;
 }
 
 } // namespace Text

@@ -32,6 +32,18 @@ namespace Toolkit
 namespace Text
 {
 
+struct CharacterHitTest
+{
+  /**
+   * @brief Enumeration of the types of hit test.
+   */
+  enum Mode
+  {
+    TAP,   ///< Retrieves the first or last character of the line if the touch point is outside of the boundaries of the text.
+    SCROLL ///< Retrieves the character above or below to the touch point if it's outside of the boundaries of the text.
+  };
+};
+
 struct CursorInfo
 {
   CursorInfo()
@@ -75,11 +87,13 @@ struct GetCursorPositionParameters
  *
  * @param[in] visualModel The visual model.
  * @param[in] visualY The touch point 'y' in text's coords.
+ * @param[out] matchedLine Whether the touch point actually hits a line.
  *
  * @return A line index.
  */
 LineIndex GetClosestLine( VisualModelPtr visualModel,
-                          float visualY );
+                          float visualY,
+                          bool& matchedLine );
 
 /**
  * @brief Calculates the vertical line's offset for a given line.
@@ -97,11 +111,18 @@ float CalculateLineOffset( const Vector<LineRun>& lines,
 /**
  * @brief Retrieves the cursor's logical position for a given touch point x,y
  *
+ * There are two types of hit test: CharacterHitTest::TAP retrieves the first or
+ * last character of a line if the touch point is outside the boundaries of the
+ * text, CharacterHitTest::SCROLL retrieves the character above or below to the
+ * touch point if it's outside the boundaries of the text.
+ *
  * @param[in] visualModel The visual model.
  * @param[in] logicalModel The logical model.
  * @param[in] metrics A wrapper around FontClient used to get metrics.
  * @param[in] visualX The touch point 'x' in text's coords.
  * @param[in] visualY The touch point 'y' in text's coords.
+ * @param[in] mode The type of hit test.
+ * @param[out] matchedCharacter Whether the touch point actually hits a character.
  *
  * @return The logical cursor position (in characters). 0 is just before the first character, a value equal to the number of characters is just after the last character.
  */
@@ -109,8 +130,9 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
                                       LogicalModelPtr logicalModel,
                                       MetricsPtr metrics,
                                       float visualX,
-                                      float visualY );
-
+                                      float visualY,
+                                      CharacterHitTest::Mode mode,
+                                      bool& matchedCharacter );
 
 /**
  * @brief Calculates the cursor's position for a given character index in the logical order.
@@ -134,8 +156,9 @@ void GetCursorPosition( GetCursorPositionParameters& parameters,
  * @param[in] visualY The touch point 'y' in text's coords.
  * @param[out] startIndex Index to the first character of the selected word.
  * @param[out] endIndex Index to the last character of the selected word.
+ * @param[out] noTextHitIndex Index to the nearest character when there is no hit.
  *
- * @return @e true if the indices are found.
+ * @return @e true if the touch point hits a character.
  */
 bool FindSelectionIndices( VisualModelPtr visualModel,
                            LogicalModelPtr logicalModel,
@@ -143,7 +166,8 @@ bool FindSelectionIndices( VisualModelPtr visualModel,
                            float visualX,
                            float visualY,
                            CharacterIndex& startIndex,
-                           CharacterIndex& endIndex );
+                           CharacterIndex& endIndex,
+                           CharacterIndex& noTextHitIndex );
 
 } // namespace Text
 

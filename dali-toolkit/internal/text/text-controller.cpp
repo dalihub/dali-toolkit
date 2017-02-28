@@ -1335,6 +1335,46 @@ const std::string& Controller::GetInputOutlineProperties() const
   return GetDefaultOutlineProperties();
 }
 
+void Controller::SetNoTextDoubleTapAction( NoTextTap::Action action )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mDoubleTapAction = action;
+  }
+}
+
+Controller::NoTextTap::Action Controller::GetNoTextDoubleTapAction() const
+{
+  NoTextTap::Action action = NoTextTap::NO_ACTION;
+
+  if( NULL != mImpl->mEventData )
+  {
+    action = mImpl->mEventData->mDoubleTapAction;
+  }
+
+  return action;
+}
+
+void Controller::SetNoTextLongPressAction( NoTextTap::Action action )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mLongPressAction = action;
+  }
+}
+
+Controller::NoTextTap::Action Controller::GetNoTextLongPressAction() const
+{
+  NoTextTap::Action action = NoTextTap::NO_ACTION;
+
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mLongPressAction;
+  }
+
+  return action;
+}
+
 // public : Queries & retrieves.
 
 LayoutEngine& Controller::GetLayoutEngine()
@@ -1809,9 +1849,12 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
       if( mImpl->mEventData->mSelectionEnabled &&
           mImpl->IsShowingRealText() )
       {
-        SelectEvent( x, y, false );
+        relayoutNeeded = true;
+        mImpl->mEventData->mIsLeftHandleSelected = true;
+        mImpl->mEventData->mIsRightHandleSelected = true;
       }
     }
+
     // Handles & cursors must be repositioned after Relayout() i.e. after the Model has been updated
     if( relayoutNeeded )
     {
@@ -1852,35 +1895,42 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
   if( ( state == Gesture::Started ) &&
       ( NULL != mImpl->mEventData ) )
   {
-    if( !mImpl->IsShowingRealText() )
+    // The 1st long-press on inactive text-field is treated as tap
+    if( EventData::INACTIVE == mImpl->mEventData->mState )
+    {
+      mImpl->ChangeState( EventData::EDITING );
+
+      Event event( Event::TAP_EVENT );
+      event.p1.mUint = 1;
+      event.p2.mFloat = x;
+      event.p3.mFloat = y;
+      mImpl->mEventData->mEventQueue.push_back( event );
+
+      mImpl->RequestRelayout();
+    }
+    else if( !mImpl->IsShowingRealText() )
     {
       Event event( Event::LONG_PRESS_EVENT );
       event.p1.mInt = state;
+      event.p2.mFloat = x;
+      event.p3.mFloat = y;
       mImpl->mEventData->mEventQueue.push_back( event );
       mImpl->RequestRelayout();
     }
-    else
+    else if( !mImpl->IsClipboardVisible() )
     {
-      // The 1st long-press on inactive text-field is treated as tap
-      if( EventData::INACTIVE == mImpl->mEventData->mState )
-      {
-        mImpl->ChangeState( EventData::EDITING );
+      // Reset the imf manager to commit the pre-edit before selecting the text.
+      mImpl->ResetImfManager();
 
-        Event event( Event::TAP_EVENT );
-        event.p1.mUint = 1;
-        event.p2.mFloat = x;
-        event.p3.mFloat = y;
-        mImpl->mEventData->mEventQueue.push_back( event );
+      Event event( Event::LONG_PRESS_EVENT );
+      event.p1.mInt = state;
+      event.p2.mFloat = x;
+      event.p3.mFloat = y;
+      mImpl->mEventData->mEventQueue.push_back( event );
+      mImpl->RequestRelayout();
 
-        mImpl->RequestRelayout();
-      }
-      else
-      {
-        // Reset the imf manger to commit the pre-edit before selecting the text.
-        mImpl->ResetImfManager();
-
-        SelectEvent( x, y, false );
-      }
+      mImpl->mEventData->mIsLeftHandleSelected = true;
+      mImpl->mEventData->mIsRightHandleSelected = true;
     }
   }
 }
@@ -2860,6 +2910,8 @@ void Controller::SelectEvent( float x, float y, bool selectAll )
       mImpl->mEventData->mEventQueue.push_back( event );
     }
 
+    mImpl->mEventData->mIsLeftHandleSelected = true;
+    mImpl->mEventData->mIsRightHandleSelected = true;
     mImpl->RequestRelayout();
   }
 }

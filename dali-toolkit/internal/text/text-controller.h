@@ -118,6 +118,16 @@ public: // Enumerated types.
     PLACEHOLDER_TYPE_INACTIVE,
   };
 
+  struct NoTextTap
+  {
+    enum Action
+    {
+      NO_ACTION,           ///< Does no action if there is a tap on top of an area with no text.
+      HIGHLIGHT,           ///< Highlights the nearest text (at the beginning or end of the text) and shows the text's selection popup.
+      SHOW_SELECTION_POPUP ///< Shows the text's selection popup.
+    };
+  };
+
 public: // Constructor.
 
   /**
@@ -315,6 +325,34 @@ public: // Configure the text controller.
    * @copydoc Dali::Toolkit::Text::LayoutEngine::GetVerticalAlignment()
    */
   LayoutEngine::VerticalAlignment GetVerticalAlignment() const;
+
+  /**
+   * @brief Sets the action when there is a double tap event on top of a text area with no text.
+   *
+   * @param[in] action The action to do.
+   */
+  void SetNoTextDoubleTapAction( NoTextTap::Action action );
+
+  /**
+   * @brief Retrieves the action when there is a double tap event on top of a text area with no text.
+   *
+   * @return The action to do.
+   */
+  NoTextTap::Action GetNoTextDoubleTapAction() const;
+
+  /**
+   * @briefSets the action when there is a long press event on top of a text area with no text.
+   *
+   * @param[in] action The action to do.
+   */
+  void SetNoTextLongPressAction( NoTextTap::Action action );
+
+  /**
+   * @brief Retrieves the action when there is a long press event on top of a text area with no text.
+   *
+   * @return The action to do.
+   */
+  NoTextTap::Action GetNoTextLongPressAction() const;
 
 public: // Update.
 
