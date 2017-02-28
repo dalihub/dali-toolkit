@@ -21,6 +21,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
+#include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -1383,6 +1384,307 @@ int UtcDaliToolkitScrollBarHideIndicatorN(void)
   application.Render();
 
   // Check that the indicator is still invisible in the very next frame
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 0.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollBarActionShowIndicator(void)
+{
+  ToolkitTestApplication application;
+
+  // Create a scroll bar
+  ScrollBar scrollBar = ScrollBar::New();
+  DALI_TEST_CHECK( scrollBar );
+
+  Stage::GetCurrent().Add( scrollBar );
+
+  Actor indicator = scrollBar.GetScrollIndicator();
+  DALI_TEST_CHECK( indicator );
+
+  // Get the default duration to hide the indicator
+  float duration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_SHOW_DURATION );
+
+  // Check that the default duration is greater than 0
+  DALI_TEST_CHECK( duration > 0.0f );
+
+  // Make the indicator invisible
+  indicator.SetOpacity(0.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is invisible
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 0.0f, TEST_LOCATION );
+
+  // Do the "ShowIndicator" action
+  Property::Map emptyMap;
+  scrollBar.DoAction( "ShowIndicator", emptyMap );
+
+  // Wait for the specified duration
+  Wait(application, duration * 1000);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is now visible
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 1.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollBarActionHideIndicator(void)
+{
+  ToolkitTestApplication application;
+
+  // Create a scroll bar
+  ScrollBar scrollBar = ScrollBar::New();
+  DALI_TEST_CHECK( scrollBar );
+
+  Stage::GetCurrent().Add( scrollBar );
+
+  Actor indicator = scrollBar.GetScrollIndicator();
+  DALI_TEST_CHECK( indicator );
+
+  // Get the default duration to hide the indicator
+  float duration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
+
+  // Check that the default duration is greater than 0
+  DALI_TEST_CHECK( duration > 0.0f );
+
+  // Make the indicator visible
+  indicator.SetOpacity(1.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is visible
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 1.0f, TEST_LOCATION );
+
+  // Do the "HideIndicator" action
+  Property::Map emptyMap;
+  scrollBar.DoAction( "HideIndicator", emptyMap );
+
+  // Wait for the specified duration
+  Wait(application, duration * 1000);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is now invisible
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 0.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollBarActionShowTransientIndicator(void)
+{
+  ToolkitTestApplication application;
+
+  // Create a scroll bar
+  ScrollBar scrollBar = ScrollBar::New();
+  DALI_TEST_CHECK( scrollBar );
+
+  Stage::GetCurrent().Add( scrollBar );
+
+  Actor indicator = scrollBar.GetScrollIndicator();
+  DALI_TEST_CHECK( indicator );
+
+  // Get the default duration to hide the indicator
+  float duration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_SHOW_DURATION );
+
+  // Check that the default duration is greater than 0
+  DALI_TEST_CHECK( duration > 0.0f );
+
+  // Make the indicator invisible
+  indicator.SetOpacity(0.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is invisible
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 0.0f, TEST_LOCATION );
+
+  // Do the "ShowIndicator" action
+  Property::Map emptyMap;
+  scrollBar.DoAction( "ShowTransientIndicator", emptyMap );
+
+  // Wait for the specified duration
+  Wait(application, duration * 1000);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is now visible
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 1.0f, TEST_LOCATION );
+
+  // Get the default duration to hide the indicator
+  float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
+  float transientDuration = scrollBar.GetProperty<float>( DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
+  float totalVisibleDuration = hideDuration + transientDuration;
+
+  // Check that the default duration is greater than 0
+  DALI_TEST_CHECK( totalVisibleDuration > 0.0f );
+
+  // Wait for the specified duration
+  Wait(application, totalVisibleDuration * 1000);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is now invisible
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 0.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollBarActionShowTransientIndicatorImmediate(void)
+{
+  ToolkitTestApplication application;
+
+  // Create a scroll bar
+  ScrollBar scrollBar = ScrollBar::New();
+  DALI_TEST_CHECK( scrollBar );
+
+  Stage::GetCurrent().Add( scrollBar );
+
+  Actor indicator = scrollBar.GetScrollIndicator();
+  DALI_TEST_CHECK( indicator );
+
+  // Make the indicator invisible
+  indicator.SetOpacity(0.0f);
+
+  // Don't use a show animation; the indicator should appear immediately
+  scrollBar.SetProperty( ScrollBar::Property::INDICATOR_SHOW_DURATION, 0.0f );
+  float duration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_SHOW_DURATION );
+  DALI_TEST_EQUALS( duration, 0.0f, TEST_LOCATION );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Do the "ShowIndicator" action
+  Property::Map emptyMap;
+  scrollBar.DoAction( "ShowTransientIndicator", emptyMap );
+
+  // Wait for the specified duration
+  Wait(application);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is now visible
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 1.0f, TEST_LOCATION );
+
+  // Get the default duration to hide the indicator
+  float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
+  float transientDuration = scrollBar.GetProperty<float>( DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
+  float totalVisibleDuration = hideDuration + transientDuration;
+
+  // Check that the default duration is greater than 0
+  DALI_TEST_CHECK( totalVisibleDuration > 0.0f );
+
+  // Wait for the specified duration
+  Wait(application, totalVisibleDuration * 1000);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is now invisible
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 0.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollBarActionShowTransientIndicatorDuringHide(void)
+{
+  ToolkitTestApplication application;
+
+  // Create a scroll bar
+  ScrollBar scrollBar = ScrollBar::New();
+  DALI_TEST_CHECK( scrollBar );
+
+  Stage::GetCurrent().Add( scrollBar );
+
+  Actor indicator = scrollBar.GetScrollIndicator();
+  DALI_TEST_CHECK( indicator );
+
+  // Get the default duration to hide the indicator
+  float duration = scrollBar.GetIndicatorHideDuration();
+
+  // Check that the default duration is greater than 0
+  DALI_TEST_CHECK( duration > 0.0f );
+
+  // Make the indicator visible
+  indicator.SetOpacity(1.0f);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is visible
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 1.0f, TEST_LOCATION );
+
+  // Hide the indicator
+  scrollBar.HideIndicator();
+
+  // Wait for half the specified duration
+  Wait(application, duration * 0.5f * 1000);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is now partially hidden
+  DALI_TEST_CHECK( indicator.GetCurrentOpacity() < 1.0f );
+
+  // Now interrupt the Hide with a DoAction( "ShowTransientIndicator" )
+
+  // Get the default duration to hide the indicator
+  duration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_SHOW_DURATION );
+
+  // Check that the default duration is greater than 0
+  DALI_TEST_CHECK( duration > 0.0f );
+
+  // Do the "ShowIndicator" action
+  Property::Map emptyMap;
+  scrollBar.DoAction( "ShowTransientIndicator", emptyMap );
+
+  // Wait for the specified duration
+  Wait(application, duration * 1000);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is now visible
+  DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 1.0f, TEST_LOCATION );
+
+  // Get the default duration to hide the indicator
+  float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
+  float transientDuration = scrollBar.GetProperty<float>( DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
+  float totalVisibleDuration = hideDuration + transientDuration;
+
+  // Check that the default duration is greater than 0
+  DALI_TEST_CHECK( totalVisibleDuration > 0.0f );
+
+  // Wait for the specified duration
+  Wait(application, totalVisibleDuration * 1000);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check that the indicator is now invisible
   DALI_TEST_EQUALS( indicator.GetCurrentOpacity(), 0.0f, TEST_LOCATION );
 
   END_TEST;
