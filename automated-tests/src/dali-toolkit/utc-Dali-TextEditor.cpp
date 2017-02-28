@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/integration-api/events/key-event-integ.h>
+#include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/tap-gesture-event.h>
+#include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
@@ -98,6 +100,7 @@ const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight 
 const unsigned int CURSOR_BLINK_INTERVAL = 500u; // Cursor blink interval
 const float TO_MILLISECONDS = 1000.f;
 const float TO_SECONDS = 1.f / TO_MILLISECONDS;
+const float RENDER_FRAME_INTERVAL = 16.66f;
 
 const float SCROLL_THRESHOLD = 10.f;
 const float SCROLL_SPEED = 300.f;
@@ -108,6 +111,8 @@ const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 const int KEY_A_CODE = 38;
 const int KEY_D_CODE = 40;
 const int KEY_WHITE_SPACE_CODE = 65;
+
+const char* HANDLE_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insertpoint-icon.png";
 
 static bool gTextChangedCallBackCalled;
 static bool gInputStyleChangedCallbackCalled;
@@ -158,6 +163,23 @@ Integration::TapGestureEvent GenerateTap(
   return tap;
 }
 
+// Generate a PanGestureEvent to send to Core
+Integration::PanGestureEvent GeneratePan( Gesture::State state,
+                                          const Vector2& previousPosition,
+                                          const Vector2& currentPosition,
+                                          unsigned long timeDelta,
+                                          unsigned int numberOfTouches = 1u )
+{
+  Integration::PanGestureEvent pan(state);
+
+  pan.previousPosition = previousPosition;
+  pan.currentPosition = currentPosition;
+  pan.timeDelta = timeDelta;
+  pan.numberOfTouches = numberOfTouches;
+
+  return pan;
+}
+
 // Generate a KeyEvent to send to Core.
 Integration::KeyEvent GenerateKey( const std::string& keyName,
                                    const std::string& keyString,
@@ -172,6 +194,69 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                 keyModifier,
                                 timeStamp,
                                 keyState );
+}
+
+/**
+ * Helper to generate PanGestureEvent
+ *
+ * @param[in] application Application instance
+ * @param[in] state The Gesture State
+ * @param[in] pos The current position of touch.
+ */
+static void SendPan(ToolkitTestApplication& application, Gesture::State state, const Vector2& pos)
+{
+  static Vector2 last;
+
+  if( (state == Gesture::Started) ||
+      (state == Gesture::Possible) )
+  {
+    last.x = pos.x;
+    last.y = pos.y;
+  }
+
+  application.ProcessEvent( GeneratePan( state, last, pos, 16 ) );
+
+  last.x = pos.x;
+  last.y = pos.y;
+}
+
+/*
+ * Simulate time passed by.
+ *
+ * @note this will always process at least 1 frame (1/60 sec)
+ *
+ * @param application Test application instance
+ * @param duration Time to pass in milliseconds.
+ * @return The actual time passed in milliseconds
+ */
+static int Wait(ToolkitTestApplication& application, int duration = 0)
+{
+  int time = 0;
+
+  for(int i = 0; i <= ( duration / RENDER_FRAME_INTERVAL); i++)
+  {
+    application.SendNotification();
+    application.Render(RENDER_FRAME_INTERVAL);
+    time += RENDER_FRAME_INTERVAL;
+  }
+
+  return time;
+}
+
+Dali::Integration::Point GetPointDownInside( Vector2& pos )
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( pos );
+  return point;
+}
+
+Dali::Integration::Point GetPointUpInside( Vector2& pos )
+{
+  Dali::Integration::Point point;
+  point.SetState( PointState::UP );
+  point.SetScreenPosition( pos );
+  return point;
 }
 
 bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Map& fontStyleMapSet )
@@ -1463,6 +1548,25 @@ int utcDaliTextEditorEvent03(void)
   Renderer highlight = stencil.GetChildAt( 1u ).GetRendererAt( 0u );
   DALI_TEST_CHECK( highlight );
 
+  // Double tap out of bounds
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 29.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 29.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // The stencil actor should have one actors: the renderer actor.
+  stencil = editor.GetChildAt( 0u );
+
+  // The stencil actor has a container with all the actors which contain the text renderers.
+  container = stencil.GetChildAt( 0u );
+  for( unsigned int index = 0; index < container.GetChildCount(); ++index )
+  {
+    Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
+    DALI_TEST_CHECK( renderer );
+  }
+
   END_TEST;
 }
 
@@ -1638,3 +1742,96 @@ int utcDaliTextEditorEvent05(void)
 
   END_TEST;
 }
+
+int utcDaliTextEditorHandles(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorHandles");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetProperty( TextEditor::Property::TEXT, "This is a long text for the size of the text-editor." );
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
+  editor.SetProperty( TextEditor::Property::GRAB_HANDLE_IMAGE, HANDLE_IMAGE_FILE_NAME );
+  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL, true );
+
+  editor.SetSize( 30.f, 500.f );
+  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap first to get the focus.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap to create the grab handle.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Get the active layer where the text's decoration is added.
+  Actor activeLayer = editor.GetChildAt( 1u );
+
+  // Get the handle's actor.
+  Actor handle = activeLayer.GetChildAt( 1u );
+  handle.SetSize( 100.f, 100.f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Touch the grab handle to set it as pressed.
+  Vector2 touchPos( 10.0f, 50.0f );
+  Dali::Integration::TouchEvent event;
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( GetPointDownInside( touchPos ) );
+  application.ProcessEvent( event );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // drag grab handle right
+  SendPan(application, Gesture::Possible, touchPos);
+  SendPan(application, Gesture::Started, touchPos);
+  touchPos.x += 5.0f;
+  Wait(application, 100);
+
+  for(int i = 0;i<20;i++)
+  {
+    SendPan(application, Gesture::Continuing, touchPos);
+    touchPos.x += 5.0f;
+    Wait(application);
+  }
+
+  SendPan(application, Gesture::Finished, touchPos);
+  Wait(application);
+
+  // Release the grab handle.
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( GetPointUpInside( touchPos ) );
+  application.ProcessEvent( event );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+

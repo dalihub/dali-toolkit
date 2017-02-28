@@ -1930,6 +1930,16 @@ int utcDaliTextFieldEvent08(void)
 
   Wait(application, 500);
 
+  // Long Press
+  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2( 1.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Wait(application, 500);
+
   Stage stage = Stage::GetCurrent();
   Layer layer = stage.GetRootLayer();
   Actor actor = layer.FindChildByName("optionPaste");
@@ -1950,6 +1960,7 @@ int utcDaliTextFieldEvent08(void)
     application.ProcessEvent( event );
   }
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextEditor::Property::TEXT ), std::string("testTextFieldEvent"), TEST_LOCATION );
+
   END_TEST;
 }
 
