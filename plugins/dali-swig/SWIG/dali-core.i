@@ -82,6 +82,7 @@
 %ignore *::GetKeyValue(SizeType) const;
 %ignore *::TypeInfo::GetCreator() const;
 %ignore Dali::Stage::TouchedSignal;
+%ignore Dali::DevelActor::Property::Type;
 
 %rename(ParentOriginTop) Dali::ParentOrigin::TOP;
 %rename(ParentOriginBottom) Dali::ParentOrigin::BOTTOM;
@@ -245,6 +246,7 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %include <dali/public-api/events/wheel-event.h>
 
 %include <dali/public-api/actors/actor.h>
+%include <dali/devel-api/actors/actor-devel.h>
 %include <dali/public-api/actors/layer.h>
 %include <dali/public-api/common/stage.h>
 %include <dali/public-api/size-negotiation/relayout-container.h>
