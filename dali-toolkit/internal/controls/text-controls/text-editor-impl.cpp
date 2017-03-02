@@ -1014,17 +1014,20 @@ void TextEditor::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange:
       const std::string& newFont = GetImpl( styleManager ).GetDefaultFontFamily();
       // Property system did not set the font so should update it.
       mController->UpdateAfterFontChange( newFont );
+      RelayoutRequest();
       break;
     }
 
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
       GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      RelayoutRequest();
       break;
     }
     case StyleChange::THEME_CHANGE:
     {
       GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      RelayoutRequest();
       break;
     }
   }

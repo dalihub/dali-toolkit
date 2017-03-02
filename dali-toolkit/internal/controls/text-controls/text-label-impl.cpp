@@ -675,17 +675,20 @@ void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
       const std::string& newFont = GetImpl( styleManager ).GetDefaultFontFamily();
       DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE newFont(%s)\n", newFont.c_str() );
       mController->UpdateAfterFontChange( newFont );
+      RelayoutRequest();
       break;
     }
 
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
       GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      RelayoutRequest();
       break;
     }
     case StyleChange::THEME_CHANGE:
     {
       GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      RelayoutRequest();
       break;
     }
   }
