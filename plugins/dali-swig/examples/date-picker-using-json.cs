@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ namespace MyCSharpExample
             constants.Insert( "CONFIG_SCRIPT_LOG_LEVEL",  new Property.Value( "Verbose") );
             _builder.AddConstants( constants );
 
-            _builder.LoadFromFile( "./json/date-picker.json" );
+            _builder.LoadFromFile( "./json/date-picker-template.json" );
 
             // create the date-picker from the template in the json file
             BaseHandle handle =  _builder.Create( "date-picker");
