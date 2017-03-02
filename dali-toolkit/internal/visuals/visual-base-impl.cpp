@@ -334,11 +334,6 @@ bool Visual::Base::IsOnStage() const
   return mImpl->mFlags & Impl::IS_ON_STAGE;
 }
 
-bool Visual::Base::IsFromCache() const
-{
-  return mImpl->mFlags & Impl::IS_FROM_CACHE;
-}
-
 void Visual::Base::RegisterMixColor()
 {
   // Only register if not already registered.

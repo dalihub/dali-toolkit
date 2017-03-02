@@ -21,7 +21,6 @@
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/geometry.h>
-#include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/object/weak-handle.h>
@@ -139,34 +138,6 @@ public:
   static Image GetBrokenVisualImage();
 
 public:
-
-  /**
-   * @brief Request renderer from the url
-   *
-   * @return The cached renderer if exist in the cache. Otherwise an empty handle is returned.
-   */
-  Renderer GetRenderer( const std::string& key ) const;
-
-  /**
-   * @brief Cache the renderer based on the given key.
-   *
-   * If the key already exists in the cache, then the cache will save an additional renderer to the cache.
-   * RemoveRenderer will then need to be called twice to remove both items from the cache.
-   *
-   * @param[in] key The key to use for caching
-   * @param[in] renderer The Renderer to be cached
-   */
-  void SaveRenderer( const std::string& key, Renderer& renderer );
-
-  /**
-   * @brief Cleans the renderer cache by removing the renderer from the cache based on the given key if there are no longer any references to it
-   *
-   * @param[in] key The key used for caching
-   *
-   * @return True if the renderer is no longer used anywhere, false otherwise
-   */
-  bool CleanRendererCache( const std::string& key );
-
   /**
    * Get the image atlas manager.
    * @return A pointer to the atlas manager
@@ -210,35 +181,8 @@ protected:
   VisualFactoryCache& operator=(const VisualFactoryCache& rhs);
 
 private:
-  struct CachedRenderer
-  {
-    std::string mKey;
-    WeakHandle< Renderer > mRenderer;
-
-    CachedRenderer( const std::string& key, Renderer& renderer )
-    : mKey( key ),
-      mRenderer( renderer)
-    {}
-  };
-
-  typedef Dali::Vector< std::size_t > HashVector;
-  typedef Dali::OwnerContainer< const CachedRenderer* > CachedRenderers;
-
-  /**
-   * @brief Finds the first index into the cached visuals from the url
-   *
-   * @return Returns the first index into the cached renderer from the url if it exists in the cache, otherwise returns -1
-   */
-  int FindRenderer( const std::string& key ) const;
-
-private:
   Geometry mGeometry[GEOMETRY_TYPE_MAX+1];
   Shader mShader[SHADER_TYPE_MAX+1];
-
-  HashVector mRendererHashes;
-  CachedRenderers mRenderers;
-
-  Renderer mWireframeRenderer;
 
   ImageAtlasManagerPtr mAtlasManager;
   NPatchLoader mNPatchLoader;

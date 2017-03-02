@@ -278,13 +278,6 @@ protected:
    */
   bool IsOnStage() const;
 
-  /**
-   * @brief Gets whether the Dali::Renderer is from a shared cache (and therefore any modifications will affect other users of that renderer)
-   *
-   * @return Returns true if the renderer is from shared cache, false otherwise
-   */
-  bool IsFromCache() const;
-
 private:
 
   /**
