@@ -60,14 +60,14 @@ namespace Dali
             viewWrapperImpl.OnPan = new ViewWrapperImpl.OnPanDelegate(OnPan);
             viewWrapperImpl.OnTap = new ViewWrapperImpl.OnTapDelegate(OnTap);
             viewWrapperImpl.OnLongPress = new ViewWrapperImpl.OnLongPressDelegate(OnLongPress);
-            viewWrapperImpl.SignalConnected = new ViewWrapperImpl.SignalConnectedDelegate(SignalConnected);
-            viewWrapperImpl.SignalDisconnected = new ViewWrapperImpl.SignalDisconnectedDelegate(SignalDisconnected);
 
             // Make sure CustomView is initialized.
             OnInitialize();
 
-            // Make sure the style of actors/visuals initialized above are applied by the style manager.
-            viewWrapperImpl.ApplyThemeStyle();
+            // Set the StyleName the name of the View
+            // We have to do this because the StyleManager on Native side can't workout it out
+            // This will also ensure that the style of actors/visuals initialized above are applied by the style manager.
+            SetStyleName( this.GetType().Name );
         }
 
         /**
@@ -802,14 +802,6 @@ namespace Dali
          * @see EnableGestureDetection
          */
         public virtual void OnLongPress(LongPressGesture longPress)
-        {
-        }
-
-        private void SignalConnected(SlotObserver slotObserver, SWIGTYPE_p_Dali__CallbackBase callback)
-        {
-        }
-
-        private void SignalDisconnected(SlotObserver slotObserver, SWIGTYPE_p_Dali__CallbackBase callback)
         {
         }
 

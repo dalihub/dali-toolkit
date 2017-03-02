@@ -140,8 +140,6 @@ public:
     virtual void OnPan(Dali::PanGesture const &pan);
     virtual void OnTap(Dali::TapGesture const &tap);
     virtual void OnLongPress(Dali::LongPressGesture const &longPress);
-    virtual void SignalConnected(Dali::SlotObserver *slotObserver, Dali::CallbackBase *callback);
-    virtual void SignalDisconnected(Dali::SlotObserver *slotObserver, Dali::CallbackBase *callback);
     virtual Dali::Toolkit::Internal::Control::Extension *GetControlExtension();
 
     typedef void (SWIGSTDCALL* SWIG_Callback0_t)(int);
