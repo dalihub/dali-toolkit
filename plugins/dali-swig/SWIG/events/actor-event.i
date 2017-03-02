@@ -126,6 +126,43 @@
     {
       SetVisible(false);
     }
+
+    public void Raise()
+    {
+      NDalicPINVOKE.Raise(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+
+    public void Lower()
+    {
+      NDalicPINVOKE.Lower(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+
+    public void RaiseToTop()
+    {
+      NDalicPINVOKE.RaiseToTop(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+
+    public void LowerToBottom()
+    {
+      NDalicPINVOKE.LowerToBottom(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+
+    public void RaiseAbove(Actor target)
+    {
+      NDalicPINVOKE.RaiseAbove(swigCPtr, Actor.getCPtr(target));
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+
+    public void LowerBelow(Actor target)
+    {
+      NDalicPINVOKE.RaiseAbove(swigCPtr, Actor.getCPtr(target));
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+
 %}
 
 %enddef

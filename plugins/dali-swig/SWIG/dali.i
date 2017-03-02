@@ -49,6 +49,8 @@
 #include <dali/dali.h>
 #include <dali-toolkit/dali-toolkit.h>
 
+#include <dali/devel-api/actors/actor-devel.h>
+
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/viewport.h>
