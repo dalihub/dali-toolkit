@@ -361,6 +361,9 @@ DALI_SIGNAL_3_PARAM( Dali::Toolkit::PageTurnView, unsigned int, bool );
 // void Signal< Dali::Toolkit::PageTurnView >;
 DALI_SIGNAL_1_PARAM( Dali::Toolkit::PageTurnView );
 
+// void Signal< Dali::Toolkit::ProgressBar, float, float >;
+DALI_SIGNAL_3_PARAM( Dali::Toolkit::ProgressBar, float, float );
+
 // void Signal< const Dali::Toolkit::ScrollView::SnapEvent& >;
 DALI_SIGNAL_1_PARAM( const Dali::Toolkit::ScrollView::SnapEvent& );
 
