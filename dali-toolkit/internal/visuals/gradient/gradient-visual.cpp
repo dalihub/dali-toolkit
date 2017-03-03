@@ -323,6 +323,11 @@ void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const
   }
 }
 
+void GradientVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  // Do nothing
+}
+
 void GradientVisual::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );

@@ -287,6 +287,20 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   map.Insert( DevelVisual::Property::OPACITY, mImpl->mMixColor.a );
 }
 
+void Visual::Base::CreateInstancePropertyMap( Property::Map& map ) const
+{
+  DoCreateInstancePropertyMap( map );
+
+  if( mImpl->mCustomShader )
+  {
+    mImpl->mCustomShader->CreatePropertyMap( map );
+  }
+
+  //map.Insert( DevelVisual::Property::DEPTH_INDEX, mImpl->mDepthIndex );
+  //map.Insert( DevelVisual::Property::ENABLED, (bool) mImpl->mRenderer );
+}
+
+
 void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )
 {
   if( preMultipled )

@@ -144,6 +144,11 @@ void SvgVisual::DoCreatePropertyMap( Property::Map& map ) const
   }
 }
 
+void SvgVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  // Do nothing
+}
+
 void SvgVisual::ParseFromUrl( const std::string& imageUrl )
 {
   mImageUrl = imageUrl;

@@ -1139,7 +1139,8 @@ void Builder::ApplyAllStyleProperties( const TreeNode& root, const TreeNode& nod
   if( matchedStyle )
   {
     StylePtr style( *matchedStyle );
-    style->ApplyVisualsAndPropertiesRecursively( handle ); // (recurses through states)
+    Dictionary<Property::Map> instancedProperties;
+    style->ApplyVisualsAndPropertiesRecursively( handle, instancedProperties );
   }
   else // If there were no styles, instead set properties
   {

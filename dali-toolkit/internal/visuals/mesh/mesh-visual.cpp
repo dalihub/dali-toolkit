@@ -533,6 +533,11 @@ void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::MeshVisual::Property::LIGHT_POSITION, mLightPosition );
 }
 
+void MeshVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  // Do nothing
+}
+
 void MeshVisual::InitializeRenderer()
 {
   //Try to load the geometry from the file.
