@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1695,8 +1695,18 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
       mLogicalModel->UpdateTextStyleRuns( startOfSelectedText, -static_cast<int>( lengthOfSelectedText ) );
 
       // Mark the paragraphs to be updated.
-      mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-      mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      if( LayoutEngine::SINGLE_LINE_BOX == mLayoutEngine.GetLayout() )
+      {
+        mTextUpdateInfo.mCharacterIndex = 0;
+        mTextUpdateInfo.mNumberOfCharactersToRemove = mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mTextUpdateInfo.mNumberOfCharactersToAdd = mTextUpdateInfo.mPreviousNumberOfCharacters - lengthOfSelectedText;
+        mTextUpdateInfo.mClearAll = true;
+      }
+      else
+      {
+        mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      }
 
       // Delete text between handles
       Vector<Character>::Iterator first = utf32Characters.Begin() + startOfSelectedText;
@@ -2515,13 +2525,18 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     return;
   }
 
-  Text::GetCursorPosition( mVisualModel,
-                           mLogicalModel,
-                           mMetrics,
-                           logical,
+  const bool isMultiLine = ( LayoutEngine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() );
+  GetCursorPositionParameters parameters;
+  parameters.visualModel = mVisualModel;
+  parameters.logicalModel = mLogicalModel;
+  parameters.metrics = mMetrics;
+  parameters.logical = logical;
+  parameters.isMultiline = isMultiLine;
+
+  Text::GetCursorPosition( parameters,
                            cursorInfo );
 
-  if( LayoutEngine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() )
+  if( isMultiLine )
   {
     // If the text is editable and multi-line, the cursor position after a white space shouldn't exceed the boundaries of the text control.
 
@@ -2737,13 +2752,16 @@ void Controller::Impl::ScrollToMakePositionVisible( const Vector2& position, flo
     mScrollPosition.x = mVisualModel->mControlSize.width - positionEndX;
   }
 
-  if( decoratorPositionBeginY < 0.f )
+  if( LayoutEngine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() )
   {
-    mScrollPosition.y = -position.y;
-  }
-  else if( decoratorPositionEndY > mVisualModel->mControlSize.height )
-  {
-    mScrollPosition.y = mVisualModel->mControlSize.height - positionEndY;
+    if( decoratorPositionBeginY < 0.f )
+    {
+      mScrollPosition.y = -position.y;
+    }
+    else if( decoratorPositionEndY > mVisualModel->mControlSize.height )
+    {
+      mScrollPosition.y = mVisualModel->mControlSize.height - positionEndY;
+    }
   }
 }
 
@@ -2754,10 +2772,13 @@ void Controller::Impl::ScrollTextToMatchCursor( const CursorInfo& cursorInfo )
 
   // Calculate the offset to match the cursor position before the character was deleted.
   mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x;
-  mScrollPosition.y = currentCursorPosition.y - cursorInfo.lineOffset;
-
   ClampHorizontalScroll( mVisualModel->GetLayoutSize() );
-  ClampVerticalScroll( mVisualModel->GetLayoutSize() );
+
+  if( LayoutEngine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() )
+  {
+    mScrollPosition.y = currentCursorPosition.y - cursorInfo.lineOffset;
+    ClampVerticalScroll( mVisualModel->GetLayoutSize() );
+  }
 
   // Makes the new cursor position visible if needed.
   ScrollToMakePositionVisible( cursorInfo.primaryPosition, cursorInfo.lineHeight );

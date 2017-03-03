@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2356,8 +2356,18 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     }
 
     // Mark the first paragraph to be updated.
-    mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
-    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd += maxSizeOfNewText;
+    if( LayoutEngine::SINGLE_LINE_BOX == mImpl->mLayoutEngine.GetLayout() )
+    {
+      mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = numberOfCharactersInModel + maxSizeOfNewText;
+      mImpl->mTextUpdateInfo.mClearAll = true;
+    }
+    else
+    {
+      mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd += maxSizeOfNewText;
+    }
 
     // Update the cursor index.
     cursorIndex += maxSizeOfNewText;
@@ -2456,8 +2466,18 @@ bool Controller::RemoveText( int cursorOffset,
         ( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters ) )
     {
       // Mark the paragraphs to be updated.
-      mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove += numberOfCharacters;
+      if( LayoutEngine::SINGLE_LINE_BOX == mImpl->mLayoutEngine.GetLayout() )
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters - numberOfCharacters;
+        mImpl->mTextUpdateInfo.mClearAll = true;
+      }
+      else
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove += numberOfCharacters;
+      }
 
       // Update the input style and remove the text's style before removing the text.
 

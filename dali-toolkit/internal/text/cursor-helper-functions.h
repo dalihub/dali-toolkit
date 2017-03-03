@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_CURSOR_HELPER_FUNCTIONS_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,18 @@ struct CursorInfo
 };
 
 /**
+ * @brief Parameters passed to the GetCursorPosition() function.
+ */
+struct GetCursorPositionParameters
+{
+  VisualModelPtr visualModel;   ///< The visual model.
+  LogicalModelPtr logicalModel; ///< The logical model.
+  MetricsPtr metrics;           ///< A wrapper around FontClient used to get metrics.
+  CharacterIndex logical;       ///< The logical cursor position (in characters). 0 is just before the first character, a value equal to the number of characters is just after the last character.
+  bool isMultiline;             ///< Whether the text control is multi-line.
+};
+
+/**
  * @brief Retrieves the closest line for a given touch point.
  *
  * It returns the first line if the touch point is above the text and the last line if the touch point is below.
@@ -106,16 +118,10 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
  * It retrieves as well the line's height and the cursor's height and
  * if there is a valid alternative cursor, its position and height.
  *
- * @param[in] visualModel The visual model.
- * @param[in] logicalModel The logical model.
- * @param[in] metrics A wrapper around FontClient used to get metrics.
- * @param[in] logical The logical cursor position (in characters). 0 is just before the first character, a value equal to the number of characters is just after the last character.
+ * @param[in] parameters Parameters used to calculate the cursor's position.
  * @param[out] cursorInfo The line's height, the cursor's height, the cursor's position and whether there is an alternative cursor.
  */
-void GetCursorPosition( VisualModelPtr visualModel,
-                        LogicalModelPtr logicalModel,
-                        MetricsPtr metrics,
-                        CharacterIndex logical,
+void GetCursorPosition( GetCursorPositionParameters& parameters,
                         CursorInfo& cursorInfo );
 
 /**
