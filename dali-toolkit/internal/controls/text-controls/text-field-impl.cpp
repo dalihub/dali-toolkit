@@ -23,7 +23,6 @@
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/devel-api/adaptor-framework/virtual-keyboard.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -32,6 +31,7 @@
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
@@ -590,8 +590,18 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextField::Property::INPUT_METHOD_SETTINGS:
       {
-        const Property::Map map = value.Get<Property::Map>();
-        VirtualKeyboard::ApplySettings( map );
+        const Property::Map* map = value.GetMap();
+        if (map)
+        {
+          impl.mInputMethodOptions.ApplyProperty( *map );
+        }
+        impl.mController->SetInputModePassword( impl.mInputMethodOptions.IsPassword() );
+
+        Toolkit::Control control = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
+        if (control == textField)
+        {
+          impl.mImfManager.ApplyOptions( impl.mInputMethodOptions );
+        }
         break;
       }
       case Toolkit::TextField::Property::INPUT_COLOR:
@@ -994,6 +1004,9 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::TextField::Property::INPUT_METHOD_SETTINGS:
       {
+        Property::Map map;
+        impl.mInputMethodOptions.RetrieveProperty( map );
+        value = map;
         break;
       }
       case Toolkit::TextField::Property::INPUT_COLOR:
@@ -1153,6 +1166,8 @@ void TextField::OnInitialize()
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
 
+  mImfManager = ImfManager::Get();
+
   self.TouchSignal().Connect( this, &TextField::OnTouched );
 
   // Set BoundingBox to stage size if not already set.
@@ -1308,20 +1323,17 @@ void TextField::OnKeyInputFocusGained()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnKeyInputFocusGained %p\n", mController.Get() );
 
-  VirtualKeyboard::StatusChangedSignal().Connect( this, &TextField::KeyboardStatusChanged );
+  mImfManager.ApplyOptions( mInputMethodOptions );
 
-  ImfManager imfManager = ImfManager::Get();
+  mImfManager.StatusChangedSignal().Connect( this, &TextField::KeyboardStatusChanged );
 
-  if ( imfManager )
-  {
-    imfManager.EventReceivedSignal().Connect( this, &TextField::OnImfEvent );
+  mImfManager.EventReceivedSignal().Connect( this, &TextField::OnImfEvent );
 
-    // Notify that the text editing start.
-    imfManager.Activate();
+  // Notify that the text editing start.
+  mImfManager.Activate();
 
-    // When window gain lost focus, the imf manager is deactivated. Thus when window gain focus again, the imf manager must be activated.
-    imfManager.SetRestoreAfterFocusLost( true );
-  }
+  // When window gain lost focus, the imf manager is deactivated. Thus when window gain focus again, the imf manager must be activated.
+  mImfManager.SetRestoreAfterFocusLost( true );
 
    ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
 
@@ -1339,19 +1351,14 @@ void TextField::OnKeyInputFocusLost()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField:OnKeyInputFocusLost %p\n", mController.Get() );
 
-  VirtualKeyboard::StatusChangedSignal().Disconnect( this, &TextField::KeyboardStatusChanged );
+  mImfManager.StatusChangedSignal().Disconnect( this, &TextField::KeyboardStatusChanged );
+  // The text editing is finished. Therefore the imf manager don't have restore activation.
+  mImfManager.SetRestoreAfterFocusLost( false );
 
-  ImfManager imfManager = ImfManager::Get();
-  if ( imfManager )
-  {
-    // The text editing is finished. Therefore the imf manager don't have restore activation.
-    imfManager.SetRestoreAfterFocusLost( false );
+  // Notify that the text editing finish.
+  mImfManager.Deactivate();
 
-    // Notify that the text editing finish.
-    imfManager.Deactivate();
-
-    imfManager.EventReceivedSignal().Disconnect( this, &TextField::OnImfEvent );
-  }
+  mImfManager.EventReceivedSignal().Disconnect( this, &TextField::OnImfEvent );
 
   ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
 
@@ -1369,11 +1376,7 @@ void TextField::OnTap( const TapGesture& gesture )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnTap %p\n", mController.Get() );
 
-  // Show the keyboard if it was hidden.
-  if (!VirtualKeyboard::IsVisible())
-  {
-    VirtualKeyboard::Show();
-  }
+  mImfManager.Activate();
 
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
   mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x, gesture.localPoint.y );
@@ -1388,11 +1391,7 @@ void TextField::OnPan( const PanGesture& gesture )
 
 void TextField::OnLongPress( const LongPressGesture& gesture )
 {
-  // Show the keyboard if it was hidden.
-  if (!VirtualKeyboard::IsVisible())
-  {
-    VirtualKeyboard::Show();
-  }
+  mImfManager.Activate();
 
   mController->LongPressEvent( gesture.state, gesture.localPoint.x, gesture.localPoint.y );
 

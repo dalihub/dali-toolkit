@@ -22,6 +22,7 @@
 #define __DALI_IMF_MANAGER_H__
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
+#include <dali/devel-api/adaptor-framework/input-method-options.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -133,6 +134,8 @@ public:
 
   typedef Signal< void (ImfManager&) > ImfManagerSignalType; ///< Keyboard actived signal
   typedef Signal< ImfCallbackData ( ImfManager&, const ImfEventData& ) > ImfEventSignalType; ///< keyboard events
+  typedef Signal< void () > VoidSignalType;
+  typedef Signal< void (bool) > StatusSignalType;
 
 public:
 
@@ -217,6 +220,12 @@ public:
   */
   void NotifyTextInputMultiLine( bool multiLine );
 
+  /**
+   * @brief Set one or more of the Input Method options
+   * @param[in] options The options to be applied
+   */
+  void ApplyOptions( const InputMethodOptions& options );
+
 public:
 
   // Signals
@@ -234,6 +243,27 @@ public:
    * @return The Event signal containing the event data.
    */
   ImfEventSignalType& EventReceivedSignal();
+
+  /**
+   * @brief Connect to this signal to be notified when the virtual keyboard is shown or hidden.
+   *
+   * @return The signal connect to status changed event.
+   */
+  StatusSignalType& StatusChangedSignal();
+
+  /**
+   * @brief Connect to this signal to be notified when the virtual keyboard is resized.
+   *
+   * @return The signal to connect to resized event.
+   */
+  VoidSignalType& ResizedSignal();
+
+  /**
+   * @brief Connect to this signal to be notified when the virtual keyboard's language is changed.
+   *
+   * @return The signal to connect to language changed event.
+   */
+  VoidSignalType& LanguageChangedSignal();
 
   // Construction & Destruction
 

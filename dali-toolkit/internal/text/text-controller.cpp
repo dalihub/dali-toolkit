@@ -1313,6 +1313,23 @@ const std::string& Controller::GetInputOutlineProperties() const
   return GetDefaultOutlineProperties();
 }
 
+void Controller::SetInputModePassword( bool passwordInput )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mPasswordInput = passwordInput;
+  }
+}
+
+bool Controller::IsInputModePassword()
+{
+  if( NULL != mImpl->mEventData )
+  {
+    return mImpl->mEventData->mPasswordInput;
+  }
+  return false;
+}
+
 // public : Queries & retrieves.
 
 Layout::Engine& Controller::GetLayoutEngine()
