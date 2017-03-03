@@ -32,6 +32,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
+#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
@@ -672,7 +673,6 @@ std::string TextSelectionPopup::GetPressedImage() const
 
    Toolkit::PushButton option = Toolkit::PushButton::New();
    option.SetName( button.name );
-   option.SetAnimationTime( 0.0f );
    option.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
    switch( button.id )
@@ -736,11 +736,11 @@ std::string TextSelectionPopup::GetPressedImage() const
    }
 
    // 3. Set the normal option image (blank / Transparent).
-   option.SetUnselectedImage( "" );
+   option.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, "" );
 
    // 4. Set the pressed option image.
    // The image can be blank, the color can be used regardless.
-   option.SetSelectedImage( mPressedImage );
+   option.SetProperty( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, mPressedImage );
    option.SetProperty( Toolkit::Button::Property::SELECTED_COLOR, mPressedColor );
    option.SetProperty( Toolkit::Control::Property::STYLE_NAME, TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME );
 
