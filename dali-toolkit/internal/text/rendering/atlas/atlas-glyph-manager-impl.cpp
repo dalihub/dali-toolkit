@@ -27,50 +27,6 @@ namespace
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_RENDERING");
 #endif
 
-#define MAKE_SHADER(A)#A
-
-const char* VERTEX_SHADER = MAKE_SHADER(
-attribute mediump vec2    aPosition;
-attribute mediump vec2    aTexCoord;
-attribute mediump vec4    aColor;
-uniform   mediump vec2    uOffset;
-uniform   mediump mat4    uMvpMatrix;
-varying   mediump vec2    vTexCoord;
-varying   mediump vec4    vColor;
-
-void main()
-{
-  mediump vec4 position = vec4( aPosition.xy + uOffset, 0.0, 1.0 );
-  gl_Position = uMvpMatrix * position;
-  vTexCoord = aTexCoord;
-  vColor = aColor;
-}
-);
-
-const char* FRAGMENT_SHADER_L8 = MAKE_SHADER(
-uniform lowp    vec4      uColor;
-uniform         sampler2D sTexture;
-varying mediump vec2      vTexCoord;
-varying mediump vec4      vColor;
-
-void main()
-{
-  mediump vec4 color = texture2D( sTexture, vTexCoord );
-  gl_FragColor = vec4( vColor.rgb * uColor.rgb, vColor.a * uColor.a * color.r );
-}
-);
-
-const char* FRAGMENT_SHADER_RGBA = MAKE_SHADER(
-uniform lowp    vec4      uColor;
-uniform         sampler2D sTexture;
-varying mediump vec2      vTexCoord;
-
-void main()
-{
-  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;
-}
-);
-
 } // unnamed namespace
 
 namespace Dali
@@ -84,8 +40,6 @@ namespace Internal
 
 AtlasGlyphManager::AtlasGlyphManager()
 {
-  mShaderL8 = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_L8 );
-  mShaderRgba = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_RGBA );
   mAtlasManager = Dali::Toolkit::AtlasManager::New();
 }
 
@@ -255,12 +209,6 @@ void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIn
 TextureSet AtlasGlyphManager::GetTextures( uint32_t atlasId ) const
 {
   return mAtlasManager.GetTextures( atlasId );
-}
-
-Shader AtlasGlyphManager::GetShader( uint32_t atlasId ) const
-{
-  Pixel::Format pixelFormat = mAtlasManager.GetPixelFormat( atlasId );
-  return pixelFormat == Pixel::L8 ? mShaderL8 : mShaderRgba;
 }
 
 AtlasGlyphManager::~AtlasGlyphManager()

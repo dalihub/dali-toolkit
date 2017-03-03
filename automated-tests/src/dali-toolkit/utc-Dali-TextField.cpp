@@ -118,15 +118,9 @@ static Dali::Toolkit::TextField::InputStyle::Mask gInputStyleMask;
 
 static void LoadBitmapResource(TestPlatformAbstraction& platform, int width, int height)
 {
-  Integration::ResourceRequest* request = platform.GetRequest();
   Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD );
   Integration::ResourcePointer resource(bitmap);
   bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, width, height, width, height);
-
-  if(request)
-  {
-    platform.SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
-  }
 }
 
 static void LoadMarkerImages(ToolkitTestApplication& app, TextField textField)
@@ -2019,6 +2013,13 @@ int utcDaliTextFieldStyleWhilstSelected(void)
   fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
   DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+
+  // Press Escape to increase coverage
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up ) );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( !field.HasKeyInputFocus() );
 
   END_TEST;
 }

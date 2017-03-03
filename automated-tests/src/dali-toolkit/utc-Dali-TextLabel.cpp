@@ -66,7 +66,7 @@ const char* const PROPERTY_NAME_OUTLINE = "outline";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
-const unsigned int EMOJI_FONT_SIZE = 3968u;
+const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
 
 bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Map& fontStyleMapSet )
 {
@@ -486,15 +486,34 @@ int UtcDaliToolkitTextLabelLanguagesP(void)
   application.SendNotification();
   application.Render();
 
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelEmojisP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelLanguagesP");
+  TextLabel label = TextLabel::New();
+  DALI_TEST_CHECK( label );
+
+  Stage::GetCurrent().Add( label );
+
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
 
   char* pathNamePtr = get_current_dir_name();
   const std::string pathName( pathNamePtr );
   free( pathNamePtr );
 
-  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenColorEmoji.ttf", EMOJI_FONT_SIZE );
+  TextAbstraction::FontDescription fontDescription;
+  fontDescription.path = pathName + DEFAULT_FONT_DIR + "/tizen/BreezeColorEmoji.ttf";
+  fontDescription.family = "BreezeColorEmoji";
+  fontDescription.width = TextAbstraction::FontWidth::NONE;
+  fontDescription.weight = TextAbstraction::FontWeight::NORMAL;
+  fontDescription.slant = TextAbstraction::FontSlant::NONE;
 
-  const std::string emojis = "<font family='TizenColorEmoji'>\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84</font>";
+  fontClient.GetFontId( fontDescription, EMOJI_FONT_SIZE );
+
+  const std::string emojis = "<font family='BreezeColorEmoji' size='60'>\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84</font>";
   label.SetProperty( TextLabel::Property::ENABLE_MARKUP, true );
   label.SetProperty( TextLabel::Property::TEXT, emojis );
 

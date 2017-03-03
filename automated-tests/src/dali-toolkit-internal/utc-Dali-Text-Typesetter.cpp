@@ -35,7 +35,7 @@ using namespace Text;
 namespace
 {
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
-const PointSize26Dot6 EMOJI_FONT_SIZE = 62u * 64u;
+const PointSize26Dot6 EMOJI_FONT_SIZE = 3840u; // 60 * 64
 } // namespace
 
 int UtcDaliTextTypesetter(void)
@@ -86,7 +86,7 @@ int UtcDaliTextRenderingControllerRender(void)
   const std::string pathName( pathNamePtr );
   free( pathNamePtr );
 
-  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenColorEmoji.ttf", EMOJI_FONT_SIZE );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/BreezeColorEmoji.ttf", EMOJI_FONT_SIZE );
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
 
   // Creates a text controller.
@@ -97,7 +97,7 @@ int UtcDaliTextRenderingControllerRender(void)
 
   // Sets the text.
   controller->SetMarkupProcessorEnabled( true );
-  controller->SetText( "<font family='TizenSansRegular'>Hello world </font><font family='TizenColorEmoji'>\xF0\x9F\x98\x81</font>" );
+  controller->SetText( "<font family='TizenSansRegular'>Hello world </font><font family='BreezeColorEmoji'>\xF0\x9F\x98\x81</font>" );
 
   // Creates the text's model and relais-out the text.
   const Size relayoutSize( 120.f, 60.f );

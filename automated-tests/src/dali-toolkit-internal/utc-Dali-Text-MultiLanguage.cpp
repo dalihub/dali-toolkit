@@ -69,7 +69,7 @@ namespace
 {
 
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
-const unsigned int EMOJI_FONT_SIZE = 3968u;
+const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
 const unsigned int NON_DEFAULT_FONT_SIZE = 40u;
 
 struct MergeFontDescriptionsData
@@ -1303,7 +1303,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
   // Load some fonts.
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansArabicRegular.ttf" );
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf" );
-  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenColorEmoji.ttf", EMOJI_FONT_SIZE );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/BreezeColorEmoji.ttf", EMOJI_FONT_SIZE );
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf", pointSize01 );
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf", pointSize02 );
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf", pointSize01 );
@@ -1311,7 +1311,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
 
   // Font id 1 --> TizenSansArabicRegular.ttf
   // Font id 2 --> TizenSansHebrewRegular.ttf
-  // Font id 3 --> TizenColorEmoji.ttf
+  // Font id 3 --> BreezeColorEmoji.ttf
   // Font id 4 --> TizenSansRegular.ttf, size 8
   // Font id 5 --> TizenSansRegular.ttf, size 16
   // Font id 6 --> TizenSansHebrewRegular.ttf, size 8
@@ -1484,8 +1484,8 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       0u,
       4u
     },
-    const_cast<char*>( "TizenColorEmoji" ),
-    15u,
+    const_cast<char*>( "BreezeColorEmoji" ),
+    16u,
     TextAbstraction::FontWeight::NORMAL,
     TextAbstraction::FontWidth::NORMAL,
     TextAbstraction::FontSlant::NORMAL,
@@ -1699,7 +1699,7 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
     {
       "Emojis",
       "\xF0\x9F\x98\x81\xF0\x9F\x98\x82\xF0\x9F\x98\x83\xF0\x9F\x98\x84",
-      "/tizen/TizenColorEmoji.ttf",
+      "/tizen/BreezeColorEmoji.ttf",
       EMOJI_FONT_SIZE,
       0u,
       4u,

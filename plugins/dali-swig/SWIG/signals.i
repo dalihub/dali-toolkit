@@ -220,6 +220,13 @@
  Macros for signals with return values
 *****************/
 
+// 0 param signals ( with return )
+%define DALI_SIGNAL_0_PARAM_RETURN( returnType )
+
+  SIGNAL_TYPEMAP_HELPER( returnType (*func) () );
+  SIGNAL_TEMPLATE_HELPER_0( returnType, return);
+%enddef
+
 // 1 param signals ( with return )
 %define DALI_SIGNAL_1_PARAM_RETURN( returnType, argumentType1 )
 
@@ -248,6 +255,9 @@ namespace Dali
 {
 // Signal< void () >
 DALI_SIGNAL_0_PARAM();
+
+// Signal< bool () >
+DALI_SIGNAL_0_PARAM_RETURN( bool );
 
 // Signal< void (Actor) >
 DALI_SIGNAL_1_PARAM( Dali::Actor );
@@ -350,6 +360,9 @@ DALI_SIGNAL_3_PARAM( Dali::Toolkit::PageTurnView, unsigned int, bool );
 
 // void Signal< Dali::Toolkit::PageTurnView >;
 DALI_SIGNAL_1_PARAM( Dali::Toolkit::PageTurnView );
+
+// void Signal< Dali::Toolkit::ProgressBar, float, float >;
+DALI_SIGNAL_3_PARAM( Dali::Toolkit::ProgressBar, float, float );
 
 // void Signal< const Dali::Toolkit::ScrollView::SnapEvent& >;
 DALI_SIGNAL_1_PARAM( const Dali::Toolkit::ScrollView::SnapEvent& );

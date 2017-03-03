@@ -223,22 +223,12 @@ void TestVisualRender( ToolkitTestApplication& application,
   application.SendNotification();
   application.Render();
 
-  if( resourcePtr )
-  {
-    Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-    if(request)
-    {
-      application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, resourcePtr );
-    }
-  }
-
   application.Render();
   application.SendNotification();
 
   if( resourcePtr )
   {
-    DALI_TEST_EQUALS( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) ||
-                      application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceSynchronouslyFunc ), true, TEST_LOCATION);
+    DALI_TEST_EQUALS( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceSynchronouslyFunc ), true, TEST_LOCATION);
   }
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
@@ -1234,10 +1224,6 @@ void MeshVisualLoadsCorrectlyTest( Property::Map& propertyMap, ToolkitTestApplic
   application.SendNotification();
   application.Render( 0 );
 
-  //Tell the platform abstraction that the required resources have been loaded.
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetAllResourceRequestsAsLoaded();
-
   //Render again to upload the now-loaded textures.
   application.SendNotification();
   application.Render( 0 );
@@ -1280,10 +1266,6 @@ void MeshVisualDoesNotLoadCorrectlyTest( Property::Map& propertyMap, ToolkitTest
   //Attempt to render to queue resource load requests.
   application.SendNotification();
   application.Render( 0 );
-
-  //Tell the platform abstraction that the required resources have been loaded.
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetAllResourceRequestsAsLoaded();
 
   //Render again to upload the now-loaded textures.
   application.SendNotification();

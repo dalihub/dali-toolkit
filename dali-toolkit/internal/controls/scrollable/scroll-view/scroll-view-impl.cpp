@@ -26,6 +26,7 @@
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -1986,8 +1987,9 @@ void ScrollView::OnChildAdd(Actor& child)
 
     if( mTransientScrollBar )
     {
-      scrollBar.SetVisible( false );
-      scrollBar.HideIndicator();
+      // Show the scroll-indicator for a brief period
+      Property::Map emptyMap;
+      scrollBar.DoAction( "ShowTransientIndicator", emptyMap );
     }
   }
   else if(mAlterChild)
@@ -2495,7 +2497,6 @@ void ScrollView::OnPan( const PanGesture& gesture )
 
         if( ( rulerDomainX.max > size.width ) || ( rulerDomainY.max > size.height ) )
         {
-          scrollBar.SetVisible( true );
           scrollBar.ShowIndicator();
         }
       }

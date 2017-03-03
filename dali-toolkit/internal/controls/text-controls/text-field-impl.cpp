@@ -1403,10 +1403,14 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnKeyEvent %p keyCode %d\n", mController.Get(), event.keyCode );
 
-  if( Dali::DALI_KEY_ESCAPE == event.keyCode ||
-      "Return" == event.keyPressedName ) // Make a Dali key code for this
+  if( Dali::DALI_KEY_ESCAPE == event.keyCode || "Return" == event.keyPressedName ) // Make a Dali key code for this
   {
-    ClearKeyInputFocus();
+    // Make sure ClearKeyInputFocus when only key is up
+    if( event.state == KeyEvent::Up )
+    {
+      ClearKeyInputFocus();
+    }
+
     return true;
   }
 
