@@ -910,6 +910,10 @@ public class View : CustomActor {
     public static readonly int TOOLTIP = NDalicManualPINVOKE.View_Property_TOOLTIP_get();
     public static readonly int STATE = NDalicManualPINVOKE.View_Property_STATE_get();
     public static readonly int SUB_STATE = NDalicManualPINVOKE.View_Property_SUB_STATE_get();
+    public static readonly int LEFT_FOCUSABLE_ACTOR_ID = NDalicManualPINVOKE.View_Property_LEFT_FOCUSABLE_ACTOR_ID_get();
+    public static readonly int RIGHT_FOCUSABLE_ACTOR_ID = NDalicManualPINVOKE.View_Property_RIGHT_FOCUSABLE_ACTOR_ID_get();
+    public static readonly int UP_FOCUSABLE_ACTOR_ID = NDalicManualPINVOKE.View_Property_UP_FOCUSABLE_ACTOR_ID_get();
+    public static readonly int DOWN_FOCUSABLE_ACTOR_ID = NDalicManualPINVOKE.View_Property_DOWN_FOCUSABLE_ACTOR_ID_get();
 
     public Property() : this(NDalicPINVOKE.new_View_Property(), true) {
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
@@ -990,6 +994,23 @@ public class View : CustomActor {
   public static T DownCast<T>(Actor actor) where T : View
   {
       return (T)( ViewRegistry.GetViewFromActor( actor ) );
+  }
+
+  private View ConvertIdToView(uint id)
+  {
+    Actor actor = null;
+
+    if (Parent)
+    {
+      actor = Parent.FindChildById(id);
+    }
+
+    if (!actor)
+    {
+      actor = Stage.Instance.GetRootLayer().FindChildById(id);
+    }
+
+    return View.DownCast<View>(actor);
   }
 
   public void SetKeyInputFocus() {
@@ -1228,6 +1249,62 @@ public class View : CustomActor {
     }
   }
 
+  private int LeftFocusableActorId
+  {
+    get
+    {
+      int temp = 0;
+      GetProperty( View.Property.LEFT_FOCUSABLE_ACTOR_ID).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( View.Property.LEFT_FOCUSABLE_ACTOR_ID, new Dali.Property.Value( value ) );
+    }
+  }
+
+  private int RightFocusableActorId
+  {
+    get
+    {
+      int temp = 0;
+      GetProperty( View.Property.RIGHT_FOCUSABLE_ACTOR_ID).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( View.Property.RIGHT_FOCUSABLE_ACTOR_ID, new Dali.Property.Value( value ) );
+    }
+  }
+
+  private int UpFocusableActorId
+  {
+    get
+    {
+      int temp = 0;
+      GetProperty( View.Property.UP_FOCUSABLE_ACTOR_ID).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( View.Property.UP_FOCUSABLE_ACTOR_ID, new Dali.Property.Value( value ) );
+    }
+  }
+
+  private int DownFocusableActorId
+  {
+    get
+    {
+      int temp = 0;
+      GetProperty( View.Property.DOWN_FOCUSABLE_ACTOR_ID).Get( ref temp );
+      return temp;
+    }
+    set
+    {
+      SetProperty( View.Property.DOWN_FOCUSABLE_ACTOR_ID, new Dali.Property.Value( value ) );
+    }
+  }
+
   public float Flex
   {
     get
@@ -1337,6 +1414,98 @@ public class View : CustomActor {
     set
     {
       SetProperty( TableView.ChildProperty.CELL_VERTICAL_ALIGNMENT, new Dali.Property.Value( value ) );
+    }
+  }
+
+  /**
+   * @brief The left focusable view.
+   * @note This will return NULL if not set.
+   * This will also return NULL if the specified left focusable view is not on stage.
+   *
+   */
+  public View LeftFocusableView
+  {
+    // As native side will be only storing IDs so need a logic to convert View to ID and vice-versa.
+    get
+    {
+      if (LeftFocusableActorId >= 0)
+      {
+        return ConvertIdToView((uint)LeftFocusableActorId);
+      }
+      return null;
+    }
+    set
+    {
+      LeftFocusableActorId = (int)value.GetId();
+    }
+  }
+
+  /**
+   * @brief The right focusable view.
+   * @note This will return NULL if not set.
+   * This will also return NULL if the specified right focusable view is not on stage.
+   *
+   */
+  public View RightFocusableView
+  {
+    // As native side will be only storing IDs so need a logic to convert View to ID and vice-versa.
+    get
+    {
+      if (RightFocusableActorId >= 0)
+      {
+        return ConvertIdToView((uint)RightFocusableActorId);
+      }
+      return null;
+    }
+    set
+    {
+      RightFocusableActorId = (int)value.GetId();
+    }
+  }
+
+  /**
+   * @brief The up focusable view.
+   * @note This will return NULL if not set.
+   * This will also return NULL if the specified up focusable view is not on stage.
+   *
+   */
+  public View UpFocusableView
+  {
+    // As native side will be only storing IDs so need a logic to convert View to ID and vice-versa.
+    get
+    {
+      if (UpFocusableActorId >= 0)
+      {
+        return ConvertIdToView((uint)UpFocusableActorId);
+      }
+      return null;
+    }
+    set
+    {
+      UpFocusableActorId = (int)value.GetId();
+    }
+  }
+
+  /**
+   * @brief The down focusable view.
+   * @note This will return NULL if not set.
+   * This will also return NULL if the specified down focusable view is not on stage.
+   *
+   */
+  public View DownFocusableView
+  {
+    // As native side will be only storing IDs so need a logic to convert View to ID and vice-versa.
+    get
+    {
+      if (DownFocusableActorId >= 0)
+      {
+        return ConvertIdToView((uint)DownFocusableActorId);
+      }
+      return null;
+    }
+    set
+    {
+      DownFocusableActorId = (int)value.GetId();
     }
   }
 }

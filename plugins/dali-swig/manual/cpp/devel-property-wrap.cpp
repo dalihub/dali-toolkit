@@ -75,6 +75,22 @@ SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_SUB_STATE_get() {
   return jresult;
 }
 
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_LEFT_FOCUSABLE_ACTOR_ID_get() {
+  return Dali::Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_RIGHT_FOCUSABLE_ACTOR_ID_get() {
+  return Dali::Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_UP_FOCUSABLE_ACTOR_ID_get() {
+  return Dali::Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_DOWN_FOCUSABLE_ACTOR_ID_get() {
+  return Dali::Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID;
+}
+
 SWIGEXPORT int SWIGSTDCALL CSharp_ItemView_Property_LAYOUT_get() {
   int jresult ;
   int result;

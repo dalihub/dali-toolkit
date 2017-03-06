@@ -56,7 +56,6 @@
 
 namespace Dali
 {
-extern bool CaseInsensitiveStringCompare( const std::string& a, const std::string& b );
 
 namespace Toolkit
 {
@@ -267,6 +266,10 @@ public:
   : mControlImpl( controlImpl ),
     mState( Toolkit::DevelControl::NORMAL ),
     mSubStateName(""),
+    mLeftFocusableActorId( -1 ),
+    mRightFocusableActorId( -1 ),
+    mUpFocusableActorId( -1 ),
+    mDownFocusableActorId( -1 ),
     mStyleName(""),
     mBackgroundColor(Color::TRANSPARENT),
     mStartingPinchScale( NULL ),
@@ -366,6 +369,46 @@ public:
           if( value.Get( subState ) )
           {
             controlImpl.mImpl->SetSubState( subState );
+          }
+        }
+        break;
+
+        case Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID:
+        {
+          int focusId;
+          if( value.Get( focusId ) )
+          {
+            controlImpl.mImpl->mLeftFocusableActorId = focusId;
+          }
+        }
+        break;
+
+        case Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID:
+        {
+          int focusId;
+          if( value.Get( focusId ) )
+          {
+            controlImpl.mImpl->mRightFocusableActorId = focusId;
+          }
+        }
+        break;
+
+        case Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID:
+        {
+          int focusId;
+          if( value.Get( focusId ) )
+          {
+            controlImpl.mImpl->mUpFocusableActorId = focusId;
+          }
+        }
+        break;
+
+        case Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID:
+        {
+          int focusId;
+          if( value.Get( focusId ) )
+          {
+            controlImpl.mImpl->mDownFocusableActorId = focusId;
           }
         }
         break;
@@ -483,6 +526,30 @@ public:
         case Toolkit::DevelControl::Property::SUB_STATE:
         {
           value = controlImpl.mImpl->mSubStateName;
+          break;
+        }
+
+        case Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID:
+        {
+          value = controlImpl.mImpl->mLeftFocusableActorId;
+          break;
+        }
+
+        case Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID:
+        {
+          value = controlImpl.mImpl->mRightFocusableActorId;
+          break;
+        }
+
+        case Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID:
+        {
+          value = controlImpl.mImpl->mUpFocusableActorId;
+          break;
+        }
+
+        case Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID:
+        {
+          value = controlImpl.mImpl->mDownFocusableActorId;
           break;
         }
 
@@ -836,6 +903,11 @@ public:
   DevelControl::State mState;
   std::string mSubStateName;
 
+  int mLeftFocusableActorId;       ///< Actor ID of Left focusable control.
+  int mRightFocusableActorId;      ///< Actor ID of Right focusable control.
+  int mUpFocusableActorId;         ///< Actor ID of Up focusable control.
+  int mDownFocusableActorId;       ///< Actor ID of Down focusable control.
+
   RegisteredVisualContainer mVisuals; // Stores visuals needed by the control, non trivial type so std::vector used.
   std::string mStyleName;
   Vector4 mBackgroundColor;                       ///< The color of the background visual
@@ -866,17 +938,25 @@ public:
   static const PropertyRegistration PROPERTY_6;
   static const PropertyRegistration PROPERTY_7;
   static const PropertyRegistration PROPERTY_8;
+  static const PropertyRegistration PROPERTY_9;
+  static const PropertyRegistration PROPERTY_10;
+  static const PropertyRegistration PROPERTY_11;
+  static const PropertyRegistration PROPERTY_12;
 };
 
 // Properties registered without macro to use specific member variables.
-const PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "styleName",       Toolkit::Control::Property::STYLE_NAME,       Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "backgroundColor", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgroundImage", Toolkit::Control::Property::BACKGROUND_IMAGE, Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",   Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "tooltip",         Toolkit::DevelControl::Property::TOOLTIP,     Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "state",           Toolkit::DevelControl::Property::STATE,       Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_8( typeRegistration, "subState",        Toolkit::DevelControl::Property::SUB_STATE,   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "styleName",              Toolkit::Control::Property::STYLE_NAME,                   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "backgroundColor",        Toolkit::Control::Property::BACKGROUND_COLOR,             Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgroundImage",        Toolkit::Control::Property::BACKGROUND_IMAGE,             Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",          Toolkit::Control::Property::KEY_INPUT_FOCUS,              Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",             Toolkit::Control::Property::BACKGROUND,                   Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "tooltip",                Toolkit::DevelControl::Property::TOOLTIP,                 Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "state",                  Toolkit::DevelControl::Property::STATE,                   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_8( typeRegistration, "subState",               Toolkit::DevelControl::Property::SUB_STATE,               Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_9( typeRegistration, "leftFocusableActorId",   Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_10( typeRegistration, "rightFocusableActorId", Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID,Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_11( typeRegistration, "upFocusableActorId",    Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,   Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_12( typeRegistration, "downFocusableActorId",  Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {

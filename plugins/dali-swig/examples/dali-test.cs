@@ -108,6 +108,8 @@ namespace MyCSharpExample
 
         public void Initialize(object source, NUIApplicationInitEventArgs e)
         {
+            NavigationPropertiesTests();
+
             OperatorTests();
 
             CustomViewPropertyTest();
@@ -262,6 +264,83 @@ namespace MyCSharpExample
             else
             {
                 Console.WriteLine("p1 != p2");
+            }
+        }
+
+        public void NavigationPropertiesTests()
+        {
+            View view = new View();
+            View leftView, rightView, upView, downView, tmpView;
+
+            leftView = new View();
+            leftView.Name = "leftView";
+            rightView = new View();
+            rightView.Name = "rightView";
+            upView = new View();
+            upView.Name = "upView";
+            downView = new View();
+            downView.Name = "downView";
+
+            Stage.Instance.Add(leftView);
+            Stage.Instance.Add(rightView);
+            Stage.Instance.Add(upView);
+            Stage.Instance.Add(downView);
+
+            view.LeftFocusableView = leftView;
+            tmpView = view.LeftFocusableView;
+            if (string.Compare(tmpView.Name, "leftView") == 0)
+            {
+                Console.WriteLine("Passed: LeftFocusedView = " + tmpView.Name);
+            }
+            else
+            {
+                Console.WriteLine("Failed: LeftFocusedView = " + tmpView.Name);
+            }
+
+            view.RightFocusableView = rightView;
+            tmpView = view.RightFocusableView;
+            if (string.Compare(tmpView.Name, "rightView") == 0)
+            {
+                Console.WriteLine("Passed: RightFocusedView = " + tmpView.Name);
+            }
+            else
+            {
+                Console.WriteLine("Failed: RightFocusedView = " + tmpView.Name);
+            }
+
+            Stage.Instance.Add(view);
+
+            view.UpFocusableView = upView;
+            tmpView = view.UpFocusableView;
+            if (string.Compare(tmpView.Name, "upView") == 0)
+            {
+                Console.WriteLine("Passed: UpFocusedView = " + tmpView.Name);
+            }
+            else
+            {
+                Console.WriteLine("Failed: UpFocusedView = " + tmpView.Name);
+            }
+
+            view.DownFocusableView = downView;
+            tmpView = view.DownFocusableView;
+            if (string.Compare(tmpView.Name, "downView") == 0)
+            {
+                Console.WriteLine("Passed: DownFocusedView = " + tmpView.Name);
+            }
+            else
+            {
+                Console.WriteLine("Failed: DownFocusedView = " + tmpView.Name);
+            }
+
+            Stage.Instance.Remove(leftView);
+            tmpView = view.LeftFocusableView;
+            if (!tmpView)
+            {
+                Console.WriteLine("Passed: NULL LeftFocusedView");
+            }
+            else
+            {
+                Console.WriteLine("Failed: LeftFocusedView = " + tmpView.Name);
             }
         }
 
