@@ -1718,8 +1718,29 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
              ( Dali::DALI_KEY_CURSOR_UP    == keyCode ) ||
              ( Dali::DALI_KEY_CURSOR_DOWN  == keyCode ) )
     {
-      mImpl->mEventData->mCheckScrollAmount = true;
+      // If don't have any text, do nothing.
+      if( !mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters )
+      {
+        return false;
+      }
 
+      uint32_t cursorPosition = mImpl->mEventData->mPrimaryCursorPosition;
+      uint32_t numberOfCharacters = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+      uint32_t cursorLine = mImpl->mModel->mVisualModel->GetLineOfCharacter( cursorPosition );
+      uint32_t numberOfLines = mImpl->mModel->GetNumberOfLines();
+
+      // Logic to determine whether this text control will lose focus or not.
+      if( ( Dali::DALI_KEY_CURSOR_LEFT == keyCode && 0 == cursorPosition ) ||
+          ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode && numberOfCharacters == cursorPosition) ||
+          ( Dali::DALI_KEY_CURSOR_DOWN == keyCode && cursorLine == numberOfLines -1 ) ||
+          ( Dali::DALI_KEY_CURSOR_DOWN == keyCode && numberOfCharacters == cursorPosition && cursorLine -1 == numberOfLines -1 ) ||
+          ( Dali::DALI_KEY_CURSOR_UP == keyCode && cursorLine == 0 ) ||
+          ( Dali::DALI_KEY_CURSOR_UP == keyCode && numberOfCharacters == cursorPosition && cursorLine == 1 ) )
+      {
+        return false;
+      }
+
+      mImpl->mEventData->mCheckScrollAmount = true;
       Event event( Event::CURSOR_KEY_EVENT );
       event.p1.mInt = keyCode;
       mImpl->mEventData->mEventQueue.push_back( event );
