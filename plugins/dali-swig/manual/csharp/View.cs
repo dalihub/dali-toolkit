@@ -36,6 +36,9 @@ public class View : CustomActor {
 
   ~View() {
     DisposeQueue.Instance.Add(this);
+
+    // Unregister this instance of view from the view registry.
+    ViewRegistry.UnregisterView(this);
   }
 
   public override void Dispose() {

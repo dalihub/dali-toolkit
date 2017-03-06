@@ -139,9 +139,10 @@ namespace Dali
     private PropertyRangeManager _propertyRangeManager;
 
     /// <summary>
-    /// Given a C++ control the dictionary allows us to find which C# control (View) it belongs to
+    /// Given a C++ control the dictionary allows us to find which C# control (View) it belongs to.
+    /// By keeping the weak reference only, it will allow the object to be garbage collected.
     /// </summary>
-    private Dictionary<IntPtr, Dali.View> _controlMap;
+    private Dictionary<IntPtr, WeakReference> _controlMap;
 
     ///<summary>
     // Maps the name of a custom view to a create instance function
@@ -177,7 +178,7 @@ namespace Dali
       _getPropertyCallback = new GetPropertyDelegate (GetProperty);
       _setPropertyCallback  = new SetPropertyDelegate (SetProperty);
 
-      _controlMap = new Dictionary<IntPtr, View>();
+      _controlMap = new Dictionary<IntPtr, WeakReference>();
       _constructorMap = new Dictionary<string, Func<CustomView>>();
       _propertyRangeManager = new PropertyRangeManager();
 
@@ -237,7 +238,24 @@ namespace Dali
       //Console.WriteLine ("________Storing ref object cptr in control map Hex: {0:X}", refCptr);
       if ( !Instance._controlMap.ContainsKey(refCptr) )
       {
-        Instance._controlMap.Add(refCptr, view );
+        Instance._controlMap.Add(refCptr, new WeakReference(view, false));
+      }
+
+      return;
+    }
+
+    /// <summary>
+    /// Remove the this instance of control (View) and native part from the mapping table.
+    /// </summary>
+    /// <param name="view"> The instance of control (View)</param>
+    public static void UnregisterView( View view )
+    {
+      RefObject refObj = view.GetObjectPtr();
+      IntPtr refCptr = (IntPtr) RefObject.getCPtr(refObj);
+
+      if ( Instance._controlMap.ContainsKey(refCptr) )
+      {
+        Instance._controlMap.Remove(refCptr);
       }
 
       return;
@@ -272,13 +290,14 @@ namespace Dali
     public static View GetViewFromActor( Actor actor )
     {
       // we store a dictionary of ref-obects (C++ land) to custom views (C# land)
-      Dali.View view;
 
       RefObject refObj = actor.GetObjectPtr ();
       IntPtr refObjectPtr = (IntPtr) RefObject.getCPtr(refObj);
 
-      if ( Instance._controlMap.TryGetValue ( refObjectPtr, out view) )
+      WeakReference viewReference;
+      if ( Instance._controlMap.TryGetValue ( refObjectPtr, out viewReference) )
       {
+        View view = viewReference.Target as View;
         return view;
       }
       else
@@ -352,16 +371,17 @@ namespace Dali
     private IntPtr GetPropertyValue ( IntPtr controlPtr, string propertyName)
     {
       // Get the C# control that maps to the C++ control
-      Dali.View view;
-
       BaseHandle baseHandle = new BaseHandle (controlPtr, false);
 
       RefObject refObj = baseHandle.GetObjectPtr ();
 
       IntPtr refObjectPtr = (IntPtr) RefObject.getCPtr(refObj);
 
-      if ( _controlMap.TryGetValue ( refObjectPtr, out view) )
+      WeakReference viewReference;
+      if ( _controlMap.TryGetValue ( refObjectPtr, out viewReference) )
       {
+        View view = viewReference.Target as View;
+
         // call the get property function
         System.Object val = view.GetType ().GetProperty (propertyName).GetAccessors () [0].Invoke (view, null);
 
@@ -382,15 +402,15 @@ namespace Dali
     private void SetPropertyValue ( IntPtr controlPtr, string propertyName, IntPtr propertyValuePtr)
     {
       // Get the C# control that maps to the C++ control
-      Dali.View view;
 
       //Console.WriteLine ("SetPropertyValue   refObjectPtr = {0:X}", controlPtr);
 
       Property.Value propValue = new Property.Value (propertyValuePtr, false);
 
-      if ( _controlMap.TryGetValue ( controlPtr, out view) )
+      WeakReference viewReference;
+      if ( _controlMap.TryGetValue ( controlPtr, out viewReference) )
       {
-
+        View view = viewReference.Target as View;
         System.Reflection.PropertyInfo propertyInfo = view.GetType().GetProperty(propertyName);
 
         // We know the property name, we know it's type, we just need to convert from a DALi property value to native C# type
