@@ -23,6 +23,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
@@ -816,7 +817,10 @@ void TableView::OnRelayout( const Vector2& size, RelayoutContainer& container )
       if( actor &&  position.rowIndex == row && position.columnIndex == column )
       {
         // Anchor actor to top left of the cell
-        actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+        if( actor.GetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >() )
+        {
+          actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+        }
         actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
 
         Padding padding;
