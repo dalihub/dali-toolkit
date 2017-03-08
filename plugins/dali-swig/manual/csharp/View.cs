@@ -1110,27 +1110,43 @@ public class View : CustomActor {
   {
     get
     {
-      Vector4 temp = new Vector4(0.0f,0.0f,0.0f,0.0f);
-      GetProperty( View.Property.BACKGROUND_COLOR).Get(  temp );
-      return temp;
+      Vector4 backgroundColor = new Vector4(0.0f,0.0f,0.0f,0.0f);
+
+      Dali.Property.Map background = Background;
+      int visualType = 0;
+      background.Find( Dali.Constants.Visual.Property.Type ).Get( ref visualType );
+      if(visualType == (int)Dali.Constants.Visual.Type.Color)
+      {
+        background.Find( Dali.Constants.ColorVisualProperty.MixColor ).Get( backgroundColor );
+      }
+
+      return backgroundColor;
     }
     set
     {
-      SetProperty( View.Property.BACKGROUND_COLOR, new Dali.Property.Value( value ) );
+      SetProperty( View.Property.BACKGROUND, new Dali.Property.Value( value ) );
     }
   }
 
-  public Dali.Property.Map BackgroundImage
+  public string BackgroundImage
   {
     get
     {
-      Dali.Property.Map temp = new Dali.Property.Map();
-      GetProperty( View.Property.BACKGROUND_IMAGE).Get(  temp );
-      return temp;
+      string backgroundImage = "";
+
+      Dali.Property.Map background = Background;
+      int visualType = 0;
+      background.Find( Dali.Constants.Visual.Property.Type ).Get( ref visualType );
+      if(visualType == (int)Dali.Constants.Visual.Type.Image)
+      {
+        background.Find( Dali.Constants.ImageVisualProperty.URL ).Get( out backgroundImage );
+      }
+
+      return backgroundImage;
     }
     set
     {
-      SetProperty( View.Property.BACKGROUND_IMAGE, new Dali.Property.Value( value ) );
+      SetProperty( View.Property.BACKGROUND, new Dali.Property.Value( value ) );
     }
   }
 

@@ -445,7 +445,7 @@ namespace MyCSharpExample
             // Background property
             Property.Map background = new Property.Map();
             background.Add( Dali.Constants.Visual.Property.Type, new Property.Value((int)Dali.Constants.Visual.Type.Color) )
-                .Add( Dali.Constants.ColorVisualProperty.MixColor, new Property.Value(Color.Red) );
+                      .Add( Dali.Constants.ColorVisualProperty.MixColor, new Property.Value(Color.Red) );
             spin.Background = background;
 
             background = spin.Background;
@@ -469,6 +469,17 @@ namespace MyCSharpExample
             else
             {
                 Console.WriteLine ("Custom View BackgroundColor property : test failed");
+            }
+
+            // BackgroundImage property
+            spin.BackgroundImage = "background-image.jpg";
+            if(spin.BackgroundImage == "background-image.jpg")
+            {
+                Console.WriteLine ("Custom View BackgroundImage property : test passed");
+            }
+            else
+            {
+                Console.WriteLine ("Custom View BackgroundImage property : test failed");
             }
 
             // StyleName property
