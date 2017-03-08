@@ -409,6 +409,7 @@ public:
         case Toolkit::Control::Property::BACKGROUND:
         {
           std::string url;
+          Vector4 color;
           const Property::Map* map = value.GetMap();
           if( map && !map->Empty() )
           {
@@ -423,6 +424,10 @@ public:
               controlImpl.RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
               visual.SetDepthIndex( DepthIndex::BACKGROUND );
             }
+          }
+          else if( value.Get( color ) )
+          {
+            controlImpl.SetBackgroundColor(color);
           }
           else
           {
