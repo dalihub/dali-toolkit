@@ -2029,15 +2029,15 @@ void Controller::Impl::RepositionSelectionHandles()
     // Whether to retrieve the next line.
     if( index == lastGlyphOfLine )
     {
-      // Retrieve the next line.
-      ++lineRun;
-
-      // Get the last glyph of the new line.
-      lastGlyphOfLine = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1u;
-
       ++lineIndex;
       if( lineIndex < firstLineIndex + numberOfLines )
       {
+        // Retrieve the next line.
+        ++lineRun;
+
+        // Get the last glyph of the new line.
+        lastGlyphOfLine = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1u;
+
         // Keep the offset and height of the current selection box.
         const float currentLineOffset = selectionBoxInfo->lineOffset;
         const float currentLineHeight = selectionBoxInfo->lineHeight;
