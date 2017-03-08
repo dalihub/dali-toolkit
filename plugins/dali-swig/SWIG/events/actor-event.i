@@ -83,6 +83,16 @@
       }
     }
 
+   public Vector2 ScreenPosition
+   {
+      get
+      {
+        Vector2 temp = new Vector2( 0.0f, 0.0f );
+        GetProperty( Actor.Property.SCREEN_POSITION ).Get( temp );
+        return temp;
+      }
+   }
+
     public bool StateFocusEnable
     {
       set

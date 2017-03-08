@@ -193,6 +193,9 @@ namespace Dali
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Actor_Property_OPACITY_get")]
         public static extern int Actor_Property_OPACITY_get();
 
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Actor_Property_SCREEN_POSITION_get")]
+        public static extern int Actor_Property_SCREEN_POSITION_get();
+
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_TOOLTIP_get")]
         public static extern int View_Property_TOOLTIP_get();
 
