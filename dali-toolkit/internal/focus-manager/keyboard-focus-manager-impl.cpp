@@ -170,6 +170,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
     {
       // Do we need it to remember if it was previously DISABLED?
       currentlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::NORMAL );
+      currentlyFocusedControl.ClearKeyInputFocus();
     }
 
     DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
@@ -181,6 +182,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
     if( newlyFocusedControl )
     {
       newlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::FOCUSED );
+      newlyFocusedControl.SetKeyInputFocus();
     }
 
     // Push Current Focused Actor to FocusHistory
@@ -432,6 +434,7 @@ void KeyboardFocusManager::ClearFocus()
     if( currentlyFocusedControl )
     {
       currentlyFocusedControl.SetProperty( DevelControl::Property::STATE, DevelControl::NORMAL );
+      currentlyFocusedControl.ClearKeyInputFocus();
     }
   }
 
