@@ -45,6 +45,16 @@ namespace
 
 const Dali::Vector2 DEFAULT_SCROLL_BAR_PADDING( 8.0f, 6.0f );
 
+// The following properties are not in the public-api yet.
+enum
+{
+  /**
+   * @brief True if scroll-bar should be automatically show/hidden during/after panning.
+   * @details name "transientScrollBar", type bool.
+   */
+  TRANSIENT_SCROLL_BAR = Dali::Toolkit::ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP + 1
+};
+
 BaseHandle Create()
 {
   return Toolkit::TextSelectionToolbar::New();
@@ -172,8 +182,15 @@ void TextSelectionToolbar::OnInitialize()
 void TextSelectionToolbar::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   float width = std::max ( mTableOfButtons.GetNaturalSize().width, size.width );
-  mRulerX->SetDomain( RulerDomain( 0.0, width, true ) );
-  mScrollView.SetRulerX( mRulerX );
+
+  if( mScrollView )
+  {
+    mRulerX->SetDomain( RulerDomain( 0.0, width, true ) );
+    mScrollView.SetRulerX( mRulerX );
+
+    bool showTransient( width > size.width );
+    mScrollView.SetProperty( TRANSIENT_SCROLL_BAR, showTransient );
+  }
 
   if( mScrollBar )
   {

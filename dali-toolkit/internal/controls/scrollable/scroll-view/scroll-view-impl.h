@@ -356,6 +356,13 @@ public:
   void SetWheelScrollDistanceStep(Vector2 step);
 
   /**
+   * @brief Enables or disables the transient scroll-bar
+   *
+   * @param[in] transient True if scroll-bar should be automatically show/hidden during/after panning
+   */
+  void SetTransientScrollBar( bool transient );
+
+  /**
    * @copydoc Toolkit::ScrollView::GetCurrentPage
    */
   unsigned int GetCurrentPage() const;

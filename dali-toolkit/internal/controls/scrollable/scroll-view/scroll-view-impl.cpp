@@ -77,6 +77,17 @@ const float DEFAULT_SCROLL_UPDATE_DISTANCE( 30.0f );                ///< Default
 
 const std::string INTERNAL_MAX_POSITION_PROPERTY_NAME( "internalMaxPosition" );
 
+// The following properties are not in the public-api yet.
+enum
+{
+  /**
+   * @brief True if scroll-bar should be automatically show/hidden during/after panning.
+   * @details name "transientScrollBar", type bool.
+   */
+  TRANSIENT_SCROLL_BAR = Toolkit::ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP + 1
+};
+
+
 // Helpers ////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -249,6 +260,9 @@ DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wrapEnabled",                B
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "panningEnabled",             BOOLEAN,   PANNING_ENABLED             )
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "axisAutoLockEnabled",        BOOLEAN,   AXIS_AUTO_LOCK_ENABLED      )
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wheelScrollDistanceStep",    VECTOR2,   WHEEL_SCROLL_DISTANCE_STEP  )
+
+Dali::PropertyRegistration manualProperty1( typeRegistration, "transientScrollBar", TRANSIENT_SCROLL_BAR,
+    Property::BOOLEAN, Dali::Toolkit::Internal::ScrollView::SetProperty, Dali::Toolkit::Internal::ScrollView::GetProperty );
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollPosition",  VECTOR2, SCROLL_POSITION)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollPrePosition",   VECTOR2, SCROLL_PRE_POSITION)
@@ -660,7 +674,7 @@ ScrollView::ScrollView()
   mDefaultMaxOvershoot(true),
   mCanScrollHorizontal(true),
   mCanScrollVertical(true),
-  mTransientScrollBar(true)
+  mTransientScrollBar(false)
 {
 }
 
@@ -1153,6 +1167,22 @@ void ScrollView::SetWheelScrollDistanceStep(Vector2 step)
 Vector2 ScrollView::GetWheelScrollDistanceStep() const
 {
   return mWheelScrollDistanceStep;
+}
+
+void ScrollView::SetTransientScrollBar( bool transient )
+{
+  if( transient != mTransientScrollBar )
+  {
+    mTransientScrollBar = transient;
+
+    Toolkit::ScrollBar scrollBar = mScrollBar.GetHandle();
+    if( mTransientScrollBar && scrollBar )
+    {
+      // Show the scroll-indicator for a brief period
+      scrollBar.SetVisible( true );
+      GetImpl(scrollBar).ShowTransientIndicator();
+    }
+  }
 }
 
 unsigned int ScrollView::GetCurrentPage() const
@@ -1987,6 +2017,11 @@ void ScrollView::OnChildAdd(Actor& child)
       // Show the scroll-indicator for a brief period
       GetImpl(scrollBar).ShowTransientIndicator();
     }
+    else
+    {
+      scrollBar.SetVisible( false );
+      scrollBar.HideIndicator();
+    }
   }
   else if(mAlterChild)
   {
@@ -2493,6 +2528,7 @@ void ScrollView::OnPan( const PanGesture& gesture )
 
         if( ( rulerDomainX.max > size.width ) || ( rulerDomainY.max > size.height ) )
         {
+          scrollBar.SetVisible( true );
           scrollBar.ShowIndicator();
         }
       }
@@ -2901,6 +2937,11 @@ void ScrollView::SetProperty( BaseObject* object, Property::Index index, const P
         scrollViewImpl.SetWheelScrollDistanceStep( value.Get<Vector2>() );
         break;
       }
+      case TRANSIENT_SCROLL_BAR:
+      {
+        scrollViewImpl.SetTransientScrollBar( value.Get<bool>() );
+        break;
+      }
     }
   }
 }
@@ -2934,6 +2975,11 @@ Property::Value ScrollView::GetProperty( BaseObject* object, Property::Index ind
       case Toolkit::ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP:
       {
         value = scrollViewImpl.GetWheelScrollDistanceStep();
+        break;
+      }
+      case TRANSIENT_SCROLL_BAR:
+      {
+        value = scrollViewImpl.mTransientScrollBar;
         break;
       }
     }
