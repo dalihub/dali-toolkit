@@ -205,6 +205,18 @@ namespace Dali
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_SUB_STATE_get")]
         public static extern int View_Property_SUB_STATE_get();
 
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_LEFT_FOCUSABLE_ACTOR_ID_get")]
+        public static extern int View_Property_LEFT_FOCUSABLE_ACTOR_ID_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_RIGHT_FOCUSABLE_ACTOR_ID_get")]
+        public static extern int View_Property_RIGHT_FOCUSABLE_ACTOR_ID_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_UP_FOCUSABLE_ACTOR_ID_get")]
+        public static extern int View_Property_UP_FOCUSABLE_ACTOR_ID_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_DOWN_FOCUSABLE_ACTOR_ID_get")]
+        public static extern int View_Property_DOWN_FOCUSABLE_ACTOR_ID_get();
+
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_ItemView_Property_LAYOUT_get")]
         public static extern int ItemView_Property_LAYOUT_get();
 
