@@ -129,6 +129,8 @@ public:
   static ImageView New();
 
   /**
+   * @DEPRECATED_1_2_8, use New( const std::string& ) instead.
+   *
    * @brief Creates an initialized ImageView from an Image instance.
    *
    * If the handle is empty, ImageView will not display anything.
@@ -137,7 +139,7 @@ public:
    * @param[in] image The Image instance to display
    * @return A handle to a newly allocated ImageView
    */
-  static ImageView New( Image image );
+  static ImageView New( Image image ) DALI_DEPRECATED_API;
 
   /**
    * @brief Creates an initialized ImageView from an URL to an image resource.
@@ -207,13 +209,15 @@ public:
   static ImageView DownCast( BaseHandle handle );
 
   /**
+   * @DEPRECATED_1_2_8, use SetImage( const std::string& ) instead.
+   *
    * @brief Sets this ImageView from an Image instance.
    *
    * If the handle is empty, ImageView will display nothing
    * @SINCE_1_0.0
    * @param[in] image The Image instance to display.
    */
-  void SetImage( Image image );
+  void SetImage( Image image ) DALI_DEPRECATED_API;
 
   /**
    * @brief Sets this ImageView from the given URL.
@@ -241,6 +245,8 @@ public:
   void SetImage( const std::string& url, ImageDimensions size );
 
   /**
+   * @DEPRECATED_1_1.4
+   *
    * @brief Gets the Image instance handle used by the ImageView.
    *
    * A valid handle will be returned only if this instance was created with New(Image) or SetImage(Image) was called.
@@ -248,7 +254,7 @@ public:
    * @SINCE_1_0.0
    * @return The Image instance currently used by the ImageView
    */
-  Image GetImage() const;
+  Image GetImage() const DALI_DEPRECATED_API;
 
 public: // Not intended for application developers
 
