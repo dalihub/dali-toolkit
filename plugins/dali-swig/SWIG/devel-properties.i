@@ -30,6 +30,7 @@
   public static readonly int SIBLING_ORDER = NDalicManualPINVOKE.Actor_Property_SIBLING_ORDER_get();
   public static readonly int OPACITY = NDalicManualPINVOKE.Actor_Property_OPACITY_get();
   public static readonly int SCREEN_POSITION = NDalicManualPINVOKE.Actor_Property_SCREEN_POSITION_get();
+  public static readonly int POSITION_USES_ANCHOR_POINT = NDalicManualPINVOKE.Actor_Property_POSITION_USES_ANCHOR_POINT_get();
 %}
 
 %typemap(cscode) Dali::Toolkit::Control::Property %{

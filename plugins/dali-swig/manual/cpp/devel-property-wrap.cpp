@@ -48,6 +48,11 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_SCREEN_POSITION_get() {
   return Dali::DevelActor::Property::SCREEN_POSITION;
 }
 
+SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_POSITION_USES_ANCHOR_POINT_get() {
+
+  return Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT;
+}
+
 SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_TOOLTIP_get() {
   int jresult ;
   int result;

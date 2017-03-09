@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,6 +195,9 @@ namespace Dali
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Actor_Property_SCREEN_POSITION_get")]
         public static extern int Actor_Property_SCREEN_POSITION_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Actor_Property_POSITION_USES_ANCHOR_POINT_get")]
+        public static extern int Actor_Property_POSITION_USES_ANCHOR_POINT_get();
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_TOOLTIP_get")]
         public static extern int View_Property_TOOLTIP_get();
