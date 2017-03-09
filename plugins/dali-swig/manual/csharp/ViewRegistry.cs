@@ -492,12 +492,11 @@ namespace Dali
         }
         else if ( type.Equals (typeof(Size)) )
         {
-          // DALi sizes are Vector3
-          Vector3 value = new Vector3();
+          Size value = new Size();
           ok = propValue.Get( value );
           if ( ok )
           {
-            propertyInfo.SetValue(view, new Size(value.X,value.Y));
+            propertyInfo.SetValue(view, new Size(value.Width, value.Height, value.Depth));
           };
         }
         else if ( type.Equals (typeof(Color)) )

@@ -398,7 +398,7 @@ namespace MyCSharpExample
             controlLayout.ParentOrigin = NDalic.ParentOriginCenter;
             controlLayout.AnchorPoint = NDalic.AnchorPointCenter;
             controlLayout.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.ALL_DIMENSIONS);
-            controlLayout.SetCellPadding(new Size(10.0f, 10.0f));
+            controlLayout.SetCellPadding(new Size2D(10, 10));
             controlLayout.SetRelativeWidth(0, 0.5f);
             controlLayout.SetRelativeWidth(1, 0.5f);
             controlLayout.SetCellAlignment(new TableView.CellPosition(0, 0), HorizontalAlignmentType.CENTER, VerticalAlignmentType.CENTER);

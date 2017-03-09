@@ -1,381 +1,357 @@
-namespace Dali
-{
-  using System;
+/*
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
-  public enum Colors
-  {
-    Red,
-    White,
-    Blue,
-    Green,
-    Black,
-    Yellow,
-    Magenta,
-    Cyan
+namespace Dali {
+
+using System;
+
+public class Color : global::System.IDisposable {
+  private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+  protected bool swigCMemOwn;
+
+  internal Color(global::System.IntPtr cPtr, bool cMemoryOwn) {
+    swigCMemOwn = cMemoryOwn;
+    swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
+  }
+
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Color obj) {
+    return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
+  }
+
+  ~Color() {
+    DisposeQueue.Instance.Add(this);
+  }
+
+  public virtual void Dispose() {
+    if (!Stage.IsInstalled()) {
+      DisposeQueue.Instance.Add(this);
+      return;
+    }
+
+    lock(this) {
+      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
+        if (swigCMemOwn) {
+          swigCMemOwn = false;
+          NDalicPINVOKE.delete_Vector4(swigCPtr);
+        }
+        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
+      }
+      global::System.GC.SuppressFinalize(this);
+    }
   }
 
 
-  public class Color
+  public static Color operator+(Color arg1, Color arg2) {
+    return arg1.Add(arg2);
+  }
+
+  public static Color operator-(Color arg1, Color arg2) {
+    return arg1.Subtract(arg2);
+  }
+
+  public static Color operator-(Color arg1) {
+    return arg1.Subtract();
+  }
+
+  public static Color operator*(Color arg1, Color arg2) {
+    return arg1.Multiply(arg2);
+  }
+
+  public static Color operator*(Color arg1, float arg2) {
+    return arg1.Multiply(arg2);
+  }
+
+  public static Color operator/(Color arg1, Color arg2) {
+    return arg1.Divide(arg2);
+  }
+
+  public static Color operator/(Color arg1, float arg2) {
+    return arg1.Divide(arg2);
+  }
+
+
+  public float this[uint index]
   {
-
-    private float r;
-    private float g;
-    private float b;
-    private float a;
-
-    /**
-     * @brief constructor
-     *
-     * @since 1.0.0
-     */
-    public Color()
+    get
     {
-      r = 0.0f;
-      g = 0.0f;
-      b = 0.0f;
-      a = 0.0f;
-    }
-
-    /**
-     * @brief constructor
-     *
-     * @since 1.0.0
-     * @param [in] red The Color r.
-     * @param [in] green The Color g.
-     * @param [in] blue The Color b.
-     * @param [in] alpha The Color a.
-     */
-    public Color(float red, float green, float blue, float alpha)
-    {
-      r = red;
-      g = green;
-      b = blue;
-      a = alpha;
-    }
-
-    /**
-     * @brief constructor
-     *
-     * @since 1.0.0
-     * @param [in] o The Vector4 having r g b a components
-     */
-    public Color(Vector4 o)
-    {
-      r = o.r;
-      g = o.g;
-      b = o.b;
-      a = o.a;
-    }
-
-
-    /**
-     * @brief constructor
-     *
-     * @since 1.0.0
-     * @param [in] color as enum Colors.
-     */
-    public Color(Colors color)
-    {
-      switch (color)
-      {
-        case Colors.Red:
-          SetColor(1.0f, 0.0f, 0.0f, 1.0f);
-          break;
-        case Colors.White:
-          SetColor(1.0f, 1.0f, 1.0f, 1.0f);
-          break;
-        case Colors.Blue:
-          SetColor(0.0f, 0.0f, 1.0f, 1.0f);
-          break;
-        case Colors.Green:
-          SetColor(0.0f, 1.0f, 0.0f, 1.0f);
-          break;
-        case Colors.Black:
-          SetColor(0.0f, 0.0f, 0.0f, 1.0f);
-          break;
-        case Colors.Yellow:
-          SetColor(1.0f, 1.0f, 0.0f, 1.0f);
-          break;
-        case Colors.Cyan:
-          SetColor(0.0f, 1.0f, 1.0f, 1.0f);
-          break;
-        case Colors.Magenta:
-          SetColor(1.0f, 0.0f, 1.0f, 1.0f);
-          break;
-      }
-    }
-
-
-    /**
-     * @brief SetColor
-     *
-     * @since 1.0.0
-     * @param [in] red The Color r.
-     * @param [in] green The Color g.
-     * @param [in] blue The Color b.
-     * @param [in] alpha The Color a.
-     */
-    public void SetColor(float red, float green, float blue, float alpha)
-    {
-      r = red;
-      g = green;
-      b = blue;
-      a = alpha;
-    }
-
-    /**
-     * @brief name "R", type float (Color's Red component)
-     * @SINCE_1_0.0
-     */
-
-    public float R
-    {
-      get { return r; }
-      set { r = value; }
-    }
-
-    /**
-     * @brief name "G", type float (Color's Green component)
-     * @SINCE_1_0.0
-     */
-    public float G
-    {
-      get { return g; }
-      set { g = value; }
-    }
-
-    /**
-     * @brief name "B", type float (Color's Blue component)
-     * @SINCE_1_0.0
-     */
-    public float B
-    {
-      get { return b; }
-      set { b = value; }
-    }
-
-    /**
-     * @brief name "A", type float (Color's Alpha value)
-     * @SINCE_1_0.0
-     */
-    public float A
-    {
-      get { return a; }
-      set { a = value; }
-    }
-
-    /**
-     * @brief operator+
-     *
-     * @since 1.0.0
-     * @param [in] l The Color to add.
-     * @param [in] r The Color to add
-     * @return A reference to this
-     */
-    public static Color operator +(Color l, Color r)
-    {
-      return new Color(l.R + r.R, l.G + r.G, l.B + r.B, l.A + r.A);
-    }
-
-    /**
-     * @brief operator-
-     *
-     * @since 1.0.0
-     * @param [in] l The Color to substract.
-     * @param [in] r The Color to substract
-     * @return A reference to this
-     */
-    public static Color operator -(Color l, Color r)
-    {
-      return new Color(l.R - r.R, l.G - r.G, l.B - r.B, l.A - r.A);
-    }
-
-    /**
-     * @brief operator*
-     *
-     * @since 1.0.0
-     * @param [in] a The Color to multiply.
-     * @param [in] b The constant double to multiply.
-     * @return A reference to this
-     */
-    public static Color operator *(Color a, double b)
-    {
-      return new Color((float)(a.R * b), (float)(a.G * b), (float)(a.B * b), (float)(a.A * b));
-    }
-
-    /**
-     * @brief operator/
-     *
-     * @since 1.0.0
-     * @param [in] a The Color to divide.
-     * @param [in] b The Color to divide
-     * @return float value of division operation
-     */
-    public static float operator /(Color a, Color b)
-    {
-      return (float)System.Math.Sqrt((a.R / b.R) * (a.G / b.G) * (a.B / b.B) * (a.A / b.A));
-    }
-
-    /**
-     * @brief Operator ==
-     *
-     * @since 1.0.0
-     * @param [in] x The Color object to compare.
-     * @param [in] y The Color object to compare.
-     * @return bool, whether colors are equal or not
-     */
-    public static bool operator == (Color x, Color y)
-    {
-      return x.R == y.R && x.G == y.G && x.B == y.B && x.A == y.A;
-    }
-
-    /**
-     * @brief Operator !=
-     *
-     * @since 1.0.0
-     * @param [in] x The Color object to compare.
-     * @param [in] y The Color object to compare.
-     * @return bool, whether colors are equal or not
-     */
-    public static bool operator != (Color x, Color y)
-    {
-      return x.R != y.R || x.G != y.G || x.B != y.B || x.A != y.A;
-    }
-
-    /**
-     * @brief GetHashCode
-     *
-     * @since 1.0.0
-     * @return int, hascode of Color
-     */
-    public override int GetHashCode()
-    {
-      return base.GetHashCode();
-    }
-
-    /**
-     * @brief Clone
-     *
-     * @since 1.0.0
-     * @return Color object
-     */
-    public Color Clone()
-    {
-      Color copy = new Color(R, G, B, A);
-      return copy;
-    }
-
-    // Create a color for RGBA values ranging from 0..255, useful when dealing with HTML colors
-    static Color FromRgbaByte( byte red, byte green, byte blue, byte alpha )
-    {
-      return new Color ( red / 255,  green / 255, blue / 255, alpha / 255 );
-    }
-
-    // User-defined conversion from Color to Vector4
-    public static implicit operator Vector4(Color color)
-    {
-      return new Vector4(color.r, color.g, color.b, color.a);
-    }
-
-    public static implicit operator Color(Vector4 vec)
-    {
-      return new Color(vec.r, vec.g, vec.b, vec.a);
-    }
-
-    /**
-     * @brief name "White", type Color (White Color object)
-     * @SINCE_1_0.0
-     */
-    public static Color White
-    {
-      get
-      {
-        return new Color(Colors.White);
-      }
-    }
-
-    /**
-     * @brief name "Black", type Color (Black Color object)
-     * @SINCE_1_0.0
-     */
-    public static Color Black
-    {
-      get
-      {
-        return new Color(Colors.Black);
-      }
-    }
-
-    /**
-     * @brief name "Red", type Color (Red Color object)
-     * @SINCE_1_0.0
-     */
-    public static Color Red
-    {
-      get
-      {
-        return new Color(Colors.Red);
-      }
-    }
-
-    /**
-     * @brief name "Green", type Color (Green Color object)
-     * @SINCE_1_0.0
-     */
-    public static Color Green
-    {
-      get
-      {
-        return new Color(Colors.Green);
-      }
-    }
-
-    /**
-     * @brief name "Blue", type Color (Blue Color object)
-     * @SINCE_1_0.0
-     */
-    public static Color Blue
-    {
-      get
-      {
-        return new Color(Colors.Blue);
-      }
-    }
-
-    /**
-     * @brief name "Yellow", type Color (Yellow Color object)
-     * @SINCE_1_0.0
-     */
-    public static Color Yellow
-    {
-      get
-      {
-        return new Color(Colors.Yellow);
-      }
-    }
-
-    /**
-     * @brief name "Magenta", type Color (Magenta Color object)
-     * @SINCE_1_0.0
-     */
-    public static Color Magenta
-    {
-      get
-      {
-        return new Color(Colors.Magenta);
-      }
-    }
-
-    /**
-     * @brief name "Cyan", type Color (Cyan Color object)
-     * @SINCE_1_0.0
-     */
-    public static Color Cyan
-    {
-      get
-      {
-        return new Color(Colors.Cyan);
-      }
+      return ValueOfIndex(index);
     }
   }
+
+  public static Color GetColorFromPtr(global::System.IntPtr cPtr) {
+    Color ret = new Color(cPtr, false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+       return ret;
+  }
+
+
+  public Color() : this(NDalicPINVOKE.new_Vector4__SWIG_0(), true) {
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public Color(float r, float g, float b, float a) : this(NDalicPINVOKE.new_Vector4__SWIG_1(r, g, b, a), true) {
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public Color(float[] array) : this(NDalicPINVOKE.new_Vector4__SWIG_2(array), true) {
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  private Color Add(Color rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_Add(swigCPtr, Color.getCPtr(rhs)), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color AddAssign(Vector4 rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_AddAssign(swigCPtr, Color.getCPtr(rhs)), false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color Subtract(Color rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_Subtract__SWIG_0(swigCPtr, Color.getCPtr(rhs)), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color SubtractAssign(Color rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_SubtractAssign(swigCPtr, Color.getCPtr(rhs)), false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color Multiply(Color rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_Multiply__SWIG_0(swigCPtr, Color.getCPtr(rhs)), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color Multiply(float rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_Multiply__SWIG_1(swigCPtr, rhs), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color MultiplyAssign(Color rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_MultiplyAssign__SWIG_0(swigCPtr, Color.getCPtr(rhs)), false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color MultiplyAssign(float rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_MultiplyAssign__SWIG_1(swigCPtr, rhs), false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color Divide(Vector4 rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_Divide__SWIG_0(swigCPtr, Color.getCPtr(rhs)), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color Divide(float rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_Divide__SWIG_1(swigCPtr, rhs), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color DivideAssign(Color rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_DivideAssign__SWIG_0(swigCPtr, Color.getCPtr(rhs)), false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color DivideAssign(float rhs) {
+    Color ret = new Color(NDalicPINVOKE.Vector4_DivideAssign__SWIG_1(swigCPtr, rhs), false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Color Subtract() {
+    Color ret = new Color(NDalicPINVOKE.Vector4_Subtract__SWIG_1(swigCPtr), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public bool EqualTo(Color rhs) {
+    bool ret = NDalicPINVOKE.Vector4_EqualTo(swigCPtr, Color.getCPtr(rhs));
+
+    if(rhs == null) return false;
+
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public bool NotEqualTo(Color rhs) {
+    bool ret = NDalicPINVOKE.Vector4_NotEqualTo(swigCPtr, Color.getCPtr(rhs));
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+
+  private float ValueOfIndex(uint index) {
+    float ret = NDalicPINVOKE.Vector4_ValueOfIndex__SWIG_0(swigCPtr, index);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public float R {
+    set {
+      NDalicPINVOKE.Vector4_r_set(swigCPtr, value);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+    get {
+      float ret = NDalicPINVOKE.Vector4_r_get(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public float G {
+    set {
+      NDalicPINVOKE.Vector4_g_set(swigCPtr, value);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+    get {
+      float ret = NDalicPINVOKE.Vector4_g_get(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public float B {
+    set {
+      NDalicPINVOKE.Vector4_b_set(swigCPtr, value);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+    get {
+      float ret = NDalicPINVOKE.Vector4_b_get(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public float A {
+    set {
+      NDalicPINVOKE.Vector4_a_set(swigCPtr, value);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    }
+    get {
+      float ret = NDalicPINVOKE.Vector4_a_get(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public static Color Black {
+    get {
+      global::System.IntPtr cPtr = NDalicPINVOKE.BLACK_get();
+      Color ret = (cPtr == global::System.IntPtr.Zero) ? null : new Color(cPtr, false);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public static Color White {
+    get {
+      global::System.IntPtr cPtr = NDalicPINVOKE.WHITE_get();
+      Color ret = (cPtr == global::System.IntPtr.Zero) ? null : new Color(cPtr, false);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public static Color Red {
+    get {
+      global::System.IntPtr cPtr = NDalicPINVOKE.RED_get();
+      Color ret = (cPtr == global::System.IntPtr.Zero) ? null : new Color(cPtr, false);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public static Color Green {
+    get {
+      global::System.IntPtr cPtr = NDalicPINVOKE.GREEN_get();
+      Color ret = (cPtr == global::System.IntPtr.Zero) ? null : new Color(cPtr, false);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public static Color Blue {
+    get {
+      global::System.IntPtr cPtr = NDalicPINVOKE.BLUE_get();
+      Color ret = (cPtr == global::System.IntPtr.Zero) ? null : new Color(cPtr, false);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public static Color Yellow {
+    get {
+      global::System.IntPtr cPtr = NDalicPINVOKE.YELLOW_get();
+      Color ret = (cPtr == global::System.IntPtr.Zero) ? null : new Color(cPtr, false);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public static Color Magenta {
+    get {
+      global::System.IntPtr cPtr = NDalicPINVOKE.MAGENTA_get();
+      Color ret = (cPtr == global::System.IntPtr.Zero) ? null : new Color(cPtr, false);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public static Color Cyan {
+    get {
+      global::System.IntPtr cPtr = NDalicPINVOKE.CYAN_get();
+      Color ret = (cPtr == global::System.IntPtr.Zero) ? null : new Color(cPtr, false);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public static Color Transparent {
+    get {
+      global::System.IntPtr cPtr = NDalicPINVOKE.TRANSPARENT_get();
+      Color ret = (cPtr == global::System.IntPtr.Zero) ? null : new Color(cPtr, false);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
+  }
+
+  public static implicit operator Vector4(Color color)
+  {
+    return new Vector4(color.R, color.G, color.B, color.A);
+  }
+
+  public static implicit operator Color(Vector4 vec)
+  {
+    return new Color(vec.r, vec.g, vec.b, vec.a);
+  }
+
 }
+
+}
+
+

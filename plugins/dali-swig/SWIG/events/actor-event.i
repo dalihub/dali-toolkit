@@ -34,7 +34,7 @@
 
     public IntPtr GetPtrfrom ## ClassName ()
     {
-       return (IntPtr)swigCPtr;
+      return (IntPtr)swigCPtr;
     }
 
     public Position CurrentPosition
@@ -45,7 +45,21 @@
       }
     }
 
-    public Size3D CurrentSize
+    public Size2D Size2D
+    {
+      get
+      {
+        Size temp = new Size(0.0f,0.0f,0.0f);
+        GetProperty( Actor.Property.SIZE).Get(  temp );
+        return new Size2D(temp);
+      }
+      set
+      {
+        SetProperty( Actor.Property.SIZE, new Dali.Property.Value( new Size(value) ) );
+      }
+    }
+
+    public Size CurrentSize
     {
       get
       {
@@ -61,13 +75,13 @@
       }
     }
 
-   public bool Visibility
-   {
+    public bool Visibility
+    {
       get
       {
         return IsVisible();
       }
-   }
+    }
 
     public float Opacity
     {
@@ -80,6 +94,20 @@
       set
       {
         SetProperty( Actor.Property.OPACITY, new Dali.Property.Value( value ) );
+      }
+    }
+
+    public Position2D Position2D
+    {
+      get
+      {
+        Position temp = new Position(0.0f,0.0f,0.0f);
+        GetProperty( Actor.Property.POSITION).Get(  temp );
+        return new Position2D(temp);
+      }
+      set
+      {
+        SetProperty( Actor.Property.POSITION, new Dali.Property.Value( new Position(value) ) );
       }
     }
 

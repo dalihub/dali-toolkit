@@ -17,20 +17,20 @@
 
 namespace Dali {
 
-public class Size : global::System.IDisposable {
+public class Position2D : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
-  internal Size(global::System.IntPtr cPtr, bool cMemoryOwn) {
+  internal Position2D(global::System.IntPtr cPtr, bool cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
   }
 
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Size obj) {
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Position2D obj) {
     return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
   }
 
-  ~Size() {
+  ~Position2D() {
     DisposeQueue.Instance.Add(this);
   }
 
@@ -44,7 +44,7 @@ public class Size : global::System.IDisposable {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          NDalicPINVOKE.delete_Vector3(swigCPtr);
+          NDalicPINVOKE.delete_Vector2(swigCPtr);
         }
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
@@ -53,31 +53,31 @@ public class Size : global::System.IDisposable {
   }
 
 
-  public static Size operator+(Size arg1, Size arg2) {
+  public static Position2D operator+(Position2D arg1, Position2D arg2) {
     return arg1.Add(arg2);
   }
 
-  public static Size operator-(Size arg1, Size arg2) {
+  public static Position2D operator-(Position2D arg1, Position2D arg2) {
     return arg1.Subtract(arg2);
   }
 
-  public static Size operator-(Size arg1) {
+  public static Position2D operator-(Position2D arg1) {
     return arg1.Subtract();
   }
 
-  public static Size operator*(Size arg1, Size arg2) {
+  public static Position2D operator*(Position2D arg1, Position2D arg2) {
     return arg1.Multiply(arg2);
   }
 
-  public static Size operator*(Size arg1, float arg2) {
+  public static Position2D operator*(Position2D arg1, int arg2) {
     return arg1.Multiply(arg2);
   }
 
-  public static Size operator/(Size arg1, Size arg2) {
+  public static Position2D operator/(Position2D arg1, Position2D arg2) {
     return arg1.Divide(arg2);
   }
 
-  public static Size operator/(Size arg1, float arg2) {
+  public static Position2D operator/(Position2D arg1, int arg2) {
     return arg1.Divide(arg2);
   }
 
@@ -89,144 +89,124 @@ public class Size : global::System.IDisposable {
     }
   }
 
-  public static Size GetSizeFromPtr(global::System.IntPtr cPtr) {
-    Size ret = new Size(cPtr, false);
+  public static Position2D GetPosition2DFromPtr(global::System.IntPtr cPtr) {
+    Position2D ret = new Position2D(cPtr, false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
        return ret;
   }
 
 
-  public Size() : this(NDalicPINVOKE.new_Vector3__SWIG_0(), true) {
+  public Position2D() : this(NDalicPINVOKE.new_Vector2__SWIG_0(), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Size(float x, float y, float z) : this(NDalicPINVOKE.new_Vector3__SWIG_1(x, y, z), true) {
+  public Position2D(int x, int y) : this(NDalicPINVOKE.new_Vector2__SWIG_1((float)x, (float)y), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Size(Size2D size2d) : this(NDalicPINVOKE.new_Vector3__SWIG_3(Size2D.getCPtr(size2d)), true) {
+  public Position2D(Position position) : this(NDalicPINVOKE.new_Vector2__SWIG_3(Position.getCPtr(position)), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-
-  public static Size Zero {
-    get {
-      global::System.IntPtr cPtr = NDalicPINVOKE.Vector3_ZERO_get();
-      Size ret = (cPtr == global::System.IntPtr.Zero) ? null : new Size(cPtr, false);
-      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-      return ret;
-    }
-  }
-
-  private Size Add(Size rhs) {
-    Size ret = new Size(NDalicPINVOKE.Vector3_Add(swigCPtr, Size.getCPtr(rhs)), true);
+  private Position2D Add(Position2D rhs) {
+    Position2D ret = new Position2D(NDalicPINVOKE.Vector2_Add(swigCPtr, Position2D.getCPtr(rhs)), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  private Size Subtract(Size rhs) {
-    Size ret = new Size(NDalicPINVOKE.Vector3_Subtract__SWIG_0(swigCPtr, Size.getCPtr(rhs)), true);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  private Size Multiply(Size rhs) {
-    Size ret = new Size(NDalicPINVOKE.Vector3_Multiply__SWIG_0(swigCPtr, Size.getCPtr(rhs)), true);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  private Size Multiply(float rhs) {
-    Size ret = new Size(NDalicPINVOKE.Vector3_Multiply__SWIG_1(swigCPtr, rhs), true);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  private Size Divide(Size rhs) {
-    Size ret = new Size(NDalicPINVOKE.Vector3_Divide__SWIG_0(swigCPtr, Size.getCPtr(rhs)), true);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  private Size Divide(float rhs) {
-    Size ret = new Size(NDalicPINVOKE.Vector3_Divide__SWIG_1(swigCPtr, rhs), true);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  private Size Subtract() {
-    Size ret = new Size(NDalicPINVOKE.Vector3_Subtract__SWIG_1(swigCPtr), true);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  private float ValueOfIndex(uint index) {
-    float ret = NDalicPINVOKE.Vector3_ValueOfIndex__SWIG_0(swigCPtr, index);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public bool EqualTo(Size rhs) {
-    bool ret = NDalicPINVOKE.Vector3_EqualTo(swigCPtr, Size.getCPtr(rhs));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public bool NotEqualTo(Size rhs) {
-    bool ret = NDalicPINVOKE.Vector3_NotEqualTo(swigCPtr, Size.getCPtr(rhs));
+  private Position2D Subtract(Position2D rhs) {
+    Position2D ret = new Position2D(NDalicPINVOKE.Vector2_Subtract__SWIG_0(swigCPtr, Position2D.getCPtr(rhs)), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
 
-  public float Width {
+  private Position2D Multiply(Position2D rhs) {
+    Position2D ret = new Position2D(NDalicPINVOKE.Vector2_Multiply__SWIG_0(swigCPtr, Position2D.getCPtr(rhs)), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Position2D Multiply(int rhs) {
+    Position2D ret = new Position2D(NDalicPINVOKE.Vector2_Multiply__SWIG_1(swigCPtr, (float)rhs), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+
+  private Position2D Divide(Position2D rhs) {
+    Position2D ret = new Position2D(NDalicPINVOKE.Vector2_Divide__SWIG_0(swigCPtr, Position2D.getCPtr(rhs)), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Position2D Divide(int rhs) {
+    Position2D ret = new Position2D(NDalicPINVOKE.Vector2_Divide__SWIG_1(swigCPtr, (float)rhs), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private Position2D Subtract() {
+    Position2D ret = new Position2D(NDalicPINVOKE.Vector2_Subtract__SWIG_1(swigCPtr), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public bool EqualTo(Position2D rhs) {
+    bool ret = NDalicPINVOKE.Vector2_EqualTo(swigCPtr, Position2D.getCPtr(rhs));
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public bool NotEqualTo(Position2D rhs) {
+    bool ret = NDalicPINVOKE.Vector2_NotEqualTo(swigCPtr, Position2D.getCPtr(rhs));
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  private int ValueOfIndex(uint index) {
+    int ret = (int)NDalicPINVOKE.Vector2_ValueOfIndex__SWIG_0(swigCPtr, index);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+
+  public int X {
     set {
-      NDalicPINVOKE.Vector3_Width_set(swigCPtr, value);
+      NDalicPINVOKE.Vector2_X_set(swigCPtr, (float)value);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
     get {
-      float ret = NDalicPINVOKE.Vector3_Width_get(swigCPtr);
+      float ret = NDalicPINVOKE.Vector2_X_get(swigCPtr);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-      return ret;
+      return (int)ret;
     }
   }
 
-  public float Height {
+  public int Y {
     set {
-      NDalicPINVOKE.Vector3_Height_set(swigCPtr, value);
+      NDalicPINVOKE.Vector2_Y_set(swigCPtr, (float)value);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
     get {
-      float ret = NDalicPINVOKE.Vector3_Height_get(swigCPtr);
+      float ret = NDalicPINVOKE.Vector2_Y_get(swigCPtr);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-      return ret;
+      return (int)ret;
     }
   }
 
-  public float Depth {
-    set {
-      NDalicPINVOKE.Vector3_Depth_set(swigCPtr, value);
-      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    }
-    get {
-      float ret = NDalicPINVOKE.Vector3_Depth_get(swigCPtr);
-      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-      return ret;
-    }
-  }
-
-
-  public static implicit operator Vector3(Size size)
+  public static implicit operator Vector2(Position2D position2d)
   {
-    return new Vector3(size.Width, size.Height, size.Depth);
+    return new Vector2((float)position2d.X, (float)position2d.Y);
   }
 
-  public static implicit operator Size(Vector3 vec)
+  public static implicit operator Position2D(Vector2 vec)
   {
-    return new Size(vec.Width, vec.Height, vec.Depth);
+    return new Position2D((int)vec.X, (int)vec.Y);
   }
 
 }
 
 }
+
 
