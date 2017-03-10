@@ -29,6 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/internal/helpers/color-conversion.h>
 
 namespace Dali
 {
@@ -198,6 +199,7 @@ const Dali::Vector2& TextSelectionToolbar::GetPopupMaxSize() const
 
 void TextSelectionToolbar::SetUpScrollView()
 {
+  mScrollView.SetName("TextSelectionScrollView");
   mScrollView.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
   mScrollView.SetParentOrigin( ParentOrigin::CENTER_LEFT );
   mScrollView.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
@@ -336,9 +338,21 @@ void TextSelectionToolbar::ConfigureScrollview( const Property::Map& properties 
     Property::Index setPropertyIndex = mScrollView.GetPropertyIndex( propertyPair.first );
     if( setPropertyIndex != Property::INVALID_INDEX )
     {
-      // If the conversion worked, we have a valid property index,
-      // Set the property to the new value.
-      mScrollView.SetProperty( setPropertyIndex, propertyPair.second );
+      // Convert the string representation of a color into a Vector4
+      if( setPropertyIndex == Toolkit::Scrollable::Property::OVERSHOOT_EFFECT_COLOR )
+      {
+        Vector4 color;
+        if( ConvertPropertyToColor( propertyPair.second, color ) )
+        {
+          mScrollView.SetOvershootEffectColor( color );
+        }
+      }
+      else
+      {
+        // If the conversion worked, we have a valid property index,
+        // Set the property to the new value.
+        mScrollView.SetProperty( setPropertyIndex, propertyPair.second );
+      }
     }
   }
 

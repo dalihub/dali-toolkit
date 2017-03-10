@@ -36,6 +36,8 @@ class ImfManager : public Dali::BaseObject
 public:
   typedef Dali::ImfManager::ImfManagerSignalType ImfManagerSignalType;
   typedef Dali::ImfManager::ImfEventSignalType ImfEventSignalType;
+  typedef Dali::ImfManager::StatusSignalType ImfStatusSignalType;
+  typedef Dali::ImfManager::VoidSignalType ImfVoidSignalType;
 
 public:
   static Dali::ImfManager Get();
@@ -54,10 +56,14 @@ public:
   unsigned int GetCursorPosition() const;
   void SetSurroundingText( const std::string& text );
   const std::string& GetSurroundingText() const;
+  void ApplyOptions( const InputMethodOptions& options );
 
 public:  // Signals
   ImfManagerSignalType& ActivatedSignal() { return mActivatedSignal; }
   ImfEventSignalType& EventReceivedSignal() { return mEventSignal; }
+  ImfStatusSignalType& StatusChangedSignal() { return mKeyboardStatusSignal; }
+  ImfVoidSignalType& ResizedSignal() { return mKeyboardResizeSignal; }
+  ImfVoidSignalType& LanguageChangedSignal() { return mKeyboardLanguageChangedSignal; }
 
 protected:
   virtual ~ImfManager();
@@ -76,10 +82,13 @@ private:
   std::string mSurroundingText;
   bool mRestoreAfterFocusLost:1;             ///< Whether the keyboard needs to be restored (activated ) after focus regained.
   bool mIdleCallbackConnected:1;             ///< Whether the idle callback is already connected.
+  InputMethodOptions        mOptions;
 
   ImfManagerSignalType      mActivatedSignal;
   ImfEventSignalType        mEventSignal;
-
+  ImfStatusSignalType       mKeyboardStatusSignal;
+  ImfVoidSignalType         mKeyboardResizeSignal;
+  ImfVoidSignalType         mKeyboardLanguageChangedSignal;
 
   static Dali::ImfManager mToolkitImfManager;
 
@@ -195,6 +204,10 @@ const std::string& ImfManager::GetSurroundingText() const
   return mSurroundingText;
 }
 
+void ImfManager::ApplyOptions( const InputMethodOptions& options )
+{
+}
+
 } // Adaptor
 
 } // Internal
@@ -271,6 +284,11 @@ void ImfManager::NotifyTextInputMultiLine( bool multiLine )
 {
 }
 
+void ImfManager::ApplyOptions( const InputMethodOptions& options )
+{
+  Internal::Adaptor::ImfManager::GetImplementation(*this).ApplyOptions( options );
+}
+
 ImfManager::ImfManagerSignalType& ImfManager::ActivatedSignal()
 {
   return Internal::Adaptor::ImfManager::GetImplementation(*this).ActivatedSignal();
@@ -279,6 +297,21 @@ ImfManager::ImfManagerSignalType& ImfManager::ActivatedSignal()
 ImfManager::ImfEventSignalType& ImfManager::EventReceivedSignal()
 {
   return Internal::Adaptor::ImfManager::GetImplementation(*this).EventReceivedSignal();
+}
+
+ImfManager::StatusSignalType& ImfManager::StatusChangedSignal()
+{
+  return Internal::Adaptor::ImfManager::GetImplementation(*this).StatusChangedSignal();
+}
+
+ImfManager::VoidSignalType& ImfManager::ResizedSignal()
+{
+  return Internal::Adaptor::ImfManager::GetImplementation(*this).ResizedSignal();
+}
+
+ImfManager::VoidSignalType& ImfManager::LanguageChangedSignal()
+{
+  return Internal::Adaptor::ImfManager::GetImplementation(*this).LanguageChangedSignal();
 }
 
 ImfManager::ImfManager(Internal::Adaptor::ImfManager *impl)

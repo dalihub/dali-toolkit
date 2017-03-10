@@ -486,6 +486,13 @@ int UtcDaliControlBackgroundProperties(void)
   DALI_TEST_EQUALS( resultMap->Find( Visual::Property::TYPE )->Get<int>(), (int)Visual::IMAGE, TEST_LOCATION );
   DALI_TEST_EQUALS( resultMap->Find( ImageVisual::Property::URL )->Get<std::string>(), "Foobar.png", TEST_LOCATION );
 
+  // set as Color
+  control.SetProperty( Control::Property::BACKGROUND, Color::RED );
+  propValue = control.GetProperty( Control::Property::BACKGROUND );
+  resultMap = propValue.GetMap();
+  DALI_TEST_EQUALS( resultMap->Find( Visual::Property::TYPE )->Get<int>(), (int)Visual::COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>(), Color::RED, TEST_LOCATION );
+
   // Deprecated Properties
   control.SetProperty( Control::Property::BACKGROUND_COLOR, Color::YELLOW );
   DALI_TEST_EQUALS( control.GetProperty( Control::Property::BACKGROUND_COLOR ).Get< Vector4 >(), Color::YELLOW, TEST_LOCATION );

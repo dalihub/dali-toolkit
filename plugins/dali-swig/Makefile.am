@@ -78,6 +78,11 @@ $(BUILT_SOURCES): SWIG/*.i
 	./property-wrapper.rb
 	./constructor-generator.rb
 
+# have manual binding for View now, but cannot stop swig generating binding for
+# it as otherwise swig will not generate correct binding for any classes inherited
+# from it, therefore have to delete the automatic binding for View in the end
+	rm -f automatic/csharp/View.cs
+
 dist-hook: $(BUILT_SOURCES)
 	mkdir -p $(distdir)/automatic/cpp
 	cp ./automatic/cpp/*.cpp $(distdir)/automatic/cpp

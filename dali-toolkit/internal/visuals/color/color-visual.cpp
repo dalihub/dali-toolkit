@@ -138,6 +138,12 @@ void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ColorVisual::Property::MIX_COLOR, mImpl->mMixColor );
 }
 
+void ColorVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  // Do nothing
+}
+
+
 void ColorVisual::OnSetTransform()
 {
   if( mImpl->mRenderer )

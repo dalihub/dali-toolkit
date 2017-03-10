@@ -81,13 +81,7 @@ void RadioButton::OnInitialize()
 bool RadioButton::OnToggleReleased()
 {
   // Radio button overrides toggle release (button up) as doesn't allow un-selection to be performed on it directly.
-  bool stateChanged = false;
-  if( !IsSelected() )
-  {
-    Button::SetSelected( true ); // Set button to selected as previously unselected
-    stateChanged = true;
-  }
-  return stateChanged;
+  return false;
 }
 
 void RadioButton::OnStateChange( State newState )

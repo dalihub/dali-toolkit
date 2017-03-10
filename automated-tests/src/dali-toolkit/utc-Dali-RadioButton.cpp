@@ -47,6 +47,23 @@ static void TestCallback(BaseHandle handle)
   gObjectCreatedCallBackCalled = true;
 }
 
+static std::string GetButtonText( Button button )
+{
+  Property::Value value = button.GetProperty( Toolkit::Button::Property::LABEL );
+
+  Property::Map *labelProperty = value.GetMap();
+
+  std::string textLabel;
+
+  if ( labelProperty )
+  {
+    Property::Value* value = labelProperty->Find( Toolkit::TextVisual::Property::TEXT );
+    value->Get( textLabel );
+  }
+
+  return textLabel;
+}
+
 }
 
 int UtcDaliRadioButtonConstructorP(void)
@@ -138,11 +155,11 @@ int UtcDaliRadioButtonDownCast(void)
   END_TEST;
 }
 
-int UtcDaliRadioButtonLabelActor(void)
+int UtcDaliRadioButtonLabelProperty(void)
 {
   ToolkitTestApplication application;
 
-  std::string labelText = "test actor 1";
+  const std::string labelText = "test actor 1";
 
   RadioButton radioButton = RadioButton::New();
 
@@ -151,37 +168,14 @@ int UtcDaliRadioButtonLabelActor(void)
                                          .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
                         );
 
-  radioButton.SetLabelText( labelText );
+  radioButton.SetProperty( Toolkit::Button::Property::LABEL, labelText );
+  DALI_TEST_EQUALS( GetButtonText( radioButton ), labelText, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( radioButton.GetLabelText(), labelText, TEST_LOCATION );
 
   std::string labelText2 = "test actor 2";
-  radioButton.SetLabelText( labelText2 );
-  DALI_TEST_EQUALS( radioButton.GetLabelText(), labelText2, TEST_LOCATION );
+  radioButton.SetProperty( Toolkit::Button::Property::LABEL, labelText2 );
 
-  END_TEST;
-}
-
-int UtcDaliRadioButtonSelected(void)
-{
-  ToolkitTestApplication application;
-
-  RadioButton radioButton = RadioButton::New();
-
-  // Default selected
-  DALI_TEST_CHECK( radioButton.IsSelected() == false );
-
-  // False
-  radioButton.SetSelected( false );
-  DALI_TEST_CHECK( radioButton.IsSelected() == false );
-
-  // True
-  radioButton.SetSelected( true );
-  DALI_TEST_CHECK( radioButton.IsSelected() == true );
-
-  // False
-  radioButton.SetSelected( false );
-  DALI_TEST_CHECK( radioButton.IsSelected() == false );
+  DALI_TEST_EQUALS( GetButtonText( radioButton ), labelText2, TEST_LOCATION );
 
   END_TEST;
 }
@@ -343,3 +337,55 @@ int UtcDaliRadioButtonSelectedProperty(void)
 
   END_TEST;
 }
+
+
+// Deprecated API Tests
+
+int UtcDaliRadioButtonLabelActor(void)
+{
+  ToolkitTestApplication application;
+
+  std::string labelText = "test actor 1";
+
+  RadioButton radioButton = RadioButton::New();
+
+  radioButton.SetProperty( Toolkit::Button::Property::LABEL,
+                          Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                                         .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
+                        );
+
+  radioButton.SetLabelText( labelText );
+
+  DALI_TEST_EQUALS( radioButton.GetLabelText(), labelText, TEST_LOCATION );
+
+  std::string labelText2 = "test actor 2";
+  radioButton.SetLabelText( labelText2 );
+  DALI_TEST_EQUALS( radioButton.GetLabelText(), labelText2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRadioButtonSelected(void)
+{
+  ToolkitTestApplication application;
+
+  RadioButton radioButton = RadioButton::New();
+
+  // Default selected
+  DALI_TEST_CHECK( radioButton.IsSelected() == false );
+
+  // False
+  radioButton.SetSelected( false );
+  DALI_TEST_CHECK( radioButton.IsSelected() == false );
+
+  // True
+  radioButton.SetSelected( true );
+  DALI_TEST_CHECK( radioButton.IsSelected() == true );
+
+  // False
+  radioButton.SetSelected( false );
+  DALI_TEST_CHECK( radioButton.IsSelected() == false );
+
+  END_TEST;
+}
+
