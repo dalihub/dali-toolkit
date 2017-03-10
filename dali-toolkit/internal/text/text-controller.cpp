@@ -1726,7 +1726,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected KeyEvent" );
 
-  bool textChanged( false );
+  bool textChanged = false;
+  bool relayoutNeeded = false;
 
   if( ( NULL != mImpl->mEventData ) &&
       ( keyEvent.state == KeyEvent::Down ) )
@@ -1739,6 +1740,9 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       // Escape key is a special case which causes focus loss
       KeyboardFocusLostEvent();
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
     else if( ( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ) ||
              ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode ) ||
@@ -1748,10 +1752,16 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       Event event( Event::CURSOR_KEY_EVENT );
       event.p1.mInt = keyCode;
       mImpl->mEventData->mEventQueue.push_back( event );
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
     else if( Dali::DALI_KEY_BACKSPACE == keyCode )
     {
       textChanged = BackspaceKeyEvent();
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
     else if( IsKey( keyEvent, Dali::DALI_KEY_POWER ) ||
              IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
@@ -1760,6 +1770,9 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Power key/Menu/Home key behaviour does not allow edit mode to resume.
       mImpl->ChangeState( EventData::INACTIVE );
 
+      // Will request for relayout.
+      relayoutNeeded = true;
+
       // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
     }
     else if( Dali::DALI_KEY_SHIFT_LEFT == keyCode )
@@ -1767,6 +1780,11 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // DALI_KEY_SHIFT_LEFT is the key code for the Left Shift. It's sent (by the imf?) when the predictive text is enabled
       // and a character is typed after the type of a upper case latin character.
 
+      // Do nothing.
+    }
+    else if( ( Dali::DALI_KEY_VOLUME_UP == keyCode ) || ( Dali::DALI_KEY_VOLUME_DOWN == keyCode ) )
+    {
+      // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
       // Do nothing.
     }
     else
@@ -1778,19 +1796,30 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
       InsertText( keyString, COMMIT );
       textChanged = true;
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
 
     if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
          ( mImpl->mEventData->mState != EventData::INACTIVE ) &&
-         ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) )
+         ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) &&
+         ( Dali::DALI_KEY_VOLUME_UP != keyCode ) &&
+         ( Dali::DALI_KEY_VOLUME_DOWN != keyCode ) )
     {
       // Should not change the state if the key is the shift send by the imf manager.
       // Otherwise, when the state is SELECTING the text controller can't send the right
       // surrounding info to the imf.
       mImpl->ChangeState( EventData::EDITING );
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
 
-    mImpl->RequestRelayout();
+    if( relayoutNeeded )
+    {
+      mImpl->RequestRelayout();
+    }
   }
 
   if( textChanged &&
