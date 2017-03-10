@@ -124,7 +124,7 @@
       "scrollView":
       {
         "overshootAnimationSpeed":360.0,
-        "overshootSize":[1920.0,130.0]
+        "overshootSize":[1920.0,180.0]
       }
     },
     "TextSelectionScrollBar":
