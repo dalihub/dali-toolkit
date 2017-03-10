@@ -54,6 +54,7 @@ check-local: examples/dali-test.exe \
              examples/json-loader.exe \
              examples/user-alphafunction.exe \
              examples/image-view.exe \
+             examples/visuals-example.exe \
              examples/libNDalic.so examples/NDali.dll
 
 examples/%.exe: examples/%.cs
