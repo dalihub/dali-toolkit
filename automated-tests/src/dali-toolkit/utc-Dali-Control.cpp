@@ -26,6 +26,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 
 #include "dummy-control.h"
 
@@ -186,6 +187,39 @@ int UtcDaliControlDownCastTemplate(void)
   actor = Actor::New();
 
   DALI_TEST_CHECK( !DummyControl::DownCast( actor ) );
+  END_TEST;
+}
+
+int UtcDaliControlNavigationProperties(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  Stage::GetCurrent().Add( control );
+
+  DALI_TEST_EQUALS( -1, control.GetProperty( DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, control.GetProperty( DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, control.GetProperty( DevelControl::Property::UP_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, control.GetProperty( DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+
+  control.SetProperty( DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, 1 );
+  DALI_TEST_EQUALS( 1, control.GetProperty( DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+  control.SetProperty( DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID, 2 );
+  DALI_TEST_EQUALS( 2, control.GetProperty( DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+  control.SetProperty( DevelControl::Property::UP_FOCUSABLE_ACTOR_ID, 3 );
+  DALI_TEST_EQUALS( 3, control.GetProperty( DevelControl::Property::UP_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+  control.SetProperty( DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, 4 );
+  DALI_TEST_EQUALS( 4, control.GetProperty( DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+
+  control.SetProperty( DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, 15 );
+  DALI_TEST_EQUALS( 15, control.GetProperty( DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+  control.SetProperty( DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID, 16 );
+  DALI_TEST_EQUALS( 16, control.GetProperty( DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+  control.SetProperty( DevelControl::Property::UP_FOCUSABLE_ACTOR_ID, 17 );
+  DALI_TEST_EQUALS( 17, control.GetProperty( DevelControl::Property::UP_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+  control.SetProperty( DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, 18 );
+  DALI_TEST_EQUALS( 18, control.GetProperty( DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID ).Get< int >(), TEST_LOCATION );
+
   END_TEST;
 }
 
