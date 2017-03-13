@@ -1917,7 +1917,7 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
       mImpl->mEventData->mEventQueue.push_back( event );
       mImpl->RequestRelayout();
     }
-    else if( !mImpl->IsClipboardVisible() )
+    else
     {
       // Reset the imf manager to commit the pre-edit before selecting the text.
       mImpl->ResetImfManager();
