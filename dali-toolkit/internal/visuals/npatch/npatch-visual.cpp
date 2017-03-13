@@ -324,6 +324,11 @@ void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );
 }
 
+void NPatchVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  // Do nothing
+}
+
 NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mLoader( factoryCache.GetNPatchLoader() ),

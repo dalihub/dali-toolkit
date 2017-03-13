@@ -23,6 +23,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
@@ -465,10 +466,6 @@ Property::Value FlexContainer::GetProperty( BaseObject* object, Property::Index 
 
 void FlexContainer::OnChildAdd( Actor& child )
 {
-  // Anchor actor to top left of the container
-  child.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  child.SetParentOrigin( ParentOrigin::TOP_LEFT );
-
   // Create a new node for the child.
   FlexItemNode childNode;
   childNode.actor = child;
@@ -505,6 +502,13 @@ void FlexContainer::OnRelayout( const Vector2& size, RelayoutContainer& containe
     Actor child = mChildrenNodes[i].actor.GetHandle();
     if( child )
     {
+      // Anchor actor to top left of the container
+      if( child.GetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >() )
+      {
+        child.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      }
+      child.SetParentOrigin( ParentOrigin::TOP_LEFT );
+
       float negotiatedWidth = child.GetRelayoutSize(Dimension::WIDTH);
       float negotiatedHeight = child.GetRelayoutSize(Dimension::HEIGHT);
 

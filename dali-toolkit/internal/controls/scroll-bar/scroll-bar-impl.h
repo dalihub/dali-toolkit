@@ -146,7 +146,12 @@ public:
   /**
    * @copydoc Toolkit::ScrollBar::HideIndicator()
    */
- void HideIndicator();
+  void HideIndicator();
+
+  /**
+   * @brief Shows indicator until the transient duration has expired
+   */
+  void ShowTransientIndicator();
 
  /**
   * @copydoc Toolkit::ScrollBar::PanFinishedSignal()
@@ -192,6 +197,15 @@ public:
   * @return The current value of the property.
   */
  static Property::Value GetProperty( BaseObject* object, Property::Index index );
+
+ /**
+  * Performs actions as requested using the action name.
+  * @param[in] object The object on which to perform the action.
+  * @param[in] actionName The action to perform.
+  * @param[in] attributes The attributes with which to perfrom this action.
+  * @return true if action has been accepted by this control
+  */
+ static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes );
 
 private: // from Control
 
@@ -278,6 +292,7 @@ private:
 
   float mIndicatorShowDuration;                                      ///< The duration of scroll indicator show animation
   float mIndicatorHideDuration;                                      ///< The duration of scroll indicator hide animation
+  float mTransientIndicatorDuration;                                 ///< The duration before hiding transient indicator
 
   float mScrollStart;                                                ///< Scroll Start position (start of drag)
   Vector3 mGestureDisplacement;                                      ///< Gesture Displacement.

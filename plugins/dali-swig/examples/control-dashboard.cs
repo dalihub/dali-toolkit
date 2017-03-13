@@ -40,14 +40,16 @@ namespace MyCSharpExample
 
     private Dali.Application _application;
     private TableView _contentContainer;
+    private Timer _timer;
     private Stage _stage;
     private Popup _popup;
+    private ProgressBar _progressBar;
 
     // List of items
     private Item[] mViewList = {
       new Item("PushButton", true),  new Item("DropDown", false),    new Item("Toggle", true),
       new Item("InputField", false),  new Item("AnimateGif", false),  new Item("Loading", false),
-      new Item("ProgressBar", false), new Item("CheckBox", false),    new Item("RadioButton", true),
+      new Item("ProgressBar", true), new Item("CheckBox", false),    new Item("RadioButton", true),
       new Item("Tooltip", true),     new Item("Popup", true),       new Item("Toast", true),
       new Item("ItemView", false),    new Item("CheckBox", true)
     };
@@ -191,7 +193,33 @@ namespace MyCSharpExample
         }
         if (item.name.CompareTo("ProgressBar") == 0)
         {
+          _progressBar = new ProgressBar();
+          _progressBar.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
+          _progressBar.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.HEIGHT);
+          _progressBar.SetSize( 0, 50 );
 
+          _progressBar.ValueChanged += OnProgressBarValueChanged;
+
+          _timer = new Timer( 100 );
+          _timer.Tick += ( obj, e ) =>
+          {
+            float progress = (float)Math.Round( _progressBar.ProgressValue , 2 );
+
+            if( progress == 1.0f )
+            {
+              _progressBar.ProgressValue = 0.0f;
+              _progressBar.SecondaryProgressValue = 0.01f;
+            }
+            else
+            {
+              _progressBar.ProgressValue = progress + 0.01f;
+              _progressBar.SecondaryProgressValue = progress + 0.21f;
+            }
+            return true;
+          };
+          _timer.Start();
+
+          _contentContainer.AddChild(_progressBar, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
         }
         if (item.name.CompareTo("ScrollBar") == 0)
         {
@@ -412,6 +440,15 @@ namespace MyCSharpExample
         return true;
       };
       return cancelButton;
+    }
+
+    void OnProgressBarValueChanged( object source, ProgressBar.ValueChangedEventArgs e )
+    {
+      Property.Map labelVisual = new Property.Map();
+      labelVisual.Add( Dali.Constants.Visual.Property.Type, new Property.Value((int)Dali.Constants.Visual.Type.Text) )
+        .Add( Dali.Constants.TextVisualProperty.Text, new Property.Value( Math.Round( e.ProgressBar.ProgressValue, 2 ) +" / "+Math.Round( e.ProgressBar.SecondaryProgressValue, 2 )) );
+      e.ProgressBar.LabelVisual = labelVisual;
+      return;
     }
 
     public void MainLoop()

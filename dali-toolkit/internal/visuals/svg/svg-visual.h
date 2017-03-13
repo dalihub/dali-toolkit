@@ -90,6 +90,11 @@ public:  // from Visual
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
+  /**
+   * @copydoc Visual::Base::CreateInstancePropertyMap
+   */
+  virtual void DoCreateInstancePropertyMap( Property::Map& map ) const;
+
 protected:
 
   /**

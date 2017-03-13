@@ -136,18 +136,11 @@ bool KeyboardFocusManager::SetCurrentFocusActor( Actor actor )
 {
   DALI_ASSERT_DEBUG( !mIsWaitingKeyboardFocusChangeCommit && "Calling this function in the PreFocusChangeSignal callback?" );
 
-  if( actor )
-  {
-    return DoSetCurrentFocusActor( actor.GetId() );
-  }
-
-  return false;
+  return DoSetCurrentFocusActor( actor );
 }
 
-bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
+bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
 {
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
-  Actor actor = rootActor.FindChildById( actorID );
   bool success = false;
 
   // Check whether the actor is in the stage and is keyboard focusable.
@@ -170,17 +163,19 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( const unsigned int actorID )
     {
       // Do we need it to remember if it was previously DISABLED?
       currentlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::NORMAL );
+      currentlyFocusedControl.ClearKeyInputFocus();
     }
 
     DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
 
     // Save the current focused actor
-    mCurrentFocusActor = actorID;
+    mCurrentFocusActor = actor.GetId();
 
     Toolkit::Control newlyFocusedControl = Toolkit::Control::DownCast(actor);
     if( newlyFocusedControl )
     {
       newlyFocusedControl.SetProperty(DevelControl::Property::STATE, DevelControl::FOCUSED );
+      newlyFocusedControl.SetKeyInputFocus();
     }
 
     // Push Current Focused Actor to FocusHistory
@@ -432,6 +427,7 @@ void KeyboardFocusManager::ClearFocus()
     if( currentlyFocusedControl )
     {
       currentlyFocusedControl.SetProperty( DevelControl::Property::STATE, DevelControl::NORMAL );
+      currentlyFocusedControl.ClearKeyInputFocus();
     }
   }
 
@@ -515,11 +511,14 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
   {
     // Create the default if it hasn't been set and one that's shared by all the keyboard focusable actors
     mFocusIndicatorActor = Toolkit::ImageView::New( FOCUS_BORDER_IMAGE_PATH );
-    mFocusIndicatorActor.SetParentOrigin( ParentOrigin::CENTER );
 
     // Apply size constraint to the focus indicator
     mFocusIndicatorActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   }
+
+  mFocusIndicatorActor.SetParentOrigin( ParentOrigin::CENTER );
+  mFocusIndicatorActor.SetAnchorPoint( AnchorPoint::CENTER );
+  mFocusIndicatorActor.SetPosition(0.0f, 0.0f);
 
   return mFocusIndicatorActor;
 }

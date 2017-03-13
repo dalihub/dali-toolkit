@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,11 +265,13 @@ private: // Data
   Toolkit::TextField::MaxLengthReachedSignalType mMaxLengthReachedSignal;
   Toolkit::TextField::InputStyleChangedSignalType mInputStyleChangedSignal;
 
+  ImfManager         mImfManager;
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
   Toolkit::Control mStencil; ///< For EXCEED_POLICY_CLIP
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
+  Dali::InputMethodOptions mInputMethodOptions;
 
   Actor mRenderableActor;
   CallbackBase* mIdleCallback;

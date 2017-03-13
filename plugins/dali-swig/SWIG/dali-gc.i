@@ -615,6 +615,9 @@ DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void (const Dali::Touch
 //DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, (std::pair< Dali::Radian, Dali::Radian >), AngleThresholdPair);
 //DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, (std::pair< Dali::Radian, Dali::Radian >), AngleThresholdPair);
 
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::ProgressBar, float, float)>, ProgressBarValueChangedSignal);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Toolkit::ProgressBar, float, float)>, ProgressBarValueChangedSignal);
+
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, ApplicationExtensions );
 DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, ApplicationExtensions );
 

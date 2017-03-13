@@ -91,6 +91,11 @@ protected:
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
   /**
+   * @copydoc Visual::Base::CreateInstancePropertyMap
+   */
+  virtual void DoCreateInstancePropertyMap( Property::Map& map ) const;
+
+  /**
    * @copydoc Visual::Base::OnSetTransform
    */
   virtual void OnSetTransform();

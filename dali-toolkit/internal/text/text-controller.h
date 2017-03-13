@@ -334,6 +334,22 @@ public: // Configure the text controller.
    */
   bool IsTextElideEnabled() const;
 
+  /**
+   * @brief Sets input type to password
+   *
+   * @note The string is displayed continuous "*"
+   *
+   * @param[in] passwordInput True if password input is enabled.
+   */
+  void SetInputModePassword( bool passwordInput );
+
+  /**
+   * @brief Returns whether the input mode type is set as password.
+   *
+   * @return True if input mode type is password
+   */
+  bool IsInputModePassword();
+
 public: // Update.
 
   /**

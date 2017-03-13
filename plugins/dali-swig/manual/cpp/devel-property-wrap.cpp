@@ -34,21 +34,23 @@ extern "C" {
 #endif
 
 SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_SIBLING_ORDER_get() {
-  int jresult ;
-  int result;
 
-  result = (int)Dali::DevelActor::Property::SIBLING_ORDER;
-  jresult = (int)result;
-  return jresult;
+  return Dali::DevelActor::Property::SIBLING_ORDER;
 }
 
-SWIGEXPORT float SWIGSTDCALL CSharp_Actor_Property_OPACITY_get() {
-  int jresult ;
-  int result;
+SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_OPACITY_get() {
 
-  result = (float)Dali::DevelActor::Property::OPACITY;
-  jresult = (int)result;
-  return jresult;
+  return Dali::DevelActor::Property::OPACITY;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_SCREEN_POSITION_get() {
+
+  return Dali::DevelActor::Property::SCREEN_POSITION;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Actor_Property_POSITION_USES_ANCHOR_POINT_get() {
+
+  return Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT;
 }
 
 SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_TOOLTIP_get() {
@@ -76,6 +78,22 @@ SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_SUB_STATE_get() {
   result = (int)Dali::Toolkit::DevelControl::Property::SUB_STATE;
   jresult = (int)result;
   return jresult;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_LEFT_FOCUSABLE_ACTOR_ID_get() {
+  return Dali::Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_RIGHT_FOCUSABLE_ACTOR_ID_get() {
+  return Dali::Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_UP_FOCUSABLE_ACTOR_ID_get() {
+  return Dali::Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_View_Property_DOWN_FOCUSABLE_ACTOR_ID_get() {
+  return Dali::Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID;
 }
 
 SWIGEXPORT int SWIGSTDCALL CSharp_ItemView_Property_LAYOUT_get() {

@@ -72,13 +72,16 @@ Dali::PropertyRegistration dummyControlVisualProperty01(
   typeRegistration, "testVisual", Dali::Toolkit::DummyControl::Property::TEST_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
 
 Dali::PropertyRegistration dummyControlVisualProperty02(
-  typeRegistration, "testVisual", Dali::Toolkit::DummyControl::Property::TEST_VISUAL2, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
+  typeRegistration, "testVisual2", Dali::Toolkit::DummyControl::Property::TEST_VISUAL2, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
 
 Dali::PropertyRegistration dummyControlVisualProperty03(
   typeRegistration, "foregroundVisual", Dali::Toolkit::DummyControl::Property::FOREGROUND_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
 
 Dali::PropertyRegistration dummyControlVisualProperty04(
   typeRegistration, "focusVisual", Dali::Toolkit::DummyControl::Property::FOCUS_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
+
+Dali::PropertyRegistration dummyControlVisualProperty05(
+  typeRegistration, "labelVisual", Dali::Toolkit::DummyControl::Property::LABEL_VISUAL, Dali::Property::MAP, &Dali::Toolkit::DummyControlImpl::SetProperty, &Dali::Toolkit::DummyControlImpl::GetProperty );
 
 }
 
@@ -125,6 +128,12 @@ void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::B
 void DummyControlImpl::UnregisterVisual( Property::Index index )
 {
   Control::UnregisterVisual( index );
+
+  VisualIndices::iterator iter = std::find( mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index );
+  if( iter != mRegisteredVisualIndices.end() )
+  {
+    mRegisteredVisualIndices.erase(iter);
+  }
 }
 
 Toolkit::Visual::Base DummyControlImpl::GetVisual( Property::Index index )
@@ -142,7 +151,6 @@ bool DummyControlImpl::IsVisualEnabled( Property::Index index )
   return Control::IsVisualEnabled( index );
 }
 
-
 Animation DummyControlImpl::CreateTransition( const Toolkit::TransitionData& transition )
 {
   return Control::CreateTransition( transition );
@@ -159,6 +167,7 @@ void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index in
     case Toolkit::DummyControl::Property::TEST_VISUAL2:
     case Toolkit::DummyControl::Property::FOREGROUND_VISUAL:
     case Toolkit::DummyControl::Property::FOCUS_VISUAL:
+    case Toolkit::DummyControl::Property::LABEL_VISUAL:
     {
       Property::Map* map = value.GetMap();
       if( map != NULL )

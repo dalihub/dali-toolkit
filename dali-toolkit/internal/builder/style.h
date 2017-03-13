@@ -55,16 +55,41 @@ public:
    * through sub-states.
    *
    * @param[in] handle The handle to apply the visuals to
+   * @param[in] instancedProperties The maps from which to get instanced properties
    */
-  void ApplyVisualsAndPropertiesRecursively( Handle handle ) const;
+  void ApplyVisualsAndPropertiesRecursively( Handle handle,
+                                             const Dictionary<Property::Map>& instancedProperties ) const;
 
   /**
    * Apply the visuals of the style to the control pointed at by
    * handle.
    *
    * @param[in] handle The handle to apply the visuals to
+   * @param[in] instancedProperties The maps from which to get instanced properties
    */
-  void ApplyVisuals( Handle handle ) const;
+  void ApplyVisuals( Handle handle,
+                     const Dictionary<Property::Map>& instancedProperties ) const;
+
+  /**
+   * Apply the properties from the visualMaps and the instancedProperties
+   * to the control pointed at by handle.
+   *
+   * @param[in] handle The handle to apply the properties to
+   * @param[in] visualMaps The visual maps from which to get the styled properties
+   * @param[in] instancedProperties The maps from which to get instanced properties
+   */
+  static void ApplyVisuals( Handle handle,
+                            const Dictionary<Property::Map>& visualMaps,
+                            const Dictionary<Property::Map>& instancedProperties );
+
+  /**
+   * Apply the properties from the visualMap and optional instancedProperties
+   * to the control pointed at by handle.
+   */
+  static void ApplyVisual( Handle handle,
+                           const std::string& visualName,
+                           const Property::Map& visualMap,
+                           const Property::Map* instancedProperties );
 
   /**
    * Apply the properties of the style to the control pointed at by

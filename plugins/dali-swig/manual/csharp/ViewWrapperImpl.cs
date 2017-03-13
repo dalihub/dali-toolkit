@@ -58,8 +58,6 @@ namespace Dali
         public delegate void OnPanDelegate(PanGesture pan);
         public delegate void OnTapDelegate(TapGesture tap);
         public delegate void OnLongPressDelegate(LongPressGesture longPress);
-        public delegate void SignalConnectedDelegate(SlotObserver slotObserver, SWIGTYPE_p_Dali__CallbackBase callback);
-        public delegate void SignalDisconnectedDelegate(SlotObserver slotObserver, SWIGTYPE_p_Dali__CallbackBase callback);
 
         public OnStageConnectionDelegate OnStageConnection;
         public OnStageDisconnectionDelegate OnStageDisconnection;
@@ -99,8 +97,6 @@ namespace Dali
         public OnPanDelegate OnPan;
         public OnTapDelegate OnTap;
         public OnLongPressDelegate OnLongPress;
-        public SignalConnectedDelegate SignalConnected;
-        public SignalDisconnectedDelegate SignalDisconnected;
 
         internal ViewWrapperImpl(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicManualPINVOKE.ViewWrapperImpl_SWIGUpcast(cPtr), cMemoryOwn)
         {
@@ -411,7 +407,10 @@ namespace Dali
 
         private void DirectorOnStyleChange(global::System.IntPtr styleManager, int change)
         {
-            OnStyleChange(new StyleManager(styleManager, false), (StyleChangeType)change);
+            if (OnStyleChange != null)
+            {
+                OnStyleChange(new StyleManager(styleManager, false), (StyleChangeType)change);
+            }
         }
 
         private bool DirectorOnAccessibilityActivated()
@@ -482,16 +481,6 @@ namespace Dali
         private void DirectorOnLongPress(global::System.IntPtr longPress)
         {
             OnLongPress(new LongPressGesture(longPress, false));
-        }
-
-        private void DirectorSignalConnected(global::System.IntPtr slotObserver, global::System.IntPtr callback)
-        {
-            SignalConnected((slotObserver == global::System.IntPtr.Zero) ? null : new SlotObserver(slotObserver, false), (callback == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_Dali__CallbackBase(callback, false));
-        }
-
-        private void DirectorSignalDisconnected(global::System.IntPtr slotObserver, global::System.IntPtr callback)
-        {
-            SignalDisconnected((slotObserver == global::System.IntPtr.Zero) ? null : new SlotObserver(slotObserver, false), (callback == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_Dali__CallbackBase(callback, false));
         }
 
         public delegate void DelegateViewWrapperImpl_0(int depth);

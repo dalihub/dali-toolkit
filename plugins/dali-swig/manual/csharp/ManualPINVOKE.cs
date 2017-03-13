@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,6 +193,12 @@ namespace Dali
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Actor_Property_OPACITY_get")]
         public static extern int Actor_Property_OPACITY_get();
 
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Actor_Property_SCREEN_POSITION_get")]
+        public static extern int Actor_Property_SCREEN_POSITION_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Actor_Property_POSITION_USES_ANCHOR_POINT_get")]
+        public static extern int Actor_Property_POSITION_USES_ANCHOR_POINT_get();
+
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_TOOLTIP_get")]
         public static extern int View_Property_TOOLTIP_get();
 
@@ -201,6 +207,18 @@ namespace Dali
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_SUB_STATE_get")]
         public static extern int View_Property_SUB_STATE_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_LEFT_FOCUSABLE_ACTOR_ID_get")]
+        public static extern int View_Property_LEFT_FOCUSABLE_ACTOR_ID_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_RIGHT_FOCUSABLE_ACTOR_ID_get")]
+        public static extern int View_Property_RIGHT_FOCUSABLE_ACTOR_ID_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_UP_FOCUSABLE_ACTOR_ID_get")]
+        public static extern int View_Property_UP_FOCUSABLE_ACTOR_ID_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_View_Property_DOWN_FOCUSABLE_ACTOR_ID_get")]
+        public static extern int View_Property_DOWN_FOCUSABLE_ACTOR_ID_get();
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_ItemView_Property_LAYOUT_get")]
         public static extern int ItemView_Property_LAYOUT_get();

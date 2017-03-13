@@ -311,6 +311,7 @@ typedef Dali::IntrusivePtr<Dali::Toolkit::Ruler> RulerPtr;
 %template(GaussianBlurViewSignal) Dali::Signal<void (Dali::Toolkit::GaussianBlurView)>;
 %template(PageTurnSignal) Dali::Signal<void(Dali::Toolkit::PageTurnView, unsigned int, bool)>;
 %template(PagePanSignal) Dali::Signal<void(Dali::Toolkit::PageTurnView)>;
+%template(ProgressBarValueChangedSignal) Dali::Signal<void(Dali::Toolkit::ProgressBar, float, float)>;
 %template(ScrollViewSnapStartedSignal) Dali::Signal< void(const Dali::Toolkit::ScrollView::SnapEvent&)>;
 %template(ScrollableSignal) Dali::Signal< void(const Dali::Vector2&)>;
 %template(TextEditorSignal) Dali::Signal<void(Dali::Toolkit::TextEditor)>;

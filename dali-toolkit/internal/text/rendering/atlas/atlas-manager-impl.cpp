@@ -79,6 +79,14 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( const Toolkit::AtlasMa
   }
 
   Dali::Texture atlas = Dali::Texture::New( TextureType::TEXTURE_2D, pixelformat, width, height );
+
+  // Clear the background
+  unsigned int bufferSize(  width * height * Dali::Pixel::GetBytesPerPixel( pixelformat ) );
+  unsigned char* background = new unsigned char[bufferSize];
+  memset( background, 0, bufferSize );
+  PixelData backgroundPixels = PixelData::New( background, bufferSize, width, height, pixelformat, PixelData::DELETE_ARRAY );
+  atlas.Upload( backgroundPixels, 0u, 0u, 0u, 0u, width, height );
+
   AtlasDescriptor atlasDescriptor;
   atlasDescriptor.mAtlas = atlas;
   atlasDescriptor.mSize = size;
@@ -86,7 +94,7 @@ Toolkit::AtlasManager::AtlasId AtlasManager::CreateAtlas( const Toolkit::AtlasMa
   atlasDescriptor.mTotalBlocks = ( ( width - 1u ) / blockWidth ) * ( ( height - 1u ) / blockHeight );
   atlasDescriptor.mAvailableBlocks = atlasDescriptor.mTotalBlocks;
 
-  unsigned int bufferSize(  blockWidth * SINGLE_PIXEL_PADDING * Dali::Pixel::GetBytesPerPixel(pixelformat) );
+  bufferSize = blockWidth * SINGLE_PIXEL_PADDING * Dali::Pixel::GetBytesPerPixel(pixelformat);
   unsigned char* bufferHorizontalStrip = new unsigned char[bufferSize];
   memset( bufferHorizontalStrip, 0, bufferSize );
   atlasDescriptor.mHorizontalStrip = PixelData::New( bufferHorizontalStrip, bufferSize, blockWidth, SINGLE_PIXEL_PADDING, pixelformat, PixelData::DELETE_ARRAY );

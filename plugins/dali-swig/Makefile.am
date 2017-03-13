@@ -54,6 +54,7 @@ check-local: examples/dali-test.exe \
              examples/json-loader.exe \
              examples/user-alphafunction.exe \
              examples/image-view.exe \
+             examples/visuals-example.exe \
              examples/libNDalic.so examples/NDali.dll
 
 examples/%.exe: examples/%.cs
@@ -77,6 +78,11 @@ $(BUILT_SOURCES): SWIG/*.i
             $(DALI_CFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) -namespace Dali -o automatic/cpp/dali_wrap.cpp SWIG/dali.i
 	./property-wrapper.rb
 	./constructor-generator.rb
+
+# have manual binding for View now, but cannot stop swig generating binding for
+# it as otherwise swig will not generate correct binding for any classes inherited
+# from it, therefore have to delete the automatic binding for View in the end
+	rm -f automatic/csharp/View.cs
 
 dist-hook: $(BUILT_SOURCES)
 	mkdir -p $(distdir)/automatic/cpp

@@ -75,7 +75,35 @@ enum
    *
    * @see DevelControl::State
    */
-  SUB_STATE = BACKGROUND + 3
+  SUB_STATE = BACKGROUND + 3,
+
+  /**
+   * @brief The actor ID of the left focusable control.
+   * @details Name "leftFocusableActorId", type Property::INTEGER.
+   *
+   */
+  LEFT_FOCUSABLE_ACTOR_ID = BACKGROUND + 4,
+
+  /**
+   * @brief The actor ID of the right focusable control.
+   * @details Name "rightFocusableActorId", type Property::INTEGER.
+   *
+   */
+  RIGHT_FOCUSABLE_ACTOR_ID = BACKGROUND + 5,
+
+  /**
+   * @brief The actor ID of the up focusable control.
+   * @details Name "upFocusableActorId", type Property::INTEGER.
+   *
+   */
+  UP_FOCUSABLE_ACTOR_ID = BACKGROUND + 6,
+
+  /**
+   * @brief The actor ID of the down focusable control.
+   * @details Name "downFocusableActorId", type Property::INTEGER.
+   *
+   */
+  DOWN_FOCUSABLE_ACTOR_ID = BACKGROUND + 7
 };
 
 } // namespace Property

@@ -113,11 +113,6 @@ public:
   TextureSet GetTextures( uint32_t atlasId ) const;
 
   /**
-   * @copydoc Toolkit::AtlasGlyphManager::GetShader
-   */
-  Shader GetShader( uint32_t atlasId ) const;
-
-  /**
    * @copydoc Toolkit::AtlasGlyphManager::GetMetrics
    */
   const Toolkit::AtlasGlyphManager::Metrics& GetMetrics();
@@ -134,9 +129,6 @@ private:
   Dali::Toolkit::AtlasManager mAtlasManager;          ///> Atlas Manager created by GlyphManager
   std::vector< FontGlyphRecord > mFontGlyphRecords;
   Toolkit::AtlasGlyphManager::Metrics mMetrics;       ///> Metrics to pass back on GlyphManager status
-
-  Shader mShaderL8;
-  Shader mShaderRgba;
 };
 
 } // namespace Internal

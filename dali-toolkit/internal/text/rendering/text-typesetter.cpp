@@ -248,6 +248,8 @@ PixelData Typesetter::Render( const Vector2& size )
 
       // Retrieves the glyph's bitmap.
       glyphData.glyphBitmap.buffer = NULL;
+      glyphData.glyphBitmap.width = glyphInfo->width;   // Desired width and height.
+      glyphData.glyphBitmap.height = glyphInfo->height;
       fontClient.CreateBitmap( glyphInfo->fontId,
                                glyphInfo->index,
                                glyphData.glyphBitmap );
@@ -258,6 +260,10 @@ PixelData Typesetter::Render( const Vector2& size )
         TypesetGlyph( glyphData,
                       position,
                       color );
+        // delete the glyphBitmap.buffer as it is now copied into glyphData.bitmapBuffer
+        delete []glyphData.glyphBitmap.buffer;
+        glyphData.glyphBitmap.buffer = NULL;
+
       }
     }
 

@@ -27,10 +27,12 @@
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/object/property-helper-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar-devel.h>
 
 using namespace Dali;
 
@@ -46,6 +48,7 @@ const float DEFAULT_INDICATOR_FIXED_HEIGHT(80.0f);
 const float DEFAULT_INDICATOR_MINIMUM_HEIGHT(0.0f);
 const float DEFAULT_INDICATOR_START_PADDING(0.0f);
 const float DEFAULT_INDICATOR_END_PADDING(0.0f);
+const float DEFAULT_INDICATOR_TRANSIENT_DURATION(1.0f);
 
 /**
  * Indicator size constraint
@@ -154,18 +157,24 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ScrollBar, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scrollDirection",                   STRING, SCROLL_DIRECTION          )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorHeightPolicy",             STRING, INDICATOR_HEIGHT_POLICY   )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorFixedHeight",              FLOAT,  INDICATOR_FIXED_HEIGHT    )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorShowDuration",             FLOAT,  INDICATOR_SHOW_DURATION   )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorHideDuration",             FLOAT,  INDICATOR_HIDE_DURATION   )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scrollPositionIntervals",           ARRAY,  SCROLL_POSITION_INTERVALS )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorMinimumHeight",            FLOAT,  INDICATOR_MINIMUM_HEIGHT  )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorStartPadding",             FLOAT,  INDICATOR_START_PADDING   )
-DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorEndPadding",               FLOAT,  INDICATOR_END_PADDING     )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scrollDirection",                   STRING, SCROLL_DIRECTION             )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorHeightPolicy",             STRING, INDICATOR_HEIGHT_POLICY      )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorFixedHeight",              FLOAT,  INDICATOR_FIXED_HEIGHT       )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorShowDuration",             FLOAT,  INDICATOR_SHOW_DURATION      )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorHideDuration",             FLOAT,  INDICATOR_HIDE_DURATION      )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scrollPositionIntervals",           ARRAY,  SCROLL_POSITION_INTERVALS    )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorMinimumHeight",            FLOAT,  INDICATOR_MINIMUM_HEIGHT     )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorStartPadding",             FLOAT,  INDICATOR_START_PADDING      )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorEndPadding",               FLOAT,  INDICATOR_END_PADDING        )
 
-DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "panFinished",                       PAN_FINISHED_SIGNAL )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorTransientDuration", FLOAT,  INDICATOR_TRANSIENT_DURATION )
+
+DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "panFinished",                       PAN_FINISHED_SIGNAL                     )
 DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "scrollPositionIntervalReached",     SCROLL_POSITION_INTERVAL_REACHED_SIGNAL )
+
+DALI_ACTION_REGISTRATION(   Toolkit, ScrollBar, "ShowIndicator",                     ACTION_SHOW_INDICATOR                   )
+DALI_ACTION_REGISTRATION(   Toolkit, ScrollBar, "HideIndicator",                     ACTION_HIDE_INDICATOR                   )
+DALI_ACTION_REGISTRATION(   Toolkit, ScrollBar, "ShowTransientIndicator",            ACTION_SHOW_TRANSIENT_INDICATOR         )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -185,6 +194,7 @@ ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
   mPropertyScrollContentSize(Property::INVALID_INDEX),
   mIndicatorShowDuration(DEFAULT_INDICATOR_SHOW_DURATION),
   mIndicatorHideDuration(DEFAULT_INDICATOR_HIDE_DURATION),
+  mTransientIndicatorDuration(DEFAULT_INDICATOR_TRANSIENT_DURATION),
   mScrollStart(0.0f),
   mCurrentScrollPosition(0.0f),
   mIndicatorHeightPolicy(Toolkit::ScrollBar::Variable),
@@ -402,6 +412,30 @@ void ScrollBar::HideIndicator()
   {
     mIndicator.SetOpacity(0.0f);
   }
+}
+
+void ScrollBar::ShowTransientIndicator()
+{
+  // Cancel any animation
+  if(mAnimation)
+  {
+    mAnimation.Clear();
+    mAnimation.Reset();
+  }
+
+  mAnimation = Animation::New( mIndicatorShowDuration + mTransientIndicatorDuration + mIndicatorHideDuration );
+  if(mIndicatorShowDuration > 0.0f)
+  {
+    mAnimation.AnimateTo( Property( mIndicator, Actor::Property::COLOR_ALPHA ),
+                          mIndicatorShowAlpha, AlphaFunction::EASE_IN, TimePeriod(0, mIndicatorShowDuration) );
+  }
+  else
+  {
+    mIndicator.SetOpacity(mIndicatorShowAlpha);
+  }
+  mAnimation.AnimateTo( Property( mIndicator, Actor::Property::COLOR_ALPHA ),
+                        0.0f, AlphaFunction::EASE_IN, TimePeriod((mIndicatorShowDuration + mTransientIndicatorDuration), mIndicatorHideDuration) );
+  mAnimation.Play();
 }
 
 bool ScrollBar::OnPanGestureProcessTick()
@@ -688,6 +722,11 @@ void ScrollBar::SetProperty( BaseObject* object, Property::Index index, const Pr
         scrollBarImpl.ApplyConstraints();
         break;
       }
+      case Toolkit::DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION:
+      {
+        scrollBarImpl.mTransientIndicatorDuration = value.Get<float>();
+        break;
+      }
     }
   }
 }
@@ -759,9 +798,46 @@ Property::Value ScrollBar::GetProperty( BaseObject* object, Property::Index inde
         value = scrollBarImpl.mIndicatorEndPadding;
         break;
       }
+      case Toolkit::DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION:
+      {
+        value = scrollBarImpl.mTransientIndicatorDuration;
+        break;
+      }
     }
   }
   return value;
+}
+
+bool ScrollBar::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
+{
+  bool ret = false;
+
+  Dali::BaseHandle handle( object );
+
+  Toolkit::ScrollBar scrollBar = Toolkit::ScrollBar::DownCast( handle );
+
+  DALI_ASSERT_DEBUG( scrollBar );
+
+  if( scrollBar )
+  {
+    if( 0 == strcmp( actionName.c_str(), ACTION_SHOW_INDICATOR ) )
+    {
+      GetImpl( scrollBar ).ShowIndicator();
+      ret = true;
+    }
+    else if( 0 == strcmp( actionName.c_str(), ACTION_HIDE_INDICATOR ) )
+    {
+      GetImpl( scrollBar ).HideIndicator();
+      ret = true;
+    }
+    else if( 0 == strcmp( actionName.c_str(), ACTION_SHOW_TRANSIENT_INDICATOR ) )
+    {
+      GetImpl( scrollBar ).ShowTransientIndicator();
+      ret = true;
+    }
+  }
+
+  return ret;
 }
 
 Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)

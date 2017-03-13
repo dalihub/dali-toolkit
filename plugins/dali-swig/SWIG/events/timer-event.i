@@ -44,7 +44,7 @@ using System.Runtime.InteropServices;
     * (in the type of TickEventHandler-DaliEventHandlerWithReturnType<object,TickEventArgs,bool>) 
     * provided by the user. Ticked signal is emitted after specified time interval.
     */
-  public event DaliEventHandlerWithReturnType<object,TickEventArgs,bool> Ticked
+  public event DaliEventHandlerWithReturnType<object,TickEventArgs,bool> Tick
   {
      add
      {
@@ -102,5 +102,5 @@ using System.Runtime.InteropServices;
 
 namespace Dali
 {
-  DALI_TIMER_EVENTHANDLER_PARAM( Dali::Adaptor, Timer);
+  DALI_TIMER_EVENTHANDLER_PARAM( Dali, Timer);
 }

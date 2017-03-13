@@ -148,6 +148,7 @@ struct EventData
   bool mScrollAfterDelete               : 1;   ///< Whether to scroll after delete characters.
   bool mAllTextSelected                 : 1;   ///< True if the selection handles are selecting all the text.
   bool mUpdateInputStyle                : 1;   ///< Whether to update the input style after moving the cursor.
+  bool mPasswordInput                   : 1;   ///< True if password input is enabled.
   bool mCheckScrollAmount               : 1;   ///< Whether to check scrolled amount after updating the position
 };
 

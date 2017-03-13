@@ -55,6 +55,7 @@ struct SelectionBoxInfo
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const float MIN_FLOAT = std::numeric_limits<float>::min();
 const Dali::Toolkit::Text::CharacterDirection LTR = false; ///< Left To Right direction
+const uint32_t STAR = 0x2A;
 
 } // namespace
 
@@ -100,7 +101,8 @@ EventData::EventData( DecoratorPtr decorator )
   mScrollAfterUpdatePosition( false ),
   mScrollAfterDelete( false ),
   mAllTextSelected( false ),
-  mUpdateInputStyle( false )
+  mUpdateInputStyle( false ),
+  mPasswordInput( false )
 {
   mImfManager = ImfManager::Get();
 }
@@ -767,8 +769,24 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     return false;
   }
 
-  Vector<Character>& utf32Characters = mModel->mLogicalModel->mText;
+  Vector<Character> utf32CharactersStar;
+  const Length characterCount = mModel->mLogicalModel->mText.Count();
+  const bool isPasswordInput = ( mEventData != NULL && mEventData->mPasswordInput &&
+        !mEventData->mIsShowingPlaceholderText && characterCount > 0 );
 
+  if (isPasswordInput)
+  {
+    utf32CharactersStar.Resize( characterCount );
+
+    uint32_t* begin = utf32CharactersStar.Begin();
+    uint32_t* end = begin + characterCount;
+    while ( begin < end )
+    {
+      *begin++ = STAR;
+    }
+  }
+
+  Vector<Character>& utf32Characters = isPasswordInput ? utf32CharactersStar : mModel->mLogicalModel->mText;
   const Length numberOfCharacters = utf32Characters.Count();
 
   // Index to the first character of the first paragraph to be updated.
@@ -1946,15 +1964,15 @@ void Controller::Impl::RepositionSelectionHandles()
     // Whether to retrieve the next line.
     if( index == lastGlyphOfLine )
     {
-      // Retrieve the next line.
-      ++lineRun;
-
-      // Get the last glyph of the new line.
-      lastGlyphOfLine = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1u;
-
       ++lineIndex;
       if( lineIndex < firstLineIndex + numberOfLines )
       {
+        // Retrieve the next line.
+        ++lineRun;
+
+        // Get the last glyph of the new line.
+        lastGlyphOfLine = lineRun->glyphRun.glyphIndex + lineRun->glyphRun.numberOfGlyphs - 1u;
+
         // Keep the offset and height of the current selection box.
         const float currentLineOffset = selectionBoxInfo->lineOffset;
         const float currentLineHeight = selectionBoxInfo->lineHeight;
@@ -2197,6 +2215,12 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
     mEventData->mUpdateLeftSelectionPosition = true;
     mEventData->mUpdateRightSelectionPosition = true;
     mEventData->mUpdateHighlightBox = true;
+
+    // It may happen an IMF commit event arrives before the selection event
+    // if the IMF manager is in pre-edit state. The commit event will set the
+    // mEventData->mUpdateCursorPosition flag to true. If it's not set back
+    // to false, the highlight box won't be updated.
+    mEventData->mUpdateCursorPosition = false;
 
     mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
   }
@@ -2556,7 +2580,7 @@ CharacterIndex Controller::Impl::CalculateNewCursorIndex( CharacterIndex index )
     const Script script = mModel->mLogicalModel->GetScript( index );
     if( HasLigatureMustBreak( script ) )
     {
-      // Prevents to jump the whole Latin ligatures like fi, ff, or Arabic ﻻ,  ...
+      // Prevents to jump the whole Latin ligatures like fi, ff, or Arabic ﻻ, ...
       numberOfCharacters = 1u;
     }
   }

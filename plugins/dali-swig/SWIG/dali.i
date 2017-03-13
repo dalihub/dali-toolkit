@@ -49,6 +49,8 @@
 #include <dali/dali.h>
 #include <dali-toolkit/dali-toolkit.h>
 
+#include <dali/devel-api/actors/actor-devel.h>
+
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/viewport.h>
@@ -265,6 +267,7 @@ using namespace Dali::Toolkit;
 %include events/pinchgesture-event.i
 %include events/pageturnview-event.i
 %include events/pangesture-event.i
+%include events/progress-bar-event.i
 %include events/propertynotification-event.i
 %include events/longpressgesture-event.i
 %include events/rectangle.i
