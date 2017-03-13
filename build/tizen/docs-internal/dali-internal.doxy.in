@@ -359,6 +359,7 @@ ALIASES += SINCE_1_2_4="@since 1.2.4"
 ALIASES += SINCE_1_2_5="@since 1.2.5"
 ALIASES += SINCE_1_2_10="@since 1.2.10"
 ALIASES += SINCE_1_2_14="@since 1.2.14"
+ALIASES += SINCE_1_2_32="@since 1.2.32"
 
 ALIASES += DEPRECATED_1_0="@deprecated Deprecated since 1.0"
 ALIASES += DEPRECATED_1_1="@deprecated Deprecated since 1.1"
@@ -386,6 +387,7 @@ ALIASES += REMARK_STORAGE=""
 #ALIASES += SINCE_1_2_5="\par Since:\n 3.0, DALi version 1.2.5"
 #ALIASES += SINCE_1_2_10="\par Since:\n 3.0, DALi version 1.2.10"
 #ALIASES += SINCE_1_2_14="\par Since:\n 3.0, DALi version 1.2.14"
+#ALIASES += SINCE_1_2_32="\par Since:\n 3.0, DALi version 1.2.32"
 
 ## DALi has no deprecated API in Tizen 2.4 because it's DALi's first release.
 ## Thus deprecated APIs in DALi 1.0.xx will be deprecated in Tizen 3.0.
