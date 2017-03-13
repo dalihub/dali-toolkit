@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1151,8 +1151,9 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
     }
 
     const LineIndex lineIndex = mModel->mVisualModel->GetLineOfCharacter( characterIndex );
+    const LineIndex previousLineIndex = ( lineIndex > 0 ? lineIndex - 1u : lineIndex );
 
-    if( lineIndex > 0u )
+    if( previousLineIndex >= 0u )
     {
       // Retrieve the cursor position info.
       CursorInfo cursorInfo;
@@ -1160,7 +1161,7 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
                          cursorInfo );
 
       // Get the line above.
-      const LineRun& line = *( mModel->mVisualModel->mLines.Begin() + ( lineIndex - 1u ) );
+      const LineRun& line = *( mModel->mVisualModel->mLines.Begin() + previousLineIndex );
 
       // Get the next hit 'y' point.
       const float hitPointY = cursorInfo.lineOffset - 0.5f * ( line.ascender - line.descender );
