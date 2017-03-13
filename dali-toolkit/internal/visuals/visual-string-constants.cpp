@@ -39,6 +39,9 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, TEXT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, N_PATCH )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, SVG )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, ANIMATED_IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
 DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
 
@@ -75,6 +78,7 @@ const char * const PIXEL_AREA_UNIFORM_NAME( "pixelArea" );
 const char * const WRAP_MODE_UNIFORM_NAME( "wrapMode" );
 const char * const IMAGE_WRAP_MODE_U("wrapModeU");
 const char * const IMAGE_WRAP_MODE_V("wrapModeV");
+const char * const IMAGE_BORDER( "border" );
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );

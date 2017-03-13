@@ -686,10 +686,10 @@ public:
     }
   }
 
-  Toolkit::Visual::Type GetVisualTypeFromMap( const Property::Map& map )
+  Toolkit::DevelVisual::Type GetVisualTypeFromMap( const Property::Map& map )
   {
-    Property::Value* typeValue = map.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE  );
-    Toolkit::Visual::Type type = Toolkit::Visual::IMAGE;
+    Property::Value* typeValue = map.Find( Toolkit::DevelVisual::Property::TYPE, VISUAL_TYPE  );
+    Toolkit::DevelVisual::Type type = Toolkit::DevelVisual::IMAGE;
     if( typeValue )
     {
       Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, type );
@@ -721,8 +721,8 @@ public:
         Property::Map fromMap;
         visual.CreatePropertyMap( fromMap );
 
-        Toolkit::Visual::Type fromType = GetVisualTypeFromMap( fromMap );
-        Toolkit::Visual::Type toType = GetVisualTypeFromMap( toMap );
+        Toolkit::DevelVisual::Type fromType = GetVisualTypeFromMap( fromMap );
+        Toolkit::DevelVisual::Type toType = GetVisualTypeFromMap( toMap );
 
         if( fromType != toType )
         {
@@ -730,7 +730,8 @@ public:
         }
         else
         {
-          if( fromType == Toolkit::Visual::IMAGE )
+          if( fromType == Toolkit::DevelVisual::IMAGE || fromType == Toolkit::DevelVisual::N_PATCH
+              || fromType == Toolkit::DevelVisual::SVG || fromType == Toolkit::DevelVisual::ANIMATED_IMAGE )
           {
             Property::Value* fromUrl = fromMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
             Property::Value* toUrl = toMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );

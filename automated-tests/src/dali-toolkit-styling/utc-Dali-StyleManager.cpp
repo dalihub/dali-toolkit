@@ -30,6 +30,7 @@
 #include <dummy-control.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 
@@ -1249,13 +1250,13 @@ int UtcDaliStyleManagerSetSubState02(void)
   tet_infoline( "Changing state to FOCUSED - check visual changes\n");
 
   Visual::Base fgVisual1 = CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::GRADIENT, TEST_LOCATION);
-  Visual::Base focusVisual1 = CheckVisual( dummyImpl, DummyControl::Property::FOCUS_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+  Visual::Base focusVisual1 = CheckVisual( dummyImpl, DummyControl::Property::FOCUS_VISUAL, Toolkit::DevelVisual::N_PATCH, TEST_LOCATION);
 
   actor.SetProperty(DevelControl::Property::SUB_STATE, "SELECTED");
   tet_infoline( "Changing  substate to SELECTED - Expect no change\n");
 
   Visual::Base fgVisual2 = CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::GRADIENT, TEST_LOCATION);
-  Visual::Base focusVisual2 = CheckVisual( dummyImpl, DummyControl::Property::FOCUS_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+  Visual::Base focusVisual2 = CheckVisual( dummyImpl, DummyControl::Property::FOCUS_VISUAL, Toolkit::DevelVisual::N_PATCH, TEST_LOCATION);
 
   DALI_TEST_CHECK( fgVisual1 == fgVisual2 );
   DALI_TEST_CHECK( focusVisual1 == focusVisual2 );
