@@ -1735,8 +1735,10 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     int keyCode = keyEvent.keyCode;
     const std::string& keyString = keyEvent.keyPressed;
 
+    const bool isNullKey = ( 0 == keyCode ) && ( keyString.empty() );
+
     // Pre-process to separate modifying events from non-modifying input events.
-    if( 0 == keyCode )
+    if( isNullKey )
     {
       // In some platforms arrive key events with no key code.
       // Do nothing.
@@ -1808,7 +1810,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
     if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
          ( mImpl->mEventData->mState != EventData::INACTIVE ) &&
-         ( 0 != keyCode ) &&
+         ( !isNullKey ) &&
          ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) &&
          ( Dali::DALI_KEY_VOLUME_UP != keyCode ) &&
          ( Dali::DALI_KEY_VOLUME_DOWN != keyCode ) )
