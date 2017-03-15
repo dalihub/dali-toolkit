@@ -26,8 +26,9 @@
 #include <dali/devel-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -108,7 +109,7 @@ public:
    * @return A smart-pointer to the newly allocated visual.
    */
   static ImageVisualPtr New( VisualFactoryCache& factoryCache,
-                             const std::string& imageUrl,
+                             const VisualUrl& imageUrl,
                              const Property::Map& properties,
                              ImageDimensions size = ImageDimensions(),
                              FittingMode::Type fittingMode = FittingMode::DEFAULT,
@@ -127,7 +128,7 @@ public:
    * @return A smart-pointer to the newly allocated visual.
    */
   static ImageVisualPtr New( VisualFactoryCache& factoryCache,
-                             const std::string& imageUrl,
+                             const VisualUrl& imageUrl,
                              ImageDimensions size = ImageDimensions(),
                              FittingMode::Type fittingMode = FittingMode::DEFAULT,
                              Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
@@ -171,7 +172,7 @@ protected:
    * @param[in] samplingMode The SamplingMode of the resource to load
    */
   ImageVisual( VisualFactoryCache& factoryCache,
-               const std::string& imageUrl,
+               const VisualUrl& imageUrl,
                ImageDimensions size,
                FittingMode::Type fittingMode,
                Dali::SamplingMode::Type samplingMode );
@@ -237,11 +238,9 @@ private:
   void ApplyImageToSampler( const Image& image );
 
   /**
-   * @brief Initializes the Dali::Renderer from an image url string
-   *
-   * @param[in] imageUrl The image url string to intialize this ImageVisual from
+   * @brief Initializes the Dali::Renderer from the image url
    */
-  void InitializeRenderer( const std::string& imageUrl );
+  void InitializeRenderer();
 
   /**
    * @brief Initializes the Dali::Renderer from an image handle
@@ -281,7 +280,7 @@ private:
    * @param[in] attemptAtlasing If true will attempt atlasing, otherwise create unique texture
    * @return the texture set to use
    */
-  TextureSet CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading, bool attemptAtlasing );
+  TextureSet CreateTextureSet( Vector4& textureRect, bool synchronousLoading, bool attemptAtlasing );
 
   /**
    * Callback function of image resource loading succeed
@@ -313,7 +312,7 @@ private:
   PixelData mPixels;
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
-  std::string mImageUrl;
+  VisualUrl mImageUrl;
 
   Dali::ImageDimensions mDesiredSize;
   Dali::FittingMode::Type mFittingMode:3;

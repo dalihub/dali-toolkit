@@ -234,7 +234,7 @@ void RegisterStretchProperties( Renderer& renderer, const char * uniformName, co
 
 /////////////////NPatchVisual////////////////
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties )
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties )
 {
   NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
   nPatchVisual->mImageUrl = imageUrl;
@@ -243,7 +243,7 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::
   return nPatchVisual;
 }
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl )
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl )
 {
   NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
   nPatchVisual->mImageUrl = imageUrl;
@@ -254,8 +254,8 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::
 NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchImage image )
 {
   NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
-  nPatchVisual->mImageUrl = image.GetUrl();
-
+  VisualUrl visualUrl( image.GetUrl() );
+  nPatchVisual->mImageUrl = visualUrl;
   return nPatchVisual;
 }
 
@@ -263,10 +263,11 @@ void NPatchVisual::GetNaturalSize( Vector2& naturalSize )
 {
   naturalSize.x = 0u;
   naturalSize.y = 0u;
+
   // load now if not already loaded
-  if( NPatchLoader::UNINITIALIZED_ID == mId )
+  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocal() )
   {
-    mId = mLoader.Load( mImageUrl, mBorder );
+    mId = mLoader.Load( mImageUrl.GetUrl(), mBorder );
   }
   const NPatchLoader::Data* data;
   if( mLoader.GetNPatchData( mId, data ) )
@@ -304,9 +305,9 @@ void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
 void NPatchVisual::DoSetOnStage( Actor& actor )
 {
   // load when first go on stage
-  if( NPatchLoader::UNINITIALIZED_ID == mId )
+  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocal() )
   {
-    mId = mLoader.Load( mImageUrl, mBorder );
+    mId = mLoader.Load( mImageUrl.GetUrl(), mBorder );
   }
 
   Geometry geometry = CreateGeometry();
@@ -336,7 +337,7 @@ void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::N_PATCH );
-  map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
+  map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
   map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );
   map.Insert( Toolkit::DevelImageVisual::Property::BORDER, mBorder );
 }
@@ -491,7 +492,7 @@ void NPatchVisual::ApplyTextureAndUniforms()
   }
   else
   {
-    DALI_LOG_ERROR("The N patch image '%s' is not a valid N patch image\n", mImageUrl.c_str() );
+    DALI_LOG_ERROR("The N patch image '%s' is not a valid N patch image\n", mImageUrl.GetUrl().c_str() );
     TextureSet textureSet = TextureSet::New();
     mImpl->mRenderer.SetTextures( textureSet );
     Image croppedImage = VisualFactoryCache::GetBrokenVisualImage();
