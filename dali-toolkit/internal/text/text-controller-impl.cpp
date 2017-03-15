@@ -1153,26 +1153,23 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
     const LineIndex lineIndex = mModel->mVisualModel->GetLineOfCharacter( characterIndex );
     const LineIndex previousLineIndex = ( lineIndex > 0 ? lineIndex - 1u : lineIndex );
 
-    if( previousLineIndex >= 0u )
-    {
-      // Retrieve the cursor position info.
-      CursorInfo cursorInfo;
-      GetCursorPosition( mEventData->mPrimaryCursorPosition,
-                         cursorInfo );
+    // Retrieve the cursor position info.
+    CursorInfo cursorInfo;
+    GetCursorPosition( mEventData->mPrimaryCursorPosition,
+                       cursorInfo );
 
-      // Get the line above.
-      const LineRun& line = *( mModel->mVisualModel->mLines.Begin() + previousLineIndex );
+    // Get the line above.
+    const LineRun& line = *( mModel->mVisualModel->mLines.Begin() + previousLineIndex );
 
-      // Get the next hit 'y' point.
-      const float hitPointY = cursorInfo.lineOffset - 0.5f * ( line.ascender - line.descender );
+    // Get the next hit 'y' point.
+    const float hitPointY = cursorInfo.lineOffset - 0.5f * ( line.ascender - line.descender );
 
-      // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
-      mEventData->mPrimaryCursorPosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
-                                                                        mModel->mLogicalModel,
-                                                                        mMetrics,
-                                                                        mEventData->mCursorHookPositionX,
-                                                                        hitPointY );
-    }
+    // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
+    mEventData->mPrimaryCursorPosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
+                                                                      mModel->mLogicalModel,
+                                                                      mMetrics,
+                                                                      mEventData->mCursorHookPositionX,
+                                                                      hitPointY );
   }
   else if(   Dali::DALI_KEY_CURSOR_DOWN == keyCode )
   {
