@@ -98,6 +98,10 @@ const float SCROLL_SPEED = 300.f;
 const unsigned int DEFAULT_FONT_SIZE = 1152u;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
+const int KEY_A_CODE = 38;
+const int KEY_D_CODE = 40;
+const int KEY_WHITE_SPACE_CODE = 65;
+
 static bool gTextChangedCallBackCalled;
 static bool gInputStyleChangedCallbackCalled;
 static Dali::Toolkit::TextEditor::InputStyle::Mask gInputStyleMask;
@@ -531,7 +535,7 @@ int utcDaliTextEditorTextChangedP(void)
   editor.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
-  application.ProcessEvent( GenerateKey( "D", "D", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "D", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down ) );
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   END_TEST;
@@ -918,7 +922,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   editor.SetProperty( TextEditor::Property::INPUT_EMBOSS, "emboss" );
   editor.SetProperty( TextEditor::Property::INPUT_OUTLINE, "outline" );
 
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
 
   // Render and notify
   application.SendNotification();
@@ -1020,7 +1024,7 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // Add a key event but as the text editor has not the focus it should do nothing.
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
 
   // Render and notify
   application.SendNotification();
@@ -1037,8 +1041,8 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // Now the text editor has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
 
   // Render and notify
   application.SendNotification();
@@ -1069,8 +1073,8 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // The second text editor has the focus. It should handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
 
   // Render and notify
   application.SendNotification();
@@ -1126,8 +1130,8 @@ int utcDaliTextEditorEvent02(void)
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   // Now the text editor has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
 
   // Render and notify
   application.SendNotification();

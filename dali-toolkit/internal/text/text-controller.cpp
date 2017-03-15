@@ -1736,7 +1736,12 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     const std::string& keyString = keyEvent.keyPressed;
 
     // Pre-process to separate modifying events from non-modifying input events.
-    if( Dali::DALI_KEY_ESCAPE == keyCode )
+    if( 0 == keyCode )
+    {
+      // In some platforms arrive key events with no key code.
+      // Do nothing.
+    }
+    else if( Dali::DALI_KEY_ESCAPE == keyCode )
     {
       // Escape key is a special case which causes focus loss
       KeyboardFocusLostEvent();
@@ -1803,6 +1808,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
     if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
          ( mImpl->mEventData->mState != EventData::INACTIVE ) &&
+         ( 0 != keyCode ) &&
          ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) &&
          ( Dali::DALI_KEY_VOLUME_UP != keyCode ) &&
          ( Dali::DALI_KEY_VOLUME_DOWN != keyCode ) )
