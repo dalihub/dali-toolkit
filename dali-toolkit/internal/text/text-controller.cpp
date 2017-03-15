@@ -1498,6 +1498,18 @@ float Controller::GetScrollAmountByUserInput()
   return scrollAmount;
 }
 
+bool Controller::GetTextScrollInfo( float& scrollPosition, float& controlHeight, float& layoutHeight )
+{
+  const Vector2& layout = mImpl->mModel->mVisualModel->GetLayoutSize();
+  bool isScrolled;
+
+  controlHeight = mImpl->mModel->mVisualModel->mControlSize.height;
+  layoutHeight = layout.height;
+  scrollPosition = mImpl->mModel->mScrollPosition.y;
+  isScrolled = !Equals( mImpl->mModel->mScrollPosition.y, mImpl->mModel->mScrollPositionLast.y, Math::MACHINE_EPSILON_1 );
+  return isScrolled;
+}
+
 // public : Relayout.
 
 Controller::UpdateTextType Controller::Relayout( const Size& size )
