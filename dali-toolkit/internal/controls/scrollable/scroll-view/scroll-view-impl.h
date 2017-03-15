@@ -806,6 +806,13 @@ private:
    */
   void SetInternalConstraints();
 
+  /**
+   * @brief Querying whether ScrollView is currently panning or scrolling
+   *
+   * return True if ScrollView is panning or scrolling
+   */
+  bool IsPanningOrScrolling() const;
+
 protected:
 
   /**

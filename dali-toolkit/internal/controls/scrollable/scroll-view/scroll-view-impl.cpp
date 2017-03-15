@@ -84,7 +84,13 @@ enum
    * @brief True if scroll-bar should be automatically show/hidden during/after panning.
    * @details name "transientScrollBar", type bool.
    */
-  TRANSIENT_SCROLL_BAR = Toolkit::ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP + 1
+  TRANSIENT_SCROLL_BAR = Toolkit::ScrollView::Property::WHEEL_SCROLL_DISTANCE_STEP + 1,
+
+  /**
+   * @brief True if ScrollView is panning or scrolling
+   * @details name "panningOrScrolling", type bool.
+   */
+  PANNING_OR_SCROLLING
 };
 
 
@@ -262,6 +268,9 @@ DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "axisAutoLockEnabled",        B
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wheelScrollDistanceStep",    VECTOR2,   WHEEL_SCROLL_DISTANCE_STEP  )
 
 Dali::PropertyRegistration manualProperty1( typeRegistration, "transientScrollBar", TRANSIENT_SCROLL_BAR,
+    Property::BOOLEAN, Dali::Toolkit::Internal::ScrollView::SetProperty, Dali::Toolkit::Internal::ScrollView::GetProperty );
+
+Dali::PropertyRegistration manualProperty2( typeRegistration, "panningOrScrolling", PANNING_OR_SCROLLING,
     Property::BOOLEAN, Dali::Toolkit::Internal::ScrollView::SetProperty, Dali::Toolkit::Internal::ScrollView::GetProperty );
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollPosition",  VECTOR2, SCROLL_POSITION)
@@ -2908,6 +2917,29 @@ void ScrollView::SetInternalConstraints()
   ApplyConstraintToBoundActors(constraint);
 }
 
+bool ScrollView::IsPanningOrScrolling() const
+{
+  bool panningOrScrolling( mPanning );
+
+  if( mInternalXAnimation )
+  {
+    if( Animation::PLAYING == mInternalXAnimation.GetState() )
+    {
+      panningOrScrolling = true;
+    }
+  }
+
+  if( mInternalYAnimation )
+  {
+    if( Animation::PLAYING == mInternalYAnimation.GetState() )
+    {
+      panningOrScrolling = true;
+    }
+  }
+
+  return panningOrScrolling;
+}
+
 void ScrollView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::ScrollView scrollView = Toolkit::ScrollView::DownCast( Dali::BaseHandle( object ) );
@@ -2940,6 +2972,11 @@ void ScrollView::SetProperty( BaseObject* object, Property::Index index, const P
       case TRANSIENT_SCROLL_BAR:
       {
         scrollViewImpl.SetTransientScrollBar( value.Get<bool>() );
+        break;
+      }
+      case PANNING_OR_SCROLLING:
+      {
+        // NOOP
         break;
       }
     }
@@ -2980,6 +3017,11 @@ Property::Value ScrollView::GetProperty( BaseObject* object, Property::Index ind
       case TRANSIENT_SCROLL_BAR:
       {
         value = scrollViewImpl.mTransientScrollBar;
+        break;
+      }
+      case PANNING_OR_SCROLLING:
+      {
+        value = scrollViewImpl.IsPanningOrScrolling();
         break;
       }
     }
