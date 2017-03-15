@@ -61,6 +61,9 @@ namespace Dali
             viewWrapperImpl.OnTap = new ViewWrapperImpl.OnTapDelegate(OnTap);
             viewWrapperImpl.OnLongPress = new ViewWrapperImpl.OnLongPressDelegate(OnLongPress);
 
+            // By default, we do not want the position to use the anchor point
+            this.PositionUsesAnchorPoint = false;
+
             // Make sure CustomView is initialized.
             OnInitialize();
 
