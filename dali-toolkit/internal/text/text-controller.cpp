@@ -1707,8 +1707,15 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     int keyCode = keyEvent.keyCode;
     const std::string& keyString = keyEvent.keyPressed;
 
+    const bool isNullKey = ( 0 == keyCode ) && ( keyString.empty() );
+
     // Pre-process to separate modifying events from non-modifying input events.
-    if( Dali::DALI_KEY_ESCAPE == keyCode )
+    if( isNullKey )
+    {
+      // In some platforms arrive key events with no key code.
+      // Do nothing.
+    }
+    else if( Dali::DALI_KEY_ESCAPE == keyCode )
     {
       // Escape key is a special case which causes focus loss
       KeyboardFocusLostEvent();
@@ -1778,6 +1785,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
     if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
          ( mImpl->mEventData->mState != EventData::INACTIVE ) &&
+         ( !isNullKey ) &&
          ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) )
     {
       // Should not change the state if the key is the shift send by the imf manager.
