@@ -26,6 +26,12 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit/dali-toolkit.h>
 
+#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+
+#include <dali/devel-api/adaptor-framework/image-loading.h>
+
 using namespace Dali;
 using namespace Toolkit;
 
@@ -661,8 +667,13 @@ int UtcDaliPushButtonPaddingLayout(void)
   // The icon and label are each enabled and disabled to confirm the correct padding is used.
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetProperty( Toolkit::PushButton::Property::LABEL_PADDING, Vector4( 10.0f, 10.0f, 10.0f, 10.0f ) );
-  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_PADDING, Vector4( 20.0f, 20.0f, 20.0f, 20.0f ) );
+
+  const Vector4 TEST_ICON_PADDING( 20.0f, 20.0f, 20.0f, 20.0f );
+  const Vector4 TEST_LABEL_PADDING( 10.0f, 10.0f, 10.0f, 10.0f );
+
+  // Get actual size of test image
+  ImageDimensions testImageSize = Dali::GetClosestImageSize( TEST_IMAGE_ONE );
+  const Vector2 TEST_IMAGE_SIZE( testImageSize.GetWidth(), testImageSize.GetHeight() );
 
   pushButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   pushButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
@@ -709,7 +720,8 @@ int UtcDaliPushButtonPaddingLayout(void)
 
   Stage::GetCurrent().Add( pushButton );
 
-  const char* INVALID_IMAGE_FILE_NAME = "invalid-image.jpg";
+
+
   pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "RIGHT" );
   pushButton.SetProperty( Toolkit::PushButton::Property::UNSELECTED_ICON, INVALID_IMAGE_FILE_NAME );
   pushButton.SetProperty( Toolkit::PushButton::Property::SELECTED_ICON, INVALID_IMAGE_FILE_NAME );
@@ -720,7 +732,18 @@ int UtcDaliPushButtonPaddingLayout(void)
   size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
   size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
 
-  DALI_TEST_EQUALS( size, Vector2( 40.0f, 40.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_PADDING, TEST_ICON_PADDING );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( size, TEST_IMAGE_SIZE, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
+  size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
+  tet_printf( "Button RelayoutSize after icon padding(%f,%f)\n", size.width, size.height );
+  const Vector2 expectedIconAndPaddingSize( TEST_ICON_PADDING.x+TEST_ICON_PADDING.y+TEST_IMAGE_SIZE.width, TEST_ICON_PADDING.w + TEST_ICON_PADDING.z + TEST_IMAGE_SIZE.height );
+  DALI_TEST_EQUALS( size, expectedIconAndPaddingSize, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Now test padding for both label and icon simultaneously.
   pushButton.SetLabelText( "Label" );
@@ -731,10 +754,10 @@ int UtcDaliPushButtonPaddingLayout(void)
   size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
   size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
 
-  // We should not test against the exact label size, we just make sure it is larger than our label padding so we know the padding has been applied.
-  // Note we only test the width as we are horizontally aligned and the label my be less high than the icon.
-  // Full directional alignment tests are done in UtcDaliPushButtonAlignmentLayout.
-  DALI_TEST_GREATER( size.width, 60.0f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( size.width, sizeLabelAndPadding.width + expectedIconAndPaddingSize.width, TEST_LOCATION );
+  // Test height of control is same as icon and padding, as Text is smaller than icon
+  DALI_TEST_EQUALS( size.height, expectedIconAndPaddingSize.height, TEST_LOCATION );
 
   END_TEST;
 }
@@ -769,6 +792,15 @@ int UtcDaliPushButtonAlignmentLayout(void)
    * |         |   v     +------------+   -
    * +---------+   -
    */
+
+
+  const Vector4 TEST_ICON_PADDING( 70.0f, 70.0f, 70.0f, 70.0f );
+  const Vector4 TEST_LABEL_PADDING( 30.0f, 30.0f, 30.0f, 30.0f );
+
+  // Get actual size of test image
+  ImageDimensions testImageSize = Dali::GetClosestImageSize( TEST_IMAGE_ONE );
+  const Vector2 TEST_IMAGE_SIZE( testImageSize.GetWidth(), testImageSize.GetHeight() );
+
   PushButton pushButton = PushButton::New();
 
   pushButton.SetProperty( Toolkit::PushButton::Property::LABEL_PADDING, Vector4( 30.0f, 30.0f, 30.0f, 30.0f ) );
@@ -796,8 +828,17 @@ int UtcDaliPushButtonAlignmentLayout(void)
 
   DALI_TEST_EQUALS( baseSize, Vector2( 150.0f, 150.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
-  // Add a label to cause size to be modified in the direction of alignment.
-  pushButton.SetLabelText( "Label" );
+
+  DALI_TEST_EQUALS( labelAndPaddingSize, expectedLabelAndPaddingSize , Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  const Vector2 testImageWithPaddingSize = Vector2 ( ( TEST_IMAGE_SIZE.width + TEST_ICON_PADDING.x + TEST_ICON_PADDING.y ),
+                                                     ( TEST_IMAGE_SIZE.height + TEST_ICON_PADDING.w + TEST_ICON_PADDING.z ) );
+
+  // Add Icon and set its alignment
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "RIGHT" );
+  pushButton.SetProperty( Toolkit::PushButton::Property::UNSELECTED_ICON, TEST_IMAGE_ONE );
+  pushButton.SetProperty( Toolkit::PushButton::Property::SELECTED_ICON, TEST_IMAGE_ONE );
+  pushButton.SetProperty( Toolkit::PushButton::Property::ICON_PADDING, TEST_ICON_PADDING );
 
   application.SendNotification();
   application.Render();

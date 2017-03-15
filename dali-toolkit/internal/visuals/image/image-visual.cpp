@@ -18,18 +18,19 @@
 // CLASS HEADER
 #include "image-visual.h"
 
-// EXTERNAL HEADER
-#include <cstring> // for strncasecmp
+// EXTERNAL HEADERS
+#include <cstring> // for strlen()
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/devel-api/images/atlas.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/bitmap-loader.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 
-// INTERNAL HEADER
+// INTERNAL HEADERS
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -37,6 +38,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -49,8 +51,6 @@ namespace Internal
 
 namespace
 {
-const char HTTP_URL[] = "http://";
-const char HTTPS_URL[] = "https://";
 
 // property names
 const char * const IMAGE_FITTING_MODE( "fittingMode" );
@@ -184,7 +184,38 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
 
 } //unnamed namespace
 
-ImageVisual::ImageVisual( VisualFactoryCache& factoryCache )
+
+ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
+                                 const VisualUrl& imageUrl,
+                                 const Property::Map& properties,
+                                 ImageDimensions size,
+                                 FittingMode::Type fittingMode,
+                                 Dali::SamplingMode::Type samplingMode )
+{
+  ImageVisualPtr imageVisualPtr( new ImageVisual( factoryCache, imageUrl, size, fittingMode, samplingMode ) );
+  imageVisualPtr->SetProperties( properties );
+  return imageVisualPtr;
+}
+
+ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
+                                 const VisualUrl& imageUrl,
+                                 ImageDimensions size,
+                                 FittingMode::Type fittingMode,
+                                 Dali::SamplingMode::Type samplingMode )
+{
+  return new ImageVisual( factoryCache, imageUrl, size, fittingMode, samplingMode );
+}
+
+ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache, const Image& image )
+{
+  return new ImageVisual( factoryCache, image );
+}
+
+ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
+                          const VisualUrl& imageUrl,
+                          ImageDimensions size,
+                          FittingMode::Type fittingMode,
+                          Dali::SamplingMode::Type samplingMode )
 : Visual::Base( factoryCache ),
   mPixelArea( FULL_TEXTURE_RECT ),
   mDesiredSize(),
@@ -220,8 +251,22 @@ void ImageVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
       Scripting::GetEnumerationProperty( *fittingValue, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, mFittingMode );
     }
 
-    Property::Value* samplingValue = propertyMap.Find( Toolkit::ImageVisual::Property::SAMPLING_MODE, IMAGE_SAMPLING_MODE );
-    if( samplingValue )
+
+  if( mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING && mImageUrl.IsValid() )
+  {
+    // if sync loading is required, the loading should start
+    // immediately when new image url is set or the actor is off stage
+    // ( for on-stage actor with image url unchanged, resource loading
+    // is already finished )
+    LoadResourceSynchronously();
+  }
+}
+
+void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& value )
+{
+  switch( index )
+  {
+    case Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING:
     {
       Scripting::GetEnumerationProperty( *samplingValue, SAMPLING_MODE_TABLE, SAMPLING_MODE_TABLE_COUNT, mSamplingMode );
     }
@@ -317,9 +362,9 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize ) const
     naturalSize.y = mDesiredSize.GetHeight();
     return;
   }
-  else if( !mImageUrl.empty() )
+  else if( mImageUrl.IsValid() && mImageUrl.GetLocation() == VisualUrl::LOCAL )
   {
-    ImageDimensions dimentions = ResourceImage::GetImageSize( mImageUrl );
+    ImageDimensions dimentions = Dali::GetClosestImageSize( mImageUrl.GetUrl() );
     naturalSize.x = dimentions.GetWidth();
     naturalSize.y = dimentions.GetHeight();
     return;
@@ -410,36 +455,16 @@ bool ImageVisual::IsSynchronousResourceLoading() const
 
 void ImageVisual::DoSynchronousResourceLoading()
 {
-  if( !mImageUrl.empty() )
+  if( mImageUrl.IsValid() )
   {
-    BitmapLoader loader = BitmapLoader::New( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode );
+    BitmapLoader loader = BitmapLoader::New( mImageUrl.GetUrl(), mDesiredSize, mFittingMode, mSamplingMode );
     loader.Load();
     mPixels = loader.GetPixelData();
   }
 }
 
-Image ImageVisual::LoadImage( const std::string& url, bool synchronousLoading )
-{
-  if( synchronousLoading )
-  {
-    if( !mPixels )
-    {
-      // use broken image
-      return VisualFactoryCache::GetBrokenVisualImage();
-    }
-    Atlas image = Atlas::New( mPixels.GetWidth(), mPixels.GetHeight(), mPixels.GetPixelFormat() );
-    image.Upload( mPixels, 0, 0 );
-    return image;
-  }
-  else
-  {
-    ResourceImage resourceImage = Dali::ResourceImage::New( url, mDesiredSize, mFittingMode, mSamplingMode );
-    resourceImage.LoadingFinishedSignal().Connect( this, &ImageVisual::OnImageLoaded );
-    return resourceImage;
-  }
-}
 
-TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading )
+TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, bool synchronousLoading, bool attemptAtlasing )
 {
   TextureSet textureSet;
   textureRect = FULL_TEXTURE_RECT;
@@ -467,12 +492,17 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::strin
   }
   else
   {
-    textureSet = mFactoryCache.GetAtlasManager()->Add(textureRect, url, mDesiredSize, mFittingMode, true, this );
-    mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
-    if( !textureSet ) // big image, no atlasing
+
+    if( attemptAtlasing )
+    {
+      textureSet = mFactoryCache.GetAtlasManager()->Add( textureRect, mImageUrl.GetUrl(), mDesiredSize, mFittingMode, true, this );
+      mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
+    }
+    if( !textureSet ) // big image, no atlasing or atlasing failed
+
     {
       mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-      ResourceImage resourceImage = Dali::ResourceImage::New( url, mDesiredSize, mFittingMode, mSamplingMode );
+      ResourceImage resourceImage = Dali::ResourceImage::New( mImageUrl.GetUrl(), mDesiredSize, mFittingMode, mSamplingMode );
       resourceImage.LoadingFinishedSignal().Connect( this, &ImageVisual::OnImageLoaded );
       textureSet = TextureSet::New();
       TextureSetImage( textureSet, 0u, resourceImage );
@@ -489,30 +519,22 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::strin
   return textureSet;
 }
 
-void ImageVisual::InitializeRenderer( const std::string& imageUrl )
+void ImageVisual::InitializeRenderer()
 {
-  if( imageUrl.empty() )
-  {
-    return;
-  }
 
-  mImageUrl = imageUrl;
-  mImpl->mRenderer.Reset();
   mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
-  if( !mImpl->mCustomShader &&
-      ( strncasecmp( imageUrl.c_str(), HTTP_URL,  sizeof(HTTP_URL)  -1 ) != 0 ) && // ignore remote images
-      ( strncasecmp( imageUrl.c_str(), HTTPS_URL, sizeof(HTTPS_URL) -1 ) != 0 ) )
+  if( !mImpl->mCustomShader && mImageUrl.GetLocation() == VisualUrl::LOCAL )
   {
     bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
     bool cacheable =  defaultWrapMode &&  mPixelArea == FULL_TEXTURE_RECT;
 
-    mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
-    if( cacheable ) // fetch the renderer from cache if exist
-    {
-      mImpl->mRenderer = mFactoryCache.GetRenderer( imageUrl );
-      mImpl->mFlags |= Impl::IS_FROM_CACHE;
-    }
+
+    Vector4 atlasRect;
+    // texture set has to be created first as we need to know if atlasing succeeded or not
+    // when selecting the shader
+    TextureSet textures = CreateTextureSet( atlasRect, IsSynchronousResourceLoading(), true );
+    CreateRenderer( textures );
 
     if( !mImpl->mRenderer ) // new renderer is needed
     {
@@ -543,11 +565,12 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
   }
   else
   {
-    // for custom shader or remote image, renderer is not cached and atlas is not applied
-    mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
-    mImpl->mRenderer = CreateRenderer();
-    Image image = LoadImage( imageUrl, IsSynchronousResourceLoading() );
-    ApplyImageToSampler( image );
+
+    // for custom shader or remote image, atlas is not applied
+    Vector4 atlasRect; // ignored in this case
+    TextureSet textures = CreateTextureSet( atlasRect, IsSynchronousResourceLoading(), false );
+    CreateRenderer( textures );
+
   }
 }
 
@@ -590,11 +613,10 @@ void ImageVisual::UploadCompleted()
 
 void ImageVisual::DoSetOnStage( Actor& actor )
 {
-  mPlacementActor = actor;
 
-  if( !mImageUrl.empty() )
+  if( mImageUrl.IsValid() )
   {
-    InitializeRenderer( mImageUrl );
+    InitializeRenderer();
   }
   else
   {
@@ -611,10 +633,12 @@ void ImageVisual::DoSetOnStage( Actor& actor )
 void ImageVisual::DoSetOffStage( Actor& actor )
 {
   //If we own the image then make sure we release it when we go off stage
-  if( !mImageUrl.empty() )
+
+  actor.RemoveRenderer( mImpl->mRenderer);
+  if( mImageUrl.IsValid() )
   {
-    actor.RemoveRenderer( mImpl->mRenderer );
-    CleanCache(mImageUrl);
+    RemoveFromAtlas( mImageUrl.GetUrl() );
+
     mImage.Reset();
   }
   else
@@ -632,9 +656,9 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   bool sync = IsSynchronousResourceLoading();
   map.Insert( SYNCHRONOUS_LOADING, sync );
-  if( !mImageUrl.empty() )
+  if( mImageUrl.IsValid() )
   {
-    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
+    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
     map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth() );
     map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight() );
   }
@@ -656,6 +680,31 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
+}
+
+
+void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
+  if( mImageUrl.IsValid() )
+  {
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth() );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight() );
+  }
+  else if( mImage )
+  {
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, static_cast<int>(mImage.GetWidth()) );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, static_cast<int>(mImage.GetHeight()) );
+  }
+}
+
+void ImageVisual::OnSetTransform()
+{
+  if( mImpl->mRenderer )
+  {
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  }
 }
 
 Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping )

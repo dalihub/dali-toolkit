@@ -53,10 +53,32 @@ namespace Toolkit
 namespace Internal
 {
 
+
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties )
+{
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
+  svgVisual->ParseFromUrl( imageUrl );
+  svgVisual->SetProperties( properties );
+
+  return svgVisual;
+}
+
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl )
+{
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
+  svgVisual->ParseFromUrl( imageUrl );
+
+  return svgVisual;
+}
+
 SvgVisual::SvgVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mAtlasRect( FULL_TEXTURE_RECT ),
-  mParsedImage( NULL )
+  mImageUrl( ),
+  mParsedImage( NULL ),
+  mPlacementActor(),
+  mVisualSize(Vector2::ZERO)
+
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -148,10 +170,12 @@ void SvgVisual::SetSize( const Vector2& size )
 void SvgVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
-  if( !mImageUrl.empty() )
+
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::SVG );
+  if( mImageUrl.IsValid() )
+
   {
-    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
+    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
   }
 }
 
@@ -161,24 +185,16 @@ void SvgVisual::SetImage( const std::string& imageUrl, ImageDimensions size )
   {
     mImageUrl = imageUrl;
 
-    NSVGimage* parsedImageOld = mParsedImage;
 
+void SvgVisual::ParseFromUrl( const VisualUrl& imageUrl )
+{
+  mImageUrl = imageUrl;
+  if( mImageUrl.IsLocal() )
+  {
     Vector2 dpi = Stage::GetCurrent().GetDpi();
     float meanDpi = (dpi.height + dpi.width) * 0.5f;
-    mParsedImage = nsvgParseFromFile(mImageUrl.c_str(), UNITS, meanDpi);
+    mParsedImage = nsvgParseFromFile( mImageUrl.GetUrl().c_str(), UNITS, meanDpi );
 
-    if( size.GetWidth() != 0u && size.GetHeight() != 0u)
-    {
-      mImpl->mSize.x = size.GetWidth();
-      mImpl->mSize.y = size.GetHeight();
-    }
-
-    if( mImpl->mSize != Vector2::ZERO && GetIsOnStage() )
-    {
-      AddRasterizationTask( mImpl->mSize );
-    }
-
-    mFactoryCache.GetSVGRasterizationThread()->DeleteImage( parsedImageOld );
   }
 }
 
