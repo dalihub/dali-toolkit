@@ -112,6 +112,11 @@ ImageAtlasManagerPtr VisualFactoryCache::GetAtlasManager()
   return mAtlasManager;
 }
 
+TextureManager& VisualFactoryCache::GetTextureManager()
+{
+  return mTextureManager;
+}
+
 NPatchLoader& VisualFactoryCache::GetNPatchLoader()
 {
   return mNPatchLoader;
