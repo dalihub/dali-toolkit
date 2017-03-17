@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
@@ -164,6 +165,39 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     case Toolkit::DevelVisual::TEXT:
     {
       visualPtr = TextVisual::New( *( mFactoryCache.Get() ), propertyMap );
+      break;
+    }
+
+    case Toolkit::DevelVisual::N_PATCH:
+    {
+      Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
+      std::string imageUrl;
+      if( imageURLValue && imageURLValue->Get( imageUrl ) )
+      {
+        visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
+      }
+      break;
+    }
+
+    case Toolkit::DevelVisual::SVG:
+    {
+      Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
+      std::string imageUrl;
+      if( imageURLValue && imageURLValue->Get( imageUrl ) )
+      {
+        visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
+      }
+      break;
+    }
+
+    case Toolkit::DevelVisual::ANIMATED_IMAGE:
+    {
+      Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
+      std::string imageUrl;
+      if( imageURLValue && imageURLValue->Get( imageUrl ) )
+      {
+        visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
+      }
       break;
     }
   }

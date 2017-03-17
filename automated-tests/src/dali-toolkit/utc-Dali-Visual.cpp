@@ -27,6 +27,7 @@
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/align-enums.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include "dummy-control.h"
@@ -748,12 +749,15 @@ int UtcDaliVisualGetPropertyMap6(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualGetPropertyMap6: NPatchVisual" );
 
+  Rect< int > border( 1, 1, 1, 1 );
+
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
   propertyMap.Insert( "mixColor",  Color::MAGENTA );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
+  propertyMap.Insert( DevelImageVisual::Property::BORDER, border );
   Visual::Base nPatchVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -762,7 +766,7 @@ int UtcDaliVisualGetPropertyMap6(void)
   // check the property values from the returned map from visual
   Property::Value* value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
+  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::N_PATCH );
 
   value = resultMap.Find( DevelVisual::Property::MIX_COLOR,  Property::VECTOR4 );
   DALI_TEST_CHECK( value );
@@ -776,6 +780,42 @@ int UtcDaliVisualGetPropertyMap6(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() );
 
+  value = resultMap.Find( DevelImageVisual::Property::BORDER,  Property::RECTANGLE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get< Rect< int > >() == border );
+
+  Vector4 border1( 1.0f, 1.0f, 1.0f, 1.0f );
+
+  Property::Map propertyMap1;
+  propertyMap1.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
+  propertyMap1.Insert( "mixColor",  Color::MAGENTA );
+  propertyMap1.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
+  propertyMap1.Insert( ImageVisual::Property::BORDER_ONLY,  true );
+  propertyMap1.Insert( DevelImageVisual::Property::BORDER, border1 );
+  nPatchVisual = factory.CreateVisual( propertyMap1 );
+
+  nPatchVisual.CreatePropertyMap( resultMap );
+
+  // check the property values from the returned map from visual
+  value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::N_PATCH );
+
+  value = resultMap.Find( DevelVisual::Property::MIX_COLOR,  Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<Vector4>() == Color::MAGENTA );
+
+  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_NPATCH_FILE_NAME );
+
+  value = resultMap.Find( ImageVisual::Property::BORDER_ONLY,  Property::BOOLEAN );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<bool>() );
+
+  value = resultMap.Find( DevelImageVisual::Property::BORDER,  Property::RECTANGLE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get< Rect< int > >() == border );
 
   END_TEST;
 }
@@ -788,7 +828,7 @@ int UtcDaliVisualGetPropertyMap7(void)
   // request SvgVisual with a property map
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::SVG );
   propertyMap.Insert( DevelVisual::Property::MIX_COLOR, Color::WHITE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_SVG_FILE_NAME );
   Visual::Base svgVisual = factory.CreateVisual( propertyMap );
@@ -798,7 +838,7 @@ int UtcDaliVisualGetPropertyMap7(void)
   // check the property values from the returned map from a visual
   Property::Value* value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
+  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::SVG );
 
   value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
   DALI_TEST_CHECK( value );
@@ -811,7 +851,7 @@ int UtcDaliVisualGetPropertyMap7(void)
   // check the property values from the returned map from a visual
   value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
+  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::SVG );
 
   value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
   DALI_TEST_CHECK( value );
@@ -1042,34 +1082,33 @@ int UtcDaliVisualGetPropertyMap10(void)
 int UtcDaliVisualGetPropertyMap11(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetPropertyMap7: AnimatedImageVisual" );
+  tet_infoline( "UtcDaliVisualGetPropertyMap11: AnimatedImageVisual" );
 
-  // request SvgVisual with a property map
+  // request AnimatedImageVisual with a property map
   VisualFactory factory = VisualFactory::Get();
-  Property::Map propertyMap;
-  Visual::Base svgVisual = factory.CreateVisual( Property::Map()
-                                                 .Add( Visual::Property::TYPE,  Visual::IMAGE )
+  Visual::Base animatedImageVisual = factory.CreateVisual( Property::Map()
+                                                 .Add( Visual::Property::TYPE, DevelVisual::ANIMATED_IMAGE )
                                                  .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME ) );
 
   Property::Map resultMap;
-  svgVisual.CreatePropertyMap( resultMap );
+  animatedImageVisual.CreatePropertyMap( resultMap );
   // check the property values from the returned map from a visual
   Property::Value* value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
+  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_IMAGE );
 
   value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
 
-  // request SvgVisual with an URL
-  Visual::Base svgVisual2 = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
+  // request AnimatedImageVisual with an URL
+  Visual::Base animatedImageVisual2 = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
   resultMap.Clear();
-  svgVisual2.CreatePropertyMap( resultMap );
+  animatedImageVisual2.CreatePropertyMap( resultMap );
   // check the property values from the returned map from a visual
   value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == Visual::IMAGE );
+  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_IMAGE );
 
   value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
   DALI_TEST_CHECK( value );

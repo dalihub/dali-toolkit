@@ -80,9 +80,10 @@ public:
    * @brief Retrieve a texture matching the n-patch url.
    *
    * @param [in] url to retrieve
+   * @param [in] border The border size of the image
    * @return id of the texture.
    */
-  std::size_t Load( const std::string& url );
+  std::size_t Load( const std::string& url, const Rect< int >& border );
 
   /**
    * @brief Retrieve N patch data matching to an id

@@ -26,6 +26,7 @@
 #include <dali/devel-api/images/nine-patch-image.h>
 #include <dali-toolkit/devel-api/align-enums.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include "dummy-control.h"
@@ -845,7 +846,7 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   {
     tet_infoline( "whole grid" );
@@ -889,6 +890,52 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
 int UtcDaliVisualFactoryGetNPatchVisual2(void)
 {
   ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual1: Request 9-patch visual with a Property::Map including border" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
+  propertyMap.Insert( ImageVisual::Property::URL, gImage_34_RGBA );
+  propertyMap.Insert( DevelImageVisual::Property::BORDER, Rect< int >( 2, 2, 2, 2 ) );
+  {
+    tet_infoline( "whole grid" );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New();
+    TestVisualRender( application, actor, visual, 1u );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+  }
+
+  propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
+  {
+    tet_infoline( "border only" );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New();
+    TestVisualRender( application, actor, visual, 1u );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetNPatchVisual3(void)
+{
+  ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual2: Request n-patch visual with a Property::Map" );
 
   VisualFactory factory = VisualFactory::Get();
@@ -908,7 +955,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   {
     Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -953,7 +1000,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   END_TEST;
 }
 
-int UtcDaliVisualFactoryGetNPatchVisual3(void)
+int UtcDaliVisualFactoryGetNPatchVisual4(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual3: Request 9-patch visual with an image url" );
@@ -994,7 +1041,7 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
   END_TEST;
 }
 
-int UtcDaliVisualFactoryGetNPatchVisual4(void)
+int UtcDaliVisualFactoryGetNPatchVisual5(void)
 {
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual4: Request n-patch visual with an image url" );
@@ -1074,7 +1121,7 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
   propertyMap.Insert( ImageVisual::Property::URL,  "ERROR.9.jpg" );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );

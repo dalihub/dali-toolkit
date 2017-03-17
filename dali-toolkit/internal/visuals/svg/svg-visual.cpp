@@ -137,7 +137,7 @@ void SvgVisual::GetNaturalSize( Vector2& naturalSize )
 void SvgVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::SVG );
   if( !mImageUrl.empty() )
   {
     map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );

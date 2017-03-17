@@ -50,7 +50,8 @@ typedef IntrusivePtr< NPatchVisual > NPatchVisualPtr;
  * | %Property Name           | Type             |
  * |--------------------------|------------------|
  * | url                      | STRING           |
- * | borderOnly               | BOOLEAN
+ * | borderOnly               | BOOLEAN          |
+ * | border                   | RECTANGLE        |
  *
  */
 class NPatchVisual: public Visual::Base
@@ -204,7 +205,7 @@ private:
   std::string mImageUrl;      ///< The url to the N patch to load
   std::size_t mId;            ///< id of the N patch (from loader/cache)
   bool mBorderOnly;           ///< if only border is desired
-
+  Rect< int > mBorder;        ///< The size of the border
 };
 
 } // namespace Internal
