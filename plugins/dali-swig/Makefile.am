@@ -54,10 +54,15 @@ check-local: examples/dali-test.exe \
              examples/json-loader.exe \
              examples/user-alphafunction.exe \
              examples/image-view.exe \
+             examples/visuals-example.exe \
+             examples/visuals-using-custom-view.exe \
              examples/libNDalic.so examples/NDali.dll
 
 examples/%.exe: examples/%.cs
 	$(MCS) -nologo -target:exe -out:$@ -reference:NDali.dll $<
+
+examples/visuals-using-custom-view.exe: examples/visuals-using-custom-view/*.cs
+	$(MCS) -nologo -target:exe -out:$@ -reference:NDali.dll $^
 
 examples/libNDalic.so: libNDalic.so
 	cd examples && ln -sf ../libNDalic.so

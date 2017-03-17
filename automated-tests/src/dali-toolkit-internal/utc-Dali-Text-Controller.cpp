@@ -470,3 +470,42 @@ int UtcDaliTextControllerSetGetCheckProperty(void)
   tet_result(TET_PASS);
   END_TEST;
 }
+
+int UtcDaliTextControllerSetGetTapLongPressAction(void)
+{
+  tet_infoline(" UtcDaliTextControllerSetGetTapLongPressAction");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  DALI_TEST_CHECK( controller );
+
+  // Test first with no decorator.
+
+  DALI_TEST_EQUALS( Controller::NoTextTap::NO_ACTION, controller->GetNoTextDoubleTapAction(), TEST_LOCATION );
+  controller->SetNoTextDoubleTapAction( Controller::NoTextTap::HIGHLIGHT );
+  DALI_TEST_EQUALS( Controller::NoTextTap::NO_ACTION, controller->GetNoTextDoubleTapAction(), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( Controller::NoTextTap::NO_ACTION, controller->GetNoTextLongPressAction(), TEST_LOCATION );
+  controller->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
+  DALI_TEST_EQUALS( Controller::NoTextTap::NO_ACTION, controller->GetNoTextLongPressAction(), TEST_LOCATION );
+
+  // Add a decorator and re-test.
+
+  // Creates a decorator.
+  Text::DecoratorPtr decorator = Text::Decorator::New( *controller, *controller );
+
+  // Enables the text input.
+  controller->EnableTextInput( decorator );
+
+  DALI_TEST_EQUALS( Controller::NoTextTap::NO_ACTION, controller->GetNoTextDoubleTapAction(), TEST_LOCATION );
+  controller->SetNoTextDoubleTapAction( Controller::NoTextTap::HIGHLIGHT );
+  DALI_TEST_EQUALS( Controller::NoTextTap::HIGHLIGHT, controller->GetNoTextDoubleTapAction(), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( Controller::NoTextTap::SHOW_SELECTION_POPUP, controller->GetNoTextLongPressAction(), TEST_LOCATION ); // The default is SHOW_SELECTION_POPUP
+  controller->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
+  DALI_TEST_EQUALS( Controller::NoTextTap::HIGHLIGHT, controller->GetNoTextLongPressAction(), TEST_LOCATION );
+
+  END_TEST;
+}

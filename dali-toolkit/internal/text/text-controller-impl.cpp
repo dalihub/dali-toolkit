@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,8 @@ EventData::EventData( DecoratorPtr decorator )
   mPreEditStartPosition( 0u ),
   mPreEditLength( 0u ),
   mCursorHookPositionX( 0.f ),
+  mDoubleTapAction( Controller::NoTextTap::NO_ACTION ),
+  mLongPressAction( Controller::NoTextTap::SHOW_SELECTION_POPUP ),
   mIsShowingPlaceholderText( false ),
   mPreEditFlag( false ),
   mDecoratorUpdated( false ),
@@ -97,6 +99,7 @@ EventData::EventData( DecoratorPtr decorator )
   mUpdateLeftSelectionPosition( false ),
   mUpdateRightSelectionPosition( false ),
   mIsLeftHandleSelected( false ),
+  mIsRightHandleSelected( false ),
   mUpdateHighlightBox( false ),
   mScrollAfterUpdatePosition( false ),
   mScrollAfterDelete( false ),
@@ -227,10 +230,25 @@ bool Controller::Impl::ProcessInputEvents()
 
       if( mEventData->mScrollAfterUpdatePosition && ( mEventData->mIsLeftHandleSelected ? mEventData->mUpdateLeftSelectionPosition : mEventData->mUpdateRightSelectionPosition ) )
       {
-        CursorInfo& info = mEventData->mIsLeftHandleSelected ? leftHandleInfo : rightHandleInfo;
+        if( mEventData->mIsLeftHandleSelected && mEventData->mIsRightHandleSelected )
+        {
+          CursorInfo& infoLeft = leftHandleInfo;
 
-        const Vector2 currentCursorPosition( info.primaryPosition.x, info.lineOffset );
-        ScrollToMakePositionVisible( currentCursorPosition, info.lineHeight );
+          const Vector2 currentCursorPositionLeft( infoLeft.primaryPosition.x, infoLeft.lineOffset );
+          ScrollToMakePositionVisible( currentCursorPositionLeft, infoLeft.lineHeight );
+
+          CursorInfo& infoRight = rightHandleInfo;
+
+          const Vector2 currentCursorPositionRight( infoRight.primaryPosition.x, infoRight.lineOffset );
+          ScrollToMakePositionVisible( currentCursorPositionRight, infoRight.lineHeight );
+        }
+        else
+        {
+          CursorInfo& info = mEventData->mIsLeftHandleSelected ? leftHandleInfo : rightHandleInfo;
+
+          const Vector2 currentCursorPosition( info.primaryPosition.x, info.lineOffset );
+          ScrollToMakePositionVisible( currentCursorPosition, info.lineHeight );
+        }
       }
     }
 
@@ -261,6 +279,8 @@ bool Controller::Impl::ProcessInputEvents()
       mEventData->mUpdateLeftSelectionPosition = false;
       mEventData->mUpdateRightSelectionPosition = false;
       mEventData->mUpdateHighlightBox = false;
+      mEventData->mIsLeftHandleSelected = false;
+      mEventData->mIsRightHandleSelected = false;
     }
 
     mEventData->mScrollAfterUpdatePosition = false;
@@ -1151,29 +1171,30 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
     }
 
     const LineIndex lineIndex = mModel->mVisualModel->GetLineOfCharacter( characterIndex );
+    const LineIndex previousLineIndex = ( lineIndex > 0 ? lineIndex - 1u : lineIndex );
 
-    if( lineIndex > 0u )
-    {
-      // Retrieve the cursor position info.
-      CursorInfo cursorInfo;
-      GetCursorPosition( mEventData->mPrimaryCursorPosition,
-                         cursorInfo );
+    // Retrieve the cursor position info.
+    CursorInfo cursorInfo;
+    GetCursorPosition( mEventData->mPrimaryCursorPosition,
+                       cursorInfo );
 
-      // Get the line above.
-      const LineRun& line = *( mModel->mVisualModel->mLines.Begin() + ( lineIndex - 1u ) );
+    // Get the line above.
+    const LineRun& line = *( mModel->mVisualModel->mLines.Begin() + previousLineIndex );
 
-      // Get the next hit 'y' point.
-      const float hitPointY = cursorInfo.lineOffset - 0.5f * ( line.ascender - line.descender );
+    // Get the next hit 'y' point.
+    const float hitPointY = cursorInfo.lineOffset - 0.5f * ( line.ascender - line.descender );
 
-      // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
-      mEventData->mPrimaryCursorPosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
-                                                                        mModel->mLogicalModel,
-                                                                        mMetrics,
-                                                                        mEventData->mCursorHookPositionX,
-                                                                        hitPointY );
-    }
+    // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
+    bool matchedCharacter = false;
+    mEventData->mPrimaryCursorPosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
+                                                                      mModel->mLogicalModel,
+                                                                      mMetrics,
+                                                                      mEventData->mCursorHookPositionX,
+                                                                      hitPointY,
+                                                                      CharacterHitTest::TAP,
+                                                                      matchedCharacter );
   }
-  else if(   Dali::DALI_KEY_CURSOR_DOWN == keyCode )
+  else if( Dali::DALI_KEY_CURSOR_DOWN == keyCode )
   {
     // Get first the line index of the current cursor position index.
     CharacterIndex characterIndex = 0u;
@@ -1199,11 +1220,14 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
       const float hitPointY = cursorInfo.lineOffset + cursorInfo.lineHeight + 0.5f * ( line.ascender - line.descender );
 
       // Use the cursor hook position 'x' and the next hit 'y' position to calculate the new cursor index.
+      bool matchedCharacter = false;
       mEventData->mPrimaryCursorPosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
                                                                         mModel->mLogicalModel,
                                                                         mMetrics,
                                                                         mEventData->mCursorHookPositionX,
-                                                                        hitPointY );
+                                                                        hitPointY,
+                                                                        CharacterHitTest::TAP,
+                                                                        matchedCharacter );
     }
   }
 
@@ -1229,11 +1253,15 @@ void Controller::Impl::OnTapEvent( const Event& event )
         // Keep the tap 'x' position. Used to move the cursor.
         mEventData->mCursorHookPositionX = xPosition;
 
+        // Whether to touch point hits on a glyph.
+        bool matchedCharacter = false;
         mEventData->mPrimaryCursorPosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
                                                                           mModel->mLogicalModel,
                                                                           mMetrics,
                                                                           xPosition,
-                                                                          yPosition );
+                                                                          yPosition,
+                                                                          CharacterHitTest::TAP,
+                                                                          matchedCharacter );
 
         // When the cursor position is changing, delay cursor blinking
         mEventData->mDecorator->DelayCursorBlink();
@@ -1253,6 +1281,20 @@ void Controller::Impl::OnTapEvent( const Event& event )
       {
         mEventData->mImfManager.SetCursorPosition( mEventData->mPrimaryCursorPosition );
         mEventData->mImfManager.NotifyCursorPosition();
+      }
+    }
+    else if( 2u == tapCount )
+    {
+      if( mEventData->mSelectionEnabled )
+      {
+        // Convert from control's coords to text's coords.
+        const float xPosition = event.p2.mFloat - mModel->mScrollPosition.x;
+        const float yPosition = event.p3.mFloat - mModel->mScrollPosition.y;
+
+        // Calculates the logical position from the x,y coords.
+        RepositionSelectionHandles( xPosition,
+                                    yPosition,
+                                    mEventData->mDoubleTapAction );
       }
     }
   }
@@ -1325,11 +1367,25 @@ void Controller::Impl::OnLongPressEvent( const Event& event )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::OnLongPressEvent\n" );
 
-  if( EventData::EDITING == mEventData->mState )
+  if( !IsShowingRealText() && ( EventData::EDITING == mEventData->mState ) )
   {
-    ChangeState ( EventData::EDITING_WITH_POPUP );
+    ChangeState( EventData::EDITING_WITH_POPUP );
     mEventData->mDecoratorUpdated = true;
     mEventData->mUpdateInputStyle = true;
+  }
+  else
+  {
+    if( mEventData->mSelectionEnabled )
+    {
+      // Convert from control's coords to text's coords.
+      const float xPosition = event.p2.mFloat - mModel->mScrollPosition.x;
+      const float yPosition = event.p3.mFloat - mModel->mScrollPosition.y;
+
+      // Calculates the logical position from the x,y coords.
+      RepositionSelectionHandles( xPosition,
+                                  yPosition,
+                                  mEventData->mLongPressAction );
+    }
   }
 }
 
@@ -1352,11 +1408,14 @@ void Controller::Impl::OnHandleEvent( const Event& event )
     const float yPosition = event.p3.mFloat - mModel->mScrollPosition.y;
 
     // Need to calculate the handle's new position.
+    bool matchedCharacter = false;
     const CharacterIndex handleNewPosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
                                                                           mModel->mLogicalModel,
                                                                           mMetrics,
                                                                           xPosition,
-                                                                          yPosition );
+                                                                          yPosition,
+                                                                          CharacterHitTest::SCROLL,
+                                                                          matchedCharacter );
 
     if( Event::GRAB_HANDLE_EVENT == event.type )
     {
@@ -1393,6 +1452,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       // Will define the order to scroll the text to match the handle position.
       mEventData->mIsLeftHandleSelected = true;
+      mEventData->mIsRightHandleSelected = false;
     }
     else if( Event::RIGHT_SELECTION_HANDLE_EVENT == event.type )
     {
@@ -1413,6 +1473,7 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       // Will define the order to scroll the text to match the handle position.
       mEventData->mIsLeftHandleSelected = false;
+      mEventData->mIsRightHandleSelected = true;
     }
   } // end ( HANDLE_PRESSED == state )
   else if( ( HANDLE_RELEASED == state ) ||
@@ -1425,11 +1486,14 @@ void Controller::Impl::OnHandleEvent( const Event& event )
       const float xPosition = event.p2.mFloat - mModel->mScrollPosition.x;
       const float yPosition = event.p3.mFloat - mModel->mScrollPosition.y;
 
+      bool matchedCharacter = false;
       handlePosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
                                                     mModel->mLogicalModel,
                                                     mMetrics,
                                                     xPosition,
-                                                    yPosition );
+                                                    yPosition,
+                                                    CharacterHitTest::SCROLL,
+                                                    matchedCharacter );
     }
 
     if( Event::GRAB_HANDLE_EVENT == event.type )
@@ -1541,11 +1605,14 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       // Get the new handle position.
       // The grab handle's position is in decorator's coords. Need to transforms to text's coords.
+      bool matchedCharacter = false;
       const CharacterIndex handlePosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
                                                                          mModel->mLogicalModel,
                                                                          mMetrics,
                                                                          position.x - mModel->mScrollPosition.x,
-                                                                         position.y - mModel->mScrollPosition.y );
+                                                                         position.y - mModel->mScrollPosition.y,
+                                                                         CharacterHitTest::SCROLL,
+                                                                         matchedCharacter );
 
       if( mEventData->mPrimaryCursorPosition != handlePosition )
       {
@@ -1582,11 +1649,14 @@ void Controller::Impl::OnHandleEvent( const Event& event )
 
       // Get the new handle position.
       // The selection handle's position is in decorator's coords. Need to transform to text's coords.
+      bool matchedCharacter = false;
       const CharacterIndex handlePosition = Text::GetClosestCursorIndex( mModel->mVisualModel,
                                                                          mModel->mLogicalModel,
                                                                          mMetrics,
                                                                          position.x - mModel->mScrollPosition.x,
-                                                                         position.y - mModel->mScrollPosition.y );
+                                                                         position.y - mModel->mScrollPosition.y,
+                                                                         CharacterHitTest::SCROLL,
+                                                                         matchedCharacter );
 
       if( leftSelectionHandleEvent )
       {
@@ -1639,7 +1709,8 @@ void Controller::Impl::OnSelectEvent( const Event& event )
 
     // Calculates the logical position from the x,y coords.
     RepositionSelectionHandles( xPosition,
-                                yPosition );
+                                yPosition,
+                                Controller::NoTextTap::HIGHLIGHT );
   }
 }
 
@@ -2170,7 +2241,7 @@ void Controller::Impl::RepositionSelectionHandles()
   mEventData->mDecoratorUpdated = true;
 }
 
-void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY )
+void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY, Controller::NoTextTap::Action action )
 {
   if( NULL == mEventData )
   {
@@ -2196,16 +2267,18 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
   // Find which word was selected
   CharacterIndex selectionStart( 0 );
   CharacterIndex selectionEnd( 0 );
-  const bool indicesFound = FindSelectionIndices( mModel->mVisualModel,
+  CharacterIndex noTextHitIndex( 0 );
+  const bool characterHit = FindSelectionIndices( mModel->mVisualModel,
                                                   mModel->mLogicalModel,
                                                   mMetrics,
                                                   visualX,
                                                   visualY,
                                                   selectionStart,
-                                                  selectionEnd );
+                                                  selectionEnd,
+                                                  noTextHitIndex );
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "%p selectionStart %d selectionEnd %d\n", this, selectionStart, selectionEnd );
 
-  if( indicesFound )
+  if( characterHit || ( Controller::NoTextTap::HIGHLIGHT == action ) )
   {
     ChangeState( EventData::SELECTING );
 
@@ -2224,12 +2297,22 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY 
 
     mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
   }
-  else
+  else if( Controller::NoTextTap::SHOW_SELECTION_POPUP == action )
   {
     // Nothing to select. i.e. a white space, out of bounds
-    ChangeState( EventData::EDITING );
+    ChangeState( EventData::EDITING_WITH_POPUP );
 
-    mEventData->mPrimaryCursorPosition = selectionEnd;
+    mEventData->mPrimaryCursorPosition = noTextHitIndex;
+
+    mEventData->mUpdateCursorPosition = true;
+    mEventData->mUpdateGrabHandlePosition = true;
+    mEventData->mScrollAfterUpdatePosition = true;
+    mEventData->mUpdateInputStyle = true;
+  }
+  else if( Controller::NoTextTap::NO_ACTION == action )
+  {
+    // Nothing to select. i.e. a white space, out of bounds
+    mEventData->mPrimaryCursorPosition = noTextHitIndex;
 
     mEventData->mUpdateCursorPosition = true;
     mEventData->mUpdateGrabHandlePosition = true;

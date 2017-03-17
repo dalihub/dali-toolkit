@@ -111,6 +111,9 @@ const float SCROLL_SPEED = 300.f;
 const unsigned int DEFAULT_FONT_SIZE = 1152u;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
+const int KEY_A_CODE = 38;
+const int KEY_D_CODE = 40;
+
 static bool gTextChangedCallBackCalled;
 static bool gMaxCharactersCallBackCalled;
 static bool gInputStyleChangedCallbackCalled;
@@ -851,7 +854,7 @@ int utcDaliTextFieldTextChangedP(void)
   field.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
-  application.ProcessEvent( GenerateKey( "D", "D", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "D", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down ) );
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   END_TEST;
@@ -904,8 +907,8 @@ int utcDaliTextFieldMaxCharactersReachedP(void)
 
   gMaxCharactersCallBackCalled = false;
 
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
 
   DALI_TEST_CHECK( gMaxCharactersCallBackCalled );
   DALI_TEST_CHECK( maxLengthReachedSignal );
@@ -936,8 +939,8 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
 
   gMaxCharactersCallBackCalled = false;
 
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
 
   DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
   DALI_TEST_CHECK( !maxLengthReachedSignal );
@@ -1402,7 +1405,7 @@ int utcDaliTextFieldEvent01(void)
   application.Render();
 
   // Add a key event but as the text field has not the focus it should do nothing.
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
 
   // Render and notify
   application.SendNotification();
@@ -1419,8 +1422,8 @@ int utcDaliTextFieldEvent01(void)
   application.Render();
 
   // Now the text field has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
 
   // Render and notify
   application.SendNotification();
@@ -1451,8 +1454,8 @@ int utcDaliTextFieldEvent01(void)
   application.Render();
 
   // The second text field has the focus. It should handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
 
   // Render and notify
   application.SendNotification();
@@ -1510,8 +1513,8 @@ int utcDaliTextFieldEvent02(void)
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   // Now the text field has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "a", "a", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
 
   // Render and notify
   application.SendNotification();
@@ -1927,6 +1930,16 @@ int utcDaliTextFieldEvent08(void)
 
   Wait(application, 500);
 
+  // Long Press
+  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2( 1.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Wait(application, 500);
+
   Stage stage = Stage::GetCurrent();
   Layer layer = stage.GetRootLayer();
   Actor actor = layer.FindChildByName("optionPaste");
@@ -1947,6 +1960,7 @@ int utcDaliTextFieldEvent08(void)
     application.ProcessEvent( event );
   }
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextEditor::Property::TEXT ), std::string("testTextFieldEvent"), TEST_LOCATION );
+
   END_TEST;
 }
 
