@@ -158,7 +158,8 @@ namespace VisualsUsingCustomView
             // Configure the transform and size of Image visual.
             Dali.Property.Map imageVisualTransform = new Dali.Property.Map();
             imageVisualTransform.Add((int)VisualTransformPropertyType.OFFSET, new Dali.Property.Value(new Vector2(10.0f, 0.0f)))
-                .Add((int)VisualTransformPropertyType.OFFSET_SIZE_MODE, new Dali.Property.Value(new Vector4(1.0f, 1.0f, 1.0f, 1.0f)))
+                .Add((int)VisualTransformPropertyType.OFFSET_POLICY, new Dali.Property.Value(new Vector2((int)VisualTransformPolicyType.ABSOLUTE, (int)VisualTransformPolicyType.ABSOLUTE)))
+                .Add((int)VisualTransformPropertyType.SIZE_POLICY, new Dali.Property.Value(new Vector2((int)VisualTransformPolicyType.ABSOLUTE, (int)VisualTransformPolicyType.ABSOLUTE)))
                 .Add((int)VisualTransformPropertyType.SIZE, new Dali.Property.Value(new Vector2(40.0f, 40.0f)))
                 .Add((int)VisualTransformPropertyType.ORIGIN, new Dali.Property.Value((int)AlignType.CENTER_BEGIN))
                 .Add((int)VisualTransformPropertyType.ANCHOR_POINT, new Dali.Property.Value((int)AlignType.CENTER_BEGIN));
@@ -167,7 +168,8 @@ namespace VisualsUsingCustomView
             // Configure the transform and size of Text visual.
             Dali.Property.Map textVisualTransform = new Dali.Property.Map();
             textVisualTransform.Add((int)VisualTransformPropertyType.OFFSET, new Dali.Property.Value(new Vector2(0.0f, 0.0f)))
-                .Add((int)VisualTransformPropertyType.OFFSET_SIZE_MODE, new Dali.Property.Value(new Vector4(0.0f, 0.0f, 1.0f, 1.0f)))
+                .Add((int)VisualTransformPropertyType.OFFSET_POLICY, new Dali.Property.Value(new Vector2((int)VisualTransformPolicyType.RELATIVE, (int)VisualTransformPolicyType.RELATIVE)))
+                .Add((int)VisualTransformPropertyType.SIZE_POLICY, new Dali.Property.Value(new Vector2((int)VisualTransformPolicyType.ABSOLUTE, (int)VisualTransformPolicyType.ABSOLUTE)))
                 .Add((int)VisualTransformPropertyType.SIZE, new Dali.Property.Value(new Vector2(size.X - 100.0f, 50.0f)))
                 .Add((int)VisualTransformPropertyType.ORIGIN, new Dali.Property.Value((int)Align.Type.Center))
                 .Add((int)VisualTransformPropertyType.ANCHOR_POINT, new Dali.Property.Value((int)Align.Type.Center));
@@ -176,7 +178,8 @@ namespace VisualsUsingCustomView
             // Configure the transform and size of Primitive visual.
             Dali.Property.Map primitiveVisualTransform = new Dali.Property.Map();
             primitiveVisualTransform.Add((int)VisualTransformPropertyType.OFFSET, new Dali.Property.Value(new Vector2(size.X - 60.0f, 0.0f)))
-                .Add((int)VisualTransformPropertyType.OFFSET_SIZE_MODE, new Dali.Property.Value(new Vector4(1.0f, 1.0f, 1.0f, 1.0f)))
+                .Add((int)VisualTransformPropertyType.OFFSET_POLICY, new Dali.Property.Value(new Vector2((int)VisualTransformPolicyType.ABSOLUTE, (int)VisualTransformPolicyType.ABSOLUTE)))
+                .Add((int)VisualTransformPropertyType.SIZE_POLICY, new Dali.Property.Value(new Vector2((int)VisualTransformPolicyType.ABSOLUTE, (int)VisualTransformPolicyType.ABSOLUTE)))
                 .Add((int)VisualTransformPropertyType.SIZE, new Dali.Property.Value(new Vector2(40.0f, 40.0f)))
                 .Add((int)VisualTransformPropertyType.ORIGIN, new Dali.Property.Value((int)AlignType.CENTER_BEGIN))
                 .Add((int)VisualTransformPropertyType.ANCHOR_POINT, new Dali.Property.Value((int)AlignType.CENTER_BEGIN));
@@ -185,7 +188,8 @@ namespace VisualsUsingCustomView
             // Configure the transform and size of Color visual. This is also the default value.
             Dali.Property.Map colorVisualTransform = new Dali.Property.Map();
             colorVisualTransform.Add( (int)VisualTransformPropertyType.OFFSET, new Dali.Property.Value(new Vector2(0.0f,0.0f)))
-                .Add((int)VisualTransformPropertyType.OFFSET_SIZE_MODE, new Dali.Property.Value(new Vector4(0.0f, 0.0f, 0.0f, 0.0f)))
+                .Add((int)VisualTransformPropertyType.OFFSET_POLICY, new Dali.Property.Value(new Vector2((int)VisualTransformPolicyType.RELATIVE, (int)VisualTransformPolicyType.RELATIVE)))
+                .Add((int)VisualTransformPropertyType.SIZE_POLICY, new Dali.Property.Value(new Vector2((int)VisualTransformPolicyType.RELATIVE, (int)VisualTransformPolicyType.RELATIVE)))
                 .Add( (int)VisualTransformPropertyType.SIZE, new Dali.Property.Value(new Vector2(1.0f, 1.0f)) )
                 .Add( (int)VisualTransformPropertyType.ORIGIN, new Dali.Property.Value((int)AlignType.TOP_BEGIN) )
                 .Add( (int)VisualTransformPropertyType.ANCHOR_POINT, new Dali.Property.Value((int)AlignType.TOP_BEGIN) );
