@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,6 +122,7 @@
 %rename(AlignType) Dali::Toolkit::Align::Type;
 %rename(VisualType) Dali::Toolkit::Visual::Type;
 %rename(VisualTransformPropertyType) Dali::Toolkit::DevelVisual::Transform::Property::Type;
+%rename(VisualTransformPolicyType) Dali::Toolkit::DevelVisual::Transform::Policy::Type;
 %rename(VISUAL_SHADER_VERTEX) Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER;
 %rename(VISUAL_SHADER_FRAGMENT) Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER;
 %rename(VISUAL_SHADER_SUBDIVIDE_GRID_X) Dali::Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X;
