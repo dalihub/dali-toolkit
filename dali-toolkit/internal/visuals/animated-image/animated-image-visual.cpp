@@ -54,7 +54,7 @@ const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 }
 
-AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties )
+AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties )
 {
   AnimatedImageVisual* visual = new AnimatedImageVisual( factoryCache );
   visual->mImageUrl = imageUrl;
@@ -63,7 +63,7 @@ AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCach
   return visual;
 }
 
-AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl )
+AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl )
 {
   AnimatedImageVisual* visual = new AnimatedImageVisual( factoryCache );
   visual->mImageUrl = imageUrl;
@@ -90,7 +90,7 @@ void AnimatedImageVisual::GetNaturalSize( Vector2& naturalSize )
 {
   if( mImageSize.GetWidth() == 0 &&  mImageSize.GetHeight() == 0)
   {
-    mImageSize = Dali::GetGifImageSize( mImageUrl );
+    mImageSize = Dali::GetGifImageSize( mImageUrl.GetUrl() );
   }
 
   naturalSize.width = mImageSize.GetWidth();
@@ -103,9 +103,9 @@ void AnimatedImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::ANIMATED_IMAGE );
 
-  if( !mImageUrl.empty() )
+  if( mImageUrl.IsValid() )
   {
-    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
+    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
   }
 
   map.Insert( Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea );
@@ -221,12 +221,16 @@ Texture AnimatedImageVisual::PrepareAnimatedImage()
 {
   // load from image file
   std::vector<Dali::PixelData> pixelDataList;
-  if( Dali::LoadAnimatedGifFromFile( mImageUrl.c_str() , pixelDataList, mFrameDelayContainer ) )
-  {
-    mImageSize.SetWidth( pixelDataList[0].GetWidth() );
-    mImageSize.SetHeight( pixelDataList[0].GetHeight() );
 
-    return Toolkit::ImageAtlas::PackToAtlas( pixelDataList, mTextureRectContainer );
+  if( mImageUrl.IsLocal() )
+  {
+    if( Dali::LoadAnimatedGifFromFile( mImageUrl.GetUrl().c_str() , pixelDataList, mFrameDelayContainer ) )
+    {
+      mImageSize.SetWidth( pixelDataList[0].GetWidth() );
+      mImageSize.SetHeight( pixelDataList[0].GetHeight() );
+
+      return Toolkit::ImageAtlas::PackToAtlas( pixelDataList, mTextureRectContainer );
+    }
   }
 
   return Texture();

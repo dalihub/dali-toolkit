@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -77,7 +78,7 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static AnimatedImageVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties );
+  static AnimatedImageVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties );
 
   /**
    * @brief Create the animated image visual using the image URL.
@@ -85,7 +86,7 @@ public:
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] imageUrl The URL to animated image resource to use
    */
-  static AnimatedImageVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl );
+  static AnimatedImageVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl );
 
 public:  // from Visual
 
@@ -163,7 +164,7 @@ private:
   Dali::Vector<Vector4> mTextureRectContainer;
   Dali::Vector<uint32_t> mFrameDelayContainer;
   Vector4 mPixelArea;
-  std::string  mImageUrl;
+  VisualUrl mImageUrl;
 
   ImageDimensions mImageSize;
   uint32_t mCurrentFrameIndex;

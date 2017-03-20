@@ -53,7 +53,7 @@ namespace Toolkit
 namespace Internal
 {
 
-SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties )
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties )
 {
   SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
   svgVisual->ParseFromUrl( imageUrl );
@@ -62,7 +62,7 @@ SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string
   return svgVisual;
 }
 
-SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl )
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl )
 {
   SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
   svgVisual->ParseFromUrl( imageUrl );
@@ -73,7 +73,7 @@ SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const std::string
 SvgVisual::SvgVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mAtlasRect( FULL_TEXTURE_RECT ),
-  mImageUrl(),
+  mImageUrl( ),
   mParsedImage( NULL ),
   mPlacementActor(),
   mVisualSize(Vector2::ZERO)
@@ -138,9 +138,9 @@ void SvgVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
   map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::SVG );
-  if( !mImageUrl.empty() )
+  if( mImageUrl.IsValid() )
   {
-    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
+    map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
   }
 }
 
@@ -149,13 +149,15 @@ void SvgVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
   // Do nothing
 }
 
-void SvgVisual::ParseFromUrl( const std::string& imageUrl )
+void SvgVisual::ParseFromUrl( const VisualUrl& imageUrl )
 {
   mImageUrl = imageUrl;
-
-  Vector2 dpi = Stage::GetCurrent().GetDpi();
-  float meanDpi = (dpi.height + dpi.width) * 0.5f;
-  mParsedImage = nsvgParseFromFile( imageUrl.c_str(), UNITS, meanDpi );
+  if( mImageUrl.IsLocal() )
+  {
+    Vector2 dpi = Stage::GetCurrent().GetDpi();
+    float meanDpi = (dpi.height + dpi.width) * 0.5f;
+    mParsedImage = nsvgParseFromFile( mImageUrl.GetUrl().c_str(), UNITS, meanDpi );
+  }
 }
 
 void SvgVisual::AddRasterizationTask( const Vector2& size )

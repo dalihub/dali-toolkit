@@ -29,6 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -68,7 +69,7 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties );
+  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties );
 
   /**
    * @brief Create an N-patch visual using an image URL.
@@ -79,7 +80,7 @@ public:
    * @param[in] imageUrl The URL to 9 patch image resource to use
    * @return A smart-pointer to the newly allocated visual.
    */
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl );
+  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl );
 
   /**
    * @brief Create an N-patch visual with a NinePatchImage resource.
@@ -202,7 +203,7 @@ private:
 private:
 
   NPatchLoader& mLoader;      ///< reference to N patch loader for fast access
-  std::string mImageUrl;      ///< The url to the N patch to load
+  VisualUrl mImageUrl;        ///< The url to the N patch to load
   std::size_t mId;            ///< id of the N patch (from loader/cache)
   bool mBorderOnly;           ///< if only border is desired
   Rect< int > mBorder;        ///< The size of the border
