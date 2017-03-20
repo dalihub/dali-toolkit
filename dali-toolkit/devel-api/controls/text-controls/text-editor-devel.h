@@ -85,7 +85,25 @@ namespace Property
        * @brief name "smoothScrollDuration", type float
        * @details Sets the duration of smooth scroll animation
        */
-      SMOOTH_SCROLL_DURATION
+      SMOOTH_SCROLL_DURATION,
+
+      /**
+       * @brief name "enableScrollBar", type bool
+       * @details Enable or disable the scroll bar
+       */
+      ENABLE_SCROLL_BAR,
+
+      /**
+       * @brief name "scrollBarShowDuration", type float
+       * @details Sets the duration of scroll bar to show
+       */
+      SCROLL_BAR_SHOW_DURATION,
+
+      /**
+       * @brief name "scrollBarFadeDuration", type float
+       * @details Sets the duration of scroll bar to fade out
+       */
+      SCROLL_BAR_FADE_DURATION
   };
 } // namespace Property
 

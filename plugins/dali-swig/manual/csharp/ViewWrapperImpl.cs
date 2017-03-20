@@ -308,7 +308,10 @@ namespace Dali
 
         private void DirectorOnPropertySet(int index, global::System.IntPtr propertyValue)
         {
-            OnPropertySet(index, new Property.Value(propertyValue, true));
+            if (OnPropertySet != null)
+            {
+                OnPropertySet(index, new Property.Value(propertyValue, true));
+            }
         }
 
         private void DirectorOnSizeSet(global::System.IntPtr targetSize)

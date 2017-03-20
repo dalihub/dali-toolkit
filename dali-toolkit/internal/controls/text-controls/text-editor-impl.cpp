@@ -74,6 +74,11 @@ const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 };
 const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
 
+const char* const SCROLL_BAR_POSITION("sourcePosition");
+const char* const SCROLL_BAR_POSITION_MIN("sourcePositionMin");
+const char* const SCROLL_BAR_POSITION_MAX("sourcePositionMax");
+const char* const SCROLL_BAR_CONTENT_SIZE("sourceContentSize");
+
 // Type registration
 BaseHandle Create()
 {
@@ -125,6 +130,9 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "outline",                     
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputOutline",                         MAP,       INPUT_OUTLINE                        )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScroll",                   BOOLEAN,   SMOOTH_SCROLL                        )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScrollDuration",           FLOAT,     SMOOTH_SCROLL_DURATION               )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableScrollBar",                BOOLEAN,   ENABLE_SCROLL_BAR                    )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarShowDuration",          FLOAT,     SCROLL_BAR_SHOW_DURATION             )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarFadeDuration",          FLOAT,     SCROLL_BAR_FADE_DURATION             )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -613,6 +621,30 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::ENABLE_SCROLL_BAR:
+      {
+        const bool enable = value.Get< bool >();
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor SHOW_SCROLL_BAR %d\n", enable );
+
+        impl.mScrollBarEnabled = enable;
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION:
+      {
+        const float duration = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor SCROLL_BAR_SHOW_DURATION %f\n", duration );
+
+        impl.mAnimationPeriod.delaySeconds = duration;
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION:
+      {
+        const float duration = value.Get< float >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor SCROLL_BAR_FADE_DURATION %f\n", duration );
+
+        impl.mAnimationPeriod.durationSeconds = duration;
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -924,6 +956,21 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         value = impl.mScrollAnimationDuration;
         break;
       }
+      case Toolkit::DevelTextEditor::Property::ENABLE_SCROLL_BAR:
+      {
+        value = impl.mScrollBarEnabled;
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION:
+      {
+        value = impl.mAnimationPeriod.delaySeconds;
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION:
+      {
+        value = impl.mAnimationPeriod.durationSeconds;
+        break;
+      }
     } //switch
   }
 
@@ -1157,6 +1204,7 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
 
     ApplyScrollPosition();
   }
+  UpdateScrollBar();
 }
 
 void TextEditor::OnKeyInputFocusGained()
@@ -1340,6 +1388,73 @@ void TextEditor::AddDecoration( Actor& actor, bool needsClipping )
   }
 }
 
+void TextEditor::UpdateScrollBar()
+{
+  using namespace Dali;
+
+  float scrollPosition;
+  float controlSize;
+  float layoutSize;
+  bool latestScrolled;
+
+  if ( !mScrollBarEnabled )
+  {
+    return;
+  }
+  latestScrolled = mController->GetTextScrollInfo( scrollPosition, controlSize, layoutSize );
+  if ( !latestScrolled || controlSize > layoutSize)
+  {
+    return;
+  }
+
+  CustomActor self = Self();
+  if( !mScrollBar )
+  {
+    mScrollBar = Toolkit::ScrollBar::New( Toolkit::ScrollBar::Vertical );
+    mScrollBar.SetIndicatorHeightPolicy( Toolkit::ScrollBar::Variable );
+    mScrollBar.SetParentOrigin( ParentOrigin::TOP_RIGHT );
+    mScrollBar.SetAnchorPoint( AnchorPoint::TOP_RIGHT );
+    mScrollBar.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
+    mScrollBar.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::WIDTH );
+
+    // Register the scroll position property
+    Property::Index propertyScrollPosition = self.RegisterProperty( SCROLL_BAR_POSITION, scrollPosition );
+    // Register the minimum scroll position property
+    Property::Index propertyMinScrollPosition = self.RegisterProperty( SCROLL_BAR_POSITION_MIN, 0.0f );
+    // Register the maximum scroll position property
+    Property::Index propertyMaxScrollPosition = self.RegisterProperty( SCROLL_BAR_POSITION_MAX, (layoutSize - controlSize) );
+    // Register the scroll content size property
+    Property::Index propertyScrollContentSize = self.RegisterProperty( SCROLL_BAR_CONTENT_SIZE, layoutSize );
+
+    mScrollBar.SetScrollPropertySource(self, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
+
+    self.Add( mScrollBar );
+  }
+  else
+  {
+    Property::Index propertyScrollPosition = self.GetPropertyIndex( SCROLL_BAR_POSITION );
+    Property::Index propertyMaxScrollPosition = self.GetPropertyIndex( SCROLL_BAR_POSITION_MAX );
+    Property::Index propertyScrollContentSize = self.GetPropertyIndex( SCROLL_BAR_CONTENT_SIZE );
+
+    self.SetProperty( propertyScrollPosition, scrollPosition );
+    self.SetProperty( propertyMaxScrollPosition, (layoutSize - controlSize) );
+    self.SetProperty( propertyScrollContentSize, layoutSize );
+  }
+
+  Actor indicator = mScrollBar.GetScrollIndicator();
+  if( mAnimation )
+  {
+    mAnimation.Stop(); // Cancel any animation
+  }
+  else
+  {
+    mAnimation = Animation::New( mAnimationPeriod.durationSeconds );
+  }
+  indicator.SetOpacity(1.0f);
+  mAnimation.AnimateTo( Property( indicator, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN, mAnimationPeriod );
+  mAnimation.Play();
+}
+
 void TextEditor::OnStageConnect( Dali::Actor actor )
 {
   if ( mHasBeenStaged )
@@ -1448,12 +1563,14 @@ void TextEditor::ApplyScrollPosition()
 
 TextEditor::TextEditor()
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
+  mAnimationPeriod( 0.0f, 0.0f ),
   mIdleCallback( NULL ),
   mAlignmentOffset( 0.f ),
   mScrollAnimationDuration( 0.f ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mHasBeenStaged( false ),
-  mScrollAnimationEnabled( false )
+  mScrollAnimationEnabled( false ),
+  mScrollBarEnabled( false )
 {
 }
 
