@@ -197,3 +197,36 @@ int UtcDaliToolkitTextSelectionToolBarScrollBarP(void)
   DALI_TEST_CHECK( toolbar );
   END_TEST;
 }
+
+int UtcDaliToolkitTextSelectionToolBarScrollView(void)
+{
+  // Configures the ScrollView within the TextSelectionToolbar
+  ToolkitTestApplication application;
+
+  TextSelectionToolbar toolbar = TextSelectionToolbar::New();
+  DALI_TEST_CHECK( toolbar );
+  Stage::GetCurrent().Add( toolbar );
+
+  Property::Map map;
+  map["overshootEffectColor"] = Color::RED;
+  map["overshootSize"] = Vector2(50.0f, 50.f);
+  toolbar.SetProperty( Toolkit::TextSelectionToolbar::Property::SCROLL_VIEW, map );
+
+  application.SendNotification();
+  application.Render();
+
+  Actor actor = toolbar.FindChildByName("TextSelectionScrollView");
+  DALI_TEST_CHECK( actor );
+
+  ScrollView scrollView = ScrollView::DownCast( actor );
+  DALI_TEST_CHECK( scrollView );
+
+  Vector4 color = scrollView.GetProperty<Vector4>( Toolkit::Scrollable::Property::OVERSHOOT_EFFECT_COLOR );
+  DALI_TEST_EQUALS( color, Color::RED, TEST_LOCATION );
+
+  Vector2 size = scrollView.GetProperty<Vector2>( Toolkit::Scrollable::Property::OVERSHOOT_SIZE );
+  DALI_TEST_EQUALS( size, Vector2(50.0f, 50.f), TEST_LOCATION );
+
+  END_TEST;
+}
+

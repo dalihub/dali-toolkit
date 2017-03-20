@@ -18,7 +18,9 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/builder/style.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
 {
@@ -37,9 +39,11 @@ StylePtr Style::New()
   return stylePtr;
 }
 
-void Style::ApplyVisualsAndPropertiesRecursively( Handle handle ) const
+void Style::ApplyVisualsAndPropertiesRecursively(
+  Handle handle,
+  const Dictionary<Property::Map>& instancedProperties ) const
 {
-  ApplyVisuals( handle );
+  ApplyVisuals( handle, instancedProperties );
   ApplyProperties( handle );
 
   Toolkit::Control control = Toolkit::Control::DownCast(handle);
@@ -59,7 +63,7 @@ void Style::ApplyVisualsAndPropertiesRecursively( Handle handle ) const
         const StylePtr statePtr(*stylePtr);
 
         // We have a state match.
-        statePtr->ApplyVisuals( handle );
+        statePtr->ApplyVisuals( handle, instancedProperties );
         statePtr->ApplyProperties( handle );
 
         // Apply substate visuals
@@ -72,7 +76,7 @@ void Style::ApplyVisualsAndPropertiesRecursively( Handle handle ) const
           {
             const StylePtr subStatePtr(*stylePtr);
             // We have a sub-state match.
-            subStatePtr->ApplyVisuals( handle );
+            subStatePtr->ApplyVisuals( handle, instancedProperties );
             subStatePtr->ApplyProperties( handle );
           }
         }
@@ -81,18 +85,66 @@ void Style::ApplyVisualsAndPropertiesRecursively( Handle handle ) const
   }
 }
 
-void Style::ApplyVisuals( Handle handle ) const
+void Style::ApplyVisuals(
+  Handle handle,
+  const Dictionary<Property::Map>& instancedProperties ) const
 {
-  for( Dictionary<Property::Map>::iterator iter = visuals.Begin(); iter != visuals.End() ; ++iter )
+  ApplyVisuals( handle, visuals, instancedProperties );
+}
+
+void Style::ApplyVisuals(
+  Handle handle,
+  const Dictionary<Property::Map>& visualMaps,
+  const Dictionary<Property::Map>& instancedProperties )
+{
+  for( Dictionary<Property::Map>::iterator iter = visualMaps.Begin(); iter != visualMaps.End() ; ++iter )
   {
     const std::string& visualName = (*iter).key;
-    const Property::Map& map = (*iter).entry;
-    Dali::Property::Index index = handle.GetPropertyIndex( visualName );
-    if( index != Property::INVALID_INDEX )
+    Property::Map map = (*iter).entry;
+    Property::Map* instancedMap = instancedProperties.Find( visualName );
+    ApplyVisual( handle, visualName, map, instancedMap );
+  }
+}
+
+void Style::ApplyVisual(
+  Handle handle,
+  const std::string& visualName,
+  const Property::Map& visualMap,
+  const Property::Map* instancedProperties )
+{
+  // Check if this visual name is a valid property of handle
+  Dali::Property::Index index = handle.GetPropertyIndex( visualName );
+  if( index != Property::INVALID_INDEX )
+  {
+    const Property::Map* applyMap = &visualMap;
+    Property::Map mergedMap;
+
+    // If there are instanced properties, and the visual types match,
+    // merge them into the visual map
+    if( instancedProperties )
     {
-      const Property::Value value(const_cast<Property::Map&>(map));
-      handle.SetProperty( index, value );
+      Property::Value* instanceTypeValue = instancedProperties->Find( Toolkit::DevelVisual::Property::TYPE);
+      Property::Value* newTypeValue = visualMap.Find( Toolkit::DevelVisual::Property::TYPE, VISUAL_TYPE );
+      if( instanceTypeValue && newTypeValue )
+      {
+        int instanceVisualType=-1;
+        int newVisualType=-1;
+        Scripting::GetEnumerationProperty( *instanceTypeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, instanceVisualType );
+        Scripting::GetEnumerationProperty( *newTypeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, newVisualType );
+
+        if( instanceVisualType == newVisualType )
+        {
+          // Same type - merge remaining instance data
+          mergedMap.Merge( visualMap );
+          mergedMap.Merge( *instancedProperties );
+          applyMap = &mergedMap;
+        }
+      }
     }
+
+    // Apply the visual property map to the handle
+    const Property::Value value(const_cast<Property::Map&>(*applyMap));
+    handle.SetProperty( index, value );
   }
 }
 

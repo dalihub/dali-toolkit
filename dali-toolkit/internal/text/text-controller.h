@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,6 +118,16 @@ public: // Enumerated types.
   {
     PLACEHOLDER_TYPE_ACTIVE,
     PLACEHOLDER_TYPE_INACTIVE,
+  };
+
+  struct NoTextTap
+  {
+    enum Action
+    {
+      NO_ACTION,           ///< Does no action if there is a tap on top of an area with no text.
+      HIGHLIGHT,           ///< Highlights the nearest text (at the beginning or end of the text) and shows the text's selection popup.
+      SHOW_SELECTION_POPUP ///< Shows the text's selection popup.
+    };
   };
 
 public: // Constructor.
@@ -333,6 +343,50 @@ public: // Configure the text controller.
    * @copydoc ModelInterface::IsTextElideEnabled()
    */
   bool IsTextElideEnabled() const;
+
+  /**
+   * @brief Sets input type to password
+   *
+   * @note The string is displayed continuous "*"
+   *
+   * @param[in] passwordInput True if password input is enabled.
+   */
+  void SetInputModePassword( bool passwordInput );
+
+  /**
+   * @brief Returns whether the input mode type is set as password.
+   *
+   * @return True if input mode type is password
+   */
+  bool IsInputModePassword();
+
+  /**
+   * @brief Sets the action when there is a double tap event on top of a text area with no text.
+   *
+   * @param[in] action The action to do.
+   */
+  void SetNoTextDoubleTapAction( NoTextTap::Action action );
+
+  /**
+   * @brief Retrieves the action when there is a double tap event on top of a text area with no text.
+   *
+   * @return The action to do.
+   */
+  NoTextTap::Action GetNoTextDoubleTapAction() const;
+
+  /**
+   * @briefSets the action when there is a long press event on top of a text area with no text.
+   *
+   * @param[in] action The action to do.
+   */
+  void SetNoTextLongPressAction( NoTextTap::Action action );
+
+  /**
+   * @brief Retrieves the action when there is a long press event on top of a text area with no text.
+   *
+   * @return The action to do.
+   */
+  NoTextTap::Action GetNoTextLongPressAction() const;
 
 public: // Update.
 
@@ -820,6 +874,18 @@ public: // Queries & retrieves.
    * @return Distance from last scroll offset to new scroll offset
    */
   float GetScrollAmountByUserInput();
+
+  /**
+   * @brief Get latest scroll amount, control size and layout size
+   *
+   * This method is used to get information of control's scroll
+   * @param[out] scrollPosition The current scrolled position
+   * @param[out] controlHeight The size of a UI control
+   * @param[out] layoutHeight The size of a bounding box to layout text within.
+   *
+   * @return Whether the text scroll position is changed or not after last update.
+   */
+  bool GetTextScrollInfo( float& scrollPosition, float& controlHeight, float& layoutHeight );
 
 public: // Relayout.
 

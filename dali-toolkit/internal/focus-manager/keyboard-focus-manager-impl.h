@@ -165,10 +165,10 @@ private:
 
   /**
    * Move the focus to the specified actor and send notification for the focus change.
-   * @param actorID The ID of the actor to be queried
+   * @param actor The actor to be queried
    * @return Whether the focus is successful or not
    */
-  bool DoSetCurrentFocusActor(const unsigned int actorID);
+  bool DoSetCurrentFocusActor(Actor actor);
 
   /**
    * Move the focus to the next actor towards the specified direction within the layout control

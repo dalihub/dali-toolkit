@@ -131,6 +131,16 @@ public:
   void CreatePropertyMap( Property::Map& map ) const;
 
   /**
+   * @brief Create a property map containing per-instance visual properties.
+   *
+   * This will enable creation of new visuals on control state change with
+   * any alternative style properties and the relevant instance properties
+   * (e.g. for image visual, the desired size, and for text visual, the actual text).
+   * @param[in] map The property map into which to write
+   */
+  void CreateInstancePropertyMap( Property::Map& map ) const;
+
+  /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
    *
    * @param[in] preMultipled whether alpha is pre-multiplied.
@@ -222,6 +232,15 @@ protected:
   virtual void DoCreatePropertyMap( Property::Map& map ) const = 0;
 
   /**
+   * @brief Called by CreateInstancePropertyMap() allowing derived
+   * classes to store instanced data (separate to styled data) that
+   * needs copying between visuals on state change.
+   *
+   * @param[out] map The visual property map
+   */
+  virtual void DoCreateInstancePropertyMap( Property::Map& map ) const = 0;
+
+  /**
    * @brief Called by SetProperties() allowing sub classes to set their properties
    *
    * @param[in] propertyMap The properties for the requested Visual object.
@@ -258,13 +277,6 @@ protected:
    * @return Returns true if this Visual is on stage, false if it is off the stage
    */
   bool IsOnStage() const;
-
-  /**
-   * @brief Gets whether the Dali::Renderer is from a shared cache (and therefore any modifications will affect other users of that renderer)
-   *
-   * @return Returns true if the renderer is from shared cache, false otherwise
-   */
-  bool IsFromCache() const;
 
 private:
 

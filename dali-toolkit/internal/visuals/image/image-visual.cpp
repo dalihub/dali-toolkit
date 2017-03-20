@@ -499,11 +499,13 @@ void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
   std::string fragmentShader;
   const char* fragmentPreFix = nativeImage.GetCustomFragmentPreFix();
   const char* customSamplerTypename = nativeImage.GetCustomSamplerTypename();
+
   if( fragmentPreFix )
   {
     fragmentShader = fragmentPreFix;
     fragmentShader += "\n";
   }
+
   if( mImpl->mCustomShader && !mImpl->mCustomShader->mFragmentShader.empty() )
   {
     fragmentShader += mImpl->mCustomShader->mFragmentShader;
@@ -512,6 +514,7 @@ void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
   {
     fragmentShader += FRAGMENT_SHADER_NO_ATLAS;
   }
+
   if( customSamplerTypename )
   {
     fragmentShader.replace( fragmentShader.find( DEFAULT_SAMPLER_TYPENAME ), strlen( DEFAULT_SAMPLER_TYPENAME ), customSamplerTypename );
@@ -624,52 +627,27 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
       ( strncasecmp( imageUrl.c_str(), HTTPS_URL, sizeof(HTTPS_URL) -1 ) != 0 ) )
   {
     bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
-    bool defaultTransform = mImpl->mTransform.mSize == Vector2::ONE &&
-                            mImpl->mTransform.mOffset == Vector2::ZERO &&
-                            mImpl->mTransform.mOffsetSizeMode == Vector4::ZERO &&
-                            mImpl->mTransform.mOrigin == Toolkit::Align::CENTER &&
-                            mImpl->mTransform.mAnchorPoint == Toolkit::Align::CENTER;
 
-    bool cacheable =  defaultWrapMode && defaultTransform &&  mPixelArea == FULL_TEXTURE_RECT;
+    Vector4 atlasRect;
+    // texture set has to be created first as we need to know if atlasing succeeded or not
+    // when selecting the shader
+    TextureSet textures = CreateTextureSet( atlasRect, imageUrl, IsSynchronousResourceLoading(), true );
+    CreateRenderer( textures );
 
-
-    mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
-    if( cacheable ) // fetch the renderer from cache if exist
+    if( mImpl->mFlags & Impl::IS_ATLASING_APPLIED ) // the texture is packed inside atlas
     {
-      mImpl->mRenderer = mFactoryCache.GetRenderer( imageUrl );
-      mImpl->mFlags |= Impl::IS_FROM_CACHE;
-    }
-
-    if( !mImpl->mRenderer ) // new renderer is needed
-    {
-      Vector4 atlasRect;
-      // texture set has to be created first as we need to know if atlasing succeeded or not
-      // when selecting the shader
-      TextureSet textures = CreateTextureSet( atlasRect, imageUrl, IsSynchronousResourceLoading(), true );
-      CreateRenderer( textures );
-
-      if( mImpl->mFlags & Impl::IS_ATLASING_APPLIED ) // the texture is packed inside atlas
+      mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
+      if( !defaultWrapMode ) // custom wrap mode, renderer is not cached.
       {
-        mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
-        if( !defaultWrapMode ) // custom wrap mode, renderer is not cached.
-        {
-          Vector2 wrapMode(mWrapModeU-WrapMode::CLAMP_TO_EDGE, mWrapModeV-WrapMode::CLAMP_TO_EDGE);
-          wrapMode.Clamp( Vector2::ZERO, Vector2( 2.f, 2.f ) );
-          mImpl->mRenderer.RegisterProperty( WRAP_MODE_UNIFORM_NAME, wrapMode );
-        }
-      }
-
-      // save the renderer to cache only when default wrap mode and default pixel area is used
-      if( cacheable )
-      {
-        mFactoryCache.SaveRenderer( imageUrl, mImpl->mRenderer );
+        Vector2 wrapMode(mWrapModeU-WrapMode::CLAMP_TO_EDGE, mWrapModeV-WrapMode::CLAMP_TO_EDGE);
+        wrapMode.Clamp( Vector2::ZERO, Vector2( 2.f, 2.f ) );
+        mImpl->mRenderer.RegisterProperty( WRAP_MODE_UNIFORM_NAME, wrapMode );
       }
     }
   }
   else
   {
-    // for custom shader or remote image, renderer is not cached and atlas is not applied
-    mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
+    // for custom shader or remote image, atlas is not applied
     Vector4 atlasRect; // ignored in this case
     TextureSet textures = CreateTextureSet( atlasRect, imageUrl, IsSynchronousResourceLoading(), false );
     CreateRenderer( textures );
@@ -678,10 +656,9 @@ void ImageVisual::InitializeRenderer( const std::string& imageUrl )
 
 void ImageVisual::InitializeRenderer( const Image& image )
 {
-  mImpl->mFlags &= ~Impl::IS_FROM_CACHE;
-
   // don't reuse CreateTextureSet
   TextureSet textures = TextureSet::New();
+
   // Renderer can't be shared if mImage is NativeImage
   NativeImage nativeImage = NativeImage::DownCast( image );
   if( nativeImage )
@@ -748,7 +725,7 @@ void ImageVisual::DoSetOffStage( Actor& actor )
   actor.RemoveRenderer( mImpl->mRenderer);
   if( !mImageUrl.empty() )
   {
-    CleanCache(mImageUrl);
+    RemoveFromAtlas(mImageUrl);
     mImage.Reset();
   }
 
@@ -787,6 +764,22 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
+}
+
+void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
+  if( !mImageUrl.empty() )
+  {
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth() );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, mDesiredSize.GetHeight() );
+  }
+  else if( mImage )
+  {
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, static_cast<int>(mImage.GetWidth()) );
+    map.Insert( Toolkit::ImageVisual::Property::DESIRED_HEIGHT, static_cast<int>(mImage.GetHeight()) );
+  }
 }
 
 void ImageVisual::OnSetTransform()
@@ -863,24 +856,22 @@ void ImageVisual::OnImageLoaded( ResourceImage image )
   }
 }
 
-void ImageVisual::CleanCache(const std::string& url)
+void ImageVisual::RemoveFromAtlas(const std::string& url)
 {
-  if( IsFromCache() )
+  Vector4 atlasRect( 0.f, 0.f, 1.f, 1.f );
+  Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
+  if( index != Property::INVALID_INDEX )
   {
-    Vector4 atlasRect( 0.f, 0.f, 1.f, 1.f );
-    Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
-    if( index != Property::INVALID_INDEX )
-    {
-      Property::Value atlasRectValue = mImpl->mRenderer.GetProperty( index );
-      atlasRectValue.Get( atlasRect );
-    }
+    Property::Value atlasRectValue = mImpl->mRenderer.GetProperty( index );
+    atlasRectValue.Get( atlasRect );
+  }
 
-    TextureSet textureSet = mImpl->mRenderer.GetTextures();
-    mImpl->mRenderer.Reset();
-    if( mFactoryCache.CleanRendererCache( url ) && index != Property::INVALID_INDEX )
-    {
-      mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
-    }
+  TextureSet textureSet = mImpl->mRenderer.GetTextures();
+  mImpl->mRenderer.Reset();
+
+  if( index != Property::INVALID_INDEX )
+  {
+    mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
   }
 }
 

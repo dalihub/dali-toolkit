@@ -29,6 +29,8 @@
 #include <toolkit-style-monitor.h>
 #include <dummy-control.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 
 using namespace Dali;
@@ -54,6 +56,54 @@ void dali_style_manager_startup(void)
 void dali_style_manager_cleanup(void)
 {
   test_return_value = TET_PASS;
+}
+
+
+Visual::Base CheckVisual( Impl::DummyControl& dummyImpl, Property::Index visualId, int type, const char* location )
+{
+    DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(visualId), true, location);
+    Visual::Base visual = dummyImpl.GetVisual(visualId);
+    DALI_TEST_EQUALS( (bool)visual, true, location );
+    Property::Map map;
+    visual.CreatePropertyMap( map );
+    Property::Value* value = map.Find( Visual::Property::TYPE );
+    DALI_TEST_EQUALS( value != NULL, true, location );
+
+    int visualType;
+    value->Get( visualType );
+    DALI_TEST_EQUALS( visualType, type, location );
+    return visual;
+}
+
+
+Integration::Bitmap* CreateBitmap( unsigned int imageWidth, unsigned int imageHeight, unsigned int initialColor, Pixel::Format pixelFormat )
+{
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
+  Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight );
+  unsigned int bytesPerPixel = GetBytesPerPixel( pixelFormat );
+
+  memset( pixbuffer, initialColor, imageHeight * imageWidth * bytesPerPixel );
+
+  return bitmap;
+}
+
+Integration::ResourcePointer CustomizeNinePatch( TestApplication& application,
+                                                 unsigned int ninePatchImageWidth,
+                                                 unsigned int ninePatchImageHeight)
+{
+  TestPlatformAbstraction& platform = application.GetPlatform();
+
+  Pixel::Format pixelFormat = Pixel::RGBA8888;
+
+  tet_infoline("Create Bitmap");
+  platform.SetClosestImageSize(Vector2( ninePatchImageWidth, ninePatchImageHeight));
+  Integration::Bitmap* bitmap = CreateBitmap( ninePatchImageWidth, ninePatchImageHeight, 0xFF, pixelFormat );
+
+  tet_infoline("Getting resource");
+  Integration::ResourcePointer resourcePtr(bitmap);
+  platform.SetSynchronouslyLoadedResource( resourcePtr);
+
+  return resourcePtr;
 }
 
 int UtcDaliStyleManagerConstructorP(void)
@@ -884,17 +934,38 @@ int UtcDaliStyleManagerSetState01(void)
   Stage::GetCurrent().Add(actor);
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  Integration::ResourcePointer ninePatch = CustomizeNinePatch( application, 30, 30 );
 
   DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
   Visual::Base visual1 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+  Visual::Base labelVisual1 = dummyImpl.GetVisual(DummyControl::Property::LABEL_VISUAL);
+  Property::Map labelMap;
+  labelVisual1.CreatePropertyMap( labelMap );
+  labelMap[TextVisual::Property::TEXT] = "New text";
+  VisualFactory factory = VisualFactory::Get();
+  labelVisual1 = factory.CreateVisual(labelMap);
+  dummyImpl.UnregisterVisual(DummyControl::Property::LABEL_VISUAL );
+  dummyImpl.RegisterVisual(DummyControl::Property::LABEL_VISUAL, labelVisual1 );
 
   actor.SetProperty( DevelControl::Property::STATE, DevelControl::FOCUSED );
 
   DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
   DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOCUS_VISUAL), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::LABEL_VISUAL), true, TEST_LOCATION);
 
   Visual::Base visual2 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
+  Visual::Base labelVisual2 = dummyImpl.GetVisual(DummyControl::Property::LABEL_VISUAL);
   DALI_TEST_CHECK( visual1 != visual2 );
+  DALI_TEST_CHECK( labelVisual1 != labelVisual2 );
+  labelMap.Clear();
+  labelVisual2.CreatePropertyMap( labelMap );
+  Property::Value* textValue = labelMap.Find( Toolkit::TextVisual::Property::TEXT, "text");
+  DALI_TEST_CHECK( textValue );
+  Property::Value* pointSizeValue = labelMap.Find( Toolkit::TextVisual::Property::POINT_SIZE, "pointSize");
+  tet_infoline( "Check that the instance data has been copied to the new text visual\n");
+  DALI_TEST_EQUALS( textValue->Get<std::string>(), "New text", TEST_LOCATION );
+  DALI_TEST_EQUALS( pointSizeValue->Get<int>(), 10, TEST_LOCATION );
+
 
   actor.SetProperty( DevelControl::Property::STATE, DevelControl::DISABLED );
 
@@ -907,6 +978,17 @@ int UtcDaliStyleManagerSetState01(void)
 
   DALI_TEST_CHECK( visual1 != visual3 );
   DALI_TEST_CHECK( visual2 != visual3 );
+
+  Visual::Base labelVisual3 = dummyImpl.GetVisual(DummyControl::Property::LABEL_VISUAL);
+  DALI_TEST_CHECK( labelVisual2 != labelVisual3 );
+
+  labelVisual2.CreatePropertyMap( labelMap );
+  textValue = labelMap.Find(Toolkit::TextVisual::Property::TEXT, "text");
+  DALI_TEST_CHECK( textValue );
+  pointSizeValue = labelMap.Find(Toolkit::TextVisual::Property::POINT_SIZE, "pointSize");
+  tet_infoline( "Check that the instance data has been copied to the new text visual\n");
+  DALI_TEST_EQUALS( textValue->Get<std::string>(), "New text", TEST_LOCATION );
+  DALI_TEST_EQUALS( pointSizeValue->Get<int>(), 10, TEST_LOCATION );
 
   END_TEST;
 }
@@ -928,6 +1010,7 @@ int UtcDaliStyleManagerSetState02(void)
   Stage::GetCurrent().Add(actor);
 
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  Integration::ResourcePointer ninePatch = CustomizeNinePatch( application, 30, 30 );
 
   int state = actor.GetProperty<int>( DevelControl::Property::STATE );
   DALI_TEST_EQUALS( state, (int) DevelControl::NORMAL, TEST_LOCATION );
@@ -956,9 +1039,16 @@ int UtcDaliStyleManagerSetState02(void)
   DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
 
   Visual::Base visual3 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
-  Visual::Base focusVisual = dummyImpl.GetVisual(DummyControl::Property::FOCUS_VISUAL);
-  DALI_TEST_CHECK( !focusVisual );
-  DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOCUS_VISUAL), false, TEST_LOCATION);
+
+  Visual::Base testVisual = dummyImpl.GetVisual(DummyControl::Property::FOCUS_VISUAL);
+  DALI_TEST_CHECK( !testVisual );
+  testVisual = dummyImpl.GetVisual(DummyControl::Property::TEST_VISUAL);
+  DALI_TEST_CHECK( !testVisual );
+  testVisual = dummyImpl.GetVisual(DummyControl::Property::TEST_VISUAL2);
+  DALI_TEST_CHECK( !testVisual );
+  testVisual = dummyImpl.GetVisual(DummyControl::Property::LABEL_VISUAL);
+  DALI_TEST_CHECK( testVisual );
+
 
   DALI_TEST_CHECK( visual1 != visual3 );
   DALI_TEST_CHECK( visual2 != visual3 );
@@ -974,7 +1064,7 @@ int UtcDaliStyleManagerSetState02(void)
   visual1 = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
   DALI_TEST_CHECK( visual1 );
 
-  focusVisual = dummyImpl.GetVisual(DummyControl::Property::FOCUS_VISUAL);
+  Visual::Base focusVisual = dummyImpl.GetVisual(DummyControl::Property::FOCUS_VISUAL);
   DALI_TEST_CHECK( !focusVisual );
   DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOCUS_VISUAL), false, TEST_LOCATION);
 
@@ -983,7 +1073,104 @@ int UtcDaliStyleManagerSetState02(void)
 }
 
 
-int UtcDaliStyleManagerSetSubState(void)
+int UtcDaliStyleManagerSetState03N(void)
+{
+  tet_infoline("Instantiate dummy control and test state transition without state style" );
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
+                                          defaultTheme );
+
+  ToolkitTestApplication application;
+
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  Dali::StyleMonitor styleMonitor = Dali::StyleMonitor::Get();
+  StyleManager styleManager = StyleManager::Get();
+
+  DummyControl actor = DummyControl::New(true);
+  actor.SetStyleName("NoStyles");
+  Stage::GetCurrent().Add(actor);
+
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  int state = actor.GetProperty<int>( DevelControl::Property::STATE );
+  DALI_TEST_EQUALS( state, (int) DevelControl::NORMAL, TEST_LOCATION );
+
+  actor.SetProperty( DevelControl::Property::STATE,
+                     Property::Map().Add( "state", "FOCUSED" ).Add("withTransitions", false));
+
+  Visual::Base testVisual = dummyImpl.GetVisual(DummyControl::Property::TEST_VISUAL);
+  DALI_TEST_CHECK( testVisual = visual );
+
+  state = actor.GetProperty<int>( DevelControl::Property::STATE );
+  DALI_TEST_EQUALS( state, (int) DevelControl::FOCUSED, TEST_LOCATION );
+
+  actor.SetProperty( DevelControl::Property::STATE,
+                     Property::Map().Add( "state", "DISABLED" ).Add("withTransitions", false));
+
+  testVisual = dummyImpl.GetVisual(DummyControl::Property::TEST_VISUAL);
+  DALI_TEST_CHECK( testVisual = visual );
+
+  state = actor.GetProperty<int>( DevelControl::Property::STATE );
+  DALI_TEST_EQUALS( state, (int) DevelControl::DISABLED, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerSetState04N(void)
+{
+  tet_infoline("Instantiate dummy control and test state transition with style without state" );
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
+                                          defaultTheme );
+
+  ToolkitTestApplication application;
+
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  Dali::StyleMonitor styleMonitor = Dali::StyleMonitor::Get();
+  StyleManager styleManager = StyleManager::Get();
+
+  DummyControl actor = DummyControl::New(true);
+  actor.SetStyleName("NoStateStyle");
+  Stage::GetCurrent().Add(actor);
+
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  int state = actor.GetProperty<int>( DevelControl::Property::STATE );
+  DALI_TEST_EQUALS( state, (int) DevelControl::NORMAL, TEST_LOCATION );
+
+  actor.SetProperty( DevelControl::Property::STATE,
+                     Property::Map().Add( "state", "FOCUSED" ).Add("withTransitions", false));
+
+  Visual::Base testVisual = dummyImpl.GetVisual(DummyControl::Property::TEST_VISUAL);
+  DALI_TEST_CHECK( testVisual = visual );
+
+  state = actor.GetProperty<int>( DevelControl::Property::STATE );
+  DALI_TEST_EQUALS( state, (int) DevelControl::FOCUSED, TEST_LOCATION );
+
+  actor.SetProperty( DevelControl::Property::STATE,
+                     Property::Map().Add( "state", "DISABLED" ).Add("withTransitions", false));
+
+  testVisual = dummyImpl.GetVisual(DummyControl::Property::TEST_VISUAL);
+  DALI_TEST_CHECK( testVisual = visual );
+
+  state = actor.GetProperty<int>( DevelControl::Property::STATE );
+  DALI_TEST_EQUALS( state, (int) DevelControl::DISABLED, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliStyleManagerSetSubState01(void)
 {
   tet_infoline("Instantiate dummy control and test state/visual/transition capture" );
   Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
@@ -1001,53 +1188,97 @@ int UtcDaliStyleManagerSetSubState(void)
   actor.SetStyleName("ComplexControl");
   Stage::GetCurrent().Add(actor);
 
+  Integration::ResourcePointer ninePatch = CustomizeNinePatch( application, 30, 30 );
+
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
 
-  {
-    DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
-    Visual::Base visual = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
-    DALI_TEST_CHECK( visual );
-    Property::Map map;
-    visual.CreatePropertyMap( map );
-    Property::Value* value = map.Find( Visual::Property::TYPE );
-    DALI_TEST_CHECK( value );
-
-    int visualType;
-    value->Get( visualType );
-    DALI_TEST_EQUALS( visualType, (int)Toolkit::Visual::GRADIENT, TEST_LOCATION );
-  }
+  CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+  CheckVisual( dummyImpl, DummyControl::Property::TEST_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+  CheckVisual( dummyImpl, DummyControl::Property::TEST_VISUAL2, Toolkit::Visual::GRADIENT, TEST_LOCATION);
 
   actor.SetProperty(DevelControl::Property::SUB_STATE, "UNSELECTED");
 
-  {
-    DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
-    Visual::Base visual = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
-    DALI_TEST_CHECK( visual );
-    Property::Map map;
-    visual.CreatePropertyMap( map );
-    Property::Value* value = map.Find( Visual::Property::TYPE );
-    DALI_TEST_CHECK( value );
-
-    int visualType;
-    value->Get( visualType );
-    DALI_TEST_EQUALS( visualType, (int)Toolkit::Visual::COLOR, TEST_LOCATION );
-  }
+  CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+  CheckVisual( dummyImpl, DummyControl::Property::TEST_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+  CheckVisual( dummyImpl, DummyControl::Property::TEST_VISUAL2, Toolkit::Visual::COLOR, TEST_LOCATION);
 
   actor.SetProperty(DevelControl::Property::SUB_STATE, "SELECTED");
 
-  {
-    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-    DALI_TEST_EQUALS(dummyImpl.IsVisualEnabled(DummyControl::Property::FOREGROUND_VISUAL), true, TEST_LOCATION);
-    Visual::Base visual = dummyImpl.GetVisual(DummyControl::Property::FOREGROUND_VISUAL);
-    DALI_TEST_CHECK( visual );
-    Property::Map map;
-    visual.CreatePropertyMap( map );
-    Property::Value* value = map.Find( Visual::Property::TYPE );
-    DALI_TEST_CHECK( value );
+  CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+  CheckVisual( dummyImpl, DummyControl::Property::TEST_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+  CheckVisual( dummyImpl, DummyControl::Property::TEST_VISUAL2, Toolkit::Visual::GRADIENT, TEST_LOCATION);
 
-    int visualType;
-    value->Get( visualType );
-    DALI_TEST_EQUALS( visualType, (int)Toolkit::Visual::GRADIENT, TEST_LOCATION );
-  }
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerSetSubState02(void)
+{
+  tet_infoline("Instantiate complex control and test state/substate change" );
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json",
+                                          defaultTheme );
+
+  ToolkitTestApplication application;
+
+  StyleChangedSignalChecker styleChangedSignalHandler;
+  Dali::StyleMonitor styleMonitor = Dali::StyleMonitor::Get();
+  StyleManager styleManager = StyleManager::Get();
+
+  DummyControl actor = DummyControl::New(true);
+  actor.SetProperty(DevelControl::Property::STATE, "NORMAL");
+  actor.SetProperty(DevelControl::Property::SUB_STATE, "SELECTED");
+  tet_infoline( "Setting state to NORMAL/SELECTED before re-styling\n");
+
+  actor.SetStyleName("ComplexControl");
+  Stage::GetCurrent().Add(actor);
+
+  Integration::ResourcePointer ninePatch = CustomizeNinePatch( application, 30, 30 );
+
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+
+  CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+  CheckVisual( dummyImpl, DummyControl::Property::TEST_VISUAL2, Toolkit::Visual::GRADIENT, TEST_LOCATION);
+
+  actor.SetProperty(DevelControl::Property::SUB_STATE, "UNSELECTED");
+  tet_infoline( "Changing substate to UNSELECTED - check visual changes\n");
+
+  CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+  CheckVisual( dummyImpl, DummyControl::Property::TEST_VISUAL2, Toolkit::Visual::COLOR, TEST_LOCATION);
+
+  actor.SetProperty(DevelControl::Property::STATE, "FOCUSED");
+  tet_infoline( "Changing state to FOCUSED - check visual changes\n");
+
+  Visual::Base fgVisual1 = CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::GRADIENT, TEST_LOCATION);
+  Visual::Base focusVisual1 = CheckVisual( dummyImpl, DummyControl::Property::FOCUS_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+
+  actor.SetProperty(DevelControl::Property::SUB_STATE, "SELECTED");
+  tet_infoline( "Changing  substate to SELECTED - Expect no change\n");
+
+  Visual::Base fgVisual2 = CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::GRADIENT, TEST_LOCATION);
+  Visual::Base focusVisual2 = CheckVisual( dummyImpl, DummyControl::Property::FOCUS_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+
+  DALI_TEST_CHECK( fgVisual1 == fgVisual2 );
+  DALI_TEST_CHECK( focusVisual1 == focusVisual2 );
+
+  actor.SetProperty(DevelControl::Property::STATE, "NORMAL");
+  tet_infoline( "Changing state to NORMAL - Expect to change to NORMAL/SELECTED \n");
+
+  CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+  CheckVisual( dummyImpl, DummyControl::Property::TEST_VISUAL2, Toolkit::Visual::GRADIENT, TEST_LOCATION);
+
+  Visual::Base focusVisual = dummyImpl.GetVisual(DummyControl::Property::FOCUS_VISUAL);
+  DALI_TEST_CHECK( ! focusVisual );
+
+  actor.SetProperty(DevelControl::Property::STATE, "DISABLED");
+  tet_infoline( "Changing state to DISABLED - Expect to change to DISABLED/SELECTED \n");
+
+  CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::COLOR, TEST_LOCATION);
+  CheckVisual( dummyImpl, DummyControl::Property::TEST_VISUAL, Toolkit::Visual::IMAGE, TEST_LOCATION);
+
+  Visual::Base testVisual = dummyImpl.GetVisual(DummyControl::Property::FOCUS_VISUAL);
+  DALI_TEST_CHECK( ! testVisual );
+  testVisual = dummyImpl.GetVisual(DummyControl::Property::LABEL_VISUAL);
+  DALI_TEST_CHECK( ! testVisual );
+
   END_TEST;
 }

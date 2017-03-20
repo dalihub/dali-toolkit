@@ -75,86 +75,6 @@ void VisualFactoryCache::SaveShader( ShaderType type, Shader shader )
   mShader[type] = shader;
 }
 
-int VisualFactoryCache::FindRenderer( const std::string& key ) const
-{
-  int hash = Dali::CalculateHash( key );
-
-  HashVector::Iterator startIt = mRendererHashes.Begin();
-  HashVector::Iterator it;
-
-  for(;;)
-  {
-    it = std::find( startIt, mRendererHashes.End(), hash );
-    if( it != mRendererHashes.End() )
-    {
-      int index = it - mRendererHashes.Begin();
-      const CachedRenderer* cachedRenderer = mRenderers[ index ];
-
-      if( cachedRenderer && cachedRenderer->mKey == key )
-      {
-        return index;
-      }
-    }
-    else
-    {
-      break;
-    }
-    startIt = it + 1;
-  }
-
-  return -1;
-}
-
-Renderer VisualFactoryCache::GetRenderer( const std::string& key ) const
-{
-  int index = FindRenderer( key );
-  if( index != -1 )
-  {
-    return mRenderers[ index ]->mRenderer.GetHandle();
-  }
-  else
-  {
-    return Renderer();
-  }
-}
-
-void VisualFactoryCache::SaveRenderer( const std::string& key, Renderer& renderer )
-{
-  int hash = Dali::CalculateHash( key );
-  const CachedRenderer* cachedRenderer = new CachedRenderer( key, renderer );
-
-  CachedRenderers::Iterator it = std::find( mRenderers.Begin(), mRenderers.End(), static_cast< CachedRenderer* >( NULL ) );
-  if( it != mRenderers.End() )
-  {
-    *it = cachedRenderer;
-    int index = it - mRenderers.Begin();
-    mRendererHashes[ index ] = hash;
-  }
-  else
-  {
-    mRendererHashes.PushBack( hash );
-    mRenderers.PushBack( cachedRenderer );
-  }
-}
-
-bool VisualFactoryCache::CleanRendererCache( const std::string& key )
-{
-  int index = FindRenderer( key );
-  if( index != -1 )
-  {
-    const CachedRenderer*& cachedRenderer = mRenderers[ index ];
-    if( !cachedRenderer->mRenderer.GetHandle() )
-    {
-      mRendererHashes[ index ] = Dali::INITIAL_HASH_VALUE;
-
-      delete cachedRenderer;
-      cachedRenderer = NULL;
-      return true;
-    }
-  }
-  return false;
-}
-
 Geometry VisualFactoryCache::CreateQuadGeometry()
 {
   const float halfWidth = 0.5f;
@@ -294,4 +214,3 @@ Image VisualFactoryCache::GetBrokenVisualImage()
 } // namespace Toolkit
 
 } // namespace Dali
-

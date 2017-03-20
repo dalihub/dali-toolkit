@@ -261,6 +261,16 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::TextVisual::Property::ENABLE_MARKUP, mController->IsMarkupProcessorEnabled() );
 }
 
+void TextVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  map.Clear();
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::TEXT );
+  std::string text;
+  mController->GetText( text );
+  map.Insert( Toolkit::TextVisual::Property::TEXT, text );
+}
+
+
 TextVisual::TextVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mController( Text::Controller::New() ),

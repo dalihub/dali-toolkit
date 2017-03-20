@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,15 +83,39 @@
       }
     }
 
-    public bool StateFocusEnable
+    public Vector2 ScreenPosition
     {
+      get
+      {
+        Vector2 temp = new Vector2( 0.0f, 0.0f );
+        GetProperty( Actor.Property.SCREEN_POSITION ).Get( temp );
+        return temp;
+      }
+    }
+
+    protected bool PositionUsesAnchorPoint
+    {
+      get
+      {
+        bool temp = false;
+        GetProperty( Actor.Property.POSITION_USES_ANCHOR_POINT ).Get( ref temp );
+        return temp;
+      }
       set
       {
-        SetKeyboardFocusable(value);
+        SetProperty( Actor.Property.POSITION_USES_ANCHOR_POINT, new Dali.Property.Value( value ) );
       }
+    }
+
+    public bool StateFocusEnable
+    {
       get
       {
         return IsKeyboardFocusable();
+      }
+      set
+      {
+        SetKeyboardFocusable(value);
       }
     }
 

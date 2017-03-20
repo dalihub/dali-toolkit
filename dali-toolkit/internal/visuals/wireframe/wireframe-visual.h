@@ -109,6 +109,11 @@ protected: // from Visual::Base
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
   /**
+   * @copydoc Visual::Base::CreateInstancePropertyMap
+   */
+  virtual void DoCreateInstancePropertyMap( Property::Map& map ) const;
+
+  /**
    * @copydoc Visual::Base::DoSetProperties()
    */
   virtual void DoSetProperties( const Property::Map& propertyMap );

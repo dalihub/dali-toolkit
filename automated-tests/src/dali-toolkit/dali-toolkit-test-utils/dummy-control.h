@@ -48,7 +48,8 @@ public:
       TEST_VISUAL = PROPERTY_START_INDEX,
       TEST_VISUAL2,
       FOREGROUND_VISUAL,
-      FOCUS_VISUAL
+      FOCUS_VISUAL,
+      LABEL_VISUAL
     };
   };
 
@@ -92,7 +93,7 @@ public:
   void UnregisterVisual( Property::Index index );
   void EnableVisual( Property::Index index, bool enabled );
   bool IsVisualEnabled( Property::Index index );
-
+  int GetVisualCount();
   Toolkit::Visual::Base GetVisual( Property::Index index );
   Animation CreateTransition( const Toolkit::TransitionData& transition );
 

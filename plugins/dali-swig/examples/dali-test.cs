@@ -21,6 +21,75 @@ using Dali;
 
 namespace MyCSharpExample
 {
+    class MyView : View
+    {
+        private string _myOwnName;
+        public int _myCurrentValue;
+
+        public MyView()
+        {
+            _myCurrentValue = 0;
+        }
+
+        public string MyOwnName
+        {
+            get
+            {
+                return _myOwnName;
+            }
+            set
+            {
+              _myOwnName = value;
+            }
+        }
+    }
+
+    class MyButton : PushButton
+    {
+        private string _myOwnName;
+        public int _myCurrentValue;
+
+        public MyButton()
+        {
+            _myCurrentValue = 0;
+        }
+
+        public string MyOwnName
+        {
+            get
+            {
+                return _myOwnName;
+            }
+            set
+            {
+              _myOwnName = value;
+            }
+        }
+    }
+
+    class MySpin : Spin
+    {
+        private string _myOwnName;
+        public int _myCurrentValue;
+
+        public MySpin()
+        {
+            _myCurrentValue = 0;
+        }
+
+        public string MyOwnName
+        {
+            get
+            {
+                return _myOwnName;
+            }
+            set
+            {
+              _myOwnName = value;
+            }
+        }
+    }
+
     class Example
     {
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -39,6 +108,8 @@ namespace MyCSharpExample
 
         public void Initialize(object source, NUIApplicationInitEventArgs e)
         {
+            NavigationPropertiesTests();
+
             OperatorTests();
 
             CustomViewPropertyTest();
@@ -116,6 +187,8 @@ namespace MyCSharpExample
             color.B += 10;
             color.A += 10;
             Console.WriteLine( "    Color r =  " + color.R + ", g = " + color.G + ", b = " + color.B + ", a = " + color.A );
+
+            ViewDownCastTest();
         }
 
         public void RectanglePaddingClassTest()
@@ -191,6 +264,83 @@ namespace MyCSharpExample
             else
             {
                 Console.WriteLine("p1 != p2");
+            }
+        }
+
+        public void NavigationPropertiesTests()
+        {
+            View view = new View();
+            View leftView, rightView, upView, downView, tmpView;
+
+            leftView = new View();
+            leftView.Name = "leftView";
+            rightView = new View();
+            rightView.Name = "rightView";
+            upView = new View();
+            upView.Name = "upView";
+            downView = new View();
+            downView.Name = "downView";
+
+            Stage.Instance.Add(leftView);
+            Stage.Instance.Add(rightView);
+            Stage.Instance.Add(upView);
+            Stage.Instance.Add(downView);
+
+            view.LeftFocusableView = leftView;
+            tmpView = view.LeftFocusableView;
+            if (string.Compare(tmpView.Name, "leftView") == 0)
+            {
+                Console.WriteLine("Passed: LeftFocusedView = " + tmpView.Name);
+            }
+            else
+            {
+                Console.WriteLine("Failed: LeftFocusedView = " + tmpView.Name);
+            }
+
+            view.RightFocusableView = rightView;
+            tmpView = view.RightFocusableView;
+            if (string.Compare(tmpView.Name, "rightView") == 0)
+            {
+                Console.WriteLine("Passed: RightFocusedView = " + tmpView.Name);
+            }
+            else
+            {
+                Console.WriteLine("Failed: RightFocusedView = " + tmpView.Name);
+            }
+
+            Stage.Instance.Add(view);
+
+            view.UpFocusableView = upView;
+            tmpView = view.UpFocusableView;
+            if (string.Compare(tmpView.Name, "upView") == 0)
+            {
+                Console.WriteLine("Passed: UpFocusedView = " + tmpView.Name);
+            }
+            else
+            {
+                Console.WriteLine("Failed: UpFocusedView = " + tmpView.Name);
+            }
+
+            view.DownFocusableView = downView;
+            tmpView = view.DownFocusableView;
+            if (string.Compare(tmpView.Name, "downView") == 0)
+            {
+                Console.WriteLine("Passed: DownFocusedView = " + tmpView.Name);
+            }
+            else
+            {
+                Console.WriteLine("Failed: DownFocusedView = " + tmpView.Name);
+            }
+
+            Stage.Instance.Remove(leftView);
+            tmpView = view.LeftFocusableView;
+            if (!tmpView)
+            {
+                Console.WriteLine("Passed: NULL LeftFocusedView");
+            }
+            else
+            {
+                Console.WriteLine("Failed: LeftFocusedView = " + tmpView.Name);
             }
         }
 
@@ -374,7 +524,7 @@ namespace MyCSharpExample
             // Background property
             Property.Map background = new Property.Map();
             background.Add( Dali.Constants.Visual.Property.Type, new Property.Value((int)Dali.Constants.Visual.Type.Color) )
-                .Add( Dali.Constants.ColorVisualProperty.MixColor, new Property.Value(Color.Red) );
+                      .Add( Dali.Constants.ColorVisualProperty.MixColor, new Property.Value(Color.Red) );
             spin.Background = background;
 
             background = spin.Background;
@@ -400,6 +550,17 @@ namespace MyCSharpExample
                 Console.WriteLine ("Custom View BackgroundColor property : test failed");
             }
 
+            // BackgroundImage property
+            spin.BackgroundImage = "background-image.jpg";
+            if(spin.BackgroundImage == "background-image.jpg")
+            {
+                Console.WriteLine ("Custom View BackgroundImage property : test passed");
+            }
+            else
+            {
+                Console.WriteLine ("Custom View BackgroundImage property : test failed");
+            }
+
             // StyleName property
             spin.StyleName = "MyCustomStyle";
             if(spin.StyleName == "MyCustomStyle")
@@ -410,6 +571,133 @@ namespace MyCSharpExample
             {
                 Console.WriteLine ("Custom View StyleName property : test failed");
             }
+        }
+
+        public void ViewDownCastTest()
+        {
+          View container = new View();
+          container.Position = new Position(-800.0f, -800.0f, 0.0f);
+          Stage.GetCurrent().Add(container);
+
+          // Test downcast for native control
+          TextLabel myLabel = new TextLabel();
+          myLabel.Name = "MyLabelName";
+          myLabel.Text = "MyText";
+
+          Console.WriteLine("myLabel.Name = " + myLabel.Name + ", Text = " + myLabel.Text);
+
+          container.Add(myLabel);
+
+          Actor myLabelActor  = container.FindChildByName("MyLabelName");
+          if(myLabelActor)
+          {
+            TextLabel newLabel = View.DownCast<TextLabel>(myLabelActor);
+            if(newLabel)
+            {
+              Console.WriteLine("Downcast to TextLabel successful: newLabel Name = " + newLabel.Name + ", Text = " + newLabel.Text);
+            }
+            else
+            {
+              Console.WriteLine("Downcast to TextLabel failed!");
+            }
+          }
+
+          // Test downcast for class directly inherited from View
+          MyView myView = new MyView();
+          myView.Name = "MyViewName";
+          myView.MyOwnName = "MyOwnViewName";
+          myView._myCurrentValue = 5;
+
+          Console.WriteLine("myView.Name = " + myView.Name + ", MyOwnName = " + myView.MyOwnName + ", myCurrentValue = " + myView._myCurrentValue);
+
+          container.Add(myView);
+
+          Actor myViewActor  = container.FindChildByName("MyViewName");
+          if(myViewActor)
+          {
+            MyView newView = View.DownCast<MyView>(myViewActor);
+            if(newView)
+            {
+              Console.WriteLine("Downcast to MyView successful: newView Name = " + newView.Name + ", MyOwnName = " + newView.MyOwnName + ", myCurrentValue = " + newView._myCurrentValue);
+            }
+            else
+            {
+              Console.WriteLine("Downcast to MyView failed!");
+            }
+          }
+
+          // Test downcast for class directly inherited from native control
+          MyButton myButton = new MyButton();
+          myButton.Name = "MyButtonName";
+          myButton.MyOwnName = "MyOwnViewName";
+          myButton.LabelText = "MyLabelText";
+          myButton._myCurrentValue = 5;
+
+          Console.WriteLine("myButton.Name = " + myButton.Name + ", MyOwnName = " + myButton.MyOwnName + ", LabelText = " + myButton.LabelText + ", myCurrentValue = " + myButton._myCurrentValue);
+
+          container.Add(myButton);
+
+          Actor myButtonActor  = container.FindChildByName("MyButtonName");
+          if(myButtonActor)
+          {
+            MyButton newButton = View.DownCast<MyButton>(myButtonActor);
+            if(newButton)
+            {
+              Console.WriteLine("Downcast to MyButton successful: newButton Name = " + newButton.Name + ", MyOwnName = " + newButton.MyOwnName + ", LabelText = " + myButton.LabelText + ", myCurrentValue = " + newButton._myCurrentValue);
+            }
+            else
+            {
+              Console.WriteLine("Downcast to MyButton failed!");
+            }
+          }
+
+          // Test downcast for a CustomView
+          Spin spin = new Spin();
+          spin.Name = "SpinName";
+          spin.MaxValue = 8888;
+
+          Console.WriteLine("spin.Name = " + spin.Name + ", MaxValue = " + spin.MaxValue);
+
+          container.Add(spin);
+
+          Actor spinActor  = container.FindChildByName("SpinName");
+          if(spinActor)
+          {
+            Spin newSpin = View.DownCast<Spin>(spinActor);
+            if(newSpin)
+            {
+              Console.WriteLine("Downcast to Spin successful: newSpin Name = " + newSpin.Name + ", MaxValue = " + newSpin.MaxValue);
+            }
+            else
+            {
+              Console.WriteLine("Downcast to Spin failed!");
+            }
+          }
+
+          // Test downcast for class inherited from a CustomView
+          MySpin mySpin = new MySpin();
+          mySpin.Name = "MySpinName";
+          mySpin.MyOwnName = "MyOwnSpinName";
+          mySpin.MaxValue = 8888;
+          mySpin._myCurrentValue = 5;
+
+          Console.WriteLine("mySpin.Name = " + mySpin.Name + ", MyOwnName = " + mySpin.MyOwnName + ", MaxValue = " + mySpin.MaxValue + ", currentValue = " + mySpin._myCurrentValue);
+
+          container.Add(mySpin);
+
+          Actor mySpinActor  = container.FindChildByName("MySpinName");
+          if(mySpinActor)
+          {
+            MySpin newSpin = View.DownCast<MySpin>(mySpinActor);
+            if(newSpin)
+            {
+              Console.WriteLine("Downcast to MySpin successful: newSpin Name = " + newSpin.Name + ", MyOwnName = " + newSpin.MyOwnName + ", MaxValue = " + newSpin.MaxValue + ", currentValue = " + newSpin._myCurrentValue);
+            }
+            else
+            {
+              Console.WriteLine("Downcast to MySpin failed!");
+            }
+          }
         }
 
         public void MainLoop()

@@ -260,6 +260,10 @@ PixelData Typesetter::Render( const Vector2& size )
         TypesetGlyph( glyphData,
                       position,
                       color );
+        // delete the glyphBitmap.buffer as it is now copied into glyphData.bitmapBuffer
+        delete []glyphData.glyphBitmap.buffer;
+        glyphData.glyphBitmap.buffer = NULL;
+
       }
     }
 

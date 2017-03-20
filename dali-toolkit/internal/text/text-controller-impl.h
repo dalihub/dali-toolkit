@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,6 +130,9 @@ struct EventData
 
   float              mCursorHookPositionX;     ///< Used to move the cursor with the keys or when scrolling the text vertically with the handles.
 
+  Controller::NoTextTap::Action mDoubleTapAction; ///< Action to be done when there is a double tap on top of 'no text'
+  Controller::NoTextTap::Action mLongPressAction; ///< Action to be done when there is a long press on top of 'no text'
+
   bool mIsShowingPlaceholderText        : 1;   ///< True if the place-holder text is being displayed.
   bool mPreEditFlag                     : 1;   ///< True if the model contains text in pre-edit state.
   bool mDecoratorUpdated                : 1;   ///< True if the decorator was updated during event processing.
@@ -143,11 +146,13 @@ struct EventData
   bool mUpdateLeftSelectionPosition     : 1;   ///< True if the visual position of the left selection handle must be recalculated.
   bool mUpdateRightSelectionPosition    : 1;   ///< True if the visual position of the right selection handle must be recalculated.
   bool mIsLeftHandleSelected            : 1;   ///< Whether is the left handle the one which is selected.
+  bool mIsRightHandleSelected           : 1;   ///< Whether is the right handle the one which is selected.
   bool mUpdateHighlightBox              : 1;   ///< True if the text selection high light box must be updated.
   bool mScrollAfterUpdatePosition       : 1;   ///< Whether to scroll after the cursor position is updated.
   bool mScrollAfterDelete               : 1;   ///< Whether to scroll after delete characters.
   bool mAllTextSelected                 : 1;   ///< True if the selection handles are selecting all the text.
   bool mUpdateInputStyle                : 1;   ///< Whether to update the input style after moving the cursor.
+  bool mPasswordInput                   : 1;   ///< True if password input is enabled.
   bool mCheckScrollAmount               : 1;   ///< Whether to check scrolled amount after updating the position
 };
 
@@ -593,7 +598,7 @@ struct Controller::Impl
   void RequestGetTextFromClipboard();
 
   void RepositionSelectionHandles();
-  void RepositionSelectionHandles( float visualX, float visualY );
+  void RepositionSelectionHandles( float visualX, float visualY, Controller::NoTextTap::Action action );
 
   void SetPopupButtons();
 

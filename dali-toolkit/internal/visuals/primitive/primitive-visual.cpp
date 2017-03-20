@@ -438,6 +438,11 @@ void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::PrimitiveVisual::Property::LIGHT_POSITION, mLightPosition );
 }
 
+void PrimitiveVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
+{
+  // Do nothing
+}
+
 void PrimitiveVisual::OnSetTransform()
 {
   if( mImpl->mRenderer )

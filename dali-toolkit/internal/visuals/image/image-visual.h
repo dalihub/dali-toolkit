@@ -152,6 +152,11 @@ public:  // from Visual
    */
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
+  /**
+   * @copydoc Visual::Base::CreateInstancePropertyMap
+   */
+  virtual void DoCreateInstancePropertyMap( Property::Map& map ) const;
+
 protected:
 
   /**
@@ -291,9 +296,9 @@ private:
   void SetTextureRectUniform( const Vector4& textureRect  );
 
   /**
-   * Clean the renderer from cache, and remove the image from atlas if it is not used anymore
+   * Remove the image from atlas if it is not used anymore.
    */
-  void CleanCache(const std::string& url);
+  void RemoveFromAtlas(const std::string& url);
 
   /**
    * Helper method to set individual values by index key.
