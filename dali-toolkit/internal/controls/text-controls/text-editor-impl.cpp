@@ -1037,6 +1037,9 @@ void TextEditor::OnInitialize()
   // Enable the smooth handle panning.
   mController->SetSmoothHandlePanEnabled( true );
 
+  mController->SetNoTextDoubleTapAction( Controller::NoTextTap::HIGHLIGHT );
+  mController->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
+
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );

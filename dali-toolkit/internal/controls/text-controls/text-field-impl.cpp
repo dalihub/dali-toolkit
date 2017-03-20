@@ -1162,8 +1162,8 @@ void TextField::OnInitialize()
   // Disable the smooth handle panning.
   mController->SetSmoothHandlePanEnabled( false );
 
-  mController->SetNoTextDoubleTapAction( Controller::NoTextTap::NO_ACTION );
-  mController->SetNoTextLongPressAction( Controller::NoTextTap::SHOW_SELECTION_POPUP );
+  mController->SetNoTextDoubleTapAction( Controller::NoTextTap::HIGHLIGHT );
+  mController->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
 
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
