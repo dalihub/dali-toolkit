@@ -118,7 +118,7 @@ KeyboardFocusManager::KeyboardFocusManager()
   mCurrentFocusActor( 0 ),
   mFocusIndicatorActor(),
   mFocusGroupLoopEnabled( false ),
-  mIsFocusIndicatorEnabled( false ),
+  mIsFocusIndicatorEnabled( true ),
   mIsWaitingKeyboardFocusChangeCommit( false ),
   mFocusHistory(),
   mSlotDelegate( this )
