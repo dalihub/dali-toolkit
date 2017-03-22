@@ -63,6 +63,7 @@
 #include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/devel-api/adaptor-framework/drag-and-drop-detector.h>
 #include <dali/devel-api/adaptor-framework/application-extensions.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 
 #include <dali/devel-api/images/nine-patch-image.h>
 
@@ -302,7 +303,8 @@ using namespace Dali::Toolkit;
 %include gestures/touch.i
 %include gestures/key.i
 
+%include adaptor/window.i
+
 %include dali-core.i
 %include dali-adaptor.i
 %include dali-toolkit.i
-
