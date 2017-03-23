@@ -2305,8 +2305,9 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
 
 void Controller::InsertText( const std::string& text, Controller::InsertType type )
 {
-  bool removedPrevious( false );
-  bool maxLengthReached( false );
+  bool removedPrevious = false;
+  bool removedSelected = false;
+  bool maxLengthReached = false;
 
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected InsertText" )
 
@@ -2322,9 +2323,6 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   // TODO: At the moment the underline runs are only for pre-edit.
   mImpl->mModel->mVisualModel->mUnderlineRuns.Clear();
 
-  // Keep the current number of characters.
-  const Length currentNumberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mModel->mLogicalModel->mText.Count() : 0u;
-
   // Remove the previous IMF pre-edit.
   if( mImpl->mEventData->mPreEditFlag && ( 0u != mImpl->mEventData->mPreEditLength ) )
   {
@@ -2338,7 +2336,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   else
   {
     // Remove the previous Selection.
-    removedPrevious = RemoveSelectedText();
+    removedSelected = RemoveSelectedText();
+
   }
 
   Vector<Character> utf32Characters;
@@ -2508,8 +2507,6 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mModel->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
   }
 
-  const Length numberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mModel->mLogicalModel->mText.Count() : 0u;
-
   if( ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) &&
       mImpl->IsPlaceholderAvailable() )
   {
@@ -2519,13 +2516,14 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     mImpl->ClearPreEditFlag();
   }
   else if( removedPrevious ||
+           removedSelected ||
            ( 0 != utf32Characters.Count() ) )
   {
     // Queue an inserted event
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_INSERTED );
 
     mImpl->mEventData->mUpdateCursorPosition = true;
-    if( numberOfCharacters < currentNumberOfCharacters )
+    if( removedSelected )
     {
       mImpl->mEventData->mScrollAfterDelete = true;
     }
