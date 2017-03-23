@@ -813,6 +813,18 @@ private:
    */
   bool IsPanningOrScrolling() const;
 
+  /**
+   * @brief Make scroll indicator visible.
+   *
+   * @param[in] transient True if scroll-bar should be automatically show/hidden during/after panning
+   */
+  void ShowScrollIndicator(bool transient);
+
+  /**
+   * @brief Make scroll indicator invisible.
+   */
+  void HideScrollIndicator();
+
 protected:
 
   /**
@@ -953,7 +965,8 @@ private:
   Constraint mScrollMainInternalPrePositionMaxConstraint;
 
   ScrollOvershootIndicatorPtr mOvershootIndicator;
-  WeakHandle<Toolkit::ScrollBar> mScrollBar;
+  WeakHandle<Toolkit::ScrollBar> mHorizontalScrollBar;
+  WeakHandle<Toolkit::ScrollBar> mVerticalScrollBar;
 
   Toolkit::ScrollView::SnapStartedSignalType mSnapStartedSignal;
 

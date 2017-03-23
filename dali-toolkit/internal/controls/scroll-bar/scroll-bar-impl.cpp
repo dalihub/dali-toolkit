@@ -220,6 +220,7 @@ void ScrollBar::OnInitialize()
 {
   CreateDefaultIndicatorActor();
   Self().SetDrawMode(DrawMode::OVERLAY_2D);
+  SetScrollDirection(mDirection);
 }
 
 void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index propertyScrollPosition, Property::Index propertyMinScrollPosition, Property::Index propertyMaxScrollPosition, Property::Index propertyScrollContentSize )
@@ -538,9 +539,63 @@ void ScrollBar::OnSizeSet( const Vector3& size )
   }
 }
 
+void ScrollBar::OnStageConnection( int depth )
+{
+  Actor parent = Self().GetParent();
+  if (parent && mDirection == Toolkit::ScrollBar::Horizontal)
+  {
+    parent.OnRelayoutSignal().Connect( this, &ScrollBar::OnParentRelayout );
+  }
+
+  Control::OnStageConnection( depth );
+}
+
+void ScrollBar::OnStageDisconnection()
+{
+  Actor parent = Self().GetParent();
+  if (parent && mDirection == Toolkit::ScrollBar::Horizontal)
+  {
+    parent.OnRelayoutSignal().Disconnect( this, &ScrollBar::OnParentRelayout );
+  }
+
+  Control::OnStageDisconnection();
+}
+
+void ScrollBar::OnParentRelayout(Actor actor)
+{
+  // Make the height of the horizontal scroll bar to be the same as the width of its parent.
+  // The parent size only set during relayout.
+  Self().SetSize(Vector2(0.0f, actor.GetRelayoutSize( Dimension::WIDTH) ));
+}
+
 void ScrollBar::SetScrollDirection( Toolkit::ScrollBar::Direction direction )
 {
   mDirection = direction;
+
+  Actor self = Self();
+
+  if(mDirection == Toolkit::ScrollBar::Horizontal)
+  {
+    // Rotate the scroll bar and align it to the bottom of its parent
+    self.SetParentOrigin(ParentOrigin::BOTTOM_LEFT);
+    self.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    self.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH);
+    self.SetOrientation(Quaternion(Radian( 1.5f * Math::PI ), Vector3::ZAXIS));
+
+    Actor parent = self.GetParent();
+    if (parent && mDirection == Toolkit::ScrollBar::Horizontal)
+    {
+      parent.OnRelayoutSignal().Connect( this, &ScrollBar::OnParentRelayout );
+    }
+  }
+  else
+  {
+    // Align the scroll bar to the right of its parent
+    self.SetParentOrigin(ParentOrigin::TOP_RIGHT);
+    self.SetAnchorPoint(AnchorPoint::TOP_RIGHT);
+    self.SetResizePolicy(Dali::ResizePolicy::FILL_TO_PARENT, Dali::Dimension::HEIGHT);
+    self.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH);
+  }
 }
 
 Toolkit::ScrollBar::Direction ScrollBar::GetScrollDirection() const

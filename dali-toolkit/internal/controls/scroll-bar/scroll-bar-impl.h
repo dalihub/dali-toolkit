@@ -215,6 +215,16 @@ private: // from Control
    */
   virtual void OnSizeSet( const Vector3& size );
 
+  /**
+   * @copydoc CustomActorImpl::OnStageConnection()
+   */
+  virtual void OnStageConnection( int depth );
+
+  /**
+   * @copydoc CustomActorImpl::OnStageDisconnection()
+   */
+  virtual void OnStageDisconnection();
+
 private:
 
   /**
@@ -252,6 +262,12 @@ private:
    * @param[in] propertyValue The new property value.
    */
   void OnIndicatorHeightPolicyPropertySet(Property::Value propertyValue);
+
+  /**
+   * Callback when the size has been set on the parent during relayout
+   * @param[in] actor The actor that has been relaid out.
+   */
+  void OnParentRelayout(Actor actor);
 
 private:
 

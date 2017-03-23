@@ -1184,12 +1184,9 @@ void ScrollView::SetTransientScrollBar( bool transient )
   {
     mTransientScrollBar = transient;
 
-    Toolkit::ScrollBar scrollBar = mScrollBar.GetHandle();
-    if( mTransientScrollBar && scrollBar )
+    if( mTransientScrollBar )
     {
-      // Show the scroll-indicator for a brief period
-      scrollBar.SetVisible( true );
-      GetImpl(scrollBar).ShowTransientIndicator();
+      ShowScrollIndicator(true);
     }
   }
 }
@@ -1783,6 +1780,9 @@ bool ScrollView::AnimateTo(const Vector2& position, const Vector2& positionDurat
   DALI_LOG_SCROLL_STATE("[0x%X] mSnapStartedSignal [%.2f, %.2f]", this, snapEvent.position.x, snapEvent.position.y);
   mSnapStartedSignal.Emit( snapEvent );
 
+  // Make indicator visible during scrolling
+  ShowScrollIndicator(false);
+
   return (mScrollStateFlags & SCROLL_ANIMATION_FLAGS) != 0;
 }
 
@@ -1905,6 +1905,11 @@ void ScrollView::HandleSnapAnimationFinished()
   mDomainOffset += deltaPosition - mScrollPostPosition;
   self.SetProperty(Toolkit::ScrollView::Property::SCROLL_DOMAIN_OFFSET, mDomainOffset);
   HandleStoppedAnimation();
+
+  if( mTransientScrollBar )
+  {
+    HideScrollIndicator();
+  }
 }
 
 void ScrollView::SetScrollUpdateNotification( bool enabled )
@@ -2000,12 +2005,12 @@ void ScrollView::OnChildAdd(Actor& child)
   Dali::Toolkit::ScrollBar scrollBar = Dali::Toolkit::ScrollBar::DownCast(child);
   if( scrollBar )
   {
-    mScrollBar = scrollBar;
     scrollBar.SetName("ScrollBar");
 
     mInternalActor.Add( scrollBar );
     if( scrollBar.GetScrollDirection() == Toolkit::ScrollBar::Horizontal )
     {
+      mHorizontalScrollBar = scrollBar;
       scrollBar.SetScrollPropertySource( Self(),
                                          Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_X,
                                          Toolkit::Scrollable::Property::SCROLL_POSITION_MIN_X,
@@ -2014,6 +2019,7 @@ void ScrollView::OnChildAdd(Actor& child)
     }
     else
     {
+      mVerticalScrollBar = scrollBar;
       scrollBar.SetScrollPropertySource( Self(),
                                          Toolkit::ScrollView::Property::SCROLL_PRE_POSITION_Y,
                                          Toolkit::Scrollable::Property::SCROLL_POSITION_MIN_Y,
@@ -2028,7 +2034,7 @@ void ScrollView::OnChildAdd(Actor& child)
     }
     else
     {
-      scrollBar.SetVisible( false );
+      scrollBar.SetVisible(false);
       scrollBar.HideIndicator();
     }
   }
@@ -2528,19 +2534,10 @@ void ScrollView::OnPan( const PanGesture& gesture )
       self.SetProperty( Toolkit::ScrollView::Property::START_PAGE_POSITION, Vector3(gesture.position.x, gesture.position.y, 0.0f) );
 
       UpdateMainInternalConstraint();
-      Toolkit::ScrollBar scrollBar = mScrollBar.GetHandle();
-      if( scrollBar && mTransientScrollBar )
-      {
-        Vector3 size = Self().GetCurrentSize();
-        const Toolkit::RulerDomain& rulerDomainX = mRulerX->GetDomain();
-        const Toolkit::RulerDomain& rulerDomainY = mRulerY->GetDomain();
 
-        if( ( rulerDomainX.max > size.width ) || ( rulerDomainY.max > size.height ) )
-        {
-          scrollBar.SetVisible( true );
-          scrollBar.ShowIndicator();
-        }
-      }
+      // Make scroll indicator visible as soon as the panning starts
+      ShowScrollIndicator(false);
+
       break;
     }
 
@@ -2574,12 +2571,6 @@ void ScrollView::OnPan( const PanGesture& gesture )
         if( mScrollMainInternalPrePositionConstraint )
         {
           mScrollMainInternalPrePositionConstraint.Remove();
-        }
-
-        Toolkit::ScrollBar scrollBar = mScrollBar.GetHandle();
-        if( scrollBar && mTransientScrollBar )
-        {
-          scrollBar.HideIndicator();
         }
       }
       else
@@ -2938,6 +2929,64 @@ bool ScrollView::IsPanningOrScrolling() const
   }
 
   return panningOrScrolling;
+}
+
+void ScrollView::ShowScrollIndicator(bool transient)
+{
+  Vector3 scrollViewSize = Self().GetCurrentSize();
+
+  Toolkit::ScrollBar scrollBar = mHorizontalScrollBar.GetHandle();
+  if( scrollBar)
+  {
+    const Toolkit::RulerDomain& rulerDomainX = mRulerX->GetDomain();
+
+    if( rulerDomainX.max > scrollViewSize.width )
+    {
+      scrollBar.SetVisible(true);
+      if( transient )
+      {
+        GetImpl(scrollBar).ShowTransientIndicator();
+      }
+      else
+      {
+        scrollBar.ShowIndicator();
+      }
+    }
+  }
+
+  scrollBar = mVerticalScrollBar.GetHandle();
+  if( scrollBar)
+  {
+    const Toolkit::RulerDomain& rulerDomainY = mRulerY->GetDomain();
+
+    if( rulerDomainY.max > scrollViewSize.height )
+    {
+      scrollBar.SetVisible(true);
+      if( transient )
+      {
+        GetImpl(scrollBar).ShowTransientIndicator();
+      }
+      else
+      {
+        scrollBar.ShowIndicator();
+      }
+    }
+  }
+}
+
+void ScrollView::HideScrollIndicator()
+{
+  Toolkit::ScrollBar scrollBar = mHorizontalScrollBar.GetHandle();
+  if( scrollBar )
+  {
+    scrollBar.HideIndicator();
+  }
+
+  scrollBar = mVerticalScrollBar.GetHandle();
+  if( scrollBar )
+  {
+    scrollBar.HideIndicator();
+  }
 }
 
 void ScrollView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
