@@ -1500,8 +1500,8 @@ void Control::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Ty
   if( styleManager && change == StyleChange::THEME_CHANGE )
   {
     GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+    RelayoutRequest();
   }
-  RelayoutRequest();
 }
 
 void Control::OnPinch(const PinchGesture& pinch)

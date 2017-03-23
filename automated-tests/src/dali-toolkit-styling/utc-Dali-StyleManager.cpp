@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -642,8 +642,11 @@ int UtcDaliStyleManagerStyleChangedSignalFontFamily(void)
   Toolkit::TextLabel label = Toolkit::TextLabel::New(labelStr);
   Stage::GetCurrent().Add( label );
 
-  Toolkit::TextLabel label2 = Toolkit::TextLabel::New(labelStr);
-  Stage::GetCurrent().Add( label2 );
+  Toolkit::TextField field = Toolkit::TextField::New();
+  Stage::GetCurrent().Add( field );
+
+  Toolkit::TextEditor editor = Toolkit::TextEditor::New();
+  Stage::GetCurrent().Add( editor );
 
   StyleChangedSignalChecker styleChangedSignalHandler;
   Dali::StyleMonitor styleMonitor = Dali::StyleMonitor::Get();
@@ -662,6 +665,18 @@ int UtcDaliStyleManagerStyleChangedSignalFontFamily(void)
   // Check that the label's font style has been altered
   Property::Value family = label.GetProperty(TextLabel::Property::FONT_FAMILY);
   std::string familyStr;
+  family.Get( familyStr );
+
+  DALI_TEST_EQUALS( familyStr, "Times New Roman", TEST_LOCATION);
+
+  // Check that the field's font style has been altered
+  family = field.GetProperty(TextField::Property::FONT_FAMILY);
+  family.Get( familyStr );
+
+  DALI_TEST_EQUALS( familyStr, "Times New Roman", TEST_LOCATION);
+
+  // Check that the editor's font style has been altered
+  family = editor.GetProperty(TextEditor::Property::FONT_FAMILY);
   family.Get( familyStr );
 
   DALI_TEST_EQUALS( familyStr, "Times New Roman", TEST_LOCATION);
