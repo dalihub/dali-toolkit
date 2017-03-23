@@ -31,6 +31,7 @@
 
 // INTERNAL HEADERS
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -58,6 +59,7 @@ const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
 const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
 const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
 const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
+const char * const IMAGE_ATLASING("atlasing");
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN( FITTING_MODE )
@@ -253,7 +255,8 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mFittingMode( fittingMode ),
   mSamplingMode( samplingMode ),
   mWrapModeU( WrapMode::DEFAULT ),
-  mWrapModeV( WrapMode::DEFAULT )
+  mWrapModeV( WrapMode::DEFAULT ),
+  mAttemptAtlasing( false )
 {
 }
 
@@ -268,7 +271,8 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
-  mWrapModeV( WrapMode::DEFAULT )
+  mWrapModeV( WrapMode::DEFAULT ),
+  mAttemptAtlasing( false )
 {
 }
 
@@ -320,10 +324,14 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       {
         DoSetProperty( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second );
       }
+      else if ( keyValue.first == IMAGE_ATLASING )
+      {
+        DoSetProperty( Toolkit::DevelImageVisual::Property::ATLASING, keyValue.second );
+      }
     }
   }
 
-  if( mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING && mImageUrl.IsValid() )
+  if( ( mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING ) && mImageUrl.IsValid() )
   {
     // if sync loading is required, the loading should start
     // immediately when new image url is set or the actor is off stage
@@ -422,6 +430,12 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
       Scripting::GetEnumerationProperty( value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode );
       mWrapModeV = Dali::WrapMode::Type( wrapMode );
       break;
+    }
+
+    case Toolkit::DevelImageVisual::Property::ATLASING:
+    {
+      bool atlasing = false;
+      mAttemptAtlasing = value.Get( atlasing );
     }
   }
 }
@@ -628,7 +642,7 @@ void ImageVisual::InitializeRenderer()
     Vector4 atlasRect;
     // texture set has to be created first as we need to know if atlasing succeeded or not
     // when selecting the shader
-    TextureSet textures = CreateTextureSet( atlasRect, IsSynchronousResourceLoading(), true );
+    TextureSet textures = CreateTextureSet( atlasRect, IsSynchronousResourceLoading(), mAttemptAtlasing );
     CreateRenderer( textures );
 
     if( mImpl->mFlags & Impl::IS_ATLASING_APPLIED ) // the texture is packed inside atlas
@@ -761,6 +775,8 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
+
+  map.Insert( Toolkit::DevelImageVisual::Property::ATLASING, mAttemptAtlasing );
 }
 
 void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const

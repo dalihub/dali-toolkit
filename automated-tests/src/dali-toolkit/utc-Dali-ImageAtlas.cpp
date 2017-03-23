@@ -21,7 +21,10 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -390,8 +393,25 @@ int UtcDaliImageAtlasImageView(void)
   callStack.Reset();
   callStack.Enable(true);
 
-  ImageView imageView1 = ImageView::New( gImage_34_RGBA, ImageDimensions(34, 34) );
-  ImageView imageView2 = ImageView::New( gImage_50_RGBA, ImageDimensions(50, 50) );
+  Property::Map imageMap1;
+
+  imageMap1[ ImageVisual::Property::URL ] = gImage_34_RGBA;
+  imageMap1[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
+  imageMap1[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
+  imageMap1[ DevelImageVisual::Property::ATLASING] = true;
+
+  Property::Map imageMap2;
+
+  imageMap2[ ImageVisual::Property::URL ] = gImage_50_RGBA;
+  imageMap2[ ImageVisual::Property::DESIRED_HEIGHT ] = 50;
+  imageMap2[ ImageVisual::Property::DESIRED_WIDTH ] = 50;
+  imageMap2[ DevelImageVisual::Property::ATLASING ] = true;
+
+  ImageView imageView1 = ImageView::New();
+  imageView1.SetProperty( ImageView::Property::IMAGE, imageMap1 );
+
+  ImageView imageView2 = ImageView::New();
+  imageView2.SetProperty( ImageView::Property::IMAGE, imageMap2 );
 
   // ImageView doesn't do size negotiation properly: it only listens to OnSizeSet:
   imageView1.SetSize( 100, 100 );
@@ -434,7 +454,16 @@ int UtcDaliImageAtlasImageView(void)
   Stage::GetCurrent().Remove( imageView2 );
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  ImageView imageView3 = ImageView::New( gImage_128_RGB, ImageDimensions(100, 100) );
+
+  Property::Map imageMap3;
+  imageMap3[ ImageVisual::Property::URL ] = gImage_128_RGB;
+  imageMap3[ ImageVisual::Property::DESIRED_HEIGHT ] = 100;
+  imageMap3[ ImageVisual::Property::DESIRED_WIDTH ] = 100;
+  imageMap3[ DevelImageVisual::Property::ATLASING ] = true;
+
+  ImageView imageView3 = ImageView::New();
+  imageView3.SetProperty( ImageView::Property::IMAGE, imageMap3 );
+
   application.GetPlatform().SetClosestImageSize(  Vector2(100, 100) );
   Stage::GetCurrent().Add( imageView3 );
 
