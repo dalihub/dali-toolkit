@@ -11,3 +11,31 @@ INCLUDE_DIRECTORIES(
 )
 
 ADD_SUBDIRECTORY(src)
+
+#Internationalization
+SET(PO_DIR ${CMAKE_SOURCE_DIR}/resources/po)
+MESSAGE("po dir: ${PO_DIR}")
+FILE(GLOB PO_FILES RELATIVE "${PO_DIR}" "${PO_DIR}/*.po")
+
+SET(MSGFMT "/usr/bin/msgfmt")
+SET(MO_FILES_DIR /tmp/locale/en/LC_MESSAGES)
+FILE(MAKE_DIRECTORY ${MO_FILES_DIR})
+MESSAGE("mo dir: ${MO_FILES_DIR}")
+
+FOREACH(PO_FILE ${PO_FILES})
+        SET(PO_FILE ${PO_DIR}/${PO_FILE})
+        MESSAGE("PO: ${PO_FILE}")
+        GET_FILENAME_COMPONENT(ABS_PO_FILE ${PO_FILE} ABSOLUTE)
+        MESSAGE("ABS_PO_FILE : ${ABS_PO_FILE}")
+        GET_FILENAME_COMPONENT(lang ${ABS_PO_FILE} NAME_WE)
+        MESSAGE("lang : ${lang}")
+        SET(MO_FILE ${MO_FILES_DIR}/dali-toolkit.mo.${lang})
+        MESSAGE("MO_FILE : ${MO_FILE}")
+        ADD_CUSTOM_COMMAND(OUTPUT ${MO_FILE}
+                           COMMAND ${MSGFMT} -o ${MO_FILE} ${ABS_PO_FILE}
+                           DEPENDS ${ABS_PO_FILE})
+        SET(MO_FILES ${MO_FILES} ${MO_FILE})
+ENDFOREACH(PO_FILE)
+
+MESSAGE(".mo files: ${MO_FILES}")
+ADD_CUSTOM_TARGET(po ALL DEPENDS ${MO_FILES})

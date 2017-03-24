@@ -63,12 +63,14 @@
 #include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/devel-api/adaptor-framework/drag-and-drop-detector.h>
 #include <dali/devel-api/adaptor-framework/application-extensions.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 
 #include <dali/devel-api/images/nine-patch-image.h>
 
 #include <dali-toolkit/devel-api/builder/builder.h>
 
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
 
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/progress-bar/progress-bar.h>
@@ -244,6 +246,8 @@ using namespace Dali::Toolkit;
 %feature("notabstract") Dali::Toolkit::FixedRuler;
 %feature("notabstract") Dali::Toolkit::DefaultRuler;
 
+%feature("director") Dali::Toolkit::DevelKeyboardFocusManager::CustomAlgorithmInterface;
+
 // Note... all the typemap declarations have to be included before the DALi C++ head files are include otherwise
 // they have no effect.
 
@@ -302,7 +306,8 @@ using namespace Dali::Toolkit;
 %include gestures/touch.i
 %include gestures/key.i
 
+%include adaptor/window.i
+
 %include dali-core.i
 %include dali-adaptor.i
 %include dali-toolkit.i
-

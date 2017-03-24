@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+#include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
 
 namespace Dali
 {
@@ -39,6 +40,8 @@ namespace Internal
 class KeyboardFocusManager : public Dali::BaseObject
 {
 public:
+
+  typedef Toolkit::DevelKeyboardFocusManager::CustomAlgorithmInterface CustomAlgorithmInterface;
 
   /**
    * @copydoc Toolkit::KeyboardFocusManager::Get
@@ -109,6 +112,11 @@ public:
    * Move current focus to backward
    */
   void MoveFocusBackward();
+
+  /**
+   * @copydoc Toolkit::DevelKeyboardFocusManager::SetCustomAlgorithm
+   */
+  void SetCustomAlgorithm(CustomAlgorithmInterface& interface);
 
 public:
 
@@ -253,6 +261,8 @@ private:
   FocusStack mFocusHistory; ///< Stack to contain pre-focused actor's BaseObject*
 
   SlotDelegate< KeyboardFocusManager > mSlotDelegate;
+
+  CustomAlgorithmInterface* mCustomAlgorithmInterface; ///< The user's (application / toolkit) implementation of CustomAlgorithmInterface
 
 };
 

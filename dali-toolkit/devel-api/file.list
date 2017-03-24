@@ -24,6 +24,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.cpp \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
+  $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.cpp \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
   $(devel_api_src_dir)/image-loader/image-atlas.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
@@ -98,13 +99,15 @@ devel_api_visual_factory_header_files = \
 
 devel_api_visuals_header_files = \
   $(devel_api_src_dir)/visuals/text-visual-properties.h \
+  $(devel_api_src_dir)/visuals/image-visual-properties-devel.h \
   $(devel_api_src_dir)/visuals/visual-properties-devel.h
 
 devel_api_shadow_view_header_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.h
 
 devel_api_focus_manager_header_files = \
-  $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.h
+  $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.h \
+  $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.h
 
 devel_api_image_loader_header_files = \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.h \

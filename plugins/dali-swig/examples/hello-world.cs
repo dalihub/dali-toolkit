@@ -49,6 +49,7 @@ namespace MyCSharpExample
       _text.PointSize = 32.0f;
       _text.TextColor = Color.Magenta;
       stage.Add(_text);
+
     }
 
     // Callback for _animation finished signal handling
