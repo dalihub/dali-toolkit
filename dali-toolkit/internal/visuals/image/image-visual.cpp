@@ -93,7 +93,9 @@ const char* DEFAULT_SAMPLER_TYPENAME = "sampler2D";
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
-  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump mat4 uModelMatrix;\n
+  uniform mediump mat4 uViewMatrix;\n
+  uniform mediump mat4 uProjection;\n
   uniform mediump vec3 uSize;\n
   uniform mediump vec4 pixelArea;
   varying mediump vec2 vTexCoord;\n
@@ -115,7 +117,9 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
   void main()\n
   {\n
-    mediump vec4 vertexPosition = uMvpMatrix * ComputeVertexPosition();\n
+    mediump vec4 vertexPosition = uViewMatrix * uModelMatrix * ComputeVertexPosition();\n
+    vertexPosition.xy = floor ( vertexPosition.xy );\n // Pixel alignment
+    vertexPosition = uProjection *  vertexPosition;\n
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
   }\n
