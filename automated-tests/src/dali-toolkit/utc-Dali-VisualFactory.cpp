@@ -687,6 +687,7 @@ int UtcDaliVisualFactoryGetImageVisual3(void)
   propertyMap.Insert( ImageVisual::Property::PIXEL_AREA, pixelArea );
   propertyMap.Insert( ImageVisual::Property::WRAP_MODE_U, WrapMode::MIRRORED_REPEAT );
   propertyMap.Insert( ImageVisual::Property::WRAP_MODE_V, WrapMode::REPEAT );
+  propertyMap.Insert( DevelImageVisual::Property::ATLASING, true );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );

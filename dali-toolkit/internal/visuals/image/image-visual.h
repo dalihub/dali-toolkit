@@ -320,6 +320,8 @@ private:
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
 
+  bool mAttemptAtlasing:1; // If true will attempt atlasing, otherwise create unique texture
+
 };
 
 } // namespace Internal

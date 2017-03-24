@@ -132,7 +132,8 @@
                 "testVisual":
                 {
                   "visualType":"IMAGE",
-                  "url":"0001.png"
+                  "url":"0001.png",
+                  "atlasing":true
                 },
                 "testVisual2":
                 {
@@ -146,7 +147,8 @@
                 "foregroundVisual":
                 {
                   "visualType":"IMAGE",
-                  "url":"theSameImage.png"
+                  "url":"theSameImage.png",
+                  "atlasing":true
                 },
                 "labelVisual":
                 {
@@ -163,7 +165,8 @@
                 "testVisual":
                 {
                   "visualType":"IMAGE",
-                  "url":"0002.png"
+                  "url":"0002.png",
+                  "atlasing":true
                 },
                 "testVisual2":
                 {
@@ -173,7 +176,8 @@
                 "foregroundVisual":
                 {
                   "visualType":"IMAGE",
-                  "url":"theSameImage.png"
+                  "url":"theSameImage.png",
+                  "atlasing":true
                 },
                 "labelVisual":
                 {
@@ -258,7 +262,8 @@
                 "testVisual":
                 {
                   "visualType":"IMAGE",
-                  "url":"0001.png"
+                  "url":"0001.png",
+                  "atlasing":true
                 },
                 "testVisual2":
                 {
@@ -340,7 +345,8 @@
             "focusVisual":
             {
               "visualType":"IMAGE",
-              "url": "focus.png"
+              "url": "focus.png",
+              "atlasing":true
             }
           },
           "entryTransition":
