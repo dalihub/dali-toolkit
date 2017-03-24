@@ -14,6 +14,16 @@ These are device specific instructions, however, installing the test suite will 
 
 If you are planning on running tests on device, then flash your handset with latest image, or turn off ssh: `set_usb_debug.sh --mtp-sdb` and plug it in, then follow the quickstart instructions repeated below.
 
+Multi-language locale environment
+---------------------------------
+
+Locales for English and Arabic must be installed to pass some test cases:
+
+$ sudo locale-gen en
+$ sudo locale-gen ar
+$ sudo update-locale
+
+
 Quickstart
 ----------
 
