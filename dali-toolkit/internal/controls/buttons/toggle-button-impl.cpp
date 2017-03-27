@@ -324,7 +324,8 @@ void ToggleButton::RelayoutVisual( Property::Index index, const Vector2& size )
     Property::Map visualTransform;
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, visualSize )
                    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, visualPosition )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) )  // Use absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
                    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
                    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER );
 

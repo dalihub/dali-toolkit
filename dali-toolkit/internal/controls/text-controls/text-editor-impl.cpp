@@ -1037,6 +1037,9 @@ void TextEditor::OnInitialize()
   // Enable the smooth handle panning.
   mController->SetSmoothHandlePanEnabled( true );
 
+  mController->SetNoTextDoubleTapAction( Controller::NoTextTap::HIGHLIGHT );
+  mController->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
+
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
@@ -1095,20 +1098,25 @@ void TextEditor::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange:
       const std::string& newFont = GetImpl( styleManager ).GetDefaultFontFamily();
       // Property system did not set the font so should update it.
       mController->UpdateAfterFontChange( newFont );
+      RelayoutRequest();
       break;
     }
 
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
       GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      RelayoutRequest();
       break;
     }
     case StyleChange::THEME_CHANGE:
     {
-      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      // Nothing to do, let control base class handle this
       break;
     }
   }
+
+  // Up call to Control
+  Control::OnStyleChange( styleManager, change );
 }
 
 Vector3 TextEditor::GetNaturalSize()

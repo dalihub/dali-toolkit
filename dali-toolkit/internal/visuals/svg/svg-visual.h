@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 struct NSVGimage;
 
@@ -64,7 +65,7 @@ public:
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties );
+  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties );
 
   /**
    * @brief Create the SVG Visual using the image URL.
@@ -76,7 +77,7 @@ public:
    * @param[in] imageUrl The URL to svg resource to use
    * @return A smart-pointer to the newly allocated visual.
    */
-  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const std::string& imageUrl );
+  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl );
 
 public:  // from Visual
 
@@ -145,7 +146,7 @@ private:
    *
    * @param[in] imageUrl The URL of the image to parse the SVG from.
    */
-  void ParseFromUrl( const std::string& imageUrl );
+  void ParseFromUrl( const VisualUrl& imageUrl );
 
   /**
    * @bried Rasterize the svg with the given size, and add it to the visual.
@@ -163,7 +164,7 @@ private:
 
 private:
   Vector4              mAtlasRect;
-  std::string          mImageUrl;
+  VisualUrl            mImageUrl;
   NSVGimage*           mParsedImage;
   WeakHandle<Actor>    mPlacementActor;
   Vector2              mVisualSize;

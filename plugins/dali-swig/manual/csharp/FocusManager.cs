@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 
 public class FocusManager : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
+  private CustomAlgorithmInterfaceWrapper _customAlgorithmInterfaceWrapper;
 
   internal FocusManager(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicManualPINVOKE.FocusManager_SWIGUpcast(cPtr), cMemoryOwn) {
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
@@ -533,6 +534,14 @@ public class PreFocusChangeEventArgs : EventArgs
     return ret;
   }
 
+  public void SetCustomAlgorithm(ICustomFocusAlgorithm arg0) {
+    _customAlgorithmInterfaceWrapper = new CustomAlgorithmInterfaceWrapper();
+    _customAlgorithmInterfaceWrapper.SetFocusAlgorithm(arg0);
+
+    NDalicPINVOKE.SetCustomAlgorithm(swigCPtr, CustomAlgorithmInterface.getCPtr(_customAlgorithmInterfaceWrapper));
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
   public PreFocusChangeSignal PreFocusChangeSignal() {
     PreFocusChangeSignal ret = new PreFocusChangeSignal(NDalicManualPINVOKE.FocusManager_PreFocusChangeSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
@@ -567,7 +576,31 @@ public class PreFocusChangeEventArgs : EventArgs
       }
   }
 
+  public interface ICustomFocusAlgorithm
+  {
+      View GetNextFocusableActor(View current, View proposed, View.KeyboardFocus.Direction direction);
+  }
 
+  private class CustomAlgorithmInterfaceWrapper : CustomAlgorithmInterface
+  {
+      private FocusManager.ICustomFocusAlgorithm _customFocusAlgorithm;
+
+      public CustomAlgorithmInterfaceWrapper()
+      {
+      }
+
+      public void SetFocusAlgorithm(FocusManager.ICustomFocusAlgorithm customFocusAlgorithm)
+      {
+          _customFocusAlgorithm = customFocusAlgorithm;
+      }
+
+      public override Actor GetNextFocusableActor(Actor current, Actor proposed, View.KeyboardFocus.Direction direction)
+      {
+          View currentView = View.DownCast<View>(current);
+          View proposedView = View.DownCast<View>(proposed);
+          return _customFocusAlgorithm.GetNextFocusableActor(currentView, proposedView, direction);
+      }
+  }
 }
 
 }

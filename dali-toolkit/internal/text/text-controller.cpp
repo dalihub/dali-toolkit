@@ -1751,7 +1751,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected KeyEvent" );
 
-  bool textChanged( false );
+  bool textChanged = false;
+  bool relayoutNeeded = false;
 
   if( ( NULL != mImpl->mEventData ) &&
       ( keyEvent.state == KeyEvent::Down ) )
@@ -1771,6 +1772,9 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       // Escape key is a special case which causes focus loss
       KeyboardFocusLostEvent();
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
     else if( ( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ) ||
              ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode ) ||
@@ -1803,10 +1807,16 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       Event event( Event::CURSOR_KEY_EVENT );
       event.p1.mInt = keyCode;
       mImpl->mEventData->mEventQueue.push_back( event );
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
     else if( Dali::DALI_KEY_BACKSPACE == keyCode )
     {
       textChanged = BackspaceKeyEvent();
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
     else if( IsKey( keyEvent, Dali::DALI_KEY_POWER ) ||
              IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
@@ -1815,6 +1825,9 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Power key/Menu/Home key behaviour does not allow edit mode to resume.
       mImpl->ChangeState( EventData::INACTIVE );
 
+      // Will request for relayout.
+      relayoutNeeded = true;
+
       // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
     }
     else if( Dali::DALI_KEY_SHIFT_LEFT == keyCode )
@@ -1822,6 +1835,11 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // DALI_KEY_SHIFT_LEFT is the key code for the Left Shift. It's sent (by the imf?) when the predictive text is enabled
       // and a character is typed after the type of a upper case latin character.
 
+      // Do nothing.
+    }
+    else if( ( Dali::DALI_KEY_VOLUME_UP == keyCode ) || ( Dali::DALI_KEY_VOLUME_DOWN == keyCode ) )
+    {
+      // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
       // Do nothing.
     }
     else
@@ -1833,20 +1851,31 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
       InsertText( keyString, COMMIT );
       textChanged = true;
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
 
     if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
          ( mImpl->mEventData->mState != EventData::INACTIVE ) &&
          ( !isNullKey ) &&
-         ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) )
+         ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) &&
+         ( Dali::DALI_KEY_VOLUME_UP != keyCode ) &&
+         ( Dali::DALI_KEY_VOLUME_DOWN != keyCode ) )
     {
       // Should not change the state if the key is the shift send by the imf manager.
       // Otherwise, when the state is SELECTING the text controller can't send the right
       // surrounding info to the imf.
       mImpl->ChangeState( EventData::EDITING );
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
 
-    mImpl->RequestRelayout();
+    if( relayoutNeeded )
+    {
+      mImpl->RequestRelayout();
+    }
   }
 
   if( textChanged &&
@@ -2276,8 +2305,9 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
 
 void Controller::InsertText( const std::string& text, Controller::InsertType type )
 {
-  bool removedPrevious( false );
-  bool maxLengthReached( false );
+  bool removedPrevious = false;
+  bool removedSelected = false;
+  bool maxLengthReached = false;
 
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected InsertText" )
 
@@ -2293,9 +2323,6 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   // TODO: At the moment the underline runs are only for pre-edit.
   mImpl->mModel->mVisualModel->mUnderlineRuns.Clear();
 
-  // Keep the current number of characters.
-  const Length currentNumberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mModel->mLogicalModel->mText.Count() : 0u;
-
   // Remove the previous IMF pre-edit.
   if( mImpl->mEventData->mPreEditFlag && ( 0u != mImpl->mEventData->mPreEditLength ) )
   {
@@ -2309,7 +2336,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   else
   {
     // Remove the previous Selection.
-    removedPrevious = RemoveSelectedText();
+    removedSelected = RemoveSelectedText();
+
   }
 
   Vector<Character> utf32Characters;
@@ -2479,8 +2507,6 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mModel->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
   }
 
-  const Length numberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mModel->mLogicalModel->mText.Count() : 0u;
-
   if( ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) &&
       mImpl->IsPlaceholderAvailable() )
   {
@@ -2490,13 +2516,14 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     mImpl->ClearPreEditFlag();
   }
   else if( removedPrevious ||
+           removedSelected ||
            ( 0 != utf32Characters.Count() ) )
   {
     // Queue an inserted event
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_INSERTED );
 
     mImpl->mEventData->mUpdateCursorPosition = true;
-    if( numberOfCharacters < currentNumberOfCharacters )
+    if( removedSelected )
     {
       mImpl->mEventData->mScrollAfterDelete = true;
     }

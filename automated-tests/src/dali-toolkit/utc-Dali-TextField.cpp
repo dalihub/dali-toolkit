@@ -2072,3 +2072,163 @@ int utcDaliTextFieldStyleWhilstSelected(void)
 
   END_TEST;
 }
+
+int utcDaliTextFieldEscKeyLoseFocus(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldEscKeyLoseFocus");
+
+  // Creates a tap event. After creating a tap event the text field should
+  // have the focus and add text with key events should be possible.
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+
+  Stage::GetCurrent().Add( field );
+
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Add a key event but as the text field has not the focus it should do nothing.
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Up ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string(""), TEST_LOCATION );
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Now the text field has the focus, so it can handle the key events.
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Up ) );
+  application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Up ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string("ad"), TEST_LOCATION );
+
+  // Generate a Esc key event. The text field should lose the focus.
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( false, field.HasKeyInputFocus(), TEST_LOCATION );
+
+  // No more text should be introduced
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Up ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string("ad"), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliTextFieldSomeSpecialKeys(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldSomeSpecialKeys");
+
+  // Checks some special keys when the text is selected.
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  Stage::GetCurrent().Add( field );
+  LoadMarkerImages(application, field);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  const std::string longText( "This is a long text for the size of the text-field." );
+
+  field.SetProperty( TextField::Property::TEXT, longText );
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap first to get the focus.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Double tap to select a word.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Generate a Esc key event. The text field should lose the focus.
+  application.ProcessEvent( GenerateKey( "XF86PowerOff", "XF86PowerOff", DALI_KEY_POWER, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "XF86PowerOff", "XF86PowerOff", DALI_KEY_POWER, 0, 0, Integration::KeyEvent::Up ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Generate a Esc key event. The text field should lose the focus.
+  application.ProcessEvent( GenerateKey( "XF86Menu", "XF86Menu", DALI_KEY_MENU, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "XF86Menu", "XF86Menu", DALI_KEY_MENU, 0, 0, Integration::KeyEvent::Up ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Generate a Esc key event. The text field should lose the focus.
+  application.ProcessEvent( GenerateKey( "XF86Home", "XF86Home", DALI_KEY_HOME, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "XF86Home", "XF86Home", DALI_KEY_HOME, 0, 0, Integration::KeyEvent::Up ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // The text shouldn't be deleted.
+  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), longText, TEST_LOCATION );
+
+  END_TEST;
+}
