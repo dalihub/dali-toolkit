@@ -143,18 +143,6 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
 {
   bool success = false;
 
-  Actor currentFocusedActor = GetCurrentFocusActor();
-
-  // If developer set focus on same actor, doing nothing
-  if( actor == currentFocusedActor )
-  {
-    if( !actor )
-    {
-      return false;
-    }
-    return true;
-  }
-
   // Check whether the actor is in the stage and is keyboard focusable.
   if( actor && actor.IsKeyboardFocusable() )
   {
@@ -162,8 +150,9 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
     {
       actor.Add( GetFocusIndicatorActor() );
     }
-
     // Send notification for the change of focus actor
+    Actor currentFocusedActor = GetCurrentFocusActor();
+
     if( !mFocusChangedSignal.Empty() )
     {
       mFocusChangedSignal.Emit(currentFocusedActor, actor);
