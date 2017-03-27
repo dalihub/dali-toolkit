@@ -20,6 +20,7 @@
 
 // EXTERNAL HEADERS
 #include <dali/devel-api/common/hash.h>
+#include <dali/devel-api/images/pixel-data-mask.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <dali/integration-api/debug.h>
 
@@ -28,6 +29,7 @@
 #include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
 #include <dali-toolkit/internal/image-loader/image-atlas-impl.h>
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
+
 
 namespace Dali
 {
@@ -71,12 +73,45 @@ TextureManager::TextureId TextureManager::RequestLoad(
   const UseAtlas           useAtlas,
   TextureUploadObserver*   observer )
 {
+  return RequestInternalLoad( url, INVALID_TEXTURE_ID, desiredSize, fittingMode, samplingMode, useAtlas, GPU_UPLOAD, observer );
+}
+
+TextureManager::TextureId TextureManager::RequestLoad(
+  const VisualUrl&         url,
+  TextureId                maskTextureId,
+  const ImageDimensions    desiredSize,
+  FittingMode::Type        fittingMode,
+  Dali::SamplingMode::Type samplingMode,
+  const UseAtlas           useAtlas,
+  TextureUploadObserver*   observer )
+{
+  return RequestInternalLoad( url, maskTextureId, desiredSize, fittingMode, samplingMode, useAtlas, GPU_UPLOAD, observer );
+}
+
+TextureManager::TextureId TextureManager::RequestMaskLoad( const VisualUrl& maskUrl )
+{
+  // Use the normal load procedure to get the alpha mask.
+  return RequestInternalLoad( maskUrl, INVALID_TEXTURE_ID, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, CPU, NULL );
+}
+
+
+TextureManager::TextureId TextureManager::RequestInternalLoad(
+  const VisualUrl&         url,
+  TextureId                maskTextureId,
+  const ImageDimensions    desiredSize,
+  FittingMode::Type        fittingMode,
+  Dali::SamplingMode::Type samplingMode,
+  UseAtlas                 useAtlas,
+  StorageType              storageType,
+  TextureUploadObserver*   observer )
+{
   // First check if the requested Texture is cached.
-  const TextureHash textureHash = GenerateHash( url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas );
+  const TextureHash textureHash = GenerateHash( url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId );
+
+  TextureManager::TextureId textureId = INVALID_TEXTURE_ID;
 
   // Look up the texture by hash. Note: The extra parameters are used in case of a hash collision.
-  int cacheIndex = FindCachedTexture( textureHash, url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas );
-  TextureManager::TextureId textureId = INVALID_TEXTURE_ID;
+  int cacheIndex = FindCachedTexture( textureHash, url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId );
 
   // Check if the requested Texture exists in the cache.
   if( cacheIndex != INVALID_CACHE_INDEX )
@@ -87,19 +122,25 @@ TextureManager::TextureId TextureManager::RequestLoad(
 
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::RequestLoad( url=%s observer=%p ) Using cached texture @%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex, textureId );
   }
-  else
+
+  if( textureId == INVALID_TEXTURE_ID ) // There was no caching, or caching not required
   {
     // We need a new Texture.
     textureId = GenerateUniqueTextureId();
-    mTextureInfoContainer.push_back( TextureInfo( textureId, url.GetUrl(), desiredSize, fittingMode, samplingMode, false, useAtlas, textureHash ) );
+    mTextureInfoContainer.push_back( TextureInfo( textureId, maskTextureId, url.GetUrl(),
+                                                  desiredSize, fittingMode, samplingMode,
+                                                  false, useAtlas, textureHash ) );
     cacheIndex = mTextureInfoContainer.size() - 1u;
 
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex, textureId );
   }
 
   // The below code path is common whether we are using the cache or not.
-  // The textureInfoIndex now refers to either a pre-existing cached TextureInfo, or a new TextureInfo just created.
+  // The textureInfoIndex now refers to either a pre-existing cached TextureInfo,
+  // or a new TextureInfo just created.
   TextureInfo& textureInfo( mTextureInfoContainer[ cacheIndex ] );
+  textureInfo.maskTextureId = maskTextureId;
+  textureInfo.storageType = storageType;
 
   DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureInfo loadState:%s\n",
                  textureInfo.loadState == TextureManager::NOT_STARTED ? "NOT_STARTED" :
@@ -127,7 +168,7 @@ TextureManager::TextureId TextureManager::RequestLoad(
       {
         // The Texture has already loaded. The other observers have already been notified.
         // We need to send a "late" loaded notification for this observer.
-        observer->UploadComplete( textureInfo.loadingSucceeded,
+        observer->UploadComplete( true,
                                   textureInfo.textureSet, textureInfo.useAtlas,
                                   textureInfo.atlasRect );
       }
@@ -141,6 +182,11 @@ TextureManager::TextureId TextureManager::RequestLoad(
       ObserveTexture( textureInfo, observer );
       break;
     }
+    case TextureManager::LOAD_FINISHED:
+    case TextureManager::WAITING_FOR_MASK:
+    case TextureManager::LOAD_FAILED:
+      // Loading has already completed. Do nothing.
+      break;
   }
 
   // Return the TextureId for which this Texture can now be referenced by externally.
@@ -226,8 +272,6 @@ TextureSet TextureManager::GetTextureSet( TextureId textureId )
   return textureSet;
 }
 
-
-
 bool TextureManager::LoadTexture( TextureInfo& textureInfo )
 {
   bool success = true;
@@ -241,16 +285,18 @@ bool TextureManager::LoadTexture( TextureInfo& textureInfo )
       if( textureInfo.url.IsLocal() )
       {
         mAsyncLocalLoadingInfoContainer.push_back( AsyncLoadingInfo( textureInfo.textureId ) );
-        mAsyncLocalLoadingInfoContainer.back().loadId = GetImplementation(mAsyncLocalLoader).Load(
-          textureInfo.url, textureInfo.desiredSize,
-          textureInfo.fittingMode, textureInfo.samplingMode, true );
+        mAsyncLocalLoadingInfoContainer.back().loadId =
+          GetImplementation(mAsyncLocalLoader).Load( textureInfo.url, textureInfo.desiredSize,
+                                                     textureInfo.fittingMode,
+                                                     textureInfo.samplingMode, true );
       }
       else
       {
         mAsyncRemoteLoadingInfoContainer.push_back( AsyncLoadingInfo( textureInfo.textureId ) );
-        mAsyncRemoteLoadingInfoContainer.back().loadId = GetImplementation(mAsyncRemoteLoader).Load(
-          textureInfo.url, textureInfo.desiredSize,
-          textureInfo.fittingMode, textureInfo.samplingMode, true );
+        mAsyncRemoteLoadingInfoContainer.back().loadId =
+          GetImplementation(mAsyncRemoteLoader).Load( textureInfo.url, textureInfo.desiredSize,
+                                                      textureInfo.fittingMode,
+                                                      textureInfo.samplingMode, true );
       }
     }
   }
@@ -291,15 +337,12 @@ void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingCo
       int cacheIndex = GetCacheIndexFromId( loadingInfo.textureId );
       if( cacheIndex != INVALID_CACHE_INDEX )
       {
-        // Once we have found the TextureInfo data, we call a common function used to process loaded data for both sync and async loads.
         TextureInfo& textureInfo( mTextureInfoContainer[cacheIndex] );
 
         DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "  CacheIndex:%d LoadState: %d\n", cacheIndex, textureInfo.loadState );
 
-        // Only perform atlasing if the load has not been cancelled since the request.
         if( textureInfo.loadState != CANCELLED )
         {
-          // Perform atlasing and finalize the load.
           PostLoad( textureInfo, pixelData );
         }
         else
@@ -313,37 +356,108 @@ void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingCo
   }
 }
 
-
-bool TextureManager::PostLoad( TextureInfo& textureInfo, PixelData pixelData )
+void TextureManager::PostLoad( TextureInfo& textureInfo, PixelData pixelData )
 {
-  bool success = false;
-
   // Was the load successful?
   if( pixelData && ( pixelData.GetWidth() != 0 ) && ( pixelData.GetHeight() != 0 ) )
   {
-    // Regardless of whether the atlasing succeeds or not, we have a valid image, so we mark it as successful.
-    success = true;
-
-    bool usingAtlas = false;
-
     // No atlas support for now
     textureInfo.useAtlas = NO_ATLAS;
 
-    if( ! usingAtlas )
+    if( textureInfo.storageType == GPU_UPLOAD )
     {
-      DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "  TextureManager::PostLoad() textureId:%d\n", textureInfo.textureId );
+      // If there is a mask texture ID associated with this texture, then apply the mask
+      // if it's already loaded. If it hasn't, and the mask is still loading,
+      // wait for the mask to finish loading.
+      if( textureInfo.maskTextureId != INVALID_TEXTURE_ID )
+      {
+        LoadState maskLoadState = GetTextureState( textureInfo.maskTextureId );
+        if( maskLoadState == LOADING )
+        {
+          textureInfo.pixelData = pixelData; // Store the pixel data temporarily
+          textureInfo.loadState = WAITING_FOR_MASK;
+        }
+        else if( maskLoadState == LOAD_FINISHED )
+        {
+          ApplyMask( pixelData, textureInfo.maskTextureId );
+          UploadTexture( pixelData, textureInfo );
+          NotifyObservers( textureInfo, true );
+        }
+      }
+      else
+      {
+        UploadTexture( pixelData, textureInfo );
+        NotifyObservers( textureInfo, true );
+      }
+    }
+    else // currently, CPU textures are local to texture manager
+    {
+      textureInfo.pixelData = pixelData; // Store the pixel data
+      textureInfo.loadState = LOAD_FINISHED;
 
-      Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
-      texture.Upload( pixelData );
-      textureInfo.textureSet = TextureSet::New();
-      textureInfo.textureSet.SetTexture( 0u, texture );
+      // Check if there was another texture waiting for this load to complete
+      // (e.g. if this was an image mask, and its load is on a different thread)
+      CheckForWaitingTexture( textureInfo );
     }
   }
-
-  if( ! success )
+  else
   {
     DALI_LOG_ERROR( "TextureManager::AsyncImageLoad(%s) failed\n", textureInfo.url.GetUrl().c_str() );
     // @todo If the load was unsuccessful, upload the broken image.
+    textureInfo.loadState = LOAD_FAILED;
+    CheckForWaitingTexture( textureInfo );
+    NotifyObservers( textureInfo, false );
+  }
+}
+
+void TextureManager::CheckForWaitingTexture( TextureInfo& maskTextureInfo )
+{
+  // Search the cache, checking if any texture has this texture id as a
+  // maskTextureId:
+  const unsigned int size = mTextureInfoContainer.size();
+
+  for( unsigned int cacheIndex = 0; cacheIndex < size; ++cacheIndex )
+  {
+    if( mTextureInfoContainer[cacheIndex].maskTextureId == maskTextureInfo.textureId &&
+        mTextureInfoContainer[cacheIndex].loadState == WAITING_FOR_MASK )
+    {
+      TextureInfo& textureInfo( mTextureInfoContainer[cacheIndex] );
+      PixelData pixelData = textureInfo.pixelData;
+      textureInfo.pixelData.Reset();
+
+      if( maskTextureInfo.loadState == LOAD_FINISHED )
+      {
+        ApplyMask( pixelData, maskTextureInfo.textureId );
+        UploadTexture( pixelData, textureInfo );
+        NotifyObservers( textureInfo, true );
+      }
+      else
+      {
+        DALI_LOG_ERROR( "TextureManager::ApplyMask to %s failed\n", textureInfo.url.GetUrl().c_str() );
+        textureInfo.loadState = LOAD_FAILED;
+        NotifyObservers( textureInfo, false );
+      }
+    }
+  }
+}
+
+void TextureManager::ApplyMask( PixelData pixelData, TextureId maskTextureId )
+{
+  int maskCacheIndex = GetCacheIndexFromId( maskTextureId );
+  PixelData maskPixelData = mTextureInfoContainer[maskCacheIndex].pixelData;
+  Dali::ApplyMask( pixelData, maskPixelData );
+}
+
+void TextureManager::UploadTexture( PixelData pixelData, TextureInfo& textureInfo )
+{
+  if( textureInfo.useAtlas != USE_ATLAS );
+  {
+    DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "  TextureManager::UploadTexture() New Texture for textureId:%d\n", textureInfo.textureId );
+
+    Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
+    texture.Upload( pixelData );
+    textureInfo.textureSet = TextureSet::New();
+    textureInfo.textureSet.SetTexture( 0u, texture );
   }
 
   // Update the load state.
@@ -351,12 +465,11 @@ bool TextureManager::PostLoad( TextureInfo& textureInfo, PixelData pixelData )
   // load attempt is in progress or not.  If unsuccessful, a broken
   // image is still loaded.
   textureInfo.loadState = UPLOADED;
+}
 
-  // We need to store the load succeeded state as if a future request to load this texture comes in,
-  // we need to re-broadcast the UploadComplete notification to that observer.
-  textureInfo.loadingSucceeded = success;
-
-  // If there is an observer: Notify the load is complete, whether successful or not:
+void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
+{
+  // If there is an observer: Notify the upload is complete
   const unsigned int observerCount = textureInfo.observerList.Count();
   for( unsigned int i = 0; i < observerCount; ++i )
   {
@@ -369,9 +482,8 @@ bool TextureManager::PostLoad( TextureInfo& textureInfo, PixelData pixelData )
   }
 
   textureInfo.observerList.Clear();
-
-  return success;
 }
+
 
 TextureManager::TextureId TextureManager::GenerateUniqueTextureId()
 {
@@ -399,7 +511,8 @@ TextureManager::TextureHash TextureManager::GenerateHash(
   const ImageDimensions          size,
   const FittingMode::Type        fittingMode,
   const Dali::SamplingMode::Type samplingMode,
-  const UseAtlas                 useAtlas )
+  const UseAtlas                 useAtlas,
+  TextureId                      maskTextureId )
 {
   std::string hashTarget( url );
   const size_t urlLength = hashTarget.length();
@@ -431,6 +544,20 @@ TextureManager::TextureHash TextureManager::GenerateHash(
     hashTarget[ urlLength ] = useAtlas;
   }
 
+  if( maskTextureId != INVALID_TEXTURE_ID )
+  {
+    hashTarget.resize( urlLength + sizeof( TextureId ) );
+    TextureId* hashTargetPtr = reinterpret_cast<TextureId*>(&( hashTarget[ urlLength ] ));
+
+    // Append the hash target to the end of the URL byte by byte:
+    // (to avoid SIGBUS / alignment issues)
+    for( size_t byteIter = 0; byteIter < sizeof( TextureId ); ++byteIter )
+    {
+      *hashTargetPtr++ = maskTextureId & 0xff;
+      maskTextureId >>= 8u;
+    }
+  }
+
   return Dali::CalculateHash( hashTarget );
 }
 
@@ -440,7 +567,8 @@ int TextureManager::FindCachedTexture(
   const ImageDimensions             size,
   const FittingMode::Type           fittingMode,
   const Dali::SamplingMode::Type    samplingMode,
-  const bool                        useAtlas )
+  const bool                        useAtlas,
+  TextureId                         maskTextureId)
 {
   // Default to an invalid ID, in case we do not find a match.
   int cacheIndex = INVALID_CACHE_INDEX;
@@ -456,6 +584,7 @@ int TextureManager::FindCachedTexture(
 
       if( ( url == textureInfo.url.GetUrl() ) &&
           ( useAtlas == textureInfo.useAtlas ) &&
+          ( maskTextureId == textureInfo.maskTextureId ) &&
           ( size == textureInfo.desiredSize ) &&
           ( ( size.GetWidth() == 0 && size.GetHeight() == 0 ) ||
             ( fittingMode == textureInfo.fittingMode &&
