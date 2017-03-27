@@ -90,6 +90,9 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *   "DONT_CARE"
  *   "DEFAULT"
  *
+ *
+ * If the Visual is in a LayerUI it will pixel align the image, using a Layer3D will disable pixel alignment.
+ * Changing layer behaviour between LayerUI to Layer3D whilst the visual is already staged will not have an effect.
  */
 class ImageVisual: public Visual::Base, public ConnectionTracker, public AtlasUploadObserver
 {

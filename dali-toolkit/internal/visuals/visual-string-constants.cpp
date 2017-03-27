@@ -79,6 +79,7 @@ const char * const WRAP_MODE_UNIFORM_NAME( "wrapMode" );
 const char * const IMAGE_WRAP_MODE_U("wrapModeU");
 const char * const IMAGE_WRAP_MODE_V("wrapModeV");
 const char * const IMAGE_BORDER( "border" );
+const char * const PIXEL_ALIGNED_UNIFORM_NAME( "uPixelAligned" );
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );

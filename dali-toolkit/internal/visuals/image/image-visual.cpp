@@ -20,6 +20,7 @@
 
 // EXTERNAL HEADERS
 #include <cstring> // for strlen()
+#include <dali/public-api/actors/layer.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/devel-api/images/texture-set-image.h>
@@ -93,6 +94,9 @@ const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 const char* DEFAULT_SAMPLER_TYPENAME = "sampler2D";
 
+const float PIXEL_ALIGN_ON = 1.0f;
+const float PIXEL_ALIGN_OFF = 0.0f;
+
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform mediump mat4 uModelMatrix;\n
@@ -101,27 +105,28 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec3 uSize;\n
   uniform mediump vec4 pixelArea;
   varying mediump vec2 vTexCoord;\n
+  uniform lowp float uPixelAligned;\n
   \n
-
   //Visual size and offset
   uniform mediump vec2 offset;\n
   uniform mediump vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
-
+\n
   vec4 ComputeVertexPosition()\n
   {\n
     vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
     vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
     return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
   }\n
-
+\n
   void main()\n
   {\n
     mediump vec4 vertexPosition = uViewMatrix * uModelMatrix * ComputeVertexPosition();\n
-    vertexPosition.xy = floor ( vertexPosition.xy );\n // Pixel alignment
-    vertexPosition = uProjection *  vertexPosition;\n
+    vec4 alignedVertexPosition = vertexPosition;\n
+    alignedVertexPosition.xy = floor ( vertexPosition.xy );\n // Pixel alignment
+    vertexPosition = uProjection * mix( vertexPosition, alignedVertexPosition, uPixelAligned );\n
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
   }\n
@@ -501,6 +506,8 @@ void ImageVisual::CreateRenderer( TextureSet& textures )
     }
   }
 
+  shader.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_ON ); // Set default to align
+
   mImpl->mRenderer = Renderer::New( geometry, shader );
   DALI_ASSERT_DEBUG( textures );
   mImpl->mRenderer.SetTextures( textures );
@@ -719,6 +726,14 @@ void ImageVisual::DoSetOnStage( Actor& actor )
   }
 
   mPlacementActor = actor;
+
+  // Search the Actor tree to find if Layer UI behaviour set.
+  Layer layer = actor.GetLayer();
+  if ( layer && layer.GetBehavior() == Layer::LAYER_3D )
+  {
+     // Layer 3D set, do not align pixels
+     mImpl->mRenderer.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF );
+  }
 
   if( mPixelArea != FULL_TEXTURE_RECT )
   {
