@@ -128,7 +128,7 @@ namespace MyCSharpExample
             Actor actor = new Actor();
             actor.Size = new Position(200.0f, 200.0f, 0.0f);
             actor.Name = "MyActor";
-            actor.Color = new Color(1.0f, 0.0f, 1.0f, 0.8f);
+
             Console.WriteLine("Actor id: {0}", actor.GetId());
             Console.WriteLine("Actor size: " + actor.Size.X + ", " + actor.Size.Y);
             Console.WriteLine("Actor name: " + actor.Name);
