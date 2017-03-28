@@ -12,19 +12,16 @@ using System.Collections.Generic;
 
 namespace Dali
 {
-
     public class DisposeQueue
     {
-        private static DisposeQueue _disposableQueue = new DisposeQueue();
+        private static readonly DisposeQueue _disposableQueue = new DisposeQueue();
         private List<IDisposable> _disposables = new List<IDisposable>();
         private Object _listLock = new object();
-        private delegate int ProcessDisposablesDelegate(IntPtr ptr);
-        private ProcessDisposablesDelegate _disposequeueProcessDisposablesDelegate;
+        private EventThreadCallback _eventThreadCallback;
+        private EventThreadCallback.CallbackDelegate _disposeQueueProcessDisposablesDelegate;
 
         private DisposeQueue()
         {
-          _disposequeueProcessDisposablesDelegate = new ProcessDisposablesDelegate(ProcessDisposables);
-          Application.Instance.AddIdle(_disposequeueProcessDisposablesDelegate);
         }
 
         ~DisposeQueue()
@@ -36,17 +33,25 @@ namespace Dali
             get { return _disposableQueue; }
         }
 
+        public void Initialize()
+        {
+            _disposeQueueProcessDisposablesDelegate = new EventThreadCallback.CallbackDelegate(ProcessDisposables);
+            _eventThreadCallback = new EventThreadCallback(_disposeQueueProcessDisposablesDelegate);
+        }
+
         public void Add(IDisposable disposable)
         {
-            lock(_listLock)
+            lock (_listLock)
             {
                 _disposables.Add(disposable);
             }
+
+            _eventThreadCallback.Trigger();
         }
 
-        private int ProcessDisposables(IntPtr ptr)
+        private void ProcessDisposables()
         {
-            lock(_listLock)
+            lock (_listLock)
             {
                 foreach (IDisposable disposable in _disposables)
                 {
@@ -54,7 +59,6 @@ namespace Dali
                 }
                 _disposables.Clear();
             }
-            return 0;
         }
     }
 }
