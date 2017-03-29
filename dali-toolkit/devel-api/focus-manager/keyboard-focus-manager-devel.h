@@ -69,7 +69,7 @@ public:
  * @param[in] interface The user's implementation of CustomAlgorithmInterface
  * @see DevelKeyboardFocusManager::CustomAlgorithmInterface
  */
-void SetCustomAlgorithm(KeyboardFocusManager keyboardFocusManager, CustomAlgorithmInterface& interface);
+DALI_IMPORT_API void SetCustomAlgorithm(KeyboardFocusManager keyboardFocusManager, CustomAlgorithmInterface& interface);
 
 } // namespace DevelKeyboardFocusManager
 
