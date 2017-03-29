@@ -206,7 +206,7 @@ namespace MyCSharpExample
 
             Console.WriteLine( " *************************" );
 
-            using (Rectangle r2 = new Rectangle(2, 5, 20, 30))
+            using (Rectangle r2 = new Rectangle(2, 5, 20.0f, 30.0f))
             {
                 Console.WriteLine( "    Created " + r2 );
                 r2.Set(1,1,40,40);
