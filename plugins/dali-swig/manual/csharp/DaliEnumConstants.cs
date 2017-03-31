@@ -82,7 +82,10 @@ namespace Dali
         Mesh = Dali.VisualType.MESH,
         Primitive = Dali.VisualType.PRIMITIVE,
         WireFrame = Dali.VisualType.WIREFRAME,
-        Text = Dali.VisualType.TEXT
+        Text = Dali.VisualType.TEXT,
+        NPatch = Dali.VisualType.N_PATCH,
+        Svg = Dali.VisualType.SVG,
+        AnimatedImage = Dali.VisualType.ANIMATED_IMAGE
       }
 
       public struct Property
@@ -140,6 +143,7 @@ namespace Dali
       public static readonly int PixelArea = NDalic.IMAGE_VISUAL_PIXEL_AREA;
       public static readonly int WrapModeU = NDalic.IMAGE_VISUAL_WRAP_MODE_U;
       public static readonly int WrapModeV = NDalic.IMAGE_VISUAL_WRAP_MODE_V;
+      public static readonly int Border = NDalic.IMAGE_VISUAL_BORDER;
     }
 
     public struct MeshVisualProperty

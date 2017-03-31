@@ -270,5 +270,8 @@ namespace Dali
 
         [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Visual_Property_MIX_COLOR_get")]
         public static extern int Visual_Property_MIX_COLOR_get();
+
+        [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Image_Visual_BORDER_get")]
+        public static extern int Image_Visual_BORDER_get();
     }
 }
