@@ -25,6 +25,10 @@
 
 %define DALI_RECTANGLE_PROPERTY_PARAM(NameSpace,ClassName)
   %typemap(cscode) NameSpace::ClassName %{
+    public Rectangle(float x, float y, float width, float height) : this( (int)x, (int)y, (int)width, (int)height )
+    {
+    }
+
     public static bool operator ==(Rectangle a, Rectangle b)
     {
         // If both are null, or both are same instance, return true.
@@ -48,12 +52,12 @@
         return !(a == b);
     }
 
-    ///< X position of the rectangle
-    public int X
+    ///< X position of the rectangle, values after the decimal point are ignored, float type provided for convenience.
+    public float X
     {
         set
         {
-            x = value;
+            x = (int)( value );
         }
         get
         {
@@ -61,12 +65,12 @@
         }
     }
 
-    ///< Y position of the rectangle
-    public int Y
+    ///< Y position of the rectangle, values after the decimal point are ignored, float type provided for convenience.
+    public float Y
     {
         set
         {
-            y = value;
+            y = (int)( value );
         }
         get
         {
@@ -74,12 +78,12 @@
         }
     }
 
-    ///< Width of the rectangle
-    public int Width
+    ///< Width of the rectangle, values after the decimal point are ignored, float type provided for convenience.
+    public float Width
     {
         set
         {
-            width = value;
+            width = (int)( value );
         }
         get
         {
@@ -87,12 +91,12 @@
         }
     }
 
-    ///< Height of the rectangle
-    public int Height
+    ///< Height of the rectangle, values after the decimal point are ignored, float type provided for convenience.
+    public float Height
     {
         set
         {
-            height = value;
+            height = (int)( value );
         }
         get
         {

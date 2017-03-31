@@ -18,9 +18,8 @@ MESSAGE("po dir: ${PO_DIR}")
 FILE(GLOB PO_FILES RELATIVE "${PO_DIR}" "${PO_DIR}/*.po")
 
 SET(MSGFMT "/usr/bin/msgfmt")
-SET(MO_FILES_DIR /tmp/locale/en/LC_MESSAGES)
+SET(MO_FILES_DIR /tmp/locale)
 FILE(MAKE_DIRECTORY ${MO_FILES_DIR})
-MESSAGE("mo dir: ${MO_FILES_DIR}")
 
 FOREACH(PO_FILE ${PO_FILES})
         SET(PO_FILE ${PO_DIR}/${PO_FILE})
@@ -29,7 +28,8 @@ FOREACH(PO_FILE ${PO_FILES})
         MESSAGE("ABS_PO_FILE : ${ABS_PO_FILE}")
         GET_FILENAME_COMPONENT(lang ${ABS_PO_FILE} NAME_WE)
         MESSAGE("lang : ${lang}")
-        SET(MO_FILE ${MO_FILES_DIR}/dali-toolkit.mo.${lang})
+        FILE(MAKE_DIRECTORY ${MO_FILES_DIR}/${lang}/LC_MESSAGES)
+        SET(MO_FILE ${MO_FILES_DIR}/${lang}/LC_MESSAGES/dali-toolkit.mo)
         MESSAGE("MO_FILE : ${MO_FILE}")
         ADD_CUSTOM_COMMAND(OUTPUT ${MO_FILE}
                            COMMAND ${MSGFMT} -o ${MO_FILE} ${ABS_PO_FILE}
