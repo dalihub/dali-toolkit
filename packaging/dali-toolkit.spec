@@ -52,10 +52,10 @@ user interface functionality.
 # This is for backward-compatibility. This does not deteriorate 4.0 Configurability
 # if tv ||"undefined"
 %if "%{?profile}" != "wearable" && "%{?profile}" != "common" && "%{?profile}" != "ivi" && "%{?profile}" != "mobile"
-%package profile_tv
+%package extension-tv
 Summary:    style files for Tizen TV (1920x1080)
 Requires:   %{name} = %{version}-%{release}
-%description profile_tv
+%description extension-tv
 dali-toolkit style files for Tizen TV (1920x1080)
 %endif
 
@@ -210,12 +210,12 @@ exit 0
 # This is for backward-compatibility. This does not deteriorate 4.0 Configurability
 # if tv ||"undefined"
 %if "%{?profile}" != "wearable" && "%{?profile}" != "mobile" && "%{?profile}" != "ivi" && "%{?profile}" != "common"
-%post profile_tv
+%post extension-tv
 pushd %{dali_toolkit_style_files}/1920x1080
 for FILE in *.json; do mv 1920x1080/"${FILE}" ../"${FILE}"; done
 popd
 
-%preun profile_tv
+%preun extension-tv
 case "$1" in
   0)
     # This is an un-installation.
@@ -229,6 +229,6 @@ case "$1" in
     :
   ;;
 esac
-%files profile_tv
+%files extension-tv
 %{dali_toolkit_style_files}/1920x1080/*
 %endif
