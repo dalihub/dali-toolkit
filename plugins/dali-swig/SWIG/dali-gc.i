@@ -175,35 +175,6 @@
 %}
 %enddef
 
-%define DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TIMERSIGNALTYPE( NameSpace, ClassName )
-%typemap(csfinalize) NameSpace::ClassName %{
-  ~TimerSignalType() {
-    DisposeQueue.Instance.Add(this);
-  }
-%}
-%enddef
-
-%define DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_TIMERSIGNALTYPE( NameSpace, ClassName )
-%typemap(csdestruct, methodname="Dispose", methodmodifiers="public") NameSpace::ClassName %{{
-    if (!Stage.IsInstalled()) {
-      DisposeQueue.Instance.Add(this);
-      return;
-    }
-
-    lock(this) {
-      if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-        if (swigCMemOwn) {
-          swigCMemOwn = false;
-          NDalicPINVOKE.delete_TimerSignalType(swigCPtr);
-        }
-        swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-      }
-      global::System.GC.SuppressFinalize(this);
-    }
-  }
-%}
-%enddef
-
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, Any );
 DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali, Any );
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali, Actor );
@@ -387,13 +358,13 @@ DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, PushButton );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, PushButton );
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, RadioButton );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, RadioButton );
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, ToggleButton );
+DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, ToggleButton );
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, Builder );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, Builder );
 
-//DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, View );
-//DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, View );
-//DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, ViewImpl );
-//DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, ViewImpl );
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit::DevelKeyboardFocusManager, CustomAlgorithmInterface );
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION( Dali::Toolkit::DevelKeyboardFocusManager, CustomAlgorithmInterface );
 
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, FlexContainer );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, FlexContainer );
@@ -453,10 +424,13 @@ DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, TextLabel );
 
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, VideoView );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, VideoView );
-//DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, VisualBase );
-//DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, VisualBase);
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali::Toolkit::Visual, Base, VisualBase );
+DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION_RENAME( Dali::Toolkit::Visual, Base, VisualBase);
+
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, VisualFactory );
 DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, VisualFactory );
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION( Dali::Toolkit, TransitionData );
+DALI_CREATE_CUSTOM_DISPOSE_DERIVED_FUNCTION( Dali::Toolkit, TransitionData );
 
 DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Application&)>, ApplicationSignal);
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void(Dali::Application&)>, ApplicationSignal);
@@ -497,8 +471,9 @@ DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void(Dali::Actor, Dali:
 //DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_STRINGVALUEPAIR( Dali, pair<std::string, Dali::Property::Value>);
 //DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_BOOLSIGNAL( Dali, Signal<bool()>);
 //DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_BOOLSIGNAL( Dali, Signal<bool()>);
-//DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_TIMERSIGNALTYPE( Dali, Signal<bool()>);
-//DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_TIMERSIGNALTYPE( Dali, Signal<bool()>);
+
+DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<bool()>, TimerSignalType);
+DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<bool()>, TimerSignalType);
 
 DALI_CREATE_CUSTOM_DESTRUCTOR_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor)>, ActorSignal);
 DALI_CREATE_CUSTOM_DISPOSE_FUNCTION_RENAME( Dali, Signal<void (Dali::Actor)>, ActorSignal);
