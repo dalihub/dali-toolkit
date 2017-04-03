@@ -31,22 +31,33 @@ namespace
 {
 
 const char* DEFAULT_LOCALE_DIR = "/tmp/locale/";
-const std::string DEFAULT_EN_LOCALE_DIR = "/tmp/locale/en/LC_MESSAGES/";
+static std::string gLocaleLang;
+static std::string gLocaleLanguage;
 
 }
 
 void dali_textselectionpopupmirroringrtl_startup(void)
 {
-  // Cheat! Copy the .mo file
-  std::ifstream  src( std::string( DEFAULT_EN_LOCALE_DIR + "dali-toolkit.mo.ar" ).c_str(), std::ifstream::binary );
-  std::ofstream  dst( std::string( DEFAULT_EN_LOCALE_DIR + "dali-toolkit.mo" ).c_str(), std::ofstream::binary );
-  dst << src.rdbuf();
+  // Keep the current locale environment.
+  char* langPtr = getenv( "LANG" );
+  gLocaleLang = std::string( langPtr );
+
+  char* languagePtr = getenv( "LANGUAGE" );
+  gLocaleLanguage = std::string( languagePtr );
+
+  // Set the locale environment to Arabic.
+  setenv( "LANG", "ar_AE.UTF-8", 1 );
+  setenv( "LANGUAGE", "ar_AE:ar", 1 );
 
   test_return_value = TET_UNDEF;
 }
 
 void dali_textselectionpopupmirroringrtl_cleanup(void)
 {
+  // Restore the locale environment.
+  setenv( "LANG", gLocaleLang.c_str(), 1 );
+  setenv( "LANGUAGE", gLocaleLanguage.c_str(), 1 );
+
   test_return_value = TET_PASS;
 }
 
@@ -59,7 +70,7 @@ int UtcDaliToolkitTextSelectionPopupMirroringRTL(void)
 
   ToolkitTestApplication application;
 
-  setlocale( LC_ALL, "en_GB.UTF-8" );
+  setlocale( LC_ALL, "ar_AE.UTF-8" );
   textdomain("dali-toolkit");
   bindtextdomain("dali-toolkit", DEFAULT_LOCALE_DIR );
 

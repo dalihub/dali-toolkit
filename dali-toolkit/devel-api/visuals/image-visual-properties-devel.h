@@ -55,6 +55,15 @@ enum Type
    * @note For N-Patch images only.
    */
   BORDER = WRAP_MODE_V + 1,
+
+  /**
+   * @brief Whether to use the texture atlas
+   * @details Name "atlasing", type Property::BOOLEAN, true to enable texture atlas
+   *
+   * @note Optional. By default atlasing is off.
+   */
+
+  ATLASING = WRAP_MODE_V + 2,
 };
 
 } //namespace Property

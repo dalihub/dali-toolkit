@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    1.2.32
+Version:    1.2.33
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-2-Clause and MIT
@@ -131,9 +131,6 @@ rm -rf %{buildroot}
 cd build/tizen
 %make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 
-# LICENSE
-mkdir -p %{buildroot}/usr/share/license
-cp -af %{_builddir}/%{name}-%{version}/LICENSE %{buildroot}/usr/share/license/%{name}
 
 # PO
 {
@@ -174,7 +171,7 @@ exit 0
 %{dali_toolkit_image_files}/*
 %{dali_toolkit_sound_files}/*
 %{dali_toolkit_style_files}/*
-%{_datadir}/license/%{name}
+%license LICENSE
 %{_datadir}/locale/*/LC_MESSAGES/*
 
 %files devel

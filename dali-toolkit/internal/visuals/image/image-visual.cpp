@@ -20,6 +20,7 @@
 
 // EXTERNAL HEADERS
 #include <cstring> // for strlen()
+#include <dali/public-api/actors/layer.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/devel-api/images/texture-set-image.h>
@@ -31,6 +32,7 @@
 
 // INTERNAL HEADERS
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -58,6 +60,7 @@ const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
 const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
 const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
 const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
+const char * const IMAGE_ATLASING("atlasing");
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN( FITTING_MODE )
@@ -91,31 +94,39 @@ const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 const char* DEFAULT_SAMPLER_TYPENAME = "sampler2D";
 
+const float PIXEL_ALIGN_ON = 1.0f;
+const float PIXEL_ALIGN_OFF = 0.0f;
+
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
-  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump mat4 uModelMatrix;\n
+  uniform mediump mat4 uViewMatrix;\n
+  uniform mediump mat4 uProjection;\n
   uniform mediump vec3 uSize;\n
   uniform mediump vec4 pixelArea;
   varying mediump vec2 vTexCoord;\n
+  uniform lowp float uPixelAligned;\n
   \n
-
   //Visual size and offset
   uniform mediump vec2 offset;\n
   uniform mediump vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
-
+\n
   vec4 ComputeVertexPosition()\n
   {\n
     vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
     vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
     return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
   }\n
-
+\n
   void main()\n
   {\n
-    mediump vec4 vertexPosition = uMvpMatrix * ComputeVertexPosition();\n
+    mediump vec4 vertexPosition = uViewMatrix * uModelMatrix * ComputeVertexPosition();\n
+    vec4 alignedVertexPosition = vertexPosition;\n
+    alignedVertexPosition.xy = floor ( vertexPosition.xy );\n // Pixel alignment
+    vertexPosition = uProjection * mix( vertexPosition, alignedVertexPosition, uPixelAligned );\n
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
   }\n
@@ -253,7 +264,8 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mFittingMode( fittingMode ),
   mSamplingMode( samplingMode ),
   mWrapModeU( WrapMode::DEFAULT ),
-  mWrapModeV( WrapMode::DEFAULT )
+  mWrapModeV( WrapMode::DEFAULT ),
+  mAttemptAtlasing( false )
 {
 }
 
@@ -268,7 +280,8 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
-  mWrapModeV( WrapMode::DEFAULT )
+  mWrapModeV( WrapMode::DEFAULT ),
+  mAttemptAtlasing( false )
 {
 }
 
@@ -320,10 +333,14 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       {
         DoSetProperty( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second );
       }
+      else if ( keyValue.first == IMAGE_ATLASING )
+      {
+        DoSetProperty( Toolkit::DevelImageVisual::Property::ATLASING, keyValue.second );
+      }
     }
   }
 
-  if( mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING && mImageUrl.IsValid() )
+  if( ( mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING ) && mImageUrl.IsValid() )
   {
     // if sync loading is required, the loading should start
     // immediately when new image url is set or the actor is off stage
@@ -423,6 +440,12 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
       mWrapModeV = Dali::WrapMode::Type( wrapMode );
       break;
     }
+
+    case Toolkit::DevelImageVisual::Property::ATLASING:
+    {
+      bool atlasing = false;
+      mAttemptAtlasing = value.Get( atlasing );
+    }
   }
 }
 
@@ -482,6 +505,8 @@ void ImageVisual::CreateRenderer( TextureSet& textures )
       }
     }
   }
+
+  shader.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_ON ); // Set default to align
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
   DALI_ASSERT_DEBUG( textures );
@@ -628,7 +653,7 @@ void ImageVisual::InitializeRenderer()
     Vector4 atlasRect;
     // texture set has to be created first as we need to know if atlasing succeeded or not
     // when selecting the shader
-    TextureSet textures = CreateTextureSet( atlasRect, IsSynchronousResourceLoading(), true );
+    TextureSet textures = CreateTextureSet( atlasRect, IsSynchronousResourceLoading(), mAttemptAtlasing );
     CreateRenderer( textures );
 
     if( mImpl->mFlags & Impl::IS_ATLASING_APPLIED ) // the texture is packed inside atlas
@@ -702,6 +727,14 @@ void ImageVisual::DoSetOnStage( Actor& actor )
 
   mPlacementActor = actor;
 
+  // Search the Actor tree to find if Layer UI behaviour set.
+  Layer layer = actor.GetLayer();
+  if ( layer && layer.GetBehavior() == Layer::LAYER_3D )
+  {
+     // Layer 3D set, do not align pixels
+     mImpl->mRenderer.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF );
+  }
+
   if( mPixelArea != FULL_TEXTURE_RECT )
   {
     mImpl->mRenderer.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, mPixelArea );
@@ -761,6 +794,8 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::PIXEL_AREA, mPixelArea );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
+
+  map.Insert( Toolkit::DevelImageVisual::Property::ATLASING, mAttemptAtlasing );
 }
 
 void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const

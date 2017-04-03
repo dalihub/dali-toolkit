@@ -27,6 +27,8 @@
 #include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/text-controls/hidden-input-properties.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include "toolkit-clipboard.h"
 
 using namespace Dali;
@@ -93,6 +95,8 @@ const char* const PROPERTY_NAME_EMBOSS                               = "emboss";
 const char* const PROPERTY_NAME_INPUT_EMBOSS                         = "inputEmboss";
 const char* const PROPERTY_NAME_OUTLINE                              = "outline";
 const char* const PROPERTY_NAME_INPUT_OUTLINE                        = "inputOutline";
+
+const char* const PROPERTY_NAME_HIDDEN_INPUT_SETTINGS                = "hiddenInputSettings";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -315,19 +319,39 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
     {
       const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
 
-      Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
-      if( NULL != valueSet )
+      if( valueGet.first.type == Property::Key::STRING )
       {
-        if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
+        Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+        if( NULL != valueSet )
         {
-          tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
+          {
+            tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+            return false;
+          }
+        }
+        else
+        {
+          tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
           return false;
         }
       }
       else
       {
-        tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
-        return false;
+        Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.indexKey );
+        if( NULL != valueSet )
+        {
+          if( valueGet.second.Get<int>() != valueSet->Get<int>() )
+          {
+            tet_printf( "  Integer Value got : [%d], expected : [%d]", valueGet.second.Get<int>(), valueSet->Get<int>() );
+            return false;
+          }
+        }
+        else
+        {
+          tet_printf( "  The Int key %d doesn't exist.", valueGet.first.indexKey );
+          return false;
+        }
       }
     }
   }
@@ -474,6 +498,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_EMBOSS ) == TextField::Property::INPUT_EMBOSS );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextField::Property::OUTLINE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_OUTLINE ) == TextField::Property::INPUT_OUTLINE );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_HIDDEN_INPUT_SETTINGS ) == DevelTextField::Property::HIDDEN_INPUT_SETTINGS );
 
   END_TEST;
 }
@@ -794,6 +819,19 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Check the input outline property
   field.SetProperty( TextField::Property::INPUT_OUTLINE, "Outline input properties" );
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_OUTLINE ), std::string("Outline input properties"), TEST_LOCATION );
+
+  // Check the hidden input settings property
+  Property::Map hiddenMapSet;
+  Property::Map hiddenMapGet;
+  hiddenMapSet[ HiddenInput::Property::MODE ] = HiddenInput::Mode::HIDE_ALL;
+  hiddenMapSet[ HiddenInput::Property::SHOW_DURATION ] = 2;
+  hiddenMapSet[ HiddenInput::Property::SUBSTITUTE_COUNT ] = 4;
+  hiddenMapSet[ HiddenInput::Property::SUBSTITUTE_CHARACTER ] = 0x23;
+  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, hiddenMapSet );
+
+  hiddenMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::HIDDEN_INPUT_SETTINGS );
+  DALI_TEST_EQUALS( hiddenMapSet.Count(), hiddenMapGet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( hiddenMapSet, hiddenMapGet ), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1963,6 +2001,92 @@ int utcDaliTextFieldEvent08(void)
 
   END_TEST;
 }
+
+int utcDaliTextFieldEvent09(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldEvent09");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  Stage::GetCurrent().Add( field );
+  LoadMarkerImages(application, field);
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  field.SetProperty( TextField::Property::TEXT, "Hello" );
+  field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  application.SendNotification();
+  application.Render();
+
+  Property::Map map;
+  map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::HIDE_NONE;
+  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.SendNotification();
+  application.Render();
+
+  map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::HIDE_ALL;
+  map[ HiddenInput::Property::SUBSTITUTE_CHARACTER ] = 0x23;
+  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.SendNotification();
+  application.Render();
+
+  map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::HIDE_COUNT;
+  map[ HiddenInput::Property::SUBSTITUTE_COUNT ] = 2;
+  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  for( unsigned int index = 0u; index < 5u; ++index )
+  {
+    application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down ) );
+    application.SendNotification();
+    application.Render();
+  }
+
+  map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::SHOW_COUNT;
+  map[ HiddenInput::Property::SUBSTITUTE_COUNT ] = 2;
+  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  for( unsigned int index = 0u; index < 5u; ++index )
+  {
+    application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down ) );
+    application.SendNotification();
+    application.Render();
+  }
+
+  map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::SHOW_LAST_CHARACTER;
+  map[ HiddenInput::Property::SHOW_DURATION ] = 0;
+  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.SendNotification();
+  application.Render();
+
+  map[ HiddenInput::Property::SHOW_DURATION ] = 100;
+  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down ) );
+  application.SendNotification();
+  application.Render();
+
+  Property::Map mapGet;
+  mapGet = field.GetProperty<Property::Map>( DevelTextField::Property::HIDDEN_INPUT_SETTINGS );
+  DALI_TEST_EQUALS( map.Count(), mapGet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( map, mapGet ), true, TEST_LOCATION );
+  END_TEST;
+}
+
 
 int utcDaliTextFieldStyleWhilstSelected(void)
 {

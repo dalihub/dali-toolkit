@@ -309,6 +309,7 @@ struct Controller::Impl
     mTextUpdateInfo(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
+    mHiddenInput( NULL ),
     mRecalculateNaturalSize( true ),
     mMarkupProcessorEnabled( false ),
     mClipboardHideEnabled( true ),
@@ -333,6 +334,8 @@ struct Controller::Impl
 
   ~Impl()
   {
+    delete mHiddenInput;
+
     delete mFontDefaults;
     delete mUnderlineDefaults;
     delete mShadowDefaults;
@@ -710,6 +713,7 @@ public:
   TextUpdateInfo mTextUpdateInfo;          ///< Info of the characters updated.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.
+  HiddenText* mHiddenInput;                ///< Avoid allocating this when the user does not specify hidden input mode.
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.

@@ -314,7 +314,7 @@ def writeCSharpData
 
             #exception case <<<
             #Tooltip gives swig build error
-            if( property.name == "Tooltip" )
+            if( property.name == "Tooltip" || property.name == "Color")
                 next
             end
             #exception case >>>

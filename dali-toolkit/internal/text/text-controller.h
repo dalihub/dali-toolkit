@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
+#include <dali-toolkit/internal/text/hidden-text.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 
 namespace Dali
@@ -56,7 +57,7 @@ typedef IntrusivePtr<Controller> ControllerPtr;
  *
  * The text selection popup button callbacks are as well handled via the TextSelectionPopupCallbackInterface interface.
  */
-class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface
+class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface, public HiddenText::Observer
 {
 public: // Enumerated types.
 
@@ -347,7 +348,7 @@ public: // Configure the text controller.
   /**
    * @brief Sets input type to password
    *
-   * @note The string is displayed continuous "*"
+   * @note The string is displayed hidden character
    *
    * @param[in] passwordInput True if password input is enabled.
    */
@@ -887,6 +888,16 @@ public: // Queries & retrieves.
    */
   bool GetTextScrollInfo( float& scrollPosition, float& controlHeight, float& layoutHeight );
 
+  /**
+   * @brief Used to set the hidden input option
+   */
+  void SetHiddenInputOption( const Property::Map& options );
+
+  /**
+   * @brief Used to get the hidden input option
+   */
+  void GetHiddenInputOption( Property::Map& options );
+
 public: // Relayout.
 
   /**
@@ -1001,6 +1012,13 @@ protected: // Inherit from TextSelectionPopup::TextPopupButtonCallbackInterface.
    * @copydoc Dali::Toolkit::TextSelectionPopup::TextPopupButtonCallbackInterface::TextPopupButtonTouched()
    */
   virtual void TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button );
+
+protected: // Inherit from HiddenText.
+
+  /**
+   * @brief Invoked from HiddenText when showing time of the last character was expired
+   */
+  virtual void DisplayTimeExpired();
 
 private: // Update.
 

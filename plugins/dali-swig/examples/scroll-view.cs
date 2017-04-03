@@ -56,8 +56,8 @@ namespace MyCSharpExample
       _scrollView = new ScrollView();
       Size stageSize = stage.Size;
       _scrollView.Size = new Position(stageSize.W, stageSize.H, 0.0f);
-      _scrollView.ParentOrigin = NDalic.ParentOriginCenter;
-      _scrollView.AnchorPoint = NDalic.AnchorPointCenter;
+      _scrollView.Position = new Position(0,0,0);
+      _scrollView.AnchorPoint = NDalic.AnchorPointTopLeft;
       stage.Add(_scrollView);
 
       // Add actors to a scroll view with 3 pages
@@ -69,8 +69,7 @@ namespace MyCSharpExample
         {
           View pageActor = new View();
           pageActor.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.ALL_DIMENSIONS);
-          pageActor.ParentOrigin = NDalic.ParentOriginCenter;
-          pageActor.AnchorPoint = NDalic.AnchorPointCenter;
+          pageActor.AnchorPoint = NDalic.AnchorPointTopLeft;
           pageActor.Position = new Position(pageColumn * stageSize.W, pageRow * stageSize.H, 0.0f);
 
           // Add images in a 3x4 grid layout for each page
@@ -125,8 +124,7 @@ namespace MyCSharpExample
       _scrollView.WheelMoved += Onwheel;
       _scrollView.KeyInputFocusGained += OnKey;
       _text = new TextLabel("View Touch Event Handler Test");
-      _text.ParentOrigin = NDalic.ParentOriginCenter;
-      _text.AnchorPoint = NDalic.AnchorPointCenter;
+      _text.AnchorPoint = NDalic.AnchorPointTopLeft;
       _text.HorizontalAlignment = "CENTER";
       _text.PointSize = 48.0f;
 

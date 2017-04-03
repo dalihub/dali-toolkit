@@ -23,8 +23,8 @@ if BUILD_MCS
 
 all-local: libNDalic.so NDali.dll
 
-libNDalic.so: automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o manual/cpp/view-wrapper-impl-wrap.o manual/cpp/callbackbase_wrap.o manual/cpp/devel-property-wrap.o
-	g++ -shared automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o manual/cpp/view-wrapper-impl-wrap.o manual/cpp/callbackbase_wrap.o manual/cpp/devel-property-wrap.o -o libNDalic.so $(DALICORE_LIBS) $(DALIADAPTOR_LIBS) $(DALITOOLKIT_LIBS)
+libNDalic.so: automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o manual/cpp/view-wrapper-impl-wrap.o manual/cpp/event-thread-callback-wrap.o manual/cpp/devel-property-wrap.o
+	g++ -shared automatic/cpp/dali_wrap.o manual/cpp/keyboard_focus_manager_wrap.o manual/cpp/view-wrapper-impl-wrap.o manual/cpp/event-thread-callback-wrap.o manual/cpp/devel-property-wrap.o -o libNDalic.so $(DALICORE_LIBS) $(DALIADAPTOR_LIBS) $(DALITOOLKIT_LIBS)
 
 automatic/cpp/dali_wrap.o: $(BUILT_SOURCES)
 	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) automatic/cpp/dali_wrap.cpp -o automatic/cpp/dali_wrap.o
@@ -35,8 +35,8 @@ manual/cpp/keyboard_focus_manager_wrap.o: $(BUILT_SOURCES)
 manual/cpp/view-wrapper-impl-wrap.o: $(BUILT_SOURCES)
 	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) manual/cpp/view-wrapper-impl-wrap.cpp -o manual/cpp/view-wrapper-impl-wrap.o
 
-manual/cpp/callbackbase_wrap.o: $(BUILT_SOURCES)
-	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) manual/cpp/callbackbase_wrap.cpp -o manual/cpp/callbackbase_wrap.o
+manual/cpp/event-thread-callback-wrap.o: $(BUILT_SOURCES)
+	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) manual/cpp/event-thread-callback-wrap.cpp -o manual/cpp/event-thread-callback-wrap.o
 
 manual/cpp/devel-property-wrap.o: $(BUILT_SOURCES)
 	g++ -c -fpic $(CXXFLAGS) $(DALICORE_CFLAGS) $(DALIADAPTOR_CFLAGS) $(DALITOOLKIT_CFLAGS) manual/cpp/devel-property-wrap.cpp -o manual/cpp/devel-property-wrap.o
