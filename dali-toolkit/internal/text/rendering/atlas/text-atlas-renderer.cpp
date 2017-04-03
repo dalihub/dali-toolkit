@@ -450,6 +450,7 @@ struct AtlasRenderer::Impl
         mActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
         mActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
         mActor.SetSize( textSize );
+        mActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
       }
 
       for( std::vector< MeshRecord >::iterator it = meshContainer.begin(),
@@ -566,17 +567,18 @@ struct AtlasRenderer::Impl
     renderer.SetTextures( textureSet );
     renderer.SetProperty( Dali::Renderer::Property::BLEND_MODE, BlendMode::ON );
     renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, DepthIndex::CONTENT + mDepth );
+
     Actor actor = Actor::New();
 #if defined(DEBUG_ENABLED)
     actor.SetName( "Text renderable actor" );
 #endif
     actor.AddRenderer( renderer );
-
     // Keep all of the origins aligned
     actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
     actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
     actor.SetSize( actorSize );
     actor.RegisterProperty("uOffset", Vector2::ZERO );
+    actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
     return actor;
   }
 
