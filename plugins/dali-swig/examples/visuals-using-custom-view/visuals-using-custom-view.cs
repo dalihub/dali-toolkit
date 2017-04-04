@@ -37,7 +37,7 @@ namespace VisualsUsingCustomView
             contentLayout.Name = "ContentLayout";
             contentLayout.WidthResizePolicy = "FILL_TO_PARENT";
             contentLayout.HeightResizePolicy = "FILL_TO_PARENT";
-            contentLayout.SetCellPadding(new Size(5.0f, 5.0f));
+            contentLayout.SetCellPadding(new Size2D(5, 5));
             contentLayout.BackgroundColor = new Color(0.949f, 0.949f, 0.949f, 1.0f);
 
             stage.GetDefaultLayer().Add(contentLayout);

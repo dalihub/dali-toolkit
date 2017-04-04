@@ -105,6 +105,7 @@ namespace MyCSharpExample
 
         public void Initialize(object source, NUIApplicationInitEventArgs e)
         {
+
             //1)
             NavigationPropertiesTests();
 
@@ -125,6 +126,7 @@ namespace MyCSharpExample
 
             //7)
             ViewDownCastTest();
+
         }
 
 
@@ -402,8 +404,9 @@ namespace MyCSharpExample
             spin.Background = background;
 
             background = spin.Background;
-            Vector4 backgroundColor = new Vector4();
+            Color backgroundColor = new Color();
             background.Find(Dali.Constants.ColorVisualProperty.MixColor).Get(backgroundColor);
+
             if (backgroundColor == Color.Red)
             {
                 Console.WriteLine("Custom View Background property : test passed");
@@ -415,7 +418,8 @@ namespace MyCSharpExample
 
             // BackgroundColor property
             spin.BackgroundColor = Color.Yellow;
-            if (spin.BackgroundColor == Color.Yellow)
+
+            if (spin.BackgroundColor.EqualTo(Color.Yellow))
             {
                 Console.WriteLine("Custom View BackgroundColor property : test passed");
             }
@@ -462,10 +466,10 @@ namespace MyCSharpExample
             handle.GetProperty(myPropertyIndex).Get(ref myProperty);
             Console.WriteLine("myProperty value: " + myProperty);
 
-            int myPropertyIndex2 = handle.RegisterProperty("myProperty2", new Property.Value(new Size(5.0f, 5.0f)), Property.AccessMode.READ_WRITE);
-            Size myProperty2 = new Size(0.0f, 0.0f);
+            int myPropertyIndex2 = handle.RegisterProperty("myProperty2", new Property.Value(new Size(5.0f, 5.0f, 5.0f)), Property.AccessMode.READ_WRITE);
+            Size myProperty2 = new Size(0.0f, 0.0f, 0.0f);
             handle.GetProperty(myPropertyIndex2).Get(myProperty2);
-            Console.WriteLine("myProperty2 value: " + myProperty2.W + ", " + myProperty2.H);
+            Console.WriteLine("myProperty2 value: " + myProperty2.Width + ", " + myProperty2.Height);
 
             Actor actor = new Actor();
             actor.Size = new Position(200.0f, 200.0f, 0.0f);
@@ -476,8 +480,8 @@ namespace MyCSharpExample
 
             Stage stage = Stage.GetCurrent();
             stage.BackgroundColor = Color.White;
-            Size stageSize = stage.Size;
-            Console.WriteLine("Stage size: " + stageSize.W + ", " + stageSize.H);
+            Size2D stageSize = stage.Size;
+            Console.WriteLine("Stage size: " + stageSize.Width + ", " + stageSize.Height);
             stage.Add(actor);
 
             TextLabel text = new TextLabel("Hello World");
@@ -585,14 +589,15 @@ namespace MyCSharpExample
             Console.WriteLine("");
             Console.WriteLine("### [6] SizePositionTest START");
 
-            Size Size = new Size(100, 50);
+            Size Size = new Size(100, 50, 25);
             Console.WriteLine("    Created " + Size);
-            Console.WriteLine("    Size x =  " + Size.W + ", y = " + Size.H);
-            Size += new Size(20, 20);
-            Console.WriteLine("    Size x =  " + Size.W + ", y = " + Size.H);
-            Size.W += 10;
-            Size.H += 10;
-            Console.WriteLine("    Size width =  " + Size.W + ", height = " + Size.H);
+            Console.WriteLine("    Size w =  " + Size.Width + ", h = " + Size.Height + ", d = " + Size.Depth);
+            Size += new Size(20, 20, 20);
+            Console.WriteLine("    Size w =  " + Size.Width + ", h = " + Size.Height + ", d = " + Size.Depth);
+            Size.Width += 10;
+            Size.Height += 10;
+            Size.Depth += 10;
+            Console.WriteLine("    Size width =  " + Size.Width+ ", height = " + Size.Height + ", depth = " + Size.Depth);
 
             Console.WriteLine(" *************************");
             Position Position = new Position(20, 100, 50);
@@ -604,7 +609,7 @@ namespace MyCSharpExample
             Position.Y += 10;
             Position.Z += 10;
             Console.WriteLine("    Position width =  " + Position.X + ", height = " + Position.Y + ", depth = " + Position.Z);
-            Position parentOrigin = new Dali.Position(NDalic.ParentOriginBottomRight);
+            Position parentOrigin = ParentOrigin.BottomRight;
             Console.WriteLine("    parentOrigin x =  " + parentOrigin.X + ", y = " + parentOrigin.Y + ", z = " + parentOrigin.Z);
 
             Console.WriteLine(" *************************");
@@ -771,7 +776,117 @@ namespace MyCSharpExample
             Example example = new Example(Application.NewApplication());
             example.MainLoop();
         }
+
+      private void LOG(string str, int result = -1)
+      {
+        if (result == 1) Console.WriteLine(str + " : test passed!");
+        else if (result == 0) Console.WriteLine(str + " : test failed! TEST FAILED! test failed! TEST FAILED!");
+        else Console.WriteLine(str);
+      }
+
+      private void CustomPropertyHighLevelClassTest()
+      {
+        LOG("=================================");
+        LOG(" high level class test");
+        LOG("=================================");
+
+        Handle handle = new Handle();
+        int myPropertyIndex1 = handle.RegisterProperty("myProperty1", new Property.Value(new Size(10, 20, 30)), Property.AccessMode.READ_WRITE);
+        Size myProperty1 = Dali.Size.Zero;
+        handle.GetProperty(myPropertyIndex1).Get(myProperty1);
+        if (myProperty1.EqualTo(new Size(10, 20, 30))) LOG( "myProperty1 must be Size(10, 20, 30) get=" + myProperty1, 1);
+        else LOG( "myProperty1 must be Size(10, 20, 30) get=" + myProperty1, 0);
+
+        int myPropertyIndex2 = handle.RegisterProperty("myProperty2", new Property.Value(new Position(40, 50, 60)), Property.AccessMode.READ_WRITE);
+        Position myProperty2 = Dali.Position.Zero;
+        handle.GetProperty(myPropertyIndex2).Get(myProperty2);
+        if (myProperty2.EqualTo(new Position(40, 50, 60))) LOG( "myProperty2 must be Position(40, 50, 60) get=" + myProperty2, 1);
+        else LOG( "myProperty2 must be Position(40, 50, 60) get=" + myProperty2, 0);
+
+        int myPropertyIndex3 = handle.RegisterProperty("myProperty3", new Property.Value(Color.Cyan), Property.AccessMode.READ_WRITE);
+        Color myProperty3 = Color.Transparent;
+        handle.GetProperty(myPropertyIndex3).Get(myProperty3);
+        if (myProperty3.EqualTo(Color.Cyan)) LOG( "myProperty3 must be Color.Cyan get=" + myProperty3, 1);
+        else LOG( "myProperty3 must be Color.Cyan get=" + myProperty3, 0);
+
+        int myPropertyIndex4 = handle.RegisterProperty("myProperty4", new Property.Value(new Size2D(100, 200)), Property.AccessMode.READ_WRITE);
+        Size2D myProperty4 = new Size2D(0, 0);
+        handle.GetProperty(myPropertyIndex4).Get(myProperty4);
+        if (myProperty4.EqualTo(new Size2D(100, 200))) LOG( "myProperty4 must be new Size2D(100, 200) get=" + myProperty4, 1);
+        else LOG( "myProperty4 must be new Size2D(100, 200) get=" + myProperty4, 0);
+
+        int myPropertyIndex5 = handle.RegisterProperty("myProperty5", new Property.Value(new Position2D(200, 300)), Property.AccessMode.READ_WRITE);
+        Position2D myProperty5 = new Position2D(0, 0);
+        handle.GetProperty(myPropertyIndex5).Get(myProperty5);
+        if (myProperty5.EqualTo(new Position2D(200, 300))) LOG( "myProperty5 must be new Position2D(200, 300) get=" + myProperty5, 1);
+        else LOG( "myProperty5 must be new Position2D(200, 300) get=" + myProperty5, 0);
+
+        View view = new View();
+        view.Size2D = new Size2D(new Size(200.0f, 200.0f, 0.0f));
+        view.Name = "MyView1";
+        view.BackgroundColor = new Color(1.0f, 0.0f, 1.0f, 0.8f);
+        LOG("view id: " + view.GetId());
+        LOG("view size: " + view.Size.Width + ", " + view.Size.Height + "," + view.Size.Depth);
+        LOG("view size2d: " + view.Size2D.Width + ", " + view.Size2D.Height);
+        LOG("view name: " + view.Name);
+
+        Stage stage = Stage.GetCurrent();
+        Size2D stageSize = stage.Size;
+        LOG("Stage size2d: " + stageSize.Width + ", " + stageSize.Height);
+        stage.Add(view);
+
+        Size Size = new Size(100, 50, 25);
+        LOG( Size +  "Created. this should be (100, 50, 25)!");
+        LOG( "Size width= " + Size.Width + ", height=" + Size.Height + ",depth=" + Size.Depth );
+        Size += new Size(20, 20, 20);
+        if(Size.EqualTo(new Size(120, 70, 45))){ LOG( "plus Size(20,20,20) should be +20 for each! x =  " + Size.Width + ", y = " + Size.Height + ", z = " + Size.Depth, 1);}
+        else { LOG( "plus Size(20,20,20) should be +20 for each! x =  " + Size.Width + ", y = " + Size.Height + ", z = " + Size.Depth, 0);}
+
+        Size.Width += 10;
+        Size.Height += 10;
+        Size.Depth += 10;
+        if(Size.EqualTo(new Size(130, 80, 55))){ LOG( "plus 10 for each! width =  " + Size.Width + ", height = " + Size.Height + ", depth = " + Size.Depth, 1); }
+        else { LOG( "plus 10 for each! width =  " + Size.Width + ", height = " + Size.Height + ", depth = " + Size.Depth, 0); }
+
+        Position Position = new Position(20, 100, 50);
+        LOG(Position + "Created ");
+        LOG( "Position x =  " + Position.X + ", y = " + Position.Y + ", z = " + Position.Z );
+        Position += new Position(20, 20, 20);
+        if(Position.EqualTo(new Position(40, 120, 70))) LOG( "plus Position(20, 20, 20)! Position x =  " + Position.X + ", y = " + Position.Y + ", z = " + Position.Z, 1);
+        else LOG( "plus Position(20, 20, 20)! Position x =  " + Position.X + ", y = " + Position.Y + ", z = " + Position.Z, 0);
+
+        Position.X += 10;
+        Position.Y += 10;
+        Position.Z += 10;
+        if(Position.EqualTo(new Position(50, 130, 80))) LOG( "plus +10 for each! Position width =  " + Position.X + ", height = " + Position.Y + ", depth = " + Position.Z, 1 );
+        else  LOG( "plus +10 for each! Position width =  " + Position.X + ", height = " + Position.Y + ", depth = " + Position.Z, 0 );
+
+        Position2D _position2d = new Position2D(new Position(600.0f, 700.0f, 800.0f));
+        LOG(_position2d + "Created ");
+        LOG( "_postion2d x =  " + _position2d.X + ", y = " + _position2d.Y);
+        _position2d += new Position2D(20, 20);
+        if(_position2d.EqualTo(new Position2D(620, 720))) LOG( "plus Position2D(20, 20)! Position x =  " + _position2d.X + ", y = " + _position2d.Y, 1);
+        else LOG( "plus Position2D(20, 20)! Position x =  " + _position2d.X + ", y = " + _position2d.Y, 0);
+
+        Position parentOrigin = ParentOrigin.BottomRight;
+        LOG( "parentOrigin.BottomRight x=" + parentOrigin.X + ", y=" + parentOrigin.Y + ", z=" + parentOrigin.Z );
+
+        Color color = new Color(20, 100, 50, 200);
+        LOG( color +  "    Created ");
+        LOG( "Color R =  " + color.R + ", G = " + color.G + ", B = " + color.B + ", A = " + color.A );
+        color += new Color(20, 20, 20, 20);
+        if(color.EqualTo(new Color(40, 120, 70, 220))) LOG( "plus Color(20, 20, 20, 20)! Color R =  " + color.R + ", G = " + color.G + ", B = " + color.B + ", A = " + color.A, 1 );
+        else LOG( "plus Color(20, 20, 20, 20)! Color R =  " + color.R + ", G = " + color.G + ", B = " + color.B + ", A = " + color.A, 0 );
+        color.R += 10;
+        color.G += 10;
+        color.B += 10;
+        color.A += 10;
+        if(color.EqualTo(new Color(50, 130, 80, 230))) LOG( "plus +10 for each! Color r =  " + color.R + ", g = " + color.G + ", b = " + color.B + ", a = " + color.A, 1 );
+        else LOG( "plus +10 for each! Color r =  " + color.R + ", g = " + color.G + ", b = " + color.B + ", a = " + color.A, 0 );
+
+        LOG("=================================");
+      }
+
     }
 }
-
 
