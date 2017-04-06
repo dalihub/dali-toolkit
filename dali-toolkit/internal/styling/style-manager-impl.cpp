@@ -39,6 +39,7 @@ const char* FONT_SIZE_QUALIFIER = "fontsize";
 const char* DEFAULT_THEME = DALI_STYLE_DIR "dali-toolkit-default-theme.json";
 
 const char* PACKAGE_PATH_KEY = "PACKAGE_PATH";
+const char* APPLICATION_RESOURCE_PATH_KEY = "APPLICATION_RESOURCE_PATH";
 const char* DEFAULT_PACKAGE_PATH = DALI_DATA_READ_ONLY_DIR "/toolkit/";
 
 } // namespace
@@ -109,7 +110,7 @@ StyleManager::StyleManager()
   if( mStyleMonitor )
   {
     mStyleMonitor.StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
-
+    mThemeBuilderConstants[ APPLICATION_RESOURCE_PATH_KEY ] = mStyleMonitor.GetAppResourcePath();
     mDefaultFontSize = mStyleMonitor.GetDefaultFontSize();
   }
 
