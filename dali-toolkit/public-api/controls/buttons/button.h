@@ -326,8 +326,6 @@ public:
   float GetAnimationTime() const DALI_DEPRECATED_API;
 
   /**
-   * @DEPRECATED_1_1.32 SetProperty LABEL or Styling file
-   *
    * @brief Sets the button's label.
    *
    * @SINCE_1_0.0

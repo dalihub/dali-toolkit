@@ -157,7 +157,7 @@ float Button::GetAnimationTime() const
 
 void Button::SetLabelText( const std::string& label )
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetLabelText() is deprecated and will be removed from next release. Use SetProperty LABEL or Styling file instead.\n" );
+  DALI_LOG_WARNING("DEPRECATION WARNING: SetLabelText() is deprecated and will be removed from next release. Use SetProperty LABEL or Styling file instead.\n" );
 
   Dali::Toolkit::GetImplementation( *this ).SetLabelText( label );
 }
