@@ -39,8 +39,6 @@
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-
-#include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
@@ -138,33 +136,20 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       std::string imageUrl;
       if( imageURLValue && imageURLValue->Get( imageUrl ) )
       {
-
-        VisualUrl visualUrl( imageUrl );
-
-        switch( visualUrl.GetType() )
+        if( NinePatchImage::IsNinePatchUrl( imageUrl ) )
         {
-          case VisualUrl::N_PATCH:
-          {
-            visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-            break;
-          }
-          case VisualUrl::SVG:
-          {
-            visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-            break;
-          }
-          case VisualUrl::GIF:
-          {
-            visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-            break;
-          }
-          case VisualUrl::REGULAR_IMAGE:
-          {
-            visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-            break;
-          }
+          visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
+        }
+        else if( SvgVisual::IsSvgUrl( imageUrl ) )
+        {
+          visualPtr = new SvgVisual( *( mFactoryCache.Get() ) );
+        }
+        else
+        {
+          visualPtr = new ImageVisual( *( mFactoryCache.Get() ) );
         }
       }
+
       break;
     }
 
@@ -237,33 +222,29 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
     mFactoryCache = new VisualFactoryCache();
   }
 
-  Visual::BasePtr visualPtr;
-
-  // first resolve url type to know which visual to create
-  VisualUrl visualUrl( url );
-  switch( visualUrl.GetType() )
+  if( mDebugEnabled )
   {
-    case VisualUrl::N_PATCH:
-    {
-      visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl );
-      break;
-    }
-    case VisualUrl::SVG:
-    {
-      visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl );
-      break;
-    }
-    case VisualUrl::GIF:
-    {
-      visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl );
-      break;
-    }
-    case VisualUrl::REGULAR_IMAGE:
-    {
-      visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, size );
-      break;
-    }
+    return Toolkit::Visual::Base( new WireframeVisual( *( mFactoryCache.Get() ) ) );
   }
+
+  if( NinePatchImage::IsNinePatchUrl( url ) )
+  {
+    NPatchVisual* visualPtr = new NPatchVisual( *( mFactoryCache.Get() ) );
+    visualPtr->SetImage( url );
+
+    return Toolkit::Visual::Base( visualPtr );
+  }
+  else if( SvgVisual::IsSvgUrl( url ) )
+  {
+    SvgVisual* visualPtr = new SvgVisual( *( mFactoryCache.Get() ) );
+    visualPtr->SetImage( url, size );
+    return Toolkit::Visual::Base( visualPtr );
+  }
+  else
+  {
+    ImageVisual* visualPtr = new ImageVisual( *( mFactoryCache.Get() ));
+    Actor actor;
+    visualPtr->SetImage( actor, url, size );
 
     return Toolkit::Visual::Base( visualPtr );
   }

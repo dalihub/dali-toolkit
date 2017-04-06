@@ -200,42 +200,20 @@ void RegisterStretchProperties( Renderer& renderer, const char * uniformName, co
 
 /////////////////NPatchVisual////////////////
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties )
-{
-  NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
-  nPatchVisual->mImageUrl = imageUrl;
-  nPatchVisual->SetProperties( properties );
-
-  return nPatchVisual;
-}
-
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl )
-
+NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
+: Visual::Base( factoryCache ),
+  mBorderOnly( false )
 {
 }
 
 NPatchVisual::~NPatchVisual()
 {
-
-  NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
-  VisualUrl visualUrl( image.GetUrl() );
-  nPatchVisual->mImageUrl = visualUrl;
-  return nPatchVisual;
 }
 
 void NPatchVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap )
 {
-
-  naturalSize.x = 0u;
-  naturalSize.y = 0u;
-
-  // load now if not already loaded
-  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocal() )
-  {
-    mId = mLoader.Load( mImageUrl.GetUrl(), mBorder );
-  }
-  const NPatchLoader::Data* data;
-  if( mLoader.GetNPatchData( mId, data ) )
+  Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
+  if( imageURLValue )
   {
     //Read the borderOnly property first since InitialiseFromImage relies on mBorderOnly to be properly set
     Property::Value* borderOnlyValue = propertyMap.Find( Toolkit::ImageVisual::Property::BORDER_ONLY, BORDER_ONLY );
@@ -259,12 +237,10 @@ void NPatchVisual::DoInitialize( Actor& actor, const Property::Map& propertyMap 
 
 void NPatchVisual::GetNaturalSize( Vector2& naturalSize ) const
 {
-
-  // load when first go on stage
-  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocal() )
+  if( mImage )
   {
-    mId = mLoader.Load( mImageUrl.GetUrl(), mBorder );
-
+    naturalSize.x = mImage.GetWidth();
+    naturalSize.y = mImage.GetHeight();
   }
   else if( !mImageUrl.empty() )
   {
@@ -278,18 +254,7 @@ void NPatchVisual::GetNaturalSize( Vector2& naturalSize ) const
   }
 }
 
-
-void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
-{
-  map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::N_PATCH );
-  map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
-  map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );
-  map.Insert( Toolkit::DevelImageVisual::Property::BORDER, mBorder );
-}
-
-void NPatchVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
-
+void NPatchVisual::SetClipRect( const Rect<int>& clipRect )
 {
   Visual::Base::SetClipRect( clipRect );
   //ToDo: renderer responds to the clipRect change
@@ -546,16 +511,9 @@ void NPatchVisual::InitializeFromImage( NinePatchImage nPatch )
   mCroppedImage = nPatch.CreateCroppedBufferImage();
   if( !mCroppedImage )
   {
-
-    DALI_LOG_ERROR("The N patch image '%s' is not a valid N patch image\n", mImageUrl.GetUrl().c_str() );
-    TextureSet textureSet = TextureSet::New();
-    mImpl->mRenderer.SetTextures( textureSet );
-    Image croppedImage = VisualFactoryCache::GetBrokenVisualImage();
-    TextureSetImage( textureSet, 0u, croppedImage );
-    mImpl->mRenderer.RegisterProperty( "uFixed[0]", Vector2::ZERO );
-    mImpl->mRenderer.RegisterProperty( "uFixed[1]", Vector2::ZERO );
-    mImpl->mRenderer.RegisterProperty( "uFixed[2]", Vector2::ZERO );
-    mImpl->mRenderer.RegisterProperty( "uStretchTotal", Vector2( croppedImage.GetWidth(), croppedImage.GetHeight() ) );
+    DALI_LOG_ERROR("'%s' specify a valid 9 patch image\n", mImageUrl.c_str() );
+    InitializeFromBrokenImage();
+    return;
   }
 
   mImageSize = ImageDimensions( mCroppedImage.GetWidth(), mCroppedImage.GetHeight() );

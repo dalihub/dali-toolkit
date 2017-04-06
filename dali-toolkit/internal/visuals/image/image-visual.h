@@ -28,14 +28,6 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/object/weak-handle.h>
 
-<<<<<<< HEAD
-=======
-// INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/visual-url.h>
-
->>>>>>> 8cfc796... Encapsulated visual URL in new VisualUrl class.
 namespace Dali
 {
 
@@ -87,45 +79,11 @@ class ImageVisual: public Visual::Base, public ConnectionTracker, public AtlasUp
 public:
 
   /**
-<<<<<<< HEAD
    * @brief Constructor.
-=======
-   * @brief Create a new image visual with a URL.
-   *
-   * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
-   *
-   * @param[in] factoryCache The VisualFactoryCache object
-   * @param[in] imageUrl The URL of the image resource to use
-   * @param[in] properties A Property::Map containing settings for this visual
-   * @param[in] size The width and height to fit the loaded image to.
-   * @param[in] fittingMode The FittingMode of the resource to load
-   * @param[in] samplingMode The SamplingMode of the resource to load
-   * @return A smart-pointer to the newly allocated visual.
-   */
-  static ImageVisualPtr New( VisualFactoryCache& factoryCache,
-                             const VisualUrl& imageUrl,
-                             const Property::Map& properties,
-                             ImageDimensions size = ImageDimensions(),
-                             FittingMode::Type fittingMode = FittingMode::DEFAULT,
-                             Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
-
-  /**
-   * @brief Create a new image visual with a URL.
-   *
-   * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
->>>>>>> 8cfc796... Encapsulated visual URL in new VisualUrl class.
    *
    * @param[in] factoryCache The VisualFactoryCache object
    */
-<<<<<<< HEAD
   ImageVisual( VisualFactoryCache& factoryCache );
-=======
-  static ImageVisualPtr New( VisualFactoryCache& factoryCache,
-                             const VisualUrl& imageUrl,
-                             ImageDimensions size = ImageDimensions(),
-                             FittingMode::Type fittingMode = FittingMode::DEFAULT,
-                             Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
->>>>>>> 8cfc796... Encapsulated visual URL in new VisualUrl class.
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -145,27 +103,6 @@ public:  // from Visual
   virtual void DoCreatePropertyMap( Property::Map& map ) const;
 
 protected:
-<<<<<<< HEAD
-=======
-
-  /**
-   * @brief Constructor with a URL.
-   *
-   * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
-   *
-   * @param[in] factoryCache The VisualFactoryCache object
-   * @param[in] imageUrl The URL of the image resource to use
-   * @param[in] size The width and height to fit the loaded image to.
-   * @param[in] fittingMode The FittingMode of the resource to load
-   * @param[in] samplingMode The SamplingMode of the resource to load
-   */
-  ImageVisual( VisualFactoryCache& factoryCache,
-               const VisualUrl& imageUrl,
-               ImageDimensions size,
-               FittingMode::Type fittingMode,
-               Dali::SamplingMode::Type samplingMode );
-
->>>>>>> 8cfc796... Encapsulated visual URL in new VisualUrl class.
   /**
    * @copydoc Visual::Base::DoInitialize
    */
@@ -233,9 +170,11 @@ private:
   void ApplyImageToSampler( const Image& image );
 
   /**
-   * @brief Initializes the Dali::Renderer from the image url
+   * @brief Initializes the Dali::Renderer from an image url string
+   *
+   * @param[in] imageUrl The image url string to intialize this ImageVisual from
    */
-  void InitializeRenderer();
+  void InitializeRenderer( const std::string& imageUrl );
 
   /**
    * @brief Initializes the Dali::Renderer from an image handle
@@ -282,11 +221,7 @@ private:
    * @param[in] url The URL of the image resource to use.
    * @param[in] synchronousLoading If true, the resource is loaded synchronously, otherwise asynchronously.
    */
-<<<<<<< HEAD
   TextureSet CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading );
-=======
-  TextureSet CreateTextureSet( Vector4& textureRect, bool synchronousLoading, bool attemptAtlasing );
->>>>>>> 8cfc796... Encapsulated visual URL in new VisualUrl class.
 
   /**
    * Callback function of image resource loading succeed
@@ -315,10 +250,6 @@ private:
   PixelData mPixels;
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
-<<<<<<< HEAD
-=======
-  VisualUrl mImageUrl;
->>>>>>> 8cfc796... Encapsulated visual URL in new VisualUrl class.
 
   std::string mImageUrl;
   Dali::ImageDimensions mDesiredSize;

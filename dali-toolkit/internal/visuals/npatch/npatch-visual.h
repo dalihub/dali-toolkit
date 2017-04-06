@@ -29,11 +29,6 @@
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/shader.h>
 
-
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/visual-url.h>
-
 namespace Dali
 {
 
@@ -59,28 +54,11 @@ class NPatchVisual: public Visual::Base
 public:
 
   /**
-
-   * @brief Create an N-patch visual using an image URL.
-   *
-   * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
-   *
-   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
-   * @param[in] imageUrl The URL to 9 patch image resource to use
-   * @param[in] properties A Property::Map containing settings for this visual
-   * @return A smart-pointer to the newly allocated visual.
-   */
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties );
-
-  /**
-   * @brief Create an N-patch visual using an image URL.
-   *
-   * The visual will load the image synchronously when the associated actor is put on stage, and destroy the image when it is off stage
-
+   * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-
-  static NPatchVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl );
+  NPatchVisual( VisualFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -226,13 +204,14 @@ private:
 
 private:
 
+  NinePatchImage mImage; ///< The image to render if the visual was set from an NinePatchImage, empty otherwise
+  Image mCroppedImage;
 
-  NPatchLoader& mLoader;      ///< reference to N patch loader for fast access
-  VisualUrl mImageUrl;        ///< The url to the N patch to load
-  std::size_t mId;            ///< id of the N patch (from loader/cache)
-  bool mBorderOnly;           ///< if only border is desired
-  Rect< int > mBorder;        ///< The size of the border
-
+  std::string mImageUrl; ///< The url to the image resource to render if the visual was set from an image resource url, empty otherwise
+  NinePatchImage::StretchRanges mStretchPixelsX;
+  NinePatchImage::StretchRanges mStretchPixelsY;
+  ImageDimensions mImageSize;
+  bool mBorderOnly;
 };
 
 } // namespace Internal

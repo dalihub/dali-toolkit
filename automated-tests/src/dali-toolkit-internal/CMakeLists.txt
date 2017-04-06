@@ -18,14 +18,6 @@ SET(TC_SOURCES
  utc-Dali-VisualModel.cpp
  utc-Dali-Text-Layout.cpp
  utc-Dali-Text-Controller.cpp
-
- utc-Dali-VisualUrl.cpp
- utc-Dali-Text-Markup.cpp
- utc-Dali-Text-Typesetter.cpp
- utc-Dali-Text-ViewModel.cpp
- utc-Dali-DebugRendering.cpp
- utc-Dali-ItemView-internal.cpp
- utc-Dali-PropertyHelper.cpp
  utc-Dali-ColorConversion.cpp
 )
 

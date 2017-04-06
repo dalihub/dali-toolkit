@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/visual-url.h>
 
 struct NSVGimage;
 
@@ -55,14 +54,12 @@ public:
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-
-  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties );
+  SvgVisual( VisualFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
    */
-
-  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl );
+  ~SvgVisual();
 
 public:  // from Visual
 
@@ -125,15 +122,6 @@ public:
   void ApplyRasterizedImage( PixelData rasterizedPixelData );
 
 private:
-
-  /**
-   * @brief Parses the SVG Image from the set URL.
-   *
-   * @param[in] imageUrl The URL of the image to parse the SVG from.
-   */
-  void ParseFromUrl( const VisualUrl& imageUrl );
-
-
   /**
    * @bried Rasterize the svg with the given size, and add it to the visual.
    *
@@ -150,7 +138,7 @@ private:
 
 private:
   Vector4              mAtlasRect;
-  VisualUrl            mImageUrl;
+  std::string          mImageUrl;
   NSVGimage*           mParsedImage;
   WeakHandle<Actor>    mPlacementActor;
 
