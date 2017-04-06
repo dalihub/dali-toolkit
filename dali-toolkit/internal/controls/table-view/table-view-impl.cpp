@@ -1366,6 +1366,10 @@ Actor TableView::GetNextKeyboardFocusableActor(Actor currentFocusedActor, Toolki
           }
           break;
         }
+        default:
+        {
+          break;
+        }
       }
 
       // Move the focus if we haven't lost it.

@@ -119,6 +119,10 @@ int ItemLayout::GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Cont
       }
       break;
     }
+    default:
+    {
+      break;
+    }
   }
   return itemID;
 }
