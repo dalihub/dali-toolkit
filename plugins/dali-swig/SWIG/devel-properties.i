@@ -19,11 +19,15 @@
   public static readonly int VISUAL_PROPERTY_TRANSFORM = NDalicManualPINVOKE.Visual_Property_TRANSFORM_get();
   public static readonly int VISUAL_PROPERTY_PREMULTIPLIED_ALPHA = NDalicManualPINVOKE.Visual_Property_PREMULTIPLIED_ALPHA_get();
   public static readonly int VISUAL_PROPERTY_MIX_COLOR = NDalicManualPINVOKE.Visual_Property_MIX_COLOR_get();
+  public static readonly int IMAGE_VISUAL_BORDER = NDalicManualPINVOKE.Image_Visual_BORDER_get();
 %}
 
 %typemap(cscode) Dali::Toolkit::Visual::Type %{
   ,
-  TEXT
+  TEXT,
+  N_PATCH,
+  SVG,
+  ANIMATED_IMAGE
 %}
 
 %typemap(cscode) Dali::Actor::Property %{

@@ -153,9 +153,9 @@ namespace ImageViewExample
                 _animation.EndTime = 6000;
                 _animation.TargetProperty = "Size";
                 KeyFrames _keyFrames = new KeyFrames();
-                _keyFrames.Add(0.0f, new Size3D(0.0f, 0.0f, 0.0f));
-                _keyFrames.Add(0.3f, new Size3D((stage.Size * 0.7f)));
-                _keyFrames.Add(1.0f, new Size3D(stage.Size));
+                _keyFrames.Add(0.0f, new Size(0.0f, 0.0f, 0.0f));
+                _keyFrames.Add(0.3f, new Size((stage.Size * 0.7f)));
+                _keyFrames.Add(1.0f, new Size(stage.Size));
                 _animation.AnimateBetween(_imageView, _keyFrames, Animation.Interpolation.Linear);
 
                 _animation.EndAction = Animation.EndActions.Discard;

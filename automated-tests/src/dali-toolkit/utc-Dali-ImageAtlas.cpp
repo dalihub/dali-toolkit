@@ -467,7 +467,7 @@ int UtcDaliImageAtlasImageView(void)
   application.GetPlatform().SetClosestImageSize(  Vector2(100, 100) );
   Stage::GetCurrent().Add( imageView3 );
 
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);

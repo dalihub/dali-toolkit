@@ -51,7 +51,9 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying highp vec2 vTexCoord;\n
   varying highp float vRatio;\n
-  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump mat4 uModelMatrix;\n
+  uniform mediump mat4 uViewMatrix;\n
+  uniform mediump mat4 uProjection;\n
   uniform mediump vec3 uSize;\n
   uniform mediump float uDelta;\n
   uniform mediump vec2 uTextureSize;
@@ -61,25 +63,29 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   void main()\n
   {\n
     {\n
-      mediump vec4 vertexPosition = vec4(aPosition*uSize.xy, 0.0, 1.0);\n
+      highp vec4 vertexPosition = vec4(aPosition*uSize.xy, 0.0, 1.0);\n
+      vertexPosition = uViewMatrix *  uModelMatrix  * vertexPosition ;\n
+      vertexPosition.x = floor( vertexPosition.x ) + 0.5;
+      vertexPosition.y = floor( vertexPosition.y ) + 0.5;
       float smallTextPadding = max(uSize.x - uTextureSize.x, 0. );\n
       float gap = max( uGap, smallTextPadding );\n
-      vTexCoord.x = ( uDelta + ( uRtl * ( uTextureSize.x - uSize.x ) )  + ( aPosition.x * uSize.x ) )/ ( uTextureSize.x+gap );\n
-      vTexCoord.y = aPosition.y;\n
+      float delta = floor ( uDelta ) + 0.5;
+      vTexCoord.x = ( delta  + ( uRtl * ( uTextureSize.x - uSize.x ) ) + (  aPosition.x * uSize.x ) )/ ( uTextureSize.x + gap );\n
+      vTexCoord.y = ( 0.5 + floor(  aPosition.y * uSize.y ) )/ ( uTextureSize.y ) ;\n
       vRatio = uTextureSize.x / ( uTextureSize.x + gap );\n
-      gl_Position = uMvpMatrix * vertexPosition;\n
+      gl_Position = uProjection * vertexPosition;
     }\n
   }\n
 );
 
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
+  varying highp vec2 vTexCoord;\n
   varying highp float vRatio;\n
   uniform sampler2D sTexture;\n
   \n
   void main()\n
   {\n
-    mediump vec2 texCoord;\n
+    highp vec2 texCoord;\n
     texCoord.y = vTexCoord.y;\n
     texCoord.x = fract( vTexCoord.x ) / vRatio;\n
     if ( texCoord.x > 1.0 )\n
@@ -169,7 +175,7 @@ void CreateRenderer( FrameBufferImage frameBufferImage, Dali::Renderer& renderer
   Shader shader = Shader::New( VERTEX_SHADER_SCROLL , FRAGMENT_SHADER, Shader::Hint::NONE );
 
   Sampler sampler = Sampler::New();
-  sampler.SetFilterMode(FilterMode::NEAREST, FilterMode::NEAREST );
+  sampler.SetFilterMode(FilterMode::LINEAR, FilterMode::LINEAR );
 
   TextureSet textureSet = TextureSet::New();
   TextureSetImage( textureSet, 0u, frameBufferImage );
@@ -267,6 +273,13 @@ void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, co
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] offscreenSize[%f,%f] direction[%d] alignmentOffset[%f]\n",
                  controlSize.x, controlSize.y, offScreenSize.x, offScreenSize.y, direction, alignmentOffset );
+
+  CleanUp(); //  If already scrolling then restart with new parameters
+
+  if ( mScrollAnimation )
+  {
+    mScrollAnimation.Clear();
+  }
 
   FrameBufferImage offscreenRenderTargetForText = FrameBufferImage::New( offScreenSize.width, offScreenSize.height, Pixel::RGBA8888 );
   Renderer renderer;

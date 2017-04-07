@@ -28,6 +28,7 @@
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -227,6 +228,15 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Visual_Property_MIX_COLOR_get() {
   int result;
 
   result = (int)Dali::Toolkit::DevelVisual::Property::MIX_COLOR;
+  jresult = (int)result;
+  return jresult;
+}
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Image_Visual_BORDER_get() {
+  int jresult ;
+  int result;
+
+  result = (int)Dali::Toolkit::DevelImageVisual::Property::BORDER;
   jresult = (int)result;
   return jresult;
 }

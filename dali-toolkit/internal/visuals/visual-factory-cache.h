@@ -28,6 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
+#include <dali-toolkit/internal/visuals/texture-manager.h>
 
 namespace Dali
 {
@@ -37,11 +38,12 @@ namespace Toolkit
 
 namespace Internal
 {
-
 class ImageAtlasManager;
+class NPatchLoader;
+class TextureManager;
+
 typedef IntrusivePtr<ImageAtlasManager> ImageAtlasManagerPtr;
 
-class NPatchLoader;
 
 /**
  * Caches shaders and geometries. Owned by VisualFactory.
@@ -145,6 +147,12 @@ public:
   ImageAtlasManagerPtr GetAtlasManager();
 
   /**
+   * Get the texture manager
+   * @return A reference to the texture manager
+   */
+  TextureManager& GetTextureManager();
+
+  /**
    * Get the N-Patch texture cache.
    * @return A reference to the N patch loader
    */
@@ -185,8 +193,8 @@ private:
   Shader mShader[SHADER_TYPE_MAX+1];
 
   ImageAtlasManagerPtr mAtlasManager;
-  NPatchLoader mNPatchLoader;
-
+  TextureManager       mTextureManager;
+  NPatchLoader         mNPatchLoader;
   SvgRasterizeThread*  mSvgRasterizeThread;
 };
 
