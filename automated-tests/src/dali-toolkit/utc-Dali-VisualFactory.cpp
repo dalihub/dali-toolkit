@@ -695,6 +695,25 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
   }
 
+  propertyMap.Clear();
+  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
+  propertyMap.Insert( ImageVisual::Property::URL, gImage_34_RGBA );
+  propertyMap.Insert( DevelImageVisual::Property::BORDER, Rect< int >( 1, 1, 1, 1 ) );
+  {
+    tet_infoline( "whole grid" );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New();
+    TestVisualRender( application, actor, visual, 1u );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+  }
+
   END_TEST;
 }
 
