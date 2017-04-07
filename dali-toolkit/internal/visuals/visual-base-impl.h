@@ -44,6 +44,8 @@ namespace Internal
 namespace Visual
 {
 
+class ResourceObserver;
+
 /**
  * Base class for all Control rendering logic. A control may have multiple visuals.
  *
@@ -207,6 +209,29 @@ public:
    */
   void AnimateProperty( Dali::Animation& transition,
                         Internal::TransitionData::Animator& animator );
+
+  /**
+   * @brief Add an observer to watch for when the Visuals resources are loaded.
+   * Currently only supports a single observer
+   *
+   */
+  void AddResourceObserver( Visual::ResourceObserver& observer );
+
+  /**
+   * @brief Remove an observer
+   */
+  void RemoveResourceObserver( Visual::ResourceObserver& observer );
+
+  /**
+   * @brief Called when the visuals resources are loaded / ready
+   */
+  void ResourceReady();
+
+  /**
+   * @brief Called when the visuals resources are loaded / ready
+   * @return true if ready, false otherwise
+   */
+  bool IsResourceReady() const;
 
 protected:
 
