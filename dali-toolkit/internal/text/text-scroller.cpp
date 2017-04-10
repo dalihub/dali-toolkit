@@ -268,13 +268,6 @@ void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, co
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] offscreenSize[%f,%f] direction[%d] alignmentOffset[%f]\n",
                  controlSize.x, controlSize.y, offScreenSize.x, offScreenSize.y, direction, alignmentOffset );
 
-  CleanUp(); //  If already scrolling then restart with new parameters
-
-  if ( mScrollAnimation )
-  {
-    mScrollAnimation.Clear();
-  }
-
   FrameBufferImage offscreenRenderTargetForText = FrameBufferImage::New( offScreenSize.width, offScreenSize.height, Pixel::RGBA8888 );
   Renderer renderer;
 
