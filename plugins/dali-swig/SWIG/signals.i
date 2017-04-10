@@ -265,6 +265,9 @@ DALI_SIGNAL_1_PARAM( Dali::Actor );
 //  Signal< void (float) >
 DALI_SIGNAL_1_PARAM( float );
 
+//  Signal< void (bool) >
+DALI_SIGNAL_1_PARAM( bool );
+
 // Signal< void (Dali::Application&) >
 DALI_SIGNAL_1_PARAM( Dali::Application& );
 

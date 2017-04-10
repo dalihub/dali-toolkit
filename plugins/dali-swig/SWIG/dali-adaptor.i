@@ -107,6 +107,7 @@
 %template(ApplicationSignal) Dali::Signal<void(Dali::Application&)>;
 %template(ApplicationControlSignal) Dali::Signal<void(Dali::Application&, void*)>;
 %template(TimerSignalType) Dali::Signal<bool()>;
+%template(WindowFocusSignalType) Dali::Signal<void(bool)>;
 
 
 // Application specialisation

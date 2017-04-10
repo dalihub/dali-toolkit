@@ -34,6 +34,7 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/internal/visuals/texture-manager.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -261,11 +262,13 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mPlacementActor(),
   mImageUrl( imageUrl ),
   mDesiredSize( size ),
+  mTextureId( TextureManager::INVALID_TEXTURE_ID ),
   mFittingMode( fittingMode ),
   mSamplingMode( samplingMode ),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
-  mAttemptAtlasing( false )
+  mAttemptAtlasing( false ),
+  mTextureLoading( false )
 {
 }
 
@@ -277,11 +280,13 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mPlacementActor(),
   mImageUrl(),
   mDesiredSize(),
+  mTextureId( TextureManager::INVALID_TEXTURE_ID ),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
-  mAttemptAtlasing( false )
+  mAttemptAtlasing( false ),
+  mTextureLoading( false )
 {
 }
 
@@ -465,16 +470,16 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
   }
   else if( mImageUrl.IsValid() && mImageUrl.GetLocation() == VisualUrl::LOCAL )
   {
-    ImageDimensions dimentions = Dali::GetClosestImageSize( mImageUrl.GetUrl() );
-    naturalSize.x = dimentions.GetWidth();
-    naturalSize.y = dimentions.GetHeight();
+    ImageDimensions dimensions = Dali::GetClosestImageSize( mImageUrl.GetUrl() );
+    naturalSize.x = dimensions.GetWidth();
+    naturalSize.y = dimensions.GetHeight();
     return;
   }
 
   naturalSize = Vector2::ZERO;
 }
 
-void ImageVisual::CreateRenderer( TextureSet& textures )
+void ImageVisual::CreateRenderer( TextureSet& textureSet )
 {
   Geometry geometry;
   Shader shader;
@@ -509,8 +514,11 @@ void ImageVisual::CreateRenderer( TextureSet& textures )
   shader.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_ON ); // Set default to align
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
-  DALI_ASSERT_DEBUG( textures );
-  mImpl->mRenderer.SetTextures( textures );
+  if( textureSet )
+  {
+    mImpl->mRenderer.SetTextures( textureSet );
+  }
+  // else still waiting for texture load to finish.
 
   //Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
@@ -583,12 +591,16 @@ void ImageVisual::LoadResourceSynchronously()
     BitmapLoader loader = BitmapLoader::New( mImageUrl.GetUrl(), mDesiredSize, mFittingMode, mSamplingMode );
     loader.Load();
     mPixels = loader.GetPixelData();
+    mTextureLoading = false;
   }
 }
 
 TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, bool synchronousLoading, bool attemptAtlasing )
 {
   TextureSet textureSet;
+
+  mTextureLoading = false;
+
   textureRect = FULL_TEXTURE_RECT;
   if( synchronousLoading )
   {
@@ -622,23 +634,34 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, bool synchronous
     {
       textureSet = mFactoryCache.GetAtlasManager()->Add( textureRect, mImageUrl.GetUrl(), mDesiredSize, mFittingMode, true, this );
       mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
+      mTextureLoading = true;
     }
     if( !textureSet ) // big image, no atlasing or atlasing failed
     {
       mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-      ResourceImage resourceImage = Dali::ResourceImage::New( mImageUrl.GetUrl(), mDesiredSize, mFittingMode, mSamplingMode );
-      resourceImage.LoadingFinishedSignal().Connect( this, &ImageVisual::OnImageLoaded );
-      textureSet = TextureSet::New();
-      TextureSetImage( textureSet, 0u, resourceImage );
+      TextureManager& textureManager = mFactoryCache.GetTextureManager();
+      mTextureId = textureManager.RequestLoad( mImageUrl, mDesiredSize, mFittingMode,
+                                               mSamplingMode, TextureManager::NO_ATLAS, this );
+
+      TextureManager::LoadState loadState = textureManager.GetTextureState( mTextureId );
+
+      mTextureLoading = ( loadState == TextureManager::LOADING );
+
+      if( loadState == TextureManager::UPLOADED )
+      {
+        // UploadComplete has already been called - keep the same texture set
+        textureSet = textureManager.GetTextureSet(mTextureId);
+      }
     }
   }
 
-  if( !(mImpl->mFlags & Impl::IS_ATLASING_APPLIED) )
+  if( ! (mImpl->mFlags & Impl::IS_ATLASING_APPLIED) && textureSet )
   {
     Sampler sampler = Sampler::New();
     sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
     textureSet.SetSampler( 0u, sampler );
   }
+
   return textureSet;
 }
 
@@ -646,7 +669,7 @@ void ImageVisual::InitializeRenderer()
 {
   mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
-  if( !mImpl->mCustomShader && mImageUrl.GetLocation() == VisualUrl::LOCAL )
+  if( ! mImpl->mCustomShader && mImageUrl.GetLocation() == VisualUrl::LOCAL )
   {
     bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
 
@@ -697,18 +720,6 @@ void ImageVisual::InitializeRenderer( const Image& image )
   ApplyImageToSampler( image );
 }
 
-void ImageVisual::UploadCompleted()
-{
-  // Resource image is loaded. If weak handle is holding a placement actor, it is the time to add the renderer to actor.
-  Actor actor = mPlacementActor.GetHandle();
-  if( actor )
-  {
-    actor.AddRenderer( mImpl->mRenderer );
-    // reset the weak handle so that the renderer only get added to actor once
-    mPlacementActor.Reset();
-  }
-}
-
 void ImageVisual::DoSetOnStage( Actor& actor )
 {
   if( mImageUrl.IsValid() )
@@ -726,7 +737,6 @@ void ImageVisual::DoSetOnStage( Actor& actor )
   }
 
   mPlacementActor = actor;
-
   // Search the Actor tree to find if Layer UI behaviour set.
   Layer layer = actor.GetLayer();
   if ( layer && layer.GetBehavior() == Layer::LAYER_3D )
@@ -740,7 +750,7 @@ void ImageVisual::DoSetOnStage( Actor& actor )
     mImpl->mRenderer.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, mPixelArea );
   }
 
-  if( IsSynchronousResourceLoading() || !(mImpl->mFlags & Impl::IS_ATLASING_APPLIED) )
+  if( mTextureLoading == false )
   {
     actor.AddRenderer( mImpl->mRenderer );
     mPlacementActor.Reset();
@@ -755,10 +765,10 @@ void ImageVisual::DoSetOffStage( Actor& actor )
   actor.RemoveRenderer( mImpl->mRenderer);
   if( mImageUrl.IsValid() )
   {
-    RemoveFromAtlas( mImageUrl.GetUrl() );
+    RemoveTexture( mImageUrl.GetUrl() );
     mImage.Reset();
   }
-
+  mTextureLoading = false;
   mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
 }
@@ -876,34 +886,74 @@ void ImageVisual::ApplyImageToSampler( const Image& image )
   }
 }
 
-void ImageVisual::OnImageLoaded( ResourceImage image )
+// From existing atlas manager
+void ImageVisual::UploadCompleted()
 {
-  if( image.GetLoadingState() == Dali::ResourceLoadingFailed )
+  // Texture has been uploaded. If weak handle is holding a placement actor, it is the time to add the renderer to actor.
+  Actor actor = mPlacementActor.GetHandle();
+  if( actor )
   {
-    Image brokenImage = VisualFactoryCache::GetBrokenVisualImage();
-    if( mImpl->mRenderer )
-    {
-      ApplyImageToSampler( brokenImage );
-    }
+    actor.AddRenderer( mImpl->mRenderer );
+
+    // reset the weak handle so that the renderer only get added to actor once
+    mPlacementActor.Reset();
   }
+  mTextureLoading = false;
 }
 
-void ImageVisual::RemoveFromAtlas(const std::string& url)
+// From Texture Manager
+void ImageVisual::UploadComplete( bool loadingSuccess, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle )
 {
-  Vector4 atlasRect( 0.f, 0.f, 1.f, 1.f );
-  Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
-  if( index != Property::INVALID_INDEX )
+  Actor actor = mPlacementActor.GetHandle();
+  if( actor )
   {
-    Property::Value atlasRectValue = mImpl->mRenderer.GetProperty( index );
-    atlasRectValue.Get( atlasRect );
+    if( mImpl->mRenderer )
+    {
+      actor.AddRenderer( mImpl->mRenderer );
+      // reset the weak handle so that the renderer only get added to actor once
+      mPlacementActor.Reset();
+
+      if( loadingSuccess )
+      {
+        Sampler sampler = Sampler::New();
+        sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
+        textureSet.SetSampler( 0u, sampler );
+        mImpl->mRenderer.SetTextures(textureSet);
+      }
+      else
+      {
+        Image brokenImage = VisualFactoryCache::GetBrokenVisualImage();
+        ApplyImageToSampler( brokenImage );
+      }
+    }
   }
+  mTextureLoading = false;
+}
 
-  TextureSet textureSet = mImpl->mRenderer.GetTextures();
-  mImpl->mRenderer.Reset();
-
-  if( index != Property::INVALID_INDEX )
+void ImageVisual::RemoveTexture(const std::string& url)
+{
+  if( mTextureId != TextureManager::INVALID_TEXTURE_ID )
   {
-    mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
+    mFactoryCache.GetTextureManager().Remove( mTextureId );
+    mTextureId = TextureManager::INVALID_TEXTURE_ID;
+  }
+  else
+  {
+    Vector4 atlasRect( 0.f, 0.f, 1.f, 1.f );
+    Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
+    if( index != Property::INVALID_INDEX )
+    {
+      Property::Value atlasRectValue = mImpl->mRenderer.GetProperty( index );
+      atlasRectValue.Get( atlasRect );
+    }
+
+    TextureSet textureSet = mImpl->mRenderer.GetTextures();
+    mImpl->mRenderer.Reset();
+
+    if( index != Property::INVALID_INDEX )
+    {
+      mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
+    }
   }
 }
 

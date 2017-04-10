@@ -46,54 +46,6 @@ namespace Dali
       OrthographicProjection = Dali.ProjectionMode.ORTHOGRAPHIC_PROJECTION      ///< Relative distance from the camera does not affect the size of objects @SINCE_1_0.0
     }
 
-    public struct ParentOrigin
-    {
-      public static readonly float Top = NDalic.ParentOriginTop;
-      public static readonly float Bottom = NDalic.ParentOriginBottom;
-      public static readonly float Left = NDalic.ParentOriginLeft;
-      public static readonly float Right = NDalic.ParentOriginRight;
-      public static readonly float Middle = NDalic.ParentOriginMiddle;
-      public static readonly Dali.Vector3 TopLeft = NDalic.ParentOriginTopLeft;
-      public static readonly Dali.Vector3 TopCenter = NDalic.ParentOriginTopCenter;
-      public static readonly Dali.Vector3 TopRight = NDalic.ParentOriginTopRight;
-      public static readonly Dali.Vector3 CenterLeft = NDalic.ParentOriginCenterLeft;
-      public static readonly Dali.Vector3 Center = NDalic.ParentOriginCenter;
-      public static readonly Dali.Vector3 CenterRight = NDalic.ParentOriginCenterRight;
-      public static readonly Dali.Vector3 BottomLeft = NDalic.ParentOriginBottomLeft;
-      public static readonly Dali.Vector3 BottomCenter = NDalic.ParentOriginBottomCenter;
-      public static readonly Dali.Vector3 BottomRight = NDalic.ParentOriginBottomRight;
-    }
-
-    public struct AnchorPoint
-    {
-      public static readonly float Top = NDalic.AnchorPointTop;
-      public static readonly float Bottom = NDalic.AnchorPointBottom;
-      public static readonly float Left = NDalic.AnchorPointLeft;
-      public static readonly float Right = NDalic.AnchorPointRight;
-      public static readonly float Middle = NDalic.AnchorPointMiddle;
-      public static readonly Dali.Vector3 TopLeft = NDalic.AnchorPointTopLeft;
-      public static readonly Dali.Vector3 TopCenter = NDalic.AnchorPointTopCenter;
-      public static readonly Dali.Vector3 TopRight = NDalic.AnchorPointTopRight;
-      public static readonly Dali.Vector3 CenterLeft = NDalic.AnchorPointCenterLeft;
-      public static readonly Dali.Vector3 Center = NDalic.AnchorPointCenter;
-      public static readonly Dali.Vector3 CenterRight = NDalic.AnchorPointCenterRight;
-      public static readonly Dali.Vector3 BottomLeft = NDalic.AnchorPointBottomLeft;
-      public static readonly Dali.Vector3 BottomCenter = NDalic.AnchorPointBottomCenter;
-      public static readonly Dali.Vector3 BottomRight = NDalic.AnchorPointBottomRight;
-    }
-
-    public struct Vect3
-    {
-      public static readonly Dali.Vector3 One = Dali.Vector3.ONE;
-      public static readonly Dali.Vector3 Xaxis = Dali.Vector3.XAXIS;
-      public static readonly Dali.Vector3 Yaxis = Dali.Vector3.YAXIS;
-      public static readonly Dali.Vector3 Zaxis = Dali.Vector3.ZAXIS;
-      public static readonly Dali.Vector3 NegativeXaxis = Dali.Vector3.NEGATIVE_XAXIS;
-      public static readonly Dali.Vector3 NegativeYaxis = Dali.Vector3.NEGATIVE_YAXIS;
-      public static readonly Dali.Vector3 NegativeZaxis = Dali.Vector3.NEGATIVE_ZAXIS;
-      public static readonly Dali.Vector3 Zero = Dali.Vector3.ZERO;
-    }
-
     public struct Direction
     {
       public enum Type
@@ -130,7 +82,10 @@ namespace Dali
         Mesh = Dali.VisualType.MESH,
         Primitive = Dali.VisualType.PRIMITIVE,
         WireFrame = Dali.VisualType.WIREFRAME,
-        Text = Dali.VisualType.TEXT
+        Text = Dali.VisualType.TEXT,
+        NPatch = Dali.VisualType.N_PATCH,
+        Svg = Dali.VisualType.SVG,
+        AnimatedImage = Dali.VisualType.ANIMATED_IMAGE
       }
 
       public struct Property
@@ -188,6 +143,7 @@ namespace Dali
       public static readonly int PixelArea = NDalic.IMAGE_VISUAL_PIXEL_AREA;
       public static readonly int WrapModeU = NDalic.IMAGE_VISUAL_WRAP_MODE_U;
       public static readonly int WrapModeV = NDalic.IMAGE_VISUAL_WRAP_MODE_V;
+      public static readonly int Border = NDalic.IMAGE_VISUAL_BORDER;
     }
 
     public struct MeshVisualProperty

@@ -553,6 +553,59 @@ int UtcDaliToolkitTextlabelScrollingP(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextlabelScrollingInterruptedP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelScrollingInterruptedP");
+  TextLabel label = TextLabel::New("Some text to scroll");
+  DALI_TEST_CHECK( label );
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  Stage::GetCurrent().Add( label );
+  label.SetSize( 360.0f, 20.f );
+  // Turn on all the effects
+  label.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+
+  // Render the text.
+  application.SendNotification();
+  application.Render();
+
+  unsigned int actorCount1 = label.GetChildCount();
+  tet_printf("Initial actor count is(%d)\n", actorCount1 );
+
+  try
+  {
+    // Render some text with the shared atlas backend
+    label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    application.SendNotification();
+    application.Render(2000);
+
+    unsigned int actorCount1 = label.GetChildCount();
+    tet_printf("Actor count after scrolling is(%d)\n", actorCount1 );
+
+    label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::RED );
+
+    // Render the text.
+    application.SendNotification();
+    application.Render();
+
+    unsigned int actorCount2 = label.GetChildCount();
+    tet_printf("After changing color the actor count is(%d)\n", actorCount2 );
+
+    DALI_TEST_EQUALS( actorCount1, actorCount2, TEST_LOCATION );
+
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextlabelScrollingN(void)
 {
   ToolkitTestApplication application;
