@@ -250,7 +250,7 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation01(void)
   manager.SetFocus( dummy3 );
   DALI_TEST_CHECK( dummy3Impl.keyInputFocusGained );
 
-  Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Up);
+  Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Up, "");
   application.ProcessEvent(event);
 
   DALI_TEST_CHECK( callback1.mIsCalled );
@@ -296,7 +296,7 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
   manager.SetFocus( dummy3 );
   DALI_TEST_CHECK( dummy3Impl.keyInputFocusGained );
 
-  Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Up);
+  Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Up, "" );
   application.ProcessEvent(event);
 
   DALI_TEST_CHECK( !callback1.mIsCalled );

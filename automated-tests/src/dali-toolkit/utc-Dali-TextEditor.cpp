@@ -114,6 +114,8 @@ const int KEY_WHITE_SPACE_CODE = 65;
 
 const char* HANDLE_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insertpoint-icon.png";
 
+const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
+
 static bool gTextChangedCallBackCalled;
 static bool gInputStyleChangedCallbackCalled;
 static Dali::Toolkit::TextEditor::InputStyle::Mask gInputStyleMask;
@@ -186,14 +188,16 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                    int keyCode,
                                    int keyModifier,
                                    unsigned long timeStamp,
-                                   const Integration::KeyEvent::State& keyState )
+                                   const Integration::KeyEvent::State& keyState,
+                                   const std::string& deviceName )
 {
   return Integration::KeyEvent( keyName,
                                 keyString,
                                 keyCode,
                                 keyModifier,
                                 timeStamp,
-                                keyState );
+                                keyState,
+                                deviceName );
 }
 
 /**
@@ -772,7 +776,7 @@ int utcDaliTextEditorTextChangedP(void)
   editor.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
-  application.ProcessEvent( GenerateKey( "D", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "D", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME  ) );
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   END_TEST;
@@ -1092,7 +1096,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   gInputStyleMask = TextEditor::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1117,7 +1121,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   gInputStyleMask = TextEditor::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1133,7 +1137,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   gInputStyleMask = TextEditor::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1174,7 +1178,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   editor.SetProperty( TextEditor::Property::INPUT_EMBOSS, "emboss" );
   editor.SetProperty( TextEditor::Property::INPUT_OUTLINE, "outline" );
 
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1282,7 +1286,7 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // Add a key event but as the text editor has not the focus it should do nothing.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1299,8 +1303,8 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // Now the text editor has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1331,8 +1335,8 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // The second text editor has the focus. It should handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1388,8 +1392,8 @@ int utcDaliTextEditorEvent02(void)
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   // Now the text editor has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1413,8 +1417,8 @@ int utcDaliTextEditorEvent02(void)
   // Move the cursor and check the position changes.
   Vector3 position1 = cursor.GetCurrentPosition();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1424,8 +1428,8 @@ int utcDaliTextEditorEvent02(void)
 
   DALI_TEST_CHECK( position2.x < position1.x );
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1463,8 +1467,8 @@ int utcDaliTextEditorEvent02(void)
   DALI_TEST_CHECK( position5.x > position4.x );
 
   // Remove all the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
   editor.SetProperty( TextEditor::Property::TEXT, "" );
 
   // Render and notify
@@ -1604,8 +1608,8 @@ int utcDaliTextEditorEvent04(void)
   application.Render();
 
   // Move at the end of the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1613,8 +1617,8 @@ int utcDaliTextEditorEvent04(void)
 
   for( unsigned int index = 0u; index < 10u; ++index )
   {
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down ) );
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down ) );
+    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
+    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
     // Render and notify
     application.SendNotification();
@@ -1622,7 +1626,7 @@ int utcDaliTextEditorEvent04(void)
   }
 
   // Add a character
-  application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1631,8 +1635,8 @@ int utcDaliTextEditorEvent04(void)
   DALI_TEST_EQUALS( "Hello\nworld", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   // Add some key events
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1640,8 +1644,8 @@ int utcDaliTextEditorEvent04(void)
 
   for( unsigned int index = 0u; index < 10u; ++index )
   {
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down ) );
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down ) );
+    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
+    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
     // Render and notify
     application.SendNotification();
@@ -1649,7 +1653,7 @@ int utcDaliTextEditorEvent04(void)
   }
 
   // Add a character
-  application.ProcessEvent( GenerateKey( " ", " ", KEY_WHITE_SPACE_CODE, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( " ", " ", KEY_WHITE_SPACE_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1699,8 +1703,8 @@ int utcDaliTextEditorEvent05(void)
   application.Render();
 
   // Move at the end of the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
   // Render and notify
   application.SendNotification();
@@ -1709,7 +1713,7 @@ int utcDaliTextEditorEvent05(void)
   for( unsigned int index = 0u; index < 10u; ++index )
   {
     // Add a character
-    application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down ) );
+    application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
     // Render and notify
     application.SendNotification();
@@ -1721,7 +1725,7 @@ int utcDaliTextEditorEvent05(void)
   // Continuous scroll left to increase coverage
   for( unsigned int index = 0u; index < 10u; ++index )
   {
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down ) );
+    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME ) );
 
     // Render and notify
     application.SendNotification();
@@ -1734,7 +1738,7 @@ int utcDaliTextEditorEvent05(void)
   DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Press Escape to increase coverage
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME ) );
   application.SendNotification();
   application.Render();
 
