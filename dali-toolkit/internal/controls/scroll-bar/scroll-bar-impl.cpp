@@ -28,6 +28,7 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/object/handle-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
@@ -361,7 +362,7 @@ void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification& source)
   Handle scrollableHandle = mScrollableObject.GetBaseHandle();
   if(scrollableHandle)
   {
-    mScrollPositionIntervalReachedSignal.Emit(scrollableHandle.GetProperty<float>(mPropertyScrollPosition));
+    mScrollPositionIntervalReachedSignal.Emit( DevelHandle::GetCurrentProperty< float >( scrollableHandle, mPropertyScrollPosition ) );
   }
 }
 
@@ -471,7 +472,7 @@ void ScrollBar::OnPan( const PanGesture& gesture )
         }
 
         ShowIndicator();
-        mScrollStart = scrollableHandle.GetProperty<float>(mPropertyScrollPosition);
+        mScrollStart = DevelHandle::GetCurrentProperty< float >( scrollableHandle, mPropertyScrollPosition );
         mGestureDisplacement = Vector3::ZERO;
         mIsPanning = true;
 
@@ -482,8 +483,8 @@ void ScrollBar::OnPan( const PanGesture& gesture )
         mGestureDisplacement.x += gesture.displacement.x;
         mGestureDisplacement.y += gesture.displacement.y;
 
-        float minScrollPosition = scrollableHandle.GetProperty<float>( mPropertyMinScrollPosition );
-        float maxScrollPosition = scrollableHandle.GetProperty<float>( mPropertyMaxScrollPosition );
+        float minScrollPosition = DevelHandle::GetCurrentProperty<float>( scrollableHandle, mPropertyMinScrollPosition );
+        float maxScrollPosition = DevelHandle::GetCurrentProperty<float>( scrollableHandle, mPropertyMaxScrollPosition );
 
         // The domain size is the internal range
         float domainSize = maxScrollPosition - minScrollPosition;

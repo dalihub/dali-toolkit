@@ -32,6 +32,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/object/handle-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
@@ -407,7 +408,7 @@ ItemLayoutPtr ItemView::GetActiveLayout() const
 
 float ItemView::GetCurrentLayoutPosition(unsigned int itemId) const
 {
-  return Self().GetProperty<float>( Toolkit::ItemView::Property::LAYOUT_POSITION ) + static_cast<float>( itemId );
+  return DevelHandle::GetCurrentProperty< float >( Self(), Toolkit::ItemView::Property::LAYOUT_POSITION ) + static_cast<float>( itemId );
 }
 
 void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSize, float durationSeconds)
@@ -1233,7 +1234,7 @@ void ItemView::OnPan( const PanGesture& gesture )
 
       float firstItemScrollPosition = ClampFirstItemPosition(layoutPositionDelta, layoutSize, *mActiveLayout);
 
-      float currentOvershoot = self.GetProperty<float>(Toolkit::ItemView::Property::OVERSHOOT);
+      float currentOvershoot = DevelHandle::GetCurrentProperty< float >( self, Toolkit::ItemView::Property::OVERSHOOT );
 
       self.SetProperty(Toolkit::ItemView::Property::LAYOUT_POSITION, firstItemScrollPosition );
 
@@ -1645,7 +1646,7 @@ void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
 
   if(mOvershootAnimationSpeed > Math::MACHINE_EPSILON_0)
   {
-    float currentOvershoot = self.GetProperty<float>(Toolkit::ItemView::Property::OVERSHOOT);
+    float currentOvershoot = DevelHandle::GetCurrentProperty< float >( self, Toolkit::ItemView::Property::OVERSHOOT );
     float duration = 0.0f;
 
     if (mOvershootOverlay)
