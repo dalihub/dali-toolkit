@@ -29,6 +29,7 @@ namespace
 const char* const TEST_FILE( "test.mp4" );
 const char* const VOLUME_LEFT( "volumeLeft" );
 const char* const VOLUME_RIGHT( "volumeRight" );
+const char* const RENDERING_TYPE( "renderingTarget" );
 
 }
 
@@ -201,20 +202,21 @@ int UtcDaliVideoViewProperty4(void)
   left = right = 0.f;
 
   Property::Map map;
-  map.Insert( VOLUME_LEFT, 1.0f );
+  map.Insert( VOLUME_LEFT, 0.5f );
   map.Insert( VOLUME_RIGHT, 0.5f );
 
-  Property::Map map2;
   view.SetProperty( VideoView::Property::VOLUME, map );
-  Property::Value val4 = view.GetProperty( VideoView::Property::VOLUME );
-  DALI_TEST_CHECK( val4.Get( map2 ) );
+  Property::Value val = view.GetProperty( VideoView::Property::VOLUME );
 
-  Property::Value* volumeLeft = map.Find( VOLUME_LEFT );
-  Property::Value* volumeRight = map.Find( VOLUME_RIGHT );
+  Property::Map map2;
+  DALI_TEST_CHECK( val.Get( map2 ) );
+
+  Property::Value* volumeLeft = map2.Find( VOLUME_LEFT );
+  Property::Value* volumeRight = map2.Find( VOLUME_RIGHT );
 
   DALI_TEST_CHECK( volumeLeft && volumeLeft->Get( left ) );
   DALI_TEST_CHECK( volumeRight && volumeRight->Get( right ) );
-  DALI_TEST_CHECK( left == 1.0f );
+  DALI_TEST_CHECK( left == 0.5f );
   DALI_TEST_CHECK( right == 0.5f );
 
   END_TEST;
@@ -272,6 +274,41 @@ int UtcDaliVideoViewMethodsForCoverage(void)
   videoView.Backward(10);
   VideoView::VideoViewSignalType& signal = videoView.FinishedSignal();
   DALI_TEST_EQUALS( 0, signal.GetConnectionCount(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewMethodsForRenderType(void)
+{
+  ToolkitTestApplication application;
+  VideoView videoView = VideoView::New();
+  DALI_TEST_CHECK( videoView );
+
+  Property::Map windowSurfaceTarget;
+  Property::Map nativeImageTarget;
+
+  windowSurfaceTarget.Insert( RENDERING_TYPE, "windowSurfaceTarget" );
+  nativeImageTarget.Insert( RENDERING_TYPE, "nativeImageTarget" );
+
+  Property::Map map;
+  Property::Value value;
+  videoView.SetProperty( VideoView::Property::VIDEO, windowSurfaceTarget );
+
+  value = videoView.GetProperty( VideoView::Property::VIDEO );
+  DALI_TEST_CHECK( value.Get( map ) );
+
+  Property::Value* type = map.Find( RENDERING_TYPE );
+  DALI_TEST_CHECK( type );
+  DALI_TEST_EQUALS( "windowSurfaceTarget", type->Get<std::string>(), TEST_LOCATION );
+
+  videoView.SetProperty( VideoView::Property::VIDEO, nativeImageTarget );
+
+  value = videoView.GetProperty( VideoView::Property::VIDEO );
+  DALI_TEST_CHECK( value.Get( map ) );
+  type = map.Find( RENDERING_TYPE );
+
+  DALI_TEST_CHECK( type );
+  DALI_TEST_EQUALS( "nativeImageTarget", type->Get<std::string>(), TEST_LOCATION );
 
   END_TEST;
 }
