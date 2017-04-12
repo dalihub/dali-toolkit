@@ -8,7 +8,7 @@ namespace Dali
     static public void Initialize()
     {
        // Register all views with the type registry
-       System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor (typeof(Dali.Spin).TypeHandle);
+       //System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor (typeof(Dali.Spin).TypeHandle);
     }
   }
 }
