@@ -244,6 +244,7 @@ typedef std::pair< Dali::Radian, Dali::Radian > AngleThresholdPair;
 %include <dali/public-api/events/long-press-gesture-detector.h>
 %include <dali/public-api/events/long-press-gesture.h>
 %include <dali/public-api/events/wheel-event.h>
+%include <dali/devel-api/events/key-event-devel.h>
 
 %include <dali/public-api/actors/actor.h>
 %include <dali/devel-api/actors/actor-devel.h>
