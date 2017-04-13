@@ -22,6 +22,7 @@
 #include <cstring> // for strcmp
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
+#include <dali/devel-api/common/stage-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -42,16 +43,14 @@ namespace
 // Signals
 
 const char* const SIGNAL_KEY_INPUT_FOCUS_CHANGED = "keyInputFocusChanged";
-const char* const SIGNAL_UNHANDLED_KEY_EVENT =     "unhandledKeyEvent";
 
 }
 
 KeyInputFocusManager::KeyInputFocusManager()
-: mSlotDelegate( this )
+: mSlotDelegate( this ),
+  mCurrentFocusControl()
 {
-  Stage::GetCurrent().KeyEventSignal().Connect(mSlotDelegate, &KeyInputFocusManager::OnKeyEvent);
-  mObjectRegistry = Dali::Stage::GetCurrent().GetObjectRegistry();
-  mObjectRegistry.ObjectDestroyedSignal().Connect( this, &KeyInputFocusManager::OnObjectDestroyed );
+  DevelStage::KeyEventGeneratedSignal( Stage::GetCurrent() ).Connect(mSlotDelegate, &KeyInputFocusManager::OnKeyEvent);
 }
 
 KeyInputFocusManager::~KeyInputFocusManager()
@@ -66,23 +65,13 @@ void KeyInputFocusManager::SetFocus( Toolkit::Control control )
     return;
   }
 
-  FocusStackIterator pos = FindFocusControlInStack( control );
-
-  if( ( mFocusStack.Count() != 0 ) && ( pos == mFocusStack.End()-1 ) )
+  if( control == mCurrentFocusControl )
   {
-    // Control already in front, so No-op
+    // Control already has focus
     return;
   }
 
-  if( pos != mFocusStack.End() )
-  {
-    // A previously focused control wants to regain focus
-    mFocusStack.Erase( pos );
-  }
-  else
-  {
-    control.OffStageSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlStageDisconnection );
-  }
+  control.OffStageSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlStageDisconnection );
 
   Dali::Toolkit::Control previousFocusControl = GetCurrentFocusControl();
   if( previousFocusControl )
@@ -91,7 +80,8 @@ void KeyInputFocusManager::SetFocus( Toolkit::Control control )
     GetImplementation( previousFocusControl ).OnKeyInputFocusLost();
   }
 
-  mFocusStack.PushBack( &control.GetBaseObject() );
+  // Set control to currentFocusControl
+  mCurrentFocusControl = control;
 
   // Tell the new actor that it has gained focus.
   GetImplementation( control ).OnKeyInputFocusGained();
@@ -105,61 +95,20 @@ void KeyInputFocusManager::SetFocus( Toolkit::Control control )
 
 void KeyInputFocusManager::RemoveFocus( Toolkit::Control control )
 {
-  if( control )
+  if( control == mCurrentFocusControl )
   {
-    FocusStackIterator pos = FindFocusControlInStack( control );
-    if( pos != mFocusStack.End() )
-    {
-      control.OffStageSignal().Disconnect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlStageDisconnection );
+    control.OffStageSignal().Disconnect( mSlotDelegate, &KeyInputFocusManager::OnFocusControlStageDisconnection );
 
-      // Notify the control that it has lost key input focus
-      GetImplementation( control ).OnKeyInputFocusLost();
+    // Notify the control that it has lost key input focus
+    GetImplementation( control ).OnKeyInputFocusLost();
 
-      // If this is the top-most actor, pop it and change focus to the previous control
-      if( pos == mFocusStack.End() - 1 )
-      {
-        mFocusStack.Erase( pos );
-
-        Toolkit::Control previouslyFocusedControl = GetCurrentFocusControl();
-        if( previouslyFocusedControl )
-        {
-          // Tell the control that it has gained focus.
-          GetImplementation( previouslyFocusedControl ).OnKeyInputFocusGained();
-        }
-      }
-      else
-      {
-        // If the removed control is not currently focused, then no need to emit signal.
-        mFocusStack.Erase( pos );
-      }
-    }
+    mCurrentFocusControl.Reset();
   }
 }
 
 Toolkit::Control KeyInputFocusManager::GetCurrentFocusControl() const
 {
-  Toolkit::Control currentControl;
-
-  FocusStack::SizeType count = mFocusStack.Count();
-  if( count != 0 )
-  {
-    BaseObject* object = mFocusStack[ count - 1 ];
-    BaseHandle handle( object );
-    currentControl = Dali::Toolkit::Control::DownCast( handle );
-  }
-  return currentControl;
-}
-
-bool KeyInputFocusManager::IsKeyboardListener( Toolkit::Control control ) const
-{
-  bool result = false;
-
-  if( FindFocusControlInStack( control ) != mFocusStack.End() )
-  {
-    result = true;
-  }
-
-  return result;
+  return mCurrentFocusControl;
 }
 
 Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusManager::KeyInputFocusChangedSignal()
@@ -167,46 +116,41 @@ Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusMana
   return mKeyInputFocusChangedSignal;
 }
 
-Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalType& KeyInputFocusManager::UnhandledKeyEventSignal()
-{
-  return mUnhandledKeyEventSignal;
-}
-
-KeyInputFocusManager::FocusStackIterator KeyInputFocusManager::FindFocusControlInStack( Toolkit::Control control ) const
-{
-  BaseObject* controlObject = &control.GetBaseObject();
-  return std::find( mFocusStack.Begin(), mFocusStack.End(), controlObject );
-}
-
-void KeyInputFocusManager::OnKeyEvent( const KeyEvent& event )
+bool KeyInputFocusManager::OnKeyEvent( const KeyEvent& event )
 {
   bool consumed = false;
 
-  if( mFocusStack.Count() > 0 )
+  Toolkit::Control control = GetCurrentFocusControl();
+  if( control )
   {
-    FocusStack::SizeType index = mFocusStack.Count();
-    while( mFocusStack.Count() != 0 && !consumed && index > 0 )
+    // Notify the control about the key event
+    consumed = EmitKeyEventSignal( control, event );
+  }
+
+  return consumed;
+}
+
+bool KeyInputFocusManager::EmitKeyEventSignal( Toolkit::Control control, const KeyEvent& event )
+{
+  bool consumed = false;
+
+  if( control )
+  {
+    consumed = GetImplementation( control ).EmitKeyEventSignal( event );
+
+    // if control doesn't consume KeyEvent, give KeyEvent to its parent.
+    if( !consumed )
     {
-      --index;
-      BaseObject* object = mFocusStack[ index ];
-      BaseHandle handle( object );
-      Toolkit::Control control = Toolkit::Control::DownCast( object );
-      if( control )
+      Toolkit::Control parent = Toolkit::Control::DownCast( control.GetParent() );
+
+      if( parent )
       {
-        // Notify the control about the key event
-        consumed = GetImplementation( control ).EmitKeyEventSignal( event );
+        consumed = EmitKeyEventSignal( parent, event );
       }
     }
   }
 
-  if( !consumed )
-  {
-    // Emit signal to inform that a key event is not consumed.
-    if( !mUnhandledKeyEventSignal.Empty() )
-    {
-      mUnhandledKeyEventSignal.Emit(event);
-    }
-  }
+  return consumed;
 }
 
 void KeyInputFocusManager::OnFocusControlStageDisconnection( Dali::Actor actor )
@@ -214,17 +158,6 @@ void KeyInputFocusManager::OnFocusControlStageDisconnection( Dali::Actor actor )
   RemoveFocus( Dali::Toolkit::Control::DownCast( actor ) );
 }
 
-void KeyInputFocusManager::OnObjectDestroyed( const Dali::RefObject* object )
-{
-  // The object is already destroyed. Don't create handles to it, or try sending
-  // signals to it. Remove it's pointer from the stack.
-  const BaseObject* baseObject = static_cast<const BaseObject*>( object );
-  FocusStackIterator pos = std::find( mFocusStack.Begin(), mFocusStack.End(), baseObject );
-  if( pos != mFocusStack.End() )
-  {
-    mFocusStack.Erase( pos );
-  }
-}
 
 bool KeyInputFocusManager::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
@@ -236,10 +169,6 @@ bool KeyInputFocusManager::DoConnectSignal( BaseObject* object, ConnectionTracke
     if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_CHANGED ) )
     {
       manager->KeyInputFocusChangedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_UNHANDLED_KEY_EVENT ) )
-    {
-      manager->UnhandledKeyEventSignal().Connect( tracker, functor );
     }
     else
     {

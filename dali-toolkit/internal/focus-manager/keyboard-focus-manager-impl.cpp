@@ -37,7 +37,6 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
-#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 
 namespace Dali
@@ -125,7 +124,7 @@ KeyboardFocusManager::KeyboardFocusManager()
   mCustomAlgorithmInterface(NULL)
 {
   // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorEnabled.
-  Toolkit::KeyInputFocusManager::Get().UnhandledKeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
+  Stage::GetCurrent().KeyEventSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
   Stage::GetCurrent().TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
 }
 
