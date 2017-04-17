@@ -44,6 +44,9 @@ void utc_dali_toolkit_keyboard_focus_manager_cleanup(void)
 namespace
 {
 
+const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
+
+
 // Functors to test whether GetNextFocusableActor() method of CustomAlgorithmInterface is called when the keyboard focus is about to change
 class CustomAlgorithm : public Dali::Toolkit::DevelKeyboardFocusManager::CustomAlgorithmInterface
 {
@@ -863,7 +866,7 @@ int UtcDaliKeyboardFocusManagerSignalFocusedActorActivated(void)
   FocusedActorActivatedCallback focusedActorActivatedCallback(focusedActorActivatedSignalVerified);
   manager.FocusedActorEnterKeySignal().Connect( &focusedActorActivatedCallback, &FocusedActorActivatedCallback::Callback );
 
-  Integration::KeyEvent returnEvent("Return", "", 0, 0, 0, Integration::KeyEvent::Up);
+  Integration::KeyEvent returnEvent("Return", "", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME );
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true
@@ -921,8 +924,8 @@ int UtcDaliKeyboardFocusManagerSignalFocusGroupChanged(void)
   FocusGroupChangedCallback focusGroupChangedCallback(focusGroupChangedSignalVerified);
   manager.FocusGroupChangedSignal().Connect( &focusGroupChangedCallback, &FocusGroupChangedCallback::Callback );
 
-  Integration::KeyEvent tabEvent("Tab", "", 0, 0, 0, Integration::KeyEvent::Down);
-  Integration::KeyEvent shiftTabEvent("Tab", "", 0, 1, 0, Integration::KeyEvent::Down);
+  Integration::KeyEvent tabEvent("Tab", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent shiftTabEvent("Tab", "", 0, 1, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME);
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true
@@ -1044,12 +1047,12 @@ int UtcDaliKeyboardFocusManagerChangeFocusDirectionByKeyEvents(void)
   FocusChangedCallback focusChangedCallback(focusChangedSignalVerified);
   manager.FocusChangedSignal().Connect( &focusChangedCallback, &FocusChangedCallback::Callback );
 
-  Integration::KeyEvent leftEvent("Left", "", 0, 0, 0, Integration::KeyEvent::Down);
-  Integration::KeyEvent rightEvent("Right", "", 0, 0, 0, Integration::KeyEvent::Down);
-  Integration::KeyEvent upEvent("Up", "", 0, 0, 0, Integration::KeyEvent::Down);
-  Integration::KeyEvent downEvent("Down", "", 0, 0, 0, Integration::KeyEvent::Down);
-  Integration::KeyEvent pageUpEvent("Prior", "", 0, 0, 0, Integration::KeyEvent::Down);
-  Integration::KeyEvent pageDownEvent("Next", "", 0, 0, 0, Integration::KeyEvent::Down);
+  Integration::KeyEvent leftEvent("Left", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME);
+  Integration::KeyEvent rightEvent("Right", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent upEvent("Up", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent downEvent("Down", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent pageUpEvent("Prior", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME );
+  Integration::KeyEvent pageDownEvent("Next", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME );
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true

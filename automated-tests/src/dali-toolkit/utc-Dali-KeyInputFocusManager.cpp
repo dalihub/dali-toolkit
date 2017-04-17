@@ -21,6 +21,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
+#include <dali/devel-api/common/stage-devel.h>
 
 #include "dummy-control.h"
 
@@ -79,20 +80,34 @@ struct SignalData
 };
 
 /**
- * Callback class to test SignalUnhandledKeyEvent signal
+ * Callback class for KeyEvent signal of control.
  */
-class SignalUnhandledKeyEventCallback : public Dali::ConnectionTracker
+class KeyEventCallback : public Dali::ConnectionTracker
 {
 public:
-  SignalUnhandledKeyEventCallback( SignalData& data ) : mSignalData( data ) { }
-
-  void Callback(const KeyEvent& event)
+  /**
+   * Constructor
+   * @param[in]  returnValue  Set return value of KeyEvent callback.
+   * */
+  KeyEventCallback( bool consumed )
+  : mConsumed( consumed ),
+    mIsCalled( false )
   {
-    mSignalData.functorCalled = true;
-    mSignalData.receivedKeyEvent = event;
   }
 
-  SignalData& mSignalData;
+  bool Callback( Control control, const KeyEvent& keyEvent )
+  {
+    mIsCalled = true;
+    return mConsumed;
+  }
+
+  void Callback( const KeyEvent& keyEvent )
+  {
+    mIsCalled = true;
+  }
+
+  bool mConsumed;
+  bool mIsCalled;
 };
 
 } // namespace
@@ -132,7 +147,7 @@ int UtcDaliKeyInputFocusManagerSetFocus01(void)
   ToolkitTestApplication application;
   Stage stage = Stage::GetCurrent();
 
-  tet_infoline(" Check that there is no focused control. Add a control to the stack. Check it is now the focused actor and receives KeyInputFocusGained signal");
+  tet_infoline(" Check that there is no focused control. Set focus to control. Check it is now the focused actor and receives KeyInputFocusGained signal");
 
   KeyInputFocusManager manager = KeyInputFocusManager::Get();
   DALI_TEST_CHECK(manager);
@@ -162,7 +177,7 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
   ToolkitTestApplication application;
   Stage stage = Stage::GetCurrent();
 
-  tet_infoline(" Add a control to the stack. Check it is now the focused actor and receives KeyInputFocusGained signal. Add another control - check that the first control receives KeyInputFocusLost");
+  tet_infoline(" Set focus to control. Check it is now the focused actor and receives KeyInputFocusGained signal. Set focuse to another control - check that the first control receives KeyInputFocusLost");
 
   KeyInputFocusManager manager = KeyInputFocusManager::Get();
   DALI_TEST_CHECK(manager);
@@ -173,8 +188,6 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
   stage.Add( dummy1 );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
-
-  stage.Add( dummy1 );
 
   manager.SetFocus( dummy1 );
   DALI_TEST_CHECK( dummy1.HasKeyInputFocus()); // Also tests IsKeyboardListener() API
@@ -188,8 +201,6 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
   DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
 
-  stage.Add( dummy2 );
-
   manager.SetFocus( dummy2 );
   DALI_TEST_CHECK( dummy2.HasKeyInputFocus()); // Also tests IsKeyboardListener() API
   DALI_TEST_CHECK( dummy2Impl.keyInputFocusGained );
@@ -198,6 +209,99 @@ int UtcDaliKeyInputFocusManagerSetFocus02(void)
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
   DALI_TEST_CHECK( dummy1Impl.keyInputFocusLost );
 
+  END_TEST;
+}
+
+int UtcDaliKeyInputFocusManagerKeyEventPropagation01(void)
+{
+
+  ToolkitTestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  tet_infoline("Test KeyEvent propagation. If focused control doesn't consume KeyEvent, KeyEvent will be recursively delivered to the control and its parents, until the event is consumed or the stage is reached. In this case, KeyEvent is delivered to KeyboardFocusManager via Stage's KeyEventSignal");
+
+  KeyInputFocusManager manager = KeyInputFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  KeyEventCallback stageCallback( false );
+  stage.KeyEventSignal().Connect( &stageCallback, &KeyEventCallback::Callback );
+
+  DummyControl dummy1 = DummyControl::New(true);
+  dummy1.SetSize(100.0f, 100.0f);
+  KeyEventCallback callback1( false );
+  dummy1.KeyEventSignal().Connect( &callback1, &KeyEventCallback::Callback );
+  stage.Add( dummy1 );
+
+  DummyControl dummy2 = DummyControl::New(true);
+  dummy2.SetSize(100.0f, 100.0f);
+  KeyEventCallback callback2( false );
+  dummy2.KeyEventSignal().Connect( &callback2, &KeyEventCallback::Callback );
+  dummy1.Add( dummy2 );
+
+  DummyControl dummy3 = DummyControl::New(true);
+  Impl::DummyControl& dummy3Impl = static_cast<Impl::DummyControl&>(dummy3.GetImplementation());
+  dummy3.SetSize(100.0f, 100.0f);
+  KeyEventCallback callback3( false );
+  dummy3.KeyEventSignal().Connect( &callback3, &KeyEventCallback::Callback );
+  dummy2.Add( dummy3 );
+  DALI_TEST_CHECK( ! dummy3Impl.keyInputFocusGained );
+  DALI_TEST_CHECK( ! dummy3Impl.keyInputFocusLost );
+
+  manager.SetFocus( dummy3 );
+  DALI_TEST_CHECK( dummy3Impl.keyInputFocusGained );
+
+  Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Up, "");
+  application.ProcessEvent(event);
+
+  DALI_TEST_CHECK( callback1.mIsCalled );
+  DALI_TEST_CHECK( callback2.mIsCalled );
+  DALI_TEST_CHECK( callback3.mIsCalled );
+  DALI_TEST_CHECK( stageCallback.mIsCalled );
+
+  END_TEST;
+}
+
+int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
+{
+
+  ToolkitTestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  tet_infoline("Test KeyEvent propagation. If focused control doesn't consume KeyEvent, KeyEvent will be recursively delivered to the control and its parents, until the event is consumed or the stage is reached. In this case, KeyEvent is delivered from dummy3 to dummy2");
+
+  KeyInputFocusManager manager = KeyInputFocusManager::Get();
+  DALI_TEST_CHECK(manager);
+
+  DummyControl dummy1 = DummyControl::New(true);
+  dummy1.SetSize(100.0f, 100.0f);
+  KeyEventCallback callback1( false );
+  dummy1.KeyEventSignal().Connect( &callback1, &KeyEventCallback::Callback );
+  stage.Add( dummy1 );
+
+  DummyControl dummy2 = DummyControl::New(true);
+  dummy2.SetSize(100.0f, 100.0f);
+  KeyEventCallback callback2( true );
+  dummy2.KeyEventSignal().Connect( &callback2, &KeyEventCallback::Callback );
+  dummy1.Add( dummy2 );
+
+  DummyControl dummy3 = DummyControl::New(true);
+  Impl::DummyControl& dummy3Impl = static_cast<Impl::DummyControl&>(dummy3.GetImplementation());
+  dummy3.SetSize(100.0f, 100.0f);
+  KeyEventCallback callback3( false );
+  dummy3.KeyEventSignal().Connect( &callback3, &KeyEventCallback::Callback );
+  dummy2.Add( dummy3 );
+  DALI_TEST_CHECK( ! dummy3Impl.keyInputFocusGained );
+  DALI_TEST_CHECK( ! dummy3Impl.keyInputFocusLost );
+
+  manager.SetFocus( dummy3 );
+  DALI_TEST_CHECK( dummy3Impl.keyInputFocusGained );
+
+  Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Up, "" );
+  application.ProcessEvent(event);
+
+  DALI_TEST_CHECK( !callback1.mIsCalled );
+  DALI_TEST_CHECK( callback2.mIsCalled );
+  DALI_TEST_CHECK( callback3.mIsCalled );
 
   END_TEST;
 }
@@ -254,12 +358,12 @@ int UtcDaliKeyInputFocusManagerGetCurrentFocusControl(void)
   END_TEST;
 }
 
-int UtcDaliKeyInputFocusManagerRemoveFocus01(void)
+int UtcDaliKeyInputFocusManagerRemoveFocus(void)
 {
   ToolkitTestApplication application;
   Stage stage = Stage::GetCurrent();
 
-  tet_infoline(" Add 3 focus controls. Test that removing the topmost informs the next control that it now has focus, Test that the bottommost control doesn't receive anything. ");
+  tet_infoline(" Add focus controls. Test that removing focus from control which has focus. ");
 
   KeyInputFocusManager manager = KeyInputFocusManager::Get();
   DALI_TEST_CHECK(manager);
@@ -271,328 +375,16 @@ int UtcDaliKeyInputFocusManagerRemoveFocus01(void)
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
 
-  DummyControl dummy2 = DummyControl::New(true);
-  Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
-  dummy2.SetSize(100.0f, 100.0f);
-  stage.Add( dummy2 );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusLost );
-
   manager.SetFocus(dummy1);
   DALI_TEST_CHECK(dummy1 == manager.GetCurrentFocusControl());
-
-  manager.SetFocus(dummy2);
-  DALI_TEST_CHECK(dummy2 == manager.GetCurrentFocusControl());
   dummy1Impl.keyInputFocusGained = false;
   dummy1Impl.keyInputFocusLost = false;
-  dummy2Impl.keyInputFocusGained = false;
-  dummy2Impl.keyInputFocusLost = false;
-
-  manager.RemoveFocus(dummy2);
-  DALI_TEST_CHECK(dummy1 == manager.GetCurrentFocusControl());
-  DALI_TEST_CHECK( dummy1Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( dummy2Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
-  dummy1Impl.keyInputFocusGained = false;
-  dummy1Impl.keyInputFocusLost = false;
-  dummy2Impl.keyInputFocusGained = false;
-  dummy2Impl.keyInputFocusLost = false;
 
   manager.RemoveFocus(dummy1);
   DALI_TEST_CHECK(Control() == manager.GetCurrentFocusControl());
   DALI_TEST_CHECK( dummy1Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusLost );
   DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
 
-  END_TEST;
-}
-
-int UtcDaliKeyInputFocusManagerRemoveFocus02(void)
-{
-  ToolkitTestApplication application;
-  Stage stage = Stage::GetCurrent();
-
-  tet_infoline(" Add 3 focus controls. Test that removing the bottommost doesn't change the focused control" );
-
-  KeyInputFocusManager manager = KeyInputFocusManager::Get();
-  DALI_TEST_CHECK(manager);
-
-  DummyControl dummy1 = DummyControl::New(true);
-  Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
-  dummy1.SetSize(100.0f, 100.0f);
-  stage.Add( dummy1 );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
-
-  DummyControl dummy2 = DummyControl::New(true);
-  Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
-  dummy2.SetSize(100.0f, 100.0f);
-  stage.Add( dummy2 );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusLost );
-
-  DummyControl dummy3 = DummyControl::New(true);
-  Impl::DummyControl& dummy3Impl = static_cast<Impl::DummyControl&>(dummy3.GetImplementation());
-  dummy3.SetSize(100.0f, 100.0f);
-  stage.Add( dummy3 );
-  DALI_TEST_CHECK( ! dummy3Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy3Impl.keyInputFocusLost );
-
-  manager.SetFocus(dummy1);
-  DALI_TEST_CHECK(dummy1 == manager.GetCurrentFocusControl());
-
-  manager.SetFocus(dummy2);
-  DALI_TEST_CHECK(dummy2 == manager.GetCurrentFocusControl());
-
-  manager.SetFocus(dummy3);
-  DALI_TEST_CHECK(dummy3 == manager.GetCurrentFocusControl());
-  dummy1Impl.keyInputFocusGained = false;
-  dummy1Impl.keyInputFocusLost = false;
-  dummy2Impl.keyInputFocusGained = false;
-  dummy2Impl.keyInputFocusLost = false;
-  dummy3Impl.keyInputFocusGained = false;
-  dummy3Impl.keyInputFocusLost = false;
-
-  manager.RemoveFocus(dummy1);
-  DALI_TEST_CHECK(dummy3 == manager.GetCurrentFocusControl());
-  DALI_TEST_CHECK( dummy1Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy3Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( ! dummy3Impl.keyInputFocusGained );
-  dummy1Impl.keyInputFocusGained = false;
-  dummy1Impl.keyInputFocusLost = false;
-  dummy2Impl.keyInputFocusGained = false;
-  dummy2Impl.keyInputFocusLost = false;
-  dummy3Impl.keyInputFocusGained = false;
-  dummy3Impl.keyInputFocusLost = false;
-
-  END_TEST;
-}
-
-int UtcDaliKeyInputFocusManagerRemoveFocus03(void)
-{
-  ToolkitTestApplication application;
-  Stage stage = Stage::GetCurrent();
-
-  tet_infoline(" Add 2 focus controls. Remove each of them from the bottom up. Test that the stack is now empty. Add a new control - check that it correctly has focus" );
-
-  KeyInputFocusManager manager = KeyInputFocusManager::Get();
-  DALI_TEST_CHECK(manager);
-
-  DummyControl dummy1 = DummyControl::New(true);
-  Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
-  dummy1.SetSize(100.0f, 100.0f);
-  stage.Add( dummy1 );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
-
-  DummyControl dummy2 = DummyControl::New(true);
-  Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
-  dummy2.SetSize(100.0f, 100.0f);
-  stage.Add( dummy2 );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusLost );
-
-  manager.SetFocus(dummy1);
-  DALI_TEST_CHECK(dummy1 == manager.GetCurrentFocusControl());
-
-  manager.SetFocus(dummy2);
-  DALI_TEST_CHECK(dummy2 == manager.GetCurrentFocusControl());
-
-  dummy1Impl.keyInputFocusGained = false;
-  dummy1Impl.keyInputFocusLost = false;
-  dummy2Impl.keyInputFocusGained = false;
-  dummy2Impl.keyInputFocusLost = false;
-
-  manager.RemoveFocus(dummy1);
-  DALI_TEST_CHECK(dummy2 == manager.GetCurrentFocusControl());
-  DALI_TEST_CHECK( dummy1Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
-  dummy1Impl.keyInputFocusGained = false;
-  dummy1Impl.keyInputFocusLost = false;
-  dummy2Impl.keyInputFocusGained = false;
-  dummy2Impl.keyInputFocusLost = false;
-
-  manager.RemoveFocus(dummy2);
-  DALI_TEST_CHECK(Control() == manager.GetCurrentFocusControl());
-  DALI_TEST_CHECK( dummy2Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
-  dummy1Impl.keyInputFocusGained = false;
-  dummy1Impl.keyInputFocusLost = false;
-  dummy2Impl.keyInputFocusGained = false;
-  dummy2Impl.keyInputFocusLost = false;
-
-  PushButton pushButton1 = PushButton::New();
-  stage.Add( pushButton1 );
-  manager.SetFocus( pushButton1 );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusLost );
-  DALI_TEST_CHECK( pushButton1 == manager.GetCurrentFocusControl());
-  END_TEST;
-}
-
-int UtcDaliKeyInputFocusManagerRemoveFocus04(void)
-{
-  ToolkitTestApplication application;
-  Stage stage = Stage::GetCurrent();
-
-  tet_infoline(" Test what happens if the removed control is not on the focus stack");
-  KeyInputFocusManager manager = KeyInputFocusManager::Get();
-  DALI_TEST_CHECK(manager);
-
-  PushButton pushButton1 = PushButton::New();
-  PushButton pushButton2 = PushButton::New();
-  stage.Add( pushButton1 );
-  stage.Add( pushButton2 );
-  manager.SetFocus( pushButton1 );
-  manager.SetFocus( pushButton2 );
-
-  PushButton pushButton3 = PushButton::New();
-  stage.Add( pushButton3 );
-  manager.RemoveFocus( pushButton3 );
-  DALI_TEST_CHECK( pushButton2 == manager.GetCurrentFocusControl());
-  END_TEST;
-}
-
-int UtcDaliKeyInputFocusManagerDestroyObject01(void)
-{
-  ToolkitTestApplication application;
-  Stage stage = Stage::GetCurrent();
-
-  tet_infoline(" Add 2 controls to the stack. Unparent and destroy the topmost. Check that it is removed from the stack, and that the bottommost is correctly focused" );
-
-  KeyInputFocusManager manager = KeyInputFocusManager::Get();
-  DALI_TEST_CHECK(manager);
-
-  DummyControl dummy1 = DummyControl::New(true);
-  Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
-  dummy1.SetSize(100.0f, 100.0f);
-  stage.Add( dummy1 );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
-
-  {
-    DummyControl dummy2 = DummyControl::New(true);
-    Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
-    dummy2.SetSize(100.0f, 100.0f);
-    stage.Add( dummy2 );
-    DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
-    DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusLost );
-
-    manager.SetFocus(dummy1);
-    DALI_TEST_CHECK(dummy1 == manager.GetCurrentFocusControl());
-
-    manager.SetFocus(dummy2);
-    DALI_TEST_CHECK(dummy2 == manager.GetCurrentFocusControl());
-
-    dummy1Impl.keyInputFocusGained = false;
-    dummy1Impl.keyInputFocusLost = false;
-    dummy2Impl.keyInputFocusGained = false;
-    dummy2Impl.keyInputFocusLost = false;
-
-    stage.Remove(dummy2);
-  }
-
-  DALI_TEST_CHECK(dummy1 == manager.GetCurrentFocusControl());
-  DALI_TEST_CHECK( dummy1Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
-  END_TEST;
-}
-
-int UtcDaliKeyInputFocusManagerDestroyObject02(void)
-{
-  ToolkitTestApplication application;
-  Stage stage = Stage::GetCurrent();
-
-  tet_infoline(" Add 2 controls to the stack. Destroy a different actor entirely. Check that the stack is un-affected.");
-
-  KeyInputFocusManager manager = KeyInputFocusManager::Get();
-  DALI_TEST_CHECK(manager);
-
-  DummyControl dummy1 = DummyControl::New(true);
-  Impl::DummyControl& dummy1Impl = static_cast<Impl::DummyControl&>(dummy1.GetImplementation());
-  dummy1.SetSize(100.0f, 100.0f);
-  stage.Add( dummy1 );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy1Impl.keyInputFocusLost );
-
-
-  DummyControl dummy2 = DummyControl::New(true);
-  Impl::DummyControl& dummy2Impl = static_cast<Impl::DummyControl&>(dummy2.GetImplementation());
-  dummy2.SetSize(100.0f, 100.0f);
-  stage.Add( dummy2 );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusGained );
-  DALI_TEST_CHECK( ! dummy2Impl.keyInputFocusLost );
-
-  manager.SetFocus(dummy1);
-  DALI_TEST_CHECK(dummy1 == manager.GetCurrentFocusControl());
-
-  manager.SetFocus(dummy2);
-  DALI_TEST_CHECK(dummy2 == manager.GetCurrentFocusControl());
-
-  dummy1Impl.keyInputFocusGained = false;
-  dummy1Impl.keyInputFocusLost = false;
-  dummy2Impl.keyInputFocusGained = false;
-  dummy2Impl.keyInputFocusLost = false;
-
-  {
-    BufferImage image = CreateBufferImage();
-    Actor actor = CreateRenderableActor( image );
-    stage.Add( actor );
-    actor.SetSize(100, 100);
-
-    application.SendNotification();
-    application.Render();
-
-    stage.Remove( actor );
-  }
-
-  DALI_TEST_CHECK( dummy2 == manager.GetCurrentFocusControl());
-  END_TEST;
-}
-
-int UtcDaliKeyInputFocusManagerIsKeyboardListener(void)
-{
-  ToolkitTestApplication application;
-  Stage stage = Stage::GetCurrent();
-
-  tet_infoline(" UtcDaliKeyInputFocusManagerIsKeyboardListener");
-
-  KeyInputFocusManager manager = KeyInputFocusManager::Get();
-  DALI_TEST_CHECK(manager);
-
-  PushButton pushButton1 = PushButton::New();
-  PushButton pushButton2 = PushButton::New();
-  stage.Add( pushButton1 );
-  stage.Add( pushButton2 );
-
-  manager.SetFocus(pushButton1);
-  DALI_TEST_CHECK(pushButton1 == manager.GetCurrentFocusControl());
-
-  manager.SetFocus(pushButton2);
-  DALI_TEST_CHECK(pushButton2 == manager.GetCurrentFocusControl());
-
-  DALI_TEST_CHECK(manager.IsKeyboardListener(pushButton1));
-  DALI_TEST_CHECK(manager.IsKeyboardListener(pushButton2));
-
-  manager.RemoveFocus(pushButton2);
-  DALI_TEST_CHECK(!manager.IsKeyboardListener(pushButton2));
-
-  manager.RemoveFocus(pushButton1);
-  DALI_TEST_CHECK(!manager.IsKeyboardListener(pushButton1));
-
-  manager.SetFocus(pushButton2);
-  DALI_TEST_CHECK(manager.IsKeyboardListener(pushButton2));
-  pushButton2.ClearKeyInputFocus();
-  DALI_TEST_CHECK(!manager.IsKeyboardListener(pushButton2));
   END_TEST;
 }
 
@@ -636,39 +428,5 @@ int UtcDaliKeyInputFocusManagerSignalKeyInputFocusChanged(void)
 
   DALI_TEST_CHECK( gainActor == Control() );
   DALI_TEST_CHECK( lostActor == Control() );
-  END_TEST;
-}
-
-int UtcDaliKeyInputFocusManagerSignalUnhandledKeyEvent(void)
-{
-  ToolkitTestApplication application;
-
-  tet_infoline("UtcDaliKeyInputFocusManagerSignalUnhandledKeyEvent");
-
-  SignalData data;
-  SignalUnhandledKeyEventCallback callback( data );
-
-  KeyInputFocusManager manager = KeyInputFocusManager::Get();
-  manager.UnhandledKeyEventSignal().Connect( &callback, &SignalUnhandledKeyEventCallback::Callback );
-
-
-  Integration::KeyEvent event("a", "a", 0, 0, 0, Integration::KeyEvent::Up);
-  application.ProcessEvent(event);
-
-  DALI_TEST_CHECK(data.functorCalled);
-  DALI_TEST_CHECK(event.keyName == data.receivedKeyEvent.keyPressedName );
-  DALI_TEST_CHECK(event.keyCode == data.receivedKeyEvent.keyCode);
-  DALI_TEST_CHECK(event.keyString == data.receivedKeyEvent.keyPressed );
-  DALI_TEST_CHECK(event.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.state) );
-
-  data.Reset();
-
-  Integration::KeyEvent event2("v", "v", 0, 0, 0, Integration::KeyEvent::Up);
-  application.ProcessEvent(event2);
-
-  DALI_TEST_CHECK(data.functorCalled);
-  DALI_TEST_CHECK(event2.keyName == data.receivedKeyEvent.keyPressedName );
-  DALI_TEST_CHECK(event2.keyCode == data.receivedKeyEvent.keyCode);
-  DALI_TEST_CHECK(event2.keyString == data.receivedKeyEvent.keyPressed );
   END_TEST;
 }

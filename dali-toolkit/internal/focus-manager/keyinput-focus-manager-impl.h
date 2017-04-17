@@ -44,9 +44,6 @@ class KeyInputFocusManager;
 class KeyInputFocusManager : public Dali::BaseObject, public Dali::ConnectionTracker
 {
 public:
-  typedef Dali::Vector< Dali::BaseObject* > FocusStack;
-  typedef FocusStack::Iterator FocusStackIterator;
-
   /**
    * Construct a new KeyInputFocusManager.
    */
@@ -67,22 +64,12 @@ public:
    */
   Toolkit::Control GetCurrentFocusControl() const;
 
-  /**
-   * @copydoc Toolkit::IsKeyboardListener
-   */
-  bool IsKeyboardListener(Toolkit::Control control) const;
-
 public:
 
   /**
    * @copydoc Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignal()
    */
   Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusChangedSignal();
-
-  /**
-   * @copydoc Toolkit::KeyInputFocusManager::UnhandledKeyEventSignal()
-   */
-  Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalType& UnhandledKeyEventSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -105,18 +92,10 @@ protected:
 private:
 
   /**
-   * Search for a control in the focus stack.
-   * @param[in] control The control for which to search
-   * @return An iterator to the control. If not found, this will equate to the
-   * mFocusStack.End() iterator.
-   */
-  FocusStackIterator FindFocusControlInStack( Toolkit::Control control ) const;
-
-  /**
    * Callback for the key event when no actor in the stage has gained the key input focus
    * @param[in] event The KeyEvent event.
    */
-  void OnKeyEvent(const KeyEvent& event);
+  bool OnKeyEvent(const KeyEvent& event);
 
   /**
    * Signal handler called when a focused Control is removed from Stage.
@@ -125,9 +104,12 @@ private:
   void OnFocusControlStageDisconnection( Dali::Actor control );
 
   /**
-   * Signal handler called when an actor is destroyed.
-   */
-  void OnObjectDestroyed(const Dali::RefObject* object);
+    *  Recursively deliver events to the control and its parents, until the event is consumed or the stage is reached.
+   * @param[in]  control  The control got KeyEvent.
+   * @param[in]  event    The KeyEvent.
+   * @return True if KeyEvent is consumed.
+    */
+  bool EmitKeyEventSignal( Toolkit::Control control, const KeyEvent& event );
 
 private:
 
@@ -141,13 +123,9 @@ private:
   // The key input focus change signal
   Toolkit::KeyInputFocusManager::KeyInputFocusChangedSignalType mKeyInputFocusChangedSignal;
 
-  // The un-handled key event signal
-  Toolkit::KeyInputFocusManager::UnhandledKeyEventSignalType mUnhandledKeyEventSignal;
-
-  // Keyboard events are sent to the current focus actor, which will be the actor on the top of the focus actors stack.
-  FocusStack mFocusStack;
   SlotDelegate< KeyInputFocusManager > mSlotDelegate;
-  ObjectRegistry mObjectRegistry;
+
+  Toolkit::Control mCurrentFocusControl; ///< The current focused control
 };
 
 } // namespace Internal

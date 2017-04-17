@@ -50,6 +50,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/events/key-event-devel.h>
 
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>

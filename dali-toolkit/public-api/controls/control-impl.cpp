@@ -1142,7 +1142,11 @@ bool Control::HasKeyInputFocus()
   bool result = false;
   if( Self().OnStage() )
   {
-    result = Toolkit::KeyInputFocusManager::Get().IsKeyboardListener(Toolkit::Control::DownCast(Self()));
+    Toolkit::Control control = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
+    if( Self() == control )
+    {
+      result = true;
+    }
   }
   return result;
 }

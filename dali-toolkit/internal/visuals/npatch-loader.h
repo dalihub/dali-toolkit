@@ -62,6 +62,7 @@ public:
     std::size_t hash;                             ///< Hash code for the Url
     uint32_t croppedWidth;                        ///< Width of the cropped middle part of N-patch
     uint32_t croppedHeight;                       ///< Height of the cropped middle part of N-patch
+    Rect< int > border;                           ///< The size of the border
   };
 
 public:
