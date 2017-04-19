@@ -186,6 +186,9 @@ void AnimatedImageVisual::DoSetOnStage( Actor& actor )
     }
 
     actor.AddRenderer( mImpl->mRenderer );
+
+    // Animated Image loaded and ready to display
+    ResourceReady();
   }
 }
 

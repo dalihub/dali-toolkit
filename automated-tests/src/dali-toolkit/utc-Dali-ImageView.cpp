@@ -24,6 +24,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali/public-api/rendering/renderer.h>
 
 #include <test-native-image.h>
@@ -836,6 +837,46 @@ int UtcDaliImageViewSetImageOffstageP(void)
   BufferImage image2 = CreateBufferImage( width, height, Vector4( 1.f, 1.f, 1.f, 1.f ) );
   imageView.SetImage( image2 );
   TestImage( imageView, image2 );
+
+  END_TEST;
+}
+
+bool gResourceReadySignalFired = false;
+
+void ResourceReadySignal( Control control )
+{
+  gResourceReadySignalFired = true;
+}
+
+int UtcDaliImageViewCheckResourceReady(void)
+{
+  ToolkitTestApplication application;
+
+  gResourceReadySignalFired = false;
+
+
+  int width = 100;
+  int height = 200;
+  Image image = CreateBufferImage( width, height, Vector4(1.f, 1.f, 1.f, 1.f) );
+
+  // Check ImageView with background and main image, to ensure both visuals are marked as loaded
+  ImageView imageView = ImageView::New( TEST_GIF_FILE_NAME );
+
+  imageView.SetBackgroundImage( image );
+
+  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), false, TEST_LOCATION );
+
+  Toolkit::DevelControl::ResourceReadySignal( imageView ).Connect( &ResourceReadySignal);
+
+  Stage::GetCurrent().Add( imageView );
+
+  application.SendNotification();
+  application.Render(16);
+
+
+  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
   END_TEST;
 }

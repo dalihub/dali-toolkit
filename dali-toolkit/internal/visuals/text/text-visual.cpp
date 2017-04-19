@@ -510,6 +510,9 @@ void TextVisual::UpdateRenderer( bool initializeRendererAndTexture )
       mImpl->mRenderer.SetTextures( textureSet );
 
       control.AddRenderer( mImpl->mRenderer );
+
+      // Text rendered and ready to display
+      ResourceReady();
     }
   }
 }
