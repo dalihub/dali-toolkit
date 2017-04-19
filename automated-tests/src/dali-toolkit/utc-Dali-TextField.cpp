@@ -97,6 +97,7 @@ const char* const PROPERTY_NAME_OUTLINE                              = "outline"
 const char* const PROPERTY_NAME_INPUT_OUTLINE                        = "inputOutline";
 
 const char* const PROPERTY_NAME_HIDDEN_INPUT_SETTINGS                = "hiddenInputSettings";
+const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSize";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -503,6 +504,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextField::Property::OUTLINE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_OUTLINE ) == TextField::Property::INPUT_OUTLINE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_HIDDEN_INPUT_SETTINGS ) == DevelTextField::Property::HIDDEN_INPUT_SETTINGS );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextField::Property::PIXEL_SIZE );
 
   END_TEST;
 }
@@ -836,6 +838,10 @@ int UtcDaliTextFieldSetPropertyP(void)
   hiddenMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::HIDDEN_INPUT_SETTINGS );
   DALI_TEST_EQUALS( hiddenMapSet.Count(), hiddenMapGet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( hiddenMapSet, hiddenMapGet ), true, TEST_LOCATION );
+
+  // Check the pixel size of font
+  field.SetProperty( DevelTextField::Property::PIXEL_SIZE, 20.f );
+  DALI_TEST_EQUALS( field.GetProperty<float>( DevelTextField::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }

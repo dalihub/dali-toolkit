@@ -138,6 +138,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputEmboss",                  
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "outline",                              MAP,       OUTLINE                              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputOutline",                         MAP,       INPUT_OUTLINE                        )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "hiddenInputSettings",            MAP,       HIDDEN_INPUT_SETTINGS                )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "pixelSize",                      FLOAT,     PIXEL_SIZE                           )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -255,9 +256,9 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const float pointSize = value.Get< float >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p POINT_SIZE %f\n", impl.mController.Get(), pointSize );
 
-          if( !Equals( impl.mController->GetDefaultPointSize(), pointSize ) )
+          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
           {
-            impl.mController->SetDefaultPointSize( pointSize );
+            impl.mController->SetDefaultFontSize( pointSize, Text::Controller::POINT_SIZE );
           }
         }
         break;
@@ -735,6 +736,20 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::PIXEL_SIZE:
+      {
+        if( impl.mController )
+        {
+          const float pixelSize = value.Get< float >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PIXEL_SIZE %f\n", impl.mController.Get(), pixelSize );
+
+          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
+          {
+            impl.mController->SetDefaultFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
+          }
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -804,7 +819,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          value = impl.mController->GetDefaultPointSize();
+          value = impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE );
         }
         break;
       }
@@ -1103,6 +1118,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         Property::Map map;
         impl.mController->GetHiddenInputOption(map);
         value = map;
+        break;
+      }
+      case Toolkit::DevelTextField::Property::PIXEL_SIZE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
+        }
         break;
       }
     } //switch

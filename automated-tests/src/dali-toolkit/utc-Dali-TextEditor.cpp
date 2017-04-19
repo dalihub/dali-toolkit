@@ -92,6 +92,7 @@ const char* const PROPERTY_NAME_SMOOTH_SCROLL_DURATION               = "smoothSc
 const char* const PROPERTY_NAME_ENABLE_SCROLL_BAR                    = "enableScrollBar";
 const char* const PROPERTY_NAME_SCROLL_BAR_SHOW_DURATION             = "scrollBarShowDuration";
 const char* const PROPERTY_NAME_SCROLL_BAR_FADE_DURATION             = "scrollBarFadeDuration";
+const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSize";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -429,6 +430,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SCROLL_BAR ) == DevelTextEditor::Property::ENABLE_SCROLL_BAR );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_SHOW_DURATION ) == DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_FADE_DURATION ) == DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextEditor::Property::PIXEL_SIZE );
 
   END_TEST;
 }
@@ -716,6 +718,10 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION ), 0.3f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   editor.SetProperty( DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION, 0.2f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check the pixel size of font
+  editor.SetProperty( DevelTextEditor::Property::PIXEL_SIZE, 20.f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }
