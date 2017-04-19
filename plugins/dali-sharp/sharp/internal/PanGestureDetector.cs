@@ -370,7 +370,7 @@ public static PanGestureDetector GetPanGestureDetectorFromPtr(global::System.Int
     get
     {
       Vector2 temp = new Vector2(0.0f,0.0f);
-      GetProperty( PanGestureDetector.Property.SCREEN_POSITION).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, PanGestureDetector.Property.SCREEN_POSITION).Get(  temp );
       return temp;
     }
 }  public Vector2 ScreenDisplacement
@@ -378,7 +378,7 @@ public static PanGestureDetector GetPanGestureDetectorFromPtr(global::System.Int
     get
     {
       Vector2 temp = new Vector2(0.0f,0.0f);
-      GetProperty( PanGestureDetector.Property.SCREEN_DISPLACEMENT).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, PanGestureDetector.Property.SCREEN_DISPLACEMENT).Get(  temp );
       return temp;
     }
 }  public Vector2 ScreenVelocity
@@ -386,7 +386,7 @@ public static PanGestureDetector GetPanGestureDetectorFromPtr(global::System.Int
     get
     {
       Vector2 temp = new Vector2(0.0f,0.0f);
-      GetProperty( PanGestureDetector.Property.SCREEN_VELOCITY).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, PanGestureDetector.Property.SCREEN_VELOCITY).Get(  temp );
       return temp;
     }
 }  public Vector2 LocalPosition
@@ -394,7 +394,7 @@ public static PanGestureDetector GetPanGestureDetectorFromPtr(global::System.Int
     get
     {
       Vector2 temp = new Vector2(0.0f,0.0f);
-      GetProperty( PanGestureDetector.Property.LOCAL_POSITION).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, PanGestureDetector.Property.LOCAL_POSITION).Get(  temp );
       return temp;
     }
 }  public Vector2 LocalDisplacement
@@ -402,7 +402,7 @@ public static PanGestureDetector GetPanGestureDetectorFromPtr(global::System.Int
     get
     {
       Vector2 temp = new Vector2(0.0f,0.0f);
-      GetProperty( PanGestureDetector.Property.LOCAL_DISPLACEMENT).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, PanGestureDetector.Property.LOCAL_DISPLACEMENT).Get(  temp );
       return temp;
     }
 }  public Vector2 LocalVelocity
@@ -410,7 +410,7 @@ public static PanGestureDetector GetPanGestureDetectorFromPtr(global::System.Int
     get
     {
       Vector2 temp = new Vector2(0.0f,0.0f);
-      GetProperty( PanGestureDetector.Property.LOCAL_VELOCITY).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, PanGestureDetector.Property.LOCAL_VELOCITY).Get(  temp );
       return temp;
     }
 }  public bool Panning
@@ -418,7 +418,7 @@ public static PanGestureDetector GetPanGestureDetectorFromPtr(global::System.Int
     get
     {
       bool temp = false;
-      GetProperty( PanGestureDetector.Property.PANNING).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, PanGestureDetector.Property.PANNING).Get( ref temp );
       return temp;
     }
 }

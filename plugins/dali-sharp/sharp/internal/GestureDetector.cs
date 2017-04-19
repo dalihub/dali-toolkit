@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class GestureDetector : Handle {
+public class GestureDetector : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal GestureDetector(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.GestureDetector_SWIGUpcast(cPtr), cMemoryOwn) {

@@ -29,7 +29,7 @@ namespace Dali {
     using System;
     using System.Runtime.InteropServices;
 
-public class Actor : Handle {
+public class Actor : Animatable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal Actor(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.Actor_SWIGUpcast(cPtr), cMemoryOwn) {

@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class LinearConstrainer : Handle {
+public class LinearConstrainer : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal LinearConstrainer(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.LinearConstrainer_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -130,8 +130,8 @@ public class LinearConstrainer : Handle {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void Remove(Handle target) {
-    NDalicPINVOKE.LinearConstrainer_Remove(swigCPtr, Handle.getCPtr(target));
+  public void Remove(Animatable target) {
+    NDalicPINVOKE.LinearConstrainer_Remove(swigCPtr, Animatable.getCPtr(target));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -140,12 +140,12 @@ public class LinearConstrainer : Handle {
     get
     {
       Dali.Property.Array temp = new Dali.Property.Array();
-      GetProperty( LinearConstrainer.Property.VALUE).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, LinearConstrainer.Property.VALUE).Get(  temp );
       return temp;
     }
     set
     {
-      SetProperty( LinearConstrainer.Property.VALUE, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, LinearConstrainer.Property.VALUE, new Dali.Property.Value( value ) );
     }
   }
   public Dali.Property.Array Progress
@@ -153,12 +153,12 @@ public class LinearConstrainer : Handle {
     get
     {
       Dali.Property.Array temp = new Dali.Property.Array();
-      GetProperty( LinearConstrainer.Property.PROGRESS).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, LinearConstrainer.Property.PROGRESS).Get(  temp );
       return temp;
     }
     set
     {
-      SetProperty( LinearConstrainer.Property.PROGRESS, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, LinearConstrainer.Property.PROGRESS, new Dali.Property.Value( value ) );
     }
   }
 

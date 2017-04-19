@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class Shader : Handle {
+public class Shader : Animatable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal Shader(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.Shader_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -64,20 +64,20 @@ public class Shader : Handle {
   public class Hint : global::System.IDisposable {
     private global::System.Runtime.InteropServices.HandleRef swigCPtr;
     protected bool swigCMemOwn;
-  
+
     internal Hint(global::System.IntPtr cPtr, bool cMemoryOwn) {
       swigCMemOwn = cMemoryOwn;
       swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
     }
-  
+
     internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Hint obj) {
       return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
     }
-  
+
     ~Hint() {
       Dispose();
     }
-  
+
     public virtual void Dispose() {
       lock(this) {
         if (swigCPtr.Handle != global::System.IntPtr.Zero) {
@@ -90,28 +90,28 @@ public class Shader : Handle {
         global::System.GC.SuppressFinalize(this);
       }
     }
-  
+
     public Hint() : this(NDalicPINVOKE.new_Shader_Hint(), true) {
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
-  
+
     public enum Value {
       NONE = 0x00,
       OUTPUT_IS_TRANSPARENT = 0x01,
       MODIFIES_GEOMETRY = 0x02
     }
-  
+
   }
 
   public class Property : global::System.IDisposable {
     private global::System.Runtime.InteropServices.HandleRef swigCPtr;
     protected bool swigCMemOwn;
-  
+
     internal Property(global::System.IntPtr cPtr, bool cMemoryOwn) {
       swigCMemOwn = cMemoryOwn;
       swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
     }
-  
+
     internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Property obj) {
       return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
     }
@@ -132,13 +132,13 @@ public class Shader : Handle {
         global::System.GC.SuppressFinalize(this);
       }
     }
-  
+
     public Property() : this(NDalicPINVOKE.new_Shader_Property(), true) {
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
-  
+
     public static readonly int PROGRAM = NDalicPINVOKE.Shader_Property_PROGRAM_get();
-  
+
   }
 
   public Shader (string vertexShader, string fragmentShader, Shader.Hint.Value hints) : this (NDalicPINVOKE.Shader_New__SWIG_0(vertexShader, fragmentShader, (int)hints), true) {
@@ -170,15 +170,14 @@ public class Shader : Handle {
     get
     {
       Dali.Property.Map temp = new Dali.Property.Map();
-      GetProperty( Shader.Property.PROGRAM).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, Shader.Property.PROGRAM).Get(  temp );
       return temp;
     }
     set
     {
-      SetProperty( Shader.Property.PROGRAM, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Shader.Property.PROGRAM, new Dali.Property.Value( value ) );
     }
   }
-
 }
 
 }
