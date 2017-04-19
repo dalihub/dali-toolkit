@@ -265,26 +265,26 @@ public class TableView : View {
     return ret;
   }
 
-  public bool AddChild(Actor child, TableView.CellPosition position) {
-    bool ret = NDalicPINVOKE.TableView_AddChild(swigCPtr, Actor.getCPtr(child), TableView.CellPosition.getCPtr(position));
+  public bool AddChild(View child, TableView.CellPosition position) {
+    bool ret = NDalicPINVOKE.TableView_AddChild(swigCPtr, View.getCPtr(child), TableView.CellPosition.getCPtr(position));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public Actor GetChildAt(TableView.CellPosition position) {
-    Actor ret = new Actor(NDalicPINVOKE.TableView_GetChildAt(swigCPtr, TableView.CellPosition.getCPtr(position)), true);
+  public View GetChildAt(TableView.CellPosition position) {
+    View ret = new View(NDalicPINVOKE.TableView_GetChildAt(swigCPtr, TableView.CellPosition.getCPtr(position)), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public Actor RemoveChildAt(TableView.CellPosition position) {
-    Actor ret = new Actor(NDalicPINVOKE.TableView_RemoveChildAt(swigCPtr, TableView.CellPosition.getCPtr(position)), true);
+  public View RemoveChildAt(TableView.CellPosition position) {
+    View ret = new View(NDalicPINVOKE.TableView_RemoveChildAt(swigCPtr, TableView.CellPosition.getCPtr(position)), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public bool FindChildPosition(Actor child, TableView.CellPosition position) {
-    bool ret = NDalicPINVOKE.TableView_FindChildPosition(swigCPtr, Actor.getCPtr(child), TableView.CellPosition.getCPtr(position));
+  public bool FindChildPosition(View child, TableView.CellPosition position) {
+    bool ret = NDalicPINVOKE.TableView_FindChildPosition(swigCPtr, View.getCPtr(child), TableView.CellPosition.getCPtr(position));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -299,8 +299,8 @@ public class TableView : View {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void DeleteRow(uint rowIndex, ActorContainer removed) {
-    NDalicPINVOKE.TableView_DeleteRow__SWIG_1(swigCPtr, rowIndex, ActorContainer.getCPtr(removed));
+  public void DeleteRow(uint rowIndex, ViewContainer removed) {
+    NDalicPINVOKE.TableView_DeleteRow__SWIG_1(swigCPtr, rowIndex, ViewContainer.getCPtr(removed));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -314,8 +314,8 @@ public class TableView : View {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void DeleteColumn(uint columnIndex, ActorContainer removed) {
-    NDalicPINVOKE.TableView_DeleteColumn__SWIG_1(swigCPtr, columnIndex, ActorContainer.getCPtr(removed));
+  public void DeleteColumn(uint columnIndex, ViewContainer removed) {
+    NDalicPINVOKE.TableView_DeleteColumn__SWIG_1(swigCPtr, columnIndex, ViewContainer.getCPtr(removed));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -324,8 +324,8 @@ public class TableView : View {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void Resize(uint rows, uint columns, ActorContainer removed) {
-    NDalicPINVOKE.TableView_Resize__SWIG_1(swigCPtr, rows, columns, ActorContainer.getCPtr(removed));
+  public void Resize(uint rows, uint columns, ViewContainer removed) {
+    NDalicPINVOKE.TableView_Resize__SWIG_1(swigCPtr, rows, columns, ViewContainer.getCPtr(removed));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

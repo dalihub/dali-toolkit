@@ -54,20 +54,20 @@ public class RenderTask : Animatable {
   public class Property : global::System.IDisposable {
     private global::System.Runtime.InteropServices.HandleRef swigCPtr;
     protected bool swigCMemOwn;
-  
+
     internal Property(global::System.IntPtr cPtr, bool cMemoryOwn) {
       swigCMemOwn = cMemoryOwn;
       swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
     }
-  
+
     internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Property obj) {
       return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
     }
-  
+
     ~Property() {
       Dispose();
     }
-  
+
     public virtual void Dispose() {
       lock(this) {
         if (swigCPtr.Handle != global::System.IntPtr.Zero) {
@@ -80,16 +80,16 @@ public class RenderTask : Animatable {
         global::System.GC.SuppressFinalize(this);
       }
     }
-  
+
     public Property() : this(NDalicPINVOKE.new_RenderTask_Property(), true) {
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
-  
+
     public static readonly int VIEWPORT_POSITION = NDalicPINVOKE.RenderTask_Property_VIEWPORT_POSITION_get();
     public static readonly int VIEWPORT_SIZE = NDalicPINVOKE.RenderTask_Property_VIEWPORT_SIZE_get();
     public static readonly int CLEAR_COLOR = NDalicPINVOKE.RenderTask_Property_CLEAR_COLOR_get();
     public static readonly int REQUIRES_SYNC = NDalicPINVOKE.RenderTask_Property_REQUIRES_SYNC_get();
-  
+
   }
 
   public static SWIGTYPE_p_f_r_Dali__Vector2__bool DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION {
@@ -98,7 +98,7 @@ public class RenderTask : Animatable {
       SWIGTYPE_p_f_r_Dali__Vector2__bool ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_f_r_Dali__Vector2__bool(cPtr, false);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
-    } 
+    }
   }
 
   public static SWIGTYPE_p_f_r_Dali__Vector2__bool FULLSCREEN_FRAMEBUFFER_FUNCTION {
@@ -107,7 +107,7 @@ public class RenderTask : Animatable {
       SWIGTYPE_p_f_r_Dali__Vector2__bool ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_f_r_Dali__Vector2__bool(cPtr, false);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
-    } 
+    }
   }
 
   public static bool DEFAULT_EXCLUSIVE {
@@ -115,7 +115,7 @@ public class RenderTask : Animatable {
       bool ret = NDalicPINVOKE.RenderTask_DEFAULT_EXCLUSIVE_get();
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
-    } 
+    }
   }
 
   public static bool DEFAULT_INPUT_ENABLED {
@@ -123,7 +123,7 @@ public class RenderTask : Animatable {
       bool ret = NDalicPINVOKE.RenderTask_DEFAULT_INPUT_ENABLED_get();
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
-    } 
+    }
   }
 
   public static Vector4 DEFAULT_CLEAR_COLOR {
@@ -132,7 +132,7 @@ public class RenderTask : Animatable {
       Vector4 ret = (cPtr == global::System.IntPtr.Zero) ? null : new Vector4(cPtr, false);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
-    } 
+    }
   }
 
   public static bool DEFAULT_CLEAR_ENABLED {
@@ -140,7 +140,7 @@ public class RenderTask : Animatable {
       bool ret = NDalicPINVOKE.RenderTask_DEFAULT_CLEAR_ENABLED_get();
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
-    } 
+    }
   }
 
   public static bool DEFAULT_CULL_MODE {
@@ -148,7 +148,7 @@ public class RenderTask : Animatable {
       bool ret = NDalicPINVOKE.RenderTask_DEFAULT_CULL_MODE_get();
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
-    } 
+    }
   }
 
   public static uint DEFAULT_REFRESH_RATE {
@@ -156,7 +156,7 @@ public class RenderTask : Animatable {
       uint ret = NDalicPINVOKE.RenderTask_DEFAULT_REFRESH_RATE_get();
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
-    } 
+    }
   }
 
   public RenderTask() : this(NDalicPINVOKE.new_RenderTask__SWIG_0(), true) {
@@ -179,13 +179,13 @@ public class RenderTask : Animatable {
     return ret;
   }
 
-  public void SetSourceActor(Actor actor) {
-    NDalicPINVOKE.RenderTask_SetSourceActor(swigCPtr, Actor.getCPtr(actor));
+  public void SetSourceView(View view) {
+    NDalicPINVOKE.RenderTask_SetSourceActor(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Actor GetSourceActor() {
-    Actor ret = new Actor(NDalicPINVOKE.RenderTask_GetSourceActor(swigCPtr), true);
+  public View GetSourceView() {
+    View ret = new View(NDalicPINVOKE.RenderTask_GetSourceActor(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -212,13 +212,13 @@ public class RenderTask : Animatable {
     return ret;
   }
 
-  public void SetCameraActor(CameraActor cameraActor) {
-    NDalicPINVOKE.RenderTask_SetCameraActor(swigCPtr, CameraActor.getCPtr(cameraActor));
+  public void SetCamera(Camera camera) {
+    NDalicPINVOKE.RenderTask_SetCameraActor(swigCPtr, Camera.getCPtr(camera));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public CameraActor GetCameraActor() {
-    CameraActor ret = new CameraActor(NDalicPINVOKE.RenderTask_GetCameraActor(swigCPtr), true);
+  public Camera GetCamera() {
+    Camera ret = new Camera(NDalicPINVOKE.RenderTask_GetCameraActor(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -257,13 +257,13 @@ public class RenderTask : Animatable {
     return ret;
   }
 
-  public void SetScreenToFrameBufferMappingActor(Actor mappingActor) {
-    NDalicPINVOKE.RenderTask_SetScreenToFrameBufferMappingActor(swigCPtr, Actor.getCPtr(mappingActor));
+  public void SetScreenToFrameBufferMappingView(View mappingView) {
+    NDalicPINVOKE.RenderTask_SetScreenToFrameBufferMappingActor(swigCPtr, View.getCPtr(mappingView));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Actor GetScreenToFrameBufferMappingActor() {
-    Actor ret = new Actor(NDalicPINVOKE.RenderTask_GetScreenToFrameBufferMappingActor(swigCPtr), true);
+  public View GetScreenToFrameBufferMappingView() {
+    View ret = new View(NDalicPINVOKE.RenderTask_GetScreenToFrameBufferMappingActor(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -351,8 +351,8 @@ public class RenderTask : Animatable {
     return ret;
   }
 
-  public bool ViewportToLocal(Actor actor, float viewportX, float viewportY, out float localX, out float localY) {
-    bool ret = NDalicPINVOKE.RenderTask_ViewportToLocal(swigCPtr, Actor.getCPtr(actor), viewportX, viewportY, out localX, out localY);
+  public bool ViewportToLocal(View view, float viewportX, float viewportY, out float localX, out float localY) {
+    bool ret = NDalicPINVOKE.RenderTask_ViewportToLocal(swigCPtr, View.getCPtr(view), viewportX, viewportY, out localX, out localY);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

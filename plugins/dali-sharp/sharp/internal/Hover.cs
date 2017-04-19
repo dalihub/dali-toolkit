@@ -76,17 +76,17 @@ public class Hover : global::System.IDisposable {
     return PointStateType.FINISHED;
   }
 
-  public Actor GetHitActor(uint point) {
+  public View GetHitView(uint point) {
     if( point < points.Count )
     {
-      return points[(int)point].hitActor;
+      return points[(int)point].hitView;
     }
     else
     {
       // Return a native empty handle
-      Actor actor = new Actor();
-      actor.Reset();
-      return actor;
+      View view = new View();
+      view.Reset();
+      return view;
     }
   }
 

@@ -617,8 +617,8 @@ public class StateChangedEventArgs : EventArgs
     return ret;
   }
 
-  public void SetLabel(Actor label) {
-    NDalicPINVOKE.Button_SetLabel(swigCPtr, Actor.getCPtr(label));
+  public void SetLabel(View label) {
+    NDalicPINVOKE.Button_SetLabel(swigCPtr, View.getCPtr(label));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -632,14 +632,14 @@ public class StateChangedEventArgs : EventArgs
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Actor GetButtonImage() {
-    Actor ret = new Actor(NDalicPINVOKE.Button_GetButtonImage(swigCPtr), true);
+  public View GetButtonImage() {
+    View ret = new View(NDalicPINVOKE.Button_GetButtonImage(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public Actor GetSelectedImage() {
-    Actor ret = new Actor(NDalicPINVOKE.Button_GetSelectedImage(swigCPtr), true);
+  public View GetSelectedImage() {
+    View ret = new View(NDalicPINVOKE.Button_GetSelectedImage(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

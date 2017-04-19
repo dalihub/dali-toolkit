@@ -10,20 +10,20 @@
 
 namespace Dali {
 
-public class ActorTouchDataSignal : global::System.IDisposable {
+internal class WheelSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
-  internal ActorTouchDataSignal(global::System.IntPtr cPtr, bool cMemoryOwn) {
+  internal WheelSignal(global::System.IntPtr cPtr, bool cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
   }
 
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(ActorTouchDataSignal obj) {
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(WheelSignal obj) {
     return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
   }
 
-  ~ActorTouchDataSignal() {
+  ~WheelSignal() {
     DisposeQueue.Instance.Add(this);
   }
 
@@ -37,7 +37,7 @@ public class ActorTouchDataSignal : global::System.IDisposable {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          NDalicPINVOKE.delete_ActorTouchDataSignal(swigCPtr);
+          NDalicPINVOKE.delete_ActorWheelSignal(swigCPtr);
         }
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
@@ -47,13 +47,13 @@ public class ActorTouchDataSignal : global::System.IDisposable {
 
 
   public bool Empty() {
-    bool ret = NDalicPINVOKE.ActorTouchDataSignal_Empty(swigCPtr);
+    bool ret = NDalicPINVOKE.ActorWheelSignal_Empty(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public uint GetConnectionCount() {
-    uint ret = NDalicPINVOKE.ActorTouchDataSignal_GetConnectionCount(swigCPtr);
+    uint ret = NDalicPINVOKE.ActorWheelSignal_GetConnectionCount(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -61,7 +61,7 @@ public class ActorTouchDataSignal : global::System.IDisposable {
   public void Connect(System.Delegate func) {
 System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(func); 
     {
-      NDalicPINVOKE.ActorTouchDataSignal_Connect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
+      NDalicPINVOKE.ActorWheelSignal_Connect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
   }
@@ -69,18 +69,18 @@ System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForD
   public void Disconnect(System.Delegate func) {
 System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(func); 
     {
-      NDalicPINVOKE.ActorTouchDataSignal_Disconnect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
+      NDalicPINVOKE.ActorWheelSignal_Disconnect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
   }
 
-  public bool Emit(Actor arg1, Touch arg2) {
-    bool ret = NDalicPINVOKE.ActorTouchDataSignal_Emit(swigCPtr, Actor.getCPtr(arg1), Touch.getCPtr(arg2));
+  public bool Emit(View arg1, Wheel arg2) {
+    bool ret = NDalicPINVOKE.ActorWheelSignal_Emit(swigCPtr, View.getCPtr(arg1), Wheel.getCPtr(arg2));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public ActorTouchDataSignal() : this(NDalicPINVOKE.new_ActorTouchDataSignal(), true) {
+  public WheelSignal() : this(NDalicPINVOKE.new_ActorWheelSignal(), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

@@ -482,15 +482,15 @@ public class Stage : BaseHandle {
 
   public void AddLayer(Layer layer)
   {
-    this.Add( (Actor)layer );
+    NDalicPINVOKE.Stage_Add(swigCPtr, Layer.getCPtr(layer));
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public void RemoveLayer(Layer layer)
   {
-    this.Remove( (Actor)layer );
+    NDalicPINVOKE.Stage_Remove(swigCPtr, Layer.getCPtr(layer));
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
-
-
 
   public static Vector4 DEFAULT_BACKGROUND_COLOR {
     get {
@@ -536,13 +536,13 @@ public class Stage : BaseHandle {
     return ret;
   }
 
-  public void Add(Actor actor) {
-    NDalicPINVOKE.Stage_Add(swigCPtr, Actor.getCPtr(actor));
+  public void Add(View view) {
+    NDalicPINVOKE.Stage_Add(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void Remove(Actor actor) {
-    NDalicPINVOKE.Stage_Remove(swigCPtr, Actor.getCPtr(actor));
+  public void Remove(View view) {
+    NDalicPINVOKE.Stage_Remove(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

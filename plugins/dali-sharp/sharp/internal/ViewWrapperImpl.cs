@@ -22,8 +22,8 @@ namespace Dali
         private global::System.Runtime.InteropServices.HandleRef swigCPtr;
         public delegate void OnStageConnectionDelegate(int depth);
         public delegate void OnStageDisconnectionDelegate();
-        public delegate void OnChildAddDelegate(Actor actor);
-        public delegate void OnChildRemoveDelegate(Actor actor);
+        public delegate void OnChildAddDelegate(View view);
+        public delegate void OnChildRemoveDelegate(View view);
         public delegate void OnPropertySetDelegate(int index, Property.Value propertyValue);
         public delegate void OnSizeSetDelegate(Vector3 targetSize);
         public delegate void OnSizeAnimationDelegate(Animation animation, Vector3 targetSize);
@@ -34,15 +34,15 @@ namespace Dali
         public delegate void OnRelayoutDelegate(Vector2 size, RelayoutContainer container);
         public delegate void OnSetResizePolicyDelegate(ResizePolicyType policy, DimensionType dimension);
         public delegate Vector3 GetNaturalSizeDelegate();
-        public delegate float CalculateChildSizeDelegate(Actor child, DimensionType dimension);
+        public delegate float CalculateChildSizeDelegate(View child, DimensionType dimension);
         public delegate float GetHeightForWidthDelegate(float width);
         public delegate float GetWidthForHeightDelegate(float height);
         public delegate bool RelayoutDependentOnChildrenDimensionDelegate(DimensionType dimension);
         public delegate bool RelayoutDependentOnChildrenDelegate();
         public delegate void OnCalculateRelayoutSizeDelegate(DimensionType dimension);
         public delegate void OnLayoutNegotiatedDelegate(float size, DimensionType dimension);
-        public delegate void OnControlChildAddDelegate(Actor child);
-        public delegate void OnControlChildRemoveDelegate(Actor child);
+        public delegate void OnControlChildAddDelegate(View child);
+        public delegate void OnControlChildRemoveDelegate(View child);
         public delegate void OnStyleChangeDelegate(StyleManager styleManager, StyleChangeType change);
         public delegate bool OnAccessibilityActivatedDelegate();
         public delegate bool OnAccessibilityPanDelegate(PanGesture gestures);
@@ -51,8 +51,8 @@ namespace Dali
         public delegate bool OnAccessibilityZoomDelegate();
         public delegate void OnKeyInputFocusGainedDelegate();
         public delegate void OnKeyInputFocusLostDelegate();
-        public delegate Actor GetNextKeyboardFocusableActorDelegate(Actor currentFocusedActor, View.KeyboardFocus.Direction direction, bool loopEnabled);
-        public delegate void OnKeyboardFocusChangeCommittedDelegate(Actor commitedFocusableActor);
+        public delegate View GetNextKeyboardFocusableActorDelegate(View currentFocusedActor, View.KeyboardFocus.Direction direction, bool loopEnabled);
+        public delegate void OnKeyboardFocusChangeCommittedDelegate(View commitedFocusableActor);
         public delegate bool OnKeyboardEnterDelegate();
         public delegate void OnPinchDelegate(PinchGesture pinch);
         public delegate void OnPanDelegate(PanGesture pan);
@@ -170,9 +170,9 @@ namespace Dali
             return ret;
         }
 
-        public float CalculateChildSizeBase(Actor child, DimensionType dimension)
+        public float CalculateChildSizeBase(View child, DimensionType dimension)
         {
-            float ret = NDalicManualPINVOKE.ViewWrapperImpl_CalculateChildSizeBase(swigCPtr, Actor.getCPtr(child), (int)dimension);
+            float ret = NDalicManualPINVOKE.ViewWrapperImpl_CalculateChildSizeBase(swigCPtr, View.getCPtr(child), (int)dimension);
             if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
             return ret;
         }
@@ -304,12 +304,12 @@ namespace Dali
 
         private void DirectorOnChildAdd(global::System.IntPtr child)
         {
-            OnChildAdd(new Actor(child, false));
+            OnChildAdd(new View(child, false));
         }
 
         private void DirectorOnChildRemove(global::System.IntPtr child)
         {
-            OnChildRemove(new Actor(child, false));
+            OnChildRemove(new View(child, false));
         }
 
         private void DirectorOnPropertySet(int index, global::System.IntPtr propertyValue)
@@ -367,7 +367,7 @@ namespace Dali
 
         private float DirectorCalculateChildSize(global::System.IntPtr child, int dimension)
         {
-            return CalculateChildSize(new Actor(child, false), (DimensionType)dimension);
+            return CalculateChildSize(new View(child, false), (DimensionType)dimension);
         }
 
         private float DirectorGetHeightForWidth(float width)
@@ -406,12 +406,12 @@ namespace Dali
 
         private void DirectorOnControlChildAdd(global::System.IntPtr child)
         {
-            OnControlChildAdd(new Actor(child, false));
+            OnControlChildAdd(new View(child, false));
         }
 
         private void DirectorOnControlChildRemove(global::System.IntPtr child)
         {
-            OnControlChildRemove(new Actor(child, false));
+            OnControlChildRemove(new View(child, false));
         }
 
         private void DirectorOnStyleChange(global::System.IntPtr styleManager, int change)
@@ -459,12 +459,12 @@ namespace Dali
 
         private global::System.IntPtr DirectorGetNextKeyboardFocusableActor(global::System.IntPtr currentFocusedActor, int direction, bool loopEnabled)
         {
-            return Actor.getCPtr(GetNextKeyboardFocusableActor(new Actor(currentFocusedActor, false), (View.KeyboardFocus.Direction)direction, loopEnabled)).Handle;
+            return View.getCPtr(GetNextKeyboardFocusableActor(new View(currentFocusedActor, false), (View.KeyboardFocus.Direction)direction, loopEnabled)).Handle;
         }
 
         private void DirectorOnKeyboardFocusChangeCommitted(global::System.IntPtr commitedFocusableActor)
         {
-            OnKeyboardFocusChangeCommitted(new Actor(commitedFocusableActor, false));
+            OnKeyboardFocusChangeCommitted(new View(commitedFocusableActor, false));
         }
 
         private bool DirectorOnKeyboardEnter()

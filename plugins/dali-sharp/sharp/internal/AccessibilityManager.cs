@@ -639,52 +639,52 @@ public class AccessibilityManager : BaseHandle {
       */
     public class FocusChangedEventArgs : EventArgs
     {
-      private Actor _actorCurrent;
-      private Actor _actorNext;
+      private View _viewCurrent;
+      private View _viewNext;
 
-      public Actor ActorCurrent
+      public View ViewCurrent
       {
         get
         {
-          return _actorCurrent;
+          return _viewCurrent;
         }
         set
         {
-          _actorCurrent = value;
+          _viewCurrent = value;
         }
       }
 
-      public Actor ActorNext
+      public View ViewNext
       {
         get
         {
-          return _actorNext;
+          return _viewNext;
         }
         set
         {
-          _actorNext = value;
+          _viewNext = value;
         }
       }
     }
 
     /**
-      * @brief Event arguments that passed via FocusedActorActivated signal
+      * @brief Event arguments that passed via FocusedViewActivated signal
       *
       */
-    public class FocusedActorActivatedEventArgs : EventArgs
+    public class FocusedViewActivatedEventArgs : EventArgs
     {
-      private Actor _actor;
+      private View _view;
 
 
-      public Actor Actor
+      public View View
       {
         get
         {
-          return _actor;
+          return _view;
         }
         set
         {
-          _actor = value;
+          _view = value;
         }
       }
     }
@@ -695,18 +695,18 @@ public class AccessibilityManager : BaseHandle {
       */
     public class FocusOvershotEventArgs : EventArgs
     {
-      private Actor _currentFocusedActor;
+      private View _currentFocusedView;
       private AccessibilityManager.FocusOvershotDirection _focusOvershotDirection;
 
-      public Actor CurrentFocusedActor
+      public View CurrentFocusedView
       {
         get
         {
-          return _currentFocusedActor;
+          return _currentFocusedView;
         }
         set
         {
-          _currentFocusedActor = value;
+          _currentFocusedView = value;
         }
       }
 
@@ -868,12 +868,12 @@ public class AccessibilityManager : BaseHandle {
     private FocusChangedEventCallbackDelegate _accessibilityManagerFocusChangedEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void FocusedActorActivatedEventCallbackDelegate(IntPtr actor);
-    private DaliEventHandler<object,FocusedActorActivatedEventArgs> _accessibilityManagerFocusedActorActivatedEventHandler;
-    private FocusedActorActivatedEventCallbackDelegate _accessibilityManagerFocusedActorActivatedEventCallbackDelegate;
+    private delegate void FocusedViewActivatedEventCallbackDelegate(IntPtr actor);
+    private DaliEventHandler<object,FocusedViewActivatedEventArgs> _accessibilityManagerFocusedViewActivatedEventHandler;
+    private FocusedViewActivatedEventCallbackDelegate _accessibilityManagerFocusedViewActivatedEventCallbackDelegate;
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-    private delegate void FocusOvershotEventCallbackDelegate(IntPtr currentFocusedActor, AccessibilityManager.FocusOvershotDirection direction);
+    private delegate void FocusOvershotEventCallbackDelegate(IntPtr currentFocusedView, AccessibilityManager.FocusOvershotDirection direction);
     private DaliEventHandler<object,FocusOvershotEventArgs> _accessibilityManagerFocusOvershotEventHandler;
     private FocusOvershotEventCallbackDelegate _accessibilityManagerFocusOvershotEventCallbackDelegate;
 
@@ -2191,8 +2191,8 @@ public class AccessibilityManager : BaseHandle {
       FocusChangedEventArgs e = new FocusChangedEventArgs();
 
       // Populate all members of "e" (FocusChangedEventArgs) with real data
-      e.ActorCurrent = Actor.GetActorFromPtr(actor1);
-      e.ActorNext = Actor.GetActorFromPtr(actor2);
+      e.ViewCurrent = View.GetViewFromPtr(actor1);
+      e.ViewNext = View.GetViewFromPtr(actor2);
 
       if (_accessibilityManagerFocusChangedEventHandler != null)
       {
@@ -2201,19 +2201,19 @@ public class AccessibilityManager : BaseHandle {
       }
     }
 
-    public event DaliEventHandler<object,FocusedActorActivatedEventArgs> FocusedActorActivated
+    public event DaliEventHandler<object,FocusedViewActivatedEventArgs> FocusedViewActivated
     {
       add
       {
         lock(this)
         {
           // Restricted to only one listener
-          if (_accessibilityManagerFocusedActorActivatedEventHandler == null)
+          if (_accessibilityManagerFocusedViewActivatedEventHandler == null)
           {
-            _accessibilityManagerFocusedActorActivatedEventHandler += value;
+            _accessibilityManagerFocusedViewActivatedEventHandler += value;
 
-            _accessibilityManagerFocusedActorActivatedEventCallbackDelegate = new FocusedActorActivatedEventCallbackDelegate(OnFocusedActorActivated);
-            this.FocusedActorActivatedSignal().Connect(_accessibilityManagerFocusedActorActivatedEventCallbackDelegate);
+            _accessibilityManagerFocusedViewActivatedEventCallbackDelegate = new FocusedViewActivatedEventCallbackDelegate(OnFocusedViewActivated);
+            this.FocusedViewActivatedSignal().Connect(_accessibilityManagerFocusedViewActivatedEventCallbackDelegate);
           }
         }
       }
@@ -2222,28 +2222,28 @@ public class AccessibilityManager : BaseHandle {
       {
         lock(this)
         {
-          if (_accessibilityManagerFocusedActorActivatedEventHandler != null)
+          if (_accessibilityManagerFocusedViewActivatedEventHandler != null)
           {
-            this.FocusedActorActivatedSignal().Disconnect(_accessibilityManagerFocusedActorActivatedEventCallbackDelegate);
+            this.FocusedViewActivatedSignal().Disconnect(_accessibilityManagerFocusedViewActivatedEventCallbackDelegate);
           }
 
-          _accessibilityManagerFocusedActorActivatedEventHandler -= value;
+          _accessibilityManagerFocusedViewActivatedEventHandler -= value;
         }
       }
     }
 
-    // Callback for AccessibilityManager FocusedActorActivatedSignal
-    private void OnFocusedActorActivated(IntPtr actor)
+    // Callback for AccessibilityManager FocusedViewActivatedSignal
+    private void OnFocusedViewActivated(IntPtr actor)
     {
-      FocusedActorActivatedEventArgs e = new FocusedActorActivatedEventArgs();
+      FocusedViewActivatedEventArgs e = new FocusedViewActivatedEventArgs();
 
-      // Populate all members of "e" (FocusedActorActivatedEventArgs) with real data
-      e.Actor = Actor.GetActorFromPtr(actor);
+      // Populate all members of "e" (FocusedViewActivatedEventArgs) with real data
+      e.View = View.GetViewFromPtr(actor);
 
-      if (_accessibilityManagerFocusedActorActivatedEventHandler != null)
+      if (_accessibilityManagerFocusedViewActivatedEventHandler != null)
       {
         //here we send all data to user event handlers
-        _accessibilityManagerFocusedActorActivatedEventHandler(this, e);
+        _accessibilityManagerFocusedViewActivatedEventHandler(this, e);
       }
     }
 
@@ -2280,12 +2280,12 @@ public class AccessibilityManager : BaseHandle {
     }
 
     // Callback for AccessibilityManager FocusOvershotSignal
-    private void OnFocusOvershot(IntPtr currentFocusedActor, AccessibilityManager.FocusOvershotDirection direction)
+    private void OnFocusOvershot(IntPtr currentFocusedView, AccessibilityManager.FocusOvershotDirection direction)
     {
       FocusOvershotEventArgs e = new FocusOvershotEventArgs();
 
       // Populate all members of "e" (FocusOvershotEventArgs) with real data
-      e.CurrentFocusedActor = Actor.GetActorFromPtr(currentFocusedActor);
+      e.CurrentFocusedView = View.GetViewFromPtr(currentFocusedView);
       e.FocusOvershotDirection = direction;
 
       if (_accessibilityManagerFocusOvershotEventHandler != null)
@@ -2313,24 +2313,24 @@ public class AccessibilityManager : BaseHandle {
     return ret;
   }
 
-  public void SetAccessibilityAttribute(Actor actor, AccessibilityManager.AccessibilityAttribute type, string text) {
-    NDalicPINVOKE.AccessibilityManager_SetAccessibilityAttribute(swigCPtr, Actor.getCPtr(actor), (int)type, text);
+  public void SetAccessibilityAttribute(View view, AccessibilityManager.AccessibilityAttribute type, string text) {
+    NDalicPINVOKE.AccessibilityManager_SetAccessibilityAttribute(swigCPtr, View.getCPtr(view), (int)type, text);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public string GetAccessibilityAttribute(Actor actor, AccessibilityManager.AccessibilityAttribute type) {
-    string ret = NDalicPINVOKE.AccessibilityManager_GetAccessibilityAttribute(swigCPtr, Actor.getCPtr(actor), (int)type);
+  public string GetAccessibilityAttribute(View view, AccessibilityManager.AccessibilityAttribute type) {
+    string ret = NDalicPINVOKE.AccessibilityManager_GetAccessibilityAttribute(swigCPtr, View.getCPtr(view), (int)type);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public void SetFocusOrder(Actor actor, uint order) {
-    NDalicPINVOKE.AccessibilityManager_SetFocusOrder(swigCPtr, Actor.getCPtr(actor), order);
+  public void SetFocusOrder(View view, uint order) {
+    NDalicPINVOKE.AccessibilityManager_SetFocusOrder(swigCPtr, View.getCPtr(view), order);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public uint GetFocusOrder(Actor actor) {
-    uint ret = NDalicPINVOKE.AccessibilityManager_GetFocusOrder(swigCPtr, Actor.getCPtr(actor));
+  public uint GetFocusOrder(View view) {
+    uint ret = NDalicPINVOKE.AccessibilityManager_GetFocusOrder(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -2341,26 +2341,26 @@ public class AccessibilityManager : BaseHandle {
     return ret;
   }
 
-  public Actor GetActorByFocusOrder(uint order) {
-    Actor ret = new Actor(NDalicPINVOKE.AccessibilityManager_GetActorByFocusOrder(swigCPtr, order), true);
+  public View GetViewByFocusOrder(uint order) {
+    View ret = new View(NDalicPINVOKE.AccessibilityManager_GetActorByFocusOrder(swigCPtr, order), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public bool SetCurrentFocusActor(Actor actor) {
-    bool ret = NDalicPINVOKE.AccessibilityManager_SetCurrentFocusActor(swigCPtr, Actor.getCPtr(actor));
+  public bool SetCurrentFocusView(View view) {
+    bool ret = NDalicPINVOKE.AccessibilityManager_SetCurrentFocusActor(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public Actor GetCurrentFocusActor() {
-    Actor ret = new Actor(NDalicPINVOKE.AccessibilityManager_GetCurrentFocusActor(swigCPtr), true);
+  public View GetCurrentFocusView() {
+    View ret = new View(NDalicPINVOKE.AccessibilityManager_GetCurrentFocusActor(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public Actor GetCurrentFocusGroup() {
-    Actor ret = new Actor(NDalicPINVOKE.AccessibilityManager_GetCurrentFocusGroup(swigCPtr), true);
+  public View GetCurrentFocusGroup() {
+    View ret = new View(NDalicPINVOKE.AccessibilityManager_GetCurrentFocusGroup(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -2393,13 +2393,13 @@ public class AccessibilityManager : BaseHandle {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetFocusGroup(Actor actor, bool isFocusGroup) {
-    NDalicPINVOKE.AccessibilityManager_SetFocusGroup(swigCPtr, Actor.getCPtr(actor), isFocusGroup);
+  public void SetFocusGroup(View view, bool isFocusGroup) {
+    NDalicPINVOKE.AccessibilityManager_SetFocusGroup(swigCPtr, View.getCPtr(view), isFocusGroup);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public bool IsFocusGroup(Actor actor) {
-    bool ret = NDalicPINVOKE.AccessibilityManager_IsFocusGroup(swigCPtr, Actor.getCPtr(actor));
+  public bool IsFocusGroup(View view) {
+    bool ret = NDalicPINVOKE.AccessibilityManager_IsFocusGroup(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -2426,19 +2426,19 @@ public class AccessibilityManager : BaseHandle {
     return ret;
   }
 
-  public void SetFocusIndicatorActor(Actor indicator) {
-    NDalicPINVOKE.AccessibilityManager_SetFocusIndicatorActor(swigCPtr, Actor.getCPtr(indicator));
+  public void SetFocusIndicatorView(View indicator) {
+    NDalicPINVOKE.AccessibilityManager_SetFocusIndicatorActor(swigCPtr, View.getCPtr(indicator));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Actor GetFocusIndicatorActor() {
-    Actor ret = new Actor(NDalicPINVOKE.AccessibilityManager_GetFocusIndicatorActor(swigCPtr), true);
+  public View GetFocusIndicatorView() {
+    View ret = new View(NDalicPINVOKE.AccessibilityManager_GetFocusIndicatorActor(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public Actor GetFocusGroup(Actor actor) {
-    Actor ret = new Actor(NDalicPINVOKE.AccessibilityManager_GetFocusGroup(swigCPtr, Actor.getCPtr(actor)), true);
+  public View GetFocusGroup(View view) {
+    View ret = new View(NDalicPINVOKE.AccessibilityManager_GetFocusGroup(swigCPtr, View.getCPtr(view)), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -2461,8 +2461,8 @@ public class AccessibilityManager : BaseHandle {
     return ret;
   }
 
-  public ActorSignal FocusedActorActivatedSignal() {
-    ActorSignal ret = new ActorSignal(NDalicPINVOKE.AccessibilityManager_FocusedActorActivatedSignal(swigCPtr), false);
+  public ViewSignal FocusedViewActivatedSignal() {
+    ViewSignal ret = new ViewSignal(NDalicPINVOKE.AccessibilityManager_FocusedActorActivatedSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

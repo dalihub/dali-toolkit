@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class CustomActor : Actor {
+    public class CustomActor : Animatable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal CustomActor(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.CustomActor_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -25,7 +25,7 @@ public class CustomActor : Actor {
     DisposeQueue.Instance.Add(this);
   }
 
-  public override void Dispose() {
+  public virtual void Dispose() {
     if (!Stage.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
@@ -40,7 +40,6 @@ public class CustomActor : Actor {
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
       global::System.GC.SuppressFinalize(this);
-      base.Dispose();
     }
   }
 

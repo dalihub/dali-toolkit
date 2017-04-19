@@ -52,14 +52,14 @@ public class ItemFactory : global::System.IDisposable {
     return ret;
   }
 
-  public virtual Actor NewItem(uint itemId) {
-    Actor ret = new Actor(NDalicPINVOKE.ItemFactory_NewItem(swigCPtr, itemId), true);
+  public virtual View NewItem(uint itemId) {
+    View ret = new View(NDalicPINVOKE.ItemFactory_NewItem(swigCPtr, itemId), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public virtual void ItemReleased(uint itemId, Actor actor) {
-    if (SwigDerivedClassHasMethod("ItemReleased", swigMethodTypes2)) NDalicPINVOKE.ItemFactory_ItemReleasedSwigExplicitItemFactory(swigCPtr, itemId, Actor.getCPtr(actor)); else NDalicPINVOKE.ItemFactory_ItemReleased(swigCPtr, itemId, Actor.getCPtr(actor));
+  public virtual void ItemReleased(uint itemId, View view) {
+    if (SwigDerivedClassHasMethod("ItemReleased", swigMethodTypes2)) NDalicPINVOKE.ItemFactory_ItemReleasedSwigExplicitItemFactory(swigCPtr, itemId, View.getCPtr(view)); else NDalicPINVOKE.ItemFactory_ItemReleased(swigCPtr, itemId, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -89,11 +89,11 @@ public class ItemFactory : global::System.IDisposable {
   }
 
   private global::System.IntPtr SwigDirectorNewItem(uint itemId) {
-    return Actor.getCPtr(NewItem(itemId)).Handle;
+    return View.getCPtr(NewItem(itemId)).Handle;
   }
 
   private void SwigDirectorItemReleased(uint itemId, global::System.IntPtr actor) {
-    ItemReleased(itemId, new Actor(actor, true));
+    ItemReleased(itemId, new View(actor, true));
   }
 
   public delegate uint SwigDelegateItemFactory_0();
@@ -106,7 +106,7 @@ public class ItemFactory : global::System.IDisposable {
 
   private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes1 = new global::System.Type[] { typeof(uint) };
-  private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] { typeof(uint), typeof(Actor) };
+  private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] { typeof(uint), typeof(View) };
 }
 
 }

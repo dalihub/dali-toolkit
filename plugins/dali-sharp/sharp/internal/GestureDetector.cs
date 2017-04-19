@@ -65,13 +65,13 @@ public class GestureDetector : BaseHandle {
     return ret;
   }
 
-  public void Attach(Actor actor) {
-    NDalicPINVOKE.GestureDetector_Attach(swigCPtr, Actor.getCPtr(actor));
+  public void Attach(View view) {
+    NDalicPINVOKE.GestureDetector_Attach(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void Detach(Actor actor) {
-    NDalicPINVOKE.GestureDetector_Detach(swigCPtr, Actor.getCPtr(actor));
+  public void Detach(View view) {
+    NDalicPINVOKE.GestureDetector_Detach(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -80,14 +80,14 @@ public class GestureDetector : BaseHandle {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public uint GetAttachedActorCount() {
+  public uint GetAttachedViewCount() {
     uint ret = NDalicPINVOKE.GestureDetector_GetAttachedActorCount(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public Actor GetAttachedActor(uint index) {
-    Actor ret = new Actor(NDalicPINVOKE.GestureDetector_GetAttachedActor(swigCPtr, index), true);
+  public View GetAttachedView(uint index) {
+    View ret = new View(NDalicPINVOKE.GestureDetector_GetAttachedActor(swigCPtr, index), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

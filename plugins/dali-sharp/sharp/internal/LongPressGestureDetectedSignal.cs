@@ -74,8 +74,8 @@ System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForD
     }
   }
 
-  public void Emit(Actor arg1, LongPressGesture arg2) {
-    NDalicPINVOKE.LongPressGestureDetectedSignal_Emit(swigCPtr, Actor.getCPtr(arg1), LongPressGesture.getCPtr(arg2));
+  public void Emit(View arg1, LongPressGesture arg2) {
+    NDalicPINVOKE.LongPressGestureDetectedSignal_Emit(swigCPtr, View.getCPtr(arg1), LongPressGesture.getCPtr(arg2));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

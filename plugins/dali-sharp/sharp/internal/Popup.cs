@@ -405,35 +405,35 @@ public class Popup : View {
     return ret;
   }
 
-  public void SetTitle(Actor titleActor) {
-    NDalicPINVOKE.Popup_SetTitle(swigCPtr, Actor.getCPtr(titleActor));
+  public void SetTitle(View titleView) {
+    NDalicPINVOKE.Popup_SetTitle(swigCPtr, View.getCPtr(titleView));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Actor GetTitle() {
-    Actor ret = new Actor(NDalicPINVOKE.Popup_GetTitle(swigCPtr), true);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public void SetContent(Actor content) {
-    NDalicPINVOKE.Popup_SetContent(swigCPtr, Actor.getCPtr(content));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public Actor GetContent() {
-    Actor ret = new Actor(NDalicPINVOKE.Popup_GetContent(swigCPtr), true);
+  public View GetTitle() {
+    View ret = new View(NDalicPINVOKE.Popup_GetTitle(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public void SetFooter(Actor footer) {
-    NDalicPINVOKE.Popup_SetFooter(swigCPtr, Actor.getCPtr(footer));
+  public void SetContent(View content) {
+    NDalicPINVOKE.Popup_SetContent(swigCPtr, View.getCPtr(content));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Actor GetFooter() {
-    Actor ret = new Actor(NDalicPINVOKE.Popup_GetFooter(swigCPtr), true);
+  public View GetContent() {
+    View ret = new View(NDalicPINVOKE.Popup_GetContent(swigCPtr), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public void SetFooter(View footer) {
+    NDalicPINVOKE.Popup_SetFooter(swigCPtr, View.getCPtr(footer));
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+  }
+
+  public View GetFooter() {
+    View ret = new View(NDalicPINVOKE.Popup_GetFooter(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

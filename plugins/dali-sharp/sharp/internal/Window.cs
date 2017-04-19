@@ -245,6 +245,12 @@ public class Window : BaseHandle {
     return ret;
   }
 
+  public WindowFocusSignalType FocusChangedSignal() {
+    WindowFocusSignalType ret = new WindowFocusSignalType(NDalicPINVOKE.FocusChangedSignal(swigCPtr), false);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
   public enum WindowOrientation {
     PORTRAIT = 0,
     LANDSCAPE = 90,

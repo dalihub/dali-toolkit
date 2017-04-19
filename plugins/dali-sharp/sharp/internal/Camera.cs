@@ -26,22 +26,22 @@
 
 namespace Dali {
 
-public class CameraActor : Actor {
+    public class Camera : Animatable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
-  internal CameraActor(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.CameraActor_SWIGUpcast(cPtr), cMemoryOwn) {
+  internal Camera(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.CameraActor_SWIGUpcast(cPtr), cMemoryOwn) {
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
   }
 
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(CameraActor obj) {
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Camera obj) {
     return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
   }
 
-  ~CameraActor() {
+  ~Camera() {
     DisposeQueue.Instance.Add(this);
   }
 
-  public override void Dispose() {
+  public virtual void Dispose() {
     if (!Stage.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
@@ -56,7 +56,6 @@ public class CameraActor : Actor {
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
       global::System.GC.SuppressFinalize(this);
-      base.Dispose();
     }
   }
 
@@ -112,26 +111,26 @@ public class CameraActor : Actor {
   
   }
 
-  public CameraActor () : this (NDalicPINVOKE.CameraActor_New__SWIG_0(), true) {
+  public Camera () : this (NDalicPINVOKE.CameraActor_New__SWIG_0(), true) {
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
 
   }
-  public CameraActor (Vector2 size) : this (NDalicPINVOKE.CameraActor_New__SWIG_1(Vector2.getCPtr(size)), true) {
+  public Camera (Vector2 size) : this (NDalicPINVOKE.CameraActor_New__SWIG_1(Vector2.getCPtr(size)), true) {
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
 
   }
-  public new static CameraActor DownCast(BaseHandle handle) {
-    CameraActor ret = new CameraActor(NDalicPINVOKE.CameraActor_DownCast(BaseHandle.getCPtr(handle)), true);
+  public new static Camera DownCast(BaseHandle handle) {
+    Camera ret = new Camera(NDalicPINVOKE.CameraActor_DownCast(BaseHandle.getCPtr(handle)), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public CameraActor(CameraActor copy) : this(NDalicPINVOKE.new_CameraActor__SWIG_1(CameraActor.getCPtr(copy)), true) {
+  public Camera(Camera copy) : this(NDalicPINVOKE.new_CameraActor__SWIG_1(Camera.getCPtr(copy)), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public CameraActor Assign(CameraActor rhs) {
-    CameraActor ret = new CameraActor(NDalicPINVOKE.CameraActor_Assign(swigCPtr, CameraActor.getCPtr(rhs)), false);
+  public Camera Assign(Camera rhs) {
+    Camera ret = new Camera(NDalicPINVOKE.CameraActor_Assign(swigCPtr, Camera.getCPtr(rhs)), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -244,12 +243,12 @@ public class CameraActor : Actor {
     get
     {
       string temp;
-      GetProperty( CameraActor.Property.TYPE).Get( out temp );
+      GetProperty( Camera.Property.TYPE).Get( out temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.TYPE, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.TYPE, new Dali.Property.Value( value ) );
     }
   }
   public string ProjectionMode
@@ -257,12 +256,12 @@ public class CameraActor : Actor {
     get
     {
       string temp;
-      GetProperty( CameraActor.Property.PROJECTION_MODE).Get( out temp );
+      GetProperty( Camera.Property.PROJECTION_MODE).Get( out temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.PROJECTION_MODE, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.PROJECTION_MODE, new Dali.Property.Value( value ) );
     }
   }
   public float FieldOfView
@@ -270,12 +269,12 @@ public class CameraActor : Actor {
     get
     {
       float temp = 0.0f;
-      GetProperty( CameraActor.Property.FIELD_OF_VIEW).Get( ref temp );
+      GetProperty( Camera.Property.FIELD_OF_VIEW).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.FIELD_OF_VIEW, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.FIELD_OF_VIEW, new Dali.Property.Value( value ) );
     }
   }
   public float AspectRatio
@@ -283,12 +282,12 @@ public class CameraActor : Actor {
     get
     {
       float temp = 0.0f;
-      GetProperty( CameraActor.Property.ASPECT_RATIO).Get( ref temp );
+      GetProperty( Camera.Property.ASPECT_RATIO).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.ASPECT_RATIO, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.ASPECT_RATIO, new Dali.Property.Value( value ) );
     }
   }
   public float NearPlaneDistance
@@ -296,12 +295,12 @@ public class CameraActor : Actor {
     get
     {
       float temp = 0.0f;
-      GetProperty( CameraActor.Property.NEAR_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.NEAR_PLANE_DISTANCE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.NEAR_PLANE_DISTANCE, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.NEAR_PLANE_DISTANCE, new Dali.Property.Value( value ) );
     }
   }
   public float FarPlaneDistance
@@ -309,12 +308,12 @@ public class CameraActor : Actor {
     get
     {
       float temp = 0.0f;
-      GetProperty( CameraActor.Property.FAR_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.FAR_PLANE_DISTANCE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.FAR_PLANE_DISTANCE, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.FAR_PLANE_DISTANCE, new Dali.Property.Value( value ) );
     }
   }
   public float LeftPlaneDistance
@@ -322,12 +321,12 @@ public class CameraActor : Actor {
     get
     {
       float temp = 0.0f;
-      GetProperty( CameraActor.Property.LEFT_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.LEFT_PLANE_DISTANCE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.LEFT_PLANE_DISTANCE, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.LEFT_PLANE_DISTANCE, new Dali.Property.Value( value ) );
     }
   }
   public float RightPlaneDistance
@@ -335,12 +334,12 @@ public class CameraActor : Actor {
     get
     {
       float temp = 0.0f;
-      GetProperty( CameraActor.Property.RIGHT_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.RIGHT_PLANE_DISTANCE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.RIGHT_PLANE_DISTANCE, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.RIGHT_PLANE_DISTANCE, new Dali.Property.Value( value ) );
     }
   }
   public float TopPlaneDistance
@@ -348,12 +347,12 @@ public class CameraActor : Actor {
     get
     {
       float temp = 0.0f;
-      GetProperty( CameraActor.Property.TOP_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.TOP_PLANE_DISTANCE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.TOP_PLANE_DISTANCE, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.TOP_PLANE_DISTANCE, new Dali.Property.Value( value ) );
     }
   }
   public float BottomPlaneDistance
@@ -361,12 +360,12 @@ public class CameraActor : Actor {
     get
     {
       float temp = 0.0f;
-      GetProperty( CameraActor.Property.BOTTOM_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.BOTTOM_PLANE_DISTANCE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.BOTTOM_PLANE_DISTANCE, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.BOTTOM_PLANE_DISTANCE, new Dali.Property.Value( value ) );
     }
   }
   public Vector3 TargetPosition
@@ -374,12 +373,12 @@ public class CameraActor : Actor {
     get
     {
       Vector3 temp = new Vector3(0.0f,0.0f,0.0f);
-      GetProperty( CameraActor.Property.TARGET_POSITION).Get(  temp );
+      GetProperty( Camera.Property.TARGET_POSITION).Get(  temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.TARGET_POSITION, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.TARGET_POSITION, new Dali.Property.Value( value ) );
     }
   }
   public Matrix ProjectionMatrix
@@ -387,7 +386,7 @@ public class CameraActor : Actor {
     get
     {
       Matrix temp = new Matrix();
-      GetProperty( CameraActor.Property.PROJECTION_MATRIX).Get(  temp );
+      GetProperty( Camera.Property.PROJECTION_MATRIX).Get(  temp );
       return temp;
     }
 }  public Matrix ViewMatrix
@@ -395,7 +394,7 @@ public class CameraActor : Actor {
     get
     {
       Matrix temp = new Matrix();
-      GetProperty( CameraActor.Property.VIEW_MATRIX).Get(  temp );
+      GetProperty( Camera.Property.VIEW_MATRIX).Get(  temp );
       return temp;
     }
 }  public bool InvertYAxis
@@ -403,12 +402,12 @@ public class CameraActor : Actor {
     get
     {
       bool temp = false;
-      GetProperty( CameraActor.Property.INVERT_Y_AXIS).Get( ref temp );
+      GetProperty( Camera.Property.INVERT_Y_AXIS).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( CameraActor.Property.INVERT_Y_AXIS, new Dali.Property.Value( value ) );
+      SetProperty( Camera.Property.INVERT_Y_AXIS, new Dali.Property.Value( value ) );
     }
   }
 

@@ -74,8 +74,8 @@ System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForD
     }
   }
 
-  public void Emit(Actor arg1, Actor arg2) {
-    NDalicPINVOKE.FocusChangedSignal_Emit(swigCPtr, Actor.getCPtr(arg1), Actor.getCPtr(arg2));
+  public void Emit(View arg1, View arg2) {
+    NDalicPINVOKE.FocusChangedSignal_Emit(swigCPtr, View.getCPtr(arg1), View.getCPtr(arg2));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

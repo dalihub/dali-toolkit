@@ -269,14 +269,14 @@ public class ItemView : Scrollable {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Actor GetItem(uint itemId) {
-    Actor ret = new Actor(NDalicPINVOKE.ItemView_GetItem(swigCPtr, itemId), true);
+  public View GetItem(uint itemId) {
+    View ret = new View(NDalicPINVOKE.ItemView_GetItem(swigCPtr, itemId), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public uint GetItemId(Actor actor) {
-    uint ret = NDalicPINVOKE.ItemView_GetItemId(swigCPtr, Actor.getCPtr(actor));
+  public uint GetItemId(View view) {
+    uint ret = NDalicPINVOKE.ItemView_GetItemId(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

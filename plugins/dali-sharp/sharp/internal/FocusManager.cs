@@ -62,38 +62,38 @@ public class FocusManager : BaseHandle {
   */
 public class FocusChangedEventArgs : EventArgs
 {
-   private Actor _actorCurrent;
-   private Actor _actorNext;
+   private View _viewCurrent;
+   private View _viewNext;
 
    /**
-     * @brief Actor - is the original focused Actor
+     * @brief ViewCurrent - is the original focused View
      *
      */
-   public Actor ActorCurrent
+   public View ViewCurrent
    {
       get
       {
-         return _actorCurrent;
+         return _viewCurrent;
       }
       set
       {
-         _actorCurrent = value;
+        _viewCurrent = value;
       }
    }
 
    /**
-     * @brief Actor - is the current focused Actor
+     * @brief ViewNext - is the current focused View
      *
      */
-   public Actor ActorNext
+   public View ViewNext
    {
       get
       {
-         return _actorNext;
+         return _viewNext;
       }
       set
       {
-         _actorNext = value;
+        _viewNext = value;
       }
    }
 }
@@ -104,22 +104,22 @@ public class FocusChangedEventArgs : EventArgs
   */
 public class FocusGroupChangedEventArgs : EventArgs
 {
-   private Actor _currentFocusedActor;
+   private View _currentFocusedView;
    private bool _forwardDirection;
 
    /**
-     * @brief Actor - is the current focused Actor
+     * @brief CurrentFocusedView - is the current focused View
      *
      */
-   public Actor CurrentFocusedActor
+   public View CurrentFocusedView
    {
       get
       {
-         return _currentFocusedActor;
+         return _currentFocusedView;
       }
       set
       {
-         _currentFocusedActor = value;
+         _currentFocusedView = value;
       }
    }
 
@@ -141,26 +141,26 @@ public class FocusGroupChangedEventArgs : EventArgs
 }
 
 /**
-  * @brief Event arguments that passed via FocusedActorEnterKey signal
+  * @brief Event arguments that passed via FocusedViewEnterKey signal
   *
   */
-public class FocusedActorEnterKeyEventArgs : EventArgs
+public class FocusedViewEnterKeyEventArgs : EventArgs
 {
-   private Actor _actor;
+   private View _view;
 
    /**
-     * @brief Actor - is the current focused Actor which has the enter key pressed on it.
+     * @brief View - is the current focused View which has the enter key pressed on it.
      *
      */
-   public Actor Actor
+   public View View
    {
       get
       {
-         return _actor;
+         return _view;
       }
       set
       {
-         _actor = value;
+        _view = value;
       }
    }
 }
@@ -171,15 +171,15 @@ public class FocusedActorEnterKeyEventArgs : EventArgs
   */
 public class PreFocusChangeEventArgs : EventArgs
 {
-   private Actor _current;
-   private Actor _proposed;
+   private View _current;
+   private View _proposed;
    private View.KeyboardFocus.Direction _direction;
 
    /**
-    * @brief Actor - is the current focused Actor.
+    * @brief Current - is the current focused View.
     *
     */
-   public Actor Current
+   public View Current
    {
       get
       {
@@ -192,10 +192,10 @@ public class PreFocusChangeEventArgs : EventArgs
    }
 
     /**
-    * @brief Actor - is the proposed focused Actor.
+    * @brief Proposed - is the proposed focused View.
     *
     */
-    public Actor Proposed
+    public View Proposed
     {
         get
         {
@@ -231,10 +231,10 @@ public class PreFocusChangeEventArgs : EventArgs
   public delegate void FocusGroupChangedEventHandler(object source, FocusGroupChangedEventArgs e);
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate void FocusedActorEnterKeyEventHandler(object source, FocusedActorEnterKeyEventArgs e);
+  public delegate void FocusedViewEnterKeyEventHandler(object source, FocusedViewEnterKeyEventArgs e);
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  public delegate Actor PreFocusChangeEventHandler(object source, PreFocusChangeEventArgs e);
+  public delegate View PreFocusChangeEventHandler(object source, PreFocusChangeEventArgs e);
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
   public delegate IntPtr PreFocusChangeEventCallbackDelegate(IntPtr current, IntPtr proposed, View.KeyboardFocus.Direction direction);
@@ -252,9 +252,9 @@ public class PreFocusChangeEventArgs : EventArgs
   private FocusGroupChangedEventCallbackDelegate _FocusManagerFocusGroupChangedEventCallbackDelegate;
 
   [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-  private delegate void FocusedActorEnterKeyEventCallbackDelegate(IntPtr actor);
-  private FocusedActorEnterKeyEventHandler _FocusManagerFocusedActorEnterKeyEventHandler;
-  private FocusedActorEnterKeyEventCallbackDelegate _FocusManagerFocusedActorEnterKeyEventCallbackDelegate;
+  private delegate void FocusedViewEnterKeyEventCallbackDelegate(IntPtr actor);
+  private FocusedViewEnterKeyEventHandler _FocusManagerFocusedViewEnterKeyEventHandler;
+  private FocusedViewEnterKeyEventCallbackDelegate _FocusManagerFocusedViewEnterKeyEventCallbackDelegate;
 
   public event PreFocusChangeEventHandler PreFocusChange
   {
@@ -290,27 +290,42 @@ public class PreFocusChangeEventArgs : EventArgs
   // Callback for FocusManager PreFocusChangeSignal
   private IntPtr OnPreFocusChange(IntPtr current, IntPtr proposed, View.KeyboardFocus.Direction direction)
   {
-      Actor actor = null;
+      View view = null;
       PreFocusChangeEventArgs e = new PreFocusChangeEventArgs();
 
       // Populate all members of "e" (PreFocusChangeEventArgs) with real data
-      e.Current = Actor.GetActorFromPtr(current);
-      e.Proposed = Actor.GetActorFromPtr(proposed);
+      if (current != global::System.IntPtr.Zero)
+      {
+        e.Current = View.GetViewFromPtr(current);
+      }
+
+      if (proposed != global::System.IntPtr.Zero)
+      {
+        e.Proposed = View.GetViewFromPtr(proposed);
+      }
+
       e.Direction = direction;
 
       if (_FocusManagerPreFocusChangeEventHandler != null)
       {
         //here we send all data to user event handlers
-          actor = _FocusManagerPreFocusChangeEventHandler(this, e);
+        view = _FocusManagerPreFocusChangeEventHandler(this, e);
       }
 
-      return actor.GetPtrfromActor();
+      if (view)
+      {
+        return view.GetPtrfromView();
+      }
+      else
+      {
+        return current;
+      }
   }
 
   /**
     * @brief Event for FocusChanged signal which can be used to subscribe/unsubscribe the event handler
     * (in the type of FocusChangedEventHandler) provided by the user.
-    * FocusChanged signal is emitted after the current focused actor has been changed.
+    * FocusChanged signal is emitted after the current focused view has been changed.
     */
   public event FocusChangedEventHandler FocusChanged
   {
@@ -344,13 +359,13 @@ public class PreFocusChangeEventArgs : EventArgs
   }
 
   // Callback for FocusManager FocusChangedSignal
-  private void OnFocusChanged(IntPtr actorCurrent, IntPtr actorNext)
+  private void OnFocusChanged(IntPtr viewCurrent, IntPtr viewNext)
   {
      FocusChangedEventArgs e = new FocusChangedEventArgs();
 
      // Populate all members of "e" (FocusChangedEventArgs) with real data
-     e.ActorCurrent = Actor.GetActorFromPtr(actorCurrent);
-     e.ActorNext = Actor.GetActorFromPtr(actorNext);
+     e.ViewCurrent = View.GetViewFromPtr(viewCurrent);
+     e.ViewNext = View.GetViewFromPtr(viewNext);
 
      if (_FocusManagerFocusChangedEventHandler != null)
      {
@@ -396,12 +411,12 @@ public class PreFocusChangeEventArgs : EventArgs
   }
 
   // Callback for FocusManager FocusGroupChangedSignal
-  private void OnFocusGroupChanged(IntPtr currentFocusedActor, bool forwardDirection)
+  private void OnFocusGroupChanged(IntPtr currentFocusedView, bool forwardDirection)
   {
      FocusGroupChangedEventArgs e = new FocusGroupChangedEventArgs();
 
      // Populate all members of "e" (FocusGroupChangedEventArgs) with real data
-     e.CurrentFocusedActor = Actor.GetActorFromPtr(currentFocusedActor);
+     e.CurrentFocusedView = View.GetViewFromPtr(currentFocusedView);
      e.ForwardDirection = forwardDirection;
 
      if (_FocusManagerFocusGroupChangedEventHandler != null)
@@ -412,23 +427,23 @@ public class PreFocusChangeEventArgs : EventArgs
   }
 
   /**
-    * @brief Event for FocusedActorEnterKeyPressed signal which can be used to subscribe/unsubscribe the event handler
-    * (in the type of FocusedActorEnterKeyEventHandler) provided by the user.
-    * FocusedActorEnterKeyPressed signal is emitted when the current focused actor has the enter key pressed on it.
+    * @brief Event for FocusedViewEnterKeyPressed signal which can be used to subscribe/unsubscribe the event handler
+    * (in the type of FocusedViewEnterKeyEventHandler) provided by the user.
+    * FocusedViewEnterKeyPressed signal is emitted when the current focused view has the enter key pressed on it.
     */
-  public event FocusedActorEnterKeyEventHandler FocusedActorEnterKeyPressed
+  public event FocusedViewEnterKeyEventHandler FocusedViewEnterKeyPressed
   {
      add
      {
         lock(this)
         {
            // Restricted to only one listener
-           if (_FocusManagerFocusedActorEnterKeyEventHandler == null)
+           if (_FocusManagerFocusedViewEnterKeyEventHandler == null)
            {
-              _FocusManagerFocusedActorEnterKeyEventHandler += value;
+              _FocusManagerFocusedViewEnterKeyEventHandler += value;
 
-              _FocusManagerFocusedActorEnterKeyEventCallbackDelegate = new FocusedActorEnterKeyEventCallbackDelegate(OnFocusedActorEnterKey);
-              this.FocusedActorEnterKeySignal().Connect(_FocusManagerFocusedActorEnterKeyEventCallbackDelegate);
+              _FocusManagerFocusedViewEnterKeyEventCallbackDelegate = new FocusedViewEnterKeyEventCallbackDelegate(OnFocusedViewEnterKey);
+              this.FocusedViewEnterKeySignal().Connect(_FocusManagerFocusedViewEnterKeyEventCallbackDelegate);
            }
         }
      }
@@ -437,28 +452,28 @@ public class PreFocusChangeEventArgs : EventArgs
      {
         lock(this)
         {
-           if (_FocusManagerFocusedActorEnterKeyEventHandler != null)
+           if (_FocusManagerFocusedViewEnterKeyEventHandler != null)
            {
-              this.FocusedActorEnterKeySignal().Disconnect(_FocusManagerFocusedActorEnterKeyEventCallbackDelegate);
+              this.FocusedViewEnterKeySignal().Disconnect(_FocusManagerFocusedViewEnterKeyEventCallbackDelegate);
            }
 
-           _FocusManagerFocusedActorEnterKeyEventHandler -= value;
+           _FocusManagerFocusedViewEnterKeyEventHandler -= value;
         }
      }
   }
 
-  // Callback for FocusManager FocusedActorEnterKeySignal
-  private void OnFocusedActorEnterKey(IntPtr actor)
+  // Callback for FocusManager FocusedViewEnterKeySignal
+  private void OnFocusedViewEnterKey(IntPtr view)
   {
-     FocusedActorEnterKeyEventArgs e = new FocusedActorEnterKeyEventArgs();
+     FocusedViewEnterKeyEventArgs e = new FocusedViewEnterKeyEventArgs();
 
-     // Populate all members of "e" (FocusedActorEnterKeyEventArgs) with real data
-     e.Actor = Actor.GetActorFromPtr(actor);
+     // Populate all members of "e" (FocusedViewEnterKeyEventArgs) with real data
+     e.View = View.GetViewFromPtr(view);
 
-     if (_FocusManagerFocusedActorEnterKeyEventHandler != null)
+     if (_FocusManagerFocusedViewEnterKeyEventHandler != null)
      {
         //here we send all data to user event handlers
-        _FocusManagerFocusedActorEnterKeyEventHandler(this, e);
+        _FocusManagerFocusedViewEnterKeyEventHandler(this, e);
      }
   }
 
@@ -472,14 +487,14 @@ public class PreFocusChangeEventArgs : EventArgs
     return ret;
   }
 
-  public bool SetCurrentFocusActor(Actor actor) {
-    bool ret = NDalicManualPINVOKE.FocusManager_SetCurrentFocusActor(swigCPtr, Actor.getCPtr(actor));
+  public bool SetCurrentFocusView(View view) {
+    bool ret = NDalicManualPINVOKE.FocusManager_SetCurrentFocusActor(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public Actor GetCurrentFocusActor() {
-    Actor ret = new Actor(NDalicManualPINVOKE.FocusManager_GetCurrentFocusActor(swigCPtr), true);
+  public View GetCurrentFocusView() {
+    View ret = new View(NDalicManualPINVOKE.FocusManager_GetCurrentFocusActor(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -506,30 +521,30 @@ public class PreFocusChangeEventArgs : EventArgs
     return ret;
   }
 
-  public void SetAsFocusGroup(Actor actor, bool isFocusGroup) {
-    NDalicManualPINVOKE.FocusManager_SetAsFocusGroup(swigCPtr, Actor.getCPtr(actor), isFocusGroup);
+  public void SetAsFocusGroup(View view, bool isFocusGroup) {
+    NDalicManualPINVOKE.FocusManager_SetAsFocusGroup(swigCPtr, View.getCPtr(view), isFocusGroup);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public bool IsFocusGroup(Actor actor) {
-    bool ret = NDalicManualPINVOKE.FocusManager_IsFocusGroup(swigCPtr, Actor.getCPtr(actor));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public Actor GetFocusGroup(Actor actor) {
-    Actor ret = new Actor(NDalicManualPINVOKE.FocusManager_GetFocusGroup(swigCPtr, Actor.getCPtr(actor)), true);
+  public bool IsFocusGroup(View view) {
+    bool ret = NDalicManualPINVOKE.FocusManager_IsFocusGroup(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public void SetFocusIndicatorActor(Actor indicator) {
-    NDalicManualPINVOKE.FocusManager_SetFocusIndicatorActor(swigCPtr, Actor.getCPtr(indicator));
+  public View GetFocusGroup(View view) {
+    View ret = new View(NDalicManualPINVOKE.FocusManager_GetFocusGroup(swigCPtr, View.getCPtr(view)), true);
+    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
+  }
+
+  public void SetFocusIndicatorView(View indicator) {
+    NDalicManualPINVOKE.FocusManager_SetFocusIndicatorActor(swigCPtr, View.getCPtr(indicator));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Actor GetFocusIndicatorActor() {
-    Actor ret = new Actor(NDalicManualPINVOKE.FocusManager_GetFocusIndicatorActor(swigCPtr), true);
+  public View GetFocusIndicatorView() {
+    View ret = new View(NDalicManualPINVOKE.FocusManager_GetFocusIndicatorActor(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -560,8 +575,8 @@ public class PreFocusChangeEventArgs : EventArgs
     return ret;
   }
 
-  public ActorSignal FocusedActorEnterKeySignal() {
-    ActorSignal ret = new ActorSignal(NDalicManualPINVOKE.FocusManager_FocusedActorEnterKeySignal(swigCPtr), false);
+  public ViewSignal FocusedViewEnterKeySignal() {
+    ViewSignal ret = new ViewSignal(NDalicManualPINVOKE.FocusManager_FocusedActorEnterKeySignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -578,7 +593,7 @@ public class PreFocusChangeEventArgs : EventArgs
 
   public interface ICustomFocusAlgorithm
   {
-      View GetNextFocusableActor(View current, View proposed, View.KeyboardFocus.Direction direction);
+      View GetNextFocusableView(View current, View proposed, View.KeyboardFocus.Direction direction);
   }
 
   private class CustomAlgorithmInterfaceWrapper : CustomAlgorithmInterface
@@ -594,11 +609,11 @@ public class PreFocusChangeEventArgs : EventArgs
           _customFocusAlgorithm = customFocusAlgorithm;
       }
 
-      public override Actor GetNextFocusableActor(Actor current, Actor proposed, View.KeyboardFocus.Direction direction)
+      public override View GetNextFocusableView(View current, View proposed, View.KeyboardFocus.Direction direction)
       {
           View currentView = View.DownCast<View>(current);
           View proposedView = View.DownCast<View>(proposed);
-          return _customFocusAlgorithm.GetNextFocusableActor(currentView, proposedView, direction);
+          return _customFocusAlgorithm.GetNextFocusableView(currentView, proposedView, direction);
       }
   }
 }

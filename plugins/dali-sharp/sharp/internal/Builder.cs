@@ -190,14 +190,14 @@ public class Builder : BaseHandle {
     return ret;
   }
 
-  public Animation CreateAnimation(string animationName, Actor sourceActor) {
-    Animation ret = new Animation(NDalicPINVOKE.Builder_CreateAnimation__SWIG_2(swigCPtr, animationName, Actor.getCPtr(sourceActor)), true);
+  public Animation CreateAnimation(string animationName, View sourceActor) {
+    Animation ret = new Animation(NDalicPINVOKE.Builder_CreateAnimation__SWIG_2(swigCPtr, animationName, View.getCPtr(sourceActor)), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public Animation CreateAnimation(string animationName, Property.Map map, Actor sourceActor) {
-    Animation ret = new Animation(NDalicPINVOKE.Builder_CreateAnimation__SWIG_3(swigCPtr, animationName, Property.Map.getCPtr(map), Actor.getCPtr(sourceActor)), true);
+  public Animation CreateAnimation(string animationName, Property.Map map, View sourceActor) {
+    Animation ret = new Animation(NDalicPINVOKE.Builder_CreateAnimation__SWIG_3(swigCPtr, animationName, Property.Map.getCPtr(map), View.getCPtr(sourceActor)), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -232,13 +232,13 @@ public class Builder : BaseHandle {
     return ret;
   }
 
-  public void AddActors(Actor toActor) {
-    NDalicPINVOKE.Builder_AddActors__SWIG_0(swigCPtr, Actor.getCPtr(toActor));
+  public void AddViews(View toView) {
+    NDalicPINVOKE.Builder_AddActors__SWIG_0(swigCPtr, View.getCPtr(toView));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void AddActors(string sectionName, Actor toActor) {
-    NDalicPINVOKE.Builder_AddActors__SWIG_1(swigCPtr, sectionName, Actor.getCPtr(toActor));
+  public void AddViews(string sectionName, View toView) {
+    NDalicPINVOKE.Builder_AddActors__SWIG_1(swigCPtr, sectionName, View.getCPtr(toView));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

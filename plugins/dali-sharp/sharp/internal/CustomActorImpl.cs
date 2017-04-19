@@ -51,13 +51,13 @@ public class CustomActorImpl : RefObject {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public virtual void OnChildAdd(Actor child) {
-    NDalicPINVOKE.CustomActorImpl_OnChildAdd(swigCPtr, Actor.getCPtr(child));
+  public virtual void OnChildAdd(View child) {
+    NDalicPINVOKE.CustomActorImpl_OnChildAdd(swigCPtr, View.getCPtr(child));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public virtual void OnChildRemove(Actor child) {
-    NDalicPINVOKE.CustomActorImpl_OnChildRemove(swigCPtr, Actor.getCPtr(child));
+  public virtual void OnChildRemove(View child) {
+    NDalicPINVOKE.CustomActorImpl_OnChildRemove(swigCPtr, View.getCPtr(child));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -116,8 +116,8 @@ public class CustomActorImpl : RefObject {
     return ret;
   }
 
-  public virtual float CalculateChildSize(Actor child, DimensionType dimension) {
-    float ret = NDalicPINVOKE.CustomActorImpl_CalculateChildSize(swigCPtr, Actor.getCPtr(child), (int)dimension);
+  public virtual float CalculateChildSize(View child, DimensionType dimension) {
+    float ret = NDalicPINVOKE.CustomActorImpl_CalculateChildSize(swigCPtr, View.getCPtr(child), (int)dimension);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

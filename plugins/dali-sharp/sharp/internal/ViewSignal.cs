@@ -10,20 +10,20 @@
 
 namespace Dali {
 
-public class ActorSignal : global::System.IDisposable {
+public class ViewSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
-  internal ActorSignal(global::System.IntPtr cPtr, bool cMemoryOwn) {
+  internal ViewSignal(global::System.IntPtr cPtr, bool cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
   }
 
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(ActorSignal obj) {
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(ViewSignal obj) {
     return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
   }
 
-  ~ActorSignal() {
+  ~ViewSignal() {
     DisposeQueue.Instance.Add(this);
   }
 
@@ -74,12 +74,12 @@ System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForD
     }
   }
 
-  public void Emit(Actor arg) {
-    NDalicPINVOKE.ActorSignal_Emit(swigCPtr, Actor.getCPtr(arg));
+  public void Emit(View arg) {
+    NDalicPINVOKE.ActorSignal_Emit(swigCPtr, View.getCPtr(arg));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public ActorSignal() : this(NDalicPINVOKE.new_ActorSignal(), true) {
+  public ViewSignal() : this(NDalicPINVOKE.new_ActorSignal(), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

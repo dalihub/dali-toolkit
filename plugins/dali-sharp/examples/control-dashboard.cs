@@ -102,7 +102,7 @@ namespace MyCSharpExample
         }
 
         // Callback for KeyboardFocusManager
-        private Actor OnPreFocusChange(object source, FocusManager.PreFocusChangeEventArgs e)
+        private View OnPreFocusChange(object source, FocusManager.PreFocusChangeEventArgs e)
         {
             if (!e.Proposed && !e.Current)
             {
@@ -321,7 +321,7 @@ namespace MyCSharpExample
                     {
                         _stage.Add(_popup);
                         _popup.SetDisplayState(Popup.DisplayStateType.SHOWN);
-                        FocusManager.Instance.SetCurrentFocusActor((_popup.FindChildByName("Footer")).FindChildByName("OKButton"));
+                        FocusManager.Instance.SetCurrentFocusView((_popup.FindChildByName("Footer")).FindChildByName("OKButton"));
                         return true;
                     };
                     _contentContainer.AddChild(button, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
@@ -372,7 +372,7 @@ namespace MyCSharpExample
         {
             Popup confirmationPopup = new Popup();
 
-            Actor footer = new Actor();
+            View footer = new View();
             footer.SetName("Footer");
             footer.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
             footer.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.HEIGHT);
@@ -412,7 +412,7 @@ namespace MyCSharpExample
             confirmationPopup.SetFooter(footer);
             return confirmationPopup;
         }
-        Actor CreateTitle(string title)
+        View CreateTitle(string title)
         {
             TextLabel titleActor = new TextLabel(title);
             titleActor.TextColor = Color.White;
