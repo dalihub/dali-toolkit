@@ -234,7 +234,23 @@ void TextScroller::SetLoopCount( int loopCount )
     if ( loopCount == 0 ) // Request to stop looping
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetLoopCount Single loop forced\n" );
-      mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
+      switch( mStopMode )
+      {
+        case DevelTextLabel::AutoScrollStopMode::IMMEDIATE:
+        {
+          mScrollAnimation.Stop();
+          break;
+        }
+        case DevelTextLabel::AutoScrollStopMode::FINISH_LOOP:
+        {
+          mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
+          break;
+        }
+        default:
+        {
+           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n" );
+        }
+      }
     }
   }
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetLoopCount [%d] Status[%s]\n", mLoopCount, (loopCount)?"looping":"stop" );
@@ -255,6 +271,17 @@ float TextScroller::GetLoopDelay() const
   return mLoopDelay;
 }
 
+void TextScroller::SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMode )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetAutoScrollStopMode [%s]\n",(stopMode == DevelTextLabel::AutoScrollStopMode::IMMEDIATE)?"IMMEDIATE":"FINISH_LOOP" );
+  mStopMode = stopMode;
+}
+
+DevelTextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const
+{
+  return mStopMode;
+}
+
 Actor TextScroller::GetSourceCamera() const
 {
   return mOffscreenCameraActor;
@@ -270,7 +297,8 @@ TextScroller::TextScroller( ScrollerInterface& scrollerInterface ) : mScrollerIn
                             mScrollSpeed( MINIMUM_SCROLL_SPEED ),
                             mLoopCount( 1 ),
                             mLoopDelay( 0.0f ),
-                            mWrapGap( 0.0f )
+                            mWrapGap( 0.0f ),
+                            mStopMode( DevelTextLabel::AutoScrollStopMode::FINISH_LOOP )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller Default Constructor\n" );
 }
