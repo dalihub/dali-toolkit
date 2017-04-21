@@ -4,6 +4,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/builder/builder.cpp \
   $(devel_api_src_dir)/builder/json-parser.cpp \
   $(devel_api_src_dir)/builder/tree-node.cpp \
+  $(devel_api_src_dir)/controls/control-devel.cpp \
   $(devel_api_src_dir)/controls/control-wrapper.cpp \
   $(devel_api_src_dir)/controls/control-wrapper-impl.cpp \
   $(devel_api_src_dir)/controls/bloom-view/bloom-view.cpp \

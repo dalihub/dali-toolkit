@@ -8,11 +8,24 @@
 %csmethodmodifiers Dali::KeyEvent::time "private";
 %csmethodmodifiers Dali::KeyEvent::state "private";
 
+%csmethodmodifiers Dali::DevelKeyEvent::GetDeviceName "private";
+%csmethodmodifiers Dali::DevelKeyEvent::SetDeviceName "private";
+
 %typemap(cscode) Dali::KeyEvent %{
   public static Key GetKeyFromPtr(global::System.IntPtr cPtr) {
     Key ret = new Key(cPtr, false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
+  }
+
+  public string DeviceName
+  {
+    get
+    {
+      string ret = NDalicPINVOKE.GetDeviceName(swigCPtr);
+      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+      return ret;
+    }
   }
 
   public string KeyPressedName

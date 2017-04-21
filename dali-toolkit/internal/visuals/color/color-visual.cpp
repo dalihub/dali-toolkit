@@ -129,6 +129,9 @@ void ColorVisual::DoSetOnStage( Actor& actor )
   InitializeRenderer();
 
   actor.AddRenderer( mImpl->mRenderer );
+
+  // Color Visual generated and ready to display
+  ResourceReady();
 }
 
 void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
