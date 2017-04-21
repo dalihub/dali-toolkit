@@ -34,7 +34,7 @@
 namespace
 {
 
-const char* LANDSCAPE_QUALIFIER = "landscape";
+//const char* LANDSCAPE_QUALIFIER = "landscape";
 const char* PORTRAIT_QUALIFIER  = "portrait";
 const char* FONT_SIZE_QUALIFIER = "fontsize";
 
@@ -295,23 +295,16 @@ bool StyleManager::LoadJSON( Toolkit::Builder builder, const std::string& jsonFi
 static void CollectQualifiers( std::vector<std::string>& qualifiersOut )
 {
   // Append the relevant qualifier for orientation
-  int orientation = 0; // Get the orientation from the system
-  switch( orientation )
-  {
-    case 90:
-    case 270:
-    {
-      qualifiersOut.push_back( std::string( LANDSCAPE_QUALIFIER ) );
-      break;
-    }
-    case 180:
-    case 0: // fall through
-    default:
-    {
-      qualifiersOut.push_back( std::string( PORTRAIT_QUALIFIER ) );
-      break;
-    }
-  }
+  // int orientation = 0; // Get the orientation from the system
+  /*
+  //// To Do /////
+  Getting orientation from the system, and determine Qualifie LANDSCAPE or PORTRAIT
+  orientation  0, 180 : PORTRAIT_QUALIFIER (default)
+  orientation 90, 270 : LANDSCAPE_QUALIFIER
+  */
+
+  qualifiersOut.push_back( std::string( PORTRAIT_QUALIFIER ) );
+
 }
 
 /**
