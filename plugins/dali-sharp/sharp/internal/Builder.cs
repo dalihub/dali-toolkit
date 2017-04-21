@@ -220,14 +220,14 @@ public class Builder : BaseHandle {
     return ret;
   }
 
-  public bool ApplyStyle(string styleName, Handle handle) {
-    bool ret = NDalicPINVOKE.Builder_ApplyStyle(swigCPtr, styleName, Handle.getCPtr(handle));
+  public bool ApplyStyle(string styleName, Animatable handle) {
+    bool ret = NDalicPINVOKE.Builder_ApplyStyle(swigCPtr, styleName, Animatable.getCPtr(handle));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public bool ApplyFromJson(Handle handle, string json) {
-    bool ret = NDalicPINVOKE.Builder_ApplyFromJson(swigCPtr, Handle.getCPtr(handle), json);
+  public bool ApplyFromJson(Animatable handle, string json) {
+    bool ret = NDalicPINVOKE.Builder_ApplyFromJson(swigCPtr, Animatable.getCPtr(handle), json);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

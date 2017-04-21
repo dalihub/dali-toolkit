@@ -16,7 +16,7 @@ namespace Dali
     {
         private static readonly DisposeQueue _disposableQueue = new DisposeQueue();
         private List<IDisposable> _disposables = new List<IDisposable>();
-        private Object _listLock = new object();
+        private System.Object _listLock = new object();
         private EventThreadCallback _eventThreadCallback;
         private EventThreadCallback.CallbackDelegate _disposeQueueProcessDisposablesDelegate;
 

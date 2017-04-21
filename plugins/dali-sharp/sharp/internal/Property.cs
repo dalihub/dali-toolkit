@@ -70,32 +70,32 @@ public class Property : global::System.IDisposable {
     } 
   }
 
-  public Property(Handle arg0, int propertyIndex) : this(NDalicPINVOKE.new_Property__SWIG_0(Handle.getCPtr(arg0), propertyIndex), true) {
+  public Property(Animatable arg0, int propertyIndex) : this(NDalicPINVOKE.new_Property__SWIG_0(Animatable.getCPtr(arg0), propertyIndex), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Property(Handle arg0, int propertyIndex, int componentIndex) : this(NDalicPINVOKE.new_Property__SWIG_1(Handle.getCPtr(arg0), propertyIndex, componentIndex), true) {
+  public Property(Animatable arg0, int propertyIndex, int componentIndex) : this(NDalicPINVOKE.new_Property__SWIG_1(Animatable.getCPtr(arg0), propertyIndex, componentIndex), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Property(Handle arg0, string propertyName) : this(NDalicPINVOKE.new_Property__SWIG_2(Handle.getCPtr(arg0), propertyName), true) {
+  public Property(Animatable arg0, string propertyName) : this(NDalicPINVOKE.new_Property__SWIG_2(Animatable.getCPtr(arg0), propertyName), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Property(Handle arg0, string propertyName, int componentIndex) : this(NDalicPINVOKE.new_Property__SWIG_3(Handle.getCPtr(arg0), propertyName, componentIndex), true) {
+  public Property(Animatable arg0, string propertyName, int componentIndex) : this(NDalicPINVOKE.new_Property__SWIG_3(Animatable.getCPtr(arg0), propertyName, componentIndex), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Handle _object {
+  public Animatable _object {
     set {
-      NDalicPINVOKE.Property__object_set(swigCPtr, Handle.getCPtr(value));
+      NDalicPINVOKE.Property__object_set(swigCPtr, Animatable.getCPtr(value));
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    } 
+    }
     get {
-      Handle ret = new Handle(NDalicPINVOKE.Property__object_get(swigCPtr), false);
+      Animatable ret = new Animatable(NDalicPINVOKE.Property__object_get(swigCPtr), false);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
-    } 
+    }
   }
 
   public int propertyIndex {

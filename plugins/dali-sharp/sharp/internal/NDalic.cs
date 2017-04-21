@@ -438,12 +438,6 @@ public class NDalic {
     } 
   }
 
-  public static Handle New() {
-    Handle ret = new Handle(NDalicPINVOKE.New(), true);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
   public static bool RegisterType(string name, SWIGTYPE_p_std__type_info baseType, System.Delegate f) {
 System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(f); 
     {

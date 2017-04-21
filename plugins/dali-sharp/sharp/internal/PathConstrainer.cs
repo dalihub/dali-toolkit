@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class PathConstrainer : Handle {
+public class PathConstrainer : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal PathConstrainer(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.PathConstrainer_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -131,8 +131,8 @@ public class PathConstrainer : Handle {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void Remove(Handle target) {
-    NDalicPINVOKE.PathConstrainer_Remove(swigCPtr, Handle.getCPtr(target));
+  public void Remove(Animatable target) {
+    NDalicPINVOKE.PathConstrainer_Remove(swigCPtr, Animatable.getCPtr(target));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -141,12 +141,12 @@ public class PathConstrainer : Handle {
     get
     {
       Vector3 temp = new Vector3(0.0f,0.0f,0.0f);
-      GetProperty( PathConstrainer.Property.FORWARD).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, PathConstrainer.Property.FORWARD).Get(  temp );
       return temp;
     }
     set
     {
-      SetProperty( PathConstrainer.Property.FORWARD, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, PathConstrainer.Property.FORWARD, new Dali.Property.Value( value ) );
     }
   }
   public Dali.Property.Array Points
@@ -154,12 +154,12 @@ public class PathConstrainer : Handle {
     get
     {
       Dali.Property.Array temp = new Dali.Property.Array();
-      GetProperty( PathConstrainer.Property.POINTS).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, PathConstrainer.Property.POINTS).Get(  temp );
       return temp;
     }
     set
     {
-      SetProperty( PathConstrainer.Property.POINTS, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, PathConstrainer.Property.POINTS, new Dali.Property.Value( value ) );
     }
   }
   public Dali.Property.Array ControlPoints
@@ -167,12 +167,12 @@ public class PathConstrainer : Handle {
     get
     {
       Dali.Property.Array temp = new Dali.Property.Array();
-      GetProperty( PathConstrainer.Property.CONTROL_POINTS).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, PathConstrainer.Property.CONTROL_POINTS).Get(  temp );
       return temp;
     }
     set
     {
-      SetProperty( PathConstrainer.Property.CONTROL_POINTS, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, PathConstrainer.Property.CONTROL_POINTS, new Dali.Property.Value( value ) );
     }
   }
 

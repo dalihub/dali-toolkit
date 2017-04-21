@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class RenderTask : Handle {
+public class RenderTask : Animatable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal RenderTask(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.RenderTask_SWIGUpcast(cPtr), cMemoryOwn) {
