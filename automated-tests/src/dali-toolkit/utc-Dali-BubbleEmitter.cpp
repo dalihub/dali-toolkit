@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include <dali.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/bubble-effect/bubble-emitter.h>
 
@@ -288,20 +289,24 @@ int UtcDaliBubbleEmitterEmitBubble(void)
   (bubbleRenderer.GetProperty(propertyIndex1)).Get( value1 );
   DALI_TEST_EQUALS(value0, 0.f, TEST_LOCATION );
   DALI_TEST_EQUALS(value1, 0.f, TEST_LOCATION );
+  ( DevelHandle::GetCurrentProperty( bubbleRenderer, propertyIndex0 ) ).Get( value0 );
+  ( DevelHandle::GetCurrentProperty( bubbleRenderer, propertyIndex0 ) ).Get( value1 );
+  DALI_TEST_EQUALS(value0, 0.f, TEST_LOCATION );
+  DALI_TEST_EQUALS(value1, 0.f, TEST_LOCATION );
 
   animation.Play();
 
   Wait(application, 300);
   propertyIndex0 = bubbleRenderer.GetPropertyIndex( "uPercentage[0]" );
   propertyIndex1 = bubbleRenderer.GetPropertyIndex( "uPercentage[1]" );
-  (bubbleRenderer.GetProperty(propertyIndex0)).Get( value0 );
-  (bubbleRenderer.GetProperty(propertyIndex1)).Get( value1 );
+  ( DevelHandle::GetCurrentProperty( bubbleRenderer, propertyIndex0 ) ).Get( value0 );
+  ( DevelHandle::GetCurrentProperty( bubbleRenderer, propertyIndex0 ) ).Get( value1 );
   DALI_TEST_CHECK( value0 >= 0.6f );
   DALI_TEST_CHECK( value1 >= 0.6f );
 
   Wait(application,500);
-  (bubbleRenderer.GetProperty(propertyIndex0)).Get( value0 );
-  (bubbleRenderer.GetProperty(propertyIndex1)).Get( value1 );
+  ( DevelHandle::GetCurrentProperty( bubbleRenderer, propertyIndex0 ) ).Get( value0 );
+  ( DevelHandle::GetCurrentProperty( bubbleRenderer, propertyIndex0 ) ).Get( value1 );
   DALI_TEST_EQUALS(value0, 1.f, TEST_LOCATION );
   DALI_TEST_EQUALS(value1, 1.f, TEST_LOCATION );
   END_TEST;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
+
+// EXTERNAL INCLUDES
+#include <dali/devel-api/object/handle-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
@@ -280,7 +283,7 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
 void ScrollOvershootEffectRipple::OnOvershootNotification(PropertyNotification& source)
 {
   Actor self = mAttachedScrollView.Self();
-  mOvershoot = self.GetProperty<float>(mOvershootProperty);
+  mOvershoot = DevelHandle::GetCurrentProperty< float >( self, mOvershootProperty );
   SetOvershoot(mOvershoot, false);
   UpdatePropertyNotifications();
 }
