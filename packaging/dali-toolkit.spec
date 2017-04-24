@@ -106,7 +106,7 @@ done
 ##############################
 %build
 PREFIX="/usr"
-CXXFLAGS+=" -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
+CXXFLAGS+=" -Wall -g -Os -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -D_GLIBCXX_USE_CXX11_ABI=0 "
 LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -Wl,-Bsymbolic-functions "
 
 %if 0%{?enable_coverage}
