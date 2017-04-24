@@ -503,13 +503,16 @@ def writeDaliToolkitProperties
       #puts(className);
       #puts(fileName);
 
-        # Get the property information ( name, type, read/writeable)
+      # Get the property information ( name, type, read/writeable)
       propertyInfo = extractToolkitPropertyInfo( macro );
 
       # get or create a new DALi class item which stores the property information
       classItem  = getDaliClassItem( className )
 
-      classItem.properties.push( propertyInfo )
+      # exclusion of control-data-impl
+      if ( className != "ControlData" )
+        classItem.properties.push( propertyInfo )
+      end
 
     end
 
