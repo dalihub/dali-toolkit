@@ -160,6 +160,7 @@
 %rename(Y) Dali::Vector4::y;
 %rename(Z) Dali::Vector4::z;
 %rename(W) Dali::Vector4::w;
+%rename(VisibilityChangeType) Dali::DevelActor::VisibilityChange::Type;
 
 typedef std::pair<std::string, Dali::Property::Value> StringValuePair;
 typedef std::vector<Dali::TouchPoint> TouchPointContainer;
