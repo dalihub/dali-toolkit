@@ -7,3 +7,4 @@ build/autom4te.cache/
 examples/*.exe
 NDali.dll
 ../examples/NDali.dll
+test/*.exe
