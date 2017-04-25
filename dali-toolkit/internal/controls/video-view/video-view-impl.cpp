@@ -67,7 +67,7 @@ DALI_TYPE_REGISTRATION_END()
 
 const char* const VOLUME_LEFT( "volumeLeft" );
 const char* const VOLUME_RIGHT( "volumeRight" );
-const char* const RENDERING_TARGET( "renderingTarget" );
+const char* const RENDERING_TARGET( "RENDERING_TARGET" );
 const char* const WINDOW_SURFACE_TARGET( "windowSurfaceTarget" );
 const char* const NATIVE_IMAGE_TARGET( "nativeImageTarget" );
 
@@ -76,7 +76,7 @@ const char* const NATIVE_IMAGE_TARGET( "nativeImageTarget" );
 VideoView::VideoView()
 : Control( ControlBehaviour( ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS ) ),
   mCurrentVideoPlayPosition( 0 ),
-  mIsNativeImageTarget( true ),
+  mSetRenderingTarget( false ),
   mIsPlay( false ),
   mIsPause( false )
 {
@@ -97,31 +97,23 @@ Toolkit::VideoView VideoView::New()
   return handle;
 }
 
-void VideoView::OnInitialize()
-{
-  Any source;
-  Dali::NativeImageSourcePtr nativeImageSourcePtr = Dali::NativeImageSource::New( source );
-  mNativeImage = Dali::NativeImage::New( *nativeImageSourcePtr );
-
-  mVideoPlayer.SetRenderingTarget( nativeImageSourcePtr );
-  mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
-}
-
 void VideoView::SetUrl( const std::string& url )
 {
   if( mUrl != url || !mPropertyMap.Empty() )
   {
-    mUrl = url;
     mPropertyMap.Clear();
+
+    mUrl = url;
   }
 
-  if( mIsNativeImageTarget )
+  if( mSetRenderingTarget )
   {
-    Actor self( Self() );
-    Internal::InitializeVisual( self, mVisual, mNativeImage );
+    mVideoPlayer.SetUrl( mUrl );
   }
-
-  mVideoPlayer.SetUrl( mUrl );
+  else
+  {
+    SetNativeImageTarget();
+  }
 }
 
 void VideoView::SetPropertyMap( Property::Map map )
@@ -513,6 +505,8 @@ void VideoView::SetWindowSurfaceTarget()
   Actor self = Self();
   int curPos = mVideoPlayer.GetPlayPosition();
 
+  mSetRenderingTarget = true;
+
   if( mVisual )
   {
     Toolkit::GetImplementation(mVisual).SetOffStage(self);
@@ -521,8 +515,7 @@ void VideoView::SetWindowSurfaceTarget()
 
   mVideoPlayer.SetRenderingTarget( Dali::Adaptor::Get().GetNativeWindowHandle() );
   mVideoPlayer.SetUrl( mUrl );
-
-  mIsNativeImageTarget = false;
+  mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
 
   if( mIsPlay )
   {
@@ -541,15 +534,17 @@ void VideoView::SetNativeImageTarget()
   Actor self( Self() );
   int curPos = mVideoPlayer.GetPlayPosition();
 
+  mSetRenderingTarget = true;
+
   Any source;
   Dali::NativeImageSourcePtr nativeImageSourcePtr = Dali::NativeImageSource::New( source );
   mNativeImage = Dali::NativeImage::New( *nativeImageSourcePtr );
 
   mVideoPlayer.SetRenderingTarget( nativeImageSourcePtr );
   mVideoPlayer.SetUrl( mUrl );
+  mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
 
   Internal::InitializeVisual( self, mVisual, mNativeImage );
-  mIsNativeImageTarget = true;
 
   if( mIsPlay )
   {
