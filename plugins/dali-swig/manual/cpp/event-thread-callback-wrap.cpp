@@ -39,14 +39,17 @@ SWIGEXPORT void * SWIGSTDCALL CSharp_Dali_new_EventThreadCallback(SWIG_CallbackM
       result = (Dali::EventThreadCallback *)new Dali::EventThreadCallback((Dali::CallbackBase *)Dali::MakeCallback(arg1));
     } catch (std::out_of_range& e) {
       {
+        delete result;
         SWIG_CSharpException(SWIG_IndexError, const_cast<char*>(e.what())); return 0;
       };
     } catch (std::exception& e) {
       {
+        delete result;
         SWIG_CSharpException(SWIG_RuntimeError, const_cast<char*>(e.what())); return 0;
       };
     } catch (...) {
       {
+        delete result;
         SWIG_CSharpException(SWIG_UnknownError, "unknown error"); return 0;
       };
     }

@@ -754,6 +754,9 @@ void ImageVisual::DoSetOnStage( Actor& actor )
   {
     actor.AddRenderer( mImpl->mRenderer );
     mPlacementActor.Reset();
+
+    // Image loaded and ready to display
+    ResourceReady();
   }
 }
 
@@ -925,6 +928,8 @@ void ImageVisual::UploadComplete( bool loadingSuccess, TextureSet textureSet, bo
         Image brokenImage = VisualFactoryCache::GetBrokenVisualImage();
         ApplyImageToSampler( brokenImage );
       }
+      // Image loaded and ready to display
+      ResourceReady();
     }
   }
   mTextureLoading = false;

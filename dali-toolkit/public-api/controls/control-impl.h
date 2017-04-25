@@ -774,7 +774,10 @@ private:
   DALI_INTERNAL Control( const Control& );
   DALI_INTERNAL Control& operator=( const Control& );
 
-  class Impl;
+public:
+  class Impl; // Class declaration is public so we can internally add devel API's to the Controls Impl
+
+private:
   Impl* mImpl;
   /// @endcond
 
