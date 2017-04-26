@@ -1035,7 +1035,18 @@ static unsigned int nsvg__parseColorRGB(const char* str)
 {
     int r = -1, g = -1, b = -1;
     char s1[32]="", s2[32]="";
-    sscanf(str + 4, "%d%[%%, \t]%d%[%%, \t]%d", &r, s1, &g, s2, &b);
+
+    /**
+     * In the original file, the formatted data reading did not specify the string with width limitation.
+     * To prevent the possible overflow, we replace '%s' with '%31s' and use strtol here
+     */
+    char* end;
+    r = strtol(str + 4, &end, 10);
+    sscanf(end, "%31[%%, \t]", s1);
+    g = strtol(end + strlen(s1), &end, 10);
+    sscanf(end, "%31[%%, \t]", s2);
+    b = strtol(end + strlen(s2), &end, 10);
+
     if (strchr(s1, '%')) {
         return NSVG_RGB((r*255)/100,(g*255)/100,(b*255)/100);
     } else {
@@ -1264,9 +1275,9 @@ static NSVGcoordinate nsvg__parseCoordinateRaw(const char* str)
 
     /**
      * In the original file, the formatted data reading did not specify the string with width limitation.
-     * To prevent the possible overflow, we replace '%s' with '%32s' here.
+     * To prevent the possible overflow, we replace '%s' with '%31s' here.
      */
-    sscanf(str, "%f%32s", &coord.value, units);
+    sscanf(str, "%f%31s", &coord.value, units);
     coord.units = nsvg__parseUnits(units);
     return coord;
 }
