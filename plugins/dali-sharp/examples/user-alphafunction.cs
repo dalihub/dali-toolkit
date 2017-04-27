@@ -48,19 +48,19 @@ namespace MyCSharpExample
         public void Initialize(object source, NUIApplicationInitEventArgs e)
         {
             Log("Initialize() is called!");
-            Stage stage = Stage.GetCurrent();
-            stage.BackgroundColor = Color.White;
-            stage.Touch += OnStageTouched;
-            stage.Touch += OnStageTouched2;
-            stage.Wheel += OnStageWheelEvent;
+            Window window = Window.Instance;
+            window.BackgroundColor = Color.White;
+            window.Touch += OnWindowTouched;
+            window.Touch += OnWindowTouched2;
+            window.Wheel += OnWindowWheelEvent;
 
-            // Add a _text label to the stage
+            // Add a _text label to the window
             _text = new TextLabel("Hello Mono World");
             _text.ParentOrigin = ParentOrigin.BottomCenter;
             _text.AnchorPoint = AnchorPoint.BottomCenter;
             _text.HorizontalAlignment = "CENTER";
             _text.PointSize = 32.0f;
-            stage.Add(_text);
+            window.Add(_text);
 
             _view1 = new View();
             _view1.Size = new Vector3(200.0f, 200.0f, 0.0f);
@@ -68,8 +68,8 @@ namespace MyCSharpExample
             _view1.ParentOrigin = ParentOrigin.Center;
             _view1.AnchorPoint = AnchorPoint.Center;
             _view1.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.ALL_DIMENSIONS);
-            _view1.OnStageEvent += OnStage;
-            stage.Add(_view1);
+            _view1.OnWindowEvent += OnWindow;
+            window.Add(_view1);
 
             _view2 = new View();
             _view2.BackgroundColor = Color.Red;
@@ -136,13 +136,13 @@ namespace MyCSharpExample
             _animation.Play();
         }
 
-        // Callback for stage touched signal handling
-        public void OnStageTouched(object source, Stage.TouchEventArgs e)
+        // Callback for window touched signal handling
+        public void OnWindowTouched(object source, Window.TouchEventArgs e)
         {
             // Only animate the _text label when touch down happens
             if (e.Touch.GetState(0) == PointStateType.DOWN)
             {
-                Log("OnStageTouched() is called! PointStateType.DOWN came!");
+                Log("OnWindowTouched() is called! PointStateType.DOWN came!");
                 myCount++;
                 if (myCount > 1)
                 {
@@ -152,10 +152,10 @@ namespace MyCSharpExample
             }
         }
 
-        // Callback for stage touched signal handling
-        public void OnStageTouched2(object source, Stage.TouchEventArgs e)
+        // Callback for window touched signal handling
+        public void OnWindowTouched2(object source, Window.TouchEventArgs e)
         {
-            Log("OnStageTouched2() is called!state=" + e.Touch.GetState(0));
+            Log("OnWindowTouched2() is called!state=" + e.Touch.GetState(0));
         }
 
         public void OnEventProcessingFinished(object source)
@@ -163,15 +163,15 @@ namespace MyCSharpExample
             Log("OnEventProcessingFinished() is called!");
         }
 
-        public void OnStageWheelEvent(object source, Stage.WheelEventArgs e)
+        public void OnWindowWheelEvent(object source, Window.WheelEventArgs e)
         {
-            Log("OnStageWheelEvent() is called!");
+            Log("OnWindowWheelEvent() is called!");
         }
 
 
-        public void OnStage(object source, View.OnStageEventArgs e)
+        public void OnWindow(object source, View.OnWindowEventArgs e)
         {
-            Log("OnStage() is called!");
+            Log("OnWindow() is called!");
         }
 
         public void MainLoop()

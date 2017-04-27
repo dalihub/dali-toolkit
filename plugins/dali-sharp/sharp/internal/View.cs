@@ -49,7 +49,7 @@ namespace Dali
 
         public virtual void Dispose()
         {
-            if (!Stage.IsInstalled())
+            if (!Window.IsInstalled())
             {
                 DisposeQueue.Instance.Add(this);
                 return;
@@ -316,15 +316,15 @@ namespace Dali
         }
 
         /**
-         * @brief Event arguments that passed via OnStage signal
+         * @brief Event arguments that passed via OnWindow signal
          *
          */
-        public class OnStageEventArgs : EventArgs
+        public class OnWindowEventArgs : EventArgs
         {
             private View _view;
 
             /**
-             * @brief View - is the view that is being connected to the stage
+             * @brief View - is the view that is being connected to the window
              *
              */
             public View View
@@ -341,15 +341,15 @@ namespace Dali
         }
 
         /**
-         * @brief Event arguments that passed via OffStage signal
+         * @brief Event arguments that passed via OffWindow signal
          *
          */
-        public class OffStageEventArgs : EventArgs
+        public class OffWindowEventArgs : EventArgs
         {
             private View _view;
 
             /**
-             * @brief View - is the view that is being disconnected from the stage
+             * @brief View - is the view that is being disconnected from the window
              *
              */
             public View View
@@ -408,16 +408,16 @@ namespace Dali
         private WheelCallbackDelegate _viewWheelCallbackDelegate;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate void OnStageEventCallbackDelegate(IntPtr control);
+        private delegate void OnWindowEventCallbackDelegate(IntPtr control);
 
-        private DaliEventHandler<object,OnStageEventArgs> _viewOnStageEventHandler;
-        private OnStageEventCallbackDelegate _viewOnStageEventCallbackDelegate;
+        private DaliEventHandler<object,OnWindowEventArgs> _viewOnWindowEventHandler;
+        private OnWindowEventCallbackDelegate _viewOnWindowEventCallbackDelegate;
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate void OffStageEventCallbackDelegate(IntPtr control);
+        private delegate void OffWindowEventCallbackDelegate(IntPtr control);
 
-        private DaliEventHandler<object,OffStageEventArgs> _viewOffStageEventHandler;
-        private OffStageEventCallbackDelegate _viewOffStageEventCallbackDelegate;
+        private DaliEventHandler<object,OffWindowEventArgs> _viewOffWindowEventHandler;
+        private OffWindowEventCallbackDelegate _viewOffWindowEventCallbackDelegate;
 
         /**
          * @brief Event for KeyInputFocusGained signal which can be used to subscribe/unsubscribe the event handler
@@ -787,23 +787,23 @@ namespace Dali
         }
 
         /**
-         * @brief Event for OnStage signal which can be used to subscribe/unsubscribe the event handler
-         * (in the type of OnStageEventHandler) provided by the user.
-         * OnStage signal is emitted after the view has been connected to the stage.
+         * @brief Event for OnWindow signal which can be used to subscribe/unsubscribe the event handler
+         * (in the type of OnWindowEventHandler) provided by the user.
+         * OnWindow signal is emitted after the view has been connected to the window.
          */
-        public event DaliEventHandler<object,OnStageEventArgs> OnStageEvent
+        public event DaliEventHandler<object,OnWindowEventArgs> OnWindowEvent
         {
             add
             {
                 lock (this)
                 {
                     // Restricted to only one listener
-                    if (_viewOnStageEventHandler == null)
+                    if (_viewOnWindowEventHandler == null)
                     {
-                        _viewOnStageEventHandler += value;
+                        _viewOnWindowEventHandler += value;
 
-                        _viewOnStageEventCallbackDelegate = new OnStageEventCallbackDelegate(OnStage);
-                        this.OnStageSignal().Connect(_viewOnStageEventCallbackDelegate);
+                        _viewOnWindowEventCallbackDelegate = new OnWindowEventCallbackDelegate(OnWindow);
+                        this.OnWindowSignal().Connect(_viewOnWindowEventCallbackDelegate);
                     }
                 }
             }
@@ -812,51 +812,51 @@ namespace Dali
             {
                 lock (this)
                 {
-                    if (_viewOnStageEventHandler != null)
+                    if (_viewOnWindowEventHandler != null)
                     {
-                        this.OnStageSignal().Disconnect(_viewOnStageEventCallbackDelegate);
+                        this.OnWindowSignal().Disconnect(_viewOnWindowEventCallbackDelegate);
                     }
 
-                    _viewOnStageEventHandler -= value;
+                    _viewOnWindowEventHandler -= value;
                 }
             }
         }
 
-        // Callback for View OnStage signal
-        private void OnStage(IntPtr data)
+        // Callback for View OnWindow signal
+        private void OnWindow(IntPtr data)
         {
-            OnStageEventArgs e = new OnStageEventArgs();
+            OnWindowEventArgs e = new OnWindowEventArgs();
 
-            // Populate all members of "e" (OnStageEventArgs) with real data
+            // Populate all members of "e" (OnWindowEventArgs) with real data
             e.View = View.GetViewFromPtr(data);
 
-            //Console.WriteLine("############# OnStage()! e.View.Name=" + e.View.Name);
+            //Console.WriteLine("############# OnWindow()! e.View.Name=" + e.View.Name);
 
-            if (_viewOnStageEventHandler != null)
+            if (_viewOnWindowEventHandler != null)
             {
                 //here we send all data to user event handlers
-                _viewOnStageEventHandler(this, e);
+                _viewOnWindowEventHandler(this, e);
             }
         }
 
         /**
-         * @brief Event for OffStage signal which can be used to subscribe/unsubscribe the event handler
-         * (in the type of OffStageEventHandler) provided by the user.
-         * OffStage signal is emitted after the view has been disconnected from the stage.
+         * @brief Event for OffWindow signal which can be used to subscribe/unsubscribe the event handler
+         * (in the type of OffWindowEventHandler) provided by the user.
+         * OffWindow signal is emitted after the view has been disconnected from the window.
          */
-        public event DaliEventHandler<object,OffStageEventArgs> OffStageEvent
+        public event DaliEventHandler<object,OffWindowEventArgs> OffWindowEvent
         {
             add
             {
                 lock (this)
                 {
                     // Restricted to only one listener
-                    if (_viewOffStageEventHandler == null)
+                    if (_viewOffWindowEventHandler == null)
                     {
-                        _viewOffStageEventHandler += value;
+                        _viewOffWindowEventHandler += value;
 
-                        _viewOffStageEventCallbackDelegate = new OffStageEventCallbackDelegate(OffStage);
-                        this.OnStageSignal().Connect(_viewOffStageEventCallbackDelegate);
+                        _viewOffWindowEventCallbackDelegate = new OffWindowEventCallbackDelegate(OffWindow);
+                        this.OnWindowSignal().Connect(_viewOffWindowEventCallbackDelegate);
                     }
                 }
             }
@@ -865,28 +865,28 @@ namespace Dali
             {
                 lock (this)
                 {
-                    if (_viewOffStageEventHandler != null)
+                    if (_viewOffWindowEventHandler != null)
                     {
-                        this.OnStageSignal().Disconnect(_viewOffStageEventCallbackDelegate);
+                        this.OnWindowSignal().Disconnect(_viewOffWindowEventCallbackDelegate);
                     }
 
-                    _viewOffStageEventHandler -= value;
+                    _viewOffWindowEventHandler -= value;
                 }
             }
         }
 
-        // Callback for View OffStage signal
-        private void OffStage(IntPtr data)
+        // Callback for View OffWindow signal
+        private void OffWindow(IntPtr data)
         {
-            OffStageEventArgs e = new OffStageEventArgs();
+            OffWindowEventArgs e = new OffWindowEventArgs();
 
-            // Populate all members of "e" (OffStageEventArgs) with real data
+            // Populate all members of "e" (OffWindowEventArgs) with real data
             e.View = View.GetViewFromPtr(data);
 
-            if (_viewOffStageEventHandler != null)
+            if (_viewOffWindowEventHandler != null)
             {
                 //here we send all data to user event handlers
-                _viewOffStageEventHandler(this, e);
+                _viewOffWindowEventHandler(this, e);
             }
         }
 
@@ -1123,7 +1123,7 @@ namespace Dali
 
             if (!view)
             {
-                view = Stage.Instance.GetRootLayer().FindChildById(id);
+                view = Window.Instance.GetRootLayer().FindChildById(id);
             }
 
             return view;
@@ -1571,7 +1571,7 @@ namespace Dali
         /**
          * @brief The left focusable view.
          * @note This will return NULL if not set.
-         * This will also return NULL if the specified left focusable view is not on stage.
+         * This will also return NULL if the specified left focusable view is not on window.
          *
          */
         public View LeftFocusableView
@@ -1594,7 +1594,7 @@ namespace Dali
         /**
          * @brief The right focusable view.
          * @note This will return NULL if not set.
-         * This will also return NULL if the specified right focusable view is not on stage.
+         * This will also return NULL if the specified right focusable view is not on window.
          *
          */
         public View RightFocusableView
@@ -1617,7 +1617,7 @@ namespace Dali
         /**
          * @brief The up focusable view.
          * @note This will return NULL if not set.
-         * This will also return NULL if the specified up focusable view is not on stage.
+         * This will also return NULL if the specified up focusable view is not on window.
          *
          */
         public View UpFocusableView
@@ -1640,7 +1640,7 @@ namespace Dali
         /**
          * @brief The down focusable view.
          * @note This will return NULL if not set.
-         * This will also return NULL if the specified down focusable view is not on stage.
+         * This will also return NULL if the specified down focusable view is not on window.
          *
          */
         public View DownFocusableView
@@ -1770,11 +1770,11 @@ namespace Dali
             }
         }
 
-        public bool IsOnStage
+        public bool IsOnWindow
         {
             get
             {
-                return OnStage();
+                return OnWindow();
             }
         }
 
@@ -1867,7 +1867,7 @@ namespace Dali
             return ret;
         }
 
-        public bool OnStage()
+        public bool OnWindow()
         {
             bool ret = NDalicPINVOKE.Actor_OnStage(swigCPtr);
             if (NDalicPINVOKE.SWIGPendingException.Pending)
@@ -2573,7 +2573,7 @@ namespace Dali
             return ret;
         }
 
-        public ViewSignal OnStageSignal()
+        public ViewSignal OnWindowSignal()
         {
             ViewSignal ret = new ViewSignal(NDalicPINVOKE.Actor_OnStageSignal(swigCPtr), false);
             if (NDalicPINVOKE.SWIGPendingException.Pending)

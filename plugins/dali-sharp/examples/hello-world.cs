@@ -27,7 +27,7 @@ namespace MyCSharpExample
         private Dali.Application _application;
         private Animation _animation;
         private TextLabel _text;
-        private Stage _stage;
+        private Window _window;
 
         public Example(Dali.Application application)
         {
@@ -38,9 +38,9 @@ namespace MyCSharpExample
         public void Initialize(object source, NUIApplicationInitEventArgs e)
         {
             Console.WriteLine("Customized Application Initialize event handler");
-            _stage = Stage.Instance;
-            _stage.BackgroundColor = Color.White;
-            _stage.Touch += OnStageTouched;
+            _window = Window.Instance;
+            _window.BackgroundColor = Color.White;
+            _window.Touch += OnWindowTouched;
 
             // Add a _text label to the stage
             _text = new TextLabel("Hello Mono World");
@@ -49,7 +49,7 @@ namespace MyCSharpExample
             _text.HorizontalAlignment = "CENTER";
             _text.PointSize = 32.0f;
             _text.TextColor = Color.Magenta;
-            _stage.Add(_text);
+            _window.Add(_text);
 
             _animation = new Animation
             {
@@ -95,8 +95,8 @@ namespace MyCSharpExample
             }
         }
 
-        // Callback for stage touched signal handling
-        public void OnStageTouched(object sender, Stage.TouchEventArgs e)
+        // Callback for window touched signal handling
+        public void OnWindowTouched(object sender, Window.TouchEventArgs e)
         {
             // Only animate the _text label when touch down happens
             if (e.Touch.GetState(0) == PointStateType.DOWN)

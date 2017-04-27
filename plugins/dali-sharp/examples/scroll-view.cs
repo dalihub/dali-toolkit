@@ -42,16 +42,16 @@ namespace MyCSharpExample
 
         private void CreateScrollView()
         {
-            Stage stage = Stage.GetCurrent();
-            stage.BackgroundColor = Color.White;
+            Window window = Window.Instance;
+            window.BackgroundColor = Color.White;
 
             // Create a scroll view
             _scrollView = new ScrollView();
-            Size2D stageSize = stage.Size;
-            _scrollView.Size = new Position(stageSize.Width, stageSize.Height, 0.0f);
+            Size2D windowSize = window.Size;
+            _scrollView.Size = new Position(windowSize.Width, windowSize.Height, 0.0f);
             _scrollView.ParentOrigin = NDalic.ParentOriginCenter;
             _scrollView.AnchorPoint = NDalic.AnchorPointCenter;
-            stage.Add(_scrollView);
+            window.Add(_scrollView);
 
             // Add actors to a scroll view with 3 pages
             int pageRows = 1;
@@ -64,13 +64,13 @@ namespace MyCSharpExample
                     pageActor.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.ALL_DIMENSIONS);
                     pageActor.ParentOrigin = NDalic.ParentOriginCenter;
                     pageActor.AnchorPoint = NDalic.AnchorPointCenter;
-                    pageActor.Position = new Position(pageColumn * stageSize.Width, pageRow * stageSize.Height, 0.0f);
+                    pageActor.Position = new Position(pageColumn * windowSize.Width, pageRow * windowSize.Height, 0.0f);
 
                     // Add images in a 3x4 grid layout for each page
                     int imageRows = 4;
                     int imageColumns = 3;
                     float margin = 10.0f;
-                    Position imageSize = new Position((stageSize.Width / imageColumns) - margin, (stageSize.Height / imageRows) - margin, 0.0f);
+                    Position imageSize = new Position((windowSize.Width / imageColumns) - margin, (windowSize.Height / imageRows) - margin, 0.0f);
 
                     for (int row = 0; row < imageRows; row++)
                     {
@@ -81,8 +81,8 @@ namespace MyCSharpExample
                             imageView.ParentOrigin = NDalic.ParentOriginCenter;
                             imageView.AnchorPoint = NDalic.AnchorPointCenter;
                             imageView.Size = imageSize;
-                            imageView.Position = new Position(margin * 0.5f + (imageSize.X + margin) * column - stageSize.Width * 0.5f + imageSize.X * 0.5f,
-                                                 margin * 0.5f + (imageSize.Y + margin) * row - stageSize.Height * 0.5f + imageSize.Y * 0.5f, 0.0f);
+                            imageView.Position = new Position(margin * 0.5f + (imageSize.X + margin) * column - windowSize.Width * 0.5f + imageSize.X * 0.5f,
+                                                 margin * 0.5f + (imageSize.Y + margin) * row - windowSize.Height * 0.5f + imageSize.Y * 0.5f, 0.0f);
                             pageActor.Add(imageView);
                         }
                     }
@@ -95,9 +95,9 @@ namespace MyCSharpExample
 
             // Set scroll view to have 3 pages in X axis and allow page snapping,
             // and also disable scrolling in Y axis.
-            RulerPtr scrollRulerX = new RulerPtr(new FixedRuler(stageSize.Width));
+            RulerPtr scrollRulerX = new RulerPtr(new FixedRuler(windowSize.Width));
             RulerPtr scrollRulerY = new RulerPtr(new DefaultRuler());
-            scrollRulerX.SetDomain(new RulerDomain(0.0f, stageSize.Width * pageColumns, true));
+            scrollRulerX.SetDomain(new RulerDomain(0.0f, windowSize.Width * pageColumns, true));
             scrollRulerY.Disable();
             _scrollView.SetRulerX(scrollRulerX);
             _scrollView.SetRulerY(scrollRulerY);
@@ -149,7 +149,7 @@ namespace MyCSharpExample
             // Only animate the _text label when touch down happens
             if (e.Touch.GetState(0) == PointStateType.DOWN)
             {
-                Console.WriteLine("Customized Stage Touch event handler");
+                Console.WriteLine("Customized Window Touch event handler");
                 // Create a new _animation
                 if (_animation)
                 {

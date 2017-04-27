@@ -30,7 +30,7 @@ public class ViewContainer : global::System.IDisposable, global::System.Collecti
   }
 
   public virtual void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
