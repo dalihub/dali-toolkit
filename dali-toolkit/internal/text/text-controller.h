@@ -121,6 +121,15 @@ public: // Enumerated types.
     PLACEHOLDER_TYPE_INACTIVE,
   };
 
+  /**
+   * @brief Enumeration for Font Size Type.
+   */
+  enum FontSizeType
+  {
+    POINT_SIZE,   // The size of font in points.
+    PIXEL_SIZE    // The size of font in pixels.
+  };
+
   struct NoTextTap
   {
     enum Action
@@ -502,18 +511,20 @@ public: // Default style & Input style
   FontSlant GetDefaultFontSlant() const;
 
   /**
-   * @brief Set the default point size.
+   * @brief Set the default font size.
    *
-   * @param[in] pointSize The default point size.
+   * @param[in] size The default font size.
+   * @param[in] type The font size type is point size or pixel size
    */
-  void SetDefaultPointSize( float pointSize );
+  void SetDefaultFontSize( float fontSize, FontSizeType type );
 
   /**
    * @brief Retrieve the default point size.
    *
+   * @param[in] type The font size type
    * @return The default point size.
    */
-  float GetDefaultPointSize() const;
+  float GetDefaultFontSize( FontSizeType type ) const;
 
   /**
    * @brief Sets the text's default color.

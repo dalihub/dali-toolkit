@@ -21,6 +21,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -63,6 +64,9 @@ const char* const PROPERTY_NAME_UNDERLINE = "underline";
 const char* const PROPERTY_NAME_SHADOW = "shadow";
 const char* const PROPERTY_NAME_EMBOSS = "emboss";
 const char* const PROPERTY_NAME_OUTLINE = "outline";
+
+const char* const PROPERTY_NAME_PIXEL_SIZE = "pixelSize";
+const char* const PROPERTY_NAME_ELLIPSIS = "ellipsis";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
@@ -203,6 +207,8 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_SHADOW ) == TextLabel::Property::SHADOW );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_EMBOSS ) == TextLabel::Property::EMBOSS );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextLabel::Property::OUTLINE );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextLabel::Property::PIXEL_SIZE );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == DevelTextLabel::Property::ELLIPSIS );
 
   END_TEST;
 }
@@ -414,6 +420,15 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // Check the outline property
   label.SetProperty( TextLabel::Property::OUTLINE, "Outline properties" );
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+
+  // Check the pixel size of font
+  label.SetProperty( DevelTextLabel::Property::PIXEL_SIZE, 20.f );
+  DALI_TEST_EQUALS( label.GetProperty<float>( DevelTextLabel::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check the ellipsis property
+  DALI_TEST_CHECK( !label.GetProperty<bool>( DevelTextLabel::Property::ELLIPSIS ) );
+  label.SetProperty( DevelTextLabel::Property::ELLIPSIS, true );
+  DALI_TEST_CHECK( label.GetProperty<bool>( DevelTextLabel::Property::ELLIPSIS ) );
 
   END_TEST;
 }
