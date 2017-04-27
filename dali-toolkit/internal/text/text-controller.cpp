@@ -2148,6 +2148,13 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
       retrieveCursor = true;
       break;
     }
+    case ImfManager::PRIVATECOMMAND:
+    {
+      // PRIVATECOMMAND event is just for getting the private command message
+      retrieveText = true;
+      retrieveCursor = true;
+      break;
+    }
     case ImfManager::VOID:
     {
       // do nothing
