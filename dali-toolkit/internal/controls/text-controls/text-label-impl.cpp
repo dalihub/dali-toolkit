@@ -20,11 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
@@ -105,6 +107,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underline",            MAP,    
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadow",               MAP,     SHADOW                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "emboss",               MAP,     EMBOSS                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "outline",              MAP,     OUTLINE                )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "pixelSize",      FLOAT,   PIXEL_SIZE             )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "ellipsis",       BOOLEAN, ELLIPSIS               )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -188,9 +192,9 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           const float pointSize = value.Get< float >();
 
-          if( !Equals( impl.mController->GetDefaultPointSize(), pointSize ) )
+          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
           {
-            impl.mController->SetDefaultPointSize( pointSize );
+            impl.mController->SetDefaultFontSize( pointSize, Text::Controller::POINT_SIZE );
           }
         }
         break;
@@ -422,6 +426,31 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::PIXEL_SIZE:
+      {
+        if( impl.mController )
+        {
+          const float pixelSize = value.Get< float >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p PIXEL_SIZE %f\n", impl.mController.Get(), pixelSize );
+
+          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
+          {
+            impl.mController->SetDefaultFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
+          }
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::ELLIPSIS:
+      {
+        if( impl.mController )
+        {
+          const bool ellipsis = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p ELLIPSIS %d\n", impl.mController.Get(), ellipsis );
+
+          impl.mController->SetTextElideEnabled( ellipsis );
+        }
+        break;
+      }
     }
   }
 }
@@ -469,7 +498,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          value = impl.mController->GetDefaultPointSize();
+          value = impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE );
         }
         break;
       }
@@ -629,6 +658,22 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       case Toolkit::TextLabel::Property::OUTLINE:
       {
         GetOutlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::PIXEL_SIZE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::ELLIPSIS:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsTextElideEnabled();
+        }
         break;
       }
     }

@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class Path : Handle {
+public class Path : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal Path(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.Path_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -42,7 +42,7 @@ public class Path : Handle {
   }
 
   public override void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -163,12 +163,12 @@ public class Path : Handle {
     get
     {
       Dali.Property.Array temp = new Dali.Property.Array();
-      GetProperty( Path.Property.POINTS).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, Path.Property.POINTS).Get(  temp );
       return temp;
     }
     set
     {
-      SetProperty( Path.Property.POINTS, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Path.Property.POINTS, new Dali.Property.Value( value ) );
     }
   }
   public Dali.Property.Array ControlPoints
@@ -176,12 +176,12 @@ public class Path : Handle {
     get
     {
       Dali.Property.Array temp = new Dali.Property.Array();
-      GetProperty( Path.Property.CONTROL_POINTS).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, Path.Property.CONTROL_POINTS).Get(  temp );
       return temp;
     }
     set
     {
-      SetProperty( Path.Property.CONTROL_POINTS, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Path.Property.CONTROL_POINTS, new Dali.Property.Value( value ) );
     }
   }
 

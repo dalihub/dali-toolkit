@@ -53,7 +53,7 @@ namespace Dali
             viewWrapperImpl.OnAccessibilityZoom = new ViewWrapperImpl.OnAccessibilityZoomDelegate(OnAccessibilityZoom);
             viewWrapperImpl.OnKeyInputFocusGained = new ViewWrapperImpl.OnKeyInputFocusGainedDelegate(OnKeyInputFocusGained);
             viewWrapperImpl.OnKeyInputFocusLost = new ViewWrapperImpl.OnKeyInputFocusLostDelegate(OnKeyInputFocusLost);
-            viewWrapperImpl.GetNextKeyboardFocusableActor = new ViewWrapperImpl.GetNextKeyboardFocusableActorDelegate(GetNextKeyboardFocusableActor);
+            viewWrapperImpl.GetNextKeyboardFocusableActor = new ViewWrapperImpl.GetNextKeyboardFocusableActorDelegate(GetNextKeyboardFocusableView);
             viewWrapperImpl.OnKeyboardFocusChangeCommitted = new ViewWrapperImpl.OnKeyboardFocusChangeCommittedDelegate(OnKeyboardFocusChangeCommitted);
             viewWrapperImpl.OnKeyboardEnter = new ViewWrapperImpl.OnKeyboardEnterDelegate(OnKeyboardEnter);
             viewWrapperImpl.OnPinch = new ViewWrapperImpl.OnPinchDelegate(OnPinch);
@@ -69,7 +69,7 @@ namespace Dali
 
             // Set the StyleName the name of the View
             // We have to do this because the StyleManager on Native side can't workout it out
-            // This will also ensure that the style of actors/visuals initialized above are applied by the style manager.
+            // This will also ensure that the style of views/visuals initialized above are applied by the style manager.
             SetStyleName( this.GetType().Name );
         }
 
@@ -112,7 +112,7 @@ namespace Dali
         /**
          * @brief Sets whether this control supports two dimensional
          * keyboard navigation (i.e. whether it knows how to handle the
-         * keyboard focus movement between its child actors).
+         * keyboard focus movement between its child views).
          *
          * The control doesn't support it by default.
          * @param[in] isSupported Whether this control supports two dimensional keyboard navigation.
@@ -136,7 +136,7 @@ namespace Dali
          * @brief Sets whether this control is a focus group for keyboard navigation.
          *
          * (i.e. the scope of keyboard focus movement
-         * can be limitied to its child actors). The control is not a focus group by default.
+         * can be limitied to its child views). The control is not a focus group by default.
          * @param[in] isFocusGroup Whether this control is set as a focus group for keyboard navigation.
          */
         public void SetAsKeyboardFocusGroup(bool isFocusGroup)
@@ -183,7 +183,7 @@ namespace Dali
         }
 
         /**
-         * @brief Request a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene).
+         * @brief Request a relayout, which means performing a size negotiation on this view, its parent and children (and potentially whole scene).
          *
          * This method can also be called from a derived class every time it needs a different size.
          * At the end of event processing, the relayout process starts and
@@ -198,7 +198,7 @@ namespace Dali
         }
 
         /**
-         * @brief Provides the Actor implementation of GetHeightForWidth.
+         * @brief Provides the View implementation of GetHeightForWidth.
          * @param width Width to use.
          * @return The height based on the width.
          */
@@ -208,7 +208,7 @@ namespace Dali
         }
 
         /**
-         * @brief Provides the Actor implementation of GetWidthForHeight.
+         * @brief Provides the View implementation of GetWidthForHeight.
          * @param height Height to use.
          * @return The width based on the height.
          */
@@ -218,22 +218,22 @@ namespace Dali
         }
 
         /**
-         * @brief Calculate the size for a child using the base actor object.
+         * @brief Calculate the size for a child using the base view object.
          *
-         * @param[in] child The child actor to calculate the size for
+         * @param[in] child The child view to calculate the size for
          * @param[in] dimension The dimension to calculate the size for. E.g. width or height
          * @return Return the calculated size for the given dimension. If more than one dimension is requested, just return the first one found.
          */
-        protected float CalculateChildSizeBase(Actor child, DimensionType dimension)
+        protected float CalculateChildSizeBase(View child, DimensionType dimension)
         {
             return viewWrapperImpl.CalculateChildSizeBase( child, dimension );
         }
 
         /**
-         * @brief Determine if this actor is dependent on it's children for relayout from the base class.
+         * @brief Determine if this view is dependent on it's children for relayout from the base class.
          *
          * @param dimension The dimension(s) to check for
-         * @return Return if the actor is dependent on it's children.
+         * @return Return if the view is dependent on it's children.
          */
         protected bool RelayoutDependentOnChildrenBase(DimensionType dimension)
         {
@@ -241,10 +241,10 @@ namespace Dali
         }
 
         /**
-         * @brief Determine if this actor is dependent on it's children for relayout from the base class.
+         * @brief Determine if this view is dependent on it's children for relayout from the base class.
          *
          * @param dimension The dimension(s) to check for
-         * @return Return if the actor is dependent on it's children.
+         * @return Return if the view is dependent on it's children.
          */
         protected bool RelayoutDependentOnChildrenBase()
         {
@@ -252,13 +252,13 @@ namespace Dali
         }
 
         /**
-         * @brief Register a visual by Property Index, linking an Actor to visual when required.
-         * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
+         * @brief Register a visual by Property Index, linking an View to visual when required.
+         * In the case of the visual being an view or control deeming visual not required then visual should be an empty handle.
          * No parenting is done during registration, this should be done by derived class.
          *
          * @param[in] index The Property index of the visual, used to reference visual
          * @param[in] visual The visual to register
-         * @note Derived class should not call visual.SetOnStage(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
+         * @note Derived class should not call visual.SetOnStage(view). It is the responsibility of the base class to connect/disconnect registered visual to stage.
          *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
          */
         protected void RegisterVisual(int index, VisualBase visual)
@@ -267,8 +267,8 @@ namespace Dali
         }
 
         /**
-         * @brief Register a visual by Property Index, linking an Actor to visual when required.
-         * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
+         * @brief Register a visual by Property Index, linking an View to visual when required.
+         * In the case of the visual being an view or control deeming visual not required then visual should be an empty handle.
          * If enabled is false then the visual is not set on stage until enabled by the derived class.
          * @see EnableVisual
          *
@@ -360,15 +360,15 @@ namespace Dali
         }
 
         /**
-         * @brief Called after the actor has been connected to the stage.
+         * @brief Called after the view has been connected to the stage.
          *
-         * When an actor is connected, it will be directly or indirectly parented to the root Actor.
-         * @param[in] depth The depth in the hierarchy for the actor
+         * When an view is connected, it will be directly or indirectly parented to the root View.
+         * @param[in] depth The depth in the hierarchy for the view
          *
-         * @note The root Actor is provided automatically by Dali::Stage, and is always considered to be connected.
-         * When the parent of a set of actors is connected to the stage, then all of the children
+         * @note The root View is provided automatically by Dali::Stage, and is always considered to be connected.
+         * When the parent of a set of views is connected to the stage, then all of the children
          * will received this callback.
-         * For the following actor tree, the callback order will be A, B, D, E, C, and finally F.
+         * For the following view tree, the callback order will be A, B, D, E, C, and finally F.
          *
          * @code
          *
@@ -379,20 +379,20 @@ namespace Dali
          *   D   E   F
          *
          * @endcode
-         * @param[in] depth The depth in the hierarchy for the actor
+         * @param[in] depth The depth in the hierarchy for the view
          */
         public virtual void OnStageConnection(int depth)
         {
         }
 
         /**
-         * @brief Called after the actor has been disconnected from Stage.
+         * @brief Called after the view has been disconnected from Stage.
          *
-         * If an actor is disconnected it either has no parent, or is parented to a disconnected actor.
+         * If an view is disconnected it either has no parent, or is parented to a disconnected view.
          *
-         * @note When the parent of a set of actors is disconnected to the stage, then all of the children
-         * will received this callback, starting with the leaf actors.
-         * For the following actor tree, the callback order will be D, E, B, F, C, and finally A.
+         * @note When the parent of a set of views is disconnected to the stage, then all of the children
+         * will received this callback, starting with the leaf views.
+         * For the following view tree, the callback order will be D, E, B, F, C, and finally A.
          *
          * @code
          *
@@ -409,25 +409,25 @@ namespace Dali
         }
 
         /**
-         * @brief Called after a child has been added to the owning actor.
+         * @brief Called after a child has been added to the owning view.
          *
          * @param[in] child The child which has been added
          */
-        public virtual void OnChildAdd(Actor actor)
+        public virtual void OnChildAdd(View view)
         {
         }
 
         /**
-         * @brief Called after the owning actor has attempted to remove a child( regardless of whether it succeeded or not ).
+         * @brief Called after the owning view has attempted to remove a child( regardless of whether it succeeded or not ).
          *
          * @param[in] child The child being removed
          */
-        public virtual void OnChildRemove(Actor actor)
+        public virtual void OnChildRemove(View View)
         {
         }
 
         /**
-         * @brief Called when the owning actor property is set.
+         * @brief Called when the owning view property is set.
          *
          * @param[in] index The Property index that was set
          * @param[in] propertyValue The value to set
@@ -437,19 +437,19 @@ namespace Dali
         }
 
         /**
-         * @brief Called when the owning actor's size is set e.g. using Actor::SetSize().
+         * @brief Called when the owning view's size is set e.g. using View::SetSize().
          *
-         * @param[in] targetSize The target size. Note that this target size may not match the size returned via Actor.GetTargetSize.
+         * @param[in] targetSize The target size. Note that this target size may not match the size returned via View.GetTargetSize.
          */
         public virtual void OnSizeSet(Vector3 targetSize)
         {
         }
 
         /**
-         * @brief Called when the owning actor's size is animated e.g. using Animation::AnimateTo( Property( actor, Actor::Property::SIZE ), ... ).
+         * @brief Called when the owning view's size is animated e.g. using Animation::AnimateTo( Property( view, View::Property::SIZE ), ... ).
          *
-         * @param[in] animation The object which is animating the owning actor.
-         * @param[in] targetSize The target size. Note that this target size may not match the size returned via @ref Actor.GetTargetSize.
+         * @param[in] animation The object which is animating the owning view.
+         * @param[in] targetSize The target size. Note that this target size may not match the size returned via @ref View.GetTargetSize.
          */
         public virtual void OnSizeAnimation(Animation animation, Vector3 targetSize)
         {
@@ -458,7 +458,7 @@ namespace Dali
         /**
          * @DEPRECATED_1_1.37 Connect to TouchSignal() instead.
          *
-         * @brief Called after a touch-event is received by the owning actor.
+         * @brief Called after a touch-event is received by the owning view.
          *
          * @param[in] touch The touch event
          * @return True if the event should be consumed.
@@ -470,7 +470,7 @@ namespace Dali
         }
 
         /**
-         * @brief Called after a hover-event is received by the owning actor.
+         * @brief Called after a hover-event is received by the owning view.
          *
          * @param[in] hover The hover event
          * @return True if the hover event should be consumed.
@@ -482,7 +482,7 @@ namespace Dali
         }
 
         /**
-         * @brief Called after a key-event is received by the actor that has had its focus set.
+         * @brief Called after a key-event is received by the view that has had its focus set.
          *
          * @param[in] key the Key Event
          * @return True if the event should be consumed.
@@ -493,7 +493,7 @@ namespace Dali
         }
 
         /**
-         * @brief Called after a wheel-event is received by the owning actor.
+         * @brief Called after a wheel-event is received by the owning view.
          *
          * @param[in] wheel The wheel event
          * @return True if the event should be consumed.
@@ -510,11 +510,11 @@ namespace Dali
          * The control is expected to assign this given size to itself/its children.
          *
          * Should be overridden by derived classes if they need to layout
-         * actors differently after certain operations like add or remove
-         * actors, resize or after changing specific properties.
+         * views differently after certain operations like add or remove
+         * views, resize or after changing specific properties.
          *
          * @param[in]      size       The allocated size.
-         * @param[in,out]  container  The control should add actors to this container that it is not able
+         * @param[in,out]  container  The control should add views to this container that it is not able
          *                            to allocate a size for.
          * @note  As this function is called from inside the size negotiation algorithm, you cannot
          * call RequestRelayout (the call would just be ignored).
@@ -534,9 +534,9 @@ namespace Dali
         }
 
         /**
-         * @brief Return the natural size of the actor.
+         * @brief Return the natural size of the view.
          *
-         * @return The actor's natural size
+         * @return The view's natural size
          */
         public virtual Vector3 GetNaturalSize()
         {
@@ -546,11 +546,11 @@ namespace Dali
         /**
          * @brief Calculate the size for a child.
          *
-         * @param[in] child The child actor to calculate the size for
+         * @param[in] child The child view to calculate the size for
          * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
          * @return Return the calculated size for the given dimension.
          */
-        public virtual float CalculateChildSize(Actor child, DimensionType dimension)
+        public virtual float CalculateChildSize(View child, DimensionType dimension)
         {
             return viewWrapperImpl.CalculateChildSizeBase( child, dimension );
         }
@@ -582,10 +582,10 @@ namespace Dali
         }
 
         /**
-         * @brief Determine if this actor is dependent on it's children for relayout.
+         * @brief Determine if this view is dependent on it's children for relayout.
          *
          * @param dimension The dimension(s) to check for
-         * @return Return if the actor is dependent on it's children.
+         * @return Return if the view is dependent on it's children.
          */
         public virtual bool RelayoutDependentOnChildren(DimensionType dimension)
         {
@@ -593,9 +593,9 @@ namespace Dali
         }
 
         /**
-         * @brief Determine if this actor is dependent on it's children for relayout from the base class.
+         * @brief Determine if this view is dependent on it's children for relayout from the base class.
          *
-         * @return Return if the actor is dependent on it's children.
+         * @return Return if the view is dependent on it's children.
          */
         public virtual bool RelayoutDependentOnChildren()
         {
@@ -711,28 +711,28 @@ namespace Dali
         }
 
         /**
-         * @brief Gets the next keyboard focusable actor in this control towards the given direction.
+         * @brief Gets the next keyboard focusable view in this control towards the given direction.
          *
          * A control needs to override this function in order to support two dimensional keyboard navigation.
-         * @param[in] currentFocusedActor The current focused actor.
+         * @param[in] currentFocusedView The current focused view.
          * @param[in] direction The direction to move the focus towards.
-         * @param[in] loopEnabled Whether the focus movement should be looped within the control.
-         * @return the next keyboard focusable actor in this control or an empty handle if no actor can be focused.
+         * @param[in] loopEnabled Whether the focus movement should be looped within the view.
+         * @return the next keyboard focusable view in this control or an empty handle if no view can be focused.
          */
-        public virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, View.KeyboardFocus.Direction direction, bool loopEnabled)
+        public virtual View GetNextKeyboardFocusableView(View currentFocusedView, View.KeyboardFocus.Direction direction, bool loopEnabled)
         {
-            return new Actor();
+            return new View();
         }
 
         /**
-         * @brief Informs this control that its chosen focusable actor will be focused.
+         * @brief Informs this control that its chosen focusable view will be focused.
          *
          * This allows the application to preform any actions if wishes
-         * before the focus is actually moved to the chosen actor.
+         * before the focus is actually moved to the chosen view.
          *
-         * @param[in] commitedFocusableActor The commited focusable actor.
+         * @param[in] commitedFocusableView The commited focusable view.
          */
-        public virtual void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
+        public virtual void OnKeyboardFocusChangeCommitted(View commitedFocusableView)
         {
         }
 
@@ -808,11 +808,11 @@ namespace Dali
         {
         }
 
-        private void OnControlChildAdd(Actor child)
+        private void OnControlChildAdd(View child)
         {
         }
 
-        private void OnControlChildRemove(Actor child)
+        private void OnControlChildRemove(View child)
         {
         }
     }

@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class Renderer : Handle {
+public class Renderer : Animatable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal Renderer(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.Renderer_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -42,7 +42,7 @@ public class Renderer : Handle {
   }
 
   public override void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -185,12 +185,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.DEPTH_INDEX).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_INDEX).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.DEPTH_INDEX, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.DEPTH_INDEX, new Dali.Property.Value( value ) );
     }
   }
   public int FaceCullingMode
@@ -198,12 +198,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.FACE_CULLING_MODE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.FACE_CULLING_MODE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.FACE_CULLING_MODE, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.FACE_CULLING_MODE, new Dali.Property.Value( value ) );
     }
   }
   public int BlendMode
@@ -211,12 +211,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.BLEND_MODE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_MODE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.BLEND_MODE, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.BLEND_MODE, new Dali.Property.Value( value ) );
     }
   }
   public int BlendEquationRgb
@@ -224,12 +224,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.BLEND_EQUATION_RGB).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_EQUATION_RGB).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.BLEND_EQUATION_RGB, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.BLEND_EQUATION_RGB, new Dali.Property.Value( value ) );
     }
   }
   public int BlendEquationAlpha
@@ -237,12 +237,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.BLEND_EQUATION_ALPHA).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_EQUATION_ALPHA).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.BLEND_EQUATION_ALPHA, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.BLEND_EQUATION_ALPHA, new Dali.Property.Value( value ) );
     }
   }
   public int BlendFactorSrcRgb
@@ -250,12 +250,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.BLEND_FACTOR_SRC_RGB).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_SRC_RGB).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.BLEND_FACTOR_SRC_RGB, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_SRC_RGB, new Dali.Property.Value( value ) );
     }
   }
   public int BlendFactorDestRgb
@@ -263,12 +263,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.BLEND_FACTOR_DEST_RGB).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_DEST_RGB).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.BLEND_FACTOR_DEST_RGB, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_DEST_RGB, new Dali.Property.Value( value ) );
     }
   }
   public int BlendFactorSrcAlpha
@@ -276,12 +276,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.BLEND_FACTOR_SRC_ALPHA).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_SRC_ALPHA).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.BLEND_FACTOR_SRC_ALPHA, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_SRC_ALPHA, new Dali.Property.Value( value ) );
     }
   }
   public int BlendFactorDestAlpha
@@ -289,12 +289,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.BLEND_FACTOR_DEST_ALPHA).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_DEST_ALPHA).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.BLEND_FACTOR_DEST_ALPHA, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_DEST_ALPHA, new Dali.Property.Value( value ) );
     }
   }
   public Vector4 BlendColor
@@ -302,12 +302,12 @@ public class Renderer : Handle {
     get
     {
       Vector4 temp = new Vector4(0.0f,0.0f,0.0f,0.0f);
-      GetProperty( Renderer.Property.BLEND_COLOR).Get(  temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_COLOR).Get(  temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.BLEND_COLOR, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.BLEND_COLOR, new Dali.Property.Value( value ) );
     }
   }
   public bool BlendPreMultipliedAlpha
@@ -315,12 +315,12 @@ public class Renderer : Handle {
     get
     {
       bool temp = false;
-      GetProperty( Renderer.Property.BLEND_PRE_MULTIPLIED_ALPHA).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_PRE_MULTIPLIED_ALPHA).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.BLEND_PRE_MULTIPLIED_ALPHA, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.BLEND_PRE_MULTIPLIED_ALPHA, new Dali.Property.Value( value ) );
     }
   }
   public int IndexRangeFirst
@@ -328,12 +328,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.INDEX_RANGE_FIRST).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.INDEX_RANGE_FIRST).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.INDEX_RANGE_FIRST, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.INDEX_RANGE_FIRST, new Dali.Property.Value( value ) );
     }
   }
   public int IndexRangeCount
@@ -341,12 +341,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.INDEX_RANGE_COUNT).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.INDEX_RANGE_COUNT).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.INDEX_RANGE_COUNT, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.INDEX_RANGE_COUNT, new Dali.Property.Value( value ) );
     }
   }
   public int DepthWriteMode
@@ -354,12 +354,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.DEPTH_WRITE_MODE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_WRITE_MODE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.DEPTH_WRITE_MODE, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.DEPTH_WRITE_MODE, new Dali.Property.Value( value ) );
     }
   }
   public int DepthFunction
@@ -367,12 +367,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.DEPTH_FUNCTION).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_FUNCTION).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.DEPTH_FUNCTION, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.DEPTH_FUNCTION, new Dali.Property.Value( value ) );
     }
   }
   public int DepthTestMode
@@ -380,12 +380,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.DEPTH_TEST_MODE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_TEST_MODE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.DEPTH_TEST_MODE, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.DEPTH_TEST_MODE, new Dali.Property.Value( value ) );
     }
   }
   public int RenderMode
@@ -393,12 +393,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.RENDER_MODE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.RENDER_MODE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.RENDER_MODE, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.RENDER_MODE, new Dali.Property.Value( value ) );
     }
   }
   public int StencilFunction
@@ -406,12 +406,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.STENCIL_FUNCTION).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.STENCIL_FUNCTION, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION, new Dali.Property.Value( value ) );
     }
   }
   public int StencilFunctionMask
@@ -419,12 +419,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.STENCIL_FUNCTION_MASK).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION_MASK).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.STENCIL_FUNCTION_MASK, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION_MASK, new Dali.Property.Value( value ) );
     }
   }
   public int StencilFunctionReference
@@ -432,12 +432,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.STENCIL_FUNCTION_REFERENCE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION_REFERENCE).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.STENCIL_FUNCTION_REFERENCE, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION_REFERENCE, new Dali.Property.Value( value ) );
     }
   }
   public int StencilMask
@@ -445,12 +445,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.STENCIL_MASK).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_MASK).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.STENCIL_MASK, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.STENCIL_MASK, new Dali.Property.Value( value ) );
     }
   }
   public int StencilOperationOnFail
@@ -458,12 +458,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.STENCIL_OPERATION_ON_FAIL).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_FAIL).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.STENCIL_OPERATION_ON_FAIL, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_FAIL, new Dali.Property.Value( value ) );
     }
   }
   public int StencilOperationOnZFail
@@ -471,12 +471,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.STENCIL_OPERATION_ON_Z_FAIL).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_Z_FAIL).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.STENCIL_OPERATION_ON_Z_FAIL, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_Z_FAIL, new Dali.Property.Value( value ) );
     }
   }
   public int StencilOperationOnZPass
@@ -484,12 +484,12 @@ public class Renderer : Handle {
     get
     {
       int temp = 0;
-      GetProperty( Renderer.Property.STENCIL_OPERATION_ON_Z_PASS).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_Z_PASS).Get( ref temp );
       return temp;
     }
     set
     {
-      SetProperty( Renderer.Property.STENCIL_OPERATION_ON_Z_PASS, new Dali.Property.Value( value ) );
+      Dali.Object.SetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_Z_PASS, new Dali.Property.Value( value ) );
     }
   }
 

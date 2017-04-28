@@ -438,12 +438,6 @@ public class NDalic {
     } 
   }
 
-  public static Handle New() {
-    Handle ret = new Handle(NDalicPINVOKE.New(), true);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
   public static bool RegisterType(string name, SWIGTYPE_p_std__type_info baseType, System.Delegate f) {
 System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(f); 
     {
@@ -963,38 +957,38 @@ System.IntPtr ip2 = System.Runtime.InteropServices.Marshal.GetFunctionPointerFor
     } 
   }
 
-  public static void UnparentAndReset(Actor actor) {
-    NDalicPINVOKE.UnparentAndReset(Actor.getCPtr(actor));
+  public static void UnparentAndReset(View view) {
+    NDalicPINVOKE.UnparentAndReset(View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static void Raise(Actor actor) {
-    NDalicPINVOKE.Raise(Actor.getCPtr(actor));
+  public static void Raise(View view) {
+    NDalicPINVOKE.Raise(View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static void Lower(Actor actor) {
-    NDalicPINVOKE.Lower(Actor.getCPtr(actor));
+  public static void Lower(View view) {
+    NDalicPINVOKE.Lower(View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static void RaiseToTop(Actor actor) {
-    NDalicPINVOKE.RaiseToTop(Actor.getCPtr(actor));
+  public static void RaiseToTop(View view) {
+    NDalicPINVOKE.RaiseToTop(View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static void LowerToBottom(Actor actor) {
-    NDalicPINVOKE.LowerToBottom(Actor.getCPtr(actor));
+  public static void LowerToBottom(View view) {
+    NDalicPINVOKE.LowerToBottom(View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static void RaiseAbove(Actor actor, Actor target) {
-    NDalicPINVOKE.RaiseAbove(Actor.getCPtr(actor), Actor.getCPtr(target));
+  public static void RaiseAbove(View view, View target) {
+    NDalicPINVOKE.RaiseAbove(View.getCPtr(view), View.getCPtr(target));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static void LowerBelow(Actor actor, Actor target) {
-    NDalicPINVOKE.LowerBelow(Actor.getCPtr(actor), Actor.getCPtr(target));
+  public static void LowerBelow(View view, View target) {
+    NDalicPINVOKE.LowerBelow(View.getCPtr(view), View.getCPtr(target));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -1012,39 +1006,6 @@ System.IntPtr ip2 = System.Runtime.InteropServices.Marshal.GetFunctionPointerFor
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 
-  }
-
-  public static WindowFocusSignalType FocusChangedSignal(Window window) {
-    WindowFocusSignalType ret = new WindowFocusSignalType(NDalicPINVOKE.FocusChangedSignal(Window.getCPtr(window)), false);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public static void SetAcceptFocus(Window window, bool accept) {
-    NDalicPINVOKE.SetAcceptFocus(Window.getCPtr(window), accept);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public static bool IsFocusAcceptable(Window window) {
-    bool ret = NDalicPINVOKE.IsFocusAcceptable(Window.getCPtr(window));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public static void Show(Window window) {
-    NDalicPINVOKE.Show(Window.getCPtr(window));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public static void Hide(Window window) {
-    NDalicPINVOKE.Hide(Window.getCPtr(window));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public static bool IsVisible(Window window) {
-    bool ret = NDalicPINVOKE.IsVisible(Window.getCPtr(window));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
   }
 
   public static ViewImpl GetImplementation(View handle) {
@@ -1069,16 +1030,6 @@ System.IntPtr ip2 = System.Runtime.InteropServices.Marshal.GetFunctionPointerFor
     SWIGTYPE_p_Dali__IntrusivePtrT_Dali__Toolkit__ItemLayout_t ret = new SWIGTYPE_p_Dali__IntrusivePtrT_Dali__Toolkit__ItemLayout_t(NDalicPINVOKE.NewItemLayout((int)type), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
-  }
-
-  public static void MoveActorConstraint(Vector3 current, SWIGTYPE_p_PropertyInputContainer inputs) {
-    NDalicPINVOKE.MoveActorConstraint(Vector3.getCPtr(current), SWIGTYPE_p_PropertyInputContainer.getCPtr(inputs));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public static void WrapActorConstraint(Vector3 position, SWIGTYPE_p_PropertyInputContainer inputs) {
-    NDalicPINVOKE.WrapActorConstraint(Vector3.getCPtr(position), SWIGTYPE_p_PropertyInputContainer.getCPtr(inputs));
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
   public static uint DEFAULT_RENDERING_BACKEND {

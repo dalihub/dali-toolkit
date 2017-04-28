@@ -26,7 +26,7 @@ public class Touch : BaseHandle {
   }
 
   public override void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -89,8 +89,8 @@ public class Touch : BaseHandle {
     return ret;
   }
 
-  public Actor GetHitActor(uint point) {
-    Actor ret = new Actor(NDalicPINVOKE.Touch_GetHitActor(swigCPtr, point), true);
+  public View GetHitView(uint point) {
+    View ret = new View(NDalicPINVOKE.Touch_GetHitActor(swigCPtr, point), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }

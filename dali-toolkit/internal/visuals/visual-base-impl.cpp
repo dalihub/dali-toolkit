@@ -521,8 +521,11 @@ void Visual::Base::AnimateProperty(
   Property::Map map;
   DoCreatePropertyMap( map );
   Property::Value* valuePtr = map.Find( Toolkit::DevelVisual::Property::TYPE );
-  int visualType;
-  valuePtr->Get(visualType);
+  int visualType = -1;
+  if( valuePtr )
+  {
+    valuePtr->Get( visualType );
+  }
 
   if( animator.propertyKey == Toolkit::DevelVisual::Property::MIX_COLOR ||
       animator.propertyKey == MIX_COLOR ||
@@ -540,7 +543,7 @@ void Visual::Base::AnimateProperty(
   }
   else if( mImpl->mRenderer )
   {
-    AnimateRendererProperty(transition, animator);
+    AnimateRendererProperty( transition, animator );
   }
 }
 

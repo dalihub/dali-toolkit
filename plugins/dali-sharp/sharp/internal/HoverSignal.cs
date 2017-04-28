@@ -10,25 +10,25 @@
 
 namespace Dali {
 
-public class ActorSignal : global::System.IDisposable {
+internal class HoverSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
-  internal ActorSignal(global::System.IntPtr cPtr, bool cMemoryOwn) {
+  internal HoverSignal(global::System.IntPtr cPtr, bool cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
   }
 
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(ActorSignal obj) {
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(HoverSignal obj) {
     return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
   }
 
-  ~ActorSignal() {
+  ~HoverSignal() {
     DisposeQueue.Instance.Add(this);
   }
 
   public virtual void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -37,7 +37,7 @@ public class ActorSignal : global::System.IDisposable {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          NDalicPINVOKE.delete_ActorSignal(swigCPtr);
+          NDalicPINVOKE.delete_ActorHoverSignal(swigCPtr);
         }
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
@@ -47,13 +47,13 @@ public class ActorSignal : global::System.IDisposable {
 
 
   public bool Empty() {
-    bool ret = NDalicPINVOKE.ActorSignal_Empty(swigCPtr);
+    bool ret = NDalicPINVOKE.ActorHoverSignal_Empty(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public uint GetConnectionCount() {
-    uint ret = NDalicPINVOKE.ActorSignal_GetConnectionCount(swigCPtr);
+    uint ret = NDalicPINVOKE.ActorHoverSignal_GetConnectionCount(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -61,7 +61,7 @@ public class ActorSignal : global::System.IDisposable {
   public void Connect(System.Delegate func) {
 System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(func); 
     {
-      NDalicPINVOKE.ActorSignal_Connect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
+      NDalicPINVOKE.ActorHoverSignal_Connect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
   }
@@ -69,17 +69,18 @@ System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForD
   public void Disconnect(System.Delegate func) {
 System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(func); 
     {
-      NDalicPINVOKE.ActorSignal_Disconnect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
+      NDalicPINVOKE.ActorHoverSignal_Disconnect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
   }
 
-  public void Emit(Actor arg) {
-    NDalicPINVOKE.ActorSignal_Emit(swigCPtr, Actor.getCPtr(arg));
+  public bool Emit(View arg1, Hover arg2) {
+    bool ret = NDalicPINVOKE.ActorHoverSignal_Emit(swigCPtr, View.getCPtr(arg1), Hover.getCPtr(arg2));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
+    return ret;
   }
 
-  public ActorSignal() : this(NDalicPINVOKE.new_ActorSignal(), true) {
+  public HoverSignal() : this(NDalicPINVOKE.new_ActorHoverSignal(), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

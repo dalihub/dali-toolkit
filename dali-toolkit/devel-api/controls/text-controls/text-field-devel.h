@@ -85,11 +85,16 @@ namespace Property
       /**
        * @brief Hides the input characters and instead shows a default character for password or pin entry.
        * @details name "hiddenInputSettings", type map.
-       * @SINCE_1_2.33
        * @note Optional.
        * @see HiddenInput
        */
       HIDDEN_INPUT_SETTINGS = INPUT_OUTLINE + 1,
+
+      /**
+       * @brief The size of font in pixels.
+       * @details name "pixelSize", type float
+       */
+      PIXEL_SIZE = INPUT_OUTLINE + 2,
   };
 } // namespace Property
 

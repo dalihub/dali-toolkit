@@ -42,7 +42,7 @@ public class ScrollViewPagePathEffect : ScrollViewEffect {
   }
 
   public override void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -71,8 +71,8 @@ public class ScrollViewPagePathEffect : ScrollViewEffect {
     return ret;
   }
 
-  public void ApplyToPage(Actor page, uint pageOrder) {
-    NDalicPINVOKE.ScrollViewPagePathEffect_ApplyToPage(swigCPtr, Actor.getCPtr(page), pageOrder);
+  public void ApplyToPage(View page, uint pageOrder) {
+    NDalicPINVOKE.ScrollViewPagePathEffect_ApplyToPage(swigCPtr, View.getCPtr(page), pageOrder);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

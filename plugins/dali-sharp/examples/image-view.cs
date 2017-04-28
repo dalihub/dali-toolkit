@@ -35,7 +35,7 @@ namespace ImageViewExample
         private bool _isAniFinised = true;
         private Layer layer, _layer1, _layer2;
         private PushButton _pushButton1, _pushButton2;
-        private Stage stage;
+        private Window window;
 
         public Example(Dali.Application application)
         {
@@ -46,25 +46,25 @@ namespace ImageViewExample
         public void Initialize(object source, NUIApplicationInitEventArgs e)
         {
             Log("Customized Application Initialize event handler");
-            stage = Stage.Instance;
-            stage.BackgroundColor = Color.Cyan;
-            stage.Touch += OnStageTouched;
-            stage.Wheel += OnStageWheelMoved;
-            stage.Key += OnStageKeyPressed;
-            //stage.EventProcessingFinished += OnStageEventProcessingFinished;
+            window = Window.Instance;
+            window.BackgroundColor = Color.Cyan;
+            window.Touch += OnWindowTouched;
+            window.Wheel += OnWindowWheelMoved;
+            window.Key += OnWindowKeyPressed;
+            //window.EventProcessingFinished += OnWindowEventProcessingFinished;
 
-            layer = stage.GetDefaultLayer();
+            layer = window.GetDefaultLayer();
             _layer1 = new Layer();
             _layer2 = new Layer();
-            stage.AddLayer(_layer1);
-            stage.AddLayer(_layer2);
+            window.Add(_layer1);
+            window.Add(_layer2);
             Log("_layer1.Behavior =" + _layer1.Behavior);
             if (_layer1.Behavior == Layer.LayerBehavior.LAYER_UI)
             {
                 _layer1.Behavior = Layer.LayerBehavior.LAYER_2D;
                 Log("again _layer1.Behavior =" + _layer1.Behavior);
             }
-            // Add a ImageView to the stage
+            // Add a ImageView to the window
             _imageView = new ImageView();
             _imageView.ResourceUrl = "./images/gallery-3.jpg";
             _imageView.ParentOrigin = ParentOrigin.Center;
@@ -77,7 +77,7 @@ namespace ImageViewExample
             _pushButton1.ParentOrigin = ParentOrigin.BottomLeft;
             _pushButton1.AnchorPoint = AnchorPoint.BottomLeft;
             _pushButton1.LabelText = "start animation";
-            _pushButton1.Position = new Vector3(0.0f, stage.Size.Height * 0.1f, 0.0f);
+            _pushButton1.Position = new Vector3(0.0f, window.Size.Height * 0.1f, 0.0f);
             _pushButton1.Clicked += OnPushButtonClicked1;
             _layer1.Add(_pushButton1);
 
@@ -85,7 +85,7 @@ namespace ImageViewExample
             _pushButton2.ParentOrigin = ParentOrigin.BottomLeft;
             _pushButton2.AnchorPoint = AnchorPoint.BottomLeft;
             _pushButton2.LabelText = "reload image with same URL";
-            _pushButton2.Position = new Vector3(0.0f, stage.Size.Height * 0.2f, 0.0f);
+            _pushButton2.Position = new Vector3(0.0f, window.Size.Height * 0.2f, 0.0f);
             _pushButton2.Clicked += OnPushButtonClicked2;
             _layer2.Add(_pushButton2);
 
@@ -154,8 +154,8 @@ namespace ImageViewExample
                 _animation.TargetProperty = "Size";
                 KeyFrames _keyFrames = new KeyFrames();
                 _keyFrames.Add(0.0f, new Size(0.0f, 0.0f, 0.0f));
-                _keyFrames.Add(0.3f, new Size((stage.Size * 0.7f)));
-                _keyFrames.Add(1.0f, new Size(stage.Size));
+                _keyFrames.Add(0.3f, new Size((window.Size * 0.7f)));
+                _keyFrames.Add(1.0f, new Size(window.Size));
                 _animation.AnimateBetween(_imageView, _keyFrames, Animation.Interpolation.Linear);
 
                 _animation.EndAction = Animation.EndActions.Discard;
@@ -189,33 +189,33 @@ namespace ImageViewExample
             }
         }
 
-        public void OnStageEventProcessingFinished(object sender, EventArgs e)
+        public void OnWindowEventProcessingFinished(object sender, EventArgs e)
         {
-            Log("OnStageEventProcessingFinished()!");
+            Log("OnWindowEventProcessingFinished()!");
             if (e != null)
             {
                 Log("e != null !");
             }
         }
 
-        public void OnStageKeyPressed(object sender, Stage.KeyEventArgs e)
+        public void OnWindowKeyPressed(object sender, Window.KeyEventArgs e)
         {
-            Log("OnStageKeyEventOccured()!");
+            Log("OnWindowKeyEventOccured()!");
             Log("keyPressedName=" + e.Key.KeyPressedName);
             Log("state=" + e.Key.State);
         }
 
-        public void OnStageWheelMoved(object sender, Stage.WheelEventArgs e)
+        public void OnWindowWheelMoved(object sender, Window.WheelEventArgs e)
         {
-            Log("OnStageWheelEventOccured()!");
+            Log("OnWindowWheelEventOccured()!");
             Log("direction=" + e.Wheel.Direction);
             Log("type=" + e.Wheel.Type);
         }
 
-        // Callback for stage touched signal handling
-        public void OnStageTouched(object sender, Stage.TouchEventArgs e)
+        // Callback for window touched signal handling
+        public void OnWindowTouched(object sender, Window.TouchEventArgs e)
         {
-            Log("OnStageTouched()! e.TouchData.GetState(0)=" + e.Touch.GetState(0));
+            Log("OnWindowTouched()! e.TouchData.GetState(0)=" + e.Touch.GetState(0));
         }
 
         public void MainLoop()

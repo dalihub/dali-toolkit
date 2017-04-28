@@ -30,7 +30,7 @@ public class TouchPointContainer : global::System.IDisposable, global::System.Co
   }
 
   public virtual void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }

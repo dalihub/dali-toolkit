@@ -42,7 +42,7 @@ public class PushButton : Button {
   }
 
   public override void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -128,13 +128,13 @@ public class PushButton : Button {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetButtonImage(Actor image) {
-    NDalicPINVOKE.PushButton_SetButtonImage__SWIG_1(swigCPtr, Actor.getCPtr(image));
+  public void SetButtonImage(View image) {
+    NDalicPINVOKE.PushButton_SetButtonImage__SWIG_1(swigCPtr, View.getCPtr(image));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetBackgroundImage(Actor image) {
-    NDalicPINVOKE.PushButton_SetBackgroundImage(swigCPtr, Actor.getCPtr(image));
+  public void SetBackgroundImage(View image) {
+    NDalicPINVOKE.PushButton_SetBackgroundImage(swigCPtr, View.getCPtr(image));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -143,28 +143,28 @@ public class PushButton : Button {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetSelectedImage(Actor image) {
-    NDalicPINVOKE.PushButton_SetSelectedImage__SWIG_1(swigCPtr, Actor.getCPtr(image));
+  public void SetSelectedImage(View image) {
+    NDalicPINVOKE.PushButton_SetSelectedImage__SWIG_1(swigCPtr, View.getCPtr(image));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetSelectedBackgroundImage(Actor image) {
-    NDalicPINVOKE.PushButton_SetSelectedBackgroundImage(swigCPtr, Actor.getCPtr(image));
+  public void SetSelectedBackgroundImage(View image) {
+    NDalicPINVOKE.PushButton_SetSelectedBackgroundImage(swigCPtr, View.getCPtr(image));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetDisabledBackgroundImage(Actor image) {
-    NDalicPINVOKE.PushButton_SetDisabledBackgroundImage(swigCPtr, Actor.getCPtr(image));
+  public void SetDisabledBackgroundImage(View image) {
+    NDalicPINVOKE.PushButton_SetDisabledBackgroundImage(swigCPtr, View.getCPtr(image));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetDisabledImage(Actor image) {
-    NDalicPINVOKE.PushButton_SetDisabledImage(swigCPtr, Actor.getCPtr(image));
+  public void SetDisabledImage(View image) {
+    NDalicPINVOKE.PushButton_SetDisabledImage(swigCPtr, View.getCPtr(image));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetDisabledSelectedImage(Actor image) {
-    NDalicPINVOKE.PushButton_SetDisabledSelectedImage(swigCPtr, Actor.getCPtr(image));
+  public void SetDisabledSelectedImage(View image) {
+    NDalicPINVOKE.PushButton_SetDisabledSelectedImage(swigCPtr, View.getCPtr(image));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
