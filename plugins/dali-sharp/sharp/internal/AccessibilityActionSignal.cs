@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class AccessibilityActionSignal : global::System.IDisposable {
+internal class AccessibilityActionSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

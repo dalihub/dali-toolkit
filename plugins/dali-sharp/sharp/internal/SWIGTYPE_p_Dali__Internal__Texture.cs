@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class SWIGTYPE_p_Dali__Internal__Texture {
+internal class SWIGTYPE_p_Dali__Internal__Texture {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal SWIGTYPE_p_Dali__Internal__Texture(global::System.IntPtr cPtr, bool futureUse) {

@@ -17,7 +17,7 @@
 
 namespace Dali
 {
-    public sealed class ViewWrapperImpl : ViewImpl
+    internal sealed class ViewWrapperImpl : ViewImpl
     {
         private global::System.Runtime.InteropServices.HandleRef swigCPtr;
         public delegate void OnStageConnectionDelegate(int depth);
@@ -49,11 +49,11 @@ namespace Dali
         public delegate bool OnAccessibilityTouchDelegate(Touch touch);
         public delegate bool OnAccessibilityValueChangeDelegate(bool isIncrease);
         public delegate bool OnAccessibilityZoomDelegate();
-        public delegate void OnKeyInputFocusGainedDelegate();
-        public delegate void OnKeyInputFocusLostDelegate();
-        public delegate View GetNextKeyboardFocusableActorDelegate(View currentFocusedActor, View.KeyboardFocus.Direction direction, bool loopEnabled);
-        public delegate void OnKeyboardFocusChangeCommittedDelegate(View commitedFocusableActor);
-        public delegate bool OnKeyboardEnterDelegate();
+        public delegate void OnFocusGainedDelegate();
+        public delegate void OnFocusLostDelegate();
+        public delegate View GetNextFocusableActorDelegate(View currentFocusedActor, View.Focus.Direction direction, bool loopEnabled);
+        public delegate void OnFocusChangeCommittedDelegate(View commitedFocusableActor);
+        public delegate bool OnFocusEnterDelegate();
         public delegate void OnPinchDelegate(PinchGesture pinch);
         public delegate void OnPanDelegate(PanGesture pan);
         public delegate void OnTapDelegate(TapGesture tap);
@@ -88,11 +88,11 @@ namespace Dali
         public OnAccessibilityTouchDelegate OnAccessibilityTouch;
         public OnAccessibilityValueChangeDelegate OnAccessibilityValueChange;
         public OnAccessibilityZoomDelegate OnAccessibilityZoom;
-        public OnKeyInputFocusGainedDelegate OnKeyInputFocusGained;
-        public OnKeyInputFocusLostDelegate OnKeyInputFocusLost;
-        public GetNextKeyboardFocusableActorDelegate GetNextKeyboardFocusableActor;
-        public OnKeyboardFocusChangeCommittedDelegate OnKeyboardFocusChangeCommitted;
-        public OnKeyboardEnterDelegate OnKeyboardEnter;
+        public OnFocusGainedDelegate OnFocusGained;
+        public OnFocusLostDelegate OnFocusLost;
+        public GetNextFocusableActorDelegate GetNextFocusableActor;
+        public OnFocusChangeCommittedDelegate OnFocusChangeCommitted;
+        public OnFocusEnterDelegate OnFocusEnter;
         public OnPinchDelegate OnPinch;
         public OnPanDelegate OnPan;
         public OnTapDelegate OnTap;
@@ -137,7 +137,7 @@ namespace Dali
             }
         }
 
-        public ViewWrapperImpl(ViewWrapperImpl.CustomViewBehaviour behaviourFlags) : this(NDalicManualPINVOKE.new_ViewWrapperImpl((int)behaviourFlags), true)
+        public ViewWrapperImpl(CustomViewBehaviour behaviourFlags) : this(NDalicManualPINVOKE.new_ViewWrapperImpl((int)behaviourFlags), true)
         {
             if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
             DirectorConnect();
@@ -236,7 +236,7 @@ namespace Dali
             return ret;
         }
 
-        public void EmitKeyInputFocusSignal(bool focusGained)
+        public void EmitFocusSignal(bool focusGained)
         {
             NDalicManualPINVOKE.ViewWrapperImpl_EmitKeyInputFocusSignal(swigCPtr, focusGained);
             if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
@@ -280,11 +280,11 @@ namespace Dali
             Delegate27 = new DelegateViewWrapperImpl_27(DirectorOnAccessibilityTouch);
             Delegate28 = new DelegateViewWrapperImpl_28(DirectorOnAccessibilityValueChange);
             Delegate29 = new DelegateViewWrapperImpl_29(DirectorOnAccessibilityZoom);
-            Delegate30 = new DelegateViewWrapperImpl_30(DirectorOnKeyInputFocusGained);
-            Delegate31 = new DelegateViewWrapperImpl_31(DirectorOnKeyInputFocusLost);
-            Delegate32 = new DelegateViewWrapperImpl_32(DirectorGetNextKeyboardFocusableActor);
-            Delegate33 = new DelegateViewWrapperImpl_33(DirectorOnKeyboardFocusChangeCommitted);
-            Delegate34 = new DelegateViewWrapperImpl_34(DirectorOnKeyboardEnter);
+            Delegate30 = new DelegateViewWrapperImpl_30(DirectorOnFocusGained);
+            Delegate31 = new DelegateViewWrapperImpl_31(DirectorOnFocusLost);
+            Delegate32 = new DelegateViewWrapperImpl_32(DirectorGetNextFocusableActor);
+            Delegate33 = new DelegateViewWrapperImpl_33(DirectorOnFocusChangeCommitted);
+            Delegate34 = new DelegateViewWrapperImpl_34(DirectorOnFocusEnter);
             Delegate35 = new DelegateViewWrapperImpl_35(DirectorOnPinch);
             Delegate36 = new DelegateViewWrapperImpl_36(DirectorOnPan);
             Delegate37 = new DelegateViewWrapperImpl_37(DirectorOnTap);
@@ -447,29 +447,29 @@ namespace Dali
             return OnAccessibilityZoom();
         }
 
-        private void DirectorOnKeyInputFocusGained()
+        private void DirectorOnFocusGained()
         {
-            OnKeyInputFocusGained();
+            OnFocusGained();
         }
 
-        private void DirectorOnKeyInputFocusLost()
+        private void DirectorOnFocusLost()
         {
-            OnKeyInputFocusLost();
+            OnFocusLost();
         }
 
-        private global::System.IntPtr DirectorGetNextKeyboardFocusableActor(global::System.IntPtr currentFocusedActor, int direction, bool loopEnabled)
+        private global::System.IntPtr DirectorGetNextFocusableActor(global::System.IntPtr currentFocusedActor, int direction, bool loopEnabled)
         {
-            return View.getCPtr(GetNextKeyboardFocusableActor(new View(currentFocusedActor, false), (View.KeyboardFocus.Direction)direction, loopEnabled)).Handle;
+            return View.getCPtr(GetNextFocusableActor(new View(currentFocusedActor, false), (View.Focus.Direction)direction, loopEnabled)).Handle;
         }
 
-        private void DirectorOnKeyboardFocusChangeCommitted(global::System.IntPtr commitedFocusableActor)
+        private void DirectorOnFocusChangeCommitted(global::System.IntPtr commitedFocusableActor)
         {
-            OnKeyboardFocusChangeCommitted(new View(commitedFocusableActor, false));
+            OnFocusChangeCommitted(new View(commitedFocusableActor, false));
         }
 
-        private bool DirectorOnKeyboardEnter()
+        private bool DirectorOnFocusEnter()
         {
-            return OnKeyboardEnter();
+            return OnFocusEnter();
         }
 
         private void DirectorOnPinch(global::System.IntPtr pinch)
@@ -575,15 +575,6 @@ namespace Dali
         private DelegateViewWrapperImpl_38 Delegate38;
         private DelegateViewWrapperImpl_39 Delegate39;
         private DelegateViewWrapperImpl_40 Delegate40;
-
-        public enum CustomViewBehaviour
-        {
-            VIEW_BEHAVIOUR_DEFAULT = 0,
-            DISABLE_SIZE_NEGOTIATION = 1 << 0,
-            REQUIRES_KEYBOARD_NAVIGATION_SUPPORT = 1 << 5,
-            DISABLE_STYLE_CHANGE_SIGNALS = 1 << 6,
-            LAST_VIEW_BEHAVIOUR_FLAG
-        }
 
         public static readonly int VIEW_BEHAVIOUR_FLAG_COUNT = NDalicManualPINVOKE.ViewWrapperImpl_CONTROL_BEHAVIOUR_FLAG_COUNT_get();
     }

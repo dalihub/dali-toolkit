@@ -68,7 +68,7 @@ namespace Dali
   /// </remarks>
   ///
   ///
-  public class ScriptableProperty : System.Attribute
+  internal class ScriptableProperty : System.Attribute
   {
     public enum ScriptableType
     {
@@ -117,7 +117,7 @@ namespace Dali
   ///
   ///
   /// </summary>
-  public sealed class ViewRegistry
+  internal sealed class ViewRegistry
   {
     /// <summary>
     /// ViewRegistry is a singleton
@@ -420,7 +420,7 @@ namespace Dali
         if ( type.Equals (typeof(Int32)) )
         {
           int value = 0;
-          ok = propValue.Get( ref value );
+          ok = propValue.Get( out value );
           if ( ok )
           {
             propertyInfo.SetValue (view, value);
@@ -429,7 +429,7 @@ namespace Dali
         else if ( type.Equals (typeof(bool)) )
         {
           bool value = false;
-          ok = propValue.Get( ref value );
+          ok = propValue.Get( out value );
           if ( ok )
           {
             propertyInfo.SetValue (view, value);
@@ -438,7 +438,7 @@ namespace Dali
         else if ( type.Equals (typeof(float)) )
         {
           float value = 0;
-          ok = propValue.Get( ref value );
+          ok = propValue.Get( out value );
           if ( ok )
           {
             propertyInfo.SetValue (view, value);

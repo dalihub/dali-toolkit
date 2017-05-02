@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class ItemLayout : RefObject {
+internal class ItemLayout : RefObject {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal ItemLayout(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.ItemLayout_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -42,18 +42,6 @@ public class ItemLayout : RefObject {
       global::System.GC.SuppressFinalize(this);
       base.Dispose();
     }
-  }
-
-
-  public void SetOrientation(ControlOrientationType orientation) {
-    NDalicPINVOKE.ItemLayout_SetOrientation(swigCPtr, (int)orientation);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public ControlOrientationType GetOrientation() {
-    ControlOrientationType ret = (ControlOrientationType)NDalicPINVOKE.ItemLayout_GetOrientation(swigCPtr);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
   }
 
   public void SetLayoutProperties(Property.Map properties) {
@@ -142,7 +130,7 @@ public class ItemLayout : RefObject {
     return ret;
   }
 
-  public virtual int GetNextFocusItemID(int itemID, int maxItems, View.KeyboardFocus.Direction direction, bool loopEnabled) {
+  public virtual int GetNextFocusItemID(int itemID, int maxItems, View.Focus.Direction direction, bool loopEnabled) {
     int ret = NDalicPINVOKE.ItemLayout_GetNextFocusItemID(swigCPtr, itemID, maxItems, (int)direction, loopEnabled);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;

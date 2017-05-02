@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public enum ViewMode {
+internal enum ViewMode {
   MONO,
   STEREO_HORIZONTAL,
   STEREO_VERTICAL,

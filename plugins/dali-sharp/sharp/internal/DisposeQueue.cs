@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace Dali
 {
-    public class DisposeQueue
+    internal class DisposeQueue
     {
         private static readonly DisposeQueue _disposableQueue = new DisposeQueue();
         private List<IDisposable> _disposables = new List<IDisposable>();

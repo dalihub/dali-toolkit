@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class Texture : BaseHandle {
+internal class Texture : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal Texture(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.Texture_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -114,7 +114,7 @@ public class Texture : BaseHandle {
     return ret;
   }
 
-  public Texture(SWIGTYPE_p_Dali__Internal__Texture pointer) : this(NDalicPINVOKE.new_Texture__SWIG_2(SWIGTYPE_p_Dali__Internal__Texture.getCPtr(pointer)), true) {
+  internal Texture(SWIGTYPE_p_Dali__Internal__Texture pointer) : this(NDalicPINVOKE.new_Texture__SWIG_2(SWIGTYPE_p_Dali__Internal__Texture.getCPtr(pointer)), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

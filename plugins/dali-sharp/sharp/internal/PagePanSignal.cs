@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class PagePanSignal : global::System.IDisposable {
+internal class PagePanSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

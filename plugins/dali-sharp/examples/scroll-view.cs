@@ -50,7 +50,7 @@ namespace MyCSharpExample
             Size2D windowSize = window.Size;
             _scrollView.Size = new Position(windowSize.Width, windowSize.Height, 0.0f);
             _scrollView.ParentOrigin = NDalic.ParentOriginCenter;
-            _scrollView.AnchorPoint = NDalic.AnchorPointCenter;
+            _scrollView.PivotPoint = NDalic.AnchorPointCenter;
             window.Add(_scrollView);
 
             // Add actors to a scroll view with 3 pages
@@ -61,9 +61,9 @@ namespace MyCSharpExample
                 for (int pageColumn = 0; pageColumn < pageColumns; pageColumn++)
                 {
                     View pageActor = new View();
-                    pageActor.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.ALL_DIMENSIONS);
+                    pageActor.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.AllDimensions);
                     pageActor.ParentOrigin = NDalic.ParentOriginCenter;
-                    pageActor.AnchorPoint = NDalic.AnchorPointCenter;
+                    pageActor.PivotPoint = NDalic.AnchorPointCenter;
                     pageActor.Position = new Position(pageColumn * windowSize.Width, pageRow * windowSize.Height, 0.0f);
 
                     // Add images in a 3x4 grid layout for each page
@@ -79,7 +79,7 @@ namespace MyCSharpExample
                             int imageId = (row * imageColumns + column) % 2 + 1;
                             ImageView imageView = new ImageView("images/image-" + imageId + ".jpg");
                             imageView.ParentOrigin = NDalic.ParentOriginCenter;
-                            imageView.AnchorPoint = NDalic.AnchorPointCenter;
+                            imageView.PivotPoint = NDalic.AnchorPointCenter;
                             imageView.Size = imageSize;
                             imageView.Position = new Position(margin * 0.5f + (imageSize.X + margin) * column - windowSize.Width * 0.5f + imageSize.X * 0.5f,
                                                  margin * 0.5f + (imageSize.Y + margin) * row - windowSize.Height * 0.5f + imageSize.Y * 0.5f, 0.0f);
@@ -105,20 +105,20 @@ namespace MyCSharpExample
             // Create a horizontal scroll bar in the bottom of scroll view (which is optional)
             _scrollBar = new ScrollBar();
             _scrollBar.ParentOrigin = NDalic.ParentOriginBottomLeft;
-            _scrollBar.AnchorPoint = NDalic.AnchorPointTopLeft;
-            _scrollBar.SetResizePolicy(ResizePolicyType.FIT_TO_CHILDREN, DimensionType.WIDTH);
-            _scrollBar.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.HEIGHT);
+            _scrollBar.PivotPoint = NDalic.AnchorPointTopLeft;
+            _scrollBar.SetResizePolicy(ResizePolicyType.FIT_TO_CHILDREN, DimensionType.Width);
+            _scrollBar.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Height);
             _scrollBar.Orientation = new Rotation(new Radian(new Degree(270.0f)), Vector3.ZAXIS);
             _scrollBar.SetScrollDirection(ScrollBar.Direction.Horizontal);
             _scrollView.Add(_scrollBar);
 
             // Connect to the OnRelayout signal
-            _scrollView.OnRelayoutEvent += OnScrollViewRelayout;
+            _scrollView.Relayout += OnScrollViewRelayout;
             _scrollView.Touched += OnTouch;
-            _scrollView.WheelMoved += Onwheel;
-            _scrollView.KeyInputFocusGained += OnKey;
+            _scrollView.WheelRolled += Onwheel;
+            _scrollView.FocusGained += OnKey;
             _text = new TextLabel("View Touch Event Handler Test");
-            _text.AnchorPoint = NDalic.AnchorPointTopLeft;
+            _text.PivotPoint = NDalic.AnchorPointTopLeft;
             _text.HorizontalAlignment = "CENTER";
             _text.PointSize = 48.0f;
 
@@ -175,7 +175,7 @@ namespace MyCSharpExample
             Console.WriteLine("View OnRelayoutEventArgs EVENT callback....");
 
             // Set the correct scroll bar size after size negotiation of scroll view is done
-            _scrollBar.Size = new Position(0.0f, _scrollView.GetRelayoutSize(DimensionType.WIDTH), 0.0f);
+            _scrollBar.Size = new Position(0.0f, _scrollView.GetRelayoutSize(DimensionType.Width), 0.0f);
         }
 
         public void MainLoop()

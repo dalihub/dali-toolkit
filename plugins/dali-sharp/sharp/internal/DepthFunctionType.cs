@@ -10,15 +10,15 @@
 
 namespace Dali {
 
-public enum DepthFunctionType {
-  NEVER,
-  ALWAYS,
-  LESS,
-  GREATER,
-  EQUAL,
-  NOT_EQUAL,
-  LESS_EQUAL,
-  GREATER_EQUAL
+internal enum DepthFunctionType {
+  Never,
+  Always,
+  Less,
+  Greater,
+  Equal,
+  NotEqual,
+  LessEqual,
+  GreaterEqual
 }
 
 }

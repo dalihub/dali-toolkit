@@ -7,7 +7,7 @@ namespace Dali
   /// <summary>
   /// Helper class for calculating what property indexes should be assigned to C# View (view) classes.
   /// </summary>
-  public class PropertyRangeManager
+  internal class PropertyRangeManager
   {
     private Dictionary<String, PropertyRange > _propertyRange;
 

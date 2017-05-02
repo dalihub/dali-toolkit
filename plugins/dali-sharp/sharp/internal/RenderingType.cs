@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public enum RenderingType {
+internal enum RenderingType {
   RENDERING_SHARED_ATLAS,
   RENDERING_VECTOR_BASED
 }

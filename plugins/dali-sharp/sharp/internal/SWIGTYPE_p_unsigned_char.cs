@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class SWIGTYPE_p_unsigned_char {
+internal class SWIGTYPE_p_unsigned_char {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal SWIGTYPE_p_unsigned_char(global::System.IntPtr cPtr, bool futureUse) {

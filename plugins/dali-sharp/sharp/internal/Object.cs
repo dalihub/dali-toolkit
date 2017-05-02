@@ -22,7 +22,7 @@
 namespace Dali
 {
 
-public static class Object
+internal static class Object
 {
   public static Property.Value GetProperty(global::System.Runtime.InteropServices.HandleRef handle, int index) {
     Property.Value ret = new Property.Value(NDalicPINVOKE.Handle_GetProperty(handle, index), true);

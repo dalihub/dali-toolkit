@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class ApplicationControlSignal : global::System.IDisposable {
+internal class ApplicationControlSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

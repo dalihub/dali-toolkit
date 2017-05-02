@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class LinearConstrainer : BaseHandle {
+internal class LinearConstrainer : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal LinearConstrainer(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.LinearConstrainer_SWIGUpcast(cPtr), cMemoryOwn) {

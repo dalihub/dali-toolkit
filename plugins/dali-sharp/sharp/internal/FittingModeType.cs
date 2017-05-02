@@ -10,11 +10,11 @@
 
 namespace Dali {
 
-public enum FittingModeType {
-  SHRINK_TO_FIT,
-  SCALE_TO_FILL,
-  FIT_WIDTH,
-  FIT_HEIGHT
+internal enum FittingModeType {
+  ShrinkToFit,
+  ScaleToFill,
+  FitWidth,
+  FitHeight
 }
 
 }

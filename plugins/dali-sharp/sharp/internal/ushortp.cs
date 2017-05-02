@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class ushortp : global::System.IDisposable {
+internal class ushortp : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -62,7 +62,7 @@ public class ushortp : global::System.IDisposable {
     return ret;
   }
 
-  public static ushortp frompointer(SWIGTYPE_p_unsigned_short t) {
+  internal static ushortp frompointer(SWIGTYPE_p_unsigned_short t) {
     global::System.IntPtr cPtr = NDalicPINVOKE.ushortp_frompointer(SWIGTYPE_p_unsigned_short.getCPtr(t));
     ushortp ret = (cPtr == global::System.IntPtr.Zero) ? null : new ushortp(cPtr, false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();

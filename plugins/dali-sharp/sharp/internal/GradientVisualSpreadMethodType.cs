@@ -10,10 +10,10 @@
 
 namespace Dali {
 
-public enum GradientVisualSpreadMethodType {
-  PAD,
-  REFLECT,
-  REPEAT
+internal enum GradientVisualSpreadMethodType {
+  Pad,
+  Reflect,
+  Repeat
 }
 
 }

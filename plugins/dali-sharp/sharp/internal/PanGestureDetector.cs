@@ -30,7 +30,7 @@ using System;
 using System.Runtime.InteropServices;
 
 
-public class PanGestureDetector : GestureDetector {
+internal class PanGestureDetector : GestureDetector {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal PanGestureDetector(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.PanGestureDetector_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -333,7 +333,7 @@ public static PanGestureDetector GetPanGestureDetectorFromPtr(global::System.Int
     return ret;
   }
 
-  public AngleThresholdPair GetAngle(uint index) {
+  internal AngleThresholdPair GetAngle(uint index) {
     AngleThresholdPair ret = new AngleThresholdPair(NDalicPINVOKE.PanGestureDetector_GetAngle(swigCPtr, index), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
@@ -418,7 +418,7 @@ public static PanGestureDetector GetPanGestureDetectorFromPtr(global::System.Int
     get
     {
       bool temp = false;
-      Dali.Object.GetProperty( swigCPtr, PanGestureDetector.Property.PANNING).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, PanGestureDetector.Property.PANNING).Get( out temp );
       return temp;
     }
 }

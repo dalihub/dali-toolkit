@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public enum StencilOperationType {
+internal enum StencilOperationType {
   ZERO,
   KEEP,
   REPLACE,

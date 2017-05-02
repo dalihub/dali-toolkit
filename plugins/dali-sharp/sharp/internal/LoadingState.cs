@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public enum LoadingState {
+internal enum LoadingState {
   ResourceLoading,
   ResourceLoadingSucceeded,
   ResourceLoadingFailed

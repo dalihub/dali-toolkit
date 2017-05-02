@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class PathConstrainer : BaseHandle {
+internal class PathConstrainer : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal PathConstrainer(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.PathConstrainer_SWIGUpcast(cPtr), cMemoryOwn) {

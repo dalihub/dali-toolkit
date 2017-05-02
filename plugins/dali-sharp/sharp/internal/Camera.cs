@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-    public class Camera : Animatable {
+internal class Camera : Animatable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal Camera(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.CameraActor_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -269,7 +269,7 @@ namespace Dali {
     get
     {
       float temp = 0.0f;
-      GetProperty( Camera.Property.FIELD_OF_VIEW).Get( ref temp );
+      GetProperty( Camera.Property.FIELD_OF_VIEW).Get( out temp );
       return temp;
     }
     set
@@ -282,7 +282,7 @@ namespace Dali {
     get
     {
       float temp = 0.0f;
-      GetProperty( Camera.Property.ASPECT_RATIO).Get( ref temp );
+      GetProperty( Camera.Property.ASPECT_RATIO).Get( out temp );
       return temp;
     }
     set
@@ -295,7 +295,7 @@ namespace Dali {
     get
     {
       float temp = 0.0f;
-      GetProperty( Camera.Property.NEAR_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.NEAR_PLANE_DISTANCE).Get( out temp );
       return temp;
     }
     set
@@ -308,7 +308,7 @@ namespace Dali {
     get
     {
       float temp = 0.0f;
-      GetProperty( Camera.Property.FAR_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.FAR_PLANE_DISTANCE).Get( out temp );
       return temp;
     }
     set
@@ -321,7 +321,7 @@ namespace Dali {
     get
     {
       float temp = 0.0f;
-      GetProperty( Camera.Property.LEFT_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.LEFT_PLANE_DISTANCE).Get( out temp );
       return temp;
     }
     set
@@ -334,7 +334,7 @@ namespace Dali {
     get
     {
       float temp = 0.0f;
-      GetProperty( Camera.Property.RIGHT_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.RIGHT_PLANE_DISTANCE).Get( out temp );
       return temp;
     }
     set
@@ -347,7 +347,7 @@ namespace Dali {
     get
     {
       float temp = 0.0f;
-      GetProperty( Camera.Property.TOP_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.TOP_PLANE_DISTANCE).Get( out temp );
       return temp;
     }
     set
@@ -360,7 +360,7 @@ namespace Dali {
     get
     {
       float temp = 0.0f;
-      GetProperty( Camera.Property.BOTTOM_PLANE_DISTANCE).Get( ref temp );
+      GetProperty( Camera.Property.BOTTOM_PLANE_DISTANCE).Get( out temp );
       return temp;
     }
     set
@@ -402,7 +402,7 @@ namespace Dali {
     get
     {
       bool temp = false;
-      GetProperty( Camera.Property.INVERT_Y_AXIS).Get( ref temp );
+      GetProperty( Camera.Property.INVERT_Y_AXIS).Get( out temp );
       return temp;
     }
     set
