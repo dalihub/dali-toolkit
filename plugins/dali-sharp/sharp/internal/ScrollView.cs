@@ -46,7 +46,7 @@ public class ScrollView : Scrollable {
   }
 
   public override void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -459,7 +459,7 @@ public class SnapStartedEventArgs : EventArgs
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetActorAutoSnap(bool enable) {
+  public void SetViewAutoSnap(bool enable) {
     NDalicPINVOKE.ScrollView_SetActorAutoSnap(swigCPtr, enable);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
@@ -620,13 +620,13 @@ public class SnapStartedEventArgs : EventArgs
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void ScrollTo(Actor actor) {
-    NDalicPINVOKE.ScrollView_ScrollTo__SWIG_8(swigCPtr, Actor.getCPtr(actor));
+  public void ScrollTo(View view) {
+    NDalicPINVOKE.ScrollView_ScrollTo__SWIG_8(swigCPtr, View.getCPtr(view));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void ScrollTo(Actor actor, float duration) {
-    NDalicPINVOKE.ScrollView_ScrollTo__SWIG_9(swigCPtr, Actor.getCPtr(actor), duration);
+  public void ScrollTo(View view, float duration) {
+    NDalicPINVOKE.ScrollView_ScrollTo__SWIG_9(swigCPtr, View.getCPtr(view), duration);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -661,13 +661,13 @@ public class SnapStartedEventArgs : EventArgs
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void BindActor(Actor child) {
-    NDalicPINVOKE.ScrollView_BindActor(swigCPtr, Actor.getCPtr(child));
+  public void BindView(View child) {
+    NDalicPINVOKE.ScrollView_BindActor(swigCPtr, View.getCPtr(child));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void UnbindActor(Actor child) {
-    NDalicPINVOKE.ScrollView_UnbindActor(swigCPtr, Actor.getCPtr(child));
+  public void UnbindView(View child) {
+    NDalicPINVOKE.ScrollView_UnbindActor(swigCPtr, View.getCPtr(child));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

@@ -241,6 +241,13 @@ int UtcDaliTextControllerImfEvent(void)
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello wo", text, TEST_LOCATION );
 
+  // Send PRIVATECOMMAND event
+  imfEvent = ImfManager::ImfEventData( ImfManager::PRIVATECOMMAND, "", 0, 0 );
+  controller->OnImfEvent( imfManager, imfEvent );
+
+  controller->GetText( text );
+  DALI_TEST_EQUALS( "Hello wo", text, TEST_LOCATION );
+
   tet_result(TET_PASS);
   END_TEST;
 }

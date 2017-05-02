@@ -28,7 +28,7 @@ public class TouchPoint : global::System.IDisposable {
   }
 
   public virtual void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -78,14 +78,14 @@ public class TouchPoint : global::System.IDisposable {
     } 
   }
 
-  public Actor hitActor {
+  public View hitView {
     set {
-      NDalicPINVOKE.TouchPoint_hitActor_set(swigCPtr, Actor.getCPtr(value));
+      NDalicPINVOKE.TouchPoint_hitActor_set(swigCPtr, View.getCPtr(value));
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
       global::System.IntPtr cPtr = NDalicPINVOKE.TouchPoint_hitActor_get(swigCPtr);
-      Actor ret = (cPtr == global::System.IntPtr.Zero) ? null : new Actor(cPtr, false);
+      View ret = (cPtr == global::System.IntPtr.Zero) ? null : new View(cPtr, false);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 

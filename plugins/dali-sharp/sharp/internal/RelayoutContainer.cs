@@ -28,7 +28,7 @@ public class RelayoutContainer : global::System.IDisposable {
   }
 
   public virtual void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -46,8 +46,8 @@ public class RelayoutContainer : global::System.IDisposable {
   }
 
 
-  public virtual void Add(Actor actor, Vector2 size) {
-    NDalicPINVOKE.RelayoutContainer_Add(swigCPtr, Actor.getCPtr(actor), Vector2.getCPtr(size));
+  public virtual void Add(View view, Vector2 size) {
+    NDalicPINVOKE.RelayoutContainer_Add(swigCPtr, View.getCPtr(view), Vector2.getCPtr(size));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

@@ -28,7 +28,7 @@ public class PanGestureDetectedSignal : global::System.IDisposable {
   }
 
   public virtual void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -74,8 +74,8 @@ System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForD
     }
   }
 
-  public void Emit(Actor arg1, PanGesture arg2) {
-    NDalicPINVOKE.PanGestureDetectedSignal_Emit(swigCPtr, Actor.getCPtr(arg1), PanGesture.getCPtr(arg2));
+  public void Emit(View arg1, PanGesture arg2) {
+    NDalicPINVOKE.PanGestureDetectedSignal_Emit(swigCPtr, View.getCPtr(arg1), PanGesture.getCPtr(arg2));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

@@ -40,7 +40,7 @@ namespace MyCSharpExample
         private Dali.Application _application;
         private TableView _contentContainer;
         private Timer _timer;
-        private Stage _stage;
+        private Window _window;
         private Popup _popup;
         private ProgressBar _progressBar;
 
@@ -62,8 +62,8 @@ namespace MyCSharpExample
         public void OnInitialize(object source, NUIApplicationInitEventArgs e)
         {
             Console.WriteLine("Customized Application Initialize event handler");
-            _stage = Stage.GetCurrent();
-            _stage.BackgroundColor = Color.White;
+            _window = Window.Instance;
+            _window.BackgroundColor = Color.White;
 
             // Top label
             TextLabel topLabel = new TextLabel();
@@ -78,7 +78,7 @@ namespace MyCSharpExample
             topLabel.HorizontalAlignment = "BEGIN";
             topLabel.VerticalAlignment = "CENTER";
             topLabel.PointSize = 42.0f;
-            _stage.Add(topLabel);
+            _window.Add(topLabel);
 
             // Grid container to contain items. Use tableView because FlexContainer support focus navigation just two direction ( up/down or left/right )
             _contentContainer = new TableView(6, 5);
@@ -86,7 +86,7 @@ namespace MyCSharpExample
             _contentContainer.SetResizePolicy(ResizePolicyType.SIZE_RELATIVE_TO_PARENT, DimensionType.HEIGHT);
             _contentContainer.SetSizeModeFactor(new Vector3(0.0f, 0.9f, 0.0f));
             _contentContainer.AnchorPoint = NDalic.AnchorPointBottomCenter;
-            _contentContainer.Position = new Position(0, _stage.Size.Height * 0.1f, 0);
+            _contentContainer.Position = new Position(0, _window.Size.Height * 0.1f, 0);
             _contentContainer.SetRelativeHeight(0, 0.07f);
             _contentContainer.SetRelativeHeight(1, 0.26f);
             _contentContainer.SetRelativeHeight(2, 0.07f);
@@ -94,7 +94,7 @@ namespace MyCSharpExample
             _contentContainer.SetRelativeHeight(4, 0.07f);
             _contentContainer.SetRelativeHeight(5, 0.26f);
             _contentContainer.SetKeyboardFocusable(true);
-            _stage.Add(_contentContainer);
+            _window.Add(_contentContainer);
 
             CreateContent();
 
@@ -102,7 +102,7 @@ namespace MyCSharpExample
         }
 
         // Callback for KeyboardFocusManager
-        private Actor OnPreFocusChange(object source, FocusManager.PreFocusChangeEventArgs e)
+        private View OnPreFocusChange(object source, FocusManager.PreFocusChangeEventArgs e)
         {
             if (!e.Proposed && !e.Current)
             {
@@ -123,13 +123,13 @@ namespace MyCSharpExample
         {
             // Make label for item
             TextLabel itemLabel = new TextLabel("    " + item.name);
-            itemLabel.Size = new Vector3(_stage.GetSize().Width * 0.2f, _stage.GetSize().Height * 0.05f, 0.0f);
+            itemLabel.Size = new Vector3(_window.GetSize().Width * 0.2f, _window.GetSize().Height * 0.05f, 0.0f);
             itemLabel.HorizontalAlignment = "BEGIN";
             itemLabel.VerticalAlignment = "BOTTOM";
             itemLabel.PointSize = 18.0f;
             _contentContainer.AddChild(itemLabel, new TableView.CellPosition(((uint)idx / 5) * 2, (uint)idx % 5));
 
-            // If item is implemented in public, attach it on stage
+            // If item is implemented in public, attach it on window
             if (item.isImplemented)
             {
                 if (item.name.CompareTo("PushButton") == 0)
@@ -319,9 +319,9 @@ namespace MyCSharpExample
 
                     button.Clicked += (obj, ee) =>
                     {
-                        _stage.Add(_popup);
+                        _window.Add(_popup);
                         _popup.SetDisplayState(Popup.DisplayStateType.SHOWN);
-                        FocusManager.Instance.SetCurrentFocusActor((_popup.FindChildByName("Footer")).FindChildByName("OKButton"));
+                        FocusManager.Instance.SetCurrentFocusView((_popup.FindChildByName("Footer")).FindChildByName("OKButton"));
                         return true;
                     };
                     _contentContainer.AddChild(button, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
@@ -346,7 +346,7 @@ namespace MyCSharpExample
                                 text.MultiLine = true;
                                 text.HorizontalAlignment = "center";
                                 toast.SetTitle(text);
-                                _stage.Add(toast);
+                                _window.Add(toast);
                                 toast.SetDisplayState(Popup.DisplayStateType.SHOWN);
                             }
                         }
@@ -362,7 +362,7 @@ namespace MyCSharpExample
             else
             {
                 ImageView notSupportView = new ImageView("images/not_yet_sign.png");
-                notSupportView.Size = new Vector3(_stage.GetSize().Width * 0.2f, _stage.GetSize().Height * 0.25f, 0.0f);
+                notSupportView.Size = new Vector3(_window.GetSize().Width * 0.2f, _window.GetSize().Height * 0.25f, 0.0f);
                 notSupportView.SetKeyboardFocusable(true);
 
                 _contentContainer.AddChild(notSupportView, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
@@ -372,7 +372,7 @@ namespace MyCSharpExample
         {
             Popup confirmationPopup = new Popup();
 
-            Actor footer = new Actor();
+            View footer = new View();
             footer.SetName("Footer");
             footer.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
             footer.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.HEIGHT);
@@ -412,7 +412,7 @@ namespace MyCSharpExample
             confirmationPopup.SetFooter(footer);
             return confirmationPopup;
         }
-        Actor CreateTitle(string title)
+        View CreateTitle(string title)
         {
             TextLabel titleActor = new TextLabel(title);
             titleActor.TextColor = Color.White;

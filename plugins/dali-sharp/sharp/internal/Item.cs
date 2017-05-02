@@ -44,7 +44,7 @@ public class Item : global::System.IDisposable {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Item(uint t, Actor u) : this(NDalicPINVOKE.new_Item__SWIG_1(t, Actor.getCPtr(u)), true) {
+  public Item(uint t, View u) : this(NDalicPINVOKE.new_Item__SWIG_1(t, View.getCPtr(u)), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -64,14 +64,14 @@ public class Item : global::System.IDisposable {
     } 
   }
 
-  public Actor second {
+  public View second {
     set {
-      NDalicPINVOKE.Item_second_set(swigCPtr, Actor.getCPtr(value));
+      NDalicPINVOKE.Item_second_set(swigCPtr, View.getCPtr(value));
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     } 
     get {
       global::System.IntPtr cPtr = NDalicPINVOKE.Item_second_get(swigCPtr);
-      Actor ret = (cPtr == global::System.IntPtr.Zero) ? null : new Actor(cPtr, false);
+      View ret = (cPtr == global::System.IntPtr.Zero) ? null : new View(cPtr, false);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
       return ret;
     } 

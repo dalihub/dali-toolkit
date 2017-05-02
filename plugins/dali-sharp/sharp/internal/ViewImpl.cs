@@ -194,13 +194,13 @@ public class ViewImpl : CustomActorImpl {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  protected virtual new void OnChildAdd(Actor child) {
-    if (SwigDerivedClassHasMethod("OnChildAdd", swigMethodTypes2)) NDalicPINVOKE.ViewImpl_OnChildAddSwigExplicitViewImpl(swigCPtr, Actor.getCPtr(child)); else NDalicPINVOKE.ViewImpl_OnChildAdd(swigCPtr, Actor.getCPtr(child));
+  protected virtual new void OnChildAdd(View child) {
+    if (SwigDerivedClassHasMethod("OnChildAdd", swigMethodTypes2)) NDalicPINVOKE.ViewImpl_OnChildAddSwigExplicitViewImpl(swigCPtr, View.getCPtr(child)); else NDalicPINVOKE.ViewImpl_OnChildAdd(swigCPtr, View.getCPtr(child));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  protected virtual new void OnChildRemove(Actor child) {
-    if (SwigDerivedClassHasMethod("OnChildRemove", swigMethodTypes3)) NDalicPINVOKE.ViewImpl_OnChildRemoveSwigExplicitViewImpl(swigCPtr, Actor.getCPtr(child)); else NDalicPINVOKE.ViewImpl_OnChildRemove(swigCPtr, Actor.getCPtr(child));
+  protected virtual new void OnChildRemove(View child) {
+    if (SwigDerivedClassHasMethod("OnChildRemove", swigMethodTypes3)) NDalicPINVOKE.ViewImpl_OnChildRemoveSwigExplicitViewImpl(swigCPtr, View.getCPtr(child)); else NDalicPINVOKE.ViewImpl_OnChildRemove(swigCPtr, View.getCPtr(child));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -259,8 +259,8 @@ public class ViewImpl : CustomActorImpl {
     return ret;
   }
 
-  protected virtual new float CalculateChildSize(Actor child, DimensionType dimension) {
-    float ret = (SwigDerivedClassHasMethod("CalculateChildSize", swigMethodTypes14) ? NDalicPINVOKE.ViewImpl_CalculateChildSizeSwigExplicitViewImpl(swigCPtr, Actor.getCPtr(child), (int)dimension) : NDalicPINVOKE.ViewImpl_CalculateChildSize(swigCPtr, Actor.getCPtr(child), (int)dimension));
+  protected virtual new float CalculateChildSize(View child, DimensionType dimension) {
+    float ret = (SwigDerivedClassHasMethod("CalculateChildSize", swigMethodTypes14) ? NDalicPINVOKE.ViewImpl_CalculateChildSizeSwigExplicitViewImpl(swigCPtr, View.getCPtr(child), (int)dimension) : NDalicPINVOKE.ViewImpl_CalculateChildSize(swigCPtr, View.getCPtr(child), (int)dimension));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -304,13 +304,13 @@ public class ViewImpl : CustomActorImpl {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public virtual void OnControlChildAdd(Actor child) {
-    if (SwigDerivedClassHasMethod("OnControlChildAdd", swigMethodTypes22)) NDalicPINVOKE.ViewImpl_OnControlChildAddSwigExplicitViewImpl(swigCPtr, Actor.getCPtr(child)); else NDalicPINVOKE.ViewImpl_OnControlChildAdd(swigCPtr, Actor.getCPtr(child));
+  public virtual void OnControlChildAdd(View child) {
+    if (SwigDerivedClassHasMethod("OnControlChildAdd", swigMethodTypes22)) NDalicPINVOKE.ViewImpl_OnControlChildAddSwigExplicitViewImpl(swigCPtr, View.getCPtr(child)); else NDalicPINVOKE.ViewImpl_OnControlChildAdd(swigCPtr, View.getCPtr(child));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public virtual void OnControlChildRemove(Actor child) {
-    if (SwigDerivedClassHasMethod("OnControlChildRemove", swigMethodTypes23)) NDalicPINVOKE.ViewImpl_OnControlChildRemoveSwigExplicitViewImpl(swigCPtr, Actor.getCPtr(child)); else NDalicPINVOKE.ViewImpl_OnControlChildRemove(swigCPtr, Actor.getCPtr(child));
+  public virtual void OnControlChildRemove(View child) {
+    if (SwigDerivedClassHasMethod("OnControlChildRemove", swigMethodTypes23)) NDalicPINVOKE.ViewImpl_OnControlChildRemoveSwigExplicitViewImpl(swigCPtr, View.getCPtr(child)); else NDalicPINVOKE.ViewImpl_OnControlChildRemove(swigCPtr, View.getCPtr(child));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -359,14 +359,14 @@ public class ViewImpl : CustomActorImpl {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public virtual Actor GetNextKeyboardFocusableActor(Actor currentFocusedActor, View.KeyboardFocus.Direction direction, bool loopEnabled) {
-    Actor ret = new Actor((SwigDerivedClassHasMethod("GetNextKeyboardFocusableActor", swigMethodTypes32) ? NDalicPINVOKE.ViewImpl_GetNextKeyboardFocusableActorSwigExplicitViewImpl(swigCPtr, Actor.getCPtr(currentFocusedActor), (int)direction, loopEnabled) : NDalicPINVOKE.ViewImpl_GetNextKeyboardFocusableActor(swigCPtr, Actor.getCPtr(currentFocusedActor), (int)direction, loopEnabled)), true);
+  public virtual View GetNextKeyboardFocusableView(View currentFocusedView, View.KeyboardFocus.Direction direction, bool loopEnabled) {
+    View ret = new View((SwigDerivedClassHasMethod("GetNextKeyboardFocusableView", swigMethodTypes32) ? NDalicPINVOKE.ViewImpl_GetNextKeyboardFocusableActorSwigExplicitViewImpl(swigCPtr, View.getCPtr(currentFocusedView), (int)direction, loopEnabled) : NDalicPINVOKE.ViewImpl_GetNextKeyboardFocusableActor(swigCPtr, View.getCPtr(currentFocusedView), (int)direction, loopEnabled)), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public virtual void OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor) {
-    if (SwigDerivedClassHasMethod("OnKeyboardFocusChangeCommitted", swigMethodTypes33)) NDalicPINVOKE.ViewImpl_OnKeyboardFocusChangeCommittedSwigExplicitViewImpl(swigCPtr, Actor.getCPtr(commitedFocusableActor)); else NDalicPINVOKE.ViewImpl_OnKeyboardFocusChangeCommitted(swigCPtr, Actor.getCPtr(commitedFocusableActor));
+  public virtual void OnKeyboardFocusChangeCommitted(View commitedFocusableView) {
+    if (SwigDerivedClassHasMethod("OnKeyboardFocusChangeCommitted", swigMethodTypes33)) NDalicPINVOKE.ViewImpl_OnKeyboardFocusChangeCommittedSwigExplicitViewImpl(swigCPtr, View.getCPtr(commitedFocusableView)); else NDalicPINVOKE.ViewImpl_OnKeyboardFocusChangeCommitted(swigCPtr, View.getCPtr(commitedFocusableView));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
@@ -471,8 +471,8 @@ public class ViewImpl : CustomActorImpl {
       swigDelegate30 = new SwigDelegateViewImpl_30(SwigDirectorOnKeyInputFocusGained);
     if (SwigDerivedClassHasMethod("OnKeyInputFocusLost", swigMethodTypes31))
       swigDelegate31 = new SwigDelegateViewImpl_31(SwigDirectorOnKeyInputFocusLost);
-    if (SwigDerivedClassHasMethod("GetNextKeyboardFocusableActor", swigMethodTypes32))
-      swigDelegate32 = new SwigDelegateViewImpl_32(SwigDirectorGetNextKeyboardFocusableActor);
+    if (SwigDerivedClassHasMethod("GetNextKeyboardFocusableView", swigMethodTypes32))
+      swigDelegate32 = new SwigDelegateViewImpl_32(SwigDirectorGetNextKeyboardFocusableView);
     if (SwigDerivedClassHasMethod("OnKeyboardFocusChangeCommitted", swigMethodTypes33))
       swigDelegate33 = new SwigDelegateViewImpl_33(SwigDirectorOnKeyboardFocusChangeCommitted);
     if (SwigDerivedClassHasMethod("OnKeyboardEnter", swigMethodTypes34))
@@ -507,11 +507,11 @@ public class ViewImpl : CustomActorImpl {
   }
 
   private void SwigDirectorOnChildAdd(global::System.IntPtr child) {
-    OnChildAdd(new Actor(child, false));
+    OnChildAdd(new View(child, false));
   }
 
   private void SwigDirectorOnChildRemove(global::System.IntPtr child) {
-    OnChildRemove(new Actor(child, false));
+    OnChildRemove(new View(child, false));
   }
 
   private void SwigDirectorOnPropertySet(int index, global::System.IntPtr propertyValue) {
@@ -555,7 +555,7 @@ public class ViewImpl : CustomActorImpl {
   }
 
   private float SwigDirectorCalculateChildSize(global::System.IntPtr child, int dimension) {
-    return CalculateChildSize(new Actor(child, false), (DimensionType)dimension);
+    return CalculateChildSize(new View(child, false), (DimensionType)dimension);
   }
 
   private float SwigDirectorGetHeightForWidth(float width) {
@@ -587,11 +587,11 @@ public class ViewImpl : CustomActorImpl {
   }
 
   private void SwigDirectorOnControlChildAdd(global::System.IntPtr child) {
-    OnControlChildAdd(new Actor(child, false));
+    OnControlChildAdd(new View(child, false));
   }
 
   private void SwigDirectorOnControlChildRemove(global::System.IntPtr child) {
-    OnControlChildRemove(new Actor(child, false));
+    OnControlChildRemove(new View(child, false));
   }
 
   private void SwigDirectorOnStyleChange(global::System.IntPtr styleManager, int change) {
@@ -626,12 +626,12 @@ public class ViewImpl : CustomActorImpl {
     OnKeyInputFocusLost();
   }
 
-  private global::System.IntPtr SwigDirectorGetNextKeyboardFocusableActor(global::System.IntPtr currentFocusedActor, int direction, bool loopEnabled) {
-    return Actor.getCPtr(GetNextKeyboardFocusableActor(new Actor(currentFocusedActor, true), (View.KeyboardFocus.Direction)direction, loopEnabled)).Handle;
+  private global::System.IntPtr SwigDirectorGetNextKeyboardFocusableView(global::System.IntPtr currentFocusedView, int direction, bool loopEnabled) {
+    return View.getCPtr(GetNextKeyboardFocusableView(new View(currentFocusedView, true), (View.KeyboardFocus.Direction)direction, loopEnabled)).Handle;
   }
 
-  private void SwigDirectorOnKeyboardFocusChangeCommitted(global::System.IntPtr commitedFocusableActor) {
-    OnKeyboardFocusChangeCommitted(new Actor(commitedFocusableActor, true));
+  private void SwigDirectorOnKeyboardFocusChangeCommitted(global::System.IntPtr commitedFocusableView) {
+    OnKeyboardFocusChangeCommitted(new View(commitedFocusableView, true));
   }
 
   private bool SwigDirectorOnKeyboardEnter() {
@@ -748,8 +748,8 @@ public class ViewImpl : CustomActorImpl {
 
   private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(int) };
   private static global::System.Type[] swigMethodTypes1 = new global::System.Type[] {  };
-  private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] { typeof(Actor) };
-  private static global::System.Type[] swigMethodTypes3 = new global::System.Type[] { typeof(Actor) };
+  private static global::System.Type[] swigMethodTypes2 = new global::System.Type[] { typeof(View) };
+  private static global::System.Type[] swigMethodTypes3 = new global::System.Type[] { typeof(View) };
   private static global::System.Type[] swigMethodTypes4 = new global::System.Type[] { typeof(int), typeof(Property.Value) };
   private static global::System.Type[] swigMethodTypes5 = new global::System.Type[] { typeof(Vector3) };
   private static global::System.Type[] swigMethodTypes6 = new global::System.Type[] { typeof(Animation), typeof(Vector3) };
@@ -760,7 +760,7 @@ public class ViewImpl : CustomActorImpl {
   private static global::System.Type[] swigMethodTypes11 = new global::System.Type[] { typeof(Vector2), typeof(RelayoutContainer) };
   private static global::System.Type[] swigMethodTypes12 = new global::System.Type[] { typeof(ResizePolicyType), typeof(DimensionType) };
   private static global::System.Type[] swigMethodTypes13 = new global::System.Type[] {  };
-  private static global::System.Type[] swigMethodTypes14 = new global::System.Type[] { typeof(Actor), typeof(DimensionType) };
+  private static global::System.Type[] swigMethodTypes14 = new global::System.Type[] { typeof(View), typeof(DimensionType) };
   private static global::System.Type[] swigMethodTypes15 = new global::System.Type[] { typeof(float) };
   private static global::System.Type[] swigMethodTypes16 = new global::System.Type[] { typeof(float) };
   private static global::System.Type[] swigMethodTypes17 = new global::System.Type[] { typeof(DimensionType) };
@@ -768,8 +768,8 @@ public class ViewImpl : CustomActorImpl {
   private static global::System.Type[] swigMethodTypes19 = new global::System.Type[] { typeof(DimensionType) };
   private static global::System.Type[] swigMethodTypes20 = new global::System.Type[] { typeof(float), typeof(DimensionType) };
   private static global::System.Type[] swigMethodTypes21 = new global::System.Type[] {  };
-  private static global::System.Type[] swigMethodTypes22 = new global::System.Type[] { typeof(Actor) };
-  private static global::System.Type[] swigMethodTypes23 = new global::System.Type[] { typeof(Actor) };
+  private static global::System.Type[] swigMethodTypes22 = new global::System.Type[] { typeof(View) };
+  private static global::System.Type[] swigMethodTypes23 = new global::System.Type[] { typeof(View) };
   private static global::System.Type[] swigMethodTypes24 = new global::System.Type[] { typeof(StyleManager), typeof(StyleChangeType) };
   private static global::System.Type[] swigMethodTypes25 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes26 = new global::System.Type[] { typeof(PanGesture) };
@@ -778,8 +778,8 @@ public class ViewImpl : CustomActorImpl {
   private static global::System.Type[] swigMethodTypes29 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes30 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes31 = new global::System.Type[] {  };
-  private static global::System.Type[] swigMethodTypes32 = new global::System.Type[] { typeof(Actor), typeof(View.KeyboardFocus.Direction), typeof(bool) };
-  private static global::System.Type[] swigMethodTypes33 = new global::System.Type[] { typeof(Actor) };
+  private static global::System.Type[] swigMethodTypes32 = new global::System.Type[] { typeof(View), typeof(View.KeyboardFocus.Direction), typeof(bool) };
+  private static global::System.Type[] swigMethodTypes33 = new global::System.Type[] { typeof(View) };
   private static global::System.Type[] swigMethodTypes34 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes35 = new global::System.Type[] { typeof(PinchGesture) };
   private static global::System.Type[] swigMethodTypes36 = new global::System.Type[] { typeof(PanGesture) };

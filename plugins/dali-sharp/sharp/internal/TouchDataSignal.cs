@@ -10,25 +10,25 @@
 
 namespace Dali {
 
-public class ActorHoverSignal : global::System.IDisposable {
+internal class TouchDataSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
-  internal ActorHoverSignal(global::System.IntPtr cPtr, bool cMemoryOwn) {
+  internal TouchDataSignal(global::System.IntPtr cPtr, bool cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
   }
 
-  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(ActorHoverSignal obj) {
+  internal static global::System.Runtime.InteropServices.HandleRef getCPtr(TouchDataSignal obj) {
     return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
   }
 
-  ~ActorHoverSignal() {
+  ~TouchDataSignal() {
     DisposeQueue.Instance.Add(this);
   }
 
   public virtual void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -37,7 +37,7 @@ public class ActorHoverSignal : global::System.IDisposable {
       if (swigCPtr.Handle != global::System.IntPtr.Zero) {
         if (swigCMemOwn) {
           swigCMemOwn = false;
-          NDalicPINVOKE.delete_ActorHoverSignal(swigCPtr);
+          NDalicPINVOKE.delete_ActorTouchDataSignal(swigCPtr);
         }
         swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
       }
@@ -47,13 +47,13 @@ public class ActorHoverSignal : global::System.IDisposable {
 
 
   public bool Empty() {
-    bool ret = NDalicPINVOKE.ActorHoverSignal_Empty(swigCPtr);
+    bool ret = NDalicPINVOKE.ActorTouchDataSignal_Empty(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
   public uint GetConnectionCount() {
-    uint ret = NDalicPINVOKE.ActorHoverSignal_GetConnectionCount(swigCPtr);
+    uint ret = NDalicPINVOKE.ActorTouchDataSignal_GetConnectionCount(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -61,7 +61,7 @@ public class ActorHoverSignal : global::System.IDisposable {
   public void Connect(System.Delegate func) {
 System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(func); 
     {
-      NDalicPINVOKE.ActorHoverSignal_Connect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
+      NDalicPINVOKE.ActorTouchDataSignal_Connect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
   }
@@ -69,18 +69,18 @@ System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForD
   public void Disconnect(System.Delegate func) {
 System.IntPtr ip = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(func); 
     {
-      NDalicPINVOKE.ActorHoverSignal_Disconnect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
+      NDalicPINVOKE.ActorTouchDataSignal_Disconnect(swigCPtr, new System.Runtime.InteropServices.HandleRef(this, ip));
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     }
   }
 
-  public bool Emit(Actor arg1, Hover arg2) {
-    bool ret = NDalicPINVOKE.ActorHoverSignal_Emit(swigCPtr, Actor.getCPtr(arg1), Hover.getCPtr(arg2));
+  public bool Emit(View arg1, Touch arg2) {
+    bool ret = NDalicPINVOKE.ActorTouchDataSignal_Emit(swigCPtr, View.getCPtr(arg1), Touch.getCPtr(arg2));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public ActorHoverSignal() : this(NDalicPINVOKE.new_ActorHoverSignal(), true) {
+  public TouchDataSignal() : this(NDalicPINVOKE.new_ActorTouchDataSignal(), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 

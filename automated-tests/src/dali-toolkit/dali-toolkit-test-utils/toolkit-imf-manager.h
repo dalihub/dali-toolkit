@@ -53,7 +53,8 @@ public:
     PREEDIT,             ///< Pre-Edit changed
     COMMIT,              ///< Commit recieved
     DELETESURROUNDING,   ///< Event to delete a range of characters from the string
-    GETSURROUNDING       ///< Event to query string and cursor position
+    GETSURROUNDING,      ///< Event to query string and cursor position
+    PRIVATECOMMAND       ///< Private command sent from the input panel
   };
 
   /**

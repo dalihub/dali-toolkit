@@ -24,6 +24,7 @@
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
@@ -685,15 +686,38 @@ FontSlant Controller::GetDefaultFontSlant() const
   return TextAbstraction::FontSlant::NORMAL;
 }
 
-void Controller::SetDefaultPointSize( float pointSize )
+void Controller::SetDefaultFontSize( float fontSize, FontSizeType type )
 {
   if( NULL == mImpl->mFontDefaults )
   {
     mImpl->mFontDefaults = new FontDefaults();
   }
 
-  mImpl->mFontDefaults->mDefaultPointSize = pointSize;
-  mImpl->mFontDefaults->sizeDefined = true;
+  switch( type )
+  {
+    case POINT_SIZE:
+    {
+      mImpl->mFontDefaults->mDefaultPointSize = fontSize;
+      mImpl->mFontDefaults->sizeDefined = true;
+      break;
+    }
+    case PIXEL_SIZE:
+    {
+      // Point size = Pixel size * 72 / DPI
+      unsigned int horizontalDpi = 0u;
+      unsigned int verticalDpi = 0u;
+      TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+      fontClient.GetDpi( horizontalDpi, verticalDpi );
+
+      mImpl->mFontDefaults->mDefaultPointSize = ( fontSize * 72 ) / horizontalDpi;
+      mImpl->mFontDefaults->sizeDefined = true;
+      break;
+    }
+    default:
+    {
+      DALI_ASSERT_ALWAYS( false );
+    }
+  }
 
   // Clear the font-specific data
   ClearFontData();
@@ -701,14 +725,38 @@ void Controller::SetDefaultPointSize( float pointSize )
   mImpl->RequestRelayout();
 }
 
-float Controller::GetDefaultPointSize() const
+float Controller::GetDefaultFontSize( FontSizeType type ) const
 {
+  float value = 0.0f;
   if( NULL != mImpl->mFontDefaults )
   {
-    return mImpl->mFontDefaults->mDefaultPointSize;
+    switch( type )
+    {
+      case POINT_SIZE:
+      {
+        value = mImpl->mFontDefaults->mDefaultPointSize;
+        break;
+      }
+      case PIXEL_SIZE:
+      {
+        // Pixel size = Point size * DPI / 72
+        unsigned int horizontalDpi = 0u;
+        unsigned int verticalDpi = 0u;
+        TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+        fontClient.GetDpi( horizontalDpi, verticalDpi );
+
+        value = mImpl->mFontDefaults->mDefaultPointSize * horizontalDpi / 72;
+        break;
+      }
+      default:
+      {
+        DALI_ASSERT_ALWAYS( false );
+      }
+    }
+    return value;
   }
 
-  return 0.0f;
+  return value;
 }
 
 void Controller::SetDefaultColor( const Vector4& color )
@@ -1219,7 +1267,7 @@ float Controller::GetInputFontPointSize() const
   }
 
   // Return the default font's point size if there is no EventData.
-  return GetDefaultPointSize();
+  return GetDefaultFontSize( Text::Controller::POINT_SIZE );
 }
 
 void Controller::SetInputLineSpacing( float lineSpacing )
@@ -2096,6 +2144,13 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
     }
     case ImfManager::GETSURROUNDING:
     {
+      retrieveText = true;
+      retrieveCursor = true;
+      break;
+    }
+    case ImfManager::PRIVATECOMMAND:
+    {
+      // PRIVATECOMMAND event is just for getting the private command message
       retrieveText = true;
       retrieveCursor = true;
       break;

@@ -46,7 +46,7 @@ public class PinchGestureDetector : GestureDetector {
   }
 
   public override void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -68,18 +68,18 @@ public class PinchGestureDetector : GestureDetector {
 
 public class DetectedEventArgs : EventArgs
 {
-   private Actor _actor;
+   private View _view;
    private PinchGesture _pinchGesture;
 
-   public Actor Actor
+   public View View
    {
       get
       {
-         return _actor;
+         return _view;
       }
       set
       {
-         _actor = value;
+        _view = value;
       }
    }
 
@@ -138,7 +138,7 @@ public class DetectedEventArgs : EventArgs
    DetectedEventArgs e = new DetectedEventArgs();
 
    // Populate all members of "e" (DetectedEventArgs) with real data
-   e.Actor = Actor.GetActorFromPtr(actor);
+   e.View = View.GetViewFromPtr(actor);
    e.PinchGesture = Dali.PinchGesture.GetPinchGestureFromPtr(pinchGesture);
 
    if (_pinchGestureEventHandler != null)

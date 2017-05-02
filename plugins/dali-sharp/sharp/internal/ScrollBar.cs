@@ -46,7 +46,7 @@ public class ScrollBar : View {
   }
 
   public override void Dispose() {
-    if (!Stage.IsInstalled()) {
+    if (!Window.IsInstalled()) {
       DisposeQueue.Instance.Add(this);
       return;
     }
@@ -261,13 +261,13 @@ public class ScrollPositionIntervalReachedEventArgs : EventArgs
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetScrollIndicator(Actor indicator) {
-    NDalicPINVOKE.ScrollBar_SetScrollIndicator(swigCPtr, Actor.getCPtr(indicator));
+  public void SetScrollIndicator(View indicator) {
+    NDalicPINVOKE.ScrollBar_SetScrollIndicator(swigCPtr, View.getCPtr(indicator));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Actor GetScrollIndicator() {
-    Actor ret = new Actor(NDalicPINVOKE.ScrollBar_GetScrollIndicator(swigCPtr), true);
+  public View GetScrollIndicator() {
+    View ret = new View(NDalicPINVOKE.ScrollBar_GetScrollIndicator(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
