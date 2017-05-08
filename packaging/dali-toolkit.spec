@@ -49,35 +49,15 @@ BuildRequires:  pkgconfig(libtzplatform-config)
 The OpenGLES Canvas Core Library Toolkit - a set of controls that provide
 user interface functionality.
 
-##############################
-# resource
-##############################
-%package resources_480x800
-Summary:    default resource files for 480x800
+# This is for backward-compatibility. This does not deteriorate 4.0 Configurability
+# if tv ||"undefined"
+%if "%{?profile}" != "wearable" && "%{?profile}" != "common" && "%{?profile}" != "ivi" && "%{?profile}" != "mobile"
+%package profile_tv
+Summary:    style files for Tizen TV (1920x1080)
 Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_720x1280
-Conflicts:  %{name}-resources_1920x1080
-%description resources_480x800
-dali-toolkit default resource files for 480x800
-Contain po / sounds / common images / style / style images
-
-%package resources_720x1280
-Summary:    default resource files for 720x1280
-Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_480x800
-Conflicts:  %{name}-resources_1920x1080
-%description resources_720x1280
-dali-toolkit default resource files for 720x1280
-Contain po / sounds / common images / style / style images
-
-%package resources_1920x1080
-Summary:    default resource files for 1920x1080
-Requires:   %{name} = %{version}-%{release}
-Conflicts:  %{name}-resources_480x800
-Conflicts:  %{name}-resources_720x1280
-%description resources_1920x1080
-dali-toolkit default resource files for 1920x1080
-Contain po / sounds / common images / style / style images
+%description profile_tv
+dali-toolkit style files for Tizen TV (1920x1080)
+%endif
 
 ##############################
 # devel
@@ -157,6 +137,7 @@ rm -rf %{buildroot}
 pushd build/tizen
 %make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 
+
 # PO
 {
 cd %{_builddir}/dali-toolkit-%{version}/dali-toolkit/po
@@ -169,17 +150,21 @@ done
 } &> /dev/null
 popd
 
-# Remove default style and style images which are for Linux build
-rm -rf %{buildroot}%{dali_toolkit_style_files}/*
-
-# Make folder to contain style and style images
-# After making folder, copy local style and style images to new folder
-mkdir -p %{buildroot}%{dali_toolkit_style_files}/480x800
-cp -r dali-toolkit/styles/480x800/* %{buildroot}%{dali_toolkit_style_files}/480x800
-mkdir -p %{buildroot}%{dali_toolkit_style_files}/720x1280
-cp -r dali-toolkit/styles/720x1280/* %{buildroot}%{dali_toolkit_style_files}/720x1280
+# This is for backward-compatibility. This does not deteriorate 4.0 Configurability
+# if tv ||"undefined"
+%if "%{?profile}" != "wearable" && "%{?profile}" != "mobile" && "%{?profile}" != "ivi" && "%{?profile}" != "common"
 mkdir -p %{buildroot}%{dali_toolkit_style_files}/1920x1080
-cp -r dali-toolkit/styles/1920x1080/* %{buildroot}%{dali_toolkit_style_files}/1920x1080
+# 720x1280/images/*.png files are exactly same with 1920x1080/images/*.png
+# if not, copy them as same as dali-toolkit/styles/1920x1080/*.json
+# cp dali-toolkit/styles/1920x1080/* %{buildroot}%{dali_toolkit_style_files}/1920x1080
+cp dali-toolkit/styles/1920x1080/*.json %{buildroot}%{dali_toolkit_style_files}/1920x1080
+
+# Do not let style package files be overwritten by the main package
+#pushd %{buildroot}%{dali_toolkit_style_files}/1920x1080
+#for FILE in *.json; do rm -f ../"${FILE}"; done
+#popd
+
+%endif
 
 ##############################
 # Post Install
@@ -206,82 +191,41 @@ exit 0
 %endif
 %defattr(-,root,root,-)
 %{_libdir}/lib%{name}.so*
+%{dali_toolkit_image_files}/*
+%{dali_toolkit_sound_files}/*
+%{dali_toolkit_style_files}/*
+%exclude %{dali_toolkit_style_files}/1920x1080
+# 720x1280/images/*.png files are exactly same with 1920x1080/images/*.png
 %license LICENSE
+%{_datadir}/locale/*/LC_MESSAGES/*
 
 %files devel
 %defattr(-,root,root,-)
 %{dev_include_path}/%{name}/*
 %{_libdir}/pkgconfig/*.pc
 
-%post resources_480x800
-pushd %{dali_toolkit_style_files}/480x800
-for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
-popd
-
-%preun resources_480x800
-pushd %{dali_toolkit_style_files}
-mv images ./480x800
-mv *.json ./480x800
-popd
-
-%postun resources_480x800
-pushd %{dali_toolkit_style_files}
-rm -rf 480x800
-popd
-
-%files resources_480x800
-%manifest dali-toolkit-resources.manifest
-%defattr(-,root,root,-)
-%{dali_toolkit_image_files}/*
-%{dali_toolkit_sound_files}/*
-%{dali_toolkit_style_files}/480x800/*
-%{_datadir}/locale/*/LC_MESSAGES/*
-
-%post resources_720x1280
-pushd %{dali_toolkit_style_files}/720x1280
-for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
-rm -rf ./*
-popd
-
-%preun resources_720x1280
-pushd %{dali_toolkit_style_files}
-mv images ./720x1280
-mv *.json ./720x1280
-popd
-
-%postun resources_720x1280
-pushd %{dali_toolkit_style_files}
-rm -rf 720x1280
-popd
-
-%files resources_720x1280
-%manifest dali-toolkit-resources.manifest
-%defattr(-,root,root,-)
-%{dali_toolkit_image_files}/*
-%{dali_toolkit_sound_files}/*
-%{dali_toolkit_style_files}/720x1280/*
-%{_datadir}/locale/*/LC_MESSAGES/*
-
-%post resources_1920x1080
+# This is for backward-compatibility. This does not deteriorate 4.0 Configurability
+# if tv ||"undefined"
+%if "%{?profile}" != "wearable" && "%{?profile}" != "mobile" && "%{?profile}" != "ivi" && "%{?profile}" != "common"
+%post profile_tv
 pushd %{dali_toolkit_style_files}/1920x1080
-for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
+for FILE in *.json; do mv 1920x1080/"${FILE}" ../"${FILE}"; done
 popd
 
-%preun resources_1920x1080
-pushd %{dali_toolkit_style_files}
-mv images ./1920x1080
-mv *.json ./1920x1080
-popd
-
-%postun resources_1920x1080
-pushd %{dali_toolkit_style_files}
-rm -rf 1920x1080
-popd
-
-%files resources_1920x1080
-%manifest dali-toolkit-resources.manifest
-%defattr(-,root,root,-)
-%{dali_toolkit_image_files}/*
-%{dali_toolkit_sound_files}/*
+%preun profile_tv
+case "$1" in
+  0)
+    # This is an un-installation.
+    pushd %{dali_toolkit_style_files}
+	for FILE in *.json; do mv 1920x1080/"${FILE}"; done
+	popd
+  ;;
+  1)
+    # This is an upgrade.
+    # Do nothing.
+    :
+  ;;
+esac
+%files profile_tv
 %{dali_toolkit_style_files}/1920x1080/*
-%{_datadir}/locale/*/LC_MESSAGES/*
+%endif
