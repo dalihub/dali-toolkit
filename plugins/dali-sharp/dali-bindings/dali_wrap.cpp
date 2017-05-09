@@ -453,6 +453,7 @@ SWIGINTERN void SWIG_CSharpException(int code, const char *msg) {
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-view.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
+#include <dali-toolkit/devel-api/controls/scrollable/scroll-view/scroll-view-devel.h>
 #include <dali-toolkit/devel-api/controls/buttons/toggle-button.h>
 
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
@@ -72852,6 +72853,15 @@ SWIGEXPORT int SWIGSTDCALL CSharp_Dali_ScrollView_Property_WHEEL_SCROLL_DISTANCE
   return jresult;
 }
 
+
+SWIGEXPORT int SWIGSTDCALL CSharp_Dali_ScrollView_Property_SCROLL_MODE_get() {
+  int jresult ;
+  int result;
+
+  result = (int)Dali::Toolkit::DevelScrollView::Property::SCROLL_MODE;
+  jresult = (int)result;
+  return jresult;
+}
 
 SWIGEXPORT int SWIGSTDCALL CSharp_Dali_ScrollView_Property_SCROLL_POSITION_get() {
   int jresult ;

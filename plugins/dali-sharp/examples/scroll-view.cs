@@ -95,12 +95,12 @@ namespace MyCSharpExample
 
             // Set scroll view to have 3 pages in X axis and allow page snapping,
             // and also disable scrolling in Y axis.
-            RulerPtr scrollRulerX = new RulerPtr(new FixedRuler(windowSize.Width));
-            RulerPtr scrollRulerY = new RulerPtr(new DefaultRuler());
-            scrollRulerX.SetDomain(new RulerDomain(0.0f, windowSize.Width * pageColumns, true));
-            scrollRulerY.Disable();
-            _scrollView.SetRulerX(scrollRulerX);
-            _scrollView.SetRulerY(scrollRulerY);
+            Property.Map rulerMap = new Property.Map();
+            rulerMap.Add((int)Dali.Constants.ScrollModeType.XAxisScrollEnabled, new Property.Value(true));
+            rulerMap.Add((int)Dali.Constants.ScrollModeType.XAxisSnapToInterval, new Property.Value(windowSize.Width));
+            rulerMap.Add((int)Dali.Constants.ScrollModeType.XAxisScrollBoundary, new Property.Value(windowSize.Width * pageColumns ) );
+            rulerMap.Add((int)Dali.Constants.ScrollModeType.YAxisScrollEnabled, new Property.Value( false ) );
+            _scrollView.ScrollMode = rulerMap;
 
             // Create a horizontal scroll bar in the bottom of scroll view (which is optional)
             _scrollBar = new ScrollBar();

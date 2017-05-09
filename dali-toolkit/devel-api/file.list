@@ -118,6 +118,10 @@ devel_api_scripting_header_files = \
   $(devel_api_src_dir)/scripting/script.h \
   $(devel_api_src_dir)/scripting/script-plugin.h
 
+devel_api_scroll_view_header_files = \
+  $(devel_api_src_dir)/controls/scrollable/scroll-view/scroll-mode.h \
+  $(devel_api_src_dir)/controls/scrollable/scroll-view/scroll-view-devel.h
+
 devel_api_shader_effects_header_files = \
   $(devel_api_src_dir)/shader-effects/alpha-discard-effect.h \
   $(devel_api_src_dir)/shader-effects/dissolve-effect.h \

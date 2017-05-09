@@ -859,6 +859,13 @@ private:
    */
   void OnScrollUpdateNotification(Dali::PropertyNotification& source);
 
+  /**
+   * Set up default rulers using a property map
+   * @param[in] scrollModeMap A map defining the characteristics of X and Y scrolling
+   * using either FixedRuler or DefaultRuler.
+   */
+  void SetScrollMode( const Property::Map& scrollModeMap );
+
 private:
 
   // Undefined

@@ -19,6 +19,16 @@ namespace Dali
 {
   namespace Constants
   {
+    public enum ScrollModeType
+    {
+      XAxisScrollEnabled,
+      XAxisSnapToInterval,
+      XAxisScrollBoundary,
+      YAxisScrollEnabled,
+      YAxisSnapToInterval,
+      YAxisScrollBoundary
+    }
+
     public enum TextureType
     {
       Texture2D     = Dali.TextureType.TEXTURE_2D,   ///< One 2D image                            @SINCE_1_1.43
