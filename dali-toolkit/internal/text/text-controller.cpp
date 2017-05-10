@@ -1418,6 +1418,26 @@ Controller::NoTextTap::Action Controller::GetNoTextLongPressAction() const
   return action;
 }
 
+bool Controller::IsUnderlineSetByString()
+{
+  return mImpl->mUnderlineSetByString;
+}
+
+void Controller::UnderlineSetByString( bool setByString )
+{
+  mImpl->mUnderlineSetByString = setByString;
+}
+
+bool Controller::IsShadowSetByString()
+{
+  return mImpl->mShadowSetByString;
+}
+
+void Controller::ShadowSetByString( bool setByString )
+{
+  mImpl->mShadowSetByString = setByString;
+}
+
 // public : Queries & retrieves.
 
 Layout::Engine& Controller::GetLayoutEngine()

@@ -398,6 +398,30 @@ public: // Configure the text controller.
    */
   NoTextTap::Action GetNoTextLongPressAction() const;
 
+  /**
+   * @brief Query if Underline settings were provided by string or map
+   * @return bool true if set by string
+   */
+  bool IsUnderlineSetByString();
+
+  /**
+   * Set method underline setting were set by
+   * @param[in] bool, true if set by string
+   */
+  void UnderlineSetByString( bool setByString );
+
+  /**
+   * @brief Query if shadow settings were provided by string or map
+   * @return bool true if set by string
+   */
+  bool IsShadowSetByString();
+
+  /**
+   * Set method shadow setting were set by
+   * @param[in] bool, true if set by string
+   */
+  void ShadowSetByString( bool setByString );
+
 public: // Update.
 
   /**
