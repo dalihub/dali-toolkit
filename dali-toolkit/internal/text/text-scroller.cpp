@@ -245,6 +245,16 @@ int TextScroller::GetLoopCount() const
   return mLoopCount;
 }
 
+void TextScroller::SetLoopDelay( float delay )
+{
+  mLoopDelay = delay;
+}
+
+float TextScroller::GetLoopDelay() const
+{
+  return mLoopDelay;
+}
+
 Actor TextScroller::GetSourceCamera() const
 {
   return mOffscreenCameraActor;
@@ -259,6 +269,7 @@ TextScroller::TextScroller( ScrollerInterface& scrollerInterface ) : mScrollerIn
                             mScrollDeltaIndex( Property::INVALID_INDEX ),
                             mScrollSpeed( MINIMUM_SCROLL_SPEED ),
                             mLoopCount( 1 ),
+                            mLoopDelay( 0.0f ),
                             mWrapGap( 0.0f )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller Default Constructor\n" );
@@ -333,7 +344,7 @@ void TextScroller::StartScrolling( float scrollAmount, float scrollDuration, int
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::StartScrolling scrollAmount[%f] scrollDuration[%f], loop[%d] speed[%d]\n", scrollAmount, scrollDuration, loopCount, mScrollSpeed );
 
   mScrollAnimation = Animation::New( scrollDuration );
-  mScrollAnimation.AnimateTo( Property( mScrollingTextActor, mScrollDeltaIndex ), scrollAmount );
+  mScrollAnimation.AnimateTo( Property( mScrollingTextActor, mScrollDeltaIndex ), scrollAmount, TimePeriod( mLoopDelay, scrollDuration ) );
   mScrollAnimation.SetEndAction( Animation::Discard );
   mScrollAnimation.SetLoopCount( loopCount );
   mScrollAnimation.FinishedSignal().Connect( this, &TextScroller::AutoScrollAnimationFinished );

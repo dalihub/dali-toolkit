@@ -70,6 +70,12 @@ namespace Property
        * @details name "ellipsis", type bool
        */
       ELLIPSIS = OUTLINE + 2,
+
+      /**
+       * @brief delay starting time of auto scrolling and further loops
+       * @details name "autoScrollLoopDelay", type float.
+       */
+      AUTO_SCROLL_LOOP_DELAY = OUTLINE + 3,
   };
 } // namespace Property
 

@@ -67,6 +67,7 @@ const char* const PROPERTY_NAME_OUTLINE = "outline";
 
 const char* const PROPERTY_NAME_PIXEL_SIZE = "pixelSize";
 const char* const PROPERTY_NAME_ELLIPSIS = "ellipsis";
+const char* const PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY = "autoScrollLoopDelay";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
@@ -209,6 +210,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextLabel::Property::OUTLINE );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextLabel::Property::PIXEL_SIZE );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == DevelTextLabel::Property::ELLIPSIS );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY ) == DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY );
 
   END_TEST;
 }
@@ -347,6 +349,7 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   const int SCROLL_SPEED = 80;
   const int SCROLL_LOOPS = 4;
   const float SCROLL_GAP = 50.0f;
+  const float SCROLL_LOOP_DELAY = 0.3f;
   label.SetProperty( TextLabel::Property::MULTI_LINE, false ); // Autoscroll only supported in single line
   DALI_TEST_CHECK( !label.GetProperty<bool>( TextLabel::Property::ENABLE_AUTO_SCROLL ) );
   label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
@@ -357,6 +360,8 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( SCROLL_LOOPS, label.GetProperty<int>( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT ), TEST_LOCATION );
   label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, SCROLL_GAP );
   DALI_TEST_EQUALS( SCROLL_GAP, label.GetProperty<float>( TextLabel::Property::AUTO_SCROLL_GAP ), TEST_LOCATION );
+  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY, SCROLL_LOOP_DELAY );
+  DALI_TEST_EQUALS( SCROLL_LOOP_DELAY, label.GetProperty<float>( DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY ), TEST_LOCATION );
 
   // Check the line spacing property
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );

@@ -104,6 +104,18 @@ public:
   int GetLoopCount() const;
 
   /**
+   * @brief Set the delay time of scroll animation loop
+   * @param[in] float delay time seconds of loops
+   */
+  void SetLoopDelay( float delay );
+
+  /**
+   * @brief Get the delay time of scroll
+   * @return float delay time seconds of loops
+   */
+  float GetLoopDelay() const;
+
+  /**
    * @brief Get the camera used to look at source, should be added to the parent of target actor.
    * @return camera Actor
    */
@@ -163,6 +175,7 @@ private:
 
   int   mScrollSpeed;            ///< Speed which text should automatically scroll at
   int   mLoopCount;              ///< Number of time the text should scroll
+  float mLoopDelay;              ///< Time delay of loop start
   float mWrapGap;                ///< Gap before text wraps around when scrolling
 
 }; // TextScroller class

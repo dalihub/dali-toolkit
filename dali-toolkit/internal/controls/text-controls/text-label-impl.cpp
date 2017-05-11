@@ -109,6 +109,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "emboss",               MAP,    
 DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "outline",              MAP,     OUTLINE                )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "pixelSize",      FLOAT,   PIXEL_SIZE             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "ellipsis",       BOOLEAN, ELLIPSIS               )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollLoopDelay", FLOAT,   AUTO_SCROLL_LOOP_DELAY )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -371,6 +372,15 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         impl.mTextScroller->SetLoopCount( value.Get<int>() );
         break;
       }
+      case Toolkit::DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY:
+      {
+         if( !impl.mTextScroller )
+        {
+          impl.mTextScroller = Text::TextScroller::New( impl );
+        }
+        impl.mTextScroller->SetLoopDelay( value.Get<float>() );
+        break;
+      }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_GAP:
       {
         if( !impl.mTextScroller )
@@ -619,6 +629,18 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           if ( impl.mTextScroller )
           {
             value = impl.mTextScroller->GetLoopCount();
+          }
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY:
+      {
+        if( impl.mController )
+        {
+          TextLabel& impl( GetImpl( label ) );
+          if ( impl.mTextScroller )
+          {
+            value = impl.mTextScroller->GetLoopDelay();
           }
         }
         break;
