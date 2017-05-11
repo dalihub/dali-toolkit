@@ -910,6 +910,13 @@ public: // Queries & retrieves.
   float GetHeightForWidth( float width );
 
   /**
+   * @brief Retrieves the text's number of lines for a given width.
+   * @param[in] width The width of the text's area.
+   * @ return The number of lines.
+   */
+  int GetLineCount( float width );
+
+  /**
    * @brief Retrieves the text's model.
    *
    * @return A pointer to the text's model.

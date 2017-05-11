@@ -83,6 +83,13 @@ namespace Property
        *          values FINISH_LOOP, IMMEDIATE, defualt FINISH_LOOP
        */
       AUTO_SCROLL_STOP_MODE = OUTLINE + 4,
+
+      /*
+       * @brief The line count of text.
+       * @details name "lineCount", type int
+       * @node this property is read-only.
+       */
+      LINE_COUNT = OUTLINE + 5
   };
 } // namespace Property
 

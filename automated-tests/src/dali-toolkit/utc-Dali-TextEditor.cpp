@@ -93,6 +93,7 @@ const char* const PROPERTY_NAME_ENABLE_SCROLL_BAR                    = "enableSc
 const char* const PROPERTY_NAME_SCROLL_BAR_SHOW_DURATION             = "scrollBarShowDuration";
 const char* const PROPERTY_NAME_SCROLL_BAR_FADE_DURATION             = "scrollBarFadeDuration";
 const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSize";
+const char* const PROPERTY_NAME_LINE_COUNT                           = "lineCount";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -433,6 +434,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_SHOW_DURATION ) == DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_FADE_DURATION ) == DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextEditor::Property::PIXEL_SIZE );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_LINE_COUNT) == DevelTextEditor::Property::LINE_COUNT );
 
   END_TEST;
 }
@@ -1932,6 +1934,31 @@ int utcDaliTextEditorFontStylePropertyStringP(void)
   value.Get(result);
 
   DALI_TEST_EQUALS( result, fontStyleSettings, TEST_LOCATION );
+
+  END_TEST;
+}
+int utcDaliTextEditorGetPropertyLinecountP(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" utcDaliTextEditorGetPropertyLinecount getting line count property");
+
+  int lineCount =0 ;
+
+  TextEditor editor = TextEditor::New();
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10) ;
+  editor.SetProperty( TextEditor::Property::TEXT,
+                       "TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST ");
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetSize( 100.0f, 100.0f );
+  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 14, TEST_LOCATION );
+
+  editor.SetSize( 50.0f, 100.0f );
+  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 28, TEST_LOCATION );
 
   END_TEST;
 }

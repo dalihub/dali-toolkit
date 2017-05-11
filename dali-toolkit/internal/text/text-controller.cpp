@@ -1599,6 +1599,13 @@ float Controller::GetHeightForWidth( float width )
   return layoutSize.height;
 }
 
+int Controller::GetLineCount( float width )
+{
+  GetHeightForWidth( width );
+  int numberofLines = mImpl->mModel->GetNumberOfLines();
+  return numberofLines;
+}
+
 const ModelInterface* const Controller::GetTextModel() const
 {
   return mImpl->mModel.Get();
