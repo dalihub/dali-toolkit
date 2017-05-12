@@ -76,8 +76,30 @@ namespace Property
        * @details name "autoScrollLoopDelay", type float.
        */
       AUTO_SCROLL_LOOP_DELAY = OUTLINE + 3,
+
+      /**
+       * @brief Auto scrolling stop behaviour.
+       * @details name "autoScrollStopMode", type [Type](@ref Dali::Toolkit::DevelTextLabel::AutoScrollStopMode::Type) (Property::INTEGER) or Property::STRING.
+       *          values FINISH_LOOP, IMMEDIATE, defualt FINISH_LOOP
+       */
+      AUTO_SCROLL_STOP_MODE = OUTLINE + 4,
   };
 } // namespace Property
+
+/**
+* @brief The type for TextLabel::Property::AUTO_SCROLL_STOP_MODE
+*/
+namespace AutoScrollStopMode
+{
+/**
+* @ref Dali::Toolkit::DevelTextLabel::AutoScrollStopMode
+*/
+enum Type
+{
+  FINISH_LOOP = 0,  ///< stop animation after current loop finished.
+  IMMEDIATE         ///< stop animation immediatly and reset position.
+};
+} // namespace AutoScrollStopMode
 
 } // namespace DevelText
 

@@ -350,6 +350,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   const int SCROLL_LOOPS = 4;
   const float SCROLL_GAP = 50.0f;
   const float SCROLL_LOOP_DELAY = 0.3f;
+  const std::string STOP_IMMEDIATE = std::string( "IMMEDIATE" );
+  const std::string STOP_FINISH_LOOP = std::string( "FINISH_LOOP" );
+
   label.SetProperty( TextLabel::Property::MULTI_LINE, false ); // Autoscroll only supported in single line
   DALI_TEST_CHECK( !label.GetProperty<bool>( TextLabel::Property::ENABLE_AUTO_SCROLL ) );
   label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
@@ -362,6 +365,14 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( SCROLL_GAP, label.GetProperty<float>( TextLabel::Property::AUTO_SCROLL_GAP ), TEST_LOCATION );
   label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY, SCROLL_LOOP_DELAY );
   DALI_TEST_EQUALS( SCROLL_LOOP_DELAY, label.GetProperty<float>( DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY ), TEST_LOCATION );
+
+  //Check autoscroll stop type property
+  label.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+  DALI_TEST_EQUALS( STOP_IMMEDIATE, label.GetProperty<std::string>( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE ), TEST_LOCATION );
+
+  label.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+  DALI_TEST_EQUALS( STOP_FINISH_LOOP, label.GetProperty<std::string>( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE ), TEST_LOCATION );
+
 
   // Check the line spacing property
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -547,23 +558,44 @@ int UtcDaliToolkitTextlabelScrollingP(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitTextLabelScrollingP");
-  TextLabel label = TextLabel::New("Some text to scroll");
-  DALI_TEST_CHECK( label );
+  TextLabel labelImmediate = TextLabel::New("Some text to scroll");
+  TextLabel labelFinished = TextLabel::New("Some text to scroll");
+
+  DALI_TEST_CHECK( labelImmediate );
+  DALI_TEST_CHECK( labelFinished );
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-  Stage::GetCurrent().Add( label );
+  Stage::GetCurrent().Add( labelImmediate );
   // Turn on all the effects
-  label.SetProperty( TextLabel::Property::MULTI_LINE, false );
-  label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
-  label.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
-  label.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelImmediate.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelImmediate.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+
+  Stage::GetCurrent().Add( labelFinished );
+  // Turn on all the effects
+  labelFinished.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelFinished.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelFinished.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelFinished.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelFinished.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+
+
 
   try
   {
     // Render some text with the shared atlas backend
-    label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    labelImmediate.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    labelFinished.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
     application.SendNotification();
     application.Render();
+
+    labelImmediate.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    labelFinished.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    application.SendNotification();
+    application.Render();
+
   }
   catch( ... )
   {
