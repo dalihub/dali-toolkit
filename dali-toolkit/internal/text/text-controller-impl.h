@@ -314,7 +314,9 @@ struct Controller::Impl
     mMarkupProcessorEnabled( false ),
     mClipboardHideEnabled( true ),
     mIsAutoScrollEnabled( false ),
-    mAutoScrollDirectionRTL( false )
+    mAutoScrollDirectionRTL( false ),
+    mUnderlineSetByString( false ),
+    mShadowSetByString( false )
   {
     mModel = Model::New();
 
@@ -721,6 +723,8 @@ public:
   bool mIsAutoScrollEnabled:1;             ///< Whether auto text scrolling is enabled.
   CharacterDirection mAutoScrollDirectionRTL:1;  ///< Direction of auto scrolling, true if rtl
 
+  bool mUnderlineSetByString:1;            ///< Set when underline is set by string (legacy) instead of map
+  bool mShadowSetByString:1;               ///< Set when shadow is set by string (legacy) instead of map
 };
 
 } // namespace Text

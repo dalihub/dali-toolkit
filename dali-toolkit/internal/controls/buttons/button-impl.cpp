@@ -363,7 +363,10 @@ std::string Button::GetLabelText() const
   if ( labelProperty )
   {
     Property::Value* value = labelProperty->Find( Toolkit::TextVisual::Property::TEXT );
-    value->Get( textLabel );
+    if( value )
+    {
+      value->Get( textLabel );
+    }
   }
 
   return textLabel;
@@ -1597,27 +1600,52 @@ void Button::SetButtonImage( Image image )
 {
   DALI_LOG_WARNING("Button::SetButtonImage @DEPRECATED_1_0.50\n");
   SetUnselectedImage( GetUrlFromImage( image ) );
+  mSetButtonImage = image;
 }
 
 void Button::SetSelectedImage( Image image )
 {
   DALI_LOG_WARNING("Button::SetSelectedImage @DEPRECATED_1_0.50\n");
   SetSelectedImage( GetUrlFromImage( image ) );
+  mSetSelectedImage = image;
 }
 
 Actor Button::GetButtonImage() const
 {
+  // When deprecated ImageView API removed then this button API can be removed too.
   DALI_LOG_WARNING("Button::GetButtonImage @DEPRECATED_1_0.50\n");
-  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL ) );
+
+  Actor imageView;
+
+  if ( mSetButtonImage )
+  {
+    imageView = Toolkit::ImageView::New( mSetButtonImage );
+  }
+  else
+  {
+    ResourceImage image = ResourceImage::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL ) );
+    imageView = Toolkit::ImageView::New( image );
+  }
 
   return imageView;
 }
 
 Actor Button::GetSelectedImage() const
 {
+  // When deprecated ImageView API removed then this button API can be removed too.
   DALI_LOG_WARNING("Button::GetSelectedImage @DEPRECATED_1_0.50\n");
-  Actor imageView = Toolkit::ImageView::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL ) );
 
+  Actor imageView;
+
+  if ( mSetSelectedImage )
+  {
+    imageView = Toolkit::ImageView::New( mSetSelectedImage );
+  }
+  else
+  {
+    ResourceImage image = ResourceImage::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL ) );
+    imageView = Toolkit::ImageView::New( image );
+  }
   return imageView;
 }
 

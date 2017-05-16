@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -477,9 +477,9 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     currentFontId = fontId;
 
     // Get the script for the current character.
-    const Script script = GetScript( index,
-                                     scriptRunIt,
-                                     scriptRunEndIt );
+    Script script = GetScript( index,
+                               scriptRunIt,
+                               scriptRunEndIt );
 
 #ifdef DEBUG_ENABLED
     {
@@ -494,6 +494,10 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                      description.path.c_str() );
     }
 #endif
+    if (script == TextAbstraction::UNKNOWN)
+    {
+      script = TextAbstraction::LATIN;
+    }
 
     // Validate whether the current character is supported by the given font.
     bool isValidFont = false;

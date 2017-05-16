@@ -13,7 +13,7 @@
 # limitations under the License.
 
 CLEANFILES = ./dali-bindings/*.o *.so *.dll \
-             ../examples/*.so ../examples/*.dll examples/*.exe
+             ../examples/*.so ../examples/*.dll examples/*.exe test/*.exe
 
 BUILT_SOURCES = ../dali-bindings/dali_wrap.cpp ../dali-bindings/dali_wrap.h
 
@@ -48,14 +48,25 @@ $(DALI_BINDINGS_DIR):
 NDali.dll: $(BUILT_SOURCES)
 	$(MCS) -nologo -target:library -out:NDali.dll ../sharp/internal/*.cs ../sharp/public/*.cs
 
-check-local: examples/hello-world.exe \
+check-local: test/test.exe \
+             examples/hello-world.exe \
              examples/scroll-view.exe \
              examples/control-dashboard.exe \
              examples/user-alphafunction.exe \
              examples/image-view.exe \
              examples/visuals-example.exe \
              examples/visuals-using-custom-view.exe \
-             examples/libNDalic.so examples/NDali.dll
+             examples/libNDalic.so examples/NDali.dll \
+             test/libNDalic.so test/NDali.dll
+
+test/test.exe: ../test/test.cs
+	$(MCS) -nologo -target:exe -out:../$@ -reference:NDali.dll $<
+
+test/libNDalic.so:
+	cd ../test && ln -sf ../build/libNDalic.so
+
+test/NDali.dll:
+	cd ../test && ln -sf ../build/NDali.dll
 
 examples/hello-world.exe: ../examples/hello-world.cs
 	$(MCS) -nologo -target:exe -out:../$@ -reference:NDali.dll $<
