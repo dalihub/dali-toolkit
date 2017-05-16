@@ -363,10 +363,7 @@ std::string Button::GetLabelText() const
   if ( labelProperty )
   {
     Property::Value* value = labelProperty->Find( Toolkit::TextVisual::Property::TEXT );
-    if( value )
-    {
-      value->Get( textLabel );
-    }
+    value->Get( textLabel );
   }
 
   return textLabel;
