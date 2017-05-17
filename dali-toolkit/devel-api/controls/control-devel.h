@@ -121,7 +121,7 @@ typedef Signal<void ( Control ) > ResourceReadySignalType;
  *   void YourCallbackName( Control control );
  * @endcode
  */
-ResourceReadySignalType& ResourceReadySignal( Control& control );
+DALI_IMPORT_API ResourceReadySignalType& ResourceReadySignal( Control& control );
 
 /**
  * @brief Query if all resources required by a control are loaded and ready.
@@ -129,7 +129,7 @@ ResourceReadySignalType& ResourceReadySignal( Control& control );
  * @return true if the resources are loaded and ready, false otherwise
  *
  */
-bool IsResourceReady( const Control& control );
+DALI_IMPORT_API bool IsResourceReady( const Control& control );
 
 } // namespace DevelControl
 
