@@ -39,9 +39,14 @@ BuildRequires:  pkgconfig(libtzplatform-config)
 %define dali_toolkit_profile TV
 %define dali_style_folder 1920x1080
 %else
+%if "%{profile}" == "wearable"
+%define dali_toolkit_profile WEARABLE
+%define dali_style_folder 360x360
+%else
 %define dali_toolkit_profile MOBILE
 %define dali_style_folder 720x1280
 # dali_style to be provided by build system as with dali_toolkit_profile or by passing --define 'dali_style 470x800' to the rpm build command
+%endif
 %endif
 
 %if "%{?dali_style}"
