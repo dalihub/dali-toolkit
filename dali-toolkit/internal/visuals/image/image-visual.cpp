@@ -704,7 +704,6 @@ void ImageVisual::InitializeRenderer( const Image& image )
   // don't reuse CreateTextureSet
   TextureSet textures = TextureSet::New();
 
-  // Renderer can't be shared if mImage is NativeImage
   NativeImage nativeImage = NativeImage::DownCast( image );
   if( nativeImage )
   {
