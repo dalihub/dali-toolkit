@@ -10,10 +10,10 @@
 
 namespace Dali {
 
-public enum DepthTestModeType {
-  OFF,
-  AUTO,
-  ON
+internal enum DepthTestModeType {
+  Off,
+  Auto,
+  On
 }
 
 }

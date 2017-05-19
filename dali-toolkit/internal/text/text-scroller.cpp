@@ -234,7 +234,23 @@ void TextScroller::SetLoopCount( int loopCount )
     if ( loopCount == 0 ) // Request to stop looping
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetLoopCount Single loop forced\n" );
-      mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
+      switch( mStopMode )
+      {
+        case DevelTextLabel::AutoScrollStopMode::IMMEDIATE:
+        {
+          mScrollAnimation.Stop();
+          break;
+        }
+        case DevelTextLabel::AutoScrollStopMode::FINISH_LOOP:
+        {
+          mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
+          break;
+        }
+        default:
+        {
+           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n" );
+        }
+      }
     }
   }
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetLoopCount [%d] Status[%s]\n", mLoopCount, (loopCount)?"looping":"stop" );
@@ -243,6 +259,27 @@ void TextScroller::SetLoopCount( int loopCount )
 int TextScroller::GetLoopCount() const
 {
   return mLoopCount;
+}
+
+void TextScroller::SetLoopDelay( float delay )
+{
+  mLoopDelay = delay;
+}
+
+float TextScroller::GetLoopDelay() const
+{
+  return mLoopDelay;
+}
+
+void TextScroller::SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMode )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetAutoScrollStopMode [%s]\n",(stopMode == DevelTextLabel::AutoScrollStopMode::IMMEDIATE)?"IMMEDIATE":"FINISH_LOOP" );
+  mStopMode = stopMode;
+}
+
+DevelTextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const
+{
+  return mStopMode;
 }
 
 Actor TextScroller::GetSourceCamera() const
@@ -259,7 +296,9 @@ TextScroller::TextScroller( ScrollerInterface& scrollerInterface ) : mScrollerIn
                             mScrollDeltaIndex( Property::INVALID_INDEX ),
                             mScrollSpeed( MINIMUM_SCROLL_SPEED ),
                             mLoopCount( 1 ),
-                            mWrapGap( 0.0f )
+                            mLoopDelay( 0.0f ),
+                            mWrapGap( 0.0f ),
+                            mStopMode( DevelTextLabel::AutoScrollStopMode::FINISH_LOOP )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller Default Constructor\n" );
 }
@@ -333,7 +372,7 @@ void TextScroller::StartScrolling( float scrollAmount, float scrollDuration, int
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::StartScrolling scrollAmount[%f] scrollDuration[%f], loop[%d] speed[%d]\n", scrollAmount, scrollDuration, loopCount, mScrollSpeed );
 
   mScrollAnimation = Animation::New( scrollDuration );
-  mScrollAnimation.AnimateTo( Property( mScrollingTextActor, mScrollDeltaIndex ), scrollAmount );
+  mScrollAnimation.AnimateTo( Property( mScrollingTextActor, mScrollDeltaIndex ), scrollAmount, TimePeriod( mLoopDelay, scrollDuration ) );
   mScrollAnimation.SetEndAction( Animation::Discard );
   mScrollAnimation.SetLoopCount( loopCount );
   mScrollAnimation.FinishedSignal().Connect( this, &TextScroller::AutoScrollAnimationFinished );

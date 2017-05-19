@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class AccessibilityFocusOvershotSignal : global::System.IDisposable {
+internal class AccessibilityFocusOvershotSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

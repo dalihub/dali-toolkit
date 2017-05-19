@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class FrameBufferImage : Image {
+internal class FrameBufferImage : Image {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal FrameBufferImage(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.FrameBufferImage_SWIGUpcast(cPtr), cMemoryOwn) {

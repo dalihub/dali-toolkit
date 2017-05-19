@@ -37,14 +37,14 @@ class NDalicPINVOKE {
     public static extern void SWIGRegisterExceptionCallbacks_NDalic(
                                 ExceptionDelegate applicationDelegate,
                                 ExceptionDelegate arithmeticDelegate,
-                                ExceptionDelegate divideByZeroDelegate, 
-                                ExceptionDelegate indexOutOfRangeDelegate, 
+                                ExceptionDelegate divideByZeroDelegate,
+                                ExceptionDelegate indexOutOfRangeDelegate,
                                 ExceptionDelegate invalidCastDelegate,
                                 ExceptionDelegate invalidOperationDelegate,
                                 ExceptionDelegate ioDelegate,
                                 ExceptionDelegate nullReferenceDelegate,
-                                ExceptionDelegate outOfMemoryDelegate, 
-                                ExceptionDelegate overflowDelegate, 
+                                ExceptionDelegate outOfMemoryDelegate,
+                                ExceptionDelegate overflowDelegate,
                                 ExceptionDelegate systemExceptionDelegate);
 
     [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="SWIGRegisterExceptionArgumentCallbacks_NDalic")]
@@ -136,7 +136,7 @@ class NDalicPINVOKE {
           if (pendingException != null)
             pending = true;
         return pending;
-      } 
+      }
     }
 
     public static void Set(global::System.Exception e) {
@@ -1659,13 +1659,13 @@ class NDalicPINVOKE {
   public static extern int Property_Value_GetType(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_Property_Value_Get__SWIG_1")]
-  public static extern bool Property_Value_Get__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1, ref bool jarg2);
+  public static extern bool Property_Value_Get__SWIG_1(global::System.Runtime.InteropServices.HandleRef jarg1, out bool jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_Property_Value_Get__SWIG_2")]
-  public static extern bool Property_Value_Get__SWIG_2(global::System.Runtime.InteropServices.HandleRef jarg1, ref float jarg2);
+  public static extern bool Property_Value_Get__SWIG_2(global::System.Runtime.InteropServices.HandleRef jarg1, out float jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_Property_Value_Get__SWIG_3")]
-  public static extern bool Property_Value_Get__SWIG_3(global::System.Runtime.InteropServices.HandleRef jarg1, ref int jarg2);
+  public static extern bool Property_Value_Get__SWIG_3(global::System.Runtime.InteropServices.HandleRef jarg1, out int jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_Property_Value_Get__SWIG_4")]
   public static extern bool Property_Value_Get__SWIG_4(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
@@ -8317,6 +8317,9 @@ class NDalicPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ScrollView_Property_WHEEL_SCROLL_DISTANCE_STEP_get")]
   public static extern int ScrollView_Property_WHEEL_SCROLL_DISTANCE_STEP_get();
+
+  [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ScrollView_Property_SCROLL_MODE_get")]
+  public static extern int ScrollView_Property_SCROLL_MODE_get();
 
   [global::System.Runtime.InteropServices.DllImport("NDalic", EntryPoint="CSharp_Dali_ScrollView_Property_SCROLL_POSITION_get")]
   public static extern int ScrollView_Property_SCROLL_POSITION_get();

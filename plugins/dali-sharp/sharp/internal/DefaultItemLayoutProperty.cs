@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public enum DefaultItemLayoutProperty {
+internal enum DefaultItemLayoutProperty {
   TYPE = 0,
   ITEM_SIZE,
   ORIENTATION,

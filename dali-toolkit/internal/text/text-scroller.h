@@ -22,6 +22,7 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/render-tasks/render-task.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
@@ -104,6 +105,30 @@ public:
   int GetLoopCount() const;
 
   /**
+   * @brief Set the delay time of scroll animation loop
+   * @param[in] float delay time seconds of loops
+   */
+  void SetLoopDelay( float delay );
+
+  /**
+   * @brief Get the delay time of scroll
+   * @return float delay time seconds of loops
+   */
+  float GetLoopDelay() const;
+
+  /**
+   * @brief Set the mode of scrolling stop
+   * @param[in] stopMode type when text scrolling is stoped.
+   */
+  void SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMode );
+
+  /**
+   * @brief Get the mode of scrolling stop
+   * @return stopMode type when text scrolling is stoped.
+   */
+  DevelTextLabel::AutoScrollStopMode::Type GetStopMode() const;
+
+  /**
    * @brief Get the camera used to look at source, should be added to the parent of target actor.
    * @return camera Actor
    */
@@ -161,9 +186,11 @@ private:
   Property::Index    mScrollDeltaIndex;         // Property used by shader to represent distance to scroll
   Animation          mScrollAnimation;          // Animation used to update the mScrollDeltaIndex
 
-  int   mScrollSpeed;            ///< Speed which text should automatically scroll at
-  int   mLoopCount;              ///< Number of time the text should scroll
-  float mWrapGap;                ///< Gap before text wraps around when scrolling
+  int   mScrollSpeed;                                   ///< Speed which text should automatically scroll at
+  int   mLoopCount;                                     ///< Number of time the text should scroll
+  float mLoopDelay;                                     ///< Time delay of loop start
+  float mWrapGap;                                       ///< Gap before text wraps around when scrolling
+  DevelTextLabel::AutoScrollStopMode::Type  mStopMode;  ///< Stop mode of scrolling text, when loop count is 0.
 
 }; // TextScroller class
 

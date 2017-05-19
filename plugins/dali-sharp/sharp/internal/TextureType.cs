@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public enum TextureType {
+internal enum TextureType {
   TEXTURE_2D,
   TEXTURE_CUBE
 }

@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class KeyEventSignal : global::System.IDisposable {
+internal class KeyEventSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

@@ -29,7 +29,7 @@ namespace Dali {
 using System;
 using System.Runtime.InteropServices;
 
-public class TapGestureDetector : GestureDetector {
+internal class TapGestureDetector : GestureDetector {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal TapGestureDetector(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.TapGestureDetector_SWIGUpcast(cPtr), cMemoryOwn) {

@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_KEYBOARD_FOCUS_MANAGER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
+#include <dali/devel-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
@@ -248,7 +249,7 @@ private:
   Toolkit::KeyboardFocusManager::FocusGroupChangedSignalType mFocusGroupChangedSignal; ///< The signal to notify the focus group change
   Toolkit::KeyboardFocusManager::FocusedActorEnterKeySignalType mFocusedActorEnterKeySignal; ///< The signal to notify that enter has been pressed on the focused actor
 
-  unsigned int mCurrentFocusActor; ///< The actor ID of current focused actor
+  WeakHandle< Actor > mCurrentFocusActor; ///< A weak handle to the current focused actor
 
   Actor mFocusIndicatorActor; ///< The focus indicator actor shared by all the keyboard focusable actors for highlight
 

@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class VectorUint16Pair : global::System.IDisposable {
+internal class VectorUint16Pair : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

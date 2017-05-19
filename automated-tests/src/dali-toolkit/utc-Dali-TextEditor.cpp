@@ -1847,3 +1847,69 @@ int utcDaliTextEditorHandles(void)
   END_TEST;
 }
 
+
+int utcDaliTextEditorUnderPropertyStringP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorUnderPropertyStringP");
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  std::string underlineSettings1( "{\"enable\":\"true\",\"color\":\"red\",\"height\":\"1\"}" );
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetProperty( TextEditor::Property::UNDERLINE, underlineSettings1 );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::UNDERLINE ), underlineSettings1, TEST_LOCATION );
+
+  tet_infoline("Set underline settings with a map");
+  // Check the input underline property
+  Property::Map underlineMapSet;
+  Property::Map underlineMapGet;
+  underlineMapSet.Insert( "enable", "true" );
+  underlineMapSet.Insert( "color", "blue" );
+  underlineMapSet.Insert( "height", "2" );
+
+  editor.SetProperty( TextEditor::Property::UNDERLINE, underlineMapSet );
+  underlineMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::UNDERLINE );
+  DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapSet, underlineMapGet ), true,  TEST_LOCATION );
+
+  tet_infoline("Set underline settings with a string");
+  editor.SetProperty( TextEditor::Property::UNDERLINE, underlineSettings1 );
+  Property::Value value = editor.GetProperty( TextEditor::Property::UNDERLINE );
+  std::string result;
+  value.Get(result);
+  DALI_TEST_EQUALS( result , underlineSettings1, TEST_LOCATION  );
+
+  tet_infoline("Trying to set invalid underline settings, should not update and stay at previous settings");
+  std::string underlineSettingsVoid( "{\"enable\":\"true\",\"coooolor\":\"blue\",\"heeeight\":\"4\"}" );
+  editor.SetProperty( TextEditor::Property::UNDERLINE, underlineSettingsVoid );
+  value = editor.GetProperty( TextEditor::Property::UNDERLINE );
+  value.Get(result);
+  DALI_TEST_EQUALS( result , underlineSettings1, TEST_LOCATION  );
+
+  END_TEST;
+}
+
+int utcDaliTextEditorShadowPropertyStringP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorUnderPropertyStringP Setting Shadow propeties by string");
+
+  TextEditor editor = TextEditor::New();
+
+  std::string shadowSettings( "{\"color\":\"green\",\"offset\":\"2 2\"}" );
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetProperty( TextEditor::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\"}" );
+
+  Property::Value value = editor.GetProperty<std::string>( TextEditor::Property::SHADOW );
+  std::string result;
+  value.Get(result);
+
+  DALI_TEST_EQUALS( result, shadowSettings, TEST_LOCATION );
+
+  END_TEST;
+}

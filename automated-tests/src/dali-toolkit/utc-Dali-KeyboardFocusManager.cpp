@@ -1380,3 +1380,31 @@ int UtcDaliKeyboardFocusManagerMoveFocusTestStateChange(void)
 
   END_TEST;
 }
+
+int UtcDaliKeyboardFocusManagerFocusedActorUnstaged(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Ensure we cannot set an actor to be focused if it is not staged and that we do not retrieve an actor if it has been unstaged" );
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK( ! manager.GetCurrentFocusActor() );
+
+  Actor actor = Actor::New();
+  actor.SetKeyboardFocusable( true );
+
+  tet_infoline( "Attempt to set unstaged actor, no actor should be returned from KeyboardFocusManager" );
+  manager.SetCurrentFocusActor( actor );
+  DALI_TEST_CHECK( ! manager.GetCurrentFocusActor() );
+
+  tet_infoline( "Add actor to stage and attempt to set, our actor should be returned from KeyboardFocusManager" );
+  Stage::GetCurrent().Add( actor );
+  manager.SetCurrentFocusActor( actor );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor() == actor );
+
+  tet_infoline( "Remove actor from stage and attempt to retrieve, no actor should be returned from KeyboardFocusManager" );
+  actor.Unparent();
+  DALI_TEST_CHECK( ! manager.GetCurrentFocusActor() );
+
+  END_TEST;
+}

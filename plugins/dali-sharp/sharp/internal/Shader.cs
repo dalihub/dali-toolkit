@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class Shader : Animatable {
+internal class Shader : Animatable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal Shader(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.Shader_SWIGUpcast(cPtr), cMemoryOwn) {

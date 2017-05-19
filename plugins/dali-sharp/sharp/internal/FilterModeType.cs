@@ -10,15 +10,15 @@
 
 namespace Dali {
 
-public enum FilterModeType {
-  NONE = 0,
-  DEFAULT,
-  NEAREST,
-  LINEAR,
-  NEAREST_MIPMAP_NEAREST,
-  LINEAR_MIPMAP_NEAREST,
-  NEAREST_MIPMAP_LINEAR,
-  LINEAR_MIPMAP_LINEAR
+internal enum FilterModeType {
+  None = 0,
+  Default,
+  Nearest,
+  Linear,
+  NearestMipmapNearest,
+  LinearMipmapNearest,
+  NearestMipmapLinear,
+  LinearMipmapLinear
 }
 
 }

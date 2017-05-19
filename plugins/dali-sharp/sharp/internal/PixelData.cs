@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class PixelData : BaseHandle {
+internal class PixelData : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal PixelData(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.PixelData_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -64,15 +64,6 @@ public class PixelData : BaseHandle {
   public PixelData (byte[] buffer, uint bufferSize, uint width, uint height, PixelFormat pixelFormat, PixelData.ReleaseFunction releaseFunction) : this (NDalicPINVOKE.PixelData_New(buffer, bufferSize, width, height, (int)pixelFormat, (int)releaseFunction), true) {
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
 
-  }
-  public PixelData(PixelData handle) : this(NDalicPINVOKE.new_PixelData__SWIG_1(PixelData.getCPtr(handle)), true) {
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public PixelData Assign(PixelData rhs) {
-    PixelData ret = new PixelData(NDalicPINVOKE.PixelData_Assign(swigCPtr, PixelData.getCPtr(rhs)), false);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
   }
 
   public uint GetWidth() {

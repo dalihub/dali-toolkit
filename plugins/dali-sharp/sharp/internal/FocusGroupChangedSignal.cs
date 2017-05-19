@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class FocusGroupChangedSignal : global::System.IDisposable {
+internal class FocusGroupChangedSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class ViewImpl : CustomActorImpl {
+internal class ViewImpl : CustomActorImpl {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal ViewImpl(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.ViewImpl_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -112,39 +112,39 @@ public class ViewImpl : CustomActorImpl {
     return ret;
   }
 
-  public void SetKeyboardNavigationSupport(bool isSupported) {
+  public void SetFocusNavigationSupport(bool isSupported) {
     NDalicPINVOKE.ViewImpl_SetKeyboardNavigationSupport(swigCPtr, isSupported);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public bool IsKeyboardNavigationSupported() {
+  public bool IsFocusNavigationSupported() {
     bool ret = NDalicPINVOKE.ViewImpl_IsKeyboardNavigationSupported(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public void SetKeyInputFocus() {
+  public void SetFocus() {
     NDalicPINVOKE.ViewImpl_SetKeyInputFocus(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public bool HasKeyInputFocus() {
+  public bool HasFocus() {
     bool ret = NDalicPINVOKE.ViewImpl_HasKeyInputFocus(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public void ClearKeyInputFocus() {
+  public void ClearFocus() {
     NDalicPINVOKE.ViewImpl_ClearKeyInputFocus(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void SetAsKeyboardFocusGroup(bool isFocusGroup) {
+  public void SetAsFocusGroup(bool isFocusGroup) {
     NDalicPINVOKE.ViewImpl_SetAsKeyboardFocusGroup(swigCPtr, isFocusGroup);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public bool IsKeyboardFocusGroup() {
+  public bool IsFocusGroup() {
     bool ret = NDalicPINVOKE.ViewImpl_IsKeyboardFocusGroup(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
@@ -155,18 +155,18 @@ public class ViewImpl : CustomActorImpl {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public void KeyboardEnter() {
+  public void FocusEnter() {
     NDalicPINVOKE.ViewImpl_KeyboardEnter(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public ControlKeySignal KeyEventSignal() {
+  internal ControlKeySignal KeyEventSignal() {
     ControlKeySignal ret = new ControlKeySignal(NDalicPINVOKE.ViewImpl_KeyEventSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public KeyInputFocusSignal KeyInputFocusGainedSignal() {
+  public KeyInputFocusSignal FocusGainedSignal() {
     KeyInputFocusSignal ret = new KeyInputFocusSignal(NDalicPINVOKE.ViewImpl_KeyInputFocusGainedSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
@@ -349,29 +349,29 @@ public class ViewImpl : CustomActorImpl {
     return ret;
   }
 
-  public virtual void OnKeyInputFocusGained() {
-    if (SwigDerivedClassHasMethod("OnKeyInputFocusGained", swigMethodTypes30)) NDalicPINVOKE.ViewImpl_OnKeyInputFocusGainedSwigExplicitViewImpl(swigCPtr); else NDalicPINVOKE.ViewImpl_OnKeyInputFocusGained(swigCPtr);
+  public virtual void OnFocusGained() {
+    if (SwigDerivedClassHasMethod("OnFocusGained", swigMethodTypes30)) NDalicPINVOKE.ViewImpl_OnKeyInputFocusGainedSwigExplicitViewImpl(swigCPtr); else NDalicPINVOKE.ViewImpl_OnKeyInputFocusGained(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public virtual void OnKeyInputFocusLost() {
-    if (SwigDerivedClassHasMethod("OnKeyInputFocusLost", swigMethodTypes31)) NDalicPINVOKE.ViewImpl_OnKeyInputFocusLostSwigExplicitViewImpl(swigCPtr); else NDalicPINVOKE.ViewImpl_OnKeyInputFocusLost(swigCPtr);
+  public virtual void OnFocusLost() {
+    if (SwigDerivedClassHasMethod("OnFocusLost", swigMethodTypes31)) NDalicPINVOKE.ViewImpl_OnKeyInputFocusLostSwigExplicitViewImpl(swigCPtr); else NDalicPINVOKE.ViewImpl_OnKeyInputFocusLost(swigCPtr);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public virtual View GetNextKeyboardFocusableView(View currentFocusedView, View.KeyboardFocus.Direction direction, bool loopEnabled) {
-    View ret = new View((SwigDerivedClassHasMethod("GetNextKeyboardFocusableView", swigMethodTypes32) ? NDalicPINVOKE.ViewImpl_GetNextKeyboardFocusableActorSwigExplicitViewImpl(swigCPtr, View.getCPtr(currentFocusedView), (int)direction, loopEnabled) : NDalicPINVOKE.ViewImpl_GetNextKeyboardFocusableActor(swigCPtr, View.getCPtr(currentFocusedView), (int)direction, loopEnabled)), true);
+  public virtual View GetNextFocusableView(View currentFocusedView, View.Focus.Direction direction, bool loopEnabled) {
+    View ret = new View((SwigDerivedClassHasMethod("GetNextFocusableView", swigMethodTypes32) ? NDalicPINVOKE.ViewImpl_GetNextKeyboardFocusableActorSwigExplicitViewImpl(swigCPtr, View.getCPtr(currentFocusedView), (int)direction, loopEnabled) : NDalicPINVOKE.ViewImpl_GetNextKeyboardFocusableActor(swigCPtr, View.getCPtr(currentFocusedView), (int)direction, loopEnabled)), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public virtual void OnKeyboardFocusChangeCommitted(View commitedFocusableView) {
-    if (SwigDerivedClassHasMethod("OnKeyboardFocusChangeCommitted", swigMethodTypes33)) NDalicPINVOKE.ViewImpl_OnKeyboardFocusChangeCommittedSwigExplicitViewImpl(swigCPtr, View.getCPtr(commitedFocusableView)); else NDalicPINVOKE.ViewImpl_OnKeyboardFocusChangeCommitted(swigCPtr, View.getCPtr(commitedFocusableView));
+  public virtual void OnFocusChangeCommitted(View commitedFocusableView) {
+    if (SwigDerivedClassHasMethod("OnFocusChangeCommitted", swigMethodTypes33)) NDalicPINVOKE.ViewImpl_OnKeyboardFocusChangeCommittedSwigExplicitViewImpl(swigCPtr, View.getCPtr(commitedFocusableView)); else NDalicPINVOKE.ViewImpl_OnKeyboardFocusChangeCommitted(swigCPtr, View.getCPtr(commitedFocusableView));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public virtual bool OnKeyboardEnter() {
-    bool ret = (SwigDerivedClassHasMethod("OnKeyboardEnter", swigMethodTypes34) ? NDalicPINVOKE.ViewImpl_OnKeyboardEnterSwigExplicitViewImpl(swigCPtr) : NDalicPINVOKE.ViewImpl_OnKeyboardEnter(swigCPtr));
+  public virtual bool OnFocusEnter() {
+    bool ret = (SwigDerivedClassHasMethod("OnFocusEnter", swigMethodTypes34) ? NDalicPINVOKE.ViewImpl_OnKeyboardEnterSwigExplicitViewImpl(swigCPtr) : NDalicPINVOKE.ViewImpl_OnKeyboardEnter(swigCPtr));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
@@ -467,16 +467,16 @@ public class ViewImpl : CustomActorImpl {
       swigDelegate28 = new SwigDelegateViewImpl_28(SwigDirectorOnAccessibilityValueChange);
     if (SwigDerivedClassHasMethod("OnAccessibilityZoom", swigMethodTypes29))
       swigDelegate29 = new SwigDelegateViewImpl_29(SwigDirectorOnAccessibilityZoom);
-    if (SwigDerivedClassHasMethod("OnKeyInputFocusGained", swigMethodTypes30))
-      swigDelegate30 = new SwigDelegateViewImpl_30(SwigDirectorOnKeyInputFocusGained);
-    if (SwigDerivedClassHasMethod("OnKeyInputFocusLost", swigMethodTypes31))
-      swigDelegate31 = new SwigDelegateViewImpl_31(SwigDirectorOnKeyInputFocusLost);
-    if (SwigDerivedClassHasMethod("GetNextKeyboardFocusableView", swigMethodTypes32))
-      swigDelegate32 = new SwigDelegateViewImpl_32(SwigDirectorGetNextKeyboardFocusableView);
-    if (SwigDerivedClassHasMethod("OnKeyboardFocusChangeCommitted", swigMethodTypes33))
-      swigDelegate33 = new SwigDelegateViewImpl_33(SwigDirectorOnKeyboardFocusChangeCommitted);
-    if (SwigDerivedClassHasMethod("OnKeyboardEnter", swigMethodTypes34))
-      swigDelegate34 = new SwigDelegateViewImpl_34(SwigDirectorOnKeyboardEnter);
+    if (SwigDerivedClassHasMethod("OnFocusGained", swigMethodTypes30))
+      swigDelegate30 = new SwigDelegateViewImpl_30(SwigDirectorOnFocusGained);
+    if (SwigDerivedClassHasMethod("OnFocusLost", swigMethodTypes31))
+      swigDelegate31 = new SwigDelegateViewImpl_31(SwigDirectorOnFocusLost);
+    if (SwigDerivedClassHasMethod("GetNextFocusableView", swigMethodTypes32))
+      swigDelegate32 = new SwigDelegateViewImpl_32(SwigDirectorGetNextFocusableView);
+    if (SwigDerivedClassHasMethod("OnFocusChangeCommitted", swigMethodTypes33))
+      swigDelegate33 = new SwigDelegateViewImpl_33(SwigDirectorOnFocusChangeCommitted);
+    if (SwigDerivedClassHasMethod("OnFocusEnter", swigMethodTypes34))
+      swigDelegate34 = new SwigDelegateViewImpl_34(SwigDirectorOnFocusEnter);
     if (SwigDerivedClassHasMethod("OnPinch", swigMethodTypes35))
       swigDelegate35 = new SwigDelegateViewImpl_35(SwigDirectorOnPinch);
     if (SwigDerivedClassHasMethod("OnPan", swigMethodTypes36))
@@ -618,24 +618,24 @@ public class ViewImpl : CustomActorImpl {
     return OnAccessibilityZoom();
   }
 
-  private void SwigDirectorOnKeyInputFocusGained() {
-    OnKeyInputFocusGained();
+  private void SwigDirectorOnFocusGained() {
+    OnFocusGained();
   }
 
-  private void SwigDirectorOnKeyInputFocusLost() {
-    OnKeyInputFocusLost();
+  private void SwigDirectorOnFocusLost() {
+    OnFocusLost();
   }
 
-  private global::System.IntPtr SwigDirectorGetNextKeyboardFocusableView(global::System.IntPtr currentFocusedView, int direction, bool loopEnabled) {
-    return View.getCPtr(GetNextKeyboardFocusableView(new View(currentFocusedView, true), (View.KeyboardFocus.Direction)direction, loopEnabled)).Handle;
+  private global::System.IntPtr SwigDirectorGetNextFocusableView(global::System.IntPtr currentFocusedView, int direction, bool loopEnabled) {
+    return View.getCPtr(GetNextFocusableView(new View(currentFocusedView, true), (View.Focus.Direction)direction, loopEnabled)).Handle;
   }
 
-  private void SwigDirectorOnKeyboardFocusChangeCommitted(global::System.IntPtr commitedFocusableView) {
-    OnKeyboardFocusChangeCommitted(new View(commitedFocusableView, true));
+  private void SwigDirectorOnFocusChangeCommitted(global::System.IntPtr commitedFocusableView) {
+    OnFocusChangeCommitted(new View(commitedFocusableView, true));
   }
 
-  private bool SwigDirectorOnKeyboardEnter() {
-    return OnKeyboardEnter();
+  private bool SwigDirectorOnFocusEnter() {
+    return OnFocusEnter();
   }
 
   private void SwigDirectorOnPinch(global::System.IntPtr pinch) {
@@ -778,7 +778,7 @@ public class ViewImpl : CustomActorImpl {
   private static global::System.Type[] swigMethodTypes29 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes30 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes31 = new global::System.Type[] {  };
-  private static global::System.Type[] swigMethodTypes32 = new global::System.Type[] { typeof(View), typeof(View.KeyboardFocus.Direction), typeof(bool) };
+  private static global::System.Type[] swigMethodTypes32 = new global::System.Type[] { typeof(View), typeof(View.Focus.Direction), typeof(bool) };
   private static global::System.Type[] swigMethodTypes33 = new global::System.Type[] { typeof(View) };
   private static global::System.Type[] swigMethodTypes34 = new global::System.Type[] {  };
   private static global::System.Type[] swigMethodTypes35 = new global::System.Type[] { typeof(PinchGesture) };

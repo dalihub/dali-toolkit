@@ -75,17 +75,17 @@ namespace MyCSharpExample
             _spinMonth.Value = 5;
             _spinDay.Value = 23;
 
-            _spinYear.SetKeyboardFocusable(true);
-            _spinMonth.SetKeyboardFocusable(true);
-            _spinDay.SetKeyboardFocusable(true);
+            _spinYear.SetFocusable(true);
+            _spinMonth.SetFocusable(true);
+            _spinDay.SetFocusable(true);
 
-            FocusManager keyboardFocusManager = FocusManager.Instance;
-            keyboardFocusManager.PreFocusChange += OnKeyboardPreFocusChange;
-            keyboardFocusManager.FocusedActorEnterKeyPressed += OnFocusedActorEnterKeyPressed;
+            FocusManager FocusManager = FocusManager.Instance;
+            FocusManager.PreFocusChange += OnPreFocusChange;
+            FocusManager.FocusedActorEnterKeyPressed += OnFocusedActorEnterKeyPressed;
 
         }
 
-        private Actor OnKeyboardPreFocusChange(object source, FocusManager.PreFocusChangeEventArgs e)
+        private Actor OnPreFocusChange(object source, FocusManager.PreFocusChangeEventArgs e)
         {
             Actor nextFocusActor = e.Proposed;
 
@@ -94,7 +94,7 @@ namespace MyCSharpExample
             {
                 nextFocusActor = _spinYear.SpinText;
             }
-            else if(e.Direction == View.KeyboardFocus.Direction.LEFT)
+            else if(e.Direction == View.Focus.Direction.LEFT)
             {
                 // Move the focus to the spin in the left of the current focused spin
                 if(e.Current == _spinMonth.SpinText)
@@ -106,7 +106,7 @@ namespace MyCSharpExample
                     nextFocusActor = _spinMonth.SpinText;
                 }
             }
-            else if(e.Direction == View.KeyboardFocus.Direction.RIGHT)
+            else if(e.Direction == View.Focus.Direction.RIGHT)
             {
                 // Move the focus to the spin in the right of the current focused spin
                 if(e.Current == _spinYear.SpinText)

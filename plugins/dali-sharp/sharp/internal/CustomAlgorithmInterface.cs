@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class CustomAlgorithmInterface : global::System.IDisposable {
+internal class CustomAlgorithmInterface : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -46,13 +46,13 @@ public class CustomAlgorithmInterface : global::System.IDisposable {
   }
 
 
-  public virtual View GetNextFocusableView(View current, View proposed, View.KeyboardFocus.Direction direction) {
+  public virtual View GetNextFocusableView(View current, View proposed, View.Focus.Direction direction) {
     View ret = new View(NDalicPINVOKE.CustomAlgorithmInterface_GetNextFocusableActor(swigCPtr, View.getCPtr(current), View.getCPtr(proposed), (int)direction), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public CustomAlgorithmInterface() : this(NDalicPINVOKE.new_CustomAlgorithmInterface(), true) {
+  internal CustomAlgorithmInterface() : this(NDalicPINVOKE.new_CustomAlgorithmInterface(), true) {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     SwigDirectorConnect();
   }
@@ -70,14 +70,14 @@ public class CustomAlgorithmInterface : global::System.IDisposable {
   }
 
   private global::System.IntPtr SwigDirectorGetNextFocusableView(global::System.IntPtr current, global::System.IntPtr proposed, int direction) {
-    return View.getCPtr(GetNextFocusableView(new View(current, true), new View(proposed, true), (View.KeyboardFocus.Direction)direction)).Handle;
+    return View.getCPtr(GetNextFocusableView(new View(current, true), new View(proposed, true), (View.Focus.Direction)direction)).Handle;
   }
 
-  public delegate global::System.IntPtr SwigDelegateCustomAlgorithmInterface_0(global::System.IntPtr current, global::System.IntPtr proposed, int direction);
+  internal delegate global::System.IntPtr SwigDelegateCustomAlgorithmInterface_0(global::System.IntPtr current, global::System.IntPtr proposed, int direction);
 
   private SwigDelegateCustomAlgorithmInterface_0 swigDelegate0;
 
-  private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(View), typeof(View), typeof(View.KeyboardFocus.Direction) };
+  private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(View), typeof(View), typeof(View.Focus.Direction) };
 }
 
 }

@@ -10,11 +10,11 @@
 
 namespace Dali {
 
-public enum FaceCullingModeType {
-  NONE,
-  FRONT,
-  BACK,
-  FRONT_AND_BACK
+internal enum FaceCullingModeType {
+  None,
+  Front,
+  Back,
+  FrontAndBack
 }
 
 }

@@ -29,7 +29,7 @@ namespace Dali {
 using System;
 using System.Runtime.InteropServices;
 
-public class LongPressGestureDetector : GestureDetector {
+internal class LongPressGestureDetector : GestureDetector {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal LongPressGestureDetector(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.LongPressGestureDetector_SWIGUpcast(cPtr), cMemoryOwn) {

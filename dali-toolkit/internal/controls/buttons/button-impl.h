@@ -680,6 +680,11 @@ private:
 
   // Actions
   bool             mClickActionPerforming;      ///< Used to manage signal emissions during action
+
+  // Deprecated API support
+  Image            mSetButtonImage;             ///< Store set image if deprecated SetButtonImage used.
+  Image            mSetSelectedImage;           ///< Store set image if deprecated SetSelectedImage used.
+
 };
 
 } // namespace Internal

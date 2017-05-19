@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public enum CameraType {
+internal enum CameraType {
   FREE_LOOK,
   LOOK_AT_TARGET
 }

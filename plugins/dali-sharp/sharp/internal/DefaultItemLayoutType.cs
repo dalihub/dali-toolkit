@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public enum DefaultItemLayoutType {
+internal enum DefaultItemLayoutType {
   DEPTH,
   GRID,
   LIST,

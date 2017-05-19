@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class SWIGTYPE_p_uint8_t {
+internal class SWIGTYPE_p_uint8_t {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal SWIGTYPE_p_uint8_t(global::System.IntPtr cPtr, bool futureUse) {

@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class SliderMarkReachedSignal : global::System.IDisposable {
+internal class SliderMarkReachedSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

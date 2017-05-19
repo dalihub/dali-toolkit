@@ -115,7 +115,7 @@ namespace Test
             buttonWithSimpleTooltip.Position = new Position(windowSize.Width /2 , 0, 0);
 
             Window.Instance.Add(buttonWithSimpleTooltip);
-            buttonWithSimpleTooltip.SetKeyboardFocusable(true);
+            buttonWithSimpleTooltip.SetFocusable(true);
             buttonWithSimpleTooltip.TooltipText = "RePosition Square and change color to Blue";
             buttonWithSimpleTooltip.Clicked += (obj, ee) =>
             {

@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class KeyInputFocusSignal : global::System.IDisposable {
+internal class KeyInputFocusSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

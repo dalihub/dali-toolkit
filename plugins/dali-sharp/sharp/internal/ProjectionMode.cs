@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public enum ProjectionMode {
+internal enum ProjectionMode {
   PERSPECTIVE_PROJECTION,
   ORTHOGRAPHIC_PROJECTION
 }

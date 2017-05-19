@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class Model3dView : View {
+internal class Model3dView : View {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal Model3dView(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.Model3dView_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -130,13 +130,6 @@ public class Model3dView : View {
     return ret;
   }
 
-  public enum PropertyRange {
-    PROPERTY_START_INDEX = PropertyRanges.PROPERTY_REGISTRATION_START_INDEX,
-    PROPERTY_END_INDEX = View.PropertyRange.PROPERTY_START_INDEX+1000,
-    ANIMATABLE_PROPERTY_START_INDEX = PropertyRanges.ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,
-    ANIMATABLE_PROPERTY_END_INDEX = PropertyRanges.ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX+1000
-  }
-
   public enum IluminationTypeEnum {
     DIFFUSE,
     DIFFUSE_WITH_TEXTURE,
@@ -187,7 +180,7 @@ public class Model3dView : View {
     get
     {
       int temp = 0;
-      GetProperty( Model3dView.Property.ILLUMINATION_TYPE).Get( ref temp );
+      GetProperty( Model3dView.Property.ILLUMINATION_TYPE).Get( out temp );
       return temp;
     }
     set
