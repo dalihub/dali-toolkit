@@ -1438,6 +1438,16 @@ void Controller::ShadowSetByString( bool setByString )
   mImpl->mShadowSetByString = setByString;
 }
 
+bool Controller::IsFontStyleSetByString()
+{
+  return mImpl->mFontStyleSetByString;
+}
+
+void Controller::FontStyleSetByString( bool setByString )
+{
+  mImpl->mFontStyleSetByString = setByString;
+}
+
 // public : Queries & retrieves.
 
 Layout::Engine& Controller::GetLayoutEngine()
