@@ -422,6 +422,18 @@ public: // Configure the text controller.
    */
   void ShadowSetByString( bool setByString );
 
+  /**
+   * @brief Query if font style settings were provided by string or map
+   * @return bool true if set by string
+   */
+  bool IsFontStyleSetByString();
+
+  /**
+   * Set method font style setting were set by
+   * @param[in] bool, true if set by string
+   */
+  void FontStyleSetByString( bool setByString );
+
 public: // Update.
 
   /**

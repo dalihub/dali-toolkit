@@ -316,7 +316,8 @@ struct Controller::Impl
     mIsAutoScrollEnabled( false ),
     mAutoScrollDirectionRTL( false ),
     mUnderlineSetByString( false ),
-    mShadowSetByString( false )
+    mShadowSetByString( false ),
+    mFontStyleSetByString( false )
   {
     mModel = Model::New();
 
@@ -725,6 +726,7 @@ public:
 
   bool mUnderlineSetByString:1;            ///< Set when underline is set by string (legacy) instead of map
   bool mShadowSetByString:1;               ///< Set when shadow is set by string (legacy) instead of map
+  bool mFontStyleSetByString:1;            ///< Set when font style is set by string (legacy) instead of map
 };
 
 } // namespace Text
