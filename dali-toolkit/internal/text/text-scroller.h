@@ -123,6 +123,11 @@ public:
   void SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMode );
 
   /**
+   * @brief Stop the auto scrolling.
+   */
+  void StopScrolling();
+
+  /**
    * @brief Get the mode of scrolling stop
    * @return stopMode type when text scrolling is stoped.
    */

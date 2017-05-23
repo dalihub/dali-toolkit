@@ -224,35 +224,11 @@ int TextScroller::GetSpeed() const
 
 void TextScroller::SetLoopCount( int loopCount )
 {
-  if ( loopCount > 0 )
+  if ( loopCount >= 0 )
   {
     mLoopCount = loopCount;
   }
 
-  if (  mScrollAnimation && mScrollAnimation.GetState() == Animation::PLAYING )
-  {
-    if ( loopCount == 0 ) // Request to stop looping
-    {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetLoopCount Single loop forced\n" );
-      switch( mStopMode )
-      {
-        case DevelTextLabel::AutoScrollStopMode::IMMEDIATE:
-        {
-          mScrollAnimation.Stop();
-          break;
-        }
-        case DevelTextLabel::AutoScrollStopMode::FINISH_LOOP:
-        {
-          mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
-          break;
-        }
-        default:
-        {
-           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n" );
-        }
-      }
-    }
-  }
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetLoopCount [%d] Status[%s]\n", mLoopCount, (loopCount)?"looping":"stop" );
 }
 
@@ -275,6 +251,30 @@ void TextScroller::SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMod
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetAutoScrollStopMode [%s]\n",(stopMode == DevelTextLabel::AutoScrollStopMode::IMMEDIATE)?"IMMEDIATE":"FINISH_LOOP" );
   mStopMode = stopMode;
+}
+
+void TextScroller::StopScrolling()
+{
+  if ( mScrollAnimation && mScrollAnimation.GetState() == Animation::PLAYING )
+  {
+    switch( mStopMode )
+    {
+      case DevelTextLabel::AutoScrollStopMode::IMMEDIATE:
+      {
+        mScrollAnimation.Stop();
+        break;
+      }
+      case DevelTextLabel::AutoScrollStopMode::FINISH_LOOP:
+      {
+        mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
+        break;
+      }
+      default:
+      {
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n" );
+      }
+    }
+  }
 }
 
 DevelTextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const
