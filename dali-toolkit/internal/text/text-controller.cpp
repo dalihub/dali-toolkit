@@ -512,6 +512,22 @@ void Controller::GetText( std::string& text ) const
   }
 }
 
+void Controller::SetPlaceholderText( const std::string& text )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    mImpl->mEventData->mPlaceholderText = text;
+
+    // Update placeholder if there is no text
+    if( mImpl->IsShowingPlaceholderText() ||
+        ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) )
+    {
+      ShowPlaceholderText();
+    }
+  }
+}
+
+// This is overloading function for PLACEHOLDER_TEXT_FOCUSED in text-field
 void Controller::SetPlaceholderText( PlaceholderType type, const std::string& text )
 {
   if( NULL != mImpl->mEventData )
@@ -534,6 +550,15 @@ void Controller::SetPlaceholderText( PlaceholderType type, const std::string& te
   }
 }
 
+void Controller::GetPlaceholderText( std::string& text ) const
+{
+  if( NULL != mImpl->mEventData )
+  {
+    text = mImpl->mEventData->mPlaceholderText;
+  }
+}
+
+// This is overloading function for PLACEHOLDER_TEXT_FOCUSED in text-field
 void Controller::GetPlaceholderText( PlaceholderType type, std::string& text ) const
 {
   if( NULL != mImpl->mEventData )
@@ -3202,17 +3227,27 @@ void Controller::ShowPlaceholderText()
     const char* text( NULL );
     size_t size( 0 );
 
-    // TODO - Switch placeholder text styles when changing state
-    if( ( EventData::INACTIVE != mImpl->mEventData->mState ) &&
-        ( 0u != mImpl->mEventData->mPlaceholderTextActive.c_str() ) )
+    if( !mImpl->mEventData->mPlaceholderTextActive.empty() || !mImpl->mEventData->mPlaceholderTextInactive.empty() )
     {
-      text = mImpl->mEventData->mPlaceholderTextActive.c_str();
-      size = mImpl->mEventData->mPlaceholderTextActive.size();
+      if( ( EventData::INACTIVE != mImpl->mEventData->mState ) &&
+          ( 0u != mImpl->mEventData->mPlaceholderTextActive.c_str() ) )
+      {
+        text = mImpl->mEventData->mPlaceholderTextActive.c_str();
+        size = mImpl->mEventData->mPlaceholderTextActive.size();
+      }
+      else
+      {
+        text = mImpl->mEventData->mPlaceholderTextInactive.c_str();
+        size = mImpl->mEventData->mPlaceholderTextInactive.size();
+      }
     }
     else
     {
-      text = mImpl->mEventData->mPlaceholderTextInactive.c_str();
-      size = mImpl->mEventData->mPlaceholderTextInactive.size();
+      if( 0u != mImpl->mEventData->mPlaceholderText.c_str() )
+      {
+        text = mImpl->mEventData->mPlaceholderText.c_str();
+        size = mImpl->mEventData->mPlaceholderText.size();
+      }
     }
 
     mImpl->mTextUpdateInfo.mCharacterIndex = 0u;

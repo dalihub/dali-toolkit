@@ -116,7 +116,19 @@ namespace Property
        * @details name "lineCount", type int
        * @note this property is read-only.
        */
-      LINE_COUNT
+      LINE_COUNT,
+
+      /**
+       * @brief The text to display when the TextEditor is empty and inactive.
+       * @details name "placeholderText", type string
+       */
+      PLACEHOLDER_TEXT,
+
+      /**
+       * @brief The placeholder-text color.
+       * @details name "placeholderTextColor", type vector4
+       */
+      PLACEHOLDER_TEXT_COLOR
   };
 } // namespace Property
 

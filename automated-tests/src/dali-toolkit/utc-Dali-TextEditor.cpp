@@ -27,6 +27,7 @@
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 
 using namespace Dali;
@@ -94,9 +95,12 @@ const char* const PROPERTY_NAME_SCROLL_BAR_SHOW_DURATION             = "scrollBa
 const char* const PROPERTY_NAME_SCROLL_BAR_FADE_DURATION             = "scrollBarFadeDuration";
 const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSize";
 const char* const PROPERTY_NAME_LINE_COUNT                           = "lineCount";
+const char* const PROPERTY_NAME_PLACEHOLDER_TEXT                     = "placeholderText";
+const char* const PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR               = "placeholderTextColor";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
+const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
 
 const unsigned int CURSOR_BLINK_INTERVAL = 500u; // Cursor blink interval
@@ -435,6 +439,8 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_FADE_DURATION ) == DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextEditor::Property::PIXEL_SIZE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_LINE_COUNT) == DevelTextEditor::Property::LINE_COUNT );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == DevelTextEditor::Property::PLACEHOLDER_TEXT );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR );
 
   END_TEST;
 }
@@ -726,6 +732,20 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check the pixel size of font
   editor.SetProperty( DevelTextEditor::Property::PIXEL_SIZE, 20.f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check placeholder text properties.
+  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT, "Setting Placeholder Text" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( DevelTextEditor::Property::PLACEHOLDER_TEXT ), std::string("Setting Placeholder Text"), TEST_LOCATION );
+
+  // Check placeholder text properties when focused.
+  editor.SetProperty( DevelControl::Property::STATE, "FOCUSED" );
+  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT, "Setting Focused Placeholder Text" );
+  DALI_TEST_EQUALS( editor.GetProperty<int>( DevelControl::Property::STATE ), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( DevelTextEditor::Property::PLACEHOLDER_TEXT ), std::string("Setting Focused Placeholder Text"), TEST_LOCATION );
+
+  // Check placeholder text's color property.
+  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR, Color::RED );
+  DALI_TEST_EQUALS( editor.GetProperty<Vector4>( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR ), Color::RED, TEST_LOCATION );
 
   END_TEST;
 }

@@ -32,6 +32,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -135,6 +136,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarShowDuration", 
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarFadeDuration",          FLOAT,     SCROLL_BAR_FADE_DURATION             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "pixelSize",                      FLOAT,     PIXEL_SIZE                           )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "lineCount",            INTEGER,   LINE_COUNT                           )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderText",                STRING,    PLACEHOLDER_TEXT                     )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",           VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -661,6 +664,32 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT:
+      {
+        if( impl.mController )
+        {
+          const std::string& text = value.Get< std::string >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor::OnPropertySet %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str() );
+
+          impl.mController->SetPlaceholderText( text );
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR:
+      {
+        if( impl.mController )
+        {
+          const Vector4& textColor = value.Get< Vector4 >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p PLACEHOLDER_TEXT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a );
+
+          if( impl.mController->GetPlaceholderTextColor() != textColor )
+          {
+            impl.mController->SetPlaceholderTextColor( textColor );
+            impl.mRenderer.Reset();
+          }
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -1001,6 +1030,24 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         {
           float width = textEditor.GetProperty( Actor::Property::SIZE_WIDTH ).Get<float>();
           value = impl.mController->GetLineCount( width );
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT:
+      {
+        if( impl.mController )
+        {
+          std::string text;
+          impl.mController->GetPlaceholderText( text );
+          value = text;
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetPlaceholderTextColor();
         }
         break;
       }

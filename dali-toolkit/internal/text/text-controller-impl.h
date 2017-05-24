@@ -104,6 +104,7 @@ struct EventData
 
   DecoratorPtr       mDecorator;               ///< Pointer to the decorator.
   ImfManager         mImfManager;              ///< The Input Method Framework Manager.
+  std::string        mPlaceholderText;         ///< The text to display when the TextField is empty.
   std::string        mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus.
   std::string        mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive.
   Vector4            mPlaceholderTextColor;    ///< The in/active placeholder text color.
@@ -383,10 +384,9 @@ struct Controller::Impl
    */
   bool IsPlaceholderAvailable() const
   {
-    return ( mEventData &&
-             ( !mEventData->mPlaceholderTextInactive.empty() ||
-               !mEventData->mPlaceholderTextActive.empty() )
-           );
+    return ( mEventData && ( !mEventData->mPlaceholderText.empty() ||
+                             !mEventData->mPlaceholderTextInactive.empty() ||
+                             !mEventData->mPlaceholderTextActive.empty() ) );
   }
 
   bool IsShowingPlaceholderText() const
@@ -399,7 +399,8 @@ struct Controller::Impl
    */
   bool IsFocusedPlaceholderAvailable() const
   {
-    return ( mEventData && !mEventData->mPlaceholderTextActive.empty() );
+    return ( mEventData && ( !mEventData->mPlaceholderTextActive.empty() ||
+                             !mEventData->mPlaceholderText.empty() ) );
   }
 
   bool IsShowingRealText() const
