@@ -26,6 +26,7 @@
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
@@ -131,11 +132,11 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
 
   trackSize.width = std::max( 0.0f, size.width ); // Ensure we don't go negative
 
-  Toolkit::Visual::Base trackVisual = GetVisual( Toolkit::ProgressBar::Property::TRACK_VISUAL );
-  Toolkit::Visual::Base secondProgressVisual = GetVisual( Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL );
-  Toolkit::Visual::Base progressVisual = GetVisual( Toolkit::ProgressBar::Property::PROGRESS_VISUAL );
-  Toolkit::Visual::Base labelVisual = GetVisual( Toolkit::ProgressBar::Property::LABEL_VISUAL );
-  Toolkit::Visual::Base indeterminateVisual = GetVisual( Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL );
+  Toolkit::Visual::Base trackVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::TRACK_VISUAL );
+  Toolkit::Visual::Base secondProgressVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL );
+  Toolkit::Visual::Base progressVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::PROGRESS_VISUAL );
+  Toolkit::Visual::Base labelVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::LABEL_VISUAL );
+  Toolkit::Visual::Base indeterminateVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL );
 
   if( trackVisual )
   {
@@ -197,8 +198,8 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
 Vector3 ProgressBar::GetNaturalSize()
 {
   // Return the bigger size after comparing trackVisual naturalSize and labelVisual naturalSize
-  Toolkit::Visual::Base trackVisual =  GetVisual( Toolkit::ProgressBar::Property::TRACK_VISUAL );
-  Toolkit::Visual::Base labelVisual =  GetVisual( Toolkit::ProgressBar::Property::LABEL_VISUAL );
+  Toolkit::Visual::Base trackVisual =  DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::TRACK_VISUAL );
+  Toolkit::Visual::Base labelVisual =  DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::LABEL_VISUAL );
 
   Size trackSize;
   Size labelSize;
@@ -275,7 +276,7 @@ float ProgressBar::GetSecondaryProgressValue() const
 void ProgressBar::SetIndeterminate( bool value )
 {
   mIndeterminate = value;
-  EnableVisual( Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL, mIndeterminate );
+  DevelControl::EnableVisual( *this, Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL, mIndeterminate );
 
   if( mIndeterminate )
   {
@@ -316,7 +317,7 @@ void ProgressBar::PlayIndeterminateVisualTransition()
     mIndeterminateVisualAni.Clear();
   }
 
-  mIndeterminateVisualAni = CreateTransition( mIndeterminateVisualTransition );
+  mIndeterminateVisualAni = DevelControl::CreateTransition( *this, mIndeterminateVisualTransition );
 
   if( mIndeterminate && mIndeterminateVisualAni )
   {
@@ -377,23 +378,23 @@ void ProgressBar::CreateVisualsForComponent( Property::Index index, const Proper
     progressVisual.SetDepthIndex( visualDepth );
     if( index == Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL )
     {
-      RegisterVisual( index, progressVisual, mIndeterminate );
+      DevelControl::RegisterVisual( *this, index, progressVisual, mIndeterminate );
     }
     else
     {
-      RegisterVisual( index, progressVisual, true );
+      DevelControl::RegisterVisual( *this, index, progressVisual, true );
     }
   }
   else
   {
-    UnregisterVisual( index );
+    DevelControl::UnregisterVisual( *this, index );
   }
 }
 
 bool ProgressBar::GetPropertyMapForVisual( Property::Index visualIndex, Property::Map& retreivedMap ) const
 {
   bool success = false;
-  Toolkit::Visual::Base visual = GetVisual( visualIndex );
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, visualIndex );
 
   if ( visual )
   {
@@ -468,7 +469,7 @@ void ProgressBar::SetProperty( BaseObject* object, Property::Index propertyIndex
         {
           // set new text string as TEXT property
           Property::Map newTextMap;
-          Toolkit::Visual::Base label = progressBarImpl.GetVisual( Toolkit::ProgressBar::Property::LABEL_VISUAL );
+          Toolkit::Visual::Base label = DevelControl::GetVisual( progressBarImpl, Toolkit::ProgressBar::Property::LABEL_VISUAL );
 
           if( label )
           {

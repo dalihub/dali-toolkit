@@ -37,6 +37,7 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/align-enums.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
@@ -385,7 +386,7 @@ void Button::MergeWithExistingLabelProperties( const Property::Map& inMap, Prope
    * 3) Merge with new properties ( settings )
    * 4) Return new merged map
    */
-  Toolkit::Visual::Base visual = GetVisual( Toolkit::Button::Property::LABEL );
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, Toolkit::Button::Property::LABEL );
   if ( visual )
   {
     DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "MergeLabelProperties Visual already exists, retrieving existing map\n");
@@ -451,13 +452,13 @@ void Button::CreateVisualsForComponent( Property::Index index, const Property::V
   if ( buttonVisual )
   {
     DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent RegisterVisual index(%d) enabled(%s)\n",
-                   index, IsVisualEnabled( index )?"true":"false" );
+                   index, DevelControl::IsVisualEnabled( *this, index )?"true":"false" );
     buttonVisual.SetDepthIndex( visualDepth );
-    RegisterVisual( index, buttonVisual, IsVisualEnabled( index ) );
+    DevelControl::RegisterVisual( *this, index, buttonVisual, DevelControl::IsVisualEnabled( *this, index ) );
   }
   else
   {
-    UnregisterVisual( index );
+    DevelControl::UnregisterVisual( *this, index );
     DALI_LOG_INFO( gLogButtonFilter, Debug::General, "CreateVisualsForComponent Visual not created or empty map (clearing visual).(%d)\n", index);
   }
   PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
@@ -467,7 +468,7 @@ bool Button::GetPropertyMapForVisual( Property::Index visualIndex, Property::Map
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "GetPropertyMapForVisual visual(%d)\n", visualIndex);
   bool success = false;
-  Toolkit::Visual::Base visual = GetVisual( visualIndex );
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, visualIndex );
   if ( visual )
   {
     visual.CreatePropertyMap( retreivedMap );
@@ -787,7 +788,7 @@ Vector3 Button::GetNaturalSize()
 
   for ( int state = Button::UNSELECTED_STATE; state < Button::STATE_COUNT; state++ )
   {
-    Toolkit::Visual::Base visual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND] );
+    Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND] );
     Size visualSize;
     if ( visual )
     {
@@ -802,7 +803,7 @@ Vector3 Button::GetNaturalSize()
   {
     for ( int state = Button::UNSELECTED_STATE; state < Button::STATE_COUNT; state++ )
     {
-      Toolkit::Visual::Base visual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[state][BACKGROUND] );
+      Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, GET_VISUAL_INDEX_FOR_STATE[state][BACKGROUND] );
       Size visualSize;
       if ( visual )
       {
@@ -830,7 +831,7 @@ Vector3 Button::GetNaturalSize()
   // Get natural size of label if text has been set
   if ( mTextStringSetFlag )
   {
-    Toolkit::Visual::Base visual = GetVisual( Toolkit::Button::Property::LABEL );
+    Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, Toolkit::Button::Property::LABEL );
 
     if ( visual )
     {
@@ -883,9 +884,9 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout targetSize(%f,%f) ptr(%p) state[%d]\n", size.width, size.height, this, mButtonState );
 
-  Toolkit::Visual::Base currentVisual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[mButtonState][FOREGROUND] );
+  Toolkit::Visual::Base currentVisual = DevelControl::GetVisual( *this, GET_VISUAL_INDEX_FOR_STATE[mButtonState][FOREGROUND] );
 
-  Toolkit::Visual::Base currentBackGroundVisual = GetVisual( GET_VISUAL_INDEX_FOR_STATE[mButtonState][BACKGROUND] );
+  Toolkit::Visual::Base currentBackGroundVisual = DevelControl::GetVisual( *this, GET_VISUAL_INDEX_FOR_STATE[mButtonState][BACKGROUND] );
 
   // Sizes and padding set to zero, if not present then values will no effect calculations.
   Vector2 visualPosition = Vector2::ZERO;
@@ -1006,7 +1007,7 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
   if ( mTextStringSetFlag )
   {
-    Toolkit::Visual::Base textVisual = GetVisual( Toolkit::Button::Property::LABEL ); // No need to search for Label visual if no text set.
+    Toolkit::Visual::Base textVisual = DevelControl::GetVisual( *this, Toolkit::Button::Property::LABEL ); // No need to search for Label visual if no text set.
 
     if ( textVisual )
     {
@@ -1101,7 +1102,7 @@ void Button::SelectRequiredVisual( Property::Index visualIndex )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SelectRequiredVisual index(%d) state(%d)\n", visualIndex, mButtonState );
 
-  EnableVisual( visualIndex, true );
+  DevelControl::EnableVisual( *this, visualIndex, true );
 }
 
 void Button::RemoveVisual( Property::Index visualIndex )
@@ -1109,11 +1110,11 @@ void Button::RemoveVisual( Property::Index visualIndex )
   // Use OnButtonVisualRemoval if want button developer to have the option to override removal.
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::RemoveVisual index(%d) state(%d)\n", visualIndex, mButtonState );
 
-  Toolkit::Visual::Base visual = GetVisual( visualIndex );
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, visualIndex );
 
   if( visual )
   {
-    EnableVisual( visualIndex, false );
+    DevelControl::EnableVisual( *this, visualIndex, false );
   }
 }
 
@@ -1511,7 +1512,7 @@ void Button::SetBackgroundImage( const std::string& filename )
   }
   else
   {
-    UnregisterVisual( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
+    DevelControl::UnregisterVisual( *this, Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
   }
 }
 
@@ -1528,7 +1529,7 @@ void Button::SetSelectedBackgroundImage( const std::string& filename )
   }
   else
   {
-    UnregisterVisual( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
+    DevelControl::UnregisterVisual( *this, Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
   }
 }
 
@@ -1559,7 +1560,7 @@ void Button::SetDisabledSelectedImage( const std::string& filename )
 // Used by Deprecated Properties which don't use the Visual Property maps for setting and getting
 std::string Button::GetUrlForImageVisual( const Property::Index index ) const
 {
-  Toolkit::Visual::Base visual = GetVisual( index );
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, index );
   std::string result;
 
   if ( visual )

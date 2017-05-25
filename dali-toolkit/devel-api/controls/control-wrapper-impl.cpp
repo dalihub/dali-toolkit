@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/styling/style-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
@@ -121,37 +122,37 @@ bool ControlWrapper::RelayoutDependentOnChildrenBase( Dimension::Type dimension 
 
 void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual )
 {
-  Control::RegisterVisual( index, visual );
+  DevelControl::RegisterVisual( *this, index, visual );
 }
 
 void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
 {
-  Control::RegisterVisual( index, visual, enabled );
+  DevelControl::RegisterVisual( *this, index, visual, enabled );
 }
 
 void ControlWrapper::UnregisterVisual( Property::Index index )
 {
-  Control::UnregisterVisual( index );
+  DevelControl::UnregisterVisual( *this, index );
 }
 
 Toolkit::Visual::Base ControlWrapper::GetVisual( Property::Index index ) const
 {
-  return Control::GetVisual( index );
+  return DevelControl::GetVisual( *this, index );
 }
 
 void ControlWrapper::EnableVisual( Property::Index index, bool enable )
 {
-  Control::EnableVisual( index, enable );
+  DevelControl::EnableVisual( *this, index, enable );
 }
 
 bool ControlWrapper::IsVisualEnabled( Property::Index index ) const
 {
-  return Control::IsVisualEnabled( index );
+  return DevelControl::IsVisualEnabled( *this, index );
 }
 
 Dali::Animation ControlWrapper::CreateTransition( const Toolkit::TransitionData& handle )
 {
-  return Control::CreateTransition( handle );
+  return DevelControl::CreateTransition( *this, handle );
 }
 
 void ControlWrapper::ApplyThemeStyle()
