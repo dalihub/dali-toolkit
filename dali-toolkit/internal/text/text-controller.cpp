@@ -2681,12 +2681,12 @@ bool Controller::RemoveText( int cursorOffset,
     Vector<Character>& currentText = mImpl->mModel->mLogicalModel->mText;
     CharacterIndex& oldCursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
 
-    CharacterIndex cursorIndex = oldCursorIndex;
+    CharacterIndex cursorIndex = 0;
 
     // Validate the cursor position & number of characters
-    if( static_cast< CharacterIndex >( std::abs( cursorOffset ) ) <= cursorIndex )
+    if( ( static_cast< int >( mImpl->mEventData->mPrimaryCursorPosition ) + cursorOffset ) >= 0 )
     {
-      cursorIndex = oldCursorIndex + cursorOffset;
+      cursorIndex = mImpl->mEventData->mPrimaryCursorPosition + cursorOffset;
     }
 
     if( ( cursorIndex + numberOfCharacters ) > currentText.Count() )

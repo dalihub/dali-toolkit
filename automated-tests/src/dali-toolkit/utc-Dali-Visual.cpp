@@ -1166,12 +1166,12 @@ int UtcDaliVisualAnimateBorderVisual01(void)
   application.Render(0);
   application.Render(2000u); // halfway point between blue and white
 
-  Vector4 color = DevelHandle::GetCurrentProperty< Vector4 >( renderer, borderColorIndex );
+  Vector4 color = renderer.GetCurrentProperty< Vector4 >( borderColorIndex );
   Vector4 testColor = (Color::BLUE + Color::WHITE)*0.5f;
   DALI_TEST_EQUALS( color, testColor, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("borderColor", testColor ), true, TEST_LOCATION );
 
-  color = DevelHandle::GetCurrentProperty< Vector3 >( renderer, mixColorIndex );
+  color = renderer.GetCurrentProperty< Vector3 >( mixColorIndex );
   testColor = Vector4( 1,1,1,0.4f );
   DALI_TEST_EQUALS( Vector3(color), Vector3(testColor), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(testColor) ), true, TEST_LOCATION );
@@ -1179,11 +1179,11 @@ int UtcDaliVisualAnimateBorderVisual01(void)
 
   application.Render(2000u);
 
-  color = DevelHandle::GetCurrentProperty< Vector4 >( renderer, borderColorIndex );
+  color = renderer.GetCurrentProperty< Vector4 >( borderColorIndex );
   DALI_TEST_EQUALS( color, Color::WHITE, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("borderColor", Color::WHITE ), true, TEST_LOCATION );
 
-  color = DevelHandle::GetCurrentProperty< Vector4 >( renderer, mixColorIndex );
+  color = renderer.GetCurrentProperty< Vector4 >( mixColorIndex );
   testColor = Vector4(1,1,1,0);
   DALI_TEST_EQUALS( color, testColor, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(testColor) ), true, TEST_LOCATION );
@@ -1225,13 +1225,13 @@ int UtcDaliVisualAnimateBorderVisual02(void)
   application.Render(0);
   application.Render(2000u); // halfway point
 
-  float size = DevelHandle::GetCurrentProperty< float >( renderer, index );
+  float size = renderer.GetCurrentProperty< float >( index );
   DALI_TEST_EQUALS( size, 7.0f, 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("borderSize", 7.0f ), true, TEST_LOCATION );
 
   application.Render(2000u); // halfway point between blue and white
 
-  size = DevelHandle::GetCurrentProperty< float >( renderer, index );
+  size = renderer.GetCurrentProperty< float >( index );
   DALI_TEST_EQUALS( size, 9.0f, 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("borderSize", 9.0f ), true, TEST_LOCATION );
 
@@ -1272,7 +1272,7 @@ int UtcDaliVisualAnimateColorVisual(void)
   application.Render(0);
   application.Render(2000u); // halfway point
 
-  Vector3 color = DevelHandle::GetCurrentProperty< Vector3 >( renderer, mixColorIndex );
+  Vector3 color = renderer.GetCurrentProperty< Vector3 >( mixColorIndex );
   Vector3 testColor = Vector3(Color::BLUE + Color::WHITE)*0.5f;
   DALI_TEST_EQUALS( color, testColor, TEST_LOCATION );
 
@@ -1280,12 +1280,12 @@ int UtcDaliVisualAnimateColorVisual(void)
 
   application.Render(2000u); // halfway point between blue and white
 
-  color = DevelHandle::GetCurrentProperty< Vector3 >( renderer, mixColorIndex );
+  color = renderer.GetCurrentProperty< Vector3 >( mixColorIndex );
   DALI_TEST_EQUALS( color, Vector3(Color::WHITE), TEST_LOCATION );
 
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(Color::WHITE) ), true, TEST_LOCATION );
 
-  blendModeValue = DevelHandle::GetCurrentProperty( renderer, Renderer::Property::BLEND_MODE );
+  blendModeValue = renderer.GetCurrentProperty( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
 
   END_TEST;
