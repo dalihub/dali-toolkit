@@ -133,8 +133,7 @@ void StyleManager::ApplyTheme( const std::string& themeFile )
 
 void StyleManager::ApplyDefaultTheme()
 {
-  std::string empty;
-  SetTheme( empty );
+  SetTheme( DEFAULT_THEME );
 }
 
 const std::string& StyleManager::GetDefaultFontFamily() const
@@ -233,10 +232,10 @@ void StyleManager::SetTheme( const std::string& themeFile )
 
   // Always load the default theme first, then merge in the custom theme if present
   themeLoaded = LoadJSON( mThemeBuilder, DEFAULT_THEME );
+  mThemeFile = themeFile;
 
-  if( ! themeFile.empty() )
+  if( themeFile.compare(DEFAULT_THEME) != 0 )
   {
-    mThemeFile = themeFile;
     themeLoaded = LoadJSON( mThemeBuilder, mThemeFile );
   }
 
