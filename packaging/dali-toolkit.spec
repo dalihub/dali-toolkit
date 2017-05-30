@@ -34,12 +34,14 @@ BuildRequires:  pkgconfig(libtzplatform-config)
 %define profile %{tizen_profile_name}
 %endif
 
-# tv
-# %define dali_style_folder 1920x1080
-
-# common
+%if "%{profile}" == "tv"
+%define dali_toolkit_profile TV
+%define dali_style_folder 1920x1080
+%else
+%define dali_toolkit_profile MOBILE
 %define dali_style_folder 720x1280
 # dali_style to be provided by build system as with dali_toolkit_profile or by passing --define 'dali_style 470x800' to the rpm build command
+%endif
 
 %if "%{?dali_style}"
   %define dali_style_folder %{dali_style}
@@ -48,16 +50,6 @@ BuildRequires:  pkgconfig(libtzplatform-config)
 %description
 The OpenGLES Canvas Core Library Toolkit - a set of controls that provide
 user interface functionality.
-
-# This is for backward-compatibility. This does not deteriorate 4.0 Configurability
-# if tv ||"undefined"
-%if "%{?profile}" != "wearable" && "%{?profile}" != "common" && "%{?profile}" != "ivi" && "%{?profile}" != "mobile"
-%package profile_tv
-Summary:    style files for Tizen TV (1920x1080)
-Requires:   %{name} = %{version}-%{release}
-%description profile_tv
-dali-toolkit style files for Tizen TV (1920x1080)
-%endif
 
 ##############################
 # devel
@@ -120,7 +112,7 @@ autoreconf --install
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
 
-%configure --enable-profile=TIZEN \
+%configure --enable-profile=%{dali_toolkit_profile} \
            --with-style=%{dali_style_folder} \
 %if 0%{?enable_debug}
            --enable-debug \
@@ -134,7 +126,7 @@ make %{?jobs:-j%jobs}
 ##############################
 %install
 rm -rf %{buildroot}
-pushd build/tizen
+cd build/tizen
 %make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 
 
@@ -148,23 +140,6 @@ do
   cp ${language}.mo %{buildroot}/%{_datadir}/locale/${language}/LC_MESSAGES/dali-toolkit.mo
 done
 } &> /dev/null
-popd
-
-# This is for backward-compatibility. This does not deteriorate 4.0 Configurability
-# if tv ||"undefined"
-%if "%{?profile}" != "wearable" && "%{?profile}" != "mobile" && "%{?profile}" != "ivi" && "%{?profile}" != "common"
-mkdir -p %{buildroot}%{dali_toolkit_style_files}/1920x1080
-# 720x1280/images/*.png files are exactly same with 1920x1080/images/*.png
-# if not, copy them as same as dali-toolkit/styles/1920x1080/*.json
-# cp dali-toolkit/styles/1920x1080/* %{buildroot}%{dali_toolkit_style_files}/1920x1080
-cp dali-toolkit/styles/1920x1080/*.json %{buildroot}%{dali_toolkit_style_files}/1920x1080
-
-# Do not let style package files be overwritten by the main package
-#pushd %{buildroot}%{dali_toolkit_style_files}/1920x1080
-#for FILE in *.json; do rm -f ../"${FILE}"; done
-#popd
-
-%endif
 
 ##############################
 # Post Install
@@ -194,8 +169,6 @@ exit 0
 %{dali_toolkit_image_files}/*
 %{dali_toolkit_sound_files}/*
 %{dali_toolkit_style_files}/*
-%exclude %{dali_toolkit_style_files}/1920x1080
-# 720x1280/images/*.png files are exactly same with 1920x1080/images/*.png
 %license LICENSE
 %{_datadir}/locale/*/LC_MESSAGES/*
 
@@ -203,29 +176,3 @@ exit 0
 %defattr(-,root,root,-)
 %{dev_include_path}/%{name}/*
 %{_libdir}/pkgconfig/*.pc
-
-# This is for backward-compatibility. This does not deteriorate 4.0 Configurability
-# if tv ||"undefined"
-%if "%{?profile}" != "wearable" && "%{?profile}" != "mobile" && "%{?profile}" != "ivi" && "%{?profile}" != "common"
-%post profile_tv
-pushd %{dali_toolkit_style_files}/1920x1080
-for FILE in *.json; do mv 1920x1080/"${FILE}" ../"${FILE}"; done
-popd
-
-%preun profile_tv
-case "$1" in
-  0)
-    # This is an un-installation.
-    pushd %{dali_toolkit_style_files}
-	for FILE in *.json; do mv 1920x1080/"${FILE}"; done
-	popd
-  ;;
-  1)
-    # This is an upgrade.
-    # Do nothing.
-    :
-  ;;
-esac
-%files profile_tv
-%{dali_toolkit_style_files}/1920x1080/*
-%endif
