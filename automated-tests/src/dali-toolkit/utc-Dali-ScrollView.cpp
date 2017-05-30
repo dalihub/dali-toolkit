@@ -18,6 +18,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
@@ -249,8 +250,8 @@ static float TestOvershootSnapDuration(ToolkitTestApplication &application, Scro
   int timeToReachOrigin = -1;
   for(int i = 0;i<MAX_FRAMES_TO_TEST_OVERSHOOT;i++)
   {
-    float overshootXValue = scrollView.GetCurrentProperty<float>( ScrollView::Property::OVERSHOOT_X );
-    float overshootYValue = scrollView.GetCurrentProperty<float>( ScrollView::Property::OVERSHOOT_Y );
+    float overshootXValue = DevelHandle::GetCurrentProperty<float>( scrollView, ScrollView::Property::OVERSHOOT_X );
+    float overshootYValue = DevelHandle::GetCurrentProperty<float>( scrollView, ScrollView::Property::OVERSHOOT_Y );
     if(overshootXValue == 0.0f && overshootYValue == 0.0f)
     {
       break;
@@ -1226,9 +1227,9 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   // 1. Scroll page in NW (-500,-500 pixels), then inspect overshoot. (don't release touch)
   Vector2 currentPos = Vector2(100.0f, 100.0f);
   currentPos = PerformGestureDiagonalSwipe(application, currentPos, Vector2(5.0f, 5.0f), 100, false);
-  float overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
-  float overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
-  Vector2 positionValue = scrollView.GetCurrentProperty< Vector2 >( ScrollView::Property::SCROLL_POSITION );
+  float overshootXValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_X );
+  float overshootYValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_Y );
+  Vector2 positionValue = DevelHandle::GetCurrentProperty< Vector2 >( scrollView, ScrollView::Property::SCROLL_POSITION );
   DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(positionValue, Vector2::ZERO, TEST_LOCATION);
@@ -1425,15 +1426,15 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
 
   // Scroll page in NW (-20,-20 pixels), then check that overshoot should be 0. (don't release touch)
   Vector2 currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 20, false);
-  float overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
-  float overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
+  float overshootXValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_X );
+  float overshootYValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_Y );
   DALI_TEST_EQUALS(overshootXValue, 0.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 0.0f, TEST_LOCATION);
 
   // Scroll page further in NW (-105,-105 pixels), then check that overshoot should be around 0.5. (don't release touch)
   currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 105, false);
-  overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
-  overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
+  overshootXValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_X );
+  overshootYValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_Y );
   // The overshoot value is a 0.0f - 1.0f ranged value of the amount overshot related to the maximum overshoot.
   // EG. If we move 105, max overshoot is 50, then we overshot 50 / 105.
   float correctOvershootValue = 50.0f / 105.f;
@@ -1442,8 +1443,8 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
 
   // Scroll page further in NW (-30,-30 pixels), then check that overshoot should be now 1.0. (don't release touch)
   currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 30, false);
-  overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
-  overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
+  overshootXValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_X );
+  overshootYValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_Y );
   DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
 
@@ -1452,15 +1453,15 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
   Wait(application);
 
   // Check that overshoot should be now around 0.8.
-  overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
-  overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
+  overshootXValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_X );
+  overshootYValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_Y );
   DALI_TEST_CHECK(overshootXValue > 0.79f && overshootXValue < 0.81f);
   DALI_TEST_CHECK(overshootYValue > 0.79f && overshootYValue < 0.81f);
 
   // Scroll page further in NW (-30,-30 pixels), then check that overshoot should be now 1.0. (don't release touch)
   currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 30, false);
-  overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
-  overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
+  overshootXValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_X );
+  overshootYValue = DevelHandle::GetCurrentProperty< float >( scrollView, ScrollView::Property::OVERSHOOT_Y );
   DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
 

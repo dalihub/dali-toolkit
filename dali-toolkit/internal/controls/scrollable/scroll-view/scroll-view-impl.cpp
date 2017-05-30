@@ -27,6 +27,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/property-map.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -1533,7 +1534,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 
     if(child)
     {
-      Vector2 position = Self().GetCurrentProperty<Vector2>( Toolkit::ScrollView::Property::SCROLL_POSITION );
+      Vector2 position = DevelHandle::GetCurrentProperty<Vector2>( Self(), Toolkit::ScrollView::Property::SCROLL_POSITION );
 
       // Get center-point of the Actor.
       Vector3 childPosition = GetPositionOfAnchor(child, AnchorPoint::CENTER);
@@ -1731,7 +1732,7 @@ bool ScrollView::AnimateTo(const Vector2& position, const Vector2& positionDurat
     }
 
     DALI_LOG_SCROLL_STATE("[0x%X] position-changed, mScrollTargetPosition[%.2f, %.2f], mScrollPrePosition[%.2f, %.2f], mScrollPostPosition[%.2f, %.2f]", this, mScrollTargetPosition.x, mScrollTargetPosition.y, mScrollPrePosition.x, mScrollPrePosition.y, mScrollPostPosition.x, mScrollPostPosition.y );
-    DALI_LOG_SCROLL_STATE("[0x%X] SCROLL_PRE_POSITION[%.2f, %.2f], SCROLL_POSITION[%.2f, %.2f]", this, self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector2>().x, self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector2>().y, self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector2>().x, self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector2>().y );
+    DALI_LOG_SCROLL_STATE("[0x%X] SCROLL_PRE_POSITION[%.2f, %.2f], SCROLL_POSITION[%.2f, %.2f]", this, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector2>().x, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector2>().y, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector2>().x, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector2>().y );
   }
 
   SetScrollUpdateNotification(true);
@@ -1828,14 +1829,14 @@ void ScrollView::FindAndUnbindActor(Actor child)
 
 Vector2 ScrollView::GetPropertyPrePosition() const
 {
-  Vector2 position = Self().GetCurrentProperty< Vector2 >( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION );
+  Vector2 position = DevelHandle::GetCurrentProperty< Vector2 >( Self(), Toolkit::ScrollView::Property::SCROLL_PRE_POSITION );
   WrapPosition(position);
   return position;
 }
 
 Vector2 ScrollView::GetPropertyPosition() const
 {
-  Vector2 position = Self().GetCurrentProperty< Vector2 >( Toolkit::ScrollView::Property::SCROLL_POSITION );
+  Vector2 position = DevelHandle::GetCurrentProperty< Vector2 >( Self(), Toolkit::ScrollView::Property::SCROLL_POSITION );
   WrapPosition(position);
 
   return position;
@@ -2174,7 +2175,7 @@ bool ScrollView::OnWheelEvent(const WheelEvent& event)
 void ScrollView::ResetScrolling()
 {
   Actor self = Self();
-  self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get( mScrollPostPosition );
+  DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_POSITION ).Get( mScrollPostPosition );
   mScrollPrePosition = mScrollPostPosition;
   DALI_LOG_SCROLL_STATE("[0x%X] Setting SCROLL_PRE_POSITION To[%.2f, %.2f]", this, mScrollPostPosition.x, mScrollPostPosition.y );
   self.SetProperty(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION, mScrollPostPosition);
@@ -2183,8 +2184,8 @@ void ScrollView::ResetScrolling()
 void ScrollView::UpdateLocalScrollProperties()
 {
   Actor self = Self();
-  self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get( mScrollPrePosition );
-  self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get( mScrollPostPosition );
+  DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get( mScrollPrePosition );
+  DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_POSITION ).Get( mScrollPostPosition );
 }
 
 // private functions
@@ -2230,7 +2231,7 @@ void ScrollView::AnimateInternalXTo( float position, float duration, AlphaFuncti
   if( duration > Math::MACHINE_EPSILON_10 )
   {
     Actor self = Self();
-    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, self.GetCurrentProperty(  Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get< Vector2 >().x, position );
+    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get< Vector2 >().x, position );
     mInternalXAnimation = Animation::New(duration);
     DALI_LOG_SCROLL_STATE("[0x%X], mInternalXAnimation[0x%X]", this, mInternalXAnimation.GetObjectPtr() );
     mInternalXAnimation.FinishedSignal().Connect(this, &ScrollView::OnScrollAnimationFinished);
@@ -2251,7 +2252,7 @@ void ScrollView::AnimateInternalYTo( float position, float duration, AlphaFuncti
   if( duration > Math::MACHINE_EPSILON_10 )
   {
     Actor self = Self();
-    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, self.GetCurrentProperty(  Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get< Vector2 >().y, position );
+    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get< Vector2 >().y, position );
     mInternalYAnimation = Animation::New(duration);
     DALI_LOG_SCROLL_STATE("[0x%X], mInternalYAnimation[0x%X]", this, mInternalYAnimation.GetObjectPtr() );
     mInternalYAnimation.FinishedSignal().Connect(this, &ScrollView::OnScrollAnimationFinished);
@@ -2278,7 +2279,7 @@ void ScrollView::OnScrollAnimationFinished( Animation& source )
 
   if( source == mInternalXAnimation )
   {
-    DALI_LOG_SCROLL_STATE("[0x%X] mInternalXAnimation[0x%X], expected[%.2f], actual[%.2f], post[%.2f]", this, mInternalXAnimation.GetObjectPtr(), mScrollTargetPosition.x, Self().GetCurrentProperty( SCROLL_PRE_POSITION ).Get< Vector2 >().x, mScrollPostPosition.x );
+    DALI_LOG_SCROLL_STATE("[0x%X] mInternalXAnimation[0x%X], expected[%.2f], actual[%.2f], post[%.2f]", this, mInternalXAnimation.GetObjectPtr(), mScrollTargetPosition.x, DevelHandle::GetCurrentProperty( Self(), SCROLL_PRE_POSITION ).Get< Vector2 >().x, mScrollPostPosition.x );
 
     if( !(mScrollStateFlags & AnimatingInternalY) )
     {
