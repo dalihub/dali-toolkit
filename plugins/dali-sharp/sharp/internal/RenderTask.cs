@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class RenderTask : Animatable {
+internal class RenderTask : Animatable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal RenderTask(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.RenderTask_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -92,7 +92,7 @@ public class RenderTask : Animatable {
 
   }
 
-  public static SWIGTYPE_p_f_r_Dali__Vector2__bool DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION {
+  internal static SWIGTYPE_p_f_r_Dali__Vector2__bool DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION {
     get {
       global::System.IntPtr cPtr = NDalicPINVOKE.RenderTask_DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION_get();
       SWIGTYPE_p_f_r_Dali__Vector2__bool ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_f_r_Dali__Vector2__bool(cPtr, false);
@@ -101,7 +101,7 @@ public class RenderTask : Animatable {
     }
   }
 
-  public static SWIGTYPE_p_f_r_Dali__Vector2__bool FULLSCREEN_FRAMEBUFFER_FUNCTION {
+  internal static SWIGTYPE_p_f_r_Dali__Vector2__bool FULLSCREEN_FRAMEBUFFER_FUNCTION {
     get {
       global::System.IntPtr cPtr = NDalicPINVOKE.RenderTask_FULLSCREEN_FRAMEBUFFER_FUNCTION_get();
       SWIGTYPE_p_f_r_Dali__Vector2__bool ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_f_r_Dali__Vector2__bool(cPtr, false);
@@ -212,12 +212,12 @@ public class RenderTask : Animatable {
     return ret;
   }
 
-  public void SetCamera(Camera camera) {
+  internal void SetCamera(Camera camera) {
     NDalicPINVOKE.RenderTask_SetCameraActor(swigCPtr, Camera.getCPtr(camera));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public Camera GetCamera() {
+  internal Camera GetCamera() {
     Camera ret = new Camera(NDalicPINVOKE.RenderTask_GetCameraActor(swigCPtr), true);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
@@ -245,12 +245,12 @@ public class RenderTask : Animatable {
     return ret;
   }
 
-  public void SetScreenToFrameBufferFunction(SWIGTYPE_p_f_r_Dali__Vector2__bool conversionFunction) {
+  internal void SetScreenToFrameBufferFunction(SWIGTYPE_p_f_r_Dali__Vector2__bool conversionFunction) {
     NDalicPINVOKE.RenderTask_SetScreenToFrameBufferFunction(swigCPtr, SWIGTYPE_p_f_r_Dali__Vector2__bool.getCPtr(conversionFunction));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public SWIGTYPE_p_f_r_Dali__Vector2__bool GetScreenToFrameBufferFunction() {
+  internal SWIGTYPE_p_f_r_Dali__Vector2__bool GetScreenToFrameBufferFunction() {
     global::System.IntPtr cPtr = NDalicPINVOKE.RenderTask_GetScreenToFrameBufferFunction(swigCPtr);
     SWIGTYPE_p_f_r_Dali__Vector2__bool ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_f_r_Dali__Vector2__bool(cPtr, false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
@@ -357,7 +357,7 @@ public class RenderTask : Animatable {
     return ret;
   }
 
-  public RenderTaskSignal FinishedSignal() {
+  internal RenderTaskSignal FinishedSignal() {
     RenderTaskSignal ret = new RenderTaskSignal(NDalicPINVOKE.RenderTask_FinishedSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
@@ -412,7 +412,7 @@ public class RenderTask : Animatable {
     get
     {
       bool temp = false;
-      GetProperty( RenderTask.Property.REQUIRES_SYNC).Get( ref temp );
+      GetProperty( RenderTask.Property.REQUIRES_SYNC).Get( out temp );
       return temp;
     }
     set

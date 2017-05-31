@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class TouchSignal : global::System.IDisposable {
+internal class TouchSignal : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

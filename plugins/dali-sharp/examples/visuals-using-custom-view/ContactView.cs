@@ -40,7 +40,7 @@ namespace VisualsUsingCustomView
         private string _name;
         private Color _color;
 
-        public ContactView() : base(typeof(ContactView).Name, ViewWrapperImpl.CustomViewBehaviour.REQUIRES_KEYBOARD_NAVIGATION_SUPPORT)
+        public ContactView() : base(typeof(ContactView).Name, CustomViewBehaviour.REQUIRES_KEYBOARD_NAVIGATION_SUPPORT)
         {
         }
 

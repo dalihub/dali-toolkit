@@ -30,7 +30,7 @@ namespace Dali {
     using System.Runtime.InteropServices;
 
 
-public class Builder : BaseHandle {
+internal class Builder : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal Builder(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.Builder_SWIGUpcast(cPtr), cMemoryOwn) {

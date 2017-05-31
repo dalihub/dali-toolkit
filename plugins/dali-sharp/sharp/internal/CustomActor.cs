@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-    public class CustomActor : Animatable {
+internal class CustomActor : Animatable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal CustomActor(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.CustomActor_SWIGUpcast(cPtr), cMemoryOwn) {

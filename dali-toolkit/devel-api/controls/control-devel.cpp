@@ -18,9 +18,13 @@
 // CLASS HEADER
 #include "control-devel.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/animation.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 
 namespace Dali
 {
@@ -33,7 +37,6 @@ namespace DevelControl
 
 ResourceReadySignalType&  ResourceReadySignal( Control& control )
 {
-
   Internal::Control& internalControl = Toolkit::Internal::GetImplementation(control);
   Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
 
@@ -46,6 +49,48 @@ bool IsResourceReady( const Control& control )
   const Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
 
   return controlImpl.IsResourceReady();
+}
+
+void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual )
+{
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
+  controlImpl.RegisterVisual( index, visual );
+}
+
+void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
+{
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
+  controlImpl.RegisterVisual( index, visual, enabled );
+}
+
+void UnregisterVisual( Internal::Control& control, Dali::Property::Index index )
+{
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
+  controlImpl.UnregisterVisual( index );
+}
+
+Toolkit::Visual::Base GetVisual( const Internal::Control& control, Dali::Property::Index index )
+{
+  const Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
+  return controlImpl.GetVisual( index );
+}
+
+void EnableVisual( Internal::Control& control, Dali::Property::Index index, bool enable )
+{
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
+  controlImpl.EnableVisual( index, enable );
+}
+
+bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index index )
+{
+  const Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
+  return controlImpl.IsVisualEnabled( index );
+}
+
+Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& handle )
+{
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
+  return controlImpl.CreateTransition( handle );
 }
 
 

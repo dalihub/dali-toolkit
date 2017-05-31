@@ -3,7 +3,7 @@
 // include all custom views here which will be
 namespace Dali
 {
-  public class ViewRegistryHelper
+  internal class ViewRegistryHelper
   {
     static public void Initialize()
     {

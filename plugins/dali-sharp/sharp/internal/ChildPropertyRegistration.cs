@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class ChildPropertyRegistration : global::System.IDisposable {
+internal class ChildPropertyRegistration : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

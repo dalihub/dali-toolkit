@@ -40,12 +40,12 @@ namespace MyCSharpExample
             Console.WriteLine("Customized Application Initialize event handler");
             _window = Window.Instance;
             _window.BackgroundColor = Color.White;
-            _window.Touch += OnWindowTouched;
+            _window.Touched += OnWindowTouched;
 
             // Add a _text label to the stage
             _text = new TextLabel("Hello Mono World");
             _text.ParentOrigin = ParentOrigin.Center;
-            _text.AnchorPoint = AnchorPoint.Center;
+            _text.PivotPoint = AnchorPoint.Center;
             _text.HorizontalAlignment = "CENTER";
             _text.PointSize = 32.0f;
             _text.TextColor = Color.Magenta;

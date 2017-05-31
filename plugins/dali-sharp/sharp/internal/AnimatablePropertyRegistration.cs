@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class AnimatablePropertyRegistration : global::System.IDisposable {
+internal class AnimatablePropertyRegistration : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class FrameBuffer : BaseHandle {
+internal class FrameBuffer : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal FrameBuffer(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.FrameBuffer_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -61,67 +61,20 @@ public class FrameBuffer : BaseHandle {
   }
 
 
-  public class Attachment : global::System.IDisposable {
-    private global::System.Runtime.InteropServices.HandleRef swigCPtr;
-    protected bool swigCMemOwn;
-  
-    internal Attachment(global::System.IntPtr cPtr, bool cMemoryOwn) {
-      swigCMemOwn = cMemoryOwn;
-      swigCPtr = new global::System.Runtime.InteropServices.HandleRef(this, cPtr);
-    }
-  
-    internal static global::System.Runtime.InteropServices.HandleRef getCPtr(Attachment obj) {
-      return (obj == null) ? new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero) : obj.swigCPtr;
-    }
-  
-    ~Attachment() {
-      Dispose();
-    }
-  
-    public virtual void Dispose() {
-      lock(this) {
-        if (swigCPtr.Handle != global::System.IntPtr.Zero) {
-          if (swigCMemOwn) {
-            swigCMemOwn = false;
-            NDalicPINVOKE.delete_FrameBuffer_Attachment(swigCPtr);
-          }
-          swigCPtr = new global::System.Runtime.InteropServices.HandleRef(null, global::System.IntPtr.Zero);
-        }
-        global::System.GC.SuppressFinalize(this);
-      }
-    }
-  
-    public Attachment() : this(NDalicPINVOKE.new_FrameBuffer_Attachment(), true) {
-      if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    }
-  
-    public enum Mask {
+  public class Attachment
+  {
+    public enum Mask 
+    {
       NONE = 0,
       DEPTH = 1 << 0,
       STENCIL = 1 << 1,
       DEPTH_STENCIL = DEPTH|STENCIL
     }
-  
   }
 
   public FrameBuffer (uint width, uint height, uint attachments) : this (NDalicPINVOKE.FrameBuffer_New(width, height, attachments), true) {
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
 
-  }
-  public FrameBuffer(FrameBuffer handle) : this(NDalicPINVOKE.new_FrameBuffer__SWIG_1(FrameBuffer.getCPtr(handle)), true) {
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-  }
-
-  public static FrameBuffer DownCast(BaseHandle handle) {
-    FrameBuffer ret = new FrameBuffer(NDalicPINVOKE.FrameBuffer_DownCast(BaseHandle.getCPtr(handle)), true);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
-  }
-
-  public FrameBuffer Assign(FrameBuffer handle) {
-    FrameBuffer ret = new FrameBuffer(NDalicPINVOKE.FrameBuffer_Assign(swigCPtr, FrameBuffer.getCPtr(handle)), false);
-    if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
-    return ret;
   }
 
   public void AttachColorTexture(Texture texture) {

@@ -10,9 +10,9 @@
 
 namespace Dali {
 
-public enum GradientVisualUnitsType {
-  OBJECT_BOUNDING_BOX,
-  USER_SPACE
+internal enum GradientVisualUnitsType {
+  ObjectBoundingBox,
+  UserSpace
 }
 
 }

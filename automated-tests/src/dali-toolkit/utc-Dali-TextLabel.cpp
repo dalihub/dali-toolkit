@@ -251,11 +251,11 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   fontStyleMapSet.Insert( "weight", "thin" );
   fontStyleMapSet.Insert( "width", "expanded" );
   fontStyleMapSet.Insert( "slant", "oblique" );
+  const std::string strFontStyle = "{\"weight\":\"thin\",\"width\":\"expanded\",\"slant\":\"oblique\"}";
 
   label.SetProperty( TextLabel::Property::FONT_STYLE, "{\"weight\":\"thin\",\"width\":\"expanded\",\"slant\":\"oblique\"}" );
-  fontStyleMapGet = label.GetProperty<Property::Map>( TextLabel::Property::FONT_STYLE );
-  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
-  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+  std::string getFontStyle = label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( getFontStyle, strFontStyle, TEST_LOCATION );
 
   label.SetProperty( TextLabel::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );

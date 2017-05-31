@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
 #include "npatch-visual.h"
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/images/texture-set-image.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>

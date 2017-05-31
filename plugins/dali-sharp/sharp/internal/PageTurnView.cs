@@ -14,7 +14,7 @@ using System;
 using System.Runtime.InteropServices;
 
 
-public class PageTurnView : View {
+internal class PageTurnView : View {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal PageTurnView(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.PageTurnView_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -475,11 +475,6 @@ public class PageTurnFinishedEventArgs : EventArgs
     return ret;
   }
 
-  public enum PropertyRange {
-    PROPERTY_START_INDEX = PropertyRanges.PROPERTY_REGISTRATION_START_INDEX,
-    PROPERTY_END_INDEX = View.PropertyRange.PROPERTY_START_INDEX+1000
-  }
-
   public Vector2 PageSize
   {
     get
@@ -498,7 +493,7 @@ public class PageTurnFinishedEventArgs : EventArgs
     get
     {
       int temp = 0;
-      GetProperty( PageTurnView.Property.CURRENT_PAGE_ID).Get( ref temp );
+      GetProperty( PageTurnView.Property.CURRENT_PAGE_ID).Get( out temp );
       return temp;
     }
     set

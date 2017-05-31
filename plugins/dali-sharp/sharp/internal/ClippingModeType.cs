@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public enum ClippingModeType {
+internal enum ClippingModeType {
   DISABLED,
   CLIP_CHILDREN
 }

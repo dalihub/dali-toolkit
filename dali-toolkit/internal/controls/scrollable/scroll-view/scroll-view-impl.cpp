@@ -27,13 +27,15 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/property-map.h>
-#include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
+#include <dali-toolkit/devel-api/controls/scrollable/scroll-view/scroll-view-devel.h>
+#include <dali-toolkit/devel-api/controls/scrollable/scroll-view/scroll-mode.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
 
@@ -250,6 +252,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wrapEnabled",                B
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "panningEnabled",             BOOLEAN,   PANNING_ENABLED             )
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "axisAutoLockEnabled",        BOOLEAN,   AXIS_AUTO_LOCK_ENABLED      )
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wheelScrollDistanceStep",    VECTOR2,   WHEEL_SCROLL_DISTANCE_STEP  )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollMode", MAP, SCROLL_MODE )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollPosition",  VECTOR2, SCROLL_POSITION)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollPrePosition",   VECTOR2, SCROLL_PRE_POSITION)
@@ -1534,7 +1537,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 
     if(child)
     {
-      Vector2 position = DevelHandle::GetCurrentProperty<Vector2>( Self(), Toolkit::ScrollView::Property::SCROLL_POSITION );
+      Vector2 position = Self().GetCurrentProperty<Vector2>( Toolkit::ScrollView::Property::SCROLL_POSITION );
 
       // Get center-point of the Actor.
       Vector3 childPosition = GetPositionOfAnchor(child, AnchorPoint::CENTER);
@@ -1732,7 +1735,7 @@ bool ScrollView::AnimateTo(const Vector2& position, const Vector2& positionDurat
     }
 
     DALI_LOG_SCROLL_STATE("[0x%X] position-changed, mScrollTargetPosition[%.2f, %.2f], mScrollPrePosition[%.2f, %.2f], mScrollPostPosition[%.2f, %.2f]", this, mScrollTargetPosition.x, mScrollTargetPosition.y, mScrollPrePosition.x, mScrollPrePosition.y, mScrollPostPosition.x, mScrollPostPosition.y );
-    DALI_LOG_SCROLL_STATE("[0x%X] SCROLL_PRE_POSITION[%.2f, %.2f], SCROLL_POSITION[%.2f, %.2f]", this, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector2>().x, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector2>().y, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector2>().x, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector2>().y );
+    DALI_LOG_SCROLL_STATE("[0x%X] SCROLL_PRE_POSITION[%.2f, %.2f], SCROLL_POSITION[%.2f, %.2f]", this, self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector2>().x, self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get<Vector2>().y, self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector2>().x, self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get<Vector2>().y );
   }
 
   SetScrollUpdateNotification(true);
@@ -1829,14 +1832,14 @@ void ScrollView::FindAndUnbindActor(Actor child)
 
 Vector2 ScrollView::GetPropertyPrePosition() const
 {
-  Vector2 position = DevelHandle::GetCurrentProperty< Vector2 >( Self(), Toolkit::ScrollView::Property::SCROLL_PRE_POSITION );
+  Vector2 position = Self().GetCurrentProperty< Vector2 >( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION );
   WrapPosition(position);
   return position;
 }
 
 Vector2 ScrollView::GetPropertyPosition() const
 {
-  Vector2 position = DevelHandle::GetCurrentProperty< Vector2 >( Self(), Toolkit::ScrollView::Property::SCROLL_POSITION );
+  Vector2 position = Self().GetCurrentProperty< Vector2 >( Toolkit::ScrollView::Property::SCROLL_POSITION );
   WrapPosition(position);
 
   return position;
@@ -2175,7 +2178,7 @@ bool ScrollView::OnWheelEvent(const WheelEvent& event)
 void ScrollView::ResetScrolling()
 {
   Actor self = Self();
-  DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_POSITION ).Get( mScrollPostPosition );
+  self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get( mScrollPostPosition );
   mScrollPrePosition = mScrollPostPosition;
   DALI_LOG_SCROLL_STATE("[0x%X] Setting SCROLL_PRE_POSITION To[%.2f, %.2f]", this, mScrollPostPosition.x, mScrollPostPosition.y );
   self.SetProperty(Toolkit::ScrollView::Property::SCROLL_PRE_POSITION, mScrollPostPosition);
@@ -2184,8 +2187,8 @@ void ScrollView::ResetScrolling()
 void ScrollView::UpdateLocalScrollProperties()
 {
   Actor self = Self();
-  DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get( mScrollPrePosition );
-  DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_POSITION ).Get( mScrollPostPosition );
+  self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get( mScrollPrePosition );
+  self.GetCurrentProperty( Toolkit::ScrollView::Property::SCROLL_POSITION ).Get( mScrollPostPosition );
 }
 
 // private functions
@@ -2231,7 +2234,7 @@ void ScrollView::AnimateInternalXTo( float position, float duration, AlphaFuncti
   if( duration > Math::MACHINE_EPSILON_10 )
   {
     Actor self = Self();
-    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get< Vector2 >().x, position );
+    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, self.GetCurrentProperty(  Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get< Vector2 >().x, position );
     mInternalXAnimation = Animation::New(duration);
     DALI_LOG_SCROLL_STATE("[0x%X], mInternalXAnimation[0x%X]", this, mInternalXAnimation.GetObjectPtr() );
     mInternalXAnimation.FinishedSignal().Connect(this, &ScrollView::OnScrollAnimationFinished);
@@ -2252,7 +2255,7 @@ void ScrollView::AnimateInternalYTo( float position, float duration, AlphaFuncti
   if( duration > Math::MACHINE_EPSILON_10 )
   {
     Actor self = Self();
-    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, DevelHandle::GetCurrentProperty( self, Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get< Vector2 >().y, position );
+    DALI_LOG_SCROLL_STATE("[0x%X], Animating from[%.2f] to[%.2f]", this, self.GetCurrentProperty(  Toolkit::ScrollView::Property::SCROLL_PRE_POSITION ).Get< Vector2 >().y, position );
     mInternalYAnimation = Animation::New(duration);
     DALI_LOG_SCROLL_STATE("[0x%X], mInternalYAnimation[0x%X]", this, mInternalYAnimation.GetObjectPtr() );
     mInternalYAnimation.FinishedSignal().Connect(this, &ScrollView::OnScrollAnimationFinished);
@@ -2279,7 +2282,7 @@ void ScrollView::OnScrollAnimationFinished( Animation& source )
 
   if( source == mInternalXAnimation )
   {
-    DALI_LOG_SCROLL_STATE("[0x%X] mInternalXAnimation[0x%X], expected[%.2f], actual[%.2f], post[%.2f]", this, mInternalXAnimation.GetObjectPtr(), mScrollTargetPosition.x, DevelHandle::GetCurrentProperty( Self(), SCROLL_PRE_POSITION ).Get< Vector2 >().x, mScrollPostPosition.x );
+    DALI_LOG_SCROLL_STATE("[0x%X] mInternalXAnimation[0x%X], expected[%.2f], actual[%.2f], post[%.2f]", this, mInternalXAnimation.GetObjectPtr(), mScrollTargetPosition.x, Self().GetCurrentProperty( SCROLL_PRE_POSITION ).Get< Vector2 >().x, mScrollPostPosition.x );
 
     if( !(mScrollStateFlags & AnimatingInternalY) )
     {
@@ -2906,6 +2909,14 @@ void ScrollView::SetProperty( BaseObject* object, Property::Index index, const P
         scrollViewImpl.SetWheelScrollDistanceStep( value.Get<Vector2>() );
         break;
       }
+      case Toolkit::DevelScrollView::Property::SCROLL_MODE:
+      {
+        Property::Map* map = value.GetMap();
+        if( map )
+        {
+          scrollViewImpl.SetScrollMode( *map );
+        }
+      }
     }
   }
 }
@@ -2945,6 +2956,90 @@ Property::Value ScrollView::GetProperty( BaseObject* object, Property::Index ind
   }
 
   return value;
+}
+
+void ScrollView::SetScrollMode( const Property::Map& scrollModeMap )
+{
+  Toolkit::RulerPtr rulerX, rulerY;
+
+  // Check the scroll mode in the X axis
+  bool xAxisScrollEnabled = true;
+  Property::Value* valuePtr = scrollModeMap.Find( Toolkit::ScrollMode::X_AXIS_SCROLL_ENABLED, "xAxisScrollEnabled" );
+  if( valuePtr && valuePtr->GetType() == Property::BOOLEAN )
+  {
+    valuePtr->Get( xAxisScrollEnabled );
+  }
+
+  if( !xAxisScrollEnabled )
+  {
+    // Default ruler and disabled
+    rulerX = new Toolkit::DefaultRuler();
+    rulerX->Disable();
+  }
+  else
+  {
+    valuePtr = scrollModeMap.Find( Toolkit::ScrollMode::X_AXIS_SNAP_TO_INTERVAL, "xAxisSnapToInterval" );
+    float xAxisSnapToInterval = 0.0f;
+    if( valuePtr && valuePtr->Get( xAxisSnapToInterval ) )
+    {
+      // Fixed ruler and enabled
+      rulerX = new Toolkit::FixedRuler( xAxisSnapToInterval );
+    }
+    else
+    {
+      // Default ruler and enabled
+      rulerX = new Toolkit::DefaultRuler();
+    }
+
+    valuePtr = scrollModeMap.Find( Toolkit::ScrollMode::X_AXIS_SCROLL_BOUNDARY, "xAxisScrollBoundary" );
+    float xAxisScrollBoundary = 0.0f;
+    if( valuePtr && valuePtr->Get( xAxisScrollBoundary ) )
+    {
+      // By default ruler domain is disabled unless set
+      rulerX->SetDomain( Toolkit::RulerDomain( 0, xAxisScrollBoundary, true ) );
+    }
+  }
+
+  // Check the scroll mode in the Y axis
+  bool yAxisScrollEnabled = true;
+  valuePtr = scrollModeMap.Find( Toolkit::ScrollMode::Y_AXIS_SCROLL_ENABLED, "yAxisScrollEnabled" );
+  if( valuePtr && valuePtr->GetType() == Property::BOOLEAN )
+  {
+    valuePtr->Get( yAxisScrollEnabled );
+  }
+
+  if( !yAxisScrollEnabled )
+  {
+    // Default ruler and disabled
+    rulerY = new Toolkit::DefaultRuler();
+    rulerY->Disable();
+  }
+  else
+  {
+    valuePtr = scrollModeMap.Find( Toolkit::ScrollMode::Y_AXIS_SNAP_TO_INTERVAL, "yAxisSnapToInterval" );
+    float yAxisSnapToInterval = 0.0f;
+    if( valuePtr && valuePtr->Get( yAxisSnapToInterval ) )
+    {
+      // Fixed ruler and enabled
+      rulerY = new Toolkit::FixedRuler(yAxisSnapToInterval);
+    }
+    else
+    {
+      // Default ruler and enabled
+      rulerY = new Toolkit::DefaultRuler();
+    }
+
+    valuePtr = scrollModeMap.Find( Toolkit::ScrollMode::Y_AXIS_SCROLL_BOUNDARY, "yAxisScrollBoundary" );
+    float yAxisScrollBoundary = 0.0f;
+    if( valuePtr && valuePtr->Get( yAxisScrollBoundary ) )
+    {
+      // By default ruler domain is disabled unless set
+      rulerY->SetDomain( Toolkit::RulerDomain( 0, yAxisScrollBoundary, true ) );
+    }
+  }
+
+  SetRulerX(rulerX);
+  SetRulerY(rulerY);
 }
 
 } // namespace Internal

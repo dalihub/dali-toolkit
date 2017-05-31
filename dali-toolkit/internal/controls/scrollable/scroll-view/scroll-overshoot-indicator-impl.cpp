@@ -18,9 +18,6 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
 
-// EXTERNAL INCLUDES
-#include <dali/devel-api/object/handle-devel.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
@@ -283,7 +280,7 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
 void ScrollOvershootEffectRipple::OnOvershootNotification(PropertyNotification& source)
 {
   Actor self = mAttachedScrollView.Self();
-  mOvershoot = DevelHandle::GetCurrentProperty< float >( self, mOvershootProperty );
+  mOvershoot = self.GetCurrentProperty< float >( mOvershootProperty );
   SetOvershoot(mOvershoot, false);
   UpdatePropertyNotifications();
 }

@@ -35,6 +35,7 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -352,7 +353,7 @@ Property::Value TextSelectionPopup::GetProperty( BaseObject* object, Property::I
       case Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER:
       {
         Property::Map map;
-        Toolkit::Visual::Base visual = impl.GetVisual( Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER );
+        Toolkit::Visual::Base visual = DevelControl::GetVisual( impl, Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER );
         if( visual )
         {
           visual.CreatePropertyMap( map );
@@ -841,7 +842,7 @@ std::string TextSelectionPopup::GetPressedImage() const
 void TextSelectionPopup::CreateBackgroundBorder( Property::Map& propertyMap )
 {
   // Removes previous image if necessary
-  UnregisterVisual( Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER );
+  DevelControl::UnregisterVisual( *this, Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER );
 
   if( ! propertyMap.Empty() )
   {
@@ -849,7 +850,7 @@ void TextSelectionPopup::CreateBackgroundBorder( Property::Map& propertyMap )
 
     if( visual )
     {
-      RegisterVisual( Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER, visual );
+      DevelControl::RegisterVisual( *this, Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER, visual );
       visual.SetDepthIndex( DepthIndex::CONTENT );
     }
   }

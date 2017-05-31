@@ -48,8 +48,8 @@ namespace ImageViewExample
             Log("Customized Application Initialize event handler");
             window = Window.Instance;
             window.BackgroundColor = Color.Cyan;
-            window.Touch += OnWindowTouched;
-            window.Wheel += OnWindowWheelMoved;
+            window.Touched += OnWindowTouched;
+            window.WheelRolled += OnWindowWheelMoved;
             window.Key += OnWindowKeyPressed;
             //window.EventProcessingFinished += OnWindowEventProcessingFinished;
 
@@ -68,14 +68,14 @@ namespace ImageViewExample
             _imageView = new ImageView();
             _imageView.ResourceUrl = "./images/gallery-3.jpg";
             _imageView.ParentOrigin = ParentOrigin.Center;
-            _imageView.AnchorPoint = AnchorPoint.Center;
+            _imageView.PivotPoint = AnchorPoint.Center;
             _imageView.PixelArea = new Vector4(0.0f, 0.0f, 0.5f, 0.5f);
             //_imageView.SetResizePolicy(ResizePolicyType.USE_NATURAL_SIZE, DimensionType.ALL_DIMENSIONS);
             layer.Add(_imageView);
 
             _pushButton1 = new PushButton();
             _pushButton1.ParentOrigin = ParentOrigin.BottomLeft;
-            _pushButton1.AnchorPoint = AnchorPoint.BottomLeft;
+            _pushButton1.PivotPoint = AnchorPoint.BottomLeft;
             _pushButton1.LabelText = "start animation";
             _pushButton1.Position = new Vector3(0.0f, window.Size.Height * 0.1f, 0.0f);
             _pushButton1.Clicked += OnPushButtonClicked1;
@@ -83,7 +83,7 @@ namespace ImageViewExample
 
             _pushButton2 = new PushButton();
             _pushButton2.ParentOrigin = ParentOrigin.BottomLeft;
-            _pushButton2.AnchorPoint = AnchorPoint.BottomLeft;
+            _pushButton2.PivotPoint = AnchorPoint.BottomLeft;
             _pushButton2.LabelText = "reload image with same URL";
             _pushButton2.Position = new Vector3(0.0f, window.Size.Height * 0.2f, 0.0f);
             _pushButton2.Clicked += OnPushButtonClicked2;
@@ -100,7 +100,7 @@ namespace ImageViewExample
                 _imageView = new ImageView();
                 _imageView.ResourceUrl = "./images/gallery-3.jpg";
                 _imageView.ParentOrigin = ParentOrigin.Center;
-                _imageView.AnchorPoint = AnchorPoint.Center;
+                _imageView.PivotPoint = AnchorPoint.Center;
                 _imageView.PixelArea = new Vector4(0.0f, 0.0f, 0.5f, 0.5f);
                 //_imageView.SetResizePolicy(ResizePolicyType.USE_NATURAL_SIZE, DimensionType.ALL_DIMENSIONS);
                 layer.Add(_imageView);

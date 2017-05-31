@@ -26,7 +26,7 @@
 
 namespace Dali {
 
-public class Renderer : Animatable {
+internal class Renderer : Animatable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal Renderer(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.Renderer_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -185,7 +185,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_INDEX).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_INDEX).Get( out temp );
       return temp;
     }
     set
@@ -198,7 +198,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.FACE_CULLING_MODE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.FACE_CULLING_MODE).Get( out temp );
       return temp;
     }
     set
@@ -211,7 +211,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_MODE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_MODE).Get( out temp );
       return temp;
     }
     set
@@ -224,7 +224,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_EQUATION_RGB).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_EQUATION_RGB).Get( out temp );
       return temp;
     }
     set
@@ -237,7 +237,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_EQUATION_ALPHA).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_EQUATION_ALPHA).Get( out temp );
       return temp;
     }
     set
@@ -250,7 +250,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_SRC_RGB).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_SRC_RGB).Get( out temp );
       return temp;
     }
     set
@@ -263,7 +263,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_DEST_RGB).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_DEST_RGB).Get( out temp );
       return temp;
     }
     set
@@ -276,7 +276,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_SRC_ALPHA).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_SRC_ALPHA).Get( out temp );
       return temp;
     }
     set
@@ -289,7 +289,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_DEST_ALPHA).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_FACTOR_DEST_ALPHA).Get( out temp );
       return temp;
     }
     set
@@ -315,7 +315,7 @@ public class Renderer : Animatable {
     get
     {
       bool temp = false;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_PRE_MULTIPLIED_ALPHA).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.BLEND_PRE_MULTIPLIED_ALPHA).Get( out temp );
       return temp;
     }
     set
@@ -328,7 +328,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.INDEX_RANGE_FIRST).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.INDEX_RANGE_FIRST).Get( out temp );
       return temp;
     }
     set
@@ -341,7 +341,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.INDEX_RANGE_COUNT).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.INDEX_RANGE_COUNT).Get( out temp );
       return temp;
     }
     set
@@ -354,7 +354,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_WRITE_MODE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_WRITE_MODE).Get( out temp );
       return temp;
     }
     set
@@ -367,7 +367,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_FUNCTION).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_FUNCTION).Get( out temp );
       return temp;
     }
     set
@@ -380,7 +380,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_TEST_MODE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.DEPTH_TEST_MODE).Get( out temp );
       return temp;
     }
     set
@@ -393,7 +393,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.RENDER_MODE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.RENDER_MODE).Get( out temp );
       return temp;
     }
     set
@@ -406,7 +406,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION).Get( out temp );
       return temp;
     }
     set
@@ -419,7 +419,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION_MASK).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION_MASK).Get( out temp );
       return temp;
     }
     set
@@ -432,7 +432,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION_REFERENCE).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_FUNCTION_REFERENCE).Get( out temp );
       return temp;
     }
     set
@@ -445,7 +445,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_MASK).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_MASK).Get( out temp );
       return temp;
     }
     set
@@ -458,7 +458,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_FAIL).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_FAIL).Get( out temp );
       return temp;
     }
     set
@@ -471,7 +471,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_Z_FAIL).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_Z_FAIL).Get( out temp );
       return temp;
     }
     set
@@ -484,7 +484,7 @@ public class Renderer : Animatable {
     get
     {
       int temp = 0;
-      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_Z_PASS).Get( ref temp );
+      Dali.Object.GetProperty( swigCPtr, Renderer.Property.STENCIL_OPERATION_ON_Z_PASS).Get( out temp );
       return temp;
     }
     set

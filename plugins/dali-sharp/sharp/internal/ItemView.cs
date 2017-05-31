@@ -30,7 +30,7 @@ using System;
 using System.Runtime.InteropServices;
 
 
-public class ItemView : Scrollable {
+internal class ItemView : Scrollable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal ItemView(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.ItemView_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -344,19 +344,12 @@ public class ItemView : Scrollable {
     return ret;
   }
 
-  public enum PropertyRange {
-    PROPERTY_START_INDEX = PropertyRanges.PROPERTY_REGISTRATION_START_INDEX,
-    PROPERTY_END_INDEX = View.PropertyRange.PROPERTY_START_INDEX+1000,
-    ANIMATABLE_PROPERTY_START_INDEX = PropertyRanges.ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,
-    ANIMATABLE_PROPERTY_END_INDEX = PropertyRanges.ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX+1000
-  }
-
   public float MinimumSwipeSpeed
   {
     get
     {
       float temp = 0.0f;
-      GetProperty( ItemView.Property.MINIMUM_SWIPE_SPEED).Get( ref temp );
+      GetProperty( ItemView.Property.MINIMUM_SWIPE_SPEED).Get( out temp );
       return temp;
     }
     set
@@ -369,7 +362,7 @@ public class ItemView : Scrollable {
     get
     {
       float temp = 0.0f;
-      GetProperty( ItemView.Property.MINIMUM_SWIPE_DISTANCE).Get( ref temp );
+      GetProperty( ItemView.Property.MINIMUM_SWIPE_DISTANCE).Get( out temp );
       return temp;
     }
     set
@@ -382,7 +375,7 @@ public class ItemView : Scrollable {
     get
     {
       float temp = 0.0f;
-      GetProperty( ItemView.Property.WHEEL_SCROLL_DISTANCE_STEP).Get( ref temp );
+      GetProperty( ItemView.Property.WHEEL_SCROLL_DISTANCE_STEP).Get( out temp );
       return temp;
     }
     set
@@ -395,7 +388,7 @@ public class ItemView : Scrollable {
     get
     {
       bool temp = false;
-      GetProperty( ItemView.Property.SNAP_TO_ITEM_ENABLED).Get( ref temp );
+      GetProperty( ItemView.Property.SNAP_TO_ITEM_ENABLED).Get( out temp );
       return temp;
     }
     set
@@ -408,7 +401,7 @@ public class ItemView : Scrollable {
     get
     {
       float temp = 0.0f;
-      GetProperty( ItemView.Property.REFRESH_INTERVAL).Get( ref temp );
+      GetProperty( ItemView.Property.REFRESH_INTERVAL).Get( out temp );
       return temp;
     }
     set
@@ -421,7 +414,7 @@ public class ItemView : Scrollable {
     get
     {
       float temp = 0.0f;
-      GetProperty( ItemView.Property.LAYOUT_POSITION).Get( ref temp );
+      GetProperty( ItemView.Property.LAYOUT_POSITION).Get( out temp );
       return temp;
     }
     set
@@ -434,7 +427,7 @@ public class ItemView : Scrollable {
     get
     {
       float temp = 0.0f;
-      GetProperty( ItemView.Property.SCROLL_SPEED).Get( ref temp );
+      GetProperty( ItemView.Property.SCROLL_SPEED).Get( out temp );
       return temp;
     }
     set
@@ -447,7 +440,7 @@ public class ItemView : Scrollable {
     get
     {
       float temp = 0.0f;
-      GetProperty( ItemView.Property.OVERSHOOT).Get( ref temp );
+      GetProperty( ItemView.Property.OVERSHOOT).Get( out temp );
       return temp;
     }
     set
@@ -473,7 +466,7 @@ public class ItemView : Scrollable {
     get
     {
       int temp = 0;
-      GetProperty( ItemView.Property.LAYOUT_ORIENTATION).Get( ref temp );
+      GetProperty( ItemView.Property.LAYOUT_ORIENTATION).Get( out temp );
       return temp;
     }
     set
@@ -486,7 +479,7 @@ public class ItemView : Scrollable {
     get
     {
       float temp = 0.0f;
-      GetProperty( ItemView.Property.SCROLL_CONTENT_SIZE).Get( ref temp );
+      GetProperty( ItemView.Property.SCROLL_CONTENT_SIZE).Get( out temp );
       return temp;
     }
     set

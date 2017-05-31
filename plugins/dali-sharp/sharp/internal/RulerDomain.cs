@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class RulerDomain : global::System.IDisposable {
+internal class RulerDomain : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -48,7 +48,7 @@ public class RulerDomain : global::System.IDisposable {
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public float min {
+  public float Min {
     set {
       NDalicPINVOKE.RulerDomain_min_set(swigCPtr, value);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
@@ -60,7 +60,7 @@ public class RulerDomain : global::System.IDisposable {
     } 
   }
 
-  public float max {
+  public float Max {
     set {
       NDalicPINVOKE.RulerDomain_max_set(swigCPtr, value);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
@@ -72,7 +72,7 @@ public class RulerDomain : global::System.IDisposable {
     } 
   }
 
-  public bool enabled {
+  public bool Enabled {
     set {
       NDalicPINVOKE.RulerDomain_enabled_set(swigCPtr, value);
       if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
@@ -102,7 +102,7 @@ public class RulerDomain : global::System.IDisposable {
     return ret;
   }
 
-  public float Clamp(float x, float length, float scale, SWIGTYPE_p_Dali__Toolkit__ClampState clamped) {
+  internal float Clamp(float x, float length, float scale, SWIGTYPE_p_Dali__Toolkit__ClampState clamped) {
     float ret = NDalicPINVOKE.RulerDomain_Clamp__SWIG_3(swigCPtr, x, length, scale, SWIGTYPE_p_Dali__Toolkit__ClampState.getCPtr(clamped));
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;

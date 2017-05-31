@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class SWIGTYPE_p_KeyboardFocusManager {
+internal class SWIGTYPE_p_KeyboardFocusManager {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal SWIGTYPE_p_KeyboardFocusManager(global::System.IntPtr cPtr, bool futureUse) {

@@ -9,12 +9,12 @@
 //------------------------------------------------------------------------------
 
 namespace Dali {
-
-public enum ControlOrientationType {
+#if false
+internal enum ControlOrientationType {
   Up,
   Left,
   Down,
   Right
 }
-
+#endif
 }

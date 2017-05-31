@@ -114,7 +114,7 @@ KeyboardFocusManager::KeyboardFocusManager()
   mFocusChangedSignal(),
   mFocusGroupChangedSignal(),
   mFocusedActorEnterKeySignal(),
-  mCurrentFocusActor( 0 ),
+  mCurrentFocusActor(),
   mFocusIndicatorActor(),
   mFocusGroupLoopEnabled( false ),
   mIsFocusIndicatorEnabled( true ),
@@ -143,16 +143,27 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
 {
   bool success = false;
 
+  Actor currentFocusedActor = GetCurrentFocusActor();
+
+  // If developer set focus on same actor, doing nothing
+  if( actor == currentFocusedActor )
+  {
+    if( !actor )
+    {
+      return false;
+    }
+    return true;
+  }
+
   // Check whether the actor is in the stage and is keyboard focusable.
-  if( actor && actor.IsKeyboardFocusable() )
+  if( actor && actor.IsKeyboardFocusable() && actor.OnStage() )
   {
     if( mIsFocusIndicatorEnabled )
     {
       actor.Add( GetFocusIndicatorActor() );
     }
-    // Send notification for the change of focus actor
-    Actor currentFocusedActor = GetCurrentFocusActor();
 
+    // Send notification for the change of focus actor
     if( !mFocusChangedSignal.Empty() )
     {
       mFocusChangedSignal.Emit(currentFocusedActor, actor);
@@ -169,7 +180,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
     DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
 
     // Save the current focused actor
-    mCurrentFocusActor = actor.GetId();
+    mCurrentFocusActor = actor;
 
     Toolkit::Control newlyFocusedControl = Toolkit::Control::DownCast(actor);
     if( newlyFocusedControl )
@@ -201,8 +212,15 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
 
 Actor KeyboardFocusManager::GetCurrentFocusActor()
 {
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
-  return rootActor.FindChildById(mCurrentFocusActor);
+  Actor actor = mCurrentFocusActor.GetHandle();
+  if( actor && ! actor.OnStage() )
+  {
+    // If the actor has been removed from the stage, then it should not be focused
+
+    actor.Reset();
+    mCurrentFocusActor.Reset();
+  }
+  return actor;
 }
 
 Actor KeyboardFocusManager::GetCurrentFocusGroup()
@@ -504,7 +522,7 @@ void KeyboardFocusManager::ClearFocus()
     }
   }
 
-  mCurrentFocusActor = 0;
+  mCurrentFocusActor.Reset();
   mIsFocusIndicatorEnabled = false;
 }
 

@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public class Item : global::System.IDisposable {
+internal class Item : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 

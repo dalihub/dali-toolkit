@@ -194,6 +194,18 @@ int UtcDaliTextControllerImfEvent(void)
   controller->GetText( text );
   DALI_TEST_CHECK( text.empty() );
 
+  imfEvent = ImfManager::ImfEventData( ImfManager::COMMIT, "Hello ", 0, 6 );
+  controller->OnImfEvent( imfManager, imfEvent );
+  controller->GetNaturalSize();
+
+  // Check 'Delete All' key which means the input panel send a big range
+  imfEvent = ImfManager::ImfEventData( ImfManager::DELETESURROUNDING, "", -100, 100 );
+  controller->OnImfEvent( imfManager, imfEvent );
+  controller->GetNaturalSize();
+
+  controller->GetText( text );
+  DALI_TEST_EQUALS( "", text, TEST_LOCATION );
+
   // Send COMMIT event.
   imfEvent = ImfManager::ImfEventData( ImfManager::COMMIT, "Hello ", 0, 6 );
   controller->OnImfEvent( imfManager, imfEvent );

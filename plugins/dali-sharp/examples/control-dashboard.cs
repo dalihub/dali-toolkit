@@ -67,9 +67,9 @@ namespace MyCSharpExample
 
             // Top label
             TextLabel topLabel = new TextLabel();
-            topLabel.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
-            topLabel.SetResizePolicy(ResizePolicyType.SIZE_RELATIVE_TO_PARENT, DimensionType.HEIGHT);
-            topLabel.AnchorPoint = NDalic.AnchorPointTopCenter;
+            topLabel.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Width);
+            topLabel.SetResizePolicy(ResizePolicyType.SIZE_RELATIVE_TO_PARENT, DimensionType.Height);
+            topLabel.PivotPoint = NDalic.AnchorPointTopCenter;
             topLabel.Position = new Position(0, 0, 0);
             topLabel.SetSizeModeFactor(new Vector3(0.0f, 0.1f, 0.0f));
             topLabel.BackgroundColor = new Color(43.0f / 255.0f, 145.0f / 255.0f, 175.0f / 255.0f, 1.0f);
@@ -82,10 +82,10 @@ namespace MyCSharpExample
 
             // Grid container to contain items. Use tableView because FlexContainer support focus navigation just two direction ( up/down or left/right )
             _contentContainer = new TableView(6, 5);
-            _contentContainer.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
-            _contentContainer.SetResizePolicy(ResizePolicyType.SIZE_RELATIVE_TO_PARENT, DimensionType.HEIGHT);
+            _contentContainer.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Width);
+            _contentContainer.SetResizePolicy(ResizePolicyType.SIZE_RELATIVE_TO_PARENT, DimensionType.Height);
             _contentContainer.SetSizeModeFactor(new Vector3(0.0f, 0.9f, 0.0f));
-            _contentContainer.AnchorPoint = NDalic.AnchorPointBottomCenter;
+            _contentContainer.PivotPoint = NDalic.AnchorPointBottomCenter;
             _contentContainer.Position = new Position(0, _window.Size.Height * 0.1f, 0);
             _contentContainer.SetRelativeHeight(0, 0.07f);
             _contentContainer.SetRelativeHeight(1, 0.26f);
@@ -93,7 +93,7 @@ namespace MyCSharpExample
             _contentContainer.SetRelativeHeight(3, 0.26f);
             _contentContainer.SetRelativeHeight(4, 0.07f);
             _contentContainer.SetRelativeHeight(5, 0.26f);
-            _contentContainer.SetKeyboardFocusable(true);
+            _contentContainer.SetFocusable(true);
             _window.Add(_contentContainer);
 
             CreateContent();
@@ -101,7 +101,7 @@ namespace MyCSharpExample
             FocusManager.Instance.PreFocusChange += OnPreFocusChange;
         }
 
-        // Callback for KeyboardFocusManager
+        // Callback for FocusManager
         private View OnPreFocusChange(object source, FocusManager.PreFocusChangeEventArgs e)
         {
             if (!e.Proposed && !e.Current)
@@ -136,8 +136,8 @@ namespace MyCSharpExample
                 {
                     PushButton pushButton = new PushButton();
                     pushButton.LabelText = "Push Button";
-                    pushButton.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
-                    pushButton.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.HEIGHT);
+                    pushButton.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Width);
+                    pushButton.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Height);
                     pushButton.UnselectedColor = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);
                     pushButton.SelectedColor = new Vector4(0.0f, 1.0f, 0.0f, 1.0f);
                     pushButton.Clicked += (obj, e) =>
@@ -193,8 +193,8 @@ namespace MyCSharpExample
                 if (item.name.CompareTo("ProgressBar") == 0)
                 {
                     _progressBar = new ProgressBar();
-                    _progressBar.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
-                    _progressBar.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.HEIGHT);
+                    _progressBar.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Width);
+                    _progressBar.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.Height);
                     _progressBar.SetSize(0, 50);
 
                     _progressBar.ValueChanged += OnProgressBarValueChanged;
@@ -234,8 +234,8 @@ namespace MyCSharpExample
                 if (item.name.CompareTo("RadioButton") == 0)
                 {
                     TableView tableView = new TableView(2, 1);
-                    tableView.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
-                    tableView.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.HEIGHT);
+                    tableView.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Width);
+                    tableView.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Height);
 
                     RadioButton rButton = new RadioButton();
                     rButton.LabelText = "Yes";
@@ -253,8 +253,8 @@ namespace MyCSharpExample
                 if (item.name.CompareTo("Tooltip") == 0)
                 {
                     TableView tableView = new TableView(2, 1);
-                    tableView.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
-                    tableView.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.HEIGHT);
+                    tableView.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Width);
+                    tableView.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Height);
 
                     // Create two push buttons and add them to a table view
                     PushButton buttonWithSimpleTooltip = new PushButton();
@@ -302,7 +302,7 @@ namespace MyCSharpExample
                     PushButton button = new PushButton();
                     button.LabelText = "Popup";
                     button.ParentOrigin = NDalic.ParentOriginCenter;
-                    button.AnchorPoint = NDalic.AnchorPointCenter;
+                    button.PivotPoint = NDalic.AnchorPointCenter;
                     button.MaximumSize = new Vector2(90.0f, 50.0f);
                     _popup = CreatePopup();
                     _popup.SetTitle(CreateTitle("Popup"));
@@ -310,11 +310,11 @@ namespace MyCSharpExample
                     TextLabel text = new TextLabel("This will erase the file permanently. Are you sure?");
                     text.BackgroundColor = Color.White;
                     text.MultiLine = true;
-                    text.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
-                    text.SetResizePolicy(ResizePolicyType.DIMENSION_DEPENDENCY, DimensionType.HEIGHT);
+                    text.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Width);
+                    text.SetResizePolicy(ResizePolicyType.DIMENSION_DEPENDENCY, DimensionType.Height);
                     text.SetPadding(new PaddingType(10.0f, 10.0f, 20.0f, 0.0f));
                     _popup.SetContent(text);
-                    _popup.SetKeyboardFocusable(true);
+                    _popup.SetFocusable(true);
                     _popup.SetDisplayState(Popup.DisplayStateType.HIDDEN);
 
                     button.Clicked += (obj, ee) =>
@@ -331,7 +331,7 @@ namespace MyCSharpExample
                     PushButton button = new PushButton();
                     button.LabelText = "Toast";
                     button.ParentOrigin = NDalic.ParentOriginCenter;
-                    button.AnchorPoint = NDalic.AnchorPointCenter;
+                    button.PivotPoint = NDalic.AnchorPointCenter;
                     button.Clicked += (obj, ee) =>
                     {
                         TypeInfo typeInfo = new TypeInfo(TypeRegistry.Get().GetTypeInfo("PopupToast"));
@@ -363,7 +363,7 @@ namespace MyCSharpExample
             {
                 ImageView notSupportView = new ImageView("images/not_yet_sign.png");
                 notSupportView.Size = new Vector3(_window.GetSize().Width * 0.2f, _window.GetSize().Height * 0.25f, 0.0f);
-                notSupportView.SetKeyboardFocusable(true);
+                notSupportView.SetFocusable(true);
 
                 _contentContainer.AddChild(notSupportView, new TableView.CellPosition(((uint)idx / 5) * 2 + 1, (uint)idx % 5));
             }
@@ -373,36 +373,36 @@ namespace MyCSharpExample
             Popup confirmationPopup = new Popup();
 
             View footer = new View();
-            footer.SetName("Footer");
-            footer.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.WIDTH);
-            footer.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.HEIGHT);
+            footer.Name = "Footer";
+            footer.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.Width);
+            footer.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.Height);
             footer.SetSize(0.0f, 80.0f);
             footer.ParentOrigin = NDalic.ParentOriginCenter;
-            footer.AnchorPoint = NDalic.AnchorPointCenter;
+            footer.PivotPoint = NDalic.AnchorPointCenter;
 
             PushButton okButton = CreateOKButton();
             okButton.ParentOrigin = NDalic.ParentOriginCenter;
-            okButton.AnchorPoint = NDalic.AnchorPointCenter;
-            okButton.SetResizePolicy(ResizePolicyType.SIZE_FIXED_OFFSET_FROM_PARENT, DimensionType.ALL_DIMENSIONS);
+            okButton.PivotPoint = NDalic.AnchorPointCenter;
+            okButton.SetResizePolicy(ResizePolicyType.SIZE_FIXED_OFFSET_FROM_PARENT, DimensionType.AllDimensions);
             okButton.SetSizeModeFactor(new Vector3(-20.0f, -20.0f, 0.0f));
 
 
             PushButton cancelButton = CreateCancelButton();
             cancelButton.ParentOrigin = NDalic.ParentOriginCenter;
-            cancelButton.AnchorPoint = NDalic.AnchorPointCenter;
-            cancelButton.SetResizePolicy(ResizePolicyType.SIZE_FIXED_OFFSET_FROM_PARENT, DimensionType.ALL_DIMENSIONS);
+            cancelButton.PivotPoint = NDalic.AnchorPointCenter;
+            cancelButton.SetResizePolicy(ResizePolicyType.SIZE_FIXED_OFFSET_FROM_PARENT, DimensionType.AllDimensions);
             cancelButton.SetSizeModeFactor(new Vector3(-20.0f, -20.0f, 0.0f));
 
 
             TableView controlLayout = new TableView(1, 2);
             controlLayout.ParentOrigin = NDalic.ParentOriginCenter;
-            controlLayout.AnchorPoint = NDalic.AnchorPointCenter;
-            controlLayout.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.ALL_DIMENSIONS);
+            controlLayout.PivotPoint = NDalic.AnchorPointCenter;
+            controlLayout.SetResizePolicy(ResizePolicyType.FILL_TO_PARENT, DimensionType.AllDimensions);
             controlLayout.SetCellPadding(new Size2D(10, 10));
             controlLayout.SetRelativeWidth(0, 0.5f);
             controlLayout.SetRelativeWidth(1, 0.5f);
-            controlLayout.SetCellAlignment(new TableView.CellPosition(0, 0), HorizontalAlignmentType.CENTER, VerticalAlignmentType.CENTER);
-            controlLayout.SetCellAlignment(new TableView.CellPosition(0, 1), HorizontalAlignmentType.CENTER, VerticalAlignmentType.CENTER);
+            controlLayout.SetCellAlignment(new TableView.CellPosition(0, 0), HorizontalAlignmentType.Center, VerticalAlignmentType.CENTER);
+            controlLayout.SetCellAlignment(new TableView.CellPosition(0, 1), HorizontalAlignmentType.Center, VerticalAlignmentType.CENTER);
             controlLayout.AddChild(okButton, new TableView.CellPosition(0, 0));
             controlLayout.AddChild(cancelButton, new TableView.CellPosition(0, 1));
 
@@ -425,9 +425,9 @@ namespace MyCSharpExample
         PushButton CreateOKButton()
         {
             PushButton okayButton = new PushButton();
-            okayButton.SetName("OKButton");
+            okayButton.Name = "OKButton";
             okayButton.LabelText = "OK";
-            okayButton.SetKeyboardFocusable(true);
+            okayButton.SetFocusable(true);
             okayButton.Clicked += (obj, ee) =>
             {
                 _popup.SetDisplayState(Popup.DisplayStateType.HIDDEN);
@@ -439,7 +439,7 @@ namespace MyCSharpExample
         {
             PushButton cancelButton = new PushButton();
             cancelButton.LabelText = "Cancel";
-            cancelButton.SetKeyboardFocusable(true);
+            cancelButton.SetFocusable(true);
             cancelButton.Clicked += (obj, ee) =>
             {
                 _popup.SetDisplayState(Popup.DisplayStateType.HIDDEN);

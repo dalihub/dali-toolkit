@@ -10,10 +10,10 @@
 
 namespace Dali {
 
-public enum DepthWriteModeType {
-  OFF,
-  AUTO,
-  ON
+internal enum DepthWriteModeType {
+  Off,
+  Auto,
+  On
 }
 
 }

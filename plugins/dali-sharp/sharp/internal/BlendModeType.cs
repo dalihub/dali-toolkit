@@ -10,7 +10,7 @@
 
 namespace Dali {
 
-public enum BlendModeType {
+internal enum BlendModeType {
   OFF,
   AUTO,
   ON

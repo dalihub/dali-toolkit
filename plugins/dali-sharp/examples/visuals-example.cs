@@ -74,7 +74,7 @@ namespace MyCSharpExample
             imageVisual.Add( Visual.Property.Type, new Property.Value( (int)Visual.Type.Image ))
                        .Add( ImageVisualProperty.URL, new Property.Value( "./images/gallery-0.jpg" ));
             imageView.Background = imageVisual;
-            contentLayout.SetCellAlignment(new TableView.CellPosition(2, 0), HorizontalAlignmentType.CENTER, VerticalAlignmentType.CENTER);
+            contentLayout.SetCellAlignment(new TableView.CellPosition(2, 0), HorizontalAlignmentType.Center, VerticalAlignmentType.CENTER);
             contentLayout.Add(imageView);
 
             // Primitive Visual example

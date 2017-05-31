@@ -21,6 +21,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 
 namespace Dali
 {
@@ -105,7 +106,7 @@ DummyControlImpl::~DummyControlImpl()
 
 void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::Base visual )
 {
-  Control::RegisterVisual( index, visual );
+  DevelControl::RegisterVisual( *this, index, visual );
 
   VisualIndices::iterator iter = std::find( mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index );
   if( iter == mRegisteredVisualIndices.end() )
@@ -116,7 +117,7 @@ void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::B
 
 void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::Base visual, bool enabled )
 {
-  Control::RegisterVisual( index, visual, enabled );
+  DevelControl::RegisterVisual( *this, index, visual, enabled );
 
   VisualIndices::iterator iter = std::find( mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index );
   if( iter == mRegisteredVisualIndices.end() )
@@ -127,7 +128,7 @@ void DummyControlImpl::RegisterVisual( Property::Index index, Toolkit::Visual::B
 
 void DummyControlImpl::UnregisterVisual( Property::Index index )
 {
-  Control::UnregisterVisual( index );
+  DevelControl::UnregisterVisual( *this, index );
 
   VisualIndices::iterator iter = std::find( mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index );
   if( iter != mRegisteredVisualIndices.end() )
@@ -138,22 +139,22 @@ void DummyControlImpl::UnregisterVisual( Property::Index index )
 
 Toolkit::Visual::Base DummyControlImpl::GetVisual( Property::Index index )
 {
-  return Control::GetVisual( index );
+  return DevelControl::GetVisual( *this, index );
 }
 
 void DummyControlImpl::EnableVisual( Property::Index index, bool enabled )
 {
-  Control::EnableVisual( index, enabled );
+  DevelControl::EnableVisual( *this, index, enabled );
 }
 
 bool DummyControlImpl::IsVisualEnabled( Property::Index index )
 {
-  return Control::IsVisualEnabled( index );
+  return DevelControl::IsVisualEnabled( *this, index );
 }
 
 Animation DummyControlImpl::CreateTransition( const Toolkit::TransitionData& transition )
 {
-  return Control::CreateTransition( transition );
+  return DevelControl::CreateTransition( *this, transition );
 }
 
 void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value )

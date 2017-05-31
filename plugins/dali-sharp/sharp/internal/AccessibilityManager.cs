@@ -13,7 +13,7 @@ namespace Dali {
     using System;
     using System.Runtime.InteropServices;
 
-public class AccessibilityManager : BaseHandle {
+internal class AccessibilityManager : BaseHandle {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 
   internal AccessibilityManager(global::System.IntPtr cPtr, bool cMemoryOwn) : base(NDalicPINVOKE.AccessibilityManager_SWIGUpcast(cPtr), cMemoryOwn) {
@@ -2467,157 +2467,157 @@ public class AccessibilityManager : BaseHandle {
     return ret;
   }
 
-  public AccessibilityActionSignal StatusChangedSignal() {
+  internal AccessibilityActionSignal StatusChangedSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_StatusChangedSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionNextSignal() {
+  internal AccessibilityActionSignal ActionNextSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionNextSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionPreviousSignal() {
+  internal AccessibilityActionSignal ActionPreviousSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionPreviousSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionActivateSignal() {
+  internal AccessibilityActionSignal ActionActivateSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionActivateSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionReadSignal() {
+  internal AccessibilityActionSignal ActionReadSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionReadSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionOverSignal() {
+  internal AccessibilityActionSignal ActionOverSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionOverSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionReadNextSignal() {
+  internal AccessibilityActionSignal ActionReadNextSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionReadNextSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionReadPreviousSignal() {
+  internal AccessibilityActionSignal ActionReadPreviousSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionReadPreviousSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionUpSignal() {
+  internal AccessibilityActionSignal ActionUpSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionUpSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionDownSignal() {
+  internal AccessibilityActionSignal ActionDownSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionDownSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionClearFocusSignal() {
+  internal AccessibilityActionSignal ActionClearFocusSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionClearFocusSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionBackSignal() {
+  internal AccessibilityActionSignal ActionBackSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionBackSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionScrollUpSignal() {
+  internal AccessibilityActionSignal ActionScrollUpSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionScrollUpSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionScrollDownSignal() {
+  internal AccessibilityActionSignal ActionScrollDownSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionScrollDownSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionPageLeftSignal() {
+  internal AccessibilityActionSignal ActionPageLeftSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionPageLeftSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionPageRightSignal() {
+  internal AccessibilityActionSignal ActionPageRightSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionPageRightSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionPageUpSignal() {
+  internal AccessibilityActionSignal ActionPageUpSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionPageUpSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionPageDownSignal() {
+  internal AccessibilityActionSignal ActionPageDownSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionPageDownSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionMoveToFirstSignal() {
+  internal AccessibilityActionSignal ActionMoveToFirstSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionMoveToFirstSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionMoveToLastSignal() {
+  internal AccessibilityActionSignal ActionMoveToLastSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionMoveToLastSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionReadFromTopSignal() {
+  internal AccessibilityActionSignal ActionReadFromTopSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionReadFromTopSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionReadFromNextSignal() {
+  internal AccessibilityActionSignal ActionReadFromNextSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionReadFromNextSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionZoomSignal() {
+  internal AccessibilityActionSignal ActionZoomSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionZoomSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionReadIndicatorInformationSignal() {
+  internal AccessibilityActionSignal ActionReadIndicatorInformationSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionReadIndicatorInformationSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionReadPauseResumeSignal() {
+  internal AccessibilityActionSignal ActionReadPauseResumeSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionReadPauseResumeSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public AccessibilityActionSignal ActionStartStopSignal() {
+  internal AccessibilityActionSignal ActionStartStopSignal() {
     AccessibilityActionSignal ret = new AccessibilityActionSignal(NDalicPINVOKE.AccessibilityManager_ActionStartStopSignal(swigCPtr), false);
     if (NDalicPINVOKE.SWIGPendingException.Pending) throw NDalicPINVOKE.SWIGPendingException.Retrieve();
     return ret;

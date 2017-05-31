@@ -50,14 +50,14 @@ namespace MyCSharpExample
             Log("Initialize() is called!");
             Window window = Window.Instance;
             window.BackgroundColor = Color.White;
-            window.Touch += OnWindowTouched;
-            window.Touch += OnWindowTouched2;
-            window.Wheel += OnWindowWheelEvent;
+            window.Touched += OnWindowTouched;
+            window.Touched += OnWindowTouched2;
+            window.WheelRolled += OnWindowWheelEvent;
 
             // Add a _text label to the window
             _text = new TextLabel("Hello Mono World");
             _text.ParentOrigin = ParentOrigin.BottomCenter;
-            _text.AnchorPoint = AnchorPoint.BottomCenter;
+            _text.PivotPoint = AnchorPoint.BottomCenter;
             _text.HorizontalAlignment = "CENTER";
             _text.PointSize = 32.0f;
             window.Add(_text);
@@ -66,25 +66,25 @@ namespace MyCSharpExample
             _view1.Size = new Vector3(200.0f, 200.0f, 0.0f);
             _view1.BackgroundColor = Color.Green;
             _view1.ParentOrigin = ParentOrigin.Center;
-            _view1.AnchorPoint = AnchorPoint.Center;
-            _view1.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.ALL_DIMENSIONS);
-            _view1.OnWindowEvent += OnWindow;
+            _view1.PivotPoint = AnchorPoint.Center;
+            _view1.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.AllDimensions);
+            _view1.AddedToWindow += OnWindow;
             window.Add(_view1);
 
             _view2 = new View();
             _view2.BackgroundColor = Color.Red;
             _view2.Size = new Vector3(50.0f, 50.0f, 0.0f);
             _view2.ParentOrigin = ParentOrigin.TopLeft;
-            _view2.AnchorPoint = AnchorPoint.TopLeft;
-            _view2.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.ALL_DIMENSIONS);
+            _view2.PivotPoint = AnchorPoint.TopLeft;
+            _view2.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.AllDimensions);
             _view1.Add(_view2);
 
             _view3 = new View();
             _view3.BackgroundColor = Color.Blue;
             _view3.Size = new Vector3(50.0f, 50.0f, 0.0f);
             _view3.ParentOrigin = ParentOrigin.TopLeft;
-            _view3.AnchorPoint = AnchorPoint.TopLeft;
-            _view3.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.ALL_DIMENSIONS);
+            _view3.PivotPoint = AnchorPoint.TopLeft;
+            _view3.SetResizePolicy(ResizePolicyType.FIXED, DimensionType.AllDimensions);
             _view1.Add(_view3);
 
             _user_alpha_func = new UserAlphaFunctionDelegate(body);
