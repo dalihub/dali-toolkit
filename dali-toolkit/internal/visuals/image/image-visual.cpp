@@ -471,8 +471,19 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
   else if( mImageUrl.IsValid() && mImageUrl.GetLocation() == VisualUrl::LOCAL )
   {
     ImageDimensions dimensions = Dali::GetClosestImageSize( mImageUrl.GetUrl() );
-    naturalSize.x = dimensions.GetWidth();
-    naturalSize.y = dimensions.GetHeight();
+
+    if( dimensions != ImageDimensions( 0, 0 ) )
+    {
+      naturalSize.x = dimensions.GetWidth();
+      naturalSize.y = dimensions.GetHeight();
+    }
+    else
+    {
+      Image brokenImage = VisualFactoryCache::GetBrokenVisualImage();
+
+      naturalSize.x = brokenImage.GetWidth();
+      naturalSize.y = brokenImage.GetWidth();
+    }
     return;
   }
 
@@ -925,6 +936,10 @@ void ImageVisual::UploadComplete( bool loadingSuccess, TextureSet textureSet, bo
       else
       {
         Image brokenImage = VisualFactoryCache::GetBrokenVisualImage();
+
+        textureSet = TextureSet::New();
+        mImpl->mRenderer.SetTextures( textureSet );
+
         ApplyImageToSampler( brokenImage );
       }
       // Image loaded and ready to display
