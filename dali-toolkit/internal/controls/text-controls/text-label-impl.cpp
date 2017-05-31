@@ -881,7 +881,7 @@ void TextLabel::SetUpAutoScrolling()
     // If speed, loopCount or gap not set via property system then will need to create a TextScroller with defaults
     mTextScroller = Text::TextScroller::New( *this );
   }
-  mTextScroller->SetParameters( mRenderableActor, controlSize, offScreenSize, direction, alignmentOffset );
+  mTextScroller->SetParameters( mRenderableActor, controlSize, offScreenSize, direction, alignmentOffset, mController->GetHorizontalAlignment() );
 
   Actor self = Self();
   self.Add( mTextScroller->GetScrollingText() );
