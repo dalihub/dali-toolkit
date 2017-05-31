@@ -44,6 +44,7 @@
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -51,357 +52,18 @@ namespace Dali
 namespace Toolkit
 {
 
-namespace
-{
-
-/**
- * Creates control through type registry
- */
-BaseHandle Create()
-{
-  return Internal::Control::New();
-}
-
-/**
- * Performs actions as requested using the action name.
- * @param[in] object The object on which to perform the action.
- * @param[in] actionName The action to perform.
- * @param[in] attributes The attributes with which to perfrom this action.
- * @return true if action has been accepted by this control
- */
-const char* ACTION_ACCESSIBILITY_ACTIVATED = "accessibilityActivated";
-static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
-{
-  bool ret = false;
-
-  if( object && ( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_ACTIVATED ) ) )
-  {
-    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-    if( control )
-    {
-      // if cast succeeds there is an implementation so no need to check
-      ret = Internal::GetImplementation( control ).OnAccessibilityActivated();
-    }
-  }
-
-  return ret;
-}
-
-/**
- * Connects a callback function with the object's signals.
- * @param[in] object The object providing the signal.
- * @param[in] tracker Used to disconnect the signal.
- * @param[in] signalName The signal to connect to.
- * @param[in] functor A newly allocated FunctorDelegate.
- * @return True if the signal was connected.
- * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
- */
-const char* SIGNAL_KEY_EVENT = "keyEvent";
-const char* SIGNAL_KEY_INPUT_FOCUS_GAINED = "keyInputFocusGained";
-const char* SIGNAL_KEY_INPUT_FOCUS_LOST = "keyInputFocusLost";
-const char* SIGNAL_TAPPED = "tapped";
-const char* SIGNAL_PANNED = "panned";
-const char* SIGNAL_PINCHED = "pinched";
-const char* SIGNAL_LONG_PRESSED = "longPressed";
-static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
-{
-  Dali::BaseHandle handle( object );
-
-  bool connected( false );
-  Toolkit::Control control = Toolkit::Control::DownCast( handle );
-  if ( control )
-  {
-    Internal::Control& controlImpl( Internal::GetImplementation( control ) );
-    connected = true;
-
-    if ( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT ) )
-    {
-      controlImpl.KeyEventSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_GAINED ) )
-    {
-      controlImpl.KeyInputFocusGainedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_INPUT_FOCUS_LOST ) )
-    {
-      controlImpl.KeyInputFocusLostSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_TAPPED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Tap );
-      controlImpl.GetTapGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PANNED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Pan );
-      controlImpl.GetPanGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_PINCHED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::Pinch );
-      controlImpl.GetPinchGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-    else if( 0 == strcmp( signalName.c_str(), SIGNAL_LONG_PRESSED ) )
-    {
-      controlImpl.EnableGestureDetection( Gesture::LongPress );
-      controlImpl.GetLongPressGestureDetector().DetectedSignal().Connect( tracker, functor );
-    }
-  }
-  return connected;
-}
-
-// Setup signals and actions using the type-registry.
-DALI_TYPE_REGISTRATION_BEGIN( Control, CustomActor, Create );
-
-// Note: Properties are registered separately below.
-
-SignalConnectorType registerSignal1( typeRegistration, SIGNAL_KEY_EVENT, &DoConnectSignal );
-SignalConnectorType registerSignal2( typeRegistration, SIGNAL_KEY_INPUT_FOCUS_GAINED, &DoConnectSignal );
-SignalConnectorType registerSignal3( typeRegistration, SIGNAL_KEY_INPUT_FOCUS_LOST, &DoConnectSignal );
-SignalConnectorType registerSignal4( typeRegistration, SIGNAL_TAPPED, &DoConnectSignal );
-SignalConnectorType registerSignal5( typeRegistration, SIGNAL_PANNED, &DoConnectSignal );
-SignalConnectorType registerSignal6( typeRegistration, SIGNAL_PINCHED, &DoConnectSignal );
-SignalConnectorType registerSignal7( typeRegistration, SIGNAL_LONG_PRESSED, &DoConnectSignal );
-
-TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &DoAction );
-
-DALI_TYPE_REGISTRATION_END()
-
-} // unnamed namespace
-
 namespace Internal
 {
 
-class Control::Impl : public ConnectionTracker
+namespace
 {
-public:
 
-  // Construction & Destruction
-  Impl(Control& controlImpl)
-: mControlImpl( controlImpl ),
-  mStyleName(""),
-  mBackgroundVisual(),
-  mBackgroundColor(Color::TRANSPARENT),
-  mStartingPinchScale( NULL ),
-  mKeyEventSignal(),
-  mPinchGestureDetector(),
-  mPanGestureDetector(),
-  mTapGestureDetector(),
-  mLongPressGestureDetector(),
-  mFlags( Control::ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
-  mIsKeyboardNavigationSupported( false ),
-  mIsKeyboardFocusGroup( false )
-{
-}
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_CONTROL_VISUALS");
+#endif
 
-  ~Impl()
-  {
-    // All gesture detectors will be destroyed so no need to disconnect.
-    delete mStartingPinchScale;
-  }
+} // unnamed namespace
 
-  // Gesture Detection Methods
-
-  void PinchDetected(Actor actor, const PinchGesture& pinch)
-  {
-    mControlImpl.OnPinch(pinch);
-  }
-
-  void PanDetected(Actor actor, const PanGesture& pan)
-  {
-    mControlImpl.OnPan(pan);
-  }
-
-  void TapDetected(Actor actor, const TapGesture& tap)
-  {
-    mControlImpl.OnTap(tap);
-  }
-
-  void LongPressDetected(Actor actor, const LongPressGesture& longPress)
-  {
-    mControlImpl.OnLongPress(longPress);
-  }
-
-  // Properties
-
-  /**
-   * Called when a property of an object of this type is set.
-   * @param[in] object The object whose property is set.
-   * @param[in] index The property index.
-   * @param[in] value The new property value.
-   */
-  static void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
-  {
-    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-
-    if ( control )
-    {
-      Control& controlImpl( GetImplementation( control ) );
-
-      switch ( index )
-      {
-        case Toolkit::Control::Property::STYLE_NAME:
-        {
-          controlImpl.SetStyleName( value.Get< std::string >() );
-          break;
-        }
-
-        case Toolkit::Control::Property::BACKGROUND_COLOR:
-        {
-          DALI_LOG_WARNING( "BACKGROUND_COLOR property is deprecated. Use BACKGROUND property instead\n" );
-          controlImpl.SetBackgroundColor( value.Get< Vector4 >() );
-          break;
-        }
-
-        case Toolkit::Control::Property::BACKGROUND_IMAGE:
-        {
-          DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
-          Image image = Scripting::NewImage( value );
-          if ( image )
-          {
-            controlImpl.SetBackgroundImage( image );
-          }
-          else
-          {
-            // An empty map means the background is no longer required
-            controlImpl.ClearBackground();
-          }
-          break;
-        }
-
-        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
-        {
-          if ( value.Get< bool >() )
-          {
-            controlImpl.SetKeyInputFocus();
-          }
-          else
-          {
-            controlImpl.ClearKeyInputFocus();
-          }
-          break;
-        }
-
-        case Toolkit::Control::Property::BACKGROUND:
-        {
-          const Property::Map* map = value.GetMap();
-          if( map )
-          {
-            controlImpl.SetBackground( *map );
-          }
-          else
-          {
-            // The background is not a property map, so we should clear the background
-            controlImpl.ClearBackground();
-          }
-          break;
-        }
-      }
-    }
-  }
-
-  /**
-   * Called to retrieve a property of an object of this type.
-   * @param[in] object The object whose property is to be retrieved.
-   * @param[in] index The property index.
-   * @return The current value of the property.
-   */
-  static Property::Value GetProperty( BaseObject* object, Property::Index index )
-  {
-    Property::Value value;
-
-    Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
-
-    if ( control )
-    {
-      Control& controlImpl( GetImplementation( control ) );
-
-      switch ( index )
-      {
-        case Toolkit::Control::Property::STYLE_NAME:
-        {
-          value = controlImpl.GetStyleName();
-          break;
-        }
-
-        case Toolkit::Control::Property::BACKGROUND_COLOR:
-        {
-          DALI_LOG_WARNING( "BACKGROUND_COLOR property is deprecated. Use BACKGROUND property instead\n" );
-          value = controlImpl.GetBackgroundColor();
-          break;
-        }
-
-        case Toolkit::Control::Property::BACKGROUND_IMAGE:
-        {
-          DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
-          Property::Map map;
-          if( controlImpl.mImpl->mBackgroundVisual )
-          {
-            controlImpl.mImpl->mBackgroundVisual.CreatePropertyMap( map );
-          }
-          value = map;
-          break;
-        }
-
-        case Toolkit::Control::Property::KEY_INPUT_FOCUS:
-        {
-          value = controlImpl.HasKeyInputFocus();
-          break;
-        }
-
-        case Toolkit::Control::Property::BACKGROUND:
-        {
-          Property::Map map;
-          if( controlImpl.mImpl->mBackgroundVisual )
-          {
-            (controlImpl.mImpl->mBackgroundVisual).CreatePropertyMap( map );
-          }
-
-          value = map;
-          break;
-        }
-
-      }
-    }
-
-    return value;
-  }
-
-  // Data
-
-  Control& mControlImpl;
-  std::string mStyleName;
-  Toolkit::Visual::Base mBackgroundVisual;   ///< The visual to render the background
-  Vector4 mBackgroundColor;                       ///< The color of the background visual
-  Vector3* mStartingPinchScale;      ///< The scale when a pinch gesture starts, TODO: consider removing this
-  Toolkit::Control::KeyEventSignalType mKeyEventSignal;
-  Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
-  Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
-
-  // Gesture Detection
-  PinchGestureDetector mPinchGestureDetector;
-  PanGestureDetector mPanGestureDetector;
-  TapGestureDetector mTapGestureDetector;
-  LongPressGestureDetector mLongPressGestureDetector;
-
-  ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
-  bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
-  bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
-
-  // Properties - these need to be members of Internal::Control::Impl as they need to function within this class.
-  static const PropertyRegistration PROPERTY_1;
-  static const PropertyRegistration PROPERTY_2;
-  static const PropertyRegistration PROPERTY_3;
-  static const PropertyRegistration PROPERTY_4;
-  static const PropertyRegistration PROPERTY_5;
-};
-
-// Properties registered without macro to use specific member variables.
-const PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "styleName",       Toolkit::Control::Property::STYLE_NAME,       Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "backgroundColor", Toolkit::Control::Property::BACKGROUND_COLOR, Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgroundImage", Toolkit::Control::Property::BACKGROUND_IMAGE, Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",   Toolkit::Control::Property::KEY_INPUT_FOCUS,  Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",      Toolkit::Control::Property::BACKGROUND,       Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Toolkit::Control Control::New()
 {
@@ -440,16 +102,12 @@ const std::string& Control::GetStyleName() const
 
 void Control::SetBackgroundColor( const Vector4& color )
 {
-  Actor self( Self() );
   mImpl->mBackgroundColor = color;
   Property::Map map;
   map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
   map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
-  InitializeVisual( self, mImpl->mBackgroundVisual, map );
-  if( mImpl->mBackgroundVisual )
-  {
-    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
-  }
+
+  SetBackground( map );
 }
 
 Vector4 Control::GetBackgroundColor() const
@@ -459,47 +117,34 @@ Vector4 Control::GetBackgroundColor() const
 
 void Control::SetBackground( const Property::Map& map )
 {
-  Actor self( Self() );
-  Toolkit::Visual::Base backgroundVisual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  if( visual )
+  {
+    mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
+    visual.SetDepthIndex( DepthIndex::BACKGROUND );
 
-  // if new visual created, replace existing one
-  if( backgroundVisual )
-  {
-    if( self.OnStage() )
-    {
-      mImpl->mBackgroundVisual.RemoveAndReset( self );
-      backgroundVisual.SetOnStage( self );
-    }
-    mImpl->mBackgroundVisual = backgroundVisual;
-    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
-  }
-  // ...otherwise process map and apply it to the existing visual
-  else if( mImpl->mBackgroundVisual )
-  {
-    Property::Value* premultipliedAlpha = map.Find( Toolkit::DevelVisual::Property::PREMULTIPLIED_ALPHA, Toolkit::Internal::PREMULTIPLIED_ALPHA );
-    if( premultipliedAlpha )
-    {
-      bool value( premultipliedAlpha->Get<bool>() );
-      Toolkit::GetImplementation( mImpl->mBackgroundVisual ).EnablePreMultipliedAlpha( value );
-    }
+    // Trigger a size negotiation request that may be needed by the new visual to relayout its contents.
+    RelayoutRequest();
   }
 }
 
 void Control::SetBackgroundImage( Image image )
 {
-  Actor self( Self() );
-  InitializeVisual( self, mImpl->mBackgroundVisual, image );
-  if( mImpl->mBackgroundVisual )
+  Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( image );
+  if( visual )
   {
-    mImpl->mBackgroundVisual.SetDepthIndex( DepthIndex::BACKGROUND );
+    mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
+    visual.SetDepthIndex( DepthIndex::BACKGROUND );
   }
 }
 
 void Control::ClearBackground()
 {
-  Actor self( Self() );
-  mImpl->mBackgroundVisual.RemoveAndReset( self );
-  mImpl->mBackgroundColor = Color::TRANSPARENT;
+   mImpl->UnregisterVisual( Toolkit::Control::Property::BACKGROUND );
+   mImpl->mBackgroundColor = Color::TRANSPARENT;
+
+   // Trigger a size negotiation request that may be needed when unregistering a visual.
+   RelayoutRequest();
 }
 
 void Control::EnableGestureDetection(Gesture::Type type)
@@ -832,19 +477,48 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 
 void Control::OnStageConnection( int depth )
 {
-  if( mImpl->mBackgroundVisual)
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageConnection number of registered visuals(%d)\n",  mImpl->mVisuals.Size() );
+
+  Actor self( Self() );
+
+  for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
-    Actor self( Self() );
-    mImpl->mBackgroundVisual.SetOnStage( self );
+    // Check whether the visual is empty and enabled
+    if( (*iter)->visual && (*iter)->enabled )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageConnection Setting visual(%d) on stage\n", (*iter)->index );
+      Toolkit::GetImplementation((*iter)->visual).SetOnStage( self );
+    }
+  }
+
+  if( mImpl->mVisuals.Empty() && ! self.GetRendererCount() )
+  {
+    Property::Value clippingValue = self.GetProperty( Actor::Property::CLIPPING_MODE );
+    int clippingMode = ClippingMode::DISABLED;
+    if( clippingValue.Get( clippingMode ) )
+    {
+      // Add a transparent background if we do not have any renderers or visuals so we clip our children
+
+      if( clippingMode == ClippingMode::CLIP_CHILDREN )
+      {
+        // Create a transparent background visual which will also get staged.
+        SetBackgroundColor( Color::TRANSPARENT );
+      }
+    }
   }
 }
 
 void Control::OnStageDisconnection()
 {
-  if( mImpl->mBackgroundVisual )
+  for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
   {
-    Actor self( Self() );
-    mImpl->mBackgroundVisual.SetOffStage( self );
+    // Check whether the visual is empty
+    if( (*iter)->visual )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageDisconnection Setting visual(%d) off stage\n", (*iter)->index );
+      Actor self( Self() );
+      Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+    }
   }
 }
 
@@ -872,10 +546,11 @@ void Control::OnChildRemove(Actor& child)
 
 void Control::OnSizeSet(const Vector3& targetSize)
 {
-  if( mImpl->mBackgroundVisual )
+  Toolkit::Visual::Base visual = mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
+  if( visual )
   {
     Vector2 size( targetSize );
-    mImpl->mBackgroundVisual.SetSize( size );
+    visual.SetSize( size );
   }
 }
 
@@ -910,6 +585,12 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
   {
     container.Add( Self().GetChildAt( i ), size );
   }
+
+  Toolkit::Visual::Base visual = mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
+  if( visual )
+  {
+    visual.SetSize( size );
+  }
 }
 
 void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
@@ -918,11 +599,12 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 
 Vector3 Control::GetNaturalSize()
 {
-  if( mImpl->mBackgroundVisual )
+  Toolkit::Visual::Base visual = mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
+  if( visual )
   {
     Vector2 naturalSize;
-    mImpl->mBackgroundVisual.GetNaturalSize(naturalSize);
-    return Vector3(naturalSize);
+    visual.GetNaturalSize( naturalSize );
+    return Vector3( naturalSize );
   }
   return Vector3::ZERO;
 }

@@ -392,6 +392,9 @@ void NPatchVisual::DoSetOnStage( Actor& actor )
   }
 
   actor.AddRenderer( mImpl->mRenderer );
+
+  // npatch loaded and ready to display
+  ResourceReady();
 }
 
 void NPatchVisual::DoSetOffStage( Actor& actor )

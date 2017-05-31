@@ -386,6 +386,9 @@ void MeshVisual::DoSetOnStage( Actor& actor )
   InitializeRenderer();
 
   actor.AddRenderer( mImpl->mRenderer );
+
+  // Mesh loaded and ready to display
+  ResourceReady();
 }
 
 void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const

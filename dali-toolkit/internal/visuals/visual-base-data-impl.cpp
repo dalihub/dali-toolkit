@@ -50,8 +50,10 @@ DALI_ENUM_TO_STRING_TABLE_END( SHADER_HINT )
 
 Internal::Visual::Base::Impl::Impl()
 : mCustomShader(NULL),
+  mResourceObserver( NULL ),
   mDepthIndex( 0.0f ),
-  mFlags( 0 )
+  mFlags( 0 ),
+  mResourceReady( false )
 {
 }
 

@@ -54,6 +54,16 @@ Base::Base(Internal::Visual::Base *impl)
 {
 }
 
+void Visual::Base::SetName( const std::string& name )
+{
+  GetImplementation( *this ).SetName( name );
+}
+
+const std::string& Visual::Base::GetName()
+{
+  return GetImplementation( *this ).GetName();
+}
+
 void Base::SetSize( const Vector2& size )
 {
   GetImplementation( *this ).SetSize( size );

@@ -156,6 +156,9 @@ void BorderVisual::DoSetOnStage( Actor& actor )
   mBorderSizeIndex = (mImpl->mRenderer).RegisterProperty( SIZE_NAME, mBorderSize );
 
   actor.AddRenderer( mImpl->mRenderer );
+
+  // Border Visual Generated and ready to display
+  ResourceReady();
 }
 
 void BorderVisual::DoCreatePropertyMap( Property::Map& map ) const

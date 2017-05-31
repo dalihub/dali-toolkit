@@ -433,6 +433,7 @@ Image ImageVisual::LoadImage( const std::string& url, bool synchronousLoading )
   }
   else
   {
+    // Asynchronous image load
     ResourceImage resourceImage = Dali::ResourceImage::New( url, mDesiredSize, mFittingMode, mSamplingMode );
     resourceImage.LoadingFinishedSignal().Connect( this, &ImageVisual::OnImageLoaded );
     return resourceImage;
@@ -467,6 +468,7 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, const std::strin
   }
   else
   {
+    // Asynchronous image load
     textureSet = mFactoryCache.GetAtlasManager()->Add(textureRect, url, mDesiredSize, mFittingMode, true, this );
     mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
     if( !textureSet ) // big image, no atlasing
@@ -586,6 +588,9 @@ void ImageVisual::UploadCompleted()
     // reset the weak handle so that the renderer only get added to actor once
     mPlacementActor.Reset();
   }
+
+  // Image async loaded into the Atlas and is ready to display
+  ResourceReady();
 }
 
 void ImageVisual::DoSetOnStage( Actor& actor )
@@ -605,6 +610,9 @@ void ImageVisual::DoSetOnStage( Actor& actor )
   {
     actor.AddRenderer( mImpl->mRenderer );
     mPlacementActor.Reset();
+
+    // If we're sync loading and not atlasing (async), then the resource is ready to display
+    ResourceReady();
   }
 }
 
@@ -847,6 +855,8 @@ void ImageVisual::OnImageLoaded( ResourceImage image )
       ApplyImageToSampler( brokenImage );
     }
   }
+  // ResourceImage async loaded and ready to display
+  ResourceReady();
 }
 
 void ImageVisual::CleanCache(const std::string& url)
