@@ -53,8 +53,8 @@ Property::Map DefaultTransform()
   transformMap
     .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
     .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN )
     .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::DevelVisual::Transform::Policy::RELATIVE, Toolkit::DevelVisual::Transform::Policy::RELATIVE ) )
     .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::DevelVisual::Transform::Policy::RELATIVE, Toolkit::DevelVisual::Transform::Policy::RELATIVE ) );
   return transformMap;
@@ -1437,12 +1437,12 @@ int UtcDaliVisualGetTransform(void)
   {
     Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ORIGIN );
     DALI_TEST_CHECK( typeValue );
-    DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::CENTER );
+    DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::TOP_BEGIN );
   }
   {
     Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT );
     DALI_TEST_CHECK( typeValue );
-    DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::CENTER );
+    DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::TOP_BEGIN );
   }
 
   END_TEST;
@@ -1454,7 +1454,7 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   transform.Insert( DevelVisual::Transform::Property::OFFSET, Vector2(10.0f, 10.0f) );
   transform.Insert( DevelVisual::Transform::Property::SIZE, Vector2(0.2f, 0.2f) );
   transform.Insert( DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::DevelVisual::Transform::Policy::ABSOLUTE, Toolkit::DevelVisual::Transform::Policy::ABSOLUTE ) );
-  transform.Insert( DevelVisual::Transform::Property::ORIGIN, "TOP_BEGIN" );
+  transform.Insert( DevelVisual::Transform::Property::ORIGIN, "CENTER" );
   transform.Insert( DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::BOTTOM_END );
 
   visual.SetTransformAndSize( transform, Vector2(100, 100) );
@@ -1488,7 +1488,7 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   {
     Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ORIGIN );
     DALI_TEST_CHECK( typeValue );
-    DALI_TEST_EQUALS( (Toolkit::Align::Type)typeValue->Get<int>(), Toolkit::Align::TOP_BEGIN, TEST_LOCATION );
+    DALI_TEST_EQUALS( (Toolkit::Align::Type)typeValue->Get<int>(), Toolkit::Align::CENTER, TEST_LOCATION );
   }
   {
     Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT );
@@ -1529,7 +1529,7 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   index = renderer.GetPropertyIndex( "origin" );
   DALI_TEST_CHECK( index != Property::INVALID_INDEX );
   Vector2 parentOrigin = renderer.GetProperty<Vector2>( index );
-  DALI_TEST_EQUALS( parentOrigin, Vector2(-0.5f,-0.5f), TEST_LOCATION );
+  DALI_TEST_EQUALS( parentOrigin, Vector2(0.0f,0.0f), TEST_LOCATION );
 
   index = renderer.GetPropertyIndex( "anchorPoint" );
   DALI_TEST_CHECK( index != Property::INVALID_INDEX );
@@ -1556,12 +1556,12 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   offsetSizeMode = renderer.GetProperty<Vector4>( renderer.GetPropertyIndex( "offsetSizeMode" ) );
   DALI_TEST_EQUALS( offsetSizeMode, Vector4(0.0f,0.0f,1.0f,1.0f), TEST_LOCATION );
 
-  //Parent origin and anchor point should have default values
+  //Parent origin and anchor point should have the default values
   parentOrigin = renderer.GetProperty<Vector2>( renderer.GetPropertyIndex( "origin" ) );
-  DALI_TEST_EQUALS( parentOrigin, Vector2(0.0f,0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( parentOrigin, Vector2(-0.5f,-0.5f), TEST_LOCATION );
 
   anchorPoint = renderer.GetProperty<Vector2>( renderer.GetPropertyIndex( "anchorPoint" ) );
-  DALI_TEST_EQUALS( anchorPoint, Vector2(0.0f,0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( anchorPoint, Vector2(0.5f,0.5f), TEST_LOCATION );
 }
 
 int UtcDaliVisualSetTransform0(void)
