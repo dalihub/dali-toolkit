@@ -22,7 +22,6 @@
 #include <dali/public-api/adaptor-framework/timer.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/property-notification.h>
-#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-array.h>
 
@@ -608,13 +607,9 @@ private:
 
 private:
 
-  typedef std::map<unsigned int, Actor> ItemPool;
-  typedef ItemPool::iterator            ItemPoolIter;
-  typedef ItemPool::const_iterator      ConstItemPoolIter;
-
   Property::Array mlayoutArray;
 
-  ItemPool mItemPool;
+  ItemContainer mItemPool;
   ItemFactory& mItemFactory;
   std::vector< ItemLayoutPtr > mLayouts;            ///< Container of Dali::Toolkit::ItemLayout objects
   Actor mOvershootOverlay;                          ///< The overlay actor for overshoot effect
