@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_SCROLLER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,11 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/internal/text/layouts/layout-alignment.h>
 
 namespace Dali
 {
@@ -66,7 +67,7 @@ public:
    * @param[in] alignmentOffset alignment of source text
    *
    */
-  void SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset );
+  void SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset, Layout::HorizontalAlignment horizontalAlignment );
 
   /**
    * @brief Set the gap distance to elapse before the text wraps around
@@ -121,6 +122,11 @@ public:
    * @param[in] stopMode type when text scrolling is stoped.
    */
   void SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMode );
+
+  /**
+   * @brief Stop the auto scrolling.
+   */
+  void StopScrolling();
 
   /**
    * @brief Get the mode of scrolling stop

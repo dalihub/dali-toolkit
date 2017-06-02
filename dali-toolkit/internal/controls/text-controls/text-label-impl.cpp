@@ -349,7 +349,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
              {
                if( impl.mTextScroller )
                {
-                 impl.mTextScroller->SetLoopCount( 0 ); // Causes the current animation to finish playing (0)
+                 impl.mTextScroller->StopScrolling();
                }
              }
              // If request is enable (true) then start autoscroll as not already running
@@ -881,7 +881,7 @@ void TextLabel::SetUpAutoScrolling()
     // If speed, loopCount or gap not set via property system then will need to create a TextScroller with defaults
     mTextScroller = Text::TextScroller::New( *this );
   }
-  mTextScroller->SetParameters( mRenderableActor, controlSize, offScreenSize, direction, alignmentOffset );
+  mTextScroller->SetParameters( mRenderableActor, controlSize, offScreenSize, direction, alignmentOffset, mController->GetHorizontalAlignment() );
 
   Actor self = Self();
   self.Add( mTextScroller->GetScrollingText() );

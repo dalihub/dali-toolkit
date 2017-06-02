@@ -33,6 +33,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 #include <dali-toolkit/internal/filters/emboss-filter.h>
@@ -193,7 +194,7 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
     FrameBufferImage dummyImage = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
 
     Internal::InitializeVisual( self, mVisualPostFilter, dummyImage );
-    RegisterVisual( POST_FILTER_VISUAL, mVisualPostFilter );
+    DevelControl::RegisterVisual( *this, POST_FILTER_VISUAL, mVisualPostFilter );
 
     Property::Map customShader;
     customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = EFFECTS_VIEW_VERTEX_SOURCE;
@@ -427,7 +428,7 @@ void EffectsView::AllocateResources()
 
     mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
     Internal::InitializeVisual( self, mVisualForChildren, mImageForChildren );
-    RegisterVisual( CHILD_VISUAL, mVisualForChildren );
+    DevelControl::RegisterVisual( *this, CHILD_VISUAL, mVisualForChildren );
     mVisualForChildren.SetDepthIndex( DepthIndex::CONTENT+1 );
 
     mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );

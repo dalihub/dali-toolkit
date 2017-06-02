@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DEVEL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,13 @@ namespace Dali
 
 namespace Toolkit
 {
+
+class TransitionData;
+
+namespace Visual
+{
+class Base;
+}
 
 namespace DevelControl
 {
@@ -121,7 +128,7 @@ typedef Signal<void ( Control ) > ResourceReadySignalType;
  *   void YourCallbackName( Control control );
  * @endcode
  */
-ResourceReadySignalType& ResourceReadySignal( Control& control );
+DALI_IMPORT_API ResourceReadySignalType& ResourceReadySignal( Control& control );
 
 /**
  * @brief Query if all resources required by a control are loaded and ready.
@@ -129,7 +136,86 @@ ResourceReadySignalType& ResourceReadySignal( Control& control );
  * @return true if the resources are loaded and ready, false otherwise
  *
  */
-bool IsResourceReady( const Control& control );
+DALI_IMPORT_API bool IsResourceReady( const Control& control );
+
+/**
+ * @brief Register a visual by Property Index, linking an Actor to visual when required.
+ * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
+ * No parenting is done during registration, this should be done by derived class.
+ *
+ * @param[in] control The control
+ * @param[in] index The Property index of the visual, used to reference visual
+ * @param[in] visual The visual to register
+ * @note Derived class should not call visual.SetOnStage(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
+ *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
+ */
+DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual );
+
+/**
+ * @brief Register a visual by Property Index, linking an Actor to visual when required.
+ *
+ * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
+ * If enabled is false then the visual is not set on stage until enabled by the derived class.
+ * @see EnableVisual
+ *
+ * @param[in] control The control
+ * @param[in] index The Property index of the visual, used to reference visual
+ * @param[in] visual The visual to register
+ * @param[in] enabled false if derived class wants to control when visual is set on stage.
+ *
+ */
+DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
+
+/**
+ * @brief Erase the entry matching the given index from the list of registered visuals
+ *
+ * @param[in] control The control
+ * @param[in] index The Property index of the visual, used to reference visual
+ */
+DALI_IMPORT_API void UnregisterVisual( Internal::Control& control, Dali::Property::Index index );
+
+/**
+ * @brief Retrieve the visual associated with the given property index.
+ *
+ * @param[in] control The control
+ * @param[in] index The Property index of the visual.
+ * @return The registered visual if exist, otherwise empty handle.
+ * @note For managing object life-cycle, do not store the returned visual as a member which increments its reference count.
+ */
+DALI_IMPORT_API Toolkit::Visual::Base GetVisual( const Internal::Control& control, Dali::Property::Index index );
+
+/**
+ * @brief Sets the given visual to be displayed or not when parent staged.
+ *
+ * @param[in] control The control
+ * @param[in] index The Property index of the visual
+ * @param[in] enable flag to set enabled or disabled.
+ */
+DALI_IMPORT_API void EnableVisual( Internal::Control& control, Dali::Property::Index index, bool enable );
+
+/**
+ * @brief Queries if the given visual is to be displayed when parent staged.
+ *
+ * @param[in] control The control
+ * @param[in] index The Property index of the visual
+ * @return bool whether visual is enabled or not
+ */
+DALI_IMPORT_API bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index index );
+
+/**
+ * @brief Create a transition effect on the control.
+ *
+ * Only generates an animation if the properties described in the transition
+ * data are staged (e.g. the visual is Enabled and the control is on stage).
+ * Otherwise the target values are stored, and will get set onto the properties
+ * when the visual is next staged.
+ *
+ * @param[in] control The control
+ * @param[in] transitionData The transition data describing the effect to create
+ * @return A handle to an animation defined with the given effect, or an empty
+ * handle if no properties match.
+ */
+DALI_IMPORT_API Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& transitionData );
 
 } // namespace DevelControl
 

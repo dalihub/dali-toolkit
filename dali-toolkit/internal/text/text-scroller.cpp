@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   uniform mediump float uDelta;\n
   uniform mediump vec2 uTextureSize;
   uniform mediump float uGap;\n
-  uniform mediump float uRtl;\n
+  uniform mediump float uAlign;\n
   \n
   void main()\n
   {\n
@@ -70,7 +70,7 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
       float smallTextPadding = max(uSize.x - uTextureSize.x, 0. );\n
       float gap = max( uGap, smallTextPadding );\n
       float delta = floor ( uDelta ) + 0.5;
-      vTexCoord.x = ( delta  + ( uRtl * ( uTextureSize.x - uSize.x ) ) + (  aPosition.x * uSize.x ) )/ ( uTextureSize.x + gap );\n
+      vTexCoord.x = ( delta  + ( uAlign * ( uTextureSize.x - uSize.x ) ) + (  aPosition.x * uSize.x ) )/ ( uTextureSize.x + gap );\n
       vTexCoord.y = ( 0.5 + floor(  aPosition.y * uSize.y ) )/ ( uTextureSize.y ) ;\n
       vRatio = uTextureSize.x / ( uTextureSize.x + gap );\n
       gl_Position = uProjection * vertexPosition;
@@ -94,6 +94,54 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
     gl_FragColor = texture2D( sTexture, texCoord );\n
   }\n
 );
+
+/**
+ * @brief How the text should be aligned when scrolling the text.
+ *
+ * 0.0f aligns the text to the left, 1.0f aligns the text to the right.
+ * The final alignment depends on three factors:
+ *   1) The alignment value of the text label (Use Text::Layout::HorizontalAlignment enumerations).
+ *   2) The text direction, i.e. whether it's LTR or RTL (0 = LTR, 1 = RTL).
+ *   3) Whether the text is greater than the size of the control ( 0 = Text width <= Control width, 1 = Text width > Control width ).
+ */
+const float ALIGNMENT_TABLE[ Text::Layout::HORIZONTAL_ALIGN_COUNT ][ 2 ][ 2 ] =
+{
+  // HORIZONTAL_ALIGN_BEGIN
+  {
+    { // LTR
+      0.0f, // Text width <= Control width
+      0.0f  // Text width >  Control width
+    },
+    { // RTL
+      1.0f, // Text width <= Control width
+      1.0f  // Text width >  Control width
+    }
+  },
+
+  // HORIZONTAL_ALIGN_CENTER
+  {
+    { // LTR
+      0.5f, // Text width <= Control width
+      0.0f  // Text width >  Control width
+    },
+    { // RTL
+      0.5f, // Text width <= Control width
+      1.0f  // Text width >  Control width
+    }
+  },
+
+  // HORIZONTAL_ALIGN_END
+  {
+    { // LTR
+      1.0f, // Text width <= Control width
+      0.0f  // Text width >  Control width
+    },
+    { // RTL
+      0.0f, // Text width <= Control width
+      1.0f  // Text width >  Control width
+    }
+  }
+};
 
 /**
  * @brief Create and set up a camera for the render task to use
@@ -224,35 +272,11 @@ int TextScroller::GetSpeed() const
 
 void TextScroller::SetLoopCount( int loopCount )
 {
-  if ( loopCount > 0 )
+  if ( loopCount >= 0 )
   {
     mLoopCount = loopCount;
   }
 
-  if (  mScrollAnimation && mScrollAnimation.GetState() == Animation::PLAYING )
-  {
-    if ( loopCount == 0 ) // Request to stop looping
-    {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetLoopCount Single loop forced\n" );
-      switch( mStopMode )
-      {
-        case DevelTextLabel::AutoScrollStopMode::IMMEDIATE:
-        {
-          mScrollAnimation.Stop();
-          break;
-        }
-        case DevelTextLabel::AutoScrollStopMode::FINISH_LOOP:
-        {
-          mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
-          break;
-        }
-        default:
-        {
-           DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n" );
-        }
-      }
-    }
-  }
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetLoopCount [%d] Status[%s]\n", mLoopCount, (loopCount)?"looping":"stop" );
 }
 
@@ -275,6 +299,30 @@ void TextScroller::SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMod
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetAutoScrollStopMode [%s]\n",(stopMode == DevelTextLabel::AutoScrollStopMode::IMMEDIATE)?"IMMEDIATE":"FINISH_LOOP" );
   mStopMode = stopMode;
+}
+
+void TextScroller::StopScrolling()
+{
+  if ( mScrollAnimation && mScrollAnimation.GetState() == Animation::PLAYING )
+  {
+    switch( mStopMode )
+    {
+      case DevelTextLabel::AutoScrollStopMode::IMMEDIATE:
+      {
+        mScrollAnimation.Stop();
+        break;
+      }
+      case DevelTextLabel::AutoScrollStopMode::FINISH_LOOP:
+      {
+        mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
+        break;
+      }
+      default:
+      {
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n" );
+      }
+    }
+  }
 }
 
 DevelTextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const
@@ -308,7 +356,7 @@ TextScroller::~TextScroller()
   CleanUp();
 }
 
-void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset )
+void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset, Layout::HorizontalAlignment horizontalAlignment )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] offscreenSize[%f,%f] direction[%d] alignmentOffset[%f]\n",
                  controlSize.x, controlSize.y, offScreenSize.x, offScreenSize.y, direction, alignmentOffset );
@@ -327,24 +375,58 @@ void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, co
   CreateRenderer( offscreenRenderTargetForText, renderer );
   CreateRenderTask( sourceActor, mOffscreenCameraActor, offscreenRenderTargetForText, mRenderTask );
 
-  // Reposition camera to match alignment of target, RTL text has direction=true
-  if ( direction )
+  float xPosition = 0.0f;
+  switch( horizontalAlignment )
   {
-    mOffscreenCameraActor.SetX( alignmentOffset + offScreenSize.width*0.5f );
-  }
-  else
-  {
-    mOffscreenCameraActor.SetX( offScreenSize.width * 0.5f );
+    case Layout::HORIZONTAL_ALIGN_BEGIN:
+    {
+      // Reposition camera to match alignment of target, RTL text has direction=true
+      if ( direction )
+      {
+        xPosition = alignmentOffset + offScreenSize.width * 0.5f;
+      }
+      else
+      {
+        xPosition = offScreenSize.width * 0.5f;
+      }
+      break;
+    }
+
+    case Layout::HORIZONTAL_ALIGN_CENTER:
+    {
+      xPosition = controlSize.width * 0.5f;
+      break;
+    }
+
+    case Layout::HORIZONTAL_ALIGN_END:
+    {
+      // Reposition camera to match alignment of target, RTL text has direction=true
+      if ( direction )
+      {
+        xPosition = offScreenSize.width * 0.5f;
+      }
+      else
+      {
+        xPosition = alignmentOffset + offScreenSize.width * 0.5f;
+      }
+      break;
+    }
   }
 
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters xPosition[%f]\n", xPosition );
+
+  mOffscreenCameraActor.SetX( xPosition );
   mOffscreenCameraActor.SetY( offScreenSize.height * 0.5f );
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters mWrapGap[%f]\n", mWrapGap )
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters mWrapGap[%f]\n", mWrapGap );
+
+  const float align = ALIGNMENT_TABLE[ horizontalAlignment ][ direction ][ offScreenSize.width > controlSize.width ];
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters align[%f]\n", align );
 
   mScrollingTextActor = Actor::New();
   mScrollingTextActor.AddRenderer( renderer );
   mScrollingTextActor.RegisterProperty( "uTextureSize", offScreenSize );
-  mScrollingTextActor.RegisterProperty( "uRtl", ((direction)?1.0f:0.0f) );
+  mScrollingTextActor.RegisterProperty( "uAlign", align );
   mScrollingTextActor.RegisterProperty( "uGap", mWrapGap );
   mScrollingTextActor.SetSize( controlSize.width, std::min( offScreenSize.height, controlSize.height ) );
   mScrollDeltaIndex = mScrollingTextActor.RegisterProperty( "uDelta", 0.0f );

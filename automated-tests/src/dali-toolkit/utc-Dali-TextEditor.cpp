@@ -1913,3 +1913,25 @@ int utcDaliTextEditorShadowPropertyStringP(void)
 
   END_TEST;
 }
+
+int utcDaliTextEditorFontStylePropertyStringP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorFontStylePropertyStringP Setting FontStyle propeties by string");
+
+  TextEditor editor = TextEditor::New();
+
+  std::string fontStyleSettings( "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetProperty( TextEditor::Property::FONT_STYLE, "{\"weight\":\"bold\",\"width\":\"condensed\",\"slant\":\"italic\"}" );
+
+  Property::Value value = editor.GetProperty<std::string>( TextEditor::Property::FONT_STYLE );
+  std::string result;
+  value.Get(result);
+
+  DALI_TEST_EQUALS( result, fontStyleSettings, TEST_LOCATION );
+
+  END_TEST;
+}

@@ -29,6 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -304,13 +305,13 @@ const std::vector<std::string>& ToggleButton::GetToggleTooltips() const
 
 void ToggleButton::PrepareVisual(Property::Index index, Toolkit::Visual::Base& visual)
 {
-  RegisterVisual( index, visual, true );
-  EnableVisual( index, false );
+  DevelControl::RegisterVisual( *this, index, visual, true );
+  DevelControl::EnableVisual( *this, index, false );
 }
 
 void ToggleButton::RelayoutVisual( Property::Index index, const Vector2& size )
 {
-  Toolkit::Visual::Base visual = GetVisual( index );
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, index );
   if ( visual )
   {
     Size visualSize = Size::ZERO;

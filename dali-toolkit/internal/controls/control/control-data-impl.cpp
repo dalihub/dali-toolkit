@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
@@ -93,6 +94,21 @@ Toolkit::DevelVisual::Type GetVisualTypeFromMap( const Property::Map& map )
   return type;
 }
 
+/**
+ *  Finds visual in given array, returning true if found along with the iterator for that visual as a out parameter
+ */
+bool FindVisual( Property::Index targetIndex, const RegisteredVisualContainer& visuals, RegisteredVisualContainer::Iterator& iter )
+{
+  for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
+  {
+    if ( (*iter)->index ==  targetIndex )
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 void FindChangableVisuals( Dictionary<Property::Map>& stateVisualsToAdd,
                            Dictionary<Property::Map>& stateVisualsToChange,
                            DictionaryKeys& stateVisualsToRemove)
@@ -111,6 +127,25 @@ void FindChangableVisuals( Dictionary<Property::Map>& stateVisualsToAdd,
       Remove( stateVisualsToRemove, visualName );
     }
   }
+}
+
+Toolkit::Visual::Base GetVisualByName(
+  const RegisteredVisualContainer& visuals,
+  const std::string& visualName )
+{
+  Toolkit::Visual::Base visualHandle;
+
+  RegisteredVisualContainer::Iterator iter;
+  for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
+  {
+    Toolkit::Visual::Base visual = (*iter)->visual;
+    if( visual && visual.GetName() == visualName )
+    {
+      visualHandle = visual;
+      break;
+    }
+  }
+  return visualHandle;
 }
 
 /**
@@ -225,8 +260,6 @@ TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &Do
 
 DALI_TYPE_REGISTRATION_END()
 
-
-
 } // unnamed namespace
 
 
@@ -283,28 +316,6 @@ Control::Impl& Control::Impl::Get( Internal::Control& internalControl )
 const Control::Impl& Control::Impl::Get( const Internal::Control& internalControl )
 {
   return *internalControl.mImpl;
-}
-
-
-
-
-Toolkit::Visual::Base Control::Impl::GetVisualByName(
-   RegisteredVisualContainer& visuals,
-  const std::string& visualName )
-{
-  Toolkit::Visual::Base visualHandle;
-
-  RegisteredVisualContainer::Iterator iter;
-  for ( iter = visuals.Begin(); iter != visuals.End(); iter++ )
-  {
-    Toolkit::Visual::Base visual = (*iter)->visual;
-    if( visual && visual.GetName() == visualName )
-    {
-      visualHandle = visual;
-      break;
-    }
-  }
-  return visualHandle;
 }
 
 // Gesture Detection Methods
@@ -369,6 +380,139 @@ bool Control::Impl::IsResourceReady() const
    }
   return true;
 }
+
+void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual )
+{
+  RegisterVisual( index, visual, true );
+}
+
+void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
+{
+  bool visualReplaced ( false );
+  Actor self = mControlImpl.Self();
+
+  if( !mVisuals.Empty() )
+  {
+    RegisteredVisualContainer::Iterator iter;
+    // Check if visual (index) is already registered.  Replace if so.
+    if ( FindVisual( index, mVisuals, iter ) )
+    {
+      if( (*iter)->visual && self.OnStage() )
+      {
+        Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+      }
+
+      StopObservingVisual( (*iter)->visual );
+      StartObservingVisual( visual );
+
+      (*iter)->visual = visual;
+      visualReplaced = true;
+    }
+  }
+
+  // If not set, set the name of the visual to the same name as the control's property.
+  // ( If the control has been type registered )
+  if( visual.GetName().empty() )
+  {
+    // Check if the control has been type registered:
+    TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid( mControlImpl ) );
+    if( typeInfo )
+    {
+      // Check if the property index has been registered:
+      Property::IndexContainer indices;
+      typeInfo.GetPropertyIndices( indices );
+      Property::IndexContainer::Iterator iter = std::find( indices.Begin(), indices.End(), index );
+      if( iter != indices.End() )
+      {
+        // If it has, then get it's name and use that for the visual
+        std::string visualName = typeInfo.GetPropertyName( index );
+        visual.SetName( visualName );
+      }
+    }
+  }
+
+  if( !visualReplaced ) // New registration entry
+  {
+    mVisuals.PushBack( new RegisteredVisual( index, visual, enabled ) );
+
+    // monitor when the visuals resources are ready
+    StartObservingVisual( visual );
+
+  }
+
+  if( visual && self.OnStage() && enabled )
+  {
+    Toolkit::GetImplementation(visual).SetOnStage( self );
+  }
+
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::RegisterVisual() Registered %s(%d), enabled:%s\n",  visual.GetName().c_str(), index, enabled?"T":"F" );
+}
+
+void Control::Impl::UnregisterVisual( Property::Index index )
+{
+   RegisteredVisualContainer::Iterator iter;
+   if ( FindVisual( index, mVisuals, iter ) )
+   {
+     // stop observing visual
+     StopObservingVisual( (*iter)->visual );
+
+     Actor self( mControlImpl.Self() );
+     Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+     (*iter)->visual.Reset();
+     mVisuals.Erase( iter );
+   }
+}
+
+Toolkit::Visual::Base Control::Impl::GetVisual( Property::Index index ) const
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mVisuals, iter ) )
+  {
+    return (*iter)->visual;
+  }
+
+  return Toolkit::Visual::Base();
+}
+
+void Control::Impl::EnableVisual( Property::Index index, bool enable )
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mVisuals, iter ) )
+  {
+    if (  (*iter)->enabled == enable )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Visual %s(%d) already %s\n", (*iter)->visual.GetName().c_str(), index, enable?"enabled":"disabled");
+      return;
+    }
+
+    (*iter)->enabled = enable;
+    Actor parentActor = mControlImpl.Self();
+    if ( mControlImpl.Self().OnStage() ) // If control not on Stage then Visual will be added when StageConnection is called.
+    {
+      if ( enable )
+      {
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting %s(%d) on stage \n", (*iter)->visual.GetName().c_str(), index );
+        Toolkit::GetImplementation((*iter)->visual).SetOnStage( parentActor );
+      }
+      else
+      {
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Setting %s(%d) off stage \n", (*iter)->visual.GetName().c_str(), index );
+        Toolkit::GetImplementation((*iter)->visual).SetOffStage( parentActor );  // No need to call if control not staged.
+      }
+    }
+  }
+}
+
+bool Control::Impl::IsVisualEnabled( Property::Index index ) const
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mVisuals, iter ) )
+  {
+    return (*iter)->enabled;
+  }
+  return false;
+}
+
 void Control::Impl::StopObservingVisual( Toolkit::Visual::Base& visual )
 {
   Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
@@ -385,14 +529,70 @@ void Control::Impl::StartObservingVisual( Toolkit::Visual::Base& visual)
   visualImpl.AddResourceObserver( *this );
 }
 
-// Properties
+Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& handle )
+{
+  Dali::Animation transition;
+  const Internal::TransitionData& transitionData = Toolkit::GetImplementation( handle );
 
-/**
- * Called when a property of an object of this type is set.
- * @param[in] object The object whose property is set.
- * @param[in] index The property index.
- * @param[in] value The new property value.
- */
+  if( transitionData.Count() > 0 )
+  {
+    // Setup a Transition from TransitionData.
+    TransitionData::Iterator end = transitionData.End();
+    for( TransitionData::Iterator iter = transitionData.Begin() ;
+         iter != end; ++iter )
+    {
+      TransitionData::Animator* animator = (*iter);
+
+      Toolkit::Visual::Base visual = GetVisualByName( mVisuals, animator->objectName );
+
+      if( visual )
+      {
+        Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+        visualImpl.AnimateProperty( transition, *animator );
+      }
+      else
+      {
+        // Otherwise, try any actor children of control (Including the control)
+        Actor child = mControlImpl.Self().FindChildByName( animator->objectName );
+        if( child )
+        {
+          Property::Index propertyIndex = DevelHandle::GetPropertyIndex( child, animator->propertyKey );
+          if( propertyIndex != Property::INVALID_INDEX )
+          {
+            if( animator->animate == false )
+            {
+              if( animator->targetValue.GetType() != Property::NONE )
+              {
+                child.SetProperty( propertyIndex, animator->targetValue );
+              }
+            }
+            else // animate the property
+            {
+              if( animator->initialValue.GetType() != Property::NONE )
+              {
+                child.SetProperty( propertyIndex, animator->initialValue );
+              }
+
+              if( ! transition )
+              {
+                transition = Dali::Animation::New( 0.1f );
+              }
+
+              transition.AnimateTo( Property( child, propertyIndex ),
+                                    animator->targetValue,
+                                    animator->alphaFunction,
+                                    TimePeriod( animator->timePeriodDelay,
+                                                animator->timePeriodDuration ) );
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return transition;
+}
+
 void Control::Impl::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
@@ -537,7 +737,7 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
           Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( url, ImageDimensions() );
           if( visual )
           {
-            controlImpl.RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
+            controlImpl.mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
             visual.SetDepthIndex( DepthIndex::BACKGROUND );
           }
         }
@@ -566,12 +766,6 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
   }
 }
 
-/**
- * Called to retrieve a property of an object of this type.
- * @param[in] object The object whose property is to be retrieved.
- * @param[in] index The property index.
- * @return The current value of the property.
- */
 Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index index )
 {
   Property::Value value;
@@ -637,7 +831,7 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
       {
         DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
         Property::Map map;
-        Toolkit::Visual::Base visual = controlImpl.GetVisual( Toolkit::Control::Property::BACKGROUND );
+        Toolkit::Visual::Base visual = controlImpl.mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
         if( visual )
         {
           visual.CreatePropertyMap( map );
@@ -655,7 +849,7 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
       case Toolkit::Control::Property::BACKGROUND:
       {
         Property::Map map;
-        Toolkit::Visual::Base visual = controlImpl.GetVisual( Toolkit::Control::Property::BACKGROUND );
+        Toolkit::Visual::Base visual = controlImpl.mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
         if( visual )
         {
           visual.CreatePropertyMap( map );
@@ -725,12 +919,6 @@ void Control::Impl::RemoveVisuals( RegisteredVisualContainer& visuals, Dictionar
   }
 }
 
-
-/**
- * Go through the list of visuals that are common to both states.
- * If they are different types, or are both image types with different
- * URLs, then the existing visual needs moving and the new visual creating
- */
 void Control::Impl::RecreateChangedVisuals( Dictionary<Property::Map>& stateVisualsToChange,
                              Dictionary<Property::Map>& instancedProperties )
 {
