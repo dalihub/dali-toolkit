@@ -134,6 +134,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableScrollBar",       
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarShowDuration",          FLOAT,     SCROLL_BAR_SHOW_DURATION             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarFadeDuration",          FLOAT,     SCROLL_BAR_FADE_DURATION             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "pixelSize",                      FLOAT,     PIXEL_SIZE                           )
+DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "lineCount",            INTEGER,   LINE_COUNT                           )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -991,6 +992,15 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         if( impl.mController )
         {
           value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::LINE_COUNT:
+      {
+        if( impl.mController )
+        {
+          float width = textEditor.GetProperty( Actor::Property::SIZE_WIDTH ).Get<float>();
+          value = impl.mController->GetLineCount( width );
         }
         break;
       }

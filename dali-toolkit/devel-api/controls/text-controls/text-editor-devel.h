@@ -109,7 +109,14 @@ namespace Property
        * @brief The size of font in pixels.
        * @details name "pixelSize", type float
        */
-      PIXEL_SIZE
+      PIXEL_SIZE,
+
+      /**
+       * @brief The line count of text.
+       * @details name "lineCount", type int
+       * @note this property is read-only.
+       */
+      LINE_COUNT
   };
 } // namespace Property
 
