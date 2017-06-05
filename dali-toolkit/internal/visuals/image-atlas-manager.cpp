@@ -20,7 +20,7 @@
 
 // EXTERNAL HEADER
 #include <dali/devel-api/images/texture-set-image.h>
-#include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 
 namespace Dali
 {
@@ -58,7 +58,7 @@ TextureSet ImageAtlasManager::Add( Vector4& textureRect,
   ImageDimensions zero;
   if( size == zero )
   {
-    dimensions = ResourceImage::GetImageSize( url );
+    dimensions = Dali::GetClosestImageSize( url );
   }
 
   // big image, atlasing is not applied

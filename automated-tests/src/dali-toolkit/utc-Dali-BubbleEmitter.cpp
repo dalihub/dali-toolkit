@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -288,20 +288,24 @@ int UtcDaliBubbleEmitterEmitBubble(void)
   (bubbleRenderer.GetProperty(propertyIndex1)).Get( value1 );
   DALI_TEST_EQUALS(value0, 0.f, TEST_LOCATION );
   DALI_TEST_EQUALS(value1, 0.f, TEST_LOCATION );
+  ( bubbleRenderer.GetCurrentProperty( propertyIndex0 ) ).Get( value0 );
+  ( bubbleRenderer.GetCurrentProperty( propertyIndex0 ) ).Get( value1 );
+  DALI_TEST_EQUALS(value0, 0.f, TEST_LOCATION );
+  DALI_TEST_EQUALS(value1, 0.f, TEST_LOCATION );
 
   animation.Play();
 
   Wait(application, 300);
   propertyIndex0 = bubbleRenderer.GetPropertyIndex( "uPercentage[0]" );
   propertyIndex1 = bubbleRenderer.GetPropertyIndex( "uPercentage[1]" );
-  (bubbleRenderer.GetProperty(propertyIndex0)).Get( value0 );
-  (bubbleRenderer.GetProperty(propertyIndex1)).Get( value1 );
+  ( bubbleRenderer.GetCurrentProperty( propertyIndex0 ) ).Get( value0 );
+  ( bubbleRenderer.GetCurrentProperty( propertyIndex0 ) ).Get( value1 );
   DALI_TEST_CHECK( value0 >= 0.6f );
   DALI_TEST_CHECK( value1 >= 0.6f );
 
   Wait(application,500);
-  (bubbleRenderer.GetProperty(propertyIndex0)).Get( value0 );
-  (bubbleRenderer.GetProperty(propertyIndex1)).Get( value1 );
+  ( bubbleRenderer.GetCurrentProperty( propertyIndex0 ) ).Get( value0 );
+  ( bubbleRenderer.GetCurrentProperty( propertyIndex0 ) ).Get( value1 );
   DALI_TEST_EQUALS(value0, 1.f, TEST_LOCATION );
   DALI_TEST_EQUALS(value1, 1.f, TEST_LOCATION );
   END_TEST;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
@@ -131,18 +132,20 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
 
   trackSize.width = std::max( 0.0f, size.width ); // Ensure we don't go negative
 
-  Toolkit::Visual::Base trackVisual = GetVisual( Toolkit::ProgressBar::Property::TRACK_VISUAL );
-  Toolkit::Visual::Base secondProgressVisual = GetVisual( Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL );
-  Toolkit::Visual::Base progressVisual = GetVisual( Toolkit::ProgressBar::Property::PROGRESS_VISUAL );
-  Toolkit::Visual::Base labelVisual = GetVisual( Toolkit::ProgressBar::Property::LABEL_VISUAL );
-  Toolkit::Visual::Base indeterminateVisual = GetVisual( Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL );
+  Toolkit::Visual::Base trackVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::TRACK_VISUAL );
+  Toolkit::Visual::Base secondProgressVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::SECONDARY_PROGRESS_VISUAL );
+  Toolkit::Visual::Base progressVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::PROGRESS_VISUAL );
+  Toolkit::Visual::Base labelVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::LABEL_VISUAL );
+  Toolkit::Visual::Base indeterminateVisual = DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL );
 
   if( trackVisual )
   {
     Property::Map visualTransform;
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, trackSize )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );  // Use Absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) );
+
     trackVisual.SetTransformAndSize( visualTransform, trackSize );
   }
 
@@ -151,7 +154,8 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
     Property::Map visualTransform;
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2( mDomain.from.x + mSecondaryProgressValue * ( mDomain.to.x - mDomain.from.x ), trackSize.height  ) )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) )  // Use Absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
                    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
                    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
     secondProgressVisual.SetTransformAndSize( visualTransform, trackSize );
@@ -162,7 +166,8 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
     Property::Map visualTransform;
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2( mDomain.from.x + mProgressValue * ( mDomain.to.x - mDomain.from.x ), trackSize.height ) )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) )  // Use Absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
                    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
                    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
     progressVisual.SetTransformAndSize( visualTransform, trackSize );
@@ -173,8 +178,8 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
     Property::Map visualTransform;
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, trackSize )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );  // Use Absolute size
-
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) );
     labelVisual.SetTransformAndSize( visualTransform, trackSize );
   }
 
@@ -183,7 +188,8 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
     Property::Map visualTransform;
 
     visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, trackSize )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_SIZE_MODE, Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );  // Use Absolute size
+                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) );
     indeterminateVisual.SetTransformAndSize( visualTransform, trackSize );
   }
 
@@ -192,8 +198,8 @@ void ProgressBar::OnRelayout( const Vector2& size, RelayoutContainer& container 
 Vector3 ProgressBar::GetNaturalSize()
 {
   // Return the bigger size after comparing trackVisual naturalSize and labelVisual naturalSize
-  Toolkit::Visual::Base trackVisual =  GetVisual( Toolkit::ProgressBar::Property::TRACK_VISUAL );
-  Toolkit::Visual::Base labelVisual =  GetVisual( Toolkit::ProgressBar::Property::LABEL_VISUAL );
+  Toolkit::Visual::Base trackVisual =  DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::TRACK_VISUAL );
+  Toolkit::Visual::Base labelVisual =  DevelControl::GetVisual( *this, Toolkit::ProgressBar::Property::LABEL_VISUAL );
 
   Size trackSize;
   Size labelSize;
@@ -270,7 +276,7 @@ float ProgressBar::GetSecondaryProgressValue() const
 void ProgressBar::SetIndeterminate( bool value )
 {
   mIndeterminate = value;
-  EnableVisual( Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL, mIndeterminate );
+  DevelControl::EnableVisual( *this, Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL, mIndeterminate );
 
   if( mIndeterminate )
   {
@@ -311,7 +317,7 @@ void ProgressBar::PlayIndeterminateVisualTransition()
     mIndeterminateVisualAni.Clear();
   }
 
-  mIndeterminateVisualAni = CreateTransition( mIndeterminateVisualTransition );
+  mIndeterminateVisualAni = DevelControl::CreateTransition( *this, mIndeterminateVisualTransition );
 
   if( mIndeterminate && mIndeterminateVisualAni )
   {
@@ -372,23 +378,23 @@ void ProgressBar::CreateVisualsForComponent( Property::Index index, const Proper
     progressVisual.SetDepthIndex( visualDepth );
     if( index == Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL )
     {
-      RegisterVisual( index, progressVisual, mIndeterminate );
+      DevelControl::RegisterVisual( *this, index, progressVisual, mIndeterminate );
     }
     else
     {
-      RegisterVisual( index, progressVisual, true );
+      DevelControl::RegisterVisual( *this, index, progressVisual, true );
     }
   }
   else
   {
-    UnregisterVisual( index );
+    DevelControl::UnregisterVisual( *this, index );
   }
 }
 
 bool ProgressBar::GetPropertyMapForVisual( Property::Index visualIndex, Property::Map& retreivedMap ) const
 {
   bool success = false;
-  Toolkit::Visual::Base visual = GetVisual( visualIndex );
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, visualIndex );
 
   if ( visual )
   {
@@ -463,7 +469,7 @@ void ProgressBar::SetProperty( BaseObject* object, Property::Index propertyIndex
         {
           // set new text string as TEXT property
           Property::Map newTextMap;
-          Toolkit::Visual::Base label = progressBarImpl.GetVisual( Toolkit::ProgressBar::Property::LABEL_VISUAL );
+          Toolkit::Visual::Base label = DevelControl::GetVisual( progressBarImpl, Toolkit::ProgressBar::Property::LABEL_VISUAL );
 
           if( label )
           {

@@ -26,7 +26,7 @@
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
-
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -51,8 +51,9 @@ struct LoadingTask
    * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    */
-  LoadingTask( uint32_t id, const std::string& url, ImageDimensions dimensions,
-               FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection );
+  LoadingTask( uint32_t id, const VisualUrl& url, ImageDimensions dimensions,
+               FittingMode::Type fittingMode, SamplingMode::Type samplingMode,
+               bool orientationCorrection );
 
   /**
    * Load the image
@@ -69,13 +70,13 @@ private:
 
 public:
 
-  PixelData pixelData;             ///< pixelData handle after successfull load
-  std::string url;                 ///< url of the image to load
-  uint32_t     id;                 ///< The unique id associated with this task.
-  ImageDimensions dimensions;      ///< dimensions to load
-  FittingMode::Type fittingMode;   ///< fitting options
-  SamplingMode::Type samplingMode; ///< sampling options
-  bool orientationCorrection:1;    ///< if orientation correction is needed
+  PixelData          pixelData;     ///< pixelData handle after successfull load
+  VisualUrl          url;           ///< url of the image to load
+  uint32_t           id;            ///< The unique id associated with this task.
+  ImageDimensions    dimensions;    ///< dimensions to load
+  FittingMode::Type  fittingMode;   ///< fitting options
+  SamplingMode::Type samplingMode;  ///< sampling options
+  bool               orientationCorrection:1; ///< if orientation correction is needed
 
 };
 

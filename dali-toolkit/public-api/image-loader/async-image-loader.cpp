@@ -19,6 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -63,12 +64,12 @@ AsyncImageLoader AsyncImageLoader::New()
 
 uint32_t AsyncImageLoader::Load( const std::string& url )
 {
-  return GetImplementation( *this ).Load( url, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
+  return GetImplementation( *this ).Load( Toolkit::Internal::VisualUrl(url), ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
 }
 
 uint32_t AsyncImageLoader::Load( const std::string& url, ImageDimensions dimensions )
 {
-  return GetImplementation( *this ).Load( url, dimensions, FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
+  return GetImplementation( *this ).Load( Toolkit::Internal::VisualUrl(url), dimensions, FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
 }
 
 uint32_t AsyncImageLoader::Load( const std::string& url,
@@ -77,7 +78,7 @@ uint32_t AsyncImageLoader::Load( const std::string& url,
                                  SamplingMode::Type samplingMode,
                                  bool orientationCorrection )
 {
-  return GetImplementation(*this).Load( url, dimensions, fittingMode, samplingMode, orientationCorrection );
+  return GetImplementation(*this).Load( Toolkit::Internal::VisualUrl(url), dimensions, fittingMode, samplingMode, orientationCorrection );
 }
 
 bool AsyncImageLoader::Cancel( uint32_t loadingTaskId )

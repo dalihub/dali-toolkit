@@ -55,7 +55,6 @@ struct SelectionBoxInfo
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const float MIN_FLOAT = std::numeric_limits<float>::min();
 const Dali::Toolkit::Text::CharacterDirection LTR = false; ///< Left To Right direction
-const uint32_t STAR = 0x2A;
 
 } // namespace
 
@@ -789,24 +788,16 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     return false;
   }
 
-  Vector<Character> utf32CharactersStar;
-  const Length characterCount = mModel->mLogicalModel->mText.Count();
-  const bool isPasswordInput = ( mEventData != NULL && mEventData->mPasswordInput &&
-        !mEventData->mIsShowingPlaceholderText && characterCount > 0 );
-
-  if (isPasswordInput)
+  Vector<Character>& srcCharacters = mModel->mLogicalModel->mText;
+  Vector<Character> displayCharacters;
+  bool useHiddenText = false;
+  if ( mHiddenInput && mEventData != NULL && !mEventData->mIsShowingPlaceholderText)
   {
-    utf32CharactersStar.Resize( characterCount );
-
-    uint32_t* begin = utf32CharactersStar.Begin();
-    uint32_t* end = begin + characterCount;
-    while ( begin < end )
-    {
-      *begin++ = STAR;
-    }
+    mHiddenInput->Substitute( srcCharacters,displayCharacters );
+    useHiddenText = true;
   }
 
-  Vector<Character>& utf32Characters = isPasswordInput ? utf32CharactersStar : mModel->mLogicalModel->mText;
+  Vector<Character>& utf32Characters = useHiddenText ? displayCharacters : srcCharacters;
   const Length numberOfCharacters = utf32Characters.Count();
 
   // Index to the first character of the first paragraph to be updated.

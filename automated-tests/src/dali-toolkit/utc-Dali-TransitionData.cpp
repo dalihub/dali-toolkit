@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -260,7 +260,9 @@ int UtcDaliTransitionDataMap1P(void)
   application.Render(0);
 
   DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION );
   DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 1.0f, 0.001f, TEST_LOCATION );
 
   anim.Play();
 
@@ -268,13 +270,13 @@ int UtcDaliTransitionDataMap1P(void)
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 1.0f, 0.001f, TEST_LOCATION );
 
   application.Render(500); // End of anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::RED), TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::RED), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 1.0f, 0.001f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -327,7 +329,9 @@ int UtcDaliTransitionDataMap2P(void)
   application.Render(0);
 
   DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 1.0f, 0.001f, TEST_LOCATION );
 
   anim.Play();
 
@@ -336,13 +340,13 @@ int UtcDaliTransitionDataMap2P(void)
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 1.0f, 0.001f, TEST_LOCATION);
 
   application.Render(500); // End of anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::RED), TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::RED), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 1.0f, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -398,7 +402,9 @@ int UtcDaliTransitionDataMap2Pb(void)
   application.Render(0);
 
   DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 1.0f, 0.001f, TEST_LOCATION );
 
   anim.Play();
 
@@ -407,13 +413,13 @@ int UtcDaliTransitionDataMap2Pb(void)
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA+Color::RED)*0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 1.0f, 0.001f, TEST_LOCATION);
 
   application.Render(500); // End of anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::RED), TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::RED), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 1.0f, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -529,6 +535,7 @@ int UtcDaliTransitionDataMap4P(void)
   application.Render(0);
 
   DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(sizeIndex), Vector2(10.0f, 10.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector2 >( sizeIndex ), Vector2(10.0f, 10.0f), TEST_LOCATION);
 
   anim.Play();
 
@@ -537,11 +544,11 @@ int UtcDaliTransitionDataMap4P(void)
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(sizeIndex), Vector2(60.0f, 60.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector2 >( sizeIndex ), Vector2(60.0f, 60.0f), TEST_LOCATION);
 
   application.Render(500); // End of anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector2>(sizeIndex), Vector2(110.0f, 110.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector2 >( sizeIndex ), Vector2(110.0f, 110.0f), TEST_LOCATION );
 
   END_TEST;
 }
@@ -595,21 +602,25 @@ int UtcDaliTransitionDataMap5P(void)
   DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 0.0f, 0.001f, TEST_LOCATION );
   DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
 
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 0.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::ON, TEST_LOCATION );
+
   anim.Play();
 
   application.SendNotification();
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 0.5f, 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 0.5f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::ON, TEST_LOCATION );
 
   application.Render(501); // End of anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::AUTO, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 1.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::AUTO, TEST_LOCATION );
 
   END_TEST;
 }
@@ -660,12 +671,15 @@ int UtcDaliTransitionDataMap6P(void)
   application.Render(0);
 
   DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION);
   DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 1.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 1.0f, 0.001f, TEST_LOCATION );
 
   // Note, This should be testing for AUTO
   // this is the same problem as C# target value being set before Play is called.
   // @todo How was this solved?
   DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::ON, TEST_LOCATION );
 
   anim.Play();
 
@@ -673,15 +687,15 @@ int UtcDaliTransitionDataMap6P(void)
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION);
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 0.5f, 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION);
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 0.5f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::ON, TEST_LOCATION );
 
   application.Render(500); // End of anim
   application.SendNotification();
-  DALI_TEST_EQUALS( renderer.GetProperty<Vector3>(mixColorIndex), Vector3(Color::MAGENTA), TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetProperty<float>(opacityIndex), 0.0f, 0.001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::BLEND_MODE), (int)BlendMode::ON, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< Vector3 >( mixColorIndex ), Vector3(Color::MAGENTA), TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< float >( opacityIndex ), 0.0f, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetCurrentProperty< int >( Renderer::Property::BLEND_MODE ), (int)BlendMode::ON, TEST_LOCATION );
 
   END_TEST;
 }

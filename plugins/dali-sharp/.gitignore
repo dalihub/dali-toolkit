@@ -1,0 +1,10 @@
+build/aclocal.m4
+build/config.log
+build/config.status
+build/config/
+build/configure
+build/autom4te.cache/
+examples/*.exe
+NDali.dll
+../examples/NDali.dll
+test/*.exe

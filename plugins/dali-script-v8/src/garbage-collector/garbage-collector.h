@@ -2,7 +2,7 @@
 #define __DALI_V8PLUGIN_GARBAGE_COLLECTOR_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
 #include <interfaces/garbage-collector-interface.h>
-#include <dali/devel-api/common/set-wrapper.h>
-
 
 namespace Dali
 {
@@ -64,13 +64,12 @@ public:
    */
   virtual void GarbageCollect();
 
-
 private:
 
   /**
    * Map between dali wrapped object (void *)
    */
-  typedef std::set< BaseWrappedObject* > ObjectMap;
+  typedef Dali::Vector< BaseWrappedObject* > ObjectMap;
   ObjectMap mObjectMap;   ///< lookup
 
 };

@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <string.h>
 #include <dali/public-api/signals/callback.h>
-#include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/integration-api/debug.h>
 
@@ -127,7 +127,7 @@ float ImageAtlas::GetOccupancyRate() const
 
 void ImageAtlas::SetBrokenImage( const std::string& brokenImageUrl )
 {
-  mBrokenImageSize = ResourceImage::GetImageSize( brokenImageUrl );
+  mBrokenImageSize = Dali::GetClosestImageSize( brokenImageUrl );
   if(mBrokenImageSize.GetWidth() > 0 && mBrokenImageSize.GetHeight() > 0 ) // check the url is valid
   {
     mBrokenImageUrl = brokenImageUrl;
@@ -145,7 +145,7 @@ bool ImageAtlas::Upload( Vector4& textureRect,
   ImageDimensions zero;
   if( size == zero ) // image size not provided
   {
-    dimensions = ResourceImage::GetImageSize( url );
+    dimensions = Dali::GetClosestImageSize( url );
     if( dimensions == zero ) // Fail to read the image & broken image file exists
     {
       if( !mBrokenImageUrl.empty() )

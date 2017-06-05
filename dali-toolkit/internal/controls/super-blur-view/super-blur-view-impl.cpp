@@ -30,6 +30,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL_INCLUDES
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
@@ -173,7 +174,7 @@ void SuperBlurView::SetImage(Image inputImage)
   Actor self( Self() );
 
   mVisuals[0] = Toolkit::VisualFactory::Get().CreateVisual( mInputImage );
-  RegisterVisual( 0, mVisuals[0] ); // Will clean up previously registered visuals for this index.
+  DevelControl::RegisterVisual( *this, 0, mVisuals[0] ); // Will clean up previously registered visuals for this index.
   mVisuals[0].SetDepthIndex(0);
   // custom shader is not applied on the original image.
 
@@ -282,7 +283,7 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
                                                 GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT );
 
       mVisuals[i] = Toolkit::VisualFactory::Get().CreateVisual( mBlurredImage[i - 1] );
-      RegisterVisual( i, mVisuals[i] ); // Will clean up existing visual with same index.
+      DevelControl::RegisterVisual( *this, i, mVisuals[i] ); // Will clean up existing visual with same index.
       mVisuals[i].SetDepthIndex( i );
       SetShaderEffect( mVisuals[i] );
     }

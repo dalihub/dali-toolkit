@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,25 +38,31 @@ GarbageCollector::~GarbageCollector()
 
 void GarbageCollector::Register( BaseWrappedObject* object )
 {
-  mObjectMap.insert( object );
+  mObjectMap.PushBack( object );
 };
 
 
 void GarbageCollector::UnRegister( BaseWrappedObject* object )
 {
-  mObjectMap.erase( object );
+  for( ObjectMap::Iterator iter = mObjectMap.Begin(); iter != mObjectMap.End(); ++iter )
+  {
+    if( *iter == object )
+    {
+      mObjectMap.Erase( iter );
+      return;
+    }
+  }
 }
 
 
 void GarbageCollector::GarbageCollect()
 {
-  for( ObjectMap::iterator iter = mObjectMap.begin(); iter != mObjectMap.end();  )
+  for( ObjectMap::Iterator iter = mObjectMap.Begin(); iter != mObjectMap.End(); ++iter )
   {
     BaseWrappedObject* object = *iter;
-    iter++; // iterator will be invalidated if we delete the object first.
     delete object; // object will call GarbageCollector.UnRegister
   }
-
+  mObjectMap.Clear();
 }
 
 } // V8Plugin

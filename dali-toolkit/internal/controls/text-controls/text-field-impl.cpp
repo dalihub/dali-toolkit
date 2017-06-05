@@ -23,6 +23,7 @@
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -32,6 +33,7 @@
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
@@ -135,6 +137,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "emboss",                       
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputEmboss",                          MAP,       INPUT_EMBOSS                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "outline",                              MAP,       OUTLINE                              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputOutline",                         MAP,       INPUT_OUTLINE                        )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "hiddenInputSettings",            MAP,       HIDDEN_INPUT_SETTINGS                )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "pixelSize",                      FLOAT,     PIXEL_SIZE                           )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -252,9 +256,9 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           const float pointSize = value.Get< float >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p POINT_SIZE %f\n", impl.mController.Get(), pointSize );
 
-          if( !Equals( impl.mController->GetDefaultPointSize(), pointSize ) )
+          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
           {
-            impl.mController->SetDefaultPointSize( pointSize );
+            impl.mController->SetDefaultFontSize( pointSize, Text::Controller::POINT_SIZE );
           }
         }
         break;
@@ -723,6 +727,29 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::HIDDEN_INPUT_SETTINGS:
+      {
+        const Property::Map* map = value.GetMap();
+        if (map)
+        {
+          impl.mController->SetHiddenInputOption(*map);
+        }
+        break;
+      }
+      case Toolkit::DevelTextField::Property::PIXEL_SIZE:
+      {
+        if( impl.mController )
+        {
+          const float pixelSize = value.Get< float >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p PIXEL_SIZE %f\n", impl.mController.Get(), pixelSize );
+
+          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
+          {
+            impl.mController->SetDefaultFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
+          }
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -792,7 +819,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          value = impl.mController->GetDefaultPointSize();
+          value = impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE );
         }
         break;
       }
@@ -1086,6 +1113,21 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         GetOutlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
         break;
       }
+      case Toolkit::DevelTextField::Property::HIDDEN_INPUT_SETTINGS:
+      {
+        Property::Map map;
+        impl.mController->GetHiddenInputOption(map);
+        value = map;
+        break;
+      }
+      case Toolkit::DevelTextField::Property::PIXEL_SIZE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
+        }
+        break;
+      }
     } //switch
   }
 
@@ -1162,8 +1204,8 @@ void TextField::OnInitialize()
   // Disable the smooth handle panning.
   mController->SetSmoothHandlePanEnabled( false );
 
-  mController->SetNoTextDoubleTapAction( Controller::NoTextTap::NO_ACTION );
-  mController->SetNoTextLongPressAction( Controller::NoTextTap::SHOW_SELECTION_POPUP );
+  mController->SetNoTextDoubleTapAction( Controller::NoTextTap::HIGHLIGHT );
+  mController->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
 
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
@@ -1209,20 +1251,25 @@ void TextField::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
       const std::string& newFont = GetImpl( styleManager ).GetDefaultFontFamily();
       // Property system did not set the font so should update it.
       mController->UpdateAfterFontChange( newFont );
+      RelayoutRequest();
       break;
     }
 
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
       GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      RelayoutRequest();
       break;
     }
     case StyleChange::THEME_CHANGE:
     {
-      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      // Nothing to do, let control base class handle this
       break;
     }
   }
+
+  // Up call to Control
+  Control::OnStyleChange( styleManager, change );
 }
 
 Vector3 TextField::GetNaturalSize()
@@ -1405,7 +1452,7 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnKeyEvent %p keyCode %d\n", mController.Get(), event.keyCode );
 
-  if( Dali::DALI_KEY_ESCAPE == event.keyCode || "Return" == event.keyPressedName ) // Make a Dali key code for this
+  if( Dali::DALI_KEY_ESCAPE == event.keyCode ) // Make a Dali key code for this
   {
     // Make sure ClearKeyInputFocus when only key is up
     if( event.state == KeyEvent::Up )

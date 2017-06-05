@@ -361,7 +361,7 @@ void ScrollBar::OnScrollPositionIntervalReached(PropertyNotification& source)
   Handle scrollableHandle = mScrollableObject.GetBaseHandle();
   if(scrollableHandle)
   {
-    mScrollPositionIntervalReachedSignal.Emit(scrollableHandle.GetProperty<float>(mPropertyScrollPosition));
+    mScrollPositionIntervalReachedSignal.Emit( scrollableHandle.GetCurrentProperty< float >( mPropertyScrollPosition ) );
   }
 }
 
@@ -471,7 +471,7 @@ void ScrollBar::OnPan( const PanGesture& gesture )
         }
 
         ShowIndicator();
-        mScrollStart = scrollableHandle.GetProperty<float>(mPropertyScrollPosition);
+        mScrollStart = scrollableHandle.GetCurrentProperty< float >( mPropertyScrollPosition );
         mGestureDisplacement = Vector3::ZERO;
         mIsPanning = true;
 
@@ -482,8 +482,8 @@ void ScrollBar::OnPan( const PanGesture& gesture )
         mGestureDisplacement.x += gesture.displacement.x;
         mGestureDisplacement.y += gesture.displacement.y;
 
-        float minScrollPosition = scrollableHandle.GetProperty<float>( mPropertyMinScrollPosition );
-        float maxScrollPosition = scrollableHandle.GetProperty<float>( mPropertyMaxScrollPosition );
+        float minScrollPosition = scrollableHandle.GetCurrentProperty<float>( mPropertyMinScrollPosition );
+        float maxScrollPosition = scrollableHandle.GetCurrentProperty<float>( mPropertyMaxScrollPosition );
 
         // The domain size is the internal range
         float domainSize = maxScrollPosition - minScrollPosition;
