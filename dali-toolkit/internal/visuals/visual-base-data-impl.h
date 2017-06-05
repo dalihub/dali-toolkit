@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-resource-observer.h>
 #include <dali-toolkit/devel-api/align-enums.h>
 
 namespace Dali
@@ -115,6 +116,7 @@ struct Base::Impl
   Renderer        mRenderer;
   CustomShader*   mCustomShader;
   SlotDelegate<Visual::Base>* mBlendSlotDelegate; ///< Used to own mix color animation connection
+  ResourceObserver* mResourceObserver;  ///< Allows controls to observe when the visual resources are loaded and ready
   std::string     mName;
   Transform       mTransform;
   Vector4         mMixColor;
@@ -123,6 +125,7 @@ struct Base::Impl
   Property::Index mMixColorIndex;
   Property::Index mOpacityIndex;
   int             mFlags;
+  bool            mResourceReady:1;
 };
 
 } // namespace Visual

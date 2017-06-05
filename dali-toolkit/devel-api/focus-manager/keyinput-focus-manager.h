@@ -44,7 +44,6 @@ class KeyInputFocusManager;
  * | %Signal Name         | Method                            |
  * |----------------------|-----------------------------------|
  * | keyInputFocusChanged | @ref KeyInputFocusChangedSignal() |
- * | unhandledKeyEvent    | @ref UnhandledKeyEventSignal()    |
  */
 class DALI_IMPORT_API KeyInputFocusManager : public BaseHandle
 {
@@ -52,9 +51,6 @@ public:
 
   // KeyInputFocusChanged
   typedef Signal< void (Control, Control) > KeyInputFocusChangedSignalType;
-
-  // Unhandled Key Event
-  typedef Signal< void (const KeyEvent&) > UnhandledKeyEventSignalType;
 
 public:
 
@@ -103,13 +99,6 @@ public:
    */
   void RemoveFocus(Control control);
 
-  /**
-   * Queries whether a control is currently part of the focus stack.
-   * @param [in] control which should be queried.
-   * @return True if it is part of the foucus stack False otherwise.
-   */
-  bool IsKeyboardListener(Control control);
-
 public: // Signals
 
   /**
@@ -123,16 +112,6 @@ public: // Signals
    * @return The signal to connect to.
    */
   KeyInputFocusChangedSignalType& KeyInputFocusChangedSignal();
-
-  /**
-   * This signal is emitted when a key event was received, and none of the focused controls on the stage have consumed it.
-   * A callback of the following type may be connected:
-   * @code
-   *   void YourCallbackName(const KeyEvent& event);
-   * @endcode
-   * @return The signal to connect to.
-   */
-  UnhandledKeyEventSignalType& UnhandledKeyEventSignal();
 
 private:
 

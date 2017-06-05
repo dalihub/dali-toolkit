@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -359,7 +359,7 @@ int UtcDaliEffectsViewOffsetProperty(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*1000.0f) + 1u/*just beyond the animation duration*/);
 
-  value = view.GetProperty( EffectsView::Property::EFFECT_OFFSET );
+  value = view.GetCurrentProperty( EffectsView::Property::EFFECT_OFFSET );
   value.Get(offsetValue);
   DALI_TEST_EQUALS( offsetValue, offsetAnimate, TEST_LOCATION );
 
@@ -394,7 +394,7 @@ int UtcDaliEffectsViewColorProperty(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*1000.0f) + 1u/*just beyond the animation duration*/);
 
-  value = view.GetProperty( EffectsView::Property::EFFECT_COLOR );
+  value = view.GetCurrentProperty( EffectsView::Property::EFFECT_COLOR );
   value.Get(colorValue);
   DALI_TEST_EQUALS( colorValue, colorAnimate, TEST_LOCATION );
 

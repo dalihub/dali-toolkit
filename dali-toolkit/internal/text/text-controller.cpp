@@ -24,6 +24,7 @@
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-support.h>
@@ -685,15 +686,38 @@ FontSlant Controller::GetDefaultFontSlant() const
   return TextAbstraction::FontSlant::NORMAL;
 }
 
-void Controller::SetDefaultPointSize( float pointSize )
+void Controller::SetDefaultFontSize( float fontSize, FontSizeType type )
 {
   if( NULL == mImpl->mFontDefaults )
   {
     mImpl->mFontDefaults = new FontDefaults();
   }
 
-  mImpl->mFontDefaults->mDefaultPointSize = pointSize;
-  mImpl->mFontDefaults->sizeDefined = true;
+  switch( type )
+  {
+    case POINT_SIZE:
+    {
+      mImpl->mFontDefaults->mDefaultPointSize = fontSize;
+      mImpl->mFontDefaults->sizeDefined = true;
+      break;
+    }
+    case PIXEL_SIZE:
+    {
+      // Point size = Pixel size * 72 / DPI
+      unsigned int horizontalDpi = 0u;
+      unsigned int verticalDpi = 0u;
+      TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+      fontClient.GetDpi( horizontalDpi, verticalDpi );
+
+      mImpl->mFontDefaults->mDefaultPointSize = ( fontSize * 72 ) / horizontalDpi;
+      mImpl->mFontDefaults->sizeDefined = true;
+      break;
+    }
+    default:
+    {
+      DALI_ASSERT_ALWAYS( false );
+    }
+  }
 
   // Clear the font-specific data
   ClearFontData();
@@ -701,14 +725,38 @@ void Controller::SetDefaultPointSize( float pointSize )
   mImpl->RequestRelayout();
 }
 
-float Controller::GetDefaultPointSize() const
+float Controller::GetDefaultFontSize( FontSizeType type ) const
 {
+  float value = 0.0f;
   if( NULL != mImpl->mFontDefaults )
   {
-    return mImpl->mFontDefaults->mDefaultPointSize;
+    switch( type )
+    {
+      case POINT_SIZE:
+      {
+        value = mImpl->mFontDefaults->mDefaultPointSize;
+        break;
+      }
+      case PIXEL_SIZE:
+      {
+        // Pixel size = Point size * DPI / 72
+        unsigned int horizontalDpi = 0u;
+        unsigned int verticalDpi = 0u;
+        TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+        fontClient.GetDpi( horizontalDpi, verticalDpi );
+
+        value = mImpl->mFontDefaults->mDefaultPointSize * horizontalDpi / 72;
+        break;
+      }
+      default:
+      {
+        DALI_ASSERT_ALWAYS( false );
+      }
+    }
+    return value;
   }
 
-  return 0.0f;
+  return value;
 }
 
 void Controller::SetDefaultColor( const Vector4& color )
@@ -1219,7 +1267,7 @@ float Controller::GetInputFontPointSize() const
   }
 
   // Return the default font's point size if there is no EventData.
-  return GetDefaultPointSize();
+  return GetDefaultFontSize( Text::Controller::POINT_SIZE );
 }
 
 void Controller::SetInputLineSpacing( float lineSpacing )
@@ -1368,6 +1416,36 @@ Controller::NoTextTap::Action Controller::GetNoTextLongPressAction() const
   }
 
   return action;
+}
+
+bool Controller::IsUnderlineSetByString()
+{
+  return mImpl->mUnderlineSetByString;
+}
+
+void Controller::UnderlineSetByString( bool setByString )
+{
+  mImpl->mUnderlineSetByString = setByString;
+}
+
+bool Controller::IsShadowSetByString()
+{
+  return mImpl->mShadowSetByString;
+}
+
+void Controller::ShadowSetByString( bool setByString )
+{
+  mImpl->mShadowSetByString = setByString;
+}
+
+bool Controller::IsFontStyleSetByString()
+{
+  return mImpl->mFontStyleSetByString;
+}
+
+void Controller::FontStyleSetByString( bool setByString )
+{
+  mImpl->mFontStyleSetByString = setByString;
 }
 
 // public : Queries & retrieves.
@@ -1548,6 +1626,23 @@ bool Controller::GetTextScrollInfo( float& scrollPosition, float& controlHeight,
   scrollPosition = mImpl->mModel->mScrollPosition.y;
   isScrolled = !Equals( mImpl->mModel->mScrollPosition.y, mImpl->mModel->mScrollPositionLast.y, Math::MACHINE_EPSILON_1 );
   return isScrolled;
+}
+
+void Controller::SetHiddenInputOption(const Property::Map& options )
+{
+  if( NULL == mImpl->mHiddenInput )
+  {
+    mImpl->mHiddenInput = new HiddenText( this );
+  }
+  mImpl->mHiddenInput->SetProperties(options);
+}
+
+void Controller::GetHiddenInputOption(Property::Map& options )
+{
+  if( NULL != mImpl->mHiddenInput )
+  {
+    mImpl->mHiddenInput->GetProperties(options);
+  }
 }
 
 // public : Relayout.
@@ -1751,7 +1846,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 {
   DALI_ASSERT_DEBUG( mImpl->mEventData && "Unexpected KeyEvent" );
 
-  bool textChanged( false );
+  bool textChanged = false;
+  bool relayoutNeeded = false;
 
   if( ( NULL != mImpl->mEventData ) &&
       ( keyEvent.state == KeyEvent::Down ) )
@@ -1771,6 +1867,9 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       // Escape key is a special case which causes focus loss
       KeyboardFocusLostEvent();
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
     else if( ( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ) ||
              ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode ) ||
@@ -1803,10 +1902,16 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       Event event( Event::CURSOR_KEY_EVENT );
       event.p1.mInt = keyCode;
       mImpl->mEventData->mEventQueue.push_back( event );
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
     else if( Dali::DALI_KEY_BACKSPACE == keyCode )
     {
       textChanged = BackspaceKeyEvent();
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
     else if( IsKey( keyEvent, Dali::DALI_KEY_POWER ) ||
              IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
@@ -1815,6 +1920,9 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Power key/Menu/Home key behaviour does not allow edit mode to resume.
       mImpl->ChangeState( EventData::INACTIVE );
 
+      // Will request for relayout.
+      relayoutNeeded = true;
+
       // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
     }
     else if( Dali::DALI_KEY_SHIFT_LEFT == keyCode )
@@ -1822,6 +1930,11 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // DALI_KEY_SHIFT_LEFT is the key code for the Left Shift. It's sent (by the imf?) when the predictive text is enabled
       // and a character is typed after the type of a upper case latin character.
 
+      // Do nothing.
+    }
+    else if( ( Dali::DALI_KEY_VOLUME_UP == keyCode ) || ( Dali::DALI_KEY_VOLUME_DOWN == keyCode ) )
+    {
+      // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
       // Do nothing.
     }
     else
@@ -1833,20 +1946,31 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
       InsertText( keyString, COMMIT );
       textChanged = true;
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
 
     if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
          ( mImpl->mEventData->mState != EventData::INACTIVE ) &&
          ( !isNullKey ) &&
-         ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) )
+         ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) &&
+         ( Dali::DALI_KEY_VOLUME_UP != keyCode ) &&
+         ( Dali::DALI_KEY_VOLUME_DOWN != keyCode ) )
     {
       // Should not change the state if the key is the shift send by the imf manager.
       // Otherwise, when the state is SELECTING the text controller can't send the right
       // surrounding info to the imf.
       mImpl->ChangeState( EventData::EDITING );
+
+      // Will request for relayout.
+      relayoutNeeded = true;
     }
 
-    mImpl->RequestRelayout();
+    if( relayoutNeeded )
+    {
+      mImpl->RequestRelayout();
+    }
   }
 
   if( textChanged &&
@@ -2050,6 +2174,13 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
     }
     case ImfManager::GETSURROUNDING:
     {
+      retrieveText = true;
+      retrieveCursor = true;
+      break;
+    }
+    case ImfManager::PRIVATECOMMAND:
+    {
+      // PRIVATECOMMAND event is just for getting the private command message
       retrieveText = true;
       retrieveCursor = true;
       break;
@@ -2272,12 +2403,22 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
   }
 }
 
+void Controller::DisplayTimeExpired()
+{
+  mImpl->mEventData->mUpdateCursorPosition = true;
+  // Apply modifications to the model
+  mImpl->mOperationsPending = ALL_OPERATIONS;
+
+  mImpl->RequestRelayout();
+}
+
 // private : Update.
 
 void Controller::InsertText( const std::string& text, Controller::InsertType type )
 {
-  bool removedPrevious( false );
-  bool maxLengthReached( false );
+  bool removedPrevious = false;
+  bool removedSelected = false;
+  bool maxLengthReached = false;
 
   DALI_ASSERT_DEBUG( NULL != mImpl->mEventData && "Unexpected InsertText" )
 
@@ -2293,9 +2434,6 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   // TODO: At the moment the underline runs are only for pre-edit.
   mImpl->mModel->mVisualModel->mUnderlineRuns.Clear();
 
-  // Keep the current number of characters.
-  const Length currentNumberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mModel->mLogicalModel->mText.Count() : 0u;
-
   // Remove the previous IMF pre-edit.
   if( mImpl->mEventData->mPreEditFlag && ( 0u != mImpl->mEventData->mPreEditLength ) )
   {
@@ -2309,7 +2447,8 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   else
   {
     // Remove the previous Selection.
-    removedPrevious = RemoveSelectedText();
+    removedSelected = RemoveSelectedText();
+
   }
 
   Vector<Character> utf32Characters;
@@ -2479,8 +2618,6 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Inserted %d characters, new size %d new cursor %d\n", maxSizeOfNewText, mImpl->mModel->mLogicalModel->mText.Count(), mImpl->mEventData->mPrimaryCursorPosition );
   }
 
-  const Length numberOfCharacters = mImpl->IsShowingRealText() ? mImpl->mModel->mLogicalModel->mText.Count() : 0u;
-
   if( ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) &&
       mImpl->IsPlaceholderAvailable() )
   {
@@ -2490,13 +2627,14 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     mImpl->ClearPreEditFlag();
   }
   else if( removedPrevious ||
+           removedSelected ||
            ( 0 != utf32Characters.Count() ) )
   {
     // Queue an inserted event
     mImpl->QueueModifyEvent( ModifyEvent::TEXT_INSERTED );
 
     mImpl->mEventData->mUpdateCursorPosition = true;
-    if( numberOfCharacters < currentNumberOfCharacters )
+    if( removedSelected )
     {
       mImpl->mEventData->mScrollAfterDelete = true;
     }
@@ -2553,12 +2691,12 @@ bool Controller::RemoveText( int cursorOffset,
     Vector<Character>& currentText = mImpl->mModel->mLogicalModel->mText;
     CharacterIndex& oldCursorIndex = mImpl->mEventData->mPrimaryCursorPosition;
 
-    CharacterIndex cursorIndex = oldCursorIndex;
+    CharacterIndex cursorIndex = 0;
 
     // Validate the cursor position & number of characters
-    if( static_cast< CharacterIndex >( std::abs( cursorOffset ) ) <= cursorIndex )
+    if( ( static_cast< int >( mImpl->mEventData->mPrimaryCursorPosition ) + cursorOffset ) >= 0 )
     {
-      cursorIndex = oldCursorIndex + cursorOffset;
+      cursorIndex = mImpl->mEventData->mPrimaryCursorPosition + cursorOffset;
     }
 
     if( ( cursorIndex + numberOfCharacters ) > currentText.Count() )

@@ -23,6 +23,8 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali/public-api/rendering/renderer.h>
 
 #include <test-native-image.h>
@@ -452,7 +454,15 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
   callStack.Reset();
   callStack.Enable(true);
 
-  ImageView imageView = ImageView::New( gImage_34_RGBA, ImageDimensions( 34, 34 ) );
+  Property::Map imageMap;
+
+  imageMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
+  imageMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
+  imageMap[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
+  imageMap[ DevelImageVisual::Property::ATLASING] = true;
+
+  ImageView imageView = ImageView::New();
+  imageView.SetProperty( ImageView::Property::IMAGE, imageMap );
 
   // By default, Aysnc loading is used
   // loading is not started if the actor is offStage
@@ -493,6 +503,7 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing02(void)
   asyncLoadingMap[ "desiredHeight" ] = 34;
   asyncLoadingMap[ "desiredWidth" ] = 34;
   asyncLoadingMap[ "synchronousLoading" ] = false;
+  asyncLoadingMap[ "atlasing" ] = true;
 
   ImageView imageView = ImageView::New();
   imageView.SetProperty( ImageView::Property::IMAGE, asyncLoadingMap );
@@ -527,6 +538,7 @@ int UtcDaliImageViewSyncLoading(void)
 
   Property::Map syncLoadingMap;
   syncLoadingMap[ ImageVisual::Property::SYNCHRONOUS_LOADING ] = true;
+  syncLoadingMap[ DevelImageVisual::Property::ATLASING ] = true;
 
   // Sync loading, no atlasing for big size image
   {
@@ -535,6 +547,7 @@ int UtcDaliImageViewSyncLoading(void)
     // Sync loading is used
     syncLoadingMap[ ImageVisual::Property::URL ] = gImage_600_RGB;
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
+
 
     // BitmapLoader is used, and the loading is started immediately even the actor is not on stage.
     BitmapLoader loader = BitmapLoader::GetLatestCreated();
@@ -598,6 +611,7 @@ int UtcDaliImageViewSyncLoading02(void)
     syncLoadingMap[ "desiredHeight" ] = 34;
     syncLoadingMap[ "desiredWidth" ] = 34;
     syncLoadingMap[ "synchronousLoading" ] = true;
+    syncLoadingMap[ "atlasing" ] = true;
     imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
 
     // loading is started even if the actor is offStage
@@ -823,6 +837,46 @@ int UtcDaliImageViewSetImageOffstageP(void)
   BufferImage image2 = CreateBufferImage( width, height, Vector4( 1.f, 1.f, 1.f, 1.f ) );
   imageView.SetImage( image2 );
   TestImage( imageView, image2 );
+
+  END_TEST;
+}
+
+bool gResourceReadySignalFired = false;
+
+void ResourceReadySignal( Control control )
+{
+  gResourceReadySignalFired = true;
+}
+
+int UtcDaliImageViewCheckResourceReady(void)
+{
+  ToolkitTestApplication application;
+
+  gResourceReadySignalFired = false;
+
+
+  int width = 100;
+  int height = 200;
+  Image image = CreateBufferImage( width, height, Vector4(1.f, 1.f, 1.f, 1.f) );
+
+  // Check ImageView with background and main image, to ensure both visuals are marked as loaded
+  ImageView imageView = ImageView::New( TEST_GIF_FILE_NAME );
+
+  imageView.SetBackgroundImage( image );
+
+  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), false, TEST_LOCATION );
+
+  Toolkit::DevelControl::ResourceReadySignal( imageView ).Connect( &ResourceReadySignal);
+
+  Stage::GetCurrent().Add( imageView );
+
+  application.SendNotification();
+  application.Render(16);
+
+
+  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
   END_TEST;
 }

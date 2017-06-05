@@ -103,7 +103,13 @@ namespace Property
        * @brief name "scrollBarFadeDuration", type float
        * @details Sets the duration of scroll bar to fade out
        */
-      SCROLL_BAR_FADE_DURATION
+      SCROLL_BAR_FADE_DURATION,
+
+      /**
+       * @brief The size of font in pixels.
+       * @details name "pixelSize", type float
+       */
+      PIXEL_SIZE
   };
 } // namespace Property
 

@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
+#include <dali-toolkit/internal/text/hidden-text.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 
 namespace Dali
@@ -56,7 +57,7 @@ typedef IntrusivePtr<Controller> ControllerPtr;
  *
  * The text selection popup button callbacks are as well handled via the TextSelectionPopupCallbackInterface interface.
  */
-class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface
+class Controller : public RefObject, public Decorator::ControllerInterface, public TextSelectionPopupCallbackInterface, public HiddenText::Observer
 {
 public: // Enumerated types.
 
@@ -118,6 +119,15 @@ public: // Enumerated types.
   {
     PLACEHOLDER_TYPE_ACTIVE,
     PLACEHOLDER_TYPE_INACTIVE,
+  };
+
+  /**
+   * @brief Enumeration for Font Size Type.
+   */
+  enum FontSizeType
+  {
+    POINT_SIZE,   // The size of font in points.
+    PIXEL_SIZE    // The size of font in pixels.
   };
 
   struct NoTextTap
@@ -347,7 +357,7 @@ public: // Configure the text controller.
   /**
    * @brief Sets input type to password
    *
-   * @note The string is displayed continuous "*"
+   * @note The string is displayed hidden character
    *
    * @param[in] passwordInput True if password input is enabled.
    */
@@ -387,6 +397,42 @@ public: // Configure the text controller.
    * @return The action to do.
    */
   NoTextTap::Action GetNoTextLongPressAction() const;
+
+  /**
+   * @brief Query if Underline settings were provided by string or map
+   * @return bool true if set by string
+   */
+  bool IsUnderlineSetByString();
+
+  /**
+   * Set method underline setting were set by
+   * @param[in] bool, true if set by string
+   */
+  void UnderlineSetByString( bool setByString );
+
+  /**
+   * @brief Query if shadow settings were provided by string or map
+   * @return bool true if set by string
+   */
+  bool IsShadowSetByString();
+
+  /**
+   * Set method shadow setting were set by
+   * @param[in] bool, true if set by string
+   */
+  void ShadowSetByString( bool setByString );
+
+  /**
+   * @brief Query if font style settings were provided by string or map
+   * @return bool true if set by string
+   */
+  bool IsFontStyleSetByString();
+
+  /**
+   * Set method font style setting were set by
+   * @param[in] bool, true if set by string
+   */
+  void FontStyleSetByString( bool setByString );
 
 public: // Update.
 
@@ -501,18 +547,20 @@ public: // Default style & Input style
   FontSlant GetDefaultFontSlant() const;
 
   /**
-   * @brief Set the default point size.
+   * @brief Set the default font size.
    *
-   * @param[in] pointSize The default point size.
+   * @param[in] size The default font size.
+   * @param[in] type The font size type is point size or pixel size
    */
-  void SetDefaultPointSize( float pointSize );
+  void SetDefaultFontSize( float fontSize, FontSizeType type );
 
   /**
    * @brief Retrieve the default point size.
    *
+   * @param[in] type The font size type
    * @return The default point size.
    */
-  float GetDefaultPointSize() const;
+  float GetDefaultFontSize( FontSizeType type ) const;
 
   /**
    * @brief Sets the text's default color.
@@ -887,6 +935,16 @@ public: // Queries & retrieves.
    */
   bool GetTextScrollInfo( float& scrollPosition, float& controlHeight, float& layoutHeight );
 
+  /**
+   * @brief Used to set the hidden input option
+   */
+  void SetHiddenInputOption( const Property::Map& options );
+
+  /**
+   * @brief Used to get the hidden input option
+   */
+  void GetHiddenInputOption( Property::Map& options );
+
 public: // Relayout.
 
   /**
@@ -1001,6 +1059,13 @@ protected: // Inherit from TextSelectionPopup::TextPopupButtonCallbackInterface.
    * @copydoc Dali::Toolkit::TextSelectionPopup::TextPopupButtonCallbackInterface::TextPopupButtonTouched()
    */
   virtual void TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Buttons button );
+
+protected: // Inherit from HiddenText.
+
+  /**
+   * @brief Invoked from HiddenText when showing time of the last character was expired
+   */
+  virtual void DisplayTimeExpired();
 
 private: // Update.
 

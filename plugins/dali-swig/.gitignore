@@ -1,8 +1,0 @@
-*.dll
-examples/*.exe
-autom4te.cache/
-aclocal.m4
-config/
-config.*
-automatic/*
-configure

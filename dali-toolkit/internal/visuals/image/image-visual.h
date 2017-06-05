@@ -26,8 +26,10 @@
 #include <dali/devel-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
+#include <dali-toolkit/internal/visuals/texture-upload-observer.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -89,8 +91,11 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *   "DONT_CARE"
  *   "DEFAULT"
  *
+ *
+ * If the Visual is in a LayerUI it will pixel align the image, using a Layer3D will disable pixel alignment.
+ * Changing layer behaviour between LayerUI to Layer3D whilst the visual is already staged will not have an effect.
  */
-class ImageVisual: public Visual::Base, public ConnectionTracker, public AtlasUploadObserver
+class ImageVisual: public Visual::Base, public ConnectionTracker, public AtlasUploadObserver, public TextureUploadObserver
 {
 public:
 
@@ -108,7 +113,7 @@ public:
    * @return A smart-pointer to the newly allocated visual.
    */
   static ImageVisualPtr New( VisualFactoryCache& factoryCache,
-                             const std::string& imageUrl,
+                             const VisualUrl& imageUrl,
                              const Property::Map& properties,
                              ImageDimensions size = ImageDimensions(),
                              FittingMode::Type fittingMode = FittingMode::DEFAULT,
@@ -127,7 +132,7 @@ public:
    * @return A smart-pointer to the newly allocated visual.
    */
   static ImageVisualPtr New( VisualFactoryCache& factoryCache,
-                             const std::string& imageUrl,
+                             const VisualUrl& imageUrl,
                              ImageDimensions size = ImageDimensions(),
                              FittingMode::Type fittingMode = FittingMode::DEFAULT,
                              Dali::SamplingMode::Type samplingMode = SamplingMode::BOX_THEN_LINEAR );
@@ -171,7 +176,7 @@ protected:
    * @param[in] samplingMode The SamplingMode of the resource to load
    */
   ImageVisual( VisualFactoryCache& factoryCache,
-               const std::string& imageUrl,
+               const VisualUrl& imageUrl,
                ImageDimensions size,
                FittingMode::Type fittingMode,
                Dali::SamplingMode::Type samplingMode );
@@ -227,6 +232,14 @@ public:
    */
   virtual void UploadCompleted();
 
+  /**
+   * @copydoc TextureUploadObserver::UploadCompleted
+   *
+   * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
+   * This callback is the place to add the renderer as it would be called once the loading is finished.
+   */
+  virtual void UploadComplete( bool success, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle );
+
 private:
 
   /**
@@ -237,11 +250,9 @@ private:
   void ApplyImageToSampler( const Image& image );
 
   /**
-   * @brief Initializes the Dali::Renderer from an image url string
-   *
-   * @param[in] imageUrl The image url string to intialize this ImageVisual from
+   * @brief Initializes the Dali::Renderer from the image url
    */
-  void InitializeRenderer( const std::string& imageUrl );
+  void InitializeRenderer();
 
   /**
    * @brief Initializes the Dali::Renderer from an image handle
@@ -281,13 +292,7 @@ private:
    * @param[in] attemptAtlasing If true will attempt atlasing, otherwise create unique texture
    * @return the texture set to use
    */
-  TextureSet CreateTextureSet( Vector4& textureRect, const std::string& url, bool synchronousLoading, bool attemptAtlasing );
-
-  /**
-   * Callback function of image resource loading succeed
-   * @param[in] image The Image content that we attempted to load from mImageUrl
-   */
-  void OnImageLoaded( ResourceImage image );
+  TextureSet CreateTextureSet( Vector4& textureRect, bool synchronousLoading, bool attemptAtlasing );
 
   /**
    * Set the value to the uTextureRect uniform
@@ -296,9 +301,9 @@ private:
   void SetTextureRectUniform( const Vector4& textureRect  );
 
   /**
-   * Remove the image from atlas if it is not used anymore.
+   * Remove the texture if it is not used anymore.
    */
-  void RemoveFromAtlas(const std::string& url);
+  void RemoveTexture(const std::string& url);
 
   /**
    * Helper method to set individual values by index key.
@@ -313,14 +318,17 @@ private:
   PixelData mPixels;
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
-  std::string mImageUrl;
+  VisualUrl mImageUrl;
 
   Dali::ImageDimensions mDesiredSize;
+  TextureManager::TextureId mTextureId;
+
   Dali::FittingMode::Type mFittingMode:3;
   Dali::SamplingMode::Type mSamplingMode:4;
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
-
+  bool mAttemptAtlasing:1; ///< If true will attempt atlasing, otherwise create unique texture
+  bool mTextureLoading:1;  ///< True if the texture is being loaded asynchronously, or false when it has loaded.
 };
 
 } // namespace Internal

@@ -1614,6 +1614,38 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
   fontDescriptions10.PushBack( fontDescription1003 );
   fontDescriptions10.PushBack( fontDescription1004 );
 
+  FontRun fontRun1101 =
+  {
+    {
+      0u,
+      22u
+    },
+    5u
+  };
+  Vector<FontRun> fontRuns11;
+  fontRuns11.PushBack( fontRun1101 );
+
+  FontDescriptionRun fontDescription1101 =
+  {
+    {
+      0,
+      22u
+    },
+    const_cast<char*>( "TizenSans" ),
+    9u,
+    TextAbstraction::FontWeight::NORMAL,
+    TextAbstraction::FontWidth::NORMAL,
+    TextAbstraction::FontSlant::NORMAL,
+    pointSize02,
+    true,
+    false,
+    false,
+    false,
+    true
+  };
+  Vector<FontDescriptionRun> fontDescriptions11;
+  fontDescriptions11.PushBack( fontDescription1101 );
+
   const ValidateFontsData data[] =
   {
     {
@@ -1716,8 +1748,18 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       fontDescriptions10,
       fontRuns10
     },
+    {
+      "Unknown script -> changed to LATIN",
+      "WRC – The Official App",
+      "/tizen/TizenSansRegular.ttf",
+      TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      0u,
+      22u,
+      fontDescriptions11,
+      fontRuns11
+    },
   };
-  const unsigned int numberOfTests = 10u;
+  const unsigned int numberOfTests = 11u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {

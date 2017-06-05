@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LAYOUT_ALIGNMENT_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,12 @@ enum VerticalAlignment
   VERTICAL_ALIGN_TOP,
   VERTICAL_ALIGN_CENTER,
   VERTICAL_ALIGN_BOTTOM
+};
+
+enum AlignmentCount
+{
+  HORIZONTAL_ALIGN_COUNT = HORIZONTAL_ALIGN_END + 1,
+  VERTICAL_ALIGN_COUNT = VERTICAL_ALIGN_BOTTOM + 1
 };
 
 } // namespace Layout

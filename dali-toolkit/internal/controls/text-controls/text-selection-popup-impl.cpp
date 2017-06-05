@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <libintl.h>
+#include <string.h>
 #include <cfloat>
 #include <dali/public-api/animation/animation.h>
 #include <dali/devel-api/images/nine-patch-image.h>
@@ -34,6 +35,7 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -87,6 +89,9 @@ const char* const OPTION_CUT("optionCut");                                      
 const char* const OPTION_COPY("optionCopy");                                      // "Copy" popup option.
 const char* const OPTION_PASTE("optionPaste");                                    // "Paste" popup option.
 const char* const OPTION_CLIPBOARD("optionClipboard");                            // "Clipboard" popup option.
+
+const std::string IDS_LTR( "IDS_LTR" );
+const std::string RTL_DIRECTION( "RTL" );
 
 BaseHandle Create()
 {
@@ -348,7 +353,7 @@ Property::Value TextSelectionPopup::GetProperty( BaseObject* object, Property::I
       case Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER:
       {
         Property::Map map;
-        Toolkit::Visual::Base visual = impl.GetVisual( Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER );
+        Toolkit::Visual::Base visual = DevelControl::GetVisual( impl, Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER );
         if( visual )
         {
           visual.CreatePropertyMap( map );
@@ -802,6 +807,19 @@ std::string TextSelectionPopup::GetPressedImage() const
      self.Add( mToolbar );
    }
 
+   // Whether to mirror the list of buttons (for right to left languages)
+   bool mirror = false;
+   char* idsLtr = GET_LOCALE_TEXT( IDS_LTR.c_str() );
+   if( NULL != idsLtr )
+   {
+     mirror = ( 0 == strcmp( idsLtr, RTL_DIRECTION.c_str() ) );
+
+     if( mirror )
+     {
+       std::reverse( mOrderListOfButtons.begin(), mOrderListOfButtons.end() );
+     }
+   }
+
    // Iterate list of buttons and add active ones to Toolbar
    std::size_t numberOfOptionsRequired =  GetNumberOfEnabledOptions();
    std::size_t numberOfOptionsAdded = 0u;
@@ -814,12 +832,17 @@ std::string TextSelectionPopup::GetPressedImage() const
        AddOption(  button, ( numberOfOptionsAdded < numberOfOptionsRequired ) , showIcons, showCaptions );
      }
    }
+
+   if( mirror )
+   {
+     mToolbar.ScrollTo( Vector2( mPopupMaxSize.x, 0.f ) );
+   }
  }
 
 void TextSelectionPopup::CreateBackgroundBorder( Property::Map& propertyMap )
 {
   // Removes previous image if necessary
-  UnregisterVisual( Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER );
+  DevelControl::UnregisterVisual( *this, Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER );
 
   if( ! propertyMap.Empty() )
   {
@@ -827,7 +850,7 @@ void TextSelectionPopup::CreateBackgroundBorder( Property::Map& propertyMap )
 
     if( visual )
     {
-      RegisterVisual( Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER, visual );
+      DevelControl::RegisterVisual( *this, Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER, visual );
       visual.SetDepthIndex( DepthIndex::CONTENT );
     }
   }

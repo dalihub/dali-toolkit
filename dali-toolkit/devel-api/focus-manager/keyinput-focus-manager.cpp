@@ -84,19 +84,9 @@ void KeyInputFocusManager::RemoveFocus(Control control)
   GetImpl(*this).RemoveFocus(control);
 }
 
-bool KeyInputFocusManager::IsKeyboardListener(Control control)
-{
-  return GetImpl(*this).IsKeyboardListener(control);
-}
-
 KeyInputFocusManager::KeyInputFocusChangedSignalType& KeyInputFocusManager::KeyInputFocusChangedSignal()
 {
   return GetImpl(*this).KeyInputFocusChangedSignal();
-}
-
-KeyInputFocusManager::UnhandledKeyEventSignalType& KeyInputFocusManager::UnhandledKeyEventSignal()
-{
-  return GetImpl(*this).UnhandledKeyEventSignal();
 }
 
 } // namespace Toolkit

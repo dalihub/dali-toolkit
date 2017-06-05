@@ -97,6 +97,11 @@ public:
    */
   const Vector2& GetScrollBarPadding() const;
 
+  /**
+   * @copydoc Toolkit::TextSelectionToolbar::ScrollTo()
+   */
+  void ScrollTo( const Vector2& position );
+
 private: // From Control
 
   /**
@@ -184,6 +189,7 @@ private: // Data
   Vector2 mScrollBarPadding;                          ///< The padding used to position the scroll indicator.
   unsigned int mIndexInTable;                         ///< Index in table to add option
   Dali::Vector< unsigned int > mDividerIndexes;       ///< Vector of indexes in the Toolbar that contain dividers.
+  bool mFirstScrollEnd;                               ///< Used for RTL mirroring. Avoids the overshoot to be shown the first time the popup is shown.
 };
 
 } // namespace Internal

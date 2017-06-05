@@ -4,6 +4,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/builder/builder.cpp \
   $(devel_api_src_dir)/builder/json-parser.cpp \
   $(devel_api_src_dir)/builder/tree-node.cpp \
+  $(devel_api_src_dir)/controls/control-devel.cpp \
   $(devel_api_src_dir)/controls/control-wrapper.cpp \
   $(devel_api_src_dir)/controls/control-wrapper-impl.cpp \
   $(devel_api_src_dir)/controls/bloom-view/bloom-view.cpp \
@@ -24,6 +25,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.cpp \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
+  $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.cpp \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
   $(devel_api_src_dir)/image-loader/image-atlas.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
@@ -98,13 +100,15 @@ devel_api_visual_factory_header_files = \
 
 devel_api_visuals_header_files = \
   $(devel_api_src_dir)/visuals/text-visual-properties.h \
+  $(devel_api_src_dir)/visuals/image-visual-properties-devel.h \
   $(devel_api_src_dir)/visuals/visual-properties-devel.h
 
 devel_api_shadow_view_header_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.h
 
 devel_api_focus_manager_header_files = \
-  $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.h
+  $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.h \
+  $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.h
 
 devel_api_image_loader_header_files = \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.h \
@@ -113,6 +117,10 @@ devel_api_image_loader_header_files = \
 devel_api_scripting_header_files = \
   $(devel_api_src_dir)/scripting/script.h \
   $(devel_api_src_dir)/scripting/script-plugin.h
+
+devel_api_scroll_view_header_files = \
+  $(devel_api_src_dir)/controls/scrollable/scroll-view/scroll-mode.h \
+  $(devel_api_src_dir)/controls/scrollable/scroll-view/scroll-view-devel.h
 
 devel_api_shader_effects_header_files = \
   $(devel_api_src_dir)/shader-effects/alpha-discard-effect.h \
@@ -126,7 +134,10 @@ devel_api_super_blur_view_header_files = \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.h
 
 devel_api_text_controls_header_files = \
+  $(devel_api_src_dir)/controls/text-controls/hidden-input-properties.h \
   $(devel_api_src_dir)/controls/text-controls/text-editor-devel.h \
+  $(devel_api_src_dir)/controls/text-controls/text-field-devel.h \
+  $(devel_api_src_dir)/controls/text-controls/text-label-devel.h \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.h \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.h
 

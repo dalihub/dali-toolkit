@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
+#include <dali-toolkit/devel-api/controls/scrollable/scroll-view/scroll-view-devel.h>
+#include <dali-toolkit/devel-api/controls/scrollable/scroll-view/scroll-mode.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -249,8 +251,8 @@ static float TestOvershootSnapDuration(ToolkitTestApplication &application, Scro
   int timeToReachOrigin = -1;
   for(int i = 0;i<MAX_FRAMES_TO_TEST_OVERSHOOT;i++)
   {
-    float overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
-    float overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+    float overshootXValue = scrollView.GetCurrentProperty<float>( ScrollView::Property::OVERSHOOT_X );
+    float overshootYValue = scrollView.GetCurrentProperty<float>( ScrollView::Property::OVERSHOOT_Y );
     if(overshootXValue == 0.0f && overshootYValue == 0.0f)
     {
       break;
@@ -275,6 +277,37 @@ float TestAlphaFunction(float progress)
 {
   return std::min( progress * 2.0f, 1.0f );
 }
+
+static Vector2 PerformGestureDiagonalSwipe(ToolkitTestApplication& application, Vector2 start, Vector2 direction, int frames, bool finish = true)
+{
+  gOnScrollStartCalled = false;
+  gOnScrollUpdateCalled = false;
+  gOnScrollCompleteCalled = false;
+  gOnSnapStartCalled = false;
+
+  // Now do a pan starting from (start) and heading (direction)
+  Vector2 pos(start);
+  SendPan(application, Gesture::Possible, pos);
+  SendPan(application, Gesture::Started, pos);
+  Wait(application);
+
+  for(int i = 0;i<frames;i++)
+  {
+    pos += direction; // Move in this direction
+    SendPan(application, Gesture::Continuing, pos);
+    Wait(application);
+  }
+
+  if(finish)
+  {
+    pos += direction; // Move in this direction.
+    SendPan(application, Gesture::Finished, pos);
+    Wait(application, RENDER_DELAY_SCROLL);
+  }
+
+  return pos;
+}
+
 
 } // unnamed namespace
 
@@ -586,6 +619,215 @@ int UtcDaliToolkitScrollViewScrollToPageP(void)
   Wait(application);
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), Vector2(0.0f, 0.0f), TEST_LOCATION );
   DALI_TEST_EQUALS( static_cast<int>(scrollView.GetCurrentPage()), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliToolkitScrollModeP1(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliToolkitScrollView ScrollMode property" );
+
+  // Set up a scrollView.
+  ScrollView scrollView = ScrollView::New();
+
+  // Do not rely on stage size for UTC tests.
+  Vector2 pageSize( 720.0f, 1280.0f );
+  scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  scrollView.SetSize( pageSize );
+  scrollView.SetParentOrigin( ParentOrigin::CENTER );
+  scrollView.SetAnchorPoint( AnchorPoint::CENTER );
+  scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
+
+  // Position rulers.
+  Property::Map rulerMap;
+  rulerMap.Add( ScrollMode::X_AXIS_SCROLL_ENABLED, true );
+  rulerMap.Add( ScrollMode::X_AXIS_SNAP_TO_INTERVAL, pageSize.width );
+  rulerMap.Add( ScrollMode::X_AXIS_SCROLL_BOUNDARY, pageSize.width*3 );
+  rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_ENABLED, false );
+  scrollView.SetProperty( DevelScrollView::Property::SCROLL_MODE, rulerMap);
+
+  scrollView.SetWrapMode( false );
+  scrollView.SetScrollSensitive( true );
+
+  Stage::GetCurrent().Add( scrollView );
+
+  // Set up a gesture to perform.
+  Vector2 startPos( 50.0f, 0.0f );
+  Vector2 direction( -5.0f, 0.0f );
+  int frames = 200;
+
+  // Force starting position.
+  scrollView.ScrollTo( startPos, 0.0f );
+  Wait( application );
+
+  // Deliberately skip the "Finished" part of the gesture, so we can read the coordinates before the snap begins.
+  Vector2 currentPos( PerformGestureDiagonalSwipe( application, startPos, direction, frames - 1, false ) );
+
+  // Confirm the final X coord has not moved more than one page from the start X position.
+  DALI_TEST_GREATER( ( startPos.x + pageSize.width ), scrollView.GetCurrentScrollPosition().x, TEST_LOCATION );
+
+  // Finish the gesture and wait for the snap.
+  currentPos += direction;
+  SendPan( application, Gesture::Finished, currentPos );
+  // We add RENDER_FRAME_INTERVAL on to wait for an extra frame (for the last "finished" gesture to complete first.
+  Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
+
+  // Confirm the final X coord has snapped to exactly one page ahead of the start page.
+  DALI_TEST_EQUALS( pageSize.width, scrollView.GetCurrentScrollPosition().x, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollModeP2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliToolkitScrollView ScrollMode property" );
+
+  // Set up a scrollView.
+  ScrollView scrollView = ScrollView::New();
+
+  // Do not rely on stage size for UTC tests.
+  Vector2 pageSize( 720.0f, 1280.0f );
+  scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  scrollView.SetSize( pageSize );
+  scrollView.SetParentOrigin( ParentOrigin::CENTER );
+  scrollView.SetAnchorPoint( AnchorPoint::CENTER );
+  scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
+
+  // Position rulers.
+  Property::Map rulerMap;
+  rulerMap.Add( ScrollMode::X_AXIS_SCROLL_ENABLED, false );
+  rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_ENABLED, true );
+  rulerMap.Add( ScrollMode::Y_AXIS_SNAP_TO_INTERVAL, pageSize.height );
+  rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_BOUNDARY, pageSize.height*3 );
+  scrollView.SetProperty( DevelScrollView::Property::SCROLL_MODE, rulerMap);
+
+  scrollView.SetWrapMode( false );
+  scrollView.SetScrollSensitive( true );
+
+  Stage::GetCurrent().Add( scrollView );
+
+  // Set up a gesture to perform.
+  Vector2 startPos( 0.0f, 50.0f );
+  Vector2 direction( 0.0f, -6.0f );
+  int frames = 200;
+
+  // Force starting position.
+  scrollView.ScrollTo( startPos, 0.0f );
+  Wait( application );
+
+  // Deliberately skip the "Finished" part of the gesture, so we can read the coordinates before the snap begins.
+  Vector2 currentPos( PerformGestureDiagonalSwipe( application, startPos, direction, frames - 1, false ) );
+
+  // Confirm the final X coord has not moved more than one page from the start X position.
+  DALI_TEST_GREATER( ( startPos.y + pageSize.height ), scrollView.GetCurrentScrollPosition().y, TEST_LOCATION );
+
+  // Finish the gesture and wait for the snap.
+  currentPos += direction;
+  SendPan( application, Gesture::Finished, currentPos );
+  // We add RENDER_FRAME_INTERVAL on to wait for an extra frame (for the last "finished" gesture to complete first.
+  Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
+
+  // Confirm the final Y coord has snapped to exactly one page ahead of the start page.
+  DALI_TEST_EQUALS( pageSize.height, scrollView.GetCurrentScrollPosition().y, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollModeP3(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliToolkitScrollView ScrollMode property" );
+
+  // Set up a scrollView.
+  ScrollView scrollView = ScrollView::New();
+
+  // Do not rely on stage size for UTC tests.
+  Vector2 pageSize( 720.0f, 1280.0f );
+  scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  scrollView.SetSize( pageSize );
+  scrollView.SetParentOrigin( ParentOrigin::CENTER );
+  scrollView.SetAnchorPoint( AnchorPoint::CENTER );
+  scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
+
+  // Position rulers.
+  Property::Map rulerMap;
+  rulerMap.Add( ScrollMode::X_AXIS_SCROLL_ENABLED, false );
+  rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_ENABLED, true );
+  rulerMap.Add( ScrollMode::Y_AXIS_SNAP_TO_INTERVAL, pageSize.height );
+  rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_BOUNDARY, pageSize.height*3 );
+  scrollView.SetProperty( DevelScrollView::Property::SCROLL_MODE, rulerMap);
+
+  scrollView.SetWrapMode( false );
+  scrollView.SetScrollSensitive( true );
+
+  Stage::GetCurrent().Add( scrollView );
+
+  // Set up a gesture to perform.
+  Vector2 startPos( 0.0f, 50.0f );
+  Vector2 direction( 0.0f, -6.0f );
+  int frames = 200;
+
+  // Force starting position.
+  scrollView.ScrollTo( startPos, 0.0f );
+  Wait( application );
+
+  // Deliberately skip the "Finished" part of the gesture, so we can read the coordinates before the snap begins.
+  Vector2 currentPos( PerformGestureDiagonalSwipe( application, startPos, direction, frames - 1, false ) );
+
+  // Confirm the final X coord has not moved more than one page from the start X position.
+  DALI_TEST_GREATER( ( startPos.y + pageSize.height ), scrollView.GetCurrentScrollPosition().y, TEST_LOCATION );
+
+  // Finish the gesture and wait for the snap.
+  currentPos += direction;
+  SendPan( application, Gesture::Finished, currentPos );
+  // We add RENDER_FRAME_INTERVAL on to wait for an extra frame (for the last "finished" gesture to complete first.
+  Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
+
+  // Confirm the final Y coord has snapped to exactly one page ahead of the start page.
+  DALI_TEST_EQUALS( pageSize.height, scrollView.GetCurrentScrollPosition().y, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitScrollModeP4(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( " UtcDaliToolkitScrollView ScrollMode property, DefaultRulers" );
+
+  // Set up a scrollView.
+  ScrollView scrollView = ScrollView::New();
+
+  // Do not rely on stage size for UTC tests.
+  Vector2 pageSize( 720.0f, 1280.0f );
+  scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
+  scrollView.SetSize( pageSize );
+  scrollView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  scrollView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
+
+  // Position rulers - expect Default rulers to be used which don't snap
+  Property::Map rulerMap;
+  rulerMap.Add( ScrollMode::X_AXIS_SCROLL_ENABLED, true );
+  rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_ENABLED, true );
+  scrollView.SetProperty( DevelScrollView::Property::SCROLL_MODE, rulerMap);
+
+  scrollView.SetWrapMode( false );
+  scrollView.SetScrollSensitive( true );
+
+  Stage::GetCurrent().Add( scrollView );
+
+  Vector2 START_POSITION = Vector2(10.0f, 10.0f);
+
+  scrollView.ScrollTo(START_POSITION, 0.0f);
+  Wait(application);
+  // Try a vertical swipe.
+  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
+  // Take into account resampling done when prediction is off.
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition() - Vector2(0.0f, 0.5f), Vector2(10.0f, -50.0f), 0.25f, TEST_LOCATION );
+
 
   END_TEST;
 }
@@ -948,36 +1190,6 @@ int UtcDaliToolkitScrollViewSignalsUpdate02(void)
   END_TEST;
 }
 
-static Vector2 PerformGestureDiagonalSwipe(ToolkitTestApplication& application, Vector2 start, Vector2 direction, int frames, bool finish = true)
-{
-  gOnScrollStartCalled = false;
-  gOnScrollUpdateCalled = false;
-  gOnScrollCompleteCalled = false;
-  gOnSnapStartCalled = false;
-
-  // Now do a pan starting from (start) and heading (direction)
-  Vector2 pos(start);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
-  Wait(application);
-
-  for(int i = 0;i<frames;i++)
-  {
-    pos += direction; // Move in this direction
-    SendPan(application, Gesture::Continuing, pos);
-    Wait(application);
-  }
-
-  if(finish)
-  {
-    pos += direction; // Move in this direction.
-    SendPan(application, Gesture::Finished, pos);
-    Wait(application, RENDER_DELAY_SCROLL);
-  }
-
-  return pos;
-}
-
 int UtcDaliToolkitScrollViewScrollSensitive(void)
 {
   ToolkitTestApplication application;
@@ -1226,9 +1438,9 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   // 1. Scroll page in NW (-500,-500 pixels), then inspect overshoot. (don't release touch)
   Vector2 currentPos = Vector2(100.0f, 100.0f);
   currentPos = PerformGestureDiagonalSwipe(application, currentPos, Vector2(5.0f, 5.0f), 100, false);
-  float overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
-  float overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
-  Vector2 positionValue = scrollView.GetProperty<Vector2>(ScrollView::Property::SCROLL_POSITION);
+  float overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
+  float overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
+  Vector2 positionValue = scrollView.GetCurrentProperty< Vector2 >( ScrollView::Property::SCROLL_POSITION );
   DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(positionValue, Vector2::ZERO, TEST_LOCATION);
@@ -1425,15 +1637,15 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
 
   // Scroll page in NW (-20,-20 pixels), then check that overshoot should be 0. (don't release touch)
   Vector2 currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 20, false);
-  float overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
-  float overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+  float overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
+  float overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
   DALI_TEST_EQUALS(overshootXValue, 0.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 0.0f, TEST_LOCATION);
 
   // Scroll page further in NW (-105,-105 pixels), then check that overshoot should be around 0.5. (don't release touch)
   currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 105, false);
-  overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
-  overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+  overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
+  overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
   // The overshoot value is a 0.0f - 1.0f ranged value of the amount overshot related to the maximum overshoot.
   // EG. If we move 105, max overshoot is 50, then we overshot 50 / 105.
   float correctOvershootValue = 50.0f / 105.f;
@@ -1442,8 +1654,8 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
 
   // Scroll page further in NW (-30,-30 pixels), then check that overshoot should be now 1.0. (don't release touch)
   currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 30, false);
-  overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
-  overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+  overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
+  overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
   DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
 
@@ -1452,15 +1664,15 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
   Wait(application);
 
   // Check that overshoot should be now around 0.8.
-  overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
-  overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+  overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
+  overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
   DALI_TEST_CHECK(overshootXValue > 0.79f && overshootXValue < 0.81f);
   DALI_TEST_CHECK(overshootYValue > 0.79f && overshootYValue < 0.81f);
 
   // Scroll page further in NW (-30,-30 pixels), then check that overshoot should be now 1.0. (don't release touch)
   currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 30, false);
-  overshootXValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_X);
-  overshootYValue = scrollView.GetProperty<float>(ScrollView::Property::OVERSHOOT_Y);
+  overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
+  overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
   DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
 

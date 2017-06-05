@@ -280,11 +280,16 @@ void TextSelectionToolbar::SetUpScrollBar( bool enable )
 
 void TextSelectionToolbar::OnScrollStarted( const Vector2& position )
 {
+  if( mFirstScrollEnd )
+  {
+    mScrollView.SetOvershootEnabled( true );
+  }
   mTableOfButtons.SetSensitive( false );
 }
 
 void TextSelectionToolbar::OnScrollCompleted( const Vector2& position )
 {
+  mFirstScrollEnd = true;
   mTableOfButtons.SetSensitive( true );
 }
 
@@ -325,6 +330,13 @@ void TextSelectionToolbar::SetScrollBarPadding( const Vector2& padding )
   }
 
   RelayoutRequest();
+}
+
+void TextSelectionToolbar::ScrollTo( const Vector2& position )
+{
+  mFirstScrollEnd = false;
+  mScrollView.SetOvershootEnabled( false );
+  mScrollView.ScrollTo( position, 0.f );
 }
 
 void TextSelectionToolbar::ConfigureScrollview( const Property::Map& properties )
@@ -369,7 +381,8 @@ TextSelectionToolbar::TextSelectionToolbar()
   mMaxSize (),
   mScrollBarPadding( DEFAULT_SCROLL_BAR_PADDING ),
   mIndexInTable( 0 ),
-  mDividerIndexes()
+  mDividerIndexes(),
+  mFirstScrollEnd( false )
 {
 }
 

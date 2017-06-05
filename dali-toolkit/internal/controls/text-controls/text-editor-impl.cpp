@@ -133,6 +133,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScrollDuration",  
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableScrollBar",                BOOLEAN,   ENABLE_SCROLL_BAR                    )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarShowDuration",          FLOAT,     SCROLL_BAR_SHOW_DURATION             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarFadeDuration",          FLOAT,     SCROLL_BAR_FADE_DURATION             )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "pixelSize",                      FLOAT,     PIXEL_SIZE                           )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -231,9 +232,9 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
           const float pointSize = value.Get< float >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p POINT_SIZE %f\n", impl.mController.Get(), pointSize );
 
-          if( !Equals( impl.mController->GetDefaultPointSize(), pointSize ) )
+          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
           {
-            impl.mController->SetDefaultPointSize( pointSize );
+            impl.mController->SetDefaultFontSize( pointSize, Text::Controller::POINT_SIZE );
           }
         }
         break;
@@ -645,6 +646,20 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         impl.mAnimationPeriod.durationSeconds = duration;
         break;
       }
+      case Toolkit::DevelTextEditor::Property::PIXEL_SIZE:
+      {
+        if( impl.mController )
+        {
+          const float pixelSize = value.Get< float >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p PIXEL_SIZE %f\n", impl.mController.Get(), pixelSize );
+
+          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
+          {
+            impl.mController->SetDefaultFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
+          }
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -702,7 +717,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       {
         if( impl.mController )
         {
-          value = impl.mController->GetDefaultPointSize();
+          value = impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE );
         }
         break;
       }
@@ -971,6 +986,14 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         value = impl.mAnimationPeriod.durationSeconds;
         break;
       }
+      case Toolkit::DevelTextEditor::Property::PIXEL_SIZE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
+        }
+        break;
+      }
     } //switch
   }
 
@@ -1037,6 +1060,9 @@ void TextEditor::OnInitialize()
   // Enable the smooth handle panning.
   mController->SetSmoothHandlePanEnabled( true );
 
+  mController->SetNoTextDoubleTapAction( Controller::NoTextTap::HIGHLIGHT );
+  mController->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
+
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
@@ -1095,20 +1121,25 @@ void TextEditor::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange:
       const std::string& newFont = GetImpl( styleManager ).GetDefaultFontFamily();
       // Property system did not set the font so should update it.
       mController->UpdateAfterFontChange( newFont );
+      RelayoutRequest();
       break;
     }
 
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
       GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      RelayoutRequest();
       break;
     }
     case StyleChange::THEME_CHANGE:
     {
-      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      // Nothing to do, let control base class handle this
       break;
     }
   }
+
+  // Up call to Control
+  Control::OnStyleChange( styleManager, change );
 }
 
 Vector3 TextEditor::GetNaturalSize()

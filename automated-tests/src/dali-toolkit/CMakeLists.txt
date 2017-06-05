@@ -18,6 +18,7 @@ SET(TC_SOURCES
    utc-Dali-FlexContainer.cpp
    utc-Dali-GaussianBlurView.cpp
    utc-Dali-ImageView.cpp
+   utc-Dali-ImageVisual.cpp
    utc-Dali-JsonParser.cpp
    utc-Dali-KeyInputFocusManager.cpp
    utc-Dali-PageTurnView.cpp
@@ -32,6 +33,8 @@ SET(TC_SOURCES
    utc-Dali-TextField.cpp
    utc-Dali-TextLabel.cpp
    utc-Dali-TextSelectionPopup.cpp
+   utc-Dali-TextSelectionPopupMirroringLTR.cpp
+   utc-Dali-TextSelectionPopupMirroringRTL.cpp
    utc-Dali-ToolBar.cpp
    utc-Dali-Tooltip.cpp
    utc-Dali-TransitionData.cpp

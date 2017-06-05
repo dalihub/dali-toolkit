@@ -401,6 +401,37 @@ const Vector4& Visual::Base::GetMixColor() const
   return mImpl->mMixColor;
 }
 
+void Visual::Base::AddResourceObserver( Visual::ResourceObserver& observer)
+{
+  mImpl->mResourceObserver = &observer;
+}
+
+void Visual::Base::RemoveResourceObserver( Visual::ResourceObserver& observer )
+{
+  mImpl->mResourceObserver = NULL;
+}
+
+void Visual::Base::ResourceReady()
+{
+  if( mImpl->mResourceReady )
+  {
+    // only inform the observer the first time the resource is ready
+    return;
+  }
+  mImpl->mResourceReady = true;
+
+  if( mImpl->mResourceObserver )
+  {
+    // observer is currently a control impl
+    mImpl->mResourceObserver->ResourceReady( *this );
+  }
+}
+
+bool Visual::Base::IsResourceReady() const
+{
+  return mImpl->mResourceReady;
+}
+
 Renderer Visual::Base::GetRenderer()
 {
   return mImpl->mRenderer;
@@ -490,8 +521,11 @@ void Visual::Base::AnimateProperty(
   Property::Map map;
   DoCreatePropertyMap( map );
   Property::Value* valuePtr = map.Find( Toolkit::DevelVisual::Property::TYPE );
-  int visualType;
-  valuePtr->Get(visualType);
+  int visualType = -1;
+  if( valuePtr )
+  {
+    valuePtr->Get( visualType );
+  }
 
   if( animator.propertyKey == Toolkit::DevelVisual::Property::MIX_COLOR ||
       animator.propertyKey == MIX_COLOR ||
@@ -509,7 +543,7 @@ void Visual::Base::AnimateProperty(
   }
   else if( mImpl->mRenderer )
   {
-    AnimateRendererProperty(transition, animator);
+    AnimateRendererProperty( transition, animator );
   }
 }
 

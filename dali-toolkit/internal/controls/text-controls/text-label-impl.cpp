@@ -20,11 +20,13 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
@@ -56,6 +58,13 @@ namespace
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
+const Scripting::StringEnum AUTO_SCROLL_STOP_MODE_TABLE[] =
+{
+  { "IMMEDIATE", Toolkit::DevelTextLabel::AutoScrollStopMode::IMMEDIATE },
+  { "FINISH_LOOP",  Toolkit::DevelTextLabel::AutoScrollStopMode::FINISH_LOOP  },
+};
+const unsigned int AUTO_SCROLL_STOP_MODE_TABLE_COUNT = sizeof( AUTO_SCROLL_STOP_MODE_TABLE ) / sizeof( AUTO_SCROLL_STOP_MODE_TABLE[0] );
+
 const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
   { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
@@ -81,30 +90,34 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::TextLabel, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "renderingBackend",     INTEGER, RENDERING_BACKEND      )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "text",                 STRING,  TEXT                   )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontFamily",           STRING,  FONT_FAMILY            )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontStyle",            MAP,     FONT_STYLE             )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "pointSize",            FLOAT,   POINT_SIZE             )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "multiLine",            BOOLEAN, MULTI_LINE             )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "horizontalAlignment",  STRING,  HORIZONTAL_ALIGNMENT   )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "verticalAlignment",    STRING,  VERTICAL_ALIGNMENT     )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "textColor",            VECTOR4, TEXT_COLOR             )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadowOffset",         VECTOR2, SHADOW_OFFSET          )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadowColor",          VECTOR4, SHADOW_COLOR           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineEnabled",     BOOLEAN, UNDERLINE_ENABLED      )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineColor",       VECTOR4, UNDERLINE_COLOR        )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineHeight",      FLOAT,   UNDERLINE_HEIGHT       )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "enableMarkup",         BOOLEAN, ENABLE_MARKUP          )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "enableAutoScroll",     BOOLEAN, ENABLE_AUTO_SCROLL     )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollSpeed",      INTEGER, AUTO_SCROLL_SPEED      )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollLoopCount",  INTEGER, AUTO_SCROLL_LOOP_COUNT )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollGap",        FLOAT,   AUTO_SCROLL_GAP        )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "lineSpacing",          FLOAT,   LINE_SPACING           )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underline",            MAP,     UNDERLINE              )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadow",               MAP,     SHADOW                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "emboss",               MAP,     EMBOSS                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "outline",              MAP,     OUTLINE                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "renderingBackend",          INTEGER, RENDERING_BACKEND      )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "text",                      STRING,  TEXT                   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontFamily",                STRING,  FONT_FAMILY            )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "fontStyle",                 MAP,     FONT_STYLE             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "pointSize",                 FLOAT,   POINT_SIZE             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "multiLine",                 BOOLEAN, MULTI_LINE             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "horizontalAlignment",       STRING,  HORIZONTAL_ALIGNMENT   )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "verticalAlignment",         STRING,  VERTICAL_ALIGNMENT     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "textColor",                 VECTOR4, TEXT_COLOR             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadowOffset",              VECTOR2, SHADOW_OFFSET          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadowColor",               VECTOR4, SHADOW_COLOR           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineEnabled",          BOOLEAN, UNDERLINE_ENABLED      )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineColor",            VECTOR4, UNDERLINE_COLOR        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underlineHeight",           FLOAT,   UNDERLINE_HEIGHT       )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "enableMarkup",              BOOLEAN, ENABLE_MARKUP          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "enableAutoScroll",          BOOLEAN, ENABLE_AUTO_SCROLL     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollSpeed",           INTEGER, AUTO_SCROLL_SPEED      )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollLoopCount",       INTEGER, AUTO_SCROLL_LOOP_COUNT )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollGap",             FLOAT,   AUTO_SCROLL_GAP        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "lineSpacing",               FLOAT,   LINE_SPACING           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "underline",                 MAP,     UNDERLINE              )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "shadow",                    MAP,     SHADOW                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "emboss",                    MAP,     EMBOSS                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "outline",                   MAP,     OUTLINE                )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "pixelSize",           FLOAT,   PIXEL_SIZE             )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "ellipsis",            BOOLEAN, ELLIPSIS               )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollLoopDelay", FLOAT,   AUTO_SCROLL_LOOP_DELAY )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollStopMode",  STRING,  AUTO_SCROLL_STOP_MODE )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -188,9 +201,9 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         {
           const float pointSize = value.Get< float >();
 
-          if( !Equals( impl.mController->GetDefaultPointSize(), pointSize ) )
+          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
           {
-            impl.mController->SetDefaultPointSize( pointSize );
+            impl.mController->SetDefaultFontSize( pointSize, Text::Controller::POINT_SIZE );
           }
         }
         break;
@@ -336,7 +349,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
              {
                if( impl.mTextScroller )
                {
-                 impl.mTextScroller->SetLoopCount( 0 ); // Causes the current animation to finish playing (0)
+                 impl.mTextScroller->StopScrolling();
                }
              }
              // If request is enable (true) then start autoscroll as not already running
@@ -346,6 +359,22 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
                impl.mController->SetAutoScrollEnabled( enableAutoScroll );
              }
           }
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE:
+      {
+        if( !impl.mTextScroller )
+        {
+          impl.mTextScroller = Text::TextScroller::New( impl );
+        }
+        DevelTextLabel::AutoScrollStopMode::Type stopMode = impl.mTextScroller->GetStopMode();
+        if( Scripting::GetEnumerationProperty< Toolkit::DevelTextLabel::AutoScrollStopMode::Type >( value,
+                                                                                                    AUTO_SCROLL_STOP_MODE_TABLE,
+                                                                                                    AUTO_SCROLL_STOP_MODE_TABLE_COUNT,
+                                                                                                    stopMode ) )
+        {
+            impl.mTextScroller->SetStopMode( stopMode );
         }
         break;
       }
@@ -365,6 +394,15 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
           impl.mTextScroller = Text::TextScroller::New( impl );
         }
         impl.mTextScroller->SetLoopCount( value.Get<int>() );
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY:
+      {
+         if( !impl.mTextScroller )
+        {
+          impl.mTextScroller = Text::TextScroller::New( impl );
+        }
+        impl.mTextScroller->SetLoopDelay( value.Get<float>() );
         break;
       }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_GAP:
@@ -422,6 +460,31 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::PIXEL_SIZE:
+      {
+        if( impl.mController )
+        {
+          const float pixelSize = value.Get< float >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p PIXEL_SIZE %f\n", impl.mController.Get(), pixelSize );
+
+          if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
+          {
+            impl.mController->SetDefaultFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
+          }
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::ELLIPSIS:
+      {
+        if( impl.mController )
+        {
+          const bool ellipsis = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p ELLIPSIS %d\n", impl.mController.Get(), ellipsis );
+
+          impl.mController->SetTextElideEnabled( ellipsis );
+        }
+        break;
+      }
     }
   }
 }
@@ -469,7 +532,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          value = impl.mController->GetDefaultPointSize();
+          value = impl.mController->GetDefaultFontSize( Text::Controller::POINT_SIZE );
         }
         break;
       }
@@ -573,6 +636,20 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE:
+      {
+        if( impl.mTextScroller )
+        {
+          const char* mode = Scripting::GetEnumerationName< Toolkit::DevelTextLabel::AutoScrollStopMode::Type >( impl.mTextScroller->GetStopMode(),
+                                                                                                                 AUTO_SCROLL_STOP_MODE_TABLE,
+                                                                                                                 AUTO_SCROLL_STOP_MODE_TABLE_COUNT );
+          if( mode )
+          {
+            value = std::string( mode );
+          }
+        }
+        break;
+      }
       case Toolkit::TextLabel::Property::AUTO_SCROLL_SPEED:
       {
         TextLabel& impl( GetImpl( label ) );
@@ -590,6 +667,18 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
           if ( impl.mTextScroller )
           {
             value = impl.mTextScroller->GetLoopCount();
+          }
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY:
+      {
+        if( impl.mController )
+        {
+          TextLabel& impl( GetImpl( label ) );
+          if ( impl.mTextScroller )
+          {
+            value = impl.mTextScroller->GetLoopDelay();
           }
         }
         break;
@@ -629,6 +718,22 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       case Toolkit::TextLabel::Property::OUTLINE:
       {
         GetOutlineProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::PIXEL_SIZE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::ELLIPSIS:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsTextElideEnabled();
+        }
         break;
       }
     }
@@ -672,19 +777,24 @@ void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
       const std::string& newFont = GetImpl( styleManager ).GetDefaultFontFamily();
       DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnStyleChange StyleChange::DEFAULT_FONT_CHANGE newFont(%s)\n", newFont.c_str() );
       mController->UpdateAfterFontChange( newFont );
+      RelayoutRequest();
       break;
     }
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
       GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      RelayoutRequest();
       break;
     }
     case StyleChange::THEME_CHANGE:
     {
-      GetImpl( styleManager ).ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
+      // Nothing to do, let control base class handle this
       break;
     }
   }
+
+  // Up call to Control
+  Control::OnStyleChange( styleManager, change );
 }
 
 Vector3 TextLabel::GetNaturalSize()
@@ -771,7 +881,7 @@ void TextLabel::SetUpAutoScrolling()
     // If speed, loopCount or gap not set via property system then will need to create a TextScroller with defaults
     mTextScroller = Text::TextScroller::New( *this );
   }
-  mTextScroller->SetParameters( mRenderableActor, controlSize, offScreenSize, direction, alignmentOffset );
+  mTextScroller->SetParameters( mRenderableActor, controlSize, offScreenSize, direction, alignmentOffset, mController->GetHorizontalAlignment() );
 
   Actor self = Self();
   self.Add( mTextScroller->GetScrollingText() );
