@@ -375,14 +375,13 @@ void ProgressBar::CreateVisualsForComponent( Property::Index index, const Proper
 
   if ( progressVisual )
   {
-    progressVisual.SetDepthIndex( visualDepth );
     if( index == Toolkit::ProgressBar::Property::INDETERMINATE_VISUAL )
     {
-      DevelControl::RegisterVisual( *this, index, progressVisual, mIndeterminate );
+      DevelControl::RegisterVisual( *this, index, progressVisual, mIndeterminate, visualDepth );
     }
     else
     {
-      DevelControl::RegisterVisual( *this, index, progressVisual, true );
+      DevelControl::RegisterVisual( *this, index, progressVisual, true, visualDepth );
     }
   }
   else
