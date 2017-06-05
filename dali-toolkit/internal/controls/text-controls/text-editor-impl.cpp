@@ -1516,6 +1516,15 @@ void TextEditor::UpdateScrollBar()
 
     mScrollBar.SetScrollPropertySource(self, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
 
+    // Set style name of ScrollBar for styling
+    mScrollBar.SetStyleName("TextEditorScrollBar");
+    Toolkit::Control scrollIndicator = Toolkit::Control::DownCast( mScrollBar.GetScrollIndicator() );
+    if( scrollIndicator )
+    {
+      // Set style name of ScrollBarIndicator for styling
+      scrollIndicator.SetStyleName("TextEditorScrollBarIndicator");
+    }
+
     self.Add( mScrollBar );
   }
   else
