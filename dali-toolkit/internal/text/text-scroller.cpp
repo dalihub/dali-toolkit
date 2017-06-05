@@ -233,6 +233,7 @@ void CreateRenderer( FrameBufferImage frameBufferImage, Dali::Renderer& renderer
   CreateGeometry( meshGeometry );
 
   renderer = Renderer::New( meshGeometry, shader );
+  renderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true );
   renderer.SetTextures( textureSet );
 }
 
