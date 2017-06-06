@@ -118,7 +118,7 @@ public: // From Control
   /**
    * @ref Dali::Toolkit::DevelControl::RegisterVisual()
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, float depthIndex );
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex );
 
   /**
    * @ref Dali::Toolkit::DevelControl::RegisterVisual()
@@ -128,7 +128,7 @@ public: // From Control
   /**
    * @ref Dali::Toolkit::DevelControl::RegisterVisual()
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, float depthIndex );
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex );
 
   /**
    * @ref Dali::Toolkit::DevelControl::UnregisterVisual()

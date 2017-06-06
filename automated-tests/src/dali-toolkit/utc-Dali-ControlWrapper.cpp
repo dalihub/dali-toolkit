@@ -430,11 +430,11 @@ int UtcDaliControlWrapperRegisterVisualWithDepthIndexToSelf(void)
     DALI_TEST_CHECK( visual );
 
     // Register to self
-    controlWrapperImpl->RegisterVisual( index, visual, 4.0f );
+    controlWrapperImpl->RegisterVisual( index, visual, 4 );
 
     DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), false, TEST_LOCATION ); // Control not destroyed yet
     DALI_TEST_EQUALS( controlWrapperImpl->GetVisual( index ), visual, TEST_LOCATION );
-    DALI_TEST_EQUALS( visual.GetDepthIndex(), 4.0f, TEST_LOCATION );
+    DALI_TEST_EQUALS( visual.GetDepthIndex(), 4, TEST_LOCATION );
   }
 
   DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), true, TEST_LOCATION ); // Should be destroyed
@@ -504,11 +504,11 @@ int UtcDaliControlWrapperRegisterDisabledVisualWithDepthIndex(void)
   DALI_TEST_CHECK(visual);
 
   // Register index with a color visual
-  controlWrapperImpl->RegisterVisual( TEST_PROPERTY, visual, false, 10.0f );
+  controlWrapperImpl->RegisterVisual( TEST_PROPERTY, visual, false, 10 );
 
   DALI_TEST_EQUALS( controlWrapperImpl->GetVisual( TEST_PROPERTY ), visual, TEST_LOCATION );
   DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), false, TEST_LOCATION );
-  DALI_TEST_EQUALS( visual.GetDepthIndex(), 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( visual.GetDepthIndex(), 10, TEST_LOCATION );
 
   Stage::GetCurrent().Add( controlWrapper );
 

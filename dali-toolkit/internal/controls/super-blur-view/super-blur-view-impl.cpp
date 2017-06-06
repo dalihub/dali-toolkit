@@ -174,7 +174,7 @@ void SuperBlurView::SetImage(Image inputImage)
   Actor self( Self() );
 
   mVisuals[0] = Toolkit::VisualFactory::Get().CreateVisual( mInputImage );
-  DevelControl::RegisterVisual( *this, 0, mVisuals[0], 0.0f ); // Will clean up previously registered visuals for this index.
+  DevelControl::RegisterVisual( *this, 0, mVisuals[0], 0 ); // Will clean up previously registered visuals for this index.
   // custom shader is not applied on the original image.
 
   BlurImage( 0,  inputImage);
@@ -282,7 +282,7 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
                                                 GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT );
 
       mVisuals[i] = Toolkit::VisualFactory::Get().CreateVisual( mBlurredImage[i - 1] );
-      DevelControl::RegisterVisual( *this, i, mVisuals[i], float( i ) ); // Will clean up existing visual with same index.
+      DevelControl::RegisterVisual( *this, i, mVisuals[i], int( i ) ); // Will clean up existing visual with same index.
       SetShaderEffect( mVisuals[i] );
     }
 

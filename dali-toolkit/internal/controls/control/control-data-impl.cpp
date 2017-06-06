@@ -387,7 +387,7 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
   RegisterVisual( index, visual, VisualState::ENABLED, DepthIndexValue::NOT_SET );
 }
 
-void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, float depthIndex )
+void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex )
 {
   RegisterVisual( index, visual, VisualState::ENABLED, DepthIndexValue::SET, depthIndex );
 }
@@ -397,12 +397,12 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
   RegisterVisual( index, visual, ( enabled ? VisualState::ENABLED : VisualState::DISABLED ), DepthIndexValue::NOT_SET );
 }
 
-void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, float depthIndex )
+void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex )
 {
   RegisterVisual( index, visual, ( enabled ? VisualState::ENABLED : VisualState::DISABLED ), DepthIndexValue::SET, depthIndex );
 }
 
-void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, float depthIndex )
+void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex )
 {
   bool visualReplaced ( false );
   Actor self = mControlImpl.Self();
@@ -420,9 +420,9 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
 
       // If we've not set the depth-index value and the new visual does not have a depth index applied to it, then use the previously set depth-index for this index
       if( ( depthIndexValueSet == DepthIndexValue::NOT_SET ) &&
-          EqualsZero( visual.GetDepthIndex() ) )
+          ( visual.GetDepthIndex() == 0 ) )
       {
-        const float currentDepthIndex = (*iter)->visual.GetDepthIndex();
+        const int currentDepthIndex = (*iter)->visual.GetDepthIndex();
         visual.SetDepthIndex( currentDepthIndex );
       }
 
@@ -466,15 +466,15 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
     // If we've not set the depth-index value, we have more than one visual and the visual does not have a depth index, then set it to be the highest
     if( ( depthIndexValueSet == DepthIndexValue::NOT_SET ) &&
         ( mVisuals.Size() > 1 ) &&
-        EqualsZero( visual.GetDepthIndex() ) )
+        ( visual.GetDepthIndex() == 0 ) )
     {
-      float maxDepthIndex = std::numeric_limits< float >::min();
+      int maxDepthIndex = std::numeric_limits< int >::min();
 
       RegisteredVisualContainer::ConstIterator iter;
       const RegisteredVisualContainer::ConstIterator endIter = mVisuals.End();
       for ( iter = mVisuals.Begin(); iter != endIter; iter++ )
       {
-        const float visualDepthIndex = (*iter)->visual.GetDepthIndex();
+        const int visualDepthIndex = (*iter)->visual.GetDepthIndex();
         if ( visualDepthIndex > maxDepthIndex )
         {
           maxDepthIndex = visualDepthIndex;
@@ -793,7 +793,7 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
           Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( url, ImageDimensions() );
           if( visual )
           {
-            controlImpl.mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual, float( DepthIndex::BACKGROUND ) );
+            controlImpl.mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND );
           }
         }
         else if( value.Get( color ) )

@@ -422,7 +422,7 @@ Button::Align Button::GetLabelAlignment()
  * 4) Unregister visual if empty map was provided. This is the method to remove a visual
  */
 
-void Button::CreateVisualsForComponent( Property::Index index, const Property::Value& value, const float visualDepth )
+void Button::CreateVisualsForComponent( Property::Index index, const Property::Value& value, const int visualDepth )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent index(%d)\n", index );
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();

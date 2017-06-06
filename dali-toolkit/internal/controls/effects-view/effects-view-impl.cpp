@@ -428,7 +428,7 @@ void EffectsView::AllocateResources()
 
     mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
     Internal::InitializeVisual( self, mVisualForChildren, mImageForChildren );
-    DevelControl::RegisterVisual( *this, CHILD_VISUAL, mVisualForChildren, float( DepthIndex::CONTENT + 1 ) );
+    DevelControl::RegisterVisual( *this, CHILD_VISUAL, mVisualForChildren, DepthIndex::CONTENT + 1 );
 
     mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
     TextureSet textureSet = TextureSet::New();

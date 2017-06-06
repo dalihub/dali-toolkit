@@ -350,7 +350,7 @@ Toolkit::TransitionData ProgressBar::ConvertPropertyToTransition( const Property
  * 4) Unregister visual if empty map was provided. This is the method to remove a visual
  */
 
-void ProgressBar::CreateVisualsForComponent( Property::Index index, const Property::Value& value, const float visualDepth )
+void ProgressBar::CreateVisualsForComponent( Property::Index index, const Property::Value& value, const int visualDepth )
 {
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
   Toolkit::Visual::Base progressVisual;

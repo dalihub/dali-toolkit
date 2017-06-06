@@ -166,7 +166,7 @@ DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property:
  * @see Visual::Base::GetDepthIndex()
  * @see Visual::Base::SetDepthIndex()
  */
-DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, float depthIndex );
+DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, int depthIndex );
 
 /**
  * @brief Register a visual by Property Index with the option of enabling/disabling it.
@@ -196,7 +196,7 @@ DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property:
  * @see Visual::Base::GetDepthIndex()
  * @see Visual::Base::SetDepthIndex()
  */
-DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled, float depthIndex );
+DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex );
 
 /**
  * @brief Erase the entry matching the given index from the list of registered visuals

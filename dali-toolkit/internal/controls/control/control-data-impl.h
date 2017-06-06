@@ -133,7 +133,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, float depthIndex );
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex );
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
@@ -143,7 +143,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, float depthIndex );
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex );
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::UnregisterVisual()
@@ -293,7 +293,7 @@ private:
    * @param[in] depthIndexValueSet Set to true if the depthIndex has actually been set manually
    * @param[in] depthIndex The visual's depth-index is set to this
    */
-  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, float depthIndex = 0.0f );
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex = 0 );
 
 public:
 

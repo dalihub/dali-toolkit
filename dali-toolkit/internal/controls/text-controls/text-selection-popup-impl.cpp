@@ -850,7 +850,7 @@ void TextSelectionPopup::CreateBackgroundBorder( Property::Map& propertyMap )
 
     if( visual )
     {
-      DevelControl::RegisterVisual( *this, Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER, visual, float( DepthIndex::CONTENT ) );
+      DevelControl::RegisterVisual( *this, Toolkit::TextSelectionPopup::Property::BACKGROUND_BORDER, visual, DepthIndex::CONTENT );
     }
   }
 }
