@@ -51,7 +51,7 @@ public:
   /**
    * @copydoc Toolkit::AsyncImageLoader::Load( const std::string&, ImageDimensions, FittingMode::Type, SamplingMode::Type, bool )
    */
-  uint32_t Load( const std::string& url,
+  uint32_t Load( const VisualUrl& url,
                  ImageDimensions dimensions,
                  FittingMode::Type fittingMode,
                  SamplingMode::Type samplingMode,
@@ -85,14 +85,11 @@ protected:
   ~AsyncImageLoader();
 
 private:
-
   Toolkit::AsyncImageLoader::ImageLoadedSignalType mLoadedSignal;
 
   ImageLoadThread mLoadThread;
   uint32_t        mLoadTaskId;
   bool            mIsLoadThreadStarted;
-
-
 };
 
 } // namespace Internal

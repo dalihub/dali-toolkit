@@ -62,6 +62,7 @@ public:
     std::size_t hash;                             ///< Hash code for the Url
     uint32_t croppedWidth;                        ///< Width of the cropped middle part of N-patch
     uint32_t croppedHeight;                       ///< Height of the cropped middle part of N-patch
+    Rect< int > border;                           ///< The size of the border
   };
 
 public:
@@ -80,9 +81,10 @@ public:
    * @brief Retrieve a texture matching the n-patch url.
    *
    * @param [in] url to retrieve
+   * @param [in] border The border size of the image
    * @return id of the texture.
    */
-  std::size_t Load( const std::string& url );
+  std::size_t Load( const std::string& url, const Rect< int >& border );
 
   /**
    * @brief Retrieve N patch data matching to an id

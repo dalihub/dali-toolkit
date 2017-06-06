@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -63,6 +64,10 @@ const char* const PROPERTY_NAME_UNDERLINE = "underline";
 const char* const PROPERTY_NAME_SHADOW = "shadow";
 const char* const PROPERTY_NAME_EMBOSS = "emboss";
 const char* const PROPERTY_NAME_OUTLINE = "outline";
+
+const char* const PROPERTY_NAME_PIXEL_SIZE = "pixelSize";
+const char* const PROPERTY_NAME_ELLIPSIS = "ellipsis";
+const char* const PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY = "autoScrollLoopDelay";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
@@ -203,6 +208,9 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_SHADOW ) == TextLabel::Property::SHADOW );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_EMBOSS ) == TextLabel::Property::EMBOSS );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextLabel::Property::OUTLINE );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextLabel::Property::PIXEL_SIZE );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == DevelTextLabel::Property::ELLIPSIS );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY ) == DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY );
 
   END_TEST;
 }
@@ -243,11 +251,11 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   fontStyleMapSet.Insert( "weight", "thin" );
   fontStyleMapSet.Insert( "width", "expanded" );
   fontStyleMapSet.Insert( "slant", "oblique" );
+  const std::string strFontStyle = "{\"weight\":\"thin\",\"width\":\"expanded\",\"slant\":\"oblique\"}";
 
   label.SetProperty( TextLabel::Property::FONT_STYLE, "{\"weight\":\"thin\",\"width\":\"expanded\",\"slant\":\"oblique\"}" );
-  fontStyleMapGet = label.GetProperty<Property::Map>( TextLabel::Property::FONT_STYLE );
-  DALI_TEST_EQUALS( fontStyleMapGet.Count(), fontStyleMapSet.Count(), TEST_LOCATION );
-  DALI_TEST_EQUALS( DaliTestCheckMaps( fontStyleMapGet, fontStyleMapSet ), true, TEST_LOCATION );
+  std::string getFontStyle = label.GetProperty<std::string>( TextLabel::Property::FONT_STYLE );
+  DALI_TEST_EQUALS( getFontStyle, strFontStyle, TEST_LOCATION );
 
   label.SetProperty( TextLabel::Property::POINT_SIZE, 10.f );
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::POINT_SIZE ), 10.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -341,6 +349,10 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   const int SCROLL_SPEED = 80;
   const int SCROLL_LOOPS = 4;
   const float SCROLL_GAP = 50.0f;
+  const float SCROLL_LOOP_DELAY = 0.3f;
+  const std::string STOP_IMMEDIATE = std::string( "IMMEDIATE" );
+  const std::string STOP_FINISH_LOOP = std::string( "FINISH_LOOP" );
+
   label.SetProperty( TextLabel::Property::MULTI_LINE, false ); // Autoscroll only supported in single line
   DALI_TEST_CHECK( !label.GetProperty<bool>( TextLabel::Property::ENABLE_AUTO_SCROLL ) );
   label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
@@ -351,6 +363,16 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( SCROLL_LOOPS, label.GetProperty<int>( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT ), TEST_LOCATION );
   label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, SCROLL_GAP );
   DALI_TEST_EQUALS( SCROLL_GAP, label.GetProperty<float>( TextLabel::Property::AUTO_SCROLL_GAP ), TEST_LOCATION );
+  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY, SCROLL_LOOP_DELAY );
+  DALI_TEST_EQUALS( SCROLL_LOOP_DELAY, label.GetProperty<float>( DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY ), TEST_LOCATION );
+
+  //Check autoscroll stop type property
+  label.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+  DALI_TEST_EQUALS( STOP_IMMEDIATE, label.GetProperty<std::string>( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE ), TEST_LOCATION );
+
+  label.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+  DALI_TEST_EQUALS( STOP_FINISH_LOOP, label.GetProperty<std::string>( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE ), TEST_LOCATION );
+
 
   // Check the line spacing property
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -414,6 +436,15 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // Check the outline property
   label.SetProperty( TextLabel::Property::OUTLINE, "Outline properties" );
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+
+  // Check the pixel size of font
+  label.SetProperty( DevelTextLabel::Property::PIXEL_SIZE, 20.f );
+  DALI_TEST_EQUALS( label.GetProperty<float>( DevelTextLabel::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check the ellipsis property
+  DALI_TEST_CHECK( !label.GetProperty<bool>( DevelTextLabel::Property::ELLIPSIS ) );
+  label.SetProperty( DevelTextLabel::Property::ELLIPSIS, true );
+  DALI_TEST_CHECK( label.GetProperty<bool>( DevelTextLabel::Property::ELLIPSIS ) );
 
   END_TEST;
 }
@@ -527,23 +558,297 @@ int UtcDaliToolkitTextlabelScrollingP(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitTextLabelScrollingP");
+  TextLabel labelImmediate = TextLabel::New("Some text to scroll");
+  TextLabel labelFinished = TextLabel::New("مرحبا بالعالم");
+
+  DALI_TEST_CHECK( labelImmediate );
+  DALI_TEST_CHECK( labelFinished );
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  Stage::GetCurrent().Add( labelImmediate );
+  // Turn on all the effects
+  labelImmediate.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelImmediate.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+
+  Stage::GetCurrent().Add( labelFinished );
+  // Turn on all the effects
+  labelFinished.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelFinished.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelFinished.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelFinished.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelFinished.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+
+
+
+  try
+  {
+    // Render some text with the shared atlas backend
+    labelImmediate.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    labelFinished.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    application.SendNotification();
+    application.Render();
+
+    labelImmediate.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    labelFinished.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    application.SendNotification();
+    application.Render();
+
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelScrollingCenterAlignP(void)
+{
+  ToolkitTestApplication application;
+  TextLabel labelShort = TextLabel::New("Some text to scroll");
+  TextLabel labelLong = TextLabel::New("Some text to scroll that is greater than the width of the text. The quick brown fox jumps over the lazy dog. Hello World, we meet again!");
+
+  DALI_TEST_CHECK( labelShort );
+  DALI_TEST_CHECK( labelLong );
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  Stage::GetCurrent().Add( labelShort );
+  // Turn on all the effects
+  labelShort.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelShort.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelShort.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+
+  Stage::GetCurrent().Add( labelLong );
+  // Turn on all the effects
+  labelLong.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelLong.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelLong.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+
+  try
+  {
+    // Render some text with the shared atlas backend
+    labelShort.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    labelLong.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    application.SendNotification();
+    application.Render();
+
+    labelShort.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    labelLong.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    application.SendNotification();
+    application.Render();
+
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelScrollingCenterAlignRTLP(void)
+{
+  ToolkitTestApplication application;
+  TextLabel labelShort = TextLabel::New("مرحبا بالعالم");
+  TextLabel labelLong = TextLabel::New("لكن لا بد أن أوضح لك أن كل هذه الأفكار المغلوطة حول استنكار  النشوة وتمجيد الألم نشأت بالفعل، وسأعرض لك التفاصيل لتكتشف حقيقة وأساس تلك السعادة البشرية، فلا أحد يرفض أو يكره أو يتجنب الشعور بالسعادة، ولكن بفضل هؤلاء الأشخاص الذين لا يدركون بأن السعادة لا بد أن نستشعرها بصورة أكثر عقلانية ومنطقية فيعرضهم هذا لمواجهة الظروف الأليمة، وأكرر بأنه لا يوجد من يرغب في الحب ونيل المنال ويتلذذ بالآلام، الألم هو الألم ولكن نتيجة لظروف ما قد تكمن السعاده فيما نتحمله من كد وأسي");
+
+  DALI_TEST_CHECK( labelShort );
+  DALI_TEST_CHECK( labelLong );
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  Stage::GetCurrent().Add( labelShort );
+  // Turn on all the effects
+  labelShort.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelShort.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelShort.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+
+  Stage::GetCurrent().Add( labelLong );
+  // Turn on all the effects
+  labelLong.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelLong.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelLong.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+
+  try
+  {
+    // Render some text with the shared atlas backend
+    labelShort.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    labelLong.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    application.SendNotification();
+    application.Render();
+
+    labelShort.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    labelLong.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    application.SendNotification();
+    application.Render();
+
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelScrollingEndAlignP(void)
+{
+  ToolkitTestApplication application;
+  TextLabel labelShort = TextLabel::New("Some text to scroll");
+  TextLabel labelLong = TextLabel::New("Some text to scroll that is greater than the width of the text. The quick brown fox jumps over the lazy dog. Hello World, we meet again!");
+
+  DALI_TEST_CHECK( labelShort );
+  DALI_TEST_CHECK( labelLong );
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  Stage::GetCurrent().Add( labelShort );
+  // Turn on all the effects
+  labelShort.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelShort.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "END" );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelShort.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+
+  Stage::GetCurrent().Add( labelLong );
+  // Turn on all the effects
+  labelLong.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelLong.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "END" );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelLong.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+
+  try
+  {
+    // Render some text with the shared atlas backend
+    labelShort.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    labelLong.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    application.SendNotification();
+    application.Render();
+
+    labelShort.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    labelLong.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    application.SendNotification();
+    application.Render();
+
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelScrollingEndAlignRTLP(void)
+{
+  ToolkitTestApplication application;
+  TextLabel labelShort = TextLabel::New("مرحبا بالعالم");
+  TextLabel labelLong = TextLabel::New("لكن لا بد أن أوضح لك أن كل هذه الأفكار المغلوطة حول استنكار  النشوة وتمجيد الألم نشأت بالفعل، وسأعرض لك التفاصيل لتكتشف حقيقة وأساس تلك السعادة البشرية، فلا أحد يرفض أو يكره أو يتجنب الشعور بالسعادة، ولكن بفضل هؤلاء الأشخاص الذين لا يدركون بأن السعادة لا بد أن نستشعرها بصورة أكثر عقلانية ومنطقية فيعرضهم هذا لمواجهة الظروف الأليمة، وأكرر بأنه لا يوجد من يرغب في الحب ونيل المنال ويتلذذ بالآلام، الألم هو الألم ولكن نتيجة لظروف ما قد تكمن السعاده فيما نتحمله من كد وأسي");
+
+  DALI_TEST_CHECK( labelShort );
+  DALI_TEST_CHECK( labelLong );
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  Stage::GetCurrent().Add( labelShort );
+  // Turn on all the effects
+  labelShort.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelShort.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "END" );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelShort.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+
+  Stage::GetCurrent().Add( labelLong );
+  // Turn on all the effects
+  labelLong.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  labelLong.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "END" );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+  labelLong.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+
+  try
+  {
+    // Render some text with the shared atlas backend
+    labelShort.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    labelLong.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    application.SendNotification();
+    application.Render();
+
+    labelShort.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    labelLong.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    application.SendNotification();
+    application.Render();
+
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelScrollingInterruptedP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelScrollingInterruptedP");
   TextLabel label = TextLabel::New("Some text to scroll");
   DALI_TEST_CHECK( label );
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
   Stage::GetCurrent().Add( label );
+  label.SetSize( 360.0f, 20.f );
   // Turn on all the effects
   label.SetProperty( TextLabel::Property::MULTI_LINE, false );
   label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
   label.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
   label.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
 
+  // Render the text.
+  application.SendNotification();
+  application.Render();
+
+  unsigned int actorCount1 = label.GetChildCount();
+  tet_printf("Initial actor count is(%d)\n", actorCount1 );
+
   try
   {
     // Render some text with the shared atlas backend
     label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
     application.SendNotification();
+    application.Render(2000);
+
+    unsigned int actorCount1 = label.GetChildCount();
+    tet_printf("Actor count after scrolling is(%d)\n", actorCount1 );
+
+    label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::RED );
+
+    // Render the text.
+    application.SendNotification();
     application.Render();
+
+    unsigned int actorCount2 = label.GetChildCount();
+    tet_printf("After changing color the actor count is(%d)\n", actorCount2 );
+
+    DALI_TEST_EQUALS( actorCount1, actorCount2, TEST_LOCATION );
+
   }
   catch( ... )
   {

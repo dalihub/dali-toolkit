@@ -117,13 +117,15 @@ bool GetPolicyFromValue( const Property::Value& value, Vector2& policy )
 Internal::Visual::Base::Impl::Impl()
 : mCustomShader( NULL ),
   mBlendSlotDelegate( NULL ),
+  mResourceObserver( NULL ),
   mTransform(),
   mMixColor( Color::WHITE ),
   mControlSize( Vector2::ZERO ),
   mDepthIndex( 0.0f ),
   mMixColorIndex( Property::INVALID_INDEX ),
   mOpacityIndex( Property::INVALID_INDEX ),
-  mFlags( 0 )
+  mFlags( 0 ),
+  mResourceReady( false )
 {
 }
 

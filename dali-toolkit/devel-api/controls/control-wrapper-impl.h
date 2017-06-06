@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CONTROL_WRAPPER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,13 @@ namespace Dali
 
 namespace Toolkit
 {
+
+class TransitionData;
+
+namespace Visual
+{
+class Base;
+}
 
 namespace Internal
 {
@@ -104,37 +111,37 @@ public: // From CustomActorImpl
 public: // From Control
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual )
+   * @ref Dali::Toolkit::DevelControl::RegisterVisual()
    */
   void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual );
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
+   * @ref Dali::Toolkit::DevelControl::RegisterVisual()
    */
   void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::UnregisterVisual()
+   * @ref Dali::Toolkit::DevelControl::UnregisterVisual()
    */
   void UnregisterVisual( Property::Index index );
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::GetVisual()
+   * @ref Dali::Toolkit::DevelControl::GetVisual()
    */
   Toolkit::Visual::Base GetVisual( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::EnableVisual()
+   * @ref Dali::Toolkit::DevelControl::EnableVisual()
    */
   void EnableVisual( Property::Index index, bool enable );
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::IsVisualEnabled()
+   * @ref Dali::Toolkit::DevelControl::IsVisualEnabled()
    */
   bool IsVisualEnabled( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Toolkit::Internal::Control::CreateTransition()
+   * @ref Dali::Toolkit::DevelControl::CreateTransition()
    */
   Dali::Animation CreateTransition( const Toolkit::TransitionData& transitionData );
 

@@ -30,7 +30,7 @@ namespace Toolkit
 namespace Internal
 {
 
-LoadingTask::LoadingTask( uint32_t id, const std::string& url, ImageDimensions dimensions,
+LoadingTask::LoadingTask( uint32_t id, const VisualUrl& url, ImageDimensions dimensions,
                           FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection )
 : pixelData(),
   url( url ),
@@ -44,7 +44,14 @@ LoadingTask::LoadingTask( uint32_t id, const std::string& url, ImageDimensions d
 
 void LoadingTask::Load()
 {
-  pixelData = Dali::LoadImageFromFile( url, dimensions, fittingMode, samplingMode, orientationCorrection );
+  if( url.IsLocal() )
+  {
+    pixelData = Dali::LoadImageFromFile( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
+  }
+  else
+  {
+    pixelData = Dali::DownloadImageSynchronously ( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
+  }
 }
 
 

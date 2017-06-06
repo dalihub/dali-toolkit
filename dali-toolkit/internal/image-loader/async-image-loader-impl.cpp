@@ -49,7 +49,7 @@ IntrusivePtr<AsyncImageLoader> AsyncImageLoader::New()
   return internal;
 }
 
-uint32_t AsyncImageLoader::Load( const std::string& url,
+uint32_t AsyncImageLoader::Load( const VisualUrl& url,
                                  ImageDimensions dimensions,
                                  FittingMode::Type fittingMode,
                                  SamplingMode::Type samplingMode,
@@ -83,7 +83,7 @@ void AsyncImageLoader::CancelAll()
 
 void AsyncImageLoader::ProcessLoadedImage()
 {
-  while( LoadingTask *next =  mLoadThread.NextCompletedTask() )
+  while( LoadingTask *next = mLoadThread.NextCompletedTask() )
   {
     mLoadedSignal.Emit( next->id, next->pixelData );
     delete next;

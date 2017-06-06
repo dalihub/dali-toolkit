@@ -1035,7 +1035,12 @@ static unsigned int nsvg__parseColorRGB(const char* str)
 {
     int r = -1, g = -1, b = -1;
     char s1[32]="", s2[32]="";
-    sscanf(str + 4, "%d%[%%, \t]%d%[%%, \t]%d", &r, s1, &g, s2, &b);
+
+    /**
+     * In the original file, the formatted data reading did not specify the string with width limitation.
+     * To prevent the possible overflow, we replace '%s' with '%32s' here.
+     */
+    sscanf(str + 4, "%d%32[%%, \t]%d%32[%%, \t]%d", &r, s1, &g, s2, &b);
     if (strchr(s1, '%')) {
         return NSVG_RGB((r*255)/100,(g*255)/100,(b*255)/100);
     } else {

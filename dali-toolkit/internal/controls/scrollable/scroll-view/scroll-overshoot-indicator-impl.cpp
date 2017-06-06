@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -280,7 +280,7 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
 void ScrollOvershootEffectRipple::OnOvershootNotification(PropertyNotification& source)
 {
   Actor self = mAttachedScrollView.Self();
-  mOvershoot = self.GetProperty<float>(mOvershootProperty);
+  mOvershoot = self.GetCurrentProperty< float >( mOvershootProperty );
   SetOvershoot(mOvershoot, false);
   UpdatePropertyNotifications();
 }

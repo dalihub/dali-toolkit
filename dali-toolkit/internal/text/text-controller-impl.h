@@ -309,11 +309,15 @@ struct Controller::Impl
     mTextUpdateInfo(),
     mOperationsPending( NO_OPERATION ),
     mMaximumNumberOfCharacters( 50u ),
+    mHiddenInput( NULL ),
     mRecalculateNaturalSize( true ),
     mMarkupProcessorEnabled( false ),
     mClipboardHideEnabled( true ),
     mIsAutoScrollEnabled( false ),
-    mAutoScrollDirectionRTL( false )
+    mAutoScrollDirectionRTL( false ),
+    mUnderlineSetByString( false ),
+    mShadowSetByString( false ),
+    mFontStyleSetByString( false )
   {
     mModel = Model::New();
 
@@ -333,6 +337,8 @@ struct Controller::Impl
 
   ~Impl()
   {
+    delete mHiddenInput;
+
     delete mFontDefaults;
     delete mUnderlineDefaults;
     delete mShadowDefaults;
@@ -710,6 +716,7 @@ public:
   TextUpdateInfo mTextUpdateInfo;          ///< Info of the characters updated.
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.
+  HiddenText* mHiddenInput;                ///< Avoid allocating this when the user does not specify hidden input mode.
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
@@ -717,6 +724,9 @@ public:
   bool mIsAutoScrollEnabled:1;             ///< Whether auto text scrolling is enabled.
   CharacterDirection mAutoScrollDirectionRTL:1;  ///< Direction of auto scrolling, true if rtl
 
+  bool mUnderlineSetByString:1;            ///< Set when underline is set by string (legacy) instead of map
+  bool mShadowSetByString:1;               ///< Set when shadow is set by string (legacy) instead of map
+  bool mFontStyleSetByString:1;            ///< Set when font style is set by string (legacy) instead of map
 };
 
 } // namespace Text

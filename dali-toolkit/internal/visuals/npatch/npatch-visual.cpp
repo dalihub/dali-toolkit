@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,15 @@
 #include "npatch-visual.h"
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/images/texture-set-image.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -46,7 +47,8 @@ namespace Internal
 
 namespace
 {
-const char * const BORDER_ONLY("borderOnly");
+const char * const BORDER_ONLY( "borderOnly" );
+const char * const BORDER( "border" );
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
@@ -232,7 +234,7 @@ void RegisterStretchProperties( Renderer& renderer, const char * uniformName, co
 
 /////////////////NPatchVisual////////////////
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl, const Property::Map& properties )
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties )
 {
   NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
   nPatchVisual->mImageUrl = imageUrl;
@@ -241,7 +243,7 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::
   return nPatchVisual;
 }
 
-NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::string& imageUrl )
+NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl )
 {
   NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
   nPatchVisual->mImageUrl = imageUrl;
@@ -252,8 +254,8 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, const std::
 NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchImage image )
 {
   NPatchVisualPtr nPatchVisual( new NPatchVisual( factoryCache ) );
-  nPatchVisual->mImageUrl = image.GetUrl();
-
+  VisualUrl visualUrl( image.GetUrl() );
+  nPatchVisual->mImageUrl = visualUrl;
   return nPatchVisual;
 }
 
@@ -261,10 +263,11 @@ void NPatchVisual::GetNaturalSize( Vector2& naturalSize )
 {
   naturalSize.x = 0u;
   naturalSize.y = 0u;
+
   // load now if not already loaded
-  if( NPatchLoader::UNINITIALIZED_ID == mId )
+  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocal() )
   {
-    mId = mLoader.Load( mImageUrl );
+    mId = mLoader.Load( mImageUrl.GetUrl(), mBorder );
   }
   const NPatchLoader::Data* data;
   if( mLoader.GetNPatchData( mId, data ) )
@@ -283,14 +286,28 @@ void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
   {
     borderOnlyValue->Get( mBorderOnly );
   }
+
+  Property::Value* borderValue = propertyMap.Find( Toolkit::DevelImageVisual::Property::BORDER, BORDER );
+  if( borderValue && ! borderValue->Get( mBorder ) ) // If value exists and is rect, just set mBorder
+  {
+    // Not a rect so try vector4
+    Vector4 border;
+    if( borderValue->Get( border ) )
+    {
+      mBorder.left = static_cast< int >( border.x );
+      mBorder.right = static_cast< int >( border.y );
+      mBorder.bottom = static_cast< int >( border.z );
+      mBorder.top = static_cast< int >( border.w );
+    }
+  }
 }
 
 void NPatchVisual::DoSetOnStage( Actor& actor )
 {
   // load when first go on stage
-  if( NPatchLoader::UNINITIALIZED_ID == mId )
+  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocal() )
   {
-    mId = mLoader.Load( mImageUrl );
+    mId = mLoader.Load( mImageUrl.GetUrl(), mBorder );
   }
 
   Geometry geometry = CreateGeometry();
@@ -300,6 +317,9 @@ void NPatchVisual::DoSetOnStage( Actor& actor )
   ApplyTextureAndUniforms();
 
   actor.AddRenderer( mImpl->mRenderer );
+
+  // npatch loaded and ready to display
+  ResourceReady();
 }
 
 void NPatchVisual::DoSetOffStage( Actor& actor )
@@ -319,9 +339,10 @@ void NPatchVisual::OnSetTransform()
 void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
-  map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl );
+  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::N_PATCH );
+  map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
   map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );
+  map.Insert( Toolkit::DevelImageVisual::Property::BORDER, mBorder );
 }
 
 void NPatchVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -334,7 +355,8 @@ NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
   mLoader( factoryCache.GetNPatchLoader() ),
   mImageUrl(),
   mId( NPatchLoader::UNINITIALIZED_ID ),
-  mBorderOnly( false )
+  mBorderOnly( false ),
+  mBorder()
 {
 }
 
@@ -473,7 +495,7 @@ void NPatchVisual::ApplyTextureAndUniforms()
   }
   else
   {
-    DALI_LOG_ERROR("The N patch image '%s' is not a valid N patch image\n", mImageUrl.c_str() );
+    DALI_LOG_ERROR("The N patch image '%s' is not a valid N patch image\n", mImageUrl.GetUrl().c_str() );
     TextureSet textureSet = TextureSet::New();
     mImpl->mRenderer.SetTextures( textureSet );
     Image croppedImage = VisualFactoryCache::GetBrokenVisualImage();

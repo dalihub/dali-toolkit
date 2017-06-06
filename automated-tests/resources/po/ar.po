@@ -1,0 +1,3 @@
+#: Used to know if the language is using a right to left script
+msgid "IDS_LTR"
+msgstr "RTL"

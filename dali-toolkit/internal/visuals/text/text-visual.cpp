@@ -248,7 +248,7 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
   GetFontStyleProperty( mController, value, Text::FontStyle::DEFAULT );
   map.Insert( Toolkit::TextVisual::Property::FONT_STYLE, value );
 
-  map.Insert( Toolkit::TextVisual::Property::POINT_SIZE, mController->GetDefaultPointSize() );
+  map.Insert( Toolkit::TextVisual::Property::POINT_SIZE, mController->GetDefaultFontSize( Text::Controller::POINT_SIZE ) );
 
   map.Insert( Toolkit::TextVisual::Property::MULTI_LINE, mController->IsMultiLineEnabled() );
 
@@ -379,9 +379,9 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
     case Toolkit::TextVisual::Property::POINT_SIZE:
     {
       const float pointSize = propertyValue.Get<float>();
-      if( !Equals( mController->GetDefaultPointSize(), pointSize ) )
+      if( !Equals( mController->GetDefaultFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
       {
-        mController->SetDefaultPointSize( pointSize );
+        mController->SetDefaultFontSize( pointSize, Text::Controller::POINT_SIZE );
       }
       break;
     }
@@ -510,6 +510,9 @@ void TextVisual::UpdateRenderer( bool initializeRendererAndTexture )
       mImpl->mRenderer.SetTextures( textureSet );
 
       control.AddRenderer( mImpl->mRenderer );
+
+      // Text rendered and ready to display
+      ResourceReady();
     }
   }
 }

@@ -185,7 +185,6 @@ public:
    */
   void SetDepthIndex( int depthIndex );
 
-
   /**
    * @brief Performs actions as requested using the action name.
    * @SINCE_1_1.38
@@ -199,6 +198,11 @@ public:
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
 private: // From Control
+
+  /**
+   * @copydoc Toolkit::Control::OnInitialize()
+   */
+  virtual void OnInitialize();
 
   /**
    * @copydoc Toolkit::Control::OnStageConnect()
@@ -246,7 +250,7 @@ private:
   Dali::Toolkit::VideoView::VideoViewSignalType mFinishedSignal;
   std::string mUrl;
   int mCurrentVideoPlayPosition;
-  bool mSetRenderingTarget;
+  bool mIsNativeImageTarget;
   bool mIsPlay;
   bool mIsPause;
 };

@@ -35,15 +35,18 @@ namespace DevelVisual
  */
 enum Type
 {
-  BORDER    = Dali::Toolkit::Visual::BORDER,
-  COLOR     = Dali::Toolkit::Visual::COLOR,
-  GRADIENT  = Dali::Toolkit::Visual::GRADIENT,
-  IMAGE     = Dali::Toolkit::Visual::IMAGE,
-  MESH      = Dali::Toolkit::Visual::MESH,
-  PRIMITIVE = Dali::Toolkit::Visual::PRIMITIVE,
-  WIREFRAME = Dali::Toolkit::Visual::WIREFRAME,
+  BORDER         = Dali::Toolkit::Visual::BORDER,
+  COLOR          = Dali::Toolkit::Visual::COLOR,
+  GRADIENT       = Dali::Toolkit::Visual::GRADIENT,
+  IMAGE          = Dali::Toolkit::Visual::IMAGE,
+  MESH           = Dali::Toolkit::Visual::MESH,
+  PRIMITIVE      = Dali::Toolkit::Visual::PRIMITIVE,
+  WIREFRAME      = Dali::Toolkit::Visual::WIREFRAME,
 
-  TEXT      = WIREFRAME + 1, ///< Renders text.
+  TEXT           = WIREFRAME + 1, ///< Renders text.
+  N_PATCH        = WIREFRAME + 2, ///< Renders an n-patch image.
+  SVG            = WIREFRAME + 3, ///< Renders an SVG image.
+  ANIMATED_IMAGE = WIREFRAME + 4  ///< Renders a animated image.
 };
 
 namespace Property

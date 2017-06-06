@@ -36,11 +36,9 @@ public:
 
   void Trigger();
 
-  bool WaitingForTrigger(unsigned int count, unsigned int seconds );
+  bool WaitingForTrigger();
 
   CallbackBase* GetCallback();
-
-  static EventThreadCallback* Get();
 
 private:
 

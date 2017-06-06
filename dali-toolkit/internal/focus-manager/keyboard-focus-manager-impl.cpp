@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
-#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 
 namespace Dali
@@ -115,16 +114,17 @@ KeyboardFocusManager::KeyboardFocusManager()
   mFocusChangedSignal(),
   mFocusGroupChangedSignal(),
   mFocusedActorEnterKeySignal(),
-  mCurrentFocusActor( 0 ),
+  mCurrentFocusActor(),
   mFocusIndicatorActor(),
   mFocusGroupLoopEnabled( false ),
   mIsFocusIndicatorEnabled( false ),
   mIsWaitingKeyboardFocusChangeCommit( false ),
   mFocusHistory(),
-  mSlotDelegate( this )
+  mSlotDelegate( this ),
+  mCustomAlgorithmInterface(NULL)
 {
   // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorEnabled.
-  Toolkit::KeyInputFocusManager::Get().UnhandledKeyEventSignal().Connect(mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
+  Stage::GetCurrent().KeyEventSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
   Stage::GetCurrent().TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
 }
 
@@ -143,16 +143,27 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
 {
   bool success = false;
 
+  Actor currentFocusedActor = GetCurrentFocusActor();
+
+  // If developer set focus on same actor, doing nothing
+  if( actor == currentFocusedActor )
+  {
+    if( !actor )
+    {
+      return false;
+    }
+    return true;
+  }
+
   // Check whether the actor is in the stage and is keyboard focusable.
-  if( actor && actor.IsKeyboardFocusable() )
+  if( actor && actor.IsKeyboardFocusable() && actor.OnStage() )
   {
     if( mIsFocusIndicatorEnabled )
     {
       actor.Add( GetFocusIndicatorActor() );
     }
-    // Send notification for the change of focus actor
-    Actor currentFocusedActor = GetCurrentFocusActor();
 
+    // Send notification for the change of focus actor
     if( !mFocusChangedSignal.Empty() )
     {
       mFocusChangedSignal.Emit(currentFocusedActor, actor);
@@ -169,7 +180,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
     DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] Focus Changed\n", __FUNCTION__, __LINE__);
 
     // Save the current focused actor
-    mCurrentFocusActor = actor.GetId();
+    mCurrentFocusActor = actor;
 
     Toolkit::Control newlyFocusedControl = Toolkit::Control::DownCast(actor);
     if( newlyFocusedControl )
@@ -201,8 +212,15 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
 
 Actor KeyboardFocusManager::GetCurrentFocusActor()
 {
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
-  return rootActor.FindChildById(mCurrentFocusActor);
+  Actor actor = mCurrentFocusActor.GetHandle();
+  if( actor && ! actor.OnStage() )
+  {
+    // If the actor has been removed from the stage, then it should not be focused
+
+    actor.Reset();
+    mCurrentFocusActor.Reset();
+  }
+  return actor;
 }
 
 Actor KeyboardFocusManager::GetCurrentFocusGroup()
@@ -268,33 +286,106 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
   bool succeed = false;
 
   // Go through the actor's hierarchy until we find a layout control that knows how to move the focus
-  Toolkit::Control parentLayoutControl = GetParentLayoutControl(currentFocusActor);
-  while(parentLayoutControl && !succeed)
+  Toolkit::Control parentLayoutControl = GetParentLayoutControl( currentFocusActor );
+  while( parentLayoutControl && !succeed )
   {
-    succeed = DoMoveFocusWithinLayoutControl(parentLayoutControl, currentFocusActor, direction);
-    parentLayoutControl = GetParentLayoutControl(parentLayoutControl);
+    succeed = DoMoveFocusWithinLayoutControl( parentLayoutControl, currentFocusActor, direction );
+    parentLayoutControl = GetParentLayoutControl( parentLayoutControl );
   }
 
-  if(!succeed && !mPreFocusChangeSignal.Empty())
+  if( !succeed )
   {
-    // Don't know how to move the focus further. The application needs to tell us which actor to move the focus to
-    mIsWaitingKeyboardFocusChangeCommit = true;
-    Actor nextFocusableActor = mPreFocusChangeSignal.Emit(currentFocusActor, Actor(), direction);
-    mIsWaitingKeyboardFocusChangeCommit = false;
+    Actor nextFocusableActor;
 
-    if ( nextFocusableActor && nextFocusableActor.IsKeyboardFocusable() )
+    Toolkit::Control currentFocusControl = Toolkit::Control::DownCast(currentFocusActor);
+
+    // If the current focused actor is a control, then find the next focusable actor via the focusable properties.
+    if( currentFocusControl )
+    {
+      int actorId = -1;
+      Property::Index index = Property::INVALID_INDEX;
+      Property::Value value;
+
+      // Find property index based upon focus direction
+      switch ( direction )
+      {
+        case Toolkit::Control::KeyboardFocus::LEFT:
+        {
+          index = Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID;
+          break;
+        }
+        case Toolkit::Control::KeyboardFocus::RIGHT:
+        {
+          index = Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID;
+          break;
+        }
+        case Toolkit::Control::KeyboardFocus::UP:
+        {
+          index = Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID;
+          break;
+        }
+        case Toolkit::Control::KeyboardFocus::DOWN:
+        {
+          index = Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID;
+          break;
+        }
+        default:
+          break;
+      }
+
+      // If the focusable property is set then determine next focusable actor
+      if( index != Property::INVALID_INDEX)
+      {
+        value = currentFocusActor.GetProperty( index );
+        actorId = value.Get<int>();
+
+        // If actor's id is valid then find actor form actor's id. The actor should be on the stage.
+        if( actorId != -1 )
+        {
+          if( currentFocusActor.GetParent() )
+          {
+            nextFocusableActor = currentFocusActor.GetParent().FindChildById( actorId );
+          }
+
+          if( !nextFocusableActor )
+          {
+            nextFocusableActor = Stage::GetCurrent().GetRootLayer().FindChildById( actorId );
+          }
+        }
+      }
+    }
+
+    if( !nextFocusableActor )
+    {
+      // If the implementation of CustomAlgorithmInterface is provided then the PreFocusChangeSignal is no longer emitted.
+      if( mCustomAlgorithmInterface )
+      {
+        mIsWaitingKeyboardFocusChangeCommit = true;
+        nextFocusableActor = mCustomAlgorithmInterface->GetNextFocusableActor( currentFocusActor, Actor(), direction );
+        mIsWaitingKeyboardFocusChangeCommit = false;
+      }
+      else if( !mPreFocusChangeSignal.Empty() )
+      {
+        // Don't know how to move the focus further. The application needs to tell us which actor to move the focus to
+        mIsWaitingKeyboardFocusChangeCommit = true;
+        nextFocusableActor = mPreFocusChangeSignal.Emit( currentFocusActor, Actor(), direction );
+        mIsWaitingKeyboardFocusChangeCommit = false;
+      }
+    }
+
+    if( nextFocusableActor && nextFocusableActor.IsKeyboardFocusable() )
     {
       // Whether the next focusable actor is a layout control
-      if(IsLayoutControl(nextFocusableActor))
+      if( IsLayoutControl( nextFocusableActor ) )
       {
         // If so, move the focus inside it.
-        Toolkit::Control layoutControl = Toolkit::Control::DownCast(nextFocusableActor);
-        succeed = DoMoveFocusWithinLayoutControl(layoutControl, currentFocusActor, direction);
+        Toolkit::Control layoutControl = Toolkit::Control::DownCast( nextFocusableActor) ;
+        succeed = DoMoveFocusWithinLayoutControl( layoutControl, currentFocusActor, direction );
       }
       else
       {
         // Otherwise, just set focus to the next focusable actor
-        succeed = SetCurrentFocusActor(nextFocusableActor);
+        succeed = SetCurrentFocusActor( nextFocusableActor );
       }
     }
   }
@@ -431,7 +522,7 @@ void KeyboardFocusManager::ClearFocus()
     }
   }
 
-  mCurrentFocusActor = 0;
+  mCurrentFocusActor.Reset();
   mIsFocusIndicatorEnabled = false;
 }
 
@@ -796,6 +887,11 @@ bool KeyboardFocusManager::DoConnectSignal( BaseObject* object, ConnectionTracke
   }
 
   return connected;
+}
+
+void KeyboardFocusManager::SetCustomAlgorithm(CustomAlgorithmInterface& interface)
+{
+  mCustomAlgorithmInterface = &interface;
 }
 
 } // namespace Internal

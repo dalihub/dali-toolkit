@@ -407,7 +407,7 @@ ItemLayoutPtr ItemView::GetActiveLayout() const
 
 float ItemView::GetCurrentLayoutPosition(unsigned int itemId) const
 {
-  return Self().GetProperty<float>( Toolkit::ItemView::Property::LAYOUT_POSITION ) + static_cast<float>( itemId );
+  return Self().GetCurrentProperty< float >( Toolkit::ItemView::Property::LAYOUT_POSITION ) + static_cast<float>( itemId );
 }
 
 void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSize, float durationSeconds)
@@ -1233,7 +1233,7 @@ void ItemView::OnPan( const PanGesture& gesture )
 
       float firstItemScrollPosition = ClampFirstItemPosition(layoutPositionDelta, layoutSize, *mActiveLayout);
 
-      float currentOvershoot = self.GetProperty<float>(Toolkit::ItemView::Property::OVERSHOOT);
+      float currentOvershoot = self.GetCurrentProperty< float >( Toolkit::ItemView::Property::OVERSHOOT );
 
       self.SetProperty(Toolkit::ItemView::Property::LAYOUT_POSITION, firstItemScrollPosition );
 
@@ -1645,7 +1645,7 @@ void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
 
   if(mOvershootAnimationSpeed > Math::MACHINE_EPSILON_0)
   {
-    float currentOvershoot = self.GetProperty<float>(Toolkit::ItemView::Property::OVERSHOOT);
+    float currentOvershoot = self.GetCurrentProperty< float >( Toolkit::ItemView::Property::OVERSHOOT );
     float duration = 0.0f;
 
     if (mOvershootOverlay)

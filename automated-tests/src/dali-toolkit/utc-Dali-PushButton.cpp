@@ -30,6 +30,8 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
+#include <dali/devel-api/adaptor-framework/image-loading.h>
+
 using namespace Dali;
 using namespace Toolkit;
 
@@ -741,8 +743,11 @@ int UtcDaliPushButtonPaddingLayout(void)
   PushButton pushButton = PushButton::New();
 
   const Vector4 TEST_ICON_PADDING( 20.0f, 20.0f, 20.0f, 20.0f );
-  const Vector4 TEST_LABEL_PADDING( 10.0f, 10.0f, 10.0f ,10.0f );
-  const Vector2 TEST_IMAGE_SIZE = Vector2( 5.0f, 5.0f);
+  const Vector4 TEST_LABEL_PADDING( 10.0f, 10.0f, 10.0f, 10.0f );
+
+  // Get actual size of test image
+  ImageDimensions testImageSize = Dali::GetClosestImageSize( TEST_IMAGE_ONE );
+  const Vector2 TEST_IMAGE_SIZE( testImageSize.GetWidth(), testImageSize.GetHeight() );
 
   pushButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   pushButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
@@ -800,8 +805,6 @@ int UtcDaliPushButtonPaddingLayout(void)
 
   Stage::GetCurrent().Add( pushButton );
 
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetClosestImageSize( TEST_IMAGE_SIZE );
 
   pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "RIGHT" );
   pushButton.SetProperty( Toolkit::PushButton::Property::UNSELECTED_ICON, TEST_IMAGE_ONE );
@@ -824,7 +827,7 @@ int UtcDaliPushButtonPaddingLayout(void)
   size.width = pushButton.GetRelayoutSize( Dimension::WIDTH );
   size.height = pushButton.GetRelayoutSize( Dimension::HEIGHT );
   tet_printf( "Button RelayoutSize after icon padding(%f,%f)\n", size.width, size.height );
-  const Vector2 expectedIconAndPaddingSize( TEST_ICON_PADDING.x+TEST_ICON_PADDING.y+TEST_IMAGE_SIZE.width, TEST_ICON_PADDING.w+TEST_ICON_PADDING.z +TEST_IMAGE_SIZE.height );
+  const Vector2 expectedIconAndPaddingSize( TEST_ICON_PADDING.x+TEST_ICON_PADDING.y+TEST_IMAGE_SIZE.width, TEST_ICON_PADDING.w + TEST_ICON_PADDING.z + TEST_IMAGE_SIZE.height );
   DALI_TEST_EQUALS( size, expectedIconAndPaddingSize, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Now test padding for both label and icon simultaneously.
@@ -847,7 +850,8 @@ int UtcDaliPushButtonPaddingLayout(void)
   tet_printf( "Button RelayoutSize after icon and label padding(%f,%f)\n", size.width, size.height );
 
   DALI_TEST_EQUALS( size.width, sizeLabelAndPadding.width + expectedIconAndPaddingSize.width, TEST_LOCATION );
-  DALI_TEST_GREATER( size.height, expectedIconAndPaddingSize.width, TEST_LOCATION ); // Test height of control is greater than icon and padding. As Text set to larger values.
+  // Test height of control is same as icon and padding, as Text is smaller than icon
+  DALI_TEST_EQUALS( size.height, expectedIconAndPaddingSize.height, TEST_LOCATION );
 
   END_TEST;
 }
@@ -885,7 +889,10 @@ int UtcDaliPushButtonAlignmentLayout(void)
 
   const Vector4 TEST_ICON_PADDING( 70.0f, 70.0f, 70.0f, 70.0f );
   const Vector4 TEST_LABEL_PADDING( 30.0f, 30.0f, 30.0f, 30.0f );
-  const Vector2 TEST_IMAGE_SIZE = Vector2( 10.0f, 10.0f);
+
+  // Get actual size of test image
+  ImageDimensions testImageSize = Dali::GetClosestImageSize( TEST_IMAGE_ONE );
+  const Vector2 TEST_IMAGE_SIZE( testImageSize.GetWidth(), testImageSize.GetHeight() );
 
   PushButton pushButton = PushButton::New();
 
@@ -924,9 +931,6 @@ int UtcDaliPushButtonAlignmentLayout(void)
 
   const Vector2 testImageWithPaddingSize = Vector2 ( ( TEST_IMAGE_SIZE.width + TEST_ICON_PADDING.x + TEST_ICON_PADDING.y ),
                                                      ( TEST_IMAGE_SIZE.height + TEST_ICON_PADDING.w + TEST_ICON_PADDING.z ) );
-
-  TestPlatformAbstraction& platform = application.GetPlatform();
-  platform.SetClosestImageSize( TEST_IMAGE_SIZE );
 
   // Add Icon and set its alignment
   pushButton.SetProperty( Toolkit::PushButton::Property::ICON_ALIGNMENT, "RIGHT" );
@@ -1516,6 +1520,299 @@ int UtcDaliPushButtonSetLabelText(void)
   pushButton.SetLabelText( STR );
 
   DALI_TEST_EQUALS( pushButton.GetLabelText(), STR, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetButtonImageDeprecatedP(void)
+{
+  ToolkitTestApplication application;
+  Image setButtonImage = ResourceImage::New( TEST_IMAGE_ONE);
+  PushButton pushButton = PushButton::New();
+  pushButton.SetButtonImage( setButtonImage );
+  Image retreivedButtonImage = ImageView::DownCast(pushButton.GetButtonImage()).GetImage();
+  DALI_TEST_EQUALS( retreivedButtonImage, setButtonImage ,  TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedImageDeprecatedP(void)
+{
+  ToolkitTestApplication application;
+  Image setButtonImage = ResourceImage::New( TEST_IMAGE_ONE);
+  PushButton pushButton = PushButton::New();
+  pushButton.SetSelectedImage( setButtonImage );
+  Image retreivedButtonImage = ImageView::DownCast(pushButton.GetSelectedImage()).GetImage();
+  DALI_TEST_EQUALS( retreivedButtonImage, setButtonImage ,  TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonGetButtonImageURLDeprecatedP(void)
+{
+  tet_infoline(" UtcDaliPushButtonGetButtonImageURLDeprecatedP Testing mix use of API");
+
+  ToolkitTestApplication application;
+
+  PushButton pushButton = PushButton::New();
+  pushButton.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, TEST_IMAGE_ONE );
+
+  ImageView retreivedButtonImageView = ImageView::DownCast(pushButton.GetButtonImage());
+  Image retreivedButtonImage = retreivedButtonImageView.GetImage();
+  ResourceImage resourceImage = ResourceImage::DownCast( retreivedButtonImage );
+
+  DALI_TEST_EQUALS( resourceImage.GetUrl(), TEST_IMAGE_ONE ,  TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonGetSelectedImageURLDeprecatedP(void)
+{
+  tet_infoline(" UtcDaliPushButtonGetSelectedImageURLDeprecatedP Testing mix use of API");
+
+  ToolkitTestApplication application;
+
+  PushButton pushButton = PushButton::New();
+
+  pushButton.SetProperty( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, TEST_IMAGE_ONE );
+
+  Image retreivedButtonImage = ImageView::DownCast(pushButton.GetSelectedImage()).GetImage();
+  ResourceImage resourceImage = ResourceImage::DownCast( retreivedButtonImage );
+  DALI_TEST_EQUALS( resourceImage.GetUrl(), TEST_IMAGE_ONE ,  TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetSelectedImageWithActorDeprecatedP(void)
+{
+  tet_infoline(" UtcDaliPushButton SetSelectedImage With ImageView (Actor)");
+
+  ToolkitTestApplication application;
+
+  Image image = ResourceImage::New( TEST_IMAGE_ONE );
+
+  DALI_TEST_CHECK( image );
+
+  ImageView imgViewSet = ImageView::New(image);
+
+  DALI_TEST_CHECK(imgViewSet );
+
+  PushButton pushButton = PushButton::New();
+
+  DALI_TEST_CHECK( pushButton );
+
+  pushButton.SetSelectedImage( imgViewSet );
+
+  ImageView imageView = ImageView::DownCast( pushButton.GetSelectedImage());
+
+  DALI_TEST_CHECK( imageView );
+
+  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  Property::Map map;
+  value.Get( map );
+  DALI_TEST_CHECK( !map.Empty() );
+  DALI_TEST_EQUALS( map[ "filename" ].Get<std::string>(), TEST_IMAGE_ONE , TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetButtonImageWithActorDeprecatedP(void)
+{
+  tet_infoline(" UtcDaliPushButton SetButtonImage With ImageView (Actor)");
+
+  ToolkitTestApplication application;
+
+  Image image = ResourceImage::New( TEST_IMAGE_ONE );
+
+  DALI_TEST_CHECK( image );
+
+  ImageView imgViewSet = ImageView::New(image);
+
+  DALI_TEST_CHECK(imgViewSet );
+
+  PushButton pushButton = PushButton::New();
+
+  DALI_TEST_CHECK( pushButton );
+
+  pushButton.SetButtonImage( imgViewSet );
+
+  ImageView imageView = ImageView::DownCast( pushButton.GetButtonImage());
+
+  DALI_TEST_CHECK( imageView );
+
+  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  Property::Map map;
+  value.Get( map );
+  DALI_TEST_CHECK( !map.Empty() );
+  DALI_TEST_EQUALS( map[ "filename" ].Get<std::string>(), TEST_IMAGE_ONE , TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetBackgroundImageWithActorDeprecatedP(void)
+{
+  tet_infoline(" UtcDaliPushButton SetBackgroundImage With ImageView (Actor)");
+
+  ToolkitTestApplication application;
+
+  Image image = ResourceImage::New( TEST_IMAGE_ONE );
+
+  DALI_TEST_CHECK( image );
+
+  ImageView imgViewSet = ImageView::New(image);
+
+  DALI_TEST_CHECK(imgViewSet );
+
+  PushButton pushButton = PushButton::New();
+
+  DALI_TEST_CHECK( pushButton );
+
+  pushButton.SetBackgroundImage( imgViewSet );
+
+  ImageView imageView = ImageView::DownCast( pushButton.GetButtonImage());
+
+  DALI_TEST_CHECK( imageView );
+
+  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  Property::Map map;
+  value.Get( map );
+  DALI_TEST_CHECK( !map.Empty() );
+  DALI_TEST_EQUALS( map[ "filename" ].Get<std::string>(), TEST_IMAGE_ONE , TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliPushButtonSetSelectedBackgroundImageWithActorDeprecatedP(void)
+{
+  tet_infoline(" UtcDaliPushButton SetSelectedBackgroundImage With ImageView (Actor)");
+
+  ToolkitTestApplication application;
+
+  Image image = ResourceImage::New( TEST_IMAGE_ONE );
+
+  DALI_TEST_CHECK( image );
+
+  ImageView imgViewSet = ImageView::New(image);
+
+  DALI_TEST_CHECK(imgViewSet );
+
+  PushButton pushButton = PushButton::New();
+
+  DALI_TEST_CHECK( pushButton );
+
+  pushButton.SetSelectedBackgroundImage( imgViewSet );
+
+  ImageView imageView = ImageView::DownCast( pushButton.GetSelectedImage());
+
+  DALI_TEST_CHECK( imageView );
+
+  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  Property::Map map;
+  value.Get( map );
+  DALI_TEST_CHECK( !map.Empty() );
+  DALI_TEST_EQUALS( map[ "filename" ].Get<std::string>(), TEST_IMAGE_ONE , TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledBackgroundImageWithActorDeprecatedP(void)
+{
+  tet_infoline(" UtcDaliPushButton SetDisabledBackgroundImage With ImageView (Actor)");
+
+  ToolkitTestApplication application;
+
+  Image image = ResourceImage::New( TEST_IMAGE_ONE );
+
+  DALI_TEST_CHECK( image );
+
+  ImageView imgViewSet = ImageView::New(image);
+
+  DALI_TEST_CHECK(imgViewSet );
+
+  PushButton pushButton = PushButton::New();
+
+  DALI_TEST_CHECK( pushButton );
+
+  pushButton.SetDisabledBackgroundImage( imgViewSet );
+
+  Property::Value value = pushButton.GetProperty( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL );
+  Property::Map map;
+  value.Get( map );
+
+  Property::Value* urlValue = map.Find( ImageVisual::Property::URL );
+
+  std::string urlString;
+  urlValue->Get( urlString );
+  DALI_TEST_EQUALS( urlString , TEST_IMAGE_ONE , TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledImageWithActorDeprecatedP(void)
+{
+  tet_infoline(" UtcDaliPushButton SetDisabledImage With ImageView (Actor)");
+
+  ToolkitTestApplication application;
+
+  Image image = ResourceImage::New( TEST_IMAGE_ONE );
+
+  DALI_TEST_CHECK( image );
+
+  ImageView imgViewSet = ImageView::New(image);
+
+  DALI_TEST_CHECK(imgViewSet );
+
+  PushButton pushButton = PushButton::New();
+
+  DALI_TEST_CHECK( pushButton );
+
+  pushButton.SetDisabledImage( imgViewSet );
+
+  Property::Value value = pushButton.GetProperty( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL );
+
+  Property::Map map;
+  value.Get( map );
+
+  Property::Value* urlValue = map.Find( ImageVisual::Property::URL );
+
+  std::string urlString;
+  urlValue->Get( urlString );
+  DALI_TEST_EQUALS( urlString , TEST_IMAGE_ONE , TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonSetDisabledSelectedImageWithActorDeprecatedP(void)
+{
+  tet_infoline(" UtcDaliPushButton SetDisabledSelectedImage With ImageView (Actor)");
+
+  ToolkitTestApplication application;
+
+  Image image = ResourceImage::New( TEST_IMAGE_ONE );
+
+  DALI_TEST_CHECK( image );
+
+  ImageView imgViewSet = ImageView::New(image);
+
+  DALI_TEST_CHECK(imgViewSet );
+
+  PushButton pushButton = PushButton::New();
+
+  DALI_TEST_CHECK( pushButton );
+
+  pushButton.SetDisabledSelectedImage( imgViewSet );
+
+  Property::Value value = pushButton.GetProperty( Toolkit::DevelButton::Property::DISABLED_SELECTED_BACKGROUND_VISUAL );
+
+  Property::Map map;
+  value.Get( map );
+
+  Property::Value* urlValue = map.Find( ImageVisual::Property::URL );
+
+  std::string urlString;
+  urlValue->Get( urlString );
+  DALI_TEST_EQUALS( urlString , TEST_IMAGE_ONE , TEST_LOCATION );
 
   END_TEST;
 }

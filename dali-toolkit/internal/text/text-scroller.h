@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_SCROLLER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@
 #include <dali/public-api/render-tasks/render-task.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/internal/text/layouts/layout-alignment.h>
 
 namespace Dali
 {
@@ -65,7 +67,7 @@ public:
    * @param[in] alignmentOffset alignment of source text
    *
    */
-  void SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset );
+  void SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset, Layout::HorizontalAlignment horizontalAlignment );
 
   /**
    * @brief Set the gap distance to elapse before the text wraps around
@@ -102,6 +104,35 @@ public:
    * @return int number of loops
    */
   int GetLoopCount() const;
+
+  /**
+   * @brief Set the delay time of scroll animation loop
+   * @param[in] float delay time seconds of loops
+   */
+  void SetLoopDelay( float delay );
+
+  /**
+   * @brief Get the delay time of scroll
+   * @return float delay time seconds of loops
+   */
+  float GetLoopDelay() const;
+
+  /**
+   * @brief Set the mode of scrolling stop
+   * @param[in] stopMode type when text scrolling is stoped.
+   */
+  void SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMode );
+
+  /**
+   * @brief Stop the auto scrolling.
+   */
+  void StopScrolling();
+
+  /**
+   * @brief Get the mode of scrolling stop
+   * @return stopMode type when text scrolling is stoped.
+   */
+  DevelTextLabel::AutoScrollStopMode::Type GetStopMode() const;
 
   /**
    * @brief Get the camera used to look at source, should be added to the parent of target actor.
@@ -161,9 +192,11 @@ private:
   Property::Index    mScrollDeltaIndex;         // Property used by shader to represent distance to scroll
   Animation          mScrollAnimation;          // Animation used to update the mScrollDeltaIndex
 
-  int   mScrollSpeed;            ///< Speed which text should automatically scroll at
-  int   mLoopCount;              ///< Number of time the text should scroll
-  float mWrapGap;                ///< Gap before text wraps around when scrolling
+  int   mScrollSpeed;                                   ///< Speed which text should automatically scroll at
+  int   mLoopCount;                                     ///< Number of time the text should scroll
+  float mLoopDelay;                                     ///< Time delay of loop start
+  float mWrapGap;                                       ///< Gap before text wraps around when scrolling
+  DevelTextLabel::AutoScrollStopMode::Type  mStopMode;  ///< Stop mode of scrolling text, when loop count is 0.
 
 }; // TextScroller class
 
