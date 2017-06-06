@@ -133,7 +133,17 @@ public:
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
    */
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, float depthIndex );
+
+  /**
+   * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
+   */
   void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
+
+  /**
+   * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
+   */
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, float depthIndex );
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::UnregisterVisual()
@@ -248,6 +258,44 @@ public:
    * @return True if the resource is read.
    */
   bool IsResourceReady() const;
+
+private:
+
+  /**
+   * Used as an alternative to boolean so that it is obvious whether a visual is enabled/disabled.
+   */
+  struct VisualState
+  {
+    enum Type
+    {
+      DISABLED = 0, ///< Visual disabled.
+      ENABLED = 1   ///< Visual enabled.
+    };
+  };
+
+  /**
+   * Used as an alternative to boolean so that it is obvious whether a visual's depth value has been set or not by the caller.
+   */
+  struct DepthIndexValue
+  {
+    enum Type
+    {
+      NOT_SET = 0, ///< Visual depth value not set by caller.
+      SET = 1      ///< Visual depth value set by caller.
+    };
+  };
+
+  /**
+   * @brief Adds the visual to the list of registered visuals.
+   * @param[in] index The Property index of the visual, used to reference visual
+   * @param[in] visual The visual to register
+   * @param[in] enabled false if derived class wants to control when visual is set on stage
+   * @param[in] depthIndexValueSet Set to true if the depthIndex has actually been set manually
+   * @param[in] depthIndex The visual's depth-index is set to this
+   */
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, float depthIndex = 0.0f );
+
+public:
 
   Control& mControlImpl;
   DevelControl::State mState;

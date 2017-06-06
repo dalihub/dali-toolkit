@@ -23,6 +23,7 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
@@ -2077,6 +2078,100 @@ int UtcDaliVisualPremultipliedAlpha(void)
     DALI_TEST_CHECK( value );
     DALI_TEST_EQUALS( value->Get<bool>(), true, TEST_LOCATION );
   }
+
+  END_TEST;
+}
+
+int UtcDaliRegisterVisualOrder(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Register Visual Order" );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
+
+  tet_infoline( "Register visual, should have depth index of 0.0f" );
+  Visual::Base testVisual = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, testVisual );
+  DALI_TEST_EQUALS( testVisual.GetDepthIndex(), 0.0f, TEST_LOCATION );
+
+  tet_infoline( "Register more visuals, each added one should have a depth index greater than previous" );
+
+  Visual::Base testVisual2 = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, testVisual2 );
+  DALI_TEST_CHECK( testVisual2.GetDepthIndex() > testVisual.GetDepthIndex() );
+
+  Visual::Base foregroundVisual = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::FOREGROUND_VISUAL, foregroundVisual );
+  DALI_TEST_CHECK( foregroundVisual.GetDepthIndex() > testVisual2.GetDepthIndex() );
+
+  Visual::Base focusVisual = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::FOCUS_VISUAL, focusVisual );
+  DALI_TEST_CHECK( focusVisual.GetDepthIndex() > foregroundVisual.GetDepthIndex() );
+
+  tet_infoline( "Set depth index on a new visual before registering, the depth index should not have been changed" );
+  Visual::Base labelVisual = factory.CreateVisual( propertyMap );
+  labelVisual.SetDepthIndex( -2000.0f );
+  dummyImpl.RegisterVisual( DummyControl::Property::LABEL_VISUAL, labelVisual );
+  DALI_TEST_EQUALS( labelVisual.GetDepthIndex(), -2000.0f, TEST_LOCATION );
+
+  tet_infoline( "Replace visual, the depth index should be the same as what was previously set" );
+  const float testVisual2DepthIndex = testVisual2.GetDepthIndex();
+  Visual::Base testVisual2Replacement = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( testVisual2Replacement.GetDepthIndex() != testVisual2DepthIndex );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, testVisual2Replacement );
+  DALI_TEST_EQUALS( testVisual2Replacement.GetDepthIndex(), testVisual2DepthIndex, TEST_LOCATION );
+
+  tet_infoline( "Replace visual and set a depth index on the replacement, the depth index of the replacement should be honoured" );
+  Visual::Base anotherTestVisual2Replacement = factory.CreateVisual( propertyMap );
+  anotherTestVisual2Replacement.SetDepthIndex( 2000.0f );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, anotherTestVisual2Replacement );
+  DALI_TEST_EQUALS( anotherTestVisual2Replacement.GetDepthIndex(), 2000.0f, TEST_LOCATION );
+
+  dummyControl.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( dummyControl );
+
+  END_TEST;
+}
+
+int UtcDaliRegisterVisualWithDepthIndex(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Register a Visual With Depth Index" );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
+
+  tet_infoline( "Register a visual with a depth index, it should be enabled by default too" );
+  Visual::Base testVisual = factory.CreateVisual( propertyMap );
+  DevelControl::RegisterVisual( dummyImpl, DummyControl::Property::TEST_VISUAL, testVisual, 203.0f );
+  DALI_TEST_EQUALS( testVisual.GetDepthIndex(), 203.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::IsVisualEnabled( dummyImpl, DummyControl::Property::TEST_VISUAL ), true, TEST_LOCATION );
+
+  tet_infoline( "Register another visual with a depth index and it disabled" );
+  Visual::Base testVisual2 = factory.CreateVisual( propertyMap );
+  DevelControl::RegisterVisual( dummyImpl, DummyControl::Property::TEST_VISUAL2, testVisual2, false, 450.0f );
+  DALI_TEST_EQUALS( testVisual2.GetDepthIndex(), 450.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::IsVisualEnabled( dummyImpl, DummyControl::Property::TEST_VISUAL2 ), false, TEST_LOCATION );
+
+  tet_infoline( "Register another visual with a depth index and it enabled using the enabled API" );
+  Visual::Base testVisual3 = factory.CreateVisual( propertyMap );
+  DevelControl::RegisterVisual( dummyImpl, DummyControl::Property::TEST_VISUAL2, testVisual3, true, 300.0f );
+  DALI_TEST_EQUALS( testVisual3.GetDepthIndex(), 300.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::IsVisualEnabled( dummyImpl, DummyControl::Property::TEST_VISUAL2 ), true, TEST_LOCATION );
+
+  dummyControl.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( dummyControl );
 
   END_TEST;
 }
