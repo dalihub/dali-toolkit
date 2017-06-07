@@ -136,6 +136,7 @@ enum Type
    * @brief The origin of the visual within its control area.
    * @details Name "origin", type Align::Type (Property::INTEGER) or Property::STRING.
    * @see Toolkit::Align
+   * @note The default is Align::TOP_BEGIN.
    */
   ORIGIN,
 
@@ -143,6 +144,7 @@ enum Type
    * @brief The anchor-point of the visual
    * @details Name "anchorPoint", type Align::Type (Property::INTEGER) or Property::STRING.
    * @see Toolkit::Align
+   * @note The default is Align::TOP_BEGIN.
    */
   ANCHOR_POINT,
 

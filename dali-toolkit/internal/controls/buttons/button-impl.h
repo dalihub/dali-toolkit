@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUTTON_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -588,7 +588,7 @@ protected:
    * @param[in] value the value to set on the component
    * @param[in] visualDepth the depth of the visual if overlapping another
    */
-  void CreateVisualsForComponent( Property::Index index ,const Property::Value& value, const float visualDepth );
+  void CreateVisualsForComponent( Property::Index index, const Property::Value& value, const int visualDepth );
 
   /**
    * @brief Get the Property map for the given Visual

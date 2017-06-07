@@ -221,7 +221,7 @@ void Visual::Base::GetNaturalSize( Vector2& naturalSize )
   naturalSize = Vector2::ZERO;
 }
 
-void Visual::Base::SetDepthIndex( float index )
+void Visual::Base::SetDepthIndex( int index )
 {
   mImpl->mDepthIndex = index;
   if( mImpl->mRenderer )
@@ -230,7 +230,7 @@ void Visual::Base::SetDepthIndex( float index )
   }
 }
 
-float Visual::Base::GetDepthIndex() const
+int Visual::Base::GetDepthIndex() const
 {
   return mImpl->mDepthIndex;
 }

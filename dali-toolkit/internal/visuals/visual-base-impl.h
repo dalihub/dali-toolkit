@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,12 +109,12 @@ public:
   /**
    * @copydoc Toolkit::Visual::Base::SetDepthIndex
    */
-  void SetDepthIndex( float index );
+  void SetDepthIndex( int index );
 
   /**
    * @copydoc Toolkit::Visual::Base::GetDepthIndex
    */
-  float GetDepthIndex() const;
+  int GetDepthIndex() const;
 
   /**
    * @copydoc Toolkit::Visual::Base::SetOnStage

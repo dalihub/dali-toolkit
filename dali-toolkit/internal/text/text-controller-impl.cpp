@@ -70,6 +70,7 @@ namespace Text
 EventData::EventData( DecoratorPtr decorator )
 : mDecorator( decorator ),
   mImfManager(),
+  mPlaceholderText(),
   mPlaceholderTextActive(),
   mPlaceholderTextInactive(),
   mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),

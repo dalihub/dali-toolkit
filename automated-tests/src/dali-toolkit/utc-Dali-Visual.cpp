@@ -23,6 +23,7 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
@@ -53,8 +54,8 @@ Property::Map DefaultTransform()
   transformMap
     .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
     .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN )
     .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::DevelVisual::Transform::Policy::RELATIVE, Toolkit::DevelVisual::Transform::Policy::RELATIVE ) )
     .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::DevelVisual::Transform::Policy::RELATIVE, Toolkit::DevelVisual::Transform::Policy::RELATIVE ) );
   return transformMap;
@@ -202,7 +203,7 @@ int UtcDaliVisualSetGetDepthIndex(void)
   propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
   Visual::Base visual = factory.CreateVisual( propertyMap );
 
-  visual.SetDepthIndex( 1.f );
+  visual.SetDepthIndex( 1 );
 
   DummyControl dummyControl = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
@@ -214,12 +215,12 @@ int UtcDaliVisualSetGetDepthIndex(void)
 
   int depthIndex = dummyControl.GetRendererAt(0u).GetProperty<int>( Renderer::Property::DEPTH_INDEX );
   DALI_TEST_EQUALS( depthIndex, 1, TEST_LOCATION );
-  DALI_TEST_EQUALS( visual.GetDepthIndex(), 1.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( visual.GetDepthIndex(), 1, TEST_LOCATION );
 
-  visual.SetDepthIndex( -1.f );
+  visual.SetDepthIndex( -1 );
   depthIndex = dummyControl.GetRendererAt(0u).GetProperty<int>( Renderer::Property::DEPTH_INDEX );
   DALI_TEST_EQUALS( depthIndex, -1, TEST_LOCATION );
-  DALI_TEST_EQUALS( visual.GetDepthIndex(), -1.f, TEST_LOCATION );
+  DALI_TEST_EQUALS( visual.GetDepthIndex(), -1, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1437,12 +1438,12 @@ int UtcDaliVisualGetTransform(void)
   {
     Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ORIGIN );
     DALI_TEST_CHECK( typeValue );
-    DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::CENTER );
+    DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::TOP_BEGIN );
   }
   {
     Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT );
     DALI_TEST_CHECK( typeValue );
-    DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::CENTER );
+    DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::TOP_BEGIN );
   }
 
   END_TEST;
@@ -1454,7 +1455,7 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   transform.Insert( DevelVisual::Transform::Property::OFFSET, Vector2(10.0f, 10.0f) );
   transform.Insert( DevelVisual::Transform::Property::SIZE, Vector2(0.2f, 0.2f) );
   transform.Insert( DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::DevelVisual::Transform::Policy::ABSOLUTE, Toolkit::DevelVisual::Transform::Policy::ABSOLUTE ) );
-  transform.Insert( DevelVisual::Transform::Property::ORIGIN, "TOP_BEGIN" );
+  transform.Insert( DevelVisual::Transform::Property::ORIGIN, "CENTER" );
   transform.Insert( DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::BOTTOM_END );
 
   visual.SetTransformAndSize( transform, Vector2(100, 100) );
@@ -1488,7 +1489,7 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   {
     Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ORIGIN );
     DALI_TEST_CHECK( typeValue );
-    DALI_TEST_EQUALS( (Toolkit::Align::Type)typeValue->Get<int>(), Toolkit::Align::TOP_BEGIN, TEST_LOCATION );
+    DALI_TEST_EQUALS( (Toolkit::Align::Type)typeValue->Get<int>(), Toolkit::Align::CENTER, TEST_LOCATION );
   }
   {
     Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT );
@@ -1529,7 +1530,7 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   index = renderer.GetPropertyIndex( "origin" );
   DALI_TEST_CHECK( index != Property::INVALID_INDEX );
   Vector2 parentOrigin = renderer.GetProperty<Vector2>( index );
-  DALI_TEST_EQUALS( parentOrigin, Vector2(-0.5f,-0.5f), TEST_LOCATION );
+  DALI_TEST_EQUALS( parentOrigin, Vector2(0.0f,0.0f), TEST_LOCATION );
 
   index = renderer.GetPropertyIndex( "anchorPoint" );
   DALI_TEST_CHECK( index != Property::INVALID_INDEX );
@@ -1556,12 +1557,12 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   offsetSizeMode = renderer.GetProperty<Vector4>( renderer.GetPropertyIndex( "offsetSizeMode" ) );
   DALI_TEST_EQUALS( offsetSizeMode, Vector4(0.0f,0.0f,1.0f,1.0f), TEST_LOCATION );
 
-  //Parent origin and anchor point should have default values
+  //Parent origin and anchor point should have the default values
   parentOrigin = renderer.GetProperty<Vector2>( renderer.GetPropertyIndex( "origin" ) );
-  DALI_TEST_EQUALS( parentOrigin, Vector2(0.0f,0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( parentOrigin, Vector2(-0.5f,-0.5f), TEST_LOCATION );
 
   anchorPoint = renderer.GetProperty<Vector2>( renderer.GetPropertyIndex( "anchorPoint" ) );
-  DALI_TEST_EQUALS( anchorPoint, Vector2(0.0f,0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( anchorPoint, Vector2(0.5f,0.5f), TEST_LOCATION );
 }
 
 int UtcDaliVisualSetTransform0(void)
@@ -1864,7 +1865,7 @@ int UtcDaliVisualRendererRemovalAndReAddition(void)
   propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
   Visual::Base visual = factory.CreateVisual( propertyMap );
 
-  visual.SetDepthIndex( 1.f );
+  visual.SetDepthIndex( 1 );
 
   DummyControl dummyControl = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
@@ -1926,7 +1927,7 @@ int UtcDaliVisualTextVisualRender(void)
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
-  textVisual.SetDepthIndex( 1.f );
+  textVisual.SetDepthIndex( 1 );
 
   DummyControl dummyControl = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
@@ -1953,7 +1954,7 @@ int UtcDaliVisualTextVisualRender(void)
   propertyMap.Insert( DevelVisual::Property::TRANSFORM, transformMap );
 
   textVisual = factory.CreateVisual( propertyMap );
-  textVisual.SetDepthIndex( 1.f );
+  textVisual.SetDepthIndex( 1 );
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, textVisual );
   dummyControl.SetSize( 720.f, 640.f );
@@ -1995,7 +1996,7 @@ int UtcDaliVisualTextVisualDisableEnable(void)
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
-  textVisual.SetDepthIndex( 1.f );
+  textVisual.SetDepthIndex( 1 );
 
   DummyControl dummyControl = DummyControl::New(true);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
@@ -2077,6 +2078,100 @@ int UtcDaliVisualPremultipliedAlpha(void)
     DALI_TEST_CHECK( value );
     DALI_TEST_EQUALS( value->Get<bool>(), true, TEST_LOCATION );
   }
+
+  END_TEST;
+}
+
+int UtcDaliRegisterVisualOrder(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Register Visual Order" );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
+
+  tet_infoline( "Register visual, should have depth index of 0.0f" );
+  Visual::Base testVisual = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, testVisual );
+  DALI_TEST_EQUALS( testVisual.GetDepthIndex(), 0, TEST_LOCATION );
+
+  tet_infoline( "Register more visuals, each added one should have a depth index greater than previous" );
+
+  Visual::Base testVisual2 = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, testVisual2 );
+  DALI_TEST_CHECK( testVisual2.GetDepthIndex() > testVisual.GetDepthIndex() );
+
+  Visual::Base foregroundVisual = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::FOREGROUND_VISUAL, foregroundVisual );
+  DALI_TEST_CHECK( foregroundVisual.GetDepthIndex() > testVisual2.GetDepthIndex() );
+
+  Visual::Base focusVisual = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::FOCUS_VISUAL, focusVisual );
+  DALI_TEST_CHECK( focusVisual.GetDepthIndex() > foregroundVisual.GetDepthIndex() );
+
+  tet_infoline( "Set depth index on a new visual before registering, the depth index should not have been changed" );
+  Visual::Base labelVisual = factory.CreateVisual( propertyMap );
+  labelVisual.SetDepthIndex( -2000 );
+  dummyImpl.RegisterVisual( DummyControl::Property::LABEL_VISUAL, labelVisual );
+  DALI_TEST_EQUALS( labelVisual.GetDepthIndex(), -2000, TEST_LOCATION );
+
+  tet_infoline( "Replace visual, the depth index should be the same as what was previously set" );
+  const int testVisual2DepthIndex = testVisual2.GetDepthIndex();
+  Visual::Base testVisual2Replacement = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( testVisual2Replacement.GetDepthIndex() != testVisual2DepthIndex );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, testVisual2Replacement );
+  DALI_TEST_EQUALS( testVisual2Replacement.GetDepthIndex(), testVisual2DepthIndex, TEST_LOCATION );
+
+  tet_infoline( "Replace visual and set a depth index on the replacement, the depth index of the replacement should be honoured" );
+  Visual::Base anotherTestVisual2Replacement = factory.CreateVisual( propertyMap );
+  anotherTestVisual2Replacement.SetDepthIndex( 2000 );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, anotherTestVisual2Replacement );
+  DALI_TEST_EQUALS( anotherTestVisual2Replacement.GetDepthIndex(), 2000, TEST_LOCATION );
+
+  dummyControl.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( dummyControl );
+
+  END_TEST;
+}
+
+int UtcDaliRegisterVisualWithDepthIndex(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Register a Visual With Depth Index" );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
+
+  tet_infoline( "Register a visual with a depth index, it should be enabled by default too" );
+  Visual::Base testVisual = factory.CreateVisual( propertyMap );
+  DevelControl::RegisterVisual( dummyImpl, DummyControl::Property::TEST_VISUAL, testVisual, 203 );
+  DALI_TEST_EQUALS( testVisual.GetDepthIndex(), 203, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::IsVisualEnabled( dummyImpl, DummyControl::Property::TEST_VISUAL ), true, TEST_LOCATION );
+
+  tet_infoline( "Register another visual with a depth index and it disabled" );
+  Visual::Base testVisual2 = factory.CreateVisual( propertyMap );
+  DevelControl::RegisterVisual( dummyImpl, DummyControl::Property::TEST_VISUAL2, testVisual2, false, 450 );
+  DALI_TEST_EQUALS( testVisual2.GetDepthIndex(), 450, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::IsVisualEnabled( dummyImpl, DummyControl::Property::TEST_VISUAL2 ), false, TEST_LOCATION );
+
+  tet_infoline( "Register another visual with a depth index and it enabled using the enabled API" );
+  Visual::Base testVisual3 = factory.CreateVisual( propertyMap );
+  DevelControl::RegisterVisual( dummyImpl, DummyControl::Property::TEST_VISUAL2, testVisual3, true, 300 );
+  DALI_TEST_EQUALS( testVisual3.GetDepthIndex(), 300, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::IsVisualEnabled( dummyImpl, DummyControl::Property::TEST_VISUAL2 ), true, TEST_LOCATION );
+
+  dummyControl.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( dummyControl );
 
   END_TEST;
 }

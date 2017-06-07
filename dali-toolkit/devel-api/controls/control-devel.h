@@ -139,32 +139,64 @@ DALI_IMPORT_API ResourceReadySignalType& ResourceReadySignal( Control& control )
 DALI_IMPORT_API bool IsResourceReady( const Control& control );
 
 /**
- * @brief Register a visual by Property Index, linking an Actor to visual when required.
- * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
- * No parenting is done during registration, this should be done by derived class.
+ * @brief Register a visual by Property Index.
  *
  * @param[in] control The control
  * @param[in] index The Property index of the visual, used to reference visual
  * @param[in] visual The visual to register
+ *
  * @note Derived class should not call visual.SetOnStage(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
  *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
+ * @note If the depth-index is not set on the visual, then it is set to be above the currently registered visuals.
+ * @note If replacing a visual, then the depth-index of the visual being replaced is used for the visual.
  */
 DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual );
 
 /**
- * @brief Register a visual by Property Index, linking an Actor to visual when required.
+ * @brief Register a visual by Property Index with a depth index.
  *
- * In the case of the visual being an actor or control deeming visual not required then visual should be an empty handle.
- * If enabled is false then the visual is not set on stage until enabled by the derived class.
- * @see EnableVisual
+ * @param[in] control The control
+ * @param[in] index The Property index of the visual, used to reference visual
+ * @param[in] visual The visual to register
+ * @param[in] depthIndex The visual's depth-index is set to this
+ *
+ * @note Derived class should not call visual.SetOnStage(actor). It is the responsibility of the base class to connect/disconnect registered visual to stage.
+ *       Use below API with enabled set to false if derived class wishes to control when visual is staged.
+ *
+ * @see Visual::Base::GetDepthIndex()
+ * @see Visual::Base::SetDepthIndex()
+ */
+DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, int depthIndex );
+
+/**
+ * @brief Register a visual by Property Index with the option of enabling/disabling it.
  *
  * @param[in] control The control
  * @param[in] index The Property index of the visual, used to reference visual
  * @param[in] visual The visual to register
  * @param[in] enabled false if derived class wants to control when visual is set on stage.
  *
+ * @note If the depth-index is not set on the visual, then it is set to be above the currently registered visuals.
+ * @note If replacing a visual, then the depth-index of the visual being replaced is used for the visual.
+ *
+ * @see EnableVisual()
  */
 DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
+
+/**
+ * @brief Register a visual by Property Index with a depth index with the option of enabling/disabling it.
+ *
+ * @param[in] control The control
+ * @param[in] index The Property index of the visual, used to reference visual
+ * @param[in] visual The visual to register
+ * @param[in] enabled false if derived class wants to control when visual is set on stage.
+ * @param[in] depthIndex The visual's depth-index is set to this
+ *
+ * @see EnableVisual()
+ * @see Visual::Base::GetDepthIndex()
+ * @see Visual::Base::SetDepthIndex()
+ */
+DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex );
 
 /**
  * @brief Erase the entry matching the given index from the list of registered visuals

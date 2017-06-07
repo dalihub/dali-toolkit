@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -405,6 +405,43 @@ int UtcDaliControlWrapperRegisterVisualToSelf(void)
   END_TEST;
 }
 
+int UtcDaliControlWrapperRegisterVisualWithDepthIndexToSelf(void)
+{
+  ToolkitTestApplication application;
+
+  Test::ObjectDestructionTracker objectDestructionTracker;
+
+  {
+    Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
+    ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
+
+    objectDestructionTracker.Start( controlWrapper );
+
+    Property::Index index = 1;
+
+    Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+    Toolkit::Visual::Base visual;
+
+    Property::Map map;
+    map[Visual::Property::TYPE] = Visual::COLOR;
+    map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+    visual = visualFactory.CreateVisual( map );
+    DALI_TEST_CHECK( visual );
+
+    // Register to self
+    controlWrapperImpl->RegisterVisual( index, visual, 4 );
+
+    DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), false, TEST_LOCATION ); // Control not destroyed yet
+    DALI_TEST_EQUALS( controlWrapperImpl->GetVisual( index ), visual, TEST_LOCATION );
+    DALI_TEST_EQUALS( visual.GetDepthIndex(), 4, TEST_LOCATION );
+  }
+
+  DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), true, TEST_LOCATION ); // Should be destroyed
+
+  END_TEST;
+}
+
 int UtcDaliControlWrapperRegisterDisabledVisual(void)
 {
   ToolkitTestApplication application;
@@ -429,6 +466,49 @@ int UtcDaliControlWrapperRegisterDisabledVisual(void)
 
   DALI_TEST_EQUALS( controlWrapperImpl->GetVisual( TEST_PROPERTY ), visual, TEST_LOCATION );
   DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), false, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( controlWrapper );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), false, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controlWrapper.OnStage(), true, TEST_LOCATION );
+
+  controlWrapperImpl->EnableVisual( TEST_PROPERTY, true );
+
+  DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlWrapperRegisterDisabledVisualWithDepthIndex(void)
+{
+  ToolkitTestApplication application;
+
+  Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
+
+  Property::Index TEST_PROPERTY = 1;
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+
+  // Register index with a color visual
+  controlWrapperImpl->RegisterVisual( TEST_PROPERTY, visual, false, 10 );
+
+  DALI_TEST_EQUALS( controlWrapperImpl->GetVisual( TEST_PROPERTY ), visual, TEST_LOCATION );
+  DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( visual.GetDepthIndex(), 10, TEST_LOCATION );
 
   Stage::GetCurrent().Add( controlWrapper );
 

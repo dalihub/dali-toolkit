@@ -117,7 +117,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "outline",                   MAP
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "pixelSize",           FLOAT,   PIXEL_SIZE             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "ellipsis",            BOOLEAN, ELLIPSIS               )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollLoopDelay", FLOAT,   AUTO_SCROLL_LOOP_DELAY )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollStopMode",  STRING,  AUTO_SCROLL_STOP_MODE )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollStopMode",  STRING,  AUTO_SCROLL_STOP_MODE  )
+DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "lineCount", INTEGER, LINE_COUNT             )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -349,7 +350,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
              {
                if( impl.mTextScroller )
                {
-                 impl.mTextScroller->SetLoopCount( 0 ); // Causes the current animation to finish playing (0)
+                 impl.mTextScroller->StopScrolling();
                }
              }
              // If request is enable (true) then start autoscroll as not already running
@@ -736,6 +737,15 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::LINE_COUNT:
+      {
+        if( impl.mController )
+        {
+          float width = label.GetProperty( Actor::Property::SIZE_WIDTH ).Get<float>();
+          value = impl.mController->GetLineCount( width );
+        }
+        break;
+      }
     }
   }
 
@@ -881,7 +891,7 @@ void TextLabel::SetUpAutoScrolling()
     // If speed, loopCount or gap not set via property system then will need to create a TextScroller with defaults
     mTextScroller = Text::TextScroller::New( *this );
   }
-  mTextScroller->SetParameters( mRenderableActor, controlSize, offScreenSize, direction, alignmentOffset );
+  mTextScroller->SetParameters( mRenderableActor, controlSize, offScreenSize, direction, alignmentOffset, mController->GetHorizontalAlignment() );
 
   Actor self = Self();
   self.Add( mTextScroller->GetScrollingText() );

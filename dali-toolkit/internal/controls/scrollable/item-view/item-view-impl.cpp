@@ -25,7 +25,6 @@
 
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/events/touch-data.h>
@@ -45,7 +44,6 @@
 #include <dali-toolkit/internal/controls/scrollable/bouncing-effect-actor.h>
 
 using std::string;
-using std::set;
 using namespace Dali;
 
 namespace // Unnamed namespace
@@ -280,18 +278,28 @@ DALI_ACTION_REGISTRATION(              Toolkit, ItemView, "disableRefresh",     
 
 DALI_TYPE_REGISTRATION_END()
 
-bool FindById( const ItemContainer& items, ItemId id )
+const ItemIter FindItemById( ItemContainer& items, ItemId id )
 {
-  for( ConstItemIter iter = items.begin(); items.end() != iter; ++iter )
+  for( ItemIter iter = items.begin(); items.end() != iter; ++iter )
   {
     if( iter->first == id )
     {
-      return true;
+      return iter;
     }
   }
 
-  return false;
+  return items.end();
 }
+
+void InsertToItemContainer( ItemContainer& items, Item item )
+{
+  if( items.end() == FindItemById( items, item.first ) )
+  {
+    ItemIter iterToInsert = std::lower_bound( items.begin(), items.end(), item );
+    items.insert( iterToInsert, item );
+  }
+}
+
 
 /**
   * Helper to apply size constraint to mOvershootOverlay
@@ -427,7 +435,7 @@ void ItemView::ActivateLayout(unsigned int layoutIndex, const Vector3& targetSiz
 
   // Move the items to the new layout positions...
 
-  for (ConstItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+  for (ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
   {
     unsigned int itemId = iter->first;
     Actor actor = iter->second;
@@ -494,7 +502,7 @@ void ItemView::DeactivateCurrentLayout()
 {
   if (mActiveLayout)
   {
-    for (ConstItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+    for (ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
     {
       Actor actor = iter->second;
       actor.RemoveConstraints();
@@ -521,7 +529,7 @@ void ItemView::OnRefreshNotification(PropertyNotification& source)
 
 void ItemView::Refresh()
 {
-  for (ItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter )
+  for (ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter )
   {
     ReleaseActor( iter->first, iter->second );
   }
@@ -622,10 +630,13 @@ Actor ItemView::GetItem(unsigned int itemId) const
 {
   Actor actor;
 
-  ConstItemPoolIter iter = mItemPool.find( itemId );
-  if( iter != mItemPool.end() )
+  for ( ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter )
   {
-    actor = iter->second;
+    if( iter->first == itemId )
+    {
+      actor = iter->second;
+      break;
+    }
   }
 
   return actor;
@@ -635,7 +646,7 @@ unsigned int ItemView::GetItemId( Actor actor ) const
 {
   unsigned int itemId( 0 );
 
-  for ( ConstItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter )
+  for ( ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter )
   {
     if( iter->second == actor )
     {
@@ -653,9 +664,9 @@ void ItemView::InsertItem( Item newItem, float durationSeconds )
   Vector3 layoutSize = Self().GetCurrentSize();
 
   Actor displacedActor;
-  ItemPoolIter afterDisplacedIter = mItemPool.end();
+  ItemIter afterDisplacedIter = mItemPool.end();
 
-  ItemPoolIter foundIter = mItemPool.find( newItem.first );
+  ItemIter foundIter = FindItemById( mItemPool, newItem.first );
   if( mItemPool.end() != foundIter )
   {
     SetupActor( newItem, layoutSize );
@@ -669,12 +680,12 @@ void ItemView::InsertItem( Item newItem, float durationSeconds )
   else
   {
     // Inserting before the existing item range?
-    ItemPoolIter iter = mItemPool.begin();
+    ItemIter iter = mItemPool.begin();
     if( iter != mItemPool.end() &&
         iter->first > newItem.first )
     {
       displacedActor = iter->second;
-      mItemPool.erase( iter++ ); // iter is still valid after the erase
+      iter = mItemPool.erase( iter ); // iter is still valid after the erase
 
       afterDisplacedIter = iter;
     }
@@ -683,7 +694,7 @@ void ItemView::InsertItem( Item newItem, float durationSeconds )
   if( displacedActor )
   {
     // Move the existing actors to make room
-    for( ItemPoolIter iter = afterDisplacedIter; mItemPool.end() != iter; ++iter )
+    for( ItemIter iter = afterDisplacedIter; mItemPool.end() != iter; ++iter )
     {
       Actor temp = iter->second;
       iter->second = displacedActor;
@@ -694,12 +705,12 @@ void ItemView::InsertItem( Item newItem, float durationSeconds )
     }
 
     // Create last item
-    ItemPool::reverse_iterator lastIter = mItemPool.rbegin();
+    ItemContainer::reverse_iterator lastIter = mItemPool.rbegin();
     if ( lastIter != mItemPool.rend() )
     {
       ItemId lastId = lastIter->first;
       Item lastItem( lastId + 1, displacedActor );
-      mItemPool.insert( lastItem );
+      InsertToItemContainer( mItemPool, lastItem );
 
       lastItem.second.RemoveConstraints();
       mActiveLayout->ApplyConstraints( lastItem.second, lastItem.first, layoutSize, Self() );
@@ -717,24 +728,21 @@ void ItemView::InsertItems( const ItemContainer& newItems, float durationSeconds
   Vector3 layoutSize = Self().GetCurrentSize();
 
   // Insert from lowest id to highest
-  std::set<Item> sortedItems;
-  for( ConstItemIter iter = newItems.begin(); newItems.end() != iter; ++iter )
-  {
-    sortedItems.insert( *iter );
-  }
+  ItemContainer sortedItems(newItems);
+  std::sort( sortedItems.begin(), sortedItems.end() );
 
-  for( std::set<Item>::iterator iter = sortedItems.begin(); sortedItems.end() != iter; ++iter )
+  for( ItemIter iter = sortedItems.begin(); sortedItems.end() != iter; ++iter )
   {
     Self().Add( iter->second );
 
-    ItemPoolIter foundIter = mItemPool.find( iter->first );
+    ItemIter foundIter = FindItemById( mItemPool, iter->first );
     if( mItemPool.end() != foundIter )
     {
       Actor moveMe = foundIter->second;
       foundIter->second = iter->second;
 
       // Move the existing actors to make room
-      for( ItemPoolIter iter = ++foundIter; mItemPool.end() != iter; ++iter )
+      for( ItemIter iter = ++foundIter; mItemPool.end() != iter; ++iter )
       {
         Actor temp = iter->second;
         iter->second = moveMe;
@@ -744,19 +752,19 @@ void ItemView::InsertItems( const ItemContainer& newItems, float durationSeconds
       // Create last item
       ItemId lastId = mItemPool.rbegin()->first;
       Item lastItem( lastId + 1, moveMe );
-      mItemPool.insert( lastItem );
+      InsertToItemContainer( mItemPool, lastItem );
     }
     else
     {
-      mItemPool.insert( *iter );
+      InsertToItemContainer( mItemPool, *iter );
     }
   }
 
   // Relayout everything
-  for (ItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+  for (ItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
   {
     // If newly inserted
-    if( FindById( newItems, iter->first ) )
+    if( std::binary_search( sortedItems.begin(), sortedItems.end(), *iter ) )
     {
       SetupActor( *iter, layoutSize );
     }
@@ -788,13 +796,10 @@ void ItemView::RemoveItems( const ItemIdContainer& itemIds, float durationSecond
   bool actorsReordered( false );
 
   // Remove from highest id to lowest
-  set<ItemId> sortedItems;
-  for( ConstItemIdIter iter = itemIds.begin(); itemIds.end() != iter; ++iter )
-  {
-    sortedItems.insert( *iter );
-  }
+  ItemIdContainer sortedItems(itemIds);
+  std::sort( sortedItems.begin(), sortedItems.end() );
 
-  for( set<ItemId>::reverse_iterator iter = sortedItems.rbegin(); sortedItems.rend() != iter; ++iter )
+  for( ItemIdContainer::reverse_iterator iter = sortedItems.rbegin(); sortedItems.rend() != iter; ++iter )
   {
     if( RemoveActor( *iter ) )
     {
@@ -814,7 +819,7 @@ bool ItemView::RemoveActor(unsigned int itemId)
 {
   bool reordered( false );
 
-  ItemPoolIter removeIter = mItemPool.find( itemId );
+  ItemIter removeIter = FindItemById( mItemPool, itemId );
   if( removeIter != mItemPool.end() )
   {
     ReleaseActor(itemId, removeIter->second);
@@ -822,12 +827,12 @@ bool ItemView::RemoveActor(unsigned int itemId)
   else
   {
     // Removing before the existing item range?
-    ItemPoolIter iter = mItemPool.begin();
+    ItemIter iter = mItemPool.begin();
     if( iter != mItemPool.end() &&
         iter->first > itemId )
     {
       // In order to decrement the first visible item ID
-      mItemPool.insert( Item(iter->first - 1, Actor()) );
+      InsertToItemContainer( mItemPool, Item(iter->first - 1, Actor()) );
 
       removeIter = mItemPool.begin();
     }
@@ -843,11 +848,11 @@ bool ItemView::RemoveActor(unsigned int itemId)
     //     ID 2 - ActorB       ID 2 - ActorC (previously ID 3)
     //     ID 3 - ActorC       ID 3 - ActorB (previously ID 4)
     //     ID 4 - ActorD
-    for (ItemPoolIter iter = removeIter; iter != mItemPool.end(); ++iter)
+    for (ItemIter iter = removeIter; iter != mItemPool.end(); ++iter)
     {
       if( iter->first < mItemPool.rbegin()->first )
       {
-        iter->second = mItemPool[ iter->first + 1 ];
+        iter->second = ( iter + 1 )->second;
       }
       else
       {
@@ -868,7 +873,7 @@ void ItemView::ReplaceItem( Item replacementItem, float durationSeconds )
   SetupActor( replacementItem, layoutSize );
   Self().Add( replacementItem.second );
 
-  const ItemPoolIter iter = mItemPool.find( replacementItem.first );
+  const ItemIter iter = FindItemById( mItemPool, replacementItem.first );
   if( mItemPool.end() != iter )
   {
     ReleaseActor(iter->first, iter->second);
@@ -876,7 +881,7 @@ void ItemView::ReplaceItem( Item replacementItem, float durationSeconds )
   }
   else
   {
-    mItemPool.insert( replacementItem );
+    InsertToItemContainer( mItemPool, replacementItem );
   }
 
   CalculateDomainSize( layoutSize );
@@ -895,7 +900,7 @@ void ItemView::ReplaceItems( const ItemContainer& replacementItems, float durati
 void ItemView::RemoveActorsOutsideRange( ItemRange range )
 {
   // Remove unwanted actors from the ItemView & ItemPool
-  for (ItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); )
+  for (ItemIter iter = mItemPool.begin(); iter != mItemPool.end(); )
   {
     unsigned int current = iter->first;
 
@@ -903,7 +908,7 @@ void ItemView::RemoveActorsOutsideRange( ItemRange range )
     {
       ReleaseActor(iter->first, iter->second);
 
-      mItemPool.erase( iter++ ); // erase invalidates the return value of post-increment; iter remains valid
+      iter = mItemPool.erase( iter ); // iter is still valid after the erase
     }
     else
     {
@@ -941,7 +946,7 @@ void ItemView::AddNewActor( unsigned int itemId, const Vector3& layoutSize )
 {
   mAddingItems = true;
 
-  if( mItemPool.end() == mItemPool.find( itemId ) )
+  if( mItemPool.end() == FindItemById( mItemPool, itemId ) )
   {
     Actor actor = mItemFactory.NewItem( itemId );
 
@@ -949,7 +954,7 @@ void ItemView::AddNewActor( unsigned int itemId, const Vector3& layoutSize )
     {
       Item newItem( itemId, actor );
 
-      mItemPool.insert( newItem );
+      InsertToItemContainer( mItemPool, newItem );
 
       SetupActor( newItem, layoutSize );
       Self().Add( actor );
@@ -1073,7 +1078,7 @@ void ItemView::ReapplyAllConstraints()
 {
   Vector3 layoutSize = Self().GetCurrentSize();
 
-  for (ConstItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+  for (ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
   {
     unsigned int id = iter->first;
     Actor actor = iter->second;
@@ -1673,7 +1678,7 @@ void ItemView::SetItemsParentOrigin( const Vector3& parentOrigin )
   if( parentOrigin != mItemsParentOrigin )
   {
     mItemsParentOrigin = parentOrigin;
-    for (ItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+    for (ItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
     {
       iter->second.SetParentOrigin(parentOrigin);
     }
@@ -1690,7 +1695,7 @@ void ItemView::SetItemsAnchorPoint( const Vector3& anchorPoint )
   if( anchorPoint != mItemsAnchorPoint )
   {
     mItemsAnchorPoint = anchorPoint;
-    for (ItemPoolIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
+    for (ItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
     {
       iter->second.SetAnchorPoint(anchorPoint);
     }

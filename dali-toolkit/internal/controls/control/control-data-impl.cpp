@@ -27,6 +27,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <cstring>
+#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -383,10 +384,25 @@ bool Control::Impl::IsResourceReady() const
 
 void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual )
 {
-  RegisterVisual( index, visual, true );
+  RegisterVisual( index, visual, VisualState::ENABLED, DepthIndexValue::NOT_SET );
+}
+
+void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex )
+{
+  RegisterVisual( index, visual, VisualState::ENABLED, DepthIndexValue::SET, depthIndex );
 }
 
 void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
+{
+  RegisterVisual( index, visual, ( enabled ? VisualState::ENABLED : VisualState::DISABLED ), DepthIndexValue::NOT_SET );
+}
+
+void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex )
+{
+  RegisterVisual( index, visual, ( enabled ? VisualState::ENABLED : VisualState::DISABLED ), DepthIndexValue::SET, depthIndex );
+}
+
+void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex )
 {
   bool visualReplaced ( false );
   Actor self = mControlImpl.Self();
@@ -402,10 +418,19 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
         Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
       }
 
+      // If we've not set the depth-index value and the new visual does not have a depth index applied to it, then use the previously set depth-index for this index
+      if( ( depthIndexValueSet == DepthIndexValue::NOT_SET ) &&
+          ( visual.GetDepthIndex() == 0 ) )
+      {
+        const int currentDepthIndex = (*iter)->visual.GetDepthIndex();
+        visual.SetDepthIndex( currentDepthIndex );
+      }
+
       StopObservingVisual( (*iter)->visual );
       StartObservingVisual( visual );
 
       (*iter)->visual = visual;
+      (*iter)->enabled = ( enabled == VisualState::ENABLED ) ? true : false;
       visualReplaced = true;
     }
   }
@@ -433,16 +458,47 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
 
   if( !visualReplaced ) // New registration entry
   {
-    mVisuals.PushBack( new RegisteredVisual( index, visual, enabled ) );
+    mVisuals.PushBack( new RegisteredVisual( index, visual, ( enabled == VisualState::ENABLED ? true : false ) ) );
 
     // monitor when the visuals resources are ready
     StartObservingVisual( visual );
 
+    // If we've not set the depth-index value, we have more than one visual and the visual does not have a depth index, then set it to be the highest
+    if( ( depthIndexValueSet == DepthIndexValue::NOT_SET ) &&
+        ( mVisuals.Size() > 1 ) &&
+        ( visual.GetDepthIndex() == 0 ) )
+    {
+      int maxDepthIndex = std::numeric_limits< int >::min();
+
+      RegisteredVisualContainer::ConstIterator iter;
+      const RegisteredVisualContainer::ConstIterator endIter = mVisuals.End();
+      for ( iter = mVisuals.Begin(); iter != endIter; iter++ )
+      {
+        const int visualDepthIndex = (*iter)->visual.GetDepthIndex();
+        if ( visualDepthIndex > maxDepthIndex )
+        {
+          maxDepthIndex = visualDepthIndex;
+        }
+      }
+
+      ++maxDepthIndex; // Add one to the current maximum depth index so that our added visual appears on top
+      visual.SetDepthIndex( maxDepthIndex );
+    }
   }
 
-  if( visual && self.OnStage() && enabled )
+  if( visual )
   {
-    Toolkit::GetImplementation(visual).SetOnStage( self );
+    // If the caller has set the depth-index, then set it here
+    if( depthIndexValueSet == DepthIndexValue::SET )
+    {
+      visual.SetDepthIndex( depthIndex );
+    }
+
+    // Put on stage if enabled and the control is already on the stage
+    if( ( enabled == VisualState::ENABLED ) && self.OnStage() )
+    {
+      Toolkit::GetImplementation(visual).SetOnStage( self );
+    }
   }
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::RegisterVisual() Registered %s(%d), enabled:%s\n",  visual.GetName().c_str(), index, enabled?"T":"F" );
@@ -737,8 +793,7 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
           Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( url, ImageDimensions() );
           if( visual )
           {
-            controlImpl.mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
-            visual.SetDepthIndex( DepthIndex::BACKGROUND );
+            controlImpl.mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND );
           }
         }
         else if( value.Get( color ) )

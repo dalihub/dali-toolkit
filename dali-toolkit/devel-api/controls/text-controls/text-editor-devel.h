@@ -109,7 +109,26 @@ namespace Property
        * @brief The size of font in pixels.
        * @details name "pixelSize", type float
        */
-      PIXEL_SIZE
+      PIXEL_SIZE,
+
+      /**
+       * @brief The line count of text.
+       * @details name "lineCount", type int
+       * @note this property is read-only.
+       */
+      LINE_COUNT,
+
+      /**
+       * @brief The text to display when the TextEditor is empty and inactive.
+       * @details name "placeholderText", type string
+       */
+      PLACEHOLDER_TEXT,
+
+      /**
+       * @brief The placeholder-text color.
+       * @details name "placeholderTextColor", type vector4
+       */
+      PLACEHOLDER_TEXT_COLOR
   };
 } // namespace Property
 

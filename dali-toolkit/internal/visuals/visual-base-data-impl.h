@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_BASE_DATA_IMPL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,7 +121,7 @@ struct Base::Impl
   Transform       mTransform;
   Vector4         mMixColor;
   Size            mControlSize;
-  float           mDepthIndex;
+  int             mDepthIndex;
   Property::Index mMixColorIndex;
   Property::Index mOpacityIndex;
   int             mFlags;
