@@ -1595,16 +1595,17 @@ int utcDaliTextEditorEvent03(void)
   // The stencil actor should have two actors: the renderer and the highlight actor.
   Actor stencil = editor.GetChildAt( 0u );
 
+  // Highlight needs to be drawn before text, so should come first in child order
+  Renderer highlight = stencil.GetChildAt( 0u ).GetRendererAt( 0u );
+  DALI_TEST_CHECK( highlight );
+
   // The stencil actor has a container with all the actors which contain the text renderers.
-  Actor container = stencil.GetChildAt( 0u );
+  Actor container = stencil.GetChildAt( 1u );
   for( unsigned int index = 0; index < container.GetChildCount(); ++index )
   {
     Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
     DALI_TEST_CHECK( renderer );
   }
-
-  Renderer highlight = stencil.GetChildAt( 1u ).GetRendererAt( 0u );
-  DALI_TEST_CHECK( highlight );
 
   // Double tap out of bounds
   application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 29.f, 25.0f ) ) );
