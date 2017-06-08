@@ -1091,6 +1091,11 @@ Toolkit::TextEditor::InputStyleChangedSignalType& TextEditor::InputStyleChangedS
   return mInputStyleChangedSignal;
 }
 
+Toolkit::DevelTextEditor::ScrollStateChangedSignalType& TextEditor::ScrollStateChangedSignal()
+{
+  return mScrollStateChangedSignal;
+}
+
 void TextEditor::OnInitialize()
 {
   Actor self = Self();
@@ -1495,6 +1500,14 @@ void TextEditor::UpdateScrollBar()
     return;
   }
 
+  // If scrolling is not started, start scrolling and emit ScrollStateChangedSignal
+  if( !mScrollStarted )
+  {
+    mScrollStarted = true;
+    Dali::Toolkit::TextEditor handle( GetOwner() );
+    mScrollStateChangedSignal.Emit( handle, DevelTextEditor::Scroll::STARTED );
+  }
+
   CustomActor self = Self();
   if( !mScrollBar )
   {
@@ -1550,6 +1563,18 @@ void TextEditor::UpdateScrollBar()
   indicator.SetOpacity(1.0f);
   mAnimation.AnimateTo( Property( indicator, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN, mAnimationPeriod );
   mAnimation.Play();
+  mAnimation.FinishedSignal().Connect( this, &TextEditor::OnScrollIndicatorAnimationFinished );
+}
+
+void TextEditor::OnScrollIndicatorAnimationFinished( Animation& animation )
+{
+  // If animation is successfully ended, then emit ScrollStateChangedSignal
+  if( animation.GetCurrentProgress() == 0.0f )
+  {
+    mScrollStarted = false;
+    Dali::Toolkit::TextEditor handle( GetOwner() );
+    mScrollStateChangedSignal.Emit( handle, DevelTextEditor::Scroll::FINISHED );
+  }
 }
 
 void TextEditor::OnStageConnect( Dali::Actor actor )
@@ -1667,7 +1692,8 @@ TextEditor::TextEditor()
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mHasBeenStaged( false ),
   mScrollAnimationEnabled( false ),
-  mScrollBarEnabled( false )
+  mScrollBarEnabled( false ),
+  mScrollStarted( false )
 {
 }
 
