@@ -769,17 +769,20 @@ Property::Value ScrollBar::GetProperty( BaseObject* object, Property::Index inde
       }
       case Toolkit::ScrollBar::Property::SCROLL_POSITION_INTERVALS:
       {
-        Property::Value value( Property::ARRAY );
-        Property::Array* array = value.GetArray();
+        Property::Value tempValue( Property::ARRAY );
+        Property::Array* array = tempValue.GetArray();
 
         if( array )
         {
           Dali::Vector<float> positions = scrollBarImpl.GetScrollPositionIntervals();
-          size_t positionCount( array->Count() );
+          size_t positionCount( positions.Count() );
+
           for( size_t i( 0 ); i != positionCount; ++i )
           {
             array->PushBack( positions[i] );
           }
+
+          value = tempValue;
         }
         break;
       }

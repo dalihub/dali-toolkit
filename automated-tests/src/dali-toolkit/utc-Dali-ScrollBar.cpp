@@ -698,6 +698,20 @@ int UtcDaliToolkitScrollBarGetScrollPositionIntervalsP(void)
   DALI_TEST_EQUALS( positionIntervals[8], results[8], TEST_LOCATION );
   DALI_TEST_EQUALS( positionIntervals[9], results[9], TEST_LOCATION );
 
+  Property::Array resultArray = scrollBar.GetProperty<Property::Array>(Toolkit::ScrollBar::Property::SCROLL_POSITION_INTERVALS);
+
+  DALI_TEST_EQUALS( positionIntervals.Count(), resultArray.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[0], resultArray[0].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[1], resultArray[1].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[2], resultArray[2].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[3], resultArray[3].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[4], resultArray[4].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[5], resultArray[5].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[6], resultArray[6].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[7], resultArray[7].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[8], resultArray[8].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[9], resultArray[9].Get<float>(), TEST_LOCATION );
+
   END_TEST;
 }
 
