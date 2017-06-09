@@ -2695,6 +2695,8 @@ void Controller::Impl::UpdateCursorPosition( const CursorInfo& cursorInfo )
 
   const Vector2 cursorPosition = cursorInfo.primaryPosition + mModel->mScrollPosition;
 
+  mEventData->mDecorator->SetGlyphOffset( PRIMARY_CURSOR, cursorInfo.glyphOffset );
+
   // Sets the cursor position.
   mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
                                        cursorPosition.x,
@@ -2845,9 +2847,20 @@ void Controller::Impl::ScrollTextToMatchCursor( const CursorInfo& cursorInfo )
   // Get the current cursor position in decorator coords.
   const Vector2& currentCursorPosition = mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
 
+  const LineIndex lineIndex = mModel->mVisualModel->GetLineOfCharacter( mEventData->mPrimaryCursorPosition  );
+
+
+
   // Calculate the offset to match the cursor position before the character was deleted.
   mModel->mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x;
-  mModel->mScrollPosition.y = currentCursorPosition.y - cursorInfo.lineOffset;
+
+  //If text control has more than two lines and current line index is not last, calculate scrollpositionY
+  if( mModel->mVisualModel->mLines.Count() > 1u && lineIndex != mModel->mVisualModel->mLines.Count() -1u )
+  {
+    const float currentCursorGlyphOffset = mEventData->mDecorator->GetGlyphOffset( PRIMARY_CURSOR );
+    mModel->mScrollPosition.y = currentCursorPosition.y - cursorInfo.lineOffset - currentCursorGlyphOffset;
+  }
+
 
   ClampHorizontalScroll( mModel->mVisualModel->GetLayoutSize() );
   ClampVerticalScroll( mModel->mVisualModel->GetLayoutSize() );
