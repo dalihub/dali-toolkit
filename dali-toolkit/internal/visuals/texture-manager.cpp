@@ -450,7 +450,7 @@ void TextureManager::ApplyMask( PixelData pixelData, TextureId maskTextureId )
 
 void TextureManager::UploadTexture( PixelData pixelData, TextureInfo& textureInfo )
 {
-  if( textureInfo.useAtlas != USE_ATLAS );
+  if( textureInfo.useAtlas != USE_ATLAS )
   {
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "  TextureManager::UploadTexture() New Texture for textureId:%d\n", textureInfo.textureId );
 
