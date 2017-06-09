@@ -62,6 +62,7 @@ const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
 const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
 const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
 const char * const IMAGE_ATLASING("atlasing");
+const char * const ALPHA_MASK_URL("alphaMaskUrl");
 
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN( FITTING_MODE )
@@ -261,8 +262,10 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl( imageUrl ),
+  mAlphaMaskUrl(),
   mDesiredSize( size ),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
+  mAlphaMaskId( TextureManager::INVALID_TEXTURE_ID ),
   mFittingMode( fittingMode ),
   mSamplingMode( samplingMode ),
   mWrapModeU( WrapMode::DEFAULT ),
@@ -279,8 +282,10 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl(),
+  mAlphaMaskUrl(),
   mDesiredSize(),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
+  mAlphaMaskId( TextureManager::INVALID_TEXTURE_ID ),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
@@ -292,6 +297,11 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
 
 ImageVisual::~ImageVisual()
 {
+  if( mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID )
+  {
+    TextureManager& textureManager = mFactoryCache.GetTextureManager();
+    textureManager.Remove( mAlphaMaskId );
+  }
 }
 
 void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
@@ -342,7 +352,18 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       {
         DoSetProperty( Toolkit::DevelImageVisual::Property::ATLASING, keyValue.second );
       }
+      else if ( keyValue.first == ALPHA_MASK_URL )
+      {
+        DoSetProperty( Toolkit::DevelImageVisual::Property::ALPHA_MASK_URL, keyValue.second );
+      }
     }
+  }
+
+  if( mAlphaMaskUrl.IsValid() )
+  {
+    // Immediately trigger the alpha mask loading (it may just get a cached value)
+    TextureManager& textureManager = mFactoryCache.GetTextureManager();
+    mAlphaMaskId = textureManager.RequestMaskLoad( mAlphaMaskUrl );
   }
 
   if( ( mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING ) && mImageUrl.IsValid() )
@@ -450,6 +471,15 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
     {
       bool atlasing = false;
       mAttemptAtlasing = value.Get( atlasing );
+    }
+
+    case Toolkit::DevelImageVisual::Property::ALPHA_MASK_URL:
+    {
+      std::string alphaUrl;
+      if( value.Get( alphaUrl ) )
+      {
+        mAlphaMaskUrl = VisualUrl( alphaUrl );
+      }
     }
   }
 }
@@ -651,8 +681,17 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, bool synchronous
     {
       mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
       TextureManager& textureManager = mFactoryCache.GetTextureManager();
-      mTextureId = textureManager.RequestLoad( mImageUrl, mDesiredSize, mFittingMode,
-                                               mSamplingMode, TextureManager::NO_ATLAS, this );
+      if( mAlphaMaskId == TextureManager::INVALID_TEXTURE_ID )
+      {
+        mTextureId = textureManager.RequestLoad( mImageUrl, mDesiredSize, mFittingMode,
+                                                 mSamplingMode, TextureManager::NO_ATLAS, this );
+      }
+      else
+      {
+        mTextureId = textureManager.RequestLoad( mImageUrl, mAlphaMaskId, mDesiredSize,
+                                                 mFittingMode, mSamplingMode,
+                                                 TextureManager::NO_ATLAS, this );
+      }
 
       TextureManager::LoadState loadState = textureManager.GetTextureState( mTextureId );
 
@@ -819,6 +858,7 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
 
   map.Insert( Toolkit::DevelImageVisual::Property::ATLASING, mAttemptAtlasing );
+  map.Insert( Toolkit::DevelImageVisual::Property::ALPHA_MASK_URL, mAlphaMaskUrl.GetUrl() );
 }
 
 void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const

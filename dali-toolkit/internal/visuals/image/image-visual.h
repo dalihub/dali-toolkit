@@ -46,13 +46,14 @@ class ImageVisual;
 typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
 
 /**
- * The visual which renders an image to the control's quad
+ * The visual which renders an image to a quad geometry
  *
  * The following properties are optional
  *
  * | %Property Name     | Type              |
  * |--------------------|-------------------|
  * | url                | STRING            |
+ * | alphaMaskUrl       | STRING            |
  * | fittingMode        | INTEGER OR STRING |
  * | samplingMode       | INTEGER OR STRING |
  * | desiredWidth       | INTEGER           |
@@ -319,9 +320,11 @@ private:
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
   VisualUrl mImageUrl;
+  VisualUrl mAlphaMaskUrl;
 
   Dali::ImageDimensions mDesiredSize;
   TextureManager::TextureId mTextureId;
+  TextureManager::TextureId mAlphaMaskId;
 
   Dali::FittingMode::Type mFittingMode:3;
   Dali::SamplingMode::Type mSamplingMode:4;
