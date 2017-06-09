@@ -39,6 +39,7 @@ namespace Text
 
 //Forward declarations
 struct CursorInfo;
+struct FontDefaults;
 
 struct Event
 {
@@ -104,6 +105,7 @@ struct EventData
 
   DecoratorPtr       mDecorator;               ///< Pointer to the decorator.
   ImfManager         mImfManager;              ///< The Input Method Framework Manager.
+  FontDefaults*      mPlaceholderFont;         ///< The placeholder default font.
   std::string        mPlaceholderText;         ///< The text to display when the TextField is empty.
   std::string        mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus.
   std::string        mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive.
@@ -155,6 +157,7 @@ struct EventData
   bool mUpdateInputStyle                : 1;   ///< Whether to update the input style after moving the cursor.
   bool mPasswordInput                   : 1;   ///< True if password input is enabled.
   bool mCheckScrollAmount               : 1;   ///< Whether to check scrolled amount after updating the position
+  bool mIsPlaceholderPixelSize          : 1;   ///< True if the placeholder font size is set as pixel size.
 };
 
 struct ModifyEvent

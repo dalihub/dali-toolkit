@@ -97,6 +97,7 @@ const char* const PROPERTY_NAME_LINE_COUNT                           = "lineCoun
 const char* const PROPERTY_NAME_PLACEHOLDER_TEXT                     = "placeholderText";
 const char* const PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR               = "placeholderTextColor";
 const char* const PROPERTY_NAME_ENABLE_SELECTION                     = "enableSelection";
+const char* const PROPERTY_NAME_PLACEHOLDER                          = "placeholder";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -467,6 +468,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == DevelTextEditor::Property::PLACEHOLDER_TEXT );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == DevelTextEditor::Property::ENABLE_SELECTION );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == DevelTextEditor::Property::PLACEHOLDER );
 
   END_TEST;
 }
@@ -773,8 +775,73 @@ int UtcDaliTextEditorSetPropertyP(void)
   editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR, Color::RED );
   DALI_TEST_EQUALS( editor.GetProperty<Vector4>( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR ), Color::RED, TEST_LOCATION );
 
+  // Check the enable selection property
   editor.SetProperty( DevelTextEditor::Property::ENABLE_SELECTION, false );
   DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SELECTION ), false, TEST_LOCATION );
+
+  // Check the placeholder property with pixel size
+  Property::Map placeholderPixelSizeMapSet;
+  Property::Map placeholderPixelSizeMapGet;
+  Property::Map placeholderFontstyleMap;
+  placeholderPixelSizeMapSet["placeholderText"] = "Setting Placeholder Text";
+  placeholderPixelSizeMapSet["placeholderColor"] = Color::BLUE;
+  placeholderPixelSizeMapSet["placeholderFontFamily"] = "Arial";
+  placeholderPixelSizeMapSet["placeholderPixelSize"] = 15.0f;
+
+  placeholderFontstyleMap.Insert( "weight", "bold" );
+  placeholderPixelSizeMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, placeholderPixelSizeMapSet );
+
+  placeholderPixelSizeMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::PLACEHOLDER );
+  DALI_TEST_EQUALS( placeholderPixelSizeMapGet.Count(), placeholderPixelSizeMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderPixelSizeMapGet, placeholderPixelSizeMapSet ), true, TEST_LOCATION );
+
+  // Check the placeholder property with point size
+  Property::Map placeholderMapSet;
+  Property::Map placeholderMapGet;
+  placeholderMapSet["placeholderText"] = "Setting Placeholder Text";
+  placeholderMapSet["placeholderColor"] = Color::RED;
+  placeholderMapSet["placeholderFontFamily"] = "Arial";
+  placeholderMapSet["placeholderPointSize"] = 12.0f;
+
+  // Check the placeholder font style property
+  placeholderFontstyleMap.Clear();
+
+  placeholderFontstyleMap.Insert( "weight", "bold" );
+  placeholderFontstyleMap.Insert( "width", "condensed" );
+  placeholderFontstyleMap.Insert( "slant", "italic" );
+  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, placeholderMapSet );
+
+  placeholderMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::PLACEHOLDER );
+  DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+
+  // Reset font style.
+  placeholderFontstyleMap.Clear();
+  placeholderFontstyleMap.Insert( "weight", "normal" );
+  placeholderFontstyleMap.Insert( "slant", "oblique" );
+  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, placeholderMapSet );
+
+  placeholderMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::PLACEHOLDER );
+  DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+
+  placeholderFontstyleMap.Clear();
+  placeholderFontstyleMap.Insert( "slant", "roman" );
+  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, placeholderMapSet );
+
+  placeholderMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::PLACEHOLDER );
+
+  placeholderFontstyleMap.Clear();
+  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+
+  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, placeholderMapSet );
+  placeholderMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::PLACEHOLDER );
+  DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
 
   END_TEST;
 }

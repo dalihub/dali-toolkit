@@ -141,6 +141,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputOutline",                 
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "hiddenInputSettings",            MAP,       HIDDEN_INPUT_SETTINGS                )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "pixelSize",                      FLOAT,     PIXEL_SIZE                           )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableSelection",                BOOLEAN,   ENABLE_SELECTION                     )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder",                    MAP,       PLACEHOLDER                          )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -762,6 +763,15 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::PLACEHOLDER:
+      {
+        const Property::Map* map = value.GetMap();
+        if( map )
+        {
+          impl.mController->SetPlaceholderProperty( *map );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -1146,6 +1156,13 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         {
           value = impl.mController->IsSelectionEnabled();
         }
+        break;
+      }
+      case Toolkit::DevelTextField::Property::PLACEHOLDER:
+      {
+        Property::Map map;
+        impl.mController->GetPlaceholderProperty( map );
+        value = map;
         break;
       }
     } //switch

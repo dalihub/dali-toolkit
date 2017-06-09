@@ -137,7 +137,30 @@ namespace Property
        * @brief Enables Text selection, such as the cursor, handle, clipboard, and highlight color.
        * @details name "enableSelection", type bool
        */
-      ENABLE_SELECTION
+      ENABLE_SELECTION,
+
+      /**
+       * @brief Sets the placeholder : text, color, font family, font style, point size, and pixel size.
+       *
+       * @code
+       *   Property::Map propertyMap;
+       *   propertyMap["placeholderText"] = "Setting Placeholder Text";
+       *   propertyMap["placeholderColor"] = Color::RED;
+       *   propertyMap["placeholderFontFamily"] = "Arial";
+       *   propertyMap["placeholderPointSize"] = 12.0f;
+       *
+       *   Property::Map fontStyleMap;
+       *   fontstyleMap.Insert( "weight", "bold" );
+       *   fontstyleMap.Insert( "width", "condensed" );
+       *   fontstyleMap.Insert( "slant", "italic" );
+       *   propertyMap["placeholderFontStyle"] = fontStyleMap;
+       *
+       *   editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, propertyMap );
+       * @endcode
+       *
+       * @details name "placeholder", type MAP
+       */
+      PLACEHOLDER
   };
 } // namespace Property
 
