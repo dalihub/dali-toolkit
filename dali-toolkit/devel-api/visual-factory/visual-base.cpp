@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,12 +81,12 @@ void Visual::Base::GetNaturalSize(Vector2& naturalSize )
   GetImplementation( *this ).GetNaturalSize( naturalSize );
 }
 
-void Visual::Base::SetDepthIndex( float index )
+void Visual::Base::SetDepthIndex( int index )
 {
   GetImplementation( *this ).SetDepthIndex( index );
 }
 
-float Visual::Base::GetDepthIndex() const
+int Visual::Base::GetDepthIndex() const
 {
   return GetImplementation( *this ).GetDepthIndex();
 }

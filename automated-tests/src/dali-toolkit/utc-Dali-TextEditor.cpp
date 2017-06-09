@@ -18,7 +18,6 @@
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
-
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/integration-api/events/key-event-integ.h>
@@ -27,6 +26,7 @@
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 
 using namespace Dali;
@@ -93,9 +93,13 @@ const char* const PROPERTY_NAME_ENABLE_SCROLL_BAR                    = "enableSc
 const char* const PROPERTY_NAME_SCROLL_BAR_SHOW_DURATION             = "scrollBarShowDuration";
 const char* const PROPERTY_NAME_SCROLL_BAR_FADE_DURATION             = "scrollBarFadeDuration";
 const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSize";
+const char* const PROPERTY_NAME_LINE_COUNT                           = "lineCount";
+const char* const PROPERTY_NAME_PLACEHOLDER_TEXT                     = "placeholderText";
+const char* const PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR               = "placeholderTextColor";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
+const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
 
 const unsigned int CURSOR_BLINK_INTERVAL = 500u; // Cursor blink interval
@@ -294,6 +298,31 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
   return true;
 }
 
+class ScrollStateChangeCallback : public Dali::ConnectionTracker
+{
+public:
+  ScrollStateChangeCallback(bool& startedCalled, bool& finishedCalled)
+  : mStartedCalled( startedCalled ),
+    mFinishedCalled( finishedCalled )
+  {
+  }
+
+  void Callback( TextEditor editor, DevelTextEditor::Scroll::Type type )
+  {
+    if( type == DevelTextEditor::Scroll::STARTED )
+    {
+      mStartedCalled = true;
+    }
+    else if( type == DevelTextEditor::Scroll::FINISHED )
+    {
+      mFinishedCalled = true;
+    }
+  }
+
+  bool& mStartedCalled;
+  bool& mFinishedCalled;
+};
+
 } // namespace
 
 int UtcDaliToolkitTextEditorConstructorP(void)
@@ -433,6 +462,9 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_SHOW_DURATION ) == DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_FADE_DURATION ) == DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextEditor::Property::PIXEL_SIZE );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_LINE_COUNT) == DevelTextEditor::Property::LINE_COUNT );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == DevelTextEditor::Property::PLACEHOLDER_TEXT );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR );
 
   END_TEST;
 }
@@ -724,6 +756,20 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check the pixel size of font
   editor.SetProperty( DevelTextEditor::Property::PIXEL_SIZE, 20.f );
   DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Check placeholder text properties.
+  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT, "Setting Placeholder Text" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( DevelTextEditor::Property::PLACEHOLDER_TEXT ), std::string("Setting Placeholder Text"), TEST_LOCATION );
+
+  // Check placeholder text properties when focused.
+  editor.SetProperty( DevelControl::Property::STATE, "FOCUSED" );
+  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT, "Setting Focused Placeholder Text" );
+  DALI_TEST_EQUALS( editor.GetProperty<int>( DevelControl::Property::STATE ), (int)DevelControl::FOCUSED, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( DevelTextEditor::Property::PLACEHOLDER_TEXT ), std::string("Setting Focused Placeholder Text"), TEST_LOCATION );
+
+  // Check placeholder text's color property.
+  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR, Color::RED );
+  DALI_TEST_EQUALS( editor.GetProperty<Vector4>( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR ), Color::RED, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1932,6 +1978,73 @@ int utcDaliTextEditorFontStylePropertyStringP(void)
   value.Get(result);
 
   DALI_TEST_EQUALS( result, fontStyleSettings, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliTextEditorGetPropertyLinecountP(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline(" utcDaliTextEditorGetPropertyLinecount getting line count property");
+
+  int lineCount =0 ;
+
+  TextEditor editor = TextEditor::New();
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10) ;
+  editor.SetProperty( TextEditor::Property::TEXT,
+                       "TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST ");
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetSize( 100.0f, 100.0f );
+  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 14, TEST_LOCATION );
+
+  editor.SetSize( 50.0f, 100.0f );
+  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 28, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliTextEditorScrollStateChangedSignalTest(void)
+{
+
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorScrollStateChangedSignalTest");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
+  editor.SetSize( 50.f, 50.f );
+  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_SCROLL_BAR, true );
+  editor.SetKeyboardFocusable(true);
+
+  bool startedCalled = false;
+  bool finishedCalled = false;
+
+  ScrollStateChangeCallback callback( startedCalled, finishedCalled );
+  DevelTextEditor::ScrollStateChangedSignal( editor ).Connect( &callback, &ScrollStateChangeCallback::Callback );
+
+  KeyboardFocusManager::Get().SetCurrentFocusActor( editor );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  editor.SetProperty( TextEditor::Property::TEXT, "Long enough message for TextEditor!");
+  application.SendNotification();
+  application.Render(6000);
+
+  application.SendNotification();
+  DALI_TEST_EQUALS( startedCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( finishedCalled, true, TEST_LOCATION );
 
   END_TEST;
 }

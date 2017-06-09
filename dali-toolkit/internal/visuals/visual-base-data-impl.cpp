@@ -241,8 +241,8 @@ Internal::Visual::Base::Impl::Transform::Transform()
 : mOffset( 0.0f,0.0f ),
   mSize( 1.0f,1.0f ),
   mOffsetSizeMode( 0.0f,0.0f,0.0f,0.0f ),
-  mOrigin( Toolkit::Align::CENTER ),
-  mAnchorPoint( Toolkit::Align::CENTER )
+  mOrigin( Toolkit::Align::TOP_BEGIN ),
+  mAnchorPoint( Toolkit::Align::TOP_BEGIN )
 {
 }
 
@@ -252,8 +252,8 @@ void Internal::Visual::Base::Impl::Transform::SetPropertyMap( const Property::Ma
   mOffset = Vector2( 0.0f,0.0f );
   mSize = Vector2( 1.0f,1.0f );
   mOffsetSizeMode = Vector4( 0.0f,0.0f,0.0f,0.0f );
-  mOrigin = Toolkit::Align::CENTER;
-  mAnchorPoint = Toolkit::Align::CENTER;
+  mOrigin = Toolkit::Align::TOP_BEGIN;
+  mAnchorPoint = Toolkit::Align::TOP_BEGIN;
 
   UpdatePropertyMap( map );
 }

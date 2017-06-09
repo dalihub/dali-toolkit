@@ -125,9 +125,19 @@ void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Bas
   DevelControl::RegisterVisual( *this, index, visual );
 }
 
+void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex )
+{
+  DevelControl::RegisterVisual( *this, index, visual, depthIndex );
+}
+
 void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
 {
   DevelControl::RegisterVisual( *this, index, visual, enabled );
+}
+
+void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex )
+{
+  DevelControl::RegisterVisual( *this, index, visual, enabled, depthIndex );
 }
 
 void ControlWrapper::UnregisterVisual( Property::Index index )

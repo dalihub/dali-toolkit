@@ -454,10 +454,24 @@ public: // Update.
   /**
    * @brief Replaces any placeholder text previously set.
    *
+   * @param[in] text A string of UTF-8 characters.
+   */
+  void SetPlaceholderText( const std::string& text );
+
+  /**
+   * @brief Replaces any placeholder text previously set.
+   *
    * @param[in] type Different placeholder-text can be shown when the control is active/inactive.
    * @param[in] text A string of UTF-8 characters.
    */
   void SetPlaceholderText( PlaceholderType type, const std::string& text );
+
+  /**
+   * @brief Retrieve any placeholder text previously set.
+   *
+   * @param[out] A string of UTF-8 characters.
+   */
+  void GetPlaceholderText( std::string& text ) const;
 
   /**
    * @brief Retrieve any placeholder text previously set.
@@ -908,6 +922,13 @@ public: // Queries & retrieves.
    * @copydoc Control::GetHeightForWidth()
    */
   float GetHeightForWidth( float width );
+
+  /**
+   * @brief Retrieves the text's number of lines for a given width.
+   * @param[in] width The width of the text's area.
+   * @ return The number of lines.
+   */
+  int GetLineCount( float width );
 
   /**
    * @brief Retrieves the text's model.

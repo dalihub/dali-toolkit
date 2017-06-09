@@ -124,8 +124,7 @@ void Control::SetBackground( const Property::Map& map )
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( map );
   if( visual )
   {
-    mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
-    visual.SetDepthIndex( DepthIndex::BACKGROUND );
+    mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND );
 
     // Trigger a size negotiation request that may be needed by the new visual to relayout its contents.
     RelayoutRequest();
@@ -137,8 +136,7 @@ void Control::SetBackgroundImage( Image image )
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( image );
   if( visual )
   {
-    mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
-    visual.SetDepthIndex( DepthIndex::BACKGROUND );
+    mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND );
   }
 }
 

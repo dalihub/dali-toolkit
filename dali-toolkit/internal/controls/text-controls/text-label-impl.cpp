@@ -117,7 +117,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextLabel, "outline",                   MAP
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "pixelSize",           FLOAT,   PIXEL_SIZE             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "ellipsis",            BOOLEAN, ELLIPSIS               )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollLoopDelay", FLOAT,   AUTO_SCROLL_LOOP_DELAY )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollStopMode",  STRING,  AUTO_SCROLL_STOP_MODE )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollStopMode",  STRING,  AUTO_SCROLL_STOP_MODE  )
+DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "lineCount", INTEGER, LINE_COUNT             )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -733,6 +734,15 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           value = impl.mController->IsTextElideEnabled();
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::LINE_COUNT:
+      {
+        if( impl.mController )
+        {
+          float width = label.GetProperty( Actor::Property::SIZE_WIDTH ).Get<float>();
+          value = impl.mController->GetLineCount( width );
         }
         break;
       }

@@ -57,10 +57,22 @@ void RegisterVisual( Internal::Control& control, Dali::Property::Index index, To
   controlImpl.RegisterVisual( index, visual );
 }
 
+void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, int depthIndex )
+{
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
+  controlImpl.RegisterVisual( index, visual, depthIndex );
+}
+
 void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
 {
   Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
   controlImpl.RegisterVisual( index, visual, enabled );
+}
+
+void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex )
+{
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
+  controlImpl.RegisterVisual( index, visual, enabled, depthIndex );
 }
 
 void UnregisterVisual( Internal::Control& control, Dali::Property::Index index )

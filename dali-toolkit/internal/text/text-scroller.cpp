@@ -233,6 +233,7 @@ void CreateRenderer( FrameBufferImage frameBufferImage, Dali::Renderer& renderer
   CreateGeometry( meshGeometry );
 
   renderer = Renderer::New( meshGeometry, shader );
+  renderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true );
   renderer.SetTextures( textureSet );
 }
 
@@ -310,6 +311,8 @@ void TextScroller::StopScrolling()
       case DevelTextLabel::AutoScrollStopMode::IMMEDIATE:
       {
         mScrollAnimation.Stop();
+        CleanUp();
+        mScrollerInterface.ScrollingFinished();
         break;
       }
       case DevelTextLabel::AutoScrollStopMode::FINISH_LOOP:
@@ -319,7 +322,7 @@ void TextScroller::StopScrolling()
       }
       default:
       {
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n" );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n" );
       }
     }
   }
@@ -363,8 +366,20 @@ void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, co
 
   CleanUp(); //  If already scrolling then restart with new parameters
 
+  float animationProgress = 0.0f;
+  int   remainedLoop = mLoopCount;
   if ( mScrollAnimation )
   {
+    if( mScrollAnimation.GetState() == Animation::PLAYING )
+    {
+      animationProgress = mScrollAnimation.GetCurrentProgress();
+
+      if( mLoopCount > 0 ) // If not a ininity loop, then calculate remained loop
+      {
+        remainedLoop = mLoopCount - ( mScrollAnimation.GetCurrentLoop() );
+        remainedLoop = ( remainedLoop <= 0 ? 1 : remainedLoop );
+      }
+    }
     mScrollAnimation.Clear();
   }
 
@@ -439,7 +454,8 @@ void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, co
      scrollAmount = -scrollAmount; // reverse direction of scrollung
   }
 
-  StartScrolling( scrollAmount, scrollDuration, mLoopCount );
+  StartScrolling( scrollAmount, scrollDuration, remainedLoop );
+  mScrollAnimation.SetCurrentProgress(animationProgress);
 }
 
 void TextScroller::AutoScrollAnimationFinished( Dali::Animation& animation )

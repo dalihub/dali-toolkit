@@ -45,7 +45,7 @@ void utc_dali_toolkit_item_view_cleanup(void)
 namespace
 {
 
-const unsigned int TOTAL_ITEM_NUMBER = 100;
+const unsigned int TOTAL_ITEM_NUMBER = 400;
 const char* TEST_IMAGE_FILE_NAME = "gallery_image_01.jpg";
 
 const int RENDER_FRAME_INTERVAL = 16;                     ///< Duration of each frame in ms. (at approx 60FPS)
@@ -423,13 +423,34 @@ int UtcDaliItemViewRemoveItem(void)
   // Remove the item with ID 2
   view.RemoveItem(2, 0.0f);
 
-  // Get the new item given the item ID 2
+  // Get the new item given the item ID 2 and 3
   Actor newItemActorID2 = view.GetItem(2);
+  Actor newItemActorID3 = view.GetItem(3);
 
   // Check the original item with item ID 2 was deleted and now item ID 2 represents the original item with ID 3
   DALI_TEST_CHECK(view.GetItemId(newItemActorID2) == 2);
   DALI_TEST_CHECK(oldItemActorID2 != newItemActorID2);
-  DALI_TEST_CHECK(newItemActorID2 = oldItemActorID3);
+  DALI_TEST_CHECK(newItemActorID2 == oldItemActorID3);
+
+  // scroll to the end of item view
+  view.ScrollToItem(TOTAL_ITEM_NUMBER - 1, 0.00f);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Refresh the item view
+  view.Refresh();
+
+  Actor itemActorID390 = view.GetItem(390);
+  DALI_TEST_CHECK(view.GetItemId(itemActorID390) == 390);
+
+  // Remove the item with ID 2 (which is now before the current item range)
+  view.RemoveItem(2, 0.0f);
+
+  // Check the original item with item ID 2 was deleted and now item ID 389 represents the original item with ID 390
+  DALI_TEST_CHECK(view.GetItemId(itemActorID390) == 389);
+  DALI_TEST_CHECK(view.GetItem(389) == itemActorID390);
+
   END_TEST;
 }
 
@@ -636,16 +657,16 @@ int UtcDaliItemViewInsertItemP(void)
   TestItemFactory factory;
   ItemView view = ItemView::New(factory);
 
-  // Create a depth layout and add it to ItemView
-  ItemLayoutPtr depthLayout = DefaultItemLayout::New( DefaultItemLayout::DEPTH);
-  depthLayout->SetOrientation(ControlOrientation::Left);
-  view.AddLayout(*depthLayout);
+  // Create a grid layout and add it to ItemView
+  ItemLayoutPtr gridLayout = DefaultItemLayout::New( DefaultItemLayout::GRID);
+  gridLayout->SetOrientation(ControlOrientation::Left);
+  view.AddLayout(*gridLayout);
 
   // Activate the grid layout so that the items will be created and added to ItemView
   Vector3 stageSize(Dali::Stage::GetCurrent().GetSize());
-  view.ActivateLayout(0, stageSize, 0.5f);
+  view.ActivateLayout(0, stageSize, 0.0f);
 
-  // Get the item given the item ID
+  // Get the specified item where new item to be inserted before that
   Actor itemActor = view.GetItem(2);
 
   ItemId id = view.GetItemId( itemActor );
@@ -655,9 +676,33 @@ int UtcDaliItemViewInsertItemP(void)
 
   Actor newActor = Actor::New();
 
-  view.InsertItem(Item(id, newActor), 0.5f);
+  view.InsertItem(Item(id, newActor), 0.0f);
 
   DALI_TEST_CHECK(view.GetItem(2) == newActor);
+
+  DALI_TEST_CHECK(view.GetItemId(itemActor) == 3);
+  DALI_TEST_CHECK(view.GetItem(3) == itemActor);
+
+  // scroll to the end of item view
+  view.ScrollToItem(TOTAL_ITEM_NUMBER - 1, 0.00f);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Refresh the item view
+  view.Refresh();
+
+  Actor itemActorID390 = view.GetItem(390);
+  DALI_TEST_CHECK(view.GetItemId(itemActorID390) == 390);
+
+  // Insert the item with ID 2 (which is now before the current item range)
+  Actor anotherNewActor = Actor::New();
+  view.InsertItem(Item(id, anotherNewActor), 0.0f);
+
+  // Check that item ID 391 now represents the original item with ID 390
+  DALI_TEST_CHECK(view.GetItemId(itemActorID390) == 391);
+  DALI_TEST_CHECK(view.GetItem(391) == itemActorID390);
+
   END_TEST;
 }
 
@@ -680,9 +725,15 @@ int UtcDaliItemViewInsertItemsP(void)
 
   unsigned int itemCount = view.GetChildCount();
 
+  // Get the specified item where new items to be inserted before that
+  Actor itemActor = view.GetItem(1);
+
+  // Check we are getting the correct Item ID given the specified item
+  DALI_TEST_CHECK(view.GetItemId(itemActor) == 1);
+
   ItemContainer insertList;
 
-  for( unsigned int i = 0u; i < 10; ++i )
+  for( unsigned int i = 1u; i < 11; ++i )
   {
     Actor child = view.GetChildAt( i );
     Actor newActor = Actor::New();
@@ -696,6 +747,10 @@ int UtcDaliItemViewInsertItemsP(void)
   }
 
   DALI_TEST_CHECK(view.GetChildCount() == itemCount + 10);
+
+  // Check that new items are inserted in the correct positions
+  DALI_TEST_CHECK(view.GetItemId(itemActor) == 11);
+  DALI_TEST_CHECK(view.GetItem(11) == itemActor);
 
   ItemIdContainer removeList;
 
@@ -715,6 +770,11 @@ int UtcDaliItemViewInsertItemsP(void)
   }
 
   DALI_TEST_CHECK(view.GetChildCount() == itemCount);
+
+  // Check that new items are removed correctly so that we are getting the correct Item ID given the specified item
+  DALI_TEST_CHECK(view.GetItemId(itemActor) == 1);
+  DALI_TEST_CHECK(view.GetItem(1) == itemActor);
+
   END_TEST;
 }
 
@@ -736,9 +796,10 @@ int UtcDaliItemViewReplaceItemP(void)
 
   Actor newActor = Actor::New();
 
-  view.ReplaceItem( Item( 0, newActor ), 0.5f );
+  view.ReplaceItem( Item( 5, newActor ), 0.5f );
 
-  DALI_TEST_CHECK(view.GetItem(0) == newActor);
+  DALI_TEST_CHECK(view.GetItem(5) == newActor);
+
   END_TEST;
 }
 

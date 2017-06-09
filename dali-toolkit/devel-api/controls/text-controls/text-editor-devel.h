@@ -109,11 +109,53 @@ namespace Property
        * @brief The size of font in pixels.
        * @details name "pixelSize", type float
        */
-      PIXEL_SIZE
+      PIXEL_SIZE,
+
+      /**
+       * @brief The line count of text.
+       * @details name "lineCount", type int
+       * @note this property is read-only.
+       */
+      LINE_COUNT,
+
+      /**
+       * @brief The text to display when the TextEditor is empty and inactive.
+       * @details name "placeholderText", type string
+       */
+      PLACEHOLDER_TEXT,
+
+      /**
+       * @brief The placeholder-text color.
+       * @details name "placeholderTextColor", type vector4
+       */
+      PLACEHOLDER_TEXT_COLOR
   };
 } // namespace Property
 
-} // namespace DevelText
+namespace Scroll
+{
+  enum Type
+  {
+    STARTED,   ///< Scrolling is started.
+    FINISHED   ///< Scrolling is finished.
+  };
+} // namespace Scroll
+
+typedef Signal< void ( TextEditor, Scroll::Type ) > ScrollStateChangedSignalType;
+
+/**
+ * @brief This signal is emitted when TextEditor scrolling is started or finished.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( ScrollState::Type type );
+ * @endcode
+ * type: Whether the scrolling is started or finished.
+ * @return The signal to connect to
+ */
+DALI_IMPORT_API ScrollStateChangedSignalType& ScrollStateChangedSignal( TextEditor textEditor );
+
+} // namespace DevelTextEditor
 
 } // namespace Toolkit
 

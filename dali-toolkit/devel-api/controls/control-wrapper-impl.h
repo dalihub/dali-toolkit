@@ -118,7 +118,17 @@ public: // From Control
   /**
    * @ref Dali::Toolkit::DevelControl::RegisterVisual()
    */
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex );
+
+  /**
+   * @ref Dali::Toolkit::DevelControl::RegisterVisual()
+   */
   void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
+
+  /**
+   * @ref Dali::Toolkit::DevelControl::RegisterVisual()
+   */
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex );
 
   /**
    * @ref Dali::Toolkit::DevelControl::UnregisterVisual()

@@ -170,14 +170,14 @@ public:
    *
    * @param[in] index The depth index of this visual.
    */
-  void SetDepthIndex( float index );
+  void SetDepthIndex( int index );
 
   /**
    * @brief Get the depth index of this visual
    *
    * @return The depth index of this visual.
    */
-  float GetDepthIndex() const;
+  int GetDepthIndex() const;
 
   /**
    * @brief Create the property map representing this visual.
