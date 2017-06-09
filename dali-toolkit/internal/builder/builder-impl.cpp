@@ -179,9 +179,10 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
   }
   else
   {
+    // load configuration map
+    LoadConfiguration( *parser.GetRoot(), mConfigurationMap );
     // load constant map (allows the user to override the constants in the json after loading)
     LoadConstants( *parser.GetRoot(), mReplacementMap );
-
     // merge includes
     if( OptionalChild includes = IsChild(*parser.GetRoot(), KEYNAME_INCLUDES) )
     {
@@ -226,6 +227,11 @@ void Builder::AddConstants( const Property::Map& map )
 void Builder::AddConstant( const std::string& key, const Property::Value& value )
 {
   mReplacementMap[key] = value;
+}
+
+const Property::Map& Builder::GetConfigurations() const
+{
+  return mConfigurationMap;
 }
 
 const Property::Map& Builder::GetConstants() const
@@ -771,6 +777,25 @@ void Builder::EmitQuitSignal()
 
 Builder::~Builder()
 {
+}
+
+void Builder::LoadConfiguration( const TreeNode& root, Property::Map& intoMap )
+{
+  Replacement replacer(intoMap);
+
+  if( OptionalChild constants = IsChild(root, "config") )
+  {
+    for(TreeNode::ConstIterator iter = (*constants).CBegin();
+        iter != (*constants).CEnd(); ++iter)
+    {
+      Dali::Property::Value property;
+      if( (*iter).second.GetName() )
+      {
+        DeterminePropertyFromNode( (*iter).second, property, replacer );
+        intoMap[ (*iter).second.GetName() ] = property;
+      }
+    }
+  }
 }
 
 void Builder::LoadConstants( const TreeNode& root, Property::Map& intoMap )
