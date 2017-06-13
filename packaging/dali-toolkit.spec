@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    1.2.42
+Version:    1.2.43
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -32,21 +32,6 @@ BuildRequires:  pkgconfig(libtzplatform-config)
 
 %if "%{tizen_version_major}" == "2" && 0%{?tizen_profile_name:1}
 %define profile %{tizen_profile_name}
-%endif
-
-%if "%{profile}" == "mobile"
-%define dali_toolkit_profile MOBILE
-%define dali_style_folder 720x1280
-# dali_style to be provided by build system as with dali_toolkit_profile or by passing --define 'dali_style 470x800' to the rpm build command
-%endif
-
-%if "%{profile}" == "tv"
-%define dali_toolkit_profile TV
-%define dali_style_folder 1920x1080
-%endif
-
-%if "%{?dali_style}"
-  %define dali_style_folder %{dali_style}
 %endif
 
 %description
@@ -144,8 +129,7 @@ autoreconf --install
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
 
-%configure --enable-profile=%{dali_toolkit_profile} \
-           --with-style=%{dali_style_folder} \
+%configure --enable-profile=TIZEN \
 %if 0%{?enable_debug}
            --enable-debug \
 %endif

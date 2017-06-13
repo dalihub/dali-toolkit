@@ -23,6 +23,7 @@
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
@@ -94,6 +95,11 @@ public:
    * @copydoc TextEditor::TextChangedSignal()
    */
   Toolkit::TextEditor::InputStyleChangedSignalType& InputStyleChangedSignal();
+
+  /**
+   * @copydoc DevelTextEditor::ScrollStateChangedSignal()
+   */
+  Toolkit::DevelTextEditor::ScrollStateChangedSignalType& ScrollStateChangedSignal();
 
 private: // From Control
 
@@ -244,6 +250,13 @@ private: // Implementation
   void ApplyScrollPosition();
 
   /**
+   * @brief Callback function for ScrollBar indicator animation finished signal
+   *
+   * Emit ScrollBarStateChanged Signal and toggle mScrollStarted flag to false
+   */
+  void OnScrollIndicatorAnimationFinished( Animation& animation );
+
+  /**
    * Construct a new TextEditor.
    */
   TextEditor();
@@ -269,6 +282,7 @@ private: // Data
   // Signals
   Toolkit::TextEditor::TextChangedSignalType mTextChangedSignal;
   Toolkit::TextEditor::InputStyleChangedSignalType mInputStyleChangedSignal;
+  Toolkit::DevelTextEditor::ScrollStateChangedSignalType mScrollStateChangedSignal;
 
   ImfManager          mImfManager;
   Text::ControllerPtr mController;
@@ -290,6 +304,7 @@ private: // Data
   bool mHasBeenStaged:1;
   bool mScrollAnimationEnabled:1;
   bool mScrollBarEnabled:1;
+  bool mScrollStarted:1;
 };
 
 } // namespace Internal

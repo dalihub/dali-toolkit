@@ -18,7 +18,6 @@
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
-
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/integration-api/events/key-event-integ.h>
@@ -298,6 +297,31 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
 
   return true;
 }
+
+class ScrollStateChangeCallback : public Dali::ConnectionTracker
+{
+public:
+  ScrollStateChangeCallback(bool& startedCalled, bool& finishedCalled)
+  : mStartedCalled( startedCalled ),
+    mFinishedCalled( finishedCalled )
+  {
+  }
+
+  void Callback( TextEditor editor, DevelTextEditor::Scroll::Type type )
+  {
+    if( type == DevelTextEditor::Scroll::STARTED )
+    {
+      mStartedCalled = true;
+    }
+    else if( type == DevelTextEditor::Scroll::FINISHED )
+    {
+      mFinishedCalled = true;
+    }
+  }
+
+  bool& mStartedCalled;
+  bool& mFinishedCalled;
+};
 
 } // namespace
 
@@ -1571,16 +1595,17 @@ int utcDaliTextEditorEvent03(void)
   // The stencil actor should have two actors: the renderer and the highlight actor.
   Actor stencil = editor.GetChildAt( 0u );
 
+  // Highlight needs to be drawn before text, so should come first in child order
+  Renderer highlight = stencil.GetChildAt( 0u ).GetRendererAt( 0u );
+  DALI_TEST_CHECK( highlight );
+
   // The stencil actor has a container with all the actors which contain the text renderers.
-  Actor container = stencil.GetChildAt( 0u );
+  Actor container = stencil.GetChildAt( 1u );
   for( unsigned int index = 0; index < container.GetChildCount(); ++index )
   {
     Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
     DALI_TEST_CHECK( renderer );
   }
-
-  Renderer highlight = stencil.GetChildAt( 1u ).GetRendererAt( 0u );
-  DALI_TEST_CHECK( highlight );
 
   // Double tap out of bounds
   application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 29.f, 25.0f ) ) );
@@ -1957,6 +1982,7 @@ int utcDaliTextEditorFontStylePropertyStringP(void)
 
   END_TEST;
 }
+
 int utcDaliTextEditorGetPropertyLinecountP(void)
 {
   ToolkitTestApplication application;
@@ -1979,6 +2005,47 @@ int utcDaliTextEditorGetPropertyLinecountP(void)
   editor.SetSize( 50.0f, 100.0f );
   lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 28, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliTextEditorScrollStateChangedSignalTest(void)
+{
+
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextEditorScrollStateChangedSignalTest");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
+  editor.SetSize( 50.f, 50.f );
+  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_SCROLL_BAR, true );
+  editor.SetKeyboardFocusable(true);
+
+  bool startedCalled = false;
+  bool finishedCalled = false;
+
+  ScrollStateChangeCallback callback( startedCalled, finishedCalled );
+  DevelTextEditor::ScrollStateChangedSignal( editor ).Connect( &callback, &ScrollStateChangeCallback::Callback );
+
+  KeyboardFocusManager::Get().SetCurrentFocusActor( editor );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  editor.SetProperty( TextEditor::Property::TEXT, "Long enough message for TextEditor!");
+  application.SendNotification();
+  application.Render(6000);
+
+  application.SendNotification();
+  DALI_TEST_EQUALS( startedCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( finishedCalled, true, TEST_LOCATION );
 
   END_TEST;
 }
