@@ -89,7 +89,7 @@ fi
 
 # Tizen Profile options
 AC_ARG_ENABLE([profile],
-              [AC_HELP_STRING([--enable-profile=UBUNTU,TIZEN],
+              [AC_HELP_STRING([--enable-profile=UBUNTU,MOBILE,WEARABLE,TV],
                             [Select the variant of tizen])],
               [dali_profile=$enableval],
               [dali_profile=UBUNTU])
@@ -99,10 +99,10 @@ AC_ARG_WITH(style,
               [AC_HELP_STRING([--with-style],
                             [Select the style folder to use])],
               [dali_style=$withval],
-              [dali_style=720x1280])
+              [dali_style=480x800])
 
 # Ensure valid profile selected
-if test "x$dali_profile" != "xUBUNTU" -a "x$dali_profile" != "xTIZEN"; then
+if test "x$dali_profile" != "xUBUNTU" -a "x$dali_profile" != "xMOBILE" -a "x$dali_profile" != "xWEARABLE" -a "x$dali_profile" != "xTV" ; then
   AC_MSG_ERROR([$enable_profile is an invalid profile])
 fi
 
