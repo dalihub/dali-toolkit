@@ -122,6 +122,7 @@ Vector4 Control::GetBackgroundColor() const
 void Control::SetBackground( const Property::Map& map )
 {
   Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  visual.SetName("background");
   if( visual )
   {
     mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND );
