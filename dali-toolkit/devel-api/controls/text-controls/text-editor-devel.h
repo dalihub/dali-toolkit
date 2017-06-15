@@ -107,6 +107,9 @@ namespace Property
 
       /**
        * @brief The size of font in pixels.
+       *
+       * Conversion from Point size to Pixel size :
+       *  Pixel size = Point size * DPI / 72
        * @details name "pixelSize", type float
        */
       PIXEL_SIZE,
