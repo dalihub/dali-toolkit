@@ -168,6 +168,13 @@ public: // From Control
    */
   void ApplyThemeStyle();
 
+public:
+  /**
+   * Enable access to non-native type info from native side
+   * @return The type info that was registered on this type
+   */
+  Dali::TypeInfo GetTypeInfo();
+
 protected:
 
   /**
