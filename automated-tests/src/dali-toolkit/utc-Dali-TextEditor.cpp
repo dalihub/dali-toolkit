@@ -96,6 +96,7 @@ const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSiz
 const char* const PROPERTY_NAME_LINE_COUNT                           = "lineCount";
 const char* const PROPERTY_NAME_PLACEHOLDER_TEXT                     = "placeholderText";
 const char* const PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR               = "placeholderTextColor";
+const char* const PROPERTY_NAME_ENABLE_SELECTION                     = "enableSelection";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -465,6 +466,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_LINE_COUNT) == DevelTextEditor::Property::LINE_COUNT );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == DevelTextEditor::Property::PLACEHOLDER_TEXT );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == DevelTextEditor::Property::ENABLE_SELECTION );
 
   END_TEST;
 }
@@ -770,6 +772,9 @@ int UtcDaliTextEditorSetPropertyP(void)
   // Check placeholder text's color property.
   editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR, Color::RED );
   DALI_TEST_EQUALS( editor.GetProperty<Vector4>( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR ), Color::RED, TEST_LOCATION );
+
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_SELECTION, false );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SELECTION ), false, TEST_LOCATION );
 
   END_TEST;
 }

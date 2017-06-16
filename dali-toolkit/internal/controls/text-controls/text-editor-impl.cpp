@@ -139,6 +139,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "pixelSize",             
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "lineCount",            INTEGER,   LINE_COUNT                           )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderText",                STRING,    PLACEHOLDER_TEXT                     )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",           VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableSelection",                BOOLEAN,   ENABLE_SELECTION                     )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -691,6 +692,16 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::ENABLE_SELECTION:
+      {
+        if( impl.mController )
+        {
+          const bool enableSelection = value.Get< bool >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_SELECTION %d\n", impl.mController.Get(), enableSelection );
+          impl.mController->SetSelectionEnabled( enableSelection );
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -1049,6 +1060,14 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         if( impl.mController )
         {
           value = impl.mController->GetPlaceholderTextColor();
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ENABLE_SELECTION:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsSelectionEnabled();
         }
         break;
       }

@@ -355,6 +355,18 @@ public: // Configure the text controller.
   bool IsTextElideEnabled() const;
 
   /**
+   * @brief Enable or disable the text selection.
+   * @param[in] enabled Whether to enable the text selection.
+   */
+  void SetSelectionEnabled( bool enabled );
+
+  /**
+   * @brief Whether the text selection is enabled or not.
+   * @return True if the text selection is enabled
+   */
+  bool IsSelectionEnabled() const;
+
+  /**
    * @brief Sets input type to password
    *
    * @note The string is displayed hidden character
