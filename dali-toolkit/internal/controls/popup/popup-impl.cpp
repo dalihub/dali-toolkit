@@ -30,6 +30,7 @@
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 
 // INTERNAL INCLUDES
@@ -592,6 +593,7 @@ void Popup::SetPopupBackgroundImage( Actor image )
   const bool prevAlter = mAlterAddedChild;
   mAlterAddedChild = false;
   mPopupContainer.Add( mPopupBackgroundImage );
+  DevelActor::LowerToBottom(mPopupBackgroundImage);
   mAlterAddedChild = prevAlter;
 
   if( mTailImage )

@@ -64,6 +64,18 @@ enum Type
    */
 
   ATLASING = WRAP_MODE_V + 2,
+
+  /**
+   * @brief URL of a masking image
+   * @details Name "alphaMaskUrl", type Property::STRING, URL of image to apply as
+   * a mask after image loading. If set after the main URL has finished loading, this
+   * may necessitate a re-load of the main image. The alpha mask image will be scaled
+   * on load to match the size of the main image, then applied to the pixel data
+   * before uploading to GL.
+   * @note Optional.
+   */
+
+  ALPHA_MASK_URL = WRAP_MODE_V + 3,
 };
 
 } //namespace Property

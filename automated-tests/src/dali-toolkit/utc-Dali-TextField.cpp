@@ -1702,16 +1702,17 @@ int utcDaliTextFieldEvent03(void)
   // The offscreen root actor should have two actors: the renderer and the highlight actor.
   Actor stencil = field.GetChildAt( 0u );
 
+  // The highlight actor is drawn first, so is the first actor in the list
+  Renderer highlight = stencil.GetChildAt( 0u ).GetRendererAt( 0u );
+  DALI_TEST_CHECK( highlight );
+
   // The offscreen root actor has a container with all the actors which contain the text renderers.
-  Actor container = stencil.GetChildAt( 0u );
+  Actor container = stencil.GetChildAt( 1u );
   for( unsigned int index = 0; index < container.GetChildCount(); ++index )
   {
     Renderer renderer = container.GetChildAt( index ).GetRendererAt( 0u );
     DALI_TEST_CHECK( renderer );
   }
-
-  Renderer highlight = stencil.GetChildAt( 1u ).GetRendererAt( 0u );
-  DALI_TEST_CHECK( highlight );
 
   END_TEST;
 }

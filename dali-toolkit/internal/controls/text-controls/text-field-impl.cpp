@@ -24,6 +24,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
@@ -1362,6 +1363,7 @@ void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
          ++it )
     {
       self.Add( *it );
+      DevelActor::LowerToBottom(*it);
     }
     mClippingDecorationActors.clear();
 
