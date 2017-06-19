@@ -37,6 +37,7 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
 
 namespace Dali
 {
@@ -602,8 +603,17 @@ Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& 
 
       if( visual )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Concise, "CreateTransition: Found visual for %s\n",
-                       visual.GetName().c_str() );
+#if defined(DEBUG_ENABLED)
+        Dali::TypeInfo typeInfo;
+        ControlWrapper* controlWrapperImpl = dynamic_cast<ControlWrapper*>(&mControlImpl);
+        if( controlWrapperImpl )
+        {
+          typeInfo = controlWrapperImpl->GetTypeInfo();
+        }
+
+        DALI_LOG_INFO( gLogFilter, Debug::Concise, "CreateTransition: Found %s visual for %s\n",
+                       visual.GetName().c_str(), typeInfo?typeInfo.GetName().c_str():"Unknown" );
+#endif
         Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
         visualImpl.AnimateProperty( transition, *animator );
       }
