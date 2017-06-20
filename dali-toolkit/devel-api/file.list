@@ -27,6 +27,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
   $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.cpp \
+  $(devel_api_src_dir)/image-loader/async-image-loader-devel.cpp \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
   $(devel_api_src_dir)/image-loader/image-atlas.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
@@ -112,6 +113,7 @@ devel_api_focus_manager_header_files = \
   $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.h
 
 devel_api_image_loader_header_files = \
+  $(devel_api_src_dir)/image-loader/async-image-loader-devel.h \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.h \
   $(devel_api_src_dir)/image-loader/image-atlas.h
 

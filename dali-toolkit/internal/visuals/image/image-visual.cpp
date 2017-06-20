@@ -24,7 +24,6 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/devel-api/images/texture-set-image.h>
-#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -632,9 +631,12 @@ void ImageVisual::LoadResourceSynchronously()
 {
   if( mImageUrl.IsValid() )
   {
-    BitmapLoader loader = BitmapLoader::New( mImageUrl.GetUrl(), mDesiredSize, mFittingMode, mSamplingMode );
-    loader.Load();
-    mPixels = loader.GetPixelData();
+    Devel::PixelBuffer pixelBuffer = LoadImageFromFile( mImageUrl.GetUrl(), mDesiredSize, mFittingMode, mSamplingMode );
+
+    if( pixelBuffer )
+    {
+      mPixels = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
+    }
     mTextureLoading = false;
   }
 }
