@@ -207,7 +207,7 @@ void TestVisualRender( ToolkitTestApplication& application,
                        Integration::ResourcePointer resourcePtr = Integration::ResourcePointer())
 {
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   if( resourcePtr )
   {
@@ -317,7 +317,7 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   TestVisualRender( application, actor, visual );
 
   Vector3 actualValue(Vector4::ZERO);
@@ -346,7 +346,7 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
   Visual::Base visual = factory.CreateVisual( map );
   DALI_TEST_CHECK( visual );
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   TestVisualRender( application, actor, visual );
 
   Vector3 actualValue;
@@ -381,9 +381,9 @@ int UtcDaliVisualFactoryGetBorderVisual1(void)
   Visual::Base visual = factory.CreateVisual(propertyMap);
   DALI_TEST_CHECK( visual );
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetSize(200.f, 200.f);
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
@@ -429,9 +429,9 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetSize(200.f, 200.f);
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f));
@@ -504,7 +504,7 @@ int UtcDaliVisualFactoryGetLinearGradientVisual(void)
   DALI_TEST_CHECK( visual );
 
   // A lookup texture is generated and pass to shader as sampler
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   TestVisualRender( application, actor, visual, 1u);
 
   END_TEST;
@@ -541,7 +541,7 @@ int UtcDaliVisualFactoryGetRadialGradientVisual(void)
   DALI_TEST_CHECK( visual );
 
   // A lookup texture is generated and pass to shader as sampler
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   TestVisualRender( application, actor, visual, 1u );
 
   Matrix3 alignMatrix( radius, 0.f, 0.f, 0.f, radius, 0.f, center.x, center.y, 1.f );
@@ -581,7 +581,7 @@ int UtcDaliVisualFactoryDefaultOffsetsGradientVisual(void)
   DALI_TEST_CHECK( visual );
 
   // A lookup texture is generated and pass to shader as sampler
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   TestVisualRender( application, actor, visual, 1u );
 
   Stage::GetCurrent().Remove( actor );
@@ -623,7 +623,7 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
     TraceCallStack& textureTrace = gl.GetTextureTrace();
     textureTrace.Enable(true);
 
-    DummyControl actor = DummyControl::New();
+    DummyControl actor = DummyControl::New(true);
     TestVisualRender( application, actor, visual, 1u,
                       ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                       ninePatchResource );
@@ -641,7 +641,7 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
     TraceCallStack& textureTrace = gl.GetTextureTrace();
     textureTrace.Enable(true);
 
-    DummyControl actor = DummyControl::New();
+    DummyControl actor = DummyControl::New(true);
     TestVisualRender( application, actor, visual, 1u,
                       ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                       ninePatchResource );
@@ -673,7 +673,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
     TraceCallStack& textureTrace = gl.GetTextureTrace();
     textureTrace.Enable(true);
 
-    DummyControl actor = DummyControl::New();
+    DummyControl actor = DummyControl::New(true);
     TestVisualRender( application, actor, visual, 1u );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
@@ -689,7 +689,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
     TraceCallStack& textureTrace = gl.GetTextureTrace();
     textureTrace.Enable(true);
 
-    DummyControl actor = DummyControl::New();
+    DummyControl actor = DummyControl::New(true);
     TestVisualRender( application, actor, visual, 1u );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
@@ -708,7 +708,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
     TraceCallStack& textureTrace = gl.GetTextureTrace();
     textureTrace.Enable(true);
 
-    DummyControl actor = DummyControl::New();
+    DummyControl actor = DummyControl::New(true);
     TestVisualRender( application, actor, visual, 1u );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
@@ -749,7 +749,7 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
     TraceCallStack& textureTrace = gl.GetTextureTrace();
     textureTrace.Enable(true);
 
-    DummyControl actor = DummyControl::New();
+    DummyControl actor = DummyControl::New(true);
     TestVisualRender( application, actor, visual, 1u,
                       ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                       ninePatchResource );
@@ -769,7 +769,7 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
     TestGlAbstraction& gl = application.GetGlAbstraction();
     TraceCallStack& textureTrace = gl.GetTextureTrace();
     textureTrace.Enable(true);
-    DummyControl actor = DummyControl::New();
+    DummyControl actor = DummyControl::New(true);
     TestVisualRender( application, actor, visual, 1u,
                       ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                       ninePatchResource );
@@ -807,7 +807,7 @@ int UtcDaliVisualFactoryGetNPatchVisual4(void)
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   TestVisualRender( application, actor, visual, 1u,
                     ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                     ninePatchResource );
@@ -853,7 +853,7 @@ int UtcDaliVisualFactoryGetNPatchVisual5(void)
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   TestVisualRender( application, actor, visual, 1u,
                     ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
                     ninePatchResource );
@@ -884,7 +884,7 @@ int UtcDaliVisualFactoryGetNPatchVisualN1(void)
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   TestVisualRender( application, actor, visual, 1u,
                     ImageDimensions(),
                     Integration::ResourcePointer(bitmap) );
@@ -921,7 +921,7 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
   TraceCallStack& drawTrace = gl.GetDrawTrace();
   drawTrace.Enable(true);
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   TestVisualRender( application, actor, visual, 1u,
                     ImageDimensions(),
                     Integration::ResourcePointer(bitmap) );
@@ -964,9 +964,9 @@ int UtcDaliVisualFactoryGetSvgVisual(void)
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetSize( 200.f, 200.f );
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f) );
@@ -1007,7 +1007,7 @@ int UtcDaliVisualFactoryGetSvgVisualLarge(void)
   DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS ); // Only rasterizes when it knows control size.
-  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   Stage::GetCurrent().Add( actor );
 
   application.SendNotification();
@@ -1042,9 +1042,9 @@ void MeshVisualLoadsCorrectlyTest( Property::Map& propertyMap, ToolkitTestApplic
   DALI_TEST_CHECK( visual );
 
   //Create an actor on stage to house the visual.
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetSize( 200.f, 200.f );
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(), Vector2( 200.f, 200.f ) );
@@ -1085,9 +1085,9 @@ void MeshVisualDoesNotLoadCorrectlyTest( Property::Map& propertyMap, ToolkitTest
   DALI_TEST_CHECK( visual );
 
   //Create an actor on stage to house the visual.
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetSize( 200.f, 200.f );
   Stage::GetCurrent().Add( actor );
   visual.SetTransformAndSize(DefaultTransform(),  Vector2( 200.f, 200.f ) );
@@ -1391,9 +1391,9 @@ void TestPrimitiveVisualWithProperties( Property::Map& propertyMap, ToolkitTestA
   DALI_TEST_CHECK( visual );
 
   //Create an actor on stage to house the visual.
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   actor.SetSize( 200.f, 200.f );
   Stage::GetCurrent().Add( actor );
@@ -1809,9 +1809,9 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
-  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   actor.SetSize( 200.0f, 200.0f );
   Stage::GetCurrent().Add( actor );
 
@@ -1898,7 +1898,7 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual2(void)
   TraceCallStack& texParameterTrace = gl.GetTexParameterTrace();
   texParameterTrace.Enable( true );
 
-  DummyControl actor = DummyControl::New();
+  DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetSize( 200.0f, 200.0f );

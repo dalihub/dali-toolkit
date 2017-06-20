@@ -23,6 +23,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/actors/custom-actor-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -177,6 +178,11 @@ void ControlWrapper::ApplyThemeStyle()
     // Apply the current style
     styleManagerImpl.ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }
+}
+
+Dali::TypeInfo ControlWrapper::GetTypeInfo()
+{
+  return DevelCustomActor::GetTypeInfo(Self());
 }
 
 } // namespace Internal
