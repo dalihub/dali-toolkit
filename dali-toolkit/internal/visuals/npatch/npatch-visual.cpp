@@ -443,10 +443,17 @@ Shader NPatchVisual::CreateShader()
     }
     hints = mImpl->mCustomShader->mHints;
 
+    /* Apply Custom Vertex Shader only if image is 9-patch */
     if( ( xStretchCount == 1 && yStretchCount == 1 ) ||
         ( xStretchCount == 0 && yStretchCount == 0 ) )
     {
-      shader = Shader::New( VERTEX_SHADER_3X3, fragmentShader, hints );
+      const char* vertexShader = VERTEX_SHADER_3X3;
+
+      if( !mImpl->mCustomShader->mVertexShader.empty() )
+      {
+        vertexShader = mImpl->mCustomShader->mVertexShader.c_str();
+      }
+      shader = Shader::New( vertexShader, fragmentShader, hints );
     }
     else if( xStretchCount > 0 || yStretchCount > 0)
     {
