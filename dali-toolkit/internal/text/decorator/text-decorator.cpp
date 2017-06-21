@@ -164,7 +164,8 @@ struct Decorator::Impl : public ConnectionTracker
     : color( Dali::Color::BLACK ),
       position(),
       cursorHeight( 0.0f ),
-      lineHeight( 0.0f )
+      lineHeight( 0.0f ),
+      glyphOffset( 0.0f )
     {
     }
 
@@ -172,6 +173,7 @@ struct Decorator::Impl : public ConnectionTracker
     Vector2 position;
     float cursorHeight;
     float lineHeight;
+    float glyphOffset;
   };
 
   struct HandleImpl
@@ -2004,6 +2006,18 @@ void Decorator::GetPosition( Cursor cursor, float& x, float& y, float& cursorHei
 const Vector2& Decorator::GetPosition( Cursor cursor ) const
 {
   return mImpl->mCursor[cursor].position;
+}
+
+void Decorator::SetGlyphOffset( Cursor cursor, float glyphOffset )
+{
+  Impl::CursorImpl& cursorImpl = mImpl->mCursor[cursor];
+
+  cursorImpl.glyphOffset = glyphOffset;
+}
+
+const float Decorator::GetGlyphOffset( Cursor cursor) const
+{
+  return mImpl->mCursor[cursor].glyphOffset;
 }
 
 void Decorator::SetCursorColor( Cursor cursor, const Dali::Vector4& color )
