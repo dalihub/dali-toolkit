@@ -1502,14 +1502,6 @@ void TextEditor::UpdateScrollBar()
     return;
   }
 
-  // If scrolling is not started, start scrolling and emit ScrollStateChangedSignal
-  if( !mScrollStarted )
-  {
-    mScrollStarted = true;
-    Dali::Toolkit::TextEditor handle( GetOwner() );
-    mScrollStateChangedSignal.Emit( handle, DevelTextEditor::Scroll::STARTED );
-  }
-
   CustomActor self = Self();
   if( !mScrollBar )
   {
@@ -1551,6 +1543,14 @@ void TextEditor::UpdateScrollBar()
     self.SetProperty( propertyScrollPosition, scrollPosition );
     self.SetProperty( propertyMaxScrollPosition, (layoutSize - controlSize) );
     self.SetProperty( propertyScrollContentSize, layoutSize );
+  }
+
+  // If scrolling is not started, start scrolling and emit ScrollStateChangedSignal
+  if( !mScrollStarted )
+  {
+    mScrollStarted = true;
+    Dali::Toolkit::TextEditor handle( GetOwner() );
+    mScrollStateChangedSignal.Emit( handle, DevelTextEditor::Scroll::STARTED );
   }
 
   Actor indicator = mScrollBar.GetScrollIndicator();
