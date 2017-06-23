@@ -668,9 +668,11 @@ void GetCursorPosition( VisualModelPtr visualModel,
     // Set the primary cursor's height.
     cursorInfo.primaryCursorHeight = cursorInfo.isSecondaryCursor ? 0.5f * glyphMetrics.fontHeight : glyphMetrics.fontHeight;
 
+
+    cursorInfo.glyphOffset = line.ascender - glyphMetrics.ascender;
     // Set the primary cursor's position.
     cursorInfo.primaryPosition.x = -glyphMetrics.xBearing + primaryPosition.x + glyphAdvance;
-    cursorInfo.primaryPosition.y = cursorInfo.lineOffset + line.ascender - glyphMetrics.ascender;
+    cursorInfo.primaryPosition.y = cursorInfo.lineOffset + cursorInfo.glyphOffset;
 
     // Transform the cursor info from line's coords to text's coords.
     cursorInfo.primaryPosition.x += line.alignmentOffset;

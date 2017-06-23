@@ -552,7 +552,10 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
     }
   }
 
-  shader.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_ON ); // Set default to align
+  // Set pixel align off as default.
+  // ToDo: Pixel align causes issues such as rattling image animation.
+  // We should trun it off until issues are resolved
+  shader.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF );
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
   if( textureSet )

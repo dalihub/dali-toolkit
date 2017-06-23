@@ -37,6 +37,7 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
 
 namespace Dali
 {
@@ -439,20 +440,19 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
   // ( If the control has been type registered )
   if( visual.GetName().empty() )
   {
-    // Check if the control has been type registered:
-    TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid( mControlImpl ) );
-    if( typeInfo )
+    try
     {
-      // Check if the property index has been registered:
-      Property::IndexContainer indices;
-      typeInfo.GetPropertyIndices( indices );
-      Property::IndexContainer::Iterator iter = std::find( indices.Begin(), indices.End(), index );
-      if( iter != indices.End() )
+      std::string visualName = self.GetPropertyName( index );
+      if( !visualName.empty() )
       {
-        // If it has, then get it's name and use that for the visual
-        std::string visualName = typeInfo.GetPropertyName( index );
+        DALI_LOG_INFO( gLogFilter, Debug::Concise, "Setting visual name for property %d to %s\n",
+                       index, visualName.c_str() );
         visual.SetName( visualName );
       }
+    }
+    catch( Dali::DaliException e )
+    {
+      DALI_LOG_WARNING( "Attempting to register visual without a registered property, index: %d\n", index );
     }
   }
 
@@ -603,11 +603,23 @@ Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& 
 
       if( visual )
       {
+#if defined(DEBUG_ENABLED)
+        Dali::TypeInfo typeInfo;
+        ControlWrapper* controlWrapperImpl = dynamic_cast<ControlWrapper*>(&mControlImpl);
+        if( controlWrapperImpl )
+        {
+          typeInfo = controlWrapperImpl->GetTypeInfo();
+        }
+
+        DALI_LOG_INFO( gLogFilter, Debug::Concise, "CreateTransition: Found %s visual for %s\n",
+                       visual.GetName().c_str(), typeInfo?typeInfo.GetName().c_str():"Unknown" );
+#endif
         Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
         visualImpl.AnimateProperty( transition, *animator );
       }
       else
       {
+        DALI_LOG_INFO( gLogFilter, Debug::Concise, "CreateTransition: Could not find visual. Trying actors");
         // Otherwise, try any actor children of control (Including the control)
         Actor child = mControlImpl.Self().FindChildByName( animator->objectName );
         if( child )

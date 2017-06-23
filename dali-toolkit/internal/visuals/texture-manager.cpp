@@ -343,6 +343,7 @@ void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingCo
 
         if( textureInfo.loadState != CANCELLED )
         {
+          // textureInfo can be invalidated after this call (as the mTextureInfoContainer may be modified)
           PostLoad( textureInfo, pixelData );
         }
         else
@@ -469,19 +470,55 @@ void TextureManager::UploadTexture( PixelData pixelData, TextureInfo& textureInf
 
 void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
 {
-  // If there is an observer: Notify the upload is complete
-  const unsigned int observerCount = textureInfo.observerList.Count();
-  for( unsigned int i = 0; i < observerCount; ++i )
+  TextureId textureId = textureInfo.textureId;
+
+  // If there is an observer: Notify the load is complete, whether successful or not:
+  // And erase it from the list
+  unsigned int observerCount = textureInfo.observerList.Count();
+  TextureInfo* info = &textureInfo;
+
+  while( observerCount )
   {
-    TextureUploadObserver* observer = textureInfo.observerList[i];
-    if( observer )
+    TextureUploadObserver* observer = info->observerList[0];
+
+    // During UploadComplete() a Control ResourceReady() signal is emitted
+    // During that signal the app may add remove /add Textures (e.g. via ImageViews).
+    // At this point no more observers can be added to the observerList, because  textureInfo.loadState = UPLOADED
+    // However it is possible for observers to be removed, hence we check the observer list count every iteration
+
+    // Also the reference to the textureInfo struct can become invalidated, because new load requests can modify
+    // the mTextureInfoContainer list (e.g. if more requests are pushed_back it can cause the list to be resized
+    // invalidating the reference to the TextureInfo ).
+    observer->UploadComplete( success, info->textureSet, info->useAtlas, info->atlasRect );
+    observer->DestructionSignal().Disconnect( this, &TextureManager::ObserverDestroyed );
+
+    // regrab the textureInfo from the container as it may have been invalidated, if textures have been removed
+    // or added during the ResourceReady() signal emission (from UploadComplete() )
+    int textureInfoIndex = GetCacheIndexFromId( textureId );
+
+    if( textureInfoIndex == INVALID_CACHE_INDEX)
     {
-      observer->UploadComplete( success, textureInfo.textureSet, textureInfo.useAtlas, textureInfo.atlasRect );
-      observer->DestructionSignal().Disconnect( this, &TextureManager::ObserverDestroyed );
+      // texture has been removed
+      return;
     }
+    info = &mTextureInfoContainer[ textureInfoIndex ];
+    observerCount = info->observerList.Count();
+    if ( observerCount > 0 )
+    {
+      // remove the observer that was just triggered if it's still in the list
+      for( TextureInfo::ObserverListType::Iterator j = info->observerList.Begin(); j != info->observerList.End(); ++j )
+      {
+        if( *j == observer )
+        {
+          info->observerList.Erase( j );
+          observerCount--;
+          break;
+         }
+      }
+    }
+
   }
 
-  textureInfo.observerList.Clear();
 }
 
 

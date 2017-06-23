@@ -613,8 +613,9 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
           if( !isValidFont ) // (3)
           {
             // The given font has not been validated.
+            int validCharacterIndex = fontClient.GetGlyphIndex(cachedDefaultFontId, character );
 
-            if( isValidCachedDefaultFont )
+            if( isValidCachedDefaultFont && validCharacterIndex != 0u )
             {
               // Use the cached default font for the script if there is one.
               fontId = cachedDefaultFontId;
