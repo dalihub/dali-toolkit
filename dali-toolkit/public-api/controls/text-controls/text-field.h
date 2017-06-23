@@ -78,7 +78,7 @@ public:
       PLACEHOLDER_TEXT_FOCUSED,                 ///< name "placeholderTextFocused",              The text to display when the TextField is empty with key-input focus,              type STRING @SINCE_1_0.0
       FONT_FAMILY,                              ///< name "fontFamily",                          The requested font family,                                                         type STRING @SINCE_1_0.0
       FONT_STYLE,                               ///< name "fontStyle",                           The requested font style,                                                          type STRING or MAP @SINCE_1_2.13
-      POINT_SIZE,                               ///< name "pointSize",                           The size of font in points,                                                        type FLOAT @SINCE_1_0.0
+      POINT_SIZE,                               ///< name "pointSize",                           The size of font in points (Conversion from Pixel size to Point size : Point size = Pixel size * 72 / DPI),       type FLOAT @SINCE_1_0.0
       MAX_LENGTH,                               ///< name "maxLength"                            The maximum number of characters that can be inserted,                             type INTEGER @SINCE_1_0.0
       EXCEED_POLICY,                            ///< name "exceedPolicy"                         Specifies how the text is truncated when it does not fit,                          type INTEGER @SINCE_1_0.0
       HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",                 The line horizontal alignment,                                                     type STRING,  values "BEGIN", "CENTER", "END" @SINCE_1_0.0

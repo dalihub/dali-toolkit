@@ -77,7 +77,7 @@ public:
       TEXT_COLOR,                               ///< name "textColor",                           The text color,                                                                  type VECTOR4 @SINCE_1_1.37
       FONT_FAMILY,                              ///< name "fontFamily",                          The requested font family,                                                       type STRING @SINCE_1_1.37
       FONT_STYLE,                               ///< name "fontStyle",                           The requested font style,                                                        type STRING or MAP @SINCE_1_2.13
-      POINT_SIZE,                               ///< name "pointSize",                           The size of font in points,                                                      type FLOAT @SINCE_1_1.37
+      POINT_SIZE,                               ///< name "pointSize",                           The size of font in points (Conversion from Pixel size to Point size : Point size = Pixel size * 72 / DPI),       type FLOAT @SINCE_1_1.37
       HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",                 The text horizontal alignment,                                                   type STRING,  values "BEGIN", "CENTER", "END" @SINCE_1_1.37
       SCROLL_THRESHOLD,                         ///< name "scrollThreshold"                      Vertical scrolling will occur if the cursor is this close to the control border, type FLOAT @SINCE_1_1.37
       SCROLL_SPEED,                             ///< name "scrollSpeed"                          The scroll speed in pixels per second,                                           type FLOAT @SINCE_1_1.37

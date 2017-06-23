@@ -119,6 +119,9 @@ public:
 
       /**
        * @brief The size of font in points.
+       *
+       * Conversion from Pixel size to Point size :
+       *  Point size = Pixel size * 72 / DPI
        * @details name "pointSize", type FLOAT.
        * @SINCE_1_0.0
        */
