@@ -2528,3 +2528,28 @@ int utcDaliTextFieldExtremlyLargePointSize(void)
   }
   END_TEST;
 }
+
+int UtcDaliTextFieldDefaultFontStylePropertyCoverage(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextFieldFontStylePorpertyCoverage");
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  Stage::GetCurrent().Add( field );
+
+  Property::Map fontStyleMapGet;
+
+  fontStyleMapGet = field.GetProperty<Property::Map>( TextField::Property::FONT_STYLE );
+
+  Property::Value* weightValue = NULL;
+  Property::Value* widthValue = NULL;
+  Property::Value* slantValue = NULL;
+  weightValue = fontStyleMapGet.Find( "weight" );
+  widthValue = fontStyleMapGet.Find( "width" );
+  slantValue = fontStyleMapGet.Find( "slant" );
+  DALI_TEST_CHECK( !weightValue );
+  DALI_TEST_CHECK( !widthValue );
+  DALI_TEST_CHECK( !slantValue );
+
+  END_TEST;
+}
