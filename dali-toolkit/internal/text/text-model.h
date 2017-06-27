@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MODEL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,6 +128,41 @@ public:
    * @copydoc ModelInterface::GetDefaultColor()
    */
   virtual const Vector4& GetDefaultColor() const;
+
+  /**
+   * @copydoc ModelInterface::GetShadowOffset()
+   */
+  virtual const Vector2& GetShadowOffset() const;
+
+  /**
+   * @copydoc ModelInterface::GetShadowColor()
+   */
+  virtual const Vector4& GetShadowColor() const;
+
+  /**
+   * @copydoc ModelInterface::GetUnderlineColor()
+   */
+  virtual const Vector4& GetUnderlineColor() const;
+
+  /**
+   * @copydoc ModelInterface::IsUnderlineEnabled()
+   */
+  virtual bool IsUnderlineEnabled() const;
+
+  /**
+   * @copydoc ModelInterface::GetUnderlineHeight()
+   */
+  virtual float GetUnderlineHeight() const;
+
+  /**
+   * @copydoc ModelInterface::GetNumberOfUnderlineRuns()
+   */
+  virtual Length GetNumberOfUnderlineRuns() const;
+
+  /**
+   * @copydoc ModelInterface::GetUnderlineRuns()
+   */
+  virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const;
 
 private: // Private contructors & copy operator.
 

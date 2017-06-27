@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_TYPESETTER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/images/pixel-data.h>
+#include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 
 namespace Dali
 {
@@ -43,6 +45,33 @@ typedef IntrusivePtr<Typesetter> TypesetterPtr;
  */
 class Typesetter : public RefObject
 {
+public:
+
+  /**
+   * @brief Behaviours of how to render the text.
+   */
+  enum RenderBehaviour
+  {
+    RENDER_TEXT_AND_STYLES,  ///< Render both the text and its styles
+    RENDER_NO_TEXT,          ///< Do not render the text itself
+    RENDER_NO_STYLES,        ///< Do not render any styles
+    RENDER_MASK              ///< Render an alpha mask (for color glyphs with no color animation, e.g. emoji)
+  };
+
+  /**
+   * @brief Styles of the text.
+   */
+  enum Style
+  {
+    STYLE_NONE,              ///< No style
+    STYLE_MASK,              ///< Alpha mask
+    STYLE_SHADOW,            ///< Hard shadow
+    STYLE_SOFT_SHADOW,       ///< Soft shadow
+    STYLE_UNDERLINE,         ///< Underline
+    STYLE_OUTLINE,           ///< Outline
+    STYLE_BACKGROUND         ///< Text background
+  };
+
 public: // Constructor.
   /**
    * @brief Creates a Typesetter instance.
@@ -68,15 +97,16 @@ public:
    * Does the following operations:
    * - Finds the visible pages needed to be rendered.
    * - Elide glyphs if needed.
-   * - Retrieves the data buffers from the text model.
-   * - Creates the pixel data used to generate the final image with the given size.
-   * - Traverse the visible glyphs, retrieve their bitmaps and compose the final pixel data.
+   * - Creates image buffers for diffrent text styles with the given size.
+   * - Combines different image buffers to create the pixel data used to generate the final image
    *
    * @param[in] size The renderer size.
+   * @param[in] behaviour The behaviour of how to render the text (i.e. whether to render the text only or the styles only or both).
+   * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment (i.e. always render as if HORIZONTAL_ALIGN_BEGIN).
    *
    * @return A pixel data with the text rendered.
    */
-  PixelData Render( const Vector2& size );
+  PixelData Render( const Vector2& size, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false );
 
 private:
   /**
@@ -92,6 +122,45 @@ private:
   // Declared private and left undefined to avoid copies.
   Typesetter& operator=( const Typesetter& handle );
 
+  /**
+   * @brief Create the image buffer for the given range of the glyphs in the given style.
+   *
+   * Does the following operations:
+   * - Retrieves the data buffers from the text model.
+   * - Creates the pixel data used to generate the final image with the given size.
+   * - Traverse the visible glyphs, retrieve their bitmaps and compose the final pixel data.
+   *
+   * @param[in] bufferWidth The width of the image buffer.
+   * @param[in] bufferHeight The height of the image buffer.
+   * @param[in] style The style of the text.
+   * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment, not ignored by default.
+   * @param[in] verticalOffset The vertical offset to be added to the glyph's position.
+   * @param[in] fromGlyphIndex The index of the first glyph within the text to be drawn
+   * @param[in] toGlyphIndex The index of the last glyph within the text to be drawn
+   *
+   * @return An image buffer with the text.
+   */
+  Devel::PixelBuffer CreateImageBuffer( const unsigned int bufferWidth, const unsigned int bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, int verticalOffset, TextAbstraction::GlyphIndex fromGlyphIndex, TextAbstraction::GlyphIndex toGlyphIndex );
+
+  /**
+   * @brief Combine the two image buffers together.
+   *
+   * The top layer buffer will blend over the bottom layer buffer:
+   * - If the pixel is not fully opaque from either buffer, it will be blended with
+   *   the pixel from the other buffer and copied to the combined buffer.
+   * - If the pixels from both buffers are fully opaque, the pixels from the top layer
+   *   buffer will be copied to the combined buffer.
+   *
+   * @param[in] topPixelBuffer The top layer buffer.
+   * @param[in] bottomPixelBuffer The bottom layer buffer.
+   * @param[in] bufferWidth The width of the image buffer.
+   * @param[in] bufferHeight The height of the image buffer.
+   *
+   * @return The combined image buffer with the text.
+   *
+   */
+  Devel::PixelBuffer CombineImageBuffer( Devel::PixelBuffer topPixelBuffer, Devel::PixelBuffer bottomPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeight );
+
 protected:
 
   /**
@@ -102,6 +171,7 @@ protected:
   virtual ~Typesetter();
 
 private:
+
    ViewModel* mModel;
 };
 

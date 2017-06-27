@@ -1743,14 +1743,14 @@ Vector3 Controller::GetNaturalSize()
     mImpl->UpdateModel( onlyOnceOperations );
 
     // Layout the text for the new width.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT );
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT | REORDER );
 
     // Store the actual control's size to restore later.
     const Size actualControlSize = mImpl->mModel->mVisualModel->mControlSize;
 
     DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
                 static_cast<OperationsMask>( onlyOnceOperations |
-                                             LAYOUT ),
+                                             LAYOUT | REORDER ),
                 naturalSize.GetVectorXY() );
 
     // Do not do again the only once operations.
@@ -3681,6 +3681,11 @@ void Controller::ResetScrollPosition()
     mImpl->mModel->mScrollPosition = Vector2::ZERO;
     mImpl->mEventData->mScrollAfterUpdatePosition = true;
   }
+}
+
+void Controller::SetControlInterface( ControlInterface* controlInterface )
+{
+  mImpl->mControlInterface = controlInterface;
 }
 
 // private : Private contructors & copy operator.

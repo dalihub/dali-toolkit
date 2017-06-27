@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_LABEL_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,7 @@ public:
     enum
     {
       /**
+       * DEPRECATED_1_2.53 No longer be supported and will be ignored.
        * @brief The type of rendering e.g. bitmap-based.
        * @details name "renderingBackend", type INT, default RENDERING_SHARED_ATLAS.
        * @SINCE_1_0.0
