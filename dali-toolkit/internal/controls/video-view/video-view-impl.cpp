@@ -26,6 +26,9 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
 #include <dali/integration-api/adaptors/adaptor.h>
+#include <dali/integration-api/debug.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
@@ -34,6 +37,7 @@
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 
 namespace Dali
 {
@@ -75,20 +79,72 @@ const char* const RENDERING_TARGET( "renderingTarget" );
 const char* const WINDOW_SURFACE_TARGET( "windowSurfaceTarget" );
 const char* const NATIVE_IMAGE_TARGET( "nativeImageTarget" );
 
+const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
+    vertexPosition.xyz *= uSize;\n
+    gl_Position = uMvpMatrix * vertexPosition;\n
+  }\n
+);
+
+const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
+  \n
+  void main()\n
+  {\n
+    gl_FragColor = vec4(mixColor, opacity)*uColor;\n
+  }\n
+);
+
+struct TriggerFunctor
+{
+  TriggerFunctor( TriggerEventInterface* notification )
+  : mNotification( notification )
+  {
+  }
+
+  void operator()( bool& current, const PropertyInputContainer& inputs )
+  {
+    if( mNotification != NULL )
+    {
+      mNotification->Trigger();
+    }
+  }
+
+  TriggerEventInterface* mNotification;
+};
+
 } // anonymous namepsace
 
 VideoView::VideoView()
 : Control( ControlBehaviour( ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS ) ),
+  mUpdateTriggerPropertyIndex( Property::INVALID_INDEX),
+  mNotification( NULL ),
   mCurrentVideoPlayPosition( 0 ),
   mIsNativeImageTarget( true ),
   mIsPlay( false ),
   mIsPause( false )
 {
   mVideoPlayer = Dali::VideoPlayer::New();
+
+  TriggerEventFactory triggerEventFactory;
+  mNotification = triggerEventFactory.CreateTriggerEvent( MakeCallback(this, &VideoView::UpdateDisplayArea ),
+                                                               TriggerEventInterface::KEEP_ALIVE_AFTER_TRIGGER);
 }
 
 VideoView::~VideoView()
 {
+  if( mNotification != NULL )
+  {
+    delete mNotification;
+  }
 }
 
 Toolkit::VideoView VideoView::New()
@@ -109,6 +165,8 @@ void VideoView::OnInitialize()
 
   mVideoPlayer.SetRenderingTarget( nativeImageSourcePtr );
   mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
+
+  mUpdateTriggerPropertyIndex = Self().RegisterProperty( "updateTrigger", true );
 }
 
 void VideoView::SetUrl( const std::string& url )
@@ -543,6 +601,11 @@ void VideoView::SetWindowSurfaceTarget()
     mVisual.Reset();
   }
 
+  Constraint constraint = Constraint::New<bool>( self, mUpdateTriggerPropertyIndex, TriggerFunctor( mNotification ) );
+  constraint.AddSource( Source( self, Actor::Property::POSITION ) );
+  constraint.AddSource( Source( self, Actor::Property::SIZE ) );
+  constraint.Apply();
+
   mVideoPlayer.SetRenderingTarget( Dali::Adaptor::Get().GetNativeWindowHandle() );
   mVideoPlayer.SetUrl( mUrl );
 
@@ -558,6 +621,18 @@ void VideoView::SetWindowSurfaceTarget()
     mVideoPlayer.Pause();
   }
   mVideoPlayer.SetPlayPosition( curPos );
+
+  // For underlay rendering mode, video display area have to be transparent.
+  Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
+  Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::ONE );
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ZERO );
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE );
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ZERO );
+  self.AddRenderer( renderer );
 }
 
 void VideoView::SetNativeImageTarget()
@@ -588,8 +663,26 @@ void VideoView::SetNativeImageTarget()
   mVideoPlayer.SetPlayPosition( curPos );
 }
 
+void VideoView::UpdateDisplayArea()
+{
+  Actor self( Self() );
+
+  bool positionUsesAnchorPoint = self.GetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >();
+  Vector3 actorSize = self.GetCurrentSize() * self.GetCurrentScale();
+  Vector3 anchorPointOffSet = actorSize * ( positionUsesAnchorPoint ? self.GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT );
+
+  Vector2 screenPosition = self.GetProperty( DevelActor::Property::SCREEN_POSITION ).Get< Vector2 >();
+
+  mDisplayArea.x = screenPosition.x - anchorPointOffSet.x;
+  mDisplayArea.y = screenPosition.y - anchorPointOffSet.y;
+  mDisplayArea.width = actorSize.x;
+  mDisplayArea.height = actorSize.y;
+
+  mVideoPlayer.SetDisplayArea( mDisplayArea );
+}
+
 } // namespace Internal
 
-} // namespace Toolkit
+} // namespace toolkit
 
 } // namespace Dali

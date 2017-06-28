@@ -346,6 +346,7 @@ int UtcDaliVideoViewCustomShaderForCoverage(void)
   ToolkitTestApplication application;
   VideoView videoView = VideoView::New();
   DALI_TEST_CHECK( videoView );
+
   Stage::GetCurrent().Add( videoView );
   videoView.SetProperty( VideoView::Property::VIDEO, "testvideo" );
 
@@ -362,6 +363,45 @@ int UtcDaliVideoViewCustomShaderForCoverage(void)
   Property::Value value = videoView.GetProperty( VideoView::Property::VIDEO );
 
   DALI_TEST_CHECK( !value.Get( map2 ) );
+  END_TEST;
+}
+
+int UtcDaliVideoViewMethodsForCoverage2(void)
+{
+  ToolkitTestApplication application;
+  VideoView videoView = VideoView::New();
+  DALI_TEST_CHECK( videoView );
+
+  Property::Map windowSurfaceTarget;
+
+  windowSurfaceTarget.Insert( RENDERING_TYPE, "windowSurfaceTarget" );
+
+  Stage::GetCurrent().Add( videoView );
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map map;
+  Property::Value value;
+  videoView.SetProperty( VideoView::Property::VIDEO, windowSurfaceTarget );
+
+  value = videoView.GetProperty( VideoView::Property::VIDEO );
+  DALI_TEST_CHECK( value.Get( map ) );
+
+  Property::Value* type = map.Find( RENDERING_TYPE );
+  DALI_TEST_CHECK( type );
+  DALI_TEST_EQUALS( "windowSurfaceTarget", type->Get<std::string>(), TEST_LOCATION );
+
+  Vector3 vector(100.0f, 100.0f, 0.0f);
+
+  DALI_TEST_CHECK(vector != videoView.GetCurrentSize());
+  videoView.SetSize( vector );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check the size in the new frame
+  DALI_TEST_CHECK(vector == videoView.GetCurrentSize());
 
   END_TEST;
 }

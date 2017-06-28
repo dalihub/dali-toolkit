@@ -87,11 +87,17 @@ public:
 
   int GetPlayPosition();
 
+  void SetDisplayArea( DisplayArea area );
+
   void SetDisplayRotation( Dali::VideoPlayerPlugin::DisplayRotation rotation );
 
   Dali::VideoPlayerPlugin::DisplayRotation GetDisplayRotation();
 
   Dali::VideoPlayerPlugin::VideoPlayerSignalType& FinishedSignal();
+
+  void Forward( int millisecond );
+
+  void Backward( int millisecond );
 
 private:
 
