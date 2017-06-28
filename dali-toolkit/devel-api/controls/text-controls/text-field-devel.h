@@ -98,6 +98,12 @@ namespace Property
        * @details name "pixelSize", type float
        */
       PIXEL_SIZE = INPUT_OUTLINE + 2,
+
+      /**
+       * @brief Enables Text selection, such as the cursor, handle, clipboard, and highlight color.
+       * @details name "enableSelection", type bool
+       */
+      ENABLE_SELECTION = INPUT_OUTLINE + 3
   };
 } // namespace Property
 

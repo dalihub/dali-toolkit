@@ -140,6 +140,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "outline",                      
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputOutline",                         MAP,       INPUT_OUTLINE                        )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "hiddenInputSettings",            MAP,       HIDDEN_INPUT_SETTINGS                )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "pixelSize",                      FLOAT,     PIXEL_SIZE                           )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableSelection",                BOOLEAN,   ENABLE_SELECTION                     )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -751,6 +752,16 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::ENABLE_SELECTION:
+      {
+        if( impl.mController )
+        {
+          const bool enableSelection = value.Get< bool >();
+           DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p ENABLE_SELECTION %d\n", impl.mController.Get(), enableSelection );
+          impl.mController->SetSelectionEnabled( enableSelection );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -1126,6 +1137,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
+        }
+        break;
+      }
+      case Toolkit::DevelTextField::Property::ENABLE_SELECTION:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsSelectionEnabled();
         }
         break;
       }

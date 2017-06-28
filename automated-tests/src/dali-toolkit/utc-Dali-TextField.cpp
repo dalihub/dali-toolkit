@@ -98,6 +98,7 @@ const char* const PROPERTY_NAME_INPUT_OUTLINE                        = "inputOut
 
 const char* const PROPERTY_NAME_HIDDEN_INPUT_SETTINGS                = "hiddenInputSettings";
 const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSize";
+const char* const PROPERTY_NAME_ENABLE_SELECTION                     = "enableSelection";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -507,6 +508,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_OUTLINE ) == TextField::Property::INPUT_OUTLINE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_HIDDEN_INPUT_SETTINGS ) == DevelTextField::Property::HIDDEN_INPUT_SETTINGS );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextField::Property::PIXEL_SIZE );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == DevelTextField::Property::ENABLE_SELECTION );
 
   END_TEST;
 }
@@ -844,6 +846,9 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Check the pixel size of font
   field.SetProperty( DevelTextField::Property::PIXEL_SIZE, 20.f );
   DALI_TEST_EQUALS( field.GetProperty<float>( DevelTextField::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  field.SetProperty( DevelTextField::Property::ENABLE_SELECTION, false );
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_SELECTION ), false, TEST_LOCATION );
 
   END_TEST;
 }

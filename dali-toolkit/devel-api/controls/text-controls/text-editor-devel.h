@@ -131,7 +131,13 @@ namespace Property
        * @brief The placeholder-text color.
        * @details name "placeholderTextColor", type vector4
        */
-      PLACEHOLDER_TEXT_COLOR
+      PLACEHOLDER_TEXT_COLOR,
+
+      /**
+       * @brief Enables Text selection, such as the cursor, handle, clipboard, and highlight color.
+       * @details name "enableSelection", type bool
+       */
+      ENABLE_SELECTION
   };
 } // namespace Property
 
