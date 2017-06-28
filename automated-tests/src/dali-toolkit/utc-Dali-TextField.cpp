@@ -1654,6 +1654,16 @@ int utcDaliTextFieldEvent02(void)
   // Should not be a renderer.
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
+  // Chanege exceed policy (EXCEED_POLICY_ORIGINAL doesn't use stencil )
+  field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
+  field.SetProperty( TextField::Property::EXCEED_POLICY, Dali::Toolkit::TextField::EXCEED_POLICY_ORIGINAL );
+
+  application.SendNotification();
+  application.Render();
+
+  // There are renderer and decorator layer
+  DALI_TEST_EQUALS( field.GetChildCount(), 2u, TEST_LOCATION );
+
   END_TEST;
 }
 

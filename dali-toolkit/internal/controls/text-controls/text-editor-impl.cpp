@@ -1157,8 +1157,8 @@ void TextEditor::OnInitialize()
 
   // Creates an extra control to be used as stencil buffer.
   mStencil = Control::New();
-  mStencil.SetAnchorPoint( AnchorPoint::CENTER );
-  mStencil.SetParentOrigin( ParentOrigin::CENTER );
+  mStencil.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  mStencil.SetParentOrigin( ParentOrigin::TOP_LEFT );
 
   // Creates a background visual. Even if the color is transparent it updates the stencil.
   mStencil.SetProperty( Toolkit::Control::Property::BACKGROUND,
@@ -1212,14 +1212,32 @@ Vector3 TextEditor::GetNaturalSize()
 
 float TextEditor::GetHeightForWidth( float width )
 {
-  return mController->GetHeightForWidth( width );
+  Padding padding;
+  Self().GetPadding( padding );
+  return mController->GetHeightForWidth( width ) + padding.top + padding.bottom;
 }
 
 void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor OnRelayout\n");
 
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( size );
+  Actor self = Self();
+  Padding padding;
+
+  self.GetPadding( padding );
+  Vector2 contentSize( size.x - ( padding.left + padding.right ), size.y - ( padding.top + padding.bottom ) );
+
+  if( mStencil )
+  {
+    mStencil.SetPosition( padding.left , padding.top  );
+  }
+  if( mActiveLayer )
+  {
+    mActiveLayer.SetPosition( padding.left , padding.top  );
+  }
+
+
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize );
 
   if( ( Text::Controller::NONE_UPDATED != updateTextType ) ||
       !mRenderer )
@@ -1238,6 +1256,7 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
     }
 
     RenderText( updateTextType );
+
   }
 
   // The text-editor emits signals when the input style changes. These changes of style are
@@ -1361,7 +1380,9 @@ void TextEditor::OnTap( const TapGesture& gesture )
   mImfManager.Activate();
 
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
-  mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x, gesture.localPoint.y );
+  Padding padding;
+  Self().GetPadding( padding );
+  mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x - padding.left, gesture.localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }
@@ -1375,7 +1396,9 @@ void TextEditor::OnLongPress( const LongPressGesture& gesture )
 {
   mImfManager.Activate();
 
-  mController->LongPressEvent( gesture.state, gesture.localPoint.x, gesture.localPoint.y );
+  Padding padding;
+  Self().GetPadding( padding );
+  mController->LongPressEvent( gesture.state, gesture.localPoint.x - padding.left, gesture.localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }
@@ -1478,7 +1501,10 @@ void TextEditor::AddDecoration( Actor& actor, bool needsClipping )
     }
     else
     {
+      actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+      actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
       Self().Add( actor );
+      mActiveLayer = actor;
     }
   }
 }
