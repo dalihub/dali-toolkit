@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-timer.h>
-#include <toolkit-bitmap-loader.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/texture-set.h>

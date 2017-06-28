@@ -7,24 +7,25 @@ SET(CAPI_LIB "dali-toolkit-internal")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
- utc-Dali-Text-CharacterSetConversion.cpp
- utc-Dali-Text-Cursor.cpp
- utc-Dali-Text-Segmentation.cpp
- utc-Dali-Text-MultiLanguage.cpp
- utc-Dali-LogicalModel.cpp
  utc-Dali-BidirectionalSupport.cpp
- utc-Dali-Text-Shaping.cpp
- utc-Dali-VisualModel.cpp
- utc-Dali-Text-Layout.cpp
- utc-Dali-Text-Controller.cpp
- utc-Dali-VisualUrl.cpp
- utc-Dali-Text-Markup.cpp
- utc-Dali-Text-Typesetter.cpp
- utc-Dali-Text-ViewModel.cpp
+ utc-Dali-ColorConversion.cpp
  utc-Dali-DebugRendering.cpp
  utc-Dali-ItemView-internal.cpp
+ utc-Dali-LogicalModel.cpp
  utc-Dali-PropertyHelper.cpp
- utc-Dali-ColorConversion.cpp
+ utc-Dali-Text-CharacterSetConversion.cpp
+ utc-Dali-Text-Controller.cpp
+ utc-Dali-Text-Cursor.cpp
+ utc-Dali-Text-Layout.cpp
+ utc-Dali-Text-Markup.cpp
+ utc-Dali-Text-MultiLanguage.cpp
+ utc-Dali-Text-Segmentation.cpp
+ utc-Dali-Text-Shaping.cpp
+ utc-Dali-Text-Typesetter.cpp
+ utc-Dali-Text-ViewModel.cpp
+ utc-Dali-TextureManager.cpp
+ utc-Dali-VisualModel.cpp
+ utc-Dali-VisualUrl.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)

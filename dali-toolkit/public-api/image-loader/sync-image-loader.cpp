@@ -46,7 +46,12 @@ PixelData Load( const std::string& url,
                 bool orientationCorrection )
 {
   // Load the image synchronously (block the thread here).
-  return Dali::LoadImageFromFile( url, dimensions, fittingMode, samplingMode, orientationCorrection );
+  Devel::PixelBuffer pixelBuffer = Dali::LoadImageFromFile( url, dimensions, fittingMode, samplingMode, orientationCorrection );
+  if( pixelBuffer )
+  {
+    return Devel::PixelBuffer::Convert( pixelBuffer );
+  }
+  return Dali::PixelData(); // return empty handle
 }
 
 

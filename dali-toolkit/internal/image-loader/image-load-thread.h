@@ -21,11 +21,11 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/images/image-operations.h>
-#include <dali/public-api/images/pixel-data.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
@@ -70,7 +70,7 @@ private:
 
 public:
 
-  PixelData          pixelData;     ///< pixelData handle after successfull load
+  Devel::PixelBuffer pixelBuffer;   ///< pixelBuffer handle after successful load
   VisualUrl          url;           ///< url of the image to load
   uint32_t           id;            ///< The unique id associated with this task.
   ImageDimensions    dimensions;    ///< dimensions to load

@@ -23,6 +23,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <deque>
 
 // INTERNAL INCLUDES
@@ -67,12 +68,12 @@ public:
   };
 
   /**
-   * Whether the texture should be stored in CPU memory, or uploaded to a GPU texture
+   * Whether the pixel data should be kept in TextureManager, or uploaded for rendering
    */
   enum StorageType
   {
-    CPU,
-    GPU_UPLOAD
+    KEEP_PIXEL_BUFFER,
+    UPLOAD_TO_TEXTURE
   };
 
   /**
@@ -140,8 +141,8 @@ public:
 
   /**
    * @brief Requests an image load of the given URL, when the texture has
-   * have loaded, it will perform a CPU blend with the image mask, and upload
-   * the blend texture.
+   * have loaded, it will perform a blend with the image mask, and upload
+   * the blended texture.
    *
    * The parameters are used to specify how the image is loaded.
    * The observer has the UploadComplete method called when the load is ready.
@@ -183,6 +184,11 @@ public:
   void Remove( const TextureManager::TextureId textureId );
 
   /**
+   * Get the visualUrl associated with the texture id
+   */
+  const VisualUrl& GetVisualUrl( TextureId textureId );
+
+  /**
    * @brief Get the current state of a texture
    * @param[in] textureId The texture id to query
    * @return The loading state if the texture is valid, or NOT_STARTED if the textureId
@@ -221,7 +227,7 @@ private:
    *                              This is called when an image load completes (or fails).
    * @return                      A TextureId to use as a handle to reference this Texture
    */
-  TextureId RequestInternalLoad(
+  TextureId RequestLoadInternal(
     const VisualUrl&         url,
     TextureId                maskTextureId,
     const ImageDimensions    desiredSize,
@@ -259,7 +265,7 @@ private:
       loadState( NOT_STARTED ),
       fittingMode( fittingMode ),
       samplingMode( samplingMode ),
-      storageType( GPU_UPLOAD ),
+      storageType( UPLOAD_TO_TEXTURE ),
       loadSynchronously( loadSynchronously ),
       useAtlas( useAtlas )
     {
@@ -272,7 +278,7 @@ private:
 
     ObserverListType observerList; ///< Container used to store all observer clients of this Texture
     Toolkit::ImageAtlas atlas;     ///< The atlas this Texture lays within (if any)
-    PixelData pixelData;           ///< The PixelData holding the image data (this is used if atlasing is deferred or CPU storage is required)
+    Devel::PixelBuffer pixelBuffer;///< The PixelBuffer holding the image data (May be empty after upload)
     TextureSet textureSet;         ///< The TextureSet holding the Texture
     VisualUrl url;                 ///< The URL of the image
     ImageDimensions desiredSize;   ///< The size requested
@@ -346,32 +352,32 @@ private:
   /**
    * @brief This signal handler is called when the async local loader finishes loading.
    * @param[in] id        This is the async image loaders Id
-   * @param[in] pixelData The loaded image data
+   * @param[in] pixelBuffer The loaded image data
    */
-  void AsyncLocalLoadComplete( uint32_t id, PixelData pixelData );
+  void AsyncLocalLoadComplete( uint32_t id, Devel::PixelBuffer pixelBuffer );
 
   /**
    * @brief This signal handler is called when the async local loader finishes loading.
    * @param[in] id        This is the async image loaders Id
-   * @param[in] pixelData The loaded image data
+   * @param[in] pixelBuffer The loaded image data
    */
-  void AsyncRemoteLoadComplete( uint32_t id, PixelData pixelData );
+  void AsyncRemoteLoadComplete( uint32_t id, Devel::PixelBuffer pixelBuffer );
 
   /**
    * Common method to handle loading completion
    * @param[in] container The Async loading container
    * @param[in] id        This is the async image loaders Id
-   * @param[in] pixelData The loaded image data
+   * @param[in] pixelBuffer The loaded image data
    */
-  void AsyncLoadComplete( AsyncLoadingInfoContainerType& container, uint32_t id, PixelData pixelData );
+  void AsyncLoadComplete( AsyncLoadingInfoContainerType& container, uint32_t id, Devel::PixelBuffer pixelBuffer );
 
   /**
    * @brief Performs Post-Load steps including atlasing.
    * @param[in] textureInfo The struct associated with this Texture
-   * @param[in] pixelData   The image pixelData
+   * @param[in] pixelBuffer The image pixelBuffer
    * @return    True if successful
    */
-  void PostLoad( TextureManager::TextureInfo& textureInfo, PixelData pixelData );
+  void PostLoad( TextureManager::TextureInfo& textureInfo, Devel::PixelBuffer& pixelBuffer );
 
   /**
    * Check if there is a texture waiting to be masked. If there
@@ -381,19 +387,19 @@ private:
   void CheckForWaitingTexture( TextureInfo& maskTextureInfo );
 
   /**
-   * Apply the mask texture to the image texture.
-   * @param[in] pixelData The image pixelData to apply the mask to
+   * Apply the mask to the pixelBuffer.
+   * @param[in] pixelBuffer The pixelBuffer to apply the mask to
    * @param[in] maskTextureId The texture id of the mask.
    */
-  void ApplyMask( PixelData pixelData, TextureId maskTextureId );
+  void ApplyMask( Devel::PixelBuffer& pixelBuffer, TextureId maskTextureId );
 
   /**
-   * Upload the texture specified in pixelData to the appropriate location
-   * @param[in] pixelData The image data to upload
+   * Upload the texture specified in pixelBuffer to the appropriate location
+   * @param[in] pixelBuffer The image data to upload
    * @param[in] textureInfo The texture info containing the location to
    * store the data to.
    */
-  void UploadTexture( PixelData pixelData, TextureInfo& textureInfo );
+  void UploadTexture( Devel::PixelBuffer& pixelBuffer, TextureInfo& textureInfo );
 
   /**
    * Mark the texture as complete, and inform observers
