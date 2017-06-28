@@ -80,6 +80,10 @@ const char * const IMAGE_WRAP_MODE_U("wrapModeU");
 const char * const IMAGE_WRAP_MODE_V("wrapModeV");
 const char * const IMAGE_BORDER( "border" );
 const char * const PIXEL_ALIGNED_UNIFORM_NAME( "uPixelAligned" );
+const char * const ANIMATED_IMAGE_URLS_NAME("urls");
+const char * const BATCH_SIZE_NAME("batchSize");
+const char * const CACHE_SIZE_NAME("cacheSize");
+const char * const FRAME_DELAY_NAME("frameDelay");
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );

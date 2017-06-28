@@ -119,31 +119,42 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     {
       Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
       std::string imageUrl;
-      if( imageURLValue && imageURLValue->Get( imageUrl ) )
+      if( imageURLValue )
       {
-        VisualUrl visualUrl( imageUrl );
-
-        switch( visualUrl.GetType() )
+        if( imageURLValue->Get( imageUrl ) )
         {
-          case VisualUrl::N_PATCH:
+          VisualUrl visualUrl( imageUrl );
+
+          switch( visualUrl.GetType() )
           {
-            visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-            break;
+            case VisualUrl::N_PATCH:
+            {
+              visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+              break;
+            }
+            case VisualUrl::SVG:
+            {
+              visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+              break;
+            }
+            case VisualUrl::GIF:
+            {
+              visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+              break;
+            }
+            case VisualUrl::REGULAR_IMAGE:
+            {
+              visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+              break;
+            }
           }
-          case VisualUrl::SVG:
+        }
+        else
+        {
+          Property::Array* array = imageURLValue->GetArray();
+          if( array )
           {
-            visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-            break;
-          }
-          case VisualUrl::GIF:
-          {
-            visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-            break;
-          }
-          case VisualUrl::REGULAR_IMAGE:
-          {
-            visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-            break;
+            visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), *array, propertyMap );
           }
         }
       }
@@ -200,9 +211,20 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     {
       Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
       std::string imageUrl;
-      if( imageURLValue && imageURLValue->Get( imageUrl ) )
+      if( imageURLValue )
       {
-        visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
+        if( imageURLValue->Get( imageUrl ) )
+        {
+          visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
+        }
+        else
+        {
+          Property::Array* array = imageURLValue->GetArray();
+          if( array )
+          {
+            visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), *array, propertyMap );
+          }
+        }
       }
       break;
     }

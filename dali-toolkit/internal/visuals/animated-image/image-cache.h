@@ -1,0 +1,103 @@
+#ifndef DALI_TOOLKIT_INTERNAL_IMAGE_CACHE_H
+#define DALI_TOOLKIT_INTERNAL_IMAGE_CACHE_H
+
+/*
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// EXTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/texture-upload-observer.h>
+#include <dali-toolkit/internal/visuals/texture-manager.h>
+
+namespace Dali
+{
+namespace Toolkit
+{
+namespace Internal
+{
+
+class ImageCache : public TextureUploadObserver
+{
+public:
+  /**
+   * Observer class to inform when the next image is ready
+   */
+  class FrameReadyObserver
+  {
+  public:
+    /**
+     * Informs observer when the next texture set is ready to display
+     * @param[in] textureSet The ready texture set
+     */
+    virtual void FrameReady( TextureSet textureSet ) = 0;
+  };
+
+  struct UrlStore
+  {
+    TextureManager::TextureId mTextureId;
+    std::string mUrl;
+  };
+
+  /**
+   * List of URLs
+   */
+  typedef std::vector<UrlStore> UrlList;
+
+public:
+  /**
+   * Constructor.
+   * @param[in] textureManager The texture manager
+   * @param[in] urlList List of urls to cache
+   * @param[in] observer FrameReady observer
+   * @param[in] batchSize The size of a batch to load
+   *
+   * This will start loading textures immediately, according to the
+   * batch and cache sizes. The cache is as large as the number of urls.
+   */
+  ImageCache( TextureManager&                 textureManager,
+              UrlList&                        urlList,
+              ImageCache::FrameReadyObserver& observer,
+              unsigned int                    batchSize );
+
+  virtual ~ImageCache();
+
+  /**
+   * Get the first frame. If it's not ready, this will trigger the
+   * sending of FrameReady() when the image becomes ready.
+   */
+  virtual TextureSet FirstFrame() = 0;
+
+  /**
+   * Get the next frame. If it's not ready, this will trigger the
+   * sending of FrameReady() when the image becomes ready.
+   * This will trigger the loading of the next batch.
+   */
+  virtual TextureSet NextFrame() = 0;
+
+protected:
+  TextureManager&        mTextureManager;
+  FrameReadyObserver&    mObserver;
+  std::vector<UrlStore>& mImageUrls;
+  unsigned int           mBatchSize;
+  unsigned int           mUrlIndex;
+  bool                   mWaitingForReadyFrame:1;
+  bool                   mRequestingLoad:1;
+};
+
+} //namespace Internal
+} //namespace Toolkit
+} //namespace Dali
+
+#endif // DALI_TOOLKIT_INTERNAL_IMAGE_CACHE_H

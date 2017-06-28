@@ -234,3 +234,18 @@ void Timer::MockEmitSignal()
 
 } // namespace Dali
 
+
+namespace Test
+{
+
+int GetTimerCount()
+{
+  return Dali::Internal::Adaptor::gTimerCount;
+}
+
+void EmitGlobalTimerSignal()
+{
+  Dali::Internal::Adaptor::gTickSignal.Emit();
+}
+
+}
