@@ -29,10 +29,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
 namespace Dali
 {
@@ -152,18 +149,6 @@ void VideoView::SetPropertyMap( Property::Map map )
     {
       mVideoSize = ImageDimensions( mVideoSize.GetWidth(), height );
     }
-  }
-
-  Property::Value* target = map.Find( RENDERING_TARGET );
-  std::string targetType;
-
-  if( target && target->Get( targetType ) && targetType == WINDOW_SURFACE_TARGET )
-  {
-    this->SetWindowSurfaceTarget();
-  }
-  else if( target && target->Get( targetType ) && targetType == NATIVE_IMAGE_TARGET )
-  {
-    this->SetNativeImageTarget();
   }
 
   RelayoutRequest();
@@ -342,33 +327,25 @@ void VideoView::SetProperty( BaseObject* object, Property::Index index, const Pr
       case Toolkit::VideoView::Property::VIDEO:
       {
         std::string videoUrl;
-        Property::Map map;
-
         if( value.Get( videoUrl ) )
         {
           impl.SetUrl( videoUrl );
         }
-        else if( value.Get( map ) )
-        {
-          Property::Value* shaderValue = map.Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
 
-          if( map.Count() > 1u || !shaderValue )
+        Property::Map map;
+        if( value.Get( map ) )
+        {
+          impl.SetPropertyMap( map );
+
+          Property::Value* target = map.Find( RENDERING_TARGET );
+          std::string targetType;
+          if( target && target->Get( targetType ) && targetType == WINDOW_SURFACE_TARGET )
           {
-            impl.SetPropertyMap( map );
+            impl.SetWindowSurfaceTarget();
           }
-          else if( impl.mVisual && map.Count() == 1u && shaderValue )
+          else if( target && target->Get( targetType ) && targetType == NATIVE_IMAGE_TARGET )
           {
-            Property::Map shaderMap;
-            if( shaderValue->Get( shaderMap ) )
-            {
-              Internal::Visual::Base& visual = Toolkit::GetImplementation( impl.mVisual );
-              visual.SetCustomShader( shaderMap );
-              if( videoView.OnStage() )
-              {
-                visual.SetOffStage( videoView );
-                visual.SetOnStage( videoView );
-              }
-            }
+            impl.SetNativeImageTarget();
           }
         }
         break;
