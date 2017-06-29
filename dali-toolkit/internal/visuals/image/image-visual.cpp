@@ -470,6 +470,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
     {
       bool atlasing = false;
       mAttemptAtlasing = value.Get( atlasing );
+      break;
     }
 
     case Toolkit::DevelImageVisual::Property::ALPHA_MASK_URL:
@@ -479,6 +480,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
       {
         mAlphaMaskUrl = VisualUrl( alphaUrl );
       }
+      break;
     }
   }
 }
