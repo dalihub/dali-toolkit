@@ -654,12 +654,15 @@ void TextureManager::ObserverDestroyed( TextureUploadObserver* observer )
   for( unsigned int i = 0; i < count; ++i )
   {
     TextureInfo& textureInfo( mTextureInfoContainer[i] );
-    for( TextureInfo::ObserverListType::Iterator j = textureInfo.observerList.Begin(); j != textureInfo.observerList.End(); ++j )
+    for( TextureInfo::ObserverListType::Iterator j = textureInfo.observerList.Begin(); j != textureInfo.observerList.End(); )
     {
       if( *j == observer )
       {
-        textureInfo.observerList.Erase( j );
-        break;
+        j = textureInfo.observerList.Erase( j );
+      }
+      else
+      {
+        ++j;
       }
     }
   }
