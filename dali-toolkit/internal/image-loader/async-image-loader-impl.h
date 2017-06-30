@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/image-loader/async-image-loader.h>
+#include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 #include <dali-toolkit/internal/image-loader/image-load-thread.h>
 
 namespace Dali
@@ -63,6 +64,11 @@ public:
   Toolkit::AsyncImageLoader::ImageLoadedSignalType& ImageLoadedSignal();
 
   /**
+   * @copydoc Toolkit::AsyncImageLoader::PixelBufferLoadedSignal
+   */
+  Toolkit::DevelAsyncImageLoader::PixelBufferLoadedSignalType& PixelBufferLoadedSignal();
+
+  /**
    * @copydoc Toolkit::AsyncImageLoader::Cancel
    */
   bool Cancel( uint32_t loadingTaskId );
@@ -86,6 +92,7 @@ protected:
 
 private:
   Toolkit::AsyncImageLoader::ImageLoadedSignalType mLoadedSignal;
+  Toolkit::DevelAsyncImageLoader::PixelBufferLoadedSignalType mPixelBufferLoadedSignal;
 
   ImageLoadThread mLoadThread;
   uint32_t        mLoadTaskId;

@@ -392,6 +392,16 @@ bool Controller::IsTextElideEnabled() const
   return mImpl->mModel->mElideEnabled;
 }
 
+void Controller::SetSelectionEnabled( bool enabled )
+{
+  mImpl->mEventData->mSelectionEnabled = enabled;
+}
+
+bool Controller::IsSelectionEnabled() const
+{
+  return mImpl->mEventData->mSelectionEnabled;
+}
+
 // public : Update
 
 void Controller::SetText( const std::string& text )

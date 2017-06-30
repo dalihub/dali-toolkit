@@ -16,7 +16,6 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-adaptor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-application.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-bitmap-loader.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-color-controller.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-event-thread-callback.cpp

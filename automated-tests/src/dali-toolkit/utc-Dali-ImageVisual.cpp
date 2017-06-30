@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-timer.h>
-#include <toolkit-bitmap-loader.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -451,11 +450,6 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   application.SendNotification();
   application.Render();
 
-  BitmapLoader loader = BitmapLoader::GetLatestCreated();
-  DALI_TEST_CHECK( loader );
-  loader.WaitForLoading();// waiting until the image to be loaded
-  DALI_TEST_CHECK( loader.IsLoaded() );
-
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
@@ -533,11 +527,6 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
   // loading started
   application.SendNotification();
   application.Render();
-
-  BitmapLoader loader = BitmapLoader::GetLatestCreated();
-  DALI_TEST_CHECK( loader );
-  loader.WaitForLoading();// waiting until the image to be loaded
-  DALI_TEST_CHECK( loader.IsLoaded() );
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 

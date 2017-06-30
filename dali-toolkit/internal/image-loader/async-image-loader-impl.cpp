@@ -71,6 +71,11 @@ Toolkit::AsyncImageLoader::ImageLoadedSignalType& AsyncImageLoader::ImageLoadedS
   return mLoadedSignal;
 }
 
+Toolkit::DevelAsyncImageLoader::PixelBufferLoadedSignalType& AsyncImageLoader::PixelBufferLoadedSignal()
+{
+  return mPixelBufferLoadedSignal;
+}
+
 bool AsyncImageLoader::Cancel( uint32_t loadingTaskId )
 {
   return mLoadThread.CancelTask( loadingTaskId );
@@ -85,7 +90,20 @@ void AsyncImageLoader::ProcessLoadedImage()
 {
   while( LoadingTask *next = mLoadThread.NextCompletedTask() )
   {
-    mLoadedSignal.Emit( next->id, next->pixelData );
+    if( mPixelBufferLoadedSignal.GetConnectionCount() > 0 )
+    {
+      mPixelBufferLoadedSignal.Emit( next->id, next->pixelBuffer );
+    }
+    else if( mLoadedSignal.GetConnectionCount() > 0 )
+    {
+      PixelData pixelData;
+      if( next->pixelBuffer )
+      {
+        pixelData = Devel::PixelBuffer::Convert( next->pixelBuffer );
+      }
+      mLoadedSignal.Emit( next->id, pixelData );
+    }
+
     delete next;
   }
 }

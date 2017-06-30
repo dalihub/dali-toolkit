@@ -38,8 +38,8 @@ static const char* gImage_50_RGBA = TEST_RESOURCE_DIR "/icon-delete.png";
 // resolution: 128*128, pixel format: RGB888
 static const char* gImage_128_RGB = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 
-// this is image is not exist, for negative test
-static const char* gImageNonExist = "non-exist.jpg";
+// Empty image, for testing broken image loading
+static const char* gEmptyImage = TEST_RESOURCE_DIR "/empty.bmp";
 
 const int RENDER_FRAME_INTERVAL = 16; ///< Duration of each frame in ms. (at approx 60FPS)
 
@@ -194,25 +194,26 @@ int UtcDaliImageAtlasSetBrokenImage(void)
   unsigned int size = 200;
   ImageAtlas atlas = ImageAtlas::New( size, size );
 
-  Vector4 textureRect;
-  atlas.Upload( textureRect, gImageNonExist );
-  DALI_TEST_EQUALS( textureRect, Vector4::ZERO, TEST_LOCATION );
-
   // Set broken image
   TestPlatformAbstraction& platform = application.GetPlatform();
   platform.SetClosestImageSize(Vector2( 34, 34));
   atlas.SetBrokenImage( gImage_34_RGBA );
 
-  // the non-exit image will be replaced with the broken image
-  platform.SetClosestImageSize(Vector2( 0, 0));
-  atlas.Upload( textureRect, gImageNonExist );
+  Vector4 textureRect;
+
+  // the empty image will be replaced with the broken image
+  platform.SetClosestImageSize(Vector2( 20, 20));
+  atlas.Upload( textureRect, gEmptyImage );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   Rect<int> pixelArea = TextureCoordinateToPixelArea(textureRect, size);
-  DALI_TEST_EQUALS( pixelArea.width, 34, TEST_LOCATION );
-  DALI_TEST_EQUALS( pixelArea.height, 34, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.width, 20, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.height, 20, TEST_LOCATION );
 
   END_TEST;
 }
+
+
 
 int UtcDaliImageAtlasUploadP(void)
 {

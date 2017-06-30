@@ -70,7 +70,6 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-adaptor.cpp
    dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    dali-toolkit-test-utils/toolkit-application.cpp
-   dali-toolkit-test-utils/toolkit-bitmap-loader.cpp
    dali-toolkit-test-utils/toolkit-clipboard.cpp
    dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
