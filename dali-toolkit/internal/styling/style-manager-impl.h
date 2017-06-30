@@ -94,6 +94,11 @@ public: // Public API
   bool GetStyleConstant( const std::string& key, Property::Value& valueOut );
 
   /**
+   * @copydoc Toolkit::StyleManager::GetConfigurations
+   */
+  const Property::Map GetConfigurations();
+
+  /**
    * @brief Apply the theme style to a control.
    *
    * @param[in] control The control to apply style.

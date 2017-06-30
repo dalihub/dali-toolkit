@@ -64,6 +64,11 @@ void Builder::AddConstant( const std::string& key, const Property::Value& value 
   GetImpl(*this).AddConstant( key, value );
 }
 
+const Property::Map& Builder::GetConfigurations() const
+{
+  return GetImpl(*this).GetConfigurations();
+}
+
 const Property::Map& Builder::GetConstants() const
 {
   return GetImpl(*this).GetConstants();

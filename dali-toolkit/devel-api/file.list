@@ -31,6 +31,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
   $(devel_api_src_dir)/image-loader/image-atlas.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
+  $(devel_api_src_dir)/styling/style-manager-devel.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
@@ -132,6 +133,9 @@ devel_api_shader_effects_header_files = \
   $(devel_api_src_dir)/shader-effects/image-region-effect.h \
   $(devel_api_src_dir)/shader-effects/motion-blur-effect.h \
   $(devel_api_src_dir)/shader-effects/motion-stretch-effect.h
+
+devel_api_styling_header_files= \
+  $(devel_api_src_dir)/styling/style-manager-devel.h
 
 devel_api_super_blur_view_header_files = \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.h
