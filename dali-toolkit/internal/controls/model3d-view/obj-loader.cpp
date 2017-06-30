@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -364,7 +364,7 @@ bool ObjLoader::LoadObject( char* objBuffer, std::streampos fileSize )
 
   std::string strMatActual;
 
-  std::string input = objBuffer;
+  std::string input( objBuffer, fileSize );
   std::istringstream ss(input);
   ss.imbue( std::locale( "C" ) );
 
@@ -442,7 +442,7 @@ bool ObjLoader::LoadObject( char* objBuffer, std::streampos fileSize )
       }
 
       int numIndices = 0;
-      while( isline >> vet[numIndices] && numIndices < MAX_POINT_INDICES )
+      while( ( numIndices < MAX_POINT_INDICES ) && ( isline >> vet[numIndices] ) )
       {
         numIndices++;
       }
@@ -566,7 +566,7 @@ void ObjLoader::LoadMaterial( char* objBuffer, std::streampos fileSize, std::str
 
   std::string info;
 
-  std::string input = objBuffer;
+  std::string input( objBuffer, fileSize );
   std::istringstream ss(input);
   ss.imbue(std::locale("C"));
 
