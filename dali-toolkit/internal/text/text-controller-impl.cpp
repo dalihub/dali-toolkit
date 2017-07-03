@@ -70,6 +70,7 @@ namespace Text
 EventData::EventData( DecoratorPtr decorator )
 : mDecorator( decorator ),
   mImfManager(),
+  mPlaceholderFont( NULL ),
   mPlaceholderText(),
   mPlaceholderTextActive(),
   mPlaceholderTextInactive(),
@@ -105,7 +106,8 @@ EventData::EventData( DecoratorPtr decorator )
   mScrollAfterDelete( false ),
   mAllTextSelected( false ),
   mUpdateInputStyle( false ),
-  mPasswordInput( false )
+  mPasswordInput( false ),
+  mIsPlaceholderPixelSize( false )
 {
   mImfManager = ImfManager::Get();
 }
@@ -884,8 +886,19 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       // Get the default font's description.
       TextAbstraction::FontDescription defaultFontDescription;
       TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
-      if( NULL != mFontDefaults )
+
+      if( IsShowingPlaceholderText() && ( NULL != mEventData->mPlaceholderFont ) )
       {
+        // If the placeholder font is set specifically, only placeholder font is changed.
+        defaultFontDescription = mEventData->mPlaceholderFont->mFontDescription;
+        if( mEventData->mPlaceholderFont->sizeDefined )
+        {
+          defaultPointSize = mEventData->mPlaceholderFont->mDefaultPointSize * 64u;
+        }
+      }
+      else if( NULL != mFontDefaults )
+      {
+        // Set the normal font and the placeholder font.
         defaultFontDescription = mFontDefaults->mFontDescription;
         defaultPointSize = mFontDefaults->mDefaultPointSize * 64u;
       }

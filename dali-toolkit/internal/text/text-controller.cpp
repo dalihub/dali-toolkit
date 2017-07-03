@@ -31,8 +31,10 @@
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
+#include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
+#include <dali-toolkit/internal/text/text-font-style.h>
 
 namespace
 {
@@ -44,6 +46,13 @@ namespace
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const std::string EMPTY_STRING("");
+
+const char * const PLACEHOLDER_TEXT = "placeholderText";
+const char * const PLACEHOLDER_COLOR = "placeholderColor";
+const char * const PLACEHOLDER_FONT_FAMILY = "placeholderFontFamily";
+const char * const PLACEHOLDER_FONT_STYLE = "placeholderFontStyle";
+const char * const PLACEHOLDER_POINT_SIZE = "placeholderPointSize";
+const char * const PLACEHOLDER_PIXEL_SIZE = "placeholderPixelSize";
 
 float ConvertToEven( float value )
 {
@@ -628,6 +637,33 @@ const std::string& Controller::GetDefaultFontFamily() const
   return EMPTY_STRING;
 }
 
+void Controller::SetPlaceholderFontFamily( const std::string& placeholderTextFontFamily )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    if( NULL == mImpl->mEventData->mPlaceholderFont )
+    {
+      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
+    }
+
+    mImpl->mEventData->mPlaceholderFont->mFontDescription.family = placeholderTextFontFamily;
+    DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetPlaceholderFontFamily %s\n", placeholderTextFontFamily.c_str());
+    mImpl->mEventData->mPlaceholderFont->familyDefined = !placeholderTextFontFamily.empty();
+
+    mImpl->RequestRelayout();
+  }
+}
+
+const std::string& Controller::GetPlaceholderFontFamily() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->mFontDescription.family;
+  }
+
+  return EMPTY_STRING;
+}
+
 void Controller::SetDefaultFontWeight( FontWeight weight )
 {
   if( NULL == mImpl->mFontDefaults )
@@ -654,6 +690,41 @@ FontWeight Controller::GetDefaultFontWeight() const
   if( NULL != mImpl->mFontDefaults )
   {
     return mImpl->mFontDefaults->mFontDescription.weight;
+  }
+
+  return TextAbstraction::FontWeight::NORMAL;
+}
+
+void Controller::SetPlaceholderTextFontWeight( FontWeight weight )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    if( NULL == mImpl->mEventData->mPlaceholderFont )
+    {
+      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
+    }
+
+    mImpl->mEventData->mPlaceholderFont->mFontDescription.weight = weight;
+    mImpl->mEventData->mPlaceholderFont->weightDefined = true;
+
+    mImpl->RequestRelayout();
+  }
+}
+
+bool Controller::IsPlaceholderTextFontWeightDefined() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->weightDefined;
+  }
+  return false;
+}
+
+FontWeight Controller::GetPlaceholderTextFontWeight() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->mFontDescription.weight;
   }
 
   return TextAbstraction::FontWeight::NORMAL;
@@ -690,6 +761,41 @@ FontWidth Controller::GetDefaultFontWidth() const
   return TextAbstraction::FontWidth::NORMAL;
 }
 
+void Controller::SetPlaceholderTextFontWidth( FontWidth width )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    if( NULL == mImpl->mEventData->mPlaceholderFont )
+    {
+      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
+    }
+
+    mImpl->mEventData->mPlaceholderFont->mFontDescription.width = width;
+    mImpl->mEventData->mPlaceholderFont->widthDefined = true;
+
+    mImpl->RequestRelayout();
+  }
+}
+
+bool Controller::IsPlaceholderTextFontWidthDefined() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->widthDefined;
+  }
+  return false;
+}
+
+FontWidth Controller::GetPlaceholderTextFontWidth() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->mFontDescription.width;
+  }
+
+  return TextAbstraction::FontWidth::NORMAL;
+}
+
 void Controller::SetDefaultFontSlant( FontSlant slant )
 {
   if( NULL == mImpl->mFontDefaults )
@@ -721,6 +827,41 @@ FontSlant Controller::GetDefaultFontSlant() const
   return TextAbstraction::FontSlant::NORMAL;
 }
 
+void Controller::SetPlaceholderTextFontSlant( FontSlant slant )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    if( NULL == mImpl->mEventData->mPlaceholderFont )
+    {
+      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
+    }
+
+    mImpl->mEventData->mPlaceholderFont->mFontDescription.slant = slant;
+    mImpl->mEventData->mPlaceholderFont->slantDefined = true;
+
+    mImpl->RequestRelayout();
+  }
+}
+
+bool Controller::IsPlaceholderTextFontSlantDefined() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->slantDefined;
+  }
+  return false;
+}
+
+FontSlant Controller::GetPlaceholderTextFontSlant() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->mFontDescription.slant;
+  }
+
+  return TextAbstraction::FontSlant::NORMAL;
+}
+
 void Controller::SetDefaultFontSize( float fontSize, FontSizeType type )
 {
   if( NULL == mImpl->mFontDefaults )
@@ -738,19 +879,15 @@ void Controller::SetDefaultFontSize( float fontSize, FontSizeType type )
     }
     case PIXEL_SIZE:
     {
-      // Point size = Pixel size * 72 / DPI
+      // Point size = Pixel size * 72.f / DPI
       unsigned int horizontalDpi = 0u;
       unsigned int verticalDpi = 0u;
       TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
       fontClient.GetDpi( horizontalDpi, verticalDpi );
 
-      mImpl->mFontDefaults->mDefaultPointSize = ( fontSize * 72 ) / horizontalDpi;
+      mImpl->mFontDefaults->mDefaultPointSize = ( fontSize * 72.f ) / static_cast< float >( horizontalDpi );
       mImpl->mFontDefaults->sizeDefined = true;
       break;
-    }
-    default:
-    {
-      DALI_ASSERT_ALWAYS( false );
     }
   }
 
@@ -774,18 +911,97 @@ float Controller::GetDefaultFontSize( FontSizeType type ) const
       }
       case PIXEL_SIZE:
       {
-        // Pixel size = Point size * DPI / 72
+        // Pixel size = Point size * DPI / 72.f
         unsigned int horizontalDpi = 0u;
         unsigned int verticalDpi = 0u;
         TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
         fontClient.GetDpi( horizontalDpi, verticalDpi );
 
-        value = mImpl->mFontDefaults->mDefaultPointSize * horizontalDpi / 72;
+        value = mImpl->mFontDefaults->mDefaultPointSize * static_cast< float >( horizontalDpi ) / 72.f;
         break;
       }
-      default:
+    }
+    return value;
+  }
+
+  return value;
+}
+
+void Controller::SetPlaceholderTextFontSize( float fontSize, FontSizeType type )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    if( NULL == mImpl->mEventData->mPlaceholderFont )
+    {
+      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
+    }
+
+    switch( type )
+    {
+      case POINT_SIZE:
       {
-        DALI_ASSERT_ALWAYS( false );
+        mImpl->mEventData->mPlaceholderFont->mDefaultPointSize = fontSize;
+        mImpl->mEventData->mPlaceholderFont->sizeDefined = true;
+        mImpl->mEventData->mIsPlaceholderPixelSize = false; // Font size flag
+        break;
+      }
+      case PIXEL_SIZE:
+      {
+        // Point size = Pixel size * 72.f / DPI
+        unsigned int horizontalDpi = 0u;
+        unsigned int verticalDpi = 0u;
+        TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+        fontClient.GetDpi( horizontalDpi, verticalDpi );
+
+        mImpl->mEventData->mPlaceholderFont->mDefaultPointSize = ( fontSize * 72.f ) / static_cast< float >( horizontalDpi );
+        mImpl->mEventData->mPlaceholderFont->sizeDefined = true;
+        mImpl->mEventData->mIsPlaceholderPixelSize = true; // Font size flag
+        break;
+      }
+    }
+
+    mImpl->RequestRelayout();
+  }
+}
+
+float Controller::GetPlaceholderTextFontSize( FontSizeType type ) const
+{
+  float value = 0.0f;
+  if( NULL != mImpl->mEventData )
+  {
+    switch( type )
+    {
+      case POINT_SIZE:
+      {
+        if( NULL != mImpl->mEventData->mPlaceholderFont )
+        {
+          value = mImpl->mEventData->mPlaceholderFont->mDefaultPointSize;
+        }
+        else
+        {
+          // If the placeholder text font size is not set, then return the default font size.
+          value = GetDefaultFontSize( POINT_SIZE );
+        }
+        break;
+      }
+      case PIXEL_SIZE:
+      {
+        if( NULL != mImpl->mEventData->mPlaceholderFont )
+        {
+          // Pixel size = Point size * DPI / 72.f
+          unsigned int horizontalDpi = 0u;
+          unsigned int verticalDpi = 0u;
+          TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+          fontClient.GetDpi( horizontalDpi, verticalDpi );
+
+          value = mImpl->mEventData->mPlaceholderFont->mDefaultPointSize * static_cast< float >( horizontalDpi ) / 72.f;
+        }
+        else
+        {
+          // If the placeholder text font size is not set, then return the default font size.
+          value = GetDefaultFontSize( PIXEL_SIZE );
+        }
+        break;
       }
     }
     return value;
@@ -1684,6 +1900,86 @@ void Controller::GetHiddenInputOption(Property::Map& options )
   if( NULL != mImpl->mHiddenInput )
   {
     mImpl->mHiddenInput->GetProperties(options);
+  }
+}
+
+void Controller::SetPlaceholderProperty( const Property::Map& map )
+{
+  const Property::Map::SizeType count = map.Count();
+
+  for( Property::Map::SizeType position = 0; position < count; ++position )
+  {
+    KeyValuePair keyValue = map.GetKeyValue( position );
+    Property::Key& key = keyValue.first;
+    Property::Value& value = keyValue.second;
+
+    if( key == PLACEHOLDER_TEXT )
+    {
+      std::string text = "";
+      value.Get( text );
+      SetPlaceholderText( text );
+    }
+    else if( key == PLACEHOLDER_COLOR )
+    {
+      Vector4 textColor;
+      value.Get( textColor );
+      if( GetPlaceholderTextColor() != textColor )
+      {
+        SetPlaceholderTextColor( textColor );
+      }
+    }
+    else if( key == PLACEHOLDER_FONT_FAMILY )
+    {
+      std::string fontFamily = "";
+      value.Get( fontFamily );
+      SetPlaceholderFontFamily( fontFamily );
+    }
+    else if( key == PLACEHOLDER_FONT_STYLE )
+    {
+      SetFontStyleProperty( this, value, Text::FontStyle::PLACEHOLDER );
+    }
+    else if( key == PLACEHOLDER_POINT_SIZE )
+    {
+      float pointSize;
+      value.Get( pointSize );
+      if( !Equals( GetPlaceholderTextFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
+      {
+        SetPlaceholderTextFontSize( pointSize, Text::Controller::POINT_SIZE );
+      }
+    }
+    else if( key == PLACEHOLDER_PIXEL_SIZE )
+    {
+      float pixelSize;
+      value.Get( pixelSize );
+      if( !Equals( GetPlaceholderTextFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
+      {
+        SetPlaceholderTextFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
+      }
+    }
+  }
+}
+
+void Controller::GetPlaceholderProperty( Property::Map& map )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    map[ PLACEHOLDER_TEXT ] = mImpl->mEventData->mPlaceholderText;
+    map[ PLACEHOLDER_COLOR ] = mImpl->mEventData->mPlaceholderTextColor;
+    map[ PLACEHOLDER_FONT_FAMILY ] = GetPlaceholderFontFamily();
+
+    Property::Value fontStyleMapGet;
+    GetFontStyleProperty( this, fontStyleMapGet, Text::FontStyle::PLACEHOLDER );
+    map[ PLACEHOLDER_FONT_STYLE ] = fontStyleMapGet;
+
+    // Choose font size : POINT_SIZE or PIXEL_SIZE
+    if( !mImpl->mEventData->mIsPlaceholderPixelSize )
+    {
+      map[ PLACEHOLDER_POINT_SIZE ] = GetPlaceholderTextFontSize( Text::Controller::POINT_SIZE );
+    }
+    else
+    {
+      map[ PLACEHOLDER_PIXEL_SIZE ] = GetPlaceholderTextFontSize( Text::Controller::PIXEL_SIZE );
+    }
   }
 }
 
