@@ -41,20 +41,21 @@ namespace Toolkit
 namespace Internal
 {
 
-/**
+ /**
   * Struct used to store Visual within the control, index is a unique key for each visual.
   */
- struct RegisteredVisual
- {
-   Property::Index index;
-   Toolkit::Visual::Base visual;
-   bool enabled;
+struct RegisteredVisual
+{
+  Property::Index index;
+  Toolkit::Visual::Base visual;
+  bool enabled : 1;
+  bool pending : 1;
 
-   RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, bool aEnabled)
-   : index(aIndex), visual(aVisual), enabled(aEnabled)
-   {
-   }
- };
+  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, bool aEnabled, bool aPendingReplacement )
+  : index(aIndex), visual(aVisual), enabled(aEnabled), pending( aPendingReplacement )
+  {
+  }
+};
 
 typedef Dali::OwnerContainer< RegisteredVisual* > RegisteredVisualContainer;
 
@@ -259,6 +260,11 @@ public:
    */
   bool IsResourceReady() const;
 
+  /**
+   * @copydoc CustomActorImpl::OnStageDisconnection()
+   */
+  void OnStageDisconnection();
+
 private:
 
   /**
@@ -332,7 +338,7 @@ public:
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
 
-  RegisteredVisualContainer mReplacementVisuals;         ///< List of visuals that will be used for replacing current visuals.
+  RegisteredVisualContainer mRemoveVisuals;         ///< List of visuals that are being replaced by another visual once ready
 
   // Properties - these need to be members of Internal::Control::Impl as they access private methods/data of Internal::Control and Internal::Control::Impl.
   static const PropertyRegistration PROPERTY_1;

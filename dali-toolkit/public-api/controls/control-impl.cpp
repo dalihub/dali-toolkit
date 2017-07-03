@@ -517,16 +517,7 @@ void Control::OnStageConnection( int depth )
 
 void Control::OnStageDisconnection()
 {
-  for(RegisteredVisualContainer::Iterator iter = mImpl->mVisuals.Begin(); iter!= mImpl->mVisuals.End(); iter++)
-  {
-    // Check whether the visual is empty
-    if( (*iter)->visual )
-    {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::OnStageDisconnection Setting visual(%d) off stage\n", (*iter)->index );
-      Actor self( Self() );
-      Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
-    }
-  }
+  mImpl->OnStageDisconnection();
 }
 
 void Control::OnKeyInputFocusGained()
