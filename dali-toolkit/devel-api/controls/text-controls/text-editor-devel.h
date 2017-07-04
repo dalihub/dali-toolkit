@@ -107,6 +107,9 @@ namespace Property
 
       /**
        * @brief The size of font in pixels.
+       *
+       * Conversion from Point size to Pixel size :
+       *  Pixel size = Point size * DPI / 72
        * @details name "pixelSize", type float
        */
       PIXEL_SIZE,
@@ -128,7 +131,36 @@ namespace Property
        * @brief The placeholder-text color.
        * @details name "placeholderTextColor", type vector4
        */
-      PLACEHOLDER_TEXT_COLOR
+      PLACEHOLDER_TEXT_COLOR,
+
+      /**
+       * @brief Enables Text selection, such as the cursor, handle, clipboard, and highlight color.
+       * @details name "enableSelection", type bool
+       */
+      ENABLE_SELECTION,
+
+      /**
+       * @brief Sets the placeholder : text, color, font family, font style, point size, and pixel size.
+       *
+       * @code
+       *   Property::Map propertyMap;
+       *   propertyMap["placeholderText"] = "Setting Placeholder Text";
+       *   propertyMap["placeholderColor"] = Color::RED;
+       *   propertyMap["placeholderFontFamily"] = "Arial";
+       *   propertyMap["placeholderPointSize"] = 12.0f;
+       *
+       *   Property::Map fontStyleMap;
+       *   fontstyleMap.Insert( "weight", "bold" );
+       *   fontstyleMap.Insert( "width", "condensed" );
+       *   fontstyleMap.Insert( "slant", "italic" );
+       *   propertyMap["placeholderFontStyle"] = fontStyleMap;
+       *
+       *   editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, propertyMap );
+       * @endcode
+       *
+       * @details name "placeholder", type MAP
+       */
+      PLACEHOLDER
   };
 } // namespace Property
 

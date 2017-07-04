@@ -20,14 +20,15 @@
 
 // EXTERNAL HEADERS
 #include <dali/devel-api/common/hash.h>
-#include <dali/devel-api/images/pixel-data-mask.h>
 #include <dali/devel-api/images/texture-set-image.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL HEADERS
 #include <dali/integration-api/debug.h>
-#include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
+#include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 #include <dali-toolkit/internal/image-loader/image-atlas-impl.h>
+#include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 
 
@@ -61,8 +62,8 @@ TextureManager::TextureManager()
   mAsyncRemoteLoader( Toolkit::AsyncImageLoader::New() ),
   mCurrentTextureId( 0 )
 {
-  mAsyncLocalLoader.ImageLoadedSignal().Connect( this, &TextureManager::AsyncLocalLoadComplete );
-  mAsyncRemoteLoader.ImageLoadedSignal().Connect( this, &TextureManager::AsyncRemoteLoadComplete );
+  DevelAsyncImageLoader::PixelBufferLoadedSignal(mAsyncLocalLoader).Connect( this, &TextureManager::AsyncLocalLoadComplete );
+  DevelAsyncImageLoader::PixelBufferLoadedSignal(mAsyncRemoteLoader).Connect( this, &TextureManager::AsyncRemoteLoadComplete );
 }
 
 TextureManager::TextureId TextureManager::RequestLoad(
@@ -73,7 +74,7 @@ TextureManager::TextureId TextureManager::RequestLoad(
   const UseAtlas           useAtlas,
   TextureUploadObserver*   observer )
 {
-  return RequestInternalLoad( url, INVALID_TEXTURE_ID, desiredSize, fittingMode, samplingMode, useAtlas, GPU_UPLOAD, observer );
+  return RequestLoadInternal( url, INVALID_TEXTURE_ID, desiredSize, fittingMode, samplingMode, useAtlas, UPLOAD_TO_TEXTURE, observer );
 }
 
 TextureManager::TextureId TextureManager::RequestLoad(
@@ -85,17 +86,17 @@ TextureManager::TextureId TextureManager::RequestLoad(
   const UseAtlas           useAtlas,
   TextureUploadObserver*   observer )
 {
-  return RequestInternalLoad( url, maskTextureId, desiredSize, fittingMode, samplingMode, useAtlas, GPU_UPLOAD, observer );
+  return RequestLoadInternal( url, maskTextureId, desiredSize, fittingMode, samplingMode, useAtlas, UPLOAD_TO_TEXTURE, observer );
 }
 
 TextureManager::TextureId TextureManager::RequestMaskLoad( const VisualUrl& maskUrl )
 {
   // Use the normal load procedure to get the alpha mask.
-  return RequestInternalLoad( maskUrl, INVALID_TEXTURE_ID, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, CPU, NULL );
+  return RequestLoadInternal( maskUrl, INVALID_TEXTURE_ID, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, KEEP_PIXEL_BUFFER, NULL );
 }
 
 
-TextureManager::TextureId TextureManager::RequestInternalLoad(
+TextureManager::TextureId TextureManager::RequestLoadInternal(
   const VisualUrl&         url,
   TextureId                maskTextureId,
   const ImageDimensions    desiredSize,
@@ -246,6 +247,15 @@ void TextureManager::Remove( const TextureManager::TextureId textureId )
   }
 }
 
+const VisualUrl& TextureManager::GetVisualUrl( TextureId textureId )
+{
+  int cacheIndex = GetCacheIndexFromId( textureId );
+  DALI_ASSERT_DEBUG( cacheIndex != INVALID_CACHE_INDEX && "TextureId out of range");
+
+  TextureInfo& cachedTextureInfo( mTextureInfoContainer[ cacheIndex ] );
+  return cachedTextureInfo.url;
+}
+
 TextureManager::LoadState TextureManager::GetTextureState( TextureId textureId )
 {
   LoadState loadState = TextureManager::NOT_STARTED;
@@ -314,17 +324,17 @@ void TextureManager::ObserveTexture( TextureInfo& textureInfo,
   }
 }
 
-void TextureManager::AsyncLocalLoadComplete( uint32_t id, PixelData pixelData )
+void TextureManager::AsyncLocalLoadComplete( uint32_t id, Devel::PixelBuffer pixelBuffer )
 {
-  AsyncLoadComplete( mAsyncLocalLoadingInfoContainer, id, pixelData );
+  AsyncLoadComplete( mAsyncLocalLoadingInfoContainer, id, pixelBuffer );
 }
 
-void TextureManager::AsyncRemoteLoadComplete( uint32_t id, PixelData pixelData )
+void TextureManager::AsyncRemoteLoadComplete( uint32_t id, Devel::PixelBuffer pixelBuffer )
 {
-  AsyncLoadComplete( mAsyncRemoteLoadingInfoContainer, id, pixelData );
+  AsyncLoadComplete( mAsyncRemoteLoadingInfoContainer, id, pixelBuffer );
 }
 
-void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingContainer, uint32_t id, PixelData pixelData )
+void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingContainer, uint32_t id, Devel::PixelBuffer pixelBuffer )
 {
   DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::AsyncLoadComplete( id:%d )\n", id );
 
@@ -344,7 +354,7 @@ void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingCo
         if( textureInfo.loadState != CANCELLED )
         {
           // textureInfo can be invalidated after this call (as the mTextureInfoContainer may be modified)
-          PostLoad( textureInfo, pixelData );
+          PostLoad( textureInfo, pixelBuffer );
         }
         else
         {
@@ -357,15 +367,15 @@ void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingCo
   }
 }
 
-void TextureManager::PostLoad( TextureInfo& textureInfo, PixelData pixelData )
+void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pixelBuffer )
 {
   // Was the load successful?
-  if( pixelData && ( pixelData.GetWidth() != 0 ) && ( pixelData.GetHeight() != 0 ) )
+  if( pixelBuffer && ( pixelBuffer.GetWidth() != 0 ) && ( pixelBuffer.GetHeight() != 0 ) )
   {
     // No atlas support for now
     textureInfo.useAtlas = NO_ATLAS;
 
-    if( textureInfo.storageType == GPU_UPLOAD )
+    if( textureInfo.storageType == UPLOAD_TO_TEXTURE )
     {
       // If there is a mask texture ID associated with this texture, then apply the mask
       // if it's already loaded. If it hasn't, and the mask is still loading,
@@ -375,25 +385,25 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, PixelData pixelData )
         LoadState maskLoadState = GetTextureState( textureInfo.maskTextureId );
         if( maskLoadState == LOADING )
         {
-          textureInfo.pixelData = pixelData; // Store the pixel data temporarily
+          textureInfo.pixelBuffer = pixelBuffer; // Store the pixel buffer temporarily
           textureInfo.loadState = WAITING_FOR_MASK;
         }
         else if( maskLoadState == LOAD_FINISHED )
         {
-          ApplyMask( pixelData, textureInfo.maskTextureId );
-          UploadTexture( pixelData, textureInfo );
+          ApplyMask( pixelBuffer, textureInfo.maskTextureId );
+          UploadTexture( pixelBuffer, textureInfo );
           NotifyObservers( textureInfo, true );
         }
       }
       else
       {
-        UploadTexture( pixelData, textureInfo );
+        UploadTexture( pixelBuffer, textureInfo );
         NotifyObservers( textureInfo, true );
       }
     }
-    else // currently, CPU textures are local to texture manager
+    else
     {
-      textureInfo.pixelData = pixelData; // Store the pixel data
+      textureInfo.pixelBuffer = pixelBuffer; // Store the pixel data
       textureInfo.loadState = LOAD_FINISHED;
 
       // Check if there was another texture waiting for this load to complete
@@ -423,13 +433,13 @@ void TextureManager::CheckForWaitingTexture( TextureInfo& maskTextureInfo )
         mTextureInfoContainer[cacheIndex].loadState == WAITING_FOR_MASK )
     {
       TextureInfo& textureInfo( mTextureInfoContainer[cacheIndex] );
-      PixelData pixelData = textureInfo.pixelData;
-      textureInfo.pixelData.Reset();
+      Devel::PixelBuffer pixelBuffer = textureInfo.pixelBuffer;
+      textureInfo.pixelBuffer.Reset();
 
       if( maskTextureInfo.loadState == LOAD_FINISHED )
       {
-        ApplyMask( pixelData, maskTextureInfo.textureId );
-        UploadTexture( pixelData, textureInfo );
+        ApplyMask( pixelBuffer, maskTextureInfo.textureId );
+        UploadTexture( pixelBuffer, textureInfo );
         NotifyObservers( textureInfo, true );
       }
       else
@@ -442,20 +452,21 @@ void TextureManager::CheckForWaitingTexture( TextureInfo& maskTextureInfo )
   }
 }
 
-void TextureManager::ApplyMask( PixelData pixelData, TextureId maskTextureId )
+void TextureManager::ApplyMask( Devel::PixelBuffer& pixelBuffer, TextureId maskTextureId )
 {
   int maskCacheIndex = GetCacheIndexFromId( maskTextureId );
-  PixelData maskPixelData = mTextureInfoContainer[maskCacheIndex].pixelData;
-  Dali::ApplyMask( pixelData, maskPixelData );
+  Devel::PixelBuffer maskPixelBuffer = mTextureInfoContainer[maskCacheIndex].pixelBuffer;
+  pixelBuffer.ApplyMask( maskPixelBuffer );
 }
 
-void TextureManager::UploadTexture( PixelData pixelData, TextureInfo& textureInfo )
+void TextureManager::UploadTexture( Devel::PixelBuffer& pixelBuffer, TextureInfo& textureInfo )
 {
   if( textureInfo.useAtlas != USE_ATLAS )
   {
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "  TextureManager::UploadTexture() New Texture for textureId:%d\n", textureInfo.textureId );
 
-    Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
+    Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight() );
+    PixelData pixelData = Devel::PixelBuffer::Convert( pixelBuffer );
     texture.Upload( pixelData );
     textureInfo.textureSet = TextureSet::New();
     textureInfo.textureSet.SetTexture( 0u, texture );
@@ -643,12 +654,15 @@ void TextureManager::ObserverDestroyed( TextureUploadObserver* observer )
   for( unsigned int i = 0; i < count; ++i )
   {
     TextureInfo& textureInfo( mTextureInfoContainer[i] );
-    for( TextureInfo::ObserverListType::Iterator j = textureInfo.observerList.Begin(); j != textureInfo.observerList.End(); ++j )
+    for( TextureInfo::ObserverListType::Iterator j = textureInfo.observerList.Begin(); j != textureInfo.observerList.End(); )
     {
       if( *j == observer )
       {
-        textureInfo.observerList.Erase( j );
-        break;
+        j = textureInfo.observerList.Erase( j );
+      }
+      else
+      {
+        ++j;
       }
     }
   }

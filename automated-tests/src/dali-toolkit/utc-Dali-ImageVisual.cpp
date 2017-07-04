@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-timer.h>
-#include <toolkit-bitmap-loader.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -451,11 +450,6 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   application.SendNotification();
   application.Render();
 
-  BitmapLoader loader = BitmapLoader::GetLatestCreated();
-  DALI_TEST_CHECK( loader );
-  loader.WaitForLoading();// waiting until the image to be loaded
-  DALI_TEST_CHECK( loader.IsLoaded() );
-
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
@@ -533,11 +527,6 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
   // loading started
   application.SendNotification();
   application.Render();
-
-  BitmapLoader loader = BitmapLoader::GetLatestCreated();
-  DALI_TEST_CHECK( loader );
-  loader.WaitForLoading();// waiting until the image to be loaded
-  DALI_TEST_CHECK( loader.IsLoaded() );
 
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
 
@@ -849,6 +838,58 @@ int UtcDaliImageVisualTextureCancelRemoteLoad(void)
   DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), false, TEST_LOCATION );
   DALI_TEST_EQUALS( drawTrace.FindMethod("DrawArrays"), false, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualTextureCancelAsyncLoad(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Load image asynchronosly, cancel loading, then load again" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable( true );
+  TraceCallStack& drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable( true );
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
+  dummyImpl.RegisterVisual( Control::Property::BACKGROUND, visual );
+
+  Stage::GetCurrent().Add( actor );
+
+  // Cancel loading
+  Stage::GetCurrent().Remove( actor );
+
+  Stage::GetCurrent().Add( actor );
+
+  // Create another visual with the same image
+  visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  dummyImpl.RegisterVisual( Control::Property::BACKGROUND, visual );
+
+  application.SendNotification();
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( drawTrace.FindMethod("DrawArrays"), true, TEST_LOCATION );
 
   END_TEST;
 }

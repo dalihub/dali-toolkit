@@ -32,7 +32,7 @@ namespace Internal
 
 LoadingTask::LoadingTask( uint32_t id, const VisualUrl& url, ImageDimensions dimensions,
                           FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection )
-: pixelData(),
+: pixelBuffer(),
   url( url ),
   id( id ),
   dimensions( dimensions ),
@@ -46,11 +46,11 @@ void LoadingTask::Load()
 {
   if( url.IsLocal() )
   {
-    pixelData = Dali::LoadImageFromFile( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
+    pixelBuffer = Dali::LoadImageFromFile( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
   }
   else
   {
-    pixelData = Dali::DownloadImageSynchronously ( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
+    pixelBuffer = Dali::DownloadImageSynchronously ( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
   }
 }
 

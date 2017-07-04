@@ -355,6 +355,18 @@ public: // Configure the text controller.
   bool IsTextElideEnabled() const;
 
   /**
+   * @brief Enable or disable the text selection.
+   * @param[in] enabled Whether to enable the text selection.
+   */
+  void SetSelectionEnabled( bool enabled );
+
+  /**
+   * @brief Whether the text selection is enabled or not.
+   * @return True if the text selection is enabled
+   */
+  bool IsSelectionEnabled() const;
+
+  /**
    * @brief Sets input type to password
    *
    * @note The string is displayed hidden character
@@ -504,6 +516,19 @@ public: // Default style & Input style
   const std::string& GetDefaultFontFamily() const;
 
   /**
+   * @brief Sets the placeholder text font family.
+   * @param[in] placeholderTextFontFamily The placeholder text font family.
+   */
+  void SetPlaceholderFontFamily( const std::string& placeholderTextFontFamily );
+
+  /**
+   * @brief Retrieves the placeholder text font family.
+   *
+   * @return The placeholder text font family
+   */
+  const std::string& GetPlaceholderFontFamily() const;
+
+  /**
    * @brief Sets the default font weight.
    *
    * @param[in] weight The font weight.
@@ -521,6 +546,27 @@ public: // Default style & Input style
    * @return The default font weight.
    */
   FontWeight GetDefaultFontWeight() const;
+
+  /**
+   * @brief Sets the placeholder text font weight.
+   *
+   * @param[in] weight The font weight
+   */
+  void SetPlaceholderTextFontWeight( FontWeight weight );
+
+  /**
+   * @brief Whether the font's weight has been defined.
+   *
+   * @return True if the placeholder text font weight is defined
+   */
+  bool IsPlaceholderTextFontWeightDefined() const;
+
+  /**
+   * @brief Retrieves the placeholder text font weight.
+   *
+   * @return The placeholder text font weight
+   */
+  FontWeight GetPlaceholderTextFontWeight() const;
 
   /**
    * @brief Sets the default font width.
@@ -542,6 +588,27 @@ public: // Default style & Input style
   FontWidth GetDefaultFontWidth() const;
 
   /**
+   * @brief Sets the placeholder text font width.
+   *
+   * @param[in] width The font width
+   */
+  void SetPlaceholderTextFontWidth( FontWidth width );
+
+  /**
+   * @brief Whether the font's width has been defined.
+   *
+   * @return True if the placeholder text font width is defined
+   */
+  bool IsPlaceholderTextFontWidthDefined() const;
+
+  /**
+   * @brief Retrieves the placeholder text font width.
+   *
+   * @return The placeholder text font width
+   */
+  FontWidth GetPlaceholderTextFontWidth() const;
+
+  /**
    * @brief Sets the default font slant.
    *
    * @param[in] slant The font slant.
@@ -561,9 +628,30 @@ public: // Default style & Input style
   FontSlant GetDefaultFontSlant() const;
 
   /**
+   * @brief Sets the placeholder text font slant.
+   *
+   * @param[in] slant The font slant
+   */
+  void SetPlaceholderTextFontSlant( FontSlant slant );
+
+  /**
+   * @brief Whether the font's slant has been defined.
+   *
+   * @return True if the placeholder text font slant is defined
+   */
+  bool IsPlaceholderTextFontSlantDefined() const;
+
+  /**
+   * @brief Retrieves the placeholder text font slant.
+   *
+   * @return The placeholder text font slant
+   */
+  FontSlant GetPlaceholderTextFontSlant() const;
+
+  /**
    * @brief Set the default font size.
    *
-   * @param[in] size The default font size.
+   * @param[in] fontSize The default font size
    * @param[in] type The font size type is point size or pixel size
    */
   void SetDefaultFontSize( float fontSize, FontSizeType type );
@@ -575,6 +663,20 @@ public: // Default style & Input style
    * @return The default point size.
    */
   float GetDefaultFontSize( FontSizeType type ) const;
+
+  /**
+   * @brief Sets the Placeholder text font size.
+   * @param[in] fontSize The placeholder text font size
+   * @param[in] type The font size type is point size or pixel size
+   */
+  void SetPlaceholderTextFontSize( float fontSize, FontSizeType type );
+
+  /**
+   * @brief Retrieves the Placeholder text font size.
+   * @param[in] type The font size type
+   * @return The placeholder font size
+   */
+  float GetPlaceholderTextFontSize( FontSizeType type ) const;
 
   /**
    * @brief Sets the text's default color.
@@ -965,6 +1067,20 @@ public: // Queries & retrieves.
    * @brief Used to get the hidden input option
    */
   void GetHiddenInputOption( Property::Map& options );
+
+  /**
+   * @brief Sets the Placeholder Properties.
+   *
+   * @param[in] map The placeholder property map
+   */
+  void SetPlaceholderProperty( const Property::Map& map );
+
+  /**
+   * @brief Retrieves the Placeholder Property map.
+   *
+   * @param[out] map The property map
+   */
+  void GetPlaceholderProperty( Property::Map& map );
 
 public: // Relayout.
 

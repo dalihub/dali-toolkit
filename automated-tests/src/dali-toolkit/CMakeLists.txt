@@ -70,7 +70,6 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-adaptor.cpp
    dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    dali-toolkit-test-utils/toolkit-application.cpp
-   dali-toolkit-test-utils/toolkit-bitmap-loader.cpp
    dali-toolkit-test-utils/toolkit-clipboard.cpp
    dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
@@ -84,6 +83,7 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-tts-player.cpp
    dali-toolkit-test-utils/toolkit-native-image-source.cpp
    dali-toolkit-test-utils/toolkit-video-player.cpp
+   dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
    dali-toolkit-test-utils/dali-test-suite-utils.cpp
    dali-toolkit-test-utils/dummy-control.cpp
    dali-toolkit-test-utils/mesh-builder.cpp

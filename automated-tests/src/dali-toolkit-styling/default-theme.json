@@ -1,4 +1,8 @@
 {
+  "config":
+  {
+    "alwaysShowFocus":false
+  },
   "constants":
   {
     "CONFIG_SCRIPT_LOG_LEVEL":"NoLogging"

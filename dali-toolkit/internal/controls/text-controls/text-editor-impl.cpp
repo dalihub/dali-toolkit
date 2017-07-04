@@ -139,6 +139,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "pixelSize",             
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "lineCount",            INTEGER,   LINE_COUNT                           )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderText",                STRING,    PLACEHOLDER_TEXT                     )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",           VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableSelection",                BOOLEAN,   ENABLE_SELECTION                     )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholder",                    MAP,       PLACEHOLDER                          )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -691,6 +693,25 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::ENABLE_SELECTION:
+      {
+        if( impl.mController )
+        {
+          const bool enableSelection = value.Get< bool >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_SELECTION %d\n", impl.mController.Get(), enableSelection );
+          impl.mController->SetSelectionEnabled( enableSelection );
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::PLACEHOLDER:
+      {
+        const Property::Map* map = value.GetMap();
+        if( map )
+        {
+          impl.mController->SetPlaceholderProperty( *map );
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -1050,6 +1071,21 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         {
           value = impl.mController->GetPlaceholderTextColor();
         }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ENABLE_SELECTION:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsSelectionEnabled();
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::PLACEHOLDER:
+      {
+        Property::Map map;
+        impl.mController->GetPlaceholderProperty( map );
+        value = map;
         break;
       }
     } //switch
@@ -1502,14 +1538,6 @@ void TextEditor::UpdateScrollBar()
     return;
   }
 
-  // If scrolling is not started, start scrolling and emit ScrollStateChangedSignal
-  if( !mScrollStarted )
-  {
-    mScrollStarted = true;
-    Dali::Toolkit::TextEditor handle( GetOwner() );
-    mScrollStateChangedSignal.Emit( handle, DevelTextEditor::Scroll::STARTED );
-  }
-
   CustomActor self = Self();
   if( !mScrollBar )
   {
@@ -1551,6 +1579,14 @@ void TextEditor::UpdateScrollBar()
     self.SetProperty( propertyScrollPosition, scrollPosition );
     self.SetProperty( propertyMaxScrollPosition, (layoutSize - controlSize) );
     self.SetProperty( propertyScrollContentSize, layoutSize );
+  }
+
+  // If scrolling is not started, start scrolling and emit ScrollStateChangedSignal
+  if( !mScrollStarted )
+  {
+    mScrollStarted = true;
+    Dali::Toolkit::TextEditor handle( GetOwner() );
+    mScrollStateChangedSignal.Emit( handle, DevelTextEditor::Scroll::STARTED );
   }
 
   Actor indicator = mScrollBar.GetScrollIndicator();

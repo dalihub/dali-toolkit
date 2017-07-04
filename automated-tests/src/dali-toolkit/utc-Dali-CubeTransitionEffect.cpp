@@ -23,9 +23,9 @@
 #include <dali-toolkit/devel-api/transition-effects/cube-transition-cross-effect.h>
 #include <dali-toolkit/devel-api/transition-effects/cube-transition-fold-effect.h>
 #include <dali-toolkit/devel-api/transition-effects/cube-transition-wave-effect.h>
-#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/public-api/images/buffer-image.h>
-
+#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 
 
 using namespace Dali;
@@ -431,9 +431,8 @@ int UtcDaliCubeTransitionWaveEffectStartTransition(void)
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
 
-  BitmapLoader loader = BitmapLoader::New( "Image.jpg" );
-  loader.Load();
-  PixelData pixelData = loader.GetPixelData();
+  Devel::PixelBuffer pixelBuffer = LoadImageFromFile(TEST_RESOURCE_DIR "/gallery-small-1.jpg");
+  PixelData pixelData = Devel::PixelBuffer::Convert( pixelBuffer );
   Texture texture = Texture::New( TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
   texture.Upload( pixelData );
 
@@ -489,9 +488,8 @@ int UtcDaliCubeTransitionCrossEffectStartTransition(void)
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
 
-  BitmapLoader loader = BitmapLoader::New( "Image.jpg" );
-  loader.Load();
-  PixelData pixelData = loader.GetPixelData();
+  Devel::PixelBuffer pixelBuffer = LoadImageFromFile(TEST_RESOURCE_DIR "/gallery-small-1.jpg");
+  PixelData pixelData = Devel::PixelBuffer::Convert( pixelBuffer );
   Texture texture = Texture::New( TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
   texture.Upload( pixelData );
 

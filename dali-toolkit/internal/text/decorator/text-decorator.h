@@ -243,6 +243,24 @@ public:
    */
   const Vector2& GetPosition( Cursor cursor ) const;
 
+
+  /**
+   * @brief Sets the glyph offset of a cursor.
+   *
+   * @param[in] cursor The cursor to set.
+   * @param[in] glyphoffset The difference of line ascender and glyph ascender.
+   */
+  void SetGlyphOffset( Cursor cursor, float glyphOffset );
+
+  /**
+   * @brief Retrieves the glyph offset of a cursor.
+   *
+   * @param[in] cursor The cursor to get.
+   *
+   * @return The glyph offset. glyph offset means difference of line ascender and glyph ascender.
+   */
+  const float GetGlyphOffset( Cursor cursor ) const;
+
   /**
    * @brief Sets the color for a cursor.
    *

@@ -1820,3 +1820,33 @@ int UtcDaliBuilderActionsWithParams(void)
 
   END_TEST;
 }
+
+int UtcDaliBuilderConfigurationP(void)
+{
+  ToolkitTestApplication application;
+
+  // JSON with a quit event when the actor is touched
+  std::string json(
+      "{\n"
+      "  \"config\":\n"
+      "  {\n"
+      "    \"alwaysShowFocus\":true\n"
+      "  }\n"
+      "}\n"
+  );
+
+  Builder builder = Builder::New();
+  builder.LoadFromString( json );
+
+  Property::Map map = builder.GetConfigurations();
+
+  Dali::Property::Value* pValue = map.Find( "alwaysShowFocus" );
+
+  DALI_TEST_CHECK( pValue );
+
+  bool value = pValue->Get<bool>();
+
+  DALI_TEST_CHECK( value );
+
+  END_TEST;
+}

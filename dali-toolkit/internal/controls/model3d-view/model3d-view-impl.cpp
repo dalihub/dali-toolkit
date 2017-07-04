@@ -27,7 +27,7 @@
 #include <dali-toolkit/public-api/controls/model3d-view/model3d-view.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/adaptor-framework/file-loader.h>
-#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
@@ -60,12 +60,11 @@ enum TextureIndex
 Texture LoadTexture( const char* imageUrl )
 {
   Texture texture;
-  Dali::BitmapLoader loader = Dali::BitmapLoader::New( imageUrl );
-  loader.Load();
-  PixelData pixelData = loader.GetPixelData();
-  if( pixelData )
+  Devel::PixelBuffer pixelBuffer = LoadImageFromFile( imageUrl );
+  if( pixelBuffer )
   {
-    texture = Texture::New( TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
+    texture = Texture::New( TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight() );
+    PixelData pixelData = Devel::PixelBuffer::Convert( pixelBuffer );
     texture.Upload( pixelData );
     texture.GenerateMipmaps();
   }

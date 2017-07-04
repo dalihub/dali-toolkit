@@ -1770,8 +1770,10 @@ int UtcDaliNPatchVisualCustomShader(void)
   VisualFactory factory = VisualFactory::Get();
   Property::Map properties;
   Property::Map shader;
+  const std::string vertexShader = "Foobar";
   const std::string fragmentShader = "Foobar";
   shader[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+  shader[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER] = vertexShader;
 
   Property::Map transformMap;
   transformMap["size"] = Vector2( 0.5f, 0.5f ) ;
@@ -1809,9 +1811,10 @@ int UtcDaliNPatchVisualCustomShader(void)
   DALI_TEST_EQUALS( renderer.GetProperty( index ), Property::Value(Vector2(0.5, 0.5)), 0.001, TEST_LOCATION );
 
   Property::Value* fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
-  // *map["vertex"]; is default here so not verifying it
-
   DALI_TEST_EQUALS( fragmentShader, fragment->Get<std::string>(), TEST_LOCATION );
+
+  Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
+  DALI_TEST_EQUALS( vertexShader, vertex->Get<std::string>(), TEST_LOCATION );
 
   END_TEST;
 }

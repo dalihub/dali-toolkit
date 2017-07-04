@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -46,12 +46,12 @@ namespace
   Texture LoadTexture( const char* imageUrl, bool generateMipmaps )
   {
     Texture texture;
-    Dali::BitmapLoader loader = Dali::BitmapLoader::New( imageUrl );
-    loader.Load();
-    PixelData pixelData = loader.GetPixelData();
-    if( pixelData )
+
+    Devel::PixelBuffer pixelBuffer = LoadImageFromFile( imageUrl );
+    if( pixelBuffer )
     {
-      texture = Texture::New( TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
+      texture = Texture::New( TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight() );
+      PixelData pixelData = Devel::PixelBuffer::Convert( pixelBuffer );
       texture.Upload( pixelData );
 
       if( generateMipmaps )
