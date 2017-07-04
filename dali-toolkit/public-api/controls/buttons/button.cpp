@@ -97,7 +97,7 @@ void Button::SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay )
 
 float Button::GetInitialAutoRepeatingDelay() const
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetPositionInheritanceMode() is deprecated and will be removed from next release. Use GetProperty INITIAL_AUTO_REPEATING_DELAY or Styling file instead.\n" );
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetInitialAutoRepeatingDelay() is deprecated and will be removed from next release. Use GetProperty INITIAL_AUTO_REPEATING_DELAY or Styling file instead.\n" );
 
   return Dali::Toolkit::GetImplementation( *this ).GetInitialAutoRepeatingDelay();
 }
