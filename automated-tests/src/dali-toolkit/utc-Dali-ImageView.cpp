@@ -77,9 +77,6 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
 const char* TEST_IMAGE_FILE_NAME2 =  "gallery_image_02.jpg";
 
-const char* TEST_IMAGE_1 = TEST_RESOURCE_DIR "/TB-gloss.png";
-const char* TEST_IMAGE_2 = TEST_RESOURCE_DIR "/tb-norm.png";
-
 // resolution: 34*34, pixel format: RGBA8888
 static const char* gImage_34_RGBA = TEST_RESOURCE_DIR "/icon-edit.png";
 // resolution: 600*600, pixel format: RGB888
@@ -1302,55 +1299,6 @@ int UtcDaliImageViewGetImageN(void)
 
   imageView.SetImage( TEST_IMAGE_FILE_NAME );
   DALI_TEST_CHECK( ! imageView.GetImage() );
-
-  END_TEST;
-}
-
-
-int UtcDaliImageViewReplaceImage(void)
-{
-  ToolkitTestApplication application;
-
-  gResourceReadySignalFired = false;
-
-  int width = 100;
-  int height = 200;
-  Image image = CreateBufferImage( width, height, Vector4(1.f, 1.f, 1.f, 1.f) );
-
-  // Check ImageView with background and main image, to ensure both visuals are marked as loaded
-  ImageView imageView = ImageView::New( TEST_IMAGE_1 );
-
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), false, TEST_LOCATION );
-
-  Toolkit::DevelControl::ResourceReadySignal( imageView ).Connect( &ResourceReadySignal);
-
-  Stage::GetCurrent().Add( imageView );
-
-  application.SendNotification();
-  application.Render(16);
-
-  // loading started, this waits for the loader thread for max 30 seconds
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( imageView.GetRendererCount(), 1u, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
-
-  gResourceReadySignalFired = false;
-
-  imageView.SetImage(TEST_IMAGE_2);
-
-  application.SendNotification();
-  application.Render(16);
-
-  // loading started, this waits for the loader thread for max 30 seconds
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( imageView.GetRendererCount(), 1u, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), true, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
   END_TEST;
 }

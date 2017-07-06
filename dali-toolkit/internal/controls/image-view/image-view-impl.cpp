@@ -87,13 +87,6 @@ Toolkit::ImageView ImageView::New()
 
 /////////////////////////////////////////////////////////////
 
-void ImageView::OnInitialize()
-{
-  // ImageView can relayout in the OnImageReady, alternative to a signal would be to have a upcall from the Control to ImageView
-  Dali::Toolkit::Control handle( GetOwner() );
-  Toolkit::DevelControl::ResourceReadySignal( handle ).Connect( this, &ImageView::OnResourceReady );
-}
-
 void ImageView::SetImage( Image image )
 {
   // Don't bother comparing if we had a visual previously, just drop old visual and create new one
@@ -101,13 +94,10 @@ void ImageView::SetImage( Image image )
   mUrl.clear();
   mPropertyMap.Clear();
 
-  Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( image );
-  if (!mVisual)
-  {
-    mVisual = visual;
-  }
+  mVisual =  Toolkit::VisualFactory::Get().CreateVisual( image );
+  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, mVisual  );
 
-  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
+  RelayoutRequest();
 }
 
 void ImageView::SetImage( const Property::Map& map )
@@ -116,14 +106,11 @@ void ImageView::SetImage( const Property::Map& map )
   mPropertyMap = map;
   mUrl.clear();
   mImage.Reset();
-  Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
-  // Don't set mVisual until it is ready and shown. Getters will still use current visual.
-  if (!mVisual)
-  {
-    mVisual = visual;
-  }
 
-  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
+  mVisual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
+  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, mVisual  );
+
+  RelayoutRequest();
 }
 
 void ImageView::SetImage( const std::string& url, ImageDimensions size )
@@ -133,14 +120,10 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
   mImage.Reset();
   mPropertyMap.Clear();
 
-  // Don't set mVisual until it is ready and shown. Getters will still use current visual.
-  Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
-  if (!mVisual)
-  {
-    mVisual = visual;
-  }
+  mVisual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
+  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, mVisual );
 
-  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual );
+  RelayoutRequest();
 }
 
 Image ImageView::GetImage() const
@@ -236,11 +219,6 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
     // Should provide a transform that handles aspect ratio according to image size
     mVisual.SetTransformAndSize( Property::Map(), size );
   }
-}
-
-void ImageView::OnResourceReady( Toolkit::Control control )
-{
-  mVisual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
 }
 
 ///////////////////////////////////////////////////////////

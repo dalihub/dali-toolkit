@@ -110,9 +110,6 @@ void SvgVisual::DoSetOnStage( Actor& actor )
 
   // Hold the weak handle of the placement actor and delay the adding of renderer until the svg rasterization is finished.
   mPlacementActor = actor;
-
-  // SVG visual needs it's size set before it can be rasterized hence set ResourceReady once on stage
-  ResourceReady();
 }
 
 void SvgVisual::DoSetOffStage( Actor& actor )

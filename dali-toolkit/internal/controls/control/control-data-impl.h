@@ -288,13 +288,10 @@ private:
   /**
    * @brief Adds the visual to the list of registered visuals.
    * @param[in] index The Property index of the visual, used to reference visual
-   * @param[in,out] visual The visual to register, which can be altered in this function
+   * @param[in] visual The visual to register
    * @param[in] enabled false if derived class wants to control when visual is set on stage
    * @param[in] depthIndexValueSet Set to true if the depthIndex has actually been set manually
    * @param[in] depthIndex The visual's depth-index is set to this
-   *
-   * @note Registering a visual with an index that already has a registered visual will replace it. The replacement will
-   *       occur once the replacement visual is ready (loaded).
    */
   void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex = 0 );
 
@@ -331,8 +328,6 @@ public:
   ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
-
-  RegisteredVisualContainer mReplacementVisuals;         ///< List of visuals that will be used for replacing current visuals.
 
   // Properties - these need to be members of Internal::Control::Impl as they access private methods/data of Internal::Control and Internal::Control::Impl.
   static const PropertyRegistration PROPERTY_1;
