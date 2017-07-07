@@ -123,6 +123,11 @@ public:
 private: // From Control
 
   /**
+   * @copydoc Toolkit::Control::OnInitialize
+   */
+  void OnInitialize();
+
+  /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
   virtual Vector3 GetNaturalSize();
@@ -141,6 +146,14 @@ private: // From Control
    * @copydoc Toolkit::Control::OnRelayout()
    */
   virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+
+private:
+
+  /**
+   * @brief Callback for ResourceReadySignal
+   * param[in] control signal prototype
+   */
+  void OnResourceReady( Toolkit::Control control );
 
 private:
   // Undefined

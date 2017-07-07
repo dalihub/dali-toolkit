@@ -457,6 +457,7 @@ void TextVisual::UpdateRenderer( bool initializeRendererAndTexture )
     }
 
     // Nothing else to do if the relayout size is zero.
+    ResourceReady();
     return;
   }
 

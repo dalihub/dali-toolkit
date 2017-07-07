@@ -165,6 +165,11 @@ private:
   typedef FocusStack::Iterator FocusStackIterator; ///< Define FocusStack::Iterator as FocusStackIterator to navigate FocusStack
 
   /**
+   * Get configuration from StyleManager.
+   */
+  void GetConfigurationFromStyleManger();
+
+  /**
    * Get the focus group of current focused actor.
    * @pre The FocusManager has been initialized.
    * @return A handle to the parent of the current focused actor which is a focus group,
@@ -253,9 +258,9 @@ private:
 
   Actor mFocusIndicatorActor; ///< The focus indicator actor shared by all the keyboard focusable actors for highlight
 
-  bool mFocusGroupLoopEnabled:1; ///< Whether the focus movement is looped within the same focus group
+  int mIsFocusIndicatorEnabled; ///< Whether indicator should be shown / hidden when getting focus. It could be enabled when keyboard focus feature is enabled and navigation keys or 'Tab' key are pressed.
 
-  bool mIsFocusIndicatorEnabled:1; ///< Whether indicator should be shown / hidden. It could be enabled when keyboard focus feature enabled and navigation keys or 'Tab' key pressed.
+  bool mFocusGroupLoopEnabled:1; ///< Whether the focus movement is looped within the same focus group
 
   bool mIsWaitingKeyboardFocusChangeCommit:1; /// A flag to indicate PreFocusChangeSignal emitted but the proposed focus actor is not commited by the application yet.
 

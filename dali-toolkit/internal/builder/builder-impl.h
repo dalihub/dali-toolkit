@@ -95,6 +95,11 @@ public:
   void AddConstant( const std::string& key, const Property::Value& value );
 
   /**
+   * @copydoc Toolkit::Builder::GetConfigurations
+   */
+  const Property::Map& GetConfigurations() const;
+
+  /**
    * @copydoc Toolkit::Builder::GetConstants
    */
   const Property::Map& GetConstants() const;
@@ -257,6 +262,8 @@ private:
 
   void LoadConstants( const TreeNode& root, Property::Map& intoMap );
 
+  void LoadConfiguration( const TreeNode& root, Property::Map& intoMap );
+
   Animation CreateAnimation( const std::string& animationName,
                              const Replacement& replacement,
                              Dali::Actor        sourceActor );
@@ -384,6 +391,7 @@ private:
   LinearConstrainerLut                mLinearConstrainerLut;
   SlotDelegate<Builder>               mSlotDelegate;
   Property::Map                       mReplacementMap;
+  Property::Map                       mConfigurationMap;
   MappingsLut                         mCompleteMappings;
   Dictionary<StylePtr>                mStyles; // State based styles
   Toolkit::Builder::BuilderSignalType mQuitSignal;

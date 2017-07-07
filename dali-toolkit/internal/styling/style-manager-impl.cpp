@@ -228,15 +228,22 @@ void StyleManager::SetTheme( const std::string& themeFile )
 {
   bool themeLoaded = false;
 
-  mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
-
-  // Always load the default theme first, then merge in the custom theme if present
-  themeLoaded = LoadJSON( mThemeBuilder, DEFAULT_THEME );
-  mThemeFile = themeFile;
+  if( mThemeFile.compare(DEFAULT_THEME) == 0 && mThemeBuilder )
+  {
+    // We have already loaded the default theme into mThemeBuilder
+  }
+  else
+  {
+    // Reload the default theme
+    mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
+    themeLoaded = LoadJSON( mThemeBuilder, DEFAULT_THEME );
+  }
 
   if( themeFile.compare(DEFAULT_THEME) != 0 )
   {
-    themeLoaded = LoadJSON( mThemeBuilder, mThemeFile );
+    // The theme is different to the default: Merge it
+    themeLoaded = LoadJSON( mThemeBuilder, themeFile );
+    mThemeFile = themeFile;
   }
 
   if( themeLoaded )
@@ -252,6 +259,32 @@ void StyleManager::SetTheme( const std::string& themeFile )
   {
     mThemeBuilder.Reset();
   }
+}
+
+const Property::Map StyleManager::GetConfigurations()
+{
+  Property::Map result;
+  if( mThemeBuilder )
+  {
+    result = mThemeBuilder.GetConfigurations();
+  }
+  else
+  {
+    bool themeLoaded = false;
+
+    mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
+
+    // Load default theme because this is first try to load stylesheet.
+    themeLoaded = LoadJSON( mThemeBuilder, DEFAULT_THEME );
+    mThemeFile = DEFAULT_THEME;
+
+    if( themeLoaded )
+    {
+      result = mThemeBuilder.GetConfigurations();
+    }
+  }
+
+  return result;
 }
 
 bool StyleManager::LoadFile( const std::string& filename, std::string& stringOut )

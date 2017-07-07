@@ -22,6 +22,7 @@
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/devel-api/adaptor-framework/video-player.h>
+#include <dali/integration-api/adaptors/trigger-event-factory.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
@@ -195,7 +196,21 @@ public:
    */
   static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes );
 
+  /**
+   * Connects a callback function with the object's signals.
+   * @param[in] object The object providing the signal.
+   * @param[in] tracker Used to disconnect the signal.
+   * @param[in] signalName The signal to connect to.
+   * @param[in] functor A newly allocated FunctorDelegate.
+   * @return True if the signal was connected.
+   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the c
+   */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+
+  /*
+   * @brief Updates video display area for window rendering target
+   */
+  void UpdateDisplayArea();
 
 private: // From Control
 
@@ -249,6 +264,11 @@ private:
   Dali::NativeImage mNativeImage; ///< Native image handle for video rendering by texture streaming
   Dali::Toolkit::VideoView::VideoViewSignalType mFinishedSignal;
   std::string mUrl;
+  Dali::DisplayArea mDisplayArea;
+
+  Property::Index mUpdateTriggerPropertyIndex;
+  TriggerEventInterface* mNotification;
+
   int mCurrentVideoPlayPosition;
   bool mIsNativeImageTarget;
   bool mIsPlay;

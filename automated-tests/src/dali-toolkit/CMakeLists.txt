@@ -83,6 +83,7 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-tts-player.cpp
    dali-toolkit-test-utils/toolkit-native-image-source.cpp
    dali-toolkit-test-utils/toolkit-video-player.cpp
+   dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
    dali-toolkit-test-utils/dali-test-suite-utils.cpp
    dali-toolkit-test-utils/dummy-control.cpp
    dali-toolkit-test-utils/mesh-builder.cpp
