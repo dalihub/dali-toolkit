@@ -78,8 +78,6 @@ void WireframeVisual::DoSetOnStage( Actor& actor )
   InitializeRenderer();
 
   actor.AddRenderer( mImpl->mRenderer );
-  // Wireframe generated and ready to display
-  ResourceReady();
 }
 
 void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const

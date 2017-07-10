@@ -99,16 +99,6 @@ const Vector2& Base::GetSize() const
   return mImpl->mSize;
 }
 
-void Base::SetName( const std::string& name )
-{
-  mImpl->mName = name;
-}
-
-const std::string& Base::GetName() const
-{
-  return mImpl->mName;
-}
-
 void Base::GetNaturalSize( Vector2& naturalSize ) const
 {
   naturalSize = Vector2::ZERO;
@@ -184,41 +174,6 @@ void Base::DoSetOffStage( Actor& actor )
 {
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
-}
-
-
-void Visual::Base::AddResourceObserver( Visual::ResourceObserver& observer)
-{
-  mImpl->mResourceObserver = &observer;
-}
-
-void Visual::Base::RemoveResourceObserver( Visual::ResourceObserver& observer )
-{
-  mImpl->mResourceObserver = NULL;
-}
-
-void Visual::Base::ResourceReady()
-{
-
-  if( mImpl->mResourceReady )
-  {
-    // only inform the observer the first time the resource is ready
-    return;
-  }
-
-
-  if( mImpl->mResourceObserver )
-  {
-    mImpl->mResourceReady = true;
-
-    // observer is currently a control impl
-    mImpl->mResourceObserver->ResourceReady( *this );
-  }
-}
-
-bool Visual::Base::IsResourceReady() const
-{
-  return mImpl->mResourceReady;
 }
 
 void Base::CreatePropertyMap( Property::Map& map ) const

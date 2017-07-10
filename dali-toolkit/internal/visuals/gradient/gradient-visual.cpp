@@ -246,9 +246,6 @@ void GradientVisual::DoSetOnStage( Actor& actor )
   InitializeRenderer();
 
   actor.AddRenderer( mImpl->mRenderer );
-
-  // Gradient Visual generated and ready to display
-  ResourceReady();
 }
 
 void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const

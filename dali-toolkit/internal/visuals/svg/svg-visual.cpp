@@ -250,9 +250,6 @@ void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
       // reset the weak handle so that the renderer only get added to actor once
       mPlacementActor.Reset();
     }
-
-   // Svg loaded and ready to display
-   ResourceReady();
   }
 }
 

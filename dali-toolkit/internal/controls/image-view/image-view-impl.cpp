@@ -15,7 +15,6 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/devel-api/controls/control-devel.h>
 
 namespace Dali
 {
@@ -84,7 +83,6 @@ void ImageView::SetImage( Image image )
 
     Actor self( Self() );
     InitializeVisual( self, mVisual, image );
-    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, mVisual  );
     mImageSize = image ? ImageDimensions( image.GetWidth(), image.GetHeight() ) : ImageDimensions( 0, 0 );
 
     RelayoutRequest();
@@ -99,7 +97,6 @@ void ImageView::SetImage( Property::Map map )
 
   Actor self( Self() );
   InitializeVisual( self, mVisual, mPropertyMap );
-  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, mVisual  );
 
   Property::Value* widthValue = mPropertyMap.Find( "width" );
   if( widthValue )
@@ -142,7 +139,6 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
 
     Actor self( Self() );
     InitializeVisual( self, mVisual, url, size );
-    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, mVisual  );
 
     mVisual.SetSize( mSizeSet );
 

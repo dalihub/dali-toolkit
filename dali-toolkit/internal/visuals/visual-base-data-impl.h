@@ -24,7 +24,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/visual-resource-observer.h>
 
 namespace Dali
 {
@@ -65,13 +64,11 @@ struct Base::Impl
 
   CustomShader* mCustomShader;
 
-  ResourceObserver* mResourceObserver;  ///< Allows controls to observe when the visual resources are loaded and ready
-  std::string     mName;
   Vector2   mSize;
   Vector2   mOffset;
   float     mDepthIndex;
   int       mFlags;
-  bool            mResourceReady:1;
+
   Impl();
   ~Impl();
 };

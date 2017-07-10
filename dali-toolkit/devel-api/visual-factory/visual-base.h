@@ -90,21 +90,6 @@ public:
   const Vector2& GetSize() const;
 
   /**
-   * @brief Set the name of the visual
-   *
-   * Used by the styling system to animate properties
-   * @param[in] name The name to give the visual
-   */
-  void SetName( const std::string& name );
-
-  /**
-   * @brief Get the name of the visual
-   *
-   * Used by the styling system to animate properties
-   * @return The name of the visual
-   */
-  const std::string& GetName();
-  /**
    * @brief Return the natural size of the visual.
    *
    * Deriving classes stipulate the natural size and by default a visual has a ZERO natural size.
