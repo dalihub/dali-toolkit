@@ -400,40 +400,31 @@ void Control::Impl::ResourceReady( Visual::Base& object)
     mControlImpl.RelayoutRequest();
   }
 
-  // go through and check if all the visuals are ready, if they are emit a signal
-  for( auto visualIter = mVisuals.Begin();
-        visualIter != mVisuals.End(); ++visualIter )
+  // Emit signal if all enabled visuals registered by the control are ready.
+  // If any visual is registered and enabled but not ready then the control will not be able to emit ReadySignal.
+
+  if ( IsResourceReady() )
   {
-    const Toolkit::Visual::Base visual = (*visualIter)->visual;
-    const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
-
-    // one of the visuals is not ready
-    if( !visualImpl.IsResourceReady() )
-    {
-      return;
-    }
+    Dali::Toolkit::Control handle( mControlImpl.GetOwner() );
+    mResourceReadySignal.Emit( handle );
   }
-
-  // all the visuals are ready
-  Dali::Toolkit::Control handle( mControlImpl.GetOwner() );
-  mResourceReadySignal.Emit( handle );
 }
 
 bool Control::Impl::IsResourceReady() const
 {
-  // go through and check all the visuals are ready
-  for ( RegisteredVisualContainer::ConstIterator visualIter = mVisuals.Begin();
+  // Iterate through and check all the enabled visuals are ready
+  for ( auto visualIter = mVisuals.Begin();
          visualIter != mVisuals.End(); ++visualIter )
-   {
-     const Toolkit::Visual::Base visual = (*visualIter)->visual;
-     const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+  {
+    const Toolkit::Visual::Base visual = (*visualIter)->visual;
+    const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
 
-     // one of the visuals is not ready
-     if( !visualImpl.IsResourceReady()  )
-     {
-       return false;
-     }
-   }
+    // one of the enabled visuals is not ready
+    if( !visualImpl.IsResourceReady() && (*visualIter)->enabled )
+    {
+      return false;
+    }
+  }
   return true;
 }
 
