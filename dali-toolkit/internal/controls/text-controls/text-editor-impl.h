@@ -296,6 +296,7 @@ private: // Data
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   Actor mRenderableActor;
+  Actor mActiveLayer;
   CallbackBase* mIdleCallback;
 
   float mAlignmentOffset;
