@@ -127,7 +127,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollLoopDelay", FLO
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollStopMode",  STRING,  AUTO_SCROLL_STOP_MODE  )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "lineCount", INTEGER, LINE_COUNT             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "lineWrapMode",        STRING,  LINE_WRAP_MODE         )
-
+DALI_DEVEL_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColorAnimatable", Color::WHITE, TEXT_COLOR_ANIMATABLE )
 DALI_TYPE_REGISTRATION_END()
 
 } // namespace
@@ -258,15 +258,7 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
 
       case Toolkit::TextLabel::Property::TEXT_COLOR:
       {
-        if( impl.mController )
-        {
-          const Vector4& textColor = value.Get< Vector4 >();
-          if( impl.mController->GetDefaultColor() != textColor )
-          {
-            impl.mController->SetDefaultColor( textColor );
-            impl.mRenderer.Reset();
-          }
-        }
+        SetProperty( object, DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE, value );
         break;
       }
 
@@ -597,6 +589,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         break;
       }
       case Toolkit::TextLabel::Property::TEXT_COLOR:
+      case Toolkit::DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE:
       {
         if ( impl.mController )
         {
@@ -850,6 +843,31 @@ float TextLabel::GetHeightForWidth( float width )
   return mController->GetHeightForWidth( width ) + padding.top + padding.bottom;
 }
 
+void TextLabel::OnPropertySet( Property::Index index, Property::Value propertyValue )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextLabel::OnPropertySet index[%d]\n", index );
+
+  switch ( index )
+  {
+    case Toolkit::TextLabel::Property::TEXT_COLOR:
+    case Toolkit::DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE:
+    {
+      const Vector4& textColor = propertyValue.Get< Vector4 >();
+      if( mController->GetDefaultColor() != textColor )
+      {
+         mController->SetDefaultColor( textColor );
+         mRenderer.Reset();
+      }
+      break;
+    }
+    default:
+    {
+      Control::OnPropertySet( index, propertyValue ); // up call to control for non-handled properties
+      break;
+    }
+  }
+}
+
 void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnRelayout\n" );
@@ -887,7 +905,12 @@ void TextLabel::RenderText()
   float alignmentOffset = 0.f;
   if( mRenderer )
   {
+
+    Dali::Toolkit::TextLabel handle = Dali::Toolkit::TextLabel( GetOwner() );
+
     renderableActor = mRenderer->Render( mController->GetView(),
+                                         handle,
+                                         Toolkit::DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE,
                                          alignmentOffset,
                                          DepthIndex::CONTENT );
   }
