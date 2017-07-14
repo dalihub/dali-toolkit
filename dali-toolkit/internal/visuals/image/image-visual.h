@@ -239,7 +239,7 @@ public:
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  virtual void UploadComplete( bool success, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle );
+  virtual void UploadComplete( bool success, int32_t textureId, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle );
 
 private:
 

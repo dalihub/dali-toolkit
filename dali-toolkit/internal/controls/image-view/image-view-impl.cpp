@@ -64,7 +64,8 @@ DALI_TYPE_REGISTRATION_END()
 using namespace Dali;
 
 ImageView::ImageView()
-: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) )
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
+  mRelayoutRequired(true)
 {
 }
 
@@ -227,6 +228,11 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
 void ImageView::OnResourceReady( Toolkit::Control control )
 {
+  if( mRelayoutRequired)
+  {
+    mRelayoutRequired = false;
+    RelayoutRequest();
+  }
 }
 
 ///////////////////////////////////////////////////////////

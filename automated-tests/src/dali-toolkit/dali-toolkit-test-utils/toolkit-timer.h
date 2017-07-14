@@ -62,4 +62,10 @@ private:
 
 } // namespace Dali
 
+namespace Test
+{
+int GetTimerCount();
+void EmitGlobalTimerSignal();
+}
+
 #endif // __DALI_TOOLKIT_TOOLKIT_TIMER_H__

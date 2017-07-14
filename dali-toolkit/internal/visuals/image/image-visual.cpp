@@ -962,7 +962,7 @@ void ImageVisual::UploadCompleted()
 }
 
 // From Texture Manager
-void ImageVisual::UploadComplete( bool loadingSuccess, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle )
+void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle )
 {
   Actor actor = mPlacementActor.GetHandle();
   if( actor )

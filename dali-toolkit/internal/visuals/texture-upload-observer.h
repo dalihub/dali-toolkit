@@ -57,11 +57,12 @@ public:
    * This should be overridden by the deriving class.
    *
    * @param[in] loadSuccess True if the texture load was successful (i.e. the resource is available). If false, then the resource failed to load. In future, this will automatically upload a "broken" image.
+   * @param[in] textureId   The textureId of the loaded texture in the TextureManager
    * @param[in] textureSet  The TextureSet containing the Texture
    * @param[in] useAtlasing True if atlasing was used (note: this may be different to what was requested)
    * @param[in] atlasRect   If using atlasing, this is the rectangle within the atlas to use.
    */
-  virtual void UploadComplete( bool loadSuccess, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect ) = 0;
+  virtual void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect ) = 0;
 
   /**
    * @brief Returns the destruction signal.

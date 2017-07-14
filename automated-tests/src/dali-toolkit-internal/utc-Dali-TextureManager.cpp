@@ -34,7 +34,7 @@ public:
   {
   }
 
-  void UploadComplete( bool loadSuccess, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect )
+  void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect )
   {
     mLoaded = loadSuccess;
     mObserverCalled = true;
