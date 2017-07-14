@@ -27,6 +27,8 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/align-enums.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <toolkit-event-thread-callback.h>
 
 #include "dummy-control.h"
 
@@ -67,6 +69,9 @@ static void TestKeyInputFocusCallback( Control control )
 
   gKeyInputFocusCallBackCalled = true;
 }
+
+const char* TEST_LARGE_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/tbcol.png";
+const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 
 } // namespace
 
@@ -800,6 +805,64 @@ int UtcDaliControlSetTransformSize(void)
   DALI_TEST_EQUALS( retMap->Find( DevelVisual::Transform::Property::ANCHOR_POINT )->Get< int >(), (int)Align::BOTTOM_END, TEST_LOCATION );
   DALI_TEST_EQUALS( retMap->Find( DevelVisual::Transform::Property::ORIGIN )->Get< int >(), (int)Align::BOTTOM_END, TEST_LOCATION );
   DALI_TEST_EQUALS( retMap->Find( DevelVisual::Transform::Property::SIZE )->Get< Vector2 >(), Vector2( 10, 20 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliControlResourcesReady(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Register 2 visuals and check ResourceReady when a visual is disabled" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMapLarge;
+  propertyMapLarge.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMapLarge.Insert( ImageVisual::Property::URL,  TEST_LARGE_IMAGE_FILE_NAME );
+
+  Property::Map propertyMapSmall;
+  propertyMapSmall.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMapSmall.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+
+  Visual::Base smallVisual = factory.CreateVisual( propertyMapSmall );
+  smallVisual.SetName("smallVisual");
+  DALI_TEST_CHECK( smallVisual );
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, smallVisual );
+
+  actor.SetSize( 200.f, 200.f );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), false, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), true, TEST_LOCATION );
+
+  Visual::Base largeVisual = factory.CreateVisual( propertyMapLarge );
+  largeVisual.SetName("largeVisual");
+  DALI_TEST_CHECK( largeVisual );
+
+  tet_infoline( "Register Visual but set disabled, IsResourceReady should be true" );
+
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, largeVisual, false );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), true, TEST_LOCATION );
 
   END_TEST;
 }

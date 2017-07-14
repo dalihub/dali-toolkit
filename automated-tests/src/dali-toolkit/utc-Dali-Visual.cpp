@@ -24,6 +24,7 @@
 #include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
@@ -2135,6 +2136,42 @@ int UtcDaliRegisterVisualOrder(void)
   anotherTestVisual2Replacement.SetDepthIndex( 2000 );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, anotherTestVisual2Replacement );
   DALI_TEST_EQUALS( anotherTestVisual2Replacement.GetDepthIndex(), 2000, TEST_LOCATION );
+
+  dummyControl.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( dummyControl );
+
+  END_TEST;
+}
+
+int UtcDaliRegisterVisualOrder02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Register Visual Order with Background Set" );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  const int backgroundDepthIndex = Toolkit::DepthIndex::BACKGROUND;
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
+
+  tet_printf( "Register a control background visual, should have depth index of %d\n", backgroundDepthIndex );
+
+  dummyControl.SetProperty( Control::Property::BACKGROUND, propertyMap );
+
+  const int TEST_VISUAL_1_DEPTH_INDEX = 0;
+  tet_printf( "Register visual, should have depth index of %d\n", TEST_VISUAL_1_DEPTH_INDEX );
+  Visual::Base testVisual1 = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, testVisual1 );
+  DALI_TEST_EQUALS( testVisual1.GetDepthIndex(), TEST_VISUAL_1_DEPTH_INDEX , TEST_LOCATION );
+
+  tet_printf( "Register another visual, should have a depth index greater than previous(%d)\n", TEST_VISUAL_1_DEPTH_INDEX );
+  Visual::Base testVisual2 = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, testVisual2 );
+  DALI_TEST_CHECK( testVisual2.GetDepthIndex() >  testVisual1.GetDepthIndex() );
 
   dummyControl.SetSize(200.f, 200.f);
   Stage::GetCurrent().Add( dummyControl );

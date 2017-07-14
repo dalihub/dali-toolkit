@@ -814,14 +814,21 @@ Vector3 TextLabel::GetNaturalSize()
 
 float TextLabel::GetHeightForWidth( float width )
 {
-  return mController->GetHeightForWidth( width );
+  Padding padding;
+  Self().GetPadding( padding );
+  return mController->GetHeightForWidth( width ) + padding.top + padding.bottom;
 }
 
 void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnRelayout\n" );
 
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( size );
+  Padding padding;
+  Self().GetPadding( padding );
+  Vector2 contentSize( size.x - ( padding.left + padding.right ), size.y - ( padding.top + padding.bottom ) );
+
+
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize );
 
   if( ( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) ) ||
       !mRenderer )
@@ -861,7 +868,9 @@ void TextLabel::RenderText()
     if( renderableActor )
     {
       const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
-      renderableActor.SetPosition( scrollOffset.x + alignmentOffset, scrollOffset.y );
+      Padding padding;
+      self.GetPadding( padding );
+      renderableActor.SetPosition( scrollOffset.x + alignmentOffset + padding.left, scrollOffset.y + padding.top );
 
       self.Add( renderableActor );
     }
