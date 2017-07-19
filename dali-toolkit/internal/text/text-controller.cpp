@@ -48,6 +48,7 @@ const float MAX_FLOAT = std::numeric_limits<float>::max();
 const std::string EMPTY_STRING("");
 
 const char * const PLACEHOLDER_TEXT = "placeholderText";
+const char * const PLACEHOLDER_TEXT_FOCUSED = "placeholderTextFocused";
 const char * const PLACEHOLDER_COLOR = "placeholderColor";
 const char * const PLACEHOLDER_FONT_FAMILY = "placeholderFontFamily";
 const char * const PLACEHOLDER_FONT_STYLE = "placeholderFontStyle";
@@ -531,22 +532,6 @@ void Controller::GetText( std::string& text ) const
   }
 }
 
-void Controller::SetPlaceholderText( const std::string& text )
-{
-  if( NULL != mImpl->mEventData )
-  {
-    mImpl->mEventData->mPlaceholderText = text;
-
-    // Update placeholder if there is no text
-    if( mImpl->IsShowingPlaceholderText() ||
-        ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) )
-    {
-      ShowPlaceholderText();
-    }
-  }
-}
-
-// This is overloading function for PLACEHOLDER_TEXT_FOCUSED in text-field
 void Controller::SetPlaceholderText( PlaceholderType type, const std::string& text )
 {
   if( NULL != mImpl->mEventData )
@@ -569,15 +554,6 @@ void Controller::SetPlaceholderText( PlaceholderType type, const std::string& te
   }
 }
 
-void Controller::GetPlaceholderText( std::string& text ) const
-{
-  if( NULL != mImpl->mEventData )
-  {
-    text = mImpl->mEventData->mPlaceholderText;
-  }
-}
-
-// This is overloading function for PLACEHOLDER_TEXT_FOCUSED in text-field
 void Controller::GetPlaceholderText( PlaceholderType type, std::string& text ) const
 {
   if( NULL != mImpl->mEventData )
@@ -1918,7 +1894,13 @@ void Controller::SetPlaceholderProperty( const Property::Map& map )
     {
       std::string text = "";
       value.Get( text );
-      SetPlaceholderText( text );
+      SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
+    }
+    else if( key == PLACEHOLDER_TEXT_FOCUSED )
+    {
+      std::string text = "";
+      value.Get( text );
+      SetPlaceholderText( Controller::PLACEHOLDER_TYPE_ACTIVE, text );
     }
     else if( key == PLACEHOLDER_COLOR )
     {
@@ -1964,7 +1946,15 @@ void Controller::GetPlaceholderProperty( Property::Map& map )
 {
   if( NULL != mImpl->mEventData )
   {
-    map[ PLACEHOLDER_TEXT ] = mImpl->mEventData->mPlaceholderText;
+    if( !mImpl->mEventData->mPlaceholderTextActive.empty() )
+    {
+      map[ PLACEHOLDER_TEXT_FOCUSED ] = mImpl->mEventData->mPlaceholderTextActive;
+    }
+    if( !mImpl->mEventData->mPlaceholderTextInactive.empty() )
+    {
+      map[ PLACEHOLDER_TEXT ] = mImpl->mEventData->mPlaceholderTextInactive;
+    }
+
     map[ PLACEHOLDER_COLOR ] = mImpl->mEventData->mPlaceholderTextColor;
     map[ PLACEHOLDER_FONT_FAMILY ] = GetPlaceholderFontFamily();
 
@@ -3554,27 +3544,17 @@ void Controller::ShowPlaceholderText()
     const char* text( NULL );
     size_t size( 0 );
 
-    if( !mImpl->mEventData->mPlaceholderTextActive.empty() || !mImpl->mEventData->mPlaceholderTextInactive.empty() )
+    // TODO - Switch Placeholder text when changing state
+    if( ( EventData::INACTIVE != mImpl->mEventData->mState ) &&
+        ( 0u != mImpl->mEventData->mPlaceholderTextActive.c_str() ) )
     {
-      if( ( EventData::INACTIVE != mImpl->mEventData->mState ) &&
-          ( 0u != mImpl->mEventData->mPlaceholderTextActive.c_str() ) )
-      {
-        text = mImpl->mEventData->mPlaceholderTextActive.c_str();
-        size = mImpl->mEventData->mPlaceholderTextActive.size();
-      }
-      else
-      {
-        text = mImpl->mEventData->mPlaceholderTextInactive.c_str();
-        size = mImpl->mEventData->mPlaceholderTextInactive.size();
-      }
+      text = mImpl->mEventData->mPlaceholderTextActive.c_str();
+      size = mImpl->mEventData->mPlaceholderTextActive.size();
     }
     else
     {
-      if( 0u != mImpl->mEventData->mPlaceholderText.c_str() )
-      {
-        text = mImpl->mEventData->mPlaceholderText.c_str();
-        size = mImpl->mEventData->mPlaceholderText.size();
-      }
+      text = mImpl->mEventData->mPlaceholderTextInactive.c_str();
+      size = mImpl->mEventData->mPlaceholderTextInactive.size();
     }
 
     mImpl->mTextUpdateInfo.mCharacterIndex = 0u;

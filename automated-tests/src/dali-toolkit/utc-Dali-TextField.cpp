@@ -860,6 +860,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map placeholderPixelSizeMapGet;
   Property::Map placeholderFontstyleMap;
   placeholderPixelSizeMapSet["placeholderText"] = "Setting Placeholder Text";
+  placeholderPixelSizeMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
   placeholderPixelSizeMapSet["placeholderColor"] = Color::BLUE;
   placeholderPixelSizeMapSet["placeholderFontFamily"] = "Arial";
   placeholderPixelSizeMapSet["placeholderPixelSize"] = 15.0f;
@@ -876,6 +877,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map placeholderMapSet;
   Property::Map placeholderMapGet;
   placeholderMapSet["placeholderText"] = "Setting Placeholder Text";
+  placeholderMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
   placeholderMapSet["placeholderColor"] = Color::RED;
   placeholderMapSet["placeholderFontFamily"] = "Arial";
   placeholderMapSet["placeholderPointSize"] = 12.0f;

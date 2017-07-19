@@ -71,7 +71,6 @@ EventData::EventData( DecoratorPtr decorator )
 : mDecorator( decorator ),
   mImfManager(),
   mPlaceholderFont( NULL ),
-  mPlaceholderText(),
   mPlaceholderTextActive(),
   mPlaceholderTextInactive(),
   mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),

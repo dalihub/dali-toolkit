@@ -26,7 +26,6 @@
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 
 using namespace Dali;
@@ -767,12 +766,6 @@ int UtcDaliTextEditorSetPropertyP(void)
   editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT, "Setting Placeholder Text" );
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( DevelTextEditor::Property::PLACEHOLDER_TEXT ), std::string("Setting Placeholder Text"), TEST_LOCATION );
 
-  // Check placeholder text properties when focused.
-  editor.SetProperty( DevelControl::Property::STATE, "FOCUSED" );
-  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT, "Setting Focused Placeholder Text" );
-  DALI_TEST_EQUALS( editor.GetProperty<int>( DevelControl::Property::STATE ), (int)DevelControl::FOCUSED, TEST_LOCATION );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( DevelTextEditor::Property::PLACEHOLDER_TEXT ), std::string("Setting Focused Placeholder Text"), TEST_LOCATION );
-
   // Check placeholder text's color property.
   editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR, Color::RED );
   DALI_TEST_EQUALS( editor.GetProperty<Vector4>( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR ), Color::RED, TEST_LOCATION );
@@ -786,6 +779,7 @@ int UtcDaliTextEditorSetPropertyP(void)
   Property::Map placeholderPixelSizeMapGet;
   Property::Map placeholderFontstyleMap;
   placeholderPixelSizeMapSet["placeholderText"] = "Setting Placeholder Text";
+  placeholderPixelSizeMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
   placeholderPixelSizeMapSet["placeholderColor"] = Color::BLUE;
   placeholderPixelSizeMapSet["placeholderFontFamily"] = "Arial";
   placeholderPixelSizeMapSet["placeholderPixelSize"] = 15.0f;
@@ -802,6 +796,7 @@ int UtcDaliTextEditorSetPropertyP(void)
   Property::Map placeholderMapSet;
   Property::Map placeholderMapGet;
   placeholderMapSet["placeholderText"] = "Setting Placeholder Text";
+  placeholderMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
   placeholderMapSet["placeholderColor"] = Color::RED;
   placeholderMapSet["placeholderFontFamily"] = "Arial";
   placeholderMapSet["placeholderPointSize"] = 12.0f;

@@ -145,14 +145,15 @@ namespace Property
        * @code
        *   Property::Map propertyMap;
        *   propertyMap["placeholderText"] = "Setting Placeholder Text";
+       *   propertyMap["placeholderTextFocused"] = "Setting Placeholder Text Focused";
        *   propertyMap["placeholderColor"] = Color::RED;
        *   propertyMap["placeholderFontFamily"] = "Arial";
        *   propertyMap["placeholderPointSize"] = 12.0f;
        *
        *   Property::Map fontStyleMap;
-       *   fontstyleMap.Insert( "weight", "bold" );
-       *   fontstyleMap.Insert( "width", "condensed" );
-       *   fontstyleMap.Insert( "slant", "italic" );
+       *   fontStyleMap.Insert( "weight", "bold" );
+       *   fontStyleMap.Insert( "width", "condensed" );
+       *   fontStyleMap.Insert( "slant", "italic" );
        *   propertyMap["placeholderFontStyle"] = fontStyleMap;
        *
        *   editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, propertyMap );

@@ -674,7 +674,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
           const std::string& text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor::OnPropertySet %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str() );
 
-          impl.mController->SetPlaceholderText( text );
+          impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
         }
         break;
       }
@@ -1060,7 +1060,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         if( impl.mController )
         {
           std::string text;
-          impl.mController->GetPlaceholderText( text );
+          impl.mController->GetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
           value = text;
         }
         break;
