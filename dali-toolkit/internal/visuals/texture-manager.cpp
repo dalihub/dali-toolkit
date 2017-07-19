@@ -74,35 +74,39 @@ TextureManager::TextureId TextureManager::RequestLoad(
   const UseAtlas           useAtlas,
   TextureUploadObserver*   observer )
 {
-  return RequestLoadInternal( url, INVALID_TEXTURE_ID, desiredSize, fittingMode, samplingMode, useAtlas, UPLOAD_TO_TEXTURE, observer );
+  return RequestLoadInternal( url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, useAtlas, false, UPLOAD_TO_TEXTURE, observer );
 }
 
 TextureManager::TextureId TextureManager::RequestLoad(
   const VisualUrl&         url,
   TextureId                maskTextureId,
+  float                    contentScale,
   const ImageDimensions    desiredSize,
   FittingMode::Type        fittingMode,
   Dali::SamplingMode::Type samplingMode,
   const UseAtlas           useAtlas,
+  bool                     cropToMask,
   TextureUploadObserver*   observer )
 {
-  return RequestLoadInternal( url, maskTextureId, desiredSize, fittingMode, samplingMode, useAtlas, UPLOAD_TO_TEXTURE, observer );
+  return RequestLoadInternal( url, maskTextureId, contentScale, desiredSize, fittingMode, samplingMode, useAtlas, cropToMask, UPLOAD_TO_TEXTURE, observer );
 }
 
 TextureManager::TextureId TextureManager::RequestMaskLoad( const VisualUrl& maskUrl )
 {
   // Use the normal load procedure to get the alpha mask.
-  return RequestLoadInternal( maskUrl, INVALID_TEXTURE_ID, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, KEEP_PIXEL_BUFFER, NULL );
+  return RequestLoadInternal( maskUrl, INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, false, KEEP_PIXEL_BUFFER, NULL );
 }
 
 
 TextureManager::TextureId TextureManager::RequestLoadInternal(
   const VisualUrl&         url,
   TextureId                maskTextureId,
+  float                    contentScale,
   const ImageDimensions    desiredSize,
   FittingMode::Type        fittingMode,
   Dali::SamplingMode::Type samplingMode,
   UseAtlas                 useAtlas,
+  bool                     cropToMask,
   StorageType              storageType,
   TextureUploadObserver*   observer )
 {
@@ -129,8 +133,8 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     // We need a new Texture.
     textureId = GenerateUniqueTextureId();
     mTextureInfoContainer.push_back( TextureInfo( textureId, maskTextureId, url.GetUrl(),
-                                                  desiredSize, fittingMode, samplingMode,
-                                                  false, useAtlas, textureHash ) );
+                                                  desiredSize, contentScale, fittingMode, samplingMode,
+                                                  false, cropToMask, useAtlas, textureHash ) );
     cacheIndex = mTextureInfoContainer.size() - 1u;
 
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex, textureId );
@@ -388,7 +392,7 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pix
         }
         else if( maskLoadState == LOAD_FINISHED )
         {
-          ApplyMask( pixelBuffer, textureInfo.maskTextureId );
+          ApplyMask( pixelBuffer, textureInfo.maskTextureId, textureInfo.scaleFactor, textureInfo.cropToMask );
           UploadTexture( pixelBuffer, textureInfo );
           NotifyObservers( textureInfo, true );
         }
@@ -436,7 +440,7 @@ void TextureManager::CheckForWaitingTexture( TextureInfo& maskTextureInfo )
 
       if( maskTextureInfo.loadState == LOAD_FINISHED )
       {
-        ApplyMask( pixelBuffer, maskTextureInfo.textureId );
+        ApplyMask( pixelBuffer, maskTextureInfo.textureId, textureInfo.scaleFactor, textureInfo.cropToMask );
         UploadTexture( pixelBuffer, textureInfo );
         NotifyObservers( textureInfo, true );
       }
@@ -450,11 +454,13 @@ void TextureManager::CheckForWaitingTexture( TextureInfo& maskTextureInfo )
   }
 }
 
-void TextureManager::ApplyMask( Devel::PixelBuffer& pixelBuffer, TextureId maskTextureId )
+void TextureManager::ApplyMask(
+  Devel::PixelBuffer& pixelBuffer, TextureId maskTextureId,
+  float contentScale, bool cropToMask )
 {
   int maskCacheIndex = GetCacheIndexFromId( maskTextureId );
   Devel::PixelBuffer maskPixelBuffer = mTextureInfoContainer[maskCacheIndex].pixelBuffer;
-  pixelBuffer.ApplyMask( maskPixelBuffer );
+  pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
 }
 
 void TextureManager::UploadTexture( Devel::PixelBuffer& pixelBuffer, TextureInfo& textureInfo )

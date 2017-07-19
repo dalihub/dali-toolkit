@@ -1125,3 +1125,63 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
 
   END_TEST;
 }
+
+
+int UtcDaliImageVisualAlphaMaskCrop(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Request image visual with an Alpha mask and scale/cropping" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_LARGE_IMAGE_FILE_NAME );
+  propertyMap.Insert( DevelImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME );
+  propertyMap.Insert( DevelImageVisual::Property::MASK_CONTENT_SCALE, 1.6f );
+  propertyMap.Insert( DevelImageVisual::Property::CROP_TO_MASK, true );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  Property::Map testMap;
+  visual.CreatePropertyMap(testMap);
+  DALI_TEST_EQUALS( *testMap.Find(DevelImageVisual::Property::ALPHA_MASK_URL),Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION );
+  DALI_TEST_EQUALS( *testMap.Find(DevelImageVisual::Property::MASK_CONTENT_SCALE), Property::Value(1.6f), TEST_LOCATION );
+  DALI_TEST_EQUALS( *testMap.Find(DevelImageVisual::Property::CROP_TO_MASK),Property::Value(true), TEST_LOCATION );
+
+  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
+  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+
+  actor.SetSize( 200.f, 200.f );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), false, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector2 size;
+  visual.GetNaturalSize(size);
+
+  DALI_TEST_EQUALS( size, Vector2( 100.0f, 100.0f ), 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), true, TEST_LOCATION );
+
+  END_TEST;
+}

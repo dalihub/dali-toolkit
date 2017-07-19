@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,8 @@ const char * const ANIMATED_IMAGE_URLS_NAME("urls");
 const char * const BATCH_SIZE_NAME("batchSize");
 const char * const CACHE_SIZE_NAME("cacheSize");
 const char * const FRAME_DELAY_NAME("frameDelay");
+const char * const MASK_CONTENT_SCALE_NAME("maskContentScale");
+const char * const CROP_TO_MASK_NAME("cropToMask");
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );
