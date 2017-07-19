@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/internal/text/layouts/layout-wrap-mode.h>
 
 namespace Dali
 {
@@ -58,6 +59,7 @@ struct Parameters
    * @param[in] glyphsPerCharacterBuffer Vector with the number of glyphs shaped from the character.
    * @param[in] totalNumberOfGlyphs The number of glyphs.
    * @param[in] horizontalAlignment The horizontal alignment.
+   * @param[in] lineWrapMode The text wrap mode.
    */
   Parameters( const Vector2& boundingBox,
               const Character* const textBuffer,
@@ -70,7 +72,8 @@ struct Parameters
               const GlyphIndex* const charactersToGlyphsBuffer,
               const Length* const glyphsPerCharacterBuffer,
               Length totalNumberOfGlyphs,
-              HorizontalAlignment horizontalAlignment )
+              HorizontalAlignment horizontalAlignment,
+              LineWrap::Mode lineWrapMode )
   : boundingBox( boundingBox ),
     textBuffer( textBuffer ),
     lineBreakInfoBuffer( lineBreakInfoBuffer ),
@@ -89,6 +92,7 @@ struct Parameters
     horizontalAlignment( horizontalAlignment ),
     startLineIndex( 0u ),
     estimatedNumberOfLines( 0u ),
+    lineWrapMode( lineWrapMode ),
     isLastNewParagraph( false )
   {}
 
@@ -110,6 +114,7 @@ struct Parameters
   HorizontalAlignment             horizontalAlignment;             ///< The horizontal alignment.
   LineIndex                       startLineIndex;                  ///< The line index where to insert the new lines.
   Length                          estimatedNumberOfLines;          ///< The estimated number of lines.
+  LineWrap::Mode                  lineWrapMode;                    ///< The line wrap mode for moving to next line.
   bool                            isLastNewParagraph;              ///< Whether the last character is a new paragraph character.
 };
 

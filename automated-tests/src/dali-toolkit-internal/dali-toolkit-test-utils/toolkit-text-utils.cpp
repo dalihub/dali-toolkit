@@ -281,7 +281,8 @@ void CreateTextModel( const std::string& text,
                                        charactersToGlyph.Begin(),
                                        glyphsPerCharacter.Begin(),
                                        numberOfGlyphs,
-                                       Layout::HORIZONTAL_ALIGN_BEGIN );
+                                       Layout::HORIZONTAL_ALIGN_BEGIN,
+                                       Layout::LineWrap::WORD );
 
   Vector<LineRun>& lines = visualModel->mLines;
 

@@ -920,3 +920,42 @@ int UtcDaliToolkitTextlabelEllipsis(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTextlabelTextWarpMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelTextWarpMode");
+
+  int lineCount =0 ;
+
+  TextLabel label = TextLabel::New();
+  label.SetSize( 300.0f, 300.f );
+  label.SetProperty( TextLabel::Property::TEXT, "Hello world Hello world" );
+  label.SetProperty( TextLabel::Property::MULTI_LINE, true );
+
+
+
+  //label.SetProperty( TextLabel::Property::POINT_SIZE, 18 );
+  Stage::GetCurrent().Add( label );
+
+  label.SetProperty( DevelTextLabel::Property::LINE_WRAP_MODE, "WRAP_MODE_WORD" );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount =  label.GetProperty<int>( DevelTextLabel::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 4, TEST_LOCATION );
+
+
+
+  label.SetProperty( DevelTextLabel::Property::LINE_WRAP_MODE, "WRAP_MODE_CHARACTER" );
+
+  application.SendNotification();
+  application.Render();
+
+
+  lineCount =  label.GetProperty<int>( DevelTextLabel::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
+
+  END_TEST;
+}

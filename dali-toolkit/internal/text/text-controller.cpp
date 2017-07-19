@@ -391,6 +391,34 @@ Layout::VerticalAlignment Controller::GetVerticalAlignment() const
   return mImpl->mModel->mVerticalAlignment;
 }
 
+void Controller::SetLineWrapMode( Layout::LineWrap::Mode lineWrapMode )
+{
+  if( lineWrapMode != mImpl->mModel->mLineWrapMode )
+  {
+    // Set the text wrap mode.
+    mImpl->mModel->mLineWrapMode = lineWrapMode;
+
+
+    // Update Text layout for applying wrap mode
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                             ALIGN                     |
+                                                             LAYOUT                    |
+                                                             UPDATE_LAYOUT_SIZE        |
+                                                             REORDER                   );
+    mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
+    mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
+
+    // Request relayout
+    mImpl->RequestRelayout();
+  }
+}
+
+Layout::LineWrap::Mode Controller::GetLineWrapMode() const
+{
+  return mImpl->mModel->mLineWrapMode;
+}
+
 void Controller::SetTextElideEnabled( bool enabled )
 {
   mImpl->mModel->mElideEnabled = enabled;
@@ -3205,7 +3233,8 @@ bool Controller::DoRelayout( const Size& size,
                                          charactersToGlyphBuffer,
                                          glyphsPerCharacterBuffer,
                                          totalNumberOfGlyphs,
-                                         mImpl->mModel->mHorizontalAlignment );
+                                         mImpl->mModel->mHorizontalAlignment,
+                                         mImpl->mModel->mLineWrapMode );
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mModel->mVisualModel->mGlyphPositions;

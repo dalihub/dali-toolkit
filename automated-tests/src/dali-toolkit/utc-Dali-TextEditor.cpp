@@ -2187,3 +2187,37 @@ int utcDaliTextEditorScrollStateChangedSignalTest(void)
 
   END_TEST;
 }
+int UtcDaliToolkitTextEditorTextWarpMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextEditorTextWarpMode");
+
+  int lineCount =0 ;
+
+  TextEditor editor = TextEditor::New();
+  editor.SetSize( 150.0f, 300.f );
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello world Hello world" );
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetProperty( DevelTextEditor::Property::LINE_WRAP_MODE, "WORD" );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 4, TEST_LOCATION );
+
+
+
+  editor.SetProperty( DevelTextEditor::Property::LINE_WRAP_MODE, "CHARACTER" );
+
+  application.SendNotification();
+  application.Render();
+
+
+  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
+
+  END_TEST;
+}
