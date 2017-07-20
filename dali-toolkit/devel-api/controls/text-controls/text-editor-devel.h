@@ -78,30 +78,35 @@ namespace Property
       /**
        * @brief name "smoothScroll", type bool
        * @details Enable or disable the smooth scroll animation
+       * @note This property is currently being used for some applications, so it can't be changed.
        */
       SMOOTH_SCROLL = INPUT_OUTLINE + 1,
 
       /**
        * @brief name "smoothScrollDuration", type float
        * @details Sets the duration of smooth scroll animation
+       * @note This property is currently being used for some applications, so it can't be changed.
        */
       SMOOTH_SCROLL_DURATION,
 
       /**
        * @brief name "enableScrollBar", type bool
        * @details Enable or disable the scroll bar
+       * @note This property is currently being used for some applications, so it can't be changed.
        */
       ENABLE_SCROLL_BAR,
 
       /**
        * @brief name "scrollBarShowDuration", type float
        * @details Sets the duration of scroll bar to show
+       * @note This property is currently being used for some applications, so it can't be changed.
        */
       SCROLL_BAR_SHOW_DURATION,
 
       /**
        * @brief name "scrollBarFadeDuration", type float
        * @details Sets the duration of scroll bar to fade out
+       * @note This property is currently being used for some applications, so it can't be changed.
        */
       SCROLL_BAR_FADE_DURATION,
 

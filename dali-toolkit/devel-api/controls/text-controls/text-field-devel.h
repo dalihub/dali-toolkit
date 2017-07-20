@@ -86,6 +86,7 @@ namespace Property
        * @brief Hides the input characters and instead shows a default character for password or pin entry.
        * @details name "hiddenInputSettings", type map.
        * @note Optional.
+       *       This property is currently being used for some applications, so it can't be changed.
        * @see HiddenInput
        */
       HIDDEN_INPUT_SETTINGS = INPUT_OUTLINE + 1,
