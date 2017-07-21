@@ -36,7 +36,7 @@ namespace Toolkit
  * Derived class must implement the UploadComplete method which is
  * executed once the texture is ready to draw.
  */
-class DALI_IMPORT_API TextureUploadObserver
+class TextureUploadObserver
 {
 public:
 
