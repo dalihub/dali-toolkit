@@ -66,7 +66,7 @@ namespace Test
  *
  * Will wait for a maximum of 30s before failing the test and returning.
  */
-bool WaitForEventThreadTrigger( int triggerCount );
+bool WaitForEventThreadTrigger( int triggerCount, int timeoutInSeconds=30 );
 
 }
 

@@ -39,10 +39,10 @@ using namespace Dali::Toolkit;
 
 namespace
 {
+const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
-const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
@@ -1077,44 +1077,6 @@ int UtcDaliVisualGetPropertyMap10(void)
   value = resultMap.Find( TextVisual::Property::ENABLE_MARKUP, Property::BOOLEAN );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( !value->Get<bool>() );
-
-  END_TEST;
-}
-
-int UtcDaliVisualGetPropertyMap11(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetPropertyMap11: AnimatedImageVisual" );
-
-  // request AnimatedImageVisual with a property map
-  VisualFactory factory = VisualFactory::Get();
-  Visual::Base animatedImageVisual = factory.CreateVisual( Property::Map()
-                                                 .Add( Visual::Property::TYPE, DevelVisual::ANIMATED_IMAGE )
-                                                 .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME ) );
-
-  Property::Map resultMap;
-  animatedImageVisual.CreatePropertyMap( resultMap );
-  // check the property values from the returned map from a visual
-  Property::Value* value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_IMAGE );
-
-  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
-
-  // request AnimatedImageVisual with an URL
-  Visual::Base animatedImageVisual2 = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
-  resultMap.Clear();
-  animatedImageVisual2.CreatePropertyMap( resultMap );
-  // check the property values from the returned map from a visual
-  value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_IMAGE );
-
-  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
 
   END_TEST;
 }

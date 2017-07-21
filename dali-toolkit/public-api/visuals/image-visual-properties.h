@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_IMAGE_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,8 @@ enum
 {
   /**
    * @brief The URL of the image.
-   * @details Name "url", type Property::STRING.
+   * @details Name "url", type Property::STRING or Property::ARRAY of Property::STRING
+   * @note The array form is used for generating animated image visuals.
    * @SINCE_1_1.45
    * @note Mandatory.
    */

@@ -67,7 +67,10 @@ extern const char * const IMAGE_WRAP_MODE_U;
 extern const char * const IMAGE_WRAP_MODE_V;
 extern const char * const IMAGE_BORDER;
 extern const char * const PIXEL_ALIGNED_UNIFORM_NAME;
-
+extern const char * const ANIMATED_IMAGE_URLS_NAME;
+extern const char * const BATCH_SIZE_NAME;
+extern const char * const CACHE_SIZE_NAME;
+extern const char * const FRAME_DELAY_NAME;
 
 // Text visual
 extern const char * const TEXT_PROPERTY;
