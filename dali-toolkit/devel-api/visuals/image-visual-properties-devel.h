@@ -101,6 +101,23 @@ enum Type
    * @details Name "frameDelay", type Property::INTEGER, The number of milliseconds between each frame. Note, this is only used with the URLS property above.
    */
   FRAME_DELAY = WRAP_MODE_V + 6,
+
+  /**
+   * @brief The scale factor to apply to the content image before masking
+   * @details Name "maskContentScale", type Property::FLOAT, The scale factor
+   * to apply to the content before masking. Note, scaled images are cropped to
+   * the same size as the alpha mask.
+   */
+  MASK_CONTENT_SCALE = WRAP_MODE_V + 7,
+
+  /**
+   * @brief Whether to crop image to mask or scale mask to fit image
+   * @details Name "cropToMask", type Property::BOOLEAN, True if the image should
+   * be cropped to match the mask size, or false if the image should remain the same size.
+   * Note, if this is false, then the mask is scaled to fit the image before being applied.
+   */
+  CROP_TO_MASK = WRAP_MODE_V + 8,
+
 };
 
 } //namespace Property
