@@ -173,6 +173,37 @@ cp -r dali-toolkit/styles/1920x1080/* %{buildroot}%{dali_toolkit_style_files}/19
 cp dali-toolkit/styles/default-feedback-theme.json %{buildroot}%{dali_toolkit_style_files}
 
 ##############################
+# Pre Install
+##############################
+
+%pre resources_480x800
+case "$1" in
+  2)
+    pushd %{dali_toolkit_style_files}
+    rm -rf ./*
+    popd
+  ;;
+esac
+
+%pre resources_720x1280
+case "$1" in
+  2)
+    pushd %{dali_toolkit_style_files}
+    rm -rf ./*
+    popd
+  ;;
+esac
+
+%pre resources_1920x1080
+case "$1" in
+  2)
+    pushd %{dali_toolkit_style_files}
+    rm -rf ./*
+    popd
+  ;;
+esac
+
+##############################
 # Post Install
 ##############################
 %post
@@ -187,7 +218,6 @@ popd
 %post resources_720x1280
 pushd %{dali_toolkit_style_files}/720x1280
 for FILE in *; do mv ./"${FILE}" ../"${FILE}"; done
-rm -rf ./*
 popd
 
 %post resources_1920x1080
@@ -226,17 +256,17 @@ exit 0
 
 %postun resources_480x800
 pushd %{dali_toolkit_style_files}
-rm -rf 480x800
+rm -rf *
 popd
 
 %postun resources_720x1280
 pushd %{dali_toolkit_style_files}
-rm -rf 720x1280
+rm -rf *
 popd
 
 %postun resources_1920x1080
 pushd %{dali_toolkit_style_files}
-rm -rf 1920x1080
+rm -rf *
 popd
 
 ##############################
