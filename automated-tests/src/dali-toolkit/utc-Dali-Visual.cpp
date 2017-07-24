@@ -24,6 +24,7 @@
 #include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
@@ -38,10 +39,10 @@ using namespace Dali::Toolkit;
 
 namespace
 {
+const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
-const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
@@ -1080,44 +1081,6 @@ int UtcDaliVisualGetPropertyMap10(void)
   END_TEST;
 }
 
-int UtcDaliVisualGetPropertyMap11(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetPropertyMap11: AnimatedImageVisual" );
-
-  // request AnimatedImageVisual with a property map
-  VisualFactory factory = VisualFactory::Get();
-  Visual::Base animatedImageVisual = factory.CreateVisual( Property::Map()
-                                                 .Add( Visual::Property::TYPE, DevelVisual::ANIMATED_IMAGE )
-                                                 .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME ) );
-
-  Property::Map resultMap;
-  animatedImageVisual.CreatePropertyMap( resultMap );
-  // check the property values from the returned map from a visual
-  Property::Value* value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_IMAGE );
-
-  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
-
-  // request AnimatedImageVisual with an URL
-  Visual::Base animatedImageVisual2 = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
-  resultMap.Clear();
-  animatedImageVisual2.CreatePropertyMap( resultMap );
-  // check the property values from the returned map from a visual
-  value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_IMAGE );
-
-  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
-  DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<std::string>() == TEST_GIF_FILE_NAME );
-
-  END_TEST;
-}
-
 int UtcDaliVisualAnimateBorderVisual01(void)
 {
   ToolkitTestApplication application;
@@ -2135,6 +2098,42 @@ int UtcDaliRegisterVisualOrder(void)
   anotherTestVisual2Replacement.SetDepthIndex( 2000 );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, anotherTestVisual2Replacement );
   DALI_TEST_EQUALS( anotherTestVisual2Replacement.GetDepthIndex(), 2000, TEST_LOCATION );
+
+  dummyControl.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( dummyControl );
+
+  END_TEST;
+}
+
+int UtcDaliRegisterVisualOrder02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Register Visual Order with Background Set" );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  const int backgroundDepthIndex = Toolkit::DepthIndex::BACKGROUND;
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
+  propertyMap.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
+
+  tet_printf( "Register a control background visual, should have depth index of %d\n", backgroundDepthIndex );
+
+  dummyControl.SetProperty( Control::Property::BACKGROUND, propertyMap );
+
+  const int TEST_VISUAL_1_DEPTH_INDEX = 0;
+  tet_printf( "Register visual, should have depth index of %d\n", TEST_VISUAL_1_DEPTH_INDEX );
+  Visual::Base testVisual1 = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, testVisual1 );
+  DALI_TEST_EQUALS( testVisual1.GetDepthIndex(), TEST_VISUAL_1_DEPTH_INDEX , TEST_LOCATION );
+
+  tet_printf( "Register another visual, should have a depth index greater than previous(%d)\n", TEST_VISUAL_1_DEPTH_INDEX );
+  Visual::Base testVisual2 = factory.CreateVisual( propertyMap );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, testVisual2 );
+  DALI_TEST_CHECK( testVisual2.GetDepthIndex() >  testVisual1.GetDepthIndex() );
 
   dummyControl.SetSize(200.f, 200.f);
   Stage::GetCurrent().Add( dummyControl );

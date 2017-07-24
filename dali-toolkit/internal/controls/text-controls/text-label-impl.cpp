@@ -81,6 +81,13 @@ const Scripting::StringEnum VERTICAL_ALIGNMENT_STRING_TABLE[] =
 };
 const unsigned int VERTICAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( VERTICAL_ALIGNMENT_STRING_TABLE ) / sizeof( VERTICAL_ALIGNMENT_STRING_TABLE[0] );
 
+const Scripting::StringEnum LINE_WRAP_MODE_STRING_TABLE[] =
+{
+  { "WRAP_MODE_WORD",      Toolkit::Text::Layout::LineWrap::WORD  },
+  { "WRAP_MODE_CHARACTER", Toolkit::Text::Layout::LineWrap::CHARACTER }
+};
+const unsigned int LINE_WRAP_MODE_STRING_TABLE_COUNT = sizeof( LINE_WRAP_MODE_STRING_TABLE ) / sizeof( LINE_WRAP_MODE_STRING_TABLE[0] );
+
 // Type registration
 BaseHandle Create()
 {
@@ -119,6 +126,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "ellipsis",            BOO
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollLoopDelay", FLOAT,   AUTO_SCROLL_LOOP_DELAY )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollStopMode",  STRING,  AUTO_SCROLL_STOP_MODE  )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "lineCount", INTEGER, LINE_COUNT             )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "lineWrapMode",        STRING,  LINE_WRAP_MODE         )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -486,6 +494,21 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::LINE_WRAP_MODE:
+      {
+        const std::string& wrapModeStr = value.Get< std::string >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p LINE_WRAP_MODE %s\n", impl.mController.Get(), wrapModeStr.c_str() );
+
+        Layout::LineWrap::Mode lineWrapMode( Layout::LineWrap::WORD );
+        if( Scripting::GetEnumeration< Layout::LineWrap::Mode >( wrapModeStr.c_str(),
+                                                                 LINE_WRAP_MODE_STRING_TABLE,
+                                                                 LINE_WRAP_MODE_STRING_TABLE_COUNT,
+                                                                 lineWrapMode ) )
+        {
+          impl.mController->SetLineWrapMode( lineWrapMode );
+        }
+        break;
+      }
     }
   }
 }
@@ -737,6 +760,14 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::LINE_WRAP_MODE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetLineWrapMode();
+        }
+        break;
+      }
       case Toolkit::DevelTextLabel::Property::LINE_COUNT:
       {
         if( impl.mController )
@@ -814,14 +845,21 @@ Vector3 TextLabel::GetNaturalSize()
 
 float TextLabel::GetHeightForWidth( float width )
 {
-  return mController->GetHeightForWidth( width );
+  Padding padding;
+  Self().GetPadding( padding );
+  return mController->GetHeightForWidth( width ) + padding.top + padding.bottom;
 }
 
 void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnRelayout\n" );
 
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( size );
+  Padding padding;
+  Self().GetPadding( padding );
+  Vector2 contentSize( size.x - ( padding.left + padding.right ), size.y - ( padding.top + padding.bottom ) );
+
+
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize );
 
   if( ( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) ) ||
       !mRenderer )
@@ -861,7 +899,9 @@ void TextLabel::RenderText()
     if( renderableActor )
     {
       const Vector2& scrollOffset = mController->GetTextModel()->GetScrollPosition();
-      renderableActor.SetPosition( scrollOffset.x + alignmentOffset, scrollOffset.y );
+      Padding padding;
+      self.GetPadding( padding );
+      renderableActor.SetPosition( scrollOffset.x + alignmentOffset + padding.left, scrollOffset.y + padding.top );
 
       self.Add( renderableActor );
     }

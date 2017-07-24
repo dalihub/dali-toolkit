@@ -150,21 +150,26 @@ public:
    * When the client has finished with the Texture, Remove() should be called.
    *
    * @param[in] url               The URL of the image to load
+   * @param[in] maskTextureId     The texture id of an image to mask this with (can be INVALID if no masking required)
+   * @param[in] contentScale      The scale factor to apply to the image before masking
    * @param[in] desiredSize       The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in] fittingMode       The FittingMode to use
    * @param[in] samplingMode      The SamplingMode to use
    * @param[in] useAtlasing       Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still be loaded, and marked successful,
    *                              but "useAtlasing" will be set to false in the "UploadCompleted" callback from the TextureManagerUploadObserver.
+   * @param[in] cropToMask        Only used with masking, this will crop the scaled image to the mask size. If false, then the mask will be scaled to fit the image before being applied.
    * @param[in] observer          The client object should inherit from this and provide the "UploadCompleted" virtual.
    *                              This is called when an image load completes (or fails).
    * @return                      A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoad( const VisualUrl&         url,
                          TextureId                maskTextureId,
+                         float                    contentScale,
                          const ImageDimensions    desiredSize,
                          FittingMode::Type        fittingMode,
                          Dali::SamplingMode::Type samplingMode,
                          const UseAtlas           useAtlasing,
+                         bool                     cropToMask,
                          TextureUploadObserver*   observer );
 
   /**
@@ -217,11 +222,13 @@ private:
    *
    * @param[in] url               The URL of the image to load
    * @param[in] maskTextureId     The texture id of an image to use as a mask. If no mask is required, then set to INVALID_TEXTURE_ID
+   * @param[in] contentScale      The scaling factor to apply to the content when masking
    * @param[in] desiredSize       The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in] fittingMode       The FittingMode to use
    * @param[in] samplingMode      The SamplingMode to use
    * @param[in] useAtlasing       Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still be loaded, and marked successful,
    *                              but "useAtlasing" will be set to false in the "UploadCompleted" callback from the TextureManagerUploadObserver.
+   * @param[in] cropToMask        Whether to crop the target after masking, or scale the mask to the image before masking.
    * @param[in] storageType,      Whether the pixel data is stored in the cache or uploaded to the GPU
    * @param[in] observer          The client object should inherit from this and provide the "UploadCompleted" virtual.
    *                              This is called when an image load completes (or fails).
@@ -230,10 +237,12 @@ private:
   TextureId RequestLoadInternal(
     const VisualUrl&         url,
     TextureId                maskTextureId,
+    float                    contentScale,
     const ImageDimensions    desiredSize,
     FittingMode::Type        fittingMode,
     Dali::SamplingMode::Type samplingMode,
     UseAtlas                 useAtlas,
+    bool                     cropToMask,
     StorageType              storageType,
     TextureUploadObserver*   observer );
 
@@ -249,9 +258,11 @@ private:
                  TextureId maskTextureId,
                  const VisualUrl& url,
                  ImageDimensions desiredSize,
+                 float scaleFactor,
                  FittingMode::Type fittingMode,
                  Dali::SamplingMode::Type samplingMode,
                  bool loadSynchronously,
+                 bool cropToMask,
                  UseAtlas useAtlas,
                  TextureManager::TextureHash hash )
     : url( url ),
@@ -261,13 +272,15 @@ private:
       textureId( textureId ),
       maskTextureId( maskTextureId ),
       hash( hash ),
+      scaleFactor( scaleFactor ),
       referenceCount( 1u ),
       loadState( NOT_STARTED ),
       fittingMode( fittingMode ),
       samplingMode( samplingMode ),
       storageType( UPLOAD_TO_TEXTURE ),
       loadSynchronously( loadSynchronously ),
-      useAtlas( useAtlas )
+      useAtlas( useAtlas ),
+      cropToMask( cropToMask )
     {
     }
 
@@ -287,6 +300,7 @@ private:
     TextureId textureId;           ///< The TextureId associated with this Texture
     TextureId maskTextureId;       ///< The mask TextureId to be applied on load
     TextureManager::TextureHash hash; ///< The hash used to cache this Texture
+    float scaleFactor;             ///< The scale factor to apply to the Texture when masking
     int16_t referenceCount;        ///< The reference count of clients using this Texture
     LoadState loadState:3;         ///< The load state showing the load progress of the Texture
     FittingMode::Type fittingMode:2; ///< The requested FittingMode
@@ -294,6 +308,7 @@ private:
     StorageType storageType:1;     ///< CPU storage / GPU upload;
     bool loadSynchronously:1;      ///< True if synchronous loading was requested
     UseAtlas useAtlas:1;           ///< USE_ATLAS if an atlas was requested. This is updated to false if atlas is not used
+    bool cropToMask:1;             ///< true if the image should be cropped to the mask size.
   };
 
   // Structs:
@@ -390,8 +405,11 @@ private:
    * Apply the mask to the pixelBuffer.
    * @param[in] pixelBuffer The pixelBuffer to apply the mask to
    * @param[in] maskTextureId The texture id of the mask.
+   * @param[in] contentScale The factor to scale the content
+   * @param[in] cropToMask Whether to crop the content to the mask size
    */
-  void ApplyMask( Devel::PixelBuffer& pixelBuffer, TextureId maskTextureId );
+  void ApplyMask( Devel::PixelBuffer& pixelBuffer, TextureId maskTextureId,
+                  float contentScale, bool cropToMask );
 
   /**
    * Upload the texture specified in pixelBuffer to the appropriate location
@@ -446,7 +464,6 @@ private:
                             const FittingMode::Type fittingMode,
                             const Dali::SamplingMode::Type samplingMode, const UseAtlas useAtlas,
                             TextureId maskTextureId );
-
   /**
    * @brief Looks up a cached texture by its hash.
    * If found, the given parameters are used to check there is no hash-collision.

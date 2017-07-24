@@ -76,6 +76,14 @@ const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 };
 const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
 
+
+const Scripting::StringEnum LINE_WRAP_MODE_STRING_TABLE[] =
+{
+  { "WORD",      Toolkit::Text::Layout::LineWrap::WORD      },
+  { "CHARACTER", Toolkit::Text::Layout::LineWrap::CHARACTER }
+};
+const unsigned int LINE_WRAP_MODE_STRING_TABLE_COUNT = sizeof( LINE_WRAP_MODE_STRING_TABLE ) / sizeof( LINE_WRAP_MODE_STRING_TABLE[0] );
+
 const char* const SCROLL_BAR_POSITION("sourcePosition");
 const char* const SCROLL_BAR_POSITION_MIN("sourcePositionMin");
 const char* const SCROLL_BAR_POSITION_MAX("sourcePositionMax");
@@ -141,6 +149,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderText",       
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",           VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableSelection",                BOOLEAN,   ENABLE_SELECTION                     )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholder",                    MAP,       PLACEHOLDER                          )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineWrapMode",                   STRING,    LINE_WRAP_MODE                       )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -674,7 +683,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
           const std::string& text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor::OnPropertySet %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str() );
 
-          impl.mController->SetPlaceholderText( text );
+          impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
         }
         break;
       }
@@ -709,6 +718,21 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         if( map )
         {
           impl.mController->SetPlaceholderProperty( *map );
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::LINE_WRAP_MODE:
+      {
+        const std::string& wrapModeStr = value.Get< std::string >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p LINE_WRAP_MODE %s\n", impl.mController.Get(), wrapModeStr.c_str() );
+
+        Layout::LineWrap::Mode lineWrapMode( Layout::LineWrap::WORD );
+        if( Scripting::GetEnumeration< Layout::LineWrap::Mode >( wrapModeStr.c_str(),
+                                                                 LINE_WRAP_MODE_STRING_TABLE,
+                                                                 LINE_WRAP_MODE_STRING_TABLE_COUNT,
+                                                                 lineWrapMode ) )
+        {
+          impl.mController->SetLineWrapMode( lineWrapMode );
         }
         break;
       }
@@ -1060,7 +1084,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         if( impl.mController )
         {
           std::string text;
-          impl.mController->GetPlaceholderText( text );
+          impl.mController->GetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
           value = text;
         }
         break;
@@ -1087,6 +1111,13 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         impl.mController->GetPlaceholderProperty( map );
         value = map;
         break;
+      }
+      case Toolkit::DevelTextEditor::Property::LINE_WRAP_MODE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetLineWrapMode();
+        }
       }
     } //switch
   }
@@ -1193,8 +1224,8 @@ void TextEditor::OnInitialize()
 
   // Creates an extra control to be used as stencil buffer.
   mStencil = Control::New();
-  mStencil.SetAnchorPoint( AnchorPoint::CENTER );
-  mStencil.SetParentOrigin( ParentOrigin::CENTER );
+  mStencil.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  mStencil.SetParentOrigin( ParentOrigin::TOP_LEFT );
 
   // Creates a background visual. Even if the color is transparent it updates the stencil.
   mStencil.SetProperty( Toolkit::Control::Property::BACKGROUND,
@@ -1248,14 +1279,32 @@ Vector3 TextEditor::GetNaturalSize()
 
 float TextEditor::GetHeightForWidth( float width )
 {
-  return mController->GetHeightForWidth( width );
+  Padding padding;
+  Self().GetPadding( padding );
+  return mController->GetHeightForWidth( width ) + padding.top + padding.bottom;
 }
 
 void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor OnRelayout\n");
 
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( size );
+  Actor self = Self();
+  Padding padding;
+
+  self.GetPadding( padding );
+  Vector2 contentSize( size.x - ( padding.left + padding.right ), size.y - ( padding.top + padding.bottom ) );
+
+  if( mStencil )
+  {
+    mStencil.SetPosition( padding.left , padding.top  );
+  }
+  if( mActiveLayer )
+  {
+    mActiveLayer.SetPosition( padding.left , padding.top  );
+  }
+
+
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize );
 
   if( ( Text::Controller::NONE_UPDATED != updateTextType ) ||
       !mRenderer )
@@ -1274,6 +1323,7 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
     }
 
     RenderText( updateTextType );
+
   }
 
   // The text-editor emits signals when the input style changes. These changes of style are
@@ -1397,7 +1447,9 @@ void TextEditor::OnTap( const TapGesture& gesture )
   mImfManager.Activate();
 
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
-  mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x, gesture.localPoint.y );
+  Padding padding;
+  Self().GetPadding( padding );
+  mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x - padding.left, gesture.localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }
@@ -1411,7 +1463,9 @@ void TextEditor::OnLongPress( const LongPressGesture& gesture )
 {
   mImfManager.Activate();
 
-  mController->LongPressEvent( gesture.state, gesture.localPoint.x, gesture.localPoint.y );
+  Padding padding;
+  Self().GetPadding( padding );
+  mController->LongPressEvent( gesture.state, gesture.localPoint.x - padding.left, gesture.localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }
@@ -1514,7 +1568,10 @@ void TextEditor::AddDecoration( Actor& actor, bool needsClipping )
     }
     else
     {
+      actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+      actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
       Self().Add( actor );
+      mActiveLayer = actor;
     }
   }
 }

@@ -74,35 +74,39 @@ TextureManager::TextureId TextureManager::RequestLoad(
   const UseAtlas           useAtlas,
   TextureUploadObserver*   observer )
 {
-  return RequestLoadInternal( url, INVALID_TEXTURE_ID, desiredSize, fittingMode, samplingMode, useAtlas, UPLOAD_TO_TEXTURE, observer );
+  return RequestLoadInternal( url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, useAtlas, false, UPLOAD_TO_TEXTURE, observer );
 }
 
 TextureManager::TextureId TextureManager::RequestLoad(
   const VisualUrl&         url,
   TextureId                maskTextureId,
+  float                    contentScale,
   const ImageDimensions    desiredSize,
   FittingMode::Type        fittingMode,
   Dali::SamplingMode::Type samplingMode,
   const UseAtlas           useAtlas,
+  bool                     cropToMask,
   TextureUploadObserver*   observer )
 {
-  return RequestLoadInternal( url, maskTextureId, desiredSize, fittingMode, samplingMode, useAtlas, UPLOAD_TO_TEXTURE, observer );
+  return RequestLoadInternal( url, maskTextureId, contentScale, desiredSize, fittingMode, samplingMode, useAtlas, cropToMask, UPLOAD_TO_TEXTURE, observer );
 }
 
 TextureManager::TextureId TextureManager::RequestMaskLoad( const VisualUrl& maskUrl )
 {
   // Use the normal load procedure to get the alpha mask.
-  return RequestLoadInternal( maskUrl, INVALID_TEXTURE_ID, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, KEEP_PIXEL_BUFFER, NULL );
+  return RequestLoadInternal( maskUrl, INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, false, KEEP_PIXEL_BUFFER, NULL );
 }
 
 
 TextureManager::TextureId TextureManager::RequestLoadInternal(
   const VisualUrl&         url,
   TextureId                maskTextureId,
+  float                    contentScale,
   const ImageDimensions    desiredSize,
   FittingMode::Type        fittingMode,
   Dali::SamplingMode::Type samplingMode,
   UseAtlas                 useAtlas,
+  bool                     cropToMask,
   StorageType              storageType,
   TextureUploadObserver*   observer )
 {
@@ -129,8 +133,8 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     // We need a new Texture.
     textureId = GenerateUniqueTextureId();
     mTextureInfoContainer.push_back( TextureInfo( textureId, maskTextureId, url.GetUrl(),
-                                                  desiredSize, fittingMode, samplingMode,
-                                                  false, useAtlas, textureHash ) );
+                                                  desiredSize, contentScale, fittingMode, samplingMode,
+                                                  false, cropToMask, useAtlas, textureHash ) );
     cacheIndex = mTextureInfoContainer.size() - 1u;
 
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex, textureId );
@@ -169,9 +173,8 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
       {
         // The Texture has already loaded. The other observers have already been notified.
         // We need to send a "late" loaded notification for this observer.
-        observer->UploadComplete( true,
-                                  textureInfo.textureSet, textureInfo.useAtlas,
-                                  textureInfo.atlasRect );
+        observer->UploadComplete( true, textureInfo.textureId, textureInfo.textureSet,
+                                  textureInfo.useAtlas, textureInfo.atlasRect );
       }
       break;
     }
@@ -200,7 +203,6 @@ void TextureManager::Remove( const TextureManager::TextureId textureId )
   if( textureInfoIndex != INVALID_INDEX )
   {
     TextureInfo& textureInfo( mTextureInfoContainer[ textureInfoIndex ] );
-
 
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::Remove(%d) cacheIdx:%d loadState:%s\n",
                    textureId, textureInfoIndex,
@@ -390,7 +392,7 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pix
         }
         else if( maskLoadState == LOAD_FINISHED )
         {
-          ApplyMask( pixelBuffer, textureInfo.maskTextureId );
+          ApplyMask( pixelBuffer, textureInfo.maskTextureId, textureInfo.scaleFactor, textureInfo.cropToMask );
           UploadTexture( pixelBuffer, textureInfo );
           NotifyObservers( textureInfo, true );
         }
@@ -438,7 +440,7 @@ void TextureManager::CheckForWaitingTexture( TextureInfo& maskTextureInfo )
 
       if( maskTextureInfo.loadState == LOAD_FINISHED )
       {
-        ApplyMask( pixelBuffer, maskTextureInfo.textureId );
+        ApplyMask( pixelBuffer, maskTextureInfo.textureId, textureInfo.scaleFactor, textureInfo.cropToMask );
         UploadTexture( pixelBuffer, textureInfo );
         NotifyObservers( textureInfo, true );
       }
@@ -452,11 +454,13 @@ void TextureManager::CheckForWaitingTexture( TextureInfo& maskTextureInfo )
   }
 }
 
-void TextureManager::ApplyMask( Devel::PixelBuffer& pixelBuffer, TextureId maskTextureId )
+void TextureManager::ApplyMask(
+  Devel::PixelBuffer& pixelBuffer, TextureId maskTextureId,
+  float contentScale, bool cropToMask )
 {
   int maskCacheIndex = GetCacheIndexFromId( maskTextureId );
   Devel::PixelBuffer maskPixelBuffer = mTextureInfoContainer[maskCacheIndex].pixelBuffer;
-  pixelBuffer.ApplyMask( maskPixelBuffer );
+  pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
 }
 
 void TextureManager::UploadTexture( Devel::PixelBuffer& pixelBuffer, TextureInfo& textureInfo )
@@ -483,8 +487,8 @@ void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
 {
   TextureId textureId = textureInfo.textureId;
 
-  // If there is an observer: Notify the load is complete, whether successful or not:
-  // And erase it from the list
+  // If there is an observer: Notify the load is complete, whether successful or not,
+  // and erase it from the list
   unsigned int observerCount = textureInfo.observerList.Count();
   TextureInfo* info = &textureInfo;
 
@@ -492,26 +496,29 @@ void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
   {
     TextureUploadObserver* observer = info->observerList[0];
 
-    // During UploadComplete() a Control ResourceReady() signal is emitted
-    // During that signal the app may add remove /add Textures (e.g. via ImageViews).
-    // At this point no more observers can be added to the observerList, because  textureInfo.loadState = UPLOADED
-    // However it is possible for observers to be removed, hence we check the observer list count every iteration
+    // During UploadComplete() a Control ResourceReady() signal is emitted.
+    // During that signal the app may add remove /add Textures (e.g. via
+    // ImageViews).  At this point no more observers can be added to the
+    // observerList, because textureInfo.loadState = UPLOADED. However it is
+    // possible for observers to be removed, hence we check the observer list
+    // count every iteration.
 
-    // Also the reference to the textureInfo struct can become invalidated, because new load requests can modify
-    // the mTextureInfoContainer list (e.g. if more requests are pushed_back it can cause the list to be resized
-    // invalidating the reference to the TextureInfo ).
-    observer->UploadComplete( success, info->textureSet, info->useAtlas, info->atlasRect );
+    // The reference to the textureInfo struct can also become invalidated,
+    // because new load requests can modify the mTextureInfoContainer list
+    // (e.g. if more requests are pushed back it can cause the list to be
+    // resized invalidating the reference to the TextureInfo ).
+    observer->UploadComplete( success, info->textureId, info->textureSet, info->useAtlas, info->atlasRect );
     observer->DestructionSignal().Disconnect( this, &TextureManager::ObserverDestroyed );
 
-    // regrab the textureInfo from the container as it may have been invalidated, if textures have been removed
-    // or added during the ResourceReady() signal emission (from UploadComplete() )
-    int textureInfoIndex = GetCacheIndexFromId( textureId );
+    // Get the textureInfo from the container again as it may have been
+    // invalidated,
 
+    int textureInfoIndex = GetCacheIndexFromId( textureId );
     if( textureInfoIndex == INVALID_CACHE_INDEX)
     {
-      // texture has been removed
-      return;
+      return; // texture has been removed - can stop.
     }
+
     info = &mTextureInfoContainer[ textureInfoIndex ];
     observerCount = info->observerList.Count();
     if ( observerCount > 0 )
@@ -524,14 +531,11 @@ void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
           info->observerList.Erase( j );
           observerCount--;
           break;
-         }
+        }
       }
     }
-
   }
-
 }
-
 
 TextureManager::TextureId TextureManager::GenerateUniqueTextureId()
 {

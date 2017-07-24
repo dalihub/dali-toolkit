@@ -198,6 +198,7 @@ struct Engine::Impl
     LineLayout tmpLineLayout;
 
     const bool isMultiline = mLayout == MULTI_LINE_BOX;
+    const bool isWordLaidOut = parameters.lineWrapMode == Layout::LineWrap::WORD;
 
     // The last glyph to be laid-out.
     const GlyphIndex lastGlyphOfParagraphPlusOne = parameters.startGlyphIndex + parameters.numberOfGlyphs;
@@ -447,7 +448,7 @@ struct Engine::Impl
       if( isMultiline &&
           ( TextAbstraction::WORD_BREAK == wordBreakInfo ) )
       {
-        oneWordLaidOut = true;
+        oneWordLaidOut = isWordLaidOut;
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  One word laid-out\n" );
 
         // Current glyph is the last one of the current word.

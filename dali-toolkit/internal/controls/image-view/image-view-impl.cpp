@@ -64,7 +64,8 @@ DALI_TYPE_REGISTRATION_END()
 using namespace Dali;
 
 ImageView::ImageView()
-: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) )
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
+  mRelayoutRequired(true)
 {
 }
 
@@ -214,6 +215,9 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   Control::OnRelayout( size, container );
 
+  // If visual is being replaced then mVisual will be the replacement visual even if not ready.
+  mVisual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
+
   if( mVisual )
   {
     // Pass in an empty map which uses default transform values meaning our visual fills the control
@@ -224,7 +228,11 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
 void ImageView::OnResourceReady( Toolkit::Control control )
 {
-  mVisual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
+  if( mRelayoutRequired)
+  {
+    mRelayoutRequired = false;
+    RelayoutRequest();
+  }
 }
 
 ///////////////////////////////////////////////////////////

@@ -179,8 +179,9 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                    int keyModifier,
                                    unsigned long timeStamp,
                                    const Integration::KeyEvent::State& keyState,
-                                   const std::string& deviceName,
-                                   const DevelKeyEvent::DeviceClass::Type& deviceClass
+                                   const std::string& deviceName = "",
+                                   const DevelDevice::Class::Type& deviceClass = DevelDevice::Class::NONE,
+                                   const DevelDevice::Subclass::Type& deviceSubclass = DevelDevice::Subclass::NONE
                                    )
 {
   return Integration::KeyEvent( keyName,
@@ -190,7 +191,8 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                 timeStamp,
                                 keyState,
                                 deviceName,
-                                deviceClass );
+                                deviceClass,
+                                deviceSubclass );
 }
 
 } // Anonymous namespace
@@ -1430,7 +1432,7 @@ int UtcDaliPopupOnKeyEvent(void)
 
   popup.SetKeyInputFocus();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", DevelKeyEvent::DeviceClass::TOUCH ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", DevelDevice::Class::TOUCH, DevelDevice::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 

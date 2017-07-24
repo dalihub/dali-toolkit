@@ -48,6 +48,7 @@ const float MAX_FLOAT = std::numeric_limits<float>::max();
 const std::string EMPTY_STRING("");
 
 const char * const PLACEHOLDER_TEXT = "placeholderText";
+const char * const PLACEHOLDER_TEXT_FOCUSED = "placeholderTextFocused";
 const char * const PLACEHOLDER_COLOR = "placeholderColor";
 const char * const PLACEHOLDER_FONT_FAMILY = "placeholderFontFamily";
 const char * const PLACEHOLDER_FONT_STYLE = "placeholderFontStyle";
@@ -391,6 +392,34 @@ Layout::VerticalAlignment Controller::GetVerticalAlignment() const
   return mImpl->mModel->mVerticalAlignment;
 }
 
+void Controller::SetLineWrapMode( Layout::LineWrap::Mode lineWrapMode )
+{
+  if( lineWrapMode != mImpl->mModel->mLineWrapMode )
+  {
+    // Set the text wrap mode.
+    mImpl->mModel->mLineWrapMode = lineWrapMode;
+
+
+    // Update Text layout for applying wrap mode
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                             ALIGN                     |
+                                                             LAYOUT                    |
+                                                             UPDATE_LAYOUT_SIZE        |
+                                                             REORDER                   );
+    mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
+    mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
+
+    // Request relayout
+    mImpl->RequestRelayout();
+  }
+}
+
+Layout::LineWrap::Mode Controller::GetLineWrapMode() const
+{
+  return mImpl->mModel->mLineWrapMode;
+}
+
 void Controller::SetTextElideEnabled( bool enabled )
 {
   mImpl->mModel->mElideEnabled = enabled;
@@ -531,22 +560,6 @@ void Controller::GetText( std::string& text ) const
   }
 }
 
-void Controller::SetPlaceholderText( const std::string& text )
-{
-  if( NULL != mImpl->mEventData )
-  {
-    mImpl->mEventData->mPlaceholderText = text;
-
-    // Update placeholder if there is no text
-    if( mImpl->IsShowingPlaceholderText() ||
-        ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) )
-    {
-      ShowPlaceholderText();
-    }
-  }
-}
-
-// This is overloading function for PLACEHOLDER_TEXT_FOCUSED in text-field
 void Controller::SetPlaceholderText( PlaceholderType type, const std::string& text )
 {
   if( NULL != mImpl->mEventData )
@@ -569,15 +582,6 @@ void Controller::SetPlaceholderText( PlaceholderType type, const std::string& te
   }
 }
 
-void Controller::GetPlaceholderText( std::string& text ) const
-{
-  if( NULL != mImpl->mEventData )
-  {
-    text = mImpl->mEventData->mPlaceholderText;
-  }
-}
-
-// This is overloading function for PLACEHOLDER_TEXT_FOCUSED in text-field
 void Controller::GetPlaceholderText( PlaceholderType type, std::string& text ) const
 {
   if( NULL != mImpl->mEventData )
@@ -1792,7 +1796,8 @@ float Controller::GetHeightForWidth( float width )
   ProcessModifyEvents();
 
   Size layoutSize;
-  if( fabsf( width - mImpl->mModel->mVisualModel->mControlSize.width ) > Math::MACHINE_EPSILON_1000 )
+  if( fabsf( width - mImpl->mModel->mVisualModel->mControlSize.width ) > Math::MACHINE_EPSILON_1000 ||
+                                                           mImpl->mTextUpdateInfo.mFullRelayoutNeeded )
   {
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
@@ -1917,7 +1922,13 @@ void Controller::SetPlaceholderProperty( const Property::Map& map )
     {
       std::string text = "";
       value.Get( text );
-      SetPlaceholderText( text );
+      SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
+    }
+    else if( key == PLACEHOLDER_TEXT_FOCUSED )
+    {
+      std::string text = "";
+      value.Get( text );
+      SetPlaceholderText( Controller::PLACEHOLDER_TYPE_ACTIVE, text );
     }
     else if( key == PLACEHOLDER_COLOR )
     {
@@ -1963,7 +1974,15 @@ void Controller::GetPlaceholderProperty( Property::Map& map )
 {
   if( NULL != mImpl->mEventData )
   {
-    map[ PLACEHOLDER_TEXT ] = mImpl->mEventData->mPlaceholderText;
+    if( !mImpl->mEventData->mPlaceholderTextActive.empty() )
+    {
+      map[ PLACEHOLDER_TEXT_FOCUSED ] = mImpl->mEventData->mPlaceholderTextActive;
+    }
+    if( !mImpl->mEventData->mPlaceholderTextInactive.empty() )
+    {
+      map[ PLACEHOLDER_TEXT ] = mImpl->mEventData->mPlaceholderTextInactive;
+    }
+
     map[ PLACEHOLDER_COLOR ] = mImpl->mEventData->mPlaceholderTextColor;
     map[ PLACEHOLDER_FONT_FAMILY ] = GetPlaceholderFontFamily();
 
@@ -2947,8 +2966,18 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     }
 
     // Mark the first paragraph to be updated.
-    mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
-    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd += maxSizeOfNewText;
+    if( Layout::Engine::SINGLE_LINE_BOX == mImpl->mLayoutEngine.GetLayout() )
+    {
+      mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = numberOfCharactersInModel + maxSizeOfNewText;
+      mImpl->mTextUpdateInfo.mClearAll = true;
+    }
+    else
+    {
+      mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd += maxSizeOfNewText;
+    }
 
     // Update the cursor index.
     cursorIndex += maxSizeOfNewText;
@@ -3046,8 +3075,18 @@ bool Controller::RemoveText( int cursorOffset,
         ( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters ) )
     {
       // Mark the paragraphs to be updated.
-      mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove += numberOfCharacters;
+      if( Layout::Engine::SINGLE_LINE_BOX == mImpl->mLayoutEngine.GetLayout() )
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters - numberOfCharacters;
+        mImpl->mTextUpdateInfo.mClearAll = true;
+      }
+      else
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove += numberOfCharacters;
+      }
 
       // Update the input style and remove the text's style before removing the text.
 
@@ -3184,7 +3223,8 @@ bool Controller::DoRelayout( const Size& size,
                                          charactersToGlyphBuffer,
                                          glyphsPerCharacterBuffer,
                                          totalNumberOfGlyphs,
-                                         mImpl->mModel->mHorizontalAlignment );
+                                         mImpl->mModel->mHorizontalAlignment,
+                                         mImpl->mModel->mLineWrapMode );
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mModel->mVisualModel->mGlyphPositions;
@@ -3533,27 +3573,17 @@ void Controller::ShowPlaceholderText()
     const char* text( NULL );
     size_t size( 0 );
 
-    if( !mImpl->mEventData->mPlaceholderTextActive.empty() || !mImpl->mEventData->mPlaceholderTextInactive.empty() )
+    // TODO - Switch Placeholder text when changing state
+    if( ( EventData::INACTIVE != mImpl->mEventData->mState ) &&
+        ( 0u != mImpl->mEventData->mPlaceholderTextActive.c_str() ) )
     {
-      if( ( EventData::INACTIVE != mImpl->mEventData->mState ) &&
-          ( 0u != mImpl->mEventData->mPlaceholderTextActive.c_str() ) )
-      {
-        text = mImpl->mEventData->mPlaceholderTextActive.c_str();
-        size = mImpl->mEventData->mPlaceholderTextActive.size();
-      }
-      else
-      {
-        text = mImpl->mEventData->mPlaceholderTextInactive.c_str();
-        size = mImpl->mEventData->mPlaceholderTextInactive.size();
-      }
+      text = mImpl->mEventData->mPlaceholderTextActive.c_str();
+      size = mImpl->mEventData->mPlaceholderTextActive.size();
     }
     else
     {
-      if( 0u != mImpl->mEventData->mPlaceholderText.c_str() )
-      {
-        text = mImpl->mEventData->mPlaceholderText.c_str();
-        size = mImpl->mEventData->mPlaceholderText.size();
-      }
+      text = mImpl->mEventData->mPlaceholderTextInactive.c_str();
+      size = mImpl->mEventData->mPlaceholderTextInactive.size();
     }
 
     mImpl->mTextUpdateInfo.mCharacterIndex = 0u;

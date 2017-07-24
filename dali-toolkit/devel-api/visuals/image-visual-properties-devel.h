@@ -76,6 +76,48 @@ enum Type
    */
 
   ALPHA_MASK_URL = WRAP_MODE_V + 3,
+
+  /**
+   * @brief Defines the batch size for pre-loading images in the AnimatedImageVisual
+   * @details Name "batchSize", type Property::INTEGER, number of images to pre-load
+   * before starting to play. Default value: 1
+   */
+  BATCH_SIZE = WRAP_MODE_V + 4,
+
+  /**
+   * @brief Defines the cache size for loading images in the AnimatedImageVisual
+   * @details Name "cacheSize", type Property::INTEGER, number of images to keep
+   * cached ahead during playback. Default value: 1
+   *
+   * @note, cacheSize should be >= batchSize.
+   * If it isn't, then the cache will automatically be changed to batchSize.
+   * @note, because of the defaults, it is expected that the application developer
+   * tune the batch and cache sizes to their particular use case.
+   */
+  CACHE_SIZE = WRAP_MODE_V + 5,
+
+  /**
+   * @brief The number of milliseconds between each frame in the AnimatedImageVisual
+   * @details Name "frameDelay", type Property::INTEGER, The number of milliseconds between each frame. Note, this is only used with the URLS property above.
+   */
+  FRAME_DELAY = WRAP_MODE_V + 6,
+
+  /**
+   * @brief The scale factor to apply to the content image before masking
+   * @details Name "maskContentScale", type Property::FLOAT, The scale factor
+   * to apply to the content before masking. Note, scaled images are cropped to
+   * the same size as the alpha mask.
+   */
+  MASK_CONTENT_SCALE = WRAP_MODE_V + 7,
+
+  /**
+   * @brief Whether to crop image to mask or scale mask to fit image
+   * @details Name "cropToMask", type Property::BOOLEAN, True if the image should
+   * be cropped to match the mask size, or false if the image should remain the same size.
+   * Note, if this is false, then the mask is scaled to fit the image before being applied.
+   */
+  CROP_TO_MASK = WRAP_MODE_V + 8,
+
 };
 
 } //namespace Property

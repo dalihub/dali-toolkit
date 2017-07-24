@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL HEADERS
 #include <cstring> // for strlen()
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/devel-api/images/texture-set-image.h>
@@ -261,10 +262,9 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl( imageUrl ),
-  mAlphaMaskUrl(),
+  mMaskingData( NULL ),
   mDesiredSize( size ),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
-  mAlphaMaskId( TextureManager::INVALID_TEXTURE_ID ),
   mFittingMode( fittingMode ),
   mSamplingMode( samplingMode ),
   mWrapModeU( WrapMode::DEFAULT ),
@@ -281,10 +281,9 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl(),
-  mAlphaMaskUrl(),
+  mMaskingData( NULL ),
   mDesiredSize(),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
-  mAlphaMaskId( TextureManager::INVALID_TEXTURE_ID ),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
@@ -296,11 +295,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
 
 ImageVisual::~ImageVisual()
 {
-  if( mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID )
-  {
-    TextureManager& textureManager = mFactoryCache.GetTextureManager();
-    textureManager.Remove( mAlphaMaskId );
-  }
+  delete mMaskingData;
 }
 
 void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
@@ -355,14 +350,15 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       {
         DoSetProperty( Toolkit::DevelImageVisual::Property::ALPHA_MASK_URL, keyValue.second );
       }
+      else if ( keyValue.first == MASK_CONTENT_SCALE_NAME )
+      {
+        DoSetProperty( Toolkit::DevelImageVisual::Property::MASK_CONTENT_SCALE, keyValue.second );
+      }
+      else if ( keyValue.first == CROP_TO_MASK_NAME )
+      {
+        DoSetProperty( Toolkit::DevelImageVisual::Property::CROP_TO_MASK, keyValue.second );
+      }
     }
-  }
-
-  if( mAlphaMaskUrl.IsValid() )
-  {
-    // Immediately trigger the alpha mask loading (it may just get a cached value)
-    TextureManager& textureManager = mFactoryCache.GetTextureManager();
-    mAlphaMaskId = textureManager.RequestMaskLoad( mAlphaMaskUrl );
   }
 
   if( ( mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING ) && mImageUrl.IsValid() )
@@ -478,10 +474,43 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
       std::string alphaUrl;
       if( value.Get( alphaUrl ) )
       {
-        mAlphaMaskUrl = VisualUrl( alphaUrl );
+        AllocateMaskData();
+        // Immediately trigger the alpha mask loading (it may just get a cached value)
+        mMaskingData->SetImage( alphaUrl );
       }
       break;
     }
+
+    case Toolkit::DevelImageVisual::Property::MASK_CONTENT_SCALE:
+    {
+      float scale;
+      if( value.Get( scale ) )
+      {
+        AllocateMaskData();
+        mMaskingData->mContentScaleFactor = scale;
+      }
+      break;
+    }
+
+    case Toolkit::DevelImageVisual::Property::CROP_TO_MASK:
+    {
+      bool crop=false;
+      if( value.Get( crop ) )
+      {
+        AllocateMaskData();
+        mMaskingData->mCropToMask = crop;
+      }
+      break;
+    }
+  }
+}
+
+void ImageVisual::AllocateMaskData()
+{
+  if( mMaskingData == NULL )
+  {
+    TextureManager& textureManager = mFactoryCache.GetTextureManager();
+    mMaskingData = new MaskingData(textureManager);
   }
 }
 
@@ -497,6 +526,18 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
   {
     naturalSize.x = mDesiredSize.GetWidth();
     naturalSize.y = mDesiredSize.GetHeight();
+    return;
+  }
+
+  else if( mMaskingData != NULL && mMaskingData->mAlphaMaskUrl.IsValid() &&
+           mMaskingData->mCropToMask )
+  {
+    ImageDimensions dimensions = Dali::GetClosestImageSize( mMaskingData->mAlphaMaskUrl.GetUrl() );
+    if( dimensions != ImageDimensions( 0, 0 ) )
+    {
+      naturalSize.x = dimensions.GetWidth();
+      naturalSize.y = dimensions.GetHeight();
+    }
     return;
   }
   else if( mImageUrl.IsValid() && mImageUrl.GetLocation() == VisualUrl::LOCAL )
@@ -688,16 +729,21 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, bool synchronous
     {
       mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
       TextureManager& textureManager = mFactoryCache.GetTextureManager();
-      if( mAlphaMaskId == TextureManager::INVALID_TEXTURE_ID )
+      if( mMaskingData == NULL )
       {
         mTextureId = textureManager.RequestLoad( mImageUrl, mDesiredSize, mFittingMode,
                                                  mSamplingMode, TextureManager::NO_ATLAS, this );
       }
       else
       {
-        mTextureId = textureManager.RequestLoad( mImageUrl, mAlphaMaskId, mDesiredSize,
+        mTextureId = textureManager.RequestLoad( mImageUrl,
+                                                 mMaskingData->mAlphaMaskId,
+                                                 mMaskingData->mContentScaleFactor,
+                                                 mDesiredSize,
                                                  mFittingMode, mSamplingMode,
-                                                 TextureManager::NO_ATLAS, this );
+                                                 TextureManager::NO_ATLAS,
+                                                 mMaskingData->mCropToMask,
+                                                 this );
       }
 
       TextureManager::LoadState loadState = textureManager.GetTextureState( mTextureId );
@@ -865,7 +911,12 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
 
   map.Insert( Toolkit::DevelImageVisual::Property::ATLASING, mAttemptAtlasing );
-  map.Insert( Toolkit::DevelImageVisual::Property::ALPHA_MASK_URL, mAlphaMaskUrl.GetUrl() );
+  if( mMaskingData != NULL )
+  {
+    map.Insert( Toolkit::DevelImageVisual::Property::ALPHA_MASK_URL, mMaskingData->mAlphaMaskUrl.GetUrl() );
+    map.Insert( Toolkit::DevelImageVisual::Property::MASK_CONTENT_SCALE, mMaskingData->mContentScaleFactor );
+    map.Insert( Toolkit::DevelImageVisual::Property::CROP_TO_MASK, mMaskingData->mCropToMask );
+  }
 }
 
 void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -962,7 +1013,7 @@ void ImageVisual::UploadCompleted()
 }
 
 // From Texture Manager
-void ImageVisual::UploadComplete( bool loadingSuccess, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle )
+void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle )
 {
   Actor actor = mPlacementActor.GetHandle();
   if( actor )
@@ -1021,6 +1072,36 @@ void ImageVisual::RemoveTexture(const std::string& url)
       mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
     }
   }
+}
+
+
+ImageVisual::MaskingData::MaskingData( TextureManager& textureManager )
+: mTextureManager( textureManager ),
+  mAlphaMaskUrl(),
+  mAlphaMaskId( TextureManager::INVALID_TEXTURE_ID ),
+  mContentScaleFactor( 1.0f ),
+  mCropToMask( true )
+{
+}
+
+ImageVisual::MaskingData::~MaskingData()
+{
+  if( Stage::IsInstalled() )
+  {
+    // TextureManager could have been deleted before the actor that contains this
+    // ImageVisual is destroyed (e.g. due to stage shutdown). Ensure the stage
+    // is still valid before accessing texture manager.
+    if( mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID )
+    {
+      mTextureManager.Remove( mAlphaMaskId );
+    }
+  }
+}
+
+void ImageVisual::MaskingData::SetImage( const std::string& maskUrl )
+{
+  mAlphaMaskUrl = maskUrl;
+  mAlphaMaskId = mTextureManager.RequestMaskLoad( mAlphaMaskUrl );
 }
 
 } // namespace Internal

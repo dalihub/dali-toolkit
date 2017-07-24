@@ -464,24 +464,21 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
 }
 
 
-void GetCursorPosition( VisualModelPtr visualModel,
-                        LogicalModelPtr logicalModel,
-                        MetricsPtr metrics,
-                        CharacterIndex logical,
+void GetCursorPosition( GetCursorPositionParameters& parameters,
                         CursorInfo& cursorInfo )
 {
   // Whether the logical cursor position is at the end of the whole text.
-  const bool isLastPosition = logicalModel->mText.Count() == logical;
+  const bool isLastPosition = parameters.logicalModel->mText.Count() == parameters.logical;
 
   // Get the line where the character is laid-out.
-  const CharacterIndex characterOfLine = isLastPosition ? ( logical - 1u ) : logical;
+  const CharacterIndex characterOfLine = isLastPosition ? ( parameters.logical - 1u ) : parameters.logical;
 
   // Whether the cursor is in the last position and the last position is a new paragraph character.
-  const bool isLastNewParagraph = isLastPosition && TextAbstraction::IsNewParagraph( *( logicalModel->mText.Begin() + characterOfLine ) );
+  const bool isLastNewParagraph = parameters.isMultiline && isLastPosition && TextAbstraction::IsNewParagraph( *( parameters.logicalModel->mText.Begin() + characterOfLine ) );
 
-  const LineRun* const modelLines = visualModel->mLines.Begin();
+  const LineRun* const modelLines = parameters.visualModel->mLines.Begin();
 
-  const LineIndex lineIndex = visualModel->GetLineOfCharacter( characterOfLine );
+  const LineIndex lineIndex = parameters.visualModel->GetLineOfCharacter( characterOfLine );
   const LineRun& line = *( modelLines + lineIndex );
 
   if( isLastNewParagraph )
@@ -493,7 +490,7 @@ void GetCursorPosition( VisualModelPtr visualModel,
     cursorInfo.isSecondaryCursor = false;
 
     // Set the line offset and height.
-    cursorInfo.lineOffset = CalculateLineOffset( visualModel->mLines,
+    cursorInfo.lineOffset = CalculateLineOffset( parameters.visualModel->mLines,
                                                  newLineIndex );
 
     // The line height is the addition of the line ascender and the line descender.
@@ -508,24 +505,24 @@ void GetCursorPosition( VisualModelPtr visualModel,
     cursorInfo.primaryPosition.y = cursorInfo.lineOffset;
 
     // Transform the cursor info from line's coords to text's coords.
-    cursorInfo.primaryPosition.x += ( LTR == line.direction ) ? 0.f : visualModel->mControlSize.width;
+    cursorInfo.primaryPosition.x += ( LTR == line.direction ) ? 0.f : parameters.visualModel->mControlSize.width;
   }
   else
   {
     // Whether this line is a bidirectional line.
-    const bool bidiLineFetched = logicalModel->FetchBidirectionalLineInfo( characterOfLine );
+    const bool bidiLineFetched = parameters.logicalModel->FetchBidirectionalLineInfo( characterOfLine );
 
     // Check if the logical position is the first or the last one of the line.
-    const bool isFirstPositionOfLine = line.characterRun.characterIndex == logical;
-    const bool isLastPositionOfLine = line.characterRun.characterIndex + line.characterRun.numberOfCharacters == logical;
+    const bool isFirstPositionOfLine = line.characterRun.characterIndex == parameters.logical;
+    const bool isLastPositionOfLine = line.characterRun.characterIndex + line.characterRun.numberOfCharacters == parameters.logical;
 
     // 'logical' is the logical 'cursor' index.
     // Get the next and current logical 'character' index.
-    const CharacterIndex characterIndex = isFirstPositionOfLine ? logical : logical - 1u;
-    const CharacterIndex nextCharacterIndex = isLastPositionOfLine ? characterIndex : logical;
+    const CharacterIndex characterIndex = isFirstPositionOfLine ? parameters.logical : parameters.logical - 1u;
+    const CharacterIndex nextCharacterIndex = isLastPositionOfLine ? characterIndex : parameters.logical;
 
     // The character's direction buffer.
-    const CharacterDirection* const directionsBuffer = bidiLineFetched ? logicalModel->mCharacterDirections.Begin() : NULL;
+    const CharacterDirection* const directionsBuffer = bidiLineFetched ? parameters.logicalModel->mCharacterDirections.Begin() : NULL;
 
     CharacterDirection isCurrentRightToLeft = false;
     CharacterDirection isNextRightToLeft = false;
@@ -544,7 +541,7 @@ void GetCursorPosition( VisualModelPtr visualModel,
                                      ( isFirstPositionOfLine && ( isRightToLeftParagraph != isCurrentRightToLeft ) ) );
 
     // Set the line offset and height.
-    cursorInfo.lineOffset = CalculateLineOffset( visualModel->mLines,
+    cursorInfo.lineOffset = CalculateLineOffset( parameters.visualModel->mLines,
                                                  lineIndex );
 
     // The line height is the addition of the line ascender and the line descender.
@@ -569,7 +566,7 @@ void GetCursorPosition( VisualModelPtr visualModel,
         index = isRightToLeftParagraph ? line.characterRun.characterIndex : line.characterRun.characterIndex + line.characterRun.numberOfCharacters - 1u;
         if( bidiLineFetched )
         {
-          index = logicalModel->GetLogicalCharacterIndex( index );
+          index = parameters.logicalModel->GetLogicalCharacterIndex( index );
         }
       }
       else if( isFirstPositionOfLine )
@@ -577,7 +574,7 @@ void GetCursorPosition( VisualModelPtr visualModel,
         index = isRightToLeftParagraph ? line.characterRun.characterIndex + line.characterRun.numberOfCharacters - 1u : line.characterRun.characterIndex;
         if( bidiLineFetched )
         {
-          index = logicalModel->GetLogicalCharacterIndex( index );
+          index = parameters.logicalModel->GetLogicalCharacterIndex( index );
         }
       }
       else
@@ -586,12 +583,12 @@ void GetCursorPosition( VisualModelPtr visualModel,
       }
     }
 
-    const GlyphIndex* const charactersToGlyphBuffer = visualModel->mCharactersToGlyph.Begin();
-    const Length* const glyphsPerCharacterBuffer = visualModel->mGlyphsPerCharacter.Begin();
-    const Length* const charactersPerGlyphBuffer = visualModel->mCharactersPerGlyph.Begin();
-    const CharacterIndex* const glyphsToCharactersBuffer = visualModel->mGlyphsToCharacters.Begin();
-    const Vector2* const glyphPositionsBuffer = visualModel->mGlyphPositions.Begin();
-    const GlyphInfo* const glyphInfoBuffer = visualModel->mGlyphs.Begin();
+    const GlyphIndex* const charactersToGlyphBuffer = parameters.visualModel->mCharactersToGlyph.Begin();
+    const Length* const glyphsPerCharacterBuffer = parameters.visualModel->mGlyphsPerCharacter.Begin();
+    const Length* const charactersPerGlyphBuffer = parameters.visualModel->mCharactersPerGlyph.Begin();
+    const CharacterIndex* const glyphsToCharactersBuffer = parameters.visualModel->mGlyphsToCharacters.Begin();
+    const Vector2* const glyphPositionsBuffer = parameters.visualModel->mGlyphPositions.Begin();
+    const GlyphInfo* const glyphInfoBuffer = parameters.visualModel->mGlyphs.Begin();
 
     // Convert the cursor position into the glyph position.
     const GlyphIndex primaryGlyphIndex = *( charactersToGlyphBuffer + index );
@@ -604,7 +601,7 @@ void GetCursorPosition( VisualModelPtr visualModel,
                       primaryNumberOfGlyphs,
                       glyphMetrics,
                       glyphInfoBuffer,
-                      metrics );
+                      parameters.metrics );
 
     // Whether to add the glyph's advance to the cursor position.
     // i.e if the paragraph is left to right and the logical cursor is zero, the position is the position of the first glyph and the advance is not added,
@@ -698,7 +695,7 @@ void GetCursorPosition( VisualModelPtr visualModel,
                         secondaryNumberOfGlyphs,
                         glyphMetrics,
                         glyphInfoBuffer,
-                        metrics );
+                        parameters.metrics );
 
       // Set the secondary cursor's position.
 

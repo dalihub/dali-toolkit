@@ -71,7 +71,6 @@ EventData::EventData( DecoratorPtr decorator )
 : mDecorator( decorator ),
   mImfManager(),
   mPlaceholderFont( NULL ),
-  mPlaceholderText(),
   mPlaceholderTextActive(),
   mPlaceholderTextInactive(),
   mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),
@@ -1789,8 +1788,18 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
       mModel->mLogicalModel->UpdateTextStyleRuns( startOfSelectedText, -static_cast<int>( lengthOfSelectedText ) );
 
       // Mark the paragraphs to be updated.
-      mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-      mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      if( Layout::Engine::SINGLE_LINE_BOX == mLayoutEngine.GetLayout() )
+      {
+        mTextUpdateInfo.mCharacterIndex = 0;
+        mTextUpdateInfo.mNumberOfCharactersToRemove = mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mTextUpdateInfo.mNumberOfCharactersToAdd = mTextUpdateInfo.mPreviousNumberOfCharacters - lengthOfSelectedText;
+        mTextUpdateInfo.mClearAll = true;
+      }
+      else
+      {
+        mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      }
 
       // Delete text between handles
       Vector<Character>::Iterator first = utf32Characters.Begin() + startOfSelectedText;
@@ -2621,13 +2630,18 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     return;
   }
 
-  Text::GetCursorPosition( mModel->mVisualModel,
-                           mModel->mLogicalModel,
-                           mMetrics,
-                           logical,
+  const bool isMultiLine = ( Layout::Engine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() );
+  GetCursorPositionParameters parameters;
+  parameters.visualModel = mModel->mVisualModel;
+  parameters.logicalModel = mModel->mLogicalModel;
+  parameters.metrics = mMetrics;
+  parameters.logical = logical;
+  parameters.isMultiline = isMultiLine;
+
+  Text::GetCursorPosition( parameters,
                            cursorInfo );
 
-  if( Layout::Engine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() )
+  if( isMultiLine )
   {
     // If the text is editable and multi-line, the cursor position after a white space shouldn't exceed the boundaries of the text control.
 
@@ -2845,13 +2859,16 @@ void Controller::Impl::ScrollToMakePositionVisible( const Vector2& position, flo
     mModel->mScrollPosition.x = mModel->mVisualModel->mControlSize.width - positionEndX;
   }
 
-  if( decoratorPositionBeginY < 0.f )
+  if( Layout::Engine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() )
   {
-    mModel->mScrollPosition.y = -position.y;
-  }
-  else if( decoratorPositionEndY > mModel->mVisualModel->mControlSize.height )
-  {
-    mModel->mScrollPosition.y = mModel->mVisualModel->mControlSize.height - positionEndY;
+    if( decoratorPositionBeginY < 0.f )
+    {
+      mModel->mScrollPosition.y = -position.y;
+    }
+    else if( decoratorPositionEndY > mModel->mVisualModel->mControlSize.height )
+    {
+      mModel->mScrollPosition.y = mModel->mVisualModel->mControlSize.height - positionEndY;
+    }
   }
 }
 
