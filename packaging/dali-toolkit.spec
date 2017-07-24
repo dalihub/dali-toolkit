@@ -177,19 +177,31 @@ cp dali-toolkit/styles/default-feedback-theme.json %{buildroot}%{dali_toolkit_st
 ##############################
 
 %pre resources_480x800
-pushd %{dali_toolkit_style_files}
-rm -rf ./*
-popd
+case "$1" in
+  2)
+    pushd %{dali_toolkit_style_files}
+    rm -rf ./*
+    popd
+  ;;
+esac
 
 %pre resources_720x1280
-pushd %{dali_toolkit_style_files}
-rm -rf ./*
-popd
+case "$1" in
+  2)
+    pushd %{dali_toolkit_style_files}
+    rm -rf ./*
+    popd
+  ;;
+esac
 
 %pre resources_1920x1080
-pushd %{dali_toolkit_style_files}
-rm -rf ./*
-popd
+case "$1" in
+  2)
+    pushd %{dali_toolkit_style_files}
+    rm -rf ./*
+    popd
+  ;;
+esac
 
 ##############################
 # Post Install
