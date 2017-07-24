@@ -161,7 +161,13 @@ namespace Property
        *
        * @details name "placeholder", type MAP
        */
-      PLACEHOLDER
+      PLACEHOLDER,
+
+      /**
+       * @brief line wrap mode when the text lines over layout width.
+       * @details name "lineWrapMode", type string.
+       */
+      LINE_WRAP_MODE
   };
 } // namespace Property
 

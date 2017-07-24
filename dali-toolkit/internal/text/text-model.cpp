@@ -109,6 +109,7 @@ Model::Model()
   mScrollPositionLast(),
   mHorizontalAlignment( Layout::HORIZONTAL_ALIGN_BEGIN ),
   mVerticalAlignment( Layout::VERTICAL_ALIGN_TOP ),
+  mLineWrapMode( Layout::LineWrap::WORD ),
   mAlignmentOffset( 0.0f ),
   mElideEnabled( false )
 {
