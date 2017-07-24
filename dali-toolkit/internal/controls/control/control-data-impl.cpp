@@ -151,6 +151,19 @@ Toolkit::Visual::Base GetVisualByName(
 }
 
 /**
+ * Move visual from source to destination container
+ */
+void MoveVisual( RegisteredVisualContainer::Iterator sourceIter, RegisteredVisualContainer& source, RegisteredVisualContainer& destination )
+{
+   Toolkit::Visual::Base visual = (*sourceIter)->visual;
+   if( visual )
+   {
+     RegisteredVisual* rv = source.Release( sourceIter );
+     destination.PushBack( rv );
+   }
+}
+
+/**
  * Performs actions as requested using the action name.
  * @param[in] object The object on which to perform the action.
  * @param[in] actionName The action to perform.
@@ -344,9 +357,51 @@ void Control::Impl::LongPressDetected(Actor actor, const LongPressGesture& longP
 // Called by a Visual when it's resource is ready
 void Control::Impl::ResourceReady( Visual::Base& object)
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "ResourceReady \n");
+
+  // A resource is ready, check if is in the replacement visual container
+  // Iterate through all visuals in replacement container and store indexes of ready visuals
+  Dali::Vector <Property::Index> readyVisuals;
+  Actor self = mControlImpl.Self();
+
+  for( auto replacementVisualIter = mReplacementVisuals.Begin();
+        replacementVisualIter < mReplacementVisuals.End(); ++replacementVisualIter )
+  {
+    const Toolkit::Visual::Base replacementVisual = (*replacementVisualIter)->visual;
+    const Internal::Visual::Base& replacementVisualImpl = Toolkit::GetImplementation( replacementVisual );
+
+    if( replacementVisualImpl.IsResourceReady() )
+    {
+      // Check if new replacement visual (index) is already queued for replacement and swap old for new.
+      RegisteredVisualContainer::Iterator registeredVisualsIter;
+      if( FindVisual( (*replacementVisualIter)->index, mVisuals, registeredVisualsIter ) )
+      {
+        Property::Index readyVisualIndex = (*replacementVisualIter)->index;
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "ResourceReady: %d Ready to replace\n", readyVisualIndex );
+        readyVisuals.PushBack( readyVisualIndex );
+        // Remove current shown visual from stage and from registered visuals container
+        Toolkit::GetImplementation((*registeredVisualsIter)->visual).SetOffStage( self );
+        mVisuals.Erase( registeredVisualsIter );
+      }
+    }
+  }
+
+  for( auto readyVisualsIter = readyVisuals.Begin(); readyVisualsIter != readyVisuals.End(); readyVisualsIter++ )
+  {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "ResourceReady: %d Matched\n", (*readyVisualsIter) );
+    // Move new visual to be shown from replacement container into the control's registered visuals container
+    // Replacement visual has already been set on stage when it was added to replacement container
+    RegisteredVisualContainer::Iterator readyReplacementVisual;
+    if( FindVisual( (*readyVisualsIter) , mReplacementVisuals, readyReplacementVisual ) )
+    {
+      MoveVisual( readyReplacementVisual, mReplacementVisuals, mVisuals ); // Erases visual from replacement queue
+    }
+    // A visual has been replaced so control will most likely need relayouting
+    mControlImpl.RelayoutRequest();
+  }
 
   // go through and check if all the visuals are ready, if they are emit a signal
-  for ( RegisteredVisualContainer::ConstIterator visualIter = mVisuals.Begin();
+  for( auto visualIter = mVisuals.Begin();
         visualIter != mVisuals.End(); ++visualIter )
   {
     const Toolkit::Visual::Base visual = (*visualIter)->visual;
@@ -362,7 +417,6 @@ void Control::Impl::ResourceReady( Visual::Base& object)
   // all the visuals are ready
   Dali::Toolkit::Control handle( mControlImpl.GetOwner() );
   mResourceReadySignal.Emit( handle );
-
 }
 
 bool Control::Impl::IsResourceReady() const
@@ -405,33 +459,56 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
 
 void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "RegisterVisual:%d \n", index );
+
   bool visualReplaced ( false );
   Actor self = mControlImpl.Self();
 
   if( !mVisuals.Empty() )
   {
-    RegisteredVisualContainer::Iterator iter;
+    RegisteredVisualContainer::Iterator registeredVisualsiter;
     // Check if visual (index) is already registered.  Replace if so.
-    if ( FindVisual( index, mVisuals, iter ) )
+    if( FindVisual( index, mVisuals, registeredVisualsiter ) )
     {
-      if( (*iter)->visual && self.OnStage() )
+      if( (*registeredVisualsiter)->visual )
       {
-        Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+        // Store current visual depth index as may need to set the replacement visual to same depth
+        const int currentDepthIndex = (*registeredVisualsiter)->visual.GetDepthIndex();
+
+        // Monitor when the visuals resources are ready
+        StopObservingVisual( (*registeredVisualsiter)->visual );
+        StartObservingVisual( visual );
+
+        if(  self.OnStage() )
+        {
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "RegisterVisual Adding visual to replacement Queue: %d \n", index );
+          // Check if visual is currently in the process of being replaced
+          RegisteredVisualContainer::Iterator queuedReplacementVisual;
+          if ( FindVisual( index, mReplacementVisuals, queuedReplacementVisual ) )
+          {
+            // If visual on replacement queue is going to be replaced before it's ready then will be removed from queue (and stage)
+            // Only the the last requested visual will be queued and then displayed.
+            Toolkit::GetImplementation( (*queuedReplacementVisual)->visual ).SetOffStage( self );
+            mReplacementVisuals.Erase(queuedReplacementVisual);
+          }
+          // Add to replacement list
+          mReplacementVisuals.PushBack( new RegisteredVisual( index, visual, ( enabled == VisualState::ENABLED ? true : false ) ) );
+        }
+        else
+        {
+          // Not staged so can just replace registered visual
+          (*registeredVisualsiter)->visual = visual;
+          (*registeredVisualsiter)->enabled = ( enabled == VisualState::ENABLED ) ? true : false;
+        }
+
+        // If we've not set the depth-index value and the new visual does not have a depth index applied to it, then use the previously set depth-index for this index
+        if( ( depthIndexValueSet == DepthIndexValue::NOT_SET ) &&
+            ( visual.GetDepthIndex() == 0 ) )
+        {
+          visual.SetDepthIndex( currentDepthIndex );
+        }
       }
 
-      // If we've not set the depth-index value and the new visual does not have a depth index applied to it, then use the previously set depth-index for this index
-      if( ( depthIndexValueSet == DepthIndexValue::NOT_SET ) &&
-          ( visual.GetDepthIndex() == 0 ) )
-      {
-        const int currentDepthIndex = (*iter)->visual.GetDepthIndex();
-        visual.SetDepthIndex( currentDepthIndex );
-      }
-
-      StopObservingVisual( (*iter)->visual );
-      StartObservingVisual( visual );
-
-      (*iter)->visual = visual;
-      (*iter)->enabled = ( enabled == VisualState::ENABLED ) ? true : false;
       visualReplaced = true;
     }
   }
@@ -458,6 +535,7 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
 
   if( !visualReplaced ) // New registration entry
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "New Visual registration %d\n", index);
     mVisuals.PushBack( new RegisteredVisual( index, visual, ( enabled == VisualState::ENABLED ? true : false ) ) );
 
     // monitor when the visuals resources are ready
@@ -497,6 +575,7 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
     // Put on stage if enabled and the control is already on the stage
     if( ( enabled == VisualState::ENABLED ) && self.OnStage() )
     {
+      // Visual must be set on stage for the renderer to be created and the ResourceReady triggered.
       Toolkit::GetImplementation(visual).SetOnStage( self );
     }
   }
@@ -532,6 +611,8 @@ Toolkit::Visual::Base Control::Impl::GetVisual( Property::Index index ) const
 
 void Control::Impl::EnableVisual( Property::Index index, bool enable )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Visual (%d)\n", index);
+
   RegisteredVisualContainer::Iterator iter;
   if ( FindVisual( index, mVisuals, iter ) )
   {
