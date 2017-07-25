@@ -2219,6 +2219,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       // In some platforms arrive key events with no key code.
       // Do nothing.
+      return false;
     }
     else if( Dali::DALI_KEY_ESCAPE == keyCode )
     {
@@ -2288,11 +2289,13 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // and a character is typed after the type of a upper case latin character.
 
       // Do nothing.
+      return false;
     }
     else if( ( Dali::DALI_KEY_VOLUME_UP == keyCode ) || ( Dali::DALI_KEY_VOLUME_DOWN == keyCode ) )
     {
       // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
       // Do nothing.
+      return false;
     }
     else
     {
