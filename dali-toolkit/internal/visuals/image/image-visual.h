@@ -229,6 +229,11 @@ protected:
    */
   virtual void OnSetTransform();
 
+  /**
+   * @copydoc Visual::Base::IsResourceReady
+   */
+  virtual bool IsResourceReady() const;
+
 public:
 
   /**

@@ -1205,7 +1205,7 @@ void TextEditor::OnInitialize()
 
   // Creates a background visual. Even if the color is transparent it updates the stencil.
   mStencil.SetProperty( Toolkit::Control::Property::BACKGROUND,
-                        Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::COLOR ).
+                        Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR ).
                         Add( ColorVisual::Property::MIX_COLOR, Color::TRANSPARENT ) );
 
   // Enable the clipping property.

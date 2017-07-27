@@ -420,7 +420,7 @@ void PrimitiveVisual::DoSetOnStage( Actor& actor )
   actor.AddRenderer( mImpl->mRenderer );
 
   // Primitive generated and ready to display
-  ResourceReady();
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const

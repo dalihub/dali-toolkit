@@ -179,6 +179,11 @@ public:
   void StartObservingVisual( Toolkit::Visual::Base& visual);
 
   /**
+   * @copydoc Dali::Toolkit::DevelControl::GetVisualResourceStatus()
+   */
+  Toolkit::Visual::ResourceStatus GetVisualResourceStatus( Property::Index index ) const;
+
+  /**
    * @copydoc Dali::Toolkit::DevelControl::CreateTransition()
    */
   Dali::Animation CreateTransition( const Toolkit::TransitionData& transitionData );

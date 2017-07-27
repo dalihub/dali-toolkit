@@ -131,7 +131,7 @@ void ColorVisual::DoSetOnStage( Actor& actor )
   actor.AddRenderer( mImpl->mRenderer );
 
   // Color Visual generated and ready to display
-  ResourceReady();
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
