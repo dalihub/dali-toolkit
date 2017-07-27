@@ -1797,7 +1797,8 @@ float Controller::GetHeightForWidth( float width )
 
   Size layoutSize;
   if( fabsf( width - mImpl->mModel->mVisualModel->mControlSize.width ) > Math::MACHINE_EPSILON_1000 ||
-                                                           mImpl->mTextUpdateInfo.mFullRelayoutNeeded )
+                                                         mImpl->mTextUpdateInfo.mFullRelayoutNeeded ||
+                                                         mImpl->mTextUpdateInfo.mClearAll            )
   {
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
