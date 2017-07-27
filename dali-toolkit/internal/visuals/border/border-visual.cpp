@@ -217,7 +217,7 @@ void BorderVisual::DoSetOnStage( Actor& actor )
   actor.AddRenderer( mImpl->mRenderer );
 
   // Border Visual Generated and ready to display
-  ResourceReady();
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 void BorderVisual::DoCreatePropertyMap( Property::Map& map ) const

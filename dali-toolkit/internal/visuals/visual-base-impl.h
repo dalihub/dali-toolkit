@@ -226,13 +226,19 @@ public:
   /**
    * @brief Called when the visuals resources are loaded / ready
    */
-  void ResourceReady();
+  void ResourceReady( Toolkit::Visual::ResourceStatus resourceStatus );
 
   /**
    * @brief Called when the visuals resources are loaded / ready
    * @return true if ready, false otherwise
    */
-  bool IsResourceReady() const;
+  virtual bool IsResourceReady() const;
+
+  /**
+   * @brief Get the loading state of the visual resource
+   * @return Return the loading status (PREPARING, READY and FAILED) of visual resource
+   */
+  Toolkit::Visual::ResourceStatus GetResourceStatus() const;
 
 protected:
 

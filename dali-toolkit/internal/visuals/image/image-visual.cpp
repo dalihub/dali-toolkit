@@ -869,7 +869,7 @@ void ImageVisual::DoSetOnStage( Actor& actor )
     mPlacementActor.Reset();
 
     // Image loaded and ready to display
-    ResourceReady();
+    ResourceReady( Toolkit::Visual::ResourceStatus::READY );
   }
 }
 
@@ -927,6 +927,7 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
 
   map.Insert( Toolkit::ImageVisual::Property::ATLASING, mAttemptAtlasing );
+
   if( mMaskingData != NULL )
   {
     map.Insert( Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mMaskingData->mAlphaMaskUrl.GetUrl() );
@@ -961,6 +962,12 @@ void ImageVisual::OnSetTransform()
   {
     mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
   }
+}
+
+bool ImageVisual::IsResourceReady() const
+{
+  return ( mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY ||
+           mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED );
 }
 
 Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping )
@@ -1035,6 +1042,7 @@ void ImageVisual::UploadCompleted()
 // From Texture Manager
 void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle )
 {
+  Toolkit::Visual::ResourceStatus resourceStatus;
   Actor actor = mPlacementActor.GetHandle();
   if( actor )
   {
@@ -1054,6 +1062,8 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
         sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
         textureSet.SetSampler( 0u, sampler );
         mImpl->mRenderer.SetTextures(textureSet);
+
+        resourceStatus = Toolkit::Visual::ResourceStatus::READY;
       }
       else
       {
@@ -1063,9 +1073,11 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
         mImpl->mRenderer.SetTextures( textureSet );
 
         ApplyImageToSampler( brokenImage );
+
+        resourceStatus = Toolkit::Visual::ResourceStatus::FAILED;
       }
       // Image loaded and ready to display
-      ResourceReady();
+      ResourceReady( resourceStatus );
     }
   }
   mLoading = false;

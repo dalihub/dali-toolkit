@@ -449,7 +449,7 @@ void AnimatedImageVisual::StartFirstFrame( TextureSet& textureSet )
   mFrameDelayTimer.Start();
 
   DALI_LOG_INFO(gAnimImgLogFilter,Debug::Concise,"ResourceReady()\n");
-  ResourceReady();
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 TextureSet AnimatedImageVisual::PrepareTextureSet()

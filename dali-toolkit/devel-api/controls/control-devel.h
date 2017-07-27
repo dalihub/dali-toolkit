@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 
 namespace Dali
 {
@@ -212,6 +213,15 @@ DALI_IMPORT_API void EnableVisual( Internal::Control& control, Dali::Property::I
  * @return bool whether visual is enabled or not
  */
 DALI_IMPORT_API bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index index );
+
+/**
+ * @brief Get the loading state of the visual resource.
+ *
+ * @param[in] control The control
+ * @param[in] index The Property index of the visual
+ * @return Return the loading status (PREPARING, READY and FAILED) of visual resource
+ */
+DALI_IMPORT_API Toolkit::Visual::ResourceStatus GetVisualResourceStatus( const Internal::Control& control, Dali::Property::Index index );
 
 /**
  * @brief Create a transition effect on the control.

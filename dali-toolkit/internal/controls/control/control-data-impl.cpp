@@ -686,6 +686,18 @@ bool Control::Impl::IsResourceReady() const
   return true;
 }
 
+Toolkit::Visual::ResourceStatus Control::Impl::GetVisualResourceStatus( Property::Index index ) const
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mVisuals, iter ) )
+  {
+    const Toolkit::Visual::Base visual = (*iter)->visual;
+    const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+    return visualImpl.GetResourceStatus( );
+  }
+
+  return Toolkit::Visual::ResourceStatus::PREPARING;
+}
 
 Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& handle )
 {
