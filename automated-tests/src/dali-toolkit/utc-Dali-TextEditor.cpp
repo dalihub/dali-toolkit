@@ -26,7 +26,6 @@
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 
 using namespace Dali;
@@ -767,12 +766,6 @@ int UtcDaliTextEditorSetPropertyP(void)
   editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT, "Setting Placeholder Text" );
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( DevelTextEditor::Property::PLACEHOLDER_TEXT ), std::string("Setting Placeholder Text"), TEST_LOCATION );
 
-  // Check placeholder text properties when focused.
-  editor.SetProperty( DevelControl::Property::STATE, "FOCUSED" );
-  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT, "Setting Focused Placeholder Text" );
-  DALI_TEST_EQUALS( editor.GetProperty<int>( DevelControl::Property::STATE ), (int)DevelControl::FOCUSED, TEST_LOCATION );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( DevelTextEditor::Property::PLACEHOLDER_TEXT ), std::string("Setting Focused Placeholder Text"), TEST_LOCATION );
-
   // Check placeholder text's color property.
   editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR, Color::RED );
   DALI_TEST_EQUALS( editor.GetProperty<Vector4>( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR ), Color::RED, TEST_LOCATION );
@@ -786,6 +779,7 @@ int UtcDaliTextEditorSetPropertyP(void)
   Property::Map placeholderPixelSizeMapGet;
   Property::Map placeholderFontstyleMap;
   placeholderPixelSizeMapSet["placeholderText"] = "Setting Placeholder Text";
+  placeholderPixelSizeMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
   placeholderPixelSizeMapSet["placeholderColor"] = Color::BLUE;
   placeholderPixelSizeMapSet["placeholderFontFamily"] = "Arial";
   placeholderPixelSizeMapSet["placeholderPixelSize"] = 15.0f;
@@ -802,6 +796,7 @@ int UtcDaliTextEditorSetPropertyP(void)
   Property::Map placeholderMapSet;
   Property::Map placeholderMapGet;
   placeholderMapSet["placeholderText"] = "Setting Placeholder Text";
+  placeholderMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
   placeholderMapSet["placeholderColor"] = Color::RED;
   placeholderMapSet["placeholderFontFamily"] = "Arial";
   placeholderMapSet["placeholderPointSize"] = 12.0f;
@@ -1935,7 +1930,22 @@ int utcDaliTextEditorEvent06(void)
 
   DALI_TEST_EQUALS( "Hello\nworld\nHello world", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
+  // For coverage
+  application.ProcessEvent( GenerateKey( "", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
 
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_VOLUME_UP, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_VOLUME_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
@@ -2184,6 +2194,40 @@ int utcDaliTextEditorScrollStateChangedSignalTest(void)
   application.SendNotification();
   DALI_TEST_EQUALS( startedCalled, true, TEST_LOCATION );
   DALI_TEST_EQUALS( finishedCalled, true, TEST_LOCATION );
+
+  END_TEST;
+}
+int UtcDaliToolkitTextEditorTextWarpMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextEditorTextWarpMode");
+
+  int lineCount =0 ;
+
+  TextEditor editor = TextEditor::New();
+  editor.SetSize( 150.0f, 300.f );
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello world Hello world" );
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetProperty( DevelTextEditor::Property::LINE_WRAP_MODE, "WORD" );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 4, TEST_LOCATION );
+
+
+
+  editor.SetProperty( DevelTextEditor::Property::LINE_WRAP_MODE, "CHARACTER" );
+
+  application.SendNotification();
+  application.Render();
+
+
+  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
 
   END_TEST;
 }

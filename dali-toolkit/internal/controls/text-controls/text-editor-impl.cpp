@@ -76,6 +76,14 @@ const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 };
 const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
 
+
+const Scripting::StringEnum LINE_WRAP_MODE_STRING_TABLE[] =
+{
+  { "WORD",      Toolkit::Text::Layout::LineWrap::WORD      },
+  { "CHARACTER", Toolkit::Text::Layout::LineWrap::CHARACTER }
+};
+const unsigned int LINE_WRAP_MODE_STRING_TABLE_COUNT = sizeof( LINE_WRAP_MODE_STRING_TABLE ) / sizeof( LINE_WRAP_MODE_STRING_TABLE[0] );
+
 const char* const SCROLL_BAR_POSITION("sourcePosition");
 const char* const SCROLL_BAR_POSITION_MIN("sourcePositionMin");
 const char* const SCROLL_BAR_POSITION_MAX("sourcePositionMax");
@@ -141,6 +149,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderText",       
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",           VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableSelection",                BOOLEAN,   ENABLE_SELECTION                     )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholder",                    MAP,       PLACEHOLDER                          )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineWrapMode",                   STRING,    LINE_WRAP_MODE                       )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -674,7 +683,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
           const std::string& text = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor::OnPropertySet %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str() );
 
-          impl.mController->SetPlaceholderText( text );
+          impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
         }
         break;
       }
@@ -709,6 +718,21 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         if( map )
         {
           impl.mController->SetPlaceholderProperty( *map );
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::LINE_WRAP_MODE:
+      {
+        const std::string& wrapModeStr = value.Get< std::string >();
+        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p LINE_WRAP_MODE %s\n", impl.mController.Get(), wrapModeStr.c_str() );
+
+        Layout::LineWrap::Mode lineWrapMode( Layout::LineWrap::WORD );
+        if( Scripting::GetEnumeration< Layout::LineWrap::Mode >( wrapModeStr.c_str(),
+                                                                 LINE_WRAP_MODE_STRING_TABLE,
+                                                                 LINE_WRAP_MODE_STRING_TABLE_COUNT,
+                                                                 lineWrapMode ) )
+        {
+          impl.mController->SetLineWrapMode( lineWrapMode );
         }
         break;
       }
@@ -1060,7 +1084,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         if( impl.mController )
         {
           std::string text;
-          impl.mController->GetPlaceholderText( text );
+          impl.mController->GetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
           value = text;
         }
         break;
@@ -1087,6 +1111,13 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         impl.mController->GetPlaceholderProperty( map );
         value = map;
         break;
+      }
+      case Toolkit::DevelTextEditor::Property::LINE_WRAP_MODE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetLineWrapMode();
+        }
       }
     } //switch
   }

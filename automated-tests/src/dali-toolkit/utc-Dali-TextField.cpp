@@ -860,6 +860,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map placeholderPixelSizeMapGet;
   Property::Map placeholderFontstyleMap;
   placeholderPixelSizeMapSet["placeholderText"] = "Setting Placeholder Text";
+  placeholderPixelSizeMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
   placeholderPixelSizeMapSet["placeholderColor"] = Color::BLUE;
   placeholderPixelSizeMapSet["placeholderFontFamily"] = "Arial";
   placeholderPixelSizeMapSet["placeholderPixelSize"] = 15.0f;
@@ -876,6 +877,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map placeholderMapSet;
   Property::Map placeholderMapGet;
   placeholderMapSet["placeholderText"] = "Setting Placeholder Text";
+  placeholderMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
   placeholderMapSet["placeholderColor"] = Color::RED;
   placeholderMapSet["placeholderFontFamily"] = "Arial";
   placeholderMapSet["placeholderPointSize"] = 12.0f;
@@ -2450,6 +2452,53 @@ int utcDaliTextFieldSomeSpecialKeys(void)
 
   // The text shouldn't be deleted.
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), longText, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int utcDaliTextFieldSizeUpdate(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("utcDaliTextFieldSizeUpdate");
+
+  // Checks some special keys when the text is selected.
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  Stage::GetCurrent().Add( field );
+
+  float previousHeight = 0.0f;
+  float currentHeight = 0.0f;
+  const float fieldWidth = 1920.0f;
+
+
+  // "ㅁ" is bigger then "ኢ"
+  field.SetSize( Vector2( fieldWidth ,10.0f ) );
+  field.SetResizePolicy( ResizePolicy::FIXED , Dimension::WIDTH );
+  field.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY , Dimension::HEIGHT );
+
+  field.SetProperty( TextField::Property::TEXT, "ኢ");
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  field.SetKeyboardFocusable(true);
+  KeyboardFocusManager::Get().SetCurrentFocusActor( field );
+
+  application.SendNotification();
+  application.Render();
+
+  previousHeight = field.GetHeightForWidth( fieldWidth );
+  DALI_TEST_EQUALS( previousHeight, field.GetProperty<float>( Actor::Property::SIZE_HEIGHT ) , TEST_LOCATION );
+
+  // Add  another script characters ( glyph height is defferent )
+  application.ProcessEvent( GenerateKey( "ㅁ", "ㅁ", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "ㅁ", "ㅁ", KEY_A_CODE, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+
+  application.SendNotification();
+  application.Render();
+
+  currentHeight = field.GetHeightForWidth( fieldWidth );
+  DALI_TEST_EQUALS( currentHeight, field.GetProperty<float>( Actor::Property::SIZE_HEIGHT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( (previousHeight < currentHeight), true , TEST_LOCATION );
 
   END_TEST;
 }

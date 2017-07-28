@@ -92,7 +92,13 @@ namespace Property
        * @details name "lineCount", type int
        * @node this property is read-only.
        */
-      LINE_COUNT = OUTLINE + 5
+      LINE_COUNT = OUTLINE + 5,
+
+      /**
+       * @brief line wrap mode when the text lines over layout width.
+       * @details name "lineWrapMode", type string.
+       */
+      LINE_WRAP_MODE = OUTLINE + 6
   };
 } // namespace Property
 

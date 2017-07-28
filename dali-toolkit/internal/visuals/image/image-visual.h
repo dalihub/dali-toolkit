@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -244,6 +244,11 @@ public:
 private:
 
   /**
+   * Allocate the mask data when a masking property is defined in the property map
+   */
+  void AllocateMaskData();
+
+  /**
    * @brief Applies the image to the texture set used for this renderer
    *
    * @param[in] image The Image to apply to the texture set used for this renderer
@@ -314,17 +319,28 @@ private:
   void DoSetProperty( Property::Index index, const Property::Value& value );
 
 private:
+  struct MaskingData
+  {
+    MaskingData( TextureManager& textureManager );
+    ~MaskingData();
+    void SetImage( const std::string& url );
+
+    TextureManager& mTextureManager;
+    VisualUrl mAlphaMaskUrl;
+    TextureManager::TextureId mAlphaMaskId;
+    float mContentScaleFactor;
+    bool mCropToMask;
+  };
 
   Image mImage;
   PixelData mPixels;
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
   VisualUrl mImageUrl;
-  VisualUrl mAlphaMaskUrl;
+  MaskingData* mMaskingData;
 
   Dali::ImageDimensions mDesiredSize;
   TextureManager::TextureId mTextureId;
-  TextureManager::TextureId mAlphaMaskId;
 
   Dali::FittingMode::Type mFittingMode:3;
   Dali::SamplingMode::Type mSamplingMode:4;
@@ -333,6 +349,8 @@ private:
   bool mAttemptAtlasing:1; ///< If true will attempt atlasing, otherwise create unique texture
   bool mTextureLoading:1;  ///< True if the texture is being loaded asynchronously, or false when it has loaded.
 };
+
+
 
 } // namespace Internal
 

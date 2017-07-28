@@ -86,6 +86,7 @@ namespace Property
        * @brief Hides the input characters and instead shows a default character for password or pin entry.
        * @details name "hiddenInputSettings", type map.
        * @note Optional.
+       *       This property is currently being used for some applications, so it can't be changed.
        * @see HiddenInput
        */
       HIDDEN_INPUT_SETTINGS = INPUT_OUTLINE + 1,
@@ -111,14 +112,15 @@ namespace Property
        * @code
        *   Property::Map propertyMap;
        *   propertyMap["placeholderText"] = "Setting Placeholder Text";
+       *   propertyMap["placeholderTextFocused"] = "Setting Placeholder Text Focused";
        *   propertyMap["placeholderColor"] = Color::RED;
        *   propertyMap["placeholderFontFamily"] = "Arial";
        *   propertyMap["placeholderPointSize"] = 12.0f;
        *
        *   Property::Map fontStyleMap;
-       *   fontstyleMap.Insert( "weight", "bold" );
-       *   fontstyleMap.Insert( "width", "condensed" );
-       *   fontstyleMap.Insert( "slant", "italic" );
+       *   fontStyleMap.Insert( "weight", "bold" );
+       *   fontStyleMap.Insert( "width", "condensed" );
+       *   fontStyleMap.Insert( "slant", "italic" );
        *   propertyMap["placeholderFontStyle"] = fontStyleMap;
        *
        *   field.SetProperty( DevelTextField::Property::PLACEHOLDER, propertyMap );
