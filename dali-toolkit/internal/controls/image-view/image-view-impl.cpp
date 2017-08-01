@@ -117,6 +117,8 @@ void ImageView::SetImage( const Property::Map& map )
   mPropertyMap = map;
   mUrl.clear();
   mImage.Reset();
+  mRelayoutRequired = true;
+
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
   // Don't set mVisual until it is ready and shown. Getters will still use current visual.
   if (!mVisual)
@@ -133,6 +135,7 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
   mUrl = url;
   mImage.Reset();
   mPropertyMap.Clear();
+  mRelayoutRequired = true;
 
   // Don't set mVisual until it is ready and shown. Getters will still use current visual.
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
@@ -228,6 +231,9 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
 void ImageView::OnResourceReady( Toolkit::Control control )
 {
+  // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
+  mVisual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
+
   if( mRelayoutRequired)
   {
     mRelayoutRequired = false;
