@@ -51,11 +51,15 @@ public:
    * @brief Render the glyphs from a ViewInterface.
    *
    * @param[in] view The interface to a view.
+   * @param[in] textControl handle to the text control
+   * @param[in] animatablePropertyIndex textControl specific animatable property
    * @param[out] alignmentOffset Offset used to internally align the placement actor.
    * @param[in] depth The depth in the tree of the parent.
    * @return The Renderable actor used to position the text.
    */
   virtual Actor Render( ViewInterface& view,
+                        Actor textContol,
+                        Property::Index animatablePropertyIndex,
                         float& alignmentOffset,
                         int depth ) = 0;
 

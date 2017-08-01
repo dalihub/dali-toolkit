@@ -30,6 +30,16 @@ namespace Toolkit
 namespace DevelTextLabel
 {
 
+/**
+ * @brief Enumeration for the start and end property ranges for this control.
+ * @SINCE_1_0.0
+ */
+enum PropertyRange
+{
+  ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,
+  ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve animatable property indices
+};
+
 namespace Property
 {
   enum Type
@@ -98,7 +108,14 @@ namespace Property
        * @brief line wrap mode when the text lines over layout width.
        * @details name "lineWrapMode", type string.
        */
-      LINE_WRAP_MODE = OUTLINE + 6
+      LINE_WRAP_MODE = OUTLINE + 6,
+
+      /*
+       * @brief Animatable text color
+       * @details text color property to use if required to animate the text color
+       */
+      TEXT_COLOR_ANIMATABLE = ANIMATABLE_PROPERTY_START_INDEX
+
   };
 } // namespace Property
 

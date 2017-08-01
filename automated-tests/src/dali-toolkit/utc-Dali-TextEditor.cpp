@@ -1930,7 +1930,22 @@ int utcDaliTextEditorEvent06(void)
 
   DALI_TEST_EQUALS( "Hello\nworld\nHello world", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
+  // For coverage
+  application.ProcessEvent( GenerateKey( "", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
 
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_VOLUME_UP, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_VOLUME_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

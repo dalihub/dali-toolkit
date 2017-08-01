@@ -1354,7 +1354,11 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
   {
     if( mRenderer )
     {
+      Dali::Toolkit::TextEditor handle = Dali::Toolkit::TextEditor( GetOwner() );
+
       renderableActor = mRenderer->Render( mController->GetView(),
+                                           handle,
+                                           Property::INVALID_INDEX, // Animatable property not supported
                                            mAlignmentOffset,
                                            DepthIndex::CONTENT );
     }

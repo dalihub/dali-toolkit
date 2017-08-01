@@ -1390,7 +1390,11 @@ void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
   {
     if( mRenderer )
     {
+      Dali::Toolkit::TextField handle = Dali::Toolkit::TextField( GetOwner() );
+
       renderableActor = mRenderer->Render( mController->GetView(),
+                                           handle,
+                                           Property::INVALID_INDEX, // Animatable property not supported
                                            mAlignmentOffset,
                                            DepthIndex::CONTENT );
     }
