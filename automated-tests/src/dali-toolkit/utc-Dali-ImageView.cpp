@@ -30,6 +30,8 @@
 #include <sstream>
 #include <unistd.h>
 
+#include "dummy-control.h"
+
 using namespace Dali;
 using namespace Toolkit;
 
@@ -831,6 +833,7 @@ int UtcDaliImageViewSetImageOffstageP(void)
 }
 
 bool gResourceReadySignalFired = false;
+Vector3 gNaturalSize;
 
 void ResourceReadySignal( Control control )
 {
@@ -1351,6 +1354,55 @@ int UtcDaliImageViewReplaceImage(void)
   DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), true, TEST_LOCATION );
 
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+void OnRelayoutOverride( Size size )
+{
+  gNaturalSize = size; // Size Relayout is using
+}
+
+int UtcDaliImageViewReplaceImageAndGetNaturalSize(void)
+{
+  ToolkitTestApplication application;
+
+  // Check ImageView with background and main image, to ensure both visuals are marked as loaded
+  ImageView imageView = ImageView::New( TEST_IMAGE_1 );
+  imageView.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+
+  DummyControl dummyControl = DummyControl::New( true );
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+  dummyControl.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
+
+  dummyControl.Add( imageView );
+  dummyImpl.SetRelayoutCallback( &OnRelayoutOverride );
+  Stage::GetCurrent().Add( dummyControl );
+
+  application.SendNotification();
+  application.Render();
+
+  // loading started, this waits for the loader thread for max 30 seconds
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( gNaturalSize.width, 1024.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( gNaturalSize.height, 1024.0f, TEST_LOCATION );
+
+  gNaturalSize = Vector3::ZERO;
+
+  imageView.SetImage(gImage_600_RGB);
+
+  // Waiting for resourceReady so SendNotifcation not called here.
+
+  // loading started, this waits for the loader thread for max 30 seconds
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( gNaturalSize.width, 600.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( gNaturalSize.height, 600.0f, TEST_LOCATION );
 
   END_TEST;
 }
