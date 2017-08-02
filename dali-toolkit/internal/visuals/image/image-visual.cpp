@@ -528,8 +528,20 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
     naturalSize.y = mDesiredSize.GetHeight();
     return;
   }
+  else if( mImpl->mRenderer ) // Check if we have a loaded image
+  {
+    auto textureSet = mImpl->mRenderer.GetTextures();
 
-  else if( mMaskingData != NULL && mMaskingData->mAlphaMaskUrl.IsValid() &&
+    if( textureSet )
+    {
+      auto texture = textureSet.GetTexture(0);
+      naturalSize.x = texture.GetWidth();
+      naturalSize.y = texture.GetHeight();
+      return;
+    }
+  }
+
+  if( mMaskingData != NULL && mMaskingData->mAlphaMaskUrl.IsValid() &&
            mMaskingData->mCropToMask )
   {
     ImageDimensions dimensions = Dali::GetClosestImageSize( mMaskingData->mAlphaMaskUrl.GetUrl() );
@@ -540,23 +552,26 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
     }
     return;
   }
-  else if( mImageUrl.IsValid() && mImageUrl.GetLocation() == VisualUrl::LOCAL )
+  else if( mImageUrl.IsValid() )
   {
-    ImageDimensions dimensions = Dali::GetClosestImageSize( mImageUrl.GetUrl() );
-
-    if( dimensions != ImageDimensions( 0, 0 ) )
+    if( mImageUrl.GetLocation() == VisualUrl::LOCAL )
     {
-      naturalSize.x = dimensions.GetWidth();
-      naturalSize.y = dimensions.GetHeight();
-    }
-    else
-    {
-      Image brokenImage = VisualFactoryCache::GetBrokenVisualImage();
+      ImageDimensions dimensions = Dali::GetClosestImageSize( mImageUrl.GetUrl() );
 
-      naturalSize.x = brokenImage.GetWidth();
-      naturalSize.y = brokenImage.GetWidth();
+      if( dimensions != ImageDimensions( 0, 0 ) )
+      {
+        naturalSize.x = dimensions.GetWidth();
+        naturalSize.y = dimensions.GetHeight();
+      }
+      else
+      {
+        Image brokenImage = VisualFactoryCache::GetBrokenVisualImage();
+
+        naturalSize.x = brokenImage.GetWidth();
+        naturalSize.y = brokenImage.GetWidth();
+      }
+      return;
     }
-    return;
   }
 
   naturalSize = Vector2::ZERO;
