@@ -196,6 +196,13 @@ uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf3
         code |= *begin++ & 0x3fu;
         break;
       }
+
+      case U0:    // Invalid case
+      {
+        begin++;
+        *utf32++ = 0x20;    // Use white space
+        break;
+      }
     }
   }
 
