@@ -64,8 +64,7 @@ DALI_TYPE_REGISTRATION_END()
 using namespace Dali;
 
 ImageView::ImageView()
-: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
-  mRelayoutRequired(true)
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) )
 {
 }
 
@@ -117,7 +116,6 @@ void ImageView::SetImage( const Property::Map& map )
   mPropertyMap = map;
   mUrl.clear();
   mImage.Reset();
-  mRelayoutRequired = true;
 
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
   // Don't set mVisual until it is ready and shown. Getters will still use current visual.
@@ -135,7 +133,6 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
   mUrl = url;
   mImage.Reset();
   mPropertyMap.Clear();
-  mRelayoutRequired = true;
 
   // Don't set mVisual until it is ready and shown. Getters will still use current visual.
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
@@ -218,9 +215,6 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   Control::OnRelayout( size, container );
 
-  // If visual is being replaced then mVisual will be the replacement visual even if not ready.
-  mVisual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
-
   if( mVisual )
   {
     // Pass in an empty map which uses default transform values meaning our visual fills the control
@@ -233,12 +227,6 @@ void ImageView::OnResourceReady( Toolkit::Control control )
 {
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
   mVisual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
-
-  if( mRelayoutRequired)
-  {
-    mRelayoutRequired = false;
-    RelayoutRequest();
-  }
 }
 
 ///////////////////////////////////////////////////////////
