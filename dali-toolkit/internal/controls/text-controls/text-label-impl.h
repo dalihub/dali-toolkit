@@ -73,34 +73,39 @@ private: // From Control
   /**
    * @copydoc Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  virtual void OnInitialize() override ;
 
   /**
    * @copydoc Control::OnStyleChange()
    */
-  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
+  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change ) override ;
 
   /**
    * @copydoc Control::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container ) override ;
 
   /**
    * @copydoc Control::GetNaturalSize()
    */
-  virtual Vector3 GetNaturalSize();
+  virtual Vector3 GetNaturalSize() override ;
 
   /**
    * @copydoc Control::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width );
+  virtual float GetHeightForWidth( float width ) override ;
 
-// From ControlInterface
+  /**
+   * @copydoc Control::OnPropertySet()
+   */
+  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) override ;
+
+  // From ControlInterface
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
-  virtual void RequestTextRelayout();
+  virtual void RequestTextRelayout() override ;
 
 private: // from TextScroller
 

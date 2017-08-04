@@ -47,6 +47,8 @@ public:
    * @copydoc Renderer::Render()
    */
   virtual Actor Render( ViewInterface& view,
+                        Actor textControl,
+                        Property::Index animatablePropertyIndex,
                         float& alignmentOffset,
                         int depth );
 

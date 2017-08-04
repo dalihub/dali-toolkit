@@ -24,6 +24,7 @@
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/animation/constraints.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -64,6 +65,7 @@ void main()
 
 const char* FRAGMENT_SHADER_L8 = MAKE_SHADER(
 uniform lowp    vec4      uColor;
+uniform lowp    vec4      textColorAnimatable;
 uniform         sampler2D sTexture;
 varying mediump vec2      vTexCoord;
 varying mediump vec4      vColor;
@@ -71,18 +73,19 @@ varying mediump vec4      vColor;
 void main()
 {
   mediump vec4 color = texture2D( sTexture, vTexCoord );
-  gl_FragColor = vec4( vColor.rgb * uColor.rgb, vColor.a * uColor.a * color.r );
+  gl_FragColor = vec4( vColor.rgb * uColor.rgb * textColorAnimatable.rgb, uColor.a * vColor.a * textColorAnimatable.a * color.r );
 }
 );
 
 const char* FRAGMENT_SHADER_RGBA = MAKE_SHADER(
 uniform lowp    vec4      uColor;
+uniform lowp    vec4      textColorAnimatable;
 uniform         sampler2D sTexture;
 varying mediump vec2      vTexCoord;
 
 void main()
 {
-  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;
+  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * textColorAnimatable;
 }
 );
 
@@ -208,6 +211,8 @@ struct AtlasRenderer::Impl
   }
 
   void AddGlyphs( Text::ViewInterface& view,
+                  Actor textControl,
+                  Property::Index animatablePropertyIndex,
                   const Vector<Vector2>& positions,
                   const Vector<GlyphInfo>& glyphs,
                   const Vector4& defaultColor,
@@ -460,7 +465,7 @@ struct AtlasRenderer::Impl
       {
         MeshRecord& meshRecord = *it;
 
-        Actor actor = CreateMeshActor( meshRecord, textSize, STYLE_NORMAL );
+        Actor actor = CreateMeshActor( textControl, animatablePropertyIndex, defaultColor, meshRecord, textSize, STYLE_NORMAL );
 
         // Whether the actor has renderers.
         const bool hasRenderer = actor.GetRendererCount() > 0u;
@@ -480,7 +485,7 @@ struct AtlasRenderer::Impl
             vertex.mColor = shadowColor;
           }
 
-          Actor shadowActor = CreateMeshActor( meshRecord, textSize, STYLE_DROP_SHADOW );
+          Actor shadowActor = CreateMeshActor(textControl, animatablePropertyIndex, defaultColor, meshRecord, textSize, STYLE_DROP_SHADOW );
 #if defined(DEBUG_ENABLED)
           shadowActor.SetName( "Text Shadow renderable actor" );
 #endif
@@ -531,7 +536,8 @@ struct AtlasRenderer::Impl
     mTextCache.Resize( 0 );
   }
 
-  Actor CreateMeshActor( const MeshRecord& meshRecord, const Vector2& actorSize, Style style )
+  Actor CreateMeshActor( Actor textControl, Property::Index animatablePropertyIndex, const Vector4& defaultColor, const MeshRecord& meshRecord,
+                         const Vector2& actorSize, Style style )
   {
     PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat );
     quadVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &meshRecord.mMesh.mVertices[ 0 ] ), meshRecord.mMesh.mVertices.Size() );
@@ -562,6 +568,26 @@ struct AtlasRenderer::Impl
         mShaderL8 = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_L8 );
       }
       shader = mShaderL8;
+    }
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "defaultColor[%f, %f, %f, %f ]\n", defaultColor.r, defaultColor.g, defaultColor.b, defaultColor.a  );
+
+    Dali::Property::Index shaderTextColorIndex = shader.RegisterProperty( "textColorAnimatable", defaultColor );
+
+    if ( animatablePropertyIndex != Property::INVALID_INDEX )
+    {
+      // create constraint for the animatable text's color Property with textColorAnimatable in the shader.
+      if( shaderTextColorIndex  )
+      {
+        Constraint constraint = Constraint::New<Vector4>( shader, shaderTextColorIndex, EqualToConstraint() );
+        constraint.AddSource( Source( textControl, animatablePropertyIndex ) );
+        constraint.Apply();
+      }
+    }
+    else
+    {
+      // If not animating the text colour then set to 1's so shader uses the current vertex color
+      shader.RegisterProperty( "textColorAnimatable", Vector4(1.0, 1.0, 1.0, 1.0 ) );
     }
 
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, shader );
@@ -814,6 +840,8 @@ Text::RendererPtr AtlasRenderer::New()
 }
 
 Actor AtlasRenderer::Render( Text::ViewInterface& view,
+                             Actor textControl,
+                             Property::Index animatablePropertyIndex,
                              float& alignmentOffset,
                              int depth )
 {
@@ -845,6 +873,8 @@ Actor AtlasRenderer::Render( Text::ViewInterface& view,
     const Vector4& defaultColor = view.GetTextColor();
 
     mImpl->AddGlyphs( view,
+                      textControl,
+                      animatablePropertyIndex,
                       positions,
                       glyphs,
                       defaultColor,
