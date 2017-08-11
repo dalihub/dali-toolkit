@@ -123,6 +123,8 @@ typedef Signal<void ( Control ) > ResourceReadySignalType;
  * by a control are loaded and ready.
  * Most resources are only loaded when the control is placed on stage.
  *
+ * @note A RelayoutRequest is queued by Control before this signal is emitted
+ *
  * A callback of the following type may be connected:
  * @code
  *   void YourCallbackName( Control control );

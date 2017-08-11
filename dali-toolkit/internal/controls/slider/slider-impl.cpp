@@ -1378,8 +1378,15 @@ Property::Value Slider::GetProperty( BaseObject* object, Property::Index propert
 
       case Toolkit::Slider::Property::MARKS:
       {
-        // TODO: Need to be able to return a PropertyArray
-        // value = sliderImpl.GetMarks();
+        Property::Value value1( Property::ARRAY );
+        Property::Array* markArray = value1.GetArray();
+
+        if( markArray )
+        {
+          *markArray = sliderImpl.GetMarks();
+        }
+
+        value = value1;
         break;
       }
 
