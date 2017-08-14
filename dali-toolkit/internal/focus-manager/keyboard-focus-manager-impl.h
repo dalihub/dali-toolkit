@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
 #include <dali/devel-api/object/weak-handle.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
@@ -161,8 +162,8 @@ protected:
 
 private:
 
-  typedef Dali::Vector< Dali::BaseObject* > FocusStack; ///< Define Dali::Vector< Dali::BaseObject* > as FocusStack to contain focus history
-  typedef FocusStack::Iterator FocusStackIterator; ///< Define FocusStack::Iterator as FocusStackIterator to navigate FocusStack
+  typedef std::vector< WeakHandle< Actor > > FocusStack; ///< Define Dali::Vector< Dali::BaseObject* > as FocusStack to contain focus history
+  typedef FocusStack::iterator FocusStackIterator; ///< Define FocusStack::Iterator as FocusStackIterator to navigate FocusStack
 
   /**
    * Get configuration from StyleManager.

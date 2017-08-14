@@ -166,7 +166,6 @@ private:
   std::string      mUrl;          ///< the url for the image if the image came from a URL, empty otherwise
   Image            mImage;        ///< the Image if the image came from a Image, null otherwise
   Property::Map    mPropertyMap;  ///< the Property::Map if the image came from a Property::Map, empty otherwise
-  bool             mRelayoutRequired; ///< True if relayout is required, e.g. due to unreadiness
 };
 
 } // namespace Internal

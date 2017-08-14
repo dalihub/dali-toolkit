@@ -208,13 +208,13 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
     }
 
     // Push Current Focused Actor to FocusHistory
-    mFocusHistory.PushBack( &actor.GetBaseObject() );
+    mFocusHistory.push_back( actor );
 
     // Delete first element before add new element when Stack is full.
-    if( mFocusHistory.Count() > MAX_HISTORY_AMOUNT )
+    if( mFocusHistory.size() > MAX_HISTORY_AMOUNT )
     {
-       FocusStackIterator beginPos = mFocusHistory.Begin();
-       mFocusHistory.Erase( beginPos );
+       FocusStackIterator beginPos = mFocusHistory.begin();
+       mFocusHistory.erase( beginPos );
     }
 
     DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
@@ -249,28 +249,39 @@ Actor KeyboardFocusManager::GetCurrentFocusGroup()
 void KeyboardFocusManager::MoveFocusBackward()
 {
   // Find Pre Focused Actor when the list size is more than 1
-  if( mFocusHistory.Count() > 1 )
+  if( mFocusHistory.size() > 1 )
   {
     // Delete current focused actor in history
-    FocusStackIterator endPos = mFocusHistory.End();
-    endPos = mFocusHistory.Erase( --endPos );
+    mFocusHistory.pop_back();
 
-    // If pre-focused actors are not on stage, remove them in stack
-    while( !Dali::Actor::DownCast(BaseHandle(mFocusHistory[ mFocusHistory.Count() - 1 ])).OnStage() )
+    // If pre-focused actors are not on stage or deleted, remove them in stack
+    while( mFocusHistory.size() > 0 )
     {
-      endPos = mFocusHistory.Erase( --endPos );
+      // Get pre focused actor
+      Actor target = mFocusHistory[ mFocusHistory.size() -1 ].GetHandle();
+
+      // Impl of Actor is not null
+      if( target && target.OnStage() )
+      {
+        // Delete pre focused actor in history because it will pushed again by SetCurrentFocusActor()
+        mFocusHistory.pop_back();
+        SetCurrentFocusActor( target );
+        break;
+      }
+      else
+      {
+        // Target is empty handle or off stage. Erase from queue
+        mFocusHistory.pop_back();
+      }
     }
 
-    // Get pre focused actor
-    BaseObject* object = mFocusHistory[ mFocusHistory.Count() - 1 ];
-    BaseHandle handle( object );
-    Actor preFocusedActor = Dali::Actor::DownCast( handle );
-
-    // Delete pre focused actor in history because it will pushed again by SetCurrentFocusActor()
-    mFocusHistory.Erase( --endPos );
-
-    SetCurrentFocusActor( preFocusedActor );
- }
+    // if there is no actor which can get focus, then push current focus actor in stack again
+    if( mFocusHistory.size() == 0 )
+    {
+      Actor currentFocusedActor = GetCurrentFocusActor();
+      mFocusHistory.push_back( currentFocusedActor );
+    }
+  }
 }
 
 bool KeyboardFocusManager::IsLayoutControl(Actor actor) const
