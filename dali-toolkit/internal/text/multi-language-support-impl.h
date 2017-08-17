@@ -80,7 +80,7 @@ struct DefaultFonts
   struct CacheItem
   {
     TextAbstraction::FontDescription description;
-    FontId fontId ;
+    FontId fontId;
   };
 
   /**
