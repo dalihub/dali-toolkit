@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -279,6 +279,13 @@ public:
    * @return Returns the override height for an underline, 0 indicates that font metrics will determine the height
    */
   float GetUnderlineHeight() const;
+
+  /**
+   * @brief Retrieves the number of underline runs.
+   *
+   * @return The number of underline runs.
+   */
+  Length GetNumberOfUnderlineRuns() const;
 
 protected:
 
