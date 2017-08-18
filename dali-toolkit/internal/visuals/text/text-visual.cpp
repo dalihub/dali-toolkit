@@ -587,9 +587,9 @@ void TextVisual::UpdateRenderer()
 
       textureSet.SetTexture( 2u, maskTexture );
 
-      // Filter mode needs to be set to nearest to avoid blurry text.
+      // Filter mode needs to be set to linear to produce better quality while scaling.
       Sampler sampler = Sampler::New();
-      sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+      sampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
       textureSet.SetSampler( 0u, sampler );
       textureSet.SetSampler( 1u, sampler );
       textureSet.SetSampler( 2u, sampler );
