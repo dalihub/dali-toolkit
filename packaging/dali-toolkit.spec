@@ -130,7 +130,9 @@ DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
 
 %configure --enable-profile=TIZEN \
+%if 0%{?enable_debug}
            --enable-debug \
+%endif
            --enable-i18n=yes
 
 make %{?jobs:-j%jobs}
