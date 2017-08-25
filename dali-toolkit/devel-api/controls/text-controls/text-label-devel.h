@@ -44,78 +44,113 @@ namespace Property
 {
   enum Type
   {
-      RENDERING_BACKEND = Dali::Toolkit::TextLabel::Property::RENDERING_BACKEND,
-      TEXT = Dali::Toolkit::TextLabel::Property::TEXT,
-      FONT_FAMILY = Dali::Toolkit::TextLabel::Property::FONT_FAMILY,
-      FONT_STYLE = Dali::Toolkit::TextLabel::Property::FONT_STYLE,
-      POINT_SIZE = Dali::Toolkit::TextLabel::Property::POINT_SIZE,
-      MULTI_LINE = Dali::Toolkit::TextLabel::Property::MULTI_LINE,
-      HORIZONTAL_ALIGNMENT = Dali::Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT,
-      VERTICAL_ALIGNMENT = Dali::Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT,
-      TEXT_COLOR = Dali::Toolkit::TextLabel::Property::TEXT_COLOR,
-      SHADOW_OFFSET = Dali::Toolkit::TextLabel::Property::SHADOW_OFFSET,
-      SHADOW_COLOR = Dali::Toolkit::TextLabel::Property::SHADOW_COLOR,
-      UNDERLINE_ENABLED = Dali::Toolkit::TextLabel::Property::UNDERLINE_ENABLED,
-      UNDERLINE_COLOR = Dali::Toolkit::TextLabel::Property::UNDERLINE_COLOR,
-      UNDERLINE_HEIGHT = Dali::Toolkit::TextLabel::Property::UNDERLINE_HEIGHT,
-      ENABLE_MARKUP = Dali::Toolkit::TextLabel::Property::ENABLE_MARKUP,
-      ENABLE_AUTO_SCROLL = Dali::Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL,
-      AUTO_SCROLL_SPEED = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_SPEED,
-      AUTO_SCROLL_LOOP_COUNT = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_LOOP_COUNT,
-      AUTO_SCROLL_GAP = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_GAP,
-      LINE_SPACING = Dali::Toolkit::TextLabel::Property::LINE_SPACING,
-      UNDERLINE = Dali::Toolkit::TextLabel::Property::UNDERLINE,
-      SHADOW = Dali::Toolkit::TextLabel::Property::SHADOW,
-      EMBOSS = Dali::Toolkit::TextLabel::Property::EMBOSS,
-      OUTLINE = Dali::Toolkit::TextLabel::Property::OUTLINE,
+    ///////////////////////////////////////////////////////////////////////////////
+    // Event side (non-animatable) properties
+    ///////////////////////////////////////////////////////////////////////////////
 
-      /**
-       * @brief The size of font in pixels.
-       *
-       * Conversion from Point size to Pixel size :
-       *  Pixel size = Point size * DPI / 72
-       * @details name "pixelSize", type float
-       */
-      PIXEL_SIZE = OUTLINE + 1,
+    RENDERING_BACKEND = Dali::Toolkit::TextLabel::Property::RENDERING_BACKEND,
+    TEXT = Dali::Toolkit::TextLabel::Property::TEXT,
+    FONT_FAMILY = Dali::Toolkit::TextLabel::Property::FONT_FAMILY,
+    FONT_STYLE = Dali::Toolkit::TextLabel::Property::FONT_STYLE,
+    POINT_SIZE = Dali::Toolkit::TextLabel::Property::POINT_SIZE,
+    MULTI_LINE = Dali::Toolkit::TextLabel::Property::MULTI_LINE,
+    HORIZONTAL_ALIGNMENT = Dali::Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT,
+    VERTICAL_ALIGNMENT = Dali::Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT,
+    TEXT_COLOR = Dali::Toolkit::TextLabel::Property::TEXT_COLOR,
+    SHADOW_OFFSET = Dali::Toolkit::TextLabel::Property::SHADOW_OFFSET,
+    SHADOW_COLOR = Dali::Toolkit::TextLabel::Property::SHADOW_COLOR,
+    UNDERLINE_ENABLED = Dali::Toolkit::TextLabel::Property::UNDERLINE_ENABLED,
+    UNDERLINE_COLOR = Dali::Toolkit::TextLabel::Property::UNDERLINE_COLOR,
+    UNDERLINE_HEIGHT = Dali::Toolkit::TextLabel::Property::UNDERLINE_HEIGHT,
+    ENABLE_MARKUP = Dali::Toolkit::TextLabel::Property::ENABLE_MARKUP,
+    ENABLE_AUTO_SCROLL = Dali::Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL,
+    AUTO_SCROLL_SPEED = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_SPEED,
+    AUTO_SCROLL_LOOP_COUNT = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_LOOP_COUNT,
+    AUTO_SCROLL_GAP = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_GAP,
+    LINE_SPACING = Dali::Toolkit::TextLabel::Property::LINE_SPACING,
+    UNDERLINE = Dali::Toolkit::TextLabel::Property::UNDERLINE,
+    SHADOW = Dali::Toolkit::TextLabel::Property::SHADOW,
+    EMBOSS = Dali::Toolkit::TextLabel::Property::EMBOSS,
+    OUTLINE = Dali::Toolkit::TextLabel::Property::OUTLINE,
 
-      /**
-       * @brief Enable or disable the ellipsis.
-       * @details name "ellipsis", type bool
-       */
-      ELLIPSIS = OUTLINE + 2,
+    /**
+     * @brief The size of font in pixels.
+     * @details Name "pixelSize", type Property::FLOAT.
+     *          Conversion from Point size to Pixel size:
+     *            Pixel size = Point size * DPI / 72
+     */
+    PIXEL_SIZE = OUTLINE + 1,
 
-      /**
-       * @brief delay starting time of auto scrolling and further loops
-       * @details name "autoScrollLoopDelay", type float.
-       */
-      AUTO_SCROLL_LOOP_DELAY = OUTLINE + 3,
+    /**
+     * @brief Enable or disable the ellipsis.
+     * @details Name "ellipsis", type Property::BOOLEAN.
+     */
+    ELLIPSIS = OUTLINE + 2,
 
-      /**
-       * @brief Auto scrolling stop behaviour.
-       * @details name "autoScrollStopMode", type [Type](@ref Dali::Toolkit::DevelTextLabel::AutoScrollStopMode::Type) (Property::INTEGER) or Property::STRING.
-       *          values FINISH_LOOP, IMMEDIATE, defualt FINISH_LOOP
-       */
-      AUTO_SCROLL_STOP_MODE = OUTLINE + 4,
+    /**
+     * @brief delay starting time of auto scrolling and further loops
+     * @details Name "autoScrollLoopDelay", type Property::FLOAT.
+     */
+    AUTO_SCROLL_LOOP_DELAY = OUTLINE + 3,
 
-      /*
-       * @brief The line count of text.
-       * @details name "lineCount", type int
-       * @node this property is read-only.
-       */
-      LINE_COUNT = OUTLINE + 5,
+    /**
+     * @brief Auto scrolling stop behaviour.
+     * @details Name "autoScrollStopMode", type [Type](@ref Dali::Toolkit::DevelTextLabel::AutoScrollStopMode::Type) (Property::INTEGER) or Property::STRING.
+     *          Values FINISH_LOOP, IMMEDIATE, default FINISH_LOOP
+     */
+    AUTO_SCROLL_STOP_MODE = OUTLINE + 4,
 
-      /**
-       * @brief line wrap mode when the text lines over layout width.
-       * @details name "lineWrapMode", type string.
-       */
-      LINE_WRAP_MODE = OUTLINE + 6,
+    /*
+     * @brief The line count of text.
+     * @details name "lineCount", type int
+     * @node This property is read-only.
+     */
+    LINE_COUNT = OUTLINE + 5,
 
-      /*
-       * @brief Animatable text color
-       * @details text color property to use if required to animate the text color
-       */
-      TEXT_COLOR_ANIMATABLE = ANIMATABLE_PROPERTY_START_INDEX
+    /**
+     * @brief line wrap mode when the text lines over layout width.
+     * @details Name "lineWrapMode", type Property::STRING.
+     */
+    LINE_WRAP_MODE = OUTLINE + 6,
 
+    ///////////////////////////////////////////////////////////////////////////////
+    // Animatable Properties
+    ///////////////////////////////////////////////////////////////////////////////
+
+    /*
+     * @brief Animatable text color.
+     * @details Name "textColorAnimatable", type Property::VECTOR4.
+     *          Text color property to use if required to animate the text color.
+     */
+    TEXT_COLOR_ANIMATABLE = ANIMATABLE_PROPERTY_START_INDEX,
+
+    /**
+     * @brief The red component of the text color.
+     * @details Name "textColorRed", type Property::FLOAT.
+     * @see TEXT_COLOR_ANIMATABLE
+     */
+    TEXT_COLOR_RED = ANIMATABLE_PROPERTY_START_INDEX + 1,
+
+    /**
+     * @brief The green component of the text color.
+     * @details Name "textColorGreen", type Property::FLOAT.
+     * @see TEXT_COLOR_ANIMATABLE
+     */
+    TEXT_COLOR_GREEN = ANIMATABLE_PROPERTY_START_INDEX + 2,
+
+    /**
+     * @brief The blue component of the text color.
+     * @details Name "textColorBlue", type Property::FLOAT.
+     * @see TEXT_COLOR_ANIMATABLE
+     */
+    TEXT_COLOR_BLUE = ANIMATABLE_PROPERTY_START_INDEX + 3,
+
+    /**
+     * @brief The alpha component of the text color.
+     * @details Name "textColorAlpha", type Property::FLOAT.
+     * @see TEXT_COLOR_ANIMATABLE
+     */
+    TEXT_COLOR_ALPHA = ANIMATABLE_PROPERTY_START_INDEX + 4,
   };
 } // namespace Property
 

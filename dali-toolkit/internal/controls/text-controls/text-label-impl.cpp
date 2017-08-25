@@ -135,6 +135,10 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollStopMode",  STR
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "lineCount", INTEGER, LINE_COUNT             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "lineWrapMode",        STRING,  LINE_WRAP_MODE         )
 DALI_DEVEL_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColorAnimatable", Color::BLACK, TEXT_COLOR_ANIMATABLE )
+DALI_DEVEL_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR_ANIMATABLE, 0)
+DALI_DEVEL_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR_ANIMATABLE, 1)
+DALI_DEVEL_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, TextLabel, "textColorBlue",  TEXT_COLOR_BLUE,  TEXT_COLOR_ANIMATABLE, 2)
+DALI_DEVEL_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, TextLabel, "textColorAlpha", TEXT_COLOR_ALPHA, TEXT_COLOR_ANIMATABLE, 3)
 DALI_TYPE_REGISTRATION_END()
 
 } // namespace
@@ -601,12 +605,8 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         break;
       }
       case Toolkit::TextLabel::Property::TEXT_COLOR:
-      case Toolkit::DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE:
       {
-        if ( impl.mController )
-        {
-          value = impl.mController->GetDefaultColor();
-        }
+        value = label.GetProperty( Toolkit::DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE );
         break;
       }
       case Toolkit::TextLabel::Property::SHADOW_OFFSET:
@@ -958,9 +958,9 @@ void TextLabel::SetUpAutoScrolling()
   TextureSet textureSet = TextureSet::New();
   textureSet.SetTexture( 0u, texture );
 
-  // Filter mode needs to be set to nearest to avoid blurry text.
+  // Filter mode needs to be set to linear to produce better quality while scaling.
   Sampler sampler = Sampler::New();
-  sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+  sampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
   textureSet.SetSampler( 0u, sampler );
 
   // Set parameters for scrolling

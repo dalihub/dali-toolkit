@@ -44,7 +44,6 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying highp vec2 vTexCoord;\n
   varying highp float vRatio;\n
-  uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   uniform mediump float uDelta;\n
   uniform mediump vec2 uTextureSize;\n
@@ -52,17 +51,34 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   uniform mediump float uHorizontalAlign;\n
   uniform mediump float uVerticalAlign;\n
   \n
+  uniform mediump mat4 uModelMatrix;\n
+  uniform mediump mat4 uViewMatrix;\n
+  uniform mediump mat4 uProjection;\n
+  \n
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
   void main()\n
   {\n
-    {\n
-      float smallTextPadding = max( uSize.x - uTextureSize.x, 0. );\n
-      float gap = max( uGap, smallTextPadding );\n
-      float delta = floor ( uDelta ) + 0.5;\n
-      vTexCoord.x = ( delta + uHorizontalAlign * ( uTextureSize.x - uSize.x ) + floor( aPosition.x * uSize.x ) + 0.5 - gap * 0.5 ) / (uTextureSize.x + gap) + 0.5;\n
-      vTexCoord.y = ( uVerticalAlign * ( uTextureSize.y - uSize.y ) + floor( aPosition.y * uSize.y ) + 0.5 ) / ( uTextureSize.y ) + 0.5;\n
-      vRatio = uTextureSize.x / ( uTextureSize.x + gap );\n
-      gl_Position = uMvpMatrix * vec4( floor( aPosition * uSize.xy ), 0.0, 1.0 );\n
-    }\n
+    mediump vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy );\n
+    mediump vec2 visualSize = mix( uSize.xy * size, size, offsetSizeMode.zw );\n
+    \n
+    mediump float smallTextPadding = max( visualSize.x - uTextureSize.x, 0. );\n
+    mediump float gap = max( uGap, smallTextPadding );\n
+    mediump float delta = floor ( uDelta ) + 0.5;\n
+    vTexCoord.x = ( delta + uHorizontalAlign * ( uTextureSize.x - visualSize.x ) + floor( aPosition.x * visualSize.x ) + 0.5 - gap * 0.5 ) / ( uTextureSize.x + gap ) + 0.5;\n
+    vTexCoord.y = ( uVerticalAlign * ( uTextureSize.y - visualSize.y ) + floor( aPosition.y * visualSize.y ) + 0.5 ) / ( uTextureSize.y ) + 0.5;\n
+    vRatio = uTextureSize.x / ( uTextureSize.x + gap );\n
+    \n
+    mediump vec4 vertexPosition = vec4( floor( ( aPosition + anchorPoint ) * visualSize + ( visualOffset + origin ) * uSize.xy ), 0.0, 1.0 );\n
+    mediump vec4 nonAlignedVertex = uViewMatrix * uModelMatrix * vertexPosition;\n
+    mediump vec4 pixelAlignedVertex = vec4 ( floor( nonAlignedVertex.xyz ), 1.0 );\n
+    \n
+    gl_Position = uProjection * pixelAlignedVertex;\n
   }\n
 );
 

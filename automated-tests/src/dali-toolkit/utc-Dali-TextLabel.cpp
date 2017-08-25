@@ -959,3 +959,34 @@ int UtcDaliToolkitTextlabelTextWarpMode(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTextLabelColorComponents(void)
+{
+  ToolkitTestApplication application;
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty( DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE, Color::RED );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_RED ),   1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_GREEN ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_BLUE ),  0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_ALPHA ), 1.0f, TEST_LOCATION );
+
+  label.SetProperty( DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE, Color::GREEN );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_RED ),   0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_GREEN ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_BLUE ),  0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_ALPHA ), 1.0f, TEST_LOCATION );
+
+  label.SetProperty( DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE, Color::BLUE );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_RED ),   0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_GREEN ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_BLUE ),  1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_ALPHA ), 1.0f, TEST_LOCATION );
+
+  label.SetProperty( DevelTextLabel::Property::TEXT_COLOR_ALPHA, 0.6f );
+  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_ALPHA ), 0.6f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< Vector4 >( DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE ), Vector4( 0.0f, 0.0f, 1.0f, 0.6f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< Vector4 >( TextLabel::Property::TEXT_COLOR ), Vector4( 0.0f, 0.0f, 1.0f, 0.6f ), TEST_LOCATION );
+
+  END_TEST;
+}
