@@ -2222,13 +2222,10 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Do nothing.
       return false;
     }
-    else if( Dali::DALI_KEY_ESCAPE == keyCode )
+    else if( Dali::DALI_KEY_ESCAPE == keyCode || Dali::DALI_KEY_BACK )
     {
-      // Escape key is a special case which causes focus loss
-      KeyboardFocusLostEvent();
-
-      // Will request for relayout.
-      relayoutNeeded = true;
+      // Do nothing
+      return false;
     }
     else if( ( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ) ||
              ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode ) ||
@@ -3686,6 +3683,11 @@ void Controller::ResetScrollPosition()
 void Controller::SetControlInterface( ControlInterface* controlInterface )
 {
   mImpl->mControlInterface = controlInterface;
+}
+
+bool Controller::IsClearFocusOnEscape()
+{
+  return mImpl->mIsClearFocusOnEscape;
 }
 
 // private : Private contructors & copy operator.
