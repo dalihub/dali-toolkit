@@ -28,7 +28,7 @@
 {
   "config":
   {
-    "alwaysShowFocus":false
+    "alwaysShowFocus":true
   },
   "styles":
   {
