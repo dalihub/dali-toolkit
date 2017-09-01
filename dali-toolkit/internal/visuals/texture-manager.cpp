@@ -19,18 +19,45 @@
 #include "texture-manager.h"
 
 // EXTERNAL HEADERS
+#include <cstdlib>
+#include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL HEADERS
-#include <dali/integration-api/debug.h>
-#include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 #include <dali-toolkit/internal/image-loader/image-atlas-impl.h>
-#include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 
+namespace
+{
+
+constexpr auto DEFAULT_NUMBER_OF_LOCAL_LOADER_THREADS = size_t{4u};
+constexpr auto DEFAULT_NUMBER_OF_REMOTE_LOADER_THREADS = size_t{8u};
+
+constexpr auto NUMBER_OF_LOCAL_LOADER_THREADS_ENV = "DALI_TEXTURE_LOCAL_THREADS";
+constexpr auto NUMBER_OF_REMOTE_LOADER_THREADS_ENV = "DALI_TEXTURE_REMOTE_THREADS";
+
+size_t GetNumberOfThreads(const char* environmentVariable, size_t defaultValue)
+{
+  using Dali::EnvironmentVariable::GetEnvironmentVariable;
+  auto numberString = GetEnvironmentVariable(environmentVariable);
+  auto numberOfThreads = numberString ? std::strtol(numberString, nullptr, 10) : 0;
+  return (numberOfThreads > 0) ? numberOfThreads : defaultValue;
+}
+
+size_t GetNumberOfLocalLoaderThreads()
+{
+  return GetNumberOfThreads(NUMBER_OF_LOCAL_LOADER_THREADS_ENV, DEFAULT_NUMBER_OF_LOCAL_LOADER_THREADS);
+}
+
+size_t GetNumberOfRemoteLoaderThreads()
+{
+  return GetNumberOfThreads(NUMBER_OF_REMOTE_LOADER_THREADS_ENV, DEFAULT_NUMBER_OF_REMOTE_LOADER_THREADS);
+}
+
+} // namespace
 
 namespace Dali
 {
@@ -58,12 +85,10 @@ const int           INVALID_CACHE_INDEX( -1 ); ///< Invalid Cache index
 
 
 TextureManager::TextureManager()
-: mAsyncLocalLoader( Toolkit::AsyncImageLoader::New() ),
-  mAsyncRemoteLoader( Toolkit::AsyncImageLoader::New() ),
-  mCurrentTextureId( 0 )
+: mCurrentTextureId( 0 ),
+  mAsyncLocalLoaders( GetNumberOfLocalLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
+  mAsyncRemoteLoaders( GetNumberOfRemoteLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } )
 {
-  DevelAsyncImageLoader::PixelBufferLoadedSignal(mAsyncLocalLoader).Connect( this, &TextureManager::AsyncLocalLoadComplete );
-  DevelAsyncImageLoader::PixelBufferLoadedSignal(mAsyncRemoteLoader).Connect( this, &TextureManager::AsyncRemoteLoadComplete );
 }
 
 TextureManager::TextureId TextureManager::RequestLoad(
@@ -294,22 +319,12 @@ bool TextureManager::LoadTexture( TextureInfo& textureInfo )
 
     if( !textureInfo.loadSynchronously )
     {
-      if( textureInfo.url.IsLocal() )
-      {
-        mAsyncLocalLoadingInfoContainer.push_back( AsyncLoadingInfo( textureInfo.textureId ) );
-        mAsyncLocalLoadingInfoContainer.back().loadId =
-          GetImplementation(mAsyncLocalLoader).Load( textureInfo.url, textureInfo.desiredSize,
-                                                     textureInfo.fittingMode,
-                                                     textureInfo.samplingMode, true );
-      }
-      else
-      {
-        mAsyncRemoteLoadingInfoContainer.push_back( AsyncLoadingInfo( textureInfo.textureId ) );
-        mAsyncRemoteLoadingInfoContainer.back().loadId =
-          GetImplementation(mAsyncRemoteLoader).Load( textureInfo.url, textureInfo.desiredSize,
-                                                      textureInfo.fittingMode,
-                                                      textureInfo.samplingMode, true );
-      }
+      auto& loadersContainer = textureInfo.url.IsLocal() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
+      auto loadingHelperIt = loadersContainer.GetNext();
+      DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
+      loadingHelperIt->Load(textureInfo.textureId, textureInfo.url,
+                            textureInfo.desiredSize, textureInfo.fittingMode,
+                            textureInfo.samplingMode, true);
     }
   }
 
@@ -324,16 +339,6 @@ void TextureManager::ObserveTexture( TextureInfo& textureInfo,
     textureInfo.observerList.PushBack( observer );
     observer->DestructionSignal().Connect( this, &TextureManager::ObserverDestroyed );
   }
-}
-
-void TextureManager::AsyncLocalLoadComplete( uint32_t id, Devel::PixelBuffer pixelBuffer )
-{
-  AsyncLoadComplete( mAsyncLocalLoadingInfoContainer, id, pixelBuffer );
-}
-
-void TextureManager::AsyncRemoteLoadComplete( uint32_t id, Devel::PixelBuffer pixelBuffer )
-{
-  AsyncLoadComplete( mAsyncRemoteLoadingInfoContainer, id, pixelBuffer );
 }
 
 void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingContainer, uint32_t id, Devel::PixelBuffer pixelBuffer )
@@ -674,13 +679,48 @@ void TextureManager::ObserverDestroyed( TextureUploadObserver* observer )
 
 TextureManager::~TextureManager()
 {
-  mTextureInfoContainer.clear();
-  mAsyncLocalLoadingInfoContainer.clear();
-  mAsyncRemoteLoadingInfoContainer.clear();
 }
 
+TextureManager::AsyncLoadingHelper::AsyncLoadingHelper(TextureManager& textureManager)
+: AsyncLoadingHelper(Toolkit::AsyncImageLoader::New(), textureManager,
+                     AsyncLoadingInfoContainerType())
+{
+}
 
+void TextureManager::AsyncLoadingHelper::Load(TextureId          textureId,
+                                              const VisualUrl&   url,
+                                              ImageDimensions    desiredSize,
+                                              FittingMode::Type  fittingMode,
+                                              SamplingMode::Type samplingMode,
+                                              bool               orientationCorrection)
+{
+  mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
+  auto id = mLoader.Load(url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+  mLoadingInfoContainer.back().loadId = id;
+}
 
+TextureManager::AsyncLoadingHelper::AsyncLoadingHelper(AsyncLoadingHelper&& rhs)
+: AsyncLoadingHelper(rhs.mLoader, rhs.mTextureManager, std::move(rhs.mLoadingInfoContainer))
+{
+}
+
+TextureManager::AsyncLoadingHelper::AsyncLoadingHelper(
+    Toolkit::AsyncImageLoader loader,
+    TextureManager& textureManager,
+    AsyncLoadingInfoContainerType&& loadingInfoContainer)
+: mLoader(loader),
+  mTextureManager(textureManager),
+  mLoadingInfoContainer(std::move(loadingInfoContainer))
+{
+  DevelAsyncImageLoader::PixelBufferLoadedSignal(mLoader).Connect(
+      this, &AsyncLoadingHelper::AsyncLoadComplete);
+}
+
+void TextureManager::AsyncLoadingHelper::AsyncLoadComplete(uint32_t           id,
+                                                           Devel::PixelBuffer pixelBuffer)
+{
+  mTextureManager.AsyncLoadComplete(mLoadingInfoContainer, id, pixelBuffer);
+}
 
 } // namespace Internal
 
