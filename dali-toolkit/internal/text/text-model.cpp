@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,41 @@ const ColorIndex* const Model::GetColorIndices() const
 const Vector4& Model::GetDefaultColor() const
 {
   return mVisualModel->mTextColor;
+}
+
+const Vector2& Model::GetShadowOffset() const
+{
+  return mVisualModel->mShadowOffset;
+}
+
+const Vector4& Model::GetShadowColor() const
+{
+  return mVisualModel->mShadowColor;
+}
+
+const Vector4& Model::GetUnderlineColor() const
+{
+  return mVisualModel->GetUnderlineColor();
+}
+
+bool Model::IsUnderlineEnabled() const
+{
+  return mVisualModel->IsUnderlineEnabled();
+}
+
+float Model::GetUnderlineHeight() const
+{
+  return mVisualModel->GetUnderlineHeight();
+}
+
+Length Model::GetNumberOfUnderlineRuns() const
+{
+  return mVisualModel->GetNumberOfUnderlineRuns();
+}
+
+void Model::GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const
+{
+  mVisualModel->GetUnderlineRuns( underlineRuns, index, numberOfRuns );
 }
 
 Model::Model()

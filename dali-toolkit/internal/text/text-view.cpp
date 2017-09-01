@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -384,7 +384,7 @@ Length View::GetNumberOfUnderlineRuns() const
 {
   if( mImpl->mVisualModel )
   {
-    return mImpl->mVisualModel->mUnderlineRuns.Count();
+    return mImpl->mVisualModel->GetNumberOfUnderlineRuns();
   }
 
   return 0u;

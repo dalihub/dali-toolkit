@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/animation/constraints.h>
+
 // INTERNAL HEADER
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -27,6 +30,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
+#include <dali-toolkit/internal/text/text-effects-style.h>
 
 namespace Dali
 {
@@ -49,6 +53,8 @@ const char * const HORIZONTAL_ALIGNMENT_PROPERTY( "horizontalAlignment" );
 const char * const VERTICAL_ALIGNMENT_PROPERTY( "verticalAlignment" );
 const char * const TEXT_COLOR_PROPERTY( "textColor" );
 const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
+const char * const SHADOW_PROPERTY( "shadow" );
+const char * const UNDERLINE_PROPERTY( "underline" );
 
 const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
 {
@@ -90,14 +96,14 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
-  uniform mediump vec4 pixelArea;
+  uniform mediump vec4 pixelArea;\n
 
   uniform mediump mat4 uModelMatrix;\n
   uniform mediump mat4 uViewMatrix;\n
   uniform mediump mat4 uProjection;\n
 
   varying mediump vec2 vTexCoord;\n
-  \n
+
   //Visual size and offset
   uniform mediump vec2 offset;\n
   uniform mediump vec2 size;\n
@@ -124,18 +130,34 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 );
 
 const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
-    varying mediump vec2 vTexCoord;\n
-    uniform sampler2D sTexture;\n
-    uniform mediump vec4 uAtlasRect;\n
-    uniform lowp vec4 uColor;\n
-    uniform lowp vec3 mixColor;\n
-    uniform lowp float opacity;\n
-    \n
-    void main()\n
-    {\n
-      mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-      gl_FragColor = texture2D( sTexture, texCoord ) * uColor * vec4( mixColor, opacity );\n
-    }\n
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform sampler2D sStyle;\n
+  uniform sampler2D sMask;\n
+  uniform lowp float uHasMultipleTextColors;\n
+  uniform lowp vec4 uTextColorAnimatable;\n
+  uniform mediump vec4 uAtlasRect;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
+    mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
+    mediump vec4 styleTexture = texture2D( sStyle, texCoord );\n
+    mediump vec4 maskTexture = texture2D( sMask, texCoord );\n
+
+    // Set the color of non-transparent pixel in text to what it is animated to.
+    // Markup text with multiple text colors are not animated (but can be supported later on if required).
+    // Emoji color are not animated.
+    mediump vec4 textColor = textTexture * textTexture.a;\n
+    mediump float vstep = step( 0.0001, textColor.a );\n
+    textColor.rgb = mix( textColor.rgb, uTextColorAnimatable.rgb, vstep * maskTexture.a * ( 1.0 - uHasMultipleTextColors ) );\n
+
+    // Draw the text as overlay above the style
+    gl_FragColor = ( textColor + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, opacity );\n
+  }\n
 );
 
 /**
@@ -187,6 +209,14 @@ Dali::Property::Index StringKeyToIndexKey( const std::string& stringKey )
   else if( stringKey == ENABLE_MARKUP_PROPERTY )
   {
     result = Toolkit::TextVisual::Property::ENABLE_MARKUP;
+  }
+  else if( stringKey == SHADOW_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::SHADOW;
+  }
+  else if( stringKey == UNDERLINE_PROPERTY )
+  {
+    result = Toolkit::TextVisual::Property::UNDERLINE;
   }
 
   return result;
@@ -259,6 +289,12 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::TextVisual::Property::TEXT_COLOR, mController->GetDefaultColor() );
 
   map.Insert( Toolkit::TextVisual::Property::ENABLE_MARKUP, mController->IsMarkupProcessorEnabled() );
+
+  GetShadowProperties( mController, value, Text::EffectStyle::DEFAULT );
+  map.Insert( Toolkit::TextVisual::Property::SHADOW, value );
+
+  GetUnderlineProperties( mController, value, Text::EffectStyle::DEFAULT );
+  map.Insert( Toolkit::TextVisual::Property::UNDERLINE, value );
 }
 
 void TextVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -274,7 +310,9 @@ void TextVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 TextVisual::TextVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache ),
   mController( Text::Controller::New() ),
-  mTypesetter( Text::Typesetter::New( mController->GetTextModel() ) )
+  mTypesetter( Text::Typesetter::New( mController->GetTextModel() ) ),
+  mAnimatableTextColorPropertyIndex( Property::INVALID_INDEX ),
+  mRendererUpdateNeeded( false )
 {
 }
 
@@ -326,7 +364,24 @@ void TextVisual::DoSetOnStage( Actor& actor )
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT );
 
-  UpdateRenderer( true ); // Renderer needs textures and to be added to control
+  const Vector4& defaultColor = mController->GetTextModel()->GetDefaultColor();
+  Dali::Property::Index shaderTextColorIndex = mImpl->mRenderer.RegisterProperty( "uTextColorAnimatable", defaultColor );
+
+  if ( mAnimatableTextColorPropertyIndex != Property::INVALID_INDEX )
+  {
+    // Create constraint for the animatable text's color Property with uTextColorAnimatable in the renderer.
+    if( shaderTextColorIndex != Property::INVALID_INDEX )
+    {
+      Constraint constraint = Constraint::New<Vector4>( mImpl->mRenderer, shaderTextColorIndex, EqualToConstraint() );
+      constraint.AddSource( Source( actor, mAnimatableTextColorPropertyIndex ) );
+      constraint.Apply();
+    }
+  }
+
+  // Renderer needs textures and to be added to control
+  mRendererUpdateNeeded = true;
+
+  UpdateRenderer();
 }
 
 void TextVisual::DoSetOffStage( Actor& actor )
@@ -348,7 +403,7 @@ void TextVisual::DoSetOffStage( Actor& actor )
 
 void TextVisual::OnSetTransform()
 {
-  UpdateRenderer( false );
+  UpdateRenderer();
 }
 
 void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Property::Value& propertyValue )
@@ -423,10 +478,20 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
       }
       break;
     }
+    case Toolkit::TextVisual::Property::SHADOW:
+    {
+      SetShadowProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
+      break;
+    }
+    case Toolkit::TextVisual::Property::UNDERLINE:
+    {
+      SetUnderlineProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
+      break;
+    }
   }
 }
 
-void TextVisual::UpdateRenderer( bool initializeRendererAndTexture )
+void TextVisual::UpdateRenderer()
 {
   Actor control = mControl.GetHandle();
   if( !control )
@@ -463,8 +528,11 @@ void TextVisual::UpdateRenderer( bool initializeRendererAndTexture )
 
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout( relayoutSize );
 
-  if( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) || initializeRendererAndTexture )
+  if( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType )
+   || mRendererUpdateNeeded )
   {
+    mRendererUpdateNeeded = false;
+
     // Removes the texture set.
     RemoveTextureSet();
 
@@ -477,11 +545,10 @@ void TextVisual::UpdateRenderer( bool initializeRendererAndTexture )
     if( ( relayoutSize.width > Math::MACHINE_EPSILON_1000 ) &&
         ( relayoutSize.height > Math::MACHINE_EPSILON_1000 ) )
     {
-      PixelData data = mTypesetter->Render( relayoutSize );
-
       Vector4 atlasRect = FULL_TEXTURE_RECT;
 
-      // Texture set not retrieved from Atlas Manager whilst pixel offset visible.
+      // Create a texture for the text without any styles
+      PixelData data = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_NO_STYLES );
 
       // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
       // In that case, create a texture. TODO: should tile the text.
@@ -496,19 +563,50 @@ void TextVisual::UpdateRenderer( bool initializeRendererAndTexture )
       TextureSet textureSet = TextureSet::New();
       textureSet.SetTexture( 0u, texture );
 
+      // Create a texture for all the text styles (without the text itself)
+      PixelData styleData = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_NO_TEXT );
+
+      Texture styleTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                           styleData.GetPixelFormat(),
+                                           styleData.GetWidth(),
+                                           styleData.GetHeight() );
+
+      styleTexture.Upload( styleData );
+
+      textureSet.SetTexture( 1u, styleTexture );
+
+      // Create a texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
+      PixelData maskData = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_MASK );
+
+      Texture maskTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                          styleData.GetPixelFormat(),
+                                          styleData.GetWidth(),
+                                          styleData.GetHeight() );
+
+      maskTexture.Upload( maskData );
+
+      textureSet.SetTexture( 2u, maskTexture );
+
+      // Filter mode needs to be set to linear to produce better quality while scaling.
+      Sampler sampler = Sampler::New();
+      sampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
+      textureSet.SetSampler( 0u, sampler );
+      textureSet.SetSampler( 1u, sampler );
+      textureSet.SetSampler( 2u, sampler );
+
+      mImpl->mRenderer.SetTextures( textureSet );
+
       mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
       mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
 
+      // Check whether it is a markup text with multiple text colors
+      const Vector4* const colorsBuffer = mController->GetTextModel()->GetColors();
+      bool hasMultipleTextColors = ( NULL != colorsBuffer );
+      mImpl->mRenderer.RegisterProperty( "uHasMultipleTextColors", static_cast<float>( hasMultipleTextColors ) );
+
       //Register transform properties
       mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
-
-      // Filter mode needs to be set to nearest to avoid blurry text.
-      Sampler sampler = Sampler::New();
-      sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
-      textureSet.SetSampler( 0u, sampler );
-
-      mImpl->mRenderer.SetTextures( textureSet );
 
       control.AddRenderer( mImpl->mRenderer );
 

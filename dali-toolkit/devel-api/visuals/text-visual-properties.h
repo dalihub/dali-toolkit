@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,18 @@ enum
    * @details name "enableMarkup", type BOOLEAN
    */
   ENABLE_MARKUP,
+
+  /**
+   * @brief The shadow parameters.
+   * @details name "shadow", type MAP.
+   */
+  SHADOW,
+
+  /**
+   * @brief The default underline parameters.
+   * @details name "underline", type MAP.
+   */
+  UNDERLINE,
 };
 
 } // namespace Property
