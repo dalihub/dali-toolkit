@@ -49,6 +49,8 @@ void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "Added glyph, font: %d index: %d\n", glyph.fontId, glyph.index );
 
+  // If glyph added to an existing or new atlas then a new glyph record is required.
+  // Check if an existing atlas will fit the image, create a new one if required.
   if ( mAtlasManager.Add( bitmap, slot ) )
   {
     // A new atlas was created so set the texture set details for the atlas

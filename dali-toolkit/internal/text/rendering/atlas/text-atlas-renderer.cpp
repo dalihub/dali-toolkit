@@ -315,25 +315,28 @@ struct AtlasRenderer::Impl
           lastUnderlinedFontId = glyph.fontId;
         } // underline
 
-        if( !mGlyphManager.IsCached( glyph.fontId, glyph.index, slot ) )
+        bool glyphNotCached = !mGlyphManager.IsCached( glyph.fontId, glyph.index, slot );  // Check FontGlyphRecord vector for entry with glyph index and fontId
+
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "AddGlyphs fontID[%u] glyphIndex[%u] [%s]\n", glyph.fontId, glyph.index, (glyphNotCached)?"not cached":"cached" );
+
+        if( glyphNotCached )
         {
-          // Select correct size for new atlas if needed....?
-          if( lastFontId != glyph.fontId )
+          MaxBlockSize& blockSize = mBlockSizes[currentBlockSize];
+
+          if ( lastFontId != glyph.fontId )
           {
             uint32_t index = 0u;
+            // Looks through all stored block sizes until finds the one which mataches required glyph font it.  Ensures new atlas block size will match existing for same font id.
+            // CalculateBlocksSize() above ensures a block size entry exists.
             for( std::vector<MaxBlockSize>::const_iterator it = mBlockSizes.begin(),
                    endIt = mBlockSizes.end();
                  it != endIt;
                  ++it, ++index )
             {
-              const MaxBlockSize& blockSize = *it;
-              if( blockSize.mFontId == glyph.fontId )
+              const MaxBlockSize& blockSizeEntry = *it;
+              if( blockSizeEntry.mFontId == glyph.fontId )
               {
-                currentBlockSize = index;
-                mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
-                                               DEFAULT_ATLAS_HEIGHT,
-                                               blockSize.mNeededBlockWidth,
-                                               blockSize.mNeededBlockHeight );
+                blockSize = mBlockSizes[index];
               }
             }
           }
@@ -363,31 +366,27 @@ struct AtlasRenderer::Impl
 
           if( bitmap )
           {
-            MaxBlockSize& blockSize = mBlockSizes[currentBlockSize];
-
             // Ensure that the next image will fit into the current block size
-            bool setSize = false;
             if( bitmap.GetWidth() > blockSize.mNeededBlockWidth )
             {
-              setSize = true;
               blockSize.mNeededBlockWidth = bitmap.GetWidth();
             }
+
             if( bitmap.GetHeight() > blockSize.mNeededBlockHeight )
             {
-              setSize = true;
               blockSize.mNeededBlockHeight = bitmap.GetHeight();
             }
 
-            if( setSize )
-            {
-              mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
-                                             DEFAULT_ATLAS_HEIGHT,
-                                             blockSize.mNeededBlockWidth,
-                                             blockSize.mNeededBlockHeight );
-            }
+            // If CheckAtlas in AtlasManager::Add can't fit the bitmap in the current atlas it will create a new atlas
+
+            // Setting the block size and size of new atlas does not mean a new one will be created. An existing atlas may still surffice.
+            mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
+                                           DEFAULT_ATLAS_HEIGHT,
+                                           blockSize.mNeededBlockWidth,
+                                           blockSize.mNeededBlockHeight );
 
             // Locate a new slot for our glyph
-            mGlyphManager.Add( glyph, bitmap, slot );
+            mGlyphManager.Add( glyph, bitmap, slot ); // slot will be 0 is glyph not added
           }
         }
         else
@@ -399,40 +398,44 @@ struct AtlasRenderer::Impl
         // Move the origin (0,0) of the mesh to the center of the actor
         const Vector2 position = *( positionsBuffer + i ) - halfTextSize - lineOffsetPosition;
 
-        // Generate mesh data for this quad, plugging in our supplied position
-        AtlasManager::Mesh2D newMesh;
-        mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
-        textCacheEntry.mFontId = glyph.fontId;
-        textCacheEntry.mImageId = slot.mImageId;
-        textCacheEntry.mIndex = glyph.index;
-        newTextCache.PushBack( textCacheEntry );
-
-        AtlasManager::Vertex2D* verticesBuffer = newMesh.mVertices.Begin();
-
-        // Get the color of the character.
-        const ColorIndex colorIndex = useDefaultColor ? 0u : *( colorIndicesBuffer + i );
-        const Vector4& color = ( useDefaultColor || ( 0u == colorIndex ) ) ? defaultColor : *( colorsBuffer + colorIndex - 1u );
-
-        for( unsigned int index = 0u, size = newMesh.mVertices.Count();
-             index < size;
-             ++index )
+        if ( 0u != slot.mImageId ) // invalid slot id, glyph has failed to be added to atlas
         {
-          AtlasManager::Vertex2D& vertex = *( verticesBuffer + index );
+          // Generate mesh data for this quad, plugging in our supplied position
+          AtlasManager::Mesh2D newMesh;
+          mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
+          textCacheEntry.mFontId = glyph.fontId;
+          textCacheEntry.mImageId = slot.mImageId;
+          textCacheEntry.mIndex = glyph.index;
+          newTextCache.PushBack( textCacheEntry );
 
-          // Set the color of the vertex.
-          vertex.mColor = color;
+          AtlasManager::Vertex2D* verticesBuffer = newMesh.mVertices.Begin();
+
+          // Get the color of the character.
+          const ColorIndex colorIndex = useDefaultColor ? 0u : *( colorIndicesBuffer + i );
+          const Vector4& color = ( useDefaultColor || ( 0u == colorIndex ) ) ? defaultColor : *( colorsBuffer + colorIndex - 1u );
+
+          for( unsigned int index = 0u, size = newMesh.mVertices.Count();
+               index < size;
+               ++index )
+          {
+            AtlasManager::Vertex2D& vertex = *( verticesBuffer + index );
+
+            // Set the color of the vertex.
+            vertex.mColor = color;
+          }
+
+          // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
+          StitchTextMesh( meshContainer,
+                          newMesh,
+                          extents,
+                          position.y + glyph.yBearing,
+                          underlineGlyph,
+                          currentUnderlinePosition,
+                          currentUnderlineThickness,
+                          slot );
+
+          lastFontId = glyph.fontId; // Prevents searching for existing blocksizes when string of the same fontId.
         }
-
-        // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
-        StitchTextMesh( meshContainer,
-                        newMesh,
-                        extents,
-                        position.y + glyph.yBearing,
-                        underlineGlyph,
-                        currentUnderlinePosition,
-                        currentUnderlineThickness,
-                        slot );
-        lastFontId = glyph.fontId;
       }
     } // glyphs
 
@@ -737,8 +740,9 @@ struct AtlasRenderer::Impl
            blockIt != blockEndIt;
            ++blockIt )
       {
-        if( (*blockIt).mFontId == fontId )
+        if( (*blockIt).mFontId == fontId )  // Different size fonts will have a different fontId
         {
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Text::AtlasRenderer::CalculateBlocksSize match found fontID(%u) glyphIndex(%u)\n", fontId, (*glyphIt).index );
           foundFont = true;
           break;
         }
@@ -753,7 +757,7 @@ struct AtlasRenderer::Impl
         maxBlockSize.mNeededBlockWidth = static_cast< uint32_t >( fontMetrics.height );
         maxBlockSize.mNeededBlockHeight = maxBlockSize.mNeededBlockWidth;
         maxBlockSize.mFontId = fontId;
-
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Text::AtlasRenderer::CalculateBlocksSize New font with no matched blocksize, setting blocksize[%u]\n", maxBlockSize.mNeededBlockWidth );
         mBlockSizes.push_back( maxBlockSize );
       }
     }

@@ -151,10 +151,26 @@ void TypesetGlyph( GlyphData& data,
       {
         // Update the alpha channel.
         const uint8_t alpha = *( data.glyphBitmap.buffer + glyphBufferOffset + index );
-        *( packedColorBuffer + 3u ) = static_cast<uint8_t>( color->a * static_cast<float>( alpha ) );
 
-        // Set the color into the final pixel buffer.
-        *( bitmapBuffer + verticalOffset + xOffsetIndex ) = packedColor;
+        // Copy non-transparent pixels only
+        if ( alpha > 0u )
+        {
+          // Check alpha of overlapped pixels
+          uint32_t& currentColor = *( bitmapBuffer + verticalOffset + xOffsetIndex );
+          uint8_t* packedCurrentColorBuffer = reinterpret_cast<uint8_t*>( &currentColor );
+
+          uint8_t currentAlpha = *( packedCurrentColorBuffer + 3u );
+          uint8_t newAlpha = static_cast<uint8_t>( color->a * static_cast<float>( alpha ) );
+
+          // For any pixel overlapped with the pixel in previous glyphs, make sure we don't
+          // overwrite a previous bigger alpha with a smaller alpha (in order to avoid
+          // semi-transparent gaps between joint glyphs with overlapped pixels, which could
+          // happen, for example, in the RTL text when we copy glyphs from right to left).
+          *( packedColorBuffer + 3u ) = std::max( currentAlpha, newAlpha );
+
+          // Set the color into the final pixel buffer.
+          currentColor = packedColor;
+        }
       }
     }
   }
