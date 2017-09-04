@@ -369,6 +369,18 @@ public: // Configure the text controller.
   bool IsTextElideEnabled() const;
 
   /**
+   * @brief Enable or disable the placeholder text elide.
+   * @param enabled Whether to enable the placeholder text elide.
+   */
+  void SetPlaceholderTextElideEnabled( bool enabled );
+
+  /**
+   * @brief Whether the placeholder text elide property is enabled.
+   * @return True if the placeholder text elide property is enabled, false otherwise.
+   */
+  bool IsPlaceholderTextElideEnabled() const;
+
+  /**
    * @brief Enable or disable the text selection.
    * @param[in] enabled Whether to enable the text selection.
    */
