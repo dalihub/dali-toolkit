@@ -18,19 +18,23 @@
  */
 
 // EXTERNAL INCLUDES
+#include <deque>
+#include <functional>
 #include <string>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
-#include <deque>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
 #include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 #include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
+#include <dali-toolkit/internal/helpers/round-robin-container-view.h>
+#include <dali-toolkit/internal/image-loader/async-image-loader-impl.h>
 
 
 namespace Dali
@@ -485,18 +489,75 @@ private:
     const bool useAtlas,
     TextureId maskTextureId );
 
+private:
+
+  /**
+   * @brief Helper class to keep the relation between AsyncImageLoader and corresponding LoadingInfo container
+   */
+  class AsyncLoadingHelper : public ConnectionTracker
+  {
+  public:
+    /**
+     * @brief Create an AsyncLoadingHelper.
+     * @param[in] textureManager Reference to the texture manager
+     */
+    AsyncLoadingHelper(TextureManager& textureManager);
+
+    /**
+     * @brief Load a new texture.
+     * @param[in] textureId             TextureId to reference the texture that will be loaded
+     * @param[in] url                   The URL of the image to load
+     * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
+     * @param[in] fittingMode           The FittingMode to use
+     * @param[in] samplingMode          The SamplingMode to use
+     * @param[in] orientationCorrection Whether to use image metadata to rotate or flip the image, e.g., from portrait to landscape
+     */
+    void Load(TextureId textureId,
+              const VisualUrl& url,
+              ImageDimensions desiredSize,
+              FittingMode::Type fittingMode,
+              SamplingMode::Type samplingMode,
+              bool orientationCorrection);
+
+  public:
+    AsyncLoadingHelper(const AsyncLoadingHelper&) = delete;
+    AsyncLoadingHelper& operator=(const AsyncLoadingHelper&) = delete;
+
+    AsyncLoadingHelper(AsyncLoadingHelper&& rhs);
+    AsyncLoadingHelper& operator=(AsyncLoadingHelper&&rhs) = delete;
+
+  private:
+    /**
+     * @brief Main constructor that used by all other constructors
+     */
+    AsyncLoadingHelper(Toolkit::AsyncImageLoader loader,
+                       TextureManager& textureManager,
+                       AsyncLoadingInfoContainerType&& loadingInfoContainer);
+
+    /**
+     * @brief Callback to be called when texture loading is complete, it passes the pixel buffer on to texture manager.
+     * @param[in] id          Loader id
+     * @param[in] pixelBuffer Image data
+     */
+    void AsyncLoadComplete(uint32_t id, Devel::PixelBuffer pixelBuffer);
+
+  private:
+    Toolkit::AsyncImageLoader     mLoader;
+    TextureManager&               mTextureManager;
+    AsyncLoadingInfoContainerType mLoadingInfoContainer;
+  };
 
 private:
 
   /**
-   * Undefined copy constructor.
+   * Deleted copy constructor.
    */
-  TextureManager( const TextureManager& );
+  TextureManager( const TextureManager& ) = delete;
 
   /**
-   * Undefined assignment operator.
+   * Deleted assignment operator.
    */
-  TextureManager& operator=( const TextureManager& rhs );
+  TextureManager& operator=( const TextureManager& rhs ) = delete;
 
   /**
    * This is called by the TextureManagerUploadObserver when an observer is destroyed.
@@ -507,14 +568,12 @@ private:
 
 private:  // Member Variables:
 
-  AsyncLoadingInfoContainerType         mAsyncLocalLoadingInfoContainer;     ///< Used to manage Asynchronous loads in progress
-  AsyncLoadingInfoContainerType         mAsyncRemoteLoadingInfoContainer;     ///< Used to manage Asynchronous loads in progress
-  AtlasInfoContainerType                mAtlasContainer;                ///< Used to manage Atlas creation and destruction
-  TextureInfoContainerType              mTextureInfoContainer;          ///< Used to manage the life-cycle and caching of Textures
-  Toolkit::AsyncImageLoader             mAsyncLocalLoader;              ///< The Asynchronous image loader used to provide all local async loads
-  Toolkit::AsyncImageLoader             mAsyncRemoteLoader;             ///< The Asynchronous image loader used to provide all remote async loads
-  TextureId                             mCurrentTextureId;              ///< The current value used for the unique Texture Id generation
+  AtlasInfoContainerType        mAtlasContainer;                  ///< Used to manage Atlas creation and destruction
+  TextureInfoContainerType      mTextureInfoContainer;            ///< Used to manage the life-cycle and caching of Textures
+  TextureId                     mCurrentTextureId;                ///< The current value used for the unique Texture Id generation
 
+  RoundRobinContainerView<AsyncLoadingHelper> mAsyncLocalLoaders;  ///< The Asynchronous image loaders used to provide all local async loads
+  RoundRobinContainerView<AsyncLoadingHelper> mAsyncRemoteLoaders; ///< The Asynchronous image loaders used to provide all remote async loads
 };
 
 
