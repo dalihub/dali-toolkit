@@ -56,6 +56,9 @@ enum
    * @brief The URL of the image.
    * @details Name "url", type Property::STRING or Property::ARRAY of Property::STRING
    * @note The array form is used for generating animated image visuals.
+   * @note The number of threads used for local and remote image loading can be controlled by the
+   *       environment variables DALI_TEXTURE_LOCAL_THREADS and DALI_TEXTURE_REMOTE_THREADS respectively.
+   *       The default values are 4 threads for local image loading and 8 threads for remote image loading.
    * @SINCE_1_1.45
    * @note Mandatory.
    */
