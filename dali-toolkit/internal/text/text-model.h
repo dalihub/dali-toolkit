@@ -100,6 +100,16 @@ public:
   virtual const LineRun* const GetLines() const;
 
   /**
+   * @copydoc ModelInterface::GetNumberOfScripts()
+   */
+  virtual Length GetNumberOfScripts() const;
+
+  /**
+   * @copydoc ModelInterface::GetScriptRuns()
+   */
+  virtual const ScriptRun* const GetScriptRuns() const;
+
+  /**
    * @copydoc ModelInterface::GetNumberOfGlyphs()
    */
   virtual Length GetNumberOfGlyphs() const;

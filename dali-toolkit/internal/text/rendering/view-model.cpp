@@ -86,6 +86,16 @@ const LineRun* const ViewModel::GetLines() const
   return mModel->GetLines();
 }
 
+Length ViewModel::GetNumberOfScripts() const
+{
+  return mModel->GetNumberOfScripts();
+}
+
+const ScriptRun* const ViewModel::GetScriptRuns() const
+{
+  return mModel->GetScriptRuns();
+}
+
 Length ViewModel::GetNumberOfGlyphs() const
 {
   if( mIsTextElided && mModel->IsTextElideEnabled() )

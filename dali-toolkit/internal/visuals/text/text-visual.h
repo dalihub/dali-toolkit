@@ -192,6 +192,13 @@ private:
   void RemoveTextureSet();
 
   /**
+   * Get the text rendering shader.
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] isRgbaTexture Whether the texture is in RGBA format.
+   */
+  Shader GetTextShader( VisualFactoryCache& factoryCache, bool isRgbaTexture );
+
+  /**
    * @brief Retrieve the text's controller.
    * @param[in] visual The text visual.
    * @return The text controller

@@ -72,6 +72,16 @@ const LineRun* const Model::GetLines() const
   return mVisualModel->mLines.Begin();
 }
 
+Length Model::GetNumberOfScripts() const
+{
+  return mLogicalModel->mScriptRuns.Count();
+}
+
+const ScriptRun* const Model::GetScriptRuns() const
+{
+  return mLogicalModel->mScriptRuns.Begin();
+}
+
 Length Model::GetNumberOfGlyphs() const
 {
   return mVisualModel->mGlyphs.Count();
