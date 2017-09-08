@@ -948,7 +948,7 @@ void TextLabel::SetUpAutoScrolling()
 
   // Create a texture of the text for scrolling
   Text::TypesetterPtr typesetter = Text::Typesetter::New( mController->GetTextModel() );
-  PixelData data = typesetter->Render( textNaturalSize, Text::Typesetter::RENDER_TEXT_AND_STYLES, true ); // ignore the horizontal alignment
+  PixelData data = typesetter->Render( textNaturalSize, Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888 ); // ignore the horizontal alignment
   Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
                                   data.GetPixelFormat(),
                                   data.GetWidth(),

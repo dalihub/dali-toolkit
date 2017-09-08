@@ -135,8 +135,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "cellPadding",    VECTOR2, CELL_
 DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layoutRows",     MAP,     LAYOUT_ROWS    )
 DALI_PROPERTY_REGISTRATION( Toolkit, TableView, "layoutColumns",  MAP,     LAYOUT_COLUMNS )
 DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "cellIndex",                VECTOR2, CELL_INDEX                )
-DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "rowSpan",                  FLOAT,   ROW_SPAN                  )
-DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "columnSpan",               FLOAT,   COLUMN_SPAN               )
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "rowSpan",                  INTEGER, ROW_SPAN                  )
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "columnSpan",               INTEGER, COLUMN_SPAN               )
 DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "cellHorizontalAlignment",  STRING,  CELL_HORIZONTAL_ALIGNMENT )
 DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, TableView, "cellVerticalAlignment",    STRING,  CELL_VERTICAL_ALIGNMENT   )
 
@@ -996,12 +996,12 @@ void TableView::OnChildAdd( Actor& child )
     Toolkit::TableView::CellPosition cellPosition;
     if( child.GetPropertyType( Toolkit::TableView::ChildProperty::ROW_SPAN ) != Property::NONE )
     {
-      cellPosition.rowSpan = static_cast<unsigned int>( child.GetProperty( Toolkit::TableView::ChildProperty::ROW_SPAN ).Get<float>() );
+      cellPosition.rowSpan = child.GetProperty( Toolkit::TableView::ChildProperty::ROW_SPAN ).Get< int >();
     }
 
     if( child.GetPropertyType( Toolkit::TableView::ChildProperty::COLUMN_SPAN ) != Property::NONE )
     {
-      cellPosition.columnSpan = static_cast<unsigned int>( child.GetProperty( Toolkit::TableView::ChildProperty::COLUMN_SPAN ).Get<float>() );
+      cellPosition.columnSpan = child.GetProperty( Toolkit::TableView::ChildProperty::COLUMN_SPAN ).Get< int >();
     }
 
     if( child.GetPropertyType( Toolkit::TableView::ChildProperty::CELL_INDEX ) != Property::NONE )

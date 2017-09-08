@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/constraints.h>
+#include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 
 // INTERNAL HEADER
 #include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
@@ -31,6 +32,7 @@
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
+#include <dali-toolkit/internal/text/script-run.h>
 
 namespace Dali
 {
@@ -129,7 +131,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   }\n
 );
 
-const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
+const char* FRAGMENT_SHADER_ATLAS_CLAMP_RGBA = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform sampler2D sStyle;\n
@@ -157,6 +159,25 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
 
     // Draw the text as overlay above the style
     gl_FragColor = ( textColor + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, opacity );\n
+  }\n
+);
+
+const char* FRAGMENT_SHADER_ATLAS_CLAMP_L8 = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform lowp vec4 uTextColorAnimatable;\n
+  uniform mediump vec4 uAtlasRect;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
+    mediump float textTexture = texture2D( sTexture, texCoord ).r;\n
+
+    // Set the color of the text to what it is animated to.
+    gl_FragColor = uTextColorAnimatable * textTexture * uColor * vec4( mixColor, opacity );\n
   }\n
 );
 
@@ -351,15 +372,7 @@ void TextVisual::DoSetOnStage( Actor& actor )
   mControl = actor;
 
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-
-  Shader shader = mFactoryCache.GetShader( VisualFactoryCache::TEXT_SHADER );
-  if( ! shader )
-  {
-    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
-    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-
-    mFactoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER, shader );
-  }
+  Shader shader = GetTextShader(mFactoryCache, true);
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT );
@@ -545,65 +558,129 @@ void TextVisual::UpdateRenderer()
     if( ( relayoutSize.width > Math::MACHINE_EPSILON_1000 ) &&
         ( relayoutSize.height > Math::MACHINE_EPSILON_1000 ) )
     {
-      Vector4 atlasRect = FULL_TEXTURE_RECT;
-
-      // Create a texture for the text without any styles
-      PixelData data = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_NO_STYLES );
-
-      // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
-      // In that case, create a texture. TODO: should tile the text.
-
-      Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                      data.GetPixelFormat(),
-                                      data.GetWidth(),
-                                      data.GetHeight() );
-
-      texture.Upload( data );
-
-      TextureSet textureSet = TextureSet::New();
-      textureSet.SetTexture( 0u, texture );
-
-      // Create a texture for all the text styles (without the text itself)
-      PixelData styleData = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_NO_TEXT );
-
-      Texture styleTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                           styleData.GetPixelFormat(),
-                                           styleData.GetWidth(),
-                                           styleData.GetHeight() );
-
-      styleTexture.Upload( styleData );
-
-      textureSet.SetTexture( 1u, styleTexture );
-
-      // Create a texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
-      PixelData maskData = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_MASK );
-
-      Texture maskTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                          styleData.GetPixelFormat(),
-                                          styleData.GetWidth(),
-                                          styleData.GetHeight() );
-
-      maskTexture.Upload( maskData );
-
-      textureSet.SetTexture( 2u, maskTexture );
-
-      // Filter mode needs to be set to linear to produce better quality while scaling.
-      Sampler sampler = Sampler::New();
-      sampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
-      textureSet.SetSampler( 0u, sampler );
-      textureSet.SetSampler( 1u, sampler );
-      textureSet.SetSampler( 2u, sampler );
-
-      mImpl->mRenderer.SetTextures( textureSet );
-
-      mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-
-      mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
-
       // Check whether it is a markup text with multiple text colors
       const Vector4* const colorsBuffer = mController->GetTextModel()->GetColors();
       bool hasMultipleTextColors = ( NULL != colorsBuffer );
+
+      // Check whether the text contains any emoji
+      bool containsEmoji = false;
+
+      Text::ScriptRunIndex numberOfScripts = mController->GetTextModel()->GetNumberOfScripts();
+      const Text::ScriptRun* scripts = mController->GetTextModel()->GetScriptRuns();
+      for ( Text::ScriptRunIndex scriptIndex = 0u; scriptIndex < numberOfScripts; scriptIndex++ )
+      {
+        const Text::ScriptRun& scriptRun = *( scripts + scriptIndex );
+        if( TextAbstraction::EMOJI == scriptRun.script )
+        {
+          containsEmoji = true;
+          break;
+        }
+      }
+
+      // Check whether the text contains any style colors (e.g. underline color, shadow color, etc.)
+      bool shadowEnabled = false;
+      const Vector2& shadowOffset = mController->GetTextModel()->GetShadowOffset();
+      if ( fabsf( shadowOffset.x ) > Math::MACHINE_EPSILON_1 || fabsf( shadowOffset.y ) > Math::MACHINE_EPSILON_1 )
+      {
+        shadowEnabled = true;
+      }
+
+      const bool underlineEnabled = mController->GetTextModel()->IsUnderlineEnabled();
+
+      if ( hasMultipleTextColors || containsEmoji || shadowEnabled || underlineEnabled )
+      {
+        // Create RGBA textures if the text contains emojis or styles or multiple text colors
+
+        // Create a texture for the text without any styles
+        PixelData data = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_NO_STYLES );
+
+        // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
+        // In that case, create a texture. TODO: should tile the text.
+
+        Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                        data.GetPixelFormat(),
+                                        data.GetWidth(),
+                                        data.GetHeight() );
+
+        texture.Upload( data );
+
+        TextureSet textureSet = TextureSet::New();
+        textureSet.SetTexture( 0u, texture );
+
+        // Create a texture for all the text styles (without the text itself)
+        PixelData styleData = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_NO_TEXT );
+
+        Texture styleTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                             styleData.GetPixelFormat(),
+                                             styleData.GetWidth(),
+                                             styleData.GetHeight() );
+
+        styleTexture.Upload( styleData );
+
+        textureSet.SetTexture( 1u, styleTexture );
+
+        // Create a texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
+        PixelData maskData = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_MASK );
+
+        Texture maskTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                            styleData.GetPixelFormat(),
+                                            styleData.GetWidth(),
+                                            styleData.GetHeight() );
+
+        maskTexture.Upload( maskData );
+
+        textureSet.SetTexture( 2u, maskTexture );
+
+        // Filter mode needs to be set to nearest to produce better quality while static.
+        Sampler sampler = Sampler::New();
+        sampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
+        textureSet.SetSampler( 0u, sampler );
+        textureSet.SetSampler( 1u, sampler );
+        textureSet.SetSampler( 2u, sampler );
+
+        mImpl->mRenderer.SetTextures( textureSet );
+
+        Shader shader = GetTextShader(mFactoryCache, true); // RGBA shader
+        mImpl->mRenderer.SetShader(shader);
+      }
+      else
+      {
+        // Create L8 texture if the text contains only single text color with no emoji and no style
+
+        // Create a texture for the text without any styles
+        PixelData data = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_NO_STYLES, false, Pixel::L8 );
+
+        // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
+        // In that case, create a texture. TODO: should tile the text.
+
+        Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                        data.GetPixelFormat(),
+                                        data.GetWidth(),
+                                        data.GetHeight() );
+
+        texture.Upload( data );
+
+        TextureSet textureSet = TextureSet::New();
+        textureSet.SetTexture( 0u, texture );
+
+        // Filter mode needs to be set to nearest to produce better quality while static.
+        Sampler sampler = Sampler::New();
+        sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+        textureSet.SetSampler( 0u, sampler );
+
+        mImpl->mRenderer.SetTextures( textureSet );
+
+        Shader shader = GetTextShader(mFactoryCache, false); // L8 shader
+        mImpl->mRenderer.SetShader(shader);
+      }
+
+      mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
+
+      Vector4 atlasRect = FULL_TEXTURE_RECT;
+      mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
       mImpl->mRenderer.RegisterProperty( "uHasMultipleTextColors", static_cast<float>( hasMultipleTextColors ) );
+
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON);
 
       //Register transform properties
       mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
@@ -633,6 +710,33 @@ void TextVisual::RemoveTextureSet()
       mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
     }
   }
+}
+
+Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool isRgbaTexture )
+{
+  Shader shader;
+  if( isRgbaTexture )
+  {
+    shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_RGBA );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP_RGBA );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+      factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_RGBA, shader );
+    }
+  }
+  else
+  {
+    shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_L8 );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP_L8 );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+      factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_L8, shader );
+    }
+  }
+
+  return shader;
 }
 
 } // namespace Internal

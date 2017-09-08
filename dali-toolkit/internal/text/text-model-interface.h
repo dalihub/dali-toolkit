@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-alignment.h>
 #include <dali-toolkit/internal/text/line-run.h>
+#include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
@@ -102,6 +103,20 @@ public:
    * @return A pointer to the vector with the laid-out lines.
    */
   virtual const LineRun* const GetLines() const = 0;
+
+  /**
+   * @brief Retrieves the number of script runs.
+   *
+   * @return The number of script runs.
+   */
+  virtual Length GetNumberOfScripts() const = 0;
+
+  /**
+   * @brief Retrieves the script runs.
+   *
+   * @return A pointer to the vector with the runs of characters with the same script..
+   */
+  virtual const ScriptRun* const GetScriptRuns() const = 0;
 
   /**
    * @brief Retrieves the number of laid-out glyphs.
