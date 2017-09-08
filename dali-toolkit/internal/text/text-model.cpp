@@ -72,16 +72,6 @@ const LineRun* const Model::GetLines() const
   return mVisualModel->mLines.Begin();
 }
 
-Length Model::GetNumberOfScripts() const
-{
-  return mLogicalModel->mScriptRuns.Count();
-}
-
-const ScriptRun* const Model::GetScriptRuns() const
-{
-  return mLogicalModel->mScriptRuns.Begin();
-}
-
 Length Model::GetNumberOfGlyphs() const
 {
   return mVisualModel->mGlyphs.Count();
@@ -110,41 +100,6 @@ const ColorIndex* const Model::GetColorIndices() const
 const Vector4& Model::GetDefaultColor() const
 {
   return mVisualModel->mTextColor;
-}
-
-const Vector2& Model::GetShadowOffset() const
-{
-  return mVisualModel->mShadowOffset;
-}
-
-const Vector4& Model::GetShadowColor() const
-{
-  return mVisualModel->mShadowColor;
-}
-
-const Vector4& Model::GetUnderlineColor() const
-{
-  return mVisualModel->GetUnderlineColor();
-}
-
-bool Model::IsUnderlineEnabled() const
-{
-  return mVisualModel->IsUnderlineEnabled();
-}
-
-float Model::GetUnderlineHeight() const
-{
-  return mVisualModel->GetUnderlineHeight();
-}
-
-Length Model::GetNumberOfUnderlineRuns() const
-{
-  return mVisualModel->GetNumberOfUnderlineRuns();
-}
-
-void Model::GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const
-{
-  mVisualModel->GetUnderlineRuns( underlineRuns, index, numberOfRuns );
 }
 
 Model::Model()
