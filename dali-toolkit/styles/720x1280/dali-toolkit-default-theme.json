@@ -28,8 +28,7 @@
 {
   "config":
   {
-    "alwaysShowFocus":false,
-    "clearFocusOnEscape":true
+    "alwaysShowFocus":false
   },
   "styles":
   {

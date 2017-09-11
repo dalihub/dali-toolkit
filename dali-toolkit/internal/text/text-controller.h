@@ -1180,13 +1180,6 @@ public: // Text-input Event Queuing.
    */
   void PasteClipboardItemEvent();
 
-  /**
-   * @brief Return whether text control clear key input focus or not when escape key is pressed.
-   *
-   * @return Whether text control clear key input focus or not
-   */
-  bool IsClearFocusOnEscape();
-
 protected: // Inherit from Text::Decorator::ControllerInterface.
 
   /**
