@@ -1116,13 +1116,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       {
         if( impl.mController )
         {
-          const char* name = Scripting::GetEnumerationName< Layout::LineWrap::Mode >( impl.mController->GetLineWrapMode(),
-                                                                                                              LINE_WRAP_MODE_STRING_TABLE,
-                                                                                                              LINE_WRAP_MODE_STRING_TABLE_COUNT );
-          if( name )
-          {
-            value = std::string( name );
-          }
+          value = impl.mController->GetLineWrapMode();
         }
       }
     } //switch
