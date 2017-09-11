@@ -127,41 +127,6 @@ public:
   virtual const Vector4& GetDefaultColor() const;
 
   /**
-   * @copydoc ModelInterface::GetShadowOffset()
-   */
-  virtual const Vector2& GetShadowOffset() const;
-
-  /**
-   * @copydoc ModelInterface::GetShadowColor()
-   */
-  virtual const Vector4& GetShadowColor() const;
-
-  /**
-   * @copydoc ModelInterface::GetUnderlineColor()
-   */
-  virtual const Vector4& GetUnderlineColor() const;
-
-  /**
-   * @copydoc ModelInterface::IsUnderlineEnabled()
-   */
-  virtual bool IsUnderlineEnabled() const;
-
-  /**
-   * @copydoc ModelInterface::GetUnderlineHeight()
-   */
-  virtual float GetUnderlineHeight() const;
-
-  /**
-   * @copydoc ModelInterface::GetNumberOfUnderlineRuns()
-   */
-  virtual Length GetNumberOfUnderlineRuns() const;
-
-  /**
-   * @copydoc ModelInterface::GetUnderlineRuns()
-   */
-  virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const;
-
-  /**
    * @brief Does the text elide.
    *
    * It stores a copy of the visible glyphs and removes as many glyphs as needed

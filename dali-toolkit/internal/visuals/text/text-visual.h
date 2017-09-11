@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/object/base-object.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
@@ -83,35 +80,6 @@ public:
    * @param[in,out] propertyMap containing string keys or a mix of strings and indexes. Will be changed to index keys.
    */
   static void ConvertStringKeysToIndexKeys( Property::Map& propertyMap );
-
-  /**
-   * @brief Retrieve the text's controller.
-   * @param[in] visual The text visual.
-   * @return The text controller
-   */
-  static Text::ControllerPtr GetController( Toolkit::Visual::Base visual )
-  {
-    return GetVisualObject( visual ).mController;
-  };
-
-  /**
-   * @brief Set the index of the animatable text color property.
-   * @param[in] visual The text visual.
-   * @param[in] animatablePropertyIndex The index of the animatable property
-   */
-  static void SetAnimatableTextColorProperty( Toolkit::Visual::Base visual, Property::Index animatablePropertyIndex )
-  {
-    GetVisualObject( visual ).mAnimatableTextColorPropertyIndex = animatablePropertyIndex;
-  };
-
-  /**
-   * @brief Set the flag to trigger the textures to be initialized and renderer to be added to the control.
-   * @param[in] visual The text visual.
-   */
-  static void EnableRendererUpdate( Toolkit::Visual::Base visual )
-  {
-    GetVisualObject( visual ).mRendererUpdateNeeded = true;
-  };
 
 public: // from Visual::Base
 
@@ -183,30 +151,19 @@ private:
 
   /**
    * @brief Updates the text's renderer.
+   * @param[in] initializeRendererAndTexture Set flag to true to initialize textures and add renderer to control.
    */
-  void UpdateRenderer();
+  void UpdateRenderer( bool initializeRendererAndTexture );
 
   /**
    * @brief Removes the texture set from the renderer.
    */
   void RemoveTextureSet();
 
-  /**
-   * @brief Retrieve the text's controller.
-   * @param[in] visual The text visual.
-   * @return The text controller
-   */
-  static TextVisual& GetVisualObject( Toolkit::Visual::Base visual )
-  {
-    return static_cast<TextVisual&>( visual.GetBaseObject() );
-  };
-
 private:
-  Text::ControllerPtr mController;                        ///< The text's controller.
-  Text::TypesetterPtr mTypesetter;                        ///< The text's typesetter.
-  WeakHandle<Actor>   mControl;                           ///< The control where the renderer is added.
-  Property::Index     mAnimatableTextColorPropertyIndex;  ///< The index of animatable text color property registered by the control.
-  bool                mRendererUpdateNeeded:1;            ///< The flag to indicate whether the renderer needs to be updated.
+  Text::ControllerPtr mController; ///< The text's controller.
+  Text::TypesetterPtr mTypesetter; ///< The text's typesetter.
+  WeakHandle<Actor>   mControl;    ///< The control where the renderer is added.
 };
 
 } // namespace Internal

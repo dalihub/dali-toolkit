@@ -999,13 +999,6 @@ public: // Default style & Input style
    */
   const std::string& GetInputOutlineProperties() const;
 
-  /**
-   * @brief Set the control's interface.
-   *
-   * @param[in] controlInterface The control's interface.
-   */
-  void SetControlInterface( ControlInterface* controlInterface );
-
 public: // Queries & retrieves.
 
   /**
@@ -1179,6 +1172,13 @@ public: // Text-input Event Queuing.
    * @brief Event from Clipboard notifying an Item has been selected for pasting
    */
   void PasteClipboardItemEvent();
+
+  /**
+   * @brief Return true when text control should clear key input focus when escape key is pressed.
+   *
+   * @return Whether text control should clear key input focus or not when escape key is pressed.
+   */
+  bool ShouldClearFocusOnEscape() const;
 
 protected: // Inherit from Text::Decorator::ControllerInterface.
 

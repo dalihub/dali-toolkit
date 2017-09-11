@@ -390,11 +390,6 @@ float VisualModel::GetUnderlineHeight() const
   return mUnderlineHeight;
 }
 
-Length VisualModel::GetNumberOfUnderlineRuns() const
-{
-  return mUnderlineRuns.Count();
-}
-
 void VisualModel::ClearCaches()
 {
   mCachedLineIndex = 0u;

@@ -144,57 +144,6 @@ public:
    * @return The default color.
    */
   virtual const Vector4& GetDefaultColor() const = 0;
-
-  /**
-   * @brief Retrieves the shadow offset, 0 indicates no shadow.
-   *
-   * @return The shadow offset.
-   */
-  virtual const Vector2& GetShadowOffset() const = 0;
-
-  /**
-   * @brief Retrieves the shadow color.
-   *
-   * @return The shadow color.
-   */
-  virtual const Vector4& GetShadowColor() const = 0;
-
-  /**
-   * @brief Retrieves the underline color.
-   *
-   * @return The underline color.
-   */
-  virtual const Vector4& GetUnderlineColor() const = 0;
-
-  /**
-   * @brief Returns whether underline is enabled or not.
-   *
-   * @return The underline state.
-   */
-  virtual bool IsUnderlineEnabled() const = 0;
-
-  /**
-   * @brief Retrieves the underline height override
-   *
-   * @return Returns the override height for an underline, 0 indicates that adaptor will determine the height
-   */
-  virtual float GetUnderlineHeight() const = 0;
-
-  /**
-   * @brief Retrieves the number of underline runs.
-   *
-   * @return The number of underline runs.
-   */
-  virtual Length GetNumberOfUnderlineRuns() const = 0;
-
-  /**
-   * @brief Retrieves the underline runs.
-   *
-   * @param[out] underlineRuns Pointer to a buffer where the underline runs are copied.
-   * @param[in] index Index of the first underline run to be copied.
-   * @param[in] numberOfRuns Number of underline runs to be copied.
-   */
-  virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const = 0;
 };
 
 } // namespace Text

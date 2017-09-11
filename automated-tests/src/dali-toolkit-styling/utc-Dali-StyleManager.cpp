@@ -33,6 +33,10 @@
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
+#include <dali/integration-api/events/key-event-integ.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -1295,6 +1299,49 @@ int UtcDaliStyleManagerSetSubState02(void)
   DALI_TEST_CHECK( ! testVisual );
   testVisual = dummyImpl.GetVisual(DummyControl::Property::LABEL_VISUAL);
   DALI_TEST_CHECK( ! testVisual );
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerConfigSectionTest(void)
+{
+  tet_infoline("Test that the properties in config section are works" );
+
+  const char* defaultTheme =
+    "{\n"
+    "  \"config\":\n"
+    "  {\n"
+    "    \"alwaysShowFocus\":false,\n"
+    "    \"clearFocusOnEscape\":false\n"
+    "  },\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "  }\n"
+    "}\n";
+
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json", defaultTheme );
+
+  ToolkitTestApplication application;
+
+  Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+
+  Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
+  bool alwaysShowFocus = config["alwaysShowFocus"].Get<bool>();
+  DALI_TEST_CHECK( !alwaysShowFocus );
+  bool clearFocusOnEscape = config["clearFocusOnEscape"].Get<bool>();
+  DALI_TEST_CHECK( !clearFocusOnEscape );
+
+  // For coverage
+  Toolkit::TextEditor editor = Toolkit::TextEditor::New();
+  editor.SetKeyboardFocusable( true );
+  Stage::GetCurrent().Add( editor );
+
+  Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( editor );
+
+  application.ProcessEvent( Integration::KeyEvent( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

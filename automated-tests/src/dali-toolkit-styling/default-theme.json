@@ -1,7 +1,8 @@
 {
   "config":
   {
-    "alwaysShowFocus":false
+    "alwaysShowFocus":false,
+    "clearFocusOnEscape":true
   },
   "constants":
   {

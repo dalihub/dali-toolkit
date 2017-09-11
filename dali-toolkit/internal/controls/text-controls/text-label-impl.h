@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/object/property-map.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
@@ -29,8 +26,6 @@
 #include <dali-toolkit/internal/text/text-scroller-interface.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-scroller.h>
-#include <dali-toolkit/internal/visuals/text/text-visual.h>
-
 
 namespace Dali
 {
@@ -137,6 +132,14 @@ private:
   TextLabel(const TextLabel&);
   TextLabel& operator=(const TextLabel& rhs);
 
+  // Connection needed to re-render text, when a Text Label returns to the stage
+  void OnStageConnect( Dali::Actor actor );
+
+  /**
+   * @brief Render view, create and attach actor(s) to this Text Label
+   */
+  void RenderText();
+
   /**
    * @brief Set up Autoscrolling
    */
@@ -145,12 +148,11 @@ private:
 private: // Data
 
   Text::ControllerPtr mController;
+  Text::RendererPtr mRenderer;
   Text::TextScrollerPtr mTextScroller;
-
-  Toolkit::Visual::Base mVisual;
-
+  Actor mRenderableActor;
   int mRenderingBackend;
-  bool mTextUpdateNeeded:1;
+  bool mHasBeenStaged:1;
 };
 
 } // namespace Internal

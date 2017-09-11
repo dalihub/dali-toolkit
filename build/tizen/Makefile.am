@@ -28,6 +28,7 @@ endif
 SUBDIRS += docs
 
 pkgconfigdir = $(libdir)/pkgconfig
+
 pkgconfig_DATA = dali-toolkit.pc
 
 MAINTAINERCLEANFILES = \
@@ -56,8 +57,8 @@ rename_cov_data:
 	@test -z $(COVERAGE_DIR) || mkdir -p $(COVERAGE_DIR)
 	@rm -f $(COVERAGE_DIR)/*
 	@cp dali-toolkit/.libs/*.gcda dali-toolkit/.libs/*.gcno  $(COVERAGE_DIR)
-	@for i in `find $(COVERAGE_DIR) -name "libdali_toolkit_la-*.gcda" -o -name "libdali_toolkit_la-*.gcno"` ;\
-		do mv $$i `echo $$i | sed s/libdali_toolkit_la-//` ; echo $$i ; done
+	@for i in `find $(COVERAGE_DIR) -name "libdali_toolkit*_la-*.gcda" -o -name "libdali_toolkit*_la-*.gcno"` ;\
+		do mv $$i `echo $$i | sed s/libdali_toolkit*_la-//` ; echo $$i ; done
 
 cov_data: rename_cov_data
 	@cd $(COVERAGE_DIR) ; lcov $(LCOV_OPTS) --base-directory . --directory . -c -o dali.info

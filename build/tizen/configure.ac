@@ -28,7 +28,6 @@ LT_INIT
 DALI_TOOLKIT_VERSION=dali_version
 AC_SUBST(DALI_TOOLKIT_VERSION)
 
-PKG_CHECK_MODULES(DALICORE, dali-core)
 
 DALI_TOOLKIT_CFLAGS=-DPLATFORM_TIZEN
 
@@ -74,6 +73,25 @@ AC_ARG_ENABLE([csharp],
                 [Enable csharp plugin])],
               [enable_csharp=$enableval],
               [enable_csharp=automatic])
+
+AC_ARG_ENABLE([cxx03_abi],
+              [AC_HELP_STRING([--enable-cxx03-abi],
+                              [Specify abi for the build])],
+              [enable_cxx03_abi=$enableval],
+              [enable_cxx03_abi=no])
+
+AC_ARG_ENABLE([rename_so],
+              [AC_HELP_STRING([--enable-rename-so],
+                              [Specify whether so file is renamed or not])],
+              [enable_rename_so=$enableval],
+              [enable_rename_so=yes])
+
+AM_CONDITIONAL([ENABLE_CXX03_ABI], [test x$enable_cxx03_abi = xyes])
+AM_CONDITIONAL([ENABLE_RENAME_SO], [test x$enable_rename_so = xyes])
+
+if test "x$enable_cxx03_abi" = "xyes"; then
+  DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -D_GLIBCXX_USE_CXX11_ABI=0"
+fi
 
 if test "x$enable_debug" = "xyes"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDEBUG_ENABLED"
@@ -203,6 +221,12 @@ if test x$enable_csharp = xyes; then
   AC_SUBST(DALITOOLKIT_LIBS)
 fi
 
+if test "x$enable_cxx03_abi" = "xyes"; then
+PKG_CHECK_MODULES(DALICORE, dali-core-cxx03)
+else
+PKG_CHECK_MODULES(DALICORE, dali-core)
+fi
+
 #set a variable for the makefile to force compile the csharp plugin
 AM_CONDITIONAL([ENABLE_CSHARP_PLUGIN], [test x$build_csharp_plugin = xyes])
 AM_CONDITIONAL([ENABLE_RUBY_FLAG], [test x$build_ruby_flag = xyes])
@@ -212,12 +236,15 @@ AC_CONFIG_FILES([
  dali-toolkit/Makefile
  plugins/javascript/Makefile
  plugins/csharp/Makefile
- dali-toolkit.pc
  docs/Makefile
  docs/dali.doxy
  docs-internal/dali-internal.doxy
  ../../automated-tests/CMakeLists.txt
 ])
+
+if test "x$enable_cxx03_abi" = "xno"; then
+AC_CONFIG_FILES([dali-toolkit.pc])
+fi
 
 AC_OUTPUT
 
