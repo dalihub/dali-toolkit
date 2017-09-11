@@ -297,19 +297,19 @@ popd
 %preun resources_480x800
 pushd %{dali_toolkit_style_files}
 mv images ./480x800
-mv *.json ./480x800
+mv dali-toolkit-default-theme.json ./480x800
 popd
 
 %preun resources_720x1280
 pushd %{dali_toolkit_style_files}
 mv images ./720x1280
-mv *.json ./720x1280
+mv dali-toolkit-default-theme.json ./720x1280
 popd
 
 %preun resources_1920x1080
 pushd %{dali_toolkit_style_files}
 mv images ./1920x1080
-mv *.json ./1920x1080
+mv dali-toolkit-default-theme.json ./1920x1080
 popd
 
 ##############################
@@ -320,19 +320,31 @@ popd
 exit 0
 
 %postun resources_480x800
-pushd %{dali_toolkit_style_files}
-rm -rf *
-popd
+case "$1" in
+  0)
+    pushd %{dali_toolkit_style_files}
+    rm -rf *
+    popd
+  ;;
+esac
 
 %postun resources_720x1280
-pushd %{dali_toolkit_style_files}
-rm -rf *
-popd
+case "$1" in
+  0)
+    pushd %{dali_toolkit_style_files}
+    rm -rf *
+    popd
+  ;;
+esac
 
 %postun resources_1920x1080
-pushd %{dali_toolkit_style_files}
-rm -rf *
-popd
+case "$1" in
+  0)
+    pushd %{dali_toolkit_style_files}
+    rm -rf *
+    popd
+  ;;
+esac
 
 ##############################
 # Files in Binary Packages
