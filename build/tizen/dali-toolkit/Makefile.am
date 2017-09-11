@@ -155,6 +155,7 @@ develapitransitioneffectsdir =  $(develapidir)/transition-effects
 develapitoolbardir =            $(develapicontrolsdir)/tool-bar
 develapitooltipdir =            $(develapicontrolsdir)/tooltip
 develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
+develapiwebviewlitedir =        $(develapicontrolsdir)/web-view-lite
 develapivisualfactorydir =      $(develapidir)/visual-factory
 develapivisualsdir =            $(develapidir)/visuals
 
@@ -188,6 +189,7 @@ develapitoolbar_HEADERS =           $(devel_api_tool_bar_header_files)
 develapitooltip_HEADERS =           $(devel_api_tooltip_header_files)
 develapitransitioneffects_HEADERS = $(devel_api_transition_effects_header_files)
 develapitextselectionpopup_HEADERS = $(devel_api_text_controls_header_files)
+develapiwebviewlite_HEADERS =       $(devel_api_web_view_lite_header_files)
 
 # public api source
 publicapidir =                     $(topleveldir)/public-api
