@@ -122,6 +122,7 @@ KeyboardFocusManager::KeyboardFocusManager()
   mIsFocusIndicatorEnabled( -1 ),
   mFocusGroupLoopEnabled( false ),
   mIsWaitingKeyboardFocusChangeCommit( false ),
+  mClearFocusOnTouch( true ),
   mFocusHistory(),
   mSlotDelegate( this ),
   mCustomAlgorithmInterface(NULL)
@@ -142,6 +143,7 @@ void KeyboardFocusManager::GetConfigurationFromStyleManger()
     {
       Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
       mIsFocusIndicatorEnabled = static_cast<int>(config["alwaysShowFocus"].Get<bool>());
+      mClearFocusOnTouch = mIsFocusIndicatorEnabled ? false : true;
     }
 }
 
@@ -863,9 +865,17 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
 void KeyboardFocusManager::OnTouch(const TouchData& touch)
 {
+  // if mIsFocusIndicatorEnabled is -1, it means Configuration is not loaded.
+  // Try to load configuration.
+  if( mIsFocusIndicatorEnabled == -1 )
+  {
+    GetConfigurationFromStyleManger();
+  }
+
   // Clear the focus when user touch the screen.
   // We only do this on a Down event, otherwise the clear action may override a manually focused actor.
-  if( ( touch.GetPointCount() < 1 ) || ( touch.GetState( 0 ) == PointState::DOWN ) )
+  // If mClearFocusOnTouch is false, do not clear the focus even if user touch the screen.
+  if( (( touch.GetPointCount() < 1 ) || ( touch.GetState( 0 ) == PointState::DOWN )) && mClearFocusOnTouch )
   {
     ClearFocus();
   }
