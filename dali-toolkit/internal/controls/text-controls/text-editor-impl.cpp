@@ -79,8 +79,8 @@ const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_
 
 const Scripting::StringEnum LINE_WRAP_MODE_STRING_TABLE[] =
 {
-  { "WRAP_MODE_WORD",      Toolkit::Text::Layout::LineWrap::WORD      },
-  { "WRAP_MODE_CHARACTER", Toolkit::Text::Layout::LineWrap::CHARACTER }
+  { "WORD",      Toolkit::Text::Layout::LineWrap::WORD      },
+  { "CHARACTER", Toolkit::Text::Layout::LineWrap::CHARACTER }
 };
 const unsigned int LINE_WRAP_MODE_STRING_TABLE_COUNT = sizeof( LINE_WRAP_MODE_STRING_TABLE ) / sizeof( LINE_WRAP_MODE_STRING_TABLE[0] );
 
