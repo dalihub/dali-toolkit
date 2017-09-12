@@ -384,7 +384,7 @@ Length View::GetNumberOfUnderlineRuns() const
 {
   if( mImpl->mVisualModel )
   {
-    return mImpl->mVisualModel->mUnderlineRuns.Count();
+    return mImpl->mVisualModel->GetNumberOfUnderlineRuns();
   }
 
   return 0u;
