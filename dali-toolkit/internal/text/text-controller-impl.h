@@ -27,6 +27,8 @@
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-model.h>
 #include <dali-toolkit/internal/text/text-view.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 
 namespace Dali
 {
@@ -320,7 +322,8 @@ struct Controller::Impl
     mAutoScrollDirectionRTL( false ),
     mUnderlineSetByString( false ),
     mShadowSetByString( false ),
-    mFontStyleSetByString( false )
+    mFontStyleSetByString( false ),
+    mShouldClearFocusOnEscape( true )
   {
     mModel = Model::New();
 
@@ -336,6 +339,17 @@ struct Controller::Impl
     // Set the text properties to default
     mModel->mVisualModel->SetUnderlineEnabled( false );
     mModel->mVisualModel->SetUnderlineHeight( 0.0f );
+
+    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+    if( styleManager )
+    {
+      bool temp;
+      Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
+      if( config["clearFocusOnEscape"].Get( temp ) )
+      {
+        mShouldClearFocusOnEscape = temp;
+      }
+    }
   }
 
   ~Impl()
@@ -730,6 +744,7 @@ public:
   bool mUnderlineSetByString:1;            ///< Set when underline is set by string (legacy) instead of map
   bool mShadowSetByString:1;               ///< Set when shadow is set by string (legacy) instead of map
   bool mFontStyleSetByString:1;            ///< Set when font style is set by string (legacy) instead of map
+  bool mShouldClearFocusOnEscape:1;        ///< Whether text control should clear key input focus
 };
 
 } // namespace Text

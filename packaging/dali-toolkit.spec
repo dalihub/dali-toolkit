@@ -1,6 +1,6 @@
 Name:       dali-toolkit
-Summary:    The OpenGLES Canvas Core Library Toolkit
-Version:    1.2.52
+Summary:    Dali 3D engine Toolkit
+Version:    1.2.56
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -10,15 +10,25 @@ Source0:    %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
+%if 0%{?tizen_version_major} < 4
+%define disable_cxx03_build 1
+%endif
+
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(dali-core)
+%if !0%{?disable_cxx03_build}
+BuildRequires:  pkgconfig(dali-core-cxx03)
+%endif
 BuildRequires: gettext
 
 # dali-toolkit only need to know the interfaces(APIs) of dali-adaptor(the devel package).
 # It doesn't need to know which adaptor will be used by applications.
 # Applications or dali-addon will decide which one they will use.
 BuildRequires:  dali-adaptor-devel
+%if !0%{?disable_cxx03_build}
+BuildRequires:  dali-adaptor-devel-cxx03
+%endif
 
 #need libtzplatform-config for directory if tizen version is 3.x
 
@@ -35,7 +45,7 @@ BuildRequires:  pkgconfig(libtzplatform-config)
 %endif
 
 %description
-The OpenGLES Canvas Core Library Toolkit - a set of controls that provide
+Dali 3D engine Toolkit - a set of controls that provide
 user interface functionality.
 
 ##############################
@@ -68,16 +78,25 @@ Conflicts:  %{name}-resources_720x1280
 dali-toolkit default resource files for 1920x1080
 Contain po / sounds / common images / style / style images
 
+%if !0%{?disable_cxx03_build}
+%package cxx03
+Summary:	Dali 3D engine Toolkit with cxx03
+Provides:	%{name}-cxx03 = %{version}-%{release}
+
+%description cxx03
+Dali 3D engine Toolkit with cxx03
+%endif
+
 ##############################
 # devel
 ##############################
 %package devel
-Summary:    Application development package for the OpenGLES Canvas toolkit
+Summary:    Application development package for Dali 3D engine toolkit
 Group:      Development/Building
 Requires:   %{name} = %{version}-%{release}
 
 %description devel
-Application development package for the OpenGLES Canvas toolkit - headers and package config
+Application development package for Dali 3D engine toolkit - headers and package config
 
 ##############################
 # Preparation
@@ -133,17 +152,51 @@ DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
 %if 0%{?enable_debug}
            --enable-debug \
 %endif
-           --enable-i18n=yes
+           --enable-i18n=yes \
+           --enable-rename-so=no
 
 make %{?jobs:-j%jobs}
+
+pushd %{_builddir}/%{name}-%{version}/build/tizen
+%make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
+popd
+
+pushd %{buildroot}%{_libdir}
+for FILE in libdali-toolkit-cxx11.so*; do mv "$FILE" "%{_builddir}/%{name}-%{version}/build/tizen/$FILE"; done
+mv pkgconfig/dali-toolkit.pc %{_builddir}/%{name}-%{version}/build/tizen/dali-toolkit.pc
+popd
+
+%if !0%{?disable_cxx03_build}
+make clean
+
+libtoolize --force
+cd %{_builddir}/dali-toolkit-%{version}/build/tizen
+autoreconf --install
+
+DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
+DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
+
+%configure --enable-profile=TIZEN \
+           --enable-cxx03-abi=yes \
+%if 0%{?enable_debug}
+           --enable-debug \
+%endif
+           --enable-i18n=yes \
+           --enable-rename-so=no
+
+make %{?jobs:-j%jobs}
+%endif
 
 ##############################
 # Installation
 ##############################
 %install
 rm -rf %{buildroot}
-pushd build/tizen
+pushd %{_builddir}/%{name}-%{version}/build/tizen
 %make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
+
+for FILE in libdali-toolkit-cxx11.so*; do mv "$FILE" "%{buildroot}%{_libdir}/$FILE"; done
+mv dali-toolkit.pc %{buildroot}%{_libdir}/pkgconfig/dali-toolkit.pc
 
 # PO
 {
@@ -155,6 +208,18 @@ do
   cp ${language}.mo %{buildroot}/%{_datadir}/locale/${language}/LC_MESSAGES/dali-toolkit.mo
 done
 } &> /dev/null
+popd
+
+#############################
+#rename
+#############################
+pushd  %{buildroot}%{_libdir}
+rm -rf libdali-toolkit.so
+rm -rf libdali-toolkit-cxx11.so
+%if !0%{?disable_cxx03_build}
+ln -s libdali-toolkit.so.0.0.* libdali-toolkit-cxx03.so
+%endif
+ln -s libdali-toolkit-cxx11.so.0.0.* libdali-toolkit.so
 popd
 
 # Remove default style and style images which are for Linux build
@@ -232,19 +297,19 @@ popd
 %preun resources_480x800
 pushd %{dali_toolkit_style_files}
 mv images ./480x800
-mv *.json ./480x800
+mv dali-toolkit-default-theme.json ./480x800
 popd
 
 %preun resources_720x1280
 pushd %{dali_toolkit_style_files}
 mv images ./720x1280
-mv *.json ./720x1280
+mv dali-toolkit-default-theme.json ./720x1280
 popd
 
 %preun resources_1920x1080
 pushd %{dali_toolkit_style_files}
 mv images ./1920x1080
-mv *.json ./1920x1080
+mv dali-toolkit-default-theme.json ./1920x1080
 popd
 
 ##############################
@@ -255,19 +320,31 @@ popd
 exit 0
 
 %postun resources_480x800
-pushd %{dali_toolkit_style_files}
-rm -rf *
-popd
+case "$1" in
+  0)
+    pushd %{dali_toolkit_style_files}
+    rm -rf *
+    popd
+  ;;
+esac
 
 %postun resources_720x1280
-pushd %{dali_toolkit_style_files}
-rm -rf *
-popd
+case "$1" in
+  0)
+    pushd %{dali_toolkit_style_files}
+    rm -rf *
+    popd
+  ;;
+esac
 
 %postun resources_1920x1080
-pushd %{dali_toolkit_style_files}
-rm -rf *
-popd
+case "$1" in
+  0)
+    pushd %{dali_toolkit_style_files}
+    rm -rf *
+    popd
+  ;;
+esac
 
 ##############################
 # Files in Binary Packages
@@ -279,13 +356,27 @@ popd
 %manifest dali-toolkit.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/lib%{name}.so*
+%{_libdir}/libdali-toolkit-cxx11.so.*
+%{_libdir}/libdali-toolkit.so
 %license LICENSE
+
+%if !0%{?disable_cxx03_build}
+%files cxx03
+%if 0%{?enable_dali_smack_rules}
+%manifest dali-toolkit.manifest-smack
+%else
+%manifest dali-toolkit.manifest
+%endif
+%defattr(-,root,root,-)
+%{_libdir}/libdali-toolkit.so.*
+%{_libdir}/libdali-toolkit-cxx03.so
+%license LICENSE
+%endif
 
 %files devel
 %defattr(-,root,root,-)
-%{dev_include_path}/%{name}/*
-%{_libdir}/pkgconfig/*.pc
+%{dev_include_path}/dali-toolkit/*
+%{_libdir}/pkgconfig/dali-toolkit.pc
 
 %files resources_480x800
 %manifest dali-toolkit-resources.manifest

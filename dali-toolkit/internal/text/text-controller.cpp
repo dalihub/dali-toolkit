@@ -686,7 +686,12 @@ void Controller::SetDefaultFontWeight( FontWeight weight )
 
 bool Controller::IsDefaultFontWeightDefined() const
 {
-  return mImpl->mFontDefaults->weightDefined;
+  if( NULL != mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->weightDefined;
+  }
+
+  return false;
 }
 
 FontWeight Controller::GetDefaultFontWeight() const
@@ -752,7 +757,12 @@ void Controller::SetDefaultFontWidth( FontWidth width )
 
 bool Controller::IsDefaultFontWidthDefined() const
 {
-  return mImpl->mFontDefaults->widthDefined;
+  if( NULL != mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->widthDefined;
+  }
+
+  return false;
 }
 
 FontWidth Controller::GetDefaultFontWidth() const
@@ -818,7 +828,11 @@ void Controller::SetDefaultFontSlant( FontSlant slant )
 
 bool Controller::IsDefaultFontSlantDefined() const
 {
-  return mImpl->mFontDefaults->slantDefined;
+  if( NULL != mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->slantDefined;
+  }
+  return false;
 }
 
 FontSlant Controller::GetDefaultFontSlant() const
@@ -2222,13 +2236,10 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Do nothing.
       return false;
     }
-    else if( Dali::DALI_KEY_ESCAPE == keyCode )
+    else if( Dali::DALI_KEY_ESCAPE == keyCode || Dali::DALI_KEY_BACK == keyCode )
     {
-      // Escape key is a special case which causes focus loss
-      KeyboardFocusLostEvent();
-
-      // Will request for relayout.
-      relayoutNeeded = true;
+      // Do nothing
+      return false;
     }
     else if( ( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ) ||
              ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode ) ||
@@ -3681,6 +3692,11 @@ void Controller::ResetScrollPosition()
     mImpl->mModel->mScrollPosition = Vector2::ZERO;
     mImpl->mEventData->mScrollAfterUpdatePosition = true;
   }
+}
+
+bool Controller::ShouldClearFocusOnEscape() const
+{
+  return mImpl->mShouldClearFocusOnEscape;
 }
 
 // private : Private contructors & copy operator.

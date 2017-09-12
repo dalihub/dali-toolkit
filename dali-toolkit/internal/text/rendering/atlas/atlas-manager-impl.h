@@ -178,7 +178,7 @@ private:
   std::vector< AtlasDescriptor > mAtlasList;            // List of atlases created
   Vector< AtlasSlotDescriptor > mImageList;             // List of bitmaps stored in atlases
   Toolkit::AtlasManager::AtlasSize mNewAtlasSize;       // Atlas size to use in next creation
-  Toolkit::AtlasManager::AddFailPolicy mAddFailPolicy;  // Policy for faling to add an Image
+  Toolkit::AtlasManager::AddFailPolicy mAddFailPolicy;  // Policy for failing to add an Image
 
   SizeType CheckAtlas( SizeType atlas,
                        SizeType width,

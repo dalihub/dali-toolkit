@@ -128,6 +128,10 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "autoScrollStopMode",  STR
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "lineCount", INTEGER, LINE_COUNT             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "lineWrapMode",        STRING,  LINE_WRAP_MODE         )
 DALI_DEVEL_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColorAnimatable", Color::WHITE, TEXT_COLOR_ANIMATABLE )
+DALI_DEVEL_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR_ANIMATABLE, 0)
+DALI_DEVEL_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR_ANIMATABLE, 1)
+DALI_DEVEL_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, TextLabel, "textColorBlue",  TEXT_COLOR_BLUE,  TEXT_COLOR_ANIMATABLE, 2)
+DALI_DEVEL_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit, TextLabel, "textColorAlpha", TEXT_COLOR_ALPHA, TEXT_COLOR_ANIMATABLE, 3)
 DALI_TYPE_REGISTRATION_END()
 
 } // namespace
@@ -589,9 +593,8 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         break;
       }
       case Toolkit::TextLabel::Property::TEXT_COLOR:
-      case Toolkit::DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE:
       {
-        if ( impl.mController )
+        if( impl.mController )
         {
           value = impl.mController->GetDefaultColor();
         }

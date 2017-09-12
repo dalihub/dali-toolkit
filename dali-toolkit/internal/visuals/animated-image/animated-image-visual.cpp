@@ -266,15 +266,26 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
     case Toolkit::ImageVisual::Property::WRAP_MODE_U:
     {
       int wrapMode;
-      Scripting::GetEnumerationProperty( value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode );
-      mWrapModeU = Dali::WrapMode::Type( wrapMode );
-      break;
+      if(Scripting::GetEnumerationProperty( value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode ))
+      {
+        mWrapModeU = Dali::WrapMode::Type(wrapMode);
+      }
+      else
+      {
+        mWrapModeU = Dali::WrapMode::Type::DEFAULT;
+      }
     }
     case Toolkit::ImageVisual::Property::WRAP_MODE_V:
     {
       int wrapMode;
-      Scripting::GetEnumerationProperty( value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode );
-      mWrapModeV = Dali::WrapMode::Type( wrapMode );
+      if(Scripting::GetEnumerationProperty( value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode ))
+      {
+        mWrapModeV = Dali::WrapMode::Type(wrapMode);
+      }
+      else
+      {
+        mWrapModeV = Dali::WrapMode::Type::DEFAULT;
+      }
       break;
     }
 

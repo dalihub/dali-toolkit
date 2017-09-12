@@ -33,7 +33,11 @@ namespace Internal
 
 namespace
 {
+#if _GLIBCXX_USE_CXX11_ABI
+const char* PLUGIN_FILE = "libdali-script-plugin-v8-cxx11.so";
+#else
 const char* PLUGIN_FILE = "libdali-script-plugin-v8.so";
+#endif
 }
 
 Script::Script()
