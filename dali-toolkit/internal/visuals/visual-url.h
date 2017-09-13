@@ -45,8 +45,9 @@ public:
 
   enum Location
   {
-    LOCAL,
-    REMOTE
+    LOCAL,   ///< file in local file system
+    TEXTURE, ///< texture uploaded to texture manager
+    REMOTE   ///< remote image
   };
 
   /**
@@ -99,9 +100,9 @@ public:
   bool IsValid() const;
 
   /**
-   * @return true if the location is LOCAL
+   * @return true if the location is LOCAL, i.e. is loadable from local file system
    */
-  bool IsLocal() const;
+  bool IsLocalResource() const;
 
 private:
   std::string mUrl;

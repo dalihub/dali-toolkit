@@ -30,53 +30,58 @@ namespace Internal
 namespace
 {
 
-VisualUrl::Location ResolveLocation( const std::string& url)
+VisualUrl::Location ResolveLocation( const std::string& url )
 {
-  const char FTP[] = { 'f', 't', 'p', ':', '/', '/' };
-  const char SSH[] = { 's', 's', 'h', ':', '/', '/' };
-  const char HTTP[] = { 'h', 't', 't', 'p', ':', '/', '/' };
-  const char HTTPS[] = { 'h', 't', 't', 'p', 's', ':', '/', '/' };
-
-  const int MATCH_FTP = 0x01;
-  const int MATCH_SSH = 0x02;
-  const int MATCH_HTTP = 0x04;
-  const int MATCH_HTTPS = 0x08;
-
   const char* urlCStr = url.c_str();
-  if( url.size() > 6 )
+  const uint32_t length = url.size();
+  if( ( length > 7 ) && urlCStr[5] == ':' && urlCStr[6] == '/' && urlCStr[7] == '/' )
   {
-    if( urlCStr[3] == ':' || urlCStr[4] == ':' || urlCStr[5] == ':' )
+    // https://
+    if( ( 'h' == tolower( urlCStr[0] ) )&&
+        ( 't' == tolower( urlCStr[1] ) )&&
+        ( 't' == tolower( urlCStr[2] ) )&&
+        ( 'p' == tolower( urlCStr[3] ) )&&
+        ( 's' == tolower( urlCStr[4] ) ) )
     {
-      int flags = 0x0F;
-      for( unsigned int i=0; i < sizeof(HTTPS); ++i )
+      return VisualUrl::REMOTE;
+    }
+  }
+  else if( ( length > 6 ) && urlCStr[4] == ':' && urlCStr[5] == '/' && urlCStr[6] == '/' )
+  {
+    // http:// or dali://
+    const char hOrd = tolower( urlCStr[0] );
+    const char tOra = tolower( urlCStr[1] );
+    const char tOrl = tolower( urlCStr[2] );
+    const char pOri = tolower( urlCStr[3] );
+    if( ( 'h' == hOrd )&&
+        ( 't' == tOra )&&
+        ( 't' == tOrl )&&
+        ( 'p' == pOri ) )
+    {
+      return VisualUrl::REMOTE;
+    }
+    if( ( 'd' == hOrd )&&
+        ( 'a' == tOra )&&
+        ( 'l' == tOrl )&&
+        ( 'i' == pOri ) )
+    {
+      return VisualUrl::TEXTURE;
+    }
+  }
+  else if( ( length > 5 ) && urlCStr[3] == ':' && urlCStr[4] == '/' && urlCStr[5] == '/' )
+  {
+    // ftp:// or ssh://
+    const char fOrS = tolower( urlCStr[0] );
+    if( ( 'f' == fOrS )||( 's' == fOrS ) )
+    {
+      const char tOrs = tolower( urlCStr[1] );
+      if( ( 't' == tOrs )||( 's' == tOrs ) )
       {
-        char c = tolower( urlCStr[i] );
-        if( i < sizeof(FTP) && (flags & MATCH_FTP) && c != FTP[i] )
+        const char pOrh = tolower( urlCStr[2] );
+        if( ( 'p' == pOrh )||( 'h' == pOrh ) )
         {
-          flags &= ~MATCH_FTP;
+          return VisualUrl::REMOTE;
         }
-        if( i < sizeof(SSH) && (flags & MATCH_SSH) && c != SSH[i] )
-        {
-          flags &= ~MATCH_SSH;
-        }
-        if( i < sizeof(HTTP) && (flags & MATCH_HTTP) && c != HTTP[i] )
-        {
-          flags &= ~MATCH_HTTP;
-        }
-        if( i < sizeof(HTTPS) && (flags & MATCH_HTTPS) && c != HTTPS[i] )
-        {
-          flags &= ~MATCH_HTTPS;
-        }
-
-        if( (flags & (MATCH_FTP | MATCH_SSH | MATCH_HTTP | MATCH_HTTPS )) == 0 )
-        {
-          break;
-        }
-      }
-
-      if( flags )
-      {
-        return VisualUrl::REMOTE;
       }
     }
   }
@@ -99,9 +104,9 @@ VisualUrl::Type ResolveType( const std::string& url )
     int index = count;
     while( --index >= 0 )
     {
-      const char currentChar = url[ index ];
+      const char currentChar = tolower( url[ index ] );
       const std::size_t offsetFromEnd = count - index - 1u;
-      if( ( offsetFromEnd < sizeof(SVG) )&&( tolower( currentChar ) == SVG[ offsetFromEnd ] ) )
+      if( ( offsetFromEnd < sizeof(SVG) )&&( currentChar == SVG[ offsetFromEnd ] ) )
       {
         // early out if SVG as can't be used in N patch for now
         if( ++svgScore == sizeof(SVG) )
@@ -109,9 +114,9 @@ VisualUrl::Type ResolveType( const std::string& url )
           return VisualUrl::SVG;
         }
       }
-      if( ( offsetFromEnd < sizeof(GIF) )&&( tolower( currentChar ) == GIF[ offsetFromEnd ] ) )
+      if( ( offsetFromEnd < sizeof(GIF) )&&( currentChar == GIF[ offsetFromEnd ] ) )
       {
-        // early out if GIF
+        // early out if GIF as can't be used in N patch for now
         if( ++gifScore == sizeof(GIF) )
         {
           return VisualUrl::GIF;
@@ -178,7 +183,11 @@ VisualUrl::VisualUrl( const std::string& url )
   if( ! url.empty() )
   {
     mLocation = ResolveLocation( url );
-    mType = ResolveType( url );
+    if( VisualUrl::TEXTURE != mLocation )
+    {
+      // TEXTURE location url doesn't need type resolving, REGULAR_IMAGE is fine
+      mType = ResolveType( url );
+    }
   }
 }
 
@@ -220,13 +229,13 @@ bool VisualUrl::IsValid() const
   return mUrl.size() > 0u;
 }
 
-bool VisualUrl::IsLocal() const
+bool VisualUrl::IsLocalResource() const
 {
   return mLocation == VisualUrl::LOCAL;
 }
 
-
-
 } // Internal
+
 } // Toolkit
+
 } // Dali

@@ -46,8 +46,6 @@ namespace Toolkit
 namespace Internal
 {
 
-class MaskTextureObserver;
-
 /**
  * The TextureManager provides a common Image loading API for Visuals.
  *
