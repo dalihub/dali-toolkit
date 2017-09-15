@@ -118,7 +118,8 @@ devel_api_focus_manager_header_files = \
 devel_api_image_loader_header_files = \
   $(devel_api_src_dir)/image-loader/async-image-loader-devel.h \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.h \
-  $(devel_api_src_dir)/image-loader/image-atlas.h
+  $(devel_api_src_dir)/image-loader/image-atlas.h \
+  $(devel_api_src_dir)/image-loader/texture-manager.h
 
 devel_api_scripting_header_files = \
   $(devel_api_src_dir)/scripting/script.h \
