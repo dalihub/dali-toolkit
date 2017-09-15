@@ -258,7 +258,6 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
                           Dali::SamplingMode::Type samplingMode )
 : Visual::Base( factoryCache ),
   mImage(),
-  mPixels(),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl( imageUrl ),
@@ -277,7 +276,6 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
 : Visual::Base( factoryCache ),
   mImage( image ),
-  mPixels(),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl(),
@@ -361,14 +359,6 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
     }
   }
 
-  if( ( mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING ) && mImageUrl.IsValid() )
-  {
-    // if sync loading is required, the loading should start
-    // immediately when new image url is set or the actor is off stage
-    // ( for on-stage actor with image url unchanged, resource loading
-    // is already finished )
-    LoadResourceSynchronously();
-  }
 }
 
 void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& value )
@@ -685,30 +675,27 @@ bool ImageVisual::IsSynchronousResourceLoading() const
   return mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
 }
 
-void ImageVisual::LoadResourceSynchronously()
-{
-  if( mImageUrl.IsValid() )
-  {
-    Devel::PixelBuffer pixelBuffer = LoadImageFromFile( mImageUrl.GetUrl(), mDesiredSize, mFittingMode, mSamplingMode );
-
-    if( pixelBuffer )
-    {
-      mPixels = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
-    }
-    mTextureLoading = false;
-  }
-}
-
 TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, bool synchronousLoading, bool attemptAtlasing )
 {
   TextureSet textureSet;
 
   mTextureLoading = false;
-
   textureRect = FULL_TEXTURE_RECT;
+
   if( synchronousLoading )
   {
-    if( !mPixels )
+    PixelData data;
+    if( mImageUrl.IsValid() )
+    {
+      // if sync loading is required, the loading should immediately when actor is on stage
+      Devel::PixelBuffer pixelBuffer = LoadImageFromFile( mImageUrl.GetUrl(), mDesiredSize, mFittingMode, mSamplingMode );
+
+      if( pixelBuffer )
+      {
+        data = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
+      }
+    }
+    if( !data )
     {
       // use broken image
       textureSet = TextureSet::New();
@@ -718,15 +705,15 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, bool synchronous
     {
       if( attemptAtlasing )
       {
-        textureSet = mFactoryCache.GetAtlasManager()->Add(textureRect, mPixels );
+        textureSet = mFactoryCache.GetAtlasManager()->Add( textureRect, data );
         mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
       }
       if( !textureSet ) // big image, no atlasing or atlasing failed
       {
         mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-        Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, mPixels.GetPixelFormat(),
-                                        mPixels.GetWidth(), mPixels.GetHeight() );
-        texture.Upload( mPixels );
+        Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(),
+                                        data.GetWidth(), data.GetHeight() );
+        texture.Upload( data );
         textureSet = TextureSet::New();
         textureSet.SetTexture( 0u, texture );
       }
@@ -734,11 +721,11 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, bool synchronous
   }
   else
   {
+    mTextureLoading = true;
     if( attemptAtlasing )
     {
       textureSet = mFactoryCache.GetAtlasManager()->Add( textureRect, mImageUrl.GetUrl(), mDesiredSize, mFittingMode, true, this );
       mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
-      mTextureLoading = true;
     }
     if( !textureSet ) // big image, no atlasing or atlasing failed
     {
@@ -762,7 +749,6 @@ TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, bool synchronous
       }
 
       TextureManager::LoadState loadState = textureManager.GetTextureState( mTextureId );
-
       mTextureLoading = ( loadState == TextureManager::LOADING );
 
       if( loadState == TextureManager::UPLOADED )
