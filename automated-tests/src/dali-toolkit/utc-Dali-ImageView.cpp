@@ -24,6 +24,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali/public-api/rendering/renderer.h>
 
 #include <test-native-image.h>
@@ -589,7 +590,6 @@ int UtcDaliImageViewSyncLoading(void)
   END_TEST;
 }
 
-
 int UtcDaliImageViewSyncLoading02(void)
 {
   ToolkitTestApplication application;
@@ -623,6 +623,30 @@ int UtcDaliImageViewSyncLoading02(void)
     DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ),
                       true, TEST_LOCATION );
   }
+  END_TEST;
+}
+
+int UtcDaliImageViewAddedTexture(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing image view with texture provided manager url");
+
+  ImageView imageView = ImageView::New();
+
+  // empty texture is ok, though pointless from app point of view
+  TextureSet  empty;
+  std::string url = TextureManager::AddTexture(empty);
+  DALI_TEST_CHECK(url.size() > 0u);
+
+  Property::Map propertyMap;
+  propertyMap[ImageVisual::Property::URL] = url;
+  imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
+
+  Stage::GetCurrent().Add( imageView );
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 

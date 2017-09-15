@@ -269,7 +269,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
   mAttemptAtlasing( false ),
-  mTextureLoading( false )
+  mLoadingStatus( false )
 {
 }
 
@@ -287,12 +287,23 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
   mAttemptAtlasing( false ),
-  mTextureLoading( false )
+  mLoadingStatus( false )
 {
 }
 
 ImageVisual::~ImageVisual()
 {
+  if( mMaskingData && Stage::IsInstalled() )
+  {
+    // TextureManager could have been deleted before the actor that contains this
+    // ImageVisual is destroyed (e.g. due to stage shutdown). Ensure the stage
+    // is still valid before accessing texture manager.
+    if( mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID )
+    {
+      TextureManager& textureManager = mFactoryCache.GetTextureManager();
+      textureManager.Remove( mMaskingData->mAlphaMaskId );
+    }
+  }
   delete mMaskingData;
 }
 
@@ -358,7 +369,6 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       }
     }
   }
-
 }
 
 void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& value )
@@ -466,7 +476,9 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
       {
         AllocateMaskData();
         // Immediately trigger the alpha mask loading (it may just get a cached value)
-        mMaskingData->SetImage( alphaUrl );
+        mMaskingData->mAlphaMaskUrl = alphaUrl;
+        TextureManager& textureManager = mFactoryCache.GetTextureManager();
+        mMaskingData->mAlphaMaskId = textureManager.RequestMaskLoad( alphaUrl );
       }
       break;
     }
@@ -499,8 +511,7 @@ void ImageVisual::AllocateMaskData()
 {
   if( mMaskingData == NULL )
   {
-    TextureManager& textureManager = mFactoryCache.GetTextureManager();
-    mMaskingData = new MaskingData(textureManager);
+    mMaskingData = new TextureManager::MaskingData();
   }
 }
 
@@ -675,118 +686,42 @@ bool ImageVisual::IsSynchronousResourceLoading() const
   return mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
 }
 
-TextureSet ImageVisual::CreateTextureSet( Vector4& textureRect, bool synchronousLoading, bool attemptAtlasing )
-{
-  TextureSet textureSet;
-
-  mTextureLoading = false;
-  textureRect = FULL_TEXTURE_RECT;
-
-  if( synchronousLoading )
-  {
-    PixelData data;
-    if( mImageUrl.IsValid() )
-    {
-      // if sync loading is required, the loading should immediately when actor is on stage
-      Devel::PixelBuffer pixelBuffer = LoadImageFromFile( mImageUrl.GetUrl(), mDesiredSize, mFittingMode, mSamplingMode );
-
-      if( pixelBuffer )
-      {
-        data = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
-      }
-    }
-    if( !data )
-    {
-      // use broken image
-      textureSet = TextureSet::New();
-      TextureSetImage( textureSet, 0u, VisualFactoryCache::GetBrokenVisualImage() );
-    }
-    else
-    {
-      if( attemptAtlasing )
-      {
-        textureSet = mFactoryCache.GetAtlasManager()->Add( textureRect, data );
-        mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
-      }
-      if( !textureSet ) // big image, no atlasing or atlasing failed
-      {
-        mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-        Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(),
-                                        data.GetWidth(), data.GetHeight() );
-        texture.Upload( data );
-        textureSet = TextureSet::New();
-        textureSet.SetTexture( 0u, texture );
-      }
-    }
-  }
-  else
-  {
-    mTextureLoading = true;
-    if( attemptAtlasing )
-    {
-      textureSet = mFactoryCache.GetAtlasManager()->Add( textureRect, mImageUrl.GetUrl(), mDesiredSize, mFittingMode, true, this );
-      mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
-    }
-    if( !textureSet ) // big image, no atlasing or atlasing failed
-    {
-      mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-      TextureManager& textureManager = mFactoryCache.GetTextureManager();
-      if( mMaskingData == NULL )
-      {
-        mTextureId = textureManager.RequestLoad( mImageUrl, mDesiredSize, mFittingMode,
-                                                 mSamplingMode, TextureManager::NO_ATLAS, this );
-      }
-      else
-      {
-        mTextureId = textureManager.RequestLoad( mImageUrl,
-                                                 mMaskingData->mAlphaMaskId,
-                                                 mMaskingData->mContentScaleFactor,
-                                                 mDesiredSize,
-                                                 mFittingMode, mSamplingMode,
-                                                 TextureManager::NO_ATLAS,
-                                                 mMaskingData->mCropToMask,
-                                                 this );
-      }
-
-      TextureManager::LoadState loadState = textureManager.GetTextureState( mTextureId );
-      mTextureLoading = ( loadState == TextureManager::LOADING );
-
-      if( loadState == TextureManager::UPLOADED )
-      {
-        // UploadComplete has already been called - keep the same texture set
-        textureSet = textureManager.GetTextureSet(mTextureId);
-      }
-    }
-  }
-
-  if( ! (mImpl->mFlags & Impl::IS_ATLASING_APPLIED) && textureSet )
-  {
-    Sampler sampler = Sampler::New();
-    sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
-    textureSet.SetSampler( 0u, sampler );
-  }
-
-  return textureSet;
-}
-
+/*
+( VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode,
+                                        ImageVisual::MaskingData* maskInfo, bool synchronousLoading,
+                                        TextureManager::TextureId textureId, Vector4& textureRect, bool& atlasingStatus, bool& loadingStatus
+ */
 void ImageVisual::InitializeRenderer()
 {
   mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
+
+  TextureManager& textureManager = mFactoryCache.GetTextureManager();
 
   if( ! mImpl->mCustomShader && mImageUrl.GetProtocolType() == VisualUrl::LOCAL )
   {
     bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
 
     Vector4 atlasRect;
+
+    auto attemptAtlasing = mAttemptAtlasing;
+
     // texture set has to be created first as we need to know if atlasing succeeded or not
     // when selecting the shader
-    TextureSet textures = CreateTextureSet( atlasRect, IsSynchronousResourceLoading(), mAttemptAtlasing );
+    TextureSet textures =
+        textureManager.LoadTexture(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode,
+                                   mMaskingData, IsSynchronousResourceLoading(), mTextureId,
+                                   atlasRect, attemptAtlasing, mLoadingStatus, mWrapModeU,
+                                   mWrapModeV, this, this, mFactoryCache.GetAtlasManager());
+    if(attemptAtlasing)
+    {
+      mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
+    }
     CreateRenderer( textures );
 
     if( mImpl->mFlags & Impl::IS_ATLASING_APPLIED ) // the texture is packed inside atlas
     {
       mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
-      if( !defaultWrapMode ) // custom wrap mode, renderer is not cached.
+      if( !defaultWrapMode ) // custom wrap mode
       {
         Vector2 wrapMode(mWrapModeU-WrapMode::CLAMP_TO_EDGE, mWrapModeV-WrapMode::CLAMP_TO_EDGE);
         wrapMode.Clamp( Vector2::ZERO, Vector2( 2.f, 2.f ) );
@@ -796,16 +731,21 @@ void ImageVisual::InitializeRenderer()
   }
   else
   {
+    auto attemptAtlasing = false;
     // for custom shader or remote image, atlas is not applied
     Vector4 atlasRect; // ignored in this case
-    TextureSet textures = CreateTextureSet( atlasRect, IsSynchronousResourceLoading(), false );
+    TextureSet textures =
+        textureManager.LoadTexture(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode,
+                                   mMaskingData, IsSynchronousResourceLoading(), mTextureId,
+                                   atlasRect, attemptAtlasing, mLoadingStatus, mWrapModeU, mWrapModeV, this,
+                                   nullptr, nullptr); // no atlasing
+    DALI_ASSERT_DEBUG(attemptAtlasing == false);
     CreateRenderer( textures );
   }
 }
 
 void ImageVisual::InitializeRenderer( const Image& image )
 {
-  // don't reuse CreateTextureSet
   TextureSet textures = TextureSet::New();
 
   NativeImage nativeImage = NativeImage::DownCast( image );
@@ -853,7 +793,7 @@ void ImageVisual::DoSetOnStage( Actor& actor )
     mImpl->mRenderer.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, mPixelArea );
   }
 
-  if( mTextureLoading == false )
+  if( mLoadingStatus == false )
   {
     actor.AddRenderer( mImpl->mRenderer );
     mPlacementActor.Reset();
@@ -874,7 +814,7 @@ void ImageVisual::DoSetOffStage( Actor& actor )
     RemoveTexture( mImageUrl.GetUrl() );
     mImage.Reset();
   }
-  mTextureLoading = false;
+  mLoadingStatus = false;
   mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
 }
@@ -1010,7 +950,7 @@ void ImageVisual::UploadCompleted()
     // reset the weak handle so that the renderer only get added to actor once
     mPlacementActor.Reset();
   }
-  mTextureLoading = false;
+  mLoadingStatus = false;
 }
 
 // From Texture Manager
@@ -1045,7 +985,7 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
       ResourceReady();
     }
   }
-  mTextureLoading = false;
+  mLoadingStatus = false;
 }
 
 void ImageVisual::RemoveTexture(const std::string& url)
@@ -1073,36 +1013,6 @@ void ImageVisual::RemoveTexture(const std::string& url)
       mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
     }
   }
-}
-
-
-ImageVisual::MaskingData::MaskingData( TextureManager& textureManager )
-: mTextureManager( textureManager ),
-  mAlphaMaskUrl(),
-  mAlphaMaskId( TextureManager::INVALID_TEXTURE_ID ),
-  mContentScaleFactor( 1.0f ),
-  mCropToMask( true )
-{
-}
-
-ImageVisual::MaskingData::~MaskingData()
-{
-  if( Stage::IsInstalled() )
-  {
-    // TextureManager could have been deleted before the actor that contains this
-    // ImageVisual is destroyed (e.g. due to stage shutdown). Ensure the stage
-    // is still valid before accessing texture manager.
-    if( mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID )
-    {
-      mTextureManager.Remove( mAlphaMaskId );
-    }
-  }
-}
-
-void ImageVisual::MaskingData::SetImage( const std::string& maskUrl )
-{
-  mAlphaMaskUrl = maskUrl;
-  mAlphaMaskId = mTextureManager.RequestMaskLoad( mAlphaMaskUrl );
 }
 
 } // namespace Internal
