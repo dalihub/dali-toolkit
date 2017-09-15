@@ -43,7 +43,7 @@ public:
     GIF
   };
 
-  enum Location
+  enum ProtocolType
   {
     LOCAL,   ///< file in local file system
     TEXTURE, ///< texture uploaded to texture manager
@@ -91,7 +91,7 @@ public:
    * Is the URL is local to the device, or remote?
    * @return the location of the resource
    */
-  Location GetLocation() const;
+  ProtocolType GetProtocolType() const;
 
   /**
    * Is the URL valid?
@@ -104,10 +104,22 @@ public:
    */
   bool IsLocalResource() const;
 
+  /**
+   * @return the location part of the url
+   */
+  std::string GetLocation();
+
+  /**
+   * Helper to create a URL of type TEXTURE
+   * @param location the location of the texture
+   * @return the Url
+   */
+  static std::string CreateTextureUrl( const std::string& location );
+
 private:
   std::string mUrl;
   Type mType;
-  Location mLocation;
+  ProtocolType mLocation;
 };
 
 

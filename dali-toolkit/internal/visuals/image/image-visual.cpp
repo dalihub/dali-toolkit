@@ -34,7 +34,7 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/internal/visuals/texture-manager.h>
+#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
@@ -554,7 +554,7 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
   }
   else if( mImageUrl.IsValid() )
   {
-    if( mImageUrl.GetLocation() == VisualUrl::LOCAL )
+    if( mImageUrl.GetProtocolType() == VisualUrl::LOCAL )
     {
       ImageDimensions dimensions = Dali::GetClosestImageSize( mImageUrl.GetUrl() );
 
@@ -787,7 +787,7 @@ void ImageVisual::InitializeRenderer()
 {
   mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
-  if( ! mImpl->mCustomShader && mImageUrl.GetLocation() == VisualUrl::LOCAL )
+  if( ! mImpl->mCustomShader && mImageUrl.GetProtocolType() == VisualUrl::LOCAL )
   {
     bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
 

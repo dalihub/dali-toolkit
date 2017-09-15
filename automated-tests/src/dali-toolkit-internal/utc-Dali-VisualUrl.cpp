@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,18 +30,18 @@ int UtcDaliVisualUrlConstructor(void)
   VisualUrl visualUrl(url);
   DALI_TEST_EQUALS( true, visualUrl.IsValid(), TEST_LOCATION );
   DALI_TEST_EQUALS( visualUrl.GetType(), VisualUrl::GIF, TEST_LOCATION );
-  DALI_TEST_EQUALS( visualUrl.GetLocation(), VisualUrl::LOCAL, TEST_LOCATION );
+  DALI_TEST_EQUALS( visualUrl.GetProtocolType(), VisualUrl::LOCAL, TEST_LOCATION );
 
   VisualUrl visualUrl2("foobar.jpeg");
   visualUrl2 = visualUrl;
   DALI_TEST_EQUALS( true, visualUrl2.IsValid(), TEST_LOCATION );
   DALI_TEST_EQUALS( visualUrl2.GetType(), VisualUrl::GIF, TEST_LOCATION );
-  DALI_TEST_EQUALS( visualUrl2.GetLocation(), VisualUrl::LOCAL, TEST_LOCATION );
+  DALI_TEST_EQUALS( visualUrl2.GetProtocolType(), VisualUrl::LOCAL, TEST_LOCATION );
 
   VisualUrl visualUrl3( visualUrl );
   DALI_TEST_EQUALS( true, visualUrl3.IsValid(), TEST_LOCATION );
   DALI_TEST_EQUALS( visualUrl3.GetType(), VisualUrl::GIF, TEST_LOCATION );
-  DALI_TEST_EQUALS( visualUrl3.GetLocation(), VisualUrl::LOCAL, TEST_LOCATION );
+  DALI_TEST_EQUALS( visualUrl3.GetProtocolType(), VisualUrl::LOCAL, TEST_LOCATION );
   END_TEST;
 }
 
@@ -144,82 +144,82 @@ int UtcDaliVisualUrlLocationP(void)
 {
   tet_infoline( "UtcDaliVisualUrl Location" );
 
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("foobar.GIF").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("foobar.9.png").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("foobar.GIF").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.jpeg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.jpeg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://bar.org/foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://bar.org/foobar.GIF").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://bar.org/foobar.GIF").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ftp://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://bar.org/foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://bar.org/foobar.GIF").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://bar.org/foobar.GIF").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("ssh://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://bar.org/foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://bar.org/foobar.GIF").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://bar.org/foobar.GIF").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("http://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://bar.org/foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://bar.org/foobar.GIF").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://bar.org/foobar.GIF").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("https://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://bar.org/foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://bar.org/foobar.GIF").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://BAR.ORG/foobar.9.png").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://bar.org/foobar.GIF").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("FTP://BAR.ORG/foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://bar.org/foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://bar.org/foobar.GIF").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://BAR.ORG/foobar.9.png").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://bar.org/foobar.GIF").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("SSH://BAR.ORG/foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://bar.org/foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://bar.org/foobar.GIF").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://bar.org/foobar.GIF").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTP://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://bar.org/foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://bar.org/foobar.GIF").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://bar.org/foobar.GIF").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::REMOTE, VisualUrl("HTTPS://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://1234").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("DALI://1234").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://bar.org/foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://1234").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("DALI://1234").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::TEXTURE, VisualUrl("dali://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
 
   END_TEST;
 }
@@ -229,44 +229,44 @@ int UtcDaliVisualUrlLocationN(void)
 {
   tet_infoline( "UtcDaliVisualUrl Location negative tests" );
 
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("h://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ht://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("htp://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("htpp://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("httt://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http;//bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http:x/bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http:/xbar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("sshttp://bar.org/foobar.svg").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http:https://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("https:http://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("HPPT://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ftp:/bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ftp:a/bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("fpp://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ftt://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ssh;//bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ssh:/bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ssh:a/bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("shh://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("sss://bar.org/foobar.9.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http:/bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("h1tps://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ht2ps://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("htt3s://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http4://bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("https5/bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("https:6/bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("https:/7bar.org/foobar.gif").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("h://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ht://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("htp://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("htpp://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("httt://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http;//bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http:x/bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http:/xbar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("sshttp://bar.org/foobar.svg").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http:https://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("https:http://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("HPPT://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ftp:/bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ftp:a/bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("fpp://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ftt://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ssh;//bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ssh:/bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ssh:a/bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("shh://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("sss://bar.org/foobar.9.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http:/bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("h1tps://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("ht2ps://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("htt3s://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("http4://bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("https5/bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("https:6/bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("https:/7bar.org/foobar.gif").GetProtocolType(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.png").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dal://1").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("d1li://1").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("da2i://1").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dal3://1").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dali4//1").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dali:5/1").GetLocation(), TEST_LOCATION );
-  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dali:/61").GetLocation(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("file://bar.org/foobar.png").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dal://1").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("d1li://1").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("da2i://1").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dal3://1").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dali4//1").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dali:5/1").GetProtocolType(), TEST_LOCATION );
+  DALI_TEST_EQUALS( VisualUrl::LOCAL, VisualUrl("dali:/61").GetProtocolType(), TEST_LOCATION );
 
   END_TEST;
 }
@@ -345,6 +345,42 @@ int UtcDaliVisualUrlIsLocalResource(void)
   DALI_TEST_EQUALS( false, VisualUrl("HTTPS://bar.org/foobar.svg").IsLocalResource(), TEST_LOCATION );
   DALI_TEST_EQUALS( false, VisualUrl("HTTPS://bar.org/foobar.GIF").IsLocalResource(), TEST_LOCATION );
   DALI_TEST_EQUALS( false, VisualUrl("HTTPS://bar.org/foobar.9.png").IsLocalResource(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliVisualUrlGetLocationP(void)
+{
+  tet_infoline( "UtcDaliVisualUrl GetLocation Positive" );
+
+  DALI_TEST_EQUAL( "a", VisualUrl("http://a").GetLocation() );
+  DALI_TEST_EQUAL( "1", VisualUrl("dali://1").GetLocation() );
+  DALI_TEST_EQUAL( "", VisualUrl("ftp://").GetLocation() );
+  DALI_TEST_EQUAL( "http://", VisualUrl("http://http://").GetLocation() );
+
+  END_TEST;
+}
+
+int UtcDaliVisualUrlGetLocationN(void)
+{
+  tet_infoline( "UtcDaliVisualUrl GetLocation Negative" );
+
+  DALI_TEST_EQUAL( "", VisualUrl("").GetLocation() );
+  DALI_TEST_EQUAL( "a", VisualUrl("a").GetLocation() );
+  DALI_TEST_EQUAL( "dali:/1", VisualUrl("dali:/1").GetLocation() );
+  DALI_TEST_EQUAL( "dali//1", VisualUrl("dali//1").GetLocation() );
+  DALI_TEST_EQUAL( "", VisualUrl("http:/http://").GetLocation() );
+
+  END_TEST;
+}
+
+int UtcDaliVisualUrlCreateTextureUrl(void)
+{
+  tet_infoline( "UtcDaliVisualUrl CreateTextureUrl" );
+
+  DALI_TEST_EQUAL( "dali://a", VisualUrl::CreateTextureUrl( "a" ) );
+  DALI_TEST_EQUAL( "dali://1234", VisualUrl::CreateTextureUrl( "1234" ) );
+  DALI_TEST_EQUAL( "dali://", VisualUrl::CreateTextureUrl( "" ) );
 
   END_TEST;
 }
