@@ -30,7 +30,7 @@ namespace Internal
 namespace
 {
 
-VisualUrl::Location ResolveLocation( const std::string& url )
+VisualUrl::ProtocolType ResolveLocation( const std::string& url )
 {
   const char* urlCStr = url.c_str();
   const uint32_t length = url.size();
@@ -219,7 +219,7 @@ VisualUrl::Type VisualUrl::GetType() const
   return mType;
 }
 
-VisualUrl::Location VisualUrl::GetLocation() const
+VisualUrl::ProtocolType VisualUrl::GetProtocolType() const
 {
   return mLocation;
 }
@@ -232,6 +232,21 @@ bool VisualUrl::IsValid() const
 bool VisualUrl::IsLocalResource() const
 {
   return mLocation == VisualUrl::LOCAL;
+}
+
+std::string VisualUrl::GetLocation()
+{
+  const auto location = mUrl.find( "://" );
+  if( std::string::npos != location )
+  {
+    return mUrl.substr( location + 3u ); // 3 characters forwards from the start of ://
+  }
+  return mUrl;
+}
+
+std::string VisualUrl::CreateTextureUrl( const std::string& location )
+{
+  return "dali://" + location;
 }
 
 } // Internal

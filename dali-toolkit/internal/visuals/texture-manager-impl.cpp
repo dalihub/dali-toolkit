@@ -16,10 +16,11 @@
  */
 
 // CLASS HEADER
-#include "texture-manager.h"
+#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 
 // EXTERNAL HEADERS
 #include <cstdlib>
+#include <string>
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/images/texture-set-image.h>
@@ -85,9 +86,9 @@ const int           INVALID_CACHE_INDEX( -1 ); ///< Invalid Cache index
 
 
 TextureManager::TextureManager()
-: mCurrentTextureId( 0 ),
-  mAsyncLocalLoaders( GetNumberOfLocalLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
-  mAsyncRemoteLoaders( GetNumberOfRemoteLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } )
+: mAsyncLocalLoaders( GetNumberOfLocalLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
+  mAsyncRemoteLoaders( GetNumberOfRemoteLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
+  mCurrentTextureId( 0 )
 {
 }
 
@@ -307,6 +308,43 @@ TextureSet TextureManager::GetTextureSet( TextureId textureId )
     textureSet = cachedTextureInfo.textureSet;
   }
   return textureSet;
+}
+
+std::string TextureManager::AddExternalTexture( TextureSet& textureSet )
+{
+  TextureManager::ExternalTextureInfo info;
+  info.textureId = GenerateUniqueTextureId();
+  info.textureSet = textureSet;
+  mExternalTextures.emplace_back( info );
+  return VisualUrl::CreateTextureUrl( std::to_string( info.textureId ) );
+}
+
+TextureSet TextureManager::RemoveExternalTexture( const std::string& url )
+{
+  if( url.size() > 0u )
+  {
+    // get the location from the Url
+    VisualUrl parseUrl( url );
+    if( VisualUrl::TEXTURE == parseUrl.GetProtocolType() )
+    {
+      std::string location = parseUrl.GetLocation();
+      if( location.size() > 0u )
+      {
+        TextureId id = std::stoi( location );
+        const auto end = mExternalTextures.end();
+        for( auto iter = mExternalTextures.begin(); iter != end; ++iter )
+        {
+          if( iter->textureId == id )
+          {
+            auto textureSet = iter->textureSet;
+            mExternalTextures.erase( iter );
+            return textureSet;
+          }
+        }
+      }
+    }
+  }
+  return TextureSet();
 }
 
 bool TextureManager::LoadTexture( TextureInfo& textureInfo )

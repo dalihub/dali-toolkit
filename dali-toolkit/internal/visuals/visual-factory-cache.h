@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_CACHE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
-#include <dali-toolkit/internal/visuals/texture-manager.h>
+#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 
 namespace Dali
 {

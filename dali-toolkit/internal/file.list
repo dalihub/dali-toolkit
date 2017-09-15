@@ -31,7 +31,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/visuals/svg/svg-visual.cpp \
    $(toolkit_src_dir)/visuals/text/text-visual.cpp \
    $(toolkit_src_dir)/visuals/transition-data-impl.cpp \
-   $(toolkit_src_dir)/visuals/texture-manager.cpp \
+   $(toolkit_src_dir)/visuals/texture-manager-impl.cpp \
    $(toolkit_src_dir)/visuals/texture-upload-observer.cpp \
    $(toolkit_src_dir)/visuals/visual-base-data-impl.cpp \
    $(toolkit_src_dir)/visuals/visual-base-impl.cpp \
