@@ -44,7 +44,7 @@ LoadingTask::LoadingTask( uint32_t id, const VisualUrl& url, ImageDimensions dim
 
 void LoadingTask::Load()
 {
-  if( url.IsLocal() )
+  if( url.IsLocalResource() )
   {
     pixelBuffer = Dali::LoadImageFromFile( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
   }

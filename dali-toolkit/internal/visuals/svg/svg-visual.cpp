@@ -155,7 +155,7 @@ void SvgVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 void SvgVisual::ParseFromUrl( const VisualUrl& imageUrl )
 {
   mImageUrl = imageUrl;
-  if( mImageUrl.IsLocal() )
+  if( mImageUrl.IsLocalResource() )
   {
     Vector2 dpi = Stage::GetCurrent().GetDpi();
     float meanDpi = (dpi.height + dpi.width) * 0.5f;

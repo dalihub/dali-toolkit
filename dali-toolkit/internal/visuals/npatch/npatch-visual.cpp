@@ -264,7 +264,7 @@ void NPatchVisual::GetNaturalSize( Vector2& naturalSize )
   naturalSize.y = 0u;
 
   // load now if not already loaded
-  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocal() )
+  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocalResource() )
   {
     mId = mLoader.Load( mImageUrl.GetUrl(), mBorder );
   }
@@ -304,7 +304,7 @@ void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
 void NPatchVisual::DoSetOnStage( Actor& actor )
 {
   // load when first go on stage
-  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocal() )
+  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocalResource() )
   {
     mId = mLoader.Load( mImageUrl.GetUrl(), mBorder );
   }

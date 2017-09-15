@@ -477,7 +477,7 @@ TextureSet AnimatedImageVisual::PrepareAnimatedGifImage()
   // load from image file
   std::vector<Dali::PixelData> pixelDataList;
 
-  if( mImageUrl.IsLocal() )
+  if( mImageUrl.IsLocalResource() )
   {
     if( Dali::LoadAnimatedGifFromFile( mImageUrl.GetUrl().c_str() , pixelDataList, mFrameDelayContainer ) )
     {

@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <memory.h>
-#include <dali/public-api/common/constants.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/view-model.h>
@@ -43,7 +42,7 @@ namespace
  */
 struct GlyphData
 {
-  Devel::PixelBuffer                           bitmapBuffer;     ///< The buffer of the whole bitmap. The format is RGBA8888.
+  uint32_t*                                    bitmapBuffer;     ///< The buffer of the whole bitmap. The format is RGBA8888.
   Vector2*                                     position;         ///< The position of the glyph.
   TextAbstraction::FontClient::GlyphBufferData glyphBitmap;      ///< The glyph's bitmap.
   unsigned int                                 width;            ///< The bitmap's width.
@@ -58,14 +57,10 @@ struct GlyphData
  * @param[in] data Struct which contains the glyph's data and the bitmap's data.
  * @param[in] position The position of the glyph.
  * @param[in] color The color of the glyph.
- * @param[in] style The style of the text.
- * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
  */
-void TypesetGlyph( GlyphData& data,
+void TypesetGlyph( const GlyphData& data,
                    const Vector2* const position,
-                   const Vector4* const color,
-                   Typesetter::Style style,
-                   Pixel::Format pixelFormat )
+                   const Vector4* const color )
 {
   if( ( 0u == data.glyphBitmap.width ) || ( 0u == data.glyphBitmap.height ) )
   {
@@ -76,177 +71,69 @@ void TypesetGlyph( GlyphData& data,
   const int widthMinusOne = static_cast<int>( data.width - 1u );
   const int heightMinusOne = static_cast<int>( data.height - 1u );
 
-  if ( Pixel::RGBA8888 == pixelFormat )
+  // Whether the given glyph is a color one.
+  const bool isColorGlyph = Pixel::BGRA8888 == data.glyphBitmap.format;
+
+  // Pointer to the color glyph if there is one.
+  const uint32_t* const colorGlyphBuffer = isColorGlyph ? reinterpret_cast<uint32_t*>( data.glyphBitmap.buffer ) : NULL;
+
+  // Pack the given color into a 32bit buffer. The alpha channel will be updated later for each pixel.
+  // The format is RGBA8888.
+  uint32_t packedColor = 0u;
+  uint8_t* packedColorBuffer = reinterpret_cast<uint8_t*>( &packedColor );
+  *( packedColorBuffer + 2 ) = static_cast<uint8_t>( color->b * 255.f );
+  *( packedColorBuffer + 1 ) = static_cast<uint8_t>( color->g * 255.f );
+    *packedColorBuffer       = static_cast<uint8_t>( color->r * 255.f );
+
+  // Initial vertical offset.
+  const int yOffset = data.verticalOffset + position->y;
+
+  // Traverse the pixels of the glyph line per line.
+  for( int lineIndex = 0, glyphHeight = static_cast<int>( data.glyphBitmap.height ); lineIndex < glyphHeight; ++lineIndex )
   {
-    // Whether the given glyph is a color one.
-    const bool isColorGlyph = Pixel::BGRA8888 == data.glyphBitmap.format;
-
-    // Pointer to the color glyph if there is one.
-    const uint32_t* const colorGlyphBuffer = isColorGlyph ? reinterpret_cast<uint32_t*>( data.glyphBitmap.buffer ) : NULL;
-
-    // Pack the given color into a 32bit buffer. The alpha channel will be updated later for each pixel.
-    // The format is RGBA8888.
-    uint32_t packedColor = 0u;
-    uint8_t* packedColorBuffer = reinterpret_cast<uint8_t*>( &packedColor );
-    *( packedColorBuffer + 2 ) = static_cast<uint8_t>( color->b * 255.f );
-    *( packedColorBuffer + 1 ) = static_cast<uint8_t>( color->g * 255.f );
-      *packedColorBuffer       = static_cast<uint8_t>( color->r * 255.f );
-
-    // Initial vertical offset.
-    const int yOffset = data.verticalOffset + position->y;
-
-    // Traverse the pixels of the glyph line per line.
-    for( int lineIndex = 0, glyphHeight = static_cast<int>( data.glyphBitmap.height ); lineIndex < glyphHeight; ++lineIndex )
+    const int yOffsetIndex = yOffset + lineIndex;
+    if( ( 0 > yOffsetIndex ) || ( yOffsetIndex > heightMinusOne ) )
     {
-      const int yOffsetIndex = yOffset + lineIndex;
-      if( ( 0 > yOffsetIndex ) || ( yOffsetIndex > heightMinusOne ) )
-      {
-        // Do not write out of bounds.
-        break;
-      }
-
-      const int verticalOffset = yOffsetIndex * data.width;
-      const int xOffset = data.horizontalOffset + position->x;
-      const int glyphBufferOffset = lineIndex * static_cast<int>( data.glyphBitmap.width );
-      for( int index = 0, glyphWidth = static_cast<int>( data.glyphBitmap.width ); index < glyphWidth; ++index )
-      {
-        const int xOffsetIndex = xOffset + index;
-        if( ( 0 > xOffsetIndex ) || ( xOffsetIndex > widthMinusOne ) )
-        {
-          // Don't write out of bounds.
-          break;
-        }
-
-        uint32_t* bitmapBuffer = reinterpret_cast< uint32_t* >( data.bitmapBuffer.GetBuffer() );
-
-        if( isColorGlyph )
-        {
-          // Retrieves the color from the color glyph. The format is BGRA8888.
-          uint32_t packedColorGlyph = *( colorGlyphBuffer + glyphBufferOffset + index );
-          uint8_t* packedColorGlyphBuffer = reinterpret_cast<uint8_t*>( &packedColorGlyph );
-
-          if( Typesetter::STYLE_SHADOW == style )
-          {
-            // The shadow of color glyph needs to have the shadow color.
-            *( packedColorGlyphBuffer + 2 ) = static_cast<uint8_t>( color->b * 255.f );
-            *( packedColorGlyphBuffer + 1 ) = static_cast<uint8_t>( color->g * 255.f );
-              *packedColorGlyphBuffer       = static_cast<uint8_t>( color->r * 255.f );
-          }
-          else
-          {
-            std::swap( *packedColorGlyphBuffer, *( packedColorGlyphBuffer + 2u ) ); // Swap B and R.
-          }
-
-          // Update the alpha channel.
-          if( Typesetter::STYLE_MASK == style )
-          {
-            // Create an alpha mask for color glyph.
-            *( packedColorGlyphBuffer + 3u ) = 0u;
-          }
-          else
-          {
-            *( packedColorGlyphBuffer + 3u ) = static_cast<uint8_t>( color->a * static_cast<float>( *( packedColorGlyphBuffer + 3u ) ) );
-          }
-
-          // Set the color into the final pixel buffer.
-          *( bitmapBuffer + verticalOffset + xOffsetIndex ) = packedColorGlyph;
-        }
-        else
-        {
-          // Update the alpha channel.
-          const uint8_t alpha = *( data.glyphBitmap.buffer + glyphBufferOffset + index );
-
-          // Copy non-transparent pixels only
-          if ( alpha > 0u )
-          {
-            // Check alpha of overlapped pixels
-            uint32_t& currentColor = *( bitmapBuffer + verticalOffset + xOffsetIndex );
-            uint8_t* packedCurrentColorBuffer = reinterpret_cast<uint8_t*>( &currentColor );
-
-            uint8_t currentAlpha = *( packedCurrentColorBuffer + 3u );
-            uint8_t newAlpha = static_cast<uint8_t>( color->a * static_cast<float>( alpha ) );
-
-            // For any pixel overlapped with the pixel in previous glyphs, make sure we don't
-            // overwrite a previous bigger alpha with a smaller alpha (in order to avoid
-            // semi-transparent gaps between joint glyphs with overlapped pixels, which could
-            // happen, for example, in the RTL text when we copy glyphs from right to left).
-            *( packedColorBuffer + 3u ) = std::max( currentAlpha, newAlpha );
-
-            // Set the color into the final pixel buffer.
-            currentColor = packedColor;
-          }
-        }
-      }
+      // Do not write out of bounds.
+      break;
     }
-  }
-  else
-  {
-    // Initial vertical offset.
-    const int yOffset = data.verticalOffset + position->y;
 
-    // Traverse the pixels of the glyph line per line.
-    for( int lineIndex = 0, glyphHeight = static_cast<int>( data.glyphBitmap.height ); lineIndex < glyphHeight; ++lineIndex )
+    const int verticalOffset = yOffsetIndex * data.width;
+    const int xOffset = data.horizontalOffset + position->x;
+    const int glyphBufferOffset = lineIndex * static_cast<int>( data.glyphBitmap.width );
+    for( int index = 0, glyphWidth = static_cast<int>( data.glyphBitmap.width ); index < glyphWidth; ++index )
     {
-      const int yOffsetIndex = yOffset + lineIndex;
-      if( ( 0 > yOffsetIndex ) || ( yOffsetIndex > heightMinusOne ) )
+      const int xOffsetIndex = xOffset + index;
+      if( ( 0 > xOffsetIndex ) || ( xOffsetIndex > widthMinusOne ) )
       {
-        // Do not write out of bounds.
+        // Don't write out of bounds.
         break;
       }
 
-      const int verticalOffset = yOffsetIndex * data.width;
-      const int xOffset = data.horizontalOffset + position->x;
-      const int glyphBufferOffset = lineIndex * static_cast<int>( data.glyphBitmap.width );
-      for( int index = 0, glyphWidth = static_cast<int>( data.glyphBitmap.width ); index < glyphWidth; ++index )
+      if( isColorGlyph )
       {
-        const int xOffsetIndex = xOffset + index;
-        if( ( 0 > xOffsetIndex ) || ( xOffsetIndex > widthMinusOne ) )
-        {
-          // Don't write out of bounds.
-          break;
-        }
-
-        uint8_t* bitmapBuffer = reinterpret_cast< uint8_t* >( data.bitmapBuffer.GetBuffer() );
+        // Retrieves the color from the glyph. The format is BGRA8888.
+        uint32_t packedColorGlyph = *( colorGlyphBuffer + glyphBufferOffset + index );
 
         // Update the alpha channel.
+        uint8_t* packedColorGlyphBuffer = reinterpret_cast<uint8_t*>( &packedColorGlyph );
+        std::swap( *packedColorGlyphBuffer, *( packedColorGlyphBuffer + 2u ) ); // Swap B and R.
+        *( packedColorGlyphBuffer + 3u ) = static_cast<uint8_t>( color->a * static_cast<float>( *( packedColorGlyphBuffer + 3u ) ) );
+
+        // Set the color into the final pixel buffer.
+        *( data.bitmapBuffer + verticalOffset + xOffsetIndex ) = packedColorGlyph;
+      }
+      else
+      {
+        // Update the alpha channel.
         const uint8_t alpha = *( data.glyphBitmap.buffer + glyphBufferOffset + index );
+        *( packedColorBuffer + 3u ) = static_cast<uint8_t>( color->a * static_cast<float>( alpha ) );
 
-        // Copy non-transparent pixels only
-        if ( alpha > 0u )
-        {
-          // Check alpha of overlapped pixels
-          uint8_t& currentAlpha = *( bitmapBuffer + verticalOffset + xOffsetIndex );
-          uint8_t newAlpha = static_cast<uint8_t>( color->a * static_cast<float>( alpha ) );
-//          printf("y: %d, x: %d: alpha: %u, currentAlpha: %u, newAlpha: %u, a: %u\n", yOffsetIndex, xOffsetIndex, alpha, currentAlpha, newAlpha, std::max( currentAlpha, newAlpha ) );
-
-          // For any pixel overlapped with the pixel in previous glyphs, make sure we don't
-          // overwrite a previous bigger alpha with a smaller alpha (in order to avoid
-          // semi-transparent gaps between joint glyphs with overlapped pixels, which could
-          // happen, for example, in the RTL text when we copy glyphs from right to left).
-          *( bitmapBuffer + verticalOffset + xOffsetIndex ) = std::max( currentAlpha, newAlpha );
-        }
+        // Set the color into the final pixel buffer.
+        *( data.bitmapBuffer + verticalOffset + xOffsetIndex ) = packedColor;
       }
     }
   }
-}
-
-bool IsGlyphUnderlined( GlyphIndex index,
-                         const Vector<GlyphRun>& underlineRuns )
-{
-  for( Vector<GlyphRun>::ConstIterator it = underlineRuns.Begin(),
-         endIt = underlineRuns.End();
-         it != endIt;
-       ++it )
-  {
-    const GlyphRun& run = *it;
-
-    if( ( run.glyphIndex <= index ) && ( index < run.glyphIndex + run.numberOfGlyphs ) )
-    {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 } // namespace
@@ -261,7 +148,7 @@ ViewModel* Typesetter::GetViewModel()
   return mModel;
 }
 
-PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat )
+PixelData Typesetter::Render( const Vector2& size )
 {
   // @todo. This initial implementation for a TextLabel has only one visible page.
 
@@ -293,73 +180,6 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
     }
   }
 
-  // Generate the image buffers of the text for each different style first,
-  // then combine all of them together as one final image buffer. We try to
-  // do all of these in CPU only, so that once the final texture is generated,
-  // no calculation is needed in GPU during each frame.
-
-  const unsigned int bufferWidth = static_cast<unsigned int>( size.width );
-  const unsigned int bufferHeight = static_cast<unsigned int>( size.height );
-
-  const unsigned int bufferSizeInt = bufferWidth * bufferHeight;
-  const unsigned int bufferSizeChar = 4u * bufferSizeInt;
-
-  Length numberOfGlyphs = mModel->GetNumberOfGlyphs();
-
-  Devel::PixelBuffer imageBuffer;
-
-  if( RENDER_MASK == behaviour )
-  {
-    // Generate the image buffer as an alpha mask for color glyphs.
-    imageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_MASK, ignoreHorizontalAlignment, pixelFormat, penY, 0u, numberOfGlyphs - 1 );
-  }
-  else if( RENDER_NO_TEXT == behaviour )
-  {
-    // Generate an empty image buffer so that it can been combined with the image buffers for styles
-    imageBuffer = Devel::PixelBuffer::New( bufferWidth, bufferHeight, Pixel::RGBA8888 );
-    memset( imageBuffer.GetBuffer(), 0u, bufferSizeChar );
-  }
-  else
-  {
-    // Generate the image buffer for the text with no style.
-    imageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_NONE, ignoreHorizontalAlignment, pixelFormat, penY, 0u, numberOfGlyphs -1 );
-  }
-
-  if ( ( RENDER_NO_STYLES != behaviour ) && ( RENDER_MASK != behaviour ) )
-  {
-    // @todo. Support shadow and underline for partial text later on.
-
-    // Generate the shadow if enabled
-    const Vector2& shadowOffset = mModel->GetShadowOffset();
-    if ( fabsf( shadowOffset.x ) > Math::MACHINE_EPSILON_1 || fabsf( shadowOffset.y ) > Math::MACHINE_EPSILON_1 )
-    {
-      // Create the image buffer for shadow
-      Devel::PixelBuffer shadowImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_SHADOW, ignoreHorizontalAlignment, pixelFormat, penY, 0u, numberOfGlyphs - 1 );
-
-      // Combine the two buffers
-      imageBuffer = CombineImageBuffer( imageBuffer, shadowImageBuffer, bufferWidth, bufferHeight );
-    }
-
-    // Generate the underline if enabled
-    const bool underlineEnabled = mModel->IsUnderlineEnabled();
-    if ( underlineEnabled )
-    {
-      // Create the image buffer for underline
-      Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, penY, 0u, numberOfGlyphs - 1 );
-
-      // Combine the two buffers
-      imageBuffer = CombineImageBuffer( imageBuffer, underlineImageBuffer, bufferWidth, bufferHeight );
-    }
-  }
-
-  // Create the final PixelData for the combined image buffer
-  PixelData pixelData = Devel::PixelBuffer::Convert( imageBuffer );
-
-  return pixelData;
-}
-
-Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth, const unsigned int bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int verticalOffset, GlyphIndex fromGlyphIndex, GlyphIndex toGlyphIndex )
-{
   // Retrieve lines, glyphs, positions and colors from the view model.
   const Length modelNumberOfLines = mModel->GetNumberOfLines();
   const LineRun* const modelLinesBuffer = mModel->GetLines();
@@ -370,26 +190,26 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
   const ColorIndex* const colorIndexBuffer = mModel->GetColorIndices();
 
   // Whether to use the default color.
-  const bool useDefaultColor = ( NULL == colorsBuffer );
+  const bool useDefaultColor = NULL == colorsBuffer;
   const Vector4& defaultColor = mModel->GetDefaultColor();
 
   // Create and initialize the pixel buffer.
   GlyphData glyphData;
-  glyphData.verticalOffset = verticalOffset;
-  glyphData.width = bufferWidth;
-  glyphData.height = bufferHeight;
-  glyphData.bitmapBuffer = Devel::PixelBuffer::New( bufferWidth, bufferHeight, pixelFormat );
+  glyphData.verticalOffset = penY;
 
-  if ( Pixel::RGBA8888 == pixelFormat )
-  {
-    const unsigned int bufferSizeInt = bufferWidth * bufferHeight;
-    const unsigned int bufferSizeChar = 4u * bufferSizeInt;
-    memset( glyphData.bitmapBuffer.GetBuffer(), 0u, bufferSizeChar );
-  }
-  else
-  {
-    memset( glyphData.bitmapBuffer.GetBuffer(), 0, bufferWidth * bufferHeight );
-  }
+  glyphData.width = static_cast<unsigned int>( size.width );
+  glyphData.height = static_cast<unsigned int>( size.height );
+  const unsigned int bufferSizeInt = glyphData.width * glyphData.height;
+  const unsigned int bufferSizeChar = 4u * bufferSizeInt;
+  glyphData.bitmapBuffer = new uint32_t[ bufferSizeInt ]; // This array will get deleted by PixelData because of the DELETE_ARRAY parameter.
+  memset( glyphData.bitmapBuffer, 0u, bufferSizeChar );
+
+  PixelData pixelData = PixelData::New( reinterpret_cast<uint8_t*>( glyphData.bitmapBuffer ),
+                                        bufferSizeChar,
+                                        glyphData.width,
+                                        glyphData.height,
+                                        Pixel::RGBA8888, // The format is RGBA8888 because is the format accepted by the image atlas manager.
+                                        PixelData::DELETE_ARRAY );
 
   // Get a handle of the font client. Used to retrieve the bitmaps of the glyphs.
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
@@ -400,54 +220,15 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
     const LineRun& line = *( modelLinesBuffer + lineIndex );
 
     // Sets the horizontal offset of the line.
-    glyphData.horizontalOffset = ignoreHorizontalAlignment ? 0 : static_cast<int>( line.alignmentOffset );
+    glyphData.horizontalOffset = static_cast<int>( line.alignmentOffset );
 
     // Increases the vertical offset with the line's ascender.
     glyphData.verticalOffset += static_cast<int>( line.ascender );
-
-    if ( style == Typesetter::STYLE_SHADOW )
-    {
-      const Vector2& shadowOffset = mModel->GetShadowOffset();
-      glyphData.horizontalOffset += shadowOffset.x;
-      if ( lineIndex == 0u )
-      {
-        // Only need to add the vertical shadow offset for once
-        glyphData.verticalOffset += shadowOffset.y;
-      }
-    }
-
-    const bool underlineEnabled = mModel->IsUnderlineEnabled();
-    const Vector4& underlineColor = mModel->GetUnderlineColor();
-    const float underlineHeight = mModel->GetUnderlineHeight();
-
-    // Get the underline runs.
-    const Length numberOfUnderlineRuns = mModel->GetNumberOfUnderlineRuns();
-    Vector<GlyphRun> underlineRuns;
-    underlineRuns.Resize( numberOfUnderlineRuns );
-    mModel->GetUnderlineRuns( underlineRuns.Begin(), 0u, numberOfUnderlineRuns );
-
-    bool thereAreUnderlinedGlyphs = false;
-
-    float currentUnderlinePosition = 0.0f;
-    float currentUnderlineThickness = underlineHeight;
-    float maxUnderlineThickness = currentUnderlineThickness;
-
-    FontId lastUnderlinedFontId = 0;
-
-    float lineExtentLeft = bufferWidth;
-    float lineExtentRight = 0.0f;
-    float baseline = 0.0f;
 
     // Traverses the glyphs of the line.
     const GlyphIndex endGlyphIndex = std::min( numberOfGlyphs, line.glyphRun.glyphIndex + line.glyphRun.numberOfGlyphs );
     for( GlyphIndex glyphIndex = line.glyphRun.glyphIndex; glyphIndex < endGlyphIndex; ++glyphIndex )
     {
-      if ( glyphIndex < fromGlyphIndex || glyphIndex > toGlyphIndex )
-      {
-        // Ignore any glyph that out of the specified range
-        continue;
-      }
-
       // Retrieve the glyph's info.
       const GlyphInfo* const glyphInfo = glyphsBuffer + glyphIndex;
 
@@ -458,84 +239,12 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
         continue;
       }
 
-      const bool underlineGlyph = underlineEnabled || IsGlyphUnderlined( glyphIndex, underlineRuns );
-      thereAreUnderlinedGlyphs = thereAreUnderlinedGlyphs || underlineGlyph;
-
-      // Are we still using the same fontId as previous
-      if( underlineGlyph && ( glyphInfo->fontId != lastUnderlinedFontId ) )
-      {
-        // We need to fetch fresh font underline metrics
-        FontMetrics fontMetrics;
-        fontClient.GetFontMetrics( glyphInfo->fontId, fontMetrics );
-        currentUnderlinePosition = ceil( fabsf( fontMetrics.underlinePosition ) );
-        const float descender = ceil( fabsf( fontMetrics.descender ) );
-
-        if( fabsf( underlineHeight ) < Math::MACHINE_EPSILON_1000 )
-        {
-          currentUnderlineThickness = fontMetrics.underlineThickness;
-
-          // Ensure underline will be at least a pixel high
-          if ( currentUnderlineThickness < 1.0f )
-          {
-            currentUnderlineThickness = 1.0f;
-          }
-          else
-          {
-            currentUnderlineThickness = ceil( currentUnderlineThickness );
-          }
-        }
-
-        // The underline thickness should be the max underline thickness of all glyphs of the line.
-        if ( currentUnderlineThickness > maxUnderlineThickness )
-        {
-          maxUnderlineThickness = currentUnderlineThickness;
-        }
-
-        // Clamp the underline position at the font descender and check for ( as EFL describes it ) a broken font
-        if( currentUnderlinePosition > descender )
-        {
-          currentUnderlinePosition = descender;
-        }
-
-        if( fabsf( currentUnderlinePosition ) < Math::MACHINE_EPSILON_1000 )
-        {
-          // Move offset down by one ( EFL behavior )
-          currentUnderlinePosition = 1.0f;
-        }
-
-        lastUnderlinedFontId = glyphInfo->fontId;
-      } // underline
-
       // Retrieves the glyph's position.
       const Vector2* const position = positionBuffer + glyphIndex;
-      if ( baseline < position->y + glyphInfo->yBearing )
-      {
-        baseline = position->y + glyphInfo->yBearing;
-      }
-
-      // Calculate the positions of leftmost and rightmost glyphs in the current line
-      if ( position->x < lineExtentLeft)
-      {
-        lineExtentLeft = position->x;
-      }
-
-      if ( position->x + glyphInfo->width > lineExtentRight)
-      {
-        lineExtentRight = position->x + glyphInfo->width;
-      }
 
       // Retrieves the glyph's color.
       const ColorIndex colorIndex = *( colorIndexBuffer + glyphIndex );
-
-      const Vector4* color;
-      if ( style == Typesetter::STYLE_SHADOW )
-      {
-        color = &( mModel->GetShadowColor() );
-      }
-      else
-      {
-        color = ( useDefaultColor || ( 0u == colorIndex ) ) ? &defaultColor : colorsBuffer + ( colorIndex - 1u );
-      }
+      const Vector4* const color = ( useDefaultColor || ( 0u == colorIndex ) ) ? &defaultColor : colorsBuffer + ( colorIndex - 1u );
 
       // Retrieves the glyph's bitmap.
       glyphData.glyphBitmap.buffer = NULL;
@@ -550,49 +259,11 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
       {
         TypesetGlyph( glyphData,
                       position,
-                      color,
-                      style,
-                      pixelFormat);
+                      color );
         // delete the glyphBitmap.buffer as it is now copied into glyphData.bitmapBuffer
         delete []glyphData.glyphBitmap.buffer;
         glyphData.glyphBitmap.buffer = NULL;
-      }
-    }
 
-    // Draw the underline from the leftmost glyph to the rightmost glyph
-    if ( thereAreUnderlinedGlyphs && style == Typesetter::STYLE_UNDERLINE )
-    {
-      int underlineYOffset = glyphData.verticalOffset + baseline + currentUnderlinePosition;
-
-      for( unsigned int y = underlineYOffset; y < underlineYOffset + maxUnderlineThickness; y++ )
-      {
-        if( ( y < 0 ) || ( y > bufferHeight - 1 ) )
-        {
-          // Do not write out of bounds.
-          break;
-        }
-
-        for( unsigned int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++ )
-        {
-          if( ( x < 0 ) || ( x > bufferWidth - 1 ) )
-          {
-            // Do not write out of bounds.
-            break;
-          }
-
-          // Always RGBA image for text with styles
-          uint32_t* bitmapBuffer = reinterpret_cast< uint32_t* >( glyphData.bitmapBuffer.GetBuffer() );
-          uint32_t underlinePixel = *( bitmapBuffer + y * glyphData.width + x );
-          uint8_t* underlinePixelBuffer = reinterpret_cast<uint8_t*>( &underlinePixel );
-
-          // Write the underline color to the pixel buffer
-          *( underlinePixelBuffer ) = static_cast<uint8_t>( underlineColor.r * 255.f );
-          *( underlinePixelBuffer + 1u ) = static_cast<uint8_t>( underlineColor.g * 255.f );
-          *( underlinePixelBuffer + 2u ) = static_cast<uint8_t>( underlineColor.b * 255.f );
-          *( underlinePixelBuffer + 3u ) = static_cast<uint8_t>( underlineColor.a * 255.f );
-
-          *( bitmapBuffer + y * glyphData.width + x ) = underlinePixel;
-        }
       }
     }
 
@@ -600,70 +271,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
     glyphData.verticalOffset += static_cast<int>( -line.descender );
   }
 
-  return glyphData.bitmapBuffer;
-}
-
-Devel::PixelBuffer Typesetter::CombineImageBuffer( Devel::PixelBuffer topPixelBuffer, Devel::PixelBuffer bottomPixelBuffer, const unsigned int bufferWidth, const unsigned int bufferHeight )
-{
-  unsigned char* topBuffer = topPixelBuffer.GetBuffer();
-  unsigned char* bottomBuffer = bottomPixelBuffer.GetBuffer();
-
-  Devel::PixelBuffer combinedPixelBuffer;
-
-  if ( topBuffer == NULL && bottomBuffer == NULL )
-  {
-    // Nothing to do if both buffers are empty.
-    return combinedPixelBuffer;
-  }
-
-  if ( topBuffer == NULL )
-  {
-    // Nothing to do if topBuffer is empty.
-    return bottomPixelBuffer;
-  }
-
-  if ( bottomBuffer == NULL )
-  {
-    // Nothing to do if bottomBuffer is empty.
-    return topPixelBuffer;
-  }
-
-  // Always combine two RGBA images
-  const unsigned int bufferSizeInt = bufferWidth * bufferHeight;
-  const unsigned int bufferSizeChar = 4u * bufferSizeInt;
-
-  combinedPixelBuffer = Devel::PixelBuffer::New( bufferWidth, bufferHeight, Pixel::RGBA8888 );
-  uint8_t* combinedBuffer = reinterpret_cast< uint8_t* >( combinedPixelBuffer.GetBuffer() );
-  memset( combinedBuffer, 0u, bufferSizeChar );
-
-  for (unsigned int pixelIndex = 0; pixelIndex < bufferSizeInt; pixelIndex++)
-  {
-    // If the alpha of the pixel in either buffer is not fully opaque, blend the two pixels.
-    // Otherwise, copy pixel from topBuffer to combinedBuffer.
-
-    unsigned int alphaBuffer1 = topBuffer[pixelIndex*4+3];
-    unsigned int alphaBuffer2 = bottomBuffer[pixelIndex*4+3];
-
-    if ( alphaBuffer1 != 255 || alphaBuffer2 != 255 )
-    {
-      // At least one pixel is not fully opaque
-      // "Over" blend the the pixel from topBuffer with the pixel in bottomBuffer
-      combinedBuffer[pixelIndex*4] = ( topBuffer[pixelIndex*4] * topBuffer[pixelIndex*4+3] / 255 ) + ( bottomBuffer[pixelIndex*4] * bottomBuffer[pixelIndex*4+3] * ( 255 - topBuffer[pixelIndex*4+3] ) / ( 255*255 ) );
-      combinedBuffer[pixelIndex*4+1] = ( topBuffer[pixelIndex*4+1] * topBuffer[pixelIndex*4+3] / 255 ) + ( bottomBuffer[pixelIndex*4+1] * bottomBuffer[pixelIndex*4+3] * ( 255 - topBuffer[pixelIndex*4+3] ) / ( 255*255 ) );
-      combinedBuffer[pixelIndex*4+2] = ( topBuffer[pixelIndex*4+2] * topBuffer[pixelIndex*4+3] / 255 ) + ( bottomBuffer[pixelIndex*4+2] * bottomBuffer[pixelIndex*4+3] * ( 255 - topBuffer[pixelIndex*4+3] ) / ( 255*255 ) );
-      combinedBuffer[pixelIndex*4+3] = topBuffer[pixelIndex*4+3] + ( bottomBuffer[pixelIndex*4+3] * ( 255 - topBuffer[pixelIndex*4+3] ) / 255 );
-    }
-    else
-    {
-      // Copy the pixel from topBuffer to combinedBuffer
-      combinedBuffer[pixelIndex*4] = topBuffer[pixelIndex*4];
-      combinedBuffer[pixelIndex*4+1] = topBuffer[pixelIndex*4+1];
-      combinedBuffer[pixelIndex*4+2] = topBuffer[pixelIndex*4+2];
-      combinedBuffer[pixelIndex*4+3] = topBuffer[pixelIndex*4+3];
-    }
-  }
-
-  return combinedPixelBuffer;
+  return pixelData;
 }
 
 Typesetter::Typesetter( const ModelInterface* const model )

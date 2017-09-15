@@ -620,7 +620,11 @@ void VideoView::SetWindowSurfaceTarget()
     mVideoPlayer.Play();
     mVideoPlayer.Pause();
   }
-  mVideoPlayer.SetPlayPosition( curPos );
+
+  if( curPos > 0 )
+  {
+    mVideoPlayer.SetPlayPosition( curPos );
+  }
 
   // For underlay rendering mode, video display area have to be transparent.
   Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
@@ -660,7 +664,10 @@ void VideoView::SetNativeImageTarget()
     mVideoPlayer.Play();
     mVideoPlayer.Pause();
   }
-  mVideoPlayer.SetPlayPosition( curPos );
+  if( curPos > 0 )
+  {
+    mVideoPlayer.SetPlayPosition( curPos );
+  }
 }
 
 void VideoView::UpdateDisplayArea()

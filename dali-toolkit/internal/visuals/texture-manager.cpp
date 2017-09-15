@@ -319,7 +319,7 @@ bool TextureManager::LoadTexture( TextureInfo& textureInfo )
 
     if( !textureInfo.loadSynchronously )
     {
-      auto& loadersContainer = textureInfo.url.IsLocal() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
+      auto& loadersContainer = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
       auto loadingHelperIt = loadersContainer.GetNext();
       DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
       loadingHelperIt->Load(textureInfo.textureId, textureInfo.url,

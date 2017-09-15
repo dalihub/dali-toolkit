@@ -986,7 +986,6 @@ int UtcDaliToolkitTextLabelColorComponents(void)
   label.SetProperty( DevelTextLabel::Property::TEXT_COLOR_ALPHA, 0.6f );
   DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_ALPHA ), 0.6f, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty< Vector4 >( DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE ), Vector4( 0.0f, 0.0f, 1.0f, 0.6f ), TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty< Vector4 >( TextLabel::Property::TEXT_COLOR ), Vector4( 0.0f, 0.0f, 1.0f, 0.6f ), TEST_LOCATION );
 
   END_TEST;
 }

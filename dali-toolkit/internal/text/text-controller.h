@@ -999,13 +999,6 @@ public: // Default style & Input style
    */
   const std::string& GetInputOutlineProperties() const;
 
-  /**
-   * @brief Set the control's interface.
-   *
-   * @param[in] controlInterface The control's interface.
-   */
-  void SetControlInterface( ControlInterface* controlInterface );
-
 public: // Queries & retrieves.
 
   /**

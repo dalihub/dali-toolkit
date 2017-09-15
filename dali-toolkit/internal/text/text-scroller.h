@@ -22,7 +22,6 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
@@ -61,16 +60,14 @@ public:
   /**
    * @brief Set parameters relating to source required for scrolling
    *
-   * @param[in] scrollingTextActor actor containing the text to be scrolled
-   * @param[in] renderer renderer to render the text
-   * @param[in] textureSet texture of the text to be scrolled
+   * @param[in] sourceActor source actor to be scrolled
    * @param[in] controlSize size of the control to scroll within
-   * @param[in] textNaturalSize natural size of the text
+   * @param[in] offScreenSize size of the sourceActor
    * @param[in] direction text direction true for right to left text
-   * @param[in] horizontalAlignment horizontal alignment of the text
-   * @param[in] verticalAlignment vertical alignment of the text
+   * @param[in] alignmentOffset alignment of source text
+   *
    */
-  void SetParameters( Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, Layout::HorizontalAlignment horizontalAlignment, Layout::VerticalAlignment verticalAlignment );
+  void SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset, Layout::HorizontalAlignment horizontalAlignment );
 
   /**
    * @brief Set the gap distance to elapse before the text wraps around
@@ -137,6 +134,18 @@ public:
    */
   DevelTextLabel::AutoScrollStopMode::Type GetStopMode() const;
 
+  /**
+   * @brief Get the camera used to look at source, should be added to the parent of target actor.
+   * @return camera Actor
+   */
+  Actor GetSourceCamera() const;
+
+  /**
+   * @brief Get the resulting scrolling text actor, add to target actor which will show scrolling text
+   * @return mesh Actor
+   */
+  Actor GetScrollingText() const;
+
 private: // Implementation
 
   /**
@@ -163,21 +172,25 @@ private: // Implementation
 
   /**
    * @brief variables required to set up scrolling animation
-   * @param[in] scrollingTextActor actor that shows scrolling text
    * @param[in] scrollAmount distance to animate text for the given duration
    * @param[in] scrollDuration duration of aninmation
    * @param[in] loopCount number of times to loop the scrolling text
    */
-  void StartScrolling( Actor scrollingTextActor, float scrollAmount, float scrollDuration, int loopCount );
+  void StartScrolling( float scrollAmount, float scrollDuration, int loopCount );
+
+  /**
+   * @brief When scrolling ended, the actors are cleaned up so no longer staged.
+   */
+  void CleanUp();
 
 private:
 
+  RenderTask         mRenderTask;               // Renders full text to a FrameBuffer which is then scrolled.
+  CameraActor        mOffscreenCameraActor;     // Camera used by render task
+  Actor              mScrollingTextActor;       // Actor used to show scrolling text
   ScrollerInterface& mScrollerInterface;        // Interface implemented by control that requires scrolling
   Property::Index    mScrollDeltaIndex;         // Property used by shader to represent distance to scroll
   Animation          mScrollAnimation;          // Animation used to update the mScrollDeltaIndex
-  Dali::Renderer     mRenderer;                 // Renderer used to render the text
-  Shader             mShader;                   // Shader originally used by the renderer while not scrolling
-  TextureSet         mTextureSet;               // Texture originally used by the renderer while not scrolling
 
   int   mScrollSpeed;                                   ///< Speed which text should automatically scroll at
   int   mLoopCount;                                     ///< Number of time the text should scroll
