@@ -280,6 +280,13 @@ public:
    */
   float GetUnderlineHeight() const;
 
+  /**
+   * @brief Retrieves the number of underline runs.
+   *
+   * @return The number of underline runs.
+   */
+  Length GetNumberOfUnderlineRuns() const;
+
 protected:
 
   /**
