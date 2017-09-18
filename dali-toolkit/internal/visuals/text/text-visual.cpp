@@ -139,7 +139,112 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   }\n
 );
 
-const char* FRAGMENT_SHADER_ATLAS_CLAMP_RGBA = DALI_COMPOSE_SHADER(
+const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform lowp vec4 uTextColorAnimatable;\n
+  uniform mediump vec4 uAtlasRect;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
+    mediump float textTexture = texture2D( sTexture, texCoord ).r;\n
+
+    // Set the color of the text to what it is animated to.
+    gl_FragColor = uTextColorAnimatable * textTexture * uColor * vec4( mixColor, opacity );
+  }\n
+);
+
+const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform mediump vec4 uAtlasRect;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
+    mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
+
+    gl_FragColor = textTexture * uColor * vec4( mixColor, opacity );
+  }\n
+);
+
+const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform sampler2D sStyle;\n
+  uniform lowp vec4 uTextColorAnimatable;\n
+  uniform mediump vec4 uAtlasRect;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
+    mediump float textTexture = texture2D( sTexture, texCoord ).r;\n
+    mediump vec4 styleTexture = texture2D( sStyle, texCoord );\n
+
+    // Draw the text as overlay above the style
+    gl_FragColor = ( uTextColorAnimatable * textTexture + styleTexture * ( 1.0 - textTexture ) ) * uColor * vec4( mixColor, opacity );\n
+  }\n
+);
+
+const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform sampler2D sStyle;\n
+  uniform mediump vec4 uAtlasRect;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
+    mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
+    mediump vec4 styleTexture = texture2D( sStyle, texCoord );\n
+
+    // Draw the text as overlay above the style
+    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, opacity );\n
+  }\n
+);
+
+const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform sampler2D sMask;\n
+  uniform lowp vec4 uTextColorAnimatable;\n
+  uniform mediump vec4 uAtlasRect;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
+    mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
+    mediump float maskTexture = texture2D( sMask, texCoord ).r;\n
+
+    // Set the color of non-transparent pixel in text to what it is animated to.
+    // Markup text with multiple text colors are not animated (but can be supported later on if required).
+    // Emoji color are not animated.
+    mediump vec4 textColor = textTexture * textTexture.a;\n
+    mediump float vstep = step( 0.0001, textColor.a );\n
+    textColor.rgb = mix( textColor.rgb, uTextColorAnimatable.rgb, vstep * maskTexture );\n
+
+    // Draw the text as overlay above the style
+    gl_FragColor = textColor * uColor * vec4( mixColor, opacity );\n
+  }\n
+);
+
+const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform sampler2D sStyle;\n
@@ -156,36 +261,17 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP_RGBA = DALI_COMPOSE_SHADER(
     mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
     mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
     mediump vec4 styleTexture = texture2D( sStyle, texCoord );\n
-    mediump vec4 maskTexture = texture2D( sMask, texCoord );\n
+    mediump float maskTexture = texture2D( sMask, texCoord ).r;\n
 
     // Set the color of non-transparent pixel in text to what it is animated to.
     // Markup text with multiple text colors are not animated (but can be supported later on if required).
     // Emoji color are not animated.
     mediump vec4 textColor = textTexture * textTexture.a;\n
     mediump float vstep = step( 0.0001, textColor.a );\n
-    textColor.rgb = mix( textColor.rgb, uTextColorAnimatable.rgb, vstep * maskTexture.a * ( 1.0 - uHasMultipleTextColors ) );\n
+    textColor.rgb = mix( textColor.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) );\n
 
     // Draw the text as overlay above the style
     gl_FragColor = ( textColor + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, opacity );\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER_ATLAS_CLAMP_L8 = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform lowp vec4 uTextColorAnimatable;\n
-  uniform mediump vec4 uAtlasRect;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-    mediump float textTexture = texture2D( sTexture, texCoord ).r;\n
-
-    // Set the color of the text to what it is animated to.
-    gl_FragColor = uTextColorAnimatable * textTexture * uColor * vec4( mixColor, opacity );\n
   }\n
 );
 
@@ -380,7 +466,7 @@ void TextVisual::DoSetOnStage( Actor& actor )
   mControl = actor;
 
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
-  Shader shader = GetTextShader(mFactoryCache, true);
+  Shader shader = GetTextShader(mFactoryCache, TextType::SINGLE_COLOR_TEXT, TextType::NO_EMOJI, TextType::NO_STYLES);
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT );
@@ -594,101 +680,16 @@ void TextVisual::UpdateRenderer()
         shadowEnabled = true;
       }
 
-      bool outlineWidthEnabled = false;
-      float outlineWidth = mController->GetTextModel()->GetOutlineWidth();
-      if ( outlineWidth > Math::MACHINE_EPSILON_1 )
-      {
-        outlineWidthEnabled = true;
-      }
-
       const bool underlineEnabled = mController->GetTextModel()->IsUnderlineEnabled();
+      const bool outlineEnabled = ( mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1 );
 
-      if ( hasMultipleTextColors || containsEmoji || shadowEnabled || underlineEnabled || outlineWidthEnabled )
-      {
-        // Create RGBA textures if the text contains emojis or styles or multiple text colors
+      const bool styleEnabled = ( shadowEnabled || underlineEnabled || outlineEnabled );
 
-        // Create a texture for the text without any styles
-        PixelData data = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_NO_STYLES );
+      TextureSet textureSet = GetTextTexture( relayoutSize, hasMultipleTextColors, containsEmoji, styleEnabled );
+      mImpl->mRenderer.SetTextures( textureSet );
 
-        // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
-        // In that case, create a texture. TODO: should tile the text.
-
-        Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                        data.GetPixelFormat(),
-                                        data.GetWidth(),
-                                        data.GetHeight() );
-
-        texture.Upload( data );
-
-        TextureSet textureSet = TextureSet::New();
-        textureSet.SetTexture( 0u, texture );
-
-        // Create a texture for all the text styles (without the text itself)
-        PixelData styleData = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_NO_TEXT );
-
-        Texture styleTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                             styleData.GetPixelFormat(),
-                                             styleData.GetWidth(),
-                                             styleData.GetHeight() );
-
-        styleTexture.Upload( styleData );
-
-        textureSet.SetTexture( 1u, styleTexture );
-
-        // Create a texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
-        PixelData maskData = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_MASK );
-
-        Texture maskTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                            styleData.GetPixelFormat(),
-                                            styleData.GetWidth(),
-                                            styleData.GetHeight() );
-
-        maskTexture.Upload( maskData );
-
-        textureSet.SetTexture( 2u, maskTexture );
-
-        // Filter mode needs to be set to nearest to produce better quality while static.
-        Sampler sampler = Sampler::New();
-        sampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
-        textureSet.SetSampler( 0u, sampler );
-        textureSet.SetSampler( 1u, sampler );
-        textureSet.SetSampler( 2u, sampler );
-
-        mImpl->mRenderer.SetTextures( textureSet );
-
-        Shader shader = GetTextShader(mFactoryCache, true); // RGBA shader
-        mImpl->mRenderer.SetShader(shader);
-      }
-      else
-      {
-        // Create L8 texture if the text contains only single text color with no emoji and no style
-
-        // Create a texture for the text without any styles
-        PixelData data = mTypesetter->Render( relayoutSize, Text::Typesetter::RENDER_NO_STYLES, false, Pixel::L8 );
-
-        // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
-        // In that case, create a texture. TODO: should tile the text.
-
-        Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                        data.GetPixelFormat(),
-                                        data.GetWidth(),
-                                        data.GetHeight() );
-
-        texture.Upload( data );
-
-        TextureSet textureSet = TextureSet::New();
-        textureSet.SetTexture( 0u, texture );
-
-        // Filter mode needs to be set to nearest to produce better quality while static.
-        Sampler sampler = Sampler::New();
-        sampler.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
-        textureSet.SetSampler( 0u, sampler );
-
-        mImpl->mRenderer.SetTextures( textureSet );
-
-        Shader shader = GetTextShader(mFactoryCache, false); // L8 shader
-        mImpl->mRenderer.SetShader(shader);
-      }
+      Shader shader = GetTextShader( mFactoryCache, hasMultipleTextColors, containsEmoji, styleEnabled );
+      mImpl->mRenderer.SetShader(shader);
 
       mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
@@ -728,27 +729,140 @@ void TextVisual::RemoveTextureSet()
   }
 }
 
-Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool isRgbaTexture )
+TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled )
 {
-  Shader shader;
-  if( isRgbaTexture )
+  // Filter mode needs to be set to linear to produce better quality while scaling.
+  Sampler sampler = Sampler::New();
+  sampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
+
+  TextureSet textureSet = TextureSet::New();
+
+  // Create RGBA texture if the text contains emojis or multiple text colors, otherwise L8 texture
+  Pixel::Format textPixelFormat = ( containsEmoji || hasMultipleTextColors ) ? Pixel::RGBA8888 : Pixel::L8;
+
+  // Create a texture for the text without any styles
+  PixelData data = mTypesetter->Render( size, Text::Typesetter::RENDER_NO_STYLES, false, textPixelFormat );
+
+  // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
+  // In that case, create a texture. TODO: should tile the text.
+
+  Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                  data.GetPixelFormat(),
+                                  data.GetWidth(),
+                                  data.GetHeight() );
+
+  texture.Upload( data );
+
+  textureSet.SetTexture( 0u, texture );
+  textureSet.SetSampler( 0u, sampler );
+
+  if ( styleEnabled )
   {
-    shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_RGBA );
-    if( !shader )
+    // Create RGBA texture for all the text styles (without the text itself)
+    PixelData styleData = mTypesetter->Render( size, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888 );
+
+    Texture styleTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                         styleData.GetPixelFormat(),
+                                         styleData.GetWidth(),
+                                         styleData.GetHeight() );
+
+    styleTexture.Upload( styleData );
+
+    textureSet.SetTexture( 1u, styleTexture );
+    textureSet.SetSampler( 1u, sampler );
+  }
+
+  if ( containsEmoji && !hasMultipleTextColors )
+  {
+    // Create a L8 texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
+    PixelData maskData = mTypesetter->Render( size, Text::Typesetter::RENDER_MASK, false, Pixel::L8 );
+
+    Texture maskTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                        maskData.GetPixelFormat(),
+                                        maskData.GetWidth(),
+                                        maskData.GetHeight() );
+
+    maskTexture.Upload( maskData );
+
+    if ( !styleEnabled )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP_RGBA );
-      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-      factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_RGBA, shader );
+      textureSet.SetTexture( 1u, maskTexture );
+      textureSet.SetSampler( 1u, sampler );
+    }
+    else
+    {
+      textureSet.SetTexture( 2u, maskTexture );
+      textureSet.SetSampler( 2u, sampler );
     }
   }
-  else
+
+  return textureSet;
+}
+
+Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled )
+{
+  Shader shader;
+
+  if( hasMultipleTextColors && !styleEnabled )
   {
-    shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_L8 );
+    // We don't animate text color if the text contains multiple colors
+    shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP_L8 );
+      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_MULTI_COLOR_TEXT );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-      factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_L8, shader );
+      factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT, shader );
+    }
+  }
+  else if( hasMultipleTextColors && styleEnabled )
+  {
+    // We don't animate text color if the text contains multiple colors
+    shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+      factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE, shader );
+    }
+  }
+  else if( !hasMultipleTextColors && !containsEmoji && !styleEnabled )
+  {
+    shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+      factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT, shader );
+    }
+  }
+  else if( !hasMultipleTextColors && !containsEmoji && styleEnabled )
+  {
+    shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+      factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE, shader );
+    }
+  }
+  else if( !hasMultipleTextColors && containsEmoji && !styleEnabled )
+  {
+    shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+      factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI, shader );
+    }
+  }
+  else // if( !hasMultipleTextColors && containsEmoji && styleEnabled )
+  {
+    shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+      factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI, shader );
     }
   }
 
