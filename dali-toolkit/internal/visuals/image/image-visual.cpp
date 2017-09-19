@@ -261,7 +261,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl( imageUrl ),
-  mMaskingData( NULL ),
+  mMaskingData( ),
   mDesiredSize( size ),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
   mFittingMode( fittingMode ),
@@ -279,7 +279,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
   mImageUrl(),
-  mMaskingData( NULL ),
+  mMaskingData( ),
   mDesiredSize(),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
   mFittingMode( FittingMode::DEFAULT ),
@@ -304,7 +304,6 @@ ImageVisual::~ImageVisual()
       textureManager.Remove( mMaskingData->mAlphaMaskId );
     }
   }
-  delete mMaskingData;
 }
 
 void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
@@ -509,9 +508,9 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
 void ImageVisual::AllocateMaskData()
 {
-  if( mMaskingData == NULL )
+  if( !mMaskingData )
   {
-    mMaskingData = new TextureManager::MaskingData();
+    mMaskingData.reset(new TextureManager::MaskingData());
   }
 }
 

@@ -19,6 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <memory>
+
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
@@ -319,7 +321,7 @@ private:
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
   VisualUrl mImageUrl;
-  TextureManager::MaskingData* mMaskingData;
+  TextureManager::MaskingDataPointer mMaskingData;
 
   Dali::ImageDimensions mDesiredSize;
   TextureManager::TextureId mTextureId;

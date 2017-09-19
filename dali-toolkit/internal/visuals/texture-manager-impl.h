@@ -21,6 +21,7 @@
 #include <deque>
 #include <functional>
 #include <string>
+#include <memory>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -115,6 +116,7 @@ public:
     float mContentScaleFactor;
     bool mCropToMask;
   };
+  using MaskingDataPointer = std::unique_ptr<MaskingData>;
 
   /**
    * Constructor.
@@ -131,7 +133,7 @@ public:
 
   TextureSet LoadTexture(VisualUrl& url, Dali::ImageDimensions desiredSize,
                          Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode,
-                         MaskingData* maskInfo, bool synchronousLoading,
+                         const MaskingDataPointer& maskInfo, bool synchronousLoading,
                          TextureManager::TextureId& textureId, Vector4& textureRect,
                          bool& atlasingStatus, bool& loadingStatus, Dali::WrapMode::Type wrapModeU,
                          Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
