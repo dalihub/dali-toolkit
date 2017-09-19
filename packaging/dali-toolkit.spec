@@ -295,22 +295,37 @@ popd
 ##############################
 
 %preun resources_480x800
-pushd %{dali_toolkit_style_files}
-mv images ./480x800
-mv dali-toolkit-default-theme.json ./480x800
-popd
+case "$1" in
+  0)
+    %preun resources_480x800
+    pushd %{dali_toolkit_style_files}
+    mv images ./480x800
+    mv dali-toolkit-default-theme.json ./480x800
+    popd
+  ;;
+esac
 
 %preun resources_720x1280
-pushd %{dali_toolkit_style_files}
-mv images ./720x1280
-mv dali-toolkit-default-theme.json ./720x1280
-popd
+case "$1" in
+  0)
+    %preun resources_720x1280
+    pushd %{dali_toolkit_style_files}
+    mv images ./720x1280
+    mv dali-toolkit-default-theme.json ./720x1280
+    popd
+  ;;
+esac
 
 %preun resources_1920x1080
-pushd %{dali_toolkit_style_files}
-mv images ./1920x1080
-mv dali-toolkit-default-theme.json ./1920x1080
-popd
+case "$1" in
+  0)
+    %preun resources_1920x1080
+    pushd %{dali_toolkit_style_files}
+    mv images ./1920x1080
+    mv dali-toolkit-default-theme.json ./1920x1080
+    popd
+  ;;
+esac
 
 ##############################
 # Post Uninstall
