@@ -15,11 +15,10 @@
  *
  */
 
-// CLASS HEADER
-#include "toolkit-video-player.h"
-
-// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/video-player.h>
 #include <dali/public-api/object/any.h>
+#include <dali/public-api/object/base-object.h>
+#include <toolkit-application.h>
 
 namespace Dali
 {
@@ -224,6 +223,11 @@ void VideoPlayer::Forward( int millisecond )
 
 void VideoPlayer::Backward( int millisecond )
 {
+}
+
+bool VideoPlayer::IsVideoTextureSupported() const
+{
+  return ToolkitApplication::DECODED_IMAGES_SUPPORTED;
 }
 
 } // namespace Dali;

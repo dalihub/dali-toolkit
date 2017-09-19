@@ -207,10 +207,20 @@ public:
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
-  /*
+  /**
    * @brief Updates video display area for window rendering target
    */
   void UpdateDisplayArea();
+
+  /**
+   * @brief Sets underlay flag and initializes new rendering target by flag.
+   */
+  void SetUnderlay( bool set );
+
+  /**
+   * @brief Checks underlay flag.
+   */
+  bool IsUnderlay();
 
 private: // From Control
 
@@ -265,14 +275,15 @@ private:
   Dali::Toolkit::VideoView::VideoViewSignalType mFinishedSignal;
   std::string mUrl;
   Dali::DisplayArea mDisplayArea;
+  Dali::Renderer mRenderer;
 
   Property::Index mUpdateTriggerPropertyIndex;
   TriggerEventInterface* mNotification;
 
   int mCurrentVideoPlayPosition;
-  bool mIsNativeImageTarget;
   bool mIsPlay;
   bool mIsPause;
+  bool mIsUnderlay;
 };
 
 } // namespace Internal

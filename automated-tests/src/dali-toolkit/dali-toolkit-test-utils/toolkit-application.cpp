@@ -87,6 +87,8 @@ std::string Application::GetResourcePath()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+bool ToolkitApplication::DECODED_IMAGES_SUPPORTED;
+
 ToolkitApplication::ToolkitApplication()
 : mApplicationStub(new Application(*this))
 {
