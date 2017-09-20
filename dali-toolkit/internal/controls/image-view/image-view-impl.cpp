@@ -196,6 +196,12 @@ Vector3 ImageView::GetNaturalSize()
   {
     Vector2 rendererNaturalSize;
     mVisual.GetNaturalSize( rendererNaturalSize );
+
+    Extents padding;
+    padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
+    rendererNaturalSize.width += ( padding.start + padding.end );
+    rendererNaturalSize.height += ( padding.top + padding.bottom );
     return Vector3( rendererNaturalSize );
   }
 
@@ -205,25 +211,31 @@ Vector3 ImageView::GetNaturalSize()
 
 float ImageView::GetHeightForWidth( float width )
 {
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
   if( mVisual )
   {
-    return mVisual.GetHeightForWidth( width );
+    return mVisual.GetHeightForWidth( width ) + padding.top + padding.bottom;
   }
   else
   {
-    return Control::GetHeightForWidth( width );
+    return Control::GetHeightForWidth( width ) + padding.top + padding.bottom;
   }
 }
 
 float ImageView::GetWidthForHeight( float height )
 {
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
   if( mVisual )
   {
-    return mVisual.GetWidthForHeight( height );
+    return mVisual.GetWidthForHeight( height ) + padding.start + padding.end;
   }
   else
   {
-    return Control::GetWidthForHeight( height );
+    return Control::GetWidthForHeight( height ) + padding.start + padding.end;
   }
 }
 
@@ -233,9 +245,25 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
   if( mVisual )
   {
-    // Pass in an empty map which uses default transform values meaning our visual fills the control
+    Extents margin;
+    margin = Self().GetProperty<Extents>( Toolkit::Control::Property::MARGIN );
+
+    Extents padding;
+    padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
+    Property::Map transformMap = Property::Map();
+
+    if( ( padding.start != 0 ) || ( padding.end != 0 ) || ( padding.top != 0 ) || ( padding.bottom != 0 ) ||
+        ( margin.start != 0 ) || ( margin.end != 0 ) || ( margin.top != 0 ) || ( margin.bottom != 0 ) )
+    {
+      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( margin.start + padding.start, margin.top + padding.top ) )
+                  .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                  .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                  .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
+    }
+
     // Should provide a transform that handles aspect ratio according to image size
-    mVisual.SetTransformAndSize( Property::Map(), size );
+    mVisual.SetTransformAndSize( transformMap, size );
   }
 }
 

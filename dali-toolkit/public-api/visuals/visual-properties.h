@@ -95,7 +95,7 @@ enum
    * @details Name "transform", type Property::MAP.
    * @SINCE_1_2.60
    * @note Optional.
-   * @see DevelVisual::Transform::Property
+   * @see Toolkit::Visual::Transform::Property
    */
   TRANSFORM,
 
@@ -196,8 +196,8 @@ enum Type
    * control.SetProperty( ..., // Some visual based property
    *                      Property::Map().Add( ... ) // Properties to set up visual
    *                                     .Add( Visual::Property::TRANSFORM,
-   *                                           Property::Array().Add( DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( Policy::ABSOLUTE, Policy::RELATIVE ) ) )
-   *                                                            .Add( DevelVisual::Transform::Property::OFFSET, Vector2( 10, 1.0f ) ) );
+   *                                           Property::Array().Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Policy::ABSOLUTE, Policy::RELATIVE ) ) )
+   *                                                            .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( 10, 1.0f ) ) );
    * @endcode
    *
    * JSON:

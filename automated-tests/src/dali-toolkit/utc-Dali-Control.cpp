@@ -865,3 +865,53 @@ int UtcDaliControlResourcesReady(void)
 
   END_TEST;
 }
+
+int UtcDaliControlMarginProperty(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetBackgroundColor( Color::BLUE );
+
+  control.SetProperty( Control::Property::MARGIN, Extents( 20, 10, 0, 0 ) );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( control.GetProperty<Extents>( Control::Property::MARGIN ), Extents( 20, 10, 0, 0 ), TEST_LOCATION );
+
+  // Parent control has one ImageView as a Child.
+  ImageView image = ImageView::New();
+  image.SetBackgroundColor( Color::RED );
+  image.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  image.SetProperty( Control::Property::PADDING, Extents( 10, 10, 10, 10 ) );
+  control.Add( image );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( image.GetProperty<Extents>( Control::Property::PADDING ), Extents( 10, 10, 10, 10 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlPaddingProperty(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetBackgroundColor( Color::BLUE );
+
+  control.SetProperty( Control::Property::PADDING, Extents( 10, 10, 10, 10 ) );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( control.GetProperty<Extents>( Control::Property::PADDING ), Extents( 10, 10, 10, 10 ), TEST_LOCATION );
+
+  END_TEST;
+}
