@@ -188,6 +188,16 @@ void ViewModel::GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex ind
   mModel->GetUnderlineRuns( underlineRuns, index, numberOfRuns );
 }
 
+const Vector4& ViewModel::GetOutlineColor() const
+{
+  return mModel->GetOutlineColor();
+}
+
+float ViewModel::GetOutlineWidth() const
+{
+  return mModel->GetOutlineWidth();
+}
+
 void ViewModel::ElideGlyphs()
 {
   mIsTextElided = false;

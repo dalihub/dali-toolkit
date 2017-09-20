@@ -147,6 +147,16 @@ void Model::GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, 
   mVisualModel->GetUnderlineRuns( underlineRuns, index, numberOfRuns );
 }
 
+const Vector4& Model::GetOutlineColor() const
+{
+  return mVisualModel->GetOutlineColor();
+}
+
+float Model::GetOutlineWidth() const
+{
+  return mVisualModel->GetOutlineWidth();
+}
+
 Model::Model()
 : mLogicalModel(),
   mVisualModel(),

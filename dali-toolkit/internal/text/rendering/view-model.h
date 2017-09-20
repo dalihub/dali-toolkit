@@ -172,6 +172,16 @@ public:
   virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const;
 
   /**
+   * @copydoc ModelInterface::GetOutlineColor()
+   */
+  virtual const Vector4& GetOutlineColor() const;
+
+  /**
+   * @copydoc ModelInterface::GetOutlineWidth()
+   */
+  virtual float GetOutlineWidth() const;
+
+ /**
    * @brief Does the text elide.
    *
    * It stores a copy of the visible glyphs and removes as many glyphs as needed

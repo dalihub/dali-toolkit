@@ -434,8 +434,18 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::EMBOSS ), std::string("Emboss properties"), TEST_LOCATION );
 
   // Check the outline property
-  label.SetProperty( TextLabel::Property::OUTLINE, "Outline properties" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+  Property::Map outlineMapSet;
+  Property::Map outlineMapGet;
+
+  outlineMapSet["color"] = Color::RED;
+  outlineMapSet["width"] = 2.0f;
+  label.SetProperty( TextLabel::Property::OUTLINE, outlineMapSet );
+
+  outlineMapSet["color"] = "red";
+  outlineMapSet["width"] = "2";
+  outlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::OUTLINE );
+  DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
 
   // Check the pixel size of font
   label.SetProperty( DevelTextLabel::Property::PIXEL_SIZE, 20.f );
@@ -987,6 +997,74 @@ int UtcDaliToolkitTextLabelColorComponents(void)
   DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_ALPHA ), 0.6f, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty< Vector4 >( DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE ), Vector4( 0.0f, 0.0f, 1.0f, 0.6f ), TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty< Vector4 >( TextLabel::Property::TEXT_COLOR ), Vector4( 0.0f, 0.0f, 1.0f, 0.6f ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelTextStyle01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelTextStyle Setting Outline after Shadow");
+
+  TextLabel label = TextLabel::New();
+  label.SetSize( 300.0f, 300.f );
+  label.SetProperty( TextLabel::Property::TEXT, "Hello world Hello world" );
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 12 );
+  Stage::GetCurrent().Add( label );
+
+  Property::Map outlineMapSet;
+  Property::Map outlineMapGet;
+
+  outlineMapSet["color"] = Color::BLUE;
+  outlineMapSet["width"] = 2.0f;
+  label.SetProperty( TextLabel::Property::OUTLINE, outlineMapSet );
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map shadowMapSet;
+  shadowMapSet.Insert( "color", "green" );
+  shadowMapSet.Insert( "offset", "2 2" );
+  label.SetProperty( TextLabel::Property::SHADOW, shadowMapSet );
+
+  outlineMapSet["color"] = Color::RED;
+  outlineMapSet["width"] = 0.0f;
+  label.SetProperty( TextLabel::Property::OUTLINE, outlineMapSet );
+
+  application.SendNotification();
+  application.Render();
+
+  outlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::OUTLINE );
+
+  Property::Value* colorValue = outlineMapGet.Find("color");
+
+  bool colorMatched( false );
+
+  if ( colorValue )
+  {
+     Property::Type valueType = colorValue->GetType();
+
+     if ( Property::STRING == valueType )
+     {
+       std::string stringValue;
+       colorValue->Get( stringValue );
+       if (  stringValue == "red" )
+       {
+         colorMatched = true;
+       }
+     }
+     else if ( Property::VECTOR4 == valueType )
+     {
+       Vector4 colorVector4;
+       colorValue->Get( colorVector4 );
+       if (  colorVector4 == Color::RED )
+       {
+         colorMatched = true;
+       }
+     }
+  }
+
+  DALI_TEST_EQUALS( colorMatched, true, TEST_LOCATION );
 
   END_TEST;
 }

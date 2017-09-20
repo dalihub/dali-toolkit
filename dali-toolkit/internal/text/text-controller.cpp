@@ -1129,6 +1129,30 @@ float Controller::GetUnderlineHeight() const
   return mImpl->mModel->mVisualModel->GetUnderlineHeight();
 }
 
+void Controller::SetOutlineColor( const Vector4& color )
+{
+  mImpl->mModel->mVisualModel->SetOutlineColor( color );
+
+  mImpl->RequestRelayout();
+}
+
+const Vector4& Controller::GetOutlineColor() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineColor();
+}
+
+void Controller::SetOutlineWidth( float width )
+{
+  mImpl->mModel->mVisualModel->SetOutlineWidth( width );
+
+  mImpl->RequestRelayout();
+}
+
+float Controller::GetOutlineWidth() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineWidth();
+}
+
 void Controller::SetDefaultEmbossProperties( const std::string& embossProperties )
 {
   if( NULL == mImpl->mEmbossDefaults )

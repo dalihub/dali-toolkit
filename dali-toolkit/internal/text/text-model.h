@@ -174,6 +174,16 @@ public:
    */
   virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const;
 
+  /**
+   * @copydoc ModelInterface::GetOutlineColor()
+   */
+  virtual const Vector4& GetOutlineColor() const;
+
+  /**
+   * @copydoc ModelInterface::GetOutlineWidth()
+   */
+  virtual float GetOutlineWidth() const;
+
 private: // Private contructors & copy operator.
 
   /**

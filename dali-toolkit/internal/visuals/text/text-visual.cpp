@@ -586,6 +586,7 @@ void TextVisual::UpdateRenderer()
       }
 
       // Check whether the text contains any style colors (e.g. underline color, shadow color, etc.)
+
       bool shadowEnabled = false;
       const Vector2& shadowOffset = mController->GetTextModel()->GetShadowOffset();
       if ( fabsf( shadowOffset.x ) > Math::MACHINE_EPSILON_1 || fabsf( shadowOffset.y ) > Math::MACHINE_EPSILON_1 )
@@ -593,9 +594,16 @@ void TextVisual::UpdateRenderer()
         shadowEnabled = true;
       }
 
+      bool outlineWidthEnabled = false;
+      float outlineWidth = mController->GetTextModel()->GetOutlineWidth();
+      if ( outlineWidth > Math::MACHINE_EPSILON_1 )
+      {
+        outlineWidthEnabled = true;
+      }
+
       const bool underlineEnabled = mController->GetTextModel()->IsUnderlineEnabled();
 
-      if ( hasMultipleTextColors || containsEmoji || shadowEnabled || underlineEnabled )
+      if ( hasMultipleTextColors || containsEmoji || shadowEnabled || underlineEnabled || outlineWidthEnabled )
       {
         // Create RGBA textures if the text contains emojis or styles or multiple text colors
 

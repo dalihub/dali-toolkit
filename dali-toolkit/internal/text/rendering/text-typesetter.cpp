@@ -102,7 +102,7 @@ void TypesetGlyph( GlyphData& data,
       if( ( 0 > yOffsetIndex ) || ( yOffsetIndex > heightMinusOne ) )
       {
         // Do not write out of bounds.
-        break;
+        continue;
       }
 
       const int verticalOffset = yOffsetIndex * data.width;
@@ -114,7 +114,7 @@ void TypesetGlyph( GlyphData& data,
         if( ( 0 > xOffsetIndex ) || ( xOffsetIndex > widthMinusOne ) )
         {
           // Don't write out of bounds.
-          break;
+          continue;
         }
 
         uint32_t* bitmapBuffer = reinterpret_cast< uint32_t* >( data.bitmapBuffer.GetBuffer() );
@@ -138,7 +138,7 @@ void TypesetGlyph( GlyphData& data,
           }
 
           // Update the alpha channel.
-          if( Typesetter::STYLE_MASK == style )
+          if( Typesetter::STYLE_MASK == style || Typesetter::STYLE_OUTLINE == style ) // Outline not shown for color glyph
           {
             // Create an alpha mask for color glyph.
             *( packedColorGlyphBuffer + 3u ) = 0u;
@@ -191,7 +191,7 @@ void TypesetGlyph( GlyphData& data,
       if( ( 0 > yOffsetIndex ) || ( yOffsetIndex > heightMinusOne ) )
       {
         // Do not write out of bounds.
-        break;
+        continue;
       }
 
       const int verticalOffset = yOffsetIndex * data.width;
@@ -203,7 +203,7 @@ void TypesetGlyph( GlyphData& data,
         if( ( 0 > xOffsetIndex ) || ( xOffsetIndex > widthMinusOne ) )
         {
           // Don't write out of bounds.
-          break;
+          continue;
         }
 
         uint8_t* bitmapBuffer = reinterpret_cast< uint8_t* >( data.bitmapBuffer.GetBuffer() );
@@ -217,7 +217,6 @@ void TypesetGlyph( GlyphData& data,
           // Check alpha of overlapped pixels
           uint8_t& currentAlpha = *( bitmapBuffer + verticalOffset + xOffsetIndex );
           uint8_t newAlpha = static_cast<uint8_t>( color->a * static_cast<float>( alpha ) );
-//          printf("y: %d, x: %d: alpha: %u, currentAlpha: %u, newAlpha: %u, a: %u\n", yOffsetIndex, xOffsetIndex, alpha, currentAlpha, newAlpha, std::max( currentAlpha, newAlpha ) );
 
           // For any pixel overlapped with the pixel in previous glyphs, make sure we don't
           // overwrite a previous bigger alpha with a smaller alpha (in order to avoid
@@ -327,6 +326,18 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
 
   if ( ( RENDER_NO_STYLES != behaviour ) && ( RENDER_MASK != behaviour ) )
   {
+
+    // Generate the outline if enabled
+    const float outlineWidth = mModel->GetOutlineWidth();
+    if ( outlineWidth > Math::MACHINE_EPSILON_1 )
+    {
+      // Create the image buffer for outline
+      Devel::PixelBuffer outlineImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penY, 0u, numberOfGlyphs -1 );
+
+      // Combine the two buffers
+      imageBuffer = CombineImageBuffer( imageBuffer, outlineImageBuffer, bufferWidth, bufferHeight );
+    }
+
     // @todo. Support shadow and underline for partial text later on.
 
     // Generate the shadow if enabled
@@ -379,6 +390,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
   glyphData.width = bufferWidth;
   glyphData.height = bufferHeight;
   glyphData.bitmapBuffer = Devel::PixelBuffer::New( bufferWidth, bufferHeight, pixelFormat );
+  glyphData.horizontalOffset = 0;
 
   if ( Pixel::RGBA8888 == pixelFormat )
   {
@@ -405,14 +417,27 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
     // Increases the vertical offset with the line's ascender.
     glyphData.verticalOffset += static_cast<int>( line.ascender );
 
-    if ( style == Typesetter::STYLE_SHADOW )
+    // Retrieves the glyph's outline width
+    float outlineWidth = mModel->GetOutlineWidth();
+
+    if( style == Typesetter::STYLE_OUTLINE )
+    {
+      glyphData.horizontalOffset -= outlineWidth;
+      if( lineIndex == 0u )
+      {
+        // Only need to add the vertical outline offset for the first line
+        glyphData.verticalOffset -= outlineWidth;
+      }
+    }
+    else if ( style == Typesetter::STYLE_SHADOW )
     {
       const Vector2& shadowOffset = mModel->GetShadowOffset();
-      glyphData.horizontalOffset += shadowOffset.x;
+      glyphData.horizontalOffset += shadowOffset.x - outlineWidth; // if outline enabled then shadow should offset from outline
+
       if ( lineIndex == 0u )
       {
-        // Only need to add the vertical shadow offset for once
-        glyphData.verticalOffset += shadowOffset.y;
+        // Only need to add the vertical shadow offset for first line
+        glyphData.verticalOffset += shadowOffset.y - outlineWidth;
       }
     }
 
@@ -532,6 +557,10 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
       {
         color = &( mModel->GetShadowColor() );
       }
+      else if ( style == Typesetter::STYLE_OUTLINE )
+      {
+        color = &( mModel->GetOutlineColor() );
+      }
       else
       {
         color = ( useDefaultColor || ( 0u == colorIndex ) ) ? &defaultColor : colorsBuffer + ( colorIndex - 1u );
@@ -541,9 +570,17 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
       glyphData.glyphBitmap.buffer = NULL;
       glyphData.glyphBitmap.width = glyphInfo->width;   // Desired width and height.
       glyphData.glyphBitmap.height = glyphInfo->height;
+
+      if( style != Typesetter::STYLE_OUTLINE && style != Typesetter::STYLE_SHADOW )
+      {
+        // Don't render outline for other styles
+        outlineWidth = 0.0f;
+      }
+
       fontClient.CreateBitmap( glyphInfo->fontId,
                                glyphInfo->index,
-                               glyphData.glyphBitmap );
+                               glyphData.glyphBitmap,
+                               outlineWidth );
 
       // Sets the glyph's bitmap into the bitmap of the whole text.
       if( NULL != glyphData.glyphBitmap.buffer )

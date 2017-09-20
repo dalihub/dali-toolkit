@@ -210,6 +210,21 @@ public:
    * @param[in] numberOfRuns Number of underline runs to be copied.
    */
   virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const = 0;
+
+  /**
+   * @brief Retrieve the outline color.
+   *
+   * @return The outline color.
+   */
+  virtual const Vector4& GetOutlineColor() const = 0;
+
+  /**
+   * @brief Retrieves the width of an outline
+   *
+   * @return The width of the outline.
+   */
+  virtual float GetOutlineWidth() const = 0;
+
 };
 
 } // namespace Text
