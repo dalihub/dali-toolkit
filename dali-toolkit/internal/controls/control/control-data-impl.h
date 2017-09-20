@@ -265,6 +265,30 @@ public:
    */
   void OnStageDisconnection();
 
+  /**
+   * @brief Sets the margin.
+   * @param[in] margin Margin is a collections of extent ( start, end, top, bottom )
+   */
+  void SetMargin( Extents margin );
+
+  /**
+   * @brief Returns the value of margin
+   * @return The value of margin
+   */
+  Extents GetMargin() const;
+
+  /**
+   * @brief Sets the padding.
+   * @param[in] padding Padding is a collections of extent ( start, end, top, bottom ).
+   */
+  void SetPadding( Extents padding );
+
+  /**
+   * @brief Returns the value of padding
+   * @return The value of padding
+   */
+  Extents GetPadding() const;
+
 private:
 
   /**
@@ -319,6 +343,8 @@ public:
   std::string mStyleName;
   Vector4 mBackgroundColor;               ///< The color of the background visual
   Vector3* mStartingPinchScale;           ///< The scale when a pinch gesture starts, TODO: consider removing this
+  Extents mMargin;                        ///< The margin values
+  Extents mPadding;                       ///< The padding values
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
@@ -352,6 +378,8 @@ public:
   static const PropertyRegistration PROPERTY_10;
   static const PropertyRegistration PROPERTY_11;
   static const PropertyRegistration PROPERTY_12;
+  static const PropertyRegistration PROPERTY_13;
+  static const PropertyRegistration PROPERTY_14;
 };
 
 

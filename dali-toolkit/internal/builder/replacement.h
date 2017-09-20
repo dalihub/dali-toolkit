@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_BUILDER_REPLACEMENT__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,6 +141,13 @@ public:
 
   /* @brief Check node for a type
    *
+   * @param node The TreeNode to check
+   * @return Optional value
+   */
+  OptionalExtents IsExtents( const TreeNode & node ) const;
+
+  /* @brief Check node for a type
+   *
    * @param child The optional child TreeNode
    * @return Optional value
    */
@@ -222,6 +229,13 @@ public:
    * @return Optional value
    */
   bool IsArray( OptionalChild child, Property::Value& out ) const;
+
+  /* @brief Check node for a type
+   *
+   * @param child The optional child TreeNode
+   * @return Optional value
+   */
+  OptionalExtents IsExtents( OptionalChild child ) const;
 
 private:
   // Overriding map (overrides the default map). The map is not owned.

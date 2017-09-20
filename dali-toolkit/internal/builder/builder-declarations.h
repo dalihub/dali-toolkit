@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_BUILDER_DECLARATIONS_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/extents.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
@@ -46,5 +47,6 @@ typedef OptionalValue<std::string> OptionalString;
 typedef OptionalValue<Dali::Matrix> OptionalMatrix;
 typedef OptionalValue<Dali::Matrix3> OptionalMatrix3;
 typedef OptionalValue<Dali::Rect<int> > OptionalRect;
+typedef OptionalValue<Dali::Extents> OptionalExtents;
 
 #endif // __DALI_TOOLKIT_BUILDER_DECLARATIONS_H__

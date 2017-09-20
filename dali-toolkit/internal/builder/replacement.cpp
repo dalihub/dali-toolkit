@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -429,7 +429,23 @@ OptionalRect Replacement::IsRect( const TreeNode & node ) const
   return ret;
 }
 
-
+OptionalExtents Replacement::IsExtents( const TreeNode & node ) const
+{
+  OptionalExtents extents;
+  if( OptionalString replace = HasFullReplacement( node ) )
+  {
+    Property::Value value = GetFullReplacement( *replace );
+    if( Property::EXTENTS == value.GetType() )
+    {
+      extents = value.Get<Extents>();
+    }
+  }
+  else
+  {
+    extents = ::IsExtents( node );
+  }
+  return extents;
+}
 
 OptionalFloat Replacement::IsFloat( OptionalChild child ) const
 {
@@ -576,6 +592,18 @@ bool Replacement::IsArray( OptionalChild child, Property::Value& out ) const
   }
 
   return ret;
+}
+
+OptionalExtents Replacement::IsExtents( OptionalChild child ) const
+{
+  if( child )
+  {
+    return IsExtents( *child );
+  }
+  else
+  {
+    return OptionalExtents();
+  }
 }
 
 } // namespace Internal

@@ -97,35 +97,64 @@ public:
     enum
     {
       /**
-       * @brief name "styleName", type std::string.
+       * @brief The name of the style to be applied to the control.
+       * @details Name "styleName", type Property::STRING.
+       * @see Toolkit::Control::SetStyleName()
        * @SINCE_1_0.0
-       * @see SetStyleName
        */
       STYLE_NAME = PROPERTY_START_INDEX,
+
       /**
        * @DEPRECATED_1_1.3
-       * @brief name "backgroundColor", mutually exclusive with BACKGROUND_IMAGE & BACKGROUND,  type Vector4.
+       * @brief The background color of the control.
+       *
+       * Mutually exclusive with BACKGROUND_IMAGE & BACKGROUND.
+       * @details Name "backgroundColor", type Property::VECTOR4.
+       * @see Toolkit::Control::SetStyleName()
        * @SINCE_1_0.0
-       * @see SetStyleName
        */
       BACKGROUND_COLOR,
+
       /**
        * @DEPRECATED_1_1.3
-       * @brief name "backgroundImage", mutually exclusive with BACKGROUND_COLOR & BACKGROUND,  type Map.
+       * @brief The background image of the control.
+       *
+       * Mutually exclusive with BACKGROUND_COLOR & BACKGROUND.
+       * @details Name "backgroundImage", type Property::MAP.
        * @SINCE_1_0.0
        */
       BACKGROUND_IMAGE,
+
       /**
-       * @brief name "keyInputFocus", type bool.
+       * @brief Receives key events to the control.
+       * @details Name "keyInputFocus", type Property::BOOLEAN.
+       * @see Toolkit::Control::SetKeyInputFocus()
        * @SINCE_1_0.0
-       * @see SetKeyInputFocus
        */
       KEY_INPUT_FOCUS,
+
       /**
-       * @brief name "background", mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE, type Map or std::string for URL or Vector4 for Color.
+       * @brief The background of the control.
+       *
+       * Mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE.
+       * @details Name "background", type Property::MAP or std::string for URL or Property::VECTOR4 for Color.
        * @SINCE_1_1.3
        */
       BACKGROUND,
+
+      /**
+       * @brief The outer space around the control.
+       * @details Name "margin", type Property::EXTENTS.
+       * @SINCE_1_2.62
+       */
+      MARGIN,
+
+      /**
+       * @brief The inner space of the control.
+       * @details Name "padding", type Property::EXTENTS.
+       * @SINCE_1_2.62
+       */
+      PADDING
     };
   };
 
