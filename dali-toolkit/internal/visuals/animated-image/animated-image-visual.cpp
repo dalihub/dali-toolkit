@@ -274,6 +274,7 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
       {
         mWrapModeU = Dali::WrapMode::Type::DEFAULT;
       }
+      break;
     }
     case Toolkit::ImageVisual::Property::WRAP_MODE_V:
     {
