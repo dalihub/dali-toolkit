@@ -265,6 +265,8 @@ private:
 
   bool mIsWaitingKeyboardFocusChangeCommit:1; /// A flag to indicate PreFocusChangeSignal emitted but the proposed focus actor is not commited by the application yet.
 
+  bool mClearFocusOnTouch:1; ///< Whether clear focus on touch.
+
   FocusStack mFocusHistory; ///< Stack to contain pre-focused actor's BaseObject*
 
   SlotDelegate< KeyboardFocusManager > mSlotDelegate;

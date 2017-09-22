@@ -732,8 +732,19 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_EMBOSS ), std::string("Emboss input properties"), TEST_LOCATION );
 
   // Check the outline property
-  editor.SetProperty( TextEditor::Property::OUTLINE, "Outline properties" );
-  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+  Property::Map outlineMapSet;
+  Property::Map outlineMapGet;
+
+  outlineMapSet["color"] = Color::RED;
+  outlineMapSet["width"] = 2.0f;
+
+  editor.SetProperty( TextEditor::Property::OUTLINE, outlineMapSet );
+
+  outlineMapSet["color"] = "red";
+  outlineMapSet["width"] = "2";
+  outlineMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::OUTLINE );
+  DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
 
   // Check the input outline property
   editor.SetProperty( TextEditor::Property::INPUT_OUTLINE, "Outline input properties" );

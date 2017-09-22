@@ -30,6 +30,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/image-loader/async-image-loader-devel.cpp \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
   $(devel_api_src_dir)/image-loader/image-atlas.cpp \
+  $(devel_api_src_dir)/image-loader/texture-manager.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
   $(devel_api_src_dir)/styling/style-manager-devel.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \

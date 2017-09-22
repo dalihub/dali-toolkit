@@ -1129,6 +1129,30 @@ float Controller::GetUnderlineHeight() const
   return mImpl->mModel->mVisualModel->GetUnderlineHeight();
 }
 
+void Controller::SetOutlineColor( const Vector4& color )
+{
+  mImpl->mModel->mVisualModel->SetOutlineColor( color );
+
+  mImpl->RequestRelayout();
+}
+
+const Vector4& Controller::GetOutlineColor() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineColor();
+}
+
+void Controller::SetOutlineWidth( float width )
+{
+  mImpl->mModel->mVisualModel->SetOutlineWidth( width );
+
+  mImpl->RequestRelayout();
+}
+
+float Controller::GetOutlineWidth() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineWidth();
+}
+
 void Controller::SetDefaultEmbossProperties( const std::string& embossProperties )
 {
   if( NULL == mImpl->mEmbossDefaults )
@@ -1757,14 +1781,14 @@ Vector3 Controller::GetNaturalSize()
     mImpl->UpdateModel( onlyOnceOperations );
 
     // Layout the text for the new width.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT );
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT | REORDER );
 
     // Store the actual control's size to restore later.
     const Size actualControlSize = mImpl->mModel->mVisualModel->mControlSize;
 
     DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
                 static_cast<OperationsMask>( onlyOnceOperations |
-                                             LAYOUT ),
+                                             LAYOUT | REORDER ),
                 naturalSize.GetVectorXY() );
 
     // Do not do again the only once operations.
@@ -3692,6 +3716,11 @@ void Controller::ResetScrollPosition()
     mImpl->mModel->mScrollPosition = Vector2::ZERO;
     mImpl->mEventData->mScrollAfterUpdatePosition = true;
   }
+}
+
+void Controller::SetControlInterface( ControlInterface* controlInterface )
+{
+  mImpl->mControlInterface = controlInterface;
 }
 
 bool Controller::ShouldClearFocusOnEscape() const

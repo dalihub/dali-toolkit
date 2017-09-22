@@ -777,6 +777,34 @@ public: // Default style & Input style
   float GetUnderlineHeight() const;
 
   /**
+   * @brief Set the outline color.
+   *
+   * @param[in] color color of outline.
+   */
+  void SetOutlineColor( const Vector4& color );
+
+  /**
+   * @brief Retrieve the outline color.
+   *
+   * @return The outline color.
+   */
+  const Vector4& GetOutlineColor() const;
+
+  /**
+   * @brief Set the outline width
+   *
+   * @param[in] width The width in pixels of the outline, 0 indicates no outline
+   */
+  void SetOutlineWidth( float width );
+
+  /**
+   * @brief Retrieves the width of an outline
+   *
+   * @return The width of the outline.
+   */
+  float GetOutlineWidth() const;
+
+  /**
    * @brief Sets the emboss's properties string.
    *
    * @note The string is stored to be recovered.
@@ -998,6 +1026,13 @@ public: // Default style & Input style
    * @return The outline's properties string.
    */
   const std::string& GetInputOutlineProperties() const;
+
+  /**
+   * @brief Set the control's interface.
+   *
+   * @param[in] controlInterface The control's interface.
+   */
+  void SetControlInterface( ControlInterface* controlInterface );
 
 public: // Queries & retrieves.
 

@@ -90,6 +90,7 @@ public:
     enum
     {
       /**
+       * DEPRECATED_1_2.53 No longer be supported and will be ignored.
        * @brief The type of rendering e.g. bitmap-based.
        * @details name "renderingBackend", type INT, default RENDERING_SHARED_ATLAS.
        * @SINCE_1_0.0

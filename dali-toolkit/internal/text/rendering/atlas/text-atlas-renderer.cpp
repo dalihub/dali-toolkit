@@ -94,6 +94,7 @@ const float HALF( 0.5f );
 const float ONE( 1.0f );
 const uint32_t DEFAULT_ATLAS_WIDTH = 512u;
 const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
+const int NO_OUTLINE( 0 );
 }
 
 struct AtlasRenderer::Impl
@@ -354,7 +355,8 @@ struct AtlasRenderer::Impl
 
           mFontClient.CreateBitmap( glyph.fontId,
                                     glyph.index,
-                                    glyphBufferData );
+                                    glyphBufferData,
+                                    NO_OUTLINE );
 
           // Create the pixel data.
           bitmap = PixelData::New( glyphBufferData.buffer,

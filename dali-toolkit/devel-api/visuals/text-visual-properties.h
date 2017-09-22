@@ -88,6 +88,18 @@ enum
    * @details name "enableMarkup", type BOOLEAN
    */
   ENABLE_MARKUP,
+
+  /**
+   * @brief The shadow parameters.
+   * @details name "shadow", type MAP.
+   */
+  SHADOW,
+
+  /**
+   * @brief The default underline parameters.
+   * @details name "underline", type MAP.
+   */
+  UNDERLINE,
 };
 
 } // namespace Property

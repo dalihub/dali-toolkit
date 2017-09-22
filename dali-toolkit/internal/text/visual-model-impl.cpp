@@ -350,6 +350,11 @@ void VisualModel::SetUnderlineColor( const Vector4& color )
   mUnderlineColorSet = true;
 }
 
+void VisualModel::SetOutlineColor( const Vector4& color )
+{
+  mOutlineColor = color;
+}
+
 void VisualModel::SetUnderlineEnabled( bool enabled )
 {
   mUnderlineEnabled = enabled;
@@ -358,6 +363,11 @@ void VisualModel::SetUnderlineEnabled( bool enabled )
 void VisualModel::SetUnderlineHeight( float height )
 {
   mUnderlineHeight = height;
+}
+
+void VisualModel::SetOutlineWidth( float width )
+{
+  mOutlineWidth = width;
 }
 
 const Vector4& VisualModel::GetTextColor() const
@@ -380,6 +390,11 @@ const Vector4& VisualModel::GetUnderlineColor() const
   return mUnderlineColor;
 }
 
+const Vector4& VisualModel::GetOutlineColor() const
+{
+  return mOutlineColor;
+}
+
 bool VisualModel::IsUnderlineEnabled() const
 {
   return mUnderlineEnabled;
@@ -388,6 +403,16 @@ bool VisualModel::IsUnderlineEnabled() const
 float VisualModel::GetUnderlineHeight() const
 {
   return mUnderlineHeight;
+}
+
+float VisualModel::GetOutlineWidth() const
+{
+  return mOutlineWidth;
+}
+
+Length VisualModel::GetNumberOfUnderlineRuns() const
+{
+  return mUnderlineRuns.Count();
 }
 
 void VisualModel::ClearCaches()
@@ -410,9 +435,11 @@ VisualModel::VisualModel()
   mTextColor( Color::BLACK ),
   mShadowColor( Color::BLACK ),
   mUnderlineColor( Color::BLACK ),
+  mOutlineColor( Color::WHITE ),
   mControlSize(),
   mShadowOffset(),
   mUnderlineHeight( 0.0f ),
+  mOutlineWidth( 0.0f ),
   mNaturalSize(),
   mLayoutSize(),
   mCachedLineIndex( 0u ),

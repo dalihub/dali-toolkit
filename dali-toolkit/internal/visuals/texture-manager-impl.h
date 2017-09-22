@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_TEXTURE_MANAGER_H
-#define DALI_TOOLKIT_TEXTURE_MANAGER_H
+#ifndef DALI_TOOLKIT_TEXTURE_MANAGER_IMPL_H
+#define DALI_TOOLKIT_TEXTURE_MANAGER_IMPL_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -209,6 +209,20 @@ public:
    * @return the associated texture set, or an empty handle if textureId is not valid
    */
   TextureSet GetTextureSet( TextureId textureId );
+
+  /**
+   * Adds an external texture to the texture manager
+   * @param[in] texture The texture to add
+   * @return string containing the URL for the texture
+   */
+  std::string AddExternalTexture( TextureSet& texture );
+
+  /**
+   * Removes an external texture from texture manager
+   * @param[in] url The string containing the texture to remove
+   * @return handle to the texture
+   */
+  TextureSet RemoveExternalTexture( const std::string& url );
 
 private:
 
@@ -545,6 +559,12 @@ private:
     AsyncLoadingInfoContainerType mLoadingInfoContainer;
   };
 
+  struct ExternalTextureInfo
+  {
+    TextureId textureId;
+    TextureSet textureSet;
+  };
+
 private:
 
   /**
@@ -566,12 +586,13 @@ private:
 
 private:  // Member Variables:
 
-  AtlasInfoContainerType        mAtlasContainer;                  ///< Used to manage Atlas creation and destruction
-  TextureInfoContainerType      mTextureInfoContainer;            ///< Used to manage the life-cycle and caching of Textures
-  TextureId                     mCurrentTextureId;                ///< The current value used for the unique Texture Id generation
+  AtlasInfoContainerType                        mAtlasContainer;       ///< Used to manage Atlas creation and destruction
+  TextureInfoContainerType                      mTextureInfoContainer; ///< Used to manage the life-cycle and caching of Textures
+  RoundRobinContainerView< AsyncLoadingHelper > mAsyncLocalLoaders;    ///< The Asynchronous image loaders used to provide all local async loads
+  RoundRobinContainerView< AsyncLoadingHelper > mAsyncRemoteLoaders;   ///< The Asynchronous image loaders used to provide all remote async loads
+  std::vector< ExternalTextureInfo >            mExternalTextures;     ///< Externally provided textures
+  TextureId                                     mCurrentTextureId;     ///< The current value used for the unique Texture Id generation
 
-  RoundRobinContainerView<AsyncLoadingHelper> mAsyncLocalLoaders;  ///< The Asynchronous image loaders used to provide all local async loads
-  RoundRobinContainerView<AsyncLoadingHelper> mAsyncRemoteLoaders; ///< The Asynchronous image loaders used to provide all remote async loads
 };
 
 
@@ -581,4 +602,4 @@ private:  // Member Variables:
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_TEXTURE_MANAGER_H
+#endif // DALI_TOOLKIT_TEXTURE_MANAGER_IMPL_H
