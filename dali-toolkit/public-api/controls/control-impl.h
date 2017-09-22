@@ -679,6 +679,12 @@ public: // API for derived classes to override
 
 private:
 
+  /**
+   * @brief Creates a clipping renderer if required.
+   * (EG. If no renders exist and clipping is enabled).
+   */
+  void CreateClippingRenderer();
+
   /// @cond internal
   // Undefined
   DALI_INTERNAL Control( const Control& );
