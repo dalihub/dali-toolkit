@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -919,8 +920,24 @@ void TextLabel::SetUpAutoScrolling()
   Vector2 textureSize = textNaturalSize + Vector2(wrapGap, 0.0f); // Add the gap as a part of the texture
 
   // Create a texture of the text for scrolling
+  Size verifiedSize = textureSize;
+  const int maxTextureSize = Dali::GetMaxTextureSize();
+
+  //if the texture size width exceed maxTextureSize, modify the visual model size and enabled the ellipsis
+  if( verifiedSize.width > maxTextureSize )
+  {
+    verifiedSize.width = maxTextureSize;
+    if( textNaturalSize.width > maxTextureSize )
+    {
+      mController->SetTextElideEnabled( true );
+    }
+    GetHeightForWidth( maxTextureSize );
+    wrapGap = std::max( maxTextureSize - textNaturalSize.width, 0.0f );
+  }
+
   Text::TypesetterPtr typesetter = Text::Typesetter::New( mController->GetTextModel() );
-  PixelData data = typesetter->Render( textureSize, Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888 ); // ignore the horizontal alignment
+
+  PixelData data = typesetter->Render( verifiedSize, Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888 ); // ignore the horizontal alignment
   Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
                                   data.GetPixelFormat(),
                                   data.GetWidth(),
@@ -938,7 +955,7 @@ void TextLabel::SetUpAutoScrolling()
 
   // Set parameters for scrolling
   Renderer renderer = static_cast<Internal::Visual::Base&>( GetImplementation( mVisual ) ).GetRenderer();
-  mTextScroller->SetParameters( Self(), renderer, textureSet, controlSize, textureSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment() );
+  mTextScroller->SetParameters( Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment() );
 }
 
 void TextLabel::ScrollingFinished()
