@@ -176,7 +176,6 @@ bool IsNodeDirty( void *itemNodes )
   // style properties are changed. So should always return true here.
   return true;
 }
-
 } // Unnamed namespace
 
 Toolkit::FlexContainer FlexContainer::New()
@@ -206,12 +205,42 @@ FlexContainer::~FlexContainer()
   mChildrenNodes.clear();
 }
 
-void FlexContainer::SetContentDirection( Toolkit::FlexContainer::ContentDirection contentDirection )
+void FlexContainer::SetContentDirection( Toolkit::FlexContainer::ContentDirection contentDirection)
 {
   if( mContentDirection != contentDirection )
   {
-    mContentDirection = contentDirection;
-    mRootNode.node->style.direction = static_cast<css_direction_t>( mContentDirection );
+    Dali::CustomActor ownerActor(GetOwner());
+
+    if( Toolkit::FlexContainer::INHERIT != contentDirection )
+    {
+      mContentDirection = contentDirection;
+
+      ownerActor.SetProperty( Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION, false );
+
+      if( Toolkit::FlexContainer::LTR == contentDirection )
+      {
+        ownerActor.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::LEFT_TO_RIGHT);
+      }
+      else
+      {
+        ownerActor.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT);
+      }
+    }
+    else
+    {
+      ownerActor.SetProperty( Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION, true );
+
+      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( ownerActor.GetParent().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+
+      if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
+      {
+        mContentDirection = Toolkit::FlexContainer::RTL;
+      }
+      else
+      {
+        mContentDirection = Toolkit::FlexContainer::LTR;
+      }
+    }
 
     RelayoutRequest();
   }
@@ -570,6 +599,31 @@ void FlexContainer::OnSizeSet( const Vector3& size )
   Control::OnSizeSet( size );
 }
 
+void FlexContainer::OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type )
+{
+  Toolkit::FlexContainer flexContainer = Toolkit::FlexContainer::DownCast(actor);
+  Toolkit::FlexContainer::ContentDirection direction;
+
+  if( type == Dali::LayoutDirection::RIGHT_TO_LEFT )
+  {
+    direction = Toolkit::FlexContainer::RTL;
+  }
+  else
+  {
+    direction = Toolkit::FlexContainer::LTR;
+  }
+
+  Toolkit::Internal::FlexContainer &flexContainerImpl = GetImpl( flexContainer );
+
+  if( flexContainerImpl.mContentDirection != direction )
+  {
+    Dali::CustomActor ownerActor(flexContainerImpl.GetOwner());
+    flexContainerImpl.mContentDirection = direction;
+
+    flexContainerImpl.RelayoutRequest();
+  }
+}
+
 void FlexContainer::ComputeLayout()
 {
   if( mRootNode.node )
@@ -641,7 +695,29 @@ void FlexContainer::ComputeLayout()
     }
 
     // Calculate the layout
-    layoutNode( mRootNode.node, Self().GetMaximumSize().x, Self().GetMaximumSize().y, mRootNode.node->style.direction );
+    css_direction_t nodeLayoutDirection = CSS_DIRECTION_INHERIT;
+    switch( mContentDirection )
+    {
+    case Dali::Toolkit::FlexContainer::LTR:
+    {
+      nodeLayoutDirection = CSS_DIRECTION_LTR;
+      break;
+    }
+
+    case Dali::Toolkit::FlexContainer::RTL:
+    {
+      nodeLayoutDirection = CSS_DIRECTION_RTL;
+      break;
+    }
+
+    case Dali::Toolkit::FlexContainer::INHERIT:
+    {
+      nodeLayoutDirection = CSS_DIRECTION_INHERIT;
+      break;
+    }
+    }
+
+    layoutNode( mRootNode.node, Self().GetMaximumSize().x, Self().GetMaximumSize().y, nodeLayoutDirection);
   }
 }
 
@@ -779,6 +855,8 @@ void FlexContainer::OnInitialize()
 {
   // Initialize the node for the flex container itself
   Dali::Actor self = Self();
+  self.LayoutDirectionChangedSignal().Connect( this, &FlexContainer::OnLayoutDirectionChanged );
+
   mRootNode.actor = self;
   mRootNode.node = new_css_node();
   mRootNode.node->context = &mChildrenNodes;
