@@ -21,6 +21,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/visuals/gradient/gradient.cpp \
    $(toolkit_src_dir)/visuals/gradient/linear-gradient.cpp \
    $(toolkit_src_dir)/visuals/gradient/radial-gradient.cpp \
+   $(toolkit_src_dir)/visuals/animated-gradient/animated-gradient-visual.cpp \
    $(toolkit_src_dir)/visuals/image-atlas-manager.cpp \
    $(toolkit_src_dir)/visuals/image/image-visual.cpp \
    $(toolkit_src_dir)/visuals/mesh/mesh-visual.cpp \
