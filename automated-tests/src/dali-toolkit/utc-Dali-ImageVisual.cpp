@@ -19,11 +19,11 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-timer.h>
 #include <toolkit-event-thread-callback.h>
-#include <dali/devel-api/images/nine-patch-image.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include "dummy-control.h"
 
@@ -1064,6 +1064,9 @@ int UtcDaliImageVisualAlphaMask(void)
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
 
+  dummyImpl.UnregisterVisual(  Control::CONTROL_PROPERTY_END_INDEX + 1 );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -1176,6 +1179,436 @@ int UtcDaliImageVisualAlphaMaskCrop(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualReleasePolicy01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualReleasePolicy01 Detached Policy, disabling visual with this policy deletes texture" );
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH,   20 );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT,   30 );
+  propertyMap.Insert( DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::DETACHED );
+
+  Visual::Base imageVisual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK( imageVisual );
+
+  // Set up debug trace
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Register visual with control and ensure it has the only handle" );
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  imageVisual.Reset();
+
+  actor.SetSize(200.f, 200.f);
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  // Test renderer and texture created
+  tet_infoline( "Confirm texture created" );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+
+  tet_infoline( "Disable visual causing the texture to be deleted" );
+  dummyImpl.EnableVisual( DummyControl::Property::TEST_VISUAL, false );
+
+  application.SendNotification();
+  application.Render(0);
+  // Test renderer and textures removed.
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualReleasePolicy02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualReleasePolicy02 Destroyed Policy, Texture should be deleted when visual destroyed" );
+
+  VisualFactory factory = VisualFactory::Get();
+  const std::string MASK_IMAGE = TEST_REMOTE_IMAGE_FILE_NAME;
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Visual::Property::MIX_COLOR, Color::MAGENTA );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH,   20 );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT,   30 );
+  propertyMap.Insert( DevelImageVisual::Property::RELEASE_POLICY , DevelImageVisual::ReleasePolicy::DESTROYED );
+
+  Visual::Base imageVisual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK( imageVisual );
+
+  // Setup debug trace
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Register visual with control and ensure it has the only handle" );
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  actor.SetSize(200.f, 200.f);
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  // Test renderer and texture created
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  tet_infoline( "Destroy visual by UnRegistering visual with control, check renderer is destroyed" );
+  dummyImpl.UnregisterVisual( DummyControl::Property::TEST_VISUAL );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  application.SendNotification();
+  application.Render();
+
+  // Test texture removed after visual destroyed.
+  tet_infoline( "Ensure texture is deleted after visual destroyed" );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualReleasePolicy03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualReleasePolicy03 Never Policy, texture should not be deleted after visual destroyed" );
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH,   20 );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT,   30 );
+  propertyMap.Insert( DevelImageVisual::Property::RELEASE_POLICY , DevelImageVisual::ReleasePolicy::NEVER );
+
+  Visual::Base imageVisual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK( imageVisual );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Register visual with control and ensure it has the only handle" );
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  actor.SetSize(200.f, 200.f);
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  // Test renderer and texture created
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+
+  tet_infoline( "Destroy visual by UnRegistering visual with control, check renderer is destroyed" );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  dummyImpl.UnregisterVisual( DummyControl::Property::TEST_VISUAL );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Ensure texture is not deleted as policy is set to NEVER" );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualReleasePolicy04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualReleasePolicy04 Two visuals with different policies sharing a texture" );
+
+  VisualFactory factory = VisualFactory::Get();
+
+  tet_infoline( "Create first visual with Never release policy" );
+  Property::Map propertyMapNeverReleasePolicy;
+  propertyMapNeverReleasePolicy.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMapNeverReleasePolicy.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+  propertyMapNeverReleasePolicy.Insert( ImageVisual::Property::DESIRED_WIDTH,   20 );
+  propertyMapNeverReleasePolicy.Insert( ImageVisual::Property::DESIRED_HEIGHT,   30 );
+  propertyMapNeverReleasePolicy.Insert( DevelImageVisual::Property::RELEASE_POLICY , DevelImageVisual::ReleasePolicy::NEVER );
+  Visual::Base imageVisualNever = factory.CreateVisual( propertyMapNeverReleasePolicy );
+
+  tet_infoline( "Create second visual with Destroyed release policy");
+  Property::Map propertyMapDestroyedReleasePolicy;
+  propertyMapDestroyedReleasePolicy.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMapDestroyedReleasePolicy.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+  propertyMapDestroyedReleasePolicy.Insert( ImageVisual::Property::DESIRED_WIDTH,   20 );
+  propertyMapDestroyedReleasePolicy.Insert( ImageVisual::Property::DESIRED_HEIGHT,   30 );
+  propertyMapDestroyedReleasePolicy.Insert( DevelImageVisual::Property::RELEASE_POLICY , DevelImageVisual::ReleasePolicy::DESTROYED );
+  Visual::Base imageVisualDestroyed = factory.CreateVisual( propertyMapDestroyedReleasePolicy );
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Register visuals with control and ensure it has the only handles" );
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisualNever );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, imageVisualDestroyed );
+  imageVisualNever.Reset(); // reduce ref count so only the control keeps the visual alive.
+  imageVisualDestroyed.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  actor.SetSize(200.f, 200.f);
+
+  // Test initially zero renderers
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  tet_infoline( "Ensure a texture is created, shared amongst both visuals.  Each visual has its own renderer" );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 2u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+
+  // Test renderer removed when visual destroyed
+  DALI_TEST_CHECK( actor.GetRendererCount() == 2u );
+  dummyImpl.UnregisterVisual( DummyControl::Property::TEST_VISUAL2 );  // TEST_VISUAL2 no longer requires the texture as release policy DESTROYED
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  application.SendNotification();
+  application.Render();
+
+  // Test texture was not deleted as TEST_VISUAL release policy is NEVER so it is still required.
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+
+  dummyImpl.UnregisterVisual( DummyControl::Property::TEST_VISUAL );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Ensure a texture is not deleted as second visual used the NEVER release policy" );
+  // Test texture was not deleted as TEST_VISUAL release policy is NEVER so it is still required.
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualReleasePolicy05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualReleasePolicy05 Testing settung by string currents correct enum" );
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map propertyMapNeverReleasePolicy;
+  propertyMapNeverReleasePolicy.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMapNeverReleasePolicy.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+  propertyMapNeverReleasePolicy.Insert( ImageVisual::Property::DESIRED_WIDTH,   20 );
+  propertyMapNeverReleasePolicy.Insert( ImageVisual::Property::DESIRED_HEIGHT,   30 );
+  propertyMapNeverReleasePolicy.Insert( "releasePolicy" , "never" );
+
+  Visual::Base imageVisualNever = factory.CreateVisual( propertyMapNeverReleasePolicy );
+
+  Property::Map resultMap;
+  imageVisualNever.CreatePropertyMap( resultMap );
+  DALI_TEST_CHECK( ! resultMap.Empty() );
+
+  DALI_TEST_EQUALS( ( resultMap.Find( DevelImageVisual::Property::RELEASE_POLICY ) )->Get<int>(), (int)DevelImageVisual::ReleasePolicy::NEVER, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualReleasePolicy06(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualReleasePolicy06 Never Policy, texture should not be affected by Disabling and Enabling visual" );
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH,   20 );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT,   30 );
+  propertyMap.Insert( DevelImageVisual::Property::RELEASE_POLICY , DevelImageVisual::ReleasePolicy::NEVER );
+
+  Visual::Base imageVisual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK( imageVisual );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Register visual with control and ensure it has the only handle" );
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  actor.SetSize(200.f, 200.f);
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  // Test renderer and texture created
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
+
+  tet_infoline( "Disable Visual and check texture not affected" );
+  dummyImpl.EnableVisual( DummyControl::Property::TEST_VISUAL, false );
+  application.SendNotification();
+  application.Render(0);
+  tet_infoline( "Check renderer is destroyed when visual off stage" );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+  textureTrace.Reset();
+
+  tet_infoline( "Re-enable Visual and check texture not affected" );
+  dummyImpl.EnableVisual( DummyControl::Property::TEST_VISUAL, true );
+  application.SendNotification();
+  application.Render(0);
+  tet_infoline( "Check texture not affected and renderer is destroyed when visual off stage" );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualReleasePolicy07(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualReleasePolicy07 Two visuals with different policies sharing a texture DETACHED and DESTROYED" );
+
+  VisualFactory factory = VisualFactory::Get();
+
+  tet_infoline( "Create first visual with DESTROYED release policy" );
+  Property::Map propertyMapNeverReleasePolicy;
+  propertyMapNeverReleasePolicy.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMapNeverReleasePolicy.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+  propertyMapNeverReleasePolicy.Insert( ImageVisual::Property::DESIRED_WIDTH,   20 );
+  propertyMapNeverReleasePolicy.Insert( ImageVisual::Property::DESIRED_HEIGHT,   30 );
+  propertyMapNeverReleasePolicy.Insert( DevelImageVisual::Property::RELEASE_POLICY , DevelImageVisual::ReleasePolicy::DESTROYED );
+  Visual::Base imageVisualDestroyed = factory.CreateVisual( propertyMapNeverReleasePolicy );
+
+  tet_infoline( "Create second visual with DETACHED release policy");
+  Property::Map propertyMapDestroyedReleasePolicy;
+  propertyMapDestroyedReleasePolicy.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMapDestroyedReleasePolicy.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+  propertyMapDestroyedReleasePolicy.Insert( ImageVisual::Property::DESIRED_WIDTH,   20 );
+  propertyMapDestroyedReleasePolicy.Insert( ImageVisual::Property::DESIRED_HEIGHT,   30 );
+  propertyMapDestroyedReleasePolicy.Insert( DevelImageVisual::Property::RELEASE_POLICY , DevelImageVisual::ReleasePolicy::DETACHED );
+  Visual::Base imageVisualDetached = factory.CreateVisual( propertyMapDestroyedReleasePolicy );
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Register visuals with control and ensure it has the only handles" );
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisualDestroyed );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, imageVisualDetached );
+  imageVisualDestroyed.Reset(); // reduce ref count so only the control keeps the visual alive.
+  imageVisualDetached.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  actor.SetSize(200.f, 200.f);
+
+  // Test initially zero renderers
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(0);
+  tet_infoline( "Ensure a texture is created, shared amongst both visuals.  Each visual has its own renderer" );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 2u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+
+  // Test renderer removed when visual destroyed
+  DALI_TEST_CHECK( actor.GetRendererCount() == 2u );
+  dummyImpl.EnableVisual( DummyControl::Property::TEST_VISUAL2, false );  // TEST_VISUAL2 no longer requires the texture as release policy DETACHED
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  application.SendNotification();
+  application.Render();
+
+  // Test texture was not deleted as TEST_VISUAL release policy is DESTROYED and is still required.
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+
+  dummyImpl.EnableVisual( DummyControl::Property::TEST_VISUAL, false );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Ensure a texture is not deleted as second visual used the DESTROYED release policy" );
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
 
   END_TEST;
 }

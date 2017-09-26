@@ -91,6 +91,13 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, REPEAT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, MIRRORED_REPEAT )
 DALI_ENUM_TO_STRING_TABLE_END( WRAP_MODE )
 
+// release policies
+DALI_ENUM_TO_STRING_TABLE_BEGIN( RELEASE_POLICY )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelImageVisual::ReleasePolicy, DETACHED )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelImageVisual::ReleasePolicy, DESTROYED )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelImageVisual::ReleasePolicy, NEVER )
+DALI_ENUM_TO_STRING_TABLE_END( RELEASE_POLICY )
+
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 const char* DEFAULT_SAMPLER_TYPENAME = "sampler2D";
@@ -267,8 +274,9 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mSamplingMode( samplingMode ),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
+  mReleasePolicy( DevelImageVisual::ReleasePolicy::DETACHED ),
   mAttemptAtlasing( false ),
-  mLoadingStatus( false )
+  mLoading( false )
 {
 }
 
@@ -285,22 +293,32 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
+  mReleasePolicy( DevelImageVisual::ReleasePolicy::DETACHED ),
   mAttemptAtlasing( false ),
-  mLoadingStatus( false )
+  mLoading( false )
 {
 }
 
 ImageVisual::~ImageVisual()
 {
-  if( mMaskingData && Stage::IsInstalled() )
+  if( Stage::IsInstalled() )
   {
-    // TextureManager could have been deleted before the actor that contains this
-    // ImageVisual is destroyed (e.g. due to stage shutdown). Ensure the stage
-    // is still valid before accessing texture manager.
-    if( mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID )
+    if( mMaskingData )
     {
-      TextureManager& textureManager = mFactoryCache.GetTextureManager();
-      textureManager.Remove( mMaskingData->mAlphaMaskId );
+      // TextureManager could have been deleted before the actor that contains this
+      // ImageVisual is destroyed (e.g. due to stage shutdown). Ensure the stage
+      // is still valid before accessing texture manager.
+      if( mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID )
+      {
+        TextureManager& textureManager = mFactoryCache.GetTextureManager();
+        textureManager.Remove( mMaskingData->mAlphaMaskId );
+      }
+    }
+
+    // ImageVisual destroyed so remove texture unless ReleasePolicy is set to never release
+    if( ( mTextureId != TextureManager::INVALID_TEXTURE_ID  ) && ( mReleasePolicy != DevelImageVisual::ReleasePolicy::NEVER ) )
+    {
+      RemoveTexture();
     }
   }
 }
@@ -349,21 +367,25 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       {
         DoSetProperty( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second );
       }
-      else if ( keyValue.first == IMAGE_ATLASING )
+      else if( keyValue.first == IMAGE_ATLASING )
       {
         DoSetProperty( Toolkit::ImageVisual::Property::ATLASING, keyValue.second );
       }
-      else if ( keyValue.first == ALPHA_MASK_URL )
+      else if( keyValue.first == ALPHA_MASK_URL )
       {
         DoSetProperty( Toolkit::ImageVisual::Property::ALPHA_MASK_URL, keyValue.second );
       }
-      else if ( keyValue.first == MASK_CONTENT_SCALE_NAME )
+      else if( keyValue.first == MASK_CONTENT_SCALE_NAME )
       {
         DoSetProperty( Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, keyValue.second );
       }
-      else if ( keyValue.first == CROP_TO_MASK_NAME )
+      else if( keyValue.first == CROP_TO_MASK_NAME )
       {
         DoSetProperty( Toolkit::ImageVisual::Property::CROP_TO_MASK, keyValue.second );
+      }
+      else if( keyValue.first == RELEASE_POLICY_NAME )
+      {
+        DoSetProperty( Toolkit::DevelImageVisual::Property::RELEASE_POLICY, keyValue.second );
       }
     }
   }
@@ -500,6 +522,14 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
         AllocateMaskData();
         mMaskingData->mCropToMask = crop;
       }
+      break;
+    }
+
+    case Toolkit::DevelImageVisual::Property::RELEASE_POLICY:
+    {
+      int releasePolicy;
+      Scripting::GetEnumerationProperty( value, RELEASE_POLICY_TABLE, RELEASE_POLICY_TABLE_COUNT, releasePolicy );
+      mReleasePolicy = DevelImageVisual::ReleasePolicy::Type( releasePolicy );
       break;
     }
   }
@@ -708,7 +738,7 @@ void ImageVisual::InitializeRenderer()
     TextureSet textures =
         textureManager.LoadTexture(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode,
                                    mMaskingData, IsSynchronousResourceLoading(), mTextureId,
-                                   atlasRect, attemptAtlasing, mLoadingStatus, mWrapModeU,
+                                   atlasRect, attemptAtlasing, mLoading, mWrapModeU,
                                    mWrapModeV, this, this, mFactoryCache.GetAtlasManager());
     if(attemptAtlasing)
     {
@@ -735,7 +765,7 @@ void ImageVisual::InitializeRenderer()
     TextureSet textures =
         textureManager.LoadTexture(mImageUrl, mDesiredSize, mFittingMode, mSamplingMode,
                                    mMaskingData, IsSynchronousResourceLoading(), mTextureId,
-                                   atlasRect, attemptAtlasing, mLoadingStatus, mWrapModeU, mWrapModeV, this,
+                                   atlasRect, attemptAtlasing, mLoading, mWrapModeU, mWrapModeV, this,
                                    nullptr, nullptr); // no atlasing
     DALI_ASSERT_DEBUG(attemptAtlasing == false);
     CreateRenderer( textures );
@@ -767,12 +797,12 @@ void ImageVisual::DoSetOnStage( Actor& actor )
   {
     InitializeRenderer();
   }
-  else if ( mImage )
+  else if( mImage )
   {
     InitializeRenderer( mImage );
   }
 
-  if ( !mImpl->mRenderer )
+  if( !mImpl->mRenderer )
   {
     return;
   }
@@ -780,7 +810,7 @@ void ImageVisual::DoSetOnStage( Actor& actor )
   mPlacementActor = actor;
   // Search the Actor tree to find if Layer UI behaviour set.
   Layer layer = actor.GetLayer();
-  if ( layer && layer.GetBehavior() == Layer::LAYER_3D )
+  if( layer && layer.GetBehavior() == Layer::LAYER_3D )
   {
      // Layer 3D set, do not align pixels
      mImpl->mRenderer.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF );
@@ -791,7 +821,7 @@ void ImageVisual::DoSetOnStage( Actor& actor )
     mImpl->mRenderer.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, mPixelArea );
   }
 
-  if( mLoadingStatus == false )
+  if( mLoading == false )
   {
     actor.AddRenderer( mImpl->mRenderer );
     mPlacementActor.Reset();
@@ -805,14 +835,19 @@ void ImageVisual::DoSetOffStage( Actor& actor )
 {
   // Visual::Base::SetOffStage only calls DoSetOffStage if mRenderer exists (is on onstage)
 
-  //If we own the image then make sure we release it when we go off stage
+  // Image release is dependent on the ReleasePolicy, renderer is destroyed.
   actor.RemoveRenderer( mImpl->mRenderer);
+  if( mReleasePolicy == DevelImageVisual::ReleasePolicy::DETACHED )
+  {
+    RemoveTexture(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
+  }
+
   if( mImageUrl.IsValid() )
   {
-    RemoveTexture( mImageUrl.GetUrl() );
+    // Legacy support for deprecated Dali::Image
     mImage.Reset();
   }
-  mLoadingStatus = false;
+  mLoading = false;
   mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
 }
@@ -856,6 +891,9 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
     map.Insert( Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskingData->mContentScaleFactor );
     map.Insert( Toolkit::ImageVisual::Property::CROP_TO_MASK, mMaskingData->mCropToMask );
   }
+
+  map.Insert( Toolkit::DevelImageVisual::Property::RELEASE_POLICY, mReleasePolicy );
+
 }
 
 void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -948,7 +986,7 @@ void ImageVisual::UploadCompleted()
     // reset the weak handle so that the renderer only get added to actor once
     mPlacementActor.Reset();
   }
-  mLoadingStatus = false;
+  mLoading = false;
 }
 
 // From Texture Manager
@@ -983,10 +1021,10 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
       ResourceReady();
     }
   }
-  mLoadingStatus = false;
+  mLoading = false;
 }
 
-void ImageVisual::RemoveTexture(const std::string& url)
+void ImageVisual::RemoveTexture()
 {
   if( mTextureId != TextureManager::INVALID_TEXTURE_ID )
   {

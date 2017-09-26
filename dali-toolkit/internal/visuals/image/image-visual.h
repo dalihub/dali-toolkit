@@ -32,6 +32,7 @@
 #include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 
 namespace Dali
 {
@@ -64,6 +65,7 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  * | pixelArea          | VECTOR4           |
  * | wrapModeU          | INTEGER OR STRING |
  * | wrapModeV          | INTEGER OR STRING |
+ * | releasePolicy      | INTEGER OR STRING |
  *
  * where pixelArea is a rectangular area.
  * In its Vector4 value, the first two elements indicate the top-left position of the area,
@@ -94,6 +96,11 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *   "DONT_CARE"
  *   "DEFAULT"
  *
+ *
+ * where releasePolicy should be one of the following policies for when to cache the image
+ *   "DETACHED"    //  Release image from cache when visual detached from stage
+ *   "DESTROYED"   //  Keep image in cache until the visual is destroyed
+ *   "NEVER"       //  Keep image in cache until application ends.
  *
  * If the Visual is in a LayerUI it will pixel align the image, using a Layer3D will disable pixel alignment.
  * Changing layer behaviour between LayerUI to Layer3D whilst the visual is already staged will not have an effect.
@@ -304,9 +311,9 @@ private:
   void SetTextureRectUniform( const Vector4& textureRect  );
 
   /**
-   * Remove the texture if it is not used anymore.
+   * Remove texture with valid TextureId
    */
-  void RemoveTexture(const std::string& url);
+  void RemoveTexture();
 
   /**
    * Helper method to set individual values by index key.
@@ -330,8 +337,9 @@ private:
   Dali::SamplingMode::Type mSamplingMode:4;
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
+  DevelImageVisual::ReleasePolicy::Type mReleasePolicy;
   bool mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
-  bool mLoadingStatus;  ///< True if the texture is being loaded asynchronously, or false when it has loaded.
+  bool mLoading;  ///< True if the texture is still loading.
 };
 
 
