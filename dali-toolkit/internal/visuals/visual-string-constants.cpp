@@ -85,6 +85,7 @@ const char * const CACHE_SIZE_NAME("cacheSize");
 const char * const FRAME_DELAY_NAME("frameDelay");
 const char * const MASK_CONTENT_SCALE_NAME("maskContentScale");
 const char * const CROP_TO_MASK_NAME("cropToMask");
+const char * const RELEASE_POLICY_NAME("releasePolicy");
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );
