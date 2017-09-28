@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/layouts/layout-alignment.h>
 #include <dali-toolkit/internal/text/line-run.h>
+#include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
@@ -104,6 +105,20 @@ public:
   virtual const LineRun* const GetLines() const = 0;
 
   /**
+   * @brief Retrieves the number of script runs.
+   *
+   * @return The number of script runs.
+   */
+  virtual Length GetNumberOfScripts() const = 0;
+
+  /**
+   * @brief Retrieves the script runs.
+   *
+   * @return A pointer to the vector with the runs of characters with the same script..
+   */
+  virtual const ScriptRun* const GetScriptRuns() const = 0;
+
+  /**
    * @brief Retrieves the number of laid-out glyphs.
    *
    * @return The number of laid-out glyphs.
@@ -144,6 +159,72 @@ public:
    * @return The default color.
    */
   virtual const Vector4& GetDefaultColor() const = 0;
+
+  /**
+   * @brief Retrieves the shadow offset, 0 indicates no shadow.
+   *
+   * @return The shadow offset.
+   */
+  virtual const Vector2& GetShadowOffset() const = 0;
+
+  /**
+   * @brief Retrieves the shadow color.
+   *
+   * @return The shadow color.
+   */
+  virtual const Vector4& GetShadowColor() const = 0;
+
+  /**
+   * @brief Retrieves the underline color.
+   *
+   * @return The underline color.
+   */
+  virtual const Vector4& GetUnderlineColor() const = 0;
+
+  /**
+   * @brief Returns whether underline is enabled or not.
+   *
+   * @return The underline state.
+   */
+  virtual bool IsUnderlineEnabled() const = 0;
+
+  /**
+   * @brief Retrieves the underline height override
+   *
+   * @return Returns the override height for an underline, 0 indicates that adaptor will determine the height
+   */
+  virtual float GetUnderlineHeight() const = 0;
+
+  /**
+   * @brief Retrieves the number of underline runs.
+   *
+   * @return The number of underline runs.
+   */
+  virtual Length GetNumberOfUnderlineRuns() const = 0;
+
+  /**
+   * @brief Retrieves the underline runs.
+   *
+   * @param[out] underlineRuns Pointer to a buffer where the underline runs are copied.
+   * @param[in] index Index of the first underline run to be copied.
+   * @param[in] numberOfRuns Number of underline runs to be copied.
+   */
+  virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const = 0;
+
+  /**
+   * @brief Retrieve the outline color.
+   *
+   * @return The outline color.
+   */
+  virtual const Vector4& GetOutlineColor() const = 0;
+
+  /**
+   * @brief Retrieves the width of an outline
+   *
+   * @return The width of the outline.
+   */
+  virtual float GetOutlineWidth() const = 0;
+
 };
 
 } // namespace Text

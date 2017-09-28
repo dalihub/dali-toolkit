@@ -35,6 +35,7 @@ namespace
 {
 const std::string COLOR_KEY( "color" );
 const std::string OFFSET_KEY( "offset" );
+const std::string WIDTH_KEY( "width" );
 const std::string HEIGHT_KEY( "height" );
 const std::string ENABLE_KEY( "enable" );
 const std::string TRUE_TOKEN( "true" );
@@ -114,6 +115,36 @@ bool ParseUnderlineProperties( const Property::Map& underlinePropertiesMap,
       const std::string heightStr = valueGet.second.Get<std::string>();
 
       height = StringToFloat( heightStr.c_str() );
+    }
+  }
+
+  return 0u == numberOfItems;
+}
+
+bool ParseOutlineProperties( const Property::Map& underlinePropertiesMap,
+                               bool& colorDefined,
+                               Vector4& color,
+                               bool& widthDefined,
+                               float& width )
+{
+  const unsigned int numberOfItems = underlinePropertiesMap.Count();
+
+  // Parses and applies the style.
+  for( unsigned int index = 0u; index < numberOfItems; ++index )
+  {
+    const KeyValuePair& valueGet = underlinePropertiesMap.GetKeyValue( index );
+
+    if( COLOR_KEY == valueGet.first.stringKey )
+    {
+      /// Color key.
+      colorDefined = true;
+      color = valueGet.second.Get<Vector4>();
+    }
+    else if( WIDTH_KEY == valueGet.first.stringKey )
+    {
+      /// Width key.
+      widthDefined = true;
+      width = valueGet.second.Get<float>();
     }
   }
 
@@ -463,24 +494,63 @@ bool SetOutlineProperties( ControllerPtr controller, const Property::Value& valu
 
   if( controller )
   {
-    const std::string properties = value.Get< std::string >();
-
     switch( type )
     {
       case EffectStyle::DEFAULT:
       {
-        // Stores the default outline's properties string to be recovered by the GetOutlineProperties() function.
-        controller->SetDefaultOutlineProperties( properties );
+        const Property::Map& propertiesMap = value.Get<Property::Map>();
+
+        bool colorDefined = false;
+        Vector4 color;
+        bool widthDefined = false;
+        float width = 0.f;
+
+        bool empty = true;
+
+        if ( !propertiesMap.Empty() )
+        {
+           empty = ParseOutlineProperties( propertiesMap,
+                                           colorDefined,
+                                           color,
+                                           widthDefined,
+                                           width );
+        }
+
+        if( !empty )
+        {
+          // Sets the default outline values.
+          if( colorDefined && ( controller->GetOutlineColor() != color ) )
+          {
+            controller->SetOutlineColor( color );
+            update = true;
+          }
+
+          if( widthDefined && ( fabsf( controller->GetOutlineWidth() - width ) > Math::MACHINE_EPSILON_1000 ) )
+          {
+            controller->SetOutlineWidth( width );
+            update = true;
+          }
+        }
+        else
+        {
+          // Disable outline
+          if( fabsf( controller->GetOutlineWidth() ) > Math::MACHINE_EPSILON_1000 )
+          {
+            controller->SetOutlineWidth( 0.0f );
+            update = true;
+          }
+        }
         break;
       }
       case EffectStyle::INPUT:
       {
-        // Stores the input outline's properties string to be recovered by the GetOutlineProperties() function.
-        controller->SetInputOutlineProperties( properties );
+        const std::string& outlineProperties = value.Get<std::string>();
+
+        controller->SetInputOutlineProperties( outlineProperties );
         break;
       }
-    }
-  }
+    } // switch
+  } // if( controller )
 
   return update;
 }
@@ -493,7 +563,21 @@ void GetOutlineProperties( ControllerPtr controller, Property::Value& value, Eff
     {
       case EffectStyle::DEFAULT:
       {
-        value = controller->GetDefaultOutlineProperties();
+        const Vector4& color = controller->GetOutlineColor();
+        const float width = controller->GetOutlineWidth();
+
+        Property::Map map;
+
+        std::string colorStr;
+        Vector4ToColorString( color, colorStr );
+        map.Insert( COLOR_KEY, colorStr );
+
+        std::string widthStr;
+        FloatToString( width, widthStr );
+        map.Insert( WIDTH_KEY, widthStr );
+
+        value = map;
+
         break;
       }
       case EffectStyle::INPUT:

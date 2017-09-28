@@ -19,7 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/texture-upload-observer.h>
-#include <dali-toolkit/internal/visuals/texture-manager.h>
+#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 
 namespace Dali
 {

@@ -159,6 +159,8 @@ struct EventData
   bool mPasswordInput                   : 1;   ///< True if password input is enabled.
   bool mCheckScrollAmount               : 1;   ///< Whether to check scrolled amount after updating the position
   bool mIsPlaceholderPixelSize          : 1;   ///< True if the placeholder font size is set as pixel size.
+  bool mIsPlaceholderElideEnabled       : 1;   ///< True if the placeholder text's elide is enabled.
+  bool mPlaceholderEllipsisFlag         : 1;   ///< True if the text controller sets the placeholder ellipsis.
 };
 
 struct ModifyEvent

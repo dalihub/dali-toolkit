@@ -86,6 +86,16 @@ const LineRun* const ViewModel::GetLines() const
   return mModel->GetLines();
 }
 
+Length ViewModel::GetNumberOfScripts() const
+{
+  return mModel->GetNumberOfScripts();
+}
+
+const ScriptRun* const ViewModel::GetScriptRuns() const
+{
+  return mModel->GetScriptRuns();
+}
+
 Length ViewModel::GetNumberOfGlyphs() const
 {
   if( mIsTextElided && mModel->IsTextElideEnabled() )
@@ -141,6 +151,51 @@ const ColorIndex* const ViewModel::GetColorIndices() const
 const Vector4& ViewModel::GetDefaultColor() const
 {
   return mModel->GetDefaultColor();
+}
+
+const Vector2& ViewModel::GetShadowOffset() const
+{
+  return mModel->GetShadowOffset();
+}
+
+const Vector4& ViewModel::GetShadowColor() const
+{
+  return mModel->GetShadowColor();
+}
+
+const Vector4& ViewModel::GetUnderlineColor() const
+{
+  return mModel->GetUnderlineColor();
+}
+
+bool ViewModel::IsUnderlineEnabled() const
+{
+  return mModel->IsUnderlineEnabled();
+}
+
+float ViewModel::GetUnderlineHeight() const
+{
+  return mModel->GetUnderlineHeight();
+}
+
+Length ViewModel::GetNumberOfUnderlineRuns() const
+{
+  return mModel->GetNumberOfUnderlineRuns();
+}
+
+void ViewModel::GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const
+{
+  mModel->GetUnderlineRuns( underlineRuns, index, numberOfRuns );
+}
+
+const Vector4& ViewModel::GetOutlineColor() const
+{
+  return mModel->GetOutlineColor();
+}
+
+float ViewModel::GetOutlineWidth() const
+{
+  return mModel->GetOutlineWidth();
 }
 
 void ViewModel::ElideGlyphs()

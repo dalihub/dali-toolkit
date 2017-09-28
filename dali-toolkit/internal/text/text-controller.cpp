@@ -54,6 +54,7 @@ const char * const PLACEHOLDER_FONT_FAMILY = "placeholderFontFamily";
 const char * const PLACEHOLDER_FONT_STYLE = "placeholderFontStyle";
 const char * const PLACEHOLDER_POINT_SIZE = "placeholderPointSize";
 const char * const PLACEHOLDER_PIXEL_SIZE = "placeholderPixelSize";
+const char * const PLACEHOLDER_ELLIPSIS = "placeholderEllipsis";
 
 float ConvertToEven( float value )
 {
@@ -428,6 +429,24 @@ void Controller::SetTextElideEnabled( bool enabled )
 bool Controller::IsTextElideEnabled() const
 {
   return mImpl->mModel->mElideEnabled;
+}
+
+void Controller::SetPlaceholderTextElideEnabled( bool enabled )
+{
+  mImpl->mEventData->mIsPlaceholderElideEnabled = enabled;
+  mImpl->mEventData->mPlaceholderEllipsisFlag = true;
+
+  // Update placeholder if there is no text
+  if( mImpl->IsShowingPlaceholderText() ||
+      ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) )
+  {
+    ShowPlaceholderText();
+  }
+}
+
+bool Controller::IsPlaceholderTextElideEnabled() const
+{
+  return mImpl->mEventData->mIsPlaceholderElideEnabled;
 }
 
 void Controller::SetSelectionEnabled( bool enabled )
@@ -1129,6 +1148,30 @@ float Controller::GetUnderlineHeight() const
   return mImpl->mModel->mVisualModel->GetUnderlineHeight();
 }
 
+void Controller::SetOutlineColor( const Vector4& color )
+{
+  mImpl->mModel->mVisualModel->SetOutlineColor( color );
+
+  mImpl->RequestRelayout();
+}
+
+const Vector4& Controller::GetOutlineColor() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineColor();
+}
+
+void Controller::SetOutlineWidth( float width )
+{
+  mImpl->mModel->mVisualModel->SetOutlineWidth( width );
+
+  mImpl->RequestRelayout();
+}
+
+float Controller::GetOutlineWidth() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineWidth();
+}
+
 void Controller::SetDefaultEmbossProperties( const std::string& embossProperties )
 {
   if( NULL == mImpl->mEmbossDefaults )
@@ -1757,14 +1800,14 @@ Vector3 Controller::GetNaturalSize()
     mImpl->UpdateModel( onlyOnceOperations );
 
     // Layout the text for the new width.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT );
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT | REORDER );
 
     // Store the actual control's size to restore later.
     const Size actualControlSize = mImpl->mModel->mVisualModel->mControlSize;
 
     DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
                 static_cast<OperationsMask>( onlyOnceOperations |
-                                             LAYOUT ),
+                                             LAYOUT | REORDER ),
                 naturalSize.GetVectorXY() );
 
     // Do not do again the only once operations.
@@ -1982,6 +2025,12 @@ void Controller::SetPlaceholderProperty( const Property::Map& map )
         SetPlaceholderTextFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
       }
     }
+    else if( key == PLACEHOLDER_ELLIPSIS )
+    {
+      bool ellipsis;
+      value.Get( ellipsis );
+      SetPlaceholderTextElideEnabled( ellipsis );
+    }
   }
 }
 
@@ -2013,6 +2062,11 @@ void Controller::GetPlaceholderProperty( Property::Map& map )
     else
     {
       map[ PLACEHOLDER_PIXEL_SIZE ] = GetPlaceholderTextFontSize( Text::Controller::PIXEL_SIZE );
+    }
+
+    if( mImpl->mEventData->mPlaceholderEllipsisFlag )
+    {
+      map[ PLACEHOLDER_ELLIPSIS ] = IsPlaceholderTextElideEnabled();
     }
   }
 }
@@ -2069,6 +2123,20 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
     // Style operations that need to be done if the text is modified.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                              COLOR );
+  }
+
+  // Set the update info to elide the text.
+  if( mImpl->mModel->mElideEnabled ||
+      ( ( NULL != mImpl->mEventData ) && mImpl->mEventData->mIsPlaceholderElideEnabled ) )
+  {
+    // Update Text layout for applying elided
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                             ALIGN                     |
+                                                             LAYOUT                    |
+                                                             UPDATE_LAYOUT_SIZE        |
+                                                             REORDER );
+    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
+    mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
   }
 
   // Make sure the model is up-to-date before layouting.
@@ -3255,13 +3323,35 @@ bool Controller::DoRelayout( const Size& size,
     layoutParameters.startLineIndex = mImpl->mTextUpdateInfo.mStartLineIndex;
     layoutParameters.estimatedNumberOfLines = mImpl->mTextUpdateInfo.mEstimatedNumberOfLines;
 
+    // Update the ellipsis
+    bool elideTextEnabled = mImpl->mModel->mElideEnabled;
+
+    if( NULL != mImpl->mEventData )
+    {
+      if( mImpl->mEventData->mPlaceholderEllipsisFlag && mImpl->IsShowingPlaceholderText() )
+      {
+        elideTextEnabled = mImpl->mEventData->mIsPlaceholderElideEnabled;
+      }
+      else if( EventData::INACTIVE != mImpl->mEventData->mState )
+      {
+        // Disable ellipsis when editing
+        elideTextEnabled = false;
+      }
+
+      // Reset the scroll position in inactive state
+      if( elideTextEnabled && ( mImpl->mEventData->mState == EventData::INACTIVE ) )
+      {
+        ResetScrollPosition();
+      }
+    }
+
     // Update the visual model.
     Size newLayoutSize;
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
                                                    glyphPositions,
                                                    mImpl->mModel->mVisualModel->mLines,
                                                    newLayoutSize,
-                                                   mImpl->mModel->mElideEnabled );
+                                                   elideTextEnabled );
 
     viewUpdated = viewUpdated || ( newLayoutSize != layoutSize );
 
@@ -3692,6 +3782,11 @@ void Controller::ResetScrollPosition()
     mImpl->mModel->mScrollPosition = Vector2::ZERO;
     mImpl->mEventData->mScrollAfterUpdatePosition = true;
   }
+}
+
+void Controller::SetControlInterface( ControlInterface* controlInterface )
+{
+  mImpl->mControlInterface = controlInterface;
 }
 
 bool Controller::ShouldClearFocusOnEscape() const

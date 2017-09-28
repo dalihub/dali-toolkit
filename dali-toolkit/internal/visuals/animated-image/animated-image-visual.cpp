@@ -274,6 +274,7 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
       {
         mWrapModeU = Dali::WrapMode::Type::DEFAULT;
       }
+      break;
     }
     case Toolkit::ImageVisual::Property::WRAP_MODE_V:
     {
@@ -477,7 +478,7 @@ TextureSet AnimatedImageVisual::PrepareAnimatedGifImage()
   // load from image file
   std::vector<Dali::PixelData> pixelDataList;
 
-  if( mImageUrl.IsLocal() )
+  if( mImageUrl.IsLocalResource() )
   {
     if( Dali::LoadAnimatedGifFromFile( mImageUrl.GetUrl().c_str() , pixelDataList, mFrameDelayContainer ) )
     {

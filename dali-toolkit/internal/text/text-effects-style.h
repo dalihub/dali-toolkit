@@ -72,6 +72,21 @@ bool ParseUnderlineProperties( const Property::Map& underlineProperties,
                                float& height );
 
 /**
+ * @brief Parses the outline properties.
+ *
+ * @param[in] outlineProperties The map with the outline properties.
+ * @param[out] colorDefined Whether the outline's color is defined.
+ * @param[out] color The outline's color.
+ * @param[out] widthDefined Whether the outline's width is defined.
+ * @param[out] width The outline's width.
+ */
+bool ParseOutlineProperties( const Property::Map& outlineProperties,
+                               bool& colorDefined,
+                               Vector4& color,
+                               bool& widthDefined,
+                               float& width );
+
+/**
  * @brief Sets the underline properties.
  *
  * @param[in] controller The text's controller.

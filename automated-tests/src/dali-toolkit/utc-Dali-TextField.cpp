@@ -100,6 +100,7 @@ const char* const PROPERTY_NAME_HIDDEN_INPUT_SETTINGS                = "hiddenIn
 const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSize";
 const char* const PROPERTY_NAME_ENABLE_SELECTION                     = "enableSelection";
 const char* const PROPERTY_NAME_PLACEHOLDER                          = "placeholder";
+const char* const PROPERTY_NAME_ELLIPSIS                             = "ellipsis";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -513,6 +514,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextField::Property::PIXEL_SIZE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == DevelTextField::Property::ENABLE_SELECTION );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == DevelTextField::Property::PLACEHOLDER );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == DevelTextField::Property::ELLIPSIS );
 
   END_TEST;
 }
@@ -827,8 +829,19 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::INPUT_EMBOSS ), std::string("Emboss input properties"), TEST_LOCATION );
 
   // Check the outline property
-  field.SetProperty( TextField::Property::OUTLINE, "Outline properties" );
-  DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+  Property::Map outlineMapSet;
+  Property::Map outlineMapGet;
+
+  outlineMapSet["color"] = Color::RED;
+  outlineMapSet["width"] = 2.0f;
+
+  field.SetProperty( TextField::Property::OUTLINE, outlineMapSet );
+
+  outlineMapSet["color"] = "red";
+  outlineMapSet["width"] = "2";
+  outlineMapGet = field.GetProperty<Property::Map>( TextField::Property::OUTLINE );
+  DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
 
   // Check the input outline property
   field.SetProperty( TextField::Property::INPUT_OUTLINE, "Outline input properties" );
@@ -864,6 +877,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   placeholderPixelSizeMapSet["placeholderColor"] = Color::BLUE;
   placeholderPixelSizeMapSet["placeholderFontFamily"] = "Arial";
   placeholderPixelSizeMapSet["placeholderPixelSize"] = 15.0f;
+  placeholderPixelSizeMapSet["placeholderEllipsis"] = true;
 
   placeholderFontstyleMap.Insert( "weight", "bold" );
   placeholderPixelSizeMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
@@ -881,6 +895,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   placeholderMapSet["placeholderColor"] = Color::RED;
   placeholderMapSet["placeholderFontFamily"] = "Arial";
   placeholderMapSet["placeholderPointSize"] = 12.0f;
+  placeholderMapSet["placeholderEllipsis"] = false;
 
   // Check the placeholder font style property
   placeholderFontstyleMap.Clear();
@@ -920,6 +935,11 @@ int UtcDaliTextFieldSetPropertyP(void)
   placeholderMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+
+  // Check the ellipsis property
+  DALI_TEST_CHECK( !field.GetProperty<bool>( DevelTextField::Property::ELLIPSIS ) );
+  field.SetProperty( DevelTextField::Property::ELLIPSIS, true );
+  DALI_TEST_CHECK( field.GetProperty<bool>( DevelTextField::Property::ELLIPSIS ) );
 
   END_TEST;
 }
