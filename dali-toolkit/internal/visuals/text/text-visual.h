@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>

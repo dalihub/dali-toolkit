@@ -25,7 +25,7 @@
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/devel-api/object/weak-handle.h>
+#include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>

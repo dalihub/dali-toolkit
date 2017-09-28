@@ -23,7 +23,6 @@
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/devel-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
