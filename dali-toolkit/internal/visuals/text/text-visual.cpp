@@ -74,11 +74,7 @@ std::string GetHorizontalAlignment( Toolkit::Text::Layout::HorizontalAlignment a
                                                                                                 HORIZONTAL_ALIGNMENT_STRING_TABLE,
                                                                                                 HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
 
-  if( name )
-  {
-    return std::string( name );
-  }
-  return std::string();
+  return std::string( name );
 }
 
 std::string GetVerticalAlignment( Toolkit::Text::Layout::VerticalAlignment alignment )
@@ -87,11 +83,7 @@ std::string GetVerticalAlignment( Toolkit::Text::Layout::VerticalAlignment align
                                                                                                 VERTICAL_ALIGNMENT_STRING_TABLE,
                                                                                                 VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
 
-  if( name )
-  {
-    return std::string( name );
-  }
-  return std::string();
+  return std::string( name );
 }
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
