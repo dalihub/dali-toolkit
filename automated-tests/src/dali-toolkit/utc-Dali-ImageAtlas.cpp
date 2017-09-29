@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
-
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;
@@ -399,14 +396,14 @@ int UtcDaliImageAtlasImageView(void)
   imageMap1[ ImageVisual::Property::URL ] = gImage_34_RGBA;
   imageMap1[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
   imageMap1[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
-  imageMap1[ DevelImageVisual::Property::ATLASING] = true;
+  imageMap1[ ImageVisual::Property::ATLASING] = true;
 
   Property::Map imageMap2;
 
   imageMap2[ ImageVisual::Property::URL ] = gImage_50_RGBA;
   imageMap2[ ImageVisual::Property::DESIRED_HEIGHT ] = 50;
   imageMap2[ ImageVisual::Property::DESIRED_WIDTH ] = 50;
-  imageMap2[ DevelImageVisual::Property::ATLASING ] = true;
+  imageMap2[ ImageVisual::Property::ATLASING ] = true;
 
   ImageView imageView1 = ImageView::New();
   imageView1.SetProperty( ImageView::Property::IMAGE, imageMap1 );
@@ -460,7 +457,7 @@ int UtcDaliImageAtlasImageView(void)
   imageMap3[ ImageVisual::Property::URL ] = gImage_128_RGB;
   imageMap3[ ImageVisual::Property::DESIRED_HEIGHT ] = 100;
   imageMap3[ ImageVisual::Property::DESIRED_WIDTH ] = 100;
-  imageMap3[ DevelImageVisual::Property::ATLASING ] = true;
+  imageMap3[ ImageVisual::Property::ATLASING ] = true;
 
   ImageView imageView3 = ImageView::New();
   imageView3.SetProperty( ImageView::Property::IMAGE, imageMap3 );

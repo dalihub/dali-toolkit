@@ -36,7 +36,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
@@ -1229,7 +1229,7 @@ void TextEditor::OnInitialize()
 
   // Creates a background visual. Even if the color is transparent it updates the stencil.
   mStencil.SetProperty( Toolkit::Control::Property::BACKGROUND,
-                        Property::Map().Add( Toolkit::Visual::Property::TYPE, DevelVisual::COLOR ).
+                        Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::COLOR ).
                         Add( ColorVisual::Property::MIX_COLOR, Color::TRANSPARENT ) );
 
   // Enable the clipping property.

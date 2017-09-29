@@ -32,8 +32,7 @@
 
 // INTERNAL HEADERS
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -352,19 +351,19 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       }
       else if ( keyValue.first == IMAGE_ATLASING )
       {
-        DoSetProperty( Toolkit::DevelImageVisual::Property::ATLASING, keyValue.second );
+        DoSetProperty( Toolkit::ImageVisual::Property::ATLASING, keyValue.second );
       }
       else if ( keyValue.first == ALPHA_MASK_URL )
       {
-        DoSetProperty( Toolkit::DevelImageVisual::Property::ALPHA_MASK_URL, keyValue.second );
+        DoSetProperty( Toolkit::ImageVisual::Property::ALPHA_MASK_URL, keyValue.second );
       }
       else if ( keyValue.first == MASK_CONTENT_SCALE_NAME )
       {
-        DoSetProperty( Toolkit::DevelImageVisual::Property::MASK_CONTENT_SCALE, keyValue.second );
+        DoSetProperty( Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, keyValue.second );
       }
       else if ( keyValue.first == CROP_TO_MASK_NAME )
       {
-        DoSetProperty( Toolkit::DevelImageVisual::Property::CROP_TO_MASK, keyValue.second );
+        DoSetProperty( Toolkit::ImageVisual::Property::CROP_TO_MASK, keyValue.second );
       }
     }
   }
@@ -461,14 +460,14 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
       break;
     }
 
-    case Toolkit::DevelImageVisual::Property::ATLASING:
+    case Toolkit::ImageVisual::Property::ATLASING:
     {
       bool atlasing = false;
       mAttemptAtlasing = value.Get( atlasing );
       break;
     }
 
-    case Toolkit::DevelImageVisual::Property::ALPHA_MASK_URL:
+    case Toolkit::ImageVisual::Property::ALPHA_MASK_URL:
     {
       std::string alphaUrl;
       if( value.Get( alphaUrl ) )
@@ -482,7 +481,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
       break;
     }
 
-    case Toolkit::DevelImageVisual::Property::MASK_CONTENT_SCALE:
+    case Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE:
     {
       float scale;
       if( value.Get( scale ) )
@@ -493,7 +492,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
       break;
     }
 
-    case Toolkit::DevelImageVisual::Property::CROP_TO_MASK:
+    case Toolkit::ImageVisual::Property::CROP_TO_MASK:
     {
       bool crop=false;
       if( value.Get( crop ) )
@@ -821,7 +820,7 @@ void ImageVisual::DoSetOffStage( Actor& actor )
 void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
 
   bool sync = IsSynchronousResourceLoading();
   map.Insert( SYNCHRONOUS_LOADING, sync );
@@ -850,19 +849,19 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
 
-  map.Insert( Toolkit::DevelImageVisual::Property::ATLASING, mAttemptAtlasing );
+  map.Insert( Toolkit::ImageVisual::Property::ATLASING, mAttemptAtlasing );
   if( mMaskingData != NULL )
   {
-    map.Insert( Toolkit::DevelImageVisual::Property::ALPHA_MASK_URL, mMaskingData->mAlphaMaskUrl.GetUrl() );
-    map.Insert( Toolkit::DevelImageVisual::Property::MASK_CONTENT_SCALE, mMaskingData->mContentScaleFactor );
-    map.Insert( Toolkit::DevelImageVisual::Property::CROP_TO_MASK, mMaskingData->mCropToMask );
+    map.Insert( Toolkit::ImageVisual::Property::ALPHA_MASK_URL, mMaskingData->mAlphaMaskUrl.GetUrl() );
+    map.Insert( Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE, mMaskingData->mContentScaleFactor );
+    map.Insert( Toolkit::ImageVisual::Property::CROP_TO_MASK, mMaskingData->mCropToMask );
   }
 }
 
 void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::IMAGE );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
   if( mImageUrl.IsValid() )
   {
     map.Insert( Toolkit::ImageVisual::Property::DESIRED_WIDTH, mDesiredSize.GetWidth() );

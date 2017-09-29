@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_COLOR_ADJUSTER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 #define DALI_COMPOSE_SHADER(STR) #STR
 
@@ -97,7 +97,7 @@ inline Property::Map CreateColorAdjuster()
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentShader;
 
   Property::Map map;
-  map[ Toolkit::DevelVisual::Property::SHADER ] = customShader;
+  map[ Toolkit::Visual::Property::SHADER ] = customShader;
 
   return map;
 }

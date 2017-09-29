@@ -30,7 +30,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 // TODO:
 // pixel format / size - set from JSON
@@ -264,7 +264,7 @@ void GaussianBlurView::OnInitialize()
   horizFragmentShaderStringStream << GAUSSIAN_BLUR_FRAGMENT_SOURCE;
   Property::Map source;
   source[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = horizFragmentShaderStringStream.str();
-  mCustomShader[ Toolkit::DevelVisual::Property::SHADER ] = source;
+  mCustomShader[ Toolkit::Visual::Property::SHADER ] = source;
 
   //////////////////////////////////////////////////////
   // Create actors

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/controls/popup/popup-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -238,11 +238,11 @@ void Tooltip::SetContent( Toolkit::Control& control, const Property::Value& valu
       if( typeValue )
       {
         // Set to an invalid value so it definitely changes if set in Scripting::GetEnumerationProperty
-        Toolkit::DevelVisual::Type visualType = static_cast< Toolkit::DevelVisual::Type >( -1 );
+        Toolkit::Visual::Type visualType = static_cast< Toolkit::Visual::Type >( -1 );
 
         if( Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType ) )
         {
-          if( visualType == Toolkit::DevelVisual::TEXT )
+          if( visualType == Toolkit::Visual::TEXT )
           {
             // Visual Type is text, ensure we have a the TEXT property set before we connect to the signals.
 
@@ -277,7 +277,7 @@ void Tooltip::SetContent( Toolkit::Control& control, const Property::Value& valu
     if( value.Get( text ) )
     {
       mContentTextVisual[ Toolkit::TextVisual::Property::TEXT ] = text;
-      mContentTextVisual[ Toolkit::Visual::Property::TYPE ] = DevelVisual::TEXT;
+      mContentTextVisual[ Toolkit::Visual::Property::TYPE ] = Visual::TEXT;
       mContentArray.Clear();
       connectSignals = true;
     }

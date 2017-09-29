@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -103,7 +103,7 @@ void SpreadFilter::Enable()
   Property::Map customShader;
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = SPREAD_FRAGMENT_SOURCE;
   Property::Map visualMap;
-  visualMap.Insert( Toolkit::DevelVisual::Property::SHADER, customShader );
+  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
 
   // set SPREAD custom shader
   mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );

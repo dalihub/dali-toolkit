@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -267,7 +267,7 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
           map = value.GetMap();
           if( map )
           {
-            Property::Value* shaderValue = map->Find( Toolkit::DevelVisual::Property::SHADER, CUSTOM_SHADER );
+            Property::Value* shaderValue = map->Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
             // set image only if property map contains image information other than custom shader
             if( map->Count() > 1u ||  !shaderValue )
             {

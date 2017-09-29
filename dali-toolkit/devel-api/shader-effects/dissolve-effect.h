@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SHADER_EFFECT_DISSOLVE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -225,7 +225,7 @@ inline Property::Map CreateDissolveEffect( bool useHighPrecision = true )
 
   customShader[ Visual::Shader::Property::HINTS ] = Shader::Hint::OUTPUT_IS_TRANSPARENT;
 
-  map[ Visual::Property::SHADER ] = customShader;
+  map[ Toolkit::Visual::Property::SHADER ] = customShader;
   return map;
 }
 

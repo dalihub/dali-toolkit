@@ -35,11 +35,11 @@
 #include <dali-toolkit/internal/text/text-definitions.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 
-#include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
 using namespace Dali::Toolkit::Text;
@@ -793,7 +793,7 @@ void TextLabel::OnInitialize()
   Actor self = Self();
 
   Property::Map propertyMap;
-  propertyMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT );
+  propertyMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT );
 
   mVisual =  Toolkit::VisualFactory::Get().CreateVisual( propertyMap );
   DevelControl::RegisterVisual( *this, Toolkit::TextLabel::Property::TEXT, mVisual  );
@@ -907,12 +907,12 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
     Self().GetPadding( padding );
 
     Property::Map visualTransform;
-    visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, contentSize )
-                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(padding.left, padding.top) )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::DevelVisual::Transform::Policy::ABSOLUTE, Toolkit::DevelVisual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
-                   .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
+    visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, contentSize )
+                   .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2(padding.left, padding.top) )
+                   .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                   .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
     mVisual.SetTransformAndSize( visualTransform, size );
 
     if ( mController->IsAutoScrollEnabled() )

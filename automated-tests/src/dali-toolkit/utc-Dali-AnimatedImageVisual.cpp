@@ -21,8 +21,6 @@
 #include <toolkit-timer.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include "dummy-control.h"
@@ -70,7 +68,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   VisualFactory factory = VisualFactory::Get();
   Visual::Base animatedImageVisual = factory.CreateVisual(
     Property::Map()
-    .Add( Visual::Property::TYPE, DevelVisual::ANIMATED_IMAGE )
+    .Add( Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE )
     .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME )
     .Add( ImageVisual::Property::PIXEL_AREA, Vector4() )
     .Add( ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT )
@@ -79,9 +77,9 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap( resultMap );
   // check the property values from the returned map from a visual
-  Property::Value* value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
+  Property::Value* value = resultMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_IMAGE );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::ANIMATED_IMAGE );
 
   value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
   DALI_TEST_CHECK( value );
@@ -92,9 +90,9 @@ int UtcDaliAnimatedImageVisualGetPropertyMap01(void)
   resultMap.Clear();
   animatedImageVisual2.CreatePropertyMap( resultMap );
   // check the property values from the returned map from a visual
-  value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
+  value = resultMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_IMAGE );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::ANIMATED_IMAGE );
 
   value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
   DALI_TEST_CHECK( value );
@@ -116,7 +114,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
 
   Visual::Base animatedImageVisual = factory.CreateVisual(
     Property::Map()
-    .Add( Visual::Property::TYPE, DevelVisual::ANIMATED_IMAGE )
+    .Add( Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE )
     .Add( "url", urls )
     .Add( "batchSize", 4 )
     .Add( "cacheSize", 8 )
@@ -128,25 +126,25 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   Property::Map resultMap;
   animatedImageVisual.CreatePropertyMap( resultMap );
   // check the property values from the returned map from a visual
-  Property::Value* value = resultMap.Find( Visual::Property::TYPE,  Property::INTEGER );
+  Property::Value* value = resultMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_IMAGE );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::ANIMATED_IMAGE );
 
-  value = resultMap.Find( DevelImageVisual::Property::URL, "url" );
+  value = resultMap.Find( ImageVisual::Property::URL, "url" );
   DALI_TEST_CHECK( value );
   Property::Array* resultUrls = value->GetArray();
   DALI_TEST_CHECK( resultUrls );
   DALI_TEST_EQUALS( resultUrls->Count(), urls.Count(), TEST_LOCATION );
 
-  value = resultMap.Find( DevelImageVisual::Property::BATCH_SIZE, "batchSize" );
+  value = resultMap.Find( ImageVisual::Property::BATCH_SIZE, "batchSize" );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<int>(), 4, TEST_LOCATION );
 
-  value = resultMap.Find( DevelImageVisual::Property::CACHE_SIZE, "cacheSize" );
+  value = resultMap.Find( ImageVisual::Property::CACHE_SIZE, "cacheSize" );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<int>(), 8, TEST_LOCATION );
 
-  value = resultMap.Find( DevelImageVisual::Property::FRAME_DELAY, "frameDelay" );
+  value = resultMap.Find( ImageVisual::Property::FRAME_DELAY, "frameDelay" );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<int>(), 200, TEST_LOCATION );
 
@@ -167,10 +165,10 @@ int UtcDaliAnimatedImageVisualMultiImage01(void)
   {
     Property::Map propertyMap;
     propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE );
-    propertyMap.Insert( DevelImageVisual::Property::URL, Property::Value(urls) );
-    propertyMap.Insert( DevelImageVisual::Property::BATCH_SIZE, 4);
-    propertyMap.Insert( DevelImageVisual::Property::CACHE_SIZE, 8);
-    propertyMap.Insert( DevelImageVisual::Property::FRAME_DELAY, 100);
+    propertyMap.Insert( ImageVisual::Property::URL, Property::Value(urls) );
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 4);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 8);
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 100);
 
     VisualFactory factory = VisualFactory::Get();
     Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -261,10 +259,10 @@ int UtcDaliAnimatedImageVisualMultiImage02(void)
 
     Property::Map propertyMap;
     propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE );
-    propertyMap.Insert( DevelImageVisual::Property::URL, Property::Value(urls) );
-    propertyMap.Insert( DevelImageVisual::Property::BATCH_SIZE, 0);
-    propertyMap.Insert( DevelImageVisual::Property::CACHE_SIZE, 0);
-    propertyMap.Insert( DevelImageVisual::Property::FRAME_DELAY, 100);
+    propertyMap.Insert( ImageVisual::Property::URL, Property::Value(urls) );
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 0);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 0);
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 100);
 
     VisualFactory factory = VisualFactory::Get();
     Visual::Base visual = factory.CreateVisual( propertyMap ); // TexMgr::Request load tId:0
@@ -334,17 +332,17 @@ int UtcDaliAnimatedImageVisualMultiImage03(void)
 
     Property::Map animatedImageMap1;
     animatedImageMap1.Insert(Visual::Property::TYPE, Visual::IMAGE );
-    animatedImageMap1.Insert( DevelImageVisual::Property::URL, Property::Value(urls1) );
-    animatedImageMap1.Insert( DevelImageVisual::Property::BATCH_SIZE, 3);
-    animatedImageMap1.Insert( DevelImageVisual::Property::CACHE_SIZE, 3);
-    animatedImageMap1.Insert( DevelImageVisual::Property::FRAME_DELAY, 100);
+    animatedImageMap1.Insert( ImageVisual::Property::URL, Property::Value(urls1) );
+    animatedImageMap1.Insert( ImageVisual::Property::BATCH_SIZE, 3);
+    animatedImageMap1.Insert( ImageVisual::Property::CACHE_SIZE, 3);
+    animatedImageMap1.Insert( ImageVisual::Property::FRAME_DELAY, 100);
 
     Property::Map animatedImageMap2;
     animatedImageMap2.Insert(Visual::Property::TYPE, Visual::IMAGE );
-    animatedImageMap2.Insert( DevelImageVisual::Property::URL, Property::Value(urls2) );
-    animatedImageMap2.Insert( DevelImageVisual::Property::BATCH_SIZE, 2);
-    animatedImageMap2.Insert( DevelImageVisual::Property::CACHE_SIZE, 2);
-    animatedImageMap2.Insert( DevelImageVisual::Property::FRAME_DELAY, 100);
+    animatedImageMap2.Insert( ImageVisual::Property::URL, Property::Value(urls2) );
+    animatedImageMap2.Insert( ImageVisual::Property::BATCH_SIZE, 2);
+    animatedImageMap2.Insert( ImageVisual::Property::CACHE_SIZE, 2);
+    animatedImageMap2.Insert( ImageVisual::Property::FRAME_DELAY, 100);
 
     VisualFactory factory = VisualFactory::Get();
     Visual::Base animatedImageVisual1 = factory.CreateVisual( animatedImageMap1 );
@@ -417,10 +415,10 @@ int UtcDaliAnimatedImageVisualMultiImage04(void)
   {
     Property::Map propertyMap;
     propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE );
-    propertyMap.Insert( DevelImageVisual::Property::URL, Property::Value(urls) );
-    propertyMap.Insert( DevelImageVisual::Property::BATCH_SIZE, 6);
-    propertyMap.Insert( DevelImageVisual::Property::CACHE_SIZE, 11);
-    propertyMap.Insert( DevelImageVisual::Property::FRAME_DELAY, 100);
+    propertyMap.Insert( ImageVisual::Property::URL, Property::Value(urls) );
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 6);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 11);
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 100);
 
     VisualFactory factory = VisualFactory::Get();
     Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -503,10 +501,10 @@ int UtcDaliAnimatedImageVisualMultiImage05(void)
   {
     Property::Map propertyMap;
     propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE );
-    propertyMap.Insert( DevelImageVisual::Property::URL, Property::Value(urls) );
-    propertyMap.Insert( DevelImageVisual::Property::BATCH_SIZE, 4);
-    propertyMap.Insert( DevelImageVisual::Property::CACHE_SIZE, 11);
-    propertyMap.Insert( DevelImageVisual::Property::FRAME_DELAY, 100);
+    propertyMap.Insert( ImageVisual::Property::URL, Property::Value(urls) );
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 4);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 11);
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 100);
 
     VisualFactory factory = VisualFactory::Get();
     Visual::Base visual = factory.CreateVisual( propertyMap );

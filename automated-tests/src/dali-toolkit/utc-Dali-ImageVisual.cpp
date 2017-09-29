@@ -19,14 +19,8 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-timer.h>
 #include <toolkit-event-thread-callback.h>
-#include <dali/public-api/rendering/renderer.h>
-#include <dali/public-api/rendering/texture-set.h>
-#include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/images/nine-patch-image.h>
 #include <dali/devel-api/object/handle-devel.h>
-#include <dali-toolkit/devel-api/align-enums.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -114,13 +108,13 @@ static void TestMixColor( Visual::Base visual, Property::Index mixColorIndex, co
   DALI_TEST_CHECK( value->Get( mixColor1 ) );
   DALI_TEST_EQUALS( mixColor1, Vector3(testColor), 0.001, TEST_LOCATION );
 
-  value = map.Find( DevelVisual::Property::MIX_COLOR );
+  value = map.Find( Visual::Property::MIX_COLOR );
   DALI_TEST_CHECK( value );
   Vector4 mixColor2;
   DALI_TEST_CHECK( value->Get( mixColor2 ) );
   DALI_TEST_EQUALS( mixColor2, testColor, 0.001, TEST_LOCATION );
 
-  value = map.Find( DevelVisual::Property::OPACITY );
+  value = map.Find( Visual::Property::OPACITY );
   DALI_TEST_CHECK( value );
   float opacity;
   DALI_TEST_CHECK( value->Get( opacity ) );
@@ -138,7 +132,7 @@ int UtcDaliImageVisualPropertyMap(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_LARGE_IMAGE_FILE_NAME );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -187,7 +181,7 @@ int UtcDaliImageVisualRemoteImageLoad(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_REMOTE_IMAGE_FILE_NAME );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -227,7 +221,7 @@ int UtcDaliImageVisualTextureReuse1(void)
   tet_infoline( "Request remote image visual with a Property::Map; request a second visual with the same property map - should reuse texture" );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_LARGE_IMAGE_FILE_NAME );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -297,7 +291,7 @@ int UtcDaliImageVisualTextureReuse2(void)
   tet_infoline( "Request remote image visual with a Property::Map; request a second visual with the same url but different property map - should create new texture" );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_REMOTE_IMAGE_FILE_NAME );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -420,7 +414,7 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_SMALL_IMAGE_FILE_NAME );
   propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, width );
   propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, height );
@@ -428,7 +422,7 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   propertyMap.Insert( ImageVisual::Property::PIXEL_AREA, pixelArea );
   propertyMap.Insert( ImageVisual::Property::WRAP_MODE_U, WrapMode::MIRRORED_REPEAT );
   propertyMap.Insert( ImageVisual::Property::WRAP_MODE_V, WrapMode::REPEAT );
-  propertyMap.Insert( DevelImageVisual::Property::ATLASING, true );
+  propertyMap.Insert( ImageVisual::Property::ATLASING, true );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
@@ -499,7 +493,7 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
   const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_LARGE_IMAGE_FILE_NAME );
   propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH, width );
   propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT, height );
@@ -586,7 +580,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::MIX_COLOR );
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, Visual::Property::MIX_COLOR );
   Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
 
@@ -632,7 +626,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(TARGET_MIX_COLOR)), true, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", TARGET_MIX_COLOR.a), true, TEST_LOCATION );
 
-  TestMixColor( visual, DevelVisual::Property::MIX_COLOR, TARGET_MIX_COLOR );
+  TestMixColor( visual, Visual::Property::MIX_COLOR, TARGET_MIX_COLOR );
 
   blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
@@ -668,7 +662,7 @@ int UtcDaliImageVisualAnimateOpacity(void)
 
   Renderer renderer = actor.GetRendererAt(0);
   tet_infoline("Test that the renderer has the opacity property");
-  Property::Index index = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::OPACITY );
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, Visual::Property::OPACITY );
   DALI_TEST_CHECK( index != Property::INVALID_INDEX );
 
 
@@ -714,7 +708,7 @@ int UtcDaliImageVisualAnimateOpacity(void)
 
     Property::Map map;
     map["target"] = "testVisual";
-    map["property"] = DevelVisual::Property::OPACITY;
+    map["property"] = Visual::Property::OPACITY;
     map["targetValue"] = 0.1f;
     map["animator"] = Property::Map()
       .Add("alphaFunction", "LINEAR")
@@ -776,7 +770,7 @@ int UtcDaliImageVisualAnimatePixelArea(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  Property::Index index = DevelHandle::GetPropertyIndex( renderer, DevelVisual::Property::MIX_COLOR );
+  Property::Index index = DevelHandle::GetPropertyIndex( renderer, Visual::Property::MIX_COLOR );
 
   tet_infoline("Test that the renderer has the mixColor property");
   DALI_TEST_CHECK( index != Property::INVALID_INDEX );
@@ -818,7 +812,7 @@ int UtcDaliImageVisualTextureCancelRemoteLoad(void)
   tet_infoline( "Request remote image visual, then destroy visual to cancel load" );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_REMOTE_IMAGE_FILE_NAME );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -851,7 +845,7 @@ int UtcDaliImageVisualTextureCancelAsyncLoad(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -903,7 +897,7 @@ int UtcDaliImageVisualSetInvalidAsyncImage(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_INVALID_FILE_NAME );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -946,7 +940,7 @@ int UtcDaliImageVisualSetInvalidSyncImage(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_INVALID_FILE_NAME );
   propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, true );
 
@@ -988,7 +982,7 @@ int UtcDaliImageVisualSetInvalidRemoteImage(void)
 
   // Local invalid file, asynchronous loading
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_REMOTE_INVALID_FILE_NAME );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -1031,16 +1025,16 @@ int UtcDaliImageVisualAlphaMask(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_LARGE_IMAGE_FILE_NAME );
-  propertyMap.Insert( DevelImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
   Property::Map testMap;
   visual.CreatePropertyMap(testMap);
-  DALI_TEST_EQUALS(*testMap.Find(DevelImageVisual::Property::ALPHA_MASK_URL),Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION );
+  DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL),Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION );
 
   // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
   // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
@@ -1084,7 +1078,7 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
   const std::string MASK_IMAGE = TEST_REMOTE_IMAGE_FILE_NAME;
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
   propertyMap.Insert( "alphaMaskUrl", MASK_IMAGE );
 
@@ -1093,7 +1087,7 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
 
   Property::Map testMap;
   visual.CreatePropertyMap(testMap);
-  DALI_TEST_EQUALS(*testMap.Find(DevelImageVisual::Property::ALPHA_MASK_URL),Property::Value(MASK_IMAGE), TEST_LOCATION );
+  DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL),Property::Value(MASK_IMAGE), TEST_LOCATION );
 
   // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
   // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
@@ -1136,20 +1130,20 @@ int UtcDaliImageVisualAlphaMaskCrop(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_LARGE_IMAGE_FILE_NAME );
-  propertyMap.Insert( DevelImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME );
-  propertyMap.Insert( DevelImageVisual::Property::MASK_CONTENT_SCALE, 1.6f );
-  propertyMap.Insert( DevelImageVisual::Property::CROP_TO_MASK, true );
+  propertyMap.Insert( ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::MASK_CONTENT_SCALE, 1.6f );
+  propertyMap.Insert( ImageVisual::Property::CROP_TO_MASK, true );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
   Property::Map testMap;
   visual.CreatePropertyMap(testMap);
-  DALI_TEST_EQUALS( *testMap.Find(DevelImageVisual::Property::ALPHA_MASK_URL),Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION );
-  DALI_TEST_EQUALS( *testMap.Find(DevelImageVisual::Property::MASK_CONTENT_SCALE), Property::Value(1.6f), TEST_LOCATION );
-  DALI_TEST_EQUALS( *testMap.Find(DevelImageVisual::Property::CROP_TO_MASK),Property::Value(true), TEST_LOCATION );
+  DALI_TEST_EQUALS( *testMap.Find(ImageVisual::Property::ALPHA_MASK_URL),Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION );
+  DALI_TEST_EQUALS( *testMap.Find(ImageVisual::Property::MASK_CONTENT_SCALE), Property::Value(1.6f), TEST_LOCATION );
+  DALI_TEST_EQUALS( *testMap.Find(ImageVisual::Property::CROP_TO_MASK),Property::Value(true), TEST_LOCATION );
 
   // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
   // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.

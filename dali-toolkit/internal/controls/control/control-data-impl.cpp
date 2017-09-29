@@ -34,7 +34,7 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
@@ -85,10 +85,10 @@ void Remove( DictionaryKeys& keys, const std::string& name )
   }
 }
 
-Toolkit::DevelVisual::Type GetVisualTypeFromMap( const Property::Map& map )
+Toolkit::Visual::Type GetVisualTypeFromMap( const Property::Map& map )
 {
-  Property::Value* typeValue = map.Find( Toolkit::DevelVisual::Property::TYPE, VISUAL_TYPE  );
-  Toolkit::DevelVisual::Type type = Toolkit::DevelVisual::IMAGE;
+  Property::Value* typeValue = map.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE  );
+  Toolkit::Visual::Type type = Toolkit::Visual::IMAGE;
   if( typeValue )
   {
     Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, type );
@@ -1095,8 +1095,8 @@ void Control::Impl::RecreateChangedVisuals( Dictionary<Property::Map>& stateVisu
       Property::Map fromMap;
       visual.CreatePropertyMap( fromMap );
 
-      Toolkit::DevelVisual::Type fromType = GetVisualTypeFromMap( fromMap );
-      Toolkit::DevelVisual::Type toType = GetVisualTypeFromMap( toMap );
+      Toolkit::Visual::Type fromType = GetVisualTypeFromMap( fromMap );
+      Toolkit::Visual::Type toType = GetVisualTypeFromMap( toMap );
 
       if( fromType != toType )
       {
@@ -1104,8 +1104,8 @@ void Control::Impl::RecreateChangedVisuals( Dictionary<Property::Map>& stateVisu
       }
       else
       {
-        if( fromType == Toolkit::DevelVisual::IMAGE || fromType == Toolkit::DevelVisual::N_PATCH
-            || fromType == Toolkit::DevelVisual::SVG || fromType == Toolkit::DevelVisual::ANIMATED_IMAGE )
+        if( fromType == Toolkit::Visual::IMAGE || fromType == Toolkit::Visual::N_PATCH
+            || fromType == Toolkit::Visual::SVG || fromType == Toolkit::Visual::ANIMATED_IMAGE )
         {
           Property::Value* fromUrl = fromMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
           Property::Value* toUrl = toMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );

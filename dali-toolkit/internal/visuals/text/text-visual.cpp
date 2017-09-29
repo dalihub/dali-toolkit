@@ -23,8 +23,8 @@
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 
 // INTERNAL HEADER
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -382,7 +382,7 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
   Property::Value value;
 
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::TEXT );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT );
 
   std::string text;
   mController->GetText( text );
@@ -415,7 +415,7 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
 void TextVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::TEXT );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT );
   std::string text;
   mController->GetText( text );
   map.Insert( Toolkit::TextVisual::Property::TEXT, text );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/buttons/button-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 
 namespace Dali
 {

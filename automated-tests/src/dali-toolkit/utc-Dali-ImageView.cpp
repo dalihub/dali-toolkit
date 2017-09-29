@@ -22,14 +22,13 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
-#include <dali/public-api/rendering/renderer.h>
 
 #include <test-native-image.h>
 #include <sstream>
 #include <unistd.h>
+
 
 #include "dummy-control.h"
 
@@ -473,7 +472,7 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
   imageMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
   imageMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
   imageMap[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
-  imageMap[ DevelImageVisual::Property::ATLASING] = true;
+  imageMap[ ImageVisual::Property::ATLASING] = true;
 
   ImageView imageView = ImageView::New();
   imageView.SetProperty( ImageView::Property::IMAGE, imageMap );
@@ -552,7 +551,7 @@ int UtcDaliImageViewSyncLoading(void)
 
   Property::Map syncLoadingMap;
   syncLoadingMap[ ImageVisual::Property::SYNCHRONOUS_LOADING ] = true;
-  syncLoadingMap[ DevelImageVisual::Property::ATLASING ] = true;
+  syncLoadingMap[ ImageVisual::Property::ATLASING ] = true;
 
   // Sync loading, no atlasing for big size image
   {

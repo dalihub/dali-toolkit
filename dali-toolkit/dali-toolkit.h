@@ -66,8 +66,10 @@
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/mesh-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 
+#include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/public-api/dali-toolkit-version.h>
 #include <dali-toolkit/public-api/enums.h>
 #include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
