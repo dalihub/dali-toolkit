@@ -593,7 +593,7 @@ void Popup::SetPopupBackgroundImage( Actor image )
   const bool prevAlter = mAlterAddedChild;
   mAlterAddedChild = false;
   mPopupContainer.Add( mPopupBackgroundImage );
-  DevelActor::LowerToBottom(mPopupBackgroundImage);
+  mPopupBackgroundImage.LowerToBottom();
   mAlterAddedChild = prevAlter;
 
   if( mTailImage )

@@ -1375,13 +1375,13 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
     // Make sure the actors are parented correctly with/without clipping
     Actor self = mStencil ? mStencil : Self();
 
-    for( std::vector<Actor>::const_iterator it = mClippingDecorationActors.begin(),
+    for( std::vector<Actor>::iterator it = mClippingDecorationActors.begin(),
            endIt = mClippingDecorationActors.end();
          it != endIt;
          ++it )
     {
       self.Add( *it );
-      DevelActor::LowerToBottom( *it );
+      it->LowerToBottom();
     }
     mClippingDecorationActors.clear();
 
