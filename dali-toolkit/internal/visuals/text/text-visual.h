@@ -192,11 +192,22 @@ private:
   void RemoveTextureSet();
 
   /**
+   * Get the texture of the text for rendering.
+   * @param[in] size The texture size.
+   * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
+   * @param[in] containsEmoji Whether the text contains emoji.
+   * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
+   */
+  TextureSet GetTextTexture( const Vector2& size, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled );
+
+  /**
    * Get the text rendering shader.
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
-   * @param[in] isRgbaTexture Whether the texture is in RGBA format.
+   * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
+   * @param[in] containsEmoji Whether the text contains emoji.
+   * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
    */
-  Shader GetTextShader( VisualFactoryCache& factoryCache, bool isRgbaTexture );
+  Shader GetTextShader( VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled );
 
   /**
    * @brief Retrieve the text's controller.
@@ -206,6 +217,24 @@ private:
   static TextVisual& GetVisualObject( Toolkit::Visual::Base visual )
   {
     return static_cast<TextVisual&>( visual.GetBaseObject() );
+  };
+
+private:
+
+  /**
+   * Used as an alternative to boolean so that it is obvious whether the text contains single or multiple text colors, and emoji and styles.
+   */
+  struct TextType
+  {
+    enum Type
+    {
+      SINGLE_COLOR_TEXT = 0, ///< The text contains single color only.
+      MULTI_COLOR_TEXT = 1,  ///< The text contains multiple colorｓ.
+      NO_EMOJI = 0,          ///< The text contains no emoji.
+      HAS_EMOJI = 1,         ///< The text contains emoji.
+      NO_STYLES = 0,         ///< The text contains contains no styles.
+      HAS_SYLES = 1          ///< The text contains contains styles.
+    };
   };
 
 private:

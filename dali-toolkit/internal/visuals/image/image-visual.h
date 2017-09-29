@@ -19,6 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <memory>
+
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
@@ -286,11 +288,6 @@ private:
   bool IsSynchronousResourceLoading() const;
 
   /**
-   * @brief Load the resource synchronously
-   */
-  void LoadResourceSynchronously();
-
-  /**
    * Creates the texture set and adds the texture to it
    * @param[out] textureRect The texture area of the texture in the atlas.
    * @param[in] url The URL of the image resource to use.
@@ -319,25 +316,12 @@ private:
   void DoSetProperty( Property::Index index, const Property::Value& value );
 
 private:
-  struct MaskingData
-  {
-    MaskingData( TextureManager& textureManager );
-    ~MaskingData();
-    void SetImage( const std::string& url );
-
-    TextureManager& mTextureManager;
-    VisualUrl mAlphaMaskUrl;
-    TextureManager::TextureId mAlphaMaskId;
-    float mContentScaleFactor;
-    bool mCropToMask;
-  };
 
   Image mImage;
-  PixelData mPixels;
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
   VisualUrl mImageUrl;
-  MaskingData* mMaskingData;
+  TextureManager::MaskingDataPointer mMaskingData;
 
   Dali::ImageDimensions mDesiredSize;
   TextureManager::TextureId mTextureId;
@@ -346,8 +330,8 @@ private:
   Dali::SamplingMode::Type mSamplingMode:4;
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
-  bool mAttemptAtlasing:1; ///< If true will attempt atlasing, otherwise create unique texture
-  bool mTextureLoading:1;  ///< True if the texture is being loaded asynchronously, or false when it has loaded.
+  bool mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
+  bool mLoadingStatus;  ///< True if the texture is being loaded asynchronously, or false when it has loaded.
 };
 
 

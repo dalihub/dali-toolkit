@@ -142,6 +142,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "hiddenInputSettings",    
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "pixelSize",                      FLOAT,     PIXEL_SIZE                           )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableSelection",                BOOLEAN,   ENABLE_SELECTION                     )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder",                    MAP,       PLACEHOLDER                          )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "ellipsis",                       BOOLEAN,   ELLIPSIS                             )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -772,6 +773,17 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::ELLIPSIS:
+      {
+        if( impl.mController )
+        {
+          const bool ellipsis = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p ELLIPSIS %d\n", impl.mController.Get(), ellipsis );
+
+          impl.mController->SetTextElideEnabled( ellipsis );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -1163,6 +1175,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         Property::Map map;
         impl.mController->GetPlaceholderProperty( map );
         value = map;
+        break;
+      }
+      case Toolkit::DevelTextField::Property::ELLIPSIS:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsTextElideEnabled();
+        }
         break;
       }
     } //switch

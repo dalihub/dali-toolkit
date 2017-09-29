@@ -116,6 +116,7 @@ namespace Property
        *   propertyMap["placeholderColor"] = Color::RED;
        *   propertyMap["placeholderFontFamily"] = "Arial";
        *   propertyMap["placeholderPointSize"] = 12.0f;
+       *   propertyMap["placeholderEllipsis"] = true;
        *
        *   Property::Map fontStyleMap;
        *   fontStyleMap.Insert( "weight", "bold" );
@@ -128,7 +129,14 @@ namespace Property
        *
        * @details name "placeholder", type MAP
        */
-      PLACEHOLDER = INPUT_OUTLINE + 4
+      PLACEHOLDER = INPUT_OUTLINE + 4,
+
+      /**
+       * @brief Enable or disable the ellipsis.
+       * @details name "ellipsis", type Property::BOOLEAN.
+       * @note PLACEHOLDER map is used to add ellipsis to placeholder text.
+       */
+      ELLIPSIS = INPUT_OUTLINE + 5
   };
 } // namespace Property
 

@@ -100,6 +100,7 @@ const char* const PROPERTY_NAME_HIDDEN_INPUT_SETTINGS                = "hiddenIn
 const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSize";
 const char* const PROPERTY_NAME_ENABLE_SELECTION                     = "enableSelection";
 const char* const PROPERTY_NAME_PLACEHOLDER                          = "placeholder";
+const char* const PROPERTY_NAME_ELLIPSIS                             = "ellipsis";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -513,6 +514,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextField::Property::PIXEL_SIZE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == DevelTextField::Property::ENABLE_SELECTION );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == DevelTextField::Property::PLACEHOLDER );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == DevelTextField::Property::ELLIPSIS );
 
   END_TEST;
 }
@@ -875,6 +877,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   placeholderPixelSizeMapSet["placeholderColor"] = Color::BLUE;
   placeholderPixelSizeMapSet["placeholderFontFamily"] = "Arial";
   placeholderPixelSizeMapSet["placeholderPixelSize"] = 15.0f;
+  placeholderPixelSizeMapSet["placeholderEllipsis"] = true;
 
   placeholderFontstyleMap.Insert( "weight", "bold" );
   placeholderPixelSizeMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
@@ -892,6 +895,7 @@ int UtcDaliTextFieldSetPropertyP(void)
   placeholderMapSet["placeholderColor"] = Color::RED;
   placeholderMapSet["placeholderFontFamily"] = "Arial";
   placeholderMapSet["placeholderPointSize"] = 12.0f;
+  placeholderMapSet["placeholderEllipsis"] = false;
 
   // Check the placeholder font style property
   placeholderFontstyleMap.Clear();
@@ -931,6 +935,11 @@ int UtcDaliTextFieldSetPropertyP(void)
   placeholderMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+
+  // Check the ellipsis property
+  DALI_TEST_CHECK( !field.GetProperty<bool>( DevelTextField::Property::ELLIPSIS ) );
+  field.SetProperty( DevelTextField::Property::ELLIPSIS, true );
+  DALI_TEST_CHECK( field.GetProperty<bool>( DevelTextField::Property::ELLIPSIS ) );
 
   END_TEST;
 }

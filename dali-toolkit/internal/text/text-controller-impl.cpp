@@ -106,7 +106,9 @@ EventData::EventData( DecoratorPtr decorator )
   mAllTextSelected( false ),
   mUpdateInputStyle( false ),
   mPasswordInput( false ),
-  mIsPlaceholderPixelSize( false )
+  mIsPlaceholderPixelSize( false ),
+  mIsPlaceholderElideEnabled( false ),
+  mPlaceholderEllipsisFlag( false )
 {
   mImfManager = ImfManager::Get();
 }

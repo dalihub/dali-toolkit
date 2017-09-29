@@ -21,6 +21,7 @@
 #include <deque>
 #include <functional>
 #include <string>
+#include <memory>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture-set.h>
@@ -45,6 +46,8 @@ namespace Toolkit
 
 namespace Internal
 {
+class ImageAtlasManager;
+typedef IntrusivePtr<ImageAtlasManager> ImageAtlasManagerPtr;
 
 /**
  * The TextureManager provides a common Image loading API for Visuals.
@@ -103,6 +106,18 @@ public:
 
 public:
 
+  struct MaskingData
+  {
+    MaskingData();
+    ~MaskingData() = default;
+
+    VisualUrl mAlphaMaskUrl;
+    TextureManager::TextureId mAlphaMaskId;
+    float mContentScaleFactor;
+    bool mCropToMask;
+  };
+  using MaskingDataPointer = std::unique_ptr<MaskingData>;
+
   /**
    * Constructor.
    */
@@ -111,10 +126,19 @@ public:
   /**
    * Destructor.
    */
-  ~TextureManager();
+  ~TextureManager() = default;
 
 
   // TextureManager Main API:
+
+  TextureSet LoadTexture(VisualUrl& url, Dali::ImageDimensions desiredSize,
+                         Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode,
+                         const MaskingDataPointer& maskInfo, bool synchronousLoading,
+                         TextureManager::TextureId& textureId, Vector4& textureRect,
+                         bool& atlasingStatus, bool& loadingStatus, Dali::WrapMode::Type wrapModeU,
+                         Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
+                         AtlasUploadObserver* atlasObserver,
+                         ImageAtlasManagerPtr imageAtlasManager);
 
   /**
    * @brief Requests an image load of the given URL.
@@ -345,25 +369,9 @@ private:
     unsigned short      loadId;      ///< The load Id used by the async loader to reference this load
   };
 
-  /**
-   * @brief This struct is used within a container to manage atlas creation and destruction.
-   */
-  struct AtlasInfo
-  {
-    AtlasInfo( Toolkit::ImageAtlas atlas, TextureSet textureSet )
-    : atlas( atlas ),
-      textureSet( textureSet )
-    {
-    }
-
-    Toolkit::ImageAtlas                 atlas;                          ///< The ImageAtlas object
-    TextureSet                          textureSet;                     ///< The TextureSet is kept in the struct to allow fast lookup of TextureSet to Atlas
-  };
-
   // Private typedefs:
 
   typedef std::deque<AsyncLoadingInfo>  AsyncLoadingInfoContainerType;  ///< The container type used to manage Asynchronous loads in progress
-  typedef std::vector<AtlasInfo>        AtlasInfoContainerType;         ///< The container type used to manage Atlas creation and destruction
   typedef std::vector<TextureInfo>      TextureInfoContainerType;       ///< The container type used to manage the life-cycle and caching of Textures
 
   /**
@@ -586,7 +594,6 @@ private:
 
 private:  // Member Variables:
 
-  AtlasInfoContainerType                        mAtlasContainer;       ///< Used to manage Atlas creation and destruction
   TextureInfoContainerType                      mTextureInfoContainer; ///< Used to manage the life-cycle and caching of Textures
   RoundRobinContainerView< AsyncLoadingHelper > mAsyncLocalLoaders;    ///< The Asynchronous image loaders used to provide all local async loads
   RoundRobinContainerView< AsyncLoadingHelper > mAsyncRemoteLoaders;   ///< The Asynchronous image loaders used to provide all remote async loads
