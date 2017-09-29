@@ -1339,7 +1339,7 @@ int UtcDaliStyleManagerConfigSectionTest(void)
 
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( editor );
 
-  application.ProcessEvent( Integration::KeyEvent( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( Integration::KeyEvent( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
