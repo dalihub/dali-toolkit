@@ -880,9 +880,9 @@ int UtcDaliImageViewCheckResourceReady(void)
 
   imageView.SetBackgroundImage( image );
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
 
-  Toolkit::DevelControl::ResourceReadySignal( imageView ).Connect( &ResourceReadySignal);
+  imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
 
   Stage::GetCurrent().Add( imageView );
 
@@ -890,7 +890,7 @@ int UtcDaliImageViewCheckResourceReady(void)
   application.Render(16);
 
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
 
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
@@ -1347,9 +1347,9 @@ int UtcDaliImageViewReplaceImage(void)
   // Check ImageView with background and main image, to ensure both visuals are marked as loaded
   ImageView imageView = ImageView::New( TEST_IMAGE_1 );
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
 
-  Toolkit::DevelControl::ResourceReadySignal( imageView ).Connect( &ResourceReadySignal);
+  imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
 
   Stage::GetCurrent().Add( imageView );
 
@@ -1375,7 +1375,7 @@ int UtcDaliImageViewReplaceImage(void)
 
   DALI_TEST_EQUALS( imageView.GetRendererCount(), 1u, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
 
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 

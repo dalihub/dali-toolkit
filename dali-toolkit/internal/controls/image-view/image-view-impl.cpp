@@ -91,7 +91,7 @@ void ImageView::OnInitialize()
 {
   // ImageView can relayout in the OnImageReady, alternative to a signal would be to have a upcall from the Control to ImageView
   Dali::Toolkit::Control handle( GetOwner() );
-  Toolkit::DevelControl::ResourceReadySignal( handle ).Connect( this, &ImageView::OnResourceReady );
+  handle.ResourceReadySignal().Connect( this, &ImageView::OnResourceReady );
 }
 
 void ImageView::SetImage( Image image )

@@ -836,7 +836,7 @@ int UtcDaliControlResourcesReady(void)
 
   actor.SetSize( 200.f, 200.f );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
   application.SendNotification();
@@ -848,7 +848,7 @@ int UtcDaliControlResourcesReady(void)
   application.Render();
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
 
   Visual::Base largeVisual = factory.CreateVisual( propertyMapLarge );
   largeVisual.SetName("largeVisual");
@@ -862,7 +862,7 @@ int UtcDaliControlResourcesReady(void)
   application.Render();
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
 
   END_TEST;
 }

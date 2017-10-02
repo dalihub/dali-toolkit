@@ -1055,7 +1055,7 @@ int UtcDaliImageVisualAlphaMask(void)
 
   actor.SetSize( 200.f, 200.f );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
   application.SendNotification();
@@ -1068,7 +1068,7 @@ int UtcDaliImageVisualAlphaMask(void)
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1105,7 +1105,7 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
   DummyControl actor = DummyControl::New();
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
   actor.SetSize( 200.f, 200.f );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
@@ -1121,7 +1121,7 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1164,7 +1164,7 @@ int UtcDaliImageVisualAlphaMaskCrop(void)
 
   actor.SetSize( 200.f, 200.f );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
   application.SendNotification();
@@ -1181,7 +1181,7 @@ int UtcDaliImageVisualAlphaMaskCrop(void)
   DALI_TEST_EQUALS( size, Vector2( 100.0f, 100.0f ), 0.001f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
 
   END_TEST;
 }

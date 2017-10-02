@@ -115,31 +115,6 @@ enum
 
 } // namespace Property
 
-/// @brief ResourceReady signal type;
-typedef Signal<void ( Control ) > ResourceReadySignalType;
-
-/**
- * @brief This signal is emitted after all resources required
- * by a control are loaded and ready.
- * Most resources are only loaded when the control is placed on stage.
- *
- * @note A RelayoutRequest is queued by Control before this signal is emitted
- *
- * A callback of the following type may be connected:
- * @code
- *   void YourCallbackName( Control control );
- * @endcode
- */
-DALI_IMPORT_API ResourceReadySignalType& ResourceReadySignal( Control& control );
-
-/**
- * @brief Query if all resources required by a control are loaded and ready.
- * Most resources are only loaded when the control is placed on stage.
- * @return true if the resources are loaded and ready, false otherwise
- *
- */
-DALI_IMPORT_API bool IsResourceReady( const Control& control );
-
 /**
  * @brief Register a visual by Property Index.
  *
