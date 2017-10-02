@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/devel-api/controls/progress-bar/progress-bar.h>
+#include <dali-toolkit/public-api/controls/progress-bar/progress-bar.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/progress-bar/progress-bar-impl.h>

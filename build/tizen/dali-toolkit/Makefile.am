@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2016 Samsung Electronics Co., Ltd.
+# Copyright (c) 2017 Samsung Electronics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -143,7 +143,6 @@ develapiscrollbardir =          $(develapicontrolsdir)/scroll-bar
 develapinavigationviewdir =     $(develapicontrolsdir)/navigation-view
 develapipageturnviewdir =       $(develapicontrolsdir)/page-turn-view
 develapipopupdir =              $(develapicontrolsdir)/popup
-develapiprogressbardir =        $(develapicontrolsdir)/progress-bar
 develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
 develapisuperblurviewdir =      $(develapicontrolsdir)/super-blur-view
 develapifocusmanagerdir =       $(develapidir)/focus-manager
@@ -176,7 +175,6 @@ develapimagnifier_HEADERS =         $(devel_api_magnifier_header_files)
 develapinavigationview_HEADERS =    $(devel_api_navigation_view_header_files)
 develapipageturnview_HEADERS =      $(devel_api_page_turn_view_header_files)
 develapipopup_HEADERS =             $(devel_api_popup_header_files)
-develapiprogressbar_HEADERS =       $(devel_api_progress_bar_header_files)
 develapivisualfactory_HEADERS =     $(devel_api_visual_factory_header_files)
 develapivisuals_HEADERS =           $(devel_api_visuals_header_files)
 develapiscripting_HEADERS =         $(devel_api_scripting_header_files)
@@ -201,6 +199,7 @@ publicapiflexcontainerdir =        $(publicapicontrolsdir)/flex-container
 publicapiimageviewdir =            $(publicapicontrolsdir)/image-view
 publicapivideoviewdir =            $(publicapicontrolsdir)/video-view
 publicapimodel3dviewdir =          $(publicapicontrolsdir)/model3d-view
+publicapiprogressbardir =          $(publicapicontrolsdir)/progress-bar
 publicapiscrollbardir =            $(publicapicontrolsdir)/scroll-bar
 publicapiscrollabledir =           $(publicapicontrolsdir)/scrollable
 publicapiscrollviewdir =           $(publicapicontrolsdir)/scrollable/scroll-view
@@ -226,6 +225,7 @@ publicapiimageview_HEADERS =            $(public_api_image_view_header_files)
 publicapivideoview_HEADERS =            $(public_api_video_view_header_files)
 publicapiitemview_HEADERS =             $(public_api_item_view_header_files)
 publicapimodel3dview_HEADERS =          $(public_api_model3d_view_header_files)
+publicapiprogressbar_HEADERS =          $(public_api_progress_bar_header_files)
 publicapiscrollbar_HEADERS =            $(public_api_scroll_bar_header_files)
 publicapiscrollable_HEADERS =           $(public_api_scrollable_header_files)
 publicapiscrollview_HEADERS =           $(public_api_scroll_view_header_files)
