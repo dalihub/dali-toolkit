@@ -25,9 +25,9 @@
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
-#include <dali-toolkit/internal/text/layouts/layout-alignment.h>
 
 namespace Dali
 {
@@ -70,7 +70,7 @@ public:
    * @param[in] horizontalAlignment horizontal alignment of the text
    * @param[in] verticalAlignment vertical alignment of the text
    */
-  void SetParameters( Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, Layout::HorizontalAlignment horizontalAlignment, Layout::VerticalAlignment verticalAlignment );
+  void SetParameters( Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment );
 
   /**
    * @brief Set the gap distance to elapse before the text wraps around

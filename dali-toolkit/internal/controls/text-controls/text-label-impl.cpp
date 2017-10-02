@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/text/property-string-parser.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -35,6 +36,7 @@
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 
 #include <dali-toolkit/public-api/align-enumerations.h>
+#include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
@@ -70,22 +72,6 @@ const Scripting::StringEnum AUTO_SCROLL_STOP_MODE_TABLE[] =
   { "FINISH_LOOP",  Toolkit::TextLabel::AutoScrollStopMode::FINISH_LOOP  },
 };
 const unsigned int AUTO_SCROLL_STOP_MODE_TABLE_COUNT = sizeof( AUTO_SCROLL_STOP_MODE_TABLE ) / sizeof( AUTO_SCROLL_STOP_MODE_TABLE[0] );
-
-const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
-{
-  { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
-  { "CENTER", Toolkit::Text::Layout::HORIZONTAL_ALIGN_CENTER },
-  { "END",    Toolkit::Text::Layout::HORIZONTAL_ALIGN_END    },
-};
-const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
-
-const Scripting::StringEnum VERTICAL_ALIGNMENT_STRING_TABLE[] =
-{
-  { "TOP",    Toolkit::Text::Layout::VERTICAL_ALIGN_TOP    },
-  { "CENTER", Toolkit::Text::Layout::VERTICAL_ALIGN_CENTER },
-  { "BOTTOM", Toolkit::Text::Layout::VERTICAL_ALIGN_BOTTOM },
-};
-const unsigned int VERTICAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( VERTICAL_ALIGNMENT_STRING_TABLE ) / sizeof( VERTICAL_ALIGNMENT_STRING_TABLE[0] );
 
 const Scripting::StringEnum LINE_WRAP_MODE_STRING_TABLE[] =
 {
@@ -241,14 +227,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          Layout::HorizontalAlignment alignment( Layout::HORIZONTAL_ALIGN_BEGIN );
-          if( Scripting::GetEnumeration< Toolkit::Text::Layout::HorizontalAlignment >( value.Get< std::string >().c_str(),
-                                                                                       HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                       HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                                       alignment ) )
-          {
-            impl.mController->SetHorizontalAlignment( alignment );
-          }
+          Toolkit::Text::HorizontalAlignment::Type alignment( Toolkit::Text::HorizontalAlignment::BEGIN );
+          Text::GetHorizontalAlignmentEnum( value, alignment );
+
+          impl.mController->SetHorizontalAlignment( alignment );
+
         }
         break;
       }
@@ -256,14 +239,10 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          Layout::VerticalAlignment alignment( Layout::VERTICAL_ALIGN_BOTTOM );
-          if( Scripting::GetEnumeration< Toolkit::Text::Layout::VerticalAlignment >( value.Get< std::string >().c_str(),
-                                                                                     VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                     VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                                     alignment ) )
-          {
-            impl.mController->SetVerticalAlignment( alignment );
-          }
+          Toolkit::Text::VerticalAlignment::Type alignment( Toolkit::Text::VerticalAlignment::BOTTOM );
+          Text::GetVerticalAlignmentEnum( value, alignment );
+
+          impl.mController->SetVerticalAlignment( alignment );
         }
         break;
       }
@@ -579,13 +558,12 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::HorizontalAlignment >( impl.mController->GetHorizontalAlignment(),
-                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
-          if( name )
-          {
-            value = std::string( name );
-          }
+          const char* name = Text::GetHorizontalAlignmentString( impl.mController->GetHorizontalAlignment() );
+
+           if ( name )
+           {
+             value = std::string( name );
+           }
         }
         break;
       }
@@ -593,9 +571,7 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::VerticalAlignment >( impl.mController->GetVerticalAlignment(),
-                                                                                                        VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                        VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
+          const char* name = Text::GetVerticalAlignmentString( impl.mController->GetVerticalAlignment() );
           if( name )
           {
             value = std::string( name );

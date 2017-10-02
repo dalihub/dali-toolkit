@@ -144,16 +144,18 @@ public:
 
       /**
        * @brief The line horizontal alignment.
-       * @details Name "horizontalAlignment", type Property::STRING
+       * @details Name "horizontalAlignment", type Property::STRING or type HorizontalAlignment::Type (Property::INTEGER)
        *          Values "BEGIN", "CENTER", "END", default BEGIN.
+       * @note Return type is Property::STRING
        * @SINCE_1_0.0
        */
       HORIZONTAL_ALIGNMENT,
 
       /**
        * @brief The line vertical alignment.
-       * @details Name "verticalAlignment", type Property::STRING.
+       * @details Name "verticalAlignment", type Property::STRING or type VerticalAlignment::Type (Property::INTEGER).
        *          Values "TOP",   "CENTER", "BOTTOM" @SINCE_1_0.0, default TOP.
+       * @note Return type is Property::STRING
        * @SINCE_1_0.0
        */
       VERTICAL_ALIGNMENT,

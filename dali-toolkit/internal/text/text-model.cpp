@@ -47,12 +47,12 @@ const Vector2& Model::GetScrollPosition() const
   return mScrollPosition;
 }
 
-Layout::HorizontalAlignment Model::GetHorizontalAlignment() const
+HorizontalAlignment::Type Model::GetHorizontalAlignment() const
 {
   return mHorizontalAlignment;
 }
 
-Layout::VerticalAlignment Model::GetVerticalAlignment() const
+VerticalAlignment::Type Model::GetVerticalAlignment() const
 {
   return mVerticalAlignment;
 }
@@ -162,8 +162,8 @@ Model::Model()
   mVisualModel(),
   mScrollPosition(),
   mScrollPositionLast(),
-  mHorizontalAlignment( Layout::HORIZONTAL_ALIGN_BEGIN ),
-  mVerticalAlignment( Layout::VERTICAL_ALIGN_TOP ),
+  mHorizontalAlignment( HorizontalAlignment::BEGIN ),
+  mVerticalAlignment( VerticalAlignment::TOP ),
   mLineWrapMode( Layout::LineWrap::WORD ),
   mAlignmentOffset( 0.0f ),
   mElideEnabled( false )

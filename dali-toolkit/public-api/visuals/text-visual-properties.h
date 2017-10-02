@@ -80,14 +80,18 @@ enum
 
   /**
    * @brief The line horizontal alignment.
-   * @details name "horizontalAlignment", type Property::STRING,  values "BEGIN", "CENTER", "END", default BEGIN.
+   * @details Name "horizontalAlignment", type HorizontalAlignment::Type (Property::INTEGER) or Property::STRING.
+   * @note Optional. If not specified, the default is HorizontalAlignment::BEGIN
+   * @note Return type is HorizontalAlignment::Type (Property::INTEGER)
    * @SINCE_1_2.60
    */
   HORIZONTAL_ALIGNMENT,
 
   /**
    * @brief The line vertical alignment.
-   * @details name "verticalAlignment", type Property::STRING,  values "TOP",   "CENTER", "BOTTOM", default TOP.
+   * @details name "verticalAlignment", VerticalAlignment::Type (Property::INTEGER) or  Property::STRING
+   * @note Optional. If not specified, the default is VerticalAlignment::TOP
+   * @note Return type is VerticalAlignment::Type (Property::INTEGER)`
    * @SINCE_1_2.60
    */
   VERTICAL_ALIGNMENT,

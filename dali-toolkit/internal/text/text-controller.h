@@ -23,13 +23,13 @@
 #include <dali/public-api/events/gesture.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/layouts/layout-wrap-mode.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
-
 
 namespace Dali
 {
@@ -325,24 +325,24 @@ public: // Configure the text controller.
    *
    * @param[in] alignment The horizontal alignment.
    */
-  void SetHorizontalAlignment( Layout::HorizontalAlignment alignment );
+  void SetHorizontalAlignment( HorizontalAlignment::Type alignment );
 
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  Layout::HorizontalAlignment GetHorizontalAlignment() const;
+  HorizontalAlignment::Type GetHorizontalAlignment() const;
 
   /**
    * @brief Sets the text's vertical alignment.
    *
    * @param[in] alignment The vertical alignment.
    */
-  void SetVerticalAlignment( Layout::VerticalAlignment alignment );
+  void SetVerticalAlignment( VerticalAlignment::Type alignment );
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  Layout::VerticalAlignment GetVerticalAlignment() const;
+  VerticalAlignment::Type GetVerticalAlignment() const;
 
   /**
    * @brief Sets the text's wrap mode

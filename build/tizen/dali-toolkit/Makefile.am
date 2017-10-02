@@ -202,7 +202,7 @@ publicapistylingdir =              $(publicapidir)/styling
 publicapitableviewdir =            $(publicapicontrolsdir)/table-view
 publicapitextcontrolsdir =         $(publicapicontrolsdir)/text-controls
 publicapifocusmanagerdir =         $(publicapidir)/focus-manager
-publicapirenderingbackenddir =     $(publicapidir)/text
+publicapitextdir =                 $(publicapidir)/text
 publicapisliderdir =               $(publicapicontrolsdir)/slider
 publicapivisualsdir =              $(publicapidir)/visuals
 
@@ -227,7 +227,7 @@ publicapistyling_HEADERS =              $(public_api_styling_header_files)
 publicapitableview_HEADERS =            $(public_api_table_view_header_files)
 publicapitextcontrols_HEADERS =         $(public_api_text_controls_header_files)
 publicapifocusmanager_HEADERS =         $(public_api_focus_manager_header_files)
-publicapirenderingbackend_HEADERS =     $(public_api_rendering_backend_header_files)
+publicapitext_HEADERS =                 $(public_api_text_header_files)
 publicapislider_HEADERS =               $(public_api_slider_header_files)
 publicapivisuals_HEADERS =              $(public_api_visuals_header_files)
 

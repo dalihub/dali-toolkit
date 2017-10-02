@@ -1078,7 +1078,7 @@ struct Engine::Impl
   void Align( const Size& size,
               CharacterIndex startIndex,
               Length numberOfCharacters,
-              HorizontalAlignment horizontalAlignment,
+              Text::HorizontalAlignment::Type horizontalAlignment,
               Vector<LineRun>& lines,
               float& alignmentOffset )
   {
@@ -1116,32 +1116,32 @@ struct Engine::Impl
   }
 
   void CalculateHorizontalAlignment( float boxWidth,
-                                     HorizontalAlignment horizontalAlignment,
+                                     HorizontalAlignment::Type horizontalAlignment,
                                      LineRun& line )
   {
     line.alignmentOffset = 0.f;
     const bool isRTL = RTL == line.direction;
     float lineLength = line.width;
 
-    HorizontalAlignment alignment = horizontalAlignment;
+    HorizontalAlignment::Type alignment = horizontalAlignment;
     if( isRTL )
     {
       // Swap the alignment type if the line is right to left.
       switch( alignment )
       {
-        case HORIZONTAL_ALIGN_BEGIN:
+        case HorizontalAlignment::BEGIN:
         {
-          alignment = HORIZONTAL_ALIGN_END;
+          alignment = HorizontalAlignment::END;
           break;
         }
-        case HORIZONTAL_ALIGN_CENTER:
+        case HorizontalAlignment::CENTER:
         {
           // Nothing to do.
           break;
         }
-        case HORIZONTAL_ALIGN_END:
+        case HorizontalAlignment::END:
         {
-          alignment = HORIZONTAL_ALIGN_BEGIN;
+          alignment = HorizontalAlignment::BEGIN;
           break;
         }
       }
@@ -1150,7 +1150,7 @@ struct Engine::Impl
     // Calculate the horizontal line offset.
     switch( alignment )
     {
-      case HORIZONTAL_ALIGN_BEGIN:
+      case HorizontalAlignment::BEGIN:
       {
         line.alignmentOffset = 0.f;
 
@@ -1161,7 +1161,7 @@ struct Engine::Impl
         }
         break;
       }
-      case HORIZONTAL_ALIGN_CENTER:
+      case HorizontalAlignment::CENTER:
       {
         line.alignmentOffset = 0.5f * ( boxWidth - lineLength );
 
@@ -1173,7 +1173,7 @@ struct Engine::Impl
         line.alignmentOffset = floorf( line.alignmentOffset ); // try to avoid pixel alignment.
         break;
       }
-      case HORIZONTAL_ALIGN_END:
+      case HorizontalAlignment::END:
       {
         if( isRTL )
         {
@@ -1272,7 +1272,7 @@ void Engine::ReLayoutRightToLeftLines( const Parameters& layoutParameters,
 void Engine::Align( const Size& size,
                     CharacterIndex startIndex,
                     Length numberOfCharacters,
-                    Layout::HorizontalAlignment horizontalAlignment,
+                    Text::HorizontalAlignment::Type horizontalAlignment,
                     Vector<LineRun>& lines,
                     float& alignmentOffset )
 {

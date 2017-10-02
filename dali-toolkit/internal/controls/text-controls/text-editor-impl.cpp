@@ -32,11 +32,13 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
@@ -67,16 +69,6 @@ const float DEFAULT_SCROLL_SPEED = 1200.f; ///< The default scroll speed for the
 
 namespace
 {
-
-const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
-{
-  { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
-  { "CENTER", Toolkit::Text::Layout::HORIZONTAL_ALIGN_CENTER },
-  { "END",    Toolkit::Text::Layout::HORIZONTAL_ALIGN_END    },
-};
-const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
-
-
 const Scripting::StringEnum LINE_WRAP_MODE_STRING_TABLE[] =
 {
   { "WORD",      Toolkit::Text::Layout::LineWrap::WORD      },
@@ -262,11 +254,9 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
           const std::string& alignStr = value.Get< std::string >();
           DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p HORIZONTAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
 
-          Layout::HorizontalAlignment alignment( Layout::HORIZONTAL_ALIGN_BEGIN );
-          if( Scripting::GetEnumeration< Layout::HorizontalAlignment >( alignStr.c_str(),
-                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                        alignment ) )
+          Text::HorizontalAlignment::Type alignment( Text::HorizontalAlignment::BEGIN );
+
+          Text::GetHorizontalAlignmentEnum( value, alignment );
           {
             impl.mController->SetHorizontalAlignment( alignment );
           }
@@ -801,9 +791,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       {
         if( impl.mController )
         {
-          const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::HorizontalAlignment >( impl.mController->GetHorizontalAlignment(),
-                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
+          const char* name = GetHorizontalAlignmentString( impl.mController->GetHorizontalAlignment() );
           if( name )
           {
             value = std::string( name );

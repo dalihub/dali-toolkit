@@ -114,8 +114,9 @@ public_api_accessibility_manager_header_files = \
 public_api_focus_manager_header_files = \
   $(public_api_src_dir)/focus-manager/keyboard-focus-manager.h
 
-public_api_rendering_backend_header_files = \
-  $(public_api_src_dir)/text/rendering-backend.h
+public_api_text_header_files = \
+  $(public_api_src_dir)/text/rendering-backend.h \
+  $(public_api_src_dir)/text/text-enumerations.h
 
 public_api_video_view_header_files = \
   $(public_api_src_dir)/controls/video-view/video-view.h

@@ -1055,13 +1055,13 @@ int UtcDaliVisualGetPropertyMap10(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<bool>() );
 
-  value = resultMap.Find( TextVisual::Property::HORIZONTAL_ALIGNMENT, Property::STRING );
+  value = resultMap.Find( TextVisual::Property::HORIZONTAL_ALIGNMENT, Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<std::string>(), "CENTER", TEST_LOCATION );
+  DALI_TEST_EQUALS( value->Get<int>(), (int)Text::HorizontalAlignment::CENTER, TEST_LOCATION );
 
-  value = resultMap.Find( TextVisual::Property::VERTICAL_ALIGNMENT, Property::STRING );
+  value = resultMap.Find( TextVisual::Property::VERTICAL_ALIGNMENT, Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_EQUALS( value->Get<std::string>(), "CENTER", TEST_LOCATION );
+  DALI_TEST_EQUALS( value->Get<int>(), (int)Text::VerticalAlignment::CENTER, TEST_LOCATION );
 
   value = resultMap.Find( TextVisual::Property::TEXT_COLOR, Property::VECTOR4 );
   DALI_TEST_CHECK( value );

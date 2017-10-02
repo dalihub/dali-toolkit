@@ -117,8 +117,9 @@ public:
 
       /**
        * @brief The text horizontal alignment.
-       * @details Name "horizontalAlignment", type Property::STRING.
+       * @details Name "horizontalAlignment", type Property::STRING or type HorizontalAlignment::Type (Property::INTEGER)
        *          Values "BEGIN" "CENTER" "END".
+       * @note Return type is Property::STRING
        * @SINCE_1_1.37
        */
       HORIZONTAL_ALIGNMENT,

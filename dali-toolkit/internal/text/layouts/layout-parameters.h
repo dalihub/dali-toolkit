@@ -22,6 +22,7 @@
 #include <dali/public-api/math/vector2.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 #include <dali-toolkit/internal/text/layouts/layout-wrap-mode.h>
 
@@ -72,7 +73,7 @@ struct Parameters
               const GlyphIndex* const charactersToGlyphsBuffer,
               const Length* const glyphsPerCharacterBuffer,
               Length totalNumberOfGlyphs,
-              HorizontalAlignment horizontalAlignment,
+              Text::HorizontalAlignment::Type horizontalAlignment,
               LineWrap::Mode lineWrapMode )
   : boundingBox( boundingBox ),
     textBuffer( textBuffer ),
@@ -111,7 +112,7 @@ struct Parameters
   GlyphIndex                      startGlyphIndex;                 ///< Index to the first glyph to layout.
   Length                          numberOfGlyphs;                  ///< The number of glyphs to layout.
   Length                          totalNumberOfGlyphs;             ///< The number of glyphs.
-  HorizontalAlignment             horizontalAlignment;             ///< The horizontal alignment.
+  HorizontalAlignment::Type       horizontalAlignment;             ///< The horizontal alignment.
   LineIndex                       startLineIndex;                  ///< The line index where to insert the new lines.
   Length                          estimatedNumberOfLines;          ///< The estimated number of lines.
   LineWrap::Mode                  lineWrapMode;                    ///< The line wrap mode for moving to next line.

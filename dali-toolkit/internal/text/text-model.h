@@ -22,7 +22,7 @@
 #include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/layouts/layout-alignment.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/layouts/layout-wrap-mode.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
@@ -77,12 +77,12 @@ public:
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  virtual Layout::HorizontalAlignment GetHorizontalAlignment() const;
+  virtual HorizontalAlignment::Type GetHorizontalAlignment() const;
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  virtual Layout::VerticalAlignment GetVerticalAlignment() const;
+  virtual VerticalAlignment::Type GetVerticalAlignment() const;
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()
@@ -211,13 +211,13 @@ public:
    * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
    * Typically this will have a negative value with scrolling occurs.
    */
-  Vector2                     mScrollPosition;      ///< The text is offset by this position when scrolling.
-  Vector2                     mScrollPositionLast;  ///< The last offset value of mScrollPosition
-  Layout::HorizontalAlignment mHorizontalAlignment; ///< The layout's horizontal alignment.
-  Layout::VerticalAlignment   mVerticalAlignment;   ///< The layout's vertical alignment.
-  Layout::LineWrap::Mode      mLineWrapMode;        ///< The text wrap mode
-  float                       mAlignmentOffset;     ///< The alignment offset.
-  bool                        mElideEnabled:1;      ///< Whether the text's elide is enabled.
+  Vector2                            mScrollPosition;      ///< The text is offset by this position when scrolling.
+  Vector2                            mScrollPositionLast;  ///< The last offset value of mScrollPosition
+  HorizontalAlignment::Type          mHorizontalAlignment; ///< The layout's horizontal alignment.
+  VerticalAlignment::Type            mVerticalAlignment;   ///< The layout's vertical alignment.
+  Layout::LineWrap::Mode             mLineWrapMode;        ///< The text wrap mode
+  float                              mAlignmentOffset;     ///< The alignment offset.
+  bool                               mElideEnabled:1;      ///< Whether the text's elide is enabled.
 };
 
 } // namespace Text

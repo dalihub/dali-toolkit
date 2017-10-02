@@ -33,6 +33,7 @@
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/script-run.h>
+#include <dali-toolkit/internal/text/text-enumerations-impl.h>
 
 namespace Dali
 {
@@ -58,49 +59,7 @@ const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
 const char * const SHADOW_PROPERTY( "shadow" );
 const char * const UNDERLINE_PROPERTY( "underline" );
 
-const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
-{
-  { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
-  { "CENTER", Toolkit::Text::Layout::HORIZONTAL_ALIGN_CENTER },
-  { "END",    Toolkit::Text::Layout::HORIZONTAL_ALIGN_END    },
-};
-const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
-
-const Scripting::StringEnum VERTICAL_ALIGNMENT_STRING_TABLE[] =
-{
-  { "TOP",    Toolkit::Text::Layout::VERTICAL_ALIGN_TOP    },
-  { "CENTER", Toolkit::Text::Layout::VERTICAL_ALIGN_CENTER },
-  { "BOTTOM", Toolkit::Text::Layout::VERTICAL_ALIGN_BOTTOM },
-};
-const unsigned int VERTICAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( VERTICAL_ALIGNMENT_STRING_TABLE ) / sizeof( VERTICAL_ALIGNMENT_STRING_TABLE[0] );
-
 const Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
-
-std::string GetHorizontalAlignment( Toolkit::Text::Layout::HorizontalAlignment alignment )
-{
-  const char* name = Scripting::GetEnumerationName<Toolkit::Text::Layout::HorizontalAlignment>( alignment,
-                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
-
-  if( name )
-  {
-    return std::string( name );
-  }
-  return std::string();
-}
-
-std::string GetVerticalAlignment( Toolkit::Text::Layout::VerticalAlignment alignment )
-{
-  const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::VerticalAlignment >( alignment,
-                                                                                                VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
-
-  if( name )
-  {
-    return std::string( name );
-  }
-  return std::string();
-}
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
@@ -397,9 +356,9 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   map.Insert( Toolkit::TextVisual::Property::MULTI_LINE, mController->IsMultiLineEnabled() );
 
-  map.Insert( Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT, GetHorizontalAlignment( mController->GetHorizontalAlignment() ) );
+  map.Insert( Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT, mController->GetHorizontalAlignment() );
 
-  map.Insert( Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT, GetVerticalAlignment( mController->GetVerticalAlignment() ) );
+  map.Insert( Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT, mController->GetVerticalAlignment() );
 
   map.Insert( Toolkit::TextVisual::Property::TEXT_COLOR, mController->GetDefaultColor() );
 
@@ -554,26 +513,18 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
     }
     case Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT:
     {
-      Toolkit::Text::Layout::HorizontalAlignment alignment( Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN );
-      if( Scripting::GetEnumeration< Toolkit::Text::Layout::HorizontalAlignment >( propertyValue.Get< std::string >().c_str(),
-                                                                                   HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                   HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                                   alignment ) )
-      {
-        mController->SetHorizontalAlignment( alignment );
-      }
+      Text::HorizontalAlignment::Type alignment( Toolkit::Text::HorizontalAlignment::BEGIN );
+      Toolkit::Text::GetHorizontalAlignmentEnum( propertyValue, alignment );
+
+      mController->SetHorizontalAlignment( alignment );
       break;
     }
     case Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT:
     {
-      Toolkit::Text::Layout::VerticalAlignment alignment( Toolkit::Text::Layout::VERTICAL_ALIGN_BOTTOM );
-      if( Scripting::GetEnumeration< Toolkit::Text::Layout::VerticalAlignment >( propertyValue.Get< std::string >().c_str(),
-                                                                                 VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                 VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                                 alignment ) )
-      {
-        mController->SetVerticalAlignment( alignment );
-      }
+      Text::VerticalAlignment::Type alignment( Toolkit::Text::VerticalAlignment::BOTTOM );
+      Toolkit::Text::GetVerticalAlignmentEnum( propertyValue, alignment);
+
+      mController->SetVerticalAlignment( alignment );
       break;
     }
     case Toolkit::TextVisual::Property::TEXT_COLOR:
