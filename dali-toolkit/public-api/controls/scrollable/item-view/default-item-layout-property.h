@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEFAULT_ITEM_LAYOUT_PROPERTY_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,25 +26,29 @@ namespace Toolkit
 
 /**
  * @brief Default item layout property.
+ * @SINCE_1_2.60
  */
 namespace DefaultItemLayoutProperty
 {
 
 /**
  * @brief The properties of each type of item layout.
+ * @SINCE_1_2.60
  */
 enum Property
 {
   /**
   * @brief The type of the Layout.
-  * @details Name "type", type(Dali::Toolkit::DefaultItemLayout::Type),Property::INTEGER
+  * @details Name "type", type Dali::Toolkit::DefaultItemLayout::Type (Property::INTEGER).
+  * @SINCE_1_2.60
   * @note Mandatory.
   */
   TYPE = 0,
 
   /**
   * @brief The size of each item in the Layout.
-  * @details Name "itemSize",Property::VECTOR3
+  * @details Name "itemSize", type Property::VECTOR3
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, see ItemLayout::GetDefaultItemSize().
   */
@@ -52,7 +56,8 @@ enum Property
 
   /**
   * @brief The internal orientation of the Layout.
-  * @details Name "orientation",type(@ref Dali::Toolkit::ControlOrientation::Type),Property::INTEGER
+  * @details Name "orientation", type Dali::Toolkit::ControlOrientation::Type (Property::INTEGER).
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is ControlOrientation::Up, The contents of control are in a vertical layout, from top to bottom.
   */
@@ -60,7 +65,8 @@ enum Property
 
   /**
   * @brief The number of columns in the GridLayout.
-  * @details Name "gridColumnNumber",Property::INTEGER.
+  * @details Name "gridColumnNumber", type Property::INTEGER.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 4.
   */
@@ -68,7 +74,8 @@ enum Property
 
   /**
   * @brief The spacing between rows in the GridLayout.
-  * @details Name "gridRowSpacing",Property::FLOAT
+  * @details Name "gridRowSpacing", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 20.0f.
   */
@@ -76,7 +83,8 @@ enum Property
 
   /**
   * @brief The spacing between columns in the GridLayout.
-  * @details Name "gridColumnSpacing",Property::FLOAT
+  * @details Name "gridColumnSpacing", type Property::FLOAT
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 20.0f.
   */
@@ -84,7 +92,8 @@ enum Property
 
   /**
   * @brief The margin in the top of the GridLayout.
-  * @details Name "gridTopMargin",Property::FLOAT
+  * @details Name "gridTopMargin", type Property::FLOAT
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 95.0f.
   */
@@ -92,7 +101,8 @@ enum Property
 
   /**
   * @brief The margin in the bottom of the GridLayout.
-  * @details Name "gridBottomMargin",Property::FLOAT
+  * @details Name "gridBottomMargin", type Property::FLOAT
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 20.0f.
   */
@@ -100,7 +110,8 @@ enum Property
 
   /**
   * @brief The margin in the left and right of the GridLayout.
-  * @details Name "gridSideMargin",Property::FLOAT
+  * @details Name "gridSideMargin", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 20.0f.
   */
@@ -108,7 +119,8 @@ enum Property
 
   /**
   * @brief The factor used to customise the scroll speed while dragging and swiping the GridLayout.
-  * @details Name "gridScrollSpeedFactor",Property::FLOAT
+  * @details Name "gridScrollSpeedFactor", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 0.03f.
   */
@@ -116,7 +128,8 @@ enum Property
 
   /**
   * @brief The maximum swipe speed in pixels per second of GridLayout.
-  * @details Name "gridMaximumSwipSpeed",Property::FLOAT
+  * @details Name "gridMaximumSwipSpeed", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 100.0f.
   */
@@ -124,7 +137,8 @@ enum Property
 
   /**
   * @brief The duration of the flick animation in seconds of GridLayout.
-  * @details Name "gridItemFlickAnimationDuration",Property::FLOAT
+  * @details Name "gridItemFlickAnimationDuration", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note This is the time taken to animate each item to its next layout position (e.g. from 1.0 to 2.0) when a flick animation is triggered by a swipe gesture.
   * @note Must be greater than zero;If not supplied, the default is 0.015f.
@@ -133,7 +147,8 @@ enum Property
 
   /**
   * @brief The number of columns in the DepthLayout.
-  * @details Name "depthColumnNumber",Property::INTEGER
+  * @details Name "depthColumnNumber", type Property::INTEGER.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 3.
   */
@@ -141,7 +156,8 @@ enum Property
 
   /**
   * @brief The number of rows in the DepthLayout.
-  * @details Name "depthRowNumber",Property::INTEGER
+  * @details Name "depthRowNumber", type Property::INTEGER.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 26.
   */
@@ -149,7 +165,8 @@ enum Property
 
   /**
   * @brief The spacing between rows in the DepthLayout.
-  * @details Name "depthRowSpacing",Property::FLOAT
+  * @details Name "depthRowSpacing", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 55.0f.
   */
@@ -157,7 +174,8 @@ enum Property
 
   /**
   * @brief The factor used to customise the scroll speed while dragging and swiping the  DepthLayout.
-  * @details Name "depthScrollSpeedFactor",Property::FLOAT
+  * @details Name "depthScrollSpeedFactor", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 0.02f.
   */
@@ -165,7 +183,8 @@ enum Property
 
   /**
   * @brief The maximumSwipSpeed of the DepthLayout.
-  * @details Name "depthMaximumSwipSpeed",Property::FLOAT
+  * @details Name "depthMaximumSwipSpeed", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 50.0f.
   */
@@ -173,7 +192,8 @@ enum Property
 
   /**
   * @brief The duration of the flick animation in seconds of DepthLayout.
-  * @details Name "depthItemFlickAnimationDuration",Property::FLOAT
+  * @details Name "depthItemFlickAnimationDuration", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note This is the time taken to animate each item to its next layout position (e.g. from 1.0 to 2.0) when a flick animation is triggered by a swipe gesture.
   * @note Must be greater than zero; If not supplied, the default is 0.03f.
@@ -183,6 +203,7 @@ enum Property
   /**
   * @brief The tilt angle of DepthLayout.
   * @details Name "depthTiltAngle",Property::FLOAT
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is (Math::PI)*0.15f.
   * @note This is clamped between -45 & 45 degrees.
@@ -191,7 +212,8 @@ enum Property
 
   /**
   * @brief The tilt angle of the individual items in the DepthLayout.
-  * @details Name "depthItemTiltAngle",Property::FLOAT
+  * @details Name "depthItemTiltAngle", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is -(Math::PI)*0.025f.
   */
@@ -199,7 +221,8 @@ enum Property
 
   /**
   * @brief The spacing angle between items in the SpiralLayout.
-  * @details Name "spiralItemSpacing",Property::FLOAT
+  * @details Name "spiralItemSpacing", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 9.5f.
   */
@@ -207,7 +230,8 @@ enum Property
 
   /**
   * @brief The factor used to customise the scroll speed while dragging and swiping the SpiralLayout.
-  * @details Name "spiralScrollSpeedFactor",Property::FLOAT
+  * @details Name "spiralScrollSpeedFactor", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 0.01f.
   */
@@ -215,7 +239,8 @@ enum Property
 
   /**
   * @brief The maximum swipe speed in pixels per second of the SpiralLayout.
-  * @details Name "spiralMaximumSwipSpeed",Property::FLOAT
+  * @details Name "spiralMaximumSwipSpeed", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 30.0f.
   */
@@ -223,7 +248,8 @@ enum Property
 
   /**
   * @brief The duration of the flick animation in seconds of the SpiralLayout.
-  * @details Name "spiralItemFlickAnimationDuration",Property::FLOAT
+  * @details Name "spiralItemFlickAnimationDuration", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note This is the time taken to animate each item to its next layout position (e.g. from 1.0 to 2.0) when a flick animation is triggered by a swipe gesture.
   * @note Must be greater than zero; If not supplied, the default is 0.1f.
@@ -232,7 +258,8 @@ enum Property
 
   /**
   * @brief The vertical distance for one revolution of the SpiralLayout.
-  * @details Name "spiralRevolutionDistance",Property::FLOAT
+  * @details Name "spiralRevolutionDistance", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note If not supplied, the default is 190.0f.
   */
@@ -240,7 +267,8 @@ enum Property
 
   /**
   * @brief The alignment of the top-item, when at the beginning of the SpiralLayout.
-  * @details Name "spiralTopItemAlignment",Property::FLOAT
+  * @details Name "spiralTopItemAlignment", type Property::FLOAT.
+  * @SINCE_1_2.60
   * @note Optional.
   * @note When at the beginning of the spiral (with a first-item layout-position of zero).A value of 0 indicates that the top-item is centered in the middle of the layout.
   * A value of -0.5 or 0.5 indicates that the top-item is centred at the top or bottom of the layout respectively.

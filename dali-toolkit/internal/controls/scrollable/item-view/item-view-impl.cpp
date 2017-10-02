@@ -36,8 +36,7 @@
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/item-factory.h>
 #include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout.h>
-#include <dali-toolkit/devel-api/controls/scrollable/item-view/default-item-layout-property.h>
-#include <dali-toolkit/devel-api/controls/scrollable/item-view/item-view-devel.h>
+#include <dali-toolkit/public-api/controls/scrollable/item-view/default-item-layout-property.h>
 #include <dali-toolkit/internal/controls/scrollable/item-view/grid-layout.h>
 #include <dali-toolkit/internal/controls/scrollable/item-view/depth-layout.h>
 #include <dali-toolkit/internal/controls/scrollable/item-view/spiral-layout.h>
@@ -259,7 +258,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "minimumSwipeDistance",       FLO
 DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "wheelScrollDistanceStep",    FLOAT,     WHEEL_SCROLL_DISTANCE_STEP   )
 DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "snapToItemEnabled",          BOOLEAN,   SNAP_TO_ITEM_ENABLED         )
 DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "refreshInterval",            FLOAT,     REFRESH_INTERVAL             )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, ItemView, "layout",               ARRAY,     LAYOUT                       )
+DALI_PROPERTY_REGISTRATION( Toolkit, ItemView, "layout",                     ARRAY,     LAYOUT                       )
 
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ItemView, "layoutPosition",      FLOAT,    LAYOUT_POSITION)
@@ -1755,27 +1754,32 @@ void ItemView::SetProperty( BaseObject* object, Property::Index index, const Pro
         itemViewImpl.SetMinimumSwipeSpeed( value.Get<float>() );
         break;
       }
+
       case Toolkit::ItemView::Property::MINIMUM_SWIPE_DISTANCE:
       {
         itemViewImpl.SetMinimumSwipeDistance( value.Get<float>() );
         break;
       }
+
       case Toolkit::ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP:
       {
         itemViewImpl.SetWheelScrollDistanceStep( value.Get<float>() );
         break;
       }
+
       case Toolkit::ItemView::Property::SNAP_TO_ITEM_ENABLED:
       {
         itemViewImpl.SetAnchoring( value.Get<bool>() );
         break;
       }
+
       case Toolkit::ItemView::Property::REFRESH_INTERVAL:
       {
         itemViewImpl.SetRefreshInterval( value.Get<float>() );
         break;
       }
-      case Toolkit::DevelItemView::Property::LAYOUT:
+
+      case Toolkit::ItemView::Property::LAYOUT:
       {
         // Get a Property::Array from the property if possible.
         Property::Array layoutArray;
@@ -1883,33 +1887,37 @@ Property::Value ItemView::GetProperty( BaseObject* object, Property::Index index
         value = itemViewImpl.GetMinimumSwipeSpeed();
         break;
       }
+
       case Toolkit::ItemView::Property::MINIMUM_SWIPE_DISTANCE:
       {
         value = itemViewImpl.GetMinimumSwipeDistance();
         break;
       }
+
       case Toolkit::ItemView::Property::WHEEL_SCROLL_DISTANCE_STEP:
       {
         value = itemViewImpl.GetWheelScrollDistanceStep();
         break;
       }
+
       case Toolkit::ItemView::Property::SNAP_TO_ITEM_ENABLED:
       {
         value = itemViewImpl.GetAnchoring();
         break;
       }
+
       case Toolkit::ItemView::Property::REFRESH_INTERVAL:
       {
         value = itemViewImpl.GetRefreshInterval();
         break;
       }
-      case Toolkit::DevelItemView::Property::LAYOUT:
+
+      case Toolkit::ItemView::Property::LAYOUT:
       {
         Property::Array layouts= itemViewImpl.GetLayoutArray();
         value = layouts;
         break;
       }
-
     }
   }
 
