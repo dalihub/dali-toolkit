@@ -25,7 +25,7 @@
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 #include <dali-toolkit/internal/text/layouts/layout-alignment.h>
 
@@ -124,7 +124,7 @@ public:
    * @brief Set the mode of scrolling stop
    * @param[in] stopMode type when text scrolling is stoped.
    */
-  void SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMode );
+  void SetStopMode( TextLabel::AutoScrollStopMode::Type stopMode );
 
   /**
    * @brief Stop the auto scrolling.
@@ -135,7 +135,7 @@ public:
    * @brief Get the mode of scrolling stop
    * @return stopMode type when text scrolling is stoped.
    */
-  DevelTextLabel::AutoScrollStopMode::Type GetStopMode() const;
+  TextLabel::AutoScrollStopMode::Type GetStopMode() const;
 
 private: // Implementation
 
@@ -183,7 +183,7 @@ private:
   int   mLoopCount;                                     ///< Number of time the text should scroll
   float mLoopDelay;                                     ///< Time delay of loop start
   float mWrapGap;                                       ///< Gap before text wraps around when scrolling
-  DevelTextLabel::AutoScrollStopMode::Type  mStopMode;  ///< Stop mode of scrolling text, when loop count is 0.
+  TextLabel::AutoScrollStopMode::Type  mStopMode;       ///< Stop mode of scrolling text, when loop count is 0.
 
 }; // TextScroller class
 
