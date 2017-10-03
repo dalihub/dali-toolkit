@@ -21,8 +21,6 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali-toolkit/devel-api/controls/scrollable/scroll-view/scroll-view-devel.h>
-#include <dali-toolkit/devel-api/controls/scrollable/scroll-view/scroll-mode.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -646,7 +644,7 @@ int UtcDaliToolkitScrollModeP1(void)
   rulerMap.Add( ScrollMode::X_AXIS_SNAP_TO_INTERVAL, pageSize.width );
   rulerMap.Add( ScrollMode::X_AXIS_SCROLL_BOUNDARY, pageSize.width*3 );
   rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_ENABLED, false );
-  scrollView.SetProperty( DevelScrollView::Property::SCROLL_MODE, rulerMap);
+  scrollView.SetProperty( ScrollView::Property::SCROLL_MODE, rulerMap);
 
   scrollView.SetWrapMode( false );
   scrollView.SetScrollSensitive( true );
@@ -702,7 +700,7 @@ int UtcDaliToolkitScrollModeP2(void)
   rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_ENABLED, true );
   rulerMap.Add( ScrollMode::Y_AXIS_SNAP_TO_INTERVAL, pageSize.height );
   rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_BOUNDARY, pageSize.height*3 );
-  scrollView.SetProperty( DevelScrollView::Property::SCROLL_MODE, rulerMap);
+  scrollView.SetProperty( ScrollView::Property::SCROLL_MODE, rulerMap);
 
   scrollView.SetWrapMode( false );
   scrollView.SetScrollSensitive( true );
@@ -758,7 +756,7 @@ int UtcDaliToolkitScrollModeP3(void)
   rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_ENABLED, true );
   rulerMap.Add( ScrollMode::Y_AXIS_SNAP_TO_INTERVAL, pageSize.height );
   rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_BOUNDARY, pageSize.height*3 );
-  scrollView.SetProperty( DevelScrollView::Property::SCROLL_MODE, rulerMap);
+  scrollView.SetProperty( ScrollView::Property::SCROLL_MODE, rulerMap);
 
   scrollView.SetWrapMode( false );
   scrollView.SetScrollSensitive( true );
@@ -812,7 +810,7 @@ int UtcDaliToolkitScrollModeP4(void)
   Property::Map rulerMap;
   rulerMap.Add( ScrollMode::X_AXIS_SCROLL_ENABLED, true );
   rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_ENABLED, true );
-  scrollView.SetProperty( DevelScrollView::Property::SCROLL_MODE, rulerMap);
+  scrollView.SetProperty( ScrollView::Property::SCROLL_MODE, rulerMap);
 
   scrollView.SetWrapMode( false );
   scrollView.SetScrollSensitive( true );

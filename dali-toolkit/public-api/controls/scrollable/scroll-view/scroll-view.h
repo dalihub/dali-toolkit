@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SCROLL_VIEW_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -503,33 +503,211 @@ public:
      */
     enum
     {
-      // Event side properties
-      WRAP_ENABLED = PROPERTY_START_INDEX,               ///< Property, name "wrapEnabled",              @see SetWrapMode(),                 type bool,     @SINCE_1_1.18
-      PANNING_ENABLED,                                   ///< Property, name "panningEnabled",           @see SetScrollSensitive(),          type bool,     @SINCE_1_1.18
-      AXIS_AUTO_LOCK_ENABLED,                            ///< Property, name "axisAutoLockEnabled",      @see SetAxisAutoLock(),             type bool,     @SINCE_1_1.18
-      WHEEL_SCROLL_DISTANCE_STEP,                        ///< Property, name "wheelScrollDistanceStep",  @see SetWheelScrollDistanceStep(),  type Vector2,  @SINCE_1_1.18
+      ///////////////////////////////////////////////////////////////////////////////
+      // Event side (non-animatable) properties
+      ///////////////////////////////////////////////////////////////////////////////
 
-      SCROLL_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "scrollPosition",            type Vector2 @SINCE_1_0.0
-      SCROLL_PRE_POSITION,                               ///< Property, name "scrollPrePosition",         type Vector2 @SINCE_1_0.0
-      SCROLL_PRE_POSITION_X,                             ///< Property, name "scrollPrePositionX",        type float @SINCE_1_0.0
-      SCROLL_PRE_POSITION_Y,                             ///< Property, name "scrollPrePositionY",        type float @SINCE_1_0.0
-      SCROLL_PRE_POSITION_MAX,                           ///< Property, name "scrollPrePositionMax",      type Vector2 @SINCE_1_0.0
-      SCROLL_PRE_POSITION_MAX_X,                         ///< Property, name "scrollPrePositionMaxX",     type float @SINCE_1_0.0
-      SCROLL_PRE_POSITION_MAX_Y,                         ///< Property, name "scrollPrePositionMaxY",     type float @SINCE_1_0.0
-      OVERSHOOT_X,                                       ///< Property, name "overshootX",                type float @SINCE_1_0.0
-      OVERSHOOT_Y,                                       ///< Property, name "overshootY",                type float @SINCE_1_0.0
-      SCROLL_FINAL,                                      ///< Property, name "scrollFinal",               type Vector2 @SINCE_1_0.0
-      SCROLL_FINAL_X,                                    ///< Property, name "scrollFinalX",              type float @SINCE_1_0.0
-      SCROLL_FINAL_Y,                                    ///< Property, name "scrollFinalY",              type float @SINCE_1_0.0
-      WRAP,                                              ///< Property, name "wrap",                      type bool @SINCE_1_0.0
-      PANNING,                                           ///< Property, name "panning",                   type bool @SINCE_1_0.0
-      SCROLLING,                                         ///< Property, name "scrolling",                 type bool @SINCE_1_0.0
-      SCROLL_DOMAIN_SIZE,                                ///< Property, name "scrollDomainSize",          type Vector2 @SINCE_1_0.0
-      SCROLL_DOMAIN_SIZE_X,                              ///< Property, name "scrollDomainSizeX",         type float @SINCE_1_0.0
-      SCROLL_DOMAIN_SIZE_Y,                              ///< Property, name "scrollDomainSizeY",         type float @SINCE_1_0.0
-      SCROLL_DOMAIN_OFFSET,                              ///< Property, name "scrollDomainOffset",        type Vector2 @SINCE_1_0.0
-      SCROLL_POSITION_DELTA,                             ///< Property, name "scrollPositionDelta",       type Vector2 @SINCE_1_0.0
-      START_PAGE_POSITION                                ///< Property, name "startPagePosition",         type Vector3 @SINCE_1_0.0
+      /**
+       * @brief Whether wrapping is enabled.
+       * @details Name "wrapEnabled", type Property::BOOLEAN.
+       * @SINCE_1_1.18
+       * @see SetWrapMode()
+       */
+      WRAP_ENABLED = PROPERTY_START_INDEX,
+
+      /**
+       * @brief Whether panning is enabled.
+       * @details Name "panningEnabled", type Property::BOOLEAN.
+       * @SINCE_1_1.18
+       * @see SetScrollSensitive()
+       */
+      PANNING_ENABLED,
+
+      /**
+       * @brief Whether the Axis Auto Lock mode for panning within the ScrollView is enabled.
+       * @details Name "axisAutoLockEnabled", type Property::BOOLEAN.
+       * @SINCE_1_1.18
+       * @see SetAxisAutoLock()
+       */
+      AXIS_AUTO_LOCK_ENABLED,
+
+      /**
+       * @brief The step of scroll distance in actor coordinates for each wheel event received in free panning mode.
+       * @details Name "wheelScrollDistanceStep", type Property::VECTOR2.
+       * @SINCE_1_1.18
+       * @see SetWheelScrollDistanceStep()
+       */
+      WHEEL_SCROLL_DISTANCE_STEP,
+
+      /**
+       * @brief The scroll mode.
+       * @details Name "scrollMode", type Property::MAP.
+       * The scroll mode map is a frontend for the Ruler helper class, containing the following keys:
+       *
+       * | %Property Name       | Type     | Required | Description                                                                                                                           |
+       * |----------------------|----------|----------|---------------------------------------------------------------------------------------------------------------------------------------|
+       * | xAxisScrollEnabled   | BOOLEAN  | No       | True if the content can be scrolled in X axis or false if not.                                                                        |
+       * | xAxisSnapToInterval  | FLOAT    | No       | When set, causes scroll view to snap to multiples of the value of the interval in the X axis while flicking. (by default no snapping) |
+       * | xAxisScrollBoundary  | FLOAT    | No       | When set, causes scroll view unable to scroll beyond the value of the boundary in the X axis (by default no boundary)                 |
+       * | yAxisScrollEnabled   | BOOLEAN  | No       | True if the content can be scrolled in Y axis or false if not.                                                                        |
+       * | yAxisSnapToInterval  | FLOAT    | No       | When set, causes scroll view to snap to multiples of the value of the interval in the Y axis while flicking. (by default no snapping) |
+       * | yAxisScrollBoundary  | FLOAT    | No       | When set, causes scroll view unable to scroll beyond the value of the boundary in the Y axis (by default no boundary)                 |
+       *
+       * Alternatively, one can use the keys defined in the Dali::Toolkit::ScrollMode::Type enumeration.
+       * @SINCE_1_2.60
+       */
+      SCROLL_MODE,
+
+      ///////////////////////////////////////////////////////////////////////////////
+      // Animatable Properties
+      ///////////////////////////////////////////////////////////////////////////////
+
+      /**
+       * @brief The current scroll position.
+       * @details Name "scrollPosition", type Property::VECTOR2.
+       * @SINCE_1_0.0
+       */
+      SCROLL_POSITION = ANIMATABLE_PROPERTY_START_INDEX,
+
+      /**
+       * @brief The position before we set the clamp at scroll boundaries.
+       * @details Name "scrollPrePosition", type Property::VECTOR2.
+       * @SINCE_1_0.0
+       */
+      SCROLL_PRE_POSITION,
+
+      /**
+       * @brief The X component of SCROLL_PRE_POSITION.
+       * @details Name "scrollPrePositionX", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      SCROLL_PRE_POSITION_X,
+
+      /**
+       * @brief The Y component of SCROLL_PRE_POSITION.
+       * @details Name "scrollPrePositionY", type Property::VECTOR2.
+       * @SINCE_1_0.0
+       */
+      SCROLL_PRE_POSITION_Y,
+
+      /**
+       * @brief The maximum value that SCROLL_PRE_POSITION can be.
+       * @details Name "scrollPrePositionMax", type Property::VECTOR2.
+       * @SINCE_1_0.0
+       */
+      SCROLL_PRE_POSITION_MAX,
+
+      /**
+       * @brief The X component of SCROLL_PRE_POSITION_MAX.
+       * @details Name "scrollPrePositionMaxX", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      SCROLL_PRE_POSITION_MAX_X,
+
+      /**
+       * @brief The Y component of SCROLL_PRE_POSITION_MAX.
+       * @details Name "scrollPrePositionMaxY", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      SCROLL_PRE_POSITION_MAX_Y,
+
+      /**
+       * @brief The amount that we can scroll beyond the boundary along the X axis.
+       * @details Name "overshootX", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      OVERSHOOT_X,
+
+      /**
+       * @brief The amount that we can scroll beyond the boundary along the Y axis.
+       * @details Name "overshootY", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      OVERSHOOT_Y,
+
+      /**
+       * @brief The position after the overshoot value has been considered in the calculation.
+       * @details Name "scrollFinal", type Property::VECTOR2.
+       * @SINCE_1_0.0
+       */
+      SCROLL_FINAL,
+
+      /**
+       * @brief The X component of SCROLL_FINAL.
+       * @details Name "scrollFinalX", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      SCROLL_FINAL_X,
+
+      /**
+       * @brief The Y component of SCROLL_FINAL.
+       * @details Name "scrollFinalY", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      SCROLL_FINAL_Y,
+
+      /**
+       * @brief Whether scrolling wraps.
+       * @details Name "wrap", type Property::BOOLEAN.
+       * @SINCE_1_0.0
+       */
+      WRAP,
+
+      /**
+       * @brief Whether we are currently panning.
+       * @details Name "panning", type Property::BOOLEAN.
+       * @SINCE_1_0.0
+       */
+      PANNING,
+
+      /**
+       * @brief Whether we are currently scrolling.
+       * @details Name "scrolling", type Property::BOOLEAN.
+       * @SINCE_1_0.0
+       */
+      SCROLLING,
+
+      /**
+       * @brief The size of the scrolling domain.
+       * @details Name "scrollDomainSize", type Property::VECTOR2.
+       * @SINCE_1_0.0
+       */
+      SCROLL_DOMAIN_SIZE,
+
+      /**
+       * @brief The X component of SCROLL_DOMAIN_SIZE.
+       * @details Name "scrollDomainSizeX", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      SCROLL_DOMAIN_SIZE_X,
+
+      /**
+       * @brief The Y component of SCROLL_DOMAIN_SIZE.
+       * @details Name "scrollDomainSizeY", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      SCROLL_DOMAIN_SIZE_Y,
+
+      /**
+       * @brief The offset of the scroll domain.
+       * @details Name "scrollDomainOffset", type Property::VECTOR2.
+       * @SINCE_1_0.0
+       */
+      SCROLL_DOMAIN_OFFSET,
+
+      /**
+       * @brief The delta in the position when scrolling.
+       * @details Name "scrollPositionDelta", type Property::VECTOR2.
+       * @SINCE_1_0.0
+       */
+      SCROLL_POSITION_DELTA,
+
+      /**
+       * @brief The starting page position.
+       * @details Name "startPagePosition", type Property::VECTOR3.
+       * @SINCE_1_0.0
+       */
+      START_PAGE_POSITION,
     };
   };
 
@@ -690,7 +868,7 @@ public:
   void SetRulerY(RulerPtr ruler);
 
   /**
-   * @brief Sets scroll sensibility of pan gesture.
+   * @brief Sets scroll sensitivity of pan gesture.
    *
    * @SINCE_1_0.0
    * @param[in] sensitive @c true to enable scroll, @c false to disable scrolling
