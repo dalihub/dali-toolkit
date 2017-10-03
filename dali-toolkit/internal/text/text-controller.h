@@ -461,6 +461,18 @@ public: // Configure the text controller.
   void ShadowSetByString( bool setByString );
 
   /**
+   * @brief Query if outline settings were provided by string or map
+   * @return bool true if set by string
+   */
+  bool IsOutlineSetByString();
+
+  /**
+   * Set method outline setting were set by
+   * @param[in] bool, true if set by string
+   */
+  void OutlineSetByString( bool setByString );
+
+  /**
    * @brief Query if font style settings were provided by string or map
    * @return bool true if set by string
    */

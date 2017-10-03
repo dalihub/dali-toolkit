@@ -446,6 +446,13 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::EMBOSS ), std::string("Emboss properties"), TEST_LOCATION );
 
   // Check the outline property
+
+  // Test string type first
+  // This is purely to maintain backward compatibility, but we don't support string as the outline property type.
+  label.SetProperty( TextLabel::Property::OUTLINE, "Outline properties" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+
+  // Then test the property map type
   Property::Map outlineMapSet;
   Property::Map outlineMapGet;
 

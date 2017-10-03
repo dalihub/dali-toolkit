@@ -732,6 +732,13 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_EMBOSS ), std::string("Emboss input properties"), TEST_LOCATION );
 
   // Check the outline property
+
+  // Test string type first
+  // This is purely to maintain backward compatibility, but we don't support string as the outline property type.
+  editor.SetProperty( TextEditor::Property::OUTLINE, "Outline properties" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+
+  // Then test the property map type
   Property::Map outlineMapSet;
   Property::Map outlineMapGet;
 
