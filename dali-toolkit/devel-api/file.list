@@ -70,9 +70,6 @@ devel_api_builder_header_files = \
 devel_api_effects_view_header_files = \
   $(devel_api_src_dir)/controls/effects-view/effects-view.h
 
-devel_api_scroll_bar_header_files = \
-  $(devel_api_src_dir)/controls/scroll-bar/scroll-bar-devel.h
-
 devel_api_magnifier_header_files = \
   $(devel_api_src_dir)/controls/magnifier/magnifier.h
 
