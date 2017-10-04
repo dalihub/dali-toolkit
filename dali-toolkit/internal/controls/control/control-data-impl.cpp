@@ -317,6 +317,7 @@ Control::Impl::Impl( Control& controlImpl )
 : mControlImpl( controlImpl ),
   mState( Toolkit::DevelControl::NORMAL ),
   mSubStateName(""),
+  mLayout( NULL ),
   mLeftFocusableActorId( -1 ),
   mRightFocusableActorId( -1 ),
   mUpFocusableActorId( -1 ),
@@ -1390,6 +1391,16 @@ void Control::Impl::SetPadding( Extents padding )
 Extents Control::Impl::GetPadding() const
 {
   return mControlImpl.mImpl->mPadding;
+}
+
+Toolkit::LayoutBase Control::Impl::GetLayout()
+{
+  return mLayout;
+}
+
+void Control::Impl::SetLayout( Toolkit::LayoutBase& layout )
+{
+  mLayout = layout;
 }
 
 } // namespace Internal
