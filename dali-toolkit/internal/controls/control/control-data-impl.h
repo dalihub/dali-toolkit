@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/visuals/visual-resource-observer.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 #include <dali-toolkit/internal/builder/style.h>
@@ -83,7 +84,7 @@ public:
 
   /**
    * @brief Constructor.
-   * @param[in] controlImpl The control which own this implementation
+   * @param[in] controlImpl The control which owns this implementation
    */
   Impl( Control& controlImpl );
 
@@ -300,6 +301,19 @@ public:
    */
   Extents GetPadding() const;
 
+  /**
+   * @brief Get the layout associated with this control, if any.
+   *
+   * @return A pointer to the layout, or NULL.
+   */
+  Toolkit::LayoutBase GetLayout();
+
+  /**
+   * @brief Set the layout on this control.
+   * @param[in] layout Pointer to the layout
+   */
+  void SetLayout( Toolkit::LayoutBase& layout );
+
 private:
 
   /**
@@ -345,6 +359,9 @@ public:
   DevelControl::State mState;
   std::string mSubStateName;
 
+  // Layout
+  Toolkit::LayoutBase mLayout;
+
   int mLeftFocusableActorId;       ///< Actor ID of Left focusable control.
   int mRightFocusableActorId;      ///< Actor ID of Right focusable control.
   int mUpFocusableActorId;         ///< Actor ID of Up focusable control.
@@ -375,6 +392,7 @@ public:
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
 
   RegisteredVisualContainer mRemoveVisuals;         ///< List of visuals that are being replaced by another visual once ready
+
 
   // Properties - these need to be members of Internal::Control::Impl as they access private methods/data of Internal::Control and Internal::Control::Impl.
   static const PropertyRegistration PROPERTY_1;

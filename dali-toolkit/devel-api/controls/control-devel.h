@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/devel-api/layouting/layout-base.h>
 
 namespace Dali
 {
@@ -240,6 +241,21 @@ DALI_IMPORT_API Dali::Animation CreateTransition( Internal::Control& control, co
  * @param[in] attributes Optional attributes for the action.
  */
 DALI_IMPORT_API void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes );
+
+/*
+ * @brief Get the layout associated with this control, if any.
+ *
+ * @return A pointer to the layout, or NULL.
+ */
+Toolkit::LayoutBase GetLayout( Internal::Control& control );
+
+/**
+ * @brief Set the layout on this control.
+ * @param[in] control The Control to set the layout on
+ * @param[in] layout Pointer to the layout
+ */
+void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout );
+
 
 } // namespace DevelControl
 

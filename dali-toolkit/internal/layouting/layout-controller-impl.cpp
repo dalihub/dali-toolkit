@@ -1,0 +1,112 @@
+/*
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali-toolkit/internal/layouting/layout-controller-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
+#include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+
+using namespace Dali;
+
+namespace Dali
+{
+namespace Toolkit
+{
+namespace Internal
+{
+
+LayoutController::LayoutController()
+: mLayoutRequested(false)
+{
+}
+
+LayoutController::~LayoutController()
+{
+}
+
+void LayoutController::Initialize()
+{
+}
+
+void LayoutController::RequestLayout( LayoutBase& layoutBase )
+{
+  mLayoutRequested = true;
+
+  LayoutParent* layoutParent = layoutBase.GetParent();
+  if( layoutParent )
+  {
+    LayoutGroup& layoutGroup = static_cast< LayoutGroup& >( *layoutParent );
+    if( ! layoutGroup.IsLayoutRequested() )
+    {
+      layoutGroup.RequestLayout();
+    }
+  }
+}
+
+void LayoutController::Process()
+{
+  // Perform the full process.
+
+  if( mLayoutRequested )
+  {
+    mLayoutRequested = false;
+
+    // If window size has changed, expect stage to have already been updated
+    Stage stage = Stage::GetCurrent();
+    uint32_t stageWidth  = stage.GetSize().width;
+    uint32_t stageHeight = stage.GetSize().height;
+
+    MeasureSpec widthSpec = MeasureSpec::MakeMeasureSpec( stageWidth, MeasureSpec::EXACTLY );
+    MeasureSpec heightSpec = MeasureSpec::MakeMeasureSpec( stageHeight, MeasureSpec::EXACTLY );
+
+    // Test how to perform a measure on each control.
+    MeasureHierarchy( stage.GetRootLayer(), widthSpec, heightSpec );
+  }
+}
+
+void LayoutController::MeasureHierarchy( Actor root, MeasureSpec widthSpec, MeasureSpec heightSpec )
+{
+  // Does this actor have a layout?
+  // Yes - measure the layout. It will call this method again for each of it's children.
+  // No - recurse through actor children.
+  //
+  // If in a leaf actor with no layout, it's natural size is bubbled back up.
+  //
+  // What happens if nothing in the tree has a layout?
+
+  Toolkit::Control control = Toolkit::Control::DownCast( root );
+  if( control )
+  {
+    Internal::Control& controlImpl = GetImplementation( control );
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
+    Toolkit::LayoutBase layout = controlDataImpl.GetLayout();
+
+    if( layout )
+    {
+      Internal::LayoutBase& layoutImpl = GetImplementation( layout );
+      layoutImpl.Measure( widthSpec, heightSpec );
+    }
+  }
+}
+
+
+
+} // namespace Internal
+} // namespace Toolkit
+} // namespace Dali

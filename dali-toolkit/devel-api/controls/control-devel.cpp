@@ -96,6 +96,18 @@ void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Proper
   controlDataImpl.DoAction( visualIndex, actionId, attributes );
 }
 
+Toolkit::LayoutBase GetLayout( Internal::Control& control )
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  return controlDataImpl.GetLayout();
+}
+
+void SetLayout( Internal::Control& control, Toolkit::LayoutBase& layout )
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.SetLayout( layout );
+}
+
 } // namespace DevelControl
 
 } // namespace Toolkit
