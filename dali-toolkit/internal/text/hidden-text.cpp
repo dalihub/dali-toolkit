@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/text/hidden-text.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
 
 using namespace Dali::Toolkit;
 

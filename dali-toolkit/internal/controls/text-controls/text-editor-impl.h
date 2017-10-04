@@ -23,7 +23,6 @@
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
@@ -97,9 +96,9 @@ public:
   Toolkit::TextEditor::InputStyleChangedSignalType& InputStyleChangedSignal();
 
   /**
-   * @copydoc DevelTextEditor::ScrollStateChangedSignal()
+   * @copydoc TextEditor::ScrollStateChangedSignal()
    */
-  Toolkit::DevelTextEditor::ScrollStateChangedSignalType& ScrollStateChangedSignal();
+  Toolkit::TextEditor::ScrollStateChangedSignalType& ScrollStateChangedSignal();
 
 private: // From Control
 
@@ -282,7 +281,7 @@ private: // Data
   // Signals
   Toolkit::TextEditor::TextChangedSignalType mTextChangedSignal;
   Toolkit::TextEditor::InputStyleChangedSignalType mInputStyleChangedSignal;
-  Toolkit::DevelTextEditor::ScrollStateChangedSignalType mScrollStateChangedSignal;
+  Toolkit::TextEditor::ScrollStateChangedSignalType mScrollStateChangedSignal;
 
   ImfManager          mImfManager;
   Text::ControllerPtr mController;

@@ -138,18 +138,18 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "emboss",                      
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputEmboss",                          MAP,       INPUT_EMBOSS                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "outline",                              MAP,       OUTLINE                              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputOutline",                         MAP,       INPUT_OUTLINE                        )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScroll",                   BOOLEAN,   SMOOTH_SCROLL                        )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScrollDuration",           FLOAT,     SMOOTH_SCROLL_DURATION               )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableScrollBar",                BOOLEAN,   ENABLE_SCROLL_BAR                    )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarShowDuration",          FLOAT,     SCROLL_BAR_SHOW_DURATION             )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarFadeDuration",          FLOAT,     SCROLL_BAR_FADE_DURATION             )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "pixelSize",                      FLOAT,     PIXEL_SIZE                           )
-DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "lineCount",            INTEGER,   LINE_COUNT                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScroll",                         BOOLEAN,   SMOOTH_SCROLL                        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScrollDuration",                 FLOAT,     SMOOTH_SCROLL_DURATION               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableScrollBar",                      BOOLEAN,   ENABLE_SCROLL_BAR                    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarShowDuration",                FLOAT,     SCROLL_BAR_SHOW_DURATION             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarFadeDuration",                FLOAT,     SCROLL_BAR_FADE_DURATION             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "pixelSize",                            FLOAT,     PIXEL_SIZE                           )
+DALI_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "lineCount",                  INTEGER,   LINE_COUNT                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableSelection",                      BOOLEAN,   ENABLE_SELECTION                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholder",                          MAP,       PLACEHOLDER                          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineWrapMode",                         STRING,    LINE_WRAP_MODE                       )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderText",                STRING,    PLACEHOLDER_TEXT                     )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",           VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableSelection",                BOOLEAN,   ENABLE_SELECTION                     )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholder",                    MAP,       PLACEHOLDER                          )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineWrapMode",                   STRING,    LINE_WRAP_MODE                       )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -618,7 +618,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL:
+      case Toolkit::TextEditor::Property::SMOOTH_SCROLL:
       {
         const bool enable = value.Get< bool >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor SMOOTH_SCROLL %d\n", enable );
@@ -626,7 +626,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         impl.mScrollAnimationEnabled = enable;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL_DURATION:
+      case Toolkit::TextEditor::Property::SMOOTH_SCROLL_DURATION:
       {
         const float duration = value.Get< float >();
         DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor SMOOTH_SCROLL_DURATION %f\n", duration );
@@ -638,7 +638,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
-      case Toolkit::DevelTextEditor::Property::ENABLE_SCROLL_BAR:
+      case Toolkit::TextEditor::Property::ENABLE_SCROLL_BAR:
       {
         const bool enable = value.Get< bool >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor SHOW_SCROLL_BAR %d\n", enable );
@@ -646,7 +646,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         impl.mScrollBarEnabled = enable;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION:
+      case Toolkit::TextEditor::Property::SCROLL_BAR_SHOW_DURATION:
       {
         const float duration = value.Get< float >();
         DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor SCROLL_BAR_SHOW_DURATION %f\n", duration );
@@ -654,7 +654,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         impl.mAnimationPeriod.delaySeconds = duration;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION:
+      case Toolkit::TextEditor::Property::SCROLL_BAR_FADE_DURATION:
       {
         const float duration = value.Get< float >();
         DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor SCROLL_BAR_FADE_DURATION %f\n", duration );
@@ -662,7 +662,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         impl.mAnimationPeriod.durationSeconds = duration;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::PIXEL_SIZE:
+      case Toolkit::TextEditor::Property::PIXEL_SIZE:
       {
         if( impl.mController )
         {
@@ -702,7 +702,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
-      case Toolkit::DevelTextEditor::Property::ENABLE_SELECTION:
+      case Toolkit::TextEditor::Property::ENABLE_SELECTION:
       {
         if( impl.mController )
         {
@@ -712,7 +712,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
-      case Toolkit::DevelTextEditor::Property::PLACEHOLDER:
+      case Toolkit::TextEditor::Property::PLACEHOLDER:
       {
         const Property::Map* map = value.GetMap();
         if( map )
@@ -721,7 +721,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
-      case Toolkit::DevelTextEditor::Property::LINE_WRAP_MODE:
+      case Toolkit::TextEditor::Property::LINE_WRAP_MODE:
       {
         const std::string& wrapModeStr = value.Get< std::string >();
         DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p LINE_WRAP_MODE %s\n", impl.mController.Get(), wrapModeStr.c_str() );
@@ -1037,32 +1037,32 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         GetOutlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL:
+      case Toolkit::TextEditor::Property::SMOOTH_SCROLL:
       {
         value = impl.mScrollAnimationEnabled;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL_DURATION:
+      case Toolkit::TextEditor::Property::SMOOTH_SCROLL_DURATION:
       {
         value = impl.mScrollAnimationDuration;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::ENABLE_SCROLL_BAR:
+      case Toolkit::TextEditor::Property::ENABLE_SCROLL_BAR:
       {
         value = impl.mScrollBarEnabled;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION:
+      case Toolkit::TextEditor::Property::SCROLL_BAR_SHOW_DURATION:
       {
         value = impl.mAnimationPeriod.delaySeconds;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION:
+      case Toolkit::TextEditor::Property::SCROLL_BAR_FADE_DURATION:
       {
         value = impl.mAnimationPeriod.durationSeconds;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::PIXEL_SIZE:
+      case Toolkit::TextEditor::Property::PIXEL_SIZE:
       {
         if( impl.mController )
         {
@@ -1070,7 +1070,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         }
         break;
       }
-      case Toolkit::DevelTextEditor::Property::LINE_COUNT:
+      case Toolkit::TextEditor::Property::LINE_COUNT:
       {
         if( impl.mController )
         {
@@ -1097,7 +1097,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         }
         break;
       }
-      case Toolkit::DevelTextEditor::Property::ENABLE_SELECTION:
+      case Toolkit::TextEditor::Property::ENABLE_SELECTION:
       {
         if( impl.mController )
         {
@@ -1105,14 +1105,14 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         }
         break;
       }
-      case Toolkit::DevelTextEditor::Property::PLACEHOLDER:
+      case Toolkit::TextEditor::Property::PLACEHOLDER:
       {
         Property::Map map;
         impl.mController->GetPlaceholderProperty( map );
         value = map;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::LINE_WRAP_MODE:
+      case Toolkit::TextEditor::Property::LINE_WRAP_MODE:
       {
         if( impl.mController )
         {
@@ -1159,7 +1159,7 @@ Toolkit::TextEditor::InputStyleChangedSignalType& TextEditor::InputStyleChangedS
   return mInputStyleChangedSignal;
 }
 
-Toolkit::DevelTextEditor::ScrollStateChangedSignalType& TextEditor::ScrollStateChangedSignal()
+Toolkit::TextEditor::ScrollStateChangedSignalType& TextEditor::ScrollStateChangedSignal()
 {
   return mScrollStateChangedSignal;
 }
@@ -1647,7 +1647,7 @@ void TextEditor::UpdateScrollBar()
   {
     mScrollStarted = true;
     Dali::Toolkit::TextEditor handle( GetOwner() );
-    mScrollStateChangedSignal.Emit( handle, DevelTextEditor::Scroll::STARTED );
+    mScrollStateChangedSignal.Emit( handle, Toolkit::TextEditor::Scroll::STARTED );
   }
 
   Actor indicator = mScrollBar.GetScrollIndicator();
@@ -1672,7 +1672,7 @@ void TextEditor::OnScrollIndicatorAnimationFinished( Animation& animation )
   {
     mScrollStarted = false;
     Dali::Toolkit::TextEditor handle( GetOwner() );
-    mScrollStateChangedSignal.Emit( handle, DevelTextEditor::Scroll::FINISHED );
+    mScrollStateChangedSignal.Emit( handle, Toolkit::TextEditor::Scroll::FINISHED );
   }
 }
 

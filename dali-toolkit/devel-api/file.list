@@ -22,7 +22,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.cpp \
-  $(devel_api_src_dir)/controls/text-controls/text-editor-devel.cpp \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
   $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.cpp \
