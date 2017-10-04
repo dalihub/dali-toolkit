@@ -74,7 +74,7 @@ void HiddenText::SetProperties( const Property::Map& map )
       {
         value.Get( mSubstituteCount );
       }
-      else if( key == Toolkit::HiddenInput::Property::SHOW_DURATION || key == PROPERTY_SHOW_DURATION )
+      else if( key == Toolkit::HiddenInput::Property::SHOW_LAST_CHARACTER_DURATION || key == PROPERTY_SHOW_DURATION )
       {
         value.Get( mDisplayDuration );
       }
@@ -86,7 +86,7 @@ void HiddenText::GetProperties( Property::Map& map )
   map[Toolkit::HiddenInput::Property::MODE] = mHideMode;
   map[Toolkit::HiddenInput::Property::SUBSTITUTE_CHARACTER] = mSubstituteText;
   map[Toolkit::HiddenInput::Property::SUBSTITUTE_COUNT] = mSubstituteCount;
-  map[Toolkit::HiddenInput::Property::SHOW_DURATION] = mDisplayDuration;
+  map[Toolkit::HiddenInput::Property::SHOW_LAST_CHARACTER_DURATION] = mDisplayDuration;
 }
 
 void HiddenText::Substitute( const Vector<Character>& source, Vector<Character>& destination )

@@ -27,8 +27,6 @@
 #include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/controls/text-controls/hidden-input-properties.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include "toolkit-clipboard.h"
 
 using namespace Dali;
@@ -510,11 +508,11 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_EMBOSS ) == TextField::Property::INPUT_EMBOSS );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextField::Property::OUTLINE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_INPUT_OUTLINE ) == TextField::Property::INPUT_OUTLINE );
-  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_HIDDEN_INPUT_SETTINGS ) == DevelTextField::Property::HIDDEN_INPUT_SETTINGS );
-  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextField::Property::PIXEL_SIZE );
-  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == DevelTextField::Property::ENABLE_SELECTION );
-  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == DevelTextField::Property::PLACEHOLDER );
-  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == DevelTextField::Property::ELLIPSIS );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_HIDDEN_INPUT_SETTINGS ) == TextField::Property::HIDDEN_INPUT_SETTINGS );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == TextField::Property::PIXEL_SIZE );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == TextField::Property::ENABLE_SELECTION );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == TextField::Property::PLACEHOLDER );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextField::Property::ELLIPSIS );
 
   END_TEST;
 }
@@ -858,22 +856,22 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map hiddenMapSet;
   Property::Map hiddenMapGet;
   hiddenMapSet[ HiddenInput::Property::MODE ] = HiddenInput::Mode::HIDE_ALL;
-  hiddenMapSet[ HiddenInput::Property::SHOW_DURATION ] = 2;
+  hiddenMapSet[ HiddenInput::Property::SHOW_LAST_CHARACTER_DURATION ] = 2;
   hiddenMapSet[ HiddenInput::Property::SUBSTITUTE_COUNT ] = 4;
   hiddenMapSet[ HiddenInput::Property::SUBSTITUTE_CHARACTER ] = 0x23;
-  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, hiddenMapSet );
+  field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, hiddenMapSet );
 
-  hiddenMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::HIDDEN_INPUT_SETTINGS );
+  hiddenMapGet = field.GetProperty<Property::Map>( TextField::Property::HIDDEN_INPUT_SETTINGS );
   DALI_TEST_EQUALS( hiddenMapSet.Count(), hiddenMapGet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( hiddenMapSet, hiddenMapGet ), true, TEST_LOCATION );
 
   // Check the pixel size of font
-  field.SetProperty( DevelTextField::Property::PIXEL_SIZE, 20.f );
-  DALI_TEST_EQUALS( field.GetProperty<float>( DevelTextField::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  field.SetProperty( TextField::Property::PIXEL_SIZE, 20.f );
+  DALI_TEST_EQUALS( field.GetProperty<float>( TextField::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the enable selection property
-  field.SetProperty( DevelTextField::Property::ENABLE_SELECTION, false );
-  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_SELECTION ), false, TEST_LOCATION );
+  field.SetProperty( TextField::Property::ENABLE_SELECTION, false );
+  DALI_TEST_EQUALS( field.GetProperty<bool>( TextField::Property::ENABLE_SELECTION ), false, TEST_LOCATION );
 
   // Check the placeholder property with pixel size
   Property::Map placeholderPixelSizeMapSet;
@@ -888,9 +886,9 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   placeholderFontstyleMap.Insert( "weight", "bold" );
   placeholderPixelSizeMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
-  field.SetProperty( DevelTextField::Property::PLACEHOLDER, placeholderPixelSizeMapSet );
+  field.SetProperty( TextField::Property::PLACEHOLDER, placeholderPixelSizeMapSet );
 
-  placeholderPixelSizeMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::PLACEHOLDER );
+  placeholderPixelSizeMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderPixelSizeMapGet.Count(), placeholderPixelSizeMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderPixelSizeMapGet, placeholderPixelSizeMapSet ), true, TEST_LOCATION );
 
@@ -911,9 +909,9 @@ int UtcDaliTextFieldSetPropertyP(void)
   placeholderFontstyleMap.Insert( "width", "condensed" );
   placeholderFontstyleMap.Insert( "slant", "italic" );
   placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
-  field.SetProperty( DevelTextField::Property::PLACEHOLDER, placeholderMapSet );
+  field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
 
-  placeholderMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::PLACEHOLDER );
+  placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
 
@@ -922,31 +920,31 @@ int UtcDaliTextFieldSetPropertyP(void)
   placeholderFontstyleMap.Insert( "weight", "normal" );
   placeholderFontstyleMap.Insert( "slant", "oblique" );
   placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
-  field.SetProperty( DevelTextField::Property::PLACEHOLDER, placeholderMapSet );
+  field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
 
-  placeholderMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::PLACEHOLDER );
+  placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
 
   placeholderFontstyleMap.Clear();
   placeholderFontstyleMap.Insert( "slant", "roman" );
   placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
-  field.SetProperty( DevelTextField::Property::PLACEHOLDER, placeholderMapSet );
+  field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
 
-  placeholderMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::PLACEHOLDER );
+  placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
 
   placeholderFontstyleMap.Clear();
   placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
 
-  field.SetProperty( DevelTextField::Property::PLACEHOLDER, placeholderMapSet );
-  placeholderMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::PLACEHOLDER );
+  field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
+  placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
 
   // Check the ellipsis property
-  DALI_TEST_CHECK( !field.GetProperty<bool>( DevelTextField::Property::ELLIPSIS ) );
-  field.SetProperty( DevelTextField::Property::ELLIPSIS, true );
-  DALI_TEST_CHECK( field.GetProperty<bool>( DevelTextField::Property::ELLIPSIS ) );
+  DALI_TEST_CHECK( !field.GetProperty<bool>( TextField::Property::ELLIPSIS ) );
+  field.SetProperty( TextField::Property::ELLIPSIS, true );
+  DALI_TEST_CHECK( field.GetProperty<bool>( TextField::Property::ELLIPSIS ) );
 
   END_TEST;
 }
@@ -2158,21 +2156,21 @@ int utcDaliTextFieldEvent09(void)
 
   Property::Map map;
   map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::HIDE_NONE;
-  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
   application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
   map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::HIDE_ALL;
   map[ HiddenInput::Property::SUBSTITUTE_CHARACTER ] = 0x23;
-  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
   application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
   map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::HIDE_COUNT;
   map[ HiddenInput::Property::SUBSTITUTE_COUNT ] = 2;
-  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
   for( unsigned int index = 0u; index < 5u; ++index )
   {
     application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
@@ -2182,7 +2180,7 @@ int utcDaliTextFieldEvent09(void)
 
   map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::SHOW_COUNT;
   map[ HiddenInput::Property::SUBSTITUTE_COUNT ] = 2;
-  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
   for( unsigned int index = 0u; index < 5u; ++index )
   {
     application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
@@ -2191,8 +2189,8 @@ int utcDaliTextFieldEvent09(void)
   }
 
   map[ HiddenInput::Property::MODE ] = HiddenInput::Mode::SHOW_LAST_CHARACTER;
-  map[ HiddenInput::Property::SHOW_DURATION ] = 0;
-  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  map[ HiddenInput::Property::SHOW_LAST_CHARACTER_DURATION ] = 0;
+  field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
   application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
@@ -2200,14 +2198,14 @@ int utcDaliTextFieldEvent09(void)
   application.SendNotification();
   application.Render();
 
-  map[ HiddenInput::Property::SHOW_DURATION ] = 100;
-  field.SetProperty( DevelTextField::Property::HIDDEN_INPUT_SETTINGS, map );
+  map[ HiddenInput::Property::SHOW_LAST_CHARACTER_DURATION ] = 100;
+  field.SetProperty( TextField::Property::HIDDEN_INPUT_SETTINGS, map );
   application.ProcessEvent( GenerateKey( "d", "d", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
   Property::Map mapGet;
-  mapGet = field.GetProperty<Property::Map>( DevelTextField::Property::HIDDEN_INPUT_SETTINGS );
+  mapGet = field.GetProperty<Property::Map>( TextField::Property::HIDDEN_INPUT_SETTINGS );
   DALI_TEST_EQUALS( map.Count(), mapGet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( map, mapGet ), true, TEST_LOCATION );
   END_TEST;

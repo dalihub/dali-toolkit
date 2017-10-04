@@ -23,7 +23,7 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/text-controls/hidden-input-properties.h>
+#include <dali-toolkit/public-api/controls/text-controls/hidden-input-properties.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
 
 namespace Dali
