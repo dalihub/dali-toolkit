@@ -11,6 +11,12 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/style.cpp \
    $(toolkit_src_dir)/builder/tree-node-manipulator.cpp \
    $(toolkit_src_dir)/builder/replacement.cpp \
+   $(toolkit_src_dir)/layouting/child-layout-data-impl.cpp \
+   $(toolkit_src_dir)/layouting/margin-layout-data-impl.cpp \
+   $(toolkit_src_dir)/layouting/layout-base-data-impl.cpp \
+   $(toolkit_src_dir)/layouting/layout-group-data-impl.cpp \
+   $(toolkit_src_dir)/layouting/layout-controller-impl.cpp \
+   $(toolkit_src_dir)/layouting/table-layout-impl.cpp \
    $(toolkit_src_dir)/visuals/animated-image/animated-image-visual.cpp \
    $(toolkit_src_dir)/visuals/animated-image/image-cache.cpp \
    $(toolkit_src_dir)/visuals/animated-image/fixed-image-cache.cpp \
@@ -56,6 +62,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/flex-container/flex-container-impl.cpp \
    $(toolkit_src_dir)/controls/gaussian-blur-view/gaussian-blur-view-impl.cpp \
    $(toolkit_src_dir)/controls/image-view/image-view-impl.cpp \
+   $(toolkit_src_dir)/controls/layouting/hbox-view-impl.cpp \
    $(toolkit_src_dir)/controls/magnifier/magnifier-impl.cpp \
    $(toolkit_src_dir)/controls/navigation-view/navigation-view-impl.cpp \
    $(toolkit_src_dir)/controls/popup/confirmation-popup-impl.cpp \
