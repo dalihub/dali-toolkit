@@ -65,12 +65,13 @@ public:
    * @param[in] renderer renderer to render the text
    * @param[in] textureSet texture of the text to be scrolled
    * @param[in] controlSize size of the control to scroll within
-   * @param[in] textNaturalSize natural size of the text
+   * @param[in] textureSize size of the texture
+   * @param[in] wrapGap The gap before scrolling wraps
    * @param[in] direction text direction true for right to left text
    * @param[in] horizontalAlignment horizontal alignment of the text
    * @param[in] verticalAlignment vertical alignment of the text
    */
-  void SetParameters( Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment );
+  void SetParameters( Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment );
 
   /**
    * @brief Set the gap distance to elapse before the text wraps around

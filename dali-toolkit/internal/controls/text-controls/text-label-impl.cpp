@@ -913,9 +913,14 @@ void TextLabel::SetUpAutoScrolling()
     mTextScroller = Text::TextScroller::New( *this );
   }
 
+  // Calculate the actual gap before scrolling wraps.
+  int textPadding = std::max( controlSize.x - textNaturalSize.x, 0.0f );
+  float wrapGap = std::max( mTextScroller->GetGap(), textPadding );
+  Vector2 textureSize = textNaturalSize + Vector2(wrapGap, 0.0f); // Add the gap as a part of the texture
+
   // Create a texture of the text for scrolling
   Text::TypesetterPtr typesetter = Text::Typesetter::New( mController->GetTextModel() );
-  PixelData data = typesetter->Render( textNaturalSize, Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888 ); // ignore the horizontal alignment
+  PixelData data = typesetter->Render( textureSize, Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888 ); // ignore the horizontal alignment
   Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
                                   data.GetPixelFormat(),
                                   data.GetWidth(),
@@ -928,11 +933,12 @@ void TextLabel::SetUpAutoScrolling()
   // Filter mode needs to be set to linear to produce better quality while scaling.
   Sampler sampler = Sampler::New();
   sampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
+  sampler.SetWrapMode( Dali::WrapMode::DEFAULT, Dali::WrapMode::REPEAT, Dali::WrapMode::DEFAULT ); // Wrap the texture in the x direction
   textureSet.SetSampler( 0u, sampler );
 
   // Set parameters for scrolling
   Renderer renderer = static_cast<Internal::Visual::Base&>( GetImplementation( mVisual ) ).GetRenderer();
-  mTextScroller->SetParameters( Self(), renderer, textureSet, controlSize, textNaturalSize, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment() );
+  mTextScroller->SetParameters( Self(), renderer, textureSet, controlSize, textureSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment() );
 }
 
 void TextLabel::ScrollingFinished()
