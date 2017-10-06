@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali/public-api/rendering/renderer.h>
-#include <dali/public-api/rendering/geometry.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 
@@ -41,7 +37,7 @@ const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
-void TestDebugVisual( Visual::Base& visual, DevelVisual::Type actualType, Vector2 expectedNaturalSize )
+void TestDebugVisual( Visual::Base& visual, Visual::Type actualType, Vector2 expectedNaturalSize )
 {
   DALI_TEST_CHECK( &typeid( Toolkit::Internal::WireframeVisual ) == &typeid( GetImplementation(visual) ) );
 
@@ -51,7 +47,7 @@ void TestDebugVisual( Visual::Base& visual, DevelVisual::Type actualType, Vector
 
   Property::Map propertyMap;
   visual.CreatePropertyMap( propertyMap );
-  Property::Value* typeValue = propertyMap.Find( Visual::Property::TYPE,  Property::INTEGER );
+  Property::Value* typeValue = propertyMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
   if ( typeValue )
   {
     DALI_TEST_CHECK( typeValue->Get<int>() == actualType );
@@ -96,7 +92,7 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap1.Insert(ColorVisual::Property::MIX_COLOR,  Color::BLUE);
   Visual::Base colorVisual = factory.CreateVisual(propertyMap1);
   DALI_TEST_CHECK( colorVisual );
-  TestDebugVisual( colorVisual, DevelVisual::COLOR, Vector2::ZERO );
+  TestDebugVisual( colorVisual, Visual::COLOR, Vector2::ZERO );
 
   // Test that border visual is replaced with debug visual
   Property::Map propertyMap2;
@@ -105,7 +101,7 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap2.Insert(BorderVisual::Property::SIZE,  2.f);
   Visual::Base borderVisual = factory.CreateVisual(propertyMap2);
   DALI_TEST_CHECK( borderVisual );
-  TestDebugVisual( borderVisual, DevelVisual::BORDER, Vector2::ZERO );
+  TestDebugVisual( borderVisual, Visual::BORDER, Vector2::ZERO );
 
   // Test that gradient visual is replaced with debug visual
   Property::Map propertyMap3;
@@ -125,17 +121,17 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap3.Insert(GradientVisual::Property::STOP_COLOR, stopColors);
   Visual::Base gradientVisual = factory.CreateVisual(propertyMap3);
   DALI_TEST_CHECK( gradientVisual );
-  TestDebugVisual( gradientVisual, DevelVisual::GRADIENT, Vector2::ZERO );
+  TestDebugVisual( gradientVisual, Visual::GRADIENT, Vector2::ZERO );
 
   // Test that image visual is replaced with debug visual
   Property::Map propertyMap4;
-  propertyMap4.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap4.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap4.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
   propertyMap4.Insert( ImageVisual::Property::DESIRED_WIDTH,  50.f );
   propertyMap4.Insert( ImageVisual::Property::DESIRED_HEIGHT,  100.f );
   Visual::Base imageVisual = factory.CreateVisual( propertyMap4 );
   DALI_TEST_CHECK( imageVisual );
-  TestDebugVisual( imageVisual, DevelVisual::IMAGE, Vector2( 50.f, 100.f ) );
+  TestDebugVisual( imageVisual, Visual::IMAGE, Vector2( 50.f, 100.f ) );
 
   // Test that SVG visual is replaced with debug visual
   // TEST_SVG_FILE:
@@ -143,21 +139,21 @@ int UtcDaliDebugRenderingGetVisual1(void)
   //  <circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
   //  </svg>
   Property::Map propertyMap5;
-  propertyMap5.Insert( Visual::Property::TYPE, DevelVisual::SVG );
+  propertyMap5.Insert( Toolkit::Visual::Property::TYPE, Visual::SVG );
   propertyMap5.Insert( ImageVisual::Property::URL,  TEST_SVG_FILE_NAME );
   Visual::Base svgVisual = factory.CreateVisual( propertyMap5 );
   DALI_TEST_CHECK( svgVisual );
-  TestDebugVisual( svgVisual, DevelVisual::SVG, Vector2(100.f, 100.f) );
+  TestDebugVisual( svgVisual, Visual::SVG, Vector2(100.f, 100.f) );
 
   // Test that AnimatedImageVisual is replaced with debug visual
   // TEST_GIF_FILE: anim.gif
   // resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
   Property::Map propertyMap6;
-  propertyMap6.Insert( Visual::Property::TYPE, DevelVisual::ANIMATED_IMAGE );
+  propertyMap6.Insert( Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE );
   propertyMap6.Insert( ImageVisual::Property::URL,  TEST_GIF_FILE_NAME );
   Visual::Base animatedImageVisual = factory.CreateVisual( propertyMap6 );
   DALI_TEST_CHECK( animatedImageVisual );
-  TestDebugVisual( animatedImageVisual, DevelVisual::ANIMATED_IMAGE, Vector2(50.f, 50.f) );
+  TestDebugVisual( animatedImageVisual, Visual::ANIMATED_IMAGE, Vector2(50.f, 50.f) );
 
   // Test that text visual is replaced with debug visual
 
@@ -172,7 +168,7 @@ int UtcDaliDebugRenderingGetVisual1(void)
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
 
   Property::Map propertyMap7;
-  propertyMap7.Insert( Visual::Property::TYPE, DevelVisual::TEXT );
+  propertyMap7.Insert( Toolkit::Visual::Property::TYPE, Visual::TEXT );
   propertyMap7.Insert( TextVisual::Property::ENABLE_MARKUP, true );
   propertyMap7.Insert( TextVisual::Property::TEXT, "<font family='TizenSans' size='12'>Hello world</font>" );
   propertyMap7.Insert( TextVisual::Property::MULTI_LINE, true );
@@ -191,11 +187,11 @@ int UtcDaliDebugRenderingGetVisual1(void)
   // Test that NPatchVisual is replaced with debug visual
   // TEST_NPATCH_FILE_NAME: image_01.9.jpg
   Property::Map propertyMap8;
-  propertyMap8.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
+  propertyMap8.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
   propertyMap8.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   Visual::Base nPatchVisual = factory.CreateVisual( propertyMap8 );
   DALI_TEST_CHECK( nPatchVisual );
-  TestDebugVisual( nPatchVisual, DevelVisual::N_PATCH, Vector2::ZERO );
+  TestDebugVisual( nPatchVisual, Visual::N_PATCH, Vector2::ZERO );
 
   EnvironmentVariable::SetTestingEnvironmentVariable(false);
   END_TEST;
@@ -212,32 +208,32 @@ int UtcDaliDebugRenderingGetVisual2(void)
 
   // Test that color visual is replaced with debug visual
   Dali::Property::Map map;
-  map[ Visual::Property::TYPE ] = Visual::COLOR;
+  map[ Toolkit::Visual::Property::TYPE ] = Visual::COLOR;
   map[ ColorVisual::Property::MIX_COLOR ] = Color::CYAN;
 
   Visual::Base colorVisual = factory.CreateVisual( map);
   DALI_TEST_CHECK( colorVisual );
-  TestDebugVisual( colorVisual, DevelVisual::COLOR, Vector2::ZERO );
+  TestDebugVisual( colorVisual, Visual::COLOR, Vector2::ZERO );
 
   // Test that border visual is replaced with debug visual
   map.Clear();
-  map[ Visual::Property::TYPE ] = Visual::BORDER;
+  map[ Toolkit::Visual::Property::TYPE ] = Visual::BORDER;
   map[ BorderVisual::Property::COLOR  ] = Color::GREEN;
   map[ BorderVisual::Property::SIZE   ] = 2.f;
   Visual::Base borderVisual = factory.CreateVisual( map );
   DALI_TEST_CHECK( borderVisual );
-  TestDebugVisual( borderVisual, DevelVisual::BORDER, Vector2::ZERO );
+  TestDebugVisual( borderVisual, Visual::BORDER, Vector2::ZERO );
 
   // Test that image visual is replaced with debug visual
   Image image = ResourceImage::New(TEST_IMAGE_FILE_NAME);
   Visual::Base imageVisual = factory.CreateVisual( image );
   DALI_TEST_CHECK( imageVisual );
-  TestDebugVisual( imageVisual, DevelVisual::IMAGE, Vector2::ZERO);
+  TestDebugVisual( imageVisual, Visual::IMAGE, Vector2::ZERO);
 
   // Test that n patch visual is replaced with debug visual
   Visual::Base nPatchVisual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( nPatchVisual );
-  TestDebugVisual( nPatchVisual, DevelVisual::N_PATCH, Vector2::ZERO );
+  TestDebugVisual( nPatchVisual, Visual::N_PATCH, Vector2::ZERO );
 
   EnvironmentVariable::SetTestingEnvironmentVariable(false);
   END_TEST;

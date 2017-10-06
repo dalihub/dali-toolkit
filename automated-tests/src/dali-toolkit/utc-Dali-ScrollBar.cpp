@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -1540,7 +1539,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicator(void)
 
   // Get the default duration to hide the indicator
   float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
-  float transientDuration = scrollBar.GetProperty<float>( DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
+  float transientDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
   float totalVisibleDuration = hideDuration + transientDuration;
 
   // Check that the default duration is greater than 0
@@ -1600,7 +1599,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorImmediate(void)
 
   // Get the default duration to hide the indicator
   float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
-  float transientDuration = scrollBar.GetProperty<float>( DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
+  float transientDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
   float totalVisibleDuration = hideDuration + transientDuration;
 
   // Check that the default duration is greater than 0
@@ -1685,7 +1684,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorDuringHide(void)
 
   // Get the default duration to hide the indicator
   float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
-  float transientDuration = scrollBar.GetProperty<float>( DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
+  float transientDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
   float totalVisibleDuration = hideDuration + transientDuration;
 
   // Check that the default duration is greater than 0

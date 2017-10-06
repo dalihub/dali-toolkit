@@ -32,7 +32,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar-devel.h>
 
 using namespace Dali;
 
@@ -166,8 +165,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "scrollPositionIntervals",      
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorMinimumHeight",            FLOAT,  INDICATOR_MINIMUM_HEIGHT     )
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorStartPadding",             FLOAT,  INDICATOR_START_PADDING      )
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorEndPadding",               FLOAT,  INDICATOR_END_PADDING        )
-
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorTransientDuration", FLOAT,  INDICATOR_TRANSIENT_DURATION )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollBar, "indicatorTransientDuration",        FLOAT,  INDICATOR_TRANSIENT_DURATION )
 
 DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "panFinished",                       PAN_FINISHED_SIGNAL                     )
 DALI_SIGNAL_REGISTRATION(   Toolkit, ScrollBar, "scrollPositionIntervalReached",     SCROLL_POSITION_INTERVAL_REACHED_SIGNAL )
@@ -722,7 +720,7 @@ void ScrollBar::SetProperty( BaseObject* object, Property::Index index, const Pr
         scrollBarImpl.ApplyConstraints();
         break;
       }
-      case Toolkit::DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION:
+      case Toolkit::ScrollBar::Property::INDICATOR_TRANSIENT_DURATION:
       {
         scrollBarImpl.mTransientIndicatorDuration = value.Get<float>();
         break;
@@ -801,7 +799,7 @@ Property::Value ScrollBar::GetProperty( BaseObject* object, Property::Index inde
         value = scrollBarImpl.mIndicatorEndPadding;
         break;
       }
-      case Toolkit::DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION:
+      case Toolkit::ScrollBar::Property::INDICATOR_TRANSIENT_DURATION:
       {
         value = scrollBarImpl.mTransientIndicatorDuration;
         break;

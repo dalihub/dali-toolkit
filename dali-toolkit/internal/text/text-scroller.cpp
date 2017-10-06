@@ -104,24 +104,24 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
  *
  * -0.5f aligns the text to the left, 0.0f aligns the text to the center, 0.5f aligns the text to the right.
  * The final alignment depends on two factors:
- *   1) The alignment value of the text label (Use Text::Layout::HorizontalAlignment enumerations).
+ *   1) The alignment value of the text label (Use Text::HorizontalAlignment enumerations).
  *   2) The text direction, i.e. whether it's LTR or RTL (0 = LTR, 1 = RTL).
  */
-const float HORIZONTAL_ALIGNMENT_TABLE[ Text::Layout::HORIZONTAL_ALIGN_COUNT ][ 2 ] =
+const float HORIZONTAL_ALIGNMENT_TABLE[ Text::HorizontalAlignment::END+1 ][ 2 ] =
 {
-  // HORIZONTAL_ALIGN_BEGIN
+  // HorizontalAlignment::BEGIN
   {
     -0.5f, // LTR
     0.5f   // RTL
   },
 
-  // HORIZONTAL_ALIGN_CENTER
+  // HorizontalAlignment::CENTER
   {
     0.0f,  // LTR
     0.0f   // RTL
   },
 
-  // HORIZONTAL_ALIGN_END
+  // HorizontalAlignment::END
   {
     0.5f,  // LTR
     -0.5f  // RTL
@@ -132,13 +132,13 @@ const float HORIZONTAL_ALIGNMENT_TABLE[ Text::Layout::HORIZONTAL_ALIGN_COUNT ][ 
  * @brief How the text should be aligned vertically when scrolling the text.
  *
  * -0.5f aligns the text to the top, 0.0f aligns the text to the center, 0.5f aligns the text to the bottom.
- * The alignment depends on the alignment value of the text label (Use Text::Layout::VerticalAlignment enumerations).
+ * The alignment depends on the alignment value of the text label (Use Text::VerticalAlignment enumerations).
  */
-const float VERTICAL_ALIGNMENT_TABLE[ Text::Layout::VERTICAL_ALIGN_COUNT ] =
+const float VERTICAL_ALIGNMENT_TABLE[ Text::VerticalAlignment::BOTTOM+1 ] =
 {
-  -0.5f, // VERTICAL_ALIGN_TOP
-  0.0f,  // VERTICAL_ALIGN_CENTER
-  0.5f   // VERTICAL_ALIGN_BOTTOM
+  -0.5f, // VerticalAlignment::TOP
+  0.0f,  // VerticalAlignment::CENTER
+  0.5f   // VerticalAlignment::BOTTOM
 };
 
 } // namespace
@@ -200,9 +200,9 @@ float TextScroller::GetLoopDelay() const
   return mLoopDelay;
 }
 
-void TextScroller::SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMode )
+void TextScroller::SetStopMode( TextLabel::AutoScrollStopMode::Type stopMode )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetAutoScrollStopMode [%s]\n",(stopMode == DevelTextLabel::AutoScrollStopMode::IMMEDIATE)?"IMMEDIATE":"FINISH_LOOP" );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetAutoScrollStopMode [%s]\n",(stopMode == TextLabel::AutoScrollStopMode::IMMEDIATE)?"IMMEDIATE":"FINISH_LOOP" );
   mStopMode = stopMode;
 }
 
@@ -212,13 +212,13 @@ void TextScroller::StopScrolling()
   {
     switch( mStopMode )
     {
-      case DevelTextLabel::AutoScrollStopMode::IMMEDIATE:
+      case TextLabel::AutoScrollStopMode::IMMEDIATE:
       {
         mScrollAnimation.Stop();
         mScrollerInterface.ScrollingFinished();
         break;
       }
-      case DevelTextLabel::AutoScrollStopMode::FINISH_LOOP:
+      case TextLabel::AutoScrollStopMode::FINISH_LOOP:
       {
         mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
         break;
@@ -231,7 +231,7 @@ void TextScroller::StopScrolling()
   }
 }
 
-DevelTextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const
+TextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const
 {
   return mStopMode;
 }
@@ -243,7 +243,7 @@ TextScroller::TextScroller( ScrollerInterface& scrollerInterface )
   mLoopCount( 1 ),
   mLoopDelay( 0.0f ),
   mWrapGap( 0.0f ),
-  mStopMode( DevelTextLabel::AutoScrollStopMode::FINISH_LOOP )
+  mStopMode( TextLabel::AutoScrollStopMode::FINISH_LOOP )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller Default Constructor\n" );
 }
@@ -252,7 +252,7 @@ TextScroller::~TextScroller()
 {
 }
 
-void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textNaturalSize, CharacterDirection direction, Layout::HorizontalAlignment horizontalAlignment, Layout::VerticalAlignment verticalAlignment )
+void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textNaturalSize, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] offscreenSize[%f,%f] direction[%d]\n",
                  controlSize.x, controlSize.y, textNaturalSize.x, textNaturalSize.y, direction );

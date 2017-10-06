@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include "wireframe-visual.h"
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -96,7 +96,7 @@ WireframeVisualPtr WireframeVisual::New( VisualFactoryCache& factoryCache, Visua
   WireframeVisualPtr wireframeVisual( new WireframeVisual( factoryCache, actualVisual ) );
 
   // Instead of calling SetProperties, looking for the only valid property 'transform'
-  Property::Value* transformValue = properties.Find( DevelVisual::Property::TRANSFORM, TRANSFORM );
+  Property::Value* transformValue = properties.Find( Toolkit::Visual::Property::TRANSFORM, TRANSFORM );
   Property::Map transformMap;
   if( transformValue && transformValue->Get( transformMap ) )
   {
@@ -149,7 +149,7 @@ void WireframeVisual::DoCreatePropertyMap( Property::Map& map ) const
   else
   {
     map.Clear();
-    map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::WIREFRAME );
+    map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::WIREFRAME );
   }
 }
 
@@ -160,7 +160,7 @@ void WireframeVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 
 void WireframeVisual::DoSetProperties( const Property::Map& propertyMap )
 {
-  Property::Value* mixValue = propertyMap.Find( Toolkit::DevelVisual::Property::MIX_COLOR, MIX_COLOR );
+  Property::Value* mixValue = propertyMap.Find( Toolkit::Visual::Property::MIX_COLOR, MIX_COLOR );
   if( mixValue )
   {
     Vector4 mixColor;

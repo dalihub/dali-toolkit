@@ -356,7 +356,7 @@ bool Controller::IsMultiLineEnabled() const
   return Layout::Engine::MULTI_LINE_BOX == mImpl->mLayoutEngine.GetLayout();
 }
 
-void Controller::SetHorizontalAlignment( Layout::HorizontalAlignment alignment )
+void Controller::SetHorizontalAlignment( Text::HorizontalAlignment::Type alignment )
 {
   if( alignment != mImpl->mModel->mHorizontalAlignment )
   {
@@ -370,12 +370,12 @@ void Controller::SetHorizontalAlignment( Layout::HorizontalAlignment alignment )
   }
 }
 
-Layout::HorizontalAlignment Controller::GetHorizontalAlignment() const
+Text::HorizontalAlignment::Type Controller::GetHorizontalAlignment() const
 {
   return mImpl->mModel->mHorizontalAlignment;
 }
 
-void Controller::SetVerticalAlignment( Layout::VerticalAlignment alignment )
+void Controller::SetVerticalAlignment( VerticalAlignment::Type alignment )
 {
   if( alignment != mImpl->mModel->mVerticalAlignment )
   {
@@ -388,12 +388,12 @@ void Controller::SetVerticalAlignment( Layout::VerticalAlignment alignment )
   }
 }
 
-Layout::VerticalAlignment Controller::GetVerticalAlignment() const
+VerticalAlignment::Type Controller::GetVerticalAlignment() const
 {
   return mImpl->mModel->mVerticalAlignment;
 }
 
-void Controller::SetLineWrapMode( Layout::LineWrap::Mode lineWrapMode )
+void Controller::SetLineWrapMode( Text::LineWrap::Mode lineWrapMode )
 {
   if( lineWrapMode != mImpl->mModel->mLineWrapMode )
   {
@@ -416,7 +416,7 @@ void Controller::SetLineWrapMode( Layout::LineWrap::Mode lineWrapMode )
   }
 }
 
-Layout::LineWrap::Mode Controller::GetLineWrapMode() const
+Text::LineWrap::Mode Controller::GetLineWrapMode() const
 {
   return mImpl->mModel->mLineWrapMode;
 }
@@ -1748,6 +1748,16 @@ bool Controller::IsShadowSetByString()
 void Controller::ShadowSetByString( bool setByString )
 {
   mImpl->mShadowSetByString = setByString;
+}
+
+bool Controller::IsOutlineSetByString()
+{
+  return mImpl->mOutlineSetByString;
+}
+
+void Controller::OutlineSetByString( bool setByString )
+{
+  mImpl->mOutlineSetByString = setByString;
 }
 
 bool Controller::IsFontStyleSetByString()
@@ -3450,17 +3460,17 @@ void Controller::CalculateVerticalOffset( const Size& controlSize )
 
   switch( mImpl->mModel->mVerticalAlignment )
   {
-    case Layout::VERTICAL_ALIGN_TOP:
+    case VerticalAlignment::TOP:
     {
       mImpl->mModel->mScrollPosition.y = 0.f;
       break;
     }
-    case Layout::VERTICAL_ALIGN_CENTER:
+    case VerticalAlignment::CENTER:
     {
       mImpl->mModel->mScrollPosition.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
       break;
     }
-    case Layout::VERTICAL_ALIGN_BOTTOM:
+    case VerticalAlignment::BOTTOM:
     {
       mImpl->mModel->mScrollPosition.y = controlSize.height - layoutSize.height;
       break;

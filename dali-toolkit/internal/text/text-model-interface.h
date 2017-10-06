@@ -22,7 +22,7 @@
 #include <dali/public-api/math/vector2.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/layouts/layout-alignment.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
@@ -74,14 +74,14 @@ public:
    *
    * @return The horizontal alignment.
    */
-  virtual Layout::HorizontalAlignment GetHorizontalAlignment() const = 0;
+  virtual HorizontalAlignment::Type GetHorizontalAlignment() const = 0;
 
   /**
    * @brief Retrieves the text's vertical alignment.
    *
    * @return The vertical alignment.
    */
-  virtual Layout::VerticalAlignment GetVerticalAlignment() const = 0;
+  virtual VerticalAlignment::Type GetVerticalAlignment() const = 0;
 
   /**
    * @brief Whether the text elide property is enabled.

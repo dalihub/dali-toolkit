@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <dali/public-api/object/property-map.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-effect.h>
 
 using namespace Dali;
@@ -337,7 +337,7 @@ Property::Map Dali::Toolkit::Internal::CreatePageTurnEffect()
   customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X ] = 20;
   customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y ] = 20;
 
-  map[ Toolkit::DevelVisual::Property::SHADER ] = customShader;
+  map[ Toolkit::Visual::Property::SHADER ] = customShader;
   return map;
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ Actor CreateColorActor( const Vector4& color )
 
   VisualFactory factory = VisualFactory::Get();
   Dali::Property::Map map;
-  map[ Visual::Property::TYPE ] = Visual::COLOR;
+  map[ Toolkit::Visual::Property::TYPE ] = Visual::COLOR;
   map[ ColorVisual::Property::MIX_COLOR ] = color;
   Visual::Base colorVisual = factory.CreateVisual( map );
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, colorVisual );

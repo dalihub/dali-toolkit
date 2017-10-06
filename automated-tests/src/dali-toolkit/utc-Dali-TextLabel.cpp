@@ -21,7 +21,6 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -208,9 +207,9 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_SHADOW ) == TextLabel::Property::SHADOW );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_EMBOSS ) == TextLabel::Property::EMBOSS );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextLabel::Property::OUTLINE );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextLabel::Property::PIXEL_SIZE );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == DevelTextLabel::Property::ELLIPSIS );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY ) == DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == TextLabel::Property::PIXEL_SIZE );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextLabel::Property::ELLIPSIS );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY ) == TextLabel::Property::AUTO_SCROLL_LOOP_DELAY );
 
   END_TEST;
 }
@@ -372,15 +371,15 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( SCROLL_LOOPS, label.GetProperty<int>( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT ), TEST_LOCATION );
   label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, SCROLL_GAP );
   DALI_TEST_EQUALS( SCROLL_GAP, label.GetProperty<float>( TextLabel::Property::AUTO_SCROLL_GAP ), TEST_LOCATION );
-  label.SetProperty(DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY, SCROLL_LOOP_DELAY );
-  DALI_TEST_EQUALS( SCROLL_LOOP_DELAY, label.GetProperty<float>( DevelTextLabel::Property::AUTO_SCROLL_LOOP_DELAY ), TEST_LOCATION );
+  label.SetProperty(TextLabel::Property::AUTO_SCROLL_LOOP_DELAY, SCROLL_LOOP_DELAY );
+  DALI_TEST_EQUALS( SCROLL_LOOP_DELAY, label.GetProperty<float>( TextLabel::Property::AUTO_SCROLL_LOOP_DELAY ), TEST_LOCATION );
 
   //Check autoscroll stop type property
-  label.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
-  DALI_TEST_EQUALS( STOP_IMMEDIATE, label.GetProperty<std::string>( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE ), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
+  DALI_TEST_EQUALS( STOP_IMMEDIATE, label.GetProperty<std::string>( TextLabel::Property::AUTO_SCROLL_STOP_MODE ), TEST_LOCATION );
 
-  label.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
-  DALI_TEST_EQUALS( STOP_FINISH_LOOP, label.GetProperty<std::string>( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE ), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::FINISH_LOOP );
+  DALI_TEST_EQUALS( STOP_FINISH_LOOP, label.GetProperty<std::string>( TextLabel::Property::AUTO_SCROLL_STOP_MODE ), TEST_LOCATION );
 
 
   // Check the line spacing property
@@ -446,6 +445,13 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::EMBOSS ), std::string("Emboss properties"), TEST_LOCATION );
 
   // Check the outline property
+
+  // Test string type first
+  // This is purely to maintain backward compatibility, but we don't support string as the outline property type.
+  label.SetProperty( TextLabel::Property::OUTLINE, "Outline properties" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+
+  // Then test the property map type
   Property::Map outlineMapSet;
   Property::Map outlineMapGet;
 
@@ -460,13 +466,13 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
 
   // Check the pixel size of font
-  label.SetProperty( DevelTextLabel::Property::PIXEL_SIZE, 20.f );
-  DALI_TEST_EQUALS( label.GetProperty<float>( DevelTextLabel::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::PIXEL_SIZE, 20.f );
+  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the ellipsis property
-  DALI_TEST_CHECK( !label.GetProperty<bool>( DevelTextLabel::Property::ELLIPSIS ) );
-  label.SetProperty( DevelTextLabel::Property::ELLIPSIS, true );
-  DALI_TEST_CHECK( label.GetProperty<bool>( DevelTextLabel::Property::ELLIPSIS ) );
+  DALI_TEST_CHECK( !label.GetProperty<bool>( TextLabel::Property::ELLIPSIS ) );
+  label.SetProperty( TextLabel::Property::ELLIPSIS, true );
+  DALI_TEST_CHECK( label.GetProperty<bool>( TextLabel::Property::ELLIPSIS ) );
 
   END_TEST;
 }
@@ -598,7 +604,7 @@ int UtcDaliToolkitTextlabelScrollingP(void)
   labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
   labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
   labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
-  labelImmediate.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+  labelImmediate.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
 
   Stage::GetCurrent().Add( labelFinished );
   // Turn on all the effects
@@ -606,7 +612,7 @@ int UtcDaliToolkitTextlabelScrollingP(void)
   labelFinished.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
   labelFinished.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
   labelFinished.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
-  labelFinished.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+  labelFinished.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::FINISH_LOOP );
 
 
 
@@ -649,7 +655,7 @@ int UtcDaliToolkitTextlabelScrollingCenterAlignP(void)
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
-  labelShort.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
 
   Stage::GetCurrent().Add( labelLong );
   // Turn on all the effects
@@ -658,7 +664,7 @@ int UtcDaliToolkitTextlabelScrollingCenterAlignP(void)
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
-  labelLong.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::FINISH_LOOP );
 
   try
   {
@@ -699,7 +705,7 @@ int UtcDaliToolkitTextlabelScrollingCenterAlignRTLP(void)
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
-  labelShort.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
 
   Stage::GetCurrent().Add( labelLong );
   // Turn on all the effects
@@ -708,7 +714,7 @@ int UtcDaliToolkitTextlabelScrollingCenterAlignRTLP(void)
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
-  labelLong.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::FINISH_LOOP );
 
   try
   {
@@ -749,7 +755,7 @@ int UtcDaliToolkitTextlabelScrollingEndAlignP(void)
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
-  labelShort.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
 
   Stage::GetCurrent().Add( labelLong );
   // Turn on all the effects
@@ -758,7 +764,7 @@ int UtcDaliToolkitTextlabelScrollingEndAlignP(void)
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
-  labelLong.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::FINISH_LOOP );
 
   try
   {
@@ -799,7 +805,7 @@ int UtcDaliToolkitTextlabelScrollingEndAlignRTLP(void)
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
   labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
-  labelShort.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::IMMEDIATE );
+  labelShort.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
 
   Stage::GetCurrent().Add( labelLong );
   // Turn on all the effects
@@ -808,7 +814,7 @@ int UtcDaliToolkitTextlabelScrollingEndAlignRTLP(void)
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
   labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
-  labelLong.SetProperty( DevelTextLabel::Property::AUTO_SCROLL_STOP_MODE, DevelTextLabel::AutoScrollStopMode::FINISH_LOOP );
+  labelLong.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::FINISH_LOOP );
 
   try
   {
@@ -948,7 +954,7 @@ int UtcDaliToolkitTextlabelEllipsis(void)
   END_TEST;
 }
 
-int UtcDaliToolkitTextlabelTextWarpMode(void)
+int UtcDaliToolkitTextlabelTextWrapMode(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitTextlabelTextWarpMode");
@@ -965,24 +971,42 @@ int UtcDaliToolkitTextlabelTextWarpMode(void)
   //label.SetProperty( TextLabel::Property::POINT_SIZE, 18 );
   Stage::GetCurrent().Add( label );
 
-  label.SetProperty( DevelTextLabel::Property::LINE_WRAP_MODE, "WRAP_MODE_WORD" );
+  label.SetProperty( TextLabel::Property::LINE_WRAP_MODE, "WORD" );
+  DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::WORD ), TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
 
-  lineCount =  label.GetProperty<int>( DevelTextLabel::Property::LINE_COUNT );
+  lineCount =  label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 4, TEST_LOCATION );
 
-
-
-  label.SetProperty( DevelTextLabel::Property::LINE_WRAP_MODE, "WRAP_MODE_CHARACTER" );
+  label.SetProperty( TextLabel::Property::LINE_WRAP_MODE, "CHARACTER" );
+  DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::CHARACTER ), TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
 
+  label.SetProperty( TextLabel::Property::LINE_WRAP_MODE, Text::LineWrap::WORD );
+  DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::WORD ), TEST_LOCATION );
 
-  lineCount =  label.GetProperty<int>( DevelTextLabel::Property::LINE_COUNT );
+  application.SendNotification();
+  application.Render();
+
+  lineCount =  label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 4, TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::LINE_WRAP_MODE, Text::LineWrap::CHARACTER );
+  DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::CHARACTER ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount =  label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
+
+  tet_infoline( "Ensure invalid string does not change wrapping mode" );
+  label.SetProperty( TextLabel::Property::LINE_WRAP_MODE, "InvalidWrapMode" );
+  DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::CHARACTER ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -992,28 +1016,28 @@ int UtcDaliToolkitTextLabelColorComponents(void)
   ToolkitTestApplication application;
 
   TextLabel label = TextLabel::New();
-  label.SetProperty( DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE, Color::RED );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_RED ),   1.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_GREEN ), 0.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_BLUE ),  0.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_ALPHA ), 1.0f, TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::RED );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_RED ),   1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_GREEN ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_BLUE ),  0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_ALPHA ), 1.0f, TEST_LOCATION );
 
-  label.SetProperty( DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE, Color::GREEN );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_RED ),   0.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_GREEN ), 1.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_BLUE ),  0.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_ALPHA ), 1.0f, TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::GREEN );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_RED ),   0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_GREEN ), 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_BLUE ),  0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_ALPHA ), 1.0f, TEST_LOCATION );
 
-  label.SetProperty( DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE, Color::BLUE );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_RED ),   0.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_GREEN ), 0.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_BLUE ),  1.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_ALPHA ), 1.0f, TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::BLUE );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_RED ),   0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_GREEN ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_BLUE ),  1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_ALPHA ), 1.0f, TEST_LOCATION );
 
-  label.SetProperty( DevelTextLabel::Property::TEXT_COLOR_ALPHA, 0.6f );
-  DALI_TEST_EQUALS( label.GetProperty< float >( DevelTextLabel::Property::TEXT_COLOR_ALPHA ), 0.6f, TEST_LOCATION );
-  DALI_TEST_EQUALS( label.GetProperty< Vector4 >( DevelTextLabel::Property::TEXT_COLOR_ANIMATABLE ), Vector4( 0.0f, 0.0f, 1.0f, 0.6f ), TEST_LOCATION );
+  label.SetProperty( TextLabel::Property::TEXT_COLOR_ALPHA, 0.6f );
+  DALI_TEST_EQUALS( label.GetProperty< float >( TextLabel::Property::TEXT_COLOR_ALPHA ), 0.6f, TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty< Vector4 >( TextLabel::Property::TEXT_COLOR ), Vector4( 0.0f, 0.0f, 1.0f, 0.6f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetProperty< Vector4 >( TextLabel::Property::UNUSED_PROPERTY_TEXT_COLOR ), Vector4( 0.0f, 0.0f, 1.0f, 0.6f ), TEST_LOCATION );
 
   END_TEST;
 }

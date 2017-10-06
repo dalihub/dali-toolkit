@@ -74,7 +74,10 @@ public:
   enum PropertyRange
   {
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1, ///< @SINCE_1_0.0
-    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000              ///< Reserve property indices @SINCE_1_0.0
+    PROPERTY_END_INDEX =   PROPERTY_START_INDEX + 1000,             ///< Reserve property indices @SINCE_1_0.0
+
+    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX, ///< @SINCE_1_2.60
+    ANIMATABLE_PROPERTY_END_INDEX =   ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1000 ///< Reserve animatable property indices @SINCE_1_2.60
   };
 
   /**
@@ -89,177 +92,303 @@ public:
      */
     enum
     {
+      ///////////////////////////////////////////////////////////////////////////////
+      // Event side (non-animatable) properties
+      ///////////////////////////////////////////////////////////////////////////////
+
       /**
-       * DEPRECATED_1_2.53 No longer be supported and will be ignored.
+       * @DEPRECATED_1_2.53 No longer be supported and will be ignored.
        * @brief The type of rendering e.g. bitmap-based.
-       * @details name "renderingBackend", type INT, default RENDERING_SHARED_ATLAS.
+       * @details Name "renderingBackend", type Property::INT.
        * @SINCE_1_0.0
        */
       RENDERING_BACKEND = PROPERTY_START_INDEX,
 
       /**
        * @brief The text to display in UTF-8 format.
-       * @details name "text", type STRING.
+       * @details Name "text", type Property::STRING.
        * @SINCE_1_0.0
        */
       TEXT,
 
       /**
        * @brief The requested font family to use.
-       * @details name "fontFamily", type STRING.
+       * @details Name "fontFamily", type Property::STRING.
        * @SINCE_1_0.0
        */
       FONT_FAMILY,
 
       /**
        * @brief The requested font style to use.
-       * @details name "fontStyle", type STRING or MAP.
+       * @details Name "fontStyle", type Property::STRING or Property::MAP.
        * @SINCE_1_2.13
        */
       FONT_STYLE,
 
       /**
        * @brief The size of font in points.
-       *
-       * Conversion from Pixel size to Point size :
-       *  Point size = Pixel size * 72 / DPI
-       * @details name "pointSize", type FLOAT.
+       * @details Name "pointSize", type Property::FLOAT.
+       *          Conversion from Pixel size to Point size:
+       *           Point size = Pixel size * 72 / DPI
        * @SINCE_1_0.0
        */
       POINT_SIZE,
 
       /**
        * @brief The single-line or multi-line layout option.
-       * @details name "multiLine", type BOOLEAN, default false.
+       * @details Name "multiLine", type Property::BOOLEAN.
        * @SINCE_1_0.0
+       * @note Default is false.
        */
       MULTI_LINE,
 
       /**
        * @brief The line horizontal alignment.
-       * @details name "horizontalAlignment", type STRING, values "BEGIN", "CENTER", "END", default BEGIN.
+       * @details Name "horizontalAlignment", type Property::STRING or type HorizontalAlignment::Type (Property::INTEGER)
+       *          Values "BEGIN", "CENTER", "END", default BEGIN.
+       * @note Return type is Property::STRING
        * @SINCE_1_0.0
        */
       HORIZONTAL_ALIGNMENT,
 
       /**
        * @brief The line vertical alignment.
-       * @details name "verticalAlignment", type STRING,  values "TOP",   "CENTER", "BOTTOM" @SINCE_1_0.0, default TOP.
+       * @details Name "verticalAlignment", type Property::STRING or type VerticalAlignment::Type (Property::INTEGER).
+       *          Values "TOP",   "CENTER", "BOTTOM" @SINCE_1_0.0, default TOP.
+       * @note Return type is Property::STRING
        * @SINCE_1_0.0
        */
       VERTICAL_ALIGNMENT,
 
       /**
+       * @DEPRECATED_1_2.60 Use the new enum value of TEXT_COLOR instead.
        * @brief The color of the text.
-       * @details name "textColor", type VECTOR4.
+       * @details Name "unusedPropertyTextColor", type Property::VECTOR4.
        * @SINCE_1_0.0
        */
-      TEXT_COLOR,
+      UNUSED_PROPERTY_TEXT_COLOR,
 
       /**
        * @DEPRECATED_1_1.37 Use SHADOW instead
        * @brief The drop shadow offset 0 indicates no shadow.
-       * @details name "shadowOffset", type VECTOR2.
+       * @details Name "shadowOffset", type Property::VECTOR2.
        */
       SHADOW_OFFSET,
 
       /**
        * @DEPRECATED_1_1.37 Use SHADOW instead
        * @brief The color of a drop shadow.
-       * @details name "shadowColor", type VECTOR4
+       * @details Name "shadowColor", type Property::VECTOR4
        */
       SHADOW_COLOR,
 
       /**
        * @DEPRECATED_1_1.37 Use UNDERLINE instead
        * @brief The underline enabled flag.
-       * @details name "underlineEnabled", type BOOLEAN.
+       * @details Name "underlineEnabled", type Property::BOOLEAN.
        */
       UNDERLINE_ENABLED,
 
       /**
        * @DEPRECATED_1_1.37 Use UNDERLINE instead
        * @brief The color of the underline.
-       * @details name "underlineColor", type VECTOR4.
+       * @details Name "underlineColor", type Property::VECTOR4.
        */
       UNDERLINE_COLOR,
 
       /**
        * @DEPRECATED_1_1.37 Use UNDERLINE instead
        * @brief Overrides the underline height from font metrics.
-       * @details name "underlineHeight", type FLOAT.
+       * @details Name "underlineHeight", type Property::FLOAT.
        */
       UNDERLINE_HEIGHT,
 
       /**
        * @brief Whether the mark-up processing is enabled.
-       * @details name "enableMarkup", type BOOLEAN.
+       * @details Name "enableMarkup", type Property::BOOLEAN.
        * @SINCE_1_0.0
+       * @note Default is false.
        */
       ENABLE_MARKUP,
 
       /**
        * @brief Starts or stops auto scrolling.
-       * @details name "enableAutoScroll", type BOOLEAN, default is false.
+       * @details Name "enableAutoScroll", type Property::BOOLEAN.
        * @SINCE_1_1.35
+       * @note Default is false.
        */
       ENABLE_AUTO_SCROLL,
 
       /**
        * @brief Sets the speed of scrolling in pixels per second.
-       * @details name "autoScrollSpeed", type INT, default in style sheet.
+       * @details Name "autoScrollSpeed", type Property::INT.
        * @SINCE_1_1.35
+       * @note Default in style sheet.
        */
       AUTO_SCROLL_SPEED,
 
       /**
        * @brief Number of complete loops when scrolling enabled.
-       * @details name "autoScrollLoopCount", type INT, default in style sheet.
+       * @details Name "autoScrollLoopCount", type Property::INT.
        * @SINCE_1_1.35
+       * @note Default in style sheet.
        */
       AUTO_SCROLL_LOOP_COUNT,
 
       /**
        * @brief Gap before scrolling wraps.
-       * @details name "autoScrollGap", type INT, default in style sheet but can be overridden to prevent same text being shown at start and end.
+       * @details Name "autoScrollGap", type Property::INT.
        * @SINCE_1_1.35
+       * @note Default in style sheet but can be overridden to prevent same text being shown at start and end.
        */
       AUTO_SCROLL_GAP,
 
       /**
        * @brief The default extra space between lines in points.
-       * @details name "lineSpacing", type FLOAT.
+       * @details Name "lineSpacing", type Property::FLOAT.
        * @SINCE_1_1.37
        */
       LINE_SPACING,
 
       /**
        * @brief The default underline parameters.
-       * @details name "underline", type MAP.
+       * @details Name "underline", type Property::MAP.
        * @SINCE_1_2.13
        */
       UNDERLINE,
 
       /**
        * @brief The default shadow parameters.
-       * @details name "shadow", type MAP.
+       * @details Name "shadow", type Property::MAP.
        * @SINCE_1_2.13
        */
       SHADOW,
 
       /**
        * @brief The default emboss parameters.
-       * @details name "emboss", type MAP.
+       * @details Name "emboss", type Property::MAP.
        * @SINCE_1_2.13
        */
       EMBOSS,
 
       /**
        * @brief The default outline parameters.
-       * @details name "outline", type MAP.
+       * @details Name "outline", type Property::MAP.
        * @SINCE_1_2.13
        */
       OUTLINE,
+
+      /**
+       * @brief The size of font in pixels.
+       * @details Name "pixelSize", type Property::FLOAT.
+       *          Conversion from Point size to Pixel size:
+       *            Pixel size = Point size * DPI / 72
+       * @SINCE_1_2.60
+       */
+      PIXEL_SIZE,
+
+      /**
+       * @brief Whether we should show the ellipsis if required.
+       * @details Name "ellipsis", type Property::BOOLEAN.
+       * @SINCE_1_2.60
+       */
+      ELLIPSIS,
+
+      /**
+       * @brief The amount of time to delay the starting time of auto scrolling and further loops.
+       * @details Name "autoScrollLoopDelay", type Property::FLOAT.
+       * @SINCE_1_2.60
+       */
+      AUTO_SCROLL_LOOP_DELAY,
+
+      /**
+       * @brief The auto scrolling stop behaviour.
+       * @details Name "autoScrollStopMode", type AutoScrollStopMode::Type (Property::INTEGER) or Property::STRING.
+       * @SINCE_1_2.60
+       * @note Default is AutoScrollStopMode::FINISH_LOOP.
+       * @see AutoScrollStopMode::Type
+       */
+      AUTO_SCROLL_STOP_MODE,
+
+      /*
+       * @brief The line count of text.
+       * @details name "lineCount", type Property::INTEGER.
+       * @SINCE_1_2.60
+       * @note This property is read-only.
+       */
+      LINE_COUNT,
+
+      /**
+       * @brief Line wrap mode when text lines are greater than the layout width.
+       * @details Name "lineWrapMode", type Text::LineWrap::Mode (Text::Property::INTEGER) or Property::STRING.
+       * @SINCE_1_2.60
+       * @note Default is Text::LineWrap::WORD.
+       * @note Return type is Text::LineWrap::Mode (Text::Property::INTEGER).
+       * @see Text::LineWrap
+       */
+      LINE_WRAP_MODE,
+
+      ///////////////////////////////////////////////////////////////////////////////
+      // Animatable Properties
+      ///////////////////////////////////////////////////////////////////////////////
+
+      /**
+       * @brief The color of the text.
+       * @details Name "textColor", type Property::VECTOR4.
+       * @SINCE_1_2.60
+       */
+      TEXT_COLOR = ANIMATABLE_PROPERTY_START_INDEX,
+
+      /**
+       * @brief The red component of the text color.
+       * @details Name "textColorRed", type Property::FLOAT.
+       * @SINCE_1_2.60
+       * @see TEXT_COLOR
+       */
+      TEXT_COLOR_RED,
+
+      /**
+       * @brief The green component of the text color.
+       * @details Name "textColorGreen", type Property::FLOAT.
+       * @SINCE_1_2.60
+       * @see TEXT_COLOR
+       */
+      TEXT_COLOR_GREEN,
+
+      /**
+       * @brief The blue component of the text color.
+       * @details Name "textColorBlue", type Property::FLOAT.
+       * @SINCE_1_2.60
+       * @see TEXT_COLOR
+       */
+      TEXT_COLOR_BLUE,
+
+      /**
+       * @brief The alpha component of the text color.
+       * @details Name "textColorAlpha", type Property::FLOAT.
+       * @SINCE_1_2.60
+       * @see TEXT_COLOR
+       */
+      TEXT_COLOR_ALPHA,
+    };
+  };
+
+  /**
+   * @brief The enumerations used for auto scroll stop mode.
+   * @SINCE_1_2.60
+   * @see Property::AUTO_SCROLL_STOP_MODE.
+   */
+  struct AutoScrollStopMode
+  {
+    /**
+     * @brief The enumerations used for auto scroll stop mode.
+     * @SINCE_1_2.60
+     * @see Property::AUTO_SCROLL_STOP_MODE.
+     */
+    enum Type
+    {
+      FINISH_LOOP = 0,  ///< Stop animation after current loop finishes. @SINCE_1_2.60
+      IMMEDIATE         ///< Stop animation immediately and reset position. @SINCE_1_2.60
     };
   };
 

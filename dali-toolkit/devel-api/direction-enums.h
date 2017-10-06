@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_TEXT_LAYOUT_WRAPMODE_H
-#define DALI_TOOLKIT_TEXT_LAYOUT_WRAPMODE_H
+#ifndef __DALI_TOOLKIT_DEVEL_API_ALIGN_ENUMS_H__
+#define __DALI_TOOLKIT_DEVEL_API_ALIGN_ENUMS_H__
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -18,51 +18,24 @@
  *
  */
 
+
 namespace Dali
 {
 
 namespace Toolkit
 {
 
-namespace Text
+namespace Direction
 {
-
-namespace Layout
-{
-
-/**
- * @brief Unit of wrapping for moving to next line
- *
- * If layout width too short to show full text,
- * WRAP_MODE_WORD mode will move word to next line,
- * +---------+
- * |HELLO    |
- * |WORLLD   |
- * +---------+
- *
- * but WRAP_MODE_CHARACTER mode will move character by character to next line
- * +---------+
- * |HELLO WOR|
- * |LD       |
- * +---------+
- */
-
-namespace LineWrap {
-
-enum Mode
-{
-  WORD,
-  CHARACTER
-};
-
-} // namespace LineWrap
-
-} // namespace Layout
-
-} // namespace Text
+  enum Type
+  {
+    LEFT_TO_RIGHT = 0,
+    RIGHT_TO_LEFT
+  };
+}
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_TEXT_LAYOUT_WRAPMODE_H
+#endif // __DALI_TOOLKIT_DEVEL_API_ALIGN_ENUMS_H__

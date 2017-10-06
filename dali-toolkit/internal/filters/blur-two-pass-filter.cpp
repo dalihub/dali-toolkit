@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 #include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -172,13 +172,13 @@ void BlurTwoPassFilter::Enable()
   Property::Map customShader;
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentSource.str();
   Property::Map visualMap;
-  visualMap.Insert( Toolkit::DevelVisual::Property::SHADER, customShader );
+  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
   mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
   mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
   // Set up blend-two-image custom shader
   customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = BLEND_TWO_IMAGES_FRAGMENT_SOURCE;
-  visualMap[ Toolkit::DevelVisual::Property::SHADER ] = customShader;
+  visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
   mActorForBlending.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
   mRootActor.Add( mActorForInput );

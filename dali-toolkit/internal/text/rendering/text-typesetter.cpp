@@ -281,17 +281,17 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
 
   switch( mModel->GetVerticalAlignment() )
   {
-    case Layout::VERTICAL_ALIGN_TOP:
+    case VerticalAlignment::TOP:
     {
       // No offset to add.
       break;
     }
-    case Layout::VERTICAL_ALIGN_CENTER:
+    case VerticalAlignment::CENTER:
     {
       penY = static_cast<int>( 0.5f * ( size.height - layoutSize.height ) );
       break;
     }
-    case Layout::VERTICAL_ALIGN_BOTTOM:
+    case VerticalAlignment::BOTTOM:
     {
       penY = static_cast<int>( size.height - layoutSize.height );
       break;

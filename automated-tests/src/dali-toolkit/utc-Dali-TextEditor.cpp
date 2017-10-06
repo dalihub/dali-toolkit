@@ -196,8 +196,8 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                    unsigned long timeStamp,
                                    const Integration::KeyEvent::State& keyState,
                                    const std::string& deviceName = DEFAULT_DEVICE_NAME,
-                                   const DevelDevice::Class::Type& deviceClass = DevelDevice::Class::NONE,
-                                   const DevelDevice::Subclass::Type& deviceSubclass = DevelDevice::Subclass::NONE )
+                                   const Device::Class::Type& deviceClass = Device::Class::NONE,
+                                   const Device::Subclass::Type& deviceSubclass = Device::Subclass::NONE )
 {
   return Integration::KeyEvent( keyName,
                                 keyString,
@@ -310,13 +310,13 @@ public:
   {
   }
 
-  void Callback( TextEditor editor, DevelTextEditor::Scroll::Type type )
+  void Callback( TextEditor editor, TextEditor::Scroll::Type type )
   {
-    if( type == DevelTextEditor::Scroll::STARTED )
+    if( type == TextEditor::Scroll::STARTED )
     {
       mStartedCalled = true;
     }
-    else if( type == DevelTextEditor::Scroll::FINISHED )
+    else if( type == TextEditor::Scroll::FINISHED )
     {
       mFinishedCalled = true;
     }
@@ -459,17 +459,17 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_EMBOSS ) == TextEditor::Property::INPUT_EMBOSS );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextEditor::Property::OUTLINE );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_INPUT_OUTLINE ) == TextEditor::Property::INPUT_OUTLINE );
-  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SMOOTH_SCROLL ) == DevelTextEditor::Property::SMOOTH_SCROLL );
-  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SMOOTH_SCROLL_DURATION ) == DevelTextEditor::Property::SMOOTH_SCROLL_DURATION );
-  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SCROLL_BAR ) == DevelTextEditor::Property::ENABLE_SCROLL_BAR );
-  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_SHOW_DURATION ) == DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION );
-  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_FADE_DURATION ) == DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION );
-  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == DevelTextEditor::Property::PIXEL_SIZE );
-  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_LINE_COUNT) == DevelTextEditor::Property::LINE_COUNT );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SMOOTH_SCROLL ) == TextEditor::Property::SMOOTH_SCROLL );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SMOOTH_SCROLL_DURATION ) == TextEditor::Property::SMOOTH_SCROLL_DURATION );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SCROLL_BAR ) == TextEditor::Property::ENABLE_SCROLL_BAR );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_SHOW_DURATION ) == TextEditor::Property::SCROLL_BAR_SHOW_DURATION );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_SCROLL_BAR_FADE_DURATION ) == TextEditor::Property::SCROLL_BAR_FADE_DURATION );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == TextEditor::Property::PIXEL_SIZE );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_LINE_COUNT) == TextEditor::Property::LINE_COUNT );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == TextEditor::Property::ENABLE_SELECTION );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == TextEditor::Property::PLACEHOLDER );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == DevelTextEditor::Property::PLACEHOLDER_TEXT );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR );
-  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == DevelTextEditor::Property::ENABLE_SELECTION );
-  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == DevelTextEditor::Property::PLACEHOLDER );
 
   END_TEST;
 }
@@ -732,6 +732,13 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_EMBOSS ), std::string("Emboss input properties"), TEST_LOCATION );
 
   // Check the outline property
+
+  // Test string type first
+  // This is purely to maintain backward compatibility, but we don't support string as the outline property type.
+  editor.SetProperty( TextEditor::Property::OUTLINE, "Outline properties" );
+  DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::OUTLINE ), std::string("Outline properties"), TEST_LOCATION );
+
+  // Then test the property map type
   Property::Map outlineMapSet;
   Property::Map outlineMapGet;
 
@@ -751,27 +758,27 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::INPUT_OUTLINE ), std::string("Outline input properties"), TEST_LOCATION );
 
   // Check the smooth scroll property
-  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::SMOOTH_SCROLL ), false, TEST_LOCATION );
-  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL, true );
-  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::SMOOTH_SCROLL ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( TextEditor::Property::SMOOTH_SCROLL ), false, TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::SMOOTH_SCROLL, true );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( TextEditor::Property::SMOOTH_SCROLL ), true, TEST_LOCATION );
 
   // Check the smooth scroll duration property
-  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION, 0.2f );
-  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::SMOOTH_SCROLL_DURATION, 0.2f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::SMOOTH_SCROLL_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the scroll bar property
-  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SCROLL_BAR ), false, TEST_LOCATION );
-  editor.SetProperty( DevelTextEditor::Property::ENABLE_SCROLL_BAR, true );
-  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SCROLL_BAR ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( TextEditor::Property::ENABLE_SCROLL_BAR ), false, TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::ENABLE_SCROLL_BAR, true );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( TextEditor::Property::ENABLE_SCROLL_BAR ), true, TEST_LOCATION );
 
-  editor.SetProperty( DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION, 0.3f );
-  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION ), 0.3f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  editor.SetProperty( DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION, 0.2f );
-  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::SCROLL_BAR_SHOW_DURATION, 0.3f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::SCROLL_BAR_SHOW_DURATION ), 0.3f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::SCROLL_BAR_FADE_DURATION, 0.2f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::SCROLL_BAR_FADE_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the pixel size of font
-  editor.SetProperty( DevelTextEditor::Property::PIXEL_SIZE, 20.f );
-  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::PIXEL_SIZE, 20.f );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check placeholder text properties.
   editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER_TEXT, "Setting Placeholder Text" );
@@ -782,8 +789,8 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS( editor.GetProperty<Vector4>( DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR ), Color::RED, TEST_LOCATION );
 
   // Check the enable selection property
-  editor.SetProperty( DevelTextEditor::Property::ENABLE_SELECTION, false );
-  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SELECTION ), false, TEST_LOCATION );
+  editor.SetProperty( TextEditor::Property::ENABLE_SELECTION, false );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( TextEditor::Property::ENABLE_SELECTION ), false, TEST_LOCATION );
 
   // Check the placeholder property with pixel size
   Property::Map placeholderPixelSizeMapSet;
@@ -797,9 +804,9 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   placeholderFontstyleMap.Insert( "weight", "bold" );
   placeholderPixelSizeMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
-  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, placeholderPixelSizeMapSet );
+  editor.SetProperty( TextEditor::Property::PLACEHOLDER, placeholderPixelSizeMapSet );
 
-  placeholderPixelSizeMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::PLACEHOLDER );
+  placeholderPixelSizeMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderPixelSizeMapGet.Count(), placeholderPixelSizeMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderPixelSizeMapGet, placeholderPixelSizeMapSet ), true, TEST_LOCATION );
 
@@ -819,9 +826,9 @@ int UtcDaliTextEditorSetPropertyP(void)
   placeholderFontstyleMap.Insert( "width", "condensed" );
   placeholderFontstyleMap.Insert( "slant", "italic" );
   placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
-  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, placeholderMapSet );
+  editor.SetProperty( TextEditor::Property::PLACEHOLDER, placeholderMapSet );
 
-  placeholderMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::PLACEHOLDER );
+  placeholderMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
 
@@ -830,24 +837,24 @@ int UtcDaliTextEditorSetPropertyP(void)
   placeholderFontstyleMap.Insert( "weight", "normal" );
   placeholderFontstyleMap.Insert( "slant", "oblique" );
   placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
-  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, placeholderMapSet );
+  editor.SetProperty( TextEditor::Property::PLACEHOLDER, placeholderMapSet );
 
-  placeholderMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::PLACEHOLDER );
+  placeholderMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
 
   placeholderFontstyleMap.Clear();
   placeholderFontstyleMap.Insert( "slant", "roman" );
   placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
-  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, placeholderMapSet );
+  editor.SetProperty( TextEditor::Property::PLACEHOLDER, placeholderMapSet );
 
-  placeholderMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::PLACEHOLDER );
+  placeholderMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::PLACEHOLDER );
 
   placeholderFontstyleMap.Clear();
   placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
 
-  editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, placeholderMapSet );
-  placeholderMapGet = editor.GetProperty<Property::Map>( DevelTextEditor::Property::PLACEHOLDER );
+  editor.SetProperty( TextEditor::Property::PLACEHOLDER, placeholderMapSet );
+  placeholderMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
 
@@ -910,7 +917,7 @@ int utcDaliTextEditorTextChangedP(void)
   editor.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
-  application.ProcessEvent( GenerateKey( "D", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "D", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   END_TEST;
@@ -1230,7 +1237,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   gInputStyleMask = TextEditor::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1255,7 +1262,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   gInputStyleMask = TextEditor::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1271,7 +1278,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   gInputStyleMask = TextEditor::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1312,7 +1319,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   editor.SetProperty( TextEditor::Property::INPUT_EMBOSS, "emboss" );
   editor.SetProperty( TextEditor::Property::INPUT_OUTLINE, "outline" );
 
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1420,7 +1427,7 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // Add a key event but as the text editor has not the focus it should do nothing.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1437,8 +1444,8 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // Now the text editor has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1469,8 +1476,8 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // The second text editor has the focus. It should handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1526,8 +1533,8 @@ int utcDaliTextEditorEvent02(void)
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   // Now the text editor has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1551,8 +1558,8 @@ int utcDaliTextEditorEvent02(void)
   // Move the cursor and check the position changes.
   Vector3 position1 = cursor.GetCurrentPosition();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1562,8 +1569,8 @@ int utcDaliTextEditorEvent02(void)
 
   DALI_TEST_CHECK( position2.x < position1.x );
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1601,8 +1608,8 @@ int utcDaliTextEditorEvent02(void)
   DALI_TEST_CHECK( position5.x > position4.x );
 
   // Remove all the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   editor.SetProperty( TextEditor::Property::TEXT, "" );
 
   // Render and notify
@@ -1743,8 +1750,8 @@ int utcDaliTextEditorEvent04(void)
   application.Render();
 
   // Move at the end of the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1752,8 +1759,8 @@ int utcDaliTextEditorEvent04(void)
 
   for( unsigned int index = 0u; index < 10u; ++index )
   {
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
     // Render and notify
     application.SendNotification();
@@ -1761,7 +1768,7 @@ int utcDaliTextEditorEvent04(void)
   }
 
   // Add a character
-  application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1770,8 +1777,8 @@ int utcDaliTextEditorEvent04(void)
   DALI_TEST_EQUALS( "Hello\nworld", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   // Add some key events
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1779,8 +1786,8 @@ int utcDaliTextEditorEvent04(void)
 
   for( unsigned int index = 0u; index < 10u; ++index )
   {
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
     // Render and notify
     application.SendNotification();
@@ -1788,7 +1795,7 @@ int utcDaliTextEditorEvent04(void)
   }
 
   // Add a character
-  application.ProcessEvent( GenerateKey( " ", " ", KEY_WHITE_SPACE_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( " ", " ", KEY_WHITE_SPACE_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1816,11 +1823,11 @@ int utcDaliTextEditorEvent05(void)
   editor.SetSize( 50.f, 50.f );
   editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
   editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL, true );
-  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION, 0.2f );
-  editor.SetProperty( DevelTextEditor::Property::ENABLE_SCROLL_BAR, true );
-  editor.SetProperty( DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION, 0.3f );
-  editor.SetProperty( DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION, 0.2f );
+  editor.SetProperty( TextEditor::Property::SMOOTH_SCROLL, true );
+  editor.SetProperty( TextEditor::Property::SMOOTH_SCROLL_DURATION, 0.2f );
+  editor.SetProperty( TextEditor::Property::ENABLE_SCROLL_BAR, true );
+  editor.SetProperty( TextEditor::Property::SCROLL_BAR_SHOW_DURATION, 0.3f );
+  editor.SetProperty( TextEditor::Property::SCROLL_BAR_FADE_DURATION, 0.2f );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1838,8 +1845,8 @@ int utcDaliTextEditorEvent05(void)
   application.Render();
 
   // Move at the end of the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1848,32 +1855,32 @@ int utcDaliTextEditorEvent05(void)
   for( unsigned int index = 0u; index < 10u; ++index )
   {
     // Add a character
-    application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
     // Render and notify
     application.SendNotification();
     application.Render();
   }
   // Modify duration after scroll is enabled
-  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION, 0.1f );
+  editor.SetProperty( TextEditor::Property::SMOOTH_SCROLL_DURATION, 0.1f );
 
   // Continuous scroll left to increase coverage
   for( unsigned int index = 0u; index < 10u; ++index )
   {
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
     // Render and notify
     application.SendNotification();
     application.Render();
   }
-  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SMOOTH_SCROLL_DURATION ), 0.1f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::SMOOTH_SCROLL ), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SCROLL_BAR ), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION ), 0.3f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( editor.GetProperty<float>( DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::SMOOTH_SCROLL_DURATION ), 0.1f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( TextEditor::Property::SMOOTH_SCROLL ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( TextEditor::Property::ENABLE_SCROLL_BAR ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::SCROLL_BAR_SHOW_DURATION ), 0.3f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::SCROLL_BAR_FADE_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Press Escape to increase coverage
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
@@ -1916,7 +1923,7 @@ int utcDaliTextEditorEvent06(void)
   application.Render();
 
   // Move to seconds line of the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1926,12 +1933,12 @@ int utcDaliTextEditorEvent06(void)
 
 
   // Add  another script characters ( glyph height is defferent )
-  application.ProcessEvent( GenerateKey( "d", "ㅁ", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "d", "ኢ", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "ㅁ", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "ኢ", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Delete characters
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   DALI_TEST_EQUALS( layoutHeight, editor.GetHeightForWidth( 100.f ), TEST_LOCATION );
 
@@ -1942,19 +1949,19 @@ int utcDaliTextEditorEvent06(void)
   DALI_TEST_EQUALS( "Hello\nworld\nHello world", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   // For coverage
-  application.ProcessEvent( GenerateKey( "", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_VOLUME_UP, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_VOLUME_UP, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_VOLUME_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelDevice::Class::NONE, DevelDevice::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_VOLUME_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
@@ -1974,7 +1981,7 @@ int utcDaliTextEditorHandles(void)
   editor.SetProperty( TextEditor::Property::TEXT, "This is a long text for the size of the text-editor." );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   editor.SetProperty( TextEditor::Property::GRAB_HANDLE_IMAGE, HANDLE_IMAGE_FILE_NAME );
-  editor.SetProperty( DevelTextEditor::Property::SMOOTH_SCROLL, true );
+  editor.SetProperty( TextEditor::Property::SMOOTH_SCROLL, true );
 
   editor.SetSize( 30.f, 500.f );
   editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
@@ -2158,11 +2165,11 @@ int utcDaliTextEditorGetPropertyLinecountP(void)
   Stage::GetCurrent().Add( editor );
 
   editor.SetSize( 100.0f, 100.0f );
-  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 14, TEST_LOCATION );
 
   editor.SetSize( 50.0f, 100.0f );
-  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 28, TEST_LOCATION );
 
   END_TEST;
@@ -2183,14 +2190,14 @@ int utcDaliTextEditorScrollStateChangedSignalTest(void)
   editor.SetSize( 50.f, 50.f );
   editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
   editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  editor.SetProperty( DevelTextEditor::Property::ENABLE_SCROLL_BAR, true );
+  editor.SetProperty( TextEditor::Property::ENABLE_SCROLL_BAR, true );
   editor.SetKeyboardFocusable(true);
 
   bool startedCalled = false;
   bool finishedCalled = false;
 
   ScrollStateChangeCallback callback( startedCalled, finishedCalled );
-  DevelTextEditor::ScrollStateChangedSignal( editor ).Connect( &callback, &ScrollStateChangeCallback::Callback );
+  editor.ScrollStateChangedSignal().Connect( &callback, &ScrollStateChangeCallback::Callback );
 
   KeyboardFocusManager::Get().SetCurrentFocusActor( editor );
 
@@ -2208,7 +2215,8 @@ int utcDaliTextEditorScrollStateChangedSignalTest(void)
 
   END_TEST;
 }
-int UtcDaliToolkitTextEditorTextWarpMode(void)
+
+int UtcDaliToolkitTextEditorTextWrapMode(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitTextEditorTextWarpMode");
@@ -2221,23 +2229,40 @@ int UtcDaliToolkitTextEditorTextWarpMode(void)
 
   Stage::GetCurrent().Add( editor );
 
-  editor.SetProperty( DevelTextEditor::Property::LINE_WRAP_MODE, "WORD" );
+  editor.SetProperty( TextEditor::Property::LINE_WRAP_MODE, "WORD" );
+  DALI_TEST_EQUALS( editor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::WORD ), TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
 
-  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 4, TEST_LOCATION );
 
-
-
-  editor.SetProperty( DevelTextEditor::Property::LINE_WRAP_MODE, "CHARACTER" );
+  editor.SetProperty( TextEditor::Property::LINE_WRAP_MODE, "CHARACTER" );
+  DALI_TEST_EQUALS( editor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::CHARACTER ), TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
 
+  lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
 
-  lineCount =  editor.GetProperty<int>( DevelTextEditor::Property::LINE_COUNT );
+  editor.SetProperty( TextEditor::Property::LINE_WRAP_MODE, Text::LineWrap::WORD );
+  DALI_TEST_EQUALS( editor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::WORD ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 4, TEST_LOCATION );
+
+  editor.SetProperty( TextEditor::Property::LINE_WRAP_MODE, Text::LineWrap::CHARACTER );
+  DALI_TEST_EQUALS( editor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::CHARACTER ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
 
   END_TEST;

@@ -36,12 +36,12 @@
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
@@ -108,7 +108,7 @@ void Control::SetBackgroundColor( const Vector4& color )
 {
   mImpl->mBackgroundColor = color;
   Property::Map map;
-  map[ Toolkit::DevelVisual::Property::TYPE ] = Toolkit::Visual::COLOR;
+  map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
   map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
 
   SetBackground( map );

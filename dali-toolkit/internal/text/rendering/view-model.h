@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 
 namespace Dali
@@ -74,12 +75,12 @@ public:
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  virtual Layout::HorizontalAlignment GetHorizontalAlignment() const;
+  virtual Text::HorizontalAlignment::Type GetHorizontalAlignment() const;
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  virtual Layout::VerticalAlignment GetVerticalAlignment() const;
+  virtual Text::VerticalAlignment::Type GetVerticalAlignment() const;
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()

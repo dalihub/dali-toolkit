@@ -26,15 +26,13 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
-
 
 namespace Dali
 {
@@ -286,7 +284,7 @@ void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
     borderOnlyValue->Get( mBorderOnly );
   }
 
-  Property::Value* borderValue = propertyMap.Find( Toolkit::DevelImageVisual::Property::BORDER, BORDER );
+  Property::Value* borderValue = propertyMap.Find( Toolkit::ImageVisual::Property::BORDER, BORDER );
   if( borderValue && ! borderValue->Get( mBorder ) ) // If value exists and is rect, just set mBorder
   {
     // Not a rect so try vector4
@@ -338,10 +336,10 @@ void NPatchVisual::OnSetTransform()
 void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::N_PATCH );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::N_PATCH );
   map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
   map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );
-  map.Insert( Toolkit::DevelImageVisual::Property::BORDER, mBorder );
+  map.Insert( Toolkit::ImageVisual::Property::BORDER, mBorder );
 }
 
 void NPatchVisual::DoCreateInstancePropertyMap( Property::Map& map ) const

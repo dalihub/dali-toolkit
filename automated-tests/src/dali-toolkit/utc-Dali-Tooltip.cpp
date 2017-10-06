@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,6 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
 #include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 
 using namespace Dali;
@@ -128,7 +126,7 @@ int UtcDaliTooltipCreateWithTextVisualMap(void)
   Control control = Control::New();
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT,
-                                            Property::Map().Add( Visual::Property::TYPE, DevelVisual::TEXT )
+                                            Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::TEXT )
                                                            .Add( TextVisual::Property::TEXT, "Hello TextVisual Test" ) )
                      );
 
@@ -168,7 +166,7 @@ int UtcDaliTooltipCreateWithTextVisualMapWithoutString(void)
   Control control = Control::New();
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT,
-                                            Property::Map().Add( Visual::Property::TYPE, DevelVisual::TEXT )
+                                            Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::TEXT )
                                                            .Add( TextVisual::Property::POINT_SIZE, 20 ) )
                      );
 
@@ -208,7 +206,7 @@ int UtcDaliTooltipCreateWithImageVisualMap(void)
   Control control = Control::New();
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT,
-                                            Property::Map().Add( Visual::Property::TYPE, Visual::IMAGE )
+                                            Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::IMAGE )
                                                            .Add( ImageVisual::Property::URL, "dummy-url.png" ) )
                      );
 
@@ -247,9 +245,9 @@ int UtcDaliTooltipCreateWithArray(void)
 
   Control control = Control::New();
   control.SetProperty( DevelControl::Property::TOOLTIP,
-                       Property::Array().Add( Property::Map().Add( Visual::Property::TYPE, Visual::IMAGE )
+                       Property::Array().Add( Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::IMAGE )
                                                              .Add( ImageVisual::Property::URL, "dummy-url.png" ) )
-                                        .Add( Property::Map().Add( Visual::Property::TYPE, DevelVisual::TEXT )
+                                        .Add( Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::TEXT )
                                                              .Add( TextVisual::Property::TEXT, "Hello Array Test" ) )
                      );
 
@@ -301,7 +299,7 @@ int UtcDaliTooltipCreateWithFullMap(void)
   Control control = Control::New();
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT,
-                                            Property::Map().Add( Visual::Property::TYPE, DevelVisual::TEXT )
+                                            Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::TEXT )
                                                            .Add( TextVisual::Property::TEXT, "Hello TextVisual Test" ) )
                                       .Add( Tooltip::Property::LAYOUT, Vector2( 1.0f, 2.0f ) )
                                       .Add( Tooltip::Property::WAIT_TIME, 2.5f )
@@ -590,9 +588,9 @@ int UtcDaliTooltipDisplayWithContentArray(void)
   control.SetSize( 100.0f, 100.0f );
   control.SetProperty( DevelControl::Property::TOOLTIP,
                        Property::Map().Add( Tooltip::Property::CONTENT,
-                                            Property::Array().Add( Property::Map().Add( Visual::Property::TYPE, Visual::IMAGE )
+                                            Property::Array().Add( Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::IMAGE )
                                                                                   .Add( ImageVisual::Property::URL, "dummy-url.png" ) )
-                                                             .Add( Property::Map().Add( Visual::Property::TYPE, DevelVisual::TEXT )
+                                                             .Add( Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::TEXT )
                                                                                   .Add( TextVisual::Property::TEXT, "Hello Array Test" ) ))
                                       .Add( Tooltip::Property::TAIL,
                                             Property::Map().Add( Tooltip::Tail::Property::VISIBILITY, true )

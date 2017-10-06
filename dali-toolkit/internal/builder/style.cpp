@@ -18,7 +18,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/builder/style.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -123,8 +123,8 @@ void Style::ApplyVisual(
     // merge them into the visual map
     if( instancedProperties )
     {
-      Property::Value* instanceTypeValue = instancedProperties->Find( Toolkit::DevelVisual::Property::TYPE);
-      Property::Value* newTypeValue = visualMap.Find( Toolkit::DevelVisual::Property::TYPE, VISUAL_TYPE );
+      Property::Value* instanceTypeValue = instancedProperties->Find( Toolkit::Visual::Property::TYPE);
+      Property::Value* newTypeValue = visualMap.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE );
       if( instanceTypeValue && newTypeValue )
       {
         int instanceVisualType=-1;
