@@ -877,12 +877,12 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map placeholderPixelSizeMapSet;
   Property::Map placeholderPixelSizeMapGet;
   Property::Map placeholderFontstyleMap;
-  placeholderPixelSizeMapSet["placeholderText"] = "Setting Placeholder Text";
-  placeholderPixelSizeMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
-  placeholderPixelSizeMapSet["placeholderColor"] = Color::BLUE;
-  placeholderPixelSizeMapSet["placeholderFontFamily"] = "Arial";
-  placeholderPixelSizeMapSet["placeholderPixelSize"] = 15.0f;
-  placeholderPixelSizeMapSet["placeholderEllipsis"] = true;
+  placeholderPixelSizeMapSet["text"] = "Setting Placeholder Text";
+  placeholderPixelSizeMapSet["textFocused"] = "Setting Placeholder Text Focused";
+  placeholderPixelSizeMapSet["color"] = Color::BLUE;
+  placeholderPixelSizeMapSet["fontFamily"] = "Arial";
+  placeholderPixelSizeMapSet["pixelSize"] = 15.0f;
+  placeholderPixelSizeMapSet["ellipsis"] = true;
 
   placeholderFontstyleMap.Insert( "weight", "bold" );
   placeholderPixelSizeMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
@@ -890,17 +890,27 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   placeholderPixelSizeMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderPixelSizeMapGet.Count(), placeholderPixelSizeMapSet.Count(), TEST_LOCATION );
-  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderPixelSizeMapGet, placeholderPixelSizeMapSet ), true, TEST_LOCATION );
+
+  tet_infoline("Test Placeholder settings set as strings is converted correctly to Property Index key and holds set value");
+  Property::Map placeholderConversionMap;
+  placeholderConversionMap[ Text::PlaceHolder::Property::TEXT ] = placeholderPixelSizeMapSet["text"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::TEXT_FOCUSED ] = placeholderPixelSizeMapSet["textFocused"] ;
+  placeholderConversionMap[ Text::PlaceHolder::Property::COLOR ] = placeholderPixelSizeMapSet["color"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderPixelSizeMapSet["fontStyle"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_FAMILY ] = placeholderPixelSizeMapSet["fontFamily"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::PIXEL_SIZE ] = placeholderPixelSizeMapSet["pixelSize"];
+
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderPixelSizeMapGet, placeholderConversionMap ), true, TEST_LOCATION );
 
   // Check the placeholder property with point size
   Property::Map placeholderMapSet;
   Property::Map placeholderMapGet;
-  placeholderMapSet["placeholderText"] = "Setting Placeholder Text";
-  placeholderMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
-  placeholderMapSet["placeholderColor"] = Color::RED;
-  placeholderMapSet["placeholderFontFamily"] = "Arial";
-  placeholderMapSet["placeholderPointSize"] = 12.0f;
-  placeholderMapSet["placeholderEllipsis"] = false;
+  placeholderMapSet["text"] = "Setting Placeholder Text";
+  placeholderMapSet["textFocused"] = "Setting Placeholder Text Focused";
+  placeholderMapSet["color"] = Color::RED;
+  placeholderMapSet["fontFamily"] = "Arial";
+  placeholderMapSet["pointSize"] = 12.0f;
+  placeholderMapSet["ellipsis"] = false;
 
   // Check the placeholder font style property
   placeholderFontstyleMap.Clear();
@@ -908,38 +918,53 @@ int UtcDaliTextFieldSetPropertyP(void)
   placeholderFontstyleMap.Insert( "weight", "bold" );
   placeholderFontstyleMap.Insert( "width", "condensed" );
   placeholderFontstyleMap.Insert( "slant", "italic" );
-  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  placeholderMapSet["fontStyle"] = placeholderFontstyleMap;
   field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
 
   placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
-  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+
+  placeholderConversionMap.Clear();
+  placeholderConversionMap[ Text::PlaceHolder::Property::TEXT ] = placeholderPixelSizeMapSet["text"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::TEXT_FOCUSED ] = placeholderPixelSizeMapSet["textFocused"] ;
+  placeholderConversionMap[ Text::PlaceHolder::Property::COLOR ] = placeholderPixelSizeMapSet["color"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderPixelSizeMapSet["fontStyle"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_FAMILY ] = placeholderPixelSizeMapSet["fontFamily"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::POINT_SIZE ] = placeholderPixelSizeMapSet["pointSize"];
+
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderConversionMap ), true, TEST_LOCATION );
 
   // Reset font style.
   placeholderFontstyleMap.Clear();
   placeholderFontstyleMap.Insert( "weight", "normal" );
   placeholderFontstyleMap.Insert( "slant", "oblique" );
-  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  placeholderMapSet["fontStyle"] = placeholderFontstyleMap;
   field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
 
   placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
-  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderPixelSizeMapSet["fontStyle"];
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderConversionMap ), true, TEST_LOCATION );
 
   placeholderFontstyleMap.Clear();
   placeholderFontstyleMap.Insert( "slant", "roman" );
-  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  placeholderMapSet["fontStyle"] = placeholderFontstyleMap;
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderPixelSizeMapSet["fontStyle"];
+
   field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
 
   placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
 
   placeholderFontstyleMap.Clear();
-  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  placeholderMapSet["fontStyle"] = placeholderFontstyleMap;
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderPixelSizeMapSet["fontStyle"];
 
   field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
   placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
-  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderConversionMap ), true, TEST_LOCATION );
 
   // Check the ellipsis property
   DALI_TEST_CHECK( !field.GetProperty<bool>( TextField::Property::ELLIPSIS ) );
@@ -2575,6 +2600,86 @@ int UtcDaliTextFieldDefaultFontStylePropertyCoverage(void)
   DALI_TEST_CHECK( !weightValue );
   DALI_TEST_CHECK( !widthValue );
   DALI_TEST_CHECK( !slantValue );
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldSettingPlaceholder(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextFieldSettingPlaceholder");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  Stage::GetCurrent().Add( field );
+
+  // Check the placeholder property with pixel size
+  Property::Map placeholderPixelSizeMapSet;
+  Property::Map placeholderPixelSizeMapGet;
+  Property::Map placeholderFontstyleMap;
+  placeholderPixelSizeMapSet[ Text::PlaceHolder::Property::TEXT ] = "Setting Placeholder Text";
+  placeholderPixelSizeMapSet[ Text::PlaceHolder::Property::TEXT_FOCUSED ] = "Setting Placeholder Text Focused";
+  placeholderPixelSizeMapSet[ Text::PlaceHolder::Property::COLOR ] = Color::BLUE;
+  placeholderPixelSizeMapSet[ Text::PlaceHolder::Property::FONT_FAMILY ] = "Arial";
+  placeholderPixelSizeMapSet[ Text::PlaceHolder::Property::PIXEL_SIZE ] = 15.0f;
+  placeholderPixelSizeMapSet[ Text::PlaceHolder::Property::ELLIPSIS ] = true;
+
+  placeholderFontstyleMap.Insert( "weight", "bold" );
+  placeholderPixelSizeMapSet[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderFontstyleMap;
+  field.SetProperty( TextField::Property::PLACEHOLDER, placeholderPixelSizeMapSet );
+
+  placeholderPixelSizeMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
+  DALI_TEST_EQUALS( placeholderPixelSizeMapGet.Count(), placeholderPixelSizeMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderPixelSizeMapGet, placeholderPixelSizeMapSet ), true, TEST_LOCATION );
+
+  // Check the placeholder property with point size
+  Property::Map placeholderMapSet;
+  Property::Map placeholderMapGet;
+  placeholderMapSet[ Text::PlaceHolder::Property::TEXT ] = "Setting Placeholder Text";
+  placeholderMapSet[ Text::PlaceHolder::Property::TEXT_FOCUSED ] = "Setting Placeholder Text Focused";
+  placeholderMapSet[ Text::PlaceHolder::Property::COLOR ] = Color::RED;
+  placeholderMapSet[ Text::PlaceHolder::Property::FONT_FAMILY ] = "Arial";
+  placeholderMapSet[ Text::PlaceHolder::Property::POINT_SIZE ] = 12.0f;
+  placeholderMapSet[ Text::PlaceHolder::Property::ELLIPSIS ] = false;
+
+  // Check the placeholder font style property
+  placeholderFontstyleMap.Clear();
+
+  placeholderFontstyleMap.Insert( "weight", "bold" );
+  placeholderFontstyleMap.Insert( "width", "condensed" );
+  placeholderFontstyleMap.Insert( "slant", "italic" );
+  placeholderMapSet[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderFontstyleMap;
+  field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
+
+  placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
+  DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+
+  // Reset font style.
+  placeholderFontstyleMap.Clear();
+  placeholderFontstyleMap.Insert( "weight", "normal" );
+  placeholderFontstyleMap.Insert( "slant", "oblique" );
+  placeholderMapSet[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderFontstyleMap;
+  field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
+
+  placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
+  DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+
+  placeholderFontstyleMap.Clear();
+  placeholderFontstyleMap.Insert( "slant", "roman" );
+  placeholderMapSet[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderFontstyleMap;
+  field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
+
+  placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
+
+  placeholderFontstyleMap.Clear();
+  placeholderMapSet[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderFontstyleMap;
+
+  field.SetProperty( TextField::Property::PLACEHOLDER, placeholderMapSet );
+  placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
+  DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
 
   END_TEST;
 }

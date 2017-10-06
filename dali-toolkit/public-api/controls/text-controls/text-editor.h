@@ -421,17 +421,17 @@ public:
        * Example:
        * @code
        *   Property::Map propertyMap;
-       *   propertyMap["placeholderText"] = "Setting Placeholder Text";
-       *   propertyMap["placeholderTextFocused"] = "Setting Placeholder Text Focused";
-       *   propertyMap["placeholderColor"] = Color::RED;
-       *   propertyMap["placeholderFontFamily"] = "Arial";
-       *   propertyMap["placeholderPointSize"] = 12.0f;
+       *   propertyMap["text"] = "Setting Placeholder Text";
+       *   propertyMap["textFocused"] = "Setting Placeholder Text Focused";
+       *   propertyMap["color"] = Color::RED;
+       *   propertyMap["fontFamily"] = "Arial";
+       *   propertyMap["pointSize"] = 12.0f;
        *
        *   Property::Map fontStyleMap;
        *   fontStyleMap.Insert( "weight", "bold" );
        *   fontStyleMap.Insert( "width", "condensed" );
        *   fontStyleMap.Insert( "slant", "italic" );
-       *   propertyMap["placeholderFontStyle"] = fontStyleMap;
+       *   propertyMap["fontStyle"] = fontStyleMap;
        *
        *   editor.SetProperty( TextEditor::Property::PLACEHOLDER, propertyMap );
        * @endcode

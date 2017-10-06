@@ -281,7 +281,17 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
     {
       const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
 
-      Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      Property::Value* valueSet = NULL;
+      if ( valueGet.first.type == Property::Key::INDEX )
+      {
+        valueSet = fontStyleMapSet.Find( valueGet.first.indexKey );
+      }
+      else
+      {
+        // Get Key is a string so searching Set Map for a string key
+        valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      }
+
       if( NULL != valueSet )
       {
         if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
@@ -292,7 +302,14 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
       }
       else
       {
-        tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        if ( valueGet.first.type == Property::Key::INDEX )
+        {
+          tet_printf( "  The key %d doesn't exist.", valueGet.first.indexKey );
+        }
+        else
+        {
+          tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        }
         return false;
       }
     }
@@ -796,67 +813,87 @@ int UtcDaliTextEditorSetPropertyP(void)
   Property::Map placeholderPixelSizeMapSet;
   Property::Map placeholderPixelSizeMapGet;
   Property::Map placeholderFontstyleMap;
-  placeholderPixelSizeMapSet["placeholderText"] = "Setting Placeholder Text";
-  placeholderPixelSizeMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
-  placeholderPixelSizeMapSet["placeholderColor"] = Color::BLUE;
-  placeholderPixelSizeMapSet["placeholderFontFamily"] = "Arial";
-  placeholderPixelSizeMapSet["placeholderPixelSize"] = 15.0f;
+  placeholderPixelSizeMapSet["text"] = "Setting Placeholder Text";
+  placeholderPixelSizeMapSet["textFocused"] = "Setting Placeholder Text Focused";
+  placeholderPixelSizeMapSet["color"] = Color::BLUE;
+  placeholderPixelSizeMapSet["fontFamily"] = "Arial";
+  placeholderPixelSizeMapSet["pixelSize"] = 15.0f;
 
   placeholderFontstyleMap.Insert( "weight", "bold" );
-  placeholderPixelSizeMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  placeholderPixelSizeMapSet["fontStyle"] = placeholderFontstyleMap;
   editor.SetProperty( TextEditor::Property::PLACEHOLDER, placeholderPixelSizeMapSet );
 
   placeholderPixelSizeMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderPixelSizeMapGet.Count(), placeholderPixelSizeMapSet.Count(), TEST_LOCATION );
-  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderPixelSizeMapGet, placeholderPixelSizeMapSet ), true, TEST_LOCATION );
+
+  tet_infoline("Test Placeholder settings set as strings is converted correctly to Property Index key and holds set value");
+  Property::Map placeholderConversionMap;
+  placeholderConversionMap[ Text::PlaceHolder::Property::TEXT ] = placeholderPixelSizeMapSet["text"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::TEXT_FOCUSED ] = placeholderPixelSizeMapSet["textFocused"] ;
+  placeholderConversionMap[ Text::PlaceHolder::Property::COLOR ] = placeholderPixelSizeMapSet["color"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderPixelSizeMapSet["fontStyle"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_FAMILY ] = placeholderPixelSizeMapSet["fontFamily"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::PIXEL_SIZE ] = placeholderPixelSizeMapSet["pixelSize"];
+
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderPixelSizeMapGet, placeholderConversionMap ), true, TEST_LOCATION );
 
   // Check the placeholder property with point size
   Property::Map placeholderMapSet;
   Property::Map placeholderMapGet;
-  placeholderMapSet["placeholderText"] = "Setting Placeholder Text";
-  placeholderMapSet["placeholderTextFocused"] = "Setting Placeholder Text Focused";
-  placeholderMapSet["placeholderColor"] = Color::RED;
-  placeholderMapSet["placeholderFontFamily"] = "Arial";
-  placeholderMapSet["placeholderPointSize"] = 12.0f;
-
+  placeholderMapSet["text"] = "Setting Placeholder Text";
+  placeholderMapSet["textFocused"] = "Setting Placeholder Text Focused";
+  placeholderMapSet["color"] = Color::RED;
+  placeholderMapSet["fontFamily"] = "Arial";
+  placeholderMapSet["pointSize"] = 12.0f;
   // Check the placeholder font style property
   placeholderFontstyleMap.Clear();
 
   placeholderFontstyleMap.Insert( "weight", "bold" );
   placeholderFontstyleMap.Insert( "width", "condensed" );
   placeholderFontstyleMap.Insert( "slant", "italic" );
-  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  placeholderMapSet["fontStyle"] = placeholderFontstyleMap;
   editor.SetProperty( TextEditor::Property::PLACEHOLDER, placeholderMapSet );
 
   placeholderMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
-  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+
+  tet_infoline("Test Placeholder settings set as strings is converted correctly to Property Index key and holds set value");
+  placeholderConversionMap.Clear();
+  placeholderConversionMap[ Text::PlaceHolder::Property::TEXT ] = placeholderMapSet["text"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::TEXT_FOCUSED ] = placeholderMapSet["textFocused"] ;
+  placeholderConversionMap[ Text::PlaceHolder::Property::COLOR ] = placeholderMapSet["color"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderPixelSizeMapSet["fontStyle"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_FAMILY ] = placeholderMapSet["fontFamily"];
+  placeholderConversionMap[ Text::PlaceHolder::Property::POINT_SIZE ] = placeholderMapSet["pointSize"];
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderConversionMap ), true, TEST_LOCATION );
 
   // Reset font style.
   placeholderFontstyleMap.Clear();
   placeholderFontstyleMap.Insert( "weight", "normal" );
   placeholderFontstyleMap.Insert( "slant", "oblique" );
-  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  placeholderMapSet["fontStyle"] = placeholderFontstyleMap;
   editor.SetProperty( TextEditor::Property::PLACEHOLDER, placeholderMapSet );
 
   placeholderMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
-  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderMapSet["fontStyle"];
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderConversionMap ), true, TEST_LOCATION );
 
   placeholderFontstyleMap.Clear();
   placeholderFontstyleMap.Insert( "slant", "roman" );
-  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  placeholderMapSet["fontStyle"] = placeholderFontstyleMap;
   editor.SetProperty( TextEditor::Property::PLACEHOLDER, placeholderMapSet );
 
   placeholderMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::PLACEHOLDER );
 
   placeholderFontstyleMap.Clear();
-  placeholderMapSet["placeholderFontStyle"] = placeholderFontstyleMap;
+  placeholderMapSet["fontStyle"] = placeholderFontstyleMap;
 
   editor.SetProperty( TextEditor::Property::PLACEHOLDER, placeholderMapSet );
   placeholderMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
-  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+  placeholderConversionMap[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderMapSet["fontStyle"];
+  DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderConversionMap ), true, TEST_LOCATION );
 
   END_TEST;
 }
