@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -170,7 +170,7 @@ bool LayoutTextTest( const LayoutTextData& data )
                                        visualModel->mGlyphsPerCharacter.Begin(),
                                        totalNumberOfGlyphs,
                                        Text::HorizontalAlignment::BEGIN,
-                                       Layout::LineWrap::WORD );
+                                       Text::LineWrap::WORD );
 
   layoutParameters.isLastNewParagraph = isLastNewParagraph;
 
@@ -386,7 +386,7 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                                        visualModel->mGlyphsPerCharacter.Begin(),
                                        visualModel->mGlyphs.Count(),
                                        Text::HorizontalAlignment::BEGIN,
-                                       Layout::LineWrap::WORD );
+                                       Text::LineWrap::WORD );
 
   layoutParameters.numberOfBidirectionalInfoRuns = logicalModel->mBidirectionalLineInfo.Count();
   layoutParameters.lineBidirectionalInfoRunsBuffer = logicalModel->mBidirectionalLineInfo.Begin();

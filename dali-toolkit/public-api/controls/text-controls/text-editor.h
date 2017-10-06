@@ -441,9 +441,12 @@ public:
       PLACEHOLDER,
 
       /**
-       * @brief line wrap mode when the text lines over layout width.
-       * @details Name "lineWrapMode", type Property::STRING.
+       * @brief Line wrap mode when text lines are greater than the layout width.
+       * @details Name "lineWrapMode", type Text::LineWrap::Mode (Text::Property::INTEGER) or Property::STRING.
        * @SINCE_1_2.60
+       * @note Default is Text::LineWrap::WORD.
+       * @note Return type is Text::LineWrap::Mode (Text::Property::INTEGER).
+       * @see Text::LineWrap
        */
       LINE_WRAP_MODE,
     };

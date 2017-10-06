@@ -27,7 +27,6 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
-#include <dali-toolkit/internal/text/layouts/layout-wrap-mode.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 
@@ -348,13 +347,13 @@ public: // Configure the text controller.
    * @brief Sets the text's wrap mode
    * @param[in] text wrap mode The unit of wrapping
    */
-  void SetLineWrapMode( Layout::LineWrap::Mode textWarpMode );
+  void SetLineWrapMode( Text::LineWrap::Mode textWarpMode );
 
   /**
    * @brief Retrieve text wrap mode previously set.
    * @return text wrap mode
    */
-  Layout::LineWrap::Mode GetLineWrapMode() const;
+  Text::LineWrap::Mode GetLineWrapMode() const;
 
   /**
    * @brief Enable or disable the text elide.

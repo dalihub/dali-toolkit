@@ -33,51 +33,96 @@ namespace Text
 {
 
 /**
- * @brief The available Horizontal alignments for text
+ * @brief The available Horizontal alignments for text.
+ *
  * @SINCE_1_2.60
  */
 namespace HorizontalAlignment
 {
-  /**
-   * @brief Enumerations for Horizontal alignment
-   *
-   * @SINCE_1_2.60
-   */
-  enum Type
-  {
-    BEGIN,   ///< @SINCE_1_2.60
-    CENTER,  ///< @SINCE_1_2.60
-    END      ///< @SINCE_1_2.60
-  };
-}
 
 /**
- * @brief The available Vertical alignments for text
+ * @brief Enumerations for Horizontal alignment.
+ *
+ * @SINCE_1_2.60
+ */
+enum Type
+{
+  BEGIN,   ///< @SINCE_1_2.60
+  CENTER,  ///< @SINCE_1_2.60
+  END      ///< @SINCE_1_2.60
+};
+
+} // namespace HorizontalAlignment
+
+/**
+ * @brief The available Vertical alignments for text.
+ *
  * @SINCE_1_2.60
  */
 namespace VerticalAlignment
 {
-  /**
-   * @brief Enumerations for Vertical alignment
-   *
-   * @SINCE_1_2.60
-   */
-  enum Type
-  {
-    TOP,     ///< @SINCE_1_2.60
-    CENTER,  ///< @SINCE_1_2.60
-    BOTTOM   ///< @SINCE_1_2.60
-  };
-}
 
-} // Text
+/**
+ * @brief Enumerations for Vertical alignment.
+ *
+ * @SINCE_1_2.60
+ */
+enum Type
+{
+  TOP,     ///< @SINCE_1_2.60
+  CENTER,  ///< @SINCE_1_2.60
+  BOTTOM   ///< @SINCE_1_2.60
+};
+
+} // namespace VerticalAlignment
+
+/**
+ * @brief Contains modes which specify how lines are wrapped.
+ *
+ * If the layout width is too short to show the full text, then a wrapping mode can be specified.
+ *
+ * LineWrap::WORD mode will move an entire word to the next line:
+ * @code
+ * +---------+
+ * |HELLO    |
+ * |WORLD    |
+ * +---------+
+ * @endcode
+ *
+ * LineWrap::CHARACTER mode will move character by character to the next line:
+ * @code
+ * +---------+
+ * |HELLO WOR|
+ * |LD       |
+ * +---------+
+ * @endcode
+ *
+ * @SINCE_1_2.60
+ */
+namespace LineWrap
+{
+
+/**
+ * @brief Enumerations specifying how a line is wrapped.
+ * @SINCE_1_2.60
+ * @see LineWrap
+ */
+enum Mode
+{
+  WORD,      ///< @SINCE_1_2.60
+  CHARACTER  ///< @SINCE_1_2.60
+};
+
+} // namespace LineWrap
+
+} // namespace Text
 
 /**
  * @}
  */
 
-} // Toolkit
+} // namespace Toolkit
 
-} // Dali
+} // namespace Dali
 
 #endif //DALI_TOOLKIT_TEXT_ENUMERATIONS_H

@@ -35,19 +35,27 @@ namespace Text
 
 /**
  * @brief Get the alignment from the provided property value.
- * @param[in] propertyValue the source value
- * @param[out] alignment the resulting alignment from the given source
+ * @param[in] propertyValue The source value (which can be a Property::INTEGER or Property::STRING type)
+ * @param[out] alignment The resulting alignment from the given source
  * @return true if the resulting alignment has been updated
  */
-bool GetHorizontalAlignmentEnum( const Property::Value& propertyValue, Toolkit::Text::HorizontalAlignment::Type& alignment );
+bool GetHorizontalAlignmentEnumeration( const Property::Value& propertyValue, Toolkit::Text::HorizontalAlignment::Type& alignment );
 
 /**
  * @brief Get the alignment from the provided property value.
- * @param[in] propertyValue the source value
- * @param[out] alignment the resulting alignment from the given source
+ * @param[in] propertyValue The source value (which can be a Property::INTEGER or Property::STRING type)
+ * @param[out] alignment The resulting alignment from the given source
  * @return true if the resulting alignment has been updated
  */
-bool GetVerticalAlignmentEnum( const Property::Value& propertyValue, Toolkit::Text::VerticalAlignment::Type& alignment );
+bool GetVerticalAlignmentEnumeration( const Property::Value& propertyValue, Toolkit::Text::VerticalAlignment::Type& alignment );
+
+/**
+ * @brief Get the line-wrap-mode from the provided property value.
+ * @param[in] propertyValue The source value (which can be a Property::INTEGER or Property::STRING type)
+ * @param[out] alignment The resulting lineWrapMode from the given source
+ * @return true if the resulting lineWrapMode has been updated
+ */
+bool GetLineWrapModeEnumeration( const Property::Value& propertyValue, Toolkit::Text::LineWrap::Mode& lineWrapMode );
 
 /**
  * @brief Get the alignment string from the provided alignment string.
@@ -62,7 +70,6 @@ const char* GetHorizontalAlignmentString( const Toolkit::Text::HorizontalAlignme
  * @return the string equivalent
  */
 const char* GetVerticalAlignmentString( const Toolkit::Text::VerticalAlignment::Type& alignment );
-
 
 } // namespace Text
 

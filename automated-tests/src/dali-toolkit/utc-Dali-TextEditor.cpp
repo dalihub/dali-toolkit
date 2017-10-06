@@ -2215,7 +2215,8 @@ int utcDaliTextEditorScrollStateChangedSignalTest(void)
 
   END_TEST;
 }
-int UtcDaliToolkitTextEditorTextWarpMode(void)
+
+int UtcDaliToolkitTextEditorTextWrapMode(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliToolkitTextEditorTextWarpMode");
@@ -2229,6 +2230,7 @@ int UtcDaliToolkitTextEditorTextWarpMode(void)
   Stage::GetCurrent().Add( editor );
 
   editor.SetProperty( TextEditor::Property::LINE_WRAP_MODE, "WORD" );
+  DALI_TEST_EQUALS( editor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::WORD ), TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
@@ -2236,13 +2238,29 @@ int UtcDaliToolkitTextEditorTextWarpMode(void)
   lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 4, TEST_LOCATION );
 
-
-
   editor.SetProperty( TextEditor::Property::LINE_WRAP_MODE, "CHARACTER" );
+  DALI_TEST_EQUALS( editor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::CHARACTER ), TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
 
+  lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
+
+  editor.SetProperty( TextEditor::Property::LINE_WRAP_MODE, Text::LineWrap::WORD );
+  DALI_TEST_EQUALS( editor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::WORD ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 4, TEST_LOCATION );
+
+  editor.SetProperty( TextEditor::Property::LINE_WRAP_MODE, Text::LineWrap::CHARACTER );
+  DALI_TEST_EQUALS( editor.GetProperty< int >( TextEditor::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::CHARACTER ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
 
   lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );

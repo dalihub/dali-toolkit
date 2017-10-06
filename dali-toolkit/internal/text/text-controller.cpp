@@ -393,7 +393,7 @@ VerticalAlignment::Type Controller::GetVerticalAlignment() const
   return mImpl->mModel->mVerticalAlignment;
 }
 
-void Controller::SetLineWrapMode( Layout::LineWrap::Mode lineWrapMode )
+void Controller::SetLineWrapMode( Text::LineWrap::Mode lineWrapMode )
 {
   if( lineWrapMode != mImpl->mModel->mLineWrapMode )
   {
@@ -416,7 +416,7 @@ void Controller::SetLineWrapMode( Layout::LineWrap::Mode lineWrapMode )
   }
 }
 
-Layout::LineWrap::Mode Controller::GetLineWrapMode() const
+Text::LineWrap::Mode Controller::GetLineWrapMode() const
 {
   return mImpl->mModel->mLineWrapMode;
 }

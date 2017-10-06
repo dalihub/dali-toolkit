@@ -162,9 +162,9 @@ Model::Model()
   mVisualModel(),
   mScrollPosition(),
   mScrollPositionLast(),
-  mHorizontalAlignment( HorizontalAlignment::BEGIN ),
-  mVerticalAlignment( VerticalAlignment::TOP ),
-  mLineWrapMode( Layout::LineWrap::WORD ),
+  mHorizontalAlignment( Text::HorizontalAlignment::BEGIN ),
+  mVerticalAlignment( Text::VerticalAlignment::TOP ),
+  mLineWrapMode( Text::LineWrap::WORD ),
   mAlignmentOffset( 0.0f ),
   mElideEnabled( false )
 {

@@ -513,18 +513,26 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
     }
     case Toolkit::TextVisual::Property::HORIZONTAL_ALIGNMENT:
     {
-      Text::HorizontalAlignment::Type alignment( Toolkit::Text::HorizontalAlignment::BEGIN );
-      Toolkit::Text::GetHorizontalAlignmentEnum( propertyValue, alignment );
-
-      mController->SetHorizontalAlignment( alignment );
+      if( mController )
+      {
+        Text::HorizontalAlignment::Type alignment( static_cast< Text::HorizontalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+        if( Toolkit::Text::GetHorizontalAlignmentEnumeration( propertyValue, alignment ) )
+        {
+          mController->SetHorizontalAlignment( alignment );
+        }
+      }
       break;
     }
     case Toolkit::TextVisual::Property::VERTICAL_ALIGNMENT:
     {
-      Text::VerticalAlignment::Type alignment( Toolkit::Text::VerticalAlignment::BOTTOM );
-      Toolkit::Text::GetVerticalAlignmentEnum( propertyValue, alignment);
-
-      mController->SetVerticalAlignment( alignment );
+      if( mController )
+      {
+        Toolkit::Text::VerticalAlignment::Type alignment( static_cast< Text::VerticalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+        if( Toolkit::Text::GetVerticalAlignmentEnumeration( propertyValue, alignment) )
+        {
+          mController->SetVerticalAlignment( alignment );
+        }
+      }
       break;
     }
     case Toolkit::TextVisual::Property::TEXT_COLOR:

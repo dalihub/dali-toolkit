@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,7 +198,7 @@ struct Engine::Impl
     LineLayout tmpLineLayout;
 
     const bool isMultiline = mLayout == MULTI_LINE_BOX;
-    const bool isWordLaidOut = parameters.lineWrapMode == Layout::LineWrap::WORD;
+    const bool isWordLaidOut = parameters.lineWrapMode == Text::LineWrap::WORD;
 
     // The last glyph to be laid-out.
     const GlyphIndex lastGlyphOfParagraphPlusOne = parameters.startGlyphIndex + parameters.numberOfGlyphs;

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LAYOUT_PARAMETERS_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
-#include <dali-toolkit/internal/text/layouts/layout-wrap-mode.h>
 
 namespace Dali
 {
@@ -74,7 +73,7 @@ struct Parameters
               const Length* const glyphsPerCharacterBuffer,
               Length totalNumberOfGlyphs,
               Text::HorizontalAlignment::Type horizontalAlignment,
-              LineWrap::Mode lineWrapMode )
+              Text::LineWrap::Mode lineWrapMode )
   : boundingBox( boundingBox ),
     textBuffer( textBuffer ),
     lineBreakInfoBuffer( lineBreakInfoBuffer ),
@@ -115,7 +114,7 @@ struct Parameters
   HorizontalAlignment::Type       horizontalAlignment;             ///< The horizontal alignment.
   LineIndex                       startLineIndex;                  ///< The line index where to insert the new lines.
   Length                          estimatedNumberOfLines;          ///< The estimated number of lines.
-  LineWrap::Mode                  lineWrapMode;                    ///< The line wrap mode for moving to next line.
+  Text::LineWrap::Mode            lineWrapMode;                    ///< The line wrap mode for moving to next line.
   bool                            isLastNewParagraph;              ///< Whether the last character is a new paragraph character.
 };
 

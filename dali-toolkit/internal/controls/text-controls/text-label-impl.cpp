@@ -73,13 +73,6 @@ const Scripting::StringEnum AUTO_SCROLL_STOP_MODE_TABLE[] =
 };
 const unsigned int AUTO_SCROLL_STOP_MODE_TABLE_COUNT = sizeof( AUTO_SCROLL_STOP_MODE_TABLE ) / sizeof( AUTO_SCROLL_STOP_MODE_TABLE[0] );
 
-const Scripting::StringEnum LINE_WRAP_MODE_STRING_TABLE[] =
-{
-  { "WRAP_MODE_WORD",      Toolkit::Text::Layout::LineWrap::WORD  },
-  { "WRAP_MODE_CHARACTER", Toolkit::Text::Layout::LineWrap::CHARACTER }
-};
-const unsigned int LINE_WRAP_MODE_STRING_TABLE_COUNT = sizeof( LINE_WRAP_MODE_STRING_TABLE ) / sizeof( LINE_WRAP_MODE_STRING_TABLE[0] );
-
 // Type registration
 BaseHandle Create()
 {
@@ -118,7 +111,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "ellipsis",           
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "autoScrollLoopDelay",       FLOAT,   AUTO_SCROLL_LOOP_DELAY     )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "autoScrollStopMode",        STRING,  AUTO_SCROLL_STOP_MODE      )
 DALI_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "lineCount",                 INTEGER, LINE_COUNT                 )
-DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "lineWrapMode",              STRING,  LINE_WRAP_MODE             )
+DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "lineWrapMode",              INTEGER, LINE_WRAP_MODE             )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -227,11 +220,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          Toolkit::Text::HorizontalAlignment::Type alignment( Toolkit::Text::HorizontalAlignment::BEGIN );
-          Text::GetHorizontalAlignmentEnum( value, alignment );
-
-          impl.mController->SetHorizontalAlignment( alignment );
-
+          Text::HorizontalAlignment::Type alignment( static_cast< Text::HorizontalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+          if( Text::GetHorizontalAlignmentEnumeration( value, alignment ) )
+          {
+            impl.mController->SetHorizontalAlignment( alignment );
+          }
         }
         break;
       }
@@ -239,10 +232,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          Toolkit::Text::VerticalAlignment::Type alignment( Toolkit::Text::VerticalAlignment::BOTTOM );
-          Text::GetVerticalAlignmentEnum( value, alignment );
-
-          impl.mController->SetVerticalAlignment( alignment );
+          Toolkit::Text::VerticalAlignment::Type alignment( static_cast< Text::VerticalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+          if( Text::GetVerticalAlignmentEnumeration( value, alignment ) )
+          {
+            impl.mController->SetVerticalAlignment( alignment );
+          }
         }
         break;
       }
@@ -480,16 +474,14 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::TextLabel::Property::LINE_WRAP_MODE:
       {
-        const std::string& wrapModeStr = value.Get< std::string >();
-        DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p LINE_WRAP_MODE %s\n", impl.mController.Get(), wrapModeStr.c_str() );
-
-        Layout::LineWrap::Mode lineWrapMode( Layout::LineWrap::WORD );
-        if( Scripting::GetEnumeration< Layout::LineWrap::Mode >( wrapModeStr.c_str(),
-                                                                 LINE_WRAP_MODE_STRING_TABLE,
-                                                                 LINE_WRAP_MODE_STRING_TABLE_COUNT,
-                                                                 lineWrapMode ) )
+        if( impl.mController )
         {
-          impl.mController->SetLineWrapMode( lineWrapMode );
+          Text::LineWrap::Mode lineWrapMode( static_cast< Text::LineWrap::Mode >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+          if( GetLineWrapModeEnumeration( value, lineWrapMode ) )
+          {
+            DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p LineWrap::MODE %d\n", impl.mController.Get(), lineWrapMode );
+            impl.mController->SetLineWrapMode( lineWrapMode );
+          }
         }
         break;
       }

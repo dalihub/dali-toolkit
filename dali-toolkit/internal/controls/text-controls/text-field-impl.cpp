@@ -281,12 +281,12 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string& alignStr = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
-
-          Text::HorizontalAlignment::Type alignment( Text::HorizontalAlignment::BEGIN );
-          GetHorizontalAlignmentEnum( value, alignment );
-          impl.mController->SetHorizontalAlignment( alignment );
+          Text::HorizontalAlignment::Type alignment( static_cast< Text::HorizontalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+          if( GetHorizontalAlignmentEnumeration( value, alignment ) )
+          {
+            DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %d\n", impl.mController.Get(), alignment );
+            impl.mController->SetHorizontalAlignment( alignment );
+          }
         }
         break;
       }
@@ -294,12 +294,12 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string& alignStr = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
-
-          Text::VerticalAlignment::Type alignment( Text::VerticalAlignment::BOTTOM );
-          GetVerticalAlignmentEnum( value, alignment );
-          impl.mController->SetVerticalAlignment( alignment );
+          Toolkit::Text::VerticalAlignment::Type alignment( static_cast< Text::VerticalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+          if( GetVerticalAlignmentEnumeration( value, alignment ) )
+          {
+            impl.mController->SetVerticalAlignment( alignment );
+            DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %d\n", impl.mController.Get(), alignment );
+          }
         }
         break;
       }

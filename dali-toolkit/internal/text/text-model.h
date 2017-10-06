@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/text-enumerations.h>
-#include <dali-toolkit/internal/text/layouts/layout-wrap-mode.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
@@ -215,7 +214,7 @@ public:
   Vector2                            mScrollPositionLast;  ///< The last offset value of mScrollPosition
   HorizontalAlignment::Type          mHorizontalAlignment; ///< The layout's horizontal alignment.
   VerticalAlignment::Type            mVerticalAlignment;   ///< The layout's vertical alignment.
-  Layout::LineWrap::Mode             mLineWrapMode;        ///< The text wrap mode
+  Text::LineWrap::Mode               mLineWrapMode;        ///< The text wrap mode
   float                              mAlignmentOffset;     ///< The alignment offset.
   bool                               mElideEnabled:1;      ///< Whether the text's elide is enabled.
 };

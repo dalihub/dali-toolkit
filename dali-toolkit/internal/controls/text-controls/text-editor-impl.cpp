@@ -69,13 +69,6 @@ const float DEFAULT_SCROLL_SPEED = 1200.f; ///< The default scroll speed for the
 
 namespace
 {
-const Scripting::StringEnum LINE_WRAP_MODE_STRING_TABLE[] =
-{
-  { "WORD",      Toolkit::Text::Layout::LineWrap::WORD      },
-  { "CHARACTER", Toolkit::Text::Layout::LineWrap::CHARACTER }
-};
-const unsigned int LINE_WRAP_MODE_STRING_TABLE_COUNT = sizeof( LINE_WRAP_MODE_STRING_TABLE ) / sizeof( LINE_WRAP_MODE_STRING_TABLE[0] );
-
 const char* const SCROLL_BAR_POSITION("sourcePosition");
 const char* const SCROLL_BAR_POSITION_MIN("sourcePositionMin");
 const char* const SCROLL_BAR_POSITION_MAX("sourcePositionMax");
@@ -139,7 +132,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "pixelSize",                   
 DALI_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "lineCount",                  INTEGER,   LINE_COUNT                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableSelection",                      BOOLEAN,   ENABLE_SELECTION                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholder",                          MAP,       PLACEHOLDER                          )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineWrapMode",                         STRING,    LINE_WRAP_MODE                       )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineWrapMode",                         INTEGER,   LINE_WRAP_MODE                       )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderText",                STRING,    PLACEHOLDER_TEXT                     )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",           VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
 
@@ -251,13 +244,10 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mController )
         {
-          const std::string& alignStr = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p HORIZONTAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
-
-          Text::HorizontalAlignment::Type alignment( Text::HorizontalAlignment::BEGIN );
-
-          Text::GetHorizontalAlignmentEnum( value, alignment );
+          Text::HorizontalAlignment::Type alignment( static_cast< Text::HorizontalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+          if( Text::GetHorizontalAlignmentEnumeration( value, alignment ) )
           {
+            DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p HORIZONTAL_ALIGNMENT %d\n", impl.mController.Get(), alignment );
             impl.mController->SetHorizontalAlignment( alignment );
           }
         }
@@ -713,16 +703,14 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       }
       case Toolkit::TextEditor::Property::LINE_WRAP_MODE:
       {
-        const std::string& wrapModeStr = value.Get< std::string >();
-        DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p LINE_WRAP_MODE %s\n", impl.mController.Get(), wrapModeStr.c_str() );
-
-        Layout::LineWrap::Mode lineWrapMode( Layout::LineWrap::WORD );
-        if( Scripting::GetEnumeration< Layout::LineWrap::Mode >( wrapModeStr.c_str(),
-                                                                 LINE_WRAP_MODE_STRING_TABLE,
-                                                                 LINE_WRAP_MODE_STRING_TABLE_COUNT,
-                                                                 lineWrapMode ) )
+        if( impl.mController )
         {
-          impl.mController->SetLineWrapMode( lineWrapMode );
+          Text::LineWrap::Mode lineWrapMode( static_cast< Text::LineWrap::Mode >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+          if( GetLineWrapModeEnumeration( value, lineWrapMode ) )
+          {
+            DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p LineWrap::MODE %d\n", impl.mController.Get(), lineWrapMode );
+            impl.mController->SetLineWrapMode( lineWrapMode );
+          }
         }
         break;
       }
