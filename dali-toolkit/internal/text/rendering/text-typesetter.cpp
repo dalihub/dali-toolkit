@@ -353,6 +353,14 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
       // Create the image buffer for shadow
       Devel::PixelBuffer shadowImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_SHADOW, ignoreHorizontalAlignment, pixelFormat, penY, 0u, numberOfGlyphs - 1 );
 
+      // Check whether it will be a soft shadow
+      const float& blurRadius = mModel->GetShadowBlurRadius();
+
+      if ( blurRadius > Math::MACHINE_EPSILON_1 )
+      {
+        shadowImageBuffer.ApplyGaussianBlur( blurRadius );
+      }
+
       // Combine the two buffers
       imageBuffer = CombineImageBuffer( imageBuffer, shadowImageBuffer, bufferWidth, bufferHeight );
     }

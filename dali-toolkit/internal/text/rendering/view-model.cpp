@@ -163,6 +163,11 @@ const Vector4& ViewModel::GetShadowColor() const
   return mModel->GetShadowColor();
 }
 
+const float& ViewModel::GetShadowBlurRadius() const
+{
+  return mModel->GetShadowBlurRadius();
+}
+
 const Vector4& ViewModel::GetUnderlineColor() const
 {
   return mModel->GetUnderlineColor();

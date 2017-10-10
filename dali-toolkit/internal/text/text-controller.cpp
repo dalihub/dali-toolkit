@@ -1113,6 +1113,21 @@ const Vector4& Controller::GetShadowColor() const
   return mImpl->mModel->mVisualModel->GetShadowColor();
 }
 
+void Controller::SetShadowBlurRadius( const float& shadowBlurRadius )
+{
+  if ( fabsf( GetShadowBlurRadius() - shadowBlurRadius ) > Math::MACHINE_EPSILON_1 )
+  {
+    mImpl->mModel->mVisualModel->SetShadowBlurRadius( shadowBlurRadius );
+
+    mImpl->RequestRelayout();
+  }
+}
+
+const float& Controller::GetShadowBlurRadius() const
+{
+  return mImpl->mModel->mVisualModel->GetShadowBlurRadius();
+}
+
 void Controller::SetUnderlineColor( const Vector4& color )
 {
   mImpl->mModel->mVisualModel->SetUnderlineColor( color );

@@ -344,6 +344,11 @@ void VisualModel::SetShadowColor( const Vector4& shadowColor )
   mShadowColor = shadowColor;
 }
 
+void VisualModel::SetShadowBlurRadius( const float& shadowBlurRadius )
+{
+  mShadowBlurRadius = shadowBlurRadius;
+}
+
 void VisualModel::SetUnderlineColor( const Vector4& color )
 {
   mUnderlineColor = color;
@@ -383,6 +388,11 @@ const Vector2& VisualModel::GetShadowOffset() const
 const Vector4& VisualModel::GetShadowColor() const
 {
   return mShadowColor;
+}
+
+const float& VisualModel::GetShadowBlurRadius() const
+{
+  return mShadowBlurRadius;
 }
 
 const Vector4& VisualModel::GetUnderlineColor() const
@@ -440,6 +450,7 @@ VisualModel::VisualModel()
   mShadowOffset(),
   mUnderlineHeight( 0.0f ),
   mOutlineWidth( 0.0f ),
+  mShadowBlurRadius( 0.0f ),
   mNaturalSize(),
   mLayoutSize(),
   mCachedLineIndex( 0u ),
