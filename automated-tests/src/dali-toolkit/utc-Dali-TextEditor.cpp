@@ -727,8 +727,9 @@ int UtcDaliTextEditorSetPropertyP(void)
   Property::Map shadowMapSet;
   Property::Map shadowMapGet;
 
-  shadowMapSet.Insert( "color", "green" );
-  shadowMapSet.Insert( "offset", "2 2" );
+  shadowMapSet.Insert( "color", Color::GREEN );
+  shadowMapSet.Insert( "offset", Vector2(2.0f, 2.0f) );
+  shadowMapSet.Insert( "blurRadius", 3.0f );
 
   editor.SetProperty( TextEditor::Property::SHADOW, shadowMapSet );
 
@@ -2149,11 +2150,11 @@ int utcDaliTextEditorShadowPropertyStringP(void)
 
   TextEditor editor = TextEditor::New();
 
-  std::string shadowSettings( "{\"color\":\"green\",\"offset\":\"2 2\"}" );
+  std::string shadowSettings( "{\"color\":\"green\",\"offset\":\"2 2\",\"blurRadius\":\"0\"}" );
 
   Stage::GetCurrent().Add( editor );
 
-  editor.SetProperty( TextEditor::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\"}" );
+  editor.SetProperty( TextEditor::Property::SHADOW, "{\"color\":\"green\",\"offset\":\"2 2\",\"blurRadius\":\"0\"}" );
 
   Property::Value value = editor.GetProperty<std::string>( TextEditor::Property::SHADOW );
   std::string result;

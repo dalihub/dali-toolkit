@@ -234,6 +234,20 @@ public:
   const Vector4& GetShadowColor() const;
 
   /**
+   * @brief Set the shadow blur radius.
+   *
+   * @param[in] shadowBlurRadius The shadow blur radius, 0,0 indicates no blur.
+   */
+  void SetShadowBlurRadius( const float& shadowBlurRadius );
+
+  /**
+   * @brief Retrieve the shadow blur radius.
+   *
+   * @return The shadow blur radius.
+   */
+  const float& GetShadowBlurRadius() const;
+
+  /**
    * @brief Sets the text's underline color.
    *
    * @param[in] color The text's underline color.
@@ -356,6 +370,7 @@ public:
   Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
   float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
   float                  mOutlineWidth;         ///< Width of outline.
+  float                  mShadowBlurRadius;     ///< Blur radius of shadow, 0 indicates no blur.
 
 private:
 

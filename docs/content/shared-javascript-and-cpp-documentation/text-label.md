@@ -207,7 +207,7 @@ label.textColor = dali.COLOR_RED;
 
 #### Drop Shadow
 
-To add a drop-shadow to the text, simply set the SHADOW property. Shadow parameters can be set through a json string, see the examples below.
+To add a drop-shadow to the text, simply set the SHADOW property. Shadow parameters can be set through a json string or through a property map, see the examples below.
 
 ~~~{.cpp}
  // C++
@@ -222,8 +222,14 @@ label2.SetProperty( TextLabel::Property::SHADOW, "{\"offset\":\"1 1\",\"color\":
 label3.SetProperty( TextLabel::Property::TEXT, "Text with Bigger Shadow" );
 label3.SetProperty( TextLabel::Property::SHADOW, "{\"offset\":\"2 2\",\"color\":\"black\"}" );
 
-label4.SetProperty( TextLabel::Property::TEXT, "Text with Color Shadow" );
-label4.SetProperty( TextLabel::Property::SHADOW, "{\"offset\":\"1 1\",\"color\":\"red\"}" );
+label4.SetProperty( TextLabel::Property::TEXT, "Text with Color Soft Shadow" );
+
+Property::Map shadow;
+shadow.Insert( "offset", Vector2(1.0f, 1.0f) );
+shadow.Insert( "color", Color::RED );
+shadow.Insert( "blurRadius", 2.0f ); // A value of 0 indicates no blur. The bigger the radius, the more blurry.
+label4.SetProperty( TextLabel::Property::SHADOW, shadow );
+
 ~~~
 
 ~~~{.js}
@@ -240,8 +246,14 @@ label2.shadow = "{\"offset\":\"1 1\",\"color\":\"black\"}";
 label3.text = "Text with Bigger Shadow";
 label3.shadow = "{\"offset\":\"2 2\",\"color\":\"black\"}";
 
-label4.SetProperty( TextLabel::Property::TEXT, "Text with Color Shadow" );
-label3.shadow = "{\"offset\":\"1 1\",\"color\":\"red\"}";
+label4.SetProperty( TextLabel::Property::TEXT, "Text with Color Soft Shadow" );
+var shadow = {
+    "offset" : [ 1.0, 1.0 ],
+    "color" : dali.COLOR_RED;
+    "blurRadius" : 2.0
+};
+label4.shadow = shadow;
+
 ~~~
 
 

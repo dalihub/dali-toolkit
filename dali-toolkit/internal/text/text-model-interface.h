@@ -175,6 +175,13 @@ public:
   virtual const Vector4& GetShadowColor() const = 0;
 
   /**
+   * @brief Retrieve the shadow blur radius.
+   *
+   * @return The shadow blur radius.
+   */
+  virtual const float& GetShadowBlurRadius() const = 0;
+
+  /**
    * @brief Retrieves the underline color.
    *
    * @return The underline color.
