@@ -61,6 +61,8 @@ ImageView ImageView::New()
 
 ImageView ImageView::New( Image image )
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: New() is deprecated and will be removed from next release. use New( const std::string& ) instead.\n" );
+
   ImageView imageView = Internal::ImageView::New();
   imageView.SetImage( image );
   return imageView;
@@ -87,6 +89,8 @@ ImageView ImageView::DownCast( BaseHandle handle )
 
 void ImageView::SetImage( Image image )
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetImage() is deprecated and will be removed from next release. Use SetImage( const std::string& ) instead.\n" );
+
   Dali::Toolkit::GetImpl( *this ).SetImage( image );
 }
 
