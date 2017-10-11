@@ -698,7 +698,6 @@ void TextVisual::UpdateRenderer()
       mImpl->mRenderer.RegisterProperty( "uHasMultipleTextColors", static_cast<float>( hasMultipleTextColors ) );
 
       mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON);
-      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true );
 
       //Register transform properties
       mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
