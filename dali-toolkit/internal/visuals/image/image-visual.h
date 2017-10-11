@@ -314,12 +314,24 @@ private:
   void DoSetProperty( Property::Index index, const Property::Value& value );
 
 private:
+  struct MaskingData
+  {
+    MaskingData( TextureManager& textureManager );
+    ~MaskingData();
+    void SetImage( const std::string& url );
+
+    TextureManager& mTextureManager;
+    VisualUrl mAlphaMaskUrl;
+    TextureManager::TextureId mAlphaMaskId;
+    float mContentScaleFactor;
+    bool mCropToMask;
+  };
 
   Image mImage;
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
   VisualUrl mImageUrl;
-  TextureManager::MaskingData* mMaskingData;
+  MaskingData* mMaskingData;
 
   Dali::ImageDimensions mDesiredSize;
   TextureManager::TextureId mTextureId;
@@ -328,8 +340,8 @@ private:
   Dali::SamplingMode::Type mSamplingMode:4;
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
-  bool mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
-  bool mLoadingStatus;  ///< True if the texture is being loaded asynchronously, or false when it has loaded.
+  bool mAttemptAtlasing:1; ///< If true will attempt atlasing, otherwise create unique texture
+  bool mTextureLoading:1;  ///< True if the texture is being loaded asynchronously, or false when it has loaded.
 };
 
 
