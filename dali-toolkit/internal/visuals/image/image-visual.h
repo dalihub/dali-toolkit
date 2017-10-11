@@ -286,6 +286,11 @@ private:
   bool IsSynchronousResourceLoading() const;
 
   /**
+   * @brief Load the resource synchronously
+   */
+  void LoadResourceSynchronously();
+
+  /**
    * Creates the texture set and adds the texture to it
    * @param[out] textureRect The texture area of the texture in the atlas.
    * @param[in] url The URL of the image resource to use.
@@ -328,6 +333,7 @@ private:
   };
 
   Image mImage;
+  PixelData mPixels;
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
   VisualUrl mImageUrl;
