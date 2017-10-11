@@ -1750,16 +1750,6 @@ void Controller::ShadowSetByString( bool setByString )
   mImpl->mShadowSetByString = setByString;
 }
 
-bool Controller::IsOutlineSetByString()
-{
-  return mImpl->mOutlineSetByString;
-}
-
-void Controller::OutlineSetByString( bool setByString )
-{
-  mImpl->mOutlineSetByString = setByString;
-}
-
 bool Controller::IsFontStyleSetByString()
 {
   return mImpl->mFontStyleSetByString;

@@ -507,26 +507,13 @@ bool SetOutlineProperties( ControllerPtr controller, const Property::Value& valu
 
         bool empty = true;
 
-        if ( propertiesMap.Empty() )
-        {
-           // Map empty so check if a string provided
-           // This is purely to maintain backward compatibility, but we don't parse the string to be a property map.
-           const std::string propertyString = value.Get<std::string>();
-
-           // Stores the default outline's properties string to be recovered by the GetOutlineProperties() function.
-           controller->SetDefaultOutlineProperties( propertyString );
-
-           controller->OutlineSetByString( true );
-        }
-        else
+        if ( !propertiesMap.Empty() )
         {
            empty = ParseOutlineProperties( propertiesMap,
                                            colorDefined,
                                            color,
                                            widthDefined,
                                            width );
-
-           controller->OutlineSetByString( false );
         }
 
         if( !empty )
@@ -576,30 +563,22 @@ void GetOutlineProperties( ControllerPtr controller, Property::Value& value, Eff
     {
       case EffectStyle::DEFAULT:
       {
-        if ( controller->IsOutlineSetByString() )
-        {
-          value = controller->GetDefaultOutlineProperties();
-          break;
-        }
-        else
-        {
-          const Vector4& color = controller->GetOutlineColor();
-          const float width = controller->GetOutlineWidth();
+        const Vector4& color = controller->GetOutlineColor();
+        const float width = controller->GetOutlineWidth();
 
-          Property::Map map;
+        Property::Map map;
 
-          std::string colorStr;
-          Vector4ToColorString( color, colorStr );
-          map.Insert( COLOR_KEY, colorStr );
+        std::string colorStr;
+        Vector4ToColorString( color, colorStr );
+        map.Insert( COLOR_KEY, colorStr );
 
-          std::string widthStr;
-          FloatToString( width, widthStr );
-          map.Insert( WIDTH_KEY, widthStr );
+        std::string widthStr;
+        FloatToString( width, widthStr );
+        map.Insert( WIDTH_KEY, widthStr );
 
-          value = map;
+        value = map;
 
-          break;
-        }
+        break;
       }
       case EffectStyle::INPUT:
       {
