@@ -222,8 +222,6 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   TextLabel label = TextLabel::New();
   DALI_TEST_CHECK( label );
 
-  Stage::GetCurrent().Add( label );
-
   // Note - we can't check the defaults since the stylesheets are platform-specific
   label.SetProperty( TextLabel::Property::RENDERING_BACKEND, Text::RENDERING_SHARED_ATLAS );
   DALI_TEST_EQUALS( (Text::RenderingType)label.GetProperty<int>( TextLabel::Property::RENDERING_BACKEND ), Text::RENDERING_SHARED_ATLAS, TEST_LOCATION );
@@ -347,13 +345,6 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty( TextLabel::Property::ENABLE_MARKUP, true );
   DALI_TEST_CHECK( label.GetProperty<bool>( TextLabel::Property::ENABLE_MARKUP ) );
 
-  // Check the text property when markup is enabled
-  label.SetProperty( TextLabel::Property::TEXT, "<color value='white'>Markup</color><color value='cyan'>Text</color>" );
-  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::TEXT ), std::string("MarkupText"), TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render();
-
   // Check autoscroll properties
   const int SCROLL_SPEED = 80;
   const int SCROLL_LOOPS = 4;
@@ -396,9 +387,6 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   underlineMapSet.Insert( "height", "1" );
 
   label.SetProperty( TextLabel::Property::UNDERLINE, underlineMapSet );
-
-  application.SendNotification();
-  application.Render();
 
   underlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::UNDERLINE );
   DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
@@ -569,11 +557,6 @@ int UtcDaliToolkitTextLabelEmojisP(void)
   const std::string emojis = "<font family='BreezeColorEmoji' size='60'>\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84</font>";
   label.SetProperty( TextLabel::Property::ENABLE_MARKUP, true );
   label.SetProperty( TextLabel::Property::TEXT, emojis );
-
-  Property::Map shadowMap;
-  shadowMap.Insert( "color", "green" );
-  shadowMap.Insert( "offset", "2 2" );
-  label.SetProperty( TextLabel::Property::SHADOW, shadowMap );
 
   application.SendNotification();
   application.Render();

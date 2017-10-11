@@ -181,9 +181,6 @@ void TypesetGlyph( GlyphData& data,
   }
   else
   {
-    // Whether the given glyph is a color one.
-    const bool isColorGlyph = Pixel::BGRA8888 == data.glyphBitmap.format;
-
     // Initial vertical offset.
     const int yOffset = data.verticalOffset + position->y;
 
@@ -211,24 +208,21 @@ void TypesetGlyph( GlyphData& data,
 
         uint8_t* bitmapBuffer = reinterpret_cast< uint8_t* >( data.bitmapBuffer.GetBuffer() );
 
-        if ( !isColorGlyph )
+        // Update the alpha channel.
+        const uint8_t alpha = *( data.glyphBitmap.buffer + glyphBufferOffset + index );
+
+        // Copy non-transparent pixels only
+        if ( alpha > 0u )
         {
-          // Update the alpha channel.
-          const uint8_t alpha = *( data.glyphBitmap.buffer + glyphBufferOffset + index );
+          // Check alpha of overlapped pixels
+          uint8_t& currentAlpha = *( bitmapBuffer + verticalOffset + xOffsetIndex );
+          uint8_t newAlpha = static_cast<uint8_t>( color->a * static_cast<float>( alpha ) );
 
-          // Copy non-transparent pixels only
-          if ( alpha > 0u )
-          {
-            // Check alpha of overlapped pixels
-            uint8_t& currentAlpha = *( bitmapBuffer + verticalOffset + xOffsetIndex );
-            uint8_t newAlpha = static_cast<uint8_t>( color->a * static_cast<float>( alpha ) );
-
-            // For any pixel overlapped with the pixel in previous glyphs, make sure we don't
-            // overwrite a previous bigger alpha with a smaller alpha (in order to avoid
-            // semi-transparent gaps between joint glyphs with overlapped pixels, which could
-            // happen, for example, in the RTL text when we copy glyphs from right to left).
-            *( bitmapBuffer + verticalOffset + xOffsetIndex ) = std::max( currentAlpha, newAlpha );
-          }
+          // For any pixel overlapped with the pixel in previous glyphs, make sure we don't
+          // overwrite a previous bigger alpha with a smaller alpha (in order to avoid
+          // semi-transparent gaps between joint glyphs with overlapped pixels, which could
+          // happen, for example, in the RTL text when we copy glyphs from right to left).
+          *( bitmapBuffer + verticalOffset + xOffsetIndex ) = std::max( currentAlpha, newAlpha );
         }
       }
     }
