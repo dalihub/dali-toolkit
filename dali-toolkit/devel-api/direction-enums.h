@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_DEVEL_API_ALIGN_ENUMS_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,25 +31,6 @@ namespace Direction
   {
     LEFT_TO_RIGHT = 0,
     RIGHT_TO_LEFT
-  };
-}
-
-/**
- * @brief Enum used to describe anchor point and parent origin of visuals
- */
-namespace Align
-{
-  enum Type
-  {
-    TOP_BEGIN      = 0,
-    TOP_CENTER,
-    TOP_END,
-    CENTER_BEGIN,
-    CENTER,
-    CENTER_END,
-    BOTTOM_BEGIN,
-    BOTTOM_CENTER,
-    BOTTOM_END
   };
 }
 

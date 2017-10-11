@@ -61,12 +61,12 @@ const Vector2& ViewModel::GetScrollPosition() const
   return mModel->GetScrollPosition();
 }
 
-Layout::HorizontalAlignment ViewModel::GetHorizontalAlignment() const
+HorizontalAlignment::Type ViewModel::GetHorizontalAlignment() const
 {
   return mModel->GetHorizontalAlignment();
 }
 
-Layout::VerticalAlignment ViewModel::GetVerticalAlignment() const
+VerticalAlignment::Type ViewModel::GetVerticalAlignment() const
 {
   return mModel->GetVerticalAlignment();
 }

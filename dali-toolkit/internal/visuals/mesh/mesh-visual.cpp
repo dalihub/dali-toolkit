@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
 #include <fstream>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -526,7 +526,7 @@ void MeshVisual::DoSetOnStage( Actor& actor )
 void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::MESH );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::MESH );
   map.Insert( Toolkit::MeshVisual::Property::OBJECT_URL, mObjectUrl );
   map.Insert( Toolkit::MeshVisual::Property::MATERIAL_URL, mMaterialUrl );
   map.Insert( Toolkit::MeshVisual::Property::TEXTURES_PATH, mTexturesPath );

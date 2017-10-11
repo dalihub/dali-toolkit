@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_CONTROL_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ class Control;
  * | keyEvent               | @ref KeyEventSignal()                               |
  * | keyInputFocusGained    | @ref KeyInputFocusGainedSignal()                    |
  * | keyInputFocusLost      | @ref KeyInputFocusLostSignal()                      |
+ * | resourceReady          | @ref ResourceReadySignal()                          |
  * | tapped                 | @ref GetTapGestureDetector().DetectedSignal()       |
  * | panned                 | @ref GetPanGestureDetector().DetectedSignal()       |
  * | pinched                | @ref GetPinchGestureDetector().DetectedSignal()     |
@@ -151,11 +152,14 @@ public:
 
   // Typedefs
 
-  /// @brief Key Event signal type;
+  /// @brief Key Event signal type. @SINCE_1_0.0
   typedef Signal<bool ( Control, const KeyEvent& ) > KeyEventSignalType;
 
-  /// @brief Key InputFocusType signal type;
+  /// @brief Key InputFocusType signal type. @SINCE_1_0.0
   typedef Signal<void ( Control ) > KeyInputFocusSignalType;
+
+  /// @brief ResourceReady signal type. @SINCE_1_2.60
+  typedef Signal<void ( Control ) > ResourceReadySignalType;
 
 public: // Creation & Destruction
 
@@ -350,6 +354,17 @@ public:
    */
   void ClearBackground();
 
+  // Resources
+
+  /**
+   * @brief Query if all resources required by a control are loaded and ready.
+   *
+   * Most resources are only loaded when the control is placed on stage.
+   * @SINCE_1_2.60
+   * @return true if the resources are loaded and ready, false otherwise
+   */
+  bool IsResourceReady() const;
+
   // Signals
 
   /**
@@ -383,8 +398,9 @@ public:
   KeyInputFocusSignalType& KeyInputFocusGainedSignal();
 
   /**
-   * @brief This signal is emitted when the control loses Key Input Focus
-   * which could be due to it being gained by another Control or Actor or just cleared from
+   * @brief This signal is emitted when the control loses Key Input Focus.
+   *
+   * This could be due to it being gained by another Control or Actor or just cleared from
    * this control as no longer required.
    *
    * A callback of the following type may be connected:
@@ -398,6 +414,21 @@ public:
    * @pre The Control has been initialized.
    */
   KeyInputFocusSignalType& KeyInputFocusLostSignal();
+
+  /**
+   * @brief This signal is emitted after all resources required by a control are loaded and ready.
+   *
+   * Most resources are only loaded when the control is placed on stage.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( Control control );
+   * @endcode
+   *
+   * @SINCE_1_2.60
+   * @note A RelayoutRequest is queued by Control before this signal is emitted
+   */
+  ResourceReadySignalType& ResourceReadySignal();
 
 public: // Intended for control developers
 

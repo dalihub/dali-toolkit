@@ -202,7 +202,12 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
       }
     }
 
-    if( !mParser.Parse( data ) )
+    if( mParser.Parse( data ) )
+    {
+      // Drop the styles and get them to be rebuilt against the new parse tree as required.
+      mStyles.Clear();
+    }
+    else
     {
       DALI_LOG_WARNING( "JSON Parse Error:%d:%d:'%s'\n",
                         mParser.GetErrorLineNumber(),
@@ -213,8 +218,8 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
     }
   }
 
-  DUMP_PARSE_TREE(parser); // This macro only writes out if DEBUG is enabled and the "DUMP_TREE" constant is defined in the stylesheet.
-  DUMP_TEST_MAPPINGS(parser);
+  DUMP_PARSE_TREE(mParser); // This macro only writes out if DEBUG is enabled and the "DUMP_TREE" constant is defined in the stylesheet.
+  DUMP_TEST_MAPPINGS(mParser);
 
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Cannot parse JSON");
 }

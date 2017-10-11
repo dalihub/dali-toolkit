@@ -32,10 +32,10 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/devel-api/controls/tooltip/tooltip-properties.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 
 #if defined(DEBUG_ENABLED)
@@ -323,12 +323,12 @@ void ToggleButton::RelayoutVisual( Property::Index index, const Vector2& size )
     DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::OnRelayout Setting visual position to(%f,%f)\n", visualPosition.x, visualPosition.y );
 
     Property::Map visualTransform;
-    visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, visualSize )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, visualPosition )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-                   .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER );
+    visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, visualSize )
+                   .Add( Toolkit::Visual::Transform::Property::OFFSET, visualPosition )
+                   .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+                   .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER );
 
     visual.SetTransformAndSize( visualTransform, size );
   }

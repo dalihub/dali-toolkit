@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,6 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -496,7 +494,7 @@ int UtcDaliButtonSetLabelStringWithPropertyMapP(void)
 
   Button button = PushButton::New();
   button.SetProperty( Toolkit::Button::Property::LABEL,
-                      Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                      Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT )
                                      .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
                                      .Add( Toolkit::TextVisual::Property::TEXT, "Button Label")
                      );
@@ -525,7 +523,7 @@ int UtcDaliButtonSetLabelStringWithPropertyMapStringsP(void)
   tet_infoline(" UtcDaliButtonSetLabelStringWithPropertyMapStringsP Intermediate part of test");
 
   Property::Map propertyMap;
-  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Toolkit::DevelVisual::TEXT );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Toolkit::Visual::TEXT );
   propertyMap.Insert( Toolkit::TextVisual::Property::TEXT,  "error if this is the final text" );
   propertyMap.Insert( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );
 
@@ -554,7 +552,7 @@ int UtcDaliButtonSetLabelWithStringP(void)
 
   // Set default point size for text visual as style sheet not available.
   button.SetProperty( Toolkit::Button::Property::LABEL,
-                      Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                      Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT )
                                      .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
                                      );
 
@@ -577,7 +575,7 @@ int UtcDaliButtonSetLabelPropertyP(void)
   Button button = PushButton::New();
 
   button.SetProperty( Toolkit::Button::Property::LABEL,
-                        Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                        Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT )
                                        .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
                                        .Add( Toolkit::TextVisual::Property::TEXT, TEST_LABEL1 )
                      );
@@ -585,7 +583,7 @@ int UtcDaliButtonSetLabelPropertyP(void)
   DALI_TEST_EQUALS( GetButtonText( button ), TEST_LABEL1,  TEST_LOCATION );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Toolkit::DevelVisual::TEXT );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Toolkit::Visual::TEXT );
   propertyMap.Insert( Toolkit::TextVisual::Property::TEXT,  TEST_LABEL2 );
   propertyMap.Insert( Toolkit::TextVisual::Property::TEXT_COLOR, Color::BLUE );
   propertyMap.Insert( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );

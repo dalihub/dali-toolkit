@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_EDITOR_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,46 +72,383 @@ public:
      */
     enum
     {
-      RENDERING_BACKEND = PROPERTY_START_INDEX, ///< name "renderingBackend",                    The type or rendering e.g. bitmap-based,                                         type INT @SINCE_1_1.37
-      TEXT,                                     ///< name "text",                                The text to display in UTF-8 format,                                             type STRING @SINCE_1_1.37
-      TEXT_COLOR,                               ///< name "textColor",                           The text color,                                                                  type VECTOR4 @SINCE_1_1.37
-      FONT_FAMILY,                              ///< name "fontFamily",                          The requested font family,                                                       type STRING @SINCE_1_1.37
-      FONT_STYLE,                               ///< name "fontStyle",                           The requested font style,                                                        type STRING or MAP @SINCE_1_2.13
-      POINT_SIZE,                               ///< name "pointSize",                           The size of font in points (Conversion from Pixel size to Point size : Point size = Pixel size * 72 / DPI),       type FLOAT @SINCE_1_1.37
-      HORIZONTAL_ALIGNMENT,                     ///< name "horizontalAlignment",                 The text horizontal alignment,                                                   type STRING,  values "BEGIN", "CENTER", "END" @SINCE_1_1.37
-      SCROLL_THRESHOLD,                         ///< name "scrollThreshold"                      Vertical scrolling will occur if the cursor is this close to the control border, type FLOAT @SINCE_1_1.37
-      SCROLL_SPEED,                             ///< name "scrollSpeed"                          The scroll speed in pixels per second,                                           type FLOAT @SINCE_1_1.37
-      PRIMARY_CURSOR_COLOR,                     ///< name "primaryCursorColor",                  The color to apply to the primary cursor,                                        type VECTOR4 @SINCE_1_1.37
-      SECONDARY_CURSOR_COLOR,                   ///< name "secondaryCursorColor",                The color to apply to the secondary cursor,                                      type VECTOR4 @SINCE_1_1.37
-      ENABLE_CURSOR_BLINK,                      ///< name "enableCursorBlink",                   Whether the cursor should blink or not,                                          type BOOLEAN @SINCE_1_1.37
-      CURSOR_BLINK_INTERVAL,                    ///< name "cursorBlinkInterval",                 The time interval in seconds between cursor on/off states,                       type FLOAT @SINCE_1_1.37
-      CURSOR_BLINK_DURATION,                    ///< name "cursorBlinkDuration",                 The cursor will stop blinking after this number of seconds (if non-zero),        type FLOAT @SINCE_1_1.37
-      CURSOR_WIDTH,                             ///< name "cursorWidth",                         The cursor width,                                                                type INTEGER @SINCE_1_1.37
-      GRAB_HANDLE_IMAGE,                        ///< name "grabHandleImage",                     The image to display for the grab handle,                                        type STRING @SINCE_1_1.37
-      GRAB_HANDLE_PRESSED_IMAGE,                ///< name "grabHandlePressedImage",              The image to display when the grab handle is pressed,                            type STRING @SINCE_1_1.37
-      SELECTION_HANDLE_IMAGE_LEFT,              ///< name "selectionHandleImageLeft",            The image to display for the left selection handle,                              type MAP @SINCE_1_1.37
-      SELECTION_HANDLE_IMAGE_RIGHT,             ///< name "selectionHandleImageRight",           The image to display for the right selection handle,                             type MAP @SINCE_1_1.37
-      SELECTION_HANDLE_PRESSED_IMAGE_LEFT,      ///< name "selectionHandlePressedImageLeft",     The image to display when the left selection handle is pressed,                  type MAP @SINCE_1_1.37
-      SELECTION_HANDLE_PRESSED_IMAGE_RIGHT,     ///< name "selectionHandlePressedImageRight",    The image to display when the right selection handle is pressed,                 type MAP @SINCE_1_1.37
-      SELECTION_HANDLE_MARKER_IMAGE_LEFT,       ///< name "selectionHandleMarkerImageLeft",      The image to display for the left selection handle marker,                       type MAP @SINCE_1_1.37
-      SELECTION_HANDLE_MARKER_IMAGE_RIGHT,      ///< name "selectionHandleMarkerImageRight",     The image to display for the right selection handle marker,                      type MAP @SINCE_1_1.37
-      SELECTION_HIGHLIGHT_COLOR,                ///< name "selectionHighlightColor",             The color of the selection highlight,                                            type VECTOR4 @SINCE_1_1.37
-      DECORATION_BOUNDING_BOX,                  ///< name "decorationBoundingBox",               The decorations (handles etc) will positioned within this area on-screen,        type RECTANGLE @SINCE_1_1.37
-      ENABLE_MARKUP,                            ///< name "enableMarkup",                        Whether the mark-up processing is enabled.                                       type BOOLEAN @SINCE_1_1.37
-      INPUT_COLOR,                              ///< name "inputColor",                          The color of the new input text,                                                 type VECTOR4 @SINCE_1_1.37
-      INPUT_FONT_FAMILY,                        ///< name "inputFontFamily",                     The font's family of the new input text,                                         type STRING @SINCE_1_1.37
-      INPUT_FONT_STYLE,                         ///< name "inputFontStyle",                      The font's style of the new input text,                                          type STRING or MAP @SINCE_1_2.13
-      INPUT_POINT_SIZE,                         ///< name "inputPointSize",                      The font's size of the new input text in points,                                 type FLOAT @SINCE_1_1.37
-      LINE_SPACING,                             ///< name "lineSpacing",                         The default extra space between lines in points,                                 type FLOAT @SINCE_1_1.37
-      INPUT_LINE_SPACING,                       ///< name "inputLineSpacing"                     The extra space between lines in points. It affects the whole paragraph where the new input text is inserted, type FLOAT @SINCE_1_1.37
-      UNDERLINE,                                ///< name "underline"                            The default underline parameters,                                                type STRING or MAP @SINCE_1_2.13
-      INPUT_UNDERLINE,                          ///< name "inputUnderline"                       The underline parameters of the new input text,                                  type STRING or MAP @SINCE_1_2.13
-      SHADOW,                                   ///< name "shadow"                               The default shadow parameters,                                                   type STRING or MAP @SINCE_1_2.13
-      INPUT_SHADOW,                             ///< name "inputShadow"                          The shadow parameters of the new input text,                                     type STRING or MAP @SINCE_1_2.13
-      EMBOSS,                                   ///< name "emboss"                               The default emboss parameters,                                                   type STRING or MAP @SINCE_1_2.13
-      INPUT_EMBOSS,                             ///< name "inputEmboss"                          The emboss parameters of the new input text,                                     type STRING or MAP @SINCE_1_2.13
-      OUTLINE,                                  ///< name "outline"                              The default outline parameters,                                                  type STRING or MAP @SINCE_1_2.13
-      INPUT_OUTLINE,                            ///< name "inputOutline"                         The outline parameters of the new input text,                                    type STRING or MAP @SINCE_1_2.13
+      /**
+       * @brief The type or rendering e.g. bitmap-based.
+       * @details Name "renderingBackend", type Property::INTEGER.
+       * @SINCE_1_1.37
+       */
+      RENDERING_BACKEND = PROPERTY_START_INDEX,
+
+      /**
+       * @brief The text to display in UTF-8 format.
+       * @details Name "text", type Property::STRING.
+       * @SINCE_1_1.37
+       */
+      TEXT,
+
+      /**
+       * @brief The text color.
+       * @details Name "textColor", type Property::VECTOR4.
+       * @SINCE_1_1.37
+       */
+      TEXT_COLOR,
+
+      /**
+       * @brief The requested font family.
+       * @details Name "fontFamily", type Property::STRING.
+       * @SINCE_1_1.37
+       */
+      FONT_FAMILY,
+
+      /**
+       * @brief The requested font style.
+       * @details Name "fontStyle", type Property::STRING or Property::MAP.
+       * @SINCE_1_2.13
+       */
+      FONT_STYLE,
+
+      /**
+       * @brief The size of font in points.
+       * @details Name "pointSize", type Property::FLOAT.
+       *          Conversion from Pixel size to Point size : Point size = Pixel size * 72 / DPI.
+       * @SINCE_1_1.37
+       */
+      POINT_SIZE,
+
+      /**
+       * @brief The text horizontal alignment.
+       * @details Name "horizontalAlignment", type Property::STRING or type HorizontalAlignment::Type (Property::INTEGER)
+       *          Values "BEGIN" "CENTER" "END".
+       * @note Return type is Property::STRING
+       * @SINCE_1_1.37
+       */
+      HORIZONTAL_ALIGNMENT,
+
+      /**
+       * @brief Vertical scrolling will occur if the cursor is this close to the control border.
+       * @details Name "scrollThreshold", type Property::FLOAT.
+       * @SINCE_1_1.37
+       */
+      SCROLL_THRESHOLD,
+
+      /**
+       * @brief The scroll speed in pixels per second.
+       * @details Name "scrollSpeed", type Property::FLOAT.
+       * @SINCE_1_1.37
+       */
+      SCROLL_SPEED,
+
+      /**
+       * @brief The color to apply to the primary cursor.
+       * @details Name "primaryCursorColor", type Property::VECTOR4.
+       * @SINCE_1_1.37
+       */
+      PRIMARY_CURSOR_COLOR,
+
+      /**
+       * @brief The color to apply to the secondary cursor.
+       * @details Name "secondaryCursorColor", type Property::VECTOR4.
+       * @SINCE_1_1.37
+       */
+      SECONDARY_CURSOR_COLOR,
+
+      /**
+       * @brief Whether the cursor should blink or not.
+       * @details Name "enableCursorBlink", type Property::BOOLEAN.
+       * @SINCE_1_1.37
+       */
+      ENABLE_CURSOR_BLINK,
+
+      /**
+       * @brief The time interval in seconds between cursor on/off states.
+       * @details Name "cursorBlinkInterval", type Property::FLOAT.
+       * @SINCE_1_1.37
+       */
+      CURSOR_BLINK_INTERVAL,
+
+      /**
+       * @brief The cursor will stop blinking after this number of seconds (if non-zero).
+       * @details Name "cursorBlinkDuration", type Property::FLOAT.
+       * @SINCE_1_1.37
+       */
+      CURSOR_BLINK_DURATION,
+
+      /**
+       * @brief The cursor width.
+       * @details Name "cursorWidth", type Property::INTEGER.
+       * @SINCE_1_1.37
+       */
+      CURSOR_WIDTH,
+
+      /**
+       * @brief The image to display for the grab handle.
+       * @details Name "grabHandleImage", type Property::STRING.
+       * @SINCE_1_1.37
+       */
+      GRAB_HANDLE_IMAGE,
+
+      /**
+       * @brief The image to display when the grab handle is pressed.
+       * @details Name "grabHandlePressedImage", type Property::STRING.
+       * @SINCE_1_1.37
+       */
+      GRAB_HANDLE_PRESSED_IMAGE,
+
+      /**
+       * @brief The image to display for the left selection handle.
+       * @details Name "selectionHandleImageLeft", type Property::MAP.
+       * @SINCE_1_1.37
+       */
+      SELECTION_HANDLE_IMAGE_LEFT,
+
+      /**
+       * @brief The image to display for the right selection handle.
+       * @details Name "selectionHandleImageRight", type Property::MAP.
+       * @SINCE_1_1.37
+       */
+      SELECTION_HANDLE_IMAGE_RIGHT,
+
+      /**
+       * @brief The image to display when the left selection handle is pressed.
+       * @details Name "selectionHandlePressedImageLeft", type Property::MAP.
+       * @SINCE_1_1.37
+       */
+      SELECTION_HANDLE_PRESSED_IMAGE_LEFT,
+
+      /**
+       * @brief The image to display when the right selection handle is pressed.
+       * @details Name "selectionHandlePressedImageRight", type Property::MAP.
+       * @SINCE_1_1.37
+       */
+      SELECTION_HANDLE_PRESSED_IMAGE_RIGHT,
+
+      /**
+       * @brief The image to display for the left selection handle marker.
+       * @details Name "selectionHandleMarkerImageLeft", type Property::MAP.
+       * @SINCE_1_1.37
+       */
+      SELECTION_HANDLE_MARKER_IMAGE_LEFT,
+
+      /**
+       * @brief The image to display for the right selection handle marker.
+       * @details Name "selectionHandleMarkerImageRight", type Property::MAP.
+       * @SINCE_1_1.37
+       */
+      SELECTION_HANDLE_MARKER_IMAGE_RIGHT,
+
+      /**
+       * @brief The color of the selection highlight.
+       * @details Name "selectionHighlightColor", type Property::VECTOR4.
+       * @SINCE_1_1.37
+       */
+      SELECTION_HIGHLIGHT_COLOR,
+
+      /**
+       * @brief The decorations (handles etc) will positioned within this area on-screen.
+       * @details Name "decorationBoundingBox", type Property::RECTANGLE.
+       * @SINCE_1_1.37
+       */
+      DECORATION_BOUNDING_BOX,
+
+      /**
+       * @brief Whether the mark-up processing is enabled.
+       * @details Name "enableMarkup", type Property::BOOLEAN.
+       * @SINCE_1_1.37
+       */
+      ENABLE_MARKUP,
+
+      /**
+       * @brief The color of the new input text.
+       * @details Name "inputColor", type Property::VECTOR4.
+       * @SINCE_1_1.37
+       */
+      INPUT_COLOR,
+
+      /**
+       * @brief The font's family of the new input text.
+       * @details Name "inputFontFamily", type Property::STRING.
+       * @SINCE_1_1.37
+       */
+      INPUT_FONT_FAMILY,
+
+      /**
+       * @brief The font's style of the new input text.
+       * @details Name "inputFontStyle", type Property::MAP.
+       * @SINCE_1_2.13
+       */
+      INPUT_FONT_STYLE,
+
+      /**
+       * @brief The font's size of the new input text in points.
+       * @details Name "inputPointSize", type Property::FLOAT.
+       * @SINCE_1_1.37
+       */
+      INPUT_POINT_SIZE,
+
+      /**
+       * @brief The default extra space between lines in points.
+       * @details Name "lineSpacing", type Property::FLOAT.
+       * @SINCE_1_1.37
+       */
+      LINE_SPACING,
+
+      /**
+       * @brief The extra space between lines in points.
+       * @details Name "inputLineSpacing",  type Property::FLOAT.
+       * @SINCE_1_1.37
+       * @note This affects the whole paragraph where the new input text is inserted.
+       */
+      INPUT_LINE_SPACING,
+
+      /**
+       * @brief The default underline parameters.
+       * @details Name "underline", type Property::MAP.
+       * @SINCE_1_2.13
+       */
+      UNDERLINE,
+
+      /**
+       * @brief The underline parameters of the new input text.
+       * @details Name "inputUnderline", type Property::MAP.
+       * @SINCE_1_2.13
+       */
+      INPUT_UNDERLINE,
+
+      /**
+       * @brief The default shadow parameters.
+       * @details Name "shadow", type Property::MAP.
+       * @SINCE_1_2.13
+       */
+      SHADOW,
+
+      /**
+       * @brief The shadow parameters of the new input text.
+       * @details Name "inputShadow", type Property::MAP.
+       * @SINCE_1_2.13
+       */
+      INPUT_SHADOW,
+
+      /**
+       * @brief The default emboss parameters.
+       * @details Name "emboss", type Property::MAP.
+       * @SINCE_1_2.13
+       */
+      EMBOSS,
+
+      /**
+       * @brief The emboss parameters of the new input text.
+       * @details Name "inputEmboss", type Property::MAP.
+       * @SINCE_1_2.13
+       */
+      INPUT_EMBOSS,
+
+      /**
+       * @brief The default outline parameters.
+       * @details Name "outline", type Property::MAP.
+       * @SINCE_1_2.13
+       */
+      OUTLINE,
+
+      /**
+       * @brief The outline parameters of the new input text.
+       * @details Name "inputOutline", type Property::MAP.
+       * @SINCE_1_2.13
+       */
+      INPUT_OUTLINE,
+
+      /**
+       * @brief Enable or disable the smooth scroll animation.
+       * @details Name "smoothScroll", type Property::BOOLEAN.
+       * @SINCE_1_2.60
+       */
+      SMOOTH_SCROLL,
+
+      /**
+       * @brief Sets the duration of smooth scroll animation.
+       * @details Name "smoothScrollDuration", type Property::FLOAT.
+       * @SINCE_1_2.60
+       */
+      SMOOTH_SCROLL_DURATION,
+
+      /**
+       * @brief Enable or disable the scroll bar.
+       * @details Name "enableScrollBar", type Property::BOOLEAN.
+       * @SINCE_1_2.60
+       */
+      ENABLE_SCROLL_BAR,
+
+      /**
+       * @brief Sets the duration of scroll bar to show.
+       * @details Name "scrollBarShowDuration", type Property::FLOAT.
+       * @SINCE_1_2.60
+       */
+      SCROLL_BAR_SHOW_DURATION,
+
+      /**
+       * @brief Sets the duration of scroll bar to fade out.
+       * @details Name "scrollBarFadeDuration", type Property::FLOAT.
+       * @SINCE_1_2.60
+       */
+      SCROLL_BAR_FADE_DURATION,
+
+      /**
+       * @brief The size of font in pixels.
+       * @details Name "pixelSize", type Property::FLOAT.
+       *          Conversion from Point size to Pixel size:
+       *           Pixel size = Point size * DPI / 72
+       * @SINCE_1_2.60
+       */
+      PIXEL_SIZE,
+
+      /**
+       * @brief The line count of text.
+       * @details Name "lineCount", type Property::INTEGER.
+       * @SINCE_1_2.60
+       * @note This property is read-only.
+       */
+      LINE_COUNT,
+
+      /**
+       * @brief Enables Text selection, such as the cursor, handle, clipboard, and highlight color.
+       * @details Name "enableSelection", type Property::BOOLEAN.
+       * @SINCE_1_2.60
+       */
+      ENABLE_SELECTION,
+
+      /**
+       * @brief Sets the placeholder : text, color, font family, font style, point size, and pixel size.
+       * @details Name "placeholder", type Property::MAP.
+       * Example:
+       * @code
+       *   Property::Map propertyMap;
+       *   propertyMap["placeholderText"] = "Setting Placeholder Text";
+       *   propertyMap["placeholderTextFocused"] = "Setting Placeholder Text Focused";
+       *   propertyMap["placeholderColor"] = Color::RED;
+       *   propertyMap["placeholderFontFamily"] = "Arial";
+       *   propertyMap["placeholderPointSize"] = 12.0f;
+       *
+       *   Property::Map fontStyleMap;
+       *   fontStyleMap.Insert( "weight", "bold" );
+       *   fontStyleMap.Insert( "width", "condensed" );
+       *   fontStyleMap.Insert( "slant", "italic" );
+       *   propertyMap["placeholderFontStyle"] = fontStyleMap;
+       *
+       *   editor.SetProperty( TextEditor::Property::PLACEHOLDER, propertyMap );
+       * @endcode
+       *
+       * @SINCE_1_2.60
+       */
+      PLACEHOLDER,
+
+      /**
+       * @brief Line wrap mode when text lines are greater than the layout width.
+       * @details Name "lineWrapMode", type Text::LineWrap::Mode (Text::Property::INTEGER) or Property::STRING.
+       * @SINCE_1_2.60
+       * @note Default is Text::LineWrap::WORD.
+       * @note Return type is Text::LineWrap::Mode (Text::Property::INTEGER).
+       * @see Text::LineWrap
+       */
+      LINE_WRAP_MODE,
     };
   };
 
@@ -141,6 +478,25 @@ public:
     };
   };
 
+  /**
+   * @brief Enumerations for the type of scrolling.
+   * @SINCE_1_2.60
+   * @see ScrollStateChangedSignal()
+   */
+  struct Scroll
+  {
+    /**
+     * @brief Enumerations for the type of scrolling.
+     * @SINCE_1_2.60
+     * @see ScrollStateChangedSignal()
+     */
+    enum Type
+    {
+      STARTED,   ///< Scrolling has started. @SINCE_1_2.60
+      FINISHED   ///< Scrolling has finished. @SINCE_1_2.60
+    };
+  };
+
   // Type Defs
 
   /**
@@ -154,6 +510,12 @@ public:
    * @SINCE_1_2_2
    */
   typedef Signal<void ( TextEditor, InputStyle::Mask ) > InputStyleChangedSignalType;
+
+  /**
+   * @brief Scroll state changed signal type.
+   * @SINCE_1_2.60
+   */
+  typedef Signal< void ( TextEditor, Scroll::Type ) > ScrollStateChangedSignalType;
 
   /**
    * @brief Creates the TextEditor control.
@@ -235,6 +597,20 @@ public:
    * @return The signal to connect to
    */
   InputStyleChangedSignalType& InputStyleChangedSignal();
+
+  /**
+   * @brief This signal is emitted when TextEditor scrolling is started or finished.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( Scroll::Type type );
+   * @endcode
+   * type: Whether the scrolling is started or finished.
+   *
+   * @SINCE_1_2.60
+   * @return The signal to connect to
+   */
+  ScrollStateChangedSignalType& ScrollStateChangedSignal();
 
 public: // Not intended for application developers
 

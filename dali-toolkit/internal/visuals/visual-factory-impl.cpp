@@ -27,9 +27,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
@@ -88,8 +87,8 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
   Visual::BasePtr visualPtr;
 
-  Property::Value* typeValue = propertyMap.Find( Toolkit::DevelVisual::Property::TYPE, VISUAL_TYPE );
-  Toolkit::DevelVisual::Type visualType = Toolkit::DevelVisual::IMAGE; // Default to IMAGE type.
+  Property::Value* typeValue = propertyMap.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE );
+  Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type.
   if( typeValue )
   {
     Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType );
@@ -179,13 +178,13 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       break;
     }
 
-    case Toolkit::DevelVisual::TEXT:
+    case Toolkit::Visual::TEXT:
     {
       visualPtr = TextVisual::New( *( mFactoryCache.Get() ), propertyMap );
       break;
     }
 
-    case Toolkit::DevelVisual::N_PATCH:
+    case Toolkit::Visual::N_PATCH:
     {
       Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
       std::string imageUrl;
@@ -196,7 +195,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       break;
     }
 
-    case Toolkit::DevelVisual::SVG:
+    case Toolkit::Visual::SVG:
     {
       Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
       std::string imageUrl;
@@ -207,7 +206,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       break;
     }
 
-    case Toolkit::DevelVisual::ANIMATED_IMAGE:
+    case Toolkit::Visual::ANIMATED_IMAGE:
     {
       Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
       std::string imageUrl;
@@ -235,7 +234,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     DALI_LOG_ERROR( "Renderer type unknown\n" );
   }
 
-  if( mDebugEnabled && visualType !=  Toolkit::DevelVisual::WIREFRAME )
+  if( mDebugEnabled && visualType !=  Toolkit::Visual::WIREFRAME )
   {
     //Create a WireframeVisual if we have debug enabled
     visualPtr = WireframeVisual::New( *( mFactoryCache.Get() ), visualPtr, propertyMap );

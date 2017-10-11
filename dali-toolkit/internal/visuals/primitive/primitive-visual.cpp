@@ -27,7 +27,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -218,7 +218,7 @@ void PrimitiveVisual::DoSetProperties( const Property::Map& propertyMap )
   }
 
   // By virtue of DoSetProperties being called last, this will override
-  // anything set by DevelVisual::Property::MIX_COLOR
+  // anything set by Toolkit::Visual::Property::MIX_COLOR
   Property::Value* colorValue = propertyMap.Find( Toolkit::PrimitiveVisual::Property::MIX_COLOR, MIX_COLOR );
   if( colorValue )
   {
@@ -426,7 +426,7 @@ void PrimitiveVisual::DoSetOnStage( Actor& actor )
 void PrimitiveVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::PRIMITIVE );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::PRIMITIVE );
   map.Insert( Toolkit::PrimitiveVisual::Property::MIX_COLOR, mImpl->mMixColor );
   map.Insert( Toolkit::PrimitiveVisual::Property::SHAPE, mPrimitiveType );
   map.Insert( Toolkit::PrimitiveVisual::Property::SLICES, mSlices );

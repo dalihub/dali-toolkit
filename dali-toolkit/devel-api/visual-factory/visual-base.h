@@ -67,8 +67,8 @@ namespace Visual
  * | size                    | VECTOR2           | No       | (1,1)                  | size of visual                                      |
  * | origin                  | INTEGER or STRING | No       | CENTER                 | origin of the visual @sa Dali::Toolkit::Align       |
  * | anchorPoint             | INTEGER or STRING | No       | CENTER                 | anchor point of the visual @sa Dali::Toolkit::Align |
- * | offsetPolicy            | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::DevelVisual::Transform::Policy   |
- * | sizePolicy              | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::DevelVisual::Transform::Policy   |
+ * | offsetPolicy            | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::Visual::Transform::Policy   |
+ * | sizePolicy              | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::Visual::Transform::Policy   |
  *
  * Relative means that the component describes a factor of the parent control size;
  * size.x = 1 means full width; size.y = 0.5 means half height.

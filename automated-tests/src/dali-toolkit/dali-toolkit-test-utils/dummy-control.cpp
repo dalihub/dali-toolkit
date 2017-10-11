@@ -19,8 +19,6 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/devel-api/align-enums.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 
 namespace Dali

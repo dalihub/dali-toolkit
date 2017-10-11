@@ -2611,17 +2611,17 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
 
     switch( mModel->mHorizontalAlignment )
     {
-      case Layout::HORIZONTAL_ALIGN_BEGIN:
+      case Text::HorizontalAlignment::BEGIN :
       {
         cursorInfo.primaryPosition.x = 0.f;
         break;
       }
-      case Layout::HORIZONTAL_ALIGN_CENTER:
+      case Text::HorizontalAlignment::CENTER:
       {
         cursorInfo.primaryPosition.x = floorf( 0.5f * mModel->mVisualModel->mControlSize.width );
         break;
       }
-      case Layout::HORIZONTAL_ALIGN_END:
+      case Text::HorizontalAlignment::END:
       {
         cursorInfo.primaryPosition.x = mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
         break;

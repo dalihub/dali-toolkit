@@ -25,9 +25,9 @@
 #include <dali/public-api/rendering/renderer.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
+#include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
-#include <dali-toolkit/internal/text/layouts/layout-alignment.h>
 
 namespace Dali
 {
@@ -65,12 +65,13 @@ public:
    * @param[in] renderer renderer to render the text
    * @param[in] textureSet texture of the text to be scrolled
    * @param[in] controlSize size of the control to scroll within
-   * @param[in] textNaturalSize natural size of the text
+   * @param[in] textureSize size of the texture
+   * @param[in] wrapGap The gap before scrolling wraps
    * @param[in] direction text direction true for right to left text
    * @param[in] horizontalAlignment horizontal alignment of the text
    * @param[in] verticalAlignment vertical alignment of the text
    */
-  void SetParameters( Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, Layout::HorizontalAlignment horizontalAlignment, Layout::VerticalAlignment verticalAlignment );
+  void SetParameters( Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment );
 
   /**
    * @brief Set the gap distance to elapse before the text wraps around
@@ -124,7 +125,7 @@ public:
    * @brief Set the mode of scrolling stop
    * @param[in] stopMode type when text scrolling is stoped.
    */
-  void SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMode );
+  void SetStopMode( TextLabel::AutoScrollStopMode::Type stopMode );
 
   /**
    * @brief Stop the auto scrolling.
@@ -135,7 +136,7 @@ public:
    * @brief Get the mode of scrolling stop
    * @return stopMode type when text scrolling is stoped.
    */
-  DevelTextLabel::AutoScrollStopMode::Type GetStopMode() const;
+  TextLabel::AutoScrollStopMode::Type GetStopMode() const;
 
 private: // Implementation
 
@@ -183,7 +184,7 @@ private:
   int   mLoopCount;                                     ///< Number of time the text should scroll
   float mLoopDelay;                                     ///< Time delay of loop start
   float mWrapGap;                                       ///< Gap before text wraps around when scrolling
-  DevelTextLabel::AutoScrollStopMode::Type  mStopMode;  ///< Stop mode of scrolling text, when loop count is 0.
+  TextLabel::AutoScrollStopMode::Type  mStopMode;       ///< Stop mode of scrolling text, when loop count is 0.
 
 }; // TextScroller class
 

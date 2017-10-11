@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ int UtcDaliCreateAlphaDiscardEffect(void)
   Property::Map effect = Toolkit::CreateAlphaDiscardEffect();
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
+  Property::Value* customShaderValue = effect.Find( Toolkit::Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;
@@ -72,7 +72,7 @@ int UtcDaliCreateDissolveEffect( bool highPrecision )
   Property::Map effect = Toolkit::CreateDissolveEffect( highPrecision );
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
+  Property::Value* customShaderValue = effect.Find( Toolkit::Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;
@@ -137,7 +137,7 @@ int UtcDaliCreateDissolveEffect(void)
   Property::Map effect = Toolkit::CreateDistanceFieldEffect();
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
+  Property::Value* customShaderValue = effect.Find( Toolkit::Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;
@@ -173,7 +173,7 @@ int UtcDaliCreateImageRegionEffect(void)
   Property::Map effect = Toolkit::CreateImageRegionEffect();
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
+  Property::Value* customShaderValue = effect.Find( Toolkit::Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;
@@ -208,7 +208,7 @@ int UtcDaliCreateMotionBlurEffect(void)
   Property::Map effect = Toolkit::CreateMotionBlurEffect();
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
+  Property::Value* customShaderValue = effect.Find( Toolkit::Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;
@@ -271,7 +271,7 @@ int UtcDaliCreateMotionStretchEffect(void)
   Property::Map effect = Toolkit::CreateMotionStretchEffect();
   DALI_TEST_CHECK( !effect.Empty() );
 
-  Property::Value* customShaderValue = effect.Find( Visual::Property::SHADER );
+  Property::Value* customShaderValue = effect.Find( Toolkit::Visual::Property::SHADER );
   DALI_TEST_CHECK( customShaderValue );
 
   Property::Map customShader;

@@ -31,11 +31,12 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
@@ -65,23 +66,6 @@ namespace // unnamed namespace
 
 namespace
 {
-
-const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
-{
-  { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
-  { "CENTER", Toolkit::Text::Layout::HORIZONTAL_ALIGN_CENTER },
-  { "END",    Toolkit::Text::Layout::HORIZONTAL_ALIGN_END    },
-};
-const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
-
-const Scripting::StringEnum VERTICAL_ALIGNMENT_STRING_TABLE[] =
-{
-  { "TOP",    Toolkit::Text::Layout::VERTICAL_ALIGN_TOP    },
-  { "CENTER", Toolkit::Text::Layout::VERTICAL_ALIGN_CENTER },
-  { "BOTTOM", Toolkit::Text::Layout::VERTICAL_ALIGN_BOTTOM },
-};
-const unsigned int VERTICAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( VERTICAL_ALIGNMENT_STRING_TABLE ) / sizeof( VERTICAL_ALIGNMENT_STRING_TABLE[0] );
-
 // Type registration
 BaseHandle Create()
 {
@@ -138,11 +122,11 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "emboss",                       
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputEmboss",                          MAP,       INPUT_EMBOSS                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "outline",                              MAP,       OUTLINE                              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "inputOutline",                         MAP,       INPUT_OUTLINE                        )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "hiddenInputSettings",            MAP,       HIDDEN_INPUT_SETTINGS                )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "pixelSize",                      FLOAT,     PIXEL_SIZE                           )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableSelection",                BOOLEAN,   ENABLE_SELECTION                     )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder",                    MAP,       PLACEHOLDER                          )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "ellipsis",                       BOOLEAN,   ELLIPSIS                             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "hiddenInputSettings",                  MAP,       HIDDEN_INPUT_SETTINGS                )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "pixelSize",                            FLOAT,     PIXEL_SIZE                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableSelection",                      BOOLEAN,   ENABLE_SELECTION                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder",                          MAP,       PLACEHOLDER                          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "ellipsis",                             BOOLEAN,   ELLIPSIS                             )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -297,15 +281,10 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string& alignStr = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
-
-          Layout::HorizontalAlignment alignment( Layout::HORIZONTAL_ALIGN_BEGIN );
-          if( Scripting::GetEnumeration< Layout::HorizontalAlignment >( alignStr.c_str(),
-                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                        alignment ) )
+          Text::HorizontalAlignment::Type alignment( static_cast< Text::HorizontalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+          if( GetHorizontalAlignmentEnumeration( value, alignment ) )
           {
+            DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p HORIZONTAL_ALIGNMENT %d\n", impl.mController.Get(), alignment );
             impl.mController->SetHorizontalAlignment( alignment );
           }
         }
@@ -315,16 +294,11 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       {
         if( impl.mController )
         {
-          const std::string& alignStr = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
-
-          Layout::VerticalAlignment alignment( Layout::VERTICAL_ALIGN_BOTTOM );
-          if( Scripting::GetEnumeration< Layout::VerticalAlignment >( alignStr.c_str(),
-                                                                      VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                      VERTICAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                      alignment ) )
+          Toolkit::Text::VerticalAlignment::Type alignment( static_cast< Text::VerticalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+          if( GetVerticalAlignmentEnumeration( value, alignment ) )
           {
             impl.mController->SetVerticalAlignment( alignment );
+            DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p VERTICAL_ALIGNMENT %d\n", impl.mController.Get(), alignment );
           }
         }
         break;
@@ -731,7 +705,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::DevelTextField::Property::HIDDEN_INPUT_SETTINGS:
+      case Toolkit::TextField::Property::HIDDEN_INPUT_SETTINGS:
       {
         const Property::Map* map = value.GetMap();
         if (map)
@@ -740,7 +714,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::DevelTextField::Property::PIXEL_SIZE:
+      case Toolkit::TextField::Property::PIXEL_SIZE:
       {
         if( impl.mController )
         {
@@ -754,7 +728,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::DevelTextField::Property::ENABLE_SELECTION:
+      case Toolkit::TextField::Property::ENABLE_SELECTION:
       {
         if( impl.mController )
         {
@@ -764,7 +738,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::DevelTextField::Property::PLACEHOLDER:
+      case Toolkit::TextField::Property::PLACEHOLDER:
       {
         const Property::Map* map = value.GetMap();
         if( map )
@@ -773,7 +747,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::DevelTextField::Property::ELLIPSIS:
+      case Toolkit::TextField::Property::ELLIPSIS:
       {
         if( impl.mController )
         {
@@ -874,10 +848,9 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::HorizontalAlignment >( impl.mController->GetHorizontalAlignment(),
-                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
-          if( name )
+          const char* name = Text::GetHorizontalAlignmentString( impl.mController->GetHorizontalAlignment() );
+
+          if ( name )
           {
             value = std::string( name );
           }
@@ -888,9 +861,8 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
       {
         if( impl.mController )
         {
-          const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::VerticalAlignment >( impl.mController->GetVerticalAlignment(),
-                                                                                                        VERTICAL_ALIGNMENT_STRING_TABLE,
-                                                                                                        VERTICAL_ALIGNMENT_STRING_TABLE_COUNT );
+          const char* name = Text::GetVerticalAlignmentString( impl.mController->GetVerticalAlignment() );
+
           if( name )
           {
             value = std::string( name );
@@ -1147,14 +1119,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         GetOutlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
         break;
       }
-      case Toolkit::DevelTextField::Property::HIDDEN_INPUT_SETTINGS:
+      case Toolkit::TextField::Property::HIDDEN_INPUT_SETTINGS:
       {
         Property::Map map;
         impl.mController->GetHiddenInputOption(map);
         value = map;
         break;
       }
-      case Toolkit::DevelTextField::Property::PIXEL_SIZE:
+      case Toolkit::TextField::Property::PIXEL_SIZE:
       {
         if( impl.mController )
         {
@@ -1162,7 +1134,7 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
-      case Toolkit::DevelTextField::Property::ENABLE_SELECTION:
+      case Toolkit::TextField::Property::ENABLE_SELECTION:
       {
         if( impl.mController )
         {
@@ -1170,14 +1142,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
-      case Toolkit::DevelTextField::Property::PLACEHOLDER:
+      case Toolkit::TextField::Property::PLACEHOLDER:
       {
         Property::Map map;
         impl.mController->GetPlaceholderProperty( map );
         value = map;
         break;
       }
-      case Toolkit::DevelTextField::Property::ELLIPSIS:
+      case Toolkit::TextField::Property::ELLIPSIS:
       {
         if( impl.mController )
         {
@@ -1445,13 +1417,13 @@ void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
     // Make sure the actors are parented correctly with/without clipping
     Actor self = mStencil ? mStencil : Self();
 
-    for( std::vector<Actor>::const_iterator it = mClippingDecorationActors.begin(),
+    for( std::vector<Actor>::iterator it = mClippingDecorationActors.begin(),
            endIt = mClippingDecorationActors.end();
          it != endIt;
          ++it )
     {
       self.Add( *it );
-      DevelActor::LowerToBottom(*it);
+      it->LowerToBottom();
     }
     mClippingDecorationActors.clear();
 
@@ -1689,7 +1661,7 @@ void TextField::EnableClipping()
 
     // Creates a background visual. Even if the color is transparent it updates the stencil.
     mStencil.SetProperty( Toolkit::Control::Property::BACKGROUND,
-                          Property::Map().Add( Toolkit::Visual::Property::TYPE, DevelVisual::COLOR ).
+                          Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR ).
                           Add( ColorVisual::Property::MIX_COLOR, Color::TRANSPARENT ) );
 
     // Enable the clipping property.

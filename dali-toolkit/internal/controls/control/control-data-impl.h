@@ -322,8 +322,7 @@ public:
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
-
-  Toolkit::DevelControl::ResourceReadySignalType mResourceReadySignal;
+  Toolkit::Control::ResourceReadySignalType mResourceReadySignal;
 
   // Gesture Detection
   PinchGestureDetector mPinchGestureDetector;

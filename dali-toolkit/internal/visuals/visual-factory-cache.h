@@ -23,7 +23,6 @@
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/devel-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
@@ -69,8 +68,12 @@ public:
     IMAGE_SHADER_ATLAS_CUSTOM_WRAP,
     NINE_PATCH_SHADER,
     SVG_SHADER,
-    TEXT_SHADER_RGBA,
-    TEXT_SHADER_L8,
+    TEXT_SHADER_MULTI_COLOR_TEXT,
+    TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE,
+    TEXT_SHADER_SINGLE_COLOR_TEXT,
+    TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE,
+    TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI,
+    TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI,
     WIREFRAME_SHADER,
     SHADER_TYPE_MAX = WIREFRAME_SHADER
   };

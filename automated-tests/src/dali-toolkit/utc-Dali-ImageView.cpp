@@ -22,13 +22,13 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali/public-api/rendering/renderer.h>
+#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 
 #include <test-native-image.h>
 #include <sstream>
 #include <unistd.h>
+
 
 #include "dummy-control.h"
 
@@ -472,7 +472,7 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
   imageMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
   imageMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
   imageMap[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
-  imageMap[ DevelImageVisual::Property::ATLASING] = true;
+  imageMap[ ImageVisual::Property::ATLASING] = true;
 
   ImageView imageView = ImageView::New();
   imageView.SetProperty( ImageView::Property::IMAGE, imageMap );
@@ -551,7 +551,7 @@ int UtcDaliImageViewSyncLoading(void)
 
   Property::Map syncLoadingMap;
   syncLoadingMap[ ImageVisual::Property::SYNCHRONOUS_LOADING ] = true;
-  syncLoadingMap[ DevelImageVisual::Property::ATLASING ] = true;
+  syncLoadingMap[ ImageVisual::Property::ATLASING ] = true;
 
   // Sync loading, no atlasing for big size image
   {
@@ -589,7 +589,6 @@ int UtcDaliImageViewSyncLoading(void)
   END_TEST;
 }
 
-
 int UtcDaliImageViewSyncLoading02(void)
 {
   ToolkitTestApplication application;
@@ -623,6 +622,30 @@ int UtcDaliImageViewSyncLoading02(void)
     DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ),
                       true, TEST_LOCATION );
   }
+  END_TEST;
+}
+
+int UtcDaliImageViewAddedTexture(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing image view with texture provided manager url");
+
+  ImageView imageView = ImageView::New();
+
+  // empty texture is ok, though pointless from app point of view
+  TextureSet  empty;
+  std::string url = TextureManager::AddTexture(empty);
+  DALI_TEST_CHECK(url.size() > 0u);
+
+  Property::Map propertyMap;
+  propertyMap[ImageVisual::Property::URL] = url;
+  imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
+
+  Stage::GetCurrent().Add( imageView );
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 
@@ -856,9 +879,9 @@ int UtcDaliImageViewCheckResourceReady(void)
 
   imageView.SetBackgroundImage( image );
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
 
-  Toolkit::DevelControl::ResourceReadySignal( imageView ).Connect( &ResourceReadySignal);
+  imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
 
   Stage::GetCurrent().Add( imageView );
 
@@ -866,7 +889,7 @@ int UtcDaliImageViewCheckResourceReady(void)
   application.Render(16);
 
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
 
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
@@ -1323,9 +1346,9 @@ int UtcDaliImageViewReplaceImage(void)
   // Check ImageView with background and main image, to ensure both visuals are marked as loaded
   ImageView imageView = ImageView::New( TEST_IMAGE_1 );
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
 
-  Toolkit::DevelControl::ResourceReadySignal( imageView ).Connect( &ResourceReadySignal);
+  imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
 
   Stage::GetCurrent().Add( imageView );
 
@@ -1351,7 +1374,7 @@ int UtcDaliImageViewReplaceImage(void)
 
   DALI_TEST_EQUALS( imageView.GetRendererCount(), 1u, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
 
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 

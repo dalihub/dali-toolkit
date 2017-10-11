@@ -25,8 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -176,7 +175,7 @@ void AnimatedImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
 
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::DevelVisual::ANIMATED_IMAGE );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::ANIMATED_IMAGE );
 
   if( mImageUrl.IsValid() )
   {
@@ -197,9 +196,9 @@ void AnimatedImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_U, mWrapModeU );
   map.Insert( Toolkit::ImageVisual::Property::WRAP_MODE_V, mWrapModeV );
 
-  map.Insert( Toolkit::DevelImageVisual::Property::BATCH_SIZE, static_cast<int>(mBatchSize) );
-  map.Insert( Toolkit::DevelImageVisual::Property::CACHE_SIZE, static_cast<int>(mCacheSize) );
-  map.Insert( Toolkit::DevelImageVisual::Property::FRAME_DELAY, static_cast<int>(mFrameDelay) );
+  map.Insert( Toolkit::ImageVisual::Property::BATCH_SIZE, static_cast<int>(mBatchSize) );
+  map.Insert( Toolkit::ImageVisual::Property::CACHE_SIZE, static_cast<int>(mCacheSize) );
+  map.Insert( Toolkit::ImageVisual::Property::FRAME_DELAY, static_cast<int>(mFrameDelay) );
 }
 
 void AnimatedImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -234,15 +233,15 @@ void AnimatedImageVisual::DoSetProperties( const Property::Map& propertyMap )
       }
       else if( keyValue.first == BATCH_SIZE_NAME )
       {
-        DoSetProperty( Toolkit::DevelImageVisual::Property::BATCH_SIZE, keyValue.second );
+        DoSetProperty( Toolkit::ImageVisual::Property::BATCH_SIZE, keyValue.second );
       }
       else if( keyValue.first == CACHE_SIZE_NAME )
       {
-        DoSetProperty( Toolkit::DevelImageVisual::Property::CACHE_SIZE, keyValue.second );
+        DoSetProperty( Toolkit::ImageVisual::Property::CACHE_SIZE, keyValue.second );
       }
       else if( keyValue.first == FRAME_DELAY_NAME )
       {
-        DoSetProperty( Toolkit::DevelImageVisual::Property::FRAME_DELAY, keyValue.second );
+        DoSetProperty( Toolkit::ImageVisual::Property::FRAME_DELAY, keyValue.second );
       }
     }
   }
@@ -290,7 +289,7 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
       break;
     }
 
-    case Toolkit::DevelImageVisual::Property::BATCH_SIZE:
+    case Toolkit::ImageVisual::Property::BATCH_SIZE:
     {
       int batchSize;
       if( value.Get( batchSize ) )
@@ -300,7 +299,7 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
       break;
     }
 
-    case Toolkit::DevelImageVisual::Property::CACHE_SIZE:
+    case Toolkit::ImageVisual::Property::CACHE_SIZE:
     {
       int cacheSize;
       if( value.Get( cacheSize ) )
@@ -310,7 +309,7 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
       break;
     }
 
-    case Toolkit::DevelImageVisual::Property::FRAME_DELAY:
+    case Toolkit::ImageVisual::Property::FRAME_DELAY:
     {
       int frameDelay;
       if( value.Get( frameDelay ) )

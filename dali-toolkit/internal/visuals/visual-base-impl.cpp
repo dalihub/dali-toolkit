@@ -26,7 +26,7 @@
 //INTERNAL HEARDER
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -82,29 +82,29 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
     {
       if( matchKey == CUSTOM_SHADER )
       {
-        matchKey = Property::Key( DevelVisual::Property::SHADER );
+        matchKey = Property::Key( Toolkit::Visual::Property::SHADER );
       }
       else if( matchKey == TRANSFORM )
       {
-        matchKey = Property::Key( DevelVisual::Property::TRANSFORM );
+        matchKey = Property::Key( Toolkit::Visual::Property::TRANSFORM );
       }
       else if( matchKey == PREMULTIPLIED_ALPHA )
       {
-        matchKey = Property::Key( DevelVisual::Property::PREMULTIPLIED_ALPHA );
+        matchKey = Property::Key( Toolkit::Visual::Property::PREMULTIPLIED_ALPHA );
       }
       else if( matchKey == MIX_COLOR )
       {
-        matchKey = Property::Key( DevelVisual::Property::MIX_COLOR );
+        matchKey = Property::Key( Toolkit::Visual::Property::MIX_COLOR );
       }
       else if( matchKey == OPACITY )
       {
-        matchKey = Property::Key( DevelVisual::Property::OPACITY );
+        matchKey = Property::Key( Toolkit::Visual::Property::OPACITY );
       }
     }
 
     switch( matchKey.indexKey )
     {
-      case DevelVisual::Property::SHADER:
+      case Toolkit::Visual::Property::SHADER:
       {
         Property::Map shaderMap;
         if( value.Get( shaderMap ) )
@@ -114,7 +114,7 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
         break;
       }
 
-      case DevelVisual::Property::TRANSFORM:
+      case Toolkit::Visual::Property::TRANSFORM:
       {
         Property::Map map;
         if( value.Get( map ) )
@@ -124,7 +124,7 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
         break;
       }
 
-      case DevelVisual::Property::PREMULTIPLIED_ALPHA:
+      case Toolkit::Visual::Property::PREMULTIPLIED_ALPHA:
       {
         bool premultipliedAlpha = false;
         if( value.Get( premultipliedAlpha ) )
@@ -134,7 +134,7 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
         break;
       }
 
-      case DevelVisual::Property::MIX_COLOR:
+      case Toolkit::Visual::Property::MIX_COLOR:
       {
         Vector4 mixColor;
         if( value.Get( mixColor ) )
@@ -151,7 +151,7 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
         }
         break;
       }
-      case DevelVisual::Property::OPACITY:
+      case Toolkit::Visual::Property::OPACITY:
       {
         float opacity;
         if( value.Get( opacity ) )
@@ -276,15 +276,15 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
 
   Property::Map transform;
   mImpl->mTransform.GetPropertyMap( transform );
-  map.Insert( DevelVisual::Property::TRANSFORM, transform );
+  map.Insert( Toolkit::Visual::Property::TRANSFORM, transform );
 
   bool premultipliedAlpha( IsPreMultipliedAlphaEnabled() );
-  map.Insert( DevelVisual::Property::PREMULTIPLIED_ALPHA, premultipliedAlpha );
+  map.Insert( Toolkit::Visual::Property::PREMULTIPLIED_ALPHA, premultipliedAlpha );
 
   // Note, Color and Primitive will also insert their own mix color into the map
   // which is ok, because they have a different key value range.
-  map.Insert( DevelVisual::Property::MIX_COLOR, mImpl->mMixColor ); // vec4
-  map.Insert( DevelVisual::Property::OPACITY, mImpl->mMixColor.a );
+  map.Insert( Toolkit::Visual::Property::MIX_COLOR, mImpl->mMixColor ); // vec4
+  map.Insert( Toolkit::Visual::Property::OPACITY, mImpl->mMixColor.a );
 }
 
 void Visual::Base::CreateInstancePropertyMap( Property::Map& map ) const
@@ -296,8 +296,8 @@ void Visual::Base::CreateInstancePropertyMap( Property::Map& map ) const
     mImpl->mCustomShader->CreatePropertyMap( map );
   }
 
-  //map.Insert( DevelVisual::Property::DEPTH_INDEX, mImpl->mDepthIndex );
-  //map.Insert( DevelVisual::Property::ENABLED, (bool) mImpl->mRenderer );
+  //map.Insert( Toolkit::Visual::Property::DEPTH_INDEX, mImpl->mDepthIndex );
+  //map.Insert( Toolkit::Visual::Property::ENABLED, (bool) mImpl->mRenderer );
 }
 
 
@@ -342,7 +342,7 @@ void Visual::Base::RegisterMixColor()
   {
     mImpl->mMixColorIndex = DevelHandle::RegisterProperty(
       mImpl->mRenderer,
-      Toolkit::DevelVisual::Property::MIX_COLOR,
+      Toolkit::Visual::Property::MIX_COLOR,
       MIX_COLOR,
       Vector3(mImpl->mMixColor) );
   }
@@ -356,7 +356,7 @@ void Visual::Base::RegisterMixColor()
   {
     mImpl->mOpacityIndex = DevelHandle::RegisterProperty(
       mImpl->mRenderer,
-      Toolkit::DevelVisual::Property::OPACITY,
+      Toolkit::Visual::Property::OPACITY,
       OPACITY,
       mImpl->mMixColor.a );
   }
@@ -520,14 +520,14 @@ void Visual::Base::AnimateProperty(
 
   Property::Map map;
   DoCreatePropertyMap( map );
-  Property::Value* valuePtr = map.Find( Toolkit::DevelVisual::Property::TYPE );
+  Property::Value* valuePtr = map.Find( Toolkit::Visual::Property::TYPE );
   int visualType = -1;
   if( valuePtr )
   {
     valuePtr->Get( visualType );
   }
 
-  if( animator.propertyKey == Toolkit::DevelVisual::Property::MIX_COLOR ||
+  if( animator.propertyKey == Toolkit::Visual::Property::MIX_COLOR ||
       animator.propertyKey == MIX_COLOR ||
       ( visualType == Toolkit::Visual::COLOR &&
         animator.propertyKey == ColorVisual::Property::MIX_COLOR ) ||
@@ -536,7 +536,7 @@ void Visual::Base::AnimateProperty(
   {
     AnimateMixColorProperty( transition, animator );
   }
-  else if(animator.propertyKey == Toolkit::DevelVisual::Property::OPACITY ||
+  else if(animator.propertyKey == Toolkit::Visual::Property::OPACITY ||
           animator.propertyKey == OPACITY )
   {
     AnimateOpacityProperty( transition, animator );
