@@ -194,12 +194,11 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
     // Set the color of non-transparent pixel in text to what it is animated to.
     // Markup text with multiple text colors are not animated (but can be supported later on if required).
     // Emoji color are not animated.
-    mediump vec4 textColor = textTexture * textTexture.a;\n
-    mediump float vstep = step( 0.0001, textColor.a );\n
-    textColor.rgb = mix( textColor.rgb, uTextColorAnimatable.rgb, vstep * maskTexture );\n
+    mediump float vstep = step( 0.0001, textTexture.a );\n
+    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture );\n
 
     // Draw the text as overlay above the style
-    gl_FragColor = textColor * uColor * vec4( mixColor, opacity );\n
+    gl_FragColor = textTexture * uColor * vec4( mixColor, opacity );\n
   }\n
 );
 
@@ -225,12 +224,11 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOS
     // Set the color of non-transparent pixel in text to what it is animated to.
     // Markup text with multiple text colors are not animated (but can be supported later on if required).
     // Emoji color are not animated.
-    mediump vec4 textColor = textTexture * textTexture.a;\n
-    mediump float vstep = step( 0.0001, textColor.a );\n
-    textColor.rgb = mix( textColor.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) );\n
+    mediump float vstep = step( 0.0001, textTexture.a );\n
+    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) );\n
 
     // Draw the text as overlay above the style
-    gl_FragColor = ( textColor + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, opacity );\n
+    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, opacity );\n
   }\n
 );
 
