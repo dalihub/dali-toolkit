@@ -43,7 +43,6 @@ const int MINIMUM_SCROLL_SPEED = 1; // Speed should be set by Property system.
 const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying highp vec2 vTexCoord;\n
-  varying highp float vRatio;\n
   uniform mediump vec3 uSize;\n
   uniform mediump float uDelta;\n
   uniform mediump vec2 uTextureSize;\n
@@ -67,12 +66,9 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
     mediump vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy );\n
     mediump vec2 visualSize = mix( uSize.xy * size, size, offsetSizeMode.zw );\n
     \n
-    mediump float smallTextPadding = max( visualSize.x - uTextureSize.x, 0. );\n
-    mediump float gap = max( uGap, smallTextPadding );\n
     mediump float delta = floor ( uDelta ) + 0.5;\n
-    vTexCoord.x = ( delta + uHorizontalAlign * ( uTextureSize.x - visualSize.x ) + floor( aPosition.x * visualSize.x ) + 0.5 - gap * 0.5 ) / ( uTextureSize.x + gap ) + 0.5;\n
+    vTexCoord.x = ( delta + uHorizontalAlign * ( uTextureSize.x - visualSize.x - uGap ) + floor( aPosition.x * visualSize.x ) + 0.5 - uGap * 0.5 ) / uTextureSize.x + 0.5;\n
     vTexCoord.y = ( uVerticalAlign * ( uTextureSize.y - visualSize.y ) + floor( aPosition.y * visualSize.y ) + 0.5 ) / ( uTextureSize.y ) + 0.5;\n
-    vRatio = uTextureSize.x / ( uTextureSize.x + gap );\n
     \n
     mediump vec4 vertexPosition = vec4( floor( ( aPosition + anchorPoint ) * visualSize + ( visualOffset + origin ) * uSize.xy ), 0.0, 1.0 );\n
     mediump vec4 nonAlignedVertex = uViewMatrix * uModelMatrix * vertexPosition;\n
@@ -84,18 +80,11 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
 
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying highp vec2 vTexCoord;\n
-  varying highp float vRatio;\n
   uniform sampler2D sTexture;\n
   \n
   void main()\n
   {\n
-    highp vec2 texCoord;\n
-    texCoord.y = vTexCoord.y;\n
-    texCoord.x = fract( vTexCoord.x ) / vRatio;\n
-    if ( texCoord.x > 1.0 || texCoord.y > 1.0 )\n
-      discard;\n
-    \n
-    gl_FragColor = texture2D( sTexture, texCoord );\n
+    gl_FragColor = texture2D( sTexture, vTexCoord );\n
   }\n
 );
 
@@ -252,10 +241,10 @@ TextScroller::~TextScroller()
 {
 }
 
-void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textNaturalSize, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment )
+void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] offscreenSize[%f,%f] direction[%d]\n",
-                 controlSize.x, controlSize.y, textNaturalSize.x, textNaturalSize.y, direction );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] textureSize[%f,%f] direction[%d]\n",
+                 controlSize.x, controlSize.y, textureSize.x, textureSize.y, direction );
 
   mRenderer = renderer;
 
@@ -288,19 +277,19 @@ void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, T
   mRenderer.SetShader( shader );
   mRenderer.SetTextures( textureSet );
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters mWrapGap[%f]\n", mWrapGap );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters wrapGap[%f]\n", wrapGap );
 
   const float horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[ horizontalAlignment ][ direction ];
   const float verticalAlign = VERTICAL_ALIGNMENT_TABLE[ verticalAlignment ];
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters horizontalAlign[%f], verticalAlign[%f]\n", horizontalAlign, verticalAlign );
 
-  scrollingTextActor.RegisterProperty( "uTextureSize", textNaturalSize );
+  scrollingTextActor.RegisterProperty( "uTextureSize", textureSize );
   scrollingTextActor.RegisterProperty( "uHorizontalAlign", horizontalAlign );
   scrollingTextActor.RegisterProperty( "uVerticalAlign", verticalAlign );
-  scrollingTextActor.RegisterProperty( "uGap", mWrapGap );
+  scrollingTextActor.RegisterProperty( "uGap", wrapGap );
   mScrollDeltaIndex = scrollingTextActor.RegisterProperty( "uDelta", 0.0f );
 
-  float scrollAmount = std::max( textNaturalSize.width + mWrapGap, controlSize.width );
+  float scrollAmount = std::max( textureSize.width, controlSize.width );
   float scrollDuration =  scrollAmount / mScrollSpeed;
 
   if ( direction  )

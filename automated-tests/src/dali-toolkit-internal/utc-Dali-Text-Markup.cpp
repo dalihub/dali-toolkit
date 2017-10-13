@@ -166,6 +166,34 @@ namespace
     return true;
   }
 
+  ///////////////////////////////////////////////////////////
+
+
+  struct XHTMLEntityToUTF8Data
+  {
+    std::string description;
+    std::string xHTMLEntityString;
+    std::string expectedString;
+  };
+
+  bool XHTMLEntityToUTF8Test( const XHTMLEntityToUTF8Data& data )
+  {
+    std::cout << "  testing " << data.description << std::endl;
+
+    Vector<ColorRun> colorRuns;
+    Vector<FontDescriptionRun> fontRuns;
+    MarkupProcessData markupProcessData( colorRuns, fontRuns );
+    ProcessMarkupString( data.xHTMLEntityString, markupProcessData );
+
+    if( markupProcessData.markupProcessedText != data.expectedString )
+    {
+      std::cout << "  different output string : " << markupProcessData.markupProcessedText << ", expected : " << data.expectedString << " " << std::endl;
+      return false;
+    }
+
+    return true;
+  }
+
 } // namespace
 
 int UtcDaliTextTokenComparison(void)
@@ -443,6 +471,57 @@ int UtcDaliTextVector2ToString(void)
   {
     ToolkitTestApplication application;
     if( !Vector2ToStringTest( data[index] ) )
+    {
+      tet_result(TET_FAIL);
+    }
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextXHTMLEntityToUTF8(void)
+{
+  tet_infoline(" UtcDaliTextXHTMLEntityToUTF8");
+  const XHTMLEntityToUTF8Data data[] =
+  {
+    {
+      "Text Without XHTML Entity",
+      "Checking XHTML Entitities",
+      "Checking XHTML Entitities"
+    },
+    {
+      "Text With XHTML Entity in Numeric form",
+      "Checking Numeric Entitities &#x26; &#x27; &#x3C; &#x3E; &#xA1; &#xA2; &#xA3; &#xA4; &#xA5; &#xA6; &#xA7; &#xA8; &#xA9; &#xAA; &#xAB; &#xAC; &#xAD; &#xAE; &#xAF; &#xB0; &#xB1; &#xB2; &#xB3; &#xB4; &#xB5; &#xB6; &#xB7; &#xB8; &#xB9; &#xBA; &#xBB; &#xBC; &#xBD; &#xBE; &#xBF; &#xC0; &#xC1; &#xC2; &#xC3; &#xC4; &#xC5; &#xE6; &#xC7; &#xC8; &#xC9; &#xCA; &#xCB; &#xCC; &#xCD; &#xCE; &#xCF; &#xF0; &#xD1; &#xD2; &#xD3; &#xD4; &#xD5; &#xD6; &#xD7; &#xD8; &#xD9; &#xDA; &#xDB; &#xDD; &#xFE; &#xDF; &#xE0; &#xE1; &#xE2; &#xE3; &#xE4; &#xE5; &#xE6; &#xE7; &#xE8; &#xE9; &#xEA; &#xEB; &#xEC; &#xED; &#xEE; &#xEF; &#xF0; &#xF1; &#xF2; &#xF3; &#xF4; &#xF5; &#xF6; &#xF7; &#xF8; &#xF9; &#xFA; &#xFB; &#xFC; &#xFD; &#xFE; &#xFF; &#x3B1; &#x3B2; &#x3B3; &#x3B4; &#x3B5; &#x3B6; &#x3B7; &#x3B8; &#x3B9; &#x3BA; &#x3BB; &#x3BC; &#x3BD; &#x3BE; &#x3BF; &#x3C0; &#x3C1; &#x3C3; &#x3C4; &#x3C5; &#x3C6; &#x3C7; &#x3C8; &#x3C9; &#x2026; &#x20AC; &#x2190; &#x2191; &#x2192; &#x2193; &#x2194; &#x2190; &#x2192; &#x2200; &#x2203; &#x2207; &#x220F; &#x2211; &#x2227; &#x2228; &#x222B; &#x2260; &#x2261; &#x2295; &#x22A5; &#x2020; &#x2021; &#x2022; ",
+      "Checking Numeric Entitities & ' < > ¡ ¢ £ ¤ ¥ ¦ § ¨ © ª « ¬ ­ ® ¯ ° ± ² ³ ´ µ ¶ · ¸ ¹ º » ¼ ½ ¾ ¿ À Á Â Ã Ä Å æ Ç È É Ê Ë Ì Í Î Ï ð Ñ Ò Ó Ô Õ Ö × Ø Ù Ú Û Ý þ ß à á â ã ä å æ ç è é ê ë ì í î ï ð ñ ò ó ô õ ö ÷ ø ù ú û ü ý þ ÿ α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ σ τ υ φ χ ψ ω … € ← ↑ → ↓ ↔ ← → ∀ ∃ ∇ ∏ ∑ ∧ ∨ ∫ ≠ ≡ ⊕ ⊥ † ‡ • "
+    },
+    {
+      "Text With XHTML Named Entities",
+      "Checking Named Entitities &amp; &apos; &lt; &gt; &iexcl; &cent; &pound; &curren; &yen; &brvbar; &sect; &uml; &copy; &ordf; &laquo; &not; &shy; &reg; &macr; &deg; &plusmn; &sup2; &sup3; &acute; &micro; &para; &middot; &cedil; &sup1; &ordm; &raquo; &frac14; &frac12; &frac34; &iquest; &Agrave; &Aacute; &Acirc; &Atilde; &Auml; &Aring; &aelig; &Ccedil; &Egrave; &Eacute; &Ecirc; &Euml; &Igrave; &Iacute; &Icirc; &Iuml; &eth; &Ntilde; &Ograve; &Oacute; &Ocirc; &Otilde; &Ouml; &times; &Oslash; &Ugrave; &Uacute; &Ucirc; &Yacute; &thorn; &szlig; &agrave; &aacute; &acirc; &atilde; &auml; &aring; &aelig; &ccedil; &egrave; &eacute; &ecirc; &euml; &igrave; &iacute; &icirc; &iuml; &eth; &ntilde; &ograve; &oacute; &ocirc; &otilde; &ouml; &divide; &oslash; &ugrave; &uacute; &ucirc; &uuml; &yacute; &thorn; &yuml; &alpha; &beta; &gamma; &delta; &epsilon; &zeta; &eta; &theta; &iota; &kappa; &lambda; &mu; &nu; &xi; &omicron; &pi; &rho; &sigma; &tau; &upsilon; &phi; &chi; &psi; &omega; &hellip; &euro; &larr; &uarr; &rarr; &darr; &harr; &larr; &rarr; &forall; &exist; &nabla; &prod; &sum; &and; &or; &int; &ne; &equiv; &oplus; &perp; &dagger; &Dagger; &bull; ",
+      "Checking Named Entitities & ' < > ¡ ¢ £ ¤ ¥ ¦ § ¨ © ª « ¬ ­ ® ¯ ° ± ² ³ ´ µ ¶ · ¸ ¹ º » ¼ ½ ¾ ¿ À Á Â Ã Ä Å æ Ç È É Ê Ë Ì Í Î Ï ð Ñ Ò Ó Ô Õ Ö × Ø Ù Ú Û Ý þ ß à á â ã ä å æ ç è é ê ë ì í î ï ð ñ ò ó ô õ ö ÷ ø ù ú û ü ý þ ÿ α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ σ τ υ φ χ ψ ω … € ← ↑ → ↓ ↔ ← → ∀ ∃ ∇ ∏ ∑ ∧ ∨ ∫ ≠ ≡ ⊕ ⊥ † ‡ • "
+    },
+    {
+      "Testing of < special character",
+      "Testing of < special character",
+      "Testing of "
+    },
+    {
+      "Testing of & special character",
+      "Testing of & special character",
+      "Testing of "
+    },
+    {
+      "Testing of & < > special character",
+      "Testing of \\& \\< \\> special character",
+      "Testing of & < > special character"
+    }
+  };
+  const unsigned int numberOfTests = 6u;
+
+  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  {
+    ToolkitTestApplication application;
+    if( !XHTMLEntityToUTF8Test( data[index] ) )
     {
       tet_result(TET_FAIL);
     }
