@@ -62,7 +62,6 @@ DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "video", MAP, VIDEO )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "looping", BOOLEAN, LOOPING )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "muted", BOOLEAN, MUTED )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "volume", MAP, VOLUME )
-DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "underlay", BOOLEAN, UNDERLAY )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, VideoView, "finished", FINISHED_SIGNAL )
 
@@ -76,8 +75,6 @@ DALI_TYPE_REGISTRATION_END()
 
 const char* const VOLUME_LEFT( "volumeLeft" );
 const char* const VOLUME_RIGHT( "volumeRight" );
-
-// 3.0 TC uses RENDERING_TARGET. It should be removed in next release
 const char* const RENDERING_TARGET( "renderingTarget" );
 const char* const WINDOW_SURFACE_TARGET( "windowSurfaceTarget" );
 const char* const NATIVE_IMAGE_TARGET( "nativeImageTarget" );
@@ -131,9 +128,9 @@ VideoView::VideoView()
   mUpdateTriggerPropertyIndex( Property::INVALID_INDEX),
   mNotification( NULL ),
   mCurrentVideoPlayPosition( 0 ),
+  mIsNativeImageTarget( true ),
   mIsPlay( false ),
-  mIsPause( false ),
-  mIsUnderlay( true )
+  mIsPause( false )
 {
   mVideoPlayer = Dali::VideoPlayer::New();
 
@@ -162,9 +159,14 @@ Toolkit::VideoView VideoView::New()
 
 void VideoView::OnInitialize()
 {
-  mUpdateTriggerPropertyIndex = Self().RegisterProperty( "updateTrigger", true );
+  Any source;
+  Dali::NativeImageSourcePtr nativeImageSourcePtr = Dali::NativeImageSource::New( source );
+  mNativeImage = Dali::NativeImage::New( *nativeImageSourcePtr );
+
+  mVideoPlayer.SetRenderingTarget( nativeImageSourcePtr );
   mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
-  SetWindowSurfaceTarget();
+
+  mUpdateTriggerPropertyIndex = Self().RegisterProperty( "updateTrigger", true );
 }
 
 void VideoView::SetUrl( const std::string& url )
@@ -175,15 +177,10 @@ void VideoView::SetUrl( const std::string& url )
     mPropertyMap.Clear();
   }
 
-  if( !mIsUnderlay )
+  if( mIsNativeImageTarget )
   {
     Actor self( Self() );
     Internal::InitializeVisual( self, mVisual, mNativeImage );
-
-    if( self.OnStage() )
-    {
-      Toolkit::GetImplementation( mVisual ).SetOnStage( self );
-    }
   }
 
   mVideoPlayer.SetUrl( mUrl );
@@ -221,12 +218,10 @@ void VideoView::SetPropertyMap( Property::Map map )
 
   if( target && target->Get( targetType ) && targetType == WINDOW_SURFACE_TARGET )
   {
-    mIsUnderlay = true;
     this->SetWindowSurfaceTarget();
   }
   else if( target && target->Get( targetType ) && targetType == NATIVE_IMAGE_TARGET )
   {
-    mIsUnderlay = false;
     this->SetNativeImageTarget();
   }
 
@@ -470,15 +465,6 @@ void VideoView::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::VideoView::Property::UNDERLAY:
-      {
-        bool underlay;
-        if( value.Get( underlay ) )
-        {
-          impl.SetUnderlay( underlay );
-        }
-        break;
-      }
     }
   }
 }
@@ -525,11 +511,6 @@ Property::Value VideoView::GetProperty( BaseObject* object, Property::Index prop
         map.Insert( VOLUME_LEFT, left );
         map.Insert( VOLUME_RIGHT, right );
         value = map;
-        break;
-      }
-      case Toolkit::VideoView::Property::UNDERLAY:
-      {
-        value = impl.IsUnderlay();
         break;
       }
     }
@@ -628,22 +609,7 @@ void VideoView::SetWindowSurfaceTarget()
   mVideoPlayer.SetRenderingTarget( Dali::Adaptor::Get().GetNativeWindowHandle() );
   mVideoPlayer.SetUrl( mUrl );
 
-  if( !mRenderer )
-  {
-    // For underlay rendering mode, video display area have to be transparent.
-    Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-    Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    mRenderer = Renderer::New( geometry, shader );
-
-    mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-    mRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::ONE );
-    mRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ZERO );
-    mRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE );
-    mRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ZERO );
-  }
-  self.AddRenderer( mRenderer );
-
-  UpdateDisplayArea();
+  mIsNativeImageTarget = false;
 
   if( mIsPlay )
   {
@@ -659,17 +625,22 @@ void VideoView::SetWindowSurfaceTarget()
   {
     mVideoPlayer.SetPlayPosition( curPos );
   }
+
+  // For underlay rendering mode, video display area have to be transparent.
+  Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
+  Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+  Renderer renderer = Renderer::New( geometry, shader );
+
+  renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::ONE );
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ZERO );
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE );
+  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ZERO );
+  self.AddRenderer( renderer );
 }
 
 void VideoView::SetNativeImageTarget()
 {
-  if( mVideoPlayer.IsVideoTextureSupported() == false )
-  {
-    DALI_LOG_ERROR( "Platform doesn't support decoded video frame images\n" );
-    mIsUnderlay = true;
-    return;
-  }
-
   Actor self( Self() );
   int curPos = mVideoPlayer.GetPlayPosition();
 
@@ -681,7 +652,7 @@ void VideoView::SetNativeImageTarget()
   mVideoPlayer.SetUrl( mUrl );
 
   Internal::InitializeVisual( self, mVisual, mNativeImage );
-  Self().RemoveRenderer( mRenderer );
+  mIsNativeImageTarget = true;
 
   if( mIsPlay )
   {
@@ -701,11 +672,6 @@ void VideoView::SetNativeImageTarget()
 
 void VideoView::UpdateDisplayArea()
 {
-  if( !mIsUnderlay )
-  {
-    return;
-  }
-
   Actor self( Self() );
 
   bool positionUsesAnchorPoint = self.GetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >();
@@ -720,28 +686,6 @@ void VideoView::UpdateDisplayArea()
   mDisplayArea.height = actorSize.y;
 
   mVideoPlayer.SetDisplayArea( mDisplayArea );
-}
-
-void VideoView::SetUnderlay( bool set )
-{
-  if( set != mIsUnderlay )
-  {
-    mIsUnderlay = set;
-
-    if( mIsUnderlay )
-    {
-      SetWindowSurfaceTarget();
-    }
-    else
-    {
-      SetNativeImageTarget();
-    }
-  }
-}
-
-bool VideoView::IsUnderlay()
-{
-  return mIsUnderlay;
 }
 
 } // namespace Internal

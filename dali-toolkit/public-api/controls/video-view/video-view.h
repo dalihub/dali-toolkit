@@ -66,8 +66,6 @@ public:
   // Signal
   typedef Signal< void (VideoView&) > VideoViewSignalType; ///< Video playback finished signal type @ SINCE_1_1.38
 
-public:
-
   /**
    * @brief Enumeration for the start and end property ranges for this control.
    * @SINCE_1_0.0
@@ -103,14 +101,7 @@ public:
        * @brief name "volume", left and right volume scalar as float type, Property::Map with two values ( "left" and "right" ).
        * @SINCE_1_1.38
        */
-      VOLUME,
-
-     /**
-       * @brief name "underlay", Video rendering by underlay, true or false
-       * This shows video composited underneath the window by the system. This means it may ignore rotation of the video-view
-       * @SINCE_1_2.62
-       */
-      UNDERLAY
+      VOLUME
     };
   };
 
