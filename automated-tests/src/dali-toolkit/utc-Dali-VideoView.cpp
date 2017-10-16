@@ -415,6 +415,7 @@ int UtcDaliVideoViewPropertyUnderlay(void)
   DALI_TEST_CHECK( view );
 
   Stage::GetCurrent().Add( view );
+  view.Play();
 
   application.SendNotification();
   application.Render();
@@ -422,10 +423,12 @@ int UtcDaliVideoViewPropertyUnderlay(void)
   bool isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
   DALI_TEST_CHECK( isUnderlay );
 
+  view.Play();
   view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, false );
   isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
   DALI_TEST_CHECK( !isUnderlay );
 
+  view.Play();
   view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, true );
   isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
   DALI_TEST_CHECK( isUnderlay );
@@ -437,6 +440,16 @@ int UtcDaliVideoViewPropertyUnderlay(void)
   view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, false );
   isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
   DALI_TEST_CHECK( isUnderlay );
+
+  // For coverage
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+
+  view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, true );
+  view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, false );
+  isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( !isUnderlay );
+
+  view.Stop();
 
   END_TEST;
 }
