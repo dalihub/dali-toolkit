@@ -23,7 +23,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.cpp \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
-  $(devel_api_src_dir)/controls/web-view-lite/web-view-lite.cpp \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
   $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.cpp \
   $(devel_api_src_dir)/image-loader/async-image-loader-devel.cpp \
@@ -141,6 +140,3 @@ devel_api_transition_effects_header_files = \
 
 devel_api_gaussian_blur_view_header_files = \
   $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.h
-
-devel_api_web_view_lite_header_files = \
-  $(devel_api_src_dir)/controls/web-view-lite/web-view-lite.h
