@@ -1309,7 +1309,8 @@ int UtcDaliStyleManagerConfigSectionTest(void)
     "  \"config\":\n"
     "  {\n"
     "    \"alwaysShowFocus\":false,\n"
-    "    \"clearFocusOnEscape\":false\n"
+    "    \"clearFocusOnEscape\":false,\n"
+    "    \"customFontDirectory\":\"" DALI_STYLE_DIR "\"\n"
     "  },\n"
     "  \"styles\":\n"
     "  {\n"
@@ -1327,9 +1328,12 @@ int UtcDaliStyleManagerConfigSectionTest(void)
   DALI_TEST_CHECK( !alwaysShowFocus );
   bool clearFocusOnEscape = config["clearFocusOnEscape"].Get<bool>();
   DALI_TEST_CHECK( !clearFocusOnEscape );
+  std::string customFontDirectory = config["customFontDirectory"].Get<std::string>();
+  DALI_TEST_EQUALS( customFontDirectory, DALI_STYLE_DIR, TEST_LOCATION );
 
   // For coverage
   Toolkit::TextEditor editor = Toolkit::TextEditor::New();
+  editor.SetProperty( TextEditor::Property::TEXT, "Test" );
   editor.SetKeyboardFocusable( true );
   Stage::GetCurrent().Add( editor );
 
