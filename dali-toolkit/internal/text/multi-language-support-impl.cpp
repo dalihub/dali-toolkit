@@ -25,7 +25,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/multi-language-helper-functions.h>
-#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 
 namespace Dali
 {
@@ -107,20 +106,6 @@ MultilanguageSupport::MultilanguageSupport()
   // Initializes the valid fonts cache to NULL (no valid fonts).
   // Reserves space to cache the valid fonts and access them with the script as an index.
   mValidFontsPerScriptCache.Resize( TextAbstraction::UNKNOWN, NULL );
-
-  // Add custom font directory
-  Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
-  if( styleManager )
-  {
-    std::string path;
-    Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
-    if( config["customFontDirectory"].Get( path ) )
-    {
-      TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-      fontClient.AddCustomFontDirectory( path.c_str() );
-    }
-  }
-
 }
 
 MultilanguageSupport::~MultilanguageSupport()
