@@ -60,6 +60,14 @@ public:
     return mLooping;
   }
 
+  void Stop()
+  {
+    if( !mFinishedSignal.Empty() )
+    {
+      mFinishedSignal.Emit();
+    }
+  }
+
 public:
 
   std::string mUrl;
@@ -163,6 +171,7 @@ void VideoPlayer::Pause()
 
 void VideoPlayer::Stop()
 {
+  Internal::Adaptor::GetImplementation( *this ).Stop();
 }
 
 void VideoPlayer::SetMute( bool mute )

@@ -23,6 +23,8 @@
 #include <dali/public-api/images/native-image.h>
 #include <dali/devel-api/adaptor-framework/video-player.h>
 #include <dali/integration-api/adaptors/trigger-event-factory.h>
+#include <dali/public-api/object/property-notification.h>
+#include <dali/public-api/object/property-conditions.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
@@ -210,7 +212,7 @@ public:
   /**
    * @brief Updates video display area for window rendering target
    */
-  void UpdateDisplayArea();
+  void UpdateDisplayArea( Dali::PropertyNotification& source );
 
   /**
    * @brief Sets underlay flag and initializes new rendering target by flag.
@@ -276,13 +278,12 @@ private:
   std::string mUrl;
   Dali::DisplayArea mDisplayArea;
   Dali::Renderer mRenderer;
-
-  Property::Index mUpdateTriggerPropertyIndex;
-  TriggerEventInterface* mNotification;
+  Dali::PropertyNotification mPositionUpdateNotification;
+  Dali::PropertyNotification mSizeUpdateNotification;
+  Dali::PropertyNotification mScaleUpdateNotification;
 
   int mCurrentVideoPlayPosition;
   bool mIsPlay;
-  bool mIsPause;
   bool mIsUnderlay;
 };
 
