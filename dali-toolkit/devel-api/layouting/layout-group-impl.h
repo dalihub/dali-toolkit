@@ -50,14 +50,15 @@ protected:
   ~LayoutGroup();
 
 public:
-  LayoutGroup(const LayoutGroup& copy)=delete;
-  LayoutGroup& operator=(const LayoutGroup& rhs)=delete;
+  LayoutGroup( const LayoutGroup& copy ) = delete;
+  LayoutGroup& operator=( const LayoutGroup& rhs ) = delete;
 
   Toolkit::LayoutGroup::LayoutId Add( LayoutBase& layoutData );
   void Remove( Toolkit::LayoutGroup::LayoutId childId );
   void Remove( LayoutBase& child );
 
   LayoutBasePtr GetChild( Toolkit::LayoutGroup::LayoutId childId );
+  unsigned int GetChildCount();
 
   /**
    * Does the hard part of MeasureChildren: figuring out the MeasureSpec to
@@ -86,6 +87,11 @@ public:
    * Check if the layout has already been requested
    */
   bool IsLayoutRequested();
+
+  /**
+   * Get the padding information
+   */
+  Extents GetPadding();
 
 public: // Implementation of LayoutParent
   virtual LayoutParent* GetParent();

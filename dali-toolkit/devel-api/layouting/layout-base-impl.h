@@ -102,20 +102,15 @@ public:
    */
   void Layout( int l, int t, int r, int b, bool animate );
 
-  uint16_t GetMinimumWidth();
-  uint16_t GetMinimumHeight();
-  void SetMinimumWidth( uint16_t minWidth );
-  void SetMinimumHeight( uint16_t minHeight );
-
-    /**
-     * Utility to return a default size. Uses the supplied size if the
-     * MeasureSpec imposed no constraints. Will get larger if allowed
-     * by the MeasureSpec.
-     *
-     * @param size Default size for this view
-     * @param measureSpec Constraints imposed by the parent
-     * @return The size this view should be.
-     */
+  /**
+   * Utility to return a default size. Uses the supplied size if the
+   * MeasureSpec imposed no constraints. Will get larger if allowed
+   * by the MeasureSpec.
+   *
+   * @param size Default size for this view
+   * @param measureSpec Constraints imposed by the parent
+   * @return The size this view should be.
+   */
   static uint16_t GetDefaultSize( uint16_t size, MeasureSpec measureSpec );
 
   /**
@@ -127,6 +122,105 @@ public:
    * Request that this layout is re-laid out
    */
   void RequestLayout();
+
+
+  /**
+   * Get the measured width (without any measurement flags). This
+   * method should be used only during measurement and layout calculations.
+   *
+   * Use {@link Dali::Actor::GetTargetSize()} to see how wide a control is after layout
+   */
+  uint16_t GetMeasuredWidth();
+
+  /**
+   * Get the measured height (without any measurement flags). This
+   * method should be used only during measurement and layout calculations.
+   *
+   * Use {@link Dali::Actor::GetTargetSize()} to see how high a control is after layout
+   */
+  uint16_t GetMeasuredHeight();
+
+  /**
+   * Get the measured width and state This method should be used only
+   * during measurement and layout calculations.
+   *
+   * Use {@link Dali::Actor::GetTargetSize()} to see how wide a view is after layout
+   */
+  MeasuredSize GetMeasuredWidthAndState();
+
+  /**
+   * Get the measured height and state. This method should be used
+   * only during measurement and layout calculations.
+   *
+   * Use {@link Dali::Actor::GetTargetSize()} to see how high a view is after layout
+   */
+  MeasuredSize GetMeasuredHeightAndState();
+
+
+  /**
+   * Returns the suggested minimum width that the view should use. This
+   * returns the maximum of the view's minimum width
+   * and the background's minimum width
+   * <p>
+   * When being used in {@link #OnMeasure()}, the caller should still
+   * ensure the returned width is within the requirements of the parent.
+   *
+   * @return The suggested minimum width of the view.
+   */
+  uint16_t GetSuggestedMinimumWidth();
+
+  /**
+   * Returns the suggested minimum height that the view should use. This
+   * returns the maximum of the view's minimum height
+   * and the background's minimum height
+   * <p>
+   * When being used in {@link #OnMeasure()}, the caller should still
+   * ensure the returned height is within the requirements of the parent.
+   *
+   * @return The suggested minimum height of the view.
+   */
+  uint16_t GetSuggestedMinimumHeight();
+
+  /**
+   * Sets the minimum width of the view. It is not guaranteed the view will
+   * be able to achieve this minimum width (for example, if its parent layout
+   * constrains it with less available width).
+   *
+   * @param minWidth The minimum width the view will try to be, in pixels
+   *
+   * @see #GetMinimumWidth()
+   */
+  void SetMinimumWidth( uint16_t minWidth );
+
+  /**
+   * Sets the minimum height of the view. It is not guaranteed the view will
+   * be able to achieve this minimum height (for example, if its parent layout
+   * constrains it with less available height).
+   *
+   * @param minHeight The minimum height the view will try to be, in pixels
+   *
+   * @see #GetMinimumHeight()
+   */
+  void SetMinimumHeight( uint16_t minHeight );
+
+  /**
+   * Returns the minimum width of the view.
+   *
+   * @return the minimum width the view will try to be, in pixels
+   *
+   * @see #SetMinimumWidth(uint16_t)
+   */
+  uint16_t GetMinimumWidth();
+
+  /**
+   * Returns the minimum height of the view.
+   *
+   * @return the minimum height the view will try to be, in pixels
+   *
+   * @see #SetMinimumHeight(uint16_t)
+   */
+  uint16_t GetMinimumHeight();
+
 
 protected:
   /**
@@ -210,19 +304,7 @@ protected:
    */
   void SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight );
 
-  /**
-   * Get the measured width (without any measurement flags)
-   */
-  uint16_t GetMeasuredWidth();
-
-  /**
-   * Get the measured height (without any measurement flags)
-   */
-  uint16_t GetMeasuredHeight();
-
-  uint16_t GetSuggestedMinimumWidth();
-  uint16_t GetSuggestedMinimumHeight();
-
+  static MeasuredSize ResolveSizeAndState( uint16_t size, MeasureSpec measureSpec, uint16_t childMeasuredState );
 
   bool SetFrame( int left, int top, int right, int bottom );
 

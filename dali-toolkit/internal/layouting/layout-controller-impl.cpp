@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,12 @@ void LayoutController::Initialize()
 {
 }
 
+void LayoutController::RegisterLayout( LayoutGroup& layout )
+{
+  // cache the layout into a vector for faster traversal
+}
+
+
 void LayoutController::RequestLayout( LayoutBase& layoutBase )
 {
   mLayoutRequested = true;
@@ -77,6 +83,7 @@ void LayoutController::Process()
 
     // Test how to perform a measure on each control.
     MeasureHierarchy( stage.GetRootLayer(), widthSpec, heightSpec );
+    PerformLayout( stage.GetRootLayer(), 0, 0, stageWidth, stageHeight );
   }
 }
 
@@ -95,16 +102,48 @@ void LayoutController::MeasureHierarchy( Actor root, MeasureSpec widthSpec, Meas
   {
     Internal::Control& controlImpl = GetImplementation( control );
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
-    Toolkit::LayoutBase layout = controlDataImpl.GetLayout();
+    LayoutBasePtr layout = controlDataImpl.GetLayout();
 
     if( layout )
     {
-      Internal::LayoutBase& layoutImpl = GetImplementation( layout );
-      layoutImpl.Measure( widthSpec, heightSpec );
+      layout->Measure( widthSpec, heightSpec );
+    }
+  }
+  else
+  {
+    // Depth first descent through actor children
+    for( unsigned int i = 0, count = root.GetChildCount(); i < count; ++i )
+    {
+      Actor child = root.GetChildAt( i );
+      MeasureHierarchy( child, widthSpec, heightSpec );
     }
   }
 }
 
+void LayoutController::PerformLayout( Actor root, int left, int top, int right, int bottom )
+{
+  Toolkit::Control control = Toolkit::Control::DownCast( root );
+  if( control )
+  {
+    Internal::Control& controlImpl = GetImplementation( control );
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
+    LayoutBasePtr layout = controlDataImpl.GetLayout();
+
+    if( layout )
+    {
+      layout->Layout( left, top, right, bottom, false ); // @todo why pass animate flag down? - should be per layout.
+    }
+  }
+  else
+  {
+    // Depth first descent through actor children
+    for( unsigned int i = 0, count = root.GetChildCount(); i < count; ++i )
+    {
+      Actor child = root.GetChildAt( i );
+      PerformLayout( child, left, top, right, bottom );
+    }
+  }
+}
 
 
 } // namespace Internal

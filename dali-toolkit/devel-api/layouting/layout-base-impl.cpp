@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 #include <dali/integration-api/debug.h>
+#include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
 #include <dali-toolkit/internal/layouting/layout-base-data-impl.h>
 
@@ -35,7 +36,7 @@ LayoutBase::LayoutBase()
 {
 }
 
-LayoutBasePtr New( BaseHandle handle )
+LayoutBasePtr LayoutBase::New( BaseHandle handle )
 {
   LayoutBasePtr layoutPtr = new LayoutBase();
   layoutPtr->Initialize( handle );
@@ -74,14 +75,14 @@ void LayoutBase::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
     ( heightMeasureSpec != mImpl->mOldHeightMeasureSpec );
 
   const bool isSpecExactly =
-    ( MeasureSpec::GetMode(widthMeasureSpec) == MeasureSpec::EXACTLY ) &&
-    ( MeasureSpec::GetMode(heightMeasureSpec) == MeasureSpec::EXACTLY );
+    ( widthMeasureSpec.GetMode() == MeasureSpec::EXACTLY ) &&
+    ( heightMeasureSpec.GetMode() == MeasureSpec::EXACTLY );
 
   const bool matchesSpecSize =
-    ( GetMeasuredWidth() == MeasureSpec::GetSize(widthMeasureSpec) ) &&
-    ( GetMeasuredHeight() == MeasureSpec::GetSize(heightMeasureSpec) );
+    ( GetMeasuredWidth() == widthMeasureSpec.GetSize() ) &&
+    ( GetMeasuredHeight() == heightMeasureSpec.GetSize() );
 
-  const bool needsLayout = specChanged && ( !isSpecExactly || !matchesSpecSize);
+  const bool needsLayout = specChanged && ( !isSpecExactly || !matchesSpecSize );
 
   if( forceLayout || needsLayout)
   {
@@ -168,8 +169,8 @@ void LayoutBase::SetMinimumHeight( uint16_t minimumHeight )
 uint16_t LayoutBase::GetDefaultSize( uint16_t size, MeasureSpec measureSpec )
 {
   uint16_t result = size;
-  uint32_t specMode = MeasureSpec::GetMode( measureSpec );
-  uint32_t specSize = MeasureSpec::GetSize( measureSpec );
+  uint32_t specMode = measureSpec.GetMode();
+  uint32_t specSize = measureSpec.GetSize();
 
   switch (specMode)
   {
@@ -203,6 +204,11 @@ void LayoutBase::OnSetLayoutData( ChildLayoutDataPtr childLayoutData )
   // Base function does nothing
 }
 
+LayoutParent* LayoutBase::GetParent()
+{
+  return mImpl->mLayoutParent;
+}
+
 void LayoutBase::RequestLayout()
 {
   // @todo Enforce failure if called in Measure/Layout passes.
@@ -212,6 +218,7 @@ void LayoutBase::RequestLayout()
 
 void LayoutBase::SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight )
 {
+  mImpl->SetPrivateFlag( Impl::PFLAG_MEASURED_DIMENSION_SET );
   mImpl->mMeasuredSize = Uint16Pair( measuredWidth, measuredHeight );
 }
 
@@ -225,6 +232,86 @@ uint16_t LayoutBase::GetMeasuredHeight()
 {
   return MeasuredSize( mImpl->mMeasuredSize.GetHeight() ).GetSize();
 }
+
+MeasuredSize LayoutBase::GetMeasuredWidthAndState()
+{
+  return MeasuredSize( mImpl->mMeasuredSize.GetWidth() );
+}
+
+MeasuredSize LayoutBase::GetMeasuredHeightAndState()
+{
+  return MeasuredSize( mImpl->mMeasuredSize.GetHeight() );
+}
+
+uint16_t LayoutBase::GetSuggestedMinimumWidth()
+{
+  Vector3 naturalSize;
+
+  // Construct a base handle to the owner, and try and cast it to Control.
+  BaseHandle handle( mImpl->mOwner );
+  Toolkit::Control control = Toolkit::Control::DownCast( handle );
+  if( control )
+  {
+    naturalSize = control.GetNaturalSize();
+  }
+
+  return std::max( mImpl->mMinimumSize.GetWidth(), uint16_t( naturalSize.width ) );
+}
+
+uint16_t LayoutBase::GetSuggestedMinimumHeight()
+{
+  Vector3 naturalSize;
+
+  // Construct a base handle to the owner, and try and cast it to Control.
+  BaseHandle handle( mImpl->mOwner );
+  Toolkit::Control control = Toolkit::Control::DownCast( handle );
+  if( control )
+  {
+    naturalSize = control.GetNaturalSize();
+  }
+
+  return std::max( mImpl->mMinimumSize.GetHeight(), uint16_t(naturalSize.height) );
+}
+
+MeasuredSize LayoutBase::ResolveSizeAndState( uint16_t size, MeasureSpec measureSpec, uint16_t childMeasuredState )
+{
+  uint32_t specMode = measureSpec.GetMode();
+  uint32_t specSize = measureSpec.GetSize();
+  MeasuredSize result;
+
+  switch( specMode )
+  {
+    case MeasureSpec::AT_MOST:
+    {
+      if (specSize < size)
+      {
+        result = MeasuredSize( specSize, MeasuredSize::MEASURED_SIZE_TOO_SMALL );
+      }
+      else
+      {
+        result = size;
+      }
+      break;
+    }
+
+    case MeasureSpec::EXACTLY:
+    {
+      result = specSize;
+      break;
+    }
+
+    case MeasureSpec::UNSPECIFIED:
+    default:
+    {
+      result = size;
+      break;
+    }
+  }
+
+  result.SetState( childMeasuredState );
+  return result;
+}
+
 
 bool LayoutBase::SetFrame( int left, int top, int right, int bottom )
 {
@@ -249,6 +336,15 @@ bool LayoutBase::SetFrame( int left, int top, int right, int bottom )
 
     mImpl->SetPrivateFlag( Impl::PFLAG_HAS_BOUNDS );
 
+
+    // Reflect up to parent control
+    auto control = Toolkit::Control::DownCast( mImpl->mOwner );
+    if( control )
+    {
+      control.SetPosition( Vector3( left, top, 0.0f ) );
+      control.SetSize( Vector3( right-left, bottom-top, 0.0f ) );
+    }
+
     if( sizeChanged )
     {
       SizeChange( Uint16Pair( newWidth, newHeight ), Uint16Pair( oldWidth, oldHeight ) );
@@ -262,7 +358,6 @@ bool LayoutBase::SetFrame( int left, int top, int right, int bottom )
 
 void LayoutBase::SizeChange( Uint16Pair newSize, Uint16Pair oldSize)
 {
-  // Reflect up to parent control
   OnSizeChanged( newSize, oldSize );
 }
 

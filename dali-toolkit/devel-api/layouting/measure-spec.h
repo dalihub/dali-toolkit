@@ -67,20 +67,20 @@ public:
     return ( size.mMeasureSpec & ~MeasureSpec::MODE_MASK ) | ( mode & MeasureSpec::MODE_MASK );
   }
 
-  static uint32_t GetMode( MeasureSpec measureSpec )
+  uint32_t GetMode()
   {
-    return ( measureSpec.mMeasureSpec & MODE_MASK );
+    return ( mMeasureSpec & MODE_MASK );
   }
 
-  static uint32_t GetSize( MeasureSpec measureSpec )
+  uint32_t GetSize()
   {
-    return ( measureSpec.mMeasureSpec & ~MODE_MASK );
+    return ( mMeasureSpec & ~MODE_MASK );
   }
 
   static uint32_t Adjust( MeasureSpec measureSpec, int32_t delta )
   {
-    uint32_t mode = GetMode( measureSpec );
-    uint32_t size = GetSize( measureSpec );
+    uint32_t mode = measureSpec.GetMode();
+    uint32_t size = measureSpec.GetSize();
 
     if( mode == UNSPECIFIED )
     {

@@ -1393,14 +1393,14 @@ Extents Control::Impl::GetPadding() const
   return mControlImpl.mImpl->mPadding;
 }
 
-Toolkit::LayoutBase Control::Impl::GetLayout()
+Toolkit::Internal::LayoutBasePtr Control::Impl::GetLayout()
 {
   return mLayout;
 }
 
-void Control::Impl::SetLayout( Toolkit::LayoutBase& layout )
+void Control::Impl::SetLayout( Toolkit::Internal::LayoutBase& layout )
 {
-  mLayout = layout;
+  mLayout = &layout;
 }
 
 } // namespace Internal

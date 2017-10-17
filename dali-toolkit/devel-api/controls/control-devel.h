@@ -256,7 +256,6 @@ Toolkit::LayoutBase GetLayout( Internal::Control& control );
  */
 void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout );
 
-
 } // namespace DevelControl
 
 } // namespace Toolkit

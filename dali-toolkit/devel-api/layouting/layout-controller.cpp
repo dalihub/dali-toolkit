@@ -66,9 +66,19 @@ LayoutController LayoutController::Get()
   return layoutController;
 }
 
+void LayoutController::RegisterLayout( LayoutGroup layout )
+{
+  GetImpl(*this).RegisterLayout( GetImplementation( layout ) );
+}
+
 void LayoutController::RequestLayout( LayoutBase layout )
 {
   GetImpl(*this).RequestLayout( GetImplementation( layout ) );
+}
+
+LayoutController::LayoutController( Internal::LayoutController *impl )
+: BaseHandle( impl )
+{
 }
 
 } //namespace Toolkit

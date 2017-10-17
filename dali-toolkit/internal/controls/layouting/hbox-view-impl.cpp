@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,11 @@
 
 //EXTERNAL HEADERS
 //INTERNAL HEADERS
+#include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/internal/layouting/hbox-layout-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/layouting/margin-layout-data-impl.h>
 
 namespace Dali
 {
@@ -37,6 +42,34 @@ Dali::Toolkit::HboxView HboxView::New()
 
 void HboxView::AddChild( Actor child )
 {
+  child.Unparent();
+  Self().Add( child );
+
+  LayoutBasePtr childLayout;
+  Toolkit::Control control = Toolkit::Control::DownCast( child );
+  if( control )
+  {
+    Internal::Control& controlImpl = GetImplementation( control );
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
+    childLayout = controlDataImpl.GetLayout();
+
+    if( ! childLayout )
+    {
+      childLayout = LayoutBase::New( child );
+
+      CustomActorImpl& customActor = static_cast< CustomActorImpl& >( controlImpl );
+      auto desiredSize = customActor.GetNaturalSize();
+
+      // HBoxLayout will apply default layout data for this object
+      auto layoutData = MarginLayoutData::New( int( desiredSize.width ), int( desiredSize.height ), 0, 0, 0, 0 );
+      childLayout->SetLayoutData( layoutData );
+    }
+  }
+
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( *this );
+  auto layout = controlDataImpl.GetLayout();
+  auto layoutGroup = static_cast<LayoutGroup*>(layout.Get());
+  layoutGroup->Add( *childLayout.Get() );
 }
 
 Actor HboxView::GetChildAt( Dali::Toolkit::HboxView::CellPosition position )
@@ -51,15 +84,22 @@ Actor HboxView::RemoveChildAt( Dali::Toolkit::HboxView::CellPosition position )
 
 void HboxView::SetCellPadding( LayoutSize size )
 {
+  GetLayout().SetCellPadding( size );
 }
 
 LayoutSize HboxView::GetCellPadding()
 {
-  return LayoutSize(0, 0);
+  return GetLayout().GetCellPadding();
 }
 
 void HboxView::SetMode( Dali::Toolkit::HboxView::Mode mode )
 {
+  GetLayout().SetMode( mode );
+}
+
+Dali::Toolkit::HboxView::Mode HboxView::GetMode()
+{
+  return GetLayout().GetMode();
 }
 
 void HboxView::SetCellWidth( Dali::Toolkit::HboxView::CellPosition cellPosition, LayoutLength width )
@@ -70,15 +110,36 @@ void HboxView::SetCellHeight( Dali::Toolkit::HboxView::CellPosition cellPosition
 {
 }
 
+void HboxView::OnInitialize()
+{
+  auto layout = HboxLayout::New();
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( *this );
+  controlDataImpl.SetLayout( *layout.Get() );
+}
+
 HboxView::HboxView()
-: Control(ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT )),
-  mSize(0, 0)
+: Control(ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ))
 {
 }
 
 HboxView::~HboxView()
 {
 }
+
+Toolkit::HboxLayout HboxView::GetLayout()
+{
+  Control::Impl& controlDataImpl = Control::Impl::Get( *this );
+  auto layout = Toolkit::LayoutBase( controlDataImpl.GetLayout().Get() );
+
+  if( layout )
+  {
+    auto hboxLayout = Toolkit::HboxLayout::DownCast( layout );
+    DALI_ASSERT_ALWAYS( hboxLayout && "HboxLayout handle is null" );
+    return hboxLayout;
+  }
+  return Toolkit::HboxLayout();
+}
+
 
 } // namespace Internal
 } // namespace Toolkit

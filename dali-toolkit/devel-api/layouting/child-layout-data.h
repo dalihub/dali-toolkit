@@ -30,6 +30,15 @@ namespace Internal DALI_INTERNAL
 class ChildLayoutData;
 }
 
+/**
+ * This class represents the desired size of a child layout.
+ * Either dimension can also take the values MATCH_PARENT (i.e. fill to parent),
+ * or WRAP_CONTENT ( i.e. fit to children ), in which case the layouting algorithms
+ * work out the best size for each child as the tree is traversed during the measure
+ * step.
+ *
+ * It is possible to set up conflicting desired sizes;
+ */
 class DALI_IMPORT_API ChildLayoutData : public BaseHandle
 {
 public:
