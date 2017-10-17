@@ -31,6 +31,10 @@ LayoutGroup::LayoutGroup()
 {
 }
 
+LayoutGroup::~LayoutGroup()
+{
+}
+
 Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutBase& child )
 {
   LayoutParent* oldParent = child.GetParent();
@@ -92,6 +96,11 @@ LayoutBasePtr LayoutGroup::GetChild( Toolkit::LayoutGroup::LayoutId childId )
   return NULL;
 }
 
+unsigned int LayoutGroup::GetChildCount()
+{
+  return mImpl->mChildren.size();
+}
+
 LayoutParent* LayoutGroup::GetParent()
 {
   return LayoutBase::GetParent();
@@ -123,9 +132,10 @@ void LayoutGroup::MeasureChildren( MeasureSpec widthMeasureSpec, MeasureSpec hei
 void LayoutGroup::MeasureChild( LayoutBasePtr child, MeasureSpec parentWidthMeasureSpec, MeasureSpec parentHeightMeasureSpec )
 {
   ChildLayoutDataPtr childLayoutData = child->GetLayoutData();
+  auto padding = GetPadding();
 
-  const MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec, mImpl->mPaddingBegin + mImpl->mPaddingEnd, childLayoutData->GetWidth());
-  const MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( parentHeightMeasureSpec, mImpl->mPaddingTop + mImpl->mPaddingBottom, childLayoutData->GetHeight());
+  const MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec, padding.start + padding.end, childLayoutData->GetWidth());
+  const MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( parentHeightMeasureSpec, padding.top + padding.bottom, childLayoutData->GetHeight());
 
   child->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
 }
@@ -135,15 +145,16 @@ void LayoutGroup::MeasureChildWithMargins( LayoutBasePtr child,
                                            MeasureSpec parentHeightMeasureSpec, uint16_t heightUsed)
 {
   MarginLayoutDataPtr layoutData = static_cast<MarginLayoutData*>( child->GetLayoutData().Get() );
+  const Extents margin = layoutData->GetMargin();
 
   MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
-                                                           mImpl->mPaddingBegin + mImpl->mPaddingEnd +
-                                                           layoutData->mBeginMargin + layoutData->mEndMargin +
+                                                           mImpl->mPadding.start + mImpl->mPadding.end +
+                                                           margin.start + margin.end +
                                                            widthUsed, layoutData->GetWidth() );
 
   MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( parentHeightMeasureSpec,
-                                                            mImpl->mPaddingTop + mImpl->mPaddingBottom +
-                                                            layoutData->mTopMargin + layoutData->mBottomMargin +
+                                                            mImpl->mPadding.top + mImpl->mPadding.bottom +
+                                                            margin.top + margin.end +
                                                             heightUsed, layoutData->GetHeight() );
 
   child->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
@@ -155,8 +166,8 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
   int padding,
   uint16_t childDimension )
 {
-  int specMode = MeasureSpec::GetMode( measureSpec );
-  int specSize = MeasureSpec::GetSize( measureSpec );
+  int specMode = measureSpec.GetMode();
+  int specSize = measureSpec.GetSize();
 
   int size = std::max( 0, specSize - padding );
 
@@ -251,6 +262,10 @@ bool LayoutGroup::IsLayoutRequested()
   return mImpl->GetPrivateFlag( Impl::PFLAG_FORCE_LAYOUT );
 }
 
+Extents LayoutGroup::GetPadding()
+{
+  return mImpl->mPadding;
+}
 
 } // namespace Internal
 } // namespace Toolkit

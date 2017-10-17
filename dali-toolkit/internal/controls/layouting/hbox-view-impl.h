@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CONTROL_HBOX_VIEW_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
  */
 
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali-toolkit/devel-api/layouting/layout-group.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
-
+#include <dali-toolkit/devel-api/layouting/layout-group.h>
 #include <dali-toolkit/devel-api/controls/layouting/hbox-view.h>
+#include <dali-toolkit/internal/layouting/hbox-layout-impl.h>
 
 namespace Dali
 {
@@ -45,6 +45,7 @@ public:
   void SetCellPadding( LayoutSize size );
   LayoutSize GetCellPadding();
   void SetMode( Dali::Toolkit::HboxView::Mode mode );
+  Dali::Toolkit::HboxView::Mode GetMode();
   void SetCellWidth( Dali::Toolkit::HboxView::CellPosition cellPosition, LayoutLength width );
   void SetCellHeight( Dali::Toolkit::HboxView::CellPosition cellPosition, LayoutLength height );
 
@@ -52,13 +53,17 @@ protected:
   HboxView();
   virtual ~HboxView();
 
+protected:
+  /**
+   * @copydoc Toolkit::Control::OnInitialize()
+   */
+  virtual void OnInitialize();
+
 private:
   HboxView( const HboxView& other ) = delete;
   HboxView& operator=( const HboxView& other ) = delete;
 
-private:
-  Uint16Pair mSize;
-
+  Toolkit::HboxLayout GetLayout();
 };
 
 } // namespace Internal

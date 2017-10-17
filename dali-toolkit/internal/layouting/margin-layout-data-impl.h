@@ -36,20 +36,23 @@ class MarginLayoutData : public ChildLayoutData
 {
 public:
   static MarginLayoutDataPtr New( uint16_t width, uint16_t height, uint16_t begin, uint16_t end, uint16_t top, uint16_t bottom );
+  virtual ChildLayoutDataPtr Clone();
+
+  MarginLayoutData( const MarginLayoutData& other ) = delete;
+  MarginLayoutData& operator=( const MarginLayoutData& other ) = delete;
+
+  /**
+   * Get the margin data
+   * @return the margin
+   */
+  const Extents& GetMargin();
 
 protected:
   MarginLayoutData( uint16_t width, uint16_t height, uint16_t begin, uint16_t end, uint16_t top, uint16_t bottom );
   virtual ~MarginLayoutData();
 
 private:
-  MarginLayoutData( const MarginLayoutData& other ) = delete;
-  MarginLayoutData& operator=( const MarginLayoutData& other ) = delete;
-
-public:
-  uint16_t mBeginMargin;
-  uint16_t mEndMargin;
-  uint16_t mTopMargin;
-  uint16_t mBottomMargin;
+  Extents mMargin;
 };
 
 } // namespace Internal

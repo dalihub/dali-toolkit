@@ -306,13 +306,13 @@ public:
    *
    * @return A pointer to the layout, or NULL.
    */
-  Toolkit::LayoutBase GetLayout();
+  Toolkit::Internal::LayoutBasePtr GetLayout();
 
   /**
    * @brief Set the layout on this control.
    * @param[in] layout Pointer to the layout
    */
-  void SetLayout( Toolkit::LayoutBase& layout );
+  void SetLayout( Toolkit::Internal::LayoutBase& layout );
 
 private:
 
@@ -360,7 +360,7 @@ public:
   std::string mSubStateName;
 
   // Layout
-  Toolkit::LayoutBase mLayout;
+  Toolkit::Internal::LayoutBasePtr mLayout;
 
   int mLeftFocusableActorId;       ///< Actor ID of Left focusable control.
   int mRightFocusableActorId;      ///< Actor ID of Right focusable control.

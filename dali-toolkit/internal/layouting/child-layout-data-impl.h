@@ -37,27 +37,22 @@ class ChildLayoutData : public BaseObject
 {
 public:
   static ChildLayoutDataPtr New( uint16_t width, uint16_t height );
+  virtual ChildLayoutDataPtr Clone();
 
-public:
+  ChildLayoutData( const ChildLayoutData& other ) = delete;
+  ChildLayoutData& operator=( const ChildLayoutData& other ) = delete;
+
   uint16_t GetWidth();
   uint16_t GetHeight();
   void SetWidth( uint16_t width );
   void SetHeight( uint16_t height );
-
-public:
-  virtual ChildLayoutDataPtr Clone();
 
 protected:
   ChildLayoutData( uint16_t width, uint16_t height );
   virtual ~ChildLayoutData();
 
 private:
-  ChildLayoutData( const ChildLayoutData& other ) = delete;
-  ChildLayoutData& operator=( const ChildLayoutData& other ) = delete;
-
-private:
   Uint16Pair mSize;
-
 };
 
 } // namespace Internal

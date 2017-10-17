@@ -33,12 +33,20 @@ MarginLayoutDataPtr MarginLayoutData::New( uint16_t width, uint16_t height, uint
   return object;
 }
 
+ChildLayoutDataPtr MarginLayoutData::Clone()
+{
+  ChildLayoutDataPtr object( new MarginLayoutData( GetWidth(), GetHeight(), mMargin.start, mMargin.end, mMargin.top, mMargin.bottom ) );
+  return object;
+}
+
+const Extents& MarginLayoutData::GetMargin()
+{
+  return mMargin;
+}
+
 MarginLayoutData::MarginLayoutData( uint16_t width, uint16_t height, uint16_t begin, uint16_t end, uint16_t top, uint16_t bottom )
 : ChildLayoutData(width, height),
-  mBeginMargin(begin),
-  mEndMargin(end),
-  mTopMargin(top),
-  mBottomMargin(bottom)
+  mMargin( begin, end, top, bottom )
 {
 }
 

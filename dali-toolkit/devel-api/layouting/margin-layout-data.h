@@ -30,6 +30,9 @@ namespace Internal DALI_INTERNAL
 class MarginLayoutData;
 }
 
+/**
+ * This class represents the desired margins for a layout child
+ */
 class DALI_IMPORT_API MarginLayoutData : public ChildLayoutData
 {
 public:

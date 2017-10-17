@@ -99,13 +99,13 @@ void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Proper
 Toolkit::LayoutBase GetLayout( Internal::Control& control )
 {
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
-  return controlDataImpl.GetLayout();
+  return Toolkit::LayoutBase( controlDataImpl.GetLayout().Get() );
 }
 
-void SetLayout( Internal::Control& control, Toolkit::LayoutBase& layout )
+void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout )
 {
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
-  controlDataImpl.SetLayout( layout );
+  controlDataImpl.SetLayout( GetImplementation( layout ) );
 }
 
 } // namespace DevelControl
