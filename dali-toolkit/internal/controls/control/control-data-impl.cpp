@@ -302,14 +302,15 @@ const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "backgro
 const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgroundImage",        Toolkit::Control::Property::BACKGROUND_IMAGE,             Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",          Toolkit::Control::Property::KEY_INPUT_FOCUS,              Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",             Toolkit::Control::Property::BACKGROUND,                   Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "tooltip",                Toolkit::DevelControl::Property::TOOLTIP,                 Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "state",                  Toolkit::DevelControl::Property::STATE,                   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_8( typeRegistration, "subState",               Toolkit::DevelControl::Property::SUB_STATE,               Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_9( typeRegistration, "leftFocusableActorId",   Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_10( typeRegistration, "rightFocusableActorId", Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID,Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_11( typeRegistration, "upFocusableActorId",    Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,   Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_12( typeRegistration, "downFocusableActorId",  Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-
+const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "margin",                 Toolkit::Control::Property::MARGIN,                       Property::EXTENTS, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "padding",                Toolkit::Control::Property::PADDING,                      Property::EXTENTS, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_8( typeRegistration, "tooltip",                Toolkit::DevelControl::Property::TOOLTIP,                 Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_9( typeRegistration, "state",                  Toolkit::DevelControl::Property::STATE,                   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_10( typeRegistration, "subState",               Toolkit::DevelControl::Property::SUB_STATE,               Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_11( typeRegistration, "leftFocusableActorId",   Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_12( typeRegistration, "rightFocusableActorId", Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID,Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_13( typeRegistration, "upFocusableActorId",    Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,   Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_14( typeRegistration, "downFocusableActorId",  Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 
 Control::Impl::Impl( Control& controlImpl )
@@ -323,6 +324,8 @@ Control::Impl::Impl( Control& controlImpl )
   mStyleName(""),
   mBackgroundColor(Color::TRANSPARENT),
   mStartingPinchScale( NULL ),
+  mMargin( 0, 0, 0, 0 ),
+  mPadding( 0, 0, 0, 0 ),
   mKeyEventSignal(),
   mPinchGestureDetector(),
   mPanGestureDetector(),
@@ -910,6 +913,26 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
         break;
       }
 
+      case Toolkit::Control::Property::MARGIN:
+      {
+        Extents margin;
+        if( value.Get( margin ) )
+        {
+          controlImpl.mImpl->SetMargin( margin );
+        }
+        break;
+      }
+
+      case Toolkit::Control::Property::PADDING:
+      {
+        Extents padding;
+        if( value.Get( padding ) )
+        {
+          controlImpl.mImpl->SetPadding( padding );
+        }
+        break;
+      }
+
       case Toolkit::DevelControl::Property::TOOLTIP:
       {
         TooltipPtr& tooltipPtr = controlImpl.mImpl->mTooltip;
@@ -918,7 +941,9 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
           tooltipPtr = Tooltip::New( control );
         }
         tooltipPtr->SetProperties( value );
+        break;
       }
+
     }
   }
 }
@@ -1016,6 +1041,18 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
         break;
       }
 
+      case Toolkit::Control::Property::MARGIN:
+      {
+        value = controlImpl.mImpl->GetMargin();
+        break;
+      }
+
+      case Toolkit::Control::Property::PADDING:
+      {
+        value = controlImpl.mImpl->GetPadding();
+        break;
+      }
+
       case Toolkit::DevelControl::Property::TOOLTIP:
       {
         Property::Map map;
@@ -1026,7 +1063,6 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
         value = map;
         break;
       }
-
     }
   }
 
@@ -1296,6 +1332,26 @@ void Control::Impl::OnStageDisconnection()
   }
 
   mRemoveVisuals.Clear();
+}
+
+void Control::Impl::SetMargin( Extents margin )
+{
+  mControlImpl.mImpl->mMargin = margin;
+}
+
+Extents Control::Impl::GetMargin() const
+{
+  return mControlImpl.mImpl->mMargin;
+}
+
+void Control::Impl::SetPadding( Extents padding )
+{
+  mControlImpl.mImpl->mPadding = padding;
+}
+
+Extents Control::Impl::GetPadding() const
+{
+  return mControlImpl.mImpl->mPadding;
 }
 
 } // namespace Internal

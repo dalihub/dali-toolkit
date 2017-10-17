@@ -54,6 +54,8 @@ enum
   BACKGROUND_IMAGE  = Control::Property::BACKGROUND_IMAGE,
   KEY_INPUT_FOCUS   = Control::Property::KEY_INPUT_FOCUS,
   BACKGROUND        = Control::Property::BACKGROUND,
+  MARGIN            = Control::Property::MARGIN,
+  PADDING           = Control::Property::PADDING,
 
   /**
    * @brief Displays a tooltip when the control is hovered over.
@@ -66,7 +68,7 @@ enum
    * @note When retrieved, a Property::MAP is returned.
    * @see Toolkit::Tooltip
    */
-  TOOLTIP = BACKGROUND + 1,
+  TOOLTIP = PADDING + 1,
 
   /**
    * @brief The current state of the control.
@@ -74,7 +76,7 @@ enum
    *
    * @see DevelControl::State
    */
-  STATE = BACKGROUND + 2,
+  STATE = PADDING + 2,
 
   /**
    * @brief The current sub state of the control.
@@ -82,35 +84,35 @@ enum
    *
    * @see DevelControl::State
    */
-  SUB_STATE = BACKGROUND + 3,
+  SUB_STATE = PADDING + 3,
 
   /**
    * @brief The actor ID of the left focusable control.
    * @details Name "leftFocusableActorId", type Property::INTEGER.
    *
    */
-  LEFT_FOCUSABLE_ACTOR_ID = BACKGROUND + 4,
+  LEFT_FOCUSABLE_ACTOR_ID = PADDING + 4,
 
   /**
    * @brief The actor ID of the right focusable control.
    * @details Name "rightFocusableActorId", type Property::INTEGER.
    *
    */
-  RIGHT_FOCUSABLE_ACTOR_ID = BACKGROUND + 5,
+  RIGHT_FOCUSABLE_ACTOR_ID = PADDING + 5,
 
   /**
    * @brief The actor ID of the up focusable control.
    * @details Name "upFocusableActorId", type Property::INTEGER.
    *
    */
-  UP_FOCUSABLE_ACTOR_ID = BACKGROUND + 6,
+  UP_FOCUSABLE_ACTOR_ID = PADDING + 6,
 
   /**
    * @brief The actor ID of the down focusable control.
    * @details Name "downFocusableActorId", type Property::INTEGER.
    *
    */
-  DOWN_FOCUSABLE_ACTOR_ID = BACKGROUND + 7
+  DOWN_FOCUSABLE_ACTOR_ID = PADDING + 7
 };
 
 } // namespace Property
