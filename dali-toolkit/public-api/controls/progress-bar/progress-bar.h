@@ -38,27 +38,7 @@ class ProgressBar;
 
 /**
  * @brief ProgressBar is a control to give the user an indication of the progress of an operation.
- * *
- *     Determinate Progress State
  *
- *      #  : Progress visual
- *      *  : Secondary Progress visual
- *      =  : Track visual
- *     40% : Label visual
- *
- *     =============================================
- *     = ###############**** 40%                   =
- *     =============================================
- *
- *     Indeterminate Progress State
- *
- *      /  : Indeterminate visual
- *
- *     =============================================
- *     = ///////////////////////////////////////// =
- *     =============================================
- *
- * Also progress value percentage is shown as text inside the progress bar.
  * Signals
  * | %Signal Name      | Method                        |
  * |-------------------|-------------------------------|
