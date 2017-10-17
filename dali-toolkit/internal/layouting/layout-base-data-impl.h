@@ -46,6 +46,11 @@ public:
   MeasureSpec mOldHeightMeasureSpec;
   Uint16Pair mMinimumSize;
   Uint16Pair mMeasuredSize;
+
+  Extents mMargin; ///< Distances in pixels from the edges of this view to this view's parent.
+  Extents mPadding; ///< Distances in pixels from the edges of this view to this view's content.
+
+
   uint16_t mLeft;
   uint16_t mRight;
   uint16_t mTop;

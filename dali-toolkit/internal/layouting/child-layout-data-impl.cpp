@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,14 +33,20 @@ ChildLayoutDataPtr ChildLayoutData::New( uint16_t width, uint16_t height )
   return object;
 }
 
+ChildLayoutDataPtr ChildLayoutData::Clone()
+{
+  ChildLayoutDataPtr object( new ChildLayoutData( mSize.GetWidth(), mSize.GetHeight() ) );
+  return object;
+}
+
 uint16_t ChildLayoutData::GetWidth()
 {
-  return uint16_t(0);
+  return mSize.GetWidth();
 }
 
 uint16_t ChildLayoutData::GetHeight()
 {
-  return uint16_t(0);
+  return mSize.GetHeight();
 }
 
 void ChildLayoutData::SetWidth( uint16_t width )
@@ -53,7 +59,7 @@ void ChildLayoutData::SetHeight( uint16_t height )
 
 ChildLayoutData::ChildLayoutData( uint16_t width, uint16_t height )
 : BaseObject(),
-  mSize()
+  mSize( width, height )
 {
 }
 
@@ -64,4 +70,3 @@ ChildLayoutData::~ChildLayoutData()
 } // namespace Internal
 } // namespace Toolkit
 } // namespace Dali
-

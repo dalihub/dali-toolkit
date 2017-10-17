@@ -13,6 +13,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/replacement.cpp \
    $(toolkit_src_dir)/layouting/child-layout-data-impl.cpp \
    $(toolkit_src_dir)/layouting/margin-layout-data-impl.cpp \
+   $(toolkit_src_dir)/layouting/hbox-layout-impl.cpp \
    $(toolkit_src_dir)/layouting/layout-base-data-impl.cpp \
    $(toolkit_src_dir)/layouting/layout-group-data-impl.cpp \
    $(toolkit_src_dir)/layouting/layout-controller-impl.cpp \

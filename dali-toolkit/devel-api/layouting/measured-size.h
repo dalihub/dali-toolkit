@@ -42,10 +42,20 @@ public:
   static const uint16_t MEASURED_STATE_MASK = 0x8000;
 
   /**
+   * Bit shift to move the state to the lowest bits
+   */
+  static const uint16_t MEASURED_STATE_BIT_SHIFT = 15;
+
+  /**
    * Bit indicating if the measured size is too small
    */
   static const uint16_t MEASURED_SIZE_TOO_SMALL = 0x8000;
 
+
+  MeasuredSize()
+  : mMeasuredSize( 0 )
+  {
+  }
 
   MeasuredSize( uint16_t measuredSize )
   : mMeasuredSize( measuredSize )
@@ -84,6 +94,11 @@ public:
   inline operator uint16_t()
   {
     return mMeasuredSize;
+  }
+
+  inline void SetState( uint16_t state )
+  {
+    mMeasuredSize |= ( state & MEASURED_STATE_MASK );
   }
 
   inline uint16_t GetState()

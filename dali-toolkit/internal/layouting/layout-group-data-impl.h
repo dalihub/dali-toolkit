@@ -35,32 +35,6 @@ class LayoutGroup::Impl : public Internal::LayoutBase::Impl
 public:
   Impl( LayoutGroup& layoutGroup );
 
-
-public:
-  /**
-   * The leading padding in pixels, that is the distance in pixels between the
-   * beginning edge of this view and the beginning edge of its content.
-   */
-  int mPaddingBegin;
-
-  /**
-   * The end padding in pixels, that is the distance in pixels between the
-   * end edge of this view and the end edge of its content.
-   */
-  int mPaddingEnd;
-
-  /**
-   * The top padding in pixels, that is the distance in pixels between the
-   * top edge of this view and the top edge of its content.
-   */
-  int mPaddingTop;
-
-  /**
-   * The bottom padding in pixels, that is the distance in pixels between the
-   * bottom edge of this view and the bottom edge of its content.
-   */
-  int mPaddingBottom;
-
 public:
   struct ChildLayout
   {
@@ -68,6 +42,7 @@ public:
     Toolkit::LayoutGroup::LayoutId layoutId;
   };
 
+  Extents mPadding;
   std::vector<ChildLayout> mChildren;
   Toolkit::LayoutGroup::LayoutId mNextLayoutId;
 };

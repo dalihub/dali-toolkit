@@ -22,6 +22,7 @@ SET(TC_SOURCES
    utc-Dali-ImageVisual.cpp
    utc-Dali-JsonParser.cpp
    utc-Dali-KeyInputFocusManager.cpp
+   utc-Dali-Layouting.cpp
    utc-Dali-PageTurnView.cpp
    utc-Dali-Script.cpp
    utc-Dali-ScrollBar.cpp

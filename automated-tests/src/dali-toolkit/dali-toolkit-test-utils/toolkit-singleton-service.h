@@ -1,3 +1,6 @@
+#ifndef DALI_TOOLKIT_TEST_SINGLETON_SERVICE_H
+#define DALI_TOOLKIT_TEST_SINGLETON_SERVICE_H
+
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
@@ -14,26 +17,14 @@
  * limitations under the License.
  */
 
-#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
-#include <dali-toolkit/internal/layouting/layout-group-data-impl.h>
+#include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include "test-application.h"
 
-namespace Dali
-{
-namespace Toolkit
-{
-namespace Internal
+namespace Test
 {
 
-LayoutGroup::Impl::Impl( LayoutGroup& layoutGroup )
-: LayoutBase::Impl( layoutGroup ),
-  mPadding(),
-  mChildren(),
-  mNextLayoutId(0)
-{
-}
+void SetApplication( Dali::SingletonService singletonService, TestApplication& testApplication );
 
-} // namespace Internal
+} // Test
 
-} // namespace Toolkit
-
-} // namespace Dali
+#endif //DALI_TOOLKIT_TEST_SINGLETON_SERVICE_H

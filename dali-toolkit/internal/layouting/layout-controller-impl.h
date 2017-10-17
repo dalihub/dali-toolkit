@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_LAYOUT_CONTROLLER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 
 namespace Dali
 {
@@ -53,15 +54,24 @@ public:
   void Initialize();
 
   /**
+   * This registers the layouter with the layout controller
+   */
+  void RegisterLayout( LayoutGroup& layout );
+
+  /**
    * This marks the given layout and all its parents as dirty.
    */
   void RequestLayout( LayoutBase& layout );
 
   /**
-   * Measures next level of layouts in the actor hierarchy. Expect that this is called recursively by the
-   * child layout's OnMeasure method.
+   * Measures next level of layouts in the actor hierarchy.
    */
-  static void MeasureHierarchy( Actor root, MeasureSpec widthSpec, MeasureSpec heightSpec );
+  void MeasureHierarchy( Actor root, MeasureSpec widthSpec, MeasureSpec heightSpec );
+
+  /**
+   * Perform layout of the hierarchy
+   */
+  void PerformLayout( Actor root, int left, int top, int right, int bottom );
 
 protected: // Implementation of Processor
 
