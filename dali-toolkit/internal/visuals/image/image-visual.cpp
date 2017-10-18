@@ -293,7 +293,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
-  mReleasePolicy( DevelImageVisual::ReleasePolicy::DETACHED ),
+  mReleasePolicy( DevelImageVisual::ReleasePolicy::DESTROYED ),
   mAttemptAtlasing( false ),
   mLoading( false )
 {
