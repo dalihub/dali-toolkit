@@ -135,7 +135,6 @@ TextureSet TextureManager::LoadTexture(
     PixelData data;
     if( url.IsValid() )
     {
-      // if sync loading is required, the loading should immediately when actor is on stage
       Devel::PixelBuffer pixelBuffer = LoadImageFromFile( url.GetUrl(), desiredSize, fittingMode, samplingMode );
       if( pixelBuffer )
       {
