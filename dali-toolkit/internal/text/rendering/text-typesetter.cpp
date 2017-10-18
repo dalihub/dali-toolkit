@@ -609,7 +609,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
 
       for( unsigned int y = underlineYOffset; y < underlineYOffset + maxUnderlineThickness; y++ )
       {
-        if( ( y < 0 ) || ( y > bufferHeight - 1 ) )
+        if( y > bufferHeight - 1 )
         {
           // Do not write out of bounds.
           break;
@@ -617,7 +617,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
 
         for( unsigned int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++ )
         {
-          if( ( x < 0 ) || ( x > bufferWidth - 1 ) )
+          if( x > bufferWidth - 1 )
           {
             // Do not write out of bounds.
             break;
