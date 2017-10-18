@@ -30,6 +30,22 @@ namespace Toolkit
 namespace DevelImageVisual
 {
 
+/**
+ * @brief The policy determining if the image is loaded when the visual is staged or created.
+ */
+namespace LoadPolicy
+{
+
+/**
+ * @brief The available named elements that define the LoadPolicy.
+ */
+enum Type
+{
+  IMMEDIATE = 0,  ///< The image is loaded when the ImageVisual is created.
+  ATTACHED        ///< The image is loaded when the ImageVisual is attached to the stage.
+};
+
+} // namespace LoadPolicy
 
 /**
  * @brief The policy determining when a image is deleted from the cache in relation to the ImageVisual lifetime.
@@ -73,6 +89,14 @@ enum Type
   FRAME_DELAY         = Dali::Toolkit::ImageVisual::Property::FRAME_DELAY,
   MASK_CONTENT_SCALE  = Dali::Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE,
   CROP_TO_MASK        = Dali::Toolkit::ImageVisual::Property::CROP_TO_MASK,
+
+  /**
+   * @brief The policy to determine when an image should be loaded.
+   * @details Name "loadPolicy",  Type LoadPolicy::Type (Property::INTEGER)or Property::STRING.
+   * @note Default LoadPolicy::ATTACHED
+   * @see LoadPolicy::Type
+   */
+  LOAD_POLICY = CROP_TO_MASK + 1,
 
   /**
    * @brief The policy to determine when an image should no longer be cached.
