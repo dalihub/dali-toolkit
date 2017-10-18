@@ -77,7 +77,7 @@ enum Type
   /**
    * @brief The policy to determine when an image should no longer be cached.
    * @details Name "releasePolicy", Type ReleasePolicy::Type (Property::INTEGER) or Property::STRING
-   * @note Default ReleasePolicy::DETACHED
+   * @note Default ReleasePolicy::DESTROYED
    * @see ReleasePolicy::Type
    */
   RELEASE_POLICY = CROP_TO_MASK + 2,
