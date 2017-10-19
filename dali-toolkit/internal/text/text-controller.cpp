@@ -2315,7 +2315,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Do nothing.
       return false;
     }
-    else if( Dali::DALI_KEY_ESCAPE == keyCode || Dali::DALI_KEY_BACK == keyCode )
+    else if( Dali::DALI_KEY_ESCAPE == keyCode || Dali::DALI_KEY_BACK == keyCode  || Dali::DALI_KEY_SEARCH == keyCode )
     {
       // Do nothing
       return false;
