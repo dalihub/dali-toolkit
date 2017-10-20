@@ -84,6 +84,8 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   \n
   void main()\n
   {\n
+    if ( vTexCoord.y > 1.0 )\n
+      discard;\n
     gl_FragColor = texture2D( sTexture, vTexCoord );\n
   }\n
 );

@@ -46,6 +46,7 @@
 #include <dali-toolkit/public-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/table-view/table-view.h>
 #include <dali-toolkit/public-api/controls/text-controls/hidden-input-properties.h>
+#include <dali-toolkit/public-api/controls/text-controls/placeholder-properties.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>

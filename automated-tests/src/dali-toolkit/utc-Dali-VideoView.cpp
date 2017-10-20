@@ -405,3 +405,38 @@ int UtcDaliVideoViewMethodsForCoverage2(void)
 
   END_TEST;
 }
+
+int UtcDaliVideoViewPropertyUnderlay(void)
+{
+  ToolkitTestApplication application;
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+
+  VideoView view = VideoView::New();
+  DALI_TEST_CHECK( view );
+
+  Stage::GetCurrent().Add( view );
+
+  application.SendNotification();
+  application.Render();
+
+  bool isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( isUnderlay );
+
+  view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, false );
+  isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( !isUnderlay );
+
+  view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, true );
+  isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( isUnderlay );
+
+  // If platform api doesn't provide any API or feature for decoded images of video,
+  // UNDERLAY should be true
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = false;
+
+  view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, false );
+  isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( isUnderlay );
+
+  END_TEST;
+}

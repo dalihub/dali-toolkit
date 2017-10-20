@@ -97,6 +97,10 @@ bool Disambiguated(const TreeNode& child,
     {
       return DeterminePropertyFromNode( *childValue, Dali::Property::ARRAY, value, replacement);
     }
+    else if(*childType == "extents")
+    {
+      return DeterminePropertyFromNode( *childValue, Dali::Property::EXTENTS, value, replacement);
+    }
   }
 
   // else we failed to disambiguate
@@ -314,6 +318,15 @@ bool DeterminePropertyFromNode( const TreeNode& node, Property::Type type, Prope
 
           done = ( map->Count() == node.Size() );
         }
+      }
+      break;
+    }
+    case Property::EXTENTS:
+    {
+      if( OptionalExtents v = replacer.IsExtents(node) )
+      {
+        value = *v;
+        done = true;
       }
       break;
     }

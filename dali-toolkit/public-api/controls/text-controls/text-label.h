@@ -240,6 +240,7 @@ public:
        * @details Name "autoScrollGap", type Property::INT.
        * @SINCE_1_1.35
        * @note Default in style sheet but can be overridden to prevent same text being shown at start and end.
+       * @note Displayed gap size is not guaranteed if the text length plus gap exceeds the maximum texture size (i.e. GL_MAX_TEXTURE_SIZE).
        */
       AUTO_SCROLL_GAP,
 

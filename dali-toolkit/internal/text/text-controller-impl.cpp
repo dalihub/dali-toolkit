@@ -73,7 +73,7 @@ EventData::EventData( DecoratorPtr decorator )
   mPlaceholderFont( NULL ),
   mPlaceholderTextActive(),
   mPlaceholderTextInactive(),
-  mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),
+  mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ), // This color has been published in the Public API (placeholder-properties.h).
   mEventQueue(),
   mInputStyleChangedQueue(),
   mPreviousState( INACTIVE ),

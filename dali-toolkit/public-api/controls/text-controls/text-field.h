@@ -439,18 +439,18 @@ public:
        * Example Usage:
        * @code
        *   Property::Map propertyMap;
-       *   propertyMap["placeholderText"] = "Setting Placeholder Text";
-       *   propertyMap["placeholderTextFocused"] = "Setting Placeholder Text Focused";
-       *   propertyMap["placeholderColor"] = Color::RED;
-       *   propertyMap["placeholderFontFamily"] = "Arial";
-       *   propertyMap["placeholderPointSize"] = 12.0f;
-       *   propertyMap["placeholderEllipsis"] = true;
+       *   propertyMap[ Text::PlaceHolder::Property::TEXT ] = "Setting Placeholder Text";
+       *   propertyMap[ Text::PlaceHolder::Property::TEXT_FOCUSED] = "Setting Placeholder Text Focused";
+       *   propertyMap[ Text::PlaceHolder::Property::COLOR] = Color::RED;
+       *   propertyMap[ Text::PlaceHolder::Property::FONT_FAMILY ] = "Arial";
+       *   propertyMap[ Text::PlaceHolder::Property::POINT_SIZE ] = 12.0f;
+       *   propertyMap[ Text::PlaceHolder::Property::ELLIPSIS ] = true;
        *
        *   Property::Map fontStyleMap;
        *   fontStyleMap.Insert( "weight", "bold" );
        *   fontStyleMap.Insert( "width", "condensed" );
        *   fontStyleMap.Insert( "slant", "italic" );
-       *   propertyMap["placeholderFontStyle"] = fontStyleMap;
+       *   propertyMap[ Text::PlaceHolder::Property::FONT_STYLE] = fontStyleMap;
        *
        *   field.SetProperty( TextField::Property::PLACEHOLDER, propertyMap );
        * @endcode

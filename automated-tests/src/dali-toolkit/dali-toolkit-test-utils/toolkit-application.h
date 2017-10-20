@@ -85,6 +85,9 @@ private:
   // The Application Stub
   Application* mApplicationStub;
   friend class Application;
+
+public: // Test static member
+  static bool DECODED_IMAGES_SUPPORTED;
 };
 
 } // namespace Dali
