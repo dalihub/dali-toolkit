@@ -284,7 +284,6 @@ private:
   bool mIsPlay;
   bool mIsPause;
   bool mIsUnderlay;
-  bool mIsRenderer;
 };
 
 } // namespace Internal
