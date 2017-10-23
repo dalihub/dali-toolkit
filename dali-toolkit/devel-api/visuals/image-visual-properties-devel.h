@@ -105,6 +105,13 @@ enum Type
    * @see ReleasePolicy::Type
    */
   RELEASE_POLICY = CROP_TO_MASK + 2,
+
+  /**
+   * @brief Determines if image orientation should be corrected so the image displays as it was intended.
+   * @details Name "orientationCorrection", Type Property::BOOLEAN, if true the image's orientation will be corrected.
+   * @note Default true
+   */
+  ORIENTATION_CORRECTION = CROP_TO_MASK + 3,
 };
 
 } //namespace Property

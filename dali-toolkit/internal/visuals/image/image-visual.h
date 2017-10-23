@@ -53,20 +53,21 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *
  * The following properties are optional
  *
- * | %Property Name     | Type              |
- * |--------------------|-------------------|
- * | url                | STRING            |
- * | alphaMaskUrl       | STRING            |
- * | fittingMode        | INTEGER OR STRING |
- * | samplingMode       | INTEGER OR STRING |
- * | desiredWidth       | INTEGER           |
- * | desiredHeight      | INTEGER           |
- * | synchronousLoading | BOOLEAN           |
- * | pixelArea          | VECTOR4           |
- * | wrapModeU          | INTEGER OR STRING |
- * | wrapModeV          | INTEGER OR STRING |
- * | loadPolicy         | INTEGER OR STRING |
- * | releasePolicy      | INTEGER OR STRING |
+ * | %Property Name        | Type              |
+ * |-----------------------|-------------------|
+ * | url                   | STRING            |
+ * | alphaMaskUrl          | STRING            |
+ * | fittingMode           | INTEGER OR STRING |
+ * | samplingMode          | INTEGER OR STRING |
+ * | desiredWidth          | INTEGER           |
+ * | desiredHeight         | INTEGER           |
+ * | synchronousLoading    | BOOLEAN           |
+ * | pixelArea             | VECTOR4           |
+ * | wrapModeU             | INTEGER OR STRING |
+ * | wrapModeV             | INTEGER OR STRING |
+ * | loadPolicy            | INTEGER OR STRING |
+ * | releasePolicy         | INTEGER OR STRING |
+ * | orientationCorrection | BOOLEAN           |
  *
  * where pixelArea is a rectangular area.
  * In its Vector4 value, the first two elements indicate the top-left position of the area,
@@ -273,8 +274,9 @@ private:
    * @param[in, out] atlasing flag if the image has been put in a atlas (true), passing false will not atlas even if possible.
    * @param[out] atlasRect if atlasing is used this the texture area of the image in the atlas.
    * @param[out] textures resulting texture set from the image loading.
+   * @param[in] orientationCorrection flag determines if orientation correction should be performed
    */
-  void LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures );
+  void LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection );
 
   /**
    * @brief Initializes the Dali::Renderer from the image url
@@ -355,6 +357,7 @@ private:
   Vector4 mAtlasRect;
   bool mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
   bool mLoading;  ///< True if the texture is still loading.
+  bool mOrientationCorrection; ///< true if the image will have it's orientation corrected.
 };
 
 

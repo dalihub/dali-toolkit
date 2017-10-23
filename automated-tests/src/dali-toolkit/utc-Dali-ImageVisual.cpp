@@ -49,6 +49,7 @@ const char* TEST_REMOTE_IMAGE_FILE_NAME = "https://www.tizen.org/sites/all/theme
 const char* TEST_INVALID_FILE_NAME =  TEST_RESOURCE_DIR  "/invalid.jpg";
 const char* TEST_REMOTE_INVALID_FILE_NAME = "https://www.tizen.org/invalid.png";
 const char* TEST_MASK_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/mask.png";
+const char* TEST_ROTATED_IMAGE =  TEST_RESOURCE_DIR  "/keyboard-Landscape.jpg";
 
 
 bool gResourceReadySignalFired = false;
@@ -1717,6 +1718,64 @@ int UtcDaliImageVisualLoadPolicy03(void)
   Stage::GetCurrent().Add( actor ); // If LoadPolicy was not IMMEDIATE then as this point (after attached to stage) the test would need to wait for Loading
 
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualOrientationCorrection(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualOrientationCorrection Enabling OrientationCorrection should rotate an image with exif (90deg) orientation data with requested" );
+
+  VisualFactory factory = VisualFactory::Get();
+  tet_infoline( "Create visual with Orientation correction set OFF" );
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_ROTATED_IMAGE );
+  propertyMap.Insert( DevelImageVisual::Property::ORIENTATION_CORRECTION, false );
+  Visual::Base imageVisual = factory.CreateVisual( propertyMap );
+
+  tet_infoline( "Create control for visual, need to loaded it" );
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  Stage::GetCurrent().Add( actor );
+
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  Vector2 originalImageSize;
+  tet_infoline( "Get size of original visual to compare later with rotated image" );
+  imageVisual.GetNaturalSize( originalImageSize );
+  DALI_TEST_GREATER( originalImageSize.width, originalImageSize.height, TEST_LOCATION ); // Width and Height must be different for this test.
+  imageVisual.Reset();  // remove handle so can unregister it and remove from cache
+  dummyImpl.UnregisterVisual( DummyControl::Property::TEST_VISUAL );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Create visual with Orientation correction set ON " );
+  propertyMap.Clear();
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_ROTATED_IMAGE );
+  propertyMap.Insert( DevelImageVisual::Property::ORIENTATION_CORRECTION, true );
+  imageVisual = factory.CreateVisual( propertyMap );
+
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  Vector2 rotatedImageSize;
+  imageVisual.GetNaturalSize( rotatedImageSize );
+  tet_infoline( "Confirm that visual has rotated" );
+  DALI_TEST_EQUALS( originalImageSize.width, rotatedImageSize.height , TEST_LOCATION );
+  DALI_TEST_EQUALS( originalImageSize.height, rotatedImageSize.width , TEST_LOCATION );
+
+  Property::Map resultMap;
+  imageVisual.CreatePropertyMap( resultMap );
+
+  // check the Property::ORIENTATION_CORRECTION value from the returned map
+  Property::Value* typeValue = resultMap.Find( DevelImageVisual::Property::ORIENTATION_CORRECTION,  Property::BOOLEAN );
+  DALI_TEST_EQUALS( typeValue->Get<bool>(), true, TEST_LOCATION );
 
   END_TEST;
 }

@@ -303,7 +303,8 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mLoadPolicy( DevelImageVisual::LoadPolicy::ATTACHED ),
   mReleasePolicy( DevelImageVisual::ReleasePolicy::DESTROYED ),
   mAttemptAtlasing( false ),
-  mLoading( false )
+  mLoading( false ),
+  mOrientationCorrection( true )
 {
 }
 
@@ -399,6 +400,10 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       {
         DoSetProperty( Toolkit::DevelImageVisual::Property::RELEASE_POLICY, keyValue.second );
       }
+      else if( keyValue.first == ORIENTATION_CORRECTION_NAME )
+      {
+        DoSetProperty( Toolkit::DevelImageVisual::Property::ORIENTATION_CORRECTION, keyValue.second );
+      }
     }
   }
 
@@ -406,7 +411,7 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
   if ( mLoadPolicy == DevelImageVisual::LoadPolicy::IMMEDIATE )
   {
     auto attemptAtlasing = mAttemptAtlasing;
-    LoadTexture( attemptAtlasing, mAtlasRect, mTextures );
+    LoadTexture( attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection );
   }
 }
 
@@ -557,6 +562,16 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
       int loadPolicy;
       Scripting::GetEnumerationProperty( value, LOAD_POLICY_TABLE, LOAD_POLICY_TABLE_COUNT, loadPolicy );
       mLoadPolicy = DevelImageVisual::LoadPolicy::Type( loadPolicy );
+      break;
+    }
+    case Toolkit::DevelImageVisual::Property::ORIENTATION_CORRECTION:
+    {
+      bool orientationCorrection( mOrientationCorrection );
+      if( value.Get( orientationCorrection ) )
+      {
+        mOrientationCorrection = orientationCorrection;
+      }
+      break;
     }
   }
 }
@@ -740,7 +755,7 @@ bool ImageVisual::IsSynchronousResourceLoading() const
   return mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
 }
 
-void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures )
+void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection )
 {
   TextureManager& textureManager = mFactoryCache.GetTextureManager();
 
@@ -757,7 +772,7 @@ void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& t
   textures = textureManager.LoadTexture( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode,
                                          mMaskingData, IsSynchronousResourceLoading(), mTextureId,
                                          atlasRect, atlasing, mLoading, mWrapModeU,
-                                         mWrapModeV, textureObserver, atlasUploadObserver, atlasManager );
+                                         mWrapModeV, textureObserver, atlasUploadObserver, atlasManager, mOrientationCorrection );
 }
 
 void ImageVisual::InitializeRenderer()
@@ -769,7 +784,7 @@ void ImageVisual::InitializeRenderer()
 
   if( mTextureId == TextureManager::INVALID_TEXTURE_ID && ! mTextures ) // Only load the texture once
   {
-    LoadTexture( attemptAtlasing, mAtlasRect, mTextures );
+    LoadTexture( attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection );
   }
 
   if( attemptAtlasing ) // Flag needs to be set before creating renderer
@@ -921,7 +936,7 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   map.Insert( Toolkit::DevelImageVisual::Property::LOAD_POLICY, mLoadPolicy );
   map.Insert( Toolkit::DevelImageVisual::Property::RELEASE_POLICY, mReleasePolicy );
-
+  map.Insert( Toolkit::DevelImageVisual::Property::ORIENTATION_CORRECTION, mOrientationCorrection );
 }
 
 void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const

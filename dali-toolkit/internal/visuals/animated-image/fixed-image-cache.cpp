@@ -24,6 +24,11 @@ namespace Toolkit
 namespace Internal
 {
 
+namespace
+{
+const bool ENABLE_ORIENTATION_CORRECTION( true );
+} // namespace
+
 FixedImageCache::FixedImageCache(
   TextureManager& textureManager, UrlList& urlList, ImageCache::FrameReadyObserver& observer,
   unsigned int batchSize )
@@ -100,7 +105,7 @@ void FixedImageCache::LoadBatch()
     mImageUrls[ mUrlIndex ].mTextureId =
       mTextureManager.RequestLoad( url, ImageDimensions(), FittingMode::SCALE_TO_FILL,
                                    SamplingMode::BOX_THEN_LINEAR, TextureManager::NO_ATLAS,
-                                   this );
+                                   this, ENABLE_ORIENTATION_CORRECTION );
     mRequestingLoad = false;
     ++mUrlIndex;
   }
