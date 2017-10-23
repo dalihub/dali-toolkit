@@ -87,6 +87,7 @@ const char * const MASK_CONTENT_SCALE_NAME("maskContentScale");
 const char * const CROP_TO_MASK_NAME("cropToMask");
 const char * const LOAD_POLICY_NAME("loadPolicy");
 const char * const RELEASE_POLICY_NAME("releasePolicy");
+const char * const ORIENTATION_CORRECTION_NAME("orientationCorrection");
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );
