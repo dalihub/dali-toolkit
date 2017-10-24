@@ -538,17 +538,26 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
 
 void Control::Impl::UnregisterVisual( Property::Index index )
 {
-   RegisteredVisualContainer::Iterator iter;
-   if ( FindVisual( index, mVisuals, iter ) )
-   {
-     // stop observing visual
-     StopObservingVisual( (*iter)->visual );
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mVisuals, iter ) )
+  {
+    // stop observing visual
+    StopObservingVisual( (*iter)->visual );
 
-     Actor self( mControlImpl.Self() );
-     Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
-     (*iter)->visual.Reset();
-     mVisuals.Erase( iter );
-   }
+    Actor self( mControlImpl.Self() );
+    Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+    (*iter)->visual.Reset();
+    mVisuals.Erase( iter );
+  }
+
+  if( FindVisual( index, mRemoveVisuals, iter ) )
+  {
+    Actor self( mControlImpl.Self() );
+    Toolkit::GetImplementation( (*iter)->visual ).SetOffStage( self );
+    (*iter)->pending = false;
+    (*iter)->visual.Reset();
+    mRemoveVisuals.Erase( iter );
+  }
 }
 
 Toolkit::Visual::Base Control::Impl::GetVisual( Property::Index index ) const

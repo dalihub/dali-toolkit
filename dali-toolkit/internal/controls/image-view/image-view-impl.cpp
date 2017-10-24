@@ -102,12 +102,23 @@ void ImageView::SetImage( Image image )
   mPropertyMap.Clear();
 
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( image );
-  if (!mVisual)
+  if( visual )
   {
-    mVisual = visual;
-  }
+    if( !mVisual )
+    {
+      mVisual = visual;
+    }
 
-  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
+    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
+  }
+  else
+  {
+    // Unregister the exsiting visual
+    DevelControl::UnregisterVisual( *this, Toolkit::ImageView::Property::IMAGE );
+
+    // Trigger a size negotiation request that may be needed when unregistering a visual.
+    RelayoutRequest();
+  }
 }
 
 void ImageView::SetImage( const Property::Map& map )
@@ -118,13 +129,24 @@ void ImageView::SetImage( const Property::Map& map )
   mImage.Reset();
 
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
-  // Don't set mVisual until it is ready and shown. Getters will still use current visual.
-  if (!mVisual)
+  if( visual )
   {
-    mVisual = visual;
-  }
+    // Don't set mVisual until it is ready and shown. Getters will still use current visual.
+    if( !mVisual )
+    {
+      mVisual = visual;
+    }
 
-  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
+    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
+  }
+  else
+  {
+    // Unregister the exsiting visual
+    DevelControl::UnregisterVisual( *this, Toolkit::ImageView::Property::IMAGE );
+
+    // Trigger a size negotiation request that may be needed when unregistering a visual.
+    RelayoutRequest();
+  }
 }
 
 void ImageView::SetImage( const std::string& url, ImageDimensions size )
@@ -136,12 +158,23 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
 
   // Don't set mVisual until it is ready and shown. Getters will still use current visual.
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
-  if (!mVisual)
+  if( visual )
   {
-    mVisual = visual;
-  }
+    if( !mVisual )
+    {
+      mVisual = visual;
+    }
 
-  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual );
+    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual );
+  }
+  else
+  {
+    // Unregister the exsiting visual
+    DevelControl::UnregisterVisual( *this, Toolkit::ImageView::Property::IMAGE );
+
+    // Trigger a size negotiation request that may be needed when unregistering a visual.
+    RelayoutRequest();
+  }
 }
 
 Image ImageView::GetImage() const
