@@ -122,29 +122,32 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       {
         if( imageURLValue->Get( imageUrl ) )
         {
-          VisualUrl visualUrl( imageUrl );
-
-          switch( visualUrl.GetType() )
+          if( !imageUrl.empty() )
           {
-            case VisualUrl::N_PATCH:
+            VisualUrl visualUrl( imageUrl );
+
+            switch( visualUrl.GetType() )
             {
-              visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-              break;
-            }
-            case VisualUrl::SVG:
-            {
-              visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-              break;
-            }
-            case VisualUrl::GIF:
-            {
-              visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-              break;
-            }
-            case VisualUrl::REGULAR_IMAGE:
-            {
-              visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-              break;
+              case VisualUrl::N_PATCH:
+              {
+                visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                break;
+              }
+              case VisualUrl::SVG:
+              {
+                visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                break;
+              }
+              case VisualUrl::GIF:
+              {
+                visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                break;
+              }
+              case VisualUrl::REGULAR_IMAGE:
+              {
+                visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                break;
+              }
             }
           }
         }
@@ -252,14 +255,17 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
 
   Visual::BasePtr visualPtr;
 
-  NinePatchImage npatchImage = NinePatchImage::DownCast( image );
-  if( npatchImage )
+  if( image )
   {
-    visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), npatchImage );
-  }
-  else
-  {
-    visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), image );
+    NinePatchImage npatchImage = NinePatchImage::DownCast( image );
+    if( npatchImage )
+    {
+      visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), npatchImage );
+    }
+    else
+    {
+      visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), image );
+    }
   }
 
   if( mDebugEnabled )
@@ -280,29 +286,32 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
 
   Visual::BasePtr visualPtr;
 
-  // first resolve url type to know which visual to create
-  VisualUrl visualUrl( url );
-  switch( visualUrl.GetType() )
+  if( !url.empty() )
   {
-    case VisualUrl::N_PATCH:
+    // first resolve url type to know which visual to create
+    VisualUrl visualUrl( url );
+    switch( visualUrl.GetType() )
     {
-      visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl );
-      break;
-    }
-    case VisualUrl::SVG:
-    {
-      visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl );
-      break;
-    }
-    case VisualUrl::GIF:
-    {
-      visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl );
-      break;
-    }
-    case VisualUrl::REGULAR_IMAGE:
-    {
-      visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, size );
-      break;
+      case VisualUrl::N_PATCH:
+      {
+        visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl );
+        break;
+      }
+      case VisualUrl::SVG:
+      {
+        visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl );
+        break;
+      }
+      case VisualUrl::GIF:
+      {
+        visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl );
+        break;
+      }
+      case VisualUrl::REGULAR_IMAGE:
+      {
+        visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, size );
+        break;
+      }
     }
   }
 
