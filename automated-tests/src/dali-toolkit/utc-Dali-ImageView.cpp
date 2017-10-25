@@ -24,6 +24,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 
 #include <test-native-image.h>
 #include <sstream>
@@ -956,43 +957,119 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
   ToolkitTestApplication application;
 
   ImageView imageView = ImageView::New();
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( imageView );
 
+  Stage::GetCurrent().Add( imageView );
 
   std::string url;
   Property::Map map;
+  Toolkit::Visual::Base visual;
 
   Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  application.SendNotification();
+  application.Render( 16 );
+
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
   DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+  DALI_TEST_CHECK( ! visual );           // Visual should be invalid
 
   // Set a URL
   imageView.SetImage( "TEST_URL" );
+
+  application.SendNotification();
+  application.Render( 16 );
+
   value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
 
   DALI_TEST_CHECK( value.Get( url ) );   // Value should NOT be empty
   DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+  DALI_TEST_CHECK( visual );             // Visual should be valid
 
   // Set an empty Image
   imageView.SetImage( Image() );
+
+  application.SendNotification();
+  application.Render( 16 );
+
   value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
 
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
   DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+  DALI_TEST_CHECK( ! visual );           // Visual should be invalid
 
   // Set an Image
   ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
   imageView.SetImage( image1 );
+
+  application.SendNotification();
+  application.Render( 16 );
+
   value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
 
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
   DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( visual );             // Visual should be valid
 
   // Set an empty URL
   imageView.SetImage( "" );
+
+  application.SendNotification();
+  application.Render( 16 );
+
   value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
 
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
   DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+  DALI_TEST_CHECK( ! visual );           // Visual should be invalid
+
+  // Set a URL in property map
+  Property::Map propertyMap;
+  propertyMap[ImageVisual::Property::URL] = TEST_IMAGE_FILE_NAME;
+  imageView.SetProperty( ImageView::Property::IMAGE, propertyMap );
+
+  application.SendNotification();
+  application.Render( 16 );
+
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( visual );             // Visual should be valid
+
+  // Set a URL in property map again
+  propertyMap[ImageVisual::Property::URL] = gImage_34_RGBA;
+  imageView.SetProperty( ImageView::Property::IMAGE, propertyMap );
+
+  application.SendNotification();
+  application.Render( 16 );
+
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( visual );             // Visual should be valid
+
+  // Set an empty URL in property map
+  propertyMap[ImageVisual::Property::URL] = std::string();
+  imageView.SetProperty( ImageView::Property::IMAGE, propertyMap );
+
+  application.SendNotification();
+  application.Render( 16 );
+
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( ! visual );           // Visual should be invalid
 
   END_TEST;
 }
