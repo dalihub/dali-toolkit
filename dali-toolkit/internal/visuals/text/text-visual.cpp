@@ -106,6 +106,12 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
+  uniform lowp float preMultipliedAlpha;\n
+  \n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
+  }\n
   \n
   void main()\n
   {\n
@@ -113,7 +119,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
     mediump float textTexture = texture2D( sTexture, texCoord ).r;\n
 
     // Set the color of the text to what it is animated to.
-    gl_FragColor = uTextColorAnimatable * textTexture * uColor * vec4( mixColor, opacity );
+    gl_FragColor = uTextColorAnimatable * textTexture * uColor * visualMixColor();
   }\n
 );
 
@@ -124,13 +130,20 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
+  uniform lowp float preMultipliedAlpha;\n
+  \n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
+  }\n
   \n
   void main()\n
   {\n
     mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
     mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
+    textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
-    gl_FragColor = textTexture * uColor * vec4( mixColor, opacity );
+    gl_FragColor = textTexture * uColor * visualMixColor();
   }\n
 );
 
@@ -143,6 +156,12 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
+  uniform lowp float preMultipliedAlpha;\n
+  \n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
+  }\n
   \n
   void main()\n
   {\n
@@ -151,7 +170,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
     mediump vec4 styleTexture = texture2D( sStyle, texCoord );\n
 
     // Draw the text as overlay above the style
-    gl_FragColor = ( uTextColorAnimatable * textTexture + styleTexture * ( 1.0 - textTexture ) ) * uColor * vec4( mixColor, opacity );\n
+    gl_FragColor = ( uTextColorAnimatable * textTexture + styleTexture * ( 1.0 - textTexture ) ) * uColor * visualMixColor();\n
   }\n
 );
 
@@ -163,15 +182,22 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
+  uniform lowp float preMultipliedAlpha;\n
+  \n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
+  }\n
   \n
   void main()\n
   {\n
     mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
     mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
     mediump vec4 styleTexture = texture2D( sStyle, texCoord );\n
+    textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     // Draw the text as overlay above the style
-    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, opacity );\n
+    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * visualMixColor();\n
   }\n
 );
 
@@ -184,6 +210,12 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
+  uniform lowp float preMultipliedAlpha;\n
+  \n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
+  }\n
   \n
   void main()\n
   {\n
@@ -195,10 +227,10 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
     // Markup text with multiple text colors are not animated (but can be supported later on if required).
     // Emoji color are not animated.
     mediump float vstep = step( 0.0001, textTexture.a );\n
-    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture );\n
+    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture ) * mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     // Draw the text as overlay above the style
-    gl_FragColor = textTexture * uColor * vec4( mixColor, opacity );\n
+    gl_FragColor = textTexture * uColor * visualMixColor();\n
   }\n
 );
 
@@ -213,6 +245,12 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOS
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
+  uniform lowp float preMultipliedAlpha;\n
+  \n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
+  }\n
   \n
   void main()\n
   {\n
@@ -225,10 +263,10 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOS
     // Markup text with multiple text colors are not animated (but can be supported later on if required).
     // Emoji color are not animated.
     mediump float vstep = step( 0.0001, textTexture.a );\n
-    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) );\n
+    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) ) * mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     // Draw the text as overlay above the style
-    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, opacity );\n
+    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * visualMixColor();\n
   }\n
 );
 
@@ -427,6 +465,9 @@ void TextVisual::DoSetOnStage( Actor& actor )
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
   mImpl->mRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT );
+
+  // Enable the pre-multiplied alpha to improve the text quality
+  EnablePreMultipliedAlpha(true);
 
   const Vector4& defaultColor = mController->GetTextModel()->GetDefaultColor();
   Dali::Property::Index shaderTextColorIndex = mImpl->mRenderer.RegisterProperty( "uTextColorAnimatable", defaultColor );
@@ -655,7 +696,6 @@ void TextVisual::UpdateRenderer()
       mImpl->mRenderer.RegisterProperty( "uHasMultipleTextColors", static_cast<float>( hasMultipleTextColors ) );
 
       mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON);
-      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true );
 
       //Register transform properties
       mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );

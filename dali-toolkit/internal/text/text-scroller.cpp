@@ -81,12 +81,25 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying highp vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
+  uniform lowp float preMultipliedAlpha;\n
+  \n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
+  }\n
   \n
   void main()\n
   {\n
     if ( vTexCoord.y > 1.0 )\n
       discard;\n
-    gl_FragColor = texture2D( sTexture, vTexCoord );\n
+    \n
+    mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
+    textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
+    \n
+    gl_FragColor = textTexture * uColor * visualMixColor();
   }\n
 );
 
