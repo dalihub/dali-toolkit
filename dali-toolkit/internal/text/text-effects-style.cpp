@@ -35,6 +35,7 @@ namespace
 {
 const std::string COLOR_KEY( "color" );
 const std::string OFFSET_KEY( "offset" );
+const std::string BLUR_RADIUS_KEY( "blurRadius" );
 const std::string WIDTH_KEY( "width" );
 const std::string HEIGHT_KEY( "height" );
 const std::string ENABLE_KEY( "enable" );
@@ -46,7 +47,9 @@ bool ParseShadowProperties( const Property::Map& shadowPropertiesMap,
                             bool& colorDefined,
                             Vector4& color,
                             bool& offsetDefined,
-                            Vector2& offset )
+                            Vector2& offset,
+                            bool& blurRadiusDefined,
+                            float& blurRadius )
 {
   const unsigned int numberOfItems = shadowPropertiesMap.Count();
 
@@ -60,18 +63,45 @@ bool ParseShadowProperties( const Property::Map& shadowPropertiesMap,
       /// Color key.
       colorDefined = true;
 
-      const std::string colorStr = valueGet.second.Get<std::string>();
-
-      Text::ColorStringToVector4( colorStr.c_str(), colorStr.size(), color );
+      if( valueGet.second.GetType() == Dali::Property::STRING )
+      {
+        const std::string colorStr = valueGet.second.Get<std::string>();
+        Text::ColorStringToVector4( colorStr.c_str(), colorStr.size(), color );
+      }
+      else
+      {
+        color = valueGet.second.Get<Vector4>();
+      }
     }
     else if( OFFSET_KEY == valueGet.first.stringKey )
     {
       /// Offset key.
       offsetDefined = true;
 
-      const std::string offsetStr = valueGet.second.Get<std::string>();
+      if( valueGet.second.GetType() == Dali::Property::STRING )
+      {
+        const std::string offsetStr = valueGet.second.Get<std::string>();
+        StringToVector2( offsetStr.c_str(), offsetStr.size(), offset );
+      }
+      else
+      {
+        offset = valueGet.second.Get<Vector2>();
+      }
+    }
+    else if( BLUR_RADIUS_KEY == valueGet.first.stringKey )
+    {
+      /// Blur radius key.
+      blurRadiusDefined = true;
 
-      StringToVector2( offsetStr.c_str(), offsetStr.size(), offset );
+      if( valueGet.second.GetType() == Dali::Property::STRING )
+      {
+        const std::string blurRadiusStr = valueGet.second.Get<std::string>();
+        blurRadius = StringToFloat( blurRadiusStr.c_str() );
+      }
+      else
+      {
+        blurRadius = valueGet.second.Get<float>();
+      }
     }
   }
 
@@ -321,6 +351,8 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
         Vector4 color;
         bool offsetDefined = false;
         Vector2 offset;
+        bool blurRadiusDefined = false;
+        float blurRadius;
 
         bool empty = true;
 
@@ -336,7 +368,9 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
                                           colorDefined,
                                           color,
                                           offsetDefined,
-                                          offset );
+                                          offset,
+                                          blurRadiusDefined,
+                                          blurRadius );
 
            controller->ShadowSetByString( !empty );
 
@@ -347,7 +381,9 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
                                          colorDefined,
                                          color,
                                          offsetDefined,
-                                         offset );
+                                         offset,
+                                         blurRadiusDefined,
+                                         blurRadius );
 
           controller->ShadowSetByString( false );
         }
@@ -364,6 +400,12 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
           if( offsetDefined && ( controller->GetShadowOffset() != offset ) )
           {
             controller->SetShadowOffset( offset );
+            update = true;
+          }
+
+          if( blurRadiusDefined && ( controller->GetShadowBlurRadius() != blurRadius ) )
+          {
+            controller->SetShadowBlurRadius( blurRadius );
             update = true;
           }
         }
@@ -400,6 +442,7 @@ void GetShadowProperties( ControllerPtr controller, Property::Value& value, Effe
       {
         const Vector4& color = controller->GetShadowColor();
         const Vector2& offset = controller->GetShadowOffset();
+        const float& blurRadius = controller->GetShadowBlurRadius();
 
         if ( controller->IsShadowSetByString() )
         {
@@ -411,7 +454,11 @@ void GetShadowProperties( ControllerPtr controller, Property::Value& value, Effe
 
           std::string offsetStr;
           Vector2ToString( offset, offsetStr );
-          shadowProperties += "\"offset\":\"" + offsetStr + "\"}";
+          shadowProperties += "\"offset\":\"" + offsetStr + "\",";
+
+          std::string blurRadiusStr;
+          FloatToString( blurRadius, blurRadiusStr );
+          shadowProperties += "\"blurRadius\":\"" + blurRadiusStr + "\"}";
 
           value = shadowProperties;
         }
@@ -419,13 +466,9 @@ void GetShadowProperties( ControllerPtr controller, Property::Value& value, Effe
         {
           Property::Map map;
 
-          std::string colorStr;
-          Vector4ToColorString( color, colorStr );
-          map.Insert( COLOR_KEY, colorStr );
-
-          std::string offsetStr;
-          Vector2ToString( offset, offsetStr );
-          map.Insert( OFFSET_KEY, offsetStr );
+          map.Insert( COLOR_KEY, color );
+          map.Insert( OFFSET_KEY, offset );
+          map.Insert( BLUR_RADIUS_KEY, blurRadius );
 
           value = map;
         }

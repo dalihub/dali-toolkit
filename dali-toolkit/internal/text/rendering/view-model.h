@@ -148,6 +148,11 @@ public:
   virtual const Vector4& GetShadowColor() const;
 
   /**
+   * @copydoc ModelInterface::GetShadowBlurRadius()
+   */
+  virtual const float& GetShadowBlurRadius() const;
+
+  /**
    * @copydoc ModelInterface::GetUnderlineColor()
    */
   virtual const Vector4& GetUnderlineColor() const;

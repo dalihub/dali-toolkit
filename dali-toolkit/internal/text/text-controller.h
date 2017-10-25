@@ -758,6 +758,20 @@ public: // Default style & Input style
   const Vector4& GetShadowColor() const;
 
   /**
+   * @brief Set the shadow blur radius.
+   *
+   * @param[in] shadowBlurRadius The shadow blur radius, 0,0 indicates no blur.
+   */
+  void SetShadowBlurRadius( const float& shadowBlurRadius );
+
+  /**
+   * @brief Retrieve the shadow blur radius.
+   *
+   * @return The shadow blur radius.
+   */
+  const float& GetShadowBlurRadius() const;
+
+  /**
    * @brief Set the underline color.
    *
    * @param[in] color color of underline.
