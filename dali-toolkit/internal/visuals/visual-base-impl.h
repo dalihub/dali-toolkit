@@ -146,9 +146,9 @@ public:
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
    *
-   * @param[in] preMultipled whether alpha is pre-multiplied.
+   * @param[in] preMultiplied whether alpha is pre-multiplied.
    */
-  void EnablePreMultipliedAlpha( bool preMultipled );
+  void EnablePreMultipliedAlpha( bool preMultiplied );
 
   /**
    * @brief Query whether alpha is pre-multiplied.
