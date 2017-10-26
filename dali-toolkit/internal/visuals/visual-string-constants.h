@@ -75,6 +75,7 @@ extern const char * const MASK_CONTENT_SCALE_NAME;
 extern const char * const CROP_TO_MASK_NAME;
 extern const char * const LOAD_POLICY_NAME;
 extern const char * const RELEASE_POLICY_NAME;
+extern const char * const ORIENTATION_CORRECTION_NAME;
 
 // Text visual
 extern const char * const TEXT_PROPERTY;

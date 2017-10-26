@@ -45,6 +45,9 @@ Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "
 #else
   #define LOG_CACHE
 #endif
+
+const bool ENABLE_ORIENTATION_CORRECTION( true );
+
 }
 
 namespace Dali
@@ -139,7 +142,7 @@ void RollingImageCache::LoadBatch()
     mImageUrls[ imageFrame.mUrlIndex ].mTextureId =
       mTextureManager.RequestLoad( url, ImageDimensions(), FittingMode::SCALE_TO_FILL,
                                    SamplingMode::BOX_THEN_LINEAR, TextureManager::NO_ATLAS,
-                                   this );
+                                   this, ENABLE_ORIENTATION_CORRECTION );
     mRequestingLoad = false;
   }
 
