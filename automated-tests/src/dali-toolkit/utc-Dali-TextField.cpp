@@ -805,8 +805,9 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map shadowMapSet;
   Property::Map shadowMapGet;
 
-  shadowMapSet.Insert( "color", "green" );
-  shadowMapSet.Insert( "offset", "2 2" );
+  shadowMapSet.Insert( "color", Color::GREEN );
+  shadowMapSet.Insert( "offset", Vector2(2.0f, 2.0f) );
+  shadowMapSet.Insert( "blurRadius", 3.0f );
 
   field.SetProperty( TextField::Property::SHADOW, shadowMapSet );
 

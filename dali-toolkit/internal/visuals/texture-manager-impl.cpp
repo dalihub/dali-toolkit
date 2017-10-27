@@ -108,7 +108,7 @@ TextureSet TextureManager::LoadTexture(
     bool synchronousLoading, TextureManager::TextureId& textureId, Vector4& textureRect,
     bool& atlasingStatus, bool& loadingStatus, Dali::WrapMode::Type wrapModeU,
     Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
-    AtlasUploadObserver* atlasObserver, ImageAtlasManagerPtr imageAtlasManager)
+    AtlasUploadObserver* atlasObserver, ImageAtlasManagerPtr imageAtlasManager, bool orientationCorrection )
 {
   TextureSet textureSet;
 
@@ -135,8 +135,7 @@ TextureSet TextureManager::LoadTexture(
     PixelData data;
     if( url.IsValid() )
     {
-      // if sync loading is required, the loading should immediately when actor is on stage
-      Devel::PixelBuffer pixelBuffer = LoadImageFromFile( url.GetUrl(), desiredSize, fittingMode, samplingMode );
+      Devel::PixelBuffer pixelBuffer = LoadImageFromFile( url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection  );
       if( pixelBuffer )
       {
         data = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
@@ -186,7 +185,7 @@ TextureSet TextureManager::LoadTexture(
       atlasingStatus = false;
       if( !maskInfo )
       {
-        textureId = RequestLoad( url, desiredSize, fittingMode, samplingMode, TextureManager::NO_ATLAS, textureObserver );
+        textureId = RequestLoad( url, desiredSize, fittingMode, samplingMode, TextureManager::NO_ATLAS, textureObserver, orientationCorrection );
       }
       else
       {
@@ -197,7 +196,8 @@ TextureSet TextureManager::LoadTexture(
                                  fittingMode, samplingMode,
                                  TextureManager::NO_ATLAS,
                                  maskInfo->mCropToMask,
-                                 textureObserver );
+                                 textureObserver,
+                                 orientationCorrection);
       }
 
       TextureManager::LoadState loadState = GetTextureState( textureId );
@@ -227,9 +227,10 @@ TextureManager::TextureId TextureManager::RequestLoad(
   FittingMode::Type        fittingMode,
   Dali::SamplingMode::Type samplingMode,
   const UseAtlas           useAtlas,
-  TextureUploadObserver*   observer )
+  TextureUploadObserver*   observer,
+  bool                     orientationCorrection )
 {
-  return RequestLoadInternal( url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, useAtlas, false, UPLOAD_TO_TEXTURE, observer );
+  return RequestLoadInternal( url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, useAtlas, false, UPLOAD_TO_TEXTURE, observer, orientationCorrection );
 }
 
 TextureManager::TextureId TextureManager::RequestLoad(
@@ -241,15 +242,16 @@ TextureManager::TextureId TextureManager::RequestLoad(
   Dali::SamplingMode::Type samplingMode,
   const UseAtlas           useAtlas,
   bool                     cropToMask,
-  TextureUploadObserver*   observer )
+  TextureUploadObserver*   observer,
+  bool                     orientationCorrection )
 {
-  return RequestLoadInternal( url, maskTextureId, contentScale, desiredSize, fittingMode, samplingMode, useAtlas, cropToMask, UPLOAD_TO_TEXTURE, observer );
+  return RequestLoadInternal( url, maskTextureId, contentScale, desiredSize, fittingMode, samplingMode, useAtlas, cropToMask, UPLOAD_TO_TEXTURE, observer, orientationCorrection );
 }
 
 TextureManager::TextureId TextureManager::RequestMaskLoad( const VisualUrl& maskUrl )
 {
   // Use the normal load procedure to get the alpha mask.
-  return RequestLoadInternal( maskUrl, INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, false, KEEP_PIXEL_BUFFER, NULL );
+  return RequestLoadInternal( maskUrl, INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, false, KEEP_PIXEL_BUFFER, NULL, true );
 }
 
 TextureManager::TextureId TextureManager::RequestLoadInternal(
@@ -262,7 +264,8 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
   UseAtlas                 useAtlas,
   bool                     cropToMask,
   StorageType              storageType,
-  TextureUploadObserver*   observer )
+  TextureUploadObserver*   observer,
+  bool                     orientationCorrection )
 {
   // First check if the requested Texture is cached.
   const TextureHash textureHash = GenerateHash( url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId );
@@ -288,7 +291,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     textureId = GenerateUniqueTextureId();
     mTextureInfoContainer.push_back( TextureInfo( textureId, maskTextureId, url.GetUrl(),
                                                   desiredSize, contentScale, fittingMode, samplingMode,
-                                                  false, cropToMask, useAtlas, textureHash ) );
+                                                  false, cropToMask, useAtlas, textureHash, orientationCorrection ) );
     cacheIndex = mTextureInfoContainer.size() - 1u;
 
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex, textureId );
@@ -300,6 +303,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
   TextureInfo& textureInfo( mTextureInfoContainer[ cacheIndex ] );
   textureInfo.maskTextureId = maskTextureId;
   textureInfo.storageType = storageType;
+  textureInfo.orientationCorrection = orientationCorrection;
 
   DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureInfo loadState:%s\n",
                  textureInfo.loadState == TextureManager::NOT_STARTED ? "NOT_STARTED" :
@@ -490,7 +494,7 @@ bool TextureManager::LoadTexture( TextureInfo& textureInfo )
       DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
       loadingHelperIt->Load(textureInfo.textureId, textureInfo.url,
                             textureInfo.desiredSize, textureInfo.fittingMode,
-                            textureInfo.samplingMode, true);
+                            textureInfo.samplingMode, textureInfo.orientationCorrection );
     }
   }
 

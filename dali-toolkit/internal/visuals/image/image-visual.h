@@ -53,19 +53,21 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *
  * The following properties are optional
  *
- * | %Property Name     | Type              |
- * |--------------------|-------------------|
- * | url                | STRING            |
- * | alphaMaskUrl       | STRING            |
- * | fittingMode        | INTEGER OR STRING |
- * | samplingMode       | INTEGER OR STRING |
- * | desiredWidth       | INTEGER           |
- * | desiredHeight      | INTEGER           |
- * | synchronousLoading | BOOLEAN           |
- * | pixelArea          | VECTOR4           |
- * | wrapModeU          | INTEGER OR STRING |
- * | wrapModeV          | INTEGER OR STRING |
- * | releasePolicy      | INTEGER OR STRING |
+ * | %Property Name        | Type              |
+ * |-----------------------|-------------------|
+ * | url                   | STRING            |
+ * | alphaMaskUrl          | STRING            |
+ * | fittingMode           | INTEGER OR STRING |
+ * | samplingMode          | INTEGER OR STRING |
+ * | desiredWidth          | INTEGER           |
+ * | desiredHeight         | INTEGER           |
+ * | synchronousLoading    | BOOLEAN           |
+ * | pixelArea             | VECTOR4           |
+ * | wrapModeU             | INTEGER OR STRING |
+ * | wrapModeV             | INTEGER OR STRING |
+ * | loadPolicy            | INTEGER OR STRING |
+ * | releasePolicy         | INTEGER OR STRING |
+ * | orientationCorrection | BOOLEAN           |
  *
  * where pixelArea is a rectangular area.
  * In its Vector4 value, the first two elements indicate the top-left position of the area,
@@ -96,6 +98,9 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *   "DONT_CARE"
  *   "DEFAULT"
  *
+ * where loadPolicy should be one of the following image loading modes
+ *   "IMMEDIATE"   // Loads image even if visual not attached to stage yet
+ *   "ATTACHED"    // Only loads image once visual is attached to stage
  *
  * where releasePolicy should be one of the following policies for when to cache the image
  *   "DETACHED"    //  Release image from cache when visual detached from stage
@@ -265,6 +270,15 @@ private:
   void ApplyImageToSampler( const Image& image );
 
   /**
+   * @brief Load the texture, will try to atlas unless unable or param set to false.
+   * @param[in, out] atlasing flag if the image has been put in a atlas (true), passing false will not atlas even if possible.
+   * @param[out] atlasRect if atlasing is used this the texture area of the image in the atlas.
+   * @param[out] textures resulting texture set from the image loading.
+   * @param[in] orientationCorrection flag determines if orientation correction should be performed
+   */
+  void LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection );
+
+  /**
    * @brief Initializes the Dali::Renderer from the image url
    */
   void InitializeRenderer();
@@ -332,14 +346,18 @@ private:
 
   Dali::ImageDimensions mDesiredSize;
   TextureManager::TextureId mTextureId;
+  TextureSet mTextures;
 
   Dali::FittingMode::Type mFittingMode:3;
   Dali::SamplingMode::Type mSamplingMode:4;
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
+  DevelImageVisual::LoadPolicy::Type mLoadPolicy;
   DevelImageVisual::ReleasePolicy::Type mReleasePolicy;
+  Vector4 mAtlasRect;
   bool mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
   bool mLoading;  ///< True if the texture is still loading.
+  bool mOrientationCorrection; ///< true if the image will have it's orientation corrected.
 };
 
 

@@ -420,8 +420,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   Property::Map shadowMapSet;
   Property::Map shadowMapGet;
 
-  shadowMapSet.Insert( "color", "green" );
-  shadowMapSet.Insert( "offset", "2 2" );
+  shadowMapSet.Insert( "color", Color::GREEN );
+  shadowMapSet.Insert( "offset", Vector2(2.0f, 2.0f) );
+  shadowMapSet.Insert( "blurRadius", 5.0f );
 
   label.SetProperty( TextLabel::Property::SHADOW, shadowMapSet );
 
@@ -431,8 +432,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   shadowMapSet.Clear();
   Property::Map shadowDisabledMapGet;
-  shadowDisabledMapGet.Insert( "color", "green" );
-  shadowDisabledMapGet.Insert( "offset", "0 0" );
+  shadowDisabledMapGet.Insert( "color", Color::GREEN );
+  shadowDisabledMapGet.Insert( "offset", Vector2(0.0f, 0.0f) );
+  shadowDisabledMapGet.Insert( "blurRadius", 5.0f );
 
   label.SetProperty( TextLabel::Property::SHADOW, shadowMapSet );
 
@@ -1066,6 +1068,7 @@ int UtcDaliToolkitTextlabelTextStyle01(void)
   Property::Map shadowMapSet;
   shadowMapSet.Insert( "color", "green" );
   shadowMapSet.Insert( "offset", "2 2" );
+  shadowMapSet.Insert( "blurRadius", "3" );
   label.SetProperty( TextLabel::Property::SHADOW, shadowMapSet );
 
   outlineMapSet["color"] = Color::RED;

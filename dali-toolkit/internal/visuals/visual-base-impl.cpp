@@ -35,6 +35,8 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVisualBaseLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VISUAL_BASE" );
 #endif
+
+const char * const PRE_MULTIPLIED_ALPHA_PROPERTY( "preMultipliedAlpha" );
 }
 
 namespace Dali
@@ -301,9 +303,9 @@ void Visual::Base::CreateInstancePropertyMap( Property::Map& map ) const
 }
 
 
-void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )
+void Visual::Base::EnablePreMultipliedAlpha( bool preMultiplied )
 {
-  if( preMultipled )
+  if( preMultiplied )
   {
     mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
   }
@@ -314,7 +316,8 @@ void Visual::Base::EnablePreMultipliedAlpha( bool preMultipled )
 
   if( mImpl->mRenderer )
   {
-    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, preMultipled);
+    mImpl->mRenderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, preMultiplied);
+    mImpl->mRenderer.RegisterProperty( PRE_MULTIPLIED_ALPHA_PROPERTY, static_cast<float>( preMultiplied ) );
   }
 }
 
@@ -366,7 +369,7 @@ void Visual::Base::RegisterMixColor()
   {
     preMultipliedAlpha = 1.0f;
   }
-  mImpl->mRenderer.RegisterProperty( "preMultipliedAlpha", preMultipliedAlpha );
+  mImpl->mRenderer.RegisterProperty( PRE_MULTIPLIED_ALPHA_PROPERTY, preMultipliedAlpha );
 }
 
 void Visual::Base::SetMixColor( const Vector4& color )
