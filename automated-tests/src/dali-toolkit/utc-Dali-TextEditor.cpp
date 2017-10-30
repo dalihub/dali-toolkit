@@ -24,6 +24,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/tap-gesture-event.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
+#include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
@@ -169,6 +170,18 @@ Integration::TapGestureEvent GenerateTap(
   tap.point = point;
 
   return tap;
+}
+
+Integration::LongPressGestureEvent GenerateLongPress(
+    Gesture::State state,
+    unsigned int numberOfTouches,
+    Vector2 point)
+{
+  Integration::LongPressGestureEvent longPress( state );
+
+  longPress.numberOfTouches = numberOfTouches;
+  longPress.point = point;
+  return longPress;
 }
 
 // Generate a PanGestureEvent to send to Core
@@ -895,6 +908,12 @@ int UtcDaliTextEditorSetPropertyP(void)
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
   placeholderConversionMap[ Text::PlaceHolder::Property::FONT_STYLE ] = placeholderMapSet["fontStyle"];
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderConversionMap ), true, TEST_LOCATION );
+
+  editor.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
+  DALI_TEST_EQUALS( editor.GetProperty<int>( Actor::Property::LAYOUT_DIRECTION ), static_cast<int>( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
@@ -1751,6 +1770,14 @@ int utcDaliTextEditorEvent03(void)
     DALI_TEST_CHECK( renderer );
   }
 
+  // Long Press
+  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2( 1.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2( 1.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 
@@ -2302,6 +2329,39 @@ int UtcDaliToolkitTextEditorTextWrapMode(void)
 
   lineCount =  editor.GetProperty<int>( TextEditor::Property::LINE_COUNT );
   DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorSetPaddingProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorSetPaddingProperty\n");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+  editor.SetSize( 300.f, 50.f );
+  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( editor );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 originalSize = editor.GetNaturalSize();
+
+  editor.SetProperty( Toolkit::Control::Property::PADDING, Extents( 10, 10, 10, 10 ) );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( editor.GetProperty<Extents>( Toolkit::Control::Property::PADDING ), Extents( 10, 10, 10, 10 ), TEST_LOCATION );
+
+  Vector3 paddingAddedSize = editor.GetNaturalSize();
+
+  DALI_TEST_EQUALS( originalSize.width + 10 + 10 , paddingAddedSize.width, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( originalSize.height + 10 + 10 , paddingAddedSize.height, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }

@@ -819,13 +819,21 @@ void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::
 
 Vector3 TextLabel::GetNaturalSize()
 {
-  return mController->GetNaturalSize();
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
+  Vector3 naturalSize = mController->GetNaturalSize();
+  naturalSize.width += ( padding.start + padding.end );
+  naturalSize.height += ( padding.top + padding.bottom );
+
+  return naturalSize;
 }
 
 float TextLabel::GetHeightForWidth( float width )
 {
-  Padding padding;
-  Self().GetPadding( padding );
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
   return mController->GetHeightForWidth( width ) + padding.top + padding.bottom;
 }
 
@@ -857,9 +865,10 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::OnRelayout\n" );
 
-  Padding padding;
-  Self().GetPadding( padding );
-  Vector2 contentSize( size.x - ( padding.left + padding.right ), size.y - ( padding.top + padding.bottom ) );
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
+  Vector2 contentSize( size.x - ( padding.start + padding.end ), size.y - ( padding.top + padding.bottom ) );
 
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize );
 
@@ -871,13 +880,17 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
     // Update the visual
     TextVisual::EnableRendererUpdate( mVisual );
 
-    Padding padding;
-    Self().GetPadding( padding );
+    // Support Right-To-Left of padding
+    Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( Self().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+    if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
+    {
+      std::swap( padding.start, padding.end );
+    }
 
     Property::Map visualTransform;
     visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, contentSize )
                    .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2(padding.left, padding.top) )
+                   .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( padding.start, padding.top ) )
                    .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
                    .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
                    .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
