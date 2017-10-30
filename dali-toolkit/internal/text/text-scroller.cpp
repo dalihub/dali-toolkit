@@ -233,6 +233,10 @@ void TextScroller::StopScrolling()
       }
     }
   }
+  else
+  {
+    mScrollerInterface.ScrollingFinished();
+  }
 }
 
 TextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const

@@ -630,6 +630,12 @@ int UtcDaliToolkitTextlabelScrollingP(void)
     // Render some text with the shared atlas backend
     labelImmediate.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
     labelFinished.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+
+    labelImmediate.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+    labelFinished.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+
+    labelImmediate.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    labelFinished.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
     application.SendNotification();
     application.Render();
 
