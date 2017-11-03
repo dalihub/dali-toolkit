@@ -109,6 +109,7 @@ public:
        * @brief name "underlay", Video rendering by underlay, true or false
        * This shows video composited underneath the window by the system. This means it may ignore rotation of the video-view
        * @SINCE_1_2.62
+       * @REMARK_RAWVIDEO
        */
       UNDERLAY
     };
