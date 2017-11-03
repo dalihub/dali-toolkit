@@ -520,7 +520,7 @@ void MeshVisual::DoSetOnStage( Actor& actor )
   actor.AddRenderer( mImpl->mRenderer );
 
   // Mesh loaded and ready to display
-  ResourceReady();
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const

@@ -125,7 +125,7 @@ Internal::Visual::Base::Impl::Impl()
   mMixColorIndex( Property::INVALID_INDEX ),
   mOpacityIndex( Property::INVALID_INDEX ),
   mFlags( 0 ),
-  mResourceReady( false )
+  mResourceStatus( Toolkit::Visual::ResourceStatus::PREPARING )
 {
 }
 

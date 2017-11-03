@@ -627,7 +627,7 @@ void TextVisual::UpdateRenderer()
     }
 
     // Nothing else to do if the relayout size is zero.
-    ResourceReady();
+    ResourceReady( Toolkit::Visual::ResourceStatus::READY );
     return;
   }
 
@@ -703,7 +703,7 @@ void TextVisual::UpdateRenderer()
       control.AddRenderer( mImpl->mRenderer );
 
       // Text rendered and ready to display
-      ResourceReady();
+      ResourceReady( Toolkit::Visual::ResourceStatus::READY );
     }
   }
 }

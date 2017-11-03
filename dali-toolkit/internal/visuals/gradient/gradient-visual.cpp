@@ -280,7 +280,7 @@ void GradientVisual::DoSetOnStage( Actor& actor )
   actor.AddRenderer( mImpl->mRenderer );
 
   // Gradient Visual generated and ready to display
-  ResourceReady();
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 void GradientVisual::DoCreatePropertyMap( Property::Map& map ) const

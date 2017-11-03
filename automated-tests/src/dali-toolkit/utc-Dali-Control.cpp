@@ -834,8 +834,11 @@ int UtcDaliControlResourcesReady(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, smallVisual );
 
   actor.SetSize( 200.f, 200.f );
+
+  Toolkit::Visual::ResourceStatus resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL);
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::PREPARING), TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
   application.SendNotification();
@@ -846,8 +849,10 @@ int UtcDaliControlResourcesReady(void)
   application.SendNotification();
   application.Render();
 
+  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL);
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::READY), TEST_LOCATION );
 
   Visual::Base largeVisual = factory.CreateVisual( propertyMapLarge );
   largeVisual.SetName("largeVisual");
@@ -857,11 +862,24 @@ int UtcDaliControlResourcesReady(void)
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, largeVisual, false );
 
-  application.SendNotification();
-  application.Render();
+  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL2);
+  DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::PREPARING), TEST_LOCATION );
 
+  application.SendNotification();
+
+  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL2);
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::PREPARING), TEST_LOCATION );
+
+  dummyImpl.EnableVisual( DummyControl::Property::TEST_VISUAL2, true );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+
+  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL2);
+  DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::READY), TEST_LOCATION );
 
   END_TEST;
 }

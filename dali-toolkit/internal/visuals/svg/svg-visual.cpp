@@ -112,7 +112,7 @@ void SvgVisual::DoSetOnStage( Actor& actor )
   mPlacementActor = actor;
 
   // SVG visual needs it's size set before it can be rasterized hence set ResourceReady once on stage
-  ResourceReady();
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 void SvgVisual::DoSetOffStage( Actor& actor )
@@ -233,7 +233,7 @@ void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
     }
 
    // Svg loaded and ready to display
-   ResourceReady();
+   ResourceReady( Toolkit::Visual::ResourceStatus::READY );
   }
 }
 

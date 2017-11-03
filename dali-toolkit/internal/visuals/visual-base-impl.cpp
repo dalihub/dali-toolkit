@@ -414,25 +414,28 @@ void Visual::Base::RemoveResourceObserver( Visual::ResourceObserver& observer )
   mImpl->mResourceObserver = NULL;
 }
 
-void Visual::Base::ResourceReady()
+void Visual::Base::ResourceReady(Toolkit::Visual::ResourceStatus resourceStatus)
 {
-  if( mImpl->mResourceReady )
+  if( mImpl->mResourceStatus != resourceStatus )
   {
-    // only inform the observer the first time the resource is ready
-    return;
-  }
-  mImpl->mResourceReady = true;
+    mImpl->mResourceStatus = resourceStatus;
 
-  if( mImpl->mResourceObserver )
-  {
-    // observer is currently a control impl
-    mImpl->mResourceObserver->ResourceReady( *this );
+    if( mImpl->mResourceObserver )
+    {
+      // observer is currently a control impl
+      mImpl->mResourceObserver->ResourceReady( *this );
+    }
   }
 }
 
 bool Visual::Base::IsResourceReady() const
 {
-  return mImpl->mResourceReady;
+  return ( mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY );
+}
+
+Toolkit::Visual::ResourceStatus Visual::Base::GetResourceStatus() const
+{
+  return mImpl->mResourceStatus;
 }
 
 Renderer Visual::Base::GetRenderer()

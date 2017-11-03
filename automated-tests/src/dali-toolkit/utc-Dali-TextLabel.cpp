@@ -476,6 +476,13 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty( TextLabel::Property::ELLIPSIS, true );
   DALI_TEST_CHECK( label.GetProperty<bool>( TextLabel::Property::ELLIPSIS ) );
 
+  // Check the layout direction property
+  label.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
+  DALI_TEST_EQUALS( label.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 

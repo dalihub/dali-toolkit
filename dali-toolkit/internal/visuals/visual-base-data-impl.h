@@ -125,7 +125,7 @@ struct Base::Impl
   Property::Index mMixColorIndex;
   Property::Index mOpacityIndex;
   int             mFlags;
-  bool            mResourceReady:1;
+  Toolkit::Visual::ResourceStatus  mResourceStatus;
 };
 
 } // namespace Visual
