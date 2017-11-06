@@ -1080,6 +1080,13 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
       ResourceReady( resourceStatus );
     }
   }
+
+  // Storing TextureSet needed when renderer staged.
+  if( ! mImpl->mRenderer )
+  {
+    mTextures = textureSet;
+  }
+
   mLoading = false;
 }
 
