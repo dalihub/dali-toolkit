@@ -1035,6 +1035,8 @@ void ImageVisual::UploadCompleted()
     // reset the weak handle so that the renderer only get added to actor once
     mPlacementActor.Reset();
   }
+  // Image loaded
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
   mLoading = false;
 }
 
@@ -1061,8 +1063,6 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
         sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
         textureSet.SetSampler( 0u, sampler );
         mImpl->mRenderer.SetTextures(textureSet);
-
-        resourceStatus = Toolkit::Visual::ResourceStatus::READY;
       }
       else
       {
@@ -1072,20 +1072,26 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
         mImpl->mRenderer.SetTextures( textureSet );
 
         ApplyImageToSampler( brokenImage );
-
-        resourceStatus = Toolkit::Visual::ResourceStatus::FAILED;
       }
-      // Image loaded and ready to display
-      ResourceReady( resourceStatus );
     }
   }
-
   // Storing TextureSet needed when renderer staged.
   if( ! mImpl->mRenderer )
   {
     mTextures = textureSet;
   }
 
+  // Image loaded, set status regardless of staged status.
+  if( loadingSuccess )
+  {
+    resourceStatus = Toolkit::Visual::ResourceStatus::READY;
+  }
+  else
+  {
+    resourceStatus = Toolkit::Visual::ResourceStatus::FAILED;
+  }
+  // Signal to observers ( control ) that resources are ready. Must be all resources.
+  ResourceReady( resourceStatus );
   mLoading = false;
 }
 

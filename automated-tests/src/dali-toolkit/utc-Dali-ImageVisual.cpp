@@ -59,7 +59,6 @@ void ResourceReadySignal( Control control )
   gResourceReadySignalFired = true;
 }
 
-
 Actor CreateActorWithImageVisual(const Property::Map& map)
 {
   VisualFactory factory = VisualFactory::Get();
@@ -1684,43 +1683,144 @@ int UtcDaliImageVisualLoadPolicy02(void)
 int UtcDaliImageVisualLoadPolicy03(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliImageVisualLoadPolicy03 Load a visual image before attaching to stage and receive ResourceReady signal" );
+  tet_infoline( "UtcDaliImageVisualLoadPolicy03 Load a visual image and receive ResourceReady Signal when loaded" );
+
+  const bool VISUAL_NOT_ENABLED( false ); // Instead of just passing 'false' into an API.
 
   // Set up trace debug
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  tet_infoline( "Create visual with IMMEDIATE load policy" );
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::IMMEDIATE );
-
-  // Wait for image to load, ResourceReady signal will not be emitted until Visual is registered with a control and on stage.
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
-
-  // Ensure texture has been uploaded
-  application.SendNotification();
-  application.Render();
-
-  tet_infoline( "Ensure texture loading starts after visual created" );
-  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
-  textureTrace.Reset();
-
-  tet_infoline( "Register visuals with control and ensure it has the only handles" );
+  tet_infoline( "Create a control and connect to resource ready signal without adding to stage" );
   DummyControl actor = DummyControl::New(true);
   actor.ResourceReadySignal().Connect( &ResourceReadySignal);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-
-  tet_infoline( "Registering visual attaches it to stage and trigger the loading signal if Image loaded" );
-  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
-  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
   actor.SetSize(200.f, 200.f);
-  // Adding the Control hence Visual to stage will cause the Visual to trigger ResourceReadySignal if the image is already loaded.
-  Stage::GetCurrent().Add( actor ); // If LoadPolicy was not IMMEDIATE then as this point (after attached to stage) the test would need to wait for Loading
 
+  tet_infoline( "Create visual with IMMEDIATE load policy" );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::IMMEDIATE );
+
+  tet_infoline( "Registering visual allows control to get a signal once loaded even if visual not enabled( not staged )" );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual, VISUAL_NOT_ENABLED );
+  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  tet_infoline( "Allow image time to load resource" );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+  application.Render();
+
+  // Ensure texture has been uploaded
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
   END_TEST;
 }
+
+int UtcDaliImageVisualLoadPolicy04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualLoadPolicy04 First part  Load a visual image before attaching to stage");
+  tet_infoline( "Second part, Reuse the same image in aonther control and check resource ready signal fired" );
+
+  const bool VISUAL_NOT_ENABLED( false ); // Instead of just passing false into an API.
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Create a control and connect to resource ready signal" );
+  DummyControl actor = DummyControl::New(true);
+  actor.ResourceReadySignal().Connect( &ResourceReadySignal);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  actor.SetSize(200.f, 200.f);
+
+  tet_infoline( "Create visual with IMMEDIATE load policy" );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::IMMEDIATE );
+
+  tet_infoline( "Registering visual allows control to get a signal once loaded even if visual not enabled( staged )" );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual, VISUAL_NOT_ENABLED );
+  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  tet_infoline( "Allow image time to load" );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Testing texture is loaded and resource ready signal fired" );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  tet_infoline( "Original control correctly signalled, now testing for signal with new Control reusing the image" );
+
+  gResourceReadySignalFired = false; // Reset signal check ready for testing next Control
+  Visual::Base imageVisual2 = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::IMMEDIATE );
+  DummyControl actor2 = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl2 = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  actor2.ResourceReadySignal().Connect( &ResourceReadySignal);
+
+  tet_infoline( "Registering visual this should trigger the loading signal as is already image loaded for previous control" );
+  dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual2 );
+  imageVisual2.Reset(); // reduce ref count so only the control keeps the visual alive.
+  actor2.SetSize(200.f, 200.f);
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 0 ), true, TEST_LOCATION ); // Not expecting any further loading as texture is being reused.
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualLoadPolicy05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualLoadPolicy05 LoadPolicy::ATTACHED (default) First part  Load a visual image before attaching to stage");
+  tet_infoline( "Second part, Reuse the same image in aonther control and check resource ready signal fired" );
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Create a control and connect to resource ready signal" );
+  DummyControl actor = DummyControl::New(true);
+  actor.ResourceReadySignal().Connect( &ResourceReadySignal);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  actor.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( actor );
+
+  tet_infoline( "Create visual with ATTACHED load policy" );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::ATTACHED );
+
+  tet_infoline( "Registering visual allows control to get a signal once loaded" );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  tet_infoline( "Allow image time to load" );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Testing texture is loaded and resource ready signal fired" );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  tet_infoline( "Original control correctly signalled, now testing for signal with new Control reusing the image" );
+
+  gResourceReadySignalFired = false; // Reset signal check ready for testing next Control
+  Visual::Base imageVisual2 = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::ATTACHED );
+  DummyControl actor2 = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl2 = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  actor2.ResourceReadySignal().Connect( &ResourceReadySignal);
+
+  tet_infoline( "Registering visual this should trigger the loading signal as is already image loaded for previous control" );
+  dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual2 );
+  imageVisual2.Reset(); // reduce ref count so only the control keeps the visual alive.
+  actor2.SetSize(200.f, 200.f);
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 0 ), true, TEST_LOCATION ); // Not expecting any further loading as texture is being reused.
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliImageVisualOrientationCorrection(void)
 {
