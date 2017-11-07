@@ -278,18 +278,14 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
   if( mVisual )
   {
-    Extents margin;
-    margin = Self().GetProperty<Extents>( Toolkit::Control::Property::MARGIN );
-
     Extents padding;
     padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
 
     Property::Map transformMap = Property::Map();
 
-    if( ( padding.start != 0 ) || ( padding.end != 0 ) || ( padding.top != 0 ) || ( padding.bottom != 0 ) ||
-        ( margin.start != 0 ) || ( margin.end != 0 ) || ( margin.top != 0 ) || ( margin.bottom != 0 ) )
+    if( ( padding.start != 0 ) || ( padding.end != 0 ) || ( padding.top != 0 ) || ( padding.bottom != 0 ) )
     {
-      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( margin.start + padding.start, margin.top + padding.top ) )
+      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( padding.start, padding.top ) )
                   .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
                   .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
                   .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
