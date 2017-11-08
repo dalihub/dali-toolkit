@@ -146,6 +146,7 @@ public:
        * @brief The outer space around the control.
        * @details Name "margin", type Property::EXTENTS.
        * @SINCE_1_2.62
+       * @note Margin property is to be supported by Layout algorithms and containers in future.
        */
       MARGIN,
 
