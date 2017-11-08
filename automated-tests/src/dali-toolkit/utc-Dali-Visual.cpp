@@ -826,6 +826,7 @@ int UtcDaliVisualGetPropertyMap7(void)
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::SVG );
   propertyMap.Insert( Visual::Property::MIX_COLOR, Color::WHITE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_SVG_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::ATLASING, false );
   Visual::Base svgVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -838,6 +839,33 @@ int UtcDaliVisualGetPropertyMap7(void)
   value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get<std::string>() == TEST_SVG_FILE_NAME );
+
+  value = resultMap.Find( ImageVisual::Property::ATLASING, Property::BOOLEAN );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<bool>() == false );
+
+  // request SvgVisual with a property map 2
+  propertyMap.Clear();
+  propertyMap[ "visualType" ] = Visual::SVG;
+  propertyMap[ "mixColor" ] = Color::WHITE;
+  propertyMap[ "url" ] = TEST_SVG_FILE_NAME;
+  propertyMap[ "atlasing" ] = true;
+  Visual::Base svgVisual1 = factory.CreateVisual( propertyMap );
+
+  resultMap.Clear();
+  svgVisual1.CreatePropertyMap( resultMap );
+  // check the property values from the returned map from a visual
+  value = resultMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == Visual::SVG );
+
+  value = resultMap.Find( ImageVisual::Property::URL,  Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == TEST_SVG_FILE_NAME );
+
+  value = resultMap.Find( ImageVisual::Property::ATLASING, Property::BOOLEAN );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<bool>() == true );
 
   // request SvgVisual with an URL
   Visual::Base svgVisual2 = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
