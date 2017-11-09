@@ -234,7 +234,7 @@ bool VisualUrl::IsLocalResource() const
   return mLocation == VisualUrl::LOCAL;
 }
 
-std::string VisualUrl::GetLocation()
+std::string VisualUrl::GetLocation() const
 {
   const auto location = mUrl.find( "://" );
   if( std::string::npos != location )

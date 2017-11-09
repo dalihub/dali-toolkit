@@ -105,7 +105,7 @@ TextureManager::TextureManager()
 }
 
 TextureSet TextureManager::LoadTexture(
-    VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode,
+    const VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode,
     Dali::SamplingMode::Type samplingMode, const MaskingDataPointer& maskInfo,
     bool synchronousLoading, TextureManager::TextureId& textureId, Vector4& textureRect,
     bool& atlasingStatus, bool& loadingStatus, Dali::WrapMode::Type wrapModeU,
@@ -128,6 +128,7 @@ TextureSet TextureManager::LoadTexture(
       {
         if( elem.textureId == id )
         {
+          textureId = elem.textureId;
           return elem.textureSet;
         }
       }
@@ -206,7 +207,7 @@ TextureSet TextureManager::LoadTexture(
                                  reloadPolicy );
       }
 
-      TextureManager::LoadState loadState = GetTextureState( textureId );
+      TextureManager::LoadState loadState = GetTextureStateInternal( textureId );
       loadingStatus = ( loadState == TextureManager::LOADING );
 
       if( loadState == TextureManager::UPLOADED )
@@ -456,6 +457,31 @@ TextureManager::LoadState TextureManager::GetTextureState( TextureId textureId )
     TextureInfo& cachedTextureInfo( mTextureInfoContainer[ cacheIndex ] );
     loadState = cachedTextureInfo.loadState;
   }
+  else
+  {
+    for( auto&& elem : mExternalTextures )
+    {
+      if( elem.textureId == textureId )
+      {
+        loadState = LoadState::UPLOADED;
+        break;
+      }
+    }
+  }
+  return loadState;
+}
+
+TextureManager::LoadState TextureManager::GetTextureStateInternal( TextureId textureId )
+{
+  LoadState loadState = TextureManager::NOT_STARTED;
+
+  int cacheIndex = GetCacheIndexFromId( textureId );
+  if( cacheIndex != INVALID_CACHE_INDEX )
+  {
+    TextureInfo& cachedTextureInfo( mTextureInfoContainer[ cacheIndex ] );
+    loadState = cachedTextureInfo.loadState;
+  }
+
   return loadState;
 }
 
@@ -468,6 +494,17 @@ TextureSet TextureManager::GetTextureSet( TextureId textureId )
   {
     TextureInfo& cachedTextureInfo( mTextureInfoContainer[ cacheIndex ] );
     textureSet = cachedTextureInfo.textureSet;
+  }
+  else
+  {
+    for( auto&& elem : mExternalTextures )
+    {
+      if( elem.textureId == textureId )
+      {
+        textureSet = elem.textureSet;
+        break;
+      }
+    }
   }
   return textureSet;
 }
@@ -590,7 +627,7 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pix
       // wait for the mask to finish loading.
       if( textureInfo.maskTextureId != INVALID_TEXTURE_ID )
       {
-        LoadState maskLoadState = GetTextureState( textureInfo.maskTextureId );
+        LoadState maskLoadState = GetTextureStateInternal( textureInfo.maskTextureId );
         if( maskLoadState == LOADING )
         {
           textureInfo.pixelBuffer = pixelBuffer; // Store the pixel buffer temporarily
@@ -764,7 +801,6 @@ int TextureManager::GetCacheIndexFromId( const TextureId textureId )
     }
   }
 
-  DALI_LOG_WARNING( "Cannot locate TextureId: %d\n", textureId );
   return INVALID_CACHE_INDEX;
 }
 

@@ -140,7 +140,7 @@ public:
 
   // TextureManager Main API:
 
-  TextureSet LoadTexture(VisualUrl& url, Dali::ImageDimensions desiredSize,
+  TextureSet LoadTexture(const VisualUrl& url, Dali::ImageDimensions desiredSize,
                          Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode,
                          const MaskingDataPointer& maskInfo, bool synchronousLoading,
                          TextureManager::TextureId& textureId, Vector4& textureRect,
@@ -318,6 +318,13 @@ private:
     bool                                orientationCorrection,
     TextureManager::ReloadPolicy        reloadPolicy );
 
+  /**
+   * @brief Get the current state of a texture
+   * @param[in] textureId The texture id to query
+   * @return The loading state if the texture is valid, or NOT_STARTED if the textureId
+   * is not valid.
+   */
+  LoadState GetTextureStateInternal( TextureId textureId );
 
   typedef size_t TextureHash; ///< The type used to store the hash used for Texture caching.
 

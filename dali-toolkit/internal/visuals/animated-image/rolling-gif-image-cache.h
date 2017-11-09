@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_INTERNAL_ROLLING_IMAGE_CACHE_H
-#define DALI_TOOLKIT_INTERNAL_ROLLING_IMAGE_CACHE_H
+#ifndef DALI_TOOLKIT_INTERNAL_ROLLING_GIF_IMAGE_CACHE_H
+#define DALI_TOOLKIT_INTERNAL_ROLLING_GIF_IMAGE_CACHE_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -18,7 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
-
+#include <dali/devel-api/adaptor-framework/gif-loading.h>
 #include <dali/devel-api/common/circular-queue.h>
 #include <dali-toolkit/internal/visuals/animated-image/image-cache.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
@@ -31,16 +31,20 @@ namespace Internal
 {
 
 /**
- * Class to manage a rolling cache of images, where the cache size
+ * Class to manage a rolling cache of GIF images, where the cache size
  * is smaller than the total number of images.
+ *
+ * Frames are always ready, so the observer.FrameReady callback is never triggered;
+ * the FirstFrame and NextFrame APIs will always return a texture.
  */
-class RollingImageCache : public ImageCache, public TextureUploadObserver
+class RollingGifImageCache : public ImageCache
 {
 public:
   /**
    * Constructor.
    * @param[in] textureManager The texture manager
-   * @param[in] urlList List of urls to cache
+   * @param[in] gifLoader The loaded gif image
+   * @param[in] frameCount The number of frames in the gif
    * @param[in] observer FrameReady observer
    * @param[in] cacheSize The size of the cache
    * @param[in] batchSize The size of a batch to load
@@ -48,16 +52,17 @@ public:
    * This will start loading textures immediately, according to the
    * batch and cache sizes.
    */
-  RollingImageCache( TextureManager&                 textureManager,
-                     UrlList&                        urlList,
-                     ImageCache::FrameReadyObserver& observer,
-                     uint16_t                        cacheSize,
-                     uint16_t                        batchSize );
+  RollingGifImageCache( TextureManager&                 textureManager,
+                        GifLoading&                     gifLoader,
+                        uint32_t                        frameCount,
+                        ImageCache::FrameReadyObserver& observer,
+                        uint16_t                        cacheSize,
+                        uint16_t                        batchSize );
 
   /**
    * Destructor
    */
-  virtual ~RollingImageCache();
+  virtual ~RollingGifImageCache();
 
   /**
    * Get the first frame. If it's not ready, this will trigger the
@@ -84,11 +89,6 @@ private:
   void LoadBatch();
 
   /**
-   * Find the matching image frame, and set it to ready
-   */
-  void SetImageFrameReady( TextureManager::TextureId textureId );
-
-  /**
    * Get the texture set of the front frame.
    * @return the texture set
    */
@@ -99,31 +99,20 @@ private:
    */
   TextureManager::TextureId GetCachedTextureId( int index ) const;
 
-  /**
-   * Check if the front frame has become ready - if so, inform observer
-   * @param[in] wasReady Readiness before call.
-   */
-  void CheckFrontFrame( bool wasReady );
-
-protected:
-  virtual void UploadComplete(
-    bool           loadSuccess,
-    int32_t        textureId,
-    TextureSet     textureSet,
-    bool           useAtlasing,
-    const Vector4& atlasRect );
-
 private:
   /**
    * Secondary class to hold readiness and index into url
    */
   struct ImageFrame
   {
-    unsigned int mUrlIndex;
-    bool mReady;
+    unsigned int mFrameNumber;
   };
 
-  std::vector<UrlStore>& mImageUrls;
+  GifLoading&               mGifLoading;
+  uint32_t                  mFrameCount;
+  int                       mFrameIndex;
+  std::vector<UrlStore>     mImageUrls;
+  uint16_t                  mCacheSize;
   CircularQueue<ImageFrame> mQueue;
 };
 

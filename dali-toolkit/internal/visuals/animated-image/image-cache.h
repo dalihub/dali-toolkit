@@ -28,7 +28,7 @@ namespace Toolkit
 namespace Internal
 {
 
-class ImageCache : public TextureUploadObserver
+class ImageCache
 {
 public:
   /**
@@ -67,7 +67,6 @@ public:
    * batch and cache sizes. The cache is as large as the number of urls.
    */
   ImageCache( TextureManager&                 textureManager,
-              UrlList&                        urlList,
               ImageCache::FrameReadyObserver& observer,
               unsigned int                    batchSize );
 
@@ -89,7 +88,6 @@ public:
 protected:
   TextureManager&        mTextureManager;
   FrameReadyObserver&    mObserver;
-  std::vector<UrlStore>& mImageUrls;
   unsigned int           mBatchSize;
   unsigned int           mUrlIndex;
   bool                   mWaitingForReadyFrame:1;

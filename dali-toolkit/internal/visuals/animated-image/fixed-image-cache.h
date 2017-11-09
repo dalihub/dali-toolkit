@@ -28,7 +28,7 @@ namespace Toolkit
 namespace Internal
 {
 
-class FixedImageCache : public ImageCache
+class FixedImageCache : public ImageCache, public TextureUploadObserver
 {
 public:
   /**
@@ -97,7 +97,8 @@ protected:
     bool           useAtlasing,
     const Vector4& atlasRect );
 
-protected:
+private:
+  std::vector<UrlStore>& mImageUrls;
   std::vector<bool> mReadyFlags;
   unsigned int      mFront;
 };
