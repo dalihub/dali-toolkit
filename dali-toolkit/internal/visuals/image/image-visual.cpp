@@ -508,8 +508,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
     case Toolkit::ImageVisual::Property::ATLASING:
     {
-      bool atlasing = false;
-      mAttemptAtlasing = value.Get( atlasing );
+      value.Get( mAttemptAtlasing );
       break;
     }
 
