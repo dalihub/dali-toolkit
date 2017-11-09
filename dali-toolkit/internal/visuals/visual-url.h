@@ -107,7 +107,7 @@ public:
   /**
    * @return the location part of the url
    */
-  std::string GetLocation();
+  std::string GetLocation() const;
 
   /**
    * Helper to create a URL of type TEXTURE

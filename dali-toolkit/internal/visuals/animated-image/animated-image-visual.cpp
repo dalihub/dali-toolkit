@@ -19,9 +19,9 @@
 #include "animated-image-visual.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/gif-loading.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
@@ -32,8 +32,10 @@
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/animated-image/fixed-image-cache.h>
 #include <dali-toolkit/internal/visuals/animated-image/rolling-image-cache.h>
+#include <dali-toolkit/internal/visuals/animated-image/rolling-gif-image-cache.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
+#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 
 namespace Dali
 {
@@ -65,12 +67,17 @@ Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "
 /**
  * Multi-image  Flow of execution
  *
- *   | DoSetProperties()
+ *   | New
+ *   |   DoSetProperties()
  *   |   LoadFirstBatch()
- *   |     cache->LoadBatch()
+ *   |     new cache
+ *   |       cache->LoadBatch()
  *   |
  *   | DoSetOnStage()
+ *   |   PrepareTextureSet()
+ *   |     cache->FirstFrame()
  *   |   CreateRenderer()    (Doesn't become ready until first frame loads)
+ *   |   StartFirstFrame()
  *   |
  *   | FrameReady(textureSet)
  *   |   start first frame:
@@ -94,16 +101,21 @@ Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "
 
 AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties )
 {
-  AnimatedImageVisual* visual = new AnimatedImageVisual( factoryCache );
-  visual->mImageUrl = imageUrl;
+  AnimatedImageVisualPtr visual( new AnimatedImageVisual( factoryCache ) );
+  visual->InitializeGif( imageUrl );
   visual->SetProperties( properties );
+
+  if( visual->mFrameCount > 0 )
+  {
+    visual->LoadFirstBatch();
+  }
 
   return visual;
 }
 
 AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, const Property::Array& imageUrls, const Property::Map& properties )
 {
-  AnimatedImageVisual* visual = new AnimatedImageVisual( factoryCache );
+  AnimatedImageVisualPtr visual( new AnimatedImageVisual( factoryCache ) );
   visual->mImageUrls = new ImageCache::UrlList();
   visual->mImageUrls->reserve( imageUrls.Count() );
 
@@ -114,18 +126,36 @@ AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCach
     urlStore.mUrl = imageUrls[i].Get<std::string>();
     visual->mImageUrls->push_back( urlStore );
   }
-
+  visual->mFrameCount = imageUrls.Count();
   visual->SetProperties( properties );
-  // starts loading immediately
+
+  if( visual->mFrameCount > 0 )
+  {
+    visual->LoadFirstBatch();
+  }
+
   return visual;
 }
 
 AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl )
 {
-  AnimatedImageVisual* visual = new AnimatedImageVisual( factoryCache );
-  visual->mImageUrl = imageUrl;
+  AnimatedImageVisualPtr visual( new AnimatedImageVisual( factoryCache ) );
+  visual->InitializeGif( imageUrl );
+
+  if( visual->mFrameCount > 0 )
+  {
+    visual->LoadFirstBatch();
+  }
 
   return visual;
+}
+
+void AnimatedImageVisual::InitializeGif( const VisualUrl& imageUrl )
+{
+  mImageUrl = imageUrl;
+  mGifLoading = GifLoading::New( imageUrl.GetUrl() );
+  mFrameCount = mGifLoading->GetImageCount();
+  mGifLoading->LoadFrameDelays( mFrameDelayContainer );
 }
 
 AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache )
@@ -134,6 +164,7 @@ AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache )
   mPlacementActor(),
   mPixelArea( FULL_TEXTURE_RECT ),
   mImageUrl(),
+  mGifLoading( nullptr ),
   mCurrentFrameIndex( 0 ),
   mImageUrls( NULL ),
   mImageCache( NULL ),
@@ -141,6 +172,7 @@ AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache )
   mBatchSize( 1 ),
   mFrameDelay( 100 ),
   mUrlIndex( 0 ),
+  mFrameCount( 0 ),
   mImageSize(),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
@@ -159,7 +191,7 @@ void AnimatedImageVisual::GetNaturalSize( Vector2& naturalSize )
   {
     if( mImageUrl.IsValid() )
     {
-      mImageSize = Dali::GetGifImageSize( mImageUrl.GetUrl() );
+      mImageSize = mGifLoading->GetImageSize();
     }
     else if( mImageUrls && mImageUrls->size() > 0 )
     {
@@ -244,11 +276,6 @@ void AnimatedImageVisual::DoSetProperties( const Property::Map& propertyMap )
         DoSetProperty( Toolkit::ImageVisual::Property::FRAME_DELAY, keyValue.second );
       }
     }
-  }
-
-  if( mImageUrls && mImageUrls->size() > 0 )
-  {
-    LoadFirstBatch();
   }
 }
 
@@ -347,9 +374,6 @@ void AnimatedImageVisual::DoSetOffStage( Actor& actor )
     mFrameDelayTimer.Reset();
   }
 
-  mTextureRectContainer.Clear();
-  mFrameDelayContainer.Clear();
-
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
@@ -366,7 +390,7 @@ void AnimatedImageVisual::OnSetTransform()
 void AnimatedImageVisual::CreateRenderer()
 {
   bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
-  bool atlasing = (mTextureRectContainer.Count() > 0) ;
+  bool atlasing = false;
   Shader shader = ImageVisual::GetImageShader( mFactoryCache, atlasing, defaultWrapMode );
 
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
@@ -389,27 +413,38 @@ void AnimatedImageVisual::CreateRenderer()
   }
 
   mCurrentFrameIndex = 0;
-
-  if( mTextureRectContainer.Count() > 0 )
-  {
-    mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, mTextureRectContainer[mCurrentFrameIndex] );
-  }
 }
 
 void AnimatedImageVisual::LoadFirstBatch()
 {
-  DALI_LOG_INFO(gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::LoadFirstBatch()\n");
-
   // Ensure the batch size and cache size are no bigger than the number of URLs,
   // and that the cache is at least as big as the batch size.
-  uint16_t numUrls = mImageUrls->size();
-  uint16_t batchSize = std::min( mBatchSize, numUrls );
-  uint16_t cacheSize = std::min( std::max( batchSize, mCacheSize ), numUrls );
+  uint16_t numUrls = 0;
+  uint16_t batchSize = 1;
+  uint16_t cacheSize = 1;
+
+  if( mImageUrls )
+  {
+    numUrls = mImageUrls->size();
+  }
+  else
+  {
+    numUrls = mFrameCount;
+  }
+
+  batchSize = std::min( mBatchSize, numUrls );
+  cacheSize = std::min( std::max( batchSize, mCacheSize ), numUrls );
+
+  DALI_LOG_INFO(gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::LoadFirstBatch()  batchSize:%d  cacheSize:%d\n", batchSize, cacheSize);
 
   mUrlIndex = 0;
   TextureManager& textureManager = mFactoryCache.GetTextureManager();
 
-  if( batchSize > 0 && cacheSize > 0 )
+  if( mGifLoading != nullptr )
+  {
+    mImageCache = new RollingGifImageCache( textureManager, *mGifLoading, mFrameCount, *this, cacheSize, batchSize );
+  }
+  else if( batchSize > 0 && cacheSize > 0 )
   {
     if( cacheSize < numUrls )
     {
@@ -423,6 +458,10 @@ void AnimatedImageVisual::LoadFirstBatch()
   else
   {
     mImageCache = new RollingImageCache( textureManager, *mImageUrls, *this, 1, 1 );
+  }
+  if (!mImageCache)
+  {
+    DALI_LOG_ERROR("mImageCache is null");
   }
 }
 
@@ -439,55 +478,37 @@ void AnimatedImageVisual::StartFirstFrame( TextureSet& textureSet )
     mPlacementActor.Reset();
   }
 
-  int frameDelay = mFrameDelay;
-  if( mFrameDelayContainer.Count() > 1 )
-  {
-    frameDelay = mFrameDelayContainer[0];
-  }
-  mFrameDelayTimer = Timer::New( frameDelay );
-  mFrameDelayTimer.TickSignal().Connect( this, &AnimatedImageVisual::DisplayNextFrame );
-  mFrameDelayTimer.Start();
+  mCurrentFrameIndex = 0;
 
-  DALI_LOG_INFO(gAnimImgLogFilter,Debug::Concise,"ResourceReady()\n");
+  if( mFrameCount > 1 )
+  {
+    int frameDelay = mFrameDelay; // from URL array
+    if( mFrameDelayContainer.Count() > 0 ) // from GIF
+    {
+      frameDelay = mFrameDelayContainer[0];
+    }
+
+    mFrameDelayTimer = Timer::New( frameDelay );
+    mFrameDelayTimer.TickSignal().Connect( this, &AnimatedImageVisual::DisplayNextFrame );
+    mFrameDelayTimer.Start();
+  }
+  DALI_LOG_INFO(gAnimImgLogFilter,Debug::Concise,"ResourceReady(ResourceStatus::READY)\n");
   ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 TextureSet AnimatedImageVisual::PrepareTextureSet()
 {
   TextureSet textureSet;
-  if( mImageUrl.IsValid() )
+  if (mImageCache)
+    textureSet = mImageCache->FirstFrame();
+  if( textureSet )
   {
-    textureSet = PrepareAnimatedGifImage();
+    SetImageSize( textureSet );
   }
   else
   {
-    textureSet = mImageCache->FirstFrame();
-    if( textureSet )
-    {
-      SetImageSize( textureSet );
-    }
-  }
-  return textureSet;
-}
-
-TextureSet AnimatedImageVisual::PrepareAnimatedGifImage()
-{
-  TextureSet textureSet;
-
-  // load from image file
-  std::vector<Dali::PixelData> pixelDataList;
-
-  if( mImageUrl.IsLocalResource() )
-  {
-    if( Dali::LoadAnimatedGifFromFile( mImageUrl.GetUrl().c_str() , pixelDataList, mFrameDelayContainer ) )
-    {
-      mImageSize.SetWidth( pixelDataList[0].GetWidth() );
-      mImageSize.SetHeight( pixelDataList[0].GetHeight() );
-
-      Texture texture = Toolkit::ImageAtlas::PackToAtlas( pixelDataList, mTextureRectContainer );
-      textureSet = TextureSet::New();
-      textureSet.SetTexture( 0, texture );
-    }
+    DALI_LOG_INFO(gAnimImgLogFilter,Debug::Concise,"ResourceReady(ResourceStatus::FAILED)\n");
+    ResourceReady( Toolkit::Visual::ResourceStatus::FAILED );
   }
 
   return textureSet;
@@ -522,29 +543,31 @@ void AnimatedImageVisual::FrameReady( TextureSet textureSet )
 
 bool AnimatedImageVisual::DisplayNextFrame()
 {
-  DALI_LOG_INFO(gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::DisplayNextFrame() start\n");
-
-  if( mFrameDelayContainer.Count() > 0 )
+  if( mFrameCount > 1 )
   {
     // Wrap the frame index
     ++mCurrentFrameIndex;
-    mCurrentFrameIndex %= mFrameDelayContainer.Count();
+    mCurrentFrameIndex %= mFrameCount;
+  }
+  DALI_LOG_INFO( gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::DisplayNextFrame(this:%p) FrameCount:%d\n", this, mCurrentFrameIndex);
 
-    mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, mTextureRectContainer[mCurrentFrameIndex] );
+  if( mFrameDelayContainer.Count() > 0 )
+  {
+    unsigned int delay = mFrameDelayContainer[mCurrentFrameIndex];
 
-    if( mFrameDelayTimer.GetInterval() != mFrameDelayContainer[mCurrentFrameIndex] )
+    if( mFrameDelayTimer.GetInterval() != delay )
     {
-      mFrameDelayTimer.SetInterval( mFrameDelayContainer[mCurrentFrameIndex] );
+      mFrameDelayTimer.SetInterval( delay );
     }
   }
-  else if( mImageCache )
+
+  TextureSet textureSet;
+  if (mImageCache)
+    textureSet = mImageCache->NextFrame();
+  if( textureSet )
   {
-    TextureSet textureSet = mImageCache->NextFrame();
-    if( textureSet )
-    {
-      SetImageSize( textureSet );
-      mImpl->mRenderer.SetTextures( textureSet );
-    }
+    SetImageSize( textureSet );
+    mImpl->mRenderer.SetTextures( textureSet );
   }
 
   // Keep timer ticking

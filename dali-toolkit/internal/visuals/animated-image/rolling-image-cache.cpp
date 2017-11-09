@@ -18,6 +18,7 @@
 #include <dali-toolkit/internal/visuals/animated-image/rolling-image-cache.h>
 
 // INTERNAL HEADERS
+#include <dali-toolkit/internal/visuals/image-atlas-manager.h> // For ImageAtlasManagerPtr
 #include <dali/integration-api/debug.h>
 
 // EXTERNAL HEADERS
@@ -60,7 +61,8 @@ namespace Internal
 RollingImageCache::RollingImageCache(
   TextureManager& textureManager, UrlList& urlList, ImageCache::FrameReadyObserver& observer,
   uint16_t cacheSize, uint16_t batchSize )
-: ImageCache( textureManager, urlList, observer, batchSize ),
+: ImageCache( textureManager, observer, batchSize ),
+  mImageUrls( urlList ),
   mQueue( cacheSize )
 {
   LoadBatch();
@@ -139,10 +141,22 @@ void RollingImageCache::LoadBatch()
     // need to account for this inside the UploadComplete method using mRequestingLoad.
     mRequestingLoad = true;
 
-    mImageUrls[ imageFrame.mUrlIndex ].mTextureId =
-      mTextureManager.RequestLoad( url, ImageDimensions(), FittingMode::SCALE_TO_FILL,
-                                   SamplingMode::BOX_THEN_LINEAR, TextureManager::NO_ATLAS,
-                                   this, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED );
+    bool synchronousLoading = false;
+    bool atlasingStatus = false;
+    bool loadingStatus = false;
+    TextureManager::MaskingDataPointer maskInfo = nullptr;
+    AtlasUploadObserver* atlasObserver = nullptr;
+    ImageAtlasManagerPtr imageAtlasManager = nullptr;
+    Vector4 textureRect;
+
+    mTextureManager.LoadTexture(
+      url, ImageDimensions(), FittingMode::SCALE_TO_FILL,
+      SamplingMode::BOX_THEN_LINEAR, maskInfo,
+      synchronousLoading, mImageUrls[ imageFrame.mUrlIndex ].mTextureId, textureRect,
+      atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT,
+      Dali::WrapMode::Type::DEFAULT, this,
+      atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED );
+
     mRequestingLoad = false;
   }
 
