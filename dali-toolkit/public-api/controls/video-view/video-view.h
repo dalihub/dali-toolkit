@@ -111,6 +111,7 @@ public:
        * If false, video-view shows decoded frame images sequentially.
        * If Platform or video plugin doesn't support decoded frame images, this should always be true.
        * @SINCE_1_2.62
+       * @REMARK_RAWVIDEO
        */
       UNDERLAY
     };

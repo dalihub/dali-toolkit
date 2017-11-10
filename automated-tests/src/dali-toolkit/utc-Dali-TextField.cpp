@@ -972,6 +972,12 @@ int UtcDaliTextFieldSetPropertyP(void)
   field.SetProperty( TextField::Property::ELLIPSIS, true );
   DALI_TEST_CHECK( field.GetProperty<bool>( TextField::Property::ELLIPSIS ) );
 
+  field.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
+  DALI_TEST_EQUALS( field.GetProperty<int>( Actor::Property::LAYOUT_DIRECTION ), static_cast<int>( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 
@@ -2681,6 +2687,39 @@ int UtcDaliTextFieldSettingPlaceholder(void)
   placeholderMapGet = field.GetProperty<Property::Map>( TextField::Property::PLACEHOLDER );
   DALI_TEST_EQUALS( placeholderMapGet.Count(), placeholderMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( placeholderMapGet, placeholderMapSet ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldSetPaddingProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextFieldSetPaddingProperty\n");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( field );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector3 originalSize = field.GetNaturalSize();
+
+  field.SetProperty( Toolkit::Control::Property::PADDING, Extents( 10, 10, 10, 10 ) );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( field.GetProperty<Extents>( Toolkit::Control::Property::PADDING ), Extents( 10, 10, 10, 10 ), TEST_LOCATION );
+
+  Vector3 paddingAddedSize = field.GetNaturalSize();
+
+  DALI_TEST_EQUALS( originalSize.width + 10 + 10 , paddingAddedSize.width, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( originalSize.height + 10 + 10 , paddingAddedSize.height, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }

@@ -1250,13 +1250,20 @@ void TextEditor::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange:
 
 Vector3 TextEditor::GetNaturalSize()
 {
-  return mController->GetNaturalSize();
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
+  Vector3 naturalSize = mController->GetNaturalSize();
+  naturalSize.width += ( padding.start + padding.end );
+  naturalSize.height += ( padding.top + padding.bottom );
+
+  return naturalSize;
 }
 
 float TextEditor::GetHeightForWidth( float width )
 {
-  Padding padding;
-  Self().GetPadding( padding );
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
   return mController->GetHeightForWidth( width ) + padding.top + padding.bottom;
 }
 
@@ -1265,20 +1272,27 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor OnRelayout\n");
 
   Actor self = Self();
-  Padding padding;
 
-  self.GetPadding( padding );
-  Vector2 contentSize( size.x - ( padding.left + padding.right ), size.y - ( padding.top + padding.bottom ) );
+  Extents padding;
+  padding = self.GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
+  Vector2 contentSize( size.x - ( padding.start + padding.end ), size.y - ( padding.top + padding.bottom ) );
+
+  // Support Right-To-Left of padding
+  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
+  {
+    std::swap( padding.start, padding.end );
+  }
 
   if( mStencil )
   {
-    mStencil.SetPosition( padding.left , padding.top  );
+    mStencil.SetPosition( padding.start, padding.top );
   }
   if( mActiveLayer )
   {
-    mActiveLayer.SetPosition( padding.left , padding.top  );
+    mActiveLayer.SetPosition( padding.start, padding.top );
   }
-
 
   const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize );
 
@@ -1427,9 +1441,9 @@ void TextEditor::OnTap( const TapGesture& gesture )
   mImfManager.Activate();
 
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
-  Padding padding;
-  Self().GetPadding( padding );
-  mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x - padding.left, gesture.localPoint.y - padding.top );
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+  mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x - padding.start, gesture.localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }
@@ -1443,9 +1457,9 @@ void TextEditor::OnLongPress( const LongPressGesture& gesture )
 {
   mImfManager.Activate();
 
-  Padding padding;
-  Self().GetPadding( padding );
-  mController->LongPressEvent( gesture.state, gesture.localPoint.x - padding.left, gesture.localPoint.y - padding.top );
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+  mController->LongPressEvent( gesture.state, gesture.localPoint.x - padding.start, gesture.localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }

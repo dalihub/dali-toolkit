@@ -41,6 +41,9 @@ namespace
 {
 const char * const UNITS("px");
 
+// property name
+const char * const IMAGE_ATLASING( "atlasing" );
+
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 }
 
@@ -76,7 +79,8 @@ SvgVisual::SvgVisual( VisualFactoryCache& factoryCache )
   mImageUrl( ),
   mParsedImage( NULL ),
   mPlacementActor(),
-  mVisualSize(Vector2::ZERO)
+  mVisualSize(Vector2::ZERO),
+  mAttemptAtlasing( false )
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -93,11 +97,35 @@ SvgVisual::~SvgVisual()
 void SvgVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   // url already passed in from constructor
+  for( Property::Map::SizeType iter = 0; iter < propertyMap.Count(); ++iter )
+  {
+    KeyValuePair keyValue = propertyMap.GetKeyValue( iter );
+    if( keyValue.first.type == Property::Key::INDEX )
+    {
+      DoSetProperty( keyValue.first.indexKey, keyValue.second );
+    }
+    else if( keyValue.first == IMAGE_ATLASING )
+    {
+      DoSetProperty( Toolkit::ImageVisual::Property::ATLASING, keyValue.second );
+    }
+  }
+}
+
+void SvgVisual::DoSetProperty( Property::Index index, const Property::Value& value )
+{
+  switch( index )
+  {
+    case Toolkit::ImageVisual::Property::ATLASING:
+    {
+      value.Get( mAttemptAtlasing );
+      break;
+    }
+  }
 }
 
 void SvgVisual::DoSetOnStage( Actor& actor )
 {
-  Shader shader = ImageVisual::GetImageShader( mFactoryCache, true, true );
+  Shader shader = ImageVisual::GetImageShader( mFactoryCache, mAttemptAtlasing, true );
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
   TextureSet textureSet = TextureSet::New();
   mImpl->mRenderer = Renderer::New( geometry, shader );
@@ -144,6 +172,7 @@ void SvgVisual::DoCreatePropertyMap( Property::Map& map ) const
   if( mImageUrl.IsValid() )
   {
     map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
+    map.Insert( Toolkit::ImageVisual::Property::ATLASING, mAttemptAtlasing );
   }
 }
 
@@ -180,24 +209,30 @@ void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
   if( IsOnStage()  )
   {
     TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
-    if( mAtlasRect != FULL_TEXTURE_RECT )
+    if( mImpl->mFlags |= Impl::IS_ATLASING_APPLIED )
     {
       mFactoryCache.GetAtlasManager()->Remove( currentTextureSet, mAtlasRect );
     }
 
-    Vector4 atlasRect;
-    TextureSet textureSet = mFactoryCache.GetAtlasManager()->Add(atlasRect, rasterizedPixelData );
-    if( textureSet ) // atlasing
+    TextureSet textureSet;
+
+    if( mAttemptAtlasing )
     {
-      if( textureSet != currentTextureSet )
+      Vector4 atlasRect;
+      textureSet = mFactoryCache.GetAtlasManager()->Add(atlasRect, rasterizedPixelData );
+      if( textureSet ) // atlasing
       {
-        mImpl->mRenderer.SetTextures( textureSet );
+        if( textureSet != currentTextureSet )
+        {
+          mImpl->mRenderer.SetTextures( textureSet );
+        }
+        mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
+        mAtlasRect = atlasRect;
+        mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
       }
-      mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
-      mAtlasRect = atlasRect;
-      mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
     }
-    else // no atlasing
+
+    if( !textureSet ) // no atlasing - mAttemptAtlasing is false or adding to atlas is failed
     {
       Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888,
                                       rasterizedPixelData.GetWidth(), rasterizedPixelData.GetHeight() );

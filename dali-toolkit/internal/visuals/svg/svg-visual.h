@@ -155,6 +155,13 @@ private:
    */
   void AddRasterizationTask( const Vector2& size );
 
+  /**
+   * Helper method to set individual values by index key.
+   * @param[in] index The index key of the value
+   * @param[in] value The value
+   */
+  void DoSetProperty( Property::Index index, const Property::Value& value );
+
 
   // Undefined
   SvgVisual( const SvgVisual& svgRenderer );
@@ -168,6 +175,7 @@ private:
   NSVGimage*           mParsedImage;
   WeakHandle<Actor>    mPlacementActor;
   Vector2              mVisualSize;
+  bool                 mAttemptAtlasing;  ///< If true will attempt atlasing, otherwise create unique texture
 };
 
 } // namespace Internal
