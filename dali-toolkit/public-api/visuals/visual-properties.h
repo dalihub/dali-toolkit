@@ -45,13 +45,17 @@ namespace Visual
  */
 enum Type
 {
-  BORDER, ///< Renders a solid color as an internal border to the control's quad. @SINCE_1_1.45
-  COLOR, ///< Renders a solid color to the control's quad. @SINCE_1_1.45
-  GRADIENT, ///< Renders a smooth transition of colors to the control's quad. @SINCE_1_1.45
-  IMAGE, ///< Renders an image into the control's quad. @SINCE_1_1.45
-  MESH, ///< Renders a mesh using an "obj" file, optionally with textures provided by an "mtl" file. @SINCE_1_1.45
-  PRIMITIVE, ///< Renders a simple 3D shape, such as a cube or sphere. @SINCE_1_1.45
-  WIREFRAME ///< Renders a simple wire-frame outlining a quad. @SINCE_1_2_2
+  BORDER,           ///< Renders a solid color as an internal border to the control's quad. @SINCE_1_1.45
+  COLOR,            ///< Renders a solid color to the control's quad. @SINCE_1_1.45
+  GRADIENT,         ///< Renders a smooth transition of colors to the control's quad. @SINCE_1_1.45
+  IMAGE,            ///< Renders an image into the control's quad. @SINCE_1_1.45
+  MESH,             ///< Renders a mesh using an "obj" file, optionally with textures provided by an "mtl" file. @SINCE_1_1.45
+  PRIMITIVE,        ///< Renders a simple 3D shape, such as a cube or sphere. @SINCE_1_1.45
+  WIREFRAME,        ///< Renders a simple wire-frame outlining a quad. @SINCE_1_2_2
+  TEXT,             ///< Renders text @SINCE_1_2.60
+  N_PATCH,          ///< Renders an n-patch image. @SINCE_1_2.60
+  SVG,              ///< Renders an SVG image. @SINCE_1_2.60
+  ANIMATED_IMAGE,   ///< Renders a animated image. @SINCE_1_2.60
 };
 
 /**
@@ -78,16 +82,159 @@ enum
 
   /**
    * @brief The shader to use in the visual.
-   * @details Name "shader", type Property::Map.
+   * @details Name "shader", type Property::MAP.
    * @SINCE_1_1.45
    * @note Optional.
    * @note Will override the existing shaders.
    * @see Shader::Property
    */
-  SHADER
+  SHADER,
+
+  /**
+   * @brief The transform used by the visual.
+   * @details Name "transform", type Property::MAP.
+   * @SINCE_1_2.60
+   * @note Optional.
+   * @see Toolkit::Visual::Transform::Property
+   */
+  TRANSFORM,
+
+  /**
+   * @brief Enables/disables premultiplied alpha.
+   * @details Name "premultipliedAlpha", type Property::BOOLEAN.
+   * @SINCE_1_2.60
+   * @note Optional.
+   * @note The premultiplied alpha is false by default unless this behaviour is modified
+   * by the derived Visual type.
+   */
+  PREMULTIPLIED_ALPHA,
+
+  /**
+   * @brief Mix color is a blend color for any visual.
+   * @details Name "mixColor", type Property::VECTOR3 or Property::VECTOR4.
+   * @SINCE_1_2.60
+   * @note Optional
+   */
+  MIX_COLOR,
+
+  /**
+   * @brief Opacity is the alpha component of the mixColor, above.
+   * @details Name "opacity", type Property::FLOAT.
+   * @SINCE_1_2.60
+   * @note Optional
+   */
+  OPACITY,
 };
 
 } // namespace Property
+
+namespace Transform
+{
+
+/**
+ * @brief Policies used by the transform for the offset or size.
+ * @SINCE_1_2.60
+ *
+ */
+namespace Policy
+{
+
+enum Type
+{
+  RELATIVE = 0,   ///< Relative to the control (percentage [0.0f to 1.0f] of the control).
+  ABSOLUTE = 1    ///< Absolute value in world units.
+};
+
+} // namespace Policy
+
+namespace Property
+{
+
+enum Type
+{
+  /**
+   * @brief Offset of the visual, which can be either relative (percentage [0.0f to 1.0f] of the parent) or absolute (in world units).
+   * @details Name "offset", type Property::VECTOR2.
+   * @SINCE_1_2.60
+   *
+   * @see OFFSET_POLICY
+   */
+  OFFSET,
+
+  /**
+   * @brief Size of the visual, which can be either relative (percentage [0.0f to 1.0f] of the parent) or absolute (in world units).
+   * @details Name "size", type Property::VECTOR2.
+   * @see SIZE_POLICY
+   */
+  SIZE,
+
+  /**
+   * @brief The origin of the visual within its control area.
+   * @details Name "origin", type Align::Type (Property::INTEGER) or Property::STRING.
+   * @see Toolkit::Align
+   * @SINCE_1_2.60
+   * @note The default is Align::TOP_BEGIN.
+   */
+  ORIGIN,
+
+  /**
+   * @brief The anchor-point of the visual
+   * @details Name "anchorPoint", type Align::Type (Property::INTEGER) or Property::STRING.
+   * @see Toolkit::Align
+   * @SINCE_1_2.60
+   * @note The default is Align::TOP_BEGIN.
+   */
+  ANCHOR_POINT,
+
+  /**
+   * @brief Whether the x or y OFFSET values are relative (percentage [0.0f to 1.0f] of the control) or absolute (in world units).
+   * @details Name "offsetPolicy", type Vector2 or Property::ARRAY of Property::STRING.
+   *          If Property::ARRAY then 2 strings expected for the x and y.
+   *
+   * C++:
+   * @code
+   * control.SetProperty( ..., // Some visual based property
+   *                      Property::Map().Add( ... ) // Properties to set up visual
+   *                                     .Add( Visual::Property::TRANSFORM,
+   *                                           Property::Array().Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Policy::ABSOLUTE, Policy::RELATIVE ) ) )
+   *                                                            .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( 10, 1.0f ) ) );
+   * @endcode
+   *
+   * JSON:
+   * @code
+   * {
+   *   ...
+   *   "transition":
+   *   {
+   *     "offsetPolicy" : [ "ABSOLUTE", "RELATIVE" ],
+   *     "offset" : [ 10, 1.0 ]
+   *   }
+   *   ...
+   * }
+   *
+   * @endcode
+   * @see Policy::Type
+   * @SINCE_1_2.60
+   * @note By default, both the x and the y offset is RELATIVE.
+   */
+  OFFSET_POLICY,
+
+  /**
+   * @brief Whether the width or height SIZE values are relative (percentage [0.0f to 1.0f] of the control) or absolute (in world units).
+   * @details Name "sizePolicy", type Vector2 or Property::ARRAY of Property::STRING.
+   *          If Property::ARRAY then 2 strings expected for the width and height.
+   *
+   * @see Policy::Type
+   * @see OFFSET_POLICY for example
+   * @SINCE_1_2.60
+   * @note By default, both the width and the height is RELATIVE to the control's size.
+   */
+  SIZE_POLICY,
+};
+
+} // namespace Property
+
+} // namespace Transform
 
 /**
  * @brief Shader for Visuals

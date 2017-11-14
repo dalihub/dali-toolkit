@@ -23,6 +23,7 @@
 #include <dali/public-api/events/gesture.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
@@ -323,24 +324,36 @@ public: // Configure the text controller.
    *
    * @param[in] alignment The horizontal alignment.
    */
-  void SetHorizontalAlignment( Layout::HorizontalAlignment alignment );
+  void SetHorizontalAlignment( HorizontalAlignment::Type alignment );
 
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  Layout::HorizontalAlignment GetHorizontalAlignment() const;
+  HorizontalAlignment::Type GetHorizontalAlignment() const;
 
   /**
    * @brief Sets the text's vertical alignment.
    *
    * @param[in] alignment The vertical alignment.
    */
-  void SetVerticalAlignment( Layout::VerticalAlignment alignment );
+  void SetVerticalAlignment( VerticalAlignment::Type alignment );
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  Layout::VerticalAlignment GetVerticalAlignment() const;
+  VerticalAlignment::Type GetVerticalAlignment() const;
+
+  /**
+   * @brief Sets the text's wrap mode
+   * @param[in] text wrap mode The unit of wrapping
+   */
+  void SetLineWrapMode( Text::LineWrap::Mode textWarpMode );
+
+  /**
+   * @brief Retrieve text wrap mode previously set.
+   * @return text wrap mode
+   */
+  Text::LineWrap::Mode GetLineWrapMode() const;
 
   /**
    * @brief Enable or disable the text elide.
@@ -353,6 +366,30 @@ public: // Configure the text controller.
    * @copydoc ModelInterface::IsTextElideEnabled()
    */
   bool IsTextElideEnabled() const;
+
+  /**
+   * @brief Enable or disable the placeholder text elide.
+   * @param enabled Whether to enable the placeholder text elide.
+   */
+  void SetPlaceholderTextElideEnabled( bool enabled );
+
+  /**
+   * @brief Whether the placeholder text elide property is enabled.
+   * @return True if the placeholder text elide property is enabled, false otherwise.
+   */
+  bool IsPlaceholderTextElideEnabled() const;
+
+  /**
+   * @brief Enable or disable the text selection.
+   * @param[in] enabled Whether to enable the text selection.
+   */
+  void SetSelectionEnabled( bool enabled );
+
+  /**
+   * @brief Whether the text selection is enabled or not.
+   * @return True if the text selection is enabled
+   */
+  bool IsSelectionEnabled() const;
 
   /**
    * @brief Sets input type to password
@@ -423,6 +460,18 @@ public: // Configure the text controller.
   void ShadowSetByString( bool setByString );
 
   /**
+   * @brief Query if outline settings were provided by string or map
+   * @return bool true if set by string
+   */
+  bool IsOutlineSetByString();
+
+  /**
+   * Set method outline setting were set by
+   * @param[in] bool, true if set by string
+   */
+  void OutlineSetByString( bool setByString );
+
+  /**
    * @brief Query if font style settings were provided by string or map
    * @return bool true if set by string
    */
@@ -490,6 +539,19 @@ public: // Default style & Input style
   const std::string& GetDefaultFontFamily() const;
 
   /**
+   * @brief Sets the placeholder text font family.
+   * @param[in] placeholderTextFontFamily The placeholder text font family.
+   */
+  void SetPlaceholderFontFamily( const std::string& placeholderTextFontFamily );
+
+  /**
+   * @brief Retrieves the placeholder text font family.
+   *
+   * @return The placeholder text font family
+   */
+  const std::string& GetPlaceholderFontFamily() const;
+
+  /**
    * @brief Sets the default font weight.
    *
    * @param[in] weight The font weight.
@@ -507,6 +569,27 @@ public: // Default style & Input style
    * @return The default font weight.
    */
   FontWeight GetDefaultFontWeight() const;
+
+  /**
+   * @brief Sets the placeholder text font weight.
+   *
+   * @param[in] weight The font weight
+   */
+  void SetPlaceholderTextFontWeight( FontWeight weight );
+
+  /**
+   * @brief Whether the font's weight has been defined.
+   *
+   * @return True if the placeholder text font weight is defined
+   */
+  bool IsPlaceholderTextFontWeightDefined() const;
+
+  /**
+   * @brief Retrieves the placeholder text font weight.
+   *
+   * @return The placeholder text font weight
+   */
+  FontWeight GetPlaceholderTextFontWeight() const;
 
   /**
    * @brief Sets the default font width.
@@ -528,6 +611,27 @@ public: // Default style & Input style
   FontWidth GetDefaultFontWidth() const;
 
   /**
+   * @brief Sets the placeholder text font width.
+   *
+   * @param[in] width The font width
+   */
+  void SetPlaceholderTextFontWidth( FontWidth width );
+
+  /**
+   * @brief Whether the font's width has been defined.
+   *
+   * @return True if the placeholder text font width is defined
+   */
+  bool IsPlaceholderTextFontWidthDefined() const;
+
+  /**
+   * @brief Retrieves the placeholder text font width.
+   *
+   * @return The placeholder text font width
+   */
+  FontWidth GetPlaceholderTextFontWidth() const;
+
+  /**
    * @brief Sets the default font slant.
    *
    * @param[in] slant The font slant.
@@ -547,9 +651,30 @@ public: // Default style & Input style
   FontSlant GetDefaultFontSlant() const;
 
   /**
+   * @brief Sets the placeholder text font slant.
+   *
+   * @param[in] slant The font slant
+   */
+  void SetPlaceholderTextFontSlant( FontSlant slant );
+
+  /**
+   * @brief Whether the font's slant has been defined.
+   *
+   * @return True if the placeholder text font slant is defined
+   */
+  bool IsPlaceholderTextFontSlantDefined() const;
+
+  /**
+   * @brief Retrieves the placeholder text font slant.
+   *
+   * @return The placeholder text font slant
+   */
+  FontSlant GetPlaceholderTextFontSlant() const;
+
+  /**
    * @brief Set the default font size.
    *
-   * @param[in] size The default font size.
+   * @param[in] fontSize The default font size
    * @param[in] type The font size type is point size or pixel size
    */
   void SetDefaultFontSize( float fontSize, FontSizeType type );
@@ -561,6 +686,20 @@ public: // Default style & Input style
    * @return The default point size.
    */
   float GetDefaultFontSize( FontSizeType type ) const;
+
+  /**
+   * @brief Sets the Placeholder text font size.
+   * @param[in] fontSize The placeholder text font size
+   * @param[in] type The font size type is point size or pixel size
+   */
+  void SetPlaceholderTextFontSize( float fontSize, FontSizeType type );
+
+  /**
+   * @brief Retrieves the Placeholder text font size.
+   * @param[in] type The font size type
+   * @return The placeholder font size
+   */
+  float GetPlaceholderTextFontSize( FontSizeType type ) const;
 
   /**
    * @brief Sets the text's default color.
@@ -619,6 +758,20 @@ public: // Default style & Input style
   const Vector4& GetShadowColor() const;
 
   /**
+   * @brief Set the shadow blur radius.
+   *
+   * @param[in] shadowBlurRadius The shadow blur radius, 0,0 indicates no blur.
+   */
+  void SetShadowBlurRadius( const float& shadowBlurRadius );
+
+  /**
+   * @brief Retrieve the shadow blur radius.
+   *
+   * @return The shadow blur radius.
+   */
+  const float& GetShadowBlurRadius() const;
+
+  /**
    * @brief Set the underline color.
    *
    * @param[in] color color of underline.
@@ -659,6 +812,34 @@ public: // Default style & Input style
    * @return The height of the underline, or 0 if height is not overrided.
    */
   float GetUnderlineHeight() const;
+
+  /**
+   * @brief Set the outline color.
+   *
+   * @param[in] color color of outline.
+   */
+  void SetOutlineColor( const Vector4& color );
+
+  /**
+   * @brief Retrieve the outline color.
+   *
+   * @return The outline color.
+   */
+  const Vector4& GetOutlineColor() const;
+
+  /**
+   * @brief Set the outline width
+   *
+   * @param[in] width The width in pixels of the outline, 0 indicates no outline
+   */
+  void SetOutlineWidth( float width );
+
+  /**
+   * @brief Retrieves the width of an outline
+   *
+   * @return The width of the outline.
+   */
+  float GetOutlineWidth() const;
 
   /**
    * @brief Sets the emboss's properties string.
@@ -883,6 +1064,13 @@ public: // Default style & Input style
    */
   const std::string& GetInputOutlineProperties() const;
 
+  /**
+   * @brief Set the control's interface.
+   *
+   * @param[in] controlInterface The control's interface.
+   */
+  void SetControlInterface( ControlInterface* controlInterface );
+
 public: // Queries & retrieves.
 
   /**
@@ -908,6 +1096,13 @@ public: // Queries & retrieves.
    * @copydoc Control::GetHeightForWidth()
    */
   float GetHeightForWidth( float width );
+
+  /**
+   * @brief Retrieves the text's number of lines for a given width.
+   * @param[in] width The width of the text's area.
+   * @ return The number of lines.
+   */
+  int GetLineCount( float width );
 
   /**
    * @brief Retrieves the text's model.
@@ -944,6 +1139,20 @@ public: // Queries & retrieves.
    * @brief Used to get the hidden input option
    */
   void GetHiddenInputOption( Property::Map& options );
+
+  /**
+   * @brief Sets the Placeholder Properties.
+   *
+   * @param[in] map The placeholder property map
+   */
+  void SetPlaceholderProperty( const Property::Map& map );
+
+  /**
+   * @brief Retrieves the Placeholder Property map.
+   *
+   * @param[out] map The property map
+   */
+  void GetPlaceholderProperty( Property::Map& map );
 
 public: // Relayout.
 
@@ -1035,6 +1244,13 @@ public: // Text-input Event Queuing.
    * @brief Event from Clipboard notifying an Item has been selected for pasting
    */
   void PasteClipboardItemEvent();
+
+  /**
+   * @brief Return true when text control should clear key input focus when escape key is pressed.
+   *
+   * @return Whether text control should clear key input focus or not when escape key is pressed.
+   */
+  bool ShouldClearFocusOnEscape() const;
 
 protected: // Inherit from Text::Decorator::ControllerInterface.
 

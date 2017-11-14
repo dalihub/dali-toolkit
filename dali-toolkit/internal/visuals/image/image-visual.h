@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,20 @@
  */
 
 // EXTERNAL INCLUDES
+#include <memory>
+
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/devel-api/object/weak-handle.h>
+#include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/image-loader/atlas-upload-observer.h>
 #include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 
 namespace Dali
 {
@@ -46,21 +49,25 @@ class ImageVisual;
 typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
 
 /**
- * The visual which renders an image to the control's quad
+ * The visual which renders an image to a quad geometry
  *
  * The following properties are optional
  *
- * | %Property Name     | Type              |
- * |--------------------|-------------------|
- * | url                | STRING            |
- * | fittingMode        | INTEGER OR STRING |
- * | samplingMode       | INTEGER OR STRING |
- * | desiredWidth       | INTEGER           |
- * | desiredHeight      | INTEGER           |
- * | synchronousLoading | BOOLEAN           |
- * | pixelArea          | VECTOR4           |
- * | wrapModeU          | INTEGER OR STRING |
- * | wrapModeV          | INTEGER OR STRING |
+ * | %Property Name        | Type              |
+ * |-----------------------|-------------------|
+ * | url                   | STRING            |
+ * | alphaMaskUrl          | STRING            |
+ * | fittingMode           | INTEGER OR STRING |
+ * | samplingMode          | INTEGER OR STRING |
+ * | desiredWidth          | INTEGER           |
+ * | desiredHeight         | INTEGER           |
+ * | synchronousLoading    | BOOLEAN           |
+ * | pixelArea             | VECTOR4           |
+ * | wrapModeU             | INTEGER OR STRING |
+ * | wrapModeV             | INTEGER OR STRING |
+ * | loadPolicy            | INTEGER OR STRING |
+ * | releasePolicy         | INTEGER OR STRING |
+ * | orientationCorrection | BOOLEAN           |
  *
  * where pixelArea is a rectangular area.
  * In its Vector4 value, the first two elements indicate the top-left position of the area,
@@ -91,6 +98,14 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *   "DONT_CARE"
  *   "DEFAULT"
  *
+ * where loadPolicy should be one of the following image loading modes
+ *   "IMMEDIATE"   // Loads image even if visual not attached to stage yet
+ *   "ATTACHED"    // Only loads image once visual is attached to stage
+ *
+ * where releasePolicy should be one of the following policies for when to cache the image
+ *   "DETACHED"    //  Release image from cache when visual detached from stage
+ *   "DESTROYED"   //  Keep image in cache until the visual is destroyed
+ *   "NEVER"       //  Keep image in cache until application ends.
  *
  * If the Visual is in a LayerUI it will pixel align the image, using a Layer3D will disable pixel alignment.
  * Changing layer behaviour between LayerUI to Layer3D whilst the visual is already staged will not have an effect.
@@ -214,6 +229,11 @@ protected:
    */
   virtual void OnSetTransform();
 
+  /**
+   * @copydoc Visual::Base::IsResourceReady
+   */
+  virtual bool IsResourceReady() const;
+
 public:
 
   /**
@@ -238,9 +258,14 @@ public:
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  virtual void UploadComplete( bool success, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle );
+  virtual void UploadComplete( bool success, int32_t textureId, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle );
 
 private:
+
+  /**
+   * Allocate the mask data when a masking property is defined in the property map
+   */
+  void AllocateMaskData();
 
   /**
    * @brief Applies the image to the texture set used for this renderer
@@ -248,6 +273,15 @@ private:
    * @param[in] image The Image to apply to the texture set used for this renderer
    */
   void ApplyImageToSampler( const Image& image );
+
+  /**
+   * @brief Load the texture, will try to atlas unless unable or param set to false.
+   * @param[in, out] atlasing flag if the image has been put in a atlas (true), passing false will not atlas even if possible.
+   * @param[out] atlasRect if atlasing is used this the texture area of the image in the atlas.
+   * @param[out] textures resulting texture set from the image loading.
+   * @param[in] orientationCorrection flag determines if orientation correction should be performed
+   */
+  void LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection );
 
   /**
    * @brief Initializes the Dali::Renderer from the image url
@@ -280,11 +314,6 @@ private:
   bool IsSynchronousResourceLoading() const;
 
   /**
-   * @brief Load the resource synchronously
-   */
-  void LoadResourceSynchronously();
-
-  /**
    * Creates the texture set and adds the texture to it
    * @param[out] textureRect The texture area of the texture in the atlas.
    * @param[in] url The URL of the image resource to use.
@@ -301,9 +330,9 @@ private:
   void SetTextureRectUniform( const Vector4& textureRect  );
 
   /**
-   * Remove the texture if it is not used anymore.
+   * Remove texture with valid TextureId
    */
-  void RemoveTexture(const std::string& url);
+  void RemoveTexture();
 
   /**
    * Helper method to set individual values by index key.
@@ -315,21 +344,28 @@ private:
 private:
 
   Image mImage;
-  PixelData mPixels;
   Vector4 mPixelArea;
   WeakHandle<Actor> mPlacementActor;
   VisualUrl mImageUrl;
+  TextureManager::MaskingDataPointer mMaskingData;
 
   Dali::ImageDimensions mDesiredSize;
   TextureManager::TextureId mTextureId;
+  TextureSet mTextures;
 
   Dali::FittingMode::Type mFittingMode:3;
   Dali::SamplingMode::Type mSamplingMode:4;
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
-  bool mAttemptAtlasing:1; ///< If true will attempt atlasing, otherwise create unique texture
-  bool mTextureLoading:1;  ///< True if the texture is being loaded asynchronously, or false when it has loaded.
+  DevelImageVisual::LoadPolicy::Type mLoadPolicy;
+  DevelImageVisual::ReleasePolicy::Type mReleasePolicy;
+  Vector4 mAtlasRect;
+  bool mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
+  bool mLoading;  ///< True if the texture is still loading.
+  bool mOrientationCorrection; ///< true if the image will have it's orientation corrected.
 };
+
+
 
 } // namespace Internal
 

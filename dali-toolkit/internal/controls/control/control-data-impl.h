@@ -41,20 +41,21 @@ namespace Toolkit
 namespace Internal
 {
 
-/**
+ /**
   * Struct used to store Visual within the control, index is a unique key for each visual.
   */
- struct RegisteredVisual
- {
-   Property::Index index;
-   Toolkit::Visual::Base visual;
-   bool enabled;
+struct RegisteredVisual
+{
+  Property::Index index;
+  Toolkit::Visual::Base visual;
+  bool enabled : 1;
+  bool pending : 1;
 
-   RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, bool aEnabled)
-   : index(aIndex), visual(aVisual), enabled(aEnabled)
-   {
-   }
- };
+  RegisteredVisual( Property::Index aIndex, Toolkit::Visual::Base &aVisual, bool aEnabled, bool aPendingReplacement )
+  : index(aIndex), visual(aVisual), enabled(aEnabled), pending( aPendingReplacement )
+  {
+  }
+};
 
 typedef Dali::OwnerContainer< RegisteredVisual* > RegisteredVisualContainer;
 
@@ -133,7 +134,17 @@ public:
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
    */
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex );
+
+  /**
+   * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
+   */
   void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
+
+  /**
+   * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
+   */
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex );
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::UnregisterVisual()
@@ -166,6 +177,11 @@ public:
    * @param[in] visual The visual to start observing
    */
   void StartObservingVisual( Toolkit::Visual::Base& visual);
+
+  /**
+   * @copydoc Dali::Toolkit::DevelControl::GetVisualResourceStatus()
+   */
+  Toolkit::Visual::ResourceStatus GetVisualResourceStatus( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::CreateTransition()
@@ -249,6 +265,76 @@ public:
    */
   bool IsResourceReady() const;
 
+  /**
+   * @copydoc CustomActorImpl::OnStageDisconnection()
+   */
+  void OnStageDisconnection();
+
+  /**
+   * @brief Sets the margin.
+   * @param[in] margin Margin is a collections of extent ( start, end, top, bottom )
+   */
+  void SetMargin( Extents margin );
+
+  /**
+   * @brief Returns the value of margin
+   * @return The value of margin
+   */
+  Extents GetMargin() const;
+
+  /**
+   * @brief Sets the padding.
+   * @param[in] padding Padding is a collections of extent ( start, end, top, bottom ).
+   */
+  void SetPadding( Extents padding );
+
+  /**
+   * @brief Returns the value of padding
+   * @return The value of padding
+   */
+  Extents GetPadding() const;
+
+private:
+
+  /**
+   * Used as an alternative to boolean so that it is obvious whether a visual is enabled/disabled.
+   */
+  struct VisualState
+  {
+    enum Type
+    {
+      DISABLED = 0, ///< Visual disabled.
+      ENABLED = 1   ///< Visual enabled.
+    };
+  };
+
+  /**
+   * Used as an alternative to boolean so that it is obvious whether a visual's depth value has been set or not by the caller.
+   */
+  struct DepthIndexValue
+  {
+    enum Type
+    {
+      NOT_SET = 0, ///< Visual depth value not set by caller.
+      SET = 1      ///< Visual depth value set by caller.
+    };
+  };
+
+  /**
+   * @brief Adds the visual to the list of registered visuals.
+   * @param[in] index The Property index of the visual, used to reference visual
+   * @param[in,out] visual The visual to register, which can be altered in this function
+   * @param[in] enabled false if derived class wants to control when visual is set on stage
+   * @param[in] depthIndexValueSet Set to true if the depthIndex has actually been set manually
+   * @param[in] depthIndex The visual's depth-index is set to this
+   *
+   * @note Registering a visual with an index that already has a registered visual will replace it. The replacement will
+   *       occur once the replacement visual is ready (loaded).
+   */
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex = 0 );
+
+public:
+
   Control& mControlImpl;
   DevelControl::State mState;
   std::string mSubStateName;
@@ -262,11 +348,12 @@ public:
   std::string mStyleName;
   Vector4 mBackgroundColor;               ///< The color of the background visual
   Vector3* mStartingPinchScale;           ///< The scale when a pinch gesture starts, TODO: consider removing this
+  Extents mMargin;                        ///< The margin values
+  Extents mPadding;                       ///< The padding values
   Toolkit::Control::KeyEventSignalType mKeyEventSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
-
-  Toolkit::DevelControl::ResourceReadySignalType mResourceReadySignal;
+  Toolkit::Control::ResourceReadySignalType mResourceReadySignal;
 
   // Gesture Detection
   PinchGestureDetector mPinchGestureDetector;
@@ -281,6 +368,8 @@ public:
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
 
+  RegisteredVisualContainer mRemoveVisuals;         ///< List of visuals that are being replaced by another visual once ready
+
   // Properties - these need to be members of Internal::Control::Impl as they access private methods/data of Internal::Control and Internal::Control::Impl.
   static const PropertyRegistration PROPERTY_1;
   static const PropertyRegistration PROPERTY_2;
@@ -294,6 +383,8 @@ public:
   static const PropertyRegistration PROPERTY_10;
   static const PropertyRegistration PROPERTY_11;
   static const PropertyRegistration PROPERTY_12;
+  static const PropertyRegistration PROPERTY_13;
+  static const PropertyRegistration PROPERTY_14;
 };
 
 

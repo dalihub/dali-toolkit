@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,8 +179,9 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                    int keyModifier,
                                    unsigned long timeStamp,
                                    const Integration::KeyEvent::State& keyState,
-                                   const std::string& deviceName,
-                                   const DevelKeyEvent::DeviceClass::Type& deviceClass
+                                   const std::string& deviceName = "",
+                                   const Device::Class::Type& deviceClass = Device::Class::NONE,
+                                   const Device::Subclass::Type& deviceSubclass = Device::Subclass::NONE
                                    )
 {
   return Integration::KeyEvent( keyName,
@@ -190,7 +191,8 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                 timeStamp,
                                 keyState,
                                 deviceName,
-                                deviceClass );
+                                deviceClass,
+                                deviceSubclass );
 }
 
 } // Anonymous namespace
@@ -1430,7 +1432,7 @@ int UtcDaliPopupOnKeyEvent(void)
 
   popup.SetKeyInputFocus();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", DevelKeyEvent::DeviceClass::TOUCH ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", Device::Class::TOUCH, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 

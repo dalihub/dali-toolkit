@@ -27,6 +27,8 @@
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-model.h>
 #include <dali-toolkit/internal/text/text-view.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 
 namespace Dali
 {
@@ -39,6 +41,7 @@ namespace Text
 
 //Forward declarations
 struct CursorInfo;
+struct FontDefaults;
 
 struct Event
 {
@@ -104,6 +107,7 @@ struct EventData
 
   DecoratorPtr       mDecorator;               ///< Pointer to the decorator.
   ImfManager         mImfManager;              ///< The Input Method Framework Manager.
+  FontDefaults*      mPlaceholderFont;         ///< The placeholder default font.
   std::string        mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus.
   std::string        mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive.
   Vector4            mPlaceholderTextColor;    ///< The in/active placeholder text color.
@@ -154,6 +158,9 @@ struct EventData
   bool mUpdateInputStyle                : 1;   ///< Whether to update the input style after moving the cursor.
   bool mPasswordInput                   : 1;   ///< True if password input is enabled.
   bool mCheckScrollAmount               : 1;   ///< Whether to check scrolled amount after updating the position
+  bool mIsPlaceholderPixelSize          : 1;   ///< True if the placeholder font size is set as pixel size.
+  bool mIsPlaceholderElideEnabled       : 1;   ///< True if the placeholder text's elide is enabled.
+  bool mPlaceholderEllipsisFlag         : 1;   ///< True if the text controller sets the placeholder ellipsis.
 };
 
 struct ModifyEvent
@@ -317,7 +324,9 @@ struct Controller::Impl
     mAutoScrollDirectionRTL( false ),
     mUnderlineSetByString( false ),
     mShadowSetByString( false ),
-    mFontStyleSetByString( false )
+    mOutlineSetByString( false ),
+    mFontStyleSetByString( false ),
+    mShouldClearFocusOnEscape( true )
   {
     mModel = Model::New();
 
@@ -333,6 +342,17 @@ struct Controller::Impl
     // Set the text properties to default
     mModel->mVisualModel->SetUnderlineEnabled( false );
     mModel->mVisualModel->SetUnderlineHeight( 0.0f );
+
+    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+    if( styleManager )
+    {
+      bool temp;
+      Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
+      if( config["clearFocusOnEscape"].Get( temp ) )
+      {
+        mShouldClearFocusOnEscape = temp;
+      }
+    }
   }
 
   ~Impl()
@@ -726,7 +746,9 @@ public:
 
   bool mUnderlineSetByString:1;            ///< Set when underline is set by string (legacy) instead of map
   bool mShadowSetByString:1;               ///< Set when shadow is set by string (legacy) instead of map
+  bool mOutlineSetByString:1;              ///< Set when outline is set by string (legacy) instead of map
   bool mFontStyleSetByString:1;            ///< Set when font style is set by string (legacy) instead of map
+  bool mShouldClearFocusOnEscape:1;        ///< Whether text control should clear key input focus
 };
 
 } // namespace Text

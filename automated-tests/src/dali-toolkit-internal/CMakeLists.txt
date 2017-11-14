@@ -7,24 +7,25 @@ SET(CAPI_LIB "dali-toolkit-internal")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
- utc-Dali-Text-CharacterSetConversion.cpp
- utc-Dali-Text-Cursor.cpp
- utc-Dali-Text-Segmentation.cpp
- utc-Dali-Text-MultiLanguage.cpp
- utc-Dali-LogicalModel.cpp
  utc-Dali-BidirectionalSupport.cpp
- utc-Dali-Text-Shaping.cpp
- utc-Dali-VisualModel.cpp
- utc-Dali-Text-Layout.cpp
- utc-Dali-Text-Controller.cpp
- utc-Dali-VisualUrl.cpp
- utc-Dali-Text-Markup.cpp
- utc-Dali-Text-Typesetter.cpp
- utc-Dali-Text-ViewModel.cpp
+ utc-Dali-ColorConversion.cpp
  utc-Dali-DebugRendering.cpp
  utc-Dali-ItemView-internal.cpp
+ utc-Dali-LogicalModel.cpp
  utc-Dali-PropertyHelper.cpp
- utc-Dali-ColorConversion.cpp
+ utc-Dali-Text-CharacterSetConversion.cpp
+ utc-Dali-Text-Controller.cpp
+ utc-Dali-Text-Cursor.cpp
+ utc-Dali-Text-Layout.cpp
+ utc-Dali-Text-Markup.cpp
+ utc-Dali-Text-MultiLanguage.cpp
+ utc-Dali-Text-Segmentation.cpp
+ utc-Dali-Text-Shaping.cpp
+ utc-Dali-Text-Typesetter.cpp
+ utc-Dali-Text-ViewModel.cpp
+ utc-Dali-TextureManager.cpp
+ utc-Dali-VisualModel.cpp
+ utc-Dali-VisualUrl.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
@@ -67,7 +68,8 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali-toolkit
 )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 -ggdb --coverage -Wall -Werror")
+ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
+ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
 
@@ -85,7 +87,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
-    -lpthread
+    -lpthread --coverage
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

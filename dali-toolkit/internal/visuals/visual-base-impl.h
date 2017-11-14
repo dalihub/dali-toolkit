@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/devel-api/direction-enums.h>
 
 namespace Dali
 {
@@ -109,12 +110,12 @@ public:
   /**
    * @copydoc Toolkit::Visual::Base::SetDepthIndex
    */
-  void SetDepthIndex( float index );
+  void SetDepthIndex( int index );
 
   /**
    * @copydoc Toolkit::Visual::Base::GetDepthIndex
    */
-  float GetDepthIndex() const;
+  int GetDepthIndex() const;
 
   /**
    * @copydoc Toolkit::Visual::Base::SetOnStage
@@ -145,9 +146,9 @@ public:
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
    *
-   * @param[in] preMultipled whether alpha is pre-multiplied.
+   * @param[in] preMultiplied whether alpha is pre-multiplied.
    */
-  void EnablePreMultipliedAlpha( bool preMultipled );
+  void EnablePreMultipliedAlpha( bool preMultiplied );
 
   /**
    * @brief Query whether alpha is pre-multiplied.
@@ -225,13 +226,19 @@ public:
   /**
    * @brief Called when the visuals resources are loaded / ready
    */
-  void ResourceReady();
+  void ResourceReady( Toolkit::Visual::ResourceStatus resourceStatus );
 
   /**
    * @brief Called when the visuals resources are loaded / ready
    * @return true if ready, false otherwise
    */
-  bool IsResourceReady() const;
+  virtual bool IsResourceReady() const;
+
+  /**
+   * @brief Get the loading state of the visual resource
+   * @return Return the loading status (PREPARING, READY and FAILED) of visual resource
+   */
+  Toolkit::Visual::ResourceStatus GetResourceStatus() const;
 
 protected:
 

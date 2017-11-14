@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -131,6 +132,14 @@ void Control::ClearBackground()
   Internal::GetImplementation(*this).ClearBackground();
 }
 
+bool Control::IsResourceReady() const
+{
+  const Internal::Control& internalControl = Toolkit::Internal::GetImplementation( *this );
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
+
+  return controlDataImpl.IsResourceReady();
+}
+
 Control::KeyEventSignalType& Control::KeyEventSignal()
 {
   return Internal::GetImplementation(*this).KeyEventSignal();
@@ -144,6 +153,14 @@ Control::KeyInputFocusSignalType& Control::KeyInputFocusGainedSignal()
 Control::KeyInputFocusSignalType& Control::KeyInputFocusLostSignal()
 {
   return Internal::GetImplementation(*this).KeyInputFocusLostSignal();
+}
+
+Control::ResourceReadySignalType&  Control::ResourceReadySignal()
+{
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( *this );
+  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
+
+  return controlImpl.mResourceReadySignal;
 }
 
 Control::Control(Internal::Control& implementation)

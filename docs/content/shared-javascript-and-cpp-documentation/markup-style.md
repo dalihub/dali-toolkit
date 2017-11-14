@@ -126,4 +126,56 @@ field.SetProperty( TextLabel::Property::TEXT, "<font family='SamsungSans' weight
 field.text = "<font family='SamsungSans' weight='bold'>Hello world</font>";
 ~~~
 
+## XHTML ENTITIES
+
+Single characters can be embedded into text using character entity references. These references have a numeric value as well as a named value.
+You can use either one of them.
+
+XHTML ENTITIES Format:
+- Named reference : "&entity_name;" (i.e. an ampersand, the entity name, and then a semi-colon).
+- Numeric reference:
+- a. Decimal reference : "&#decimal_code;" (i.e. an ampersand, a hash symbol (which signals that a number reference is coming), the character's number, and then a semi colon)
+- b. Hex reference     : "&#xhex-code;" (i.e. an ampersand, a hash symbol (which signals that a number reference is coming), x which indicates the character's number is in hex, and then a semi colon)
+
+
+~~~{.cpp}
+// C++
+field.SetProperty( TextLabel::Property::TEXT, "Named Entity: &amp;  Numeric Entity: Decimal Entity: &#9827;  Hex Entity: &#x2660;" );
+~~~
+
+![ ](XHTML_entity.png)
+
+## SPECIAL CHARACTERS HANDLING IN MARKUP
+
+Three special characters are supported :
+- < : Less Than. It means beginning of tag.
+- > : Greater Than. It means end of tag.
+- & : Ampersand. It means beginning of XHTML Entity.
+
+> "&" usage in markup style changed from Tizen 4.0.
+"To display special character needs as regular, prepend it with two backslashes in the string."
+
+Below are some examples
+
+~~~{.cpp}
+// C++ ( Wrong usage to print text "Testing of < special character" )
+field.SetProperty( TextLabel::Property::TEXT, "Testing of < special character" );
+~~~
+
+![ ](SpecialCharacter1.png)
+
+~~~{.cpp}
+// C++ ( Wrong usage to print text "Testing of & special character" )
+field.SetProperty( TextLabel::Property::TEXT, "Testing of & special character" );
+~~~
+
+![ ](SpecialCharacter1.png)
+
+~~~{.cpp}
+// C++ ( Correct usage to print text "Testing of & < > special characters" )
+field.SetProperty( TextLabel::Property::TEXT, "Testing of \\& \\< \\> special characters" );
+~~~
+
+![ ](SpecialCharacters.png)
+
 */

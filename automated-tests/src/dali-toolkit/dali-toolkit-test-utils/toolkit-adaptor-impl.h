@@ -52,9 +52,9 @@ public:
 
   virtual void StartRender() {}
 
-  virtual bool PreRender( EglInterface& egl, Integration::GlAbstraction& glAbstraction ) { return false; }
+  virtual bool PreRender( EglInterface& egl, Integration::GlAbstraction& glAbstraction, bool resizingSurface ) { return false; }
 
-  virtual void PostRender( EglInterface& egl, Integration::GlAbstraction& glAbstraction, DisplayConnection* displayConnection, bool replacingSurface ) {}
+  virtual void PostRender( EglInterface& egl, Integration::GlAbstraction& glAbstraction, DisplayConnection* displayConnection, bool replacingSurface, bool resizingSurface ) {}
 
   virtual void StopRender() {}
 

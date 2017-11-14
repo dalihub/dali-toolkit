@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_CONTROL_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ class Control;
  * | keyEvent               | @ref KeyEventSignal()                               |
  * | keyInputFocusGained    | @ref KeyInputFocusGainedSignal()                    |
  * | keyInputFocusLost      | @ref KeyInputFocusLostSignal()                      |
+ * | resourceReady          | @ref ResourceReadySignal()                          |
  * | tapped                 | @ref GetTapGestureDetector().DetectedSignal()       |
  * | panned                 | @ref GetPanGestureDetector().DetectedSignal()       |
  * | pinched                | @ref GetPinchGestureDetector().DetectedSignal()     |
@@ -96,35 +97,65 @@ public:
     enum
     {
       /**
-       * @brief name "styleName", type std::string.
+       * @brief The name of the style to be applied to the control.
+       * @details Name "styleName", type Property::STRING.
+       * @see Toolkit::Control::SetStyleName()
        * @SINCE_1_0.0
-       * @see SetStyleName
        */
       STYLE_NAME = PROPERTY_START_INDEX,
+
       /**
        * @DEPRECATED_1_1.3
-       * @brief name "backgroundColor", mutually exclusive with BACKGROUND_IMAGE & BACKGROUND,  type Vector4.
+       * @brief The background color of the control.
+       *
+       * Mutually exclusive with BACKGROUND_IMAGE & BACKGROUND.
+       * @details Name "backgroundColor", type Property::VECTOR4.
+       * @see Toolkit::Control::SetStyleName()
        * @SINCE_1_0.0
-       * @see SetStyleName
        */
       BACKGROUND_COLOR,
+
       /**
        * @DEPRECATED_1_1.3
-       * @brief name "backgroundImage", mutually exclusive with BACKGROUND_COLOR & BACKGROUND,  type Map.
+       * @brief The background image of the control.
+       *
+       * Mutually exclusive with BACKGROUND_COLOR & BACKGROUND.
+       * @details Name "backgroundImage", type Property::MAP.
        * @SINCE_1_0.0
        */
       BACKGROUND_IMAGE,
+
       /**
-       * @brief name "keyInputFocus", type bool.
+       * @brief Receives key events to the control.
+       * @details Name "keyInputFocus", type Property::BOOLEAN.
+       * @see Toolkit::Control::SetKeyInputFocus()
        * @SINCE_1_0.0
-       * @see SetKeyInputFocus
        */
       KEY_INPUT_FOCUS,
+
       /**
-       * @brief name "background", mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE, type Map or std::string for URL or Vector4 for Color.
+       * @brief The background of the control.
+       *
+       * Mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE.
+       * @details Name "background", type Property::MAP or std::string for URL or Property::VECTOR4 for Color.
        * @SINCE_1_1.3
        */
       BACKGROUND,
+
+      /**
+       * @brief The outer space around the control.
+       * @details Name "margin", type Property::EXTENTS.
+       * @SINCE_1_2.62
+       * @note Margin property is to be supported by Layout algorithms and containers in future.
+       */
+      MARGIN,
+
+      /**
+       * @brief The inner space of the control.
+       * @details Name "padding", type Property::EXTENTS.
+       * @SINCE_1_2.62
+       */
+      PADDING
     };
   };
 
@@ -151,11 +182,14 @@ public:
 
   // Typedefs
 
-  /// @brief Key Event signal type;
+  /// @brief Key Event signal type. @SINCE_1_0.0
   typedef Signal<bool ( Control, const KeyEvent& ) > KeyEventSignalType;
 
-  /// @brief Key InputFocusType signal type;
+  /// @brief Key InputFocusType signal type. @SINCE_1_0.0
   typedef Signal<void ( Control ) > KeyInputFocusSignalType;
+
+  /// @brief ResourceReady signal type. @SINCE_1_2.60
+  typedef Signal<void ( Control ) > ResourceReadySignalType;
 
 public: // Creation & Destruction
 
@@ -350,6 +384,17 @@ public:
    */
   void ClearBackground();
 
+  // Resources
+
+  /**
+   * @brief Query if all resources required by a control are loaded and ready.
+   *
+   * Most resources are only loaded when the control is placed on stage.
+   * @SINCE_1_2.60
+   * @return true if the resources are loaded and ready, false otherwise
+   */
+  bool IsResourceReady() const;
+
   // Signals
 
   /**
@@ -383,8 +428,9 @@ public:
   KeyInputFocusSignalType& KeyInputFocusGainedSignal();
 
   /**
-   * @brief This signal is emitted when the control loses Key Input Focus
-   * which could be due to it being gained by another Control or Actor or just cleared from
+   * @brief This signal is emitted when the control loses Key Input Focus.
+   *
+   * This could be due to it being gained by another Control or Actor or just cleared from
    * this control as no longer required.
    *
    * A callback of the following type may be connected:
@@ -398,6 +444,21 @@ public:
    * @pre The Control has been initialized.
    */
   KeyInputFocusSignalType& KeyInputFocusLostSignal();
+
+  /**
+   * @brief This signal is emitted after all resources required by a control are loaded and ready.
+   *
+   * Most resources are only loaded when the control is placed on stage.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( Control control );
+   * @endcode
+   *
+   * @SINCE_1_2.60
+   * @note A RelayoutRequest is queued by Control before this signal is emitted
+   */
+  ResourceReadySignalType& ResourceReadySignal();
 
 public: // Intended for control developers
 

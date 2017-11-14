@@ -50,7 +50,14 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali-toolkit
 )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 -ggdb --coverage -Wall -Werror")
+#ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
+# ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
+# This works for a homogenous C++ project, but not for mixed C++/C project
+# On CMake >= 3.3, could use
+# ADD_COMPILE_OPTIONS( "$<$<COMPILE_LANGUAGE:CXX>:${${CAPI_LIB}_CFLAGS_OTHER}>" )
+# However, we need to support CMake 2.8, so instead, fall back to setting the CXX_FLAGS directly:
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb --coverage -Wall -Werror" )
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${${CAPI_LIB}_CFLAGS_OTHER}" )
 
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
     SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${directory}")
@@ -65,7 +72,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
-    -lpthread
+    -lpthread --coverage
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

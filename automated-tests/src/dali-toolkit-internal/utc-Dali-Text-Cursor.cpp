@@ -206,13 +206,18 @@ bool GetCursorPositionTest( const GetCursorPositionData& data )
                    visualModel,
                    metrics );
 
+  GetCursorPositionParameters parameters;
+  parameters.visualModel = visualModel;
+  parameters.logicalModel = logicalModel;
+  parameters.metrics = metrics;
+  parameters.isMultiline = true;
+
   for( unsigned int index = 0; index < data.numberOfTests; ++index )
   {
     CursorInfo cursorInfo;
-    GetCursorPosition( visualModel,
-                       logicalModel,
-                       metrics,
-                       data.logicalIndex[index],
+    parameters.logical = data.logicalIndex[index];
+
+    GetCursorPosition( parameters,
                        cursorInfo );
 
     if( cursorInfo.primaryPosition.x != data.visualX[index] )

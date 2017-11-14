@@ -8,6 +8,7 @@ SET(CAPI_LIB "dali-toolkit")
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
    utc-Dali-Alignment.cpp
+   utc-Dali-AnimatedImageVisual.cpp
    utc-Dali-BloomView.cpp
    utc-Dali-BubbleEmitter.cpp
    utc-Dali-Builder.cpp
@@ -35,6 +36,7 @@ SET(TC_SOURCES
    utc-Dali-TextSelectionPopup.cpp
    utc-Dali-TextSelectionPopupMirroringLTR.cpp
    utc-Dali-TextSelectionPopupMirroringRTL.cpp
+   utc-Dali-TextureManager.cpp
    utc-Dali-ToolBar.cpp
    utc-Dali-Tooltip.cpp
    utc-Dali-TransitionData.cpp
@@ -70,7 +72,6 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-adaptor.cpp
    dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    dali-toolkit-test-utils/toolkit-application.cpp
-   dali-toolkit-test-utils/toolkit-bitmap-loader.cpp
    dali-toolkit-test-utils/toolkit-clipboard.cpp
    dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
@@ -84,6 +85,7 @@ LIST(APPEND TC_SOURCES
    dali-toolkit-test-utils/toolkit-tts-player.cpp
    dali-toolkit-test-utils/toolkit-native-image-source.cpp
    dali-toolkit-test-utils/toolkit-video-player.cpp
+   dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
    dali-toolkit-test-utils/dali-test-suite-utils.cpp
    dali-toolkit-test-utils/dummy-control.cpp
    dali-toolkit-test-utils/mesh-builder.cpp
@@ -108,7 +110,8 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali-toolkit
 )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 -ggdb --coverage -Wall -Werror")
+ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
+ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
 
@@ -125,7 +128,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
-    -lpthread
+    -lpthread --coverage
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

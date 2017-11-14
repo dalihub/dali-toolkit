@@ -70,9 +70,10 @@ namespace Text
 EventData::EventData( DecoratorPtr decorator )
 : mDecorator( decorator ),
   mImfManager(),
+  mPlaceholderFont( NULL ),
   mPlaceholderTextActive(),
   mPlaceholderTextInactive(),
-  mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ),
+  mPlaceholderTextColor( 0.8f, 0.8f, 0.8f, 0.8f ), // This color has been published in the Public API (placeholder-properties.h).
   mEventQueue(),
   mInputStyleChangedQueue(),
   mPreviousState( INACTIVE ),
@@ -104,7 +105,10 @@ EventData::EventData( DecoratorPtr decorator )
   mScrollAfterDelete( false ),
   mAllTextSelected( false ),
   mUpdateInputStyle( false ),
-  mPasswordInput( false )
+  mPasswordInput( false ),
+  mIsPlaceholderPixelSize( false ),
+  mIsPlaceholderElideEnabled( false ),
+  mPlaceholderEllipsisFlag( false )
 {
   mImfManager = ImfManager::Get();
 }
@@ -883,8 +887,19 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       // Get the default font's description.
       TextAbstraction::FontDescription defaultFontDescription;
       TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
-      if( NULL != mFontDefaults )
+
+      if( IsShowingPlaceholderText() && ( NULL != mEventData->mPlaceholderFont ) )
       {
+        // If the placeholder font is set specifically, only placeholder font is changed.
+        defaultFontDescription = mEventData->mPlaceholderFont->mFontDescription;
+        if( mEventData->mPlaceholderFont->sizeDefined )
+        {
+          defaultPointSize = mEventData->mPlaceholderFont->mDefaultPointSize * 64u;
+        }
+      }
+      else if( NULL != mFontDefaults )
+      {
+        // Set the normal font and the placeholder font.
         defaultFontDescription = mFontDefaults->mFontDescription;
         defaultPointSize = mFontDefaults->mDefaultPointSize * 64u;
       }
@@ -1775,8 +1790,18 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
       mModel->mLogicalModel->UpdateTextStyleRuns( startOfSelectedText, -static_cast<int>( lengthOfSelectedText ) );
 
       // Mark the paragraphs to be updated.
-      mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-      mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      if( Layout::Engine::SINGLE_LINE_BOX == mLayoutEngine.GetLayout() )
+      {
+        mTextUpdateInfo.mCharacterIndex = 0;
+        mTextUpdateInfo.mNumberOfCharactersToRemove = mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mTextUpdateInfo.mNumberOfCharactersToAdd = mTextUpdateInfo.mPreviousNumberOfCharacters - lengthOfSelectedText;
+        mTextUpdateInfo.mClearAll = true;
+      }
+      else
+      {
+        mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+      }
 
       // Delete text between handles
       Vector<Character>::Iterator first = utf32Characters.Begin() + startOfSelectedText;
@@ -2586,17 +2611,17 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
 
     switch( mModel->mHorizontalAlignment )
     {
-      case Layout::HORIZONTAL_ALIGN_BEGIN:
+      case Text::HorizontalAlignment::BEGIN :
       {
         cursorInfo.primaryPosition.x = 0.f;
         break;
       }
-      case Layout::HORIZONTAL_ALIGN_CENTER:
+      case Text::HorizontalAlignment::CENTER:
       {
         cursorInfo.primaryPosition.x = floorf( 0.5f * mModel->mVisualModel->mControlSize.width );
         break;
       }
-      case Layout::HORIZONTAL_ALIGN_END:
+      case Text::HorizontalAlignment::END:
       {
         cursorInfo.primaryPosition.x = mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
         break;
@@ -2607,13 +2632,18 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     return;
   }
 
-  Text::GetCursorPosition( mModel->mVisualModel,
-                           mModel->mLogicalModel,
-                           mMetrics,
-                           logical,
+  const bool isMultiLine = ( Layout::Engine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() );
+  GetCursorPositionParameters parameters;
+  parameters.visualModel = mModel->mVisualModel;
+  parameters.logicalModel = mModel->mLogicalModel;
+  parameters.metrics = mMetrics;
+  parameters.logical = logical;
+  parameters.isMultiline = isMultiLine;
+
+  Text::GetCursorPosition( parameters,
                            cursorInfo );
 
-  if( Layout::Engine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() )
+  if( isMultiLine )
   {
     // If the text is editable and multi-line, the cursor position after a white space shouldn't exceed the boundaries of the text control.
 
@@ -2693,6 +2723,8 @@ void Controller::Impl::UpdateCursorPosition( const CursorInfo& cursorInfo )
   }
 
   const Vector2 cursorPosition = cursorInfo.primaryPosition + mModel->mScrollPosition;
+
+  mEventData->mDecorator->SetGlyphOffset( PRIMARY_CURSOR, cursorInfo.glyphOffset );
 
   // Sets the cursor position.
   mEventData->mDecorator->SetPosition( PRIMARY_CURSOR,
@@ -2829,13 +2861,16 @@ void Controller::Impl::ScrollToMakePositionVisible( const Vector2& position, flo
     mModel->mScrollPosition.x = mModel->mVisualModel->mControlSize.width - positionEndX;
   }
 
-  if( decoratorPositionBeginY < 0.f )
+  if( Layout::Engine::MULTI_LINE_BOX == mLayoutEngine.GetLayout() )
   {
-    mModel->mScrollPosition.y = -position.y;
-  }
-  else if( decoratorPositionEndY > mModel->mVisualModel->mControlSize.height )
-  {
-    mModel->mScrollPosition.y = mModel->mVisualModel->mControlSize.height - positionEndY;
+    if( decoratorPositionBeginY < 0.f )
+    {
+      mModel->mScrollPosition.y = -position.y;
+    }
+    else if( decoratorPositionEndY > mModel->mVisualModel->mControlSize.height )
+    {
+      mModel->mScrollPosition.y = mModel->mVisualModel->mControlSize.height - positionEndY;
+    }
   }
 }
 
@@ -2844,9 +2879,20 @@ void Controller::Impl::ScrollTextToMatchCursor( const CursorInfo& cursorInfo )
   // Get the current cursor position in decorator coords.
   const Vector2& currentCursorPosition = mEventData->mDecorator->GetPosition( PRIMARY_CURSOR );
 
+  const LineIndex lineIndex = mModel->mVisualModel->GetLineOfCharacter( mEventData->mPrimaryCursorPosition  );
+
+
+
   // Calculate the offset to match the cursor position before the character was deleted.
   mModel->mScrollPosition.x = currentCursorPosition.x - cursorInfo.primaryPosition.x;
-  mModel->mScrollPosition.y = currentCursorPosition.y - cursorInfo.lineOffset;
+
+  //If text control has more than two lines and current line index is not last, calculate scrollpositionY
+  if( mModel->mVisualModel->mLines.Count() > 1u && lineIndex != mModel->mVisualModel->mLines.Count() -1u )
+  {
+    const float currentCursorGlyphOffset = mEventData->mDecorator->GetGlyphOffset( PRIMARY_CURSOR );
+    mModel->mScrollPosition.y = currentCursorPosition.y - cursorInfo.lineOffset - currentCursorGlyphOffset;
+  }
+
 
   ClampHorizontalScroll( mModel->mVisualModel->GetLayoutSize() );
   ClampVerticalScroll( mModel->mVisualModel->GetLayoutSize() );

@@ -24,6 +24,7 @@
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/adaptors/adaptor.h>
@@ -31,10 +32,13 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/rendering-backend.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
@@ -65,15 +69,6 @@ const float DEFAULT_SCROLL_SPEED = 1200.f; ///< The default scroll speed for the
 
 namespace
 {
-
-const Scripting::StringEnum HORIZONTAL_ALIGNMENT_STRING_TABLE[] =
-{
-  { "BEGIN",  Toolkit::Text::Layout::HORIZONTAL_ALIGN_BEGIN  },
-  { "CENTER", Toolkit::Text::Layout::HORIZONTAL_ALIGN_CENTER },
-  { "END",    Toolkit::Text::Layout::HORIZONTAL_ALIGN_END    },
-};
-const unsigned int HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT = sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE ) / sizeof( HORIZONTAL_ALIGNMENT_STRING_TABLE[0] );
-
 const char* const SCROLL_BAR_POSITION("sourcePosition");
 const char* const SCROLL_BAR_POSITION_MIN("sourcePositionMin");
 const char* const SCROLL_BAR_POSITION_MAX("sourcePositionMax");
@@ -128,12 +123,18 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "emboss",                      
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputEmboss",                          MAP,       INPUT_EMBOSS                         )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "outline",                              MAP,       OUTLINE                              )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "inputOutline",                         MAP,       INPUT_OUTLINE                        )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScroll",                   BOOLEAN,   SMOOTH_SCROLL                        )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScrollDuration",           FLOAT,     SMOOTH_SCROLL_DURATION               )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableScrollBar",                BOOLEAN,   ENABLE_SCROLL_BAR                    )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarShowDuration",          FLOAT,     SCROLL_BAR_SHOW_DURATION             )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarFadeDuration",          FLOAT,     SCROLL_BAR_FADE_DURATION             )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "pixelSize",                      FLOAT,     PIXEL_SIZE                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScroll",                         BOOLEAN,   SMOOTH_SCROLL                        )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "smoothScrollDuration",                 FLOAT,     SMOOTH_SCROLL_DURATION               )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableScrollBar",                      BOOLEAN,   ENABLE_SCROLL_BAR                    )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarShowDuration",                FLOAT,     SCROLL_BAR_SHOW_DURATION             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "scrollBarFadeDuration",                FLOAT,     SCROLL_BAR_FADE_DURATION             )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "pixelSize",                            FLOAT,     PIXEL_SIZE                           )
+DALI_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextEditor, "lineCount",                  INTEGER,   LINE_COUNT                           )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableSelection",                      BOOLEAN,   ENABLE_SELECTION                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholder",                          MAP,       PLACEHOLDER                          )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineWrapMode",                         INTEGER,   LINE_WRAP_MODE                       )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderText",                STRING,    PLACEHOLDER_TEXT                     )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",           VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -243,15 +244,10 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mController )
         {
-          const std::string& alignStr = value.Get< std::string >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p HORIZONTAL_ALIGNMENT %s\n", impl.mController.Get(), alignStr.c_str() );
-
-          Layout::HorizontalAlignment alignment( Layout::HORIZONTAL_ALIGN_BEGIN );
-          if( Scripting::GetEnumeration< Layout::HorizontalAlignment >( alignStr.c_str(),
-                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                        HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT,
-                                                                        alignment ) )
+          Text::HorizontalAlignment::Type alignment( static_cast< Text::HorizontalAlignment::Type >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+          if( Text::GetHorizontalAlignmentEnumeration( value, alignment ) )
           {
+            DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p HORIZONTAL_ALIGNMENT %d\n", impl.mController.Get(), alignment );
             impl.mController->SetHorizontalAlignment( alignment );
           }
         }
@@ -602,7 +598,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL:
+      case Toolkit::TextEditor::Property::SMOOTH_SCROLL:
       {
         const bool enable = value.Get< bool >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor SMOOTH_SCROLL %d\n", enable );
@@ -610,7 +606,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         impl.mScrollAnimationEnabled = enable;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL_DURATION:
+      case Toolkit::TextEditor::Property::SMOOTH_SCROLL_DURATION:
       {
         const float duration = value.Get< float >();
         DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor SMOOTH_SCROLL_DURATION %f\n", duration );
@@ -622,7 +618,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
-      case Toolkit::DevelTextEditor::Property::ENABLE_SCROLL_BAR:
+      case Toolkit::TextEditor::Property::ENABLE_SCROLL_BAR:
       {
         const bool enable = value.Get< bool >();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor SHOW_SCROLL_BAR %d\n", enable );
@@ -630,7 +626,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         impl.mScrollBarEnabled = enable;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION:
+      case Toolkit::TextEditor::Property::SCROLL_BAR_SHOW_DURATION:
       {
         const float duration = value.Get< float >();
         DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor SCROLL_BAR_SHOW_DURATION %f\n", duration );
@@ -638,7 +634,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         impl.mAnimationPeriod.delaySeconds = duration;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION:
+      case Toolkit::TextEditor::Property::SCROLL_BAR_FADE_DURATION:
       {
         const float duration = value.Get< float >();
         DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor SCROLL_BAR_FADE_DURATION %f\n", duration );
@@ -646,7 +642,7 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         impl.mAnimationPeriod.durationSeconds = duration;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::PIXEL_SIZE:
+      case Toolkit::TextEditor::Property::PIXEL_SIZE:
       {
         if( impl.mController )
         {
@@ -656,6 +652,64 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
           if( !Equals( impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
           {
             impl.mController->SetDefaultFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
+          }
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT:
+      {
+        if( impl.mController )
+        {
+          const std::string& text = value.Get< std::string >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor::OnPropertySet %p PLACEHOLDER_TEXT %s\n", impl.mController.Get(), text.c_str() );
+
+          impl.mController->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR:
+      {
+        if( impl.mController )
+        {
+          const Vector4& textColor = value.Get< Vector4 >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p PLACEHOLDER_TEXT_COLOR %f,%f,%f,%f\n", impl.mController.Get(), textColor.r, textColor.g, textColor.b, textColor.a );
+
+          if( impl.mController->GetPlaceholderTextColor() != textColor )
+          {
+            impl.mController->SetPlaceholderTextColor( textColor );
+            impl.mRenderer.Reset();
+          }
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::ENABLE_SELECTION:
+      {
+        if( impl.mController )
+        {
+          const bool enableSelection = value.Get< bool >();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_SELECTION %d\n", impl.mController.Get(), enableSelection );
+          impl.mController->SetSelectionEnabled( enableSelection );
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::PLACEHOLDER:
+      {
+        const Property::Map* map = value.GetMap();
+        if( map )
+        {
+          impl.mController->SetPlaceholderProperty( *map );
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::LINE_WRAP_MODE:
+      {
+        if( impl.mController )
+        {
+          Text::LineWrap::Mode lineWrapMode( static_cast< Text::LineWrap::Mode >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
+          if( GetLineWrapModeEnumeration( value, lineWrapMode ) )
+          {
+            DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p LineWrap::MODE %d\n", impl.mController.Get(), lineWrapMode );
+            impl.mController->SetLineWrapMode( lineWrapMode );
           }
         }
         break;
@@ -725,9 +779,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       {
         if( impl.mController )
         {
-          const char* name = Scripting::GetEnumerationName< Toolkit::Text::Layout::HorizontalAlignment >( impl.mController->GetHorizontalAlignment(),
-                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE,
-                                                                                                          HORIZONTAL_ALIGNMENT_STRING_TABLE_COUNT );
+          const char* name = GetHorizontalAlignmentString( impl.mController->GetHorizontalAlignment() );
           if( name )
           {
             value = std::string( name );
@@ -961,38 +1013,87 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         GetOutlineProperties( impl.mController, value, Text::EffectStyle::INPUT );
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL:
+      case Toolkit::TextEditor::Property::SMOOTH_SCROLL:
       {
         value = impl.mScrollAnimationEnabled;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SMOOTH_SCROLL_DURATION:
+      case Toolkit::TextEditor::Property::SMOOTH_SCROLL_DURATION:
       {
         value = impl.mScrollAnimationDuration;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::ENABLE_SCROLL_BAR:
+      case Toolkit::TextEditor::Property::ENABLE_SCROLL_BAR:
       {
         value = impl.mScrollBarEnabled;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_SHOW_DURATION:
+      case Toolkit::TextEditor::Property::SCROLL_BAR_SHOW_DURATION:
       {
         value = impl.mAnimationPeriod.delaySeconds;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::SCROLL_BAR_FADE_DURATION:
+      case Toolkit::TextEditor::Property::SCROLL_BAR_FADE_DURATION:
       {
         value = impl.mAnimationPeriod.durationSeconds;
         break;
       }
-      case Toolkit::DevelTextEditor::Property::PIXEL_SIZE:
+      case Toolkit::TextEditor::Property::PIXEL_SIZE:
       {
         if( impl.mController )
         {
           value = impl.mController->GetDefaultFontSize( Text::Controller::PIXEL_SIZE );
         }
         break;
+      }
+      case Toolkit::TextEditor::Property::LINE_COUNT:
+      {
+        if( impl.mController )
+        {
+          float width = textEditor.GetProperty( Actor::Property::SIZE_WIDTH ).Get<float>();
+          value = impl.mController->GetLineCount( width );
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT:
+      {
+        if( impl.mController )
+        {
+          std::string text;
+          impl.mController->GetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
+          value = text;
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetPlaceholderTextColor();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::ENABLE_SELECTION:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsSelectionEnabled();
+        }
+        break;
+      }
+      case Toolkit::TextEditor::Property::PLACEHOLDER:
+      {
+        Property::Map map;
+        impl.mController->GetPlaceholderProperty( map );
+        value = map;
+        break;
+      }
+      case Toolkit::TextEditor::Property::LINE_WRAP_MODE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetLineWrapMode();
+        }
       }
     } //switch
   }
@@ -1032,6 +1133,11 @@ Toolkit::TextEditor::TextChangedSignalType& TextEditor::TextChangedSignal()
 Toolkit::TextEditor::InputStyleChangedSignalType& TextEditor::InputStyleChangedSignal()
 {
   return mInputStyleChangedSignal;
+}
+
+Toolkit::TextEditor::ScrollStateChangedSignalType& TextEditor::ScrollStateChangedSignal()
+{
+  return mScrollStateChangedSignal;
 }
 
 void TextEditor::OnInitialize()
@@ -1094,12 +1200,12 @@ void TextEditor::OnInitialize()
 
   // Creates an extra control to be used as stencil buffer.
   mStencil = Control::New();
-  mStencil.SetAnchorPoint( AnchorPoint::CENTER );
-  mStencil.SetParentOrigin( ParentOrigin::CENTER );
+  mStencil.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  mStencil.SetParentOrigin( ParentOrigin::TOP_LEFT );
 
   // Creates a background visual. Even if the color is transparent it updates the stencil.
   mStencil.SetProperty( Toolkit::Control::Property::BACKGROUND,
-                        Property::Map().Add( Toolkit::Visual::Property::TYPE, DevelVisual::COLOR ).
+                        Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR ).
                         Add( ColorVisual::Property::MIX_COLOR, Color::TRANSPARENT ) );
 
   // Enable the clipping property.
@@ -1144,19 +1250,51 @@ void TextEditor::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange:
 
 Vector3 TextEditor::GetNaturalSize()
 {
-  return mController->GetNaturalSize();
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
+  Vector3 naturalSize = mController->GetNaturalSize();
+  naturalSize.width += ( padding.start + padding.end );
+  naturalSize.height += ( padding.top + padding.bottom );
+
+  return naturalSize;
 }
 
 float TextEditor::GetHeightForWidth( float width )
 {
-  return mController->GetHeightForWidth( width );
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+  return mController->GetHeightForWidth( width ) + padding.top + padding.bottom;
 }
 
 void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor OnRelayout\n");
 
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( size );
+  Actor self = Self();
+
+  Extents padding;
+  padding = self.GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
+  Vector2 contentSize( size.x - ( padding.start + padding.end ), size.y - ( padding.top + padding.bottom ) );
+
+  // Support Right-To-Left of padding
+  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
+  {
+    std::swap( padding.start, padding.end );
+  }
+
+  if( mStencil )
+  {
+    mStencil.SetPosition( padding.start, padding.top );
+  }
+  if( mActiveLayer )
+  {
+    mActiveLayer.SetPosition( padding.start, padding.top );
+  }
+
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize );
 
   if( ( Text::Controller::NONE_UPDATED != updateTextType ) ||
       !mRenderer )
@@ -1175,6 +1313,7 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
     }
 
     RenderText( updateTextType );
+
   }
 
   // The text-editor emits signals when the input style changes. These changes of style are
@@ -1205,7 +1344,11 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
   {
     if( mRenderer )
     {
+      Dali::Toolkit::TextEditor handle = Dali::Toolkit::TextEditor( GetOwner() );
+
       renderableActor = mRenderer->Render( mController->GetView(),
+                                           handle,
+                                           Property::INVALID_INDEX, // Animatable property not supported
                                            mAlignmentOffset,
                                            DepthIndex::CONTENT );
     }
@@ -1222,12 +1365,13 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
     // Make sure the actors are parented correctly with/without clipping
     Actor self = mStencil ? mStencil : Self();
 
-    for( std::vector<Actor>::const_iterator it = mClippingDecorationActors.begin(),
+    for( std::vector<Actor>::iterator it = mClippingDecorationActors.begin(),
            endIt = mClippingDecorationActors.end();
          it != endIt;
          ++it )
     {
       self.Add( *it );
+      it->LowerToBottom();
     }
     mClippingDecorationActors.clear();
 
@@ -1297,7 +1441,9 @@ void TextEditor::OnTap( const TapGesture& gesture )
   mImfManager.Activate();
 
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
-  mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x, gesture.localPoint.y );
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+  mController->TapEvent( gesture.numberOfTaps, gesture.localPoint.x - padding.start, gesture.localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }
@@ -1311,7 +1457,9 @@ void TextEditor::OnLongPress( const LongPressGesture& gesture )
 {
   mImfManager.Activate();
 
-  mController->LongPressEvent( gesture.state, gesture.localPoint.x, gesture.localPoint.y );
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+  mController->LongPressEvent( gesture.state, gesture.localPoint.x - padding.start, gesture.localPoint.y - padding.top );
 
   SetKeyInputFocus();
 }
@@ -1320,7 +1468,7 @@ bool TextEditor::OnKeyEvent( const KeyEvent& event )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnKeyEvent %p keyCode %d\n", mController.Get(), event.keyCode );
 
-  if( Dali::DALI_KEY_ESCAPE == event.keyCode ) // Make a Dali key code for this
+  if( Dali::DALI_KEY_ESCAPE == event.keyCode && mController->ShouldClearFocusOnEscape() )
   {
     // Make sure ClearKeyInputFocus when only key is up
     if( event.state == KeyEvent::Up )
@@ -1414,7 +1562,10 @@ void TextEditor::AddDecoration( Actor& actor, bool needsClipping )
     }
     else
     {
+      actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+      actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
       Self().Add( actor );
+      mActiveLayer = actor;
     }
   }
 }
@@ -1459,6 +1610,15 @@ void TextEditor::UpdateScrollBar()
 
     mScrollBar.SetScrollPropertySource(self, propertyScrollPosition, propertyMinScrollPosition, propertyMaxScrollPosition, propertyScrollContentSize);
 
+    // Set style name of ScrollBar for styling
+    mScrollBar.SetStyleName("TextEditorScrollBar");
+    Toolkit::Control scrollIndicator = Toolkit::Control::DownCast( mScrollBar.GetScrollIndicator() );
+    if( scrollIndicator )
+    {
+      // Set style name of ScrollBarIndicator for styling
+      scrollIndicator.SetStyleName("TextEditorScrollBarIndicator");
+    }
+
     self.Add( mScrollBar );
   }
   else
@@ -1470,6 +1630,14 @@ void TextEditor::UpdateScrollBar()
     self.SetProperty( propertyScrollPosition, scrollPosition );
     self.SetProperty( propertyMaxScrollPosition, (layoutSize - controlSize) );
     self.SetProperty( propertyScrollContentSize, layoutSize );
+  }
+
+  // If scrolling is not started, start scrolling and emit ScrollStateChangedSignal
+  if( !mScrollStarted )
+  {
+    mScrollStarted = true;
+    Dali::Toolkit::TextEditor handle( GetOwner() );
+    mScrollStateChangedSignal.Emit( handle, Toolkit::TextEditor::Scroll::STARTED );
   }
 
   Actor indicator = mScrollBar.GetScrollIndicator();
@@ -1484,6 +1652,18 @@ void TextEditor::UpdateScrollBar()
   indicator.SetOpacity(1.0f);
   mAnimation.AnimateTo( Property( indicator, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN, mAnimationPeriod );
   mAnimation.Play();
+  mAnimation.FinishedSignal().Connect( this, &TextEditor::OnScrollIndicatorAnimationFinished );
+}
+
+void TextEditor::OnScrollIndicatorAnimationFinished( Animation& animation )
+{
+  // If animation is successfully ended, then emit ScrollStateChangedSignal
+  if( animation.GetCurrentProgress() == 0.0f )
+  {
+    mScrollStarted = false;
+    Dali::Toolkit::TextEditor handle( GetOwner() );
+    mScrollStateChangedSignal.Emit( handle, Toolkit::TextEditor::Scroll::FINISHED );
+  }
 }
 
 void TextEditor::OnStageConnect( Dali::Actor actor )
@@ -1601,7 +1781,8 @@ TextEditor::TextEditor()
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mHasBeenStaged( false ),
   mScrollAnimationEnabled( false ),
-  mScrollBarEnabled( false )
+  mScrollBarEnabled( false ),
+  mScrollStarted( false )
 {
 }
 

@@ -74,46 +74,33 @@ namespace Property
       INPUT_EMBOSS = Dali::Toolkit::TextEditor::Property::INPUT_EMBOSS,
       OUTLINE = Dali::Toolkit::TextEditor::Property::OUTLINE,
       INPUT_OUTLINE = Dali::Toolkit::TextEditor::Property::INPUT_OUTLINE,
+      SMOOTH_SCROLL = Dali::Toolkit::TextEditor::Property::SMOOTH_SCROLL,
+      SMOOTH_SCROLL_DURATION = Dali::Toolkit::TextEditor::Property::SMOOTH_SCROLL_DURATION,
+      ENABLE_SCROLL_BAR = Dali::Toolkit::TextEditor::Property::ENABLE_SCROLL_BAR,
+      SCROLL_BAR_SHOW_DURATION = Dali::Toolkit::TextEditor::Property::SCROLL_BAR_SHOW_DURATION,
+      SCROLL_BAR_FADE_DURATION = Dali::Toolkit::TextEditor::Property::SCROLL_BAR_FADE_DURATION,
+      PIXEL_SIZE = Dali::Toolkit::TextEditor::Property::PIXEL_SIZE,
+      LINE_COUNT = Dali::Toolkit::TextEditor::Property::LINE_COUNT,
+      ENABLE_SELECTION = Dali::Toolkit::TextEditor::Property::ENABLE_SELECTION,
+      PLACEHOLDER = Dali::Toolkit::TextEditor::Property::PLACEHOLDER,
+      LINE_WRAP_MODE = Dali::Toolkit::TextEditor::Property::LINE_WRAP_MODE,
 
       /**
-       * @brief name "smoothScroll", type bool
-       * @details Enable or disable the smooth scroll animation
+       * @brief The text to display when the TextEditor is empty and inactive.
+       * @details Name "placeholderText", type Property::STRING.
        */
-      SMOOTH_SCROLL = INPUT_OUTLINE + 1,
+      PLACEHOLDER_TEXT,
 
       /**
-       * @brief name "smoothScrollDuration", type float
-       * @details Sets the duration of smooth scroll animation
+       * @brief The placeholder-text color.
+       * @details Name "placeholderTextColor", type Property::VECTOR4.
        */
-      SMOOTH_SCROLL_DURATION,
-
-      /**
-       * @brief name "enableScrollBar", type bool
-       * @details Enable or disable the scroll bar
-       */
-      ENABLE_SCROLL_BAR,
-
-      /**
-       * @brief name "scrollBarShowDuration", type float
-       * @details Sets the duration of scroll bar to show
-       */
-      SCROLL_BAR_SHOW_DURATION,
-
-      /**
-       * @brief name "scrollBarFadeDuration", type float
-       * @details Sets the duration of scroll bar to fade out
-       */
-      SCROLL_BAR_FADE_DURATION,
-
-      /**
-       * @brief The size of font in pixels.
-       * @details name "pixelSize", type float
-       */
-      PIXEL_SIZE
+      PLACEHOLDER_TEXT_COLOR,
   };
+
 } // namespace Property
 
-} // namespace DevelText
+} // namespace DevelTextEditor
 
 } // namespace Toolkit
 

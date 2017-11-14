@@ -30,6 +30,7 @@
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 
 // INTERNAL INCLUDES
@@ -592,6 +593,7 @@ void Popup::SetPopupBackgroundImage( Actor image )
   const bool prevAlter = mAlterAddedChild;
   mAlterAddedChild = false;
   mPopupContainer.Add( mPopupBackgroundImage );
+  mPopupBackgroundImage.LowerToBottom();
   mAlterAddedChild = prevAlter;
 
   if( mTailImage )
@@ -917,7 +919,6 @@ Toolkit::Control Popup::CreateBacking()
 
   // Must always be positioned top-left of stage, regardless of parent.
   backing.SetInheritPosition(false);
-  backing.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 
   // Always the full size of the stage.
   backing.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );

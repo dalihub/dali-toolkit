@@ -118,7 +118,17 @@ public: // From Control
   /**
    * @ref Dali::Toolkit::DevelControl::RegisterVisual()
    */
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex );
+
+  /**
+   * @ref Dali::Toolkit::DevelControl::RegisterVisual()
+   */
   void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
+
+  /**
+   * @ref Dali::Toolkit::DevelControl::RegisterVisual()
+   */
+  void RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex );
 
   /**
    * @ref Dali::Toolkit::DevelControl::UnregisterVisual()
@@ -157,6 +167,13 @@ public: // From Control
    *
    */
   void ApplyThemeStyle();
+
+public:
+  /**
+   * Enable access to non-native type info from native side
+   * @return The type info that was registered on this type
+   */
+  Dali::TypeInfo GetTypeInfo();
 
 protected:
 

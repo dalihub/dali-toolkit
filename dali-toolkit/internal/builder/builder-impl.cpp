@@ -179,9 +179,10 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
   }
   else
   {
+    // load configuration map
+    LoadConfiguration( *parser.GetRoot(), mConfigurationMap );
     // load constant map (allows the user to override the constants in the json after loading)
     LoadConstants( *parser.GetRoot(), mReplacementMap );
-
     // merge includes
     if( OptionalChild includes = IsChild(*parser.GetRoot(), KEYNAME_INCLUDES) )
     {
@@ -201,7 +202,12 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
       }
     }
 
-    if( !mParser.Parse( data ) )
+    if( mParser.Parse( data ) )
+    {
+      // Drop the styles and get them to be rebuilt against the new parse tree as required.
+      mStyles.Clear();
+    }
+    else
     {
       DALI_LOG_WARNING( "JSON Parse Error:%d:%d:'%s'\n",
                         mParser.GetErrorLineNumber(),
@@ -212,8 +218,8 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
     }
   }
 
-  DUMP_PARSE_TREE(parser); // This macro only writes out if DEBUG is enabled and the "DUMP_TREE" constant is defined in the stylesheet.
-  DUMP_TEST_MAPPINGS(parser);
+  DUMP_PARSE_TREE(mParser); // This macro only writes out if DEBUG is enabled and the "DUMP_TREE" constant is defined in the stylesheet.
+  DUMP_TEST_MAPPINGS(mParser);
 
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Cannot parse JSON");
 }
@@ -226,6 +232,11 @@ void Builder::AddConstants( const Property::Map& map )
 void Builder::AddConstant( const std::string& key, const Property::Value& value )
 {
   mReplacementMap[key] = value;
+}
+
+const Property::Map& Builder::GetConfigurations() const
+{
+  return mConfigurationMap;
 }
 
 const Property::Map& Builder::GetConstants() const
@@ -771,6 +782,25 @@ void Builder::EmitQuitSignal()
 
 Builder::~Builder()
 {
+}
+
+void Builder::LoadConfiguration( const TreeNode& root, Property::Map& intoMap )
+{
+  Replacement replacer(intoMap);
+
+  if( OptionalChild constants = IsChild(root, "config") )
+  {
+    for(TreeNode::ConstIterator iter = (*constants).CBegin();
+        iter != (*constants).CEnd(); ++iter)
+    {
+      Dali::Property::Value property;
+      if( (*iter).second.GetName() )
+      {
+        DeterminePropertyFromNode( (*iter).second, property, replacer );
+        intoMap[ (*iter).second.GetName() ] = property;
+      }
+    }
+  }
 }
 
 void Builder::LoadConstants( const TreeNode& root, Property::Map& intoMap )

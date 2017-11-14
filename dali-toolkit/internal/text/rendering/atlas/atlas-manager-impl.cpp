@@ -42,6 +42,11 @@ namespace
   const uint32_t SINGLE_PIXEL_PADDING( 1u );
   const uint32_t DOUBLE_PIXEL_PADDING( SINGLE_PIXEL_PADDING << 1 );
   Toolkit::AtlasManager::AtlasSize EMPTY_SIZE;
+
+  bool IsBlockSizeSufficient( uint32_t width, uint32_t height, uint32_t requiredBlockWidth, uint32_t requiredBlockHeight )
+  {
+    return ( width + DOUBLE_PIXEL_PADDING <= requiredBlockWidth ) && ( height + DOUBLE_PIXEL_PADDING <= requiredBlockHeight );
+  }
 }
 
 AtlasManager::AtlasManager()
@@ -139,38 +144,45 @@ bool AtlasManager::Add( const PixelData& image,
   }
 
   // Search current atlases to see if there is a good match
-  while( !foundAtlas && index < mAtlasList.size() )
+  while( ( 0u == foundAtlas ) && ( index < mAtlasList.size() ) )
   {
     foundAtlas = CheckAtlas( index, width, height, pixelFormat );
     ++index;
   }
 
   // If we can't find a suitable atlas then check the policy to determine action
-  if ( !foundAtlas-- )
+  if ( 0u == foundAtlas )
   {
     if ( Toolkit::AtlasManager::FAIL_ON_ADD_CREATES == mAddFailPolicy )
     {
-      foundAtlas = CreateAtlas( mNewAtlasSize, pixelFormat );
-      if ( !foundAtlas-- )
+      if ( IsBlockSizeSufficient( width, height, mNewAtlasSize.mBlockWidth, mNewAtlasSize.mBlockHeight ) ) // Checks if image fits within the atlas blocks
       {
-        DALI_LOG_ERROR("Failed to create an atlas of %i x %i blocksize: %i x %i.\n",
-                       mNewAtlasSize.mWidth,
-                       mNewAtlasSize.mHeight,
-                       mNewAtlasSize.mBlockWidth,
-                       mNewAtlasSize.mBlockHeight );
-        return created;
+        foundAtlas = CreateAtlas( mNewAtlasSize, pixelFormat ); // Creating atlas with mNewAtlasSize, may not be the needed size!
+        if (  0u == foundAtlas )
+        {
+          DALI_LOG_ERROR("Failed to create an atlas of %i x %i blocksize: %i x %i.\n",
+                         mNewAtlasSize.mWidth,
+                         mNewAtlasSize.mHeight,
+                         mNewAtlasSize.mBlockWidth,
+                         mNewAtlasSize.mBlockHeight );
+          return false;
+        }
+        else
+        {
+          created = true;
+        }
       }
-      created = true;
-      foundAtlas = CheckAtlas( foundAtlas, width, height, pixelFormat );
     }
 
-    if ( !foundAtlas-- || Toolkit::AtlasManager::FAIL_ON_ADD_FAILS == mAddFailPolicy )
+    if ( (  0u == foundAtlas )  || Toolkit::AtlasManager::FAIL_ON_ADD_FAILS == mAddFailPolicy )
     {
-      // Haven't found an atlas for this image!!!!!!
+      // Haven't found an atlas for this image ( may have failed to add image to atlas )
       DALI_LOG_ERROR("Failed to create an atlas under current policy.\n");
-      return created;
+      return false;
     }
   }
+
+  foundAtlas--; // Atlas created successfully, decrement by 1 to get <vector> index (starts at 0 not 1)
 
   // Work out which the block we're going to use
   // Is there currently a next free block available ?
@@ -188,7 +200,7 @@ bool AtlasManager::Add( const PixelData& image,
 
   desc.mImageWidth = width;
   desc.mImageHeight = height;
-  desc.mAtlasId = foundAtlas + 1u;
+  desc.mAtlasId = foundAtlas + 1u;  // Ids start from 1 not the 0 index
   desc.mCount = 1u;
 
   // See if there's a previously freed image ID that we can assign to this new image
@@ -211,7 +223,7 @@ bool AtlasManager::Add( const PixelData& image,
     mImageList[ imageId - 1u ] = desc;
     slot.mImageId = imageId;
   }
-  slot.mAtlasId = foundAtlas + 1u;
+  slot.mAtlasId = foundAtlas + 1u; // Ids start from 1 not the 0 index
 
   // Upload the buffer image into the atlas
   UploadImage( image, desc );
@@ -226,12 +238,13 @@ AtlasManager::SizeType AtlasManager::CheckAtlas( SizeType atlas,
   AtlasManager::SizeType result = 0u;
   if ( pixelFormat == mAtlasList[ atlas ].mPixelFormat )
   {
-    // Check to see if the image will fit in these blocks, if not we'll need to create a new atlas
-    if ( ( mAtlasList[ atlas ].mAvailableBlocks + mAtlasList[ atlas ].mFreeBlocksList.Size() )
-           && width + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mSize.mBlockWidth
-           && height + DOUBLE_PIXEL_PADDING <= mAtlasList[ atlas ].mSize.mBlockHeight )
+    // Check to see if the image will fit in these blocks
+
+    const SizeType availableBlocks = mAtlasList[ atlas ].mAvailableBlocks + mAtlasList[ atlas ].mFreeBlocksList.Size();
+
+    if ( availableBlocks && IsBlockSizeSufficient( width, height,mAtlasList[ atlas ].mSize.mBlockWidth, mAtlasList[ atlas ].mSize.mBlockHeight ) )
     {
-      result = atlas + 1u;
+      result = atlas + 1u; // Atlas ids start from 1 not 0
     }
   }
   return result;

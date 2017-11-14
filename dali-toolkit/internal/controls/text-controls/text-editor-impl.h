@@ -95,6 +95,11 @@ public:
    */
   Toolkit::TextEditor::InputStyleChangedSignalType& InputStyleChangedSignal();
 
+  /**
+   * @copydoc TextEditor::ScrollStateChangedSignal()
+   */
+  Toolkit::TextEditor::ScrollStateChangedSignalType& ScrollStateChangedSignal();
+
 private: // From Control
 
   /**
@@ -244,6 +249,13 @@ private: // Implementation
   void ApplyScrollPosition();
 
   /**
+   * @brief Callback function for ScrollBar indicator animation finished signal
+   *
+   * Emit ScrollBarStateChanged Signal and toggle mScrollStarted flag to false
+   */
+  void OnScrollIndicatorAnimationFinished( Animation& animation );
+
+  /**
    * Construct a new TextEditor.
    */
   TextEditor();
@@ -269,6 +281,7 @@ private: // Data
   // Signals
   Toolkit::TextEditor::TextChangedSignalType mTextChangedSignal;
   Toolkit::TextEditor::InputStyleChangedSignalType mInputStyleChangedSignal;
+  Toolkit::TextEditor::ScrollStateChangedSignalType mScrollStateChangedSignal;
 
   ImfManager          mImfManager;
   Text::ControllerPtr mController;
@@ -282,6 +295,7 @@ private: // Data
   std::vector<Actor> mClippingDecorationActors;   ///< Decoration actors which need clipping.
 
   Actor mRenderableActor;
+  Actor mActiveLayer;
   CallbackBase* mIdleCallback;
 
   float mAlignmentOffset;
@@ -290,6 +304,7 @@ private: // Data
   bool mHasBeenStaged:1;
   bool mScrollAnimationEnabled:1;
   bool mScrollBarEnabled:1;
+  bool mScrollStarted:1;
 };
 
 } // namespace Internal

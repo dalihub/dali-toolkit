@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SVG_VISUAL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/devel-api/object/weak-handle.h>
+#include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -155,6 +155,13 @@ private:
    */
   void AddRasterizationTask( const Vector2& size );
 
+  /**
+   * Helper method to set individual values by index key.
+   * @param[in] index The index key of the value
+   * @param[in] value The value
+   */
+  void DoSetProperty( Property::Index index, const Property::Value& value );
+
 
   // Undefined
   SvgVisual( const SvgVisual& svgRenderer );
@@ -168,6 +175,7 @@ private:
   NSVGimage*           mParsedImage;
   WeakHandle<Actor>    mPlacementActor;
   Vector2              mVisualSize;
+  bool                 mAttemptAtlasing;  ///< If true will attempt atlasing, otherwise create unique texture
 };
 
 } // namespace Internal

@@ -29,10 +29,10 @@
 #include <toolkit-style-monitor.h>
 #include <dummy-control.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
+#include <dali/integration-api/events/key-event-integ.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -67,7 +67,7 @@ Visual::Base CheckVisual( Impl::DummyControl& dummyImpl, Property::Index visualI
     DALI_TEST_EQUALS( (bool)visual, true, location );
     Property::Map map;
     visual.CreatePropertyMap( map );
-    Property::Value* value = map.Find( Visual::Property::TYPE );
+    Property::Value* value = map.Find( Toolkit::Visual::Property::TYPE );
     DALI_TEST_EQUALS( value != NULL, true, location );
 
     int visualType;
@@ -1265,13 +1265,13 @@ int UtcDaliStyleManagerSetSubState02(void)
   tet_infoline( "Changing state to FOCUSED - check visual changes\n");
 
   Visual::Base fgVisual1 = CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::GRADIENT, TEST_LOCATION);
-  Visual::Base focusVisual1 = CheckVisual( dummyImpl, DummyControl::Property::FOCUS_VISUAL, Toolkit::DevelVisual::N_PATCH, TEST_LOCATION);
+  Visual::Base focusVisual1 = CheckVisual( dummyImpl, DummyControl::Property::FOCUS_VISUAL, Toolkit::Visual::N_PATCH, TEST_LOCATION);
 
   actor.SetProperty(DevelControl::Property::SUB_STATE, "SELECTED");
   tet_infoline( "Changing  substate to SELECTED - Expect no change\n");
 
   Visual::Base fgVisual2 = CheckVisual( dummyImpl, DummyControl::Property::FOREGROUND_VISUAL, Toolkit::Visual::GRADIENT, TEST_LOCATION);
-  Visual::Base focusVisual2 = CheckVisual( dummyImpl, DummyControl::Property::FOCUS_VISUAL, Toolkit::DevelVisual::N_PATCH, TEST_LOCATION);
+  Visual::Base focusVisual2 = CheckVisual( dummyImpl, DummyControl::Property::FOCUS_VISUAL, Toolkit::Visual::N_PATCH, TEST_LOCATION);
 
   DALI_TEST_CHECK( fgVisual1 == fgVisual2 );
   DALI_TEST_CHECK( focusVisual1 == focusVisual2 );
@@ -1295,6 +1295,49 @@ int UtcDaliStyleManagerSetSubState02(void)
   DALI_TEST_CHECK( ! testVisual );
   testVisual = dummyImpl.GetVisual(DummyControl::Property::LABEL_VISUAL);
   DALI_TEST_CHECK( ! testVisual );
+
+  END_TEST;
+}
+
+
+int UtcDaliStyleManagerConfigSectionTest(void)
+{
+  tet_infoline("Test that the properties in config section are works" );
+
+  const char* defaultTheme =
+    "{\n"
+    "  \"config\":\n"
+    "  {\n"
+    "    \"alwaysShowFocus\":false,\n"
+    "    \"clearFocusOnEscape\":false\n"
+    "  },\n"
+    "  \"styles\":\n"
+    "  {\n"
+    "  }\n"
+    "}\n";
+
+  Test::StyleMonitor::SetThemeFileOutput( DALI_STYLE_DIR "dali-toolkit-default-theme.json", defaultTheme );
+
+  ToolkitTestApplication application;
+
+  Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+
+  Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
+  bool alwaysShowFocus = config["alwaysShowFocus"].Get<bool>();
+  DALI_TEST_CHECK( !alwaysShowFocus );
+  bool clearFocusOnEscape = config["clearFocusOnEscape"].Get<bool>();
+  DALI_TEST_CHECK( !clearFocusOnEscape );
+
+  // For coverage
+  Toolkit::TextEditor editor = Toolkit::TextEditor::New();
+  editor.SetKeyboardFocusable( true );
+  Stage::GetCurrent().Add( editor );
+
+  Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( editor );
+
+  application.ProcessEvent( Integration::KeyEvent( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", Device::Class::NONE, Device::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

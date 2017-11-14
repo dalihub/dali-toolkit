@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,8 @@
 
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/controls/scrollable/item-view/default-item-layout-property.h>
 
 #include <dali-toolkit/internal/controls/scrollable/item-view/grid-layout.h>
-#include <dali-toolkit/devel-api/controls/scrollable/item-view/item-view-devel.h>
-
 
 using namespace Dali;
 using namespace Toolkit;
@@ -104,7 +101,7 @@ int UtcDaliItemLayoutCheckPropertiesSetBeforeActivateLayout(void)
 
   layoutArray.PushBack(gridLayoutProperty);
 
-  view.SetProperty( DevelItemView::Property::LAYOUT, layoutArray);
+  view.SetProperty( ItemView::Property::LAYOUT, layoutArray );
 
   Dali::Toolkit::Internal::GridLayout* gridLayout = dynamic_cast<Dali::Toolkit::Internal::GridLayout*>(view.GetLayout(0).Get());
 

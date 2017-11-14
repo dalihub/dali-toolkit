@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/property-map.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
@@ -26,6 +29,8 @@
 #include <dali-toolkit/internal/text/text-scroller-interface.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
 #include <dali-toolkit/internal/text/text-scroller.h>
+#include <dali-toolkit/internal/visuals/text/text-visual.h>
+
 
 namespace Dali
 {
@@ -73,34 +78,39 @@ private: // From Control
   /**
    * @copydoc Control::OnInitialize()
    */
-  virtual void OnInitialize();
+  virtual void OnInitialize() override ;
 
   /**
    * @copydoc Control::OnStyleChange()
    */
-  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change );
+  virtual void OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change ) override ;
 
   /**
    * @copydoc Control::OnRelayout()
    */
-  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container );
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container ) override ;
 
   /**
    * @copydoc Control::GetNaturalSize()
    */
-  virtual Vector3 GetNaturalSize();
+  virtual Vector3 GetNaturalSize() override ;
 
   /**
    * @copydoc Control::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width );
+  virtual float GetHeightForWidth( float width ) override ;
 
-// From ControlInterface
+  /**
+   * @copydoc Control::OnPropertySet()
+   */
+  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) override ;
+
+  // From ControlInterface
 
   /**
    * @copydoc Text::ControlInterface::RequestTextRelayout()
    */
-  virtual void RequestTextRelayout();
+  virtual void RequestTextRelayout() override ;
 
 private: // from TextScroller
 
@@ -127,14 +137,6 @@ private:
   TextLabel(const TextLabel&);
   TextLabel& operator=(const TextLabel& rhs);
 
-  // Connection needed to re-render text, when a Text Label returns to the stage
-  void OnStageConnect( Dali::Actor actor );
-
-  /**
-   * @brief Render view, create and attach actor(s) to this Text Label
-   */
-  void RenderText();
-
   /**
    * @brief Set up Autoscrolling
    */
@@ -143,11 +145,12 @@ private:
 private: // Data
 
   Text::ControllerPtr mController;
-  Text::RendererPtr mRenderer;
   Text::TextScrollerPtr mTextScroller;
-  Actor mRenderableActor;
+
+  Toolkit::Visual::Base mVisual;
+
   int mRenderingBackend;
-  bool mHasBeenStaged:1;
+  bool mTextUpdateNeeded:1;
 };
 
 } // namespace Internal

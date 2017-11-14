@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -697,6 +696,20 @@ int UtcDaliToolkitScrollBarGetScrollPositionIntervalsP(void)
   DALI_TEST_EQUALS( positionIntervals[7], results[7], TEST_LOCATION );
   DALI_TEST_EQUALS( positionIntervals[8], results[8], TEST_LOCATION );
   DALI_TEST_EQUALS( positionIntervals[9], results[9], TEST_LOCATION );
+
+  Property::Array resultArray = scrollBar.GetProperty<Property::Array>(Toolkit::ScrollBar::Property::SCROLL_POSITION_INTERVALS);
+
+  DALI_TEST_EQUALS( positionIntervals.Count(), resultArray.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[0], resultArray[0].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[1], resultArray[1].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[2], resultArray[2].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[3], resultArray[3].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[4], resultArray[4].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[5], resultArray[5].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[6], resultArray[6].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[7], resultArray[7].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[8], resultArray[8].Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( positionIntervals[9], resultArray[9].Get<float>(), TEST_LOCATION );
 
   END_TEST;
 }
@@ -1526,7 +1539,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicator(void)
 
   // Get the default duration to hide the indicator
   float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
-  float transientDuration = scrollBar.GetProperty<float>( DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
+  float transientDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
   float totalVisibleDuration = hideDuration + transientDuration;
 
   // Check that the default duration is greater than 0
@@ -1586,7 +1599,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorImmediate(void)
 
   // Get the default duration to hide the indicator
   float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
-  float transientDuration = scrollBar.GetProperty<float>( DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
+  float transientDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
   float totalVisibleDuration = hideDuration + transientDuration;
 
   // Check that the default duration is greater than 0
@@ -1671,7 +1684,7 @@ int UtcDaliToolkitScrollBarActionShowTransientIndicatorDuringHide(void)
 
   // Get the default duration to hide the indicator
   float hideDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_HIDE_DURATION );
-  float transientDuration = scrollBar.GetProperty<float>( DevelScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
+  float transientDuration = scrollBar.GetProperty<float>( ScrollBar::Property::INDICATOR_TRANSIENT_DURATION );
   float totalVisibleDuration = hideDuration + transientDuration;
 
   // Check that the default duration is greater than 0

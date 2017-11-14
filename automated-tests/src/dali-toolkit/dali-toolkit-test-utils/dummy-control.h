@@ -21,6 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/dali-toolkit.h>
 
+// EXTERNAL INCLUDES
+#include <functional>
+
 namespace Dali
 {
 
@@ -132,9 +135,13 @@ class DummyControl : public Toolkit::DummyControlImpl
 {
 public:
 
+  typedef std::function<void( Size )> RelayoutCallbackFunc;
+
   static Toolkit::DummyControl New();
 
   void SetLayout( Property::Index visualIndex, Property::Map& map );
+
+  void SetRelayoutCallback( RelayoutCallbackFunc callback );
 
 private:
 
@@ -200,6 +207,8 @@ public:
   bool keyInputFocusLost;
 
   Property::Map mLayouts;
+  RelayoutCallbackFunc mRelayoutCallback;
+
 };
 
 } // namespace Impl

@@ -35,14 +35,14 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 #if defined(DEBUG_ENABLED)
     Debug::Filter* gLogButtonFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_BUTTON_CONTROL");
@@ -422,7 +422,7 @@ Button::Align Button::GetLabelAlignment()
  * 4) Unregister visual if empty map was provided. This is the method to remove a visual
  */
 
-void Button::CreateVisualsForComponent( Property::Index index, const Property::Value& value, const float visualDepth )
+void Button::CreateVisualsForComponent( Property::Index index, const Property::Value& value, const int visualDepth )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent index(%d)\n", index );
   Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
@@ -453,8 +453,7 @@ void Button::CreateVisualsForComponent( Property::Index index, const Property::V
   {
     DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent RegisterVisual index(%d) enabled(%s)\n",
                    index, DevelControl::IsVisualEnabled( *this, index )?"true":"false" );
-    buttonVisual.SetDepthIndex( visualDepth );
-    DevelControl::RegisterVisual( *this, index, buttonVisual, DevelControl::IsVisualEnabled( *this, index ) );
+    DevelControl::RegisterVisual( *this, index, buttonVisual, DevelControl::IsVisualEnabled( *this, index ), visualDepth );
   }
   else
   {
@@ -983,8 +982,8 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
     Property::Map visualTransform;
 
-    visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, size )
-                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) );
+    visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, size )
+                   .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) );
 
     currentBackGroundVisual.SetTransformAndSize( visualTransform, size );
   }
@@ -995,12 +994,12 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
     Property::Map visualTransform;
 
-    visualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, visualSize )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, visualPosition )
-                   .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
-                   .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, visualAnchorPoint );
+    visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, visualSize )
+                   .Add( Toolkit::Visual::Transform::Property::OFFSET, visualPosition )
+                   .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                   .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                   .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, visualAnchorPoint );
 
     currentVisual.SetTransformAndSize( visualTransform, size );
   }
@@ -1026,12 +1025,12 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
 
       Property::Map textVisualTransform;
-      textVisualTransform.Add( Toolkit::DevelVisual::Transform::Property::SIZE, preSize )
-                         .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, labelPosition )
-                         .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
-                         .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( DevelVisual::Transform::Policy::ABSOLUTE, DevelVisual::Transform::Policy::ABSOLUTE ) )
-                         .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
-                         .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, visualAnchorPoint );
+      textVisualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, preSize )
+                         .Add( Toolkit::Visual::Transform::Property::OFFSET, labelPosition )
+                         .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                         .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                         .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                         .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, visualAnchorPoint );
 
       textVisual.SetTransformAndSize( textVisualTransform, size );
     }
@@ -1235,7 +1234,7 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
           DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SetProperty Setting TextVisual with string[%s]\n", textString.c_str() );
 
           Property::Map setPropertyMap;
-          setPropertyMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+          setPropertyMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT )
                         .Add( Toolkit::TextVisual::Property::TEXT, textString );
 
           GetImplementation( button ).MergeWithExistingLabelProperties( setPropertyMap, outTextVisualProperties );

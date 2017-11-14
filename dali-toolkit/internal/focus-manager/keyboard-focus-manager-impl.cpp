@@ -29,6 +29,7 @@
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/integration-api/debug.h>
 
@@ -38,6 +39,8 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 
 namespace Dali
 {
@@ -116,9 +119,10 @@ KeyboardFocusManager::KeyboardFocusManager()
   mFocusedActorEnterKeySignal(),
   mCurrentFocusActor(),
   mFocusIndicatorActor(),
+  mIsFocusIndicatorEnabled( -1 ),
   mFocusGroupLoopEnabled( false ),
-  mIsFocusIndicatorEnabled( false ),
   mIsWaitingKeyboardFocusChangeCommit( false ),
+  mClearFocusOnTouch( true ),
   mFocusHistory(),
   mSlotDelegate( this ),
   mCustomAlgorithmInterface(NULL)
@@ -132,9 +136,25 @@ KeyboardFocusManager::~KeyboardFocusManager()
 {
 }
 
+void KeyboardFocusManager::GetConfigurationFromStyleManger()
+{
+    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+    if( styleManager )
+    {
+      Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
+      mIsFocusIndicatorEnabled = static_cast<int>(config["alwaysShowFocus"].Get<bool>());
+      mClearFocusOnTouch = mIsFocusIndicatorEnabled ? false : true;
+    }
+}
+
 bool KeyboardFocusManager::SetCurrentFocusActor( Actor actor )
 {
   DALI_ASSERT_DEBUG( !mIsWaitingKeyboardFocusChangeCommit && "Calling this function in the PreFocusChangeSignal callback?" );
+
+  if( mIsFocusIndicatorEnabled == -1 )
+  {
+    GetConfigurationFromStyleManger();
+  }
 
   return DoSetCurrentFocusActor( actor );
 }
@@ -190,13 +210,13 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
     }
 
     // Push Current Focused Actor to FocusHistory
-    mFocusHistory.PushBack( &actor.GetBaseObject() );
+    mFocusHistory.push_back( actor );
 
     // Delete first element before add new element when Stack is full.
-    if( mFocusHistory.Count() > MAX_HISTORY_AMOUNT )
+    if( mFocusHistory.size() > MAX_HISTORY_AMOUNT )
     {
-       FocusStackIterator beginPos = mFocusHistory.Begin();
-       mFocusHistory.Erase( beginPos );
+       FocusStackIterator beginPos = mFocusHistory.begin();
+       mFocusHistory.erase( beginPos );
     }
 
     DALI_LOG_INFO( gLogFilter, Debug::General, "[%s:%d] SUCCEED\n", __FUNCTION__, __LINE__);
@@ -231,28 +251,39 @@ Actor KeyboardFocusManager::GetCurrentFocusGroup()
 void KeyboardFocusManager::MoveFocusBackward()
 {
   // Find Pre Focused Actor when the list size is more than 1
-  if( mFocusHistory.Count() > 1 )
+  if( mFocusHistory.size() > 1 )
   {
     // Delete current focused actor in history
-    FocusStackIterator endPos = mFocusHistory.End();
-    endPos = mFocusHistory.Erase( --endPos );
+    mFocusHistory.pop_back();
 
-    // If pre-focused actors are not on stage, remove them in stack
-    while( !Dali::Actor::DownCast(BaseHandle(mFocusHistory[ mFocusHistory.Count() - 1 ])).OnStage() )
+    // If pre-focused actors are not on stage or deleted, remove them in stack
+    while( mFocusHistory.size() > 0 )
     {
-      endPos = mFocusHistory.Erase( --endPos );
+      // Get pre focused actor
+      Actor target = mFocusHistory[ mFocusHistory.size() -1 ].GetHandle();
+
+      // Impl of Actor is not null
+      if( target && target.OnStage() )
+      {
+        // Delete pre focused actor in history because it will pushed again by SetCurrentFocusActor()
+        mFocusHistory.pop_back();
+        SetCurrentFocusActor( target );
+        break;
+      }
+      else
+      {
+        // Target is empty handle or off stage. Erase from queue
+        mFocusHistory.pop_back();
+      }
     }
 
-    // Get pre focused actor
-    BaseObject* object = mFocusHistory[ mFocusHistory.Count() - 1 ];
-    BaseHandle handle( object );
-    Actor preFocusedActor = Dali::Actor::DownCast( handle );
-
-    // Delete pre focused actor in history because it will pushed again by SetCurrentFocusActor()
-    mFocusHistory.Erase( --endPos );
-
-    SetCurrentFocusActor( preFocusedActor );
- }
+    // if there is no actor which can get focus, then push current focus actor in stack again
+    if( mFocusHistory.size() == 0 )
+    {
+      Actor currentFocusedActor = GetCurrentFocusActor();
+      mFocusHistory.push_back( currentFocusedActor );
+    }
+  }
 }
 
 bool KeyboardFocusManager::IsLayoutControl(Actor actor) const
@@ -523,7 +554,7 @@ void KeyboardFocusManager::ClearFocus()
   }
 
   mCurrentFocusActor.Reset();
-  mIsFocusIndicatorEnabled = false;
+  mIsFocusIndicatorEnabled = 0;
 }
 
 void KeyboardFocusManager::SetFocusGroupLoop(bool enabled)
@@ -623,6 +654,11 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
   std::string keyName = event.keyPressedName;
 
+  if( mIsFocusIndicatorEnabled == -1 )
+  {
+    GetConfigurationFromStyleManger();
+  }
+
   bool isFocusStartableKey = false;
 
   if(event.state == KeyEvent::Down)
@@ -634,7 +670,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         if(!mIsFocusIndicatorEnabled)
         {
           // Show focus indicator
-          mIsFocusIndicatorEnabled = true;
+          mIsFocusIndicatorEnabled = 1;
         }
         else
         {
@@ -657,7 +693,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         if(!mIsFocusIndicatorEnabled)
         {
           // Show focus indicator
-          mIsFocusIndicatorEnabled = true;
+          mIsFocusIndicatorEnabled = 1;
         }
         else
         {
@@ -678,7 +714,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorEnabled = true;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -693,7 +729,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorEnabled = true;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -708,7 +744,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorEnabled = true;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -723,7 +759,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorEnabled = true;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -738,7 +774,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorEnabled = true;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -754,7 +790,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorEnabled = true;
+        mIsFocusIndicatorEnabled = 1;
       }
 
       isFocusStartableKey = true;
@@ -765,7 +801,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorEnabled = true;
+        mIsFocusIndicatorEnabled = 1;
       }
 
       isFocusStartableKey = true;
@@ -785,7 +821,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
       if(!mIsFocusIndicatorEnabled && !isAccessibilityEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorEnabled = true;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -829,9 +865,17 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
 void KeyboardFocusManager::OnTouch(const TouchData& touch)
 {
+  // if mIsFocusIndicatorEnabled is -1, it means Configuration is not loaded.
+  // Try to load configuration.
+  if( mIsFocusIndicatorEnabled == -1 )
+  {
+    GetConfigurationFromStyleManger();
+  }
+
   // Clear the focus when user touch the screen.
   // We only do this on a Down event, otherwise the clear action may override a manually focused actor.
-  if( ( touch.GetPointCount() < 1 ) || ( touch.GetState( 0 ) == PointState::DOWN ) )
+  // If mClearFocusOnTouch is false, do not clear the focus even if user touch the screen.
+  if( (( touch.GetPointCount() < 1 ) || ( touch.GetState( 0 ) == PointState::DOWN )) && mClearFocusOnTouch )
   {
     ClearFocus();
   }

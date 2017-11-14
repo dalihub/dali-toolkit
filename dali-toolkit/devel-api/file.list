@@ -18,7 +18,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/page-turn-view/page-turn-view.cpp \
   $(devel_api_src_dir)/controls/popup/confirmation-popup.cpp \
   $(devel_api_src_dir)/controls/popup/popup.cpp \
-  $(devel_api_src_dir)/controls/progress-bar/progress-bar.cpp \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.cpp \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
@@ -26,9 +25,12 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \
   $(devel_api_src_dir)/focus-manager/keyinput-focus-manager.cpp \
   $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.cpp \
+  $(devel_api_src_dir)/image-loader/async-image-loader-devel.cpp \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
   $(devel_api_src_dir)/image-loader/image-atlas.cpp \
+  $(devel_api_src_dir)/image-loader/texture-manager.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
+  $(devel_api_src_dir)/styling/style-manager-devel.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
@@ -41,7 +43,10 @@ devel_api_src_files = \
 # Add devel header files here
 
 devel_api_header_files = \
-  $(devel_api_src_dir)/align-enums.h
+  $(devel_api_src_dir)/direction-enums.h
+
+devel_api_visuals_header_files = \
+  $(devel_api_src_dir)/visuals/image-visual-properties-devel.h
 
 devel_api_controls_header_files = \
   $(devel_api_src_dir)/controls/control-depth-index-ranges.h \
@@ -67,13 +72,6 @@ devel_api_builder_header_files = \
 devel_api_effects_view_header_files = \
   $(devel_api_src_dir)/controls/effects-view/effects-view.h
 
-devel_api_item_view_header_files = \
-  $(devel_api_src_dir)/controls/scrollable/item-view/default-item-layout-property.h \
-  $(devel_api_src_dir)/controls/scrollable/item-view/item-view-devel.h
-
-devel_api_scroll_bar_header_files = \
-  $(devel_api_src_dir)/controls/scroll-bar/scroll-bar-devel.h
-
 devel_api_magnifier_header_files = \
   $(devel_api_src_dir)/controls/magnifier/magnifier.h
 
@@ -90,18 +88,10 @@ devel_api_popup_header_files = \
   $(devel_api_src_dir)/controls/popup/confirmation-popup.h \
   $(devel_api_src_dir)/controls/popup/popup.h
 
-devel_api_progress_bar_header_files = \
-  $(devel_api_src_dir)/controls/progress-bar/progress-bar.h
-
 devel_api_visual_factory_header_files = \
   $(devel_api_src_dir)/visual-factory/transition-data.h \
   $(devel_api_src_dir)/visual-factory/visual-factory.h \
   $(devel_api_src_dir)/visual-factory/visual-base.h
-
-devel_api_visuals_header_files = \
-  $(devel_api_src_dir)/visuals/text-visual-properties.h \
-  $(devel_api_src_dir)/visuals/image-visual-properties-devel.h \
-  $(devel_api_src_dir)/visuals/visual-properties-devel.h
 
 devel_api_shadow_view_header_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.h
@@ -111,16 +101,14 @@ devel_api_focus_manager_header_files = \
   $(devel_api_src_dir)/focus-manager/keyboard-focus-manager-devel.h
 
 devel_api_image_loader_header_files = \
+  $(devel_api_src_dir)/image-loader/async-image-loader-devel.h \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.h \
-  $(devel_api_src_dir)/image-loader/image-atlas.h
+  $(devel_api_src_dir)/image-loader/image-atlas.h \
+  $(devel_api_src_dir)/image-loader/texture-manager.h
 
 devel_api_scripting_header_files = \
   $(devel_api_src_dir)/scripting/script.h \
   $(devel_api_src_dir)/scripting/script-plugin.h
-
-devel_api_scroll_view_header_files = \
-  $(devel_api_src_dir)/controls/scrollable/scroll-view/scroll-mode.h \
-  $(devel_api_src_dir)/controls/scrollable/scroll-view/scroll-view-devel.h
 
 devel_api_shader_effects_header_files = \
   $(devel_api_src_dir)/shader-effects/alpha-discard-effect.h \
@@ -130,14 +118,14 @@ devel_api_shader_effects_header_files = \
   $(devel_api_src_dir)/shader-effects/motion-blur-effect.h \
   $(devel_api_src_dir)/shader-effects/motion-stretch-effect.h
 
+devel_api_styling_header_files= \
+  $(devel_api_src_dir)/styling/style-manager-devel.h
+
 devel_api_super_blur_view_header_files = \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.h
 
 devel_api_text_controls_header_files = \
-  $(devel_api_src_dir)/controls/text-controls/hidden-input-properties.h \
   $(devel_api_src_dir)/controls/text-controls/text-editor-devel.h \
-  $(devel_api_src_dir)/controls/text-controls/text-field-devel.h \
-  $(devel_api_src_dir)/controls/text-controls/text-label-devel.h \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.h \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.h
 

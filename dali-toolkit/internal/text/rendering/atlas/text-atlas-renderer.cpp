@@ -24,6 +24,7 @@
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/animation/constraints.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -64,6 +65,7 @@ void main()
 
 const char* FRAGMENT_SHADER_L8 = MAKE_SHADER(
 uniform lowp    vec4      uColor;
+uniform lowp    vec4      textColorAnimatable;
 uniform         sampler2D sTexture;
 varying mediump vec2      vTexCoord;
 varying mediump vec4      vColor;
@@ -71,18 +73,19 @@ varying mediump vec4      vColor;
 void main()
 {
   mediump vec4 color = texture2D( sTexture, vTexCoord );
-  gl_FragColor = vec4( vColor.rgb * uColor.rgb, vColor.a * uColor.a * color.r );
+  gl_FragColor = vec4( vColor.rgb * uColor.rgb * textColorAnimatable.rgb, uColor.a * vColor.a * textColorAnimatable.a * color.r );
 }
 );
 
 const char* FRAGMENT_SHADER_RGBA = MAKE_SHADER(
 uniform lowp    vec4      uColor;
+uniform lowp    vec4      textColorAnimatable;
 uniform         sampler2D sTexture;
 varying mediump vec2      vTexCoord;
 
 void main()
 {
-  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;
+  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * textColorAnimatable;
 }
 );
 
@@ -91,6 +94,7 @@ const float HALF( 0.5f );
 const float ONE( 1.0f );
 const uint32_t DEFAULT_ATLAS_WIDTH = 512u;
 const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
+const int NO_OUTLINE( 0 );
 }
 
 struct AtlasRenderer::Impl
@@ -208,6 +212,8 @@ struct AtlasRenderer::Impl
   }
 
   void AddGlyphs( Text::ViewInterface& view,
+                  Actor textControl,
+                  Property::Index animatablePropertyIndex,
                   const Vector<Vector2>& positions,
                   const Vector<GlyphInfo>& glyphs,
                   const Vector4& defaultColor,
@@ -310,25 +316,28 @@ struct AtlasRenderer::Impl
           lastUnderlinedFontId = glyph.fontId;
         } // underline
 
-        if( !mGlyphManager.IsCached( glyph.fontId, glyph.index, slot ) )
+        bool glyphNotCached = !mGlyphManager.IsCached( glyph.fontId, glyph.index, slot );  // Check FontGlyphRecord vector for entry with glyph index and fontId
+
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "AddGlyphs fontID[%u] glyphIndex[%u] [%s]\n", glyph.fontId, glyph.index, (glyphNotCached)?"not cached":"cached" );
+
+        if( glyphNotCached )
         {
-          // Select correct size for new atlas if needed....?
-          if( lastFontId != glyph.fontId )
+          MaxBlockSize& blockSize = mBlockSizes[currentBlockSize];
+
+          if ( lastFontId != glyph.fontId )
           {
             uint32_t index = 0u;
+            // Looks through all stored block sizes until finds the one which mataches required glyph font it.  Ensures new atlas block size will match existing for same font id.
+            // CalculateBlocksSize() above ensures a block size entry exists.
             for( std::vector<MaxBlockSize>::const_iterator it = mBlockSizes.begin(),
                    endIt = mBlockSizes.end();
                  it != endIt;
                  ++it, ++index )
             {
-              const MaxBlockSize& blockSize = *it;
-              if( blockSize.mFontId == glyph.fontId )
+              const MaxBlockSize& blockSizeEntry = *it;
+              if( blockSizeEntry.mFontId == glyph.fontId )
               {
-                currentBlockSize = index;
-                mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
-                                               DEFAULT_ATLAS_HEIGHT,
-                                               blockSize.mNeededBlockWidth,
-                                               blockSize.mNeededBlockHeight );
+                blockSize = mBlockSizes[index];
               }
             }
           }
@@ -346,7 +355,8 @@ struct AtlasRenderer::Impl
 
           mFontClient.CreateBitmap( glyph.fontId,
                                     glyph.index,
-                                    glyphBufferData );
+                                    glyphBufferData,
+                                    NO_OUTLINE );
 
           // Create the pixel data.
           bitmap = PixelData::New( glyphBufferData.buffer,
@@ -358,31 +368,27 @@ struct AtlasRenderer::Impl
 
           if( bitmap )
           {
-            MaxBlockSize& blockSize = mBlockSizes[currentBlockSize];
-
             // Ensure that the next image will fit into the current block size
-            bool setSize = false;
             if( bitmap.GetWidth() > blockSize.mNeededBlockWidth )
             {
-              setSize = true;
               blockSize.mNeededBlockWidth = bitmap.GetWidth();
             }
+
             if( bitmap.GetHeight() > blockSize.mNeededBlockHeight )
             {
-              setSize = true;
               blockSize.mNeededBlockHeight = bitmap.GetHeight();
             }
 
-            if( setSize )
-            {
-              mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
-                                             DEFAULT_ATLAS_HEIGHT,
-                                             blockSize.mNeededBlockWidth,
-                                             blockSize.mNeededBlockHeight );
-            }
+            // If CheckAtlas in AtlasManager::Add can't fit the bitmap in the current atlas it will create a new atlas
+
+            // Setting the block size and size of new atlas does not mean a new one will be created. An existing atlas may still surffice.
+            mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
+                                           DEFAULT_ATLAS_HEIGHT,
+                                           blockSize.mNeededBlockWidth,
+                                           blockSize.mNeededBlockHeight );
 
             // Locate a new slot for our glyph
-            mGlyphManager.Add( glyph, bitmap, slot );
+            mGlyphManager.Add( glyph, bitmap, slot ); // slot will be 0 is glyph not added
           }
         }
         else
@@ -394,40 +400,44 @@ struct AtlasRenderer::Impl
         // Move the origin (0,0) of the mesh to the center of the actor
         const Vector2 position = *( positionsBuffer + i ) - halfTextSize - lineOffsetPosition;
 
-        // Generate mesh data for this quad, plugging in our supplied position
-        AtlasManager::Mesh2D newMesh;
-        mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
-        textCacheEntry.mFontId = glyph.fontId;
-        textCacheEntry.mImageId = slot.mImageId;
-        textCacheEntry.mIndex = glyph.index;
-        newTextCache.PushBack( textCacheEntry );
-
-        AtlasManager::Vertex2D* verticesBuffer = newMesh.mVertices.Begin();
-
-        // Get the color of the character.
-        const ColorIndex colorIndex = useDefaultColor ? 0u : *( colorIndicesBuffer + i );
-        const Vector4& color = ( useDefaultColor || ( 0u == colorIndex ) ) ? defaultColor : *( colorsBuffer + colorIndex - 1u );
-
-        for( unsigned int index = 0u, size = newMesh.mVertices.Count();
-             index < size;
-             ++index )
+        if ( 0u != slot.mImageId ) // invalid slot id, glyph has failed to be added to atlas
         {
-          AtlasManager::Vertex2D& vertex = *( verticesBuffer + index );
+          // Generate mesh data for this quad, plugging in our supplied position
+          AtlasManager::Mesh2D newMesh;
+          mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
+          textCacheEntry.mFontId = glyph.fontId;
+          textCacheEntry.mImageId = slot.mImageId;
+          textCacheEntry.mIndex = glyph.index;
+          newTextCache.PushBack( textCacheEntry );
 
-          // Set the color of the vertex.
-          vertex.mColor = color;
+          AtlasManager::Vertex2D* verticesBuffer = newMesh.mVertices.Begin();
+
+          // Get the color of the character.
+          const ColorIndex colorIndex = useDefaultColor ? 0u : *( colorIndicesBuffer + i );
+          const Vector4& color = ( useDefaultColor || ( 0u == colorIndex ) ) ? defaultColor : *( colorsBuffer + colorIndex - 1u );
+
+          for( unsigned int index = 0u, size = newMesh.mVertices.Count();
+               index < size;
+               ++index )
+          {
+            AtlasManager::Vertex2D& vertex = *( verticesBuffer + index );
+
+            // Set the color of the vertex.
+            vertex.mColor = color;
+          }
+
+          // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
+          StitchTextMesh( meshContainer,
+                          newMesh,
+                          extents,
+                          position.y + glyph.yBearing,
+                          underlineGlyph,
+                          currentUnderlinePosition,
+                          currentUnderlineThickness,
+                          slot );
+
+          lastFontId = glyph.fontId; // Prevents searching for existing blocksizes when string of the same fontId.
         }
-
-        // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
-        StitchTextMesh( meshContainer,
-                        newMesh,
-                        extents,
-                        position.y + glyph.yBearing,
-                        underlineGlyph,
-                        currentUnderlinePosition,
-                        currentUnderlineThickness,
-                        slot );
-        lastFontId = glyph.fontId;
       }
     } // glyphs
 
@@ -460,7 +470,7 @@ struct AtlasRenderer::Impl
       {
         MeshRecord& meshRecord = *it;
 
-        Actor actor = CreateMeshActor( meshRecord, textSize, STYLE_NORMAL );
+        Actor actor = CreateMeshActor( textControl, animatablePropertyIndex, defaultColor, meshRecord, textSize, STYLE_NORMAL );
 
         // Whether the actor has renderers.
         const bool hasRenderer = actor.GetRendererCount() > 0u;
@@ -480,7 +490,7 @@ struct AtlasRenderer::Impl
             vertex.mColor = shadowColor;
           }
 
-          Actor shadowActor = CreateMeshActor( meshRecord, textSize, STYLE_DROP_SHADOW );
+          Actor shadowActor = CreateMeshActor(textControl, animatablePropertyIndex, defaultColor, meshRecord, textSize, STYLE_DROP_SHADOW );
 #if defined(DEBUG_ENABLED)
           shadowActor.SetName( "Text Shadow renderable actor" );
 #endif
@@ -531,7 +541,8 @@ struct AtlasRenderer::Impl
     mTextCache.Resize( 0 );
   }
 
-  Actor CreateMeshActor( const MeshRecord& meshRecord, const Vector2& actorSize, Style style )
+  Actor CreateMeshActor( Actor textControl, Property::Index animatablePropertyIndex, const Vector4& defaultColor, const MeshRecord& meshRecord,
+                         const Vector2& actorSize, Style style )
   {
     PropertyBuffer quadVertices = PropertyBuffer::New( mQuadVertexFormat );
     quadVertices.SetData( const_cast< AtlasManager::Vertex2D* >( &meshRecord.mMesh.mVertices[ 0 ] ), meshRecord.mMesh.mVertices.Size() );
@@ -562,6 +573,26 @@ struct AtlasRenderer::Impl
         mShaderL8 = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_L8 );
       }
       shader = mShaderL8;
+    }
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "defaultColor[%f, %f, %f, %f ]\n", defaultColor.r, defaultColor.g, defaultColor.b, defaultColor.a  );
+
+    Dali::Property::Index shaderTextColorIndex = shader.RegisterProperty( "textColorAnimatable", defaultColor );
+
+    if ( animatablePropertyIndex != Property::INVALID_INDEX )
+    {
+      // create constraint for the animatable text's color Property with textColorAnimatable in the shader.
+      if( shaderTextColorIndex  )
+      {
+        Constraint constraint = Constraint::New<Vector4>( shader, shaderTextColorIndex, EqualToConstraint() );
+        constraint.AddSource( Source( textControl, animatablePropertyIndex ) );
+        constraint.Apply();
+      }
+    }
+    else
+    {
+      // If not animating the text colour then set to 1's so shader uses the current vertex color
+      shader.RegisterProperty( "textColorAnimatable", Vector4(1.0, 1.0, 1.0, 1.0 ) );
     }
 
     Dali::Renderer renderer = Dali::Renderer::New( quadGeometry, shader );
@@ -711,8 +742,9 @@ struct AtlasRenderer::Impl
            blockIt != blockEndIt;
            ++blockIt )
       {
-        if( (*blockIt).mFontId == fontId )
+        if( (*blockIt).mFontId == fontId )  // Different size fonts will have a different fontId
         {
+          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Text::AtlasRenderer::CalculateBlocksSize match found fontID(%u) glyphIndex(%u)\n", fontId, (*glyphIt).index );
           foundFont = true;
           break;
         }
@@ -727,7 +759,7 @@ struct AtlasRenderer::Impl
         maxBlockSize.mNeededBlockWidth = static_cast< uint32_t >( fontMetrics.height );
         maxBlockSize.mNeededBlockHeight = maxBlockSize.mNeededBlockWidth;
         maxBlockSize.mFontId = fontId;
-
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Text::AtlasRenderer::CalculateBlocksSize New font with no matched blocksize, setting blocksize[%u]\n", maxBlockSize.mNeededBlockWidth );
         mBlockSizes.push_back( maxBlockSize );
       }
     }
@@ -814,6 +846,8 @@ Text::RendererPtr AtlasRenderer::New()
 }
 
 Actor AtlasRenderer::Render( Text::ViewInterface& view,
+                             Actor textControl,
+                             Property::Index animatablePropertyIndex,
                              float& alignmentOffset,
                              int depth )
 {
@@ -845,6 +879,8 @@ Actor AtlasRenderer::Render( Text::ViewInterface& view,
     const Vector4& defaultColor = view.GetTextColor();
 
     mImpl->AddGlyphs( view,
+                      textControl,
+                      animatablePropertyIndex,
                       positions,
                       glyphs,
                       defaultColor,

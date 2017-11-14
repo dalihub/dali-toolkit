@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@
 #include <dali-toolkit/dali-toolkit.h>
 
 #include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 
@@ -48,6 +46,7 @@ void utc_dali_toolkit_pushbutton_cleanup(void)
 namespace
 {
 static const char* TEST_IMAGE_ONE = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+static const char* TEST_IMAGE_TWO = TEST_RESOURCE_DIR "/icon-delete.jpg";
 
 static const Vector2 INSIDE_TOUCH_POINT_POSITON  = Vector2( 240, 400 );
 static const Vector3 BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS  = Vector3( 200, 360, 0 );
@@ -448,7 +447,7 @@ int UtcDaliPushButtonLabelProperty(void)
   application.Render();
 
   pushButton.SetProperty( Toolkit::Button::Property::LABEL,
-                            Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                            Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT )
                                            .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
                           );
 
@@ -1510,7 +1509,7 @@ int UtcDaliPushButtonSetLabelText(void)
   PushButton pushButton = PushButton::New();
 
   pushButton.SetProperty( Toolkit::Button::Property::LABEL,
-                          Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                          Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT )
                                          .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
                         );
 
@@ -1813,6 +1812,40 @@ int UtcDaliPushButtonSetDisabledSelectedImageWithActorDeprecatedP(void)
   std::string urlString;
   urlValue->Get( urlString );
   DALI_TEST_EQUALS( urlString , TEST_IMAGE_ONE , TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPushButtonReplaceButtonImageP2(void)
+{
+  tet_infoline("Set button image then replace with new image and query url");
+
+  ToolkitTestApplication application;
+
+  ResourceImage setImage = ResourceImage::New( TEST_IMAGE_ONE );
+  DALI_TEST_CHECK(setImage);
+
+  Actor imgActorSet = ImageView::New(setImage);
+  DALI_TEST_CHECK(imgActorSet);
+
+  PushButton pushButton = PushButton::New();
+  pushButton.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, TEST_IMAGE_TWO );
+
+
+  Stage::GetCurrent().Add( pushButton );
+
+  pushButton.SetButtonImage( imgActorSet );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Get button image before it has been able to load");
+
+  ImageView imageView = ImageView::DownCast(pushButton.GetButtonImage());
+
+  ResourceImage getImage = ResourceImage::DownCast( imageView.GetImage() );
+
+  tet_infoline("Check if url matches last assignment even if not loaded yet");
+  DALI_TEST_EQUALS( getImage.GetUrl(), setImage.GetUrl() , TEST_LOCATION );
 
   END_TEST;
 }

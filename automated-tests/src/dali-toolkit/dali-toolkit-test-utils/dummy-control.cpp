@@ -19,8 +19,6 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/devel-api/align-enums.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 
 namespace Dali
@@ -265,6 +263,11 @@ void Impl::DummyControl::SetLayout( Property::Index visualIndex, Property::Map& 
 
 void Impl::DummyControl::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
+  if ( mRelayoutCallback )
+  {
+    mRelayoutCallback( size );  // Execute callback if set
+  }
+
   Property::Map emptyMap;
 
   for( VisualIndices::iterator iter = mRegisteredVisualIndices.begin(); iter != mRegisteredVisualIndices.end() ; ++iter )
@@ -285,6 +288,12 @@ void Impl::DummyControl::OnRelayout( const Vector2& size, RelayoutContainer& con
     visual.SetTransformAndSize( *map, size );
   }
 }
+
+void Impl::DummyControl::SetRelayoutCallback( RelayoutCallbackFunc callback  )
+{
+  mRelayoutCallback = callback;
+}
+
 
 DummyControl DummyControl::New( bool override )
 {

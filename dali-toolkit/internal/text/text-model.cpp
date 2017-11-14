@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,12 +47,12 @@ const Vector2& Model::GetScrollPosition() const
   return mScrollPosition;
 }
 
-Layout::HorizontalAlignment Model::GetHorizontalAlignment() const
+HorizontalAlignment::Type Model::GetHorizontalAlignment() const
 {
   return mHorizontalAlignment;
 }
 
-Layout::VerticalAlignment Model::GetVerticalAlignment() const
+VerticalAlignment::Type Model::GetVerticalAlignment() const
 {
   return mVerticalAlignment;
 }
@@ -70,6 +70,16 @@ Length Model::GetNumberOfLines() const
 const LineRun* const Model::GetLines() const
 {
   return mVisualModel->mLines.Begin();
+}
+
+Length Model::GetNumberOfScripts() const
+{
+  return mLogicalModel->mScriptRuns.Count();
+}
+
+const ScriptRun* const Model::GetScriptRuns() const
+{
+  return mLogicalModel->mScriptRuns.Begin();
 }
 
 Length Model::GetNumberOfGlyphs() const
@@ -102,13 +112,64 @@ const Vector4& Model::GetDefaultColor() const
   return mVisualModel->mTextColor;
 }
 
+const Vector2& Model::GetShadowOffset() const
+{
+  return mVisualModel->mShadowOffset;
+}
+
+const Vector4& Model::GetShadowColor() const
+{
+  return mVisualModel->mShadowColor;
+}
+
+const float& Model::GetShadowBlurRadius() const
+{
+  return mVisualModel->mShadowBlurRadius;
+}
+
+const Vector4& Model::GetUnderlineColor() const
+{
+  return mVisualModel->GetUnderlineColor();
+}
+
+bool Model::IsUnderlineEnabled() const
+{
+  return mVisualModel->IsUnderlineEnabled();
+}
+
+float Model::GetUnderlineHeight() const
+{
+  return mVisualModel->GetUnderlineHeight();
+}
+
+Length Model::GetNumberOfUnderlineRuns() const
+{
+  return mVisualModel->GetNumberOfUnderlineRuns();
+}
+
+void Model::GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const
+{
+  mVisualModel->GetUnderlineRuns( underlineRuns, index, numberOfRuns );
+}
+
+const Vector4& Model::GetOutlineColor() const
+{
+  return mVisualModel->GetOutlineColor();
+}
+
+float Model::GetOutlineWidth() const
+{
+  return mVisualModel->GetOutlineWidth();
+}
+
 Model::Model()
 : mLogicalModel(),
   mVisualModel(),
   mScrollPosition(),
   mScrollPositionLast(),
-  mHorizontalAlignment( Layout::HORIZONTAL_ALIGN_BEGIN ),
-  mVerticalAlignment( Layout::VERTICAL_ALIGN_TOP ),
+  mHorizontalAlignment( Text::HorizontalAlignment::BEGIN ),
+  mVerticalAlignment( Text::VerticalAlignment::TOP ),
+  mLineWrapMode( Text::LineWrap::WORD ),
   mAlignmentOffset( 0.0f ),
   mElideEnabled( false )
 {

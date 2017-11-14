@@ -20,7 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
-#include <dali/devel-api/object/weak-handle.h>
+#include <dali/public-api/object/weak-handle.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
@@ -161,8 +162,13 @@ protected:
 
 private:
 
-  typedef Dali::Vector< Dali::BaseObject* > FocusStack; ///< Define Dali::Vector< Dali::BaseObject* > as FocusStack to contain focus history
-  typedef FocusStack::Iterator FocusStackIterator; ///< Define FocusStack::Iterator as FocusStackIterator to navigate FocusStack
+  typedef std::vector< WeakHandle< Actor > > FocusStack; ///< Define Dali::Vector< Dali::BaseObject* > as FocusStack to contain focus history
+  typedef FocusStack::iterator FocusStackIterator; ///< Define FocusStack::Iterator as FocusStackIterator to navigate FocusStack
+
+  /**
+   * Get configuration from StyleManager.
+   */
+  void GetConfigurationFromStyleManger();
 
   /**
    * Get the focus group of current focused actor.
@@ -253,11 +259,13 @@ private:
 
   Actor mFocusIndicatorActor; ///< The focus indicator actor shared by all the keyboard focusable actors for highlight
 
+  int mIsFocusIndicatorEnabled; ///< Whether indicator should be shown / hidden when getting focus. It could be enabled when keyboard focus feature is enabled and navigation keys or 'Tab' key are pressed.
+
   bool mFocusGroupLoopEnabled:1; ///< Whether the focus movement is looped within the same focus group
 
-  bool mIsFocusIndicatorEnabled:1; ///< Whether indicator should be shown / hidden. It could be enabled when keyboard focus feature enabled and navigation keys or 'Tab' key pressed.
-
   bool mIsWaitingKeyboardFocusChangeCommit:1; /// A flag to indicate PreFocusChangeSignal emitted but the proposed focus actor is not commited by the application yet.
+
+  bool mClearFocusOnTouch:1; ///< Whether clear focus on touch.
 
   FocusStack mFocusHistory; ///< Stack to contain pre-focused actor's BaseObject*
 

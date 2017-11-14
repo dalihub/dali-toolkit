@@ -1727,7 +1727,8 @@ int UtcDaliBuilderTypeCasts(void)
          "\"sensitive\":   { \"typeCast\":\"boolean\", \"value\":false },"
          "\"orientation\": { \"typeCast\":\"rotation\", \"value\":[10,10,10,10] },"
          "\"colorMode\":   { \"typeCast\":\"string\", \"value\":\"USE_OWN_MULTIPLY_PARENT_COLOR\" },"
-         "\"clippingBox\": { \"typeCast\":\"rect\", \"value\":[10,10,10,10] }"
+         "\"clippingBox\": { \"typeCast\":\"rect\", \"value\":[10,10,10,10] },"
+         "\"padding\":     { \"typeCast\":\"extents\", \"value\":[10,10,10,10] }"
       "}]"
     "}"
   );
@@ -1817,6 +1818,36 @@ int UtcDaliBuilderActionsWithParams(void)
   builder.AddActors( Stage::GetCurrent().GetRootLayer() );
 
   DALI_TEST_CHECK( true ); // For Coverage
+
+  END_TEST;
+}
+
+int UtcDaliBuilderConfigurationP(void)
+{
+  ToolkitTestApplication application;
+
+  // JSON with a quit event when the actor is touched
+  std::string json(
+      "{\n"
+      "  \"config\":\n"
+      "  {\n"
+      "    \"alwaysShowFocus\":true\n"
+      "  }\n"
+      "}\n"
+  );
+
+  Builder builder = Builder::New();
+  builder.LoadFromString( json );
+
+  Property::Map map = builder.GetConfigurations();
+
+  Dali::Property::Value* pValue = map.Find( "alwaysShowFocus" );
+
+  DALI_TEST_CHECK( pValue );
+
+  bool value = pValue->Get<bool>();
+
+  DALI_TEST_CHECK( value );
 
   END_TEST;
 }

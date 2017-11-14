@@ -35,62 +35,64 @@ namespace Toolkit
 namespace DevelControl
 {
 
-ResourceReadySignalType&  ResourceReadySignal( Control& control )
-{
-  Internal::Control& internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
-
-  return controlImpl.mResourceReadySignal;
-}
-
-bool IsResourceReady( const Control& control )
-{
-  const Internal::Control& internalControl = Toolkit::Internal::GetImplementation(control);
-  const Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
-
-  return controlImpl.IsResourceReady();
-}
-
 void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual )
 {
-  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
-  controlImpl.RegisterVisual( index, visual );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.RegisterVisual( index, visual );
+}
+
+void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, int depthIndex )
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.RegisterVisual( index, visual, depthIndex );
 }
 
 void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
 {
-  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
-  controlImpl.RegisterVisual( index, visual, enabled );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.RegisterVisual( index, visual, enabled );
+}
+
+void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex )
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.RegisterVisual( index, visual, enabled, depthIndex );
 }
 
 void UnregisterVisual( Internal::Control& control, Dali::Property::Index index )
 {
-  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
-  controlImpl.UnregisterVisual( index );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.UnregisterVisual( index );
 }
 
 Toolkit::Visual::Base GetVisual( const Internal::Control& control, Dali::Property::Index index )
 {
-  const Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
-  return controlImpl.GetVisual( index );
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  return controlDataImpl.GetVisual( index );
 }
 
 void EnableVisual( Internal::Control& control, Dali::Property::Index index, bool enable )
 {
-  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
-  controlImpl.EnableVisual( index, enable );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.EnableVisual( index, enable );
 }
 
 bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index index )
 {
-  const Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
-  return controlImpl.IsVisualEnabled( index );
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  return controlDataImpl.IsVisualEnabled( index );
+}
+
+Toolkit::Visual::ResourceStatus GetVisualResourceStatus( const Internal::Control& control, Dali::Property::Index index )
+{
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  return controlDataImpl.GetVisualResourceStatus( index );
 }
 
 Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& handle )
 {
-  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( control );
-  return controlImpl.CreateTransition( handle );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  return controlDataImpl.CreateTransition( handle );
 }
 
 

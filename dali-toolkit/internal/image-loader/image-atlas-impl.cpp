@@ -22,7 +22,6 @@
 #include <string.h>
 #include <dali/public-api/signals/callback.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -262,10 +261,9 @@ void ImageAtlas::UploadToAtlas( uint32_t id, PixelData pixelData )
 
 void ImageAtlas::UploadBrokenImage( const Rect<unsigned int>& area )
 {
-  BitmapLoader loader = BitmapLoader::New(mBrokenImageUrl, ImageDimensions( area.width, area.height ) );
-  loader.Load();
-  SizeType loadedWidth = loader.GetPixelData().GetWidth();
-  SizeType loadedHeight = loader.GetPixelData().GetHeight();
+  Devel::PixelBuffer brokenBuffer = LoadImageFromFile( mBrokenImageUrl, ImageDimensions( area.width, area.height ) );
+  SizeType loadedWidth = brokenBuffer.GetWidth();
+  SizeType loadedHeight = brokenBuffer.GetHeight();
 
   bool needBackgroundClear = false;
   SizeType packX = area.x;
@@ -285,16 +283,18 @@ void ImageAtlas::UploadBrokenImage( const Rect<unsigned int>& area )
   if( needBackgroundClear )
   {
     SizeType size = area.width * area.height * Pixel::GetBytesPerPixel( mPixelFormat );
-    PixelBuffer* buffer = new PixelBuffer [size];
-    PixelData background = PixelData::New( buffer, size, area.width, area.height, mPixelFormat, PixelData::DELETE_ARRAY );
+    Devel::PixelBuffer background = Devel::PixelBuffer::New( area.width, area.height, mPixelFormat );
+    unsigned char* buffer = background.GetBuffer();
     for( SizeType idx = 0; idx < size; idx++ )
     {
       buffer[idx] = 0x00;
     }
-    mAtlas.Upload( background, 0u, 0u, area.x, area.y, area.width, area.height );
+    PixelData pixelData = Devel::PixelBuffer::Convert( background );
+    mAtlas.Upload( pixelData, 0u, 0u, area.x, area.y, area.width, area.height );
   }
 
-  mAtlas.Upload( loader.GetPixelData(), 0u, 0u, packX, packY, loadedWidth, loadedHeight );
+  PixelData brokenPixelData = Devel::PixelBuffer::Convert( brokenBuffer );
+  mAtlas.Upload( brokenPixelData, 0u, 0u, packX, packY, loadedWidth, loadedHeight );
 }
 
 } // namespace Internal

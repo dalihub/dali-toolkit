@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/buttons/button-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 
 namespace Dali
 {
@@ -97,7 +97,7 @@ void Button::SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay )
 
 float Button::GetInitialAutoRepeatingDelay() const
 {
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetPositionInheritanceMode() is deprecated and will be removed from next release. Use GetProperty INITIAL_AUTO_REPEATING_DELAY or Styling file instead.\n" );
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetInitialAutoRepeatingDelay() is deprecated and will be removed from next release. Use GetProperty INITIAL_AUTO_REPEATING_DELAY or Styling file instead.\n" );
 
   return Dali::Toolkit::GetImplementation( *this ).GetInitialAutoRepeatingDelay();
 }

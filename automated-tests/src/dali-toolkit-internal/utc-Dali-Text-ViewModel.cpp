@@ -307,14 +307,14 @@ int UtcDaliTextViewModelGetAlignment(void)
   ViewModel* model = typesetter->GetViewModel();
   DALI_TEST_CHECK( NULL != model );
 
-  DALI_TEST_EQUALS( Layout::HORIZONTAL_ALIGN_BEGIN, model->GetHorizontalAlignment(), TEST_LOCATION );
-  DALI_TEST_EQUALS( Layout::VERTICAL_ALIGN_TOP, model->GetVerticalAlignment(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Text::HorizontalAlignment::BEGIN, model->GetHorizontalAlignment(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Text::VerticalAlignment::TOP, model->GetVerticalAlignment(), TEST_LOCATION );
 
-  controller->SetHorizontalAlignment( Layout::HORIZONTAL_ALIGN_CENTER );
-  controller->SetVerticalAlignment( Layout::VERTICAL_ALIGN_CENTER );
+  controller->SetHorizontalAlignment( Text::HorizontalAlignment::CENTER );
+  controller->SetVerticalAlignment( Text::VerticalAlignment::CENTER );
 
-  DALI_TEST_EQUALS( Layout::HORIZONTAL_ALIGN_CENTER, model->GetHorizontalAlignment(), TEST_LOCATION );
-  DALI_TEST_EQUALS( Layout::VERTICAL_ALIGN_CENTER, model->GetVerticalAlignment(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Text::HorizontalAlignment::CENTER, model->GetHorizontalAlignment(), TEST_LOCATION );
+  DALI_TEST_EQUALS( Text::VerticalAlignment::CENTER, model->GetVerticalAlignment(), TEST_LOCATION );
 
   tet_result(TET_PASS);
   END_TEST;

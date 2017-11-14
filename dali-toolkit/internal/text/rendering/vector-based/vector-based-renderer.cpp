@@ -182,6 +182,8 @@ Text::RendererPtr VectorBasedRenderer::New()
 }
 
 Actor VectorBasedRenderer::Render( Text::ViewInterface& view,
+                                   Actor textControl,
+                                   Property::Index animatablePropertyIndex,
                                    float& alignmentOffset,
                                    int /*depth*/ )
 {

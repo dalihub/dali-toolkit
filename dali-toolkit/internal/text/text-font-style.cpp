@@ -45,10 +45,6 @@ const std::string TYPE_KEY( "type" );
 
 const std::string SYSTEM_TOKEN( "system" );
 
-#if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
-#endif
-
 } // namespace
 
 void SetFontFamilyProperty( ControllerPtr controller, const Property::Value& value )
@@ -216,6 +212,28 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
           }
           break;
         }
+        case FontStyle::PLACEHOLDER:
+        {
+          // Sets the placeholder text font's style values.
+          if( !weightDefined ||
+              ( weightDefined && ( controller->GetPlaceholderTextFontWeight() != weight ) ) )
+          {
+            controller->SetPlaceholderTextFontWeight( weight );
+          }
+
+          if( !widthDefined ||
+              ( widthDefined && ( controller->GetPlaceholderTextFontWidth() != width ) ) )
+          {
+            controller->SetPlaceholderTextFontWidth( width );
+          }
+
+          if( !slantDefined ||
+              ( slantDefined && ( controller->GetPlaceholderTextFontSlant() != slant ) ) )
+          {
+            controller->SetPlaceholderTextFontSlant( slant );
+          }
+          break;
+        }
       } // switch
     } // map not empty
     else
@@ -236,6 +254,13 @@ void SetFontStyleProperty( ControllerPtr controller, const Property::Value& valu
           controller->SetInputFontSlant( TextAbstraction::FontSlant::NONE );
           break;
         }
+        case FontStyle::PLACEHOLDER:
+        {
+          controller->SetPlaceholderTextFontWeight( TextAbstraction::FontWeight::NONE );
+          controller->SetPlaceholderTextFontWidth( TextAbstraction::FontWidth::NONE );
+          controller->SetPlaceholderTextFontSlant( TextAbstraction::FontSlant::NONE );
+          break;
+        }
       } // switch
     } // map.Empty()
   } // controller
@@ -245,7 +270,6 @@ void GetFontStyleProperty( ControllerPtr controller, Property::Value& value, Fon
 {
   if( controller )
   {
-    const bool isDefaultStyle = FontStyle::DEFAULT == type;
     const bool isSetbyString = controller->IsFontStyleSetByString();
 
     bool weightDefined = false;
@@ -255,46 +279,74 @@ void GetFontStyleProperty( ControllerPtr controller, Property::Value& value, Fon
     FontWidth width = TextAbstraction::FontWidth::NONE;
     FontSlant slant = TextAbstraction::FontSlant::NONE;
 
-    if( isDefaultStyle )
+    switch( type )
     {
-      weightDefined = controller->IsDefaultFontWeightDefined();
-      widthDefined = controller->IsDefaultFontWidthDefined();
-      slantDefined = controller->IsDefaultFontSlantDefined();
-
-      if( weightDefined )
+      case FontStyle::DEFAULT:
       {
-        weight = controller->GetDefaultFontWeight();
+        weightDefined = controller->IsDefaultFontWeightDefined();
+        widthDefined = controller->IsDefaultFontWidthDefined();
+        slantDefined = controller->IsDefaultFontSlantDefined();
+
+        if( weightDefined )
+        {
+          weight = controller->GetDefaultFontWeight();
+        }
+
+        if( widthDefined )
+        {
+          width = controller->GetDefaultFontWidth();
+        }
+
+        if( slantDefined )
+        {
+          slant = controller->GetDefaultFontSlant();
+        }
+        break;
       }
-
-      if( widthDefined )
+      case FontStyle::INPUT:
       {
-        width = controller->GetDefaultFontWidth();
+        weightDefined = controller->IsInputFontWeightDefined();
+        widthDefined = controller->IsInputFontWidthDefined();
+        slantDefined = controller->IsInputFontSlantDefined();
+
+        if( weightDefined )
+        {
+          weight = controller->GetInputFontWeight();
+        }
+
+        if( widthDefined )
+        {
+          width = controller->GetInputFontWidth();
+        }
+
+        if( slantDefined )
+        {
+          slant = controller->GetInputFontSlant();
+        }
+        break;
       }
-
-      if( slantDefined )
+      case FontStyle::PLACEHOLDER:
       {
-        slant = controller->GetDefaultFontSlant();
-      }
-    }
-    else
-    {
-      weightDefined = controller->IsInputFontWeightDefined();
-      widthDefined = controller->IsInputFontWidthDefined();
-      slantDefined = controller->IsInputFontSlantDefined();
+        // The type is FontStyle::PLACEHOLDER
+        weightDefined = controller->IsPlaceholderTextFontWeightDefined();
+        widthDefined = controller->IsPlaceholderTextFontWidthDefined();
+        slantDefined = controller->IsPlaceholderTextFontSlantDefined();
 
-      if( weightDefined )
-      {
-        weight = controller->GetInputFontWeight();
-      }
+        if( weightDefined )
+        {
+          weight = controller->GetPlaceholderTextFontWeight();
+        }
 
-      if( widthDefined )
-      {
-        width = controller->GetInputFontWidth();
-      }
+        if( widthDefined )
+        {
+          width = controller->GetPlaceholderTextFontWidth();
+        }
 
-      if( slantDefined )
-      {
-        slant = controller->GetInputFontSlant();
+        if( slantDefined )
+        {
+          slant = controller->GetPlaceholderTextFontSlant();
+        }
+        break;
       }
     }
 

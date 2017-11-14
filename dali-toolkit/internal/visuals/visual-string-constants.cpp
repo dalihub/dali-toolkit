@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 namespace Dali
 {
@@ -38,10 +37,10 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, GRADIENT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, MESH )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, PRIMITIVE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, TEXT )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, N_PATCH )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, SVG )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, ANIMATED_IMAGE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, TEXT )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, N_PATCH )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, SVG )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, ANIMATED_IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
 DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
 
@@ -80,6 +79,15 @@ const char * const IMAGE_WRAP_MODE_U("wrapModeU");
 const char * const IMAGE_WRAP_MODE_V("wrapModeV");
 const char * const IMAGE_BORDER( "border" );
 const char * const PIXEL_ALIGNED_UNIFORM_NAME( "uPixelAligned" );
+const char * const ANIMATED_IMAGE_URLS_NAME("urls");
+const char * const BATCH_SIZE_NAME("batchSize");
+const char * const CACHE_SIZE_NAME("cacheSize");
+const char * const FRAME_DELAY_NAME("frameDelay");
+const char * const MASK_CONTENT_SCALE_NAME("maskContentScale");
+const char * const CROP_TO_MASK_NAME("cropToMask");
+const char * const LOAD_POLICY_NAME("loadPolicy");
+const char * const RELEASE_POLICY_NAME("releasePolicy");
+const char * const ORIENTATION_CORRECTION_NAME("orientationCorrection");
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );

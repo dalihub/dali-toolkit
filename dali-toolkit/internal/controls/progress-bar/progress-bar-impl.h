@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_PROGRESS_BAR_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali-toolkit/devel-api/controls/progress-bar/progress-bar.h>
+#include <dali-toolkit/public-api/controls/progress-bar/progress-bar.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 
 namespace Dali
@@ -225,7 +225,7 @@ private:
   /**
    * Update progress bar label when progress value is changed
    */
-  void CreateVisualsForComponent( Property::Index index, const Property::Value& value, const float visualDepth );
+  void CreateVisualsForComponent( Property::Index index, const Property::Value& value, const int visualDepth );
 
   /**
    * Update progress bar label when progress value is changed

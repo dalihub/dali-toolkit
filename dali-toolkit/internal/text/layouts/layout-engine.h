@@ -23,7 +23,7 @@
 #include <dali/public-api/math/vector2.h>
 
 // INTERNAL INCLUDE
-#include <dali-toolkit/internal/text/layouts/layout-alignment.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/metrics.h>
 
@@ -144,7 +144,7 @@ public:
   void Align( const Size& size,
               CharacterIndex startIndex,
               Length numberOfCharacters,
-              Layout::HorizontalAlignment horizontalAlignment,
+              Text::HorizontalAlignment::Type horizontalAlignment,
               Vector<LineRun>& lines,
               float& alignmentOffset );
 

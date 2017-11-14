@@ -27,12 +27,15 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/controls/text-controls/placeholder-properties.h>
 #include <dali-toolkit/internal/text/bidirectional-support.h>
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
+#include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
+#include <dali-toolkit/internal/text/text-font-style.h>
 
 namespace
 {
@@ -44,6 +47,15 @@ namespace
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const std::string EMPTY_STRING("");
+
+const char * const PLACEHOLDER_TEXT = "text";
+const char * const PLACEHOLDER_TEXT_FOCUSED = "textFocused";
+const char * const PLACEHOLDER_COLOR = "color";
+const char * const PLACEHOLDER_FONT_FAMILY = "fontFamily";
+const char * const PLACEHOLDER_FONT_STYLE = "fontStyle";
+const char * const PLACEHOLDER_POINT_SIZE = "pointSize";
+const char * const PLACEHOLDER_PIXEL_SIZE = "pixelSize";
+const char * const PLACEHOLDER_ELLIPSIS = "ellipsis";
 
 float ConvertToEven( float value )
 {
@@ -345,7 +357,7 @@ bool Controller::IsMultiLineEnabled() const
   return Layout::Engine::MULTI_LINE_BOX == mImpl->mLayoutEngine.GetLayout();
 }
 
-void Controller::SetHorizontalAlignment( Layout::HorizontalAlignment alignment )
+void Controller::SetHorizontalAlignment( Text::HorizontalAlignment::Type alignment )
 {
   if( alignment != mImpl->mModel->mHorizontalAlignment )
   {
@@ -359,12 +371,12 @@ void Controller::SetHorizontalAlignment( Layout::HorizontalAlignment alignment )
   }
 }
 
-Layout::HorizontalAlignment Controller::GetHorizontalAlignment() const
+Text::HorizontalAlignment::Type Controller::GetHorizontalAlignment() const
 {
   return mImpl->mModel->mHorizontalAlignment;
 }
 
-void Controller::SetVerticalAlignment( Layout::VerticalAlignment alignment )
+void Controller::SetVerticalAlignment( VerticalAlignment::Type alignment )
 {
   if( alignment != mImpl->mModel->mVerticalAlignment )
   {
@@ -377,9 +389,37 @@ void Controller::SetVerticalAlignment( Layout::VerticalAlignment alignment )
   }
 }
 
-Layout::VerticalAlignment Controller::GetVerticalAlignment() const
+VerticalAlignment::Type Controller::GetVerticalAlignment() const
 {
   return mImpl->mModel->mVerticalAlignment;
+}
+
+void Controller::SetLineWrapMode( Text::LineWrap::Mode lineWrapMode )
+{
+  if( lineWrapMode != mImpl->mModel->mLineWrapMode )
+  {
+    // Set the text wrap mode.
+    mImpl->mModel->mLineWrapMode = lineWrapMode;
+
+
+    // Update Text layout for applying wrap mode
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                             ALIGN                     |
+                                                             LAYOUT                    |
+                                                             UPDATE_LAYOUT_SIZE        |
+                                                             REORDER                   );
+    mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
+    mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
+
+    // Request relayout
+    mImpl->RequestRelayout();
+  }
+}
+
+Text::LineWrap::Mode Controller::GetLineWrapMode() const
+{
+  return mImpl->mModel->mLineWrapMode;
 }
 
 void Controller::SetTextElideEnabled( bool enabled )
@@ -390,6 +430,34 @@ void Controller::SetTextElideEnabled( bool enabled )
 bool Controller::IsTextElideEnabled() const
 {
   return mImpl->mModel->mElideEnabled;
+}
+
+void Controller::SetPlaceholderTextElideEnabled( bool enabled )
+{
+  mImpl->mEventData->mIsPlaceholderElideEnabled = enabled;
+  mImpl->mEventData->mPlaceholderEllipsisFlag = true;
+
+  // Update placeholder if there is no text
+  if( mImpl->IsShowingPlaceholderText() ||
+      ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) )
+  {
+    ShowPlaceholderText();
+  }
+}
+
+bool Controller::IsPlaceholderTextElideEnabled() const
+{
+  return mImpl->mEventData->mIsPlaceholderElideEnabled;
+}
+
+void Controller::SetSelectionEnabled( bool enabled )
+{
+  mImpl->mEventData->mSelectionEnabled = enabled;
+}
+
+bool Controller::IsSelectionEnabled() const
+{
+  return mImpl->mEventData->mSelectionEnabled;
 }
 
 // public : Update
@@ -593,6 +661,33 @@ const std::string& Controller::GetDefaultFontFamily() const
   return EMPTY_STRING;
 }
 
+void Controller::SetPlaceholderFontFamily( const std::string& placeholderTextFontFamily )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    if( NULL == mImpl->mEventData->mPlaceholderFont )
+    {
+      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
+    }
+
+    mImpl->mEventData->mPlaceholderFont->mFontDescription.family = placeholderTextFontFamily;
+    DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::SetPlaceholderFontFamily %s\n", placeholderTextFontFamily.c_str());
+    mImpl->mEventData->mPlaceholderFont->familyDefined = !placeholderTextFontFamily.empty();
+
+    mImpl->RequestRelayout();
+  }
+}
+
+const std::string& Controller::GetPlaceholderFontFamily() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->mFontDescription.family;
+  }
+
+  return EMPTY_STRING;
+}
+
 void Controller::SetDefaultFontWeight( FontWeight weight )
 {
   if( NULL == mImpl->mFontDefaults )
@@ -611,7 +706,12 @@ void Controller::SetDefaultFontWeight( FontWeight weight )
 
 bool Controller::IsDefaultFontWeightDefined() const
 {
-  return mImpl->mFontDefaults->weightDefined;
+  if( NULL != mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->weightDefined;
+  }
+
+  return false;
 }
 
 FontWeight Controller::GetDefaultFontWeight() const
@@ -619,6 +719,41 @@ FontWeight Controller::GetDefaultFontWeight() const
   if( NULL != mImpl->mFontDefaults )
   {
     return mImpl->mFontDefaults->mFontDescription.weight;
+  }
+
+  return TextAbstraction::FontWeight::NORMAL;
+}
+
+void Controller::SetPlaceholderTextFontWeight( FontWeight weight )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    if( NULL == mImpl->mEventData->mPlaceholderFont )
+    {
+      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
+    }
+
+    mImpl->mEventData->mPlaceholderFont->mFontDescription.weight = weight;
+    mImpl->mEventData->mPlaceholderFont->weightDefined = true;
+
+    mImpl->RequestRelayout();
+  }
+}
+
+bool Controller::IsPlaceholderTextFontWeightDefined() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->weightDefined;
+  }
+  return false;
+}
+
+FontWeight Controller::GetPlaceholderTextFontWeight() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->mFontDescription.weight;
   }
 
   return TextAbstraction::FontWeight::NORMAL;
@@ -642,7 +777,12 @@ void Controller::SetDefaultFontWidth( FontWidth width )
 
 bool Controller::IsDefaultFontWidthDefined() const
 {
-  return mImpl->mFontDefaults->widthDefined;
+  if( NULL != mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->widthDefined;
+  }
+
+  return false;
 }
 
 FontWidth Controller::GetDefaultFontWidth() const
@@ -650,6 +790,41 @@ FontWidth Controller::GetDefaultFontWidth() const
   if( NULL != mImpl->mFontDefaults )
   {
     return mImpl->mFontDefaults->mFontDescription.width;
+  }
+
+  return TextAbstraction::FontWidth::NORMAL;
+}
+
+void Controller::SetPlaceholderTextFontWidth( FontWidth width )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    if( NULL == mImpl->mEventData->mPlaceholderFont )
+    {
+      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
+    }
+
+    mImpl->mEventData->mPlaceholderFont->mFontDescription.width = width;
+    mImpl->mEventData->mPlaceholderFont->widthDefined = true;
+
+    mImpl->RequestRelayout();
+  }
+}
+
+bool Controller::IsPlaceholderTextFontWidthDefined() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->widthDefined;
+  }
+  return false;
+}
+
+FontWidth Controller::GetPlaceholderTextFontWidth() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->mFontDescription.width;
   }
 
   return TextAbstraction::FontWidth::NORMAL;
@@ -673,7 +848,11 @@ void Controller::SetDefaultFontSlant( FontSlant slant )
 
 bool Controller::IsDefaultFontSlantDefined() const
 {
-  return mImpl->mFontDefaults->slantDefined;
+  if( NULL != mImpl->mFontDefaults )
+  {
+    return mImpl->mFontDefaults->slantDefined;
+  }
+  return false;
 }
 
 FontSlant Controller::GetDefaultFontSlant() const
@@ -681,6 +860,41 @@ FontSlant Controller::GetDefaultFontSlant() const
   if( NULL != mImpl->mFontDefaults )
   {
     return mImpl->mFontDefaults->mFontDescription.slant;
+  }
+
+  return TextAbstraction::FontSlant::NORMAL;
+}
+
+void Controller::SetPlaceholderTextFontSlant( FontSlant slant )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    if( NULL == mImpl->mEventData->mPlaceholderFont )
+    {
+      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
+    }
+
+    mImpl->mEventData->mPlaceholderFont->mFontDescription.slant = slant;
+    mImpl->mEventData->mPlaceholderFont->slantDefined = true;
+
+    mImpl->RequestRelayout();
+  }
+}
+
+bool Controller::IsPlaceholderTextFontSlantDefined() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->slantDefined;
+  }
+  return false;
+}
+
+FontSlant Controller::GetPlaceholderTextFontSlant() const
+{
+  if( ( NULL != mImpl->mEventData ) && ( NULL != mImpl->mEventData->mPlaceholderFont ) )
+  {
+    return mImpl->mEventData->mPlaceholderFont->mFontDescription.slant;
   }
 
   return TextAbstraction::FontSlant::NORMAL;
@@ -703,19 +917,15 @@ void Controller::SetDefaultFontSize( float fontSize, FontSizeType type )
     }
     case PIXEL_SIZE:
     {
-      // Point size = Pixel size * 72 / DPI
+      // Point size = Pixel size * 72.f / DPI
       unsigned int horizontalDpi = 0u;
       unsigned int verticalDpi = 0u;
       TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
       fontClient.GetDpi( horizontalDpi, verticalDpi );
 
-      mImpl->mFontDefaults->mDefaultPointSize = ( fontSize * 72 ) / horizontalDpi;
+      mImpl->mFontDefaults->mDefaultPointSize = ( fontSize * 72.f ) / static_cast< float >( horizontalDpi );
       mImpl->mFontDefaults->sizeDefined = true;
       break;
-    }
-    default:
-    {
-      DALI_ASSERT_ALWAYS( false );
     }
   }
 
@@ -739,18 +949,97 @@ float Controller::GetDefaultFontSize( FontSizeType type ) const
       }
       case PIXEL_SIZE:
       {
-        // Pixel size = Point size * DPI / 72
+        // Pixel size = Point size * DPI / 72.f
         unsigned int horizontalDpi = 0u;
         unsigned int verticalDpi = 0u;
         TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
         fontClient.GetDpi( horizontalDpi, verticalDpi );
 
-        value = mImpl->mFontDefaults->mDefaultPointSize * horizontalDpi / 72;
+        value = mImpl->mFontDefaults->mDefaultPointSize * static_cast< float >( horizontalDpi ) / 72.f;
         break;
       }
-      default:
+    }
+    return value;
+  }
+
+  return value;
+}
+
+void Controller::SetPlaceholderTextFontSize( float fontSize, FontSizeType type )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    if( NULL == mImpl->mEventData->mPlaceholderFont )
+    {
+      mImpl->mEventData->mPlaceholderFont = new FontDefaults();
+    }
+
+    switch( type )
+    {
+      case POINT_SIZE:
       {
-        DALI_ASSERT_ALWAYS( false );
+        mImpl->mEventData->mPlaceholderFont->mDefaultPointSize = fontSize;
+        mImpl->mEventData->mPlaceholderFont->sizeDefined = true;
+        mImpl->mEventData->mIsPlaceholderPixelSize = false; // Font size flag
+        break;
+      }
+      case PIXEL_SIZE:
+      {
+        // Point size = Pixel size * 72.f / DPI
+        unsigned int horizontalDpi = 0u;
+        unsigned int verticalDpi = 0u;
+        TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+        fontClient.GetDpi( horizontalDpi, verticalDpi );
+
+        mImpl->mEventData->mPlaceholderFont->mDefaultPointSize = ( fontSize * 72.f ) / static_cast< float >( horizontalDpi );
+        mImpl->mEventData->mPlaceholderFont->sizeDefined = true;
+        mImpl->mEventData->mIsPlaceholderPixelSize = true; // Font size flag
+        break;
+      }
+    }
+
+    mImpl->RequestRelayout();
+  }
+}
+
+float Controller::GetPlaceholderTextFontSize( FontSizeType type ) const
+{
+  float value = 0.0f;
+  if( NULL != mImpl->mEventData )
+  {
+    switch( type )
+    {
+      case POINT_SIZE:
+      {
+        if( NULL != mImpl->mEventData->mPlaceholderFont )
+        {
+          value = mImpl->mEventData->mPlaceholderFont->mDefaultPointSize;
+        }
+        else
+        {
+          // If the placeholder text font size is not set, then return the default font size.
+          value = GetDefaultFontSize( POINT_SIZE );
+        }
+        break;
+      }
+      case PIXEL_SIZE:
+      {
+        if( NULL != mImpl->mEventData->mPlaceholderFont )
+        {
+          // Pixel size = Point size * DPI / 72.f
+          unsigned int horizontalDpi = 0u;
+          unsigned int verticalDpi = 0u;
+          TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+          fontClient.GetDpi( horizontalDpi, verticalDpi );
+
+          value = mImpl->mEventData->mPlaceholderFont->mDefaultPointSize * static_cast< float >( horizontalDpi ) / 72.f;
+        }
+        else
+        {
+          // If the placeholder text font size is not set, then return the default font size.
+          value = GetDefaultFontSize( PIXEL_SIZE );
+        }
+        break;
       }
     }
     return value;
@@ -824,6 +1113,21 @@ const Vector4& Controller::GetShadowColor() const
   return mImpl->mModel->mVisualModel->GetShadowColor();
 }
 
+void Controller::SetShadowBlurRadius( const float& shadowBlurRadius )
+{
+  if ( fabsf( GetShadowBlurRadius() - shadowBlurRadius ) > Math::MACHINE_EPSILON_1 )
+  {
+    mImpl->mModel->mVisualModel->SetShadowBlurRadius( shadowBlurRadius );
+
+    mImpl->RequestRelayout();
+  }
+}
+
+const float& Controller::GetShadowBlurRadius() const
+{
+  return mImpl->mModel->mVisualModel->GetShadowBlurRadius();
+}
+
 void Controller::SetUnderlineColor( const Vector4& color )
 {
   mImpl->mModel->mVisualModel->SetUnderlineColor( color );
@@ -858,6 +1162,30 @@ void Controller::SetUnderlineHeight( float height )
 float Controller::GetUnderlineHeight() const
 {
   return mImpl->mModel->mVisualModel->GetUnderlineHeight();
+}
+
+void Controller::SetOutlineColor( const Vector4& color )
+{
+  mImpl->mModel->mVisualModel->SetOutlineColor( color );
+
+  mImpl->RequestRelayout();
+}
+
+const Vector4& Controller::GetOutlineColor() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineColor();
+}
+
+void Controller::SetOutlineWidth( float width )
+{
+  mImpl->mModel->mVisualModel->SetOutlineWidth( width );
+
+  mImpl->RequestRelayout();
+}
+
+float Controller::GetOutlineWidth() const
+{
+  return mImpl->mModel->mVisualModel->GetOutlineWidth();
 }
 
 void Controller::SetDefaultEmbossProperties( const std::string& embossProperties )
@@ -1438,6 +1766,16 @@ void Controller::ShadowSetByString( bool setByString )
   mImpl->mShadowSetByString = setByString;
 }
 
+bool Controller::IsOutlineSetByString()
+{
+  return mImpl->mOutlineSetByString;
+}
+
+void Controller::OutlineSetByString( bool setByString )
+{
+  mImpl->mOutlineSetByString = setByString;
+}
+
 bool Controller::IsFontStyleSetByString()
 {
   return mImpl->mFontStyleSetByString;
@@ -1488,14 +1826,14 @@ Vector3 Controller::GetNaturalSize()
     mImpl->UpdateModel( onlyOnceOperations );
 
     // Layout the text for the new width.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT );
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | LAYOUT | REORDER );
 
     // Store the actual control's size to restore later.
     const Size actualControlSize = mImpl->mModel->mVisualModel->mControlSize;
 
     DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
                 static_cast<OperationsMask>( onlyOnceOperations |
-                                             LAYOUT ),
+                                             LAYOUT | REORDER ),
                 naturalSize.GetVectorXY() );
 
     // Do not do again the only once operations.
@@ -1541,7 +1879,9 @@ float Controller::GetHeightForWidth( float width )
   ProcessModifyEvents();
 
   Size layoutSize;
-  if( fabsf( width - mImpl->mModel->mVisualModel->mControlSize.width ) > Math::MACHINE_EPSILON_1000 )
+  if( fabsf( width - mImpl->mModel->mVisualModel->mControlSize.width ) > Math::MACHINE_EPSILON_1000 ||
+                                                         mImpl->mTextUpdateInfo.mFullRelayoutNeeded ||
+                                                         mImpl->mTextUpdateInfo.mClearAll            )
   {
     // Operations that can be done only once until the text changes.
     const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
@@ -1599,6 +1939,13 @@ float Controller::GetHeightForWidth( float width )
   return layoutSize.height;
 }
 
+int Controller::GetLineCount( float width )
+{
+  GetHeightForWidth( width );
+  int numberofLines = mImpl->mModel->GetNumberOfLines();
+  return numberofLines;
+}
+
 const ModelInterface* const Controller::GetTextModel() const
 {
   return mImpl->mModel.Get();
@@ -1642,6 +1989,111 @@ void Controller::GetHiddenInputOption(Property::Map& options )
   if( NULL != mImpl->mHiddenInput )
   {
     mImpl->mHiddenInput->GetProperties(options);
+  }
+}
+
+void Controller::SetPlaceholderProperty( const Property::Map& map )
+{
+  const Property::Map::SizeType count = map.Count();
+
+  for( Property::Map::SizeType position = 0; position < count; ++position )
+  {
+    KeyValuePair keyValue = map.GetKeyValue( position );
+    Property::Key& key = keyValue.first;
+    Property::Value& value = keyValue.second;
+
+    if( key == Toolkit::Text::PlaceHolder::Property::TEXT  || key == PLACEHOLDER_TEXT )
+    {
+      std::string text = "";
+      value.Get( text );
+      SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, text );
+    }
+    else if( key == Toolkit::Text::PlaceHolder::Property::TEXT_FOCUSED || key == PLACEHOLDER_TEXT_FOCUSED )
+    {
+      std::string text = "";
+      value.Get( text );
+      SetPlaceholderText( Controller::PLACEHOLDER_TYPE_ACTIVE, text );
+    }
+    else if( key == Toolkit::Text::PlaceHolder::Property::COLOR || key == PLACEHOLDER_COLOR )
+    {
+      Vector4 textColor;
+      value.Get( textColor );
+      if( GetPlaceholderTextColor() != textColor )
+      {
+        SetPlaceholderTextColor( textColor );
+      }
+    }
+    else if( key == Toolkit::Text::PlaceHolder::Property::FONT_FAMILY || key == PLACEHOLDER_FONT_FAMILY )
+    {
+      std::string fontFamily = "";
+      value.Get( fontFamily );
+      SetPlaceholderFontFamily( fontFamily );
+    }
+    else if( key == Toolkit::Text::PlaceHolder::Property::FONT_STYLE || key == PLACEHOLDER_FONT_STYLE )
+    {
+      SetFontStyleProperty( this, value, Text::FontStyle::PLACEHOLDER );
+    }
+    else if( key == Toolkit::Text::PlaceHolder::Property::POINT_SIZE || key == PLACEHOLDER_POINT_SIZE )
+    {
+      float pointSize;
+      value.Get( pointSize );
+      if( !Equals( GetPlaceholderTextFontSize( Text::Controller::POINT_SIZE ), pointSize ) )
+      {
+        SetPlaceholderTextFontSize( pointSize, Text::Controller::POINT_SIZE );
+      }
+    }
+    else if( key == Toolkit::Text::PlaceHolder::Property::PIXEL_SIZE || key == PLACEHOLDER_PIXEL_SIZE )
+    {
+      float pixelSize;
+      value.Get( pixelSize );
+      if( !Equals( GetPlaceholderTextFontSize( Text::Controller::PIXEL_SIZE ), pixelSize ) )
+      {
+        SetPlaceholderTextFontSize( pixelSize, Text::Controller::PIXEL_SIZE );
+      }
+    }
+    else if( key == Toolkit::Text::PlaceHolder::Property::ELLIPSIS || key == PLACEHOLDER_ELLIPSIS )
+    {
+      bool ellipsis;
+      value.Get( ellipsis );
+      SetPlaceholderTextElideEnabled( ellipsis );
+    }
+  }
+}
+
+void Controller::GetPlaceholderProperty( Property::Map& map )
+{
+  if( NULL != mImpl->mEventData )
+  {
+    if( !mImpl->mEventData->mPlaceholderTextActive.empty() )
+    {
+      map[ Text::PlaceHolder::Property::TEXT_FOCUSED ] = mImpl->mEventData->mPlaceholderTextActive;
+    }
+    if( !mImpl->mEventData->mPlaceholderTextInactive.empty() )
+    {
+      map[ Text::PlaceHolder::Property::TEXT ] = mImpl->mEventData->mPlaceholderTextInactive;
+    }
+
+    map[ Text::PlaceHolder::Property::COLOR ] = mImpl->mEventData->mPlaceholderTextColor;
+    map[ Text::PlaceHolder::Property::FONT_FAMILY ] = GetPlaceholderFontFamily();
+
+    Property::Value fontStyleMapGet;
+    GetFontStyleProperty( this, fontStyleMapGet, Text::FontStyle::PLACEHOLDER );
+    map[ Text::PlaceHolder::Property::FONT_STYLE ] = fontStyleMapGet;
+
+    // Choose font size : POINT_SIZE or PIXEL_SIZE
+    if( !mImpl->mEventData->mIsPlaceholderPixelSize )
+    {
+      map[ Text::PlaceHolder::Property::POINT_SIZE ] = GetPlaceholderTextFontSize( Text::Controller::POINT_SIZE );
+    }
+    else
+    {
+      map[ Text::PlaceHolder::Property::PIXEL_SIZE ] = GetPlaceholderTextFontSize( Text::Controller::PIXEL_SIZE );
+    }
+
+    if( mImpl->mEventData->mPlaceholderEllipsisFlag )
+    {
+      map[ Text::PlaceHolder::Property::ELLIPSIS ] = IsPlaceholderTextElideEnabled();
+    }
   }
 }
 
@@ -1697,6 +2149,20 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
     // Style operations that need to be done if the text is modified.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                              COLOR );
+  }
+
+  // Set the update info to elide the text.
+  if( mImpl->mModel->mElideEnabled ||
+      ( ( NULL != mImpl->mEventData ) && mImpl->mEventData->mIsPlaceholderElideEnabled ) )
+  {
+    // Update Text layout for applying elided
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                             ALIGN                     |
+                                                             LAYOUT                    |
+                                                             UPDATE_LAYOUT_SIZE        |
+                                                             REORDER );
+    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
+    mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
   }
 
   // Make sure the model is up-to-date before layouting.
@@ -1862,14 +2328,12 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       // In some platforms arrive key events with no key code.
       // Do nothing.
+      return false;
     }
-    else if( Dali::DALI_KEY_ESCAPE == keyCode )
+    else if( Dali::DALI_KEY_ESCAPE == keyCode || Dali::DALI_KEY_BACK == keyCode  || Dali::DALI_KEY_SEARCH == keyCode )
     {
-      // Escape key is a special case which causes focus loss
-      KeyboardFocusLostEvent();
-
-      // Will request for relayout.
-      relayoutNeeded = true;
+      // Do nothing
+      return false;
     }
     else if( ( Dali::DALI_KEY_CURSOR_LEFT  == keyCode ) ||
              ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode ) ||
@@ -1931,11 +2395,13 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // and a character is typed after the type of a upper case latin character.
 
       // Do nothing.
+      return false;
     }
     else if( ( Dali::DALI_KEY_VOLUME_UP == keyCode ) || ( Dali::DALI_KEY_VOLUME_DOWN == keyCode ) )
     {
       // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
       // Do nothing.
+      return false;
     }
     else
     {
@@ -2609,8 +3075,18 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     }
 
     // Mark the first paragraph to be updated.
-    mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
-    mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd += maxSizeOfNewText;
+    if( Layout::Engine::SINGLE_LINE_BOX == mImpl->mLayoutEngine.GetLayout() )
+    {
+      mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = numberOfCharactersInModel + maxSizeOfNewText;
+      mImpl->mTextUpdateInfo.mClearAll = true;
+    }
+    else
+    {
+      mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd += maxSizeOfNewText;
+    }
 
     // Update the cursor index.
     cursorIndex += maxSizeOfNewText;
@@ -2708,8 +3184,18 @@ bool Controller::RemoveText( int cursorOffset,
         ( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters ) )
     {
       // Mark the paragraphs to be updated.
-      mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove += numberOfCharacters;
+      if( Layout::Engine::SINGLE_LINE_BOX == mImpl->mLayoutEngine.GetLayout() )
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters - numberOfCharacters;
+        mImpl->mTextUpdateInfo.mClearAll = true;
+      }
+      else
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex = std::min( cursorIndex, mImpl->mTextUpdateInfo.mCharacterIndex );
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove += numberOfCharacters;
+      }
 
       // Update the input style and remove the text's style before removing the text.
 
@@ -2846,7 +3332,8 @@ bool Controller::DoRelayout( const Size& size,
                                          charactersToGlyphBuffer,
                                          glyphsPerCharacterBuffer,
                                          totalNumberOfGlyphs,
-                                         mImpl->mModel->mHorizontalAlignment );
+                                         mImpl->mModel->mHorizontalAlignment,
+                                         mImpl->mModel->mLineWrapMode );
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mModel->mVisualModel->mGlyphPositions;
@@ -2862,13 +3349,35 @@ bool Controller::DoRelayout( const Size& size,
     layoutParameters.startLineIndex = mImpl->mTextUpdateInfo.mStartLineIndex;
     layoutParameters.estimatedNumberOfLines = mImpl->mTextUpdateInfo.mEstimatedNumberOfLines;
 
+    // Update the ellipsis
+    bool elideTextEnabled = mImpl->mModel->mElideEnabled;
+
+    if( NULL != mImpl->mEventData )
+    {
+      if( mImpl->mEventData->mPlaceholderEllipsisFlag && mImpl->IsShowingPlaceholderText() )
+      {
+        elideTextEnabled = mImpl->mEventData->mIsPlaceholderElideEnabled;
+      }
+      else if( EventData::INACTIVE != mImpl->mEventData->mState )
+      {
+        // Disable ellipsis when editing
+        elideTextEnabled = false;
+      }
+
+      // Reset the scroll position in inactive state
+      if( elideTextEnabled && ( mImpl->mEventData->mState == EventData::INACTIVE ) )
+      {
+        ResetScrollPosition();
+      }
+    }
+
     // Update the visual model.
     Size newLayoutSize;
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
                                                    glyphPositions,
                                                    mImpl->mModel->mVisualModel->mLines,
                                                    newLayoutSize,
-                                                   mImpl->mModel->mElideEnabled );
+                                                   elideTextEnabled );
 
     viewUpdated = viewUpdated || ( newLayoutSize != layoutSize );
 
@@ -2967,17 +3476,17 @@ void Controller::CalculateVerticalOffset( const Size& controlSize )
 
   switch( mImpl->mModel->mVerticalAlignment )
   {
-    case Layout::VERTICAL_ALIGN_TOP:
+    case VerticalAlignment::TOP:
     {
       mImpl->mModel->mScrollPosition.y = 0.f;
       break;
     }
-    case Layout::VERTICAL_ALIGN_CENTER:
+    case VerticalAlignment::CENTER:
     {
       mImpl->mModel->mScrollPosition.y = floorf( 0.5f * ( controlSize.height - layoutSize.height ) ); // try to avoid pixel alignment.
       break;
     }
-    case Layout::VERTICAL_ALIGN_BOTTOM:
+    case VerticalAlignment::BOTTOM:
     {
       mImpl->mModel->mScrollPosition.y = controlSize.height - layoutSize.height;
       break;
@@ -3195,7 +3704,7 @@ void Controller::ShowPlaceholderText()
     const char* text( NULL );
     size_t size( 0 );
 
-    // TODO - Switch placeholder text styles when changing state
+    // TODO - Switch Placeholder text when changing state
     if( ( EventData::INACTIVE != mImpl->mEventData->mState ) &&
         ( 0u != mImpl->mEventData->mPlaceholderTextActive.c_str() ) )
     {
@@ -3299,6 +3808,16 @@ void Controller::ResetScrollPosition()
     mImpl->mModel->mScrollPosition = Vector2::ZERO;
     mImpl->mEventData->mScrollAfterUpdatePosition = true;
   }
+}
+
+void Controller::SetControlInterface( ControlInterface* controlInterface )
+{
+  mImpl->mControlInterface = controlInterface;
+}
+
+bool Controller::ShouldClearFocusOnEscape() const
+{
+  return mImpl->mShouldClearFocusOnEscape;
 }
 
 // private : Private contructors & copy operator.

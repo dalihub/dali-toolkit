@@ -274,6 +274,7 @@ private: // Data
   Dali::InputMethodOptions mInputMethodOptions;
 
   Actor mRenderableActor;
+  Actor mActiveLayer;
   CallbackBase* mIdleCallback;
 
   float mAlignmentOffset;

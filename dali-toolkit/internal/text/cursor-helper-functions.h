@@ -50,6 +50,7 @@ struct CursorInfo
   : primaryPosition(),
     secondaryPosition(),
     lineOffset( 0.f ),
+    glyphOffset( 0.f ),
     lineHeight( 0.f ),
     primaryCursorHeight( 0.f ),
     secondaryCursorHeight( 0.f ),
@@ -62,10 +63,23 @@ struct CursorInfo
   Vector2 primaryPosition;       ///< The primary cursor's position (in text's coords).
   Vector2 secondaryPosition;     ///< The secondary cursor's position (in text's coords).
   float   lineOffset;            ///< The vertical offset where the line containing the cursor starts.
+  float   glyphOffset;           ///< The difference of line ascender and glyph ascender.
   float   lineHeight;            ///< The height of the line where the cursor is placed.
   float   primaryCursorHeight;   ///< The primary cursor's height.
   float   secondaryCursorHeight; ///< The secondary cursor's height.
   bool    isSecondaryCursor;     ///< Whether the secondary cursor is valid.
+};
+
+/**
+ * @brief Parameters passed to the GetCursorPosition() function.
+ */
+struct GetCursorPositionParameters
+{
+  VisualModelPtr visualModel;    ///< The visual model.
+  LogicalModelPtr logicalModel;  ///< The logical model.
+  MetricsPtr metrics;            ///< A wrapper around FontClient used to get metrics.
+  CharacterIndex logical;        ///< The logical cursor position (in characters). 0 is just before the first character, a value equal to the number of characters is just after the last character.
+  bool isMultiline;              ///< Whether the text control is multi-line.
 };
 
 /**
@@ -128,16 +142,10 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
  * It retrieves as well the line's height and the cursor's height and
  * if there is a valid alternative cursor, its position and height.
  *
- * @param[in] visualModel The visual model.
- * @param[in] logicalModel The logical model.
- * @param[in] metrics A wrapper around FontClient used to get metrics.
- * @param[in] logical The logical cursor position (in characters). 0 is just before the first character, a value equal to the number of characters is just after the last character.
+ * @param[in] parameters Parameters used to calculate the cursor's position.
  * @param[out] cursorInfo The line's height, the cursor's height, the cursor's position and whether there is an alternative cursor.
  */
-void GetCursorPosition( VisualModelPtr visualModel,
-                        LogicalModelPtr logicalModel,
-                        MetricsPtr metrics,
-                        CharacterIndex logical,
+void GetCursorPosition( GetCursorPositionParameters& parameters,
                         CursorInfo& cursorInfo );
 
 /**

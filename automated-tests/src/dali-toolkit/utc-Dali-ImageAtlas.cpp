@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
-
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/dali-toolkit.h>
 
 using namespace Dali;
@@ -38,8 +35,8 @@ static const char* gImage_50_RGBA = TEST_RESOURCE_DIR "/icon-delete.png";
 // resolution: 128*128, pixel format: RGB888
 static const char* gImage_128_RGB = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 
-// this is image is not exist, for negative test
-static const char* gImageNonExist = "non-exist.jpg";
+// Empty image, for testing broken image loading
+static const char* gEmptyImage = TEST_RESOURCE_DIR "/empty.bmp";
 
 const int RENDER_FRAME_INTERVAL = 16; ///< Duration of each frame in ms. (at approx 60FPS)
 
@@ -194,25 +191,26 @@ int UtcDaliImageAtlasSetBrokenImage(void)
   unsigned int size = 200;
   ImageAtlas atlas = ImageAtlas::New( size, size );
 
-  Vector4 textureRect;
-  atlas.Upload( textureRect, gImageNonExist );
-  DALI_TEST_EQUALS( textureRect, Vector4::ZERO, TEST_LOCATION );
-
   // Set broken image
   TestPlatformAbstraction& platform = application.GetPlatform();
   platform.SetClosestImageSize(Vector2( 34, 34));
   atlas.SetBrokenImage( gImage_34_RGBA );
 
-  // the non-exit image will be replaced with the broken image
-  platform.SetClosestImageSize(Vector2( 0, 0));
-  atlas.Upload( textureRect, gImageNonExist );
+  Vector4 textureRect;
+
+  // the empty image will be replaced with the broken image
+  platform.SetClosestImageSize(Vector2( 20, 20));
+  atlas.Upload( textureRect, gEmptyImage );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   Rect<int> pixelArea = TextureCoordinateToPixelArea(textureRect, size);
-  DALI_TEST_EQUALS( pixelArea.width, 34, TEST_LOCATION );
-  DALI_TEST_EQUALS( pixelArea.height, 34, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.width, 20, TEST_LOCATION );
+  DALI_TEST_EQUALS( pixelArea.height, 20, TEST_LOCATION );
 
   END_TEST;
 }
+
+
 
 int UtcDaliImageAtlasUploadP(void)
 {
@@ -398,14 +396,14 @@ int UtcDaliImageAtlasImageView(void)
   imageMap1[ ImageVisual::Property::URL ] = gImage_34_RGBA;
   imageMap1[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
   imageMap1[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
-  imageMap1[ DevelImageVisual::Property::ATLASING] = true;
+  imageMap1[ ImageVisual::Property::ATLASING] = true;
 
   Property::Map imageMap2;
 
   imageMap2[ ImageVisual::Property::URL ] = gImage_50_RGBA;
   imageMap2[ ImageVisual::Property::DESIRED_HEIGHT ] = 50;
   imageMap2[ ImageVisual::Property::DESIRED_WIDTH ] = 50;
-  imageMap2[ DevelImageVisual::Property::ATLASING ] = true;
+  imageMap2[ ImageVisual::Property::ATLASING ] = true;
 
   ImageView imageView1 = ImageView::New();
   imageView1.SetProperty( ImageView::Property::IMAGE, imageMap1 );
@@ -459,7 +457,7 @@ int UtcDaliImageAtlasImageView(void)
   imageMap3[ ImageVisual::Property::URL ] = gImage_128_RGB;
   imageMap3[ ImageVisual::Property::DESIRED_HEIGHT ] = 100;
   imageMap3[ ImageVisual::Property::DESIRED_WIDTH ] = 100;
-  imageMap3[ DevelImageVisual::Property::ATLASING ] = true;
+  imageMap3[ ImageVisual::Property::ATLASING ] = true;
 
   ImageView imageView3 = ImageView::New();
   imageView3.SetProperty( ImageView::Property::IMAGE, imageMap3 );

@@ -37,6 +37,14 @@ class Base;
 
 namespace Visual
 {
+
+enum class ResourceStatus
+{
+  PREPARING,
+  READY,
+  FAILED
+};
+
 /**
  * @brief A Visual provides a renderer for drawing a control component. A control may have multiple visuals.
  *
@@ -67,8 +75,8 @@ namespace Visual
  * | size                    | VECTOR2           | No       | (1,1)                  | size of visual                                      |
  * | origin                  | INTEGER or STRING | No       | CENTER                 | origin of the visual @sa Dali::Toolkit::Align       |
  * | anchorPoint             | INTEGER or STRING | No       | CENTER                 | anchor point of the visual @sa Dali::Toolkit::Align |
- * | offsetPolicy            | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::DevelVisual::Transform::Policy   |
- * | sizePolicy              | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::DevelVisual::Transform::Policy   |
+ * | offsetPolicy            | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::Visual::Transform::Policy   |
+ * | sizePolicy              | VECTOR2           | No       | ( RELATIVE, RELATIVE ) | @sa Dali::Toolkit::Visual::Transform::Policy   |
  *
  * Relative means that the component describes a factor of the parent control size;
  * size.x = 1 means full width; size.y = 0.5 means half height.
@@ -170,14 +178,14 @@ public:
    *
    * @param[in] index The depth index of this visual.
    */
-  void SetDepthIndex( float index );
+  void SetDepthIndex( int index );
 
   /**
    * @brief Get the depth index of this visual
    *
    * @return The depth index of this visual.
    */
-  float GetDepthIndex() const;
+  int GetDepthIndex() const;
 
   /**
    * @brief Create the property map representing this visual.

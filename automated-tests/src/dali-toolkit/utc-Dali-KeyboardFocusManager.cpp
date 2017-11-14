@@ -865,7 +865,7 @@ int UtcDaliKeyboardFocusManagerSignalFocusedActorActivated(void)
   FocusedActorActivatedCallback focusedActorActivatedCallback(focusedActorActivatedSignalVerified);
   manager.FocusedActorEnterKeySignal().Connect( &focusedActorActivatedCallback, &FocusedActorActivatedCallback::Callback );
 
-  Integration::KeyEvent returnEvent( "Return", "", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
+  Integration::KeyEvent returnEvent( "Return", "", 0, 0, 0, Integration::KeyEvent::Up, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true
@@ -923,8 +923,8 @@ int UtcDaliKeyboardFocusManagerSignalFocusGroupChanged(void)
   FocusGroupChangedCallback focusGroupChangedCallback(focusGroupChangedSignalVerified);
   manager.FocusGroupChangedSignal().Connect( &focusGroupChangedCallback, &FocusGroupChangedCallback::Callback );
 
-  Integration::KeyEvent tabEvent( "Tab", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
-  Integration::KeyEvent shiftTabEvent( "Tab", "", 0, 1, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
+  Integration::KeyEvent tabEvent( "Tab", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent shiftTabEvent( "Tab", "", 0, 1, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true
@@ -971,15 +971,6 @@ int UtcDaliKeyboardFocusManagerMoveFocusBackward(void)
   KeyboardFocusManager manager = KeyboardFocusManager::Get();
   DALI_TEST_CHECK(manager);
 
-  // Make history stack full
-  for(int i = 0 ; i < 31 ; i ++)
-  {
-    Actor actor = Actor::New();
-    actor.SetKeyboardFocusable(true);
-    Stage::GetCurrent().Add(actor);
-    manager.SetCurrentFocusActor(actor);
-  }
-
   // Create the first actor and add it to the stage
   Actor first = Actor::New();
   first.SetKeyboardFocusable(true);
@@ -990,10 +981,15 @@ int UtcDaliKeyboardFocusManagerMoveFocusBackward(void)
   second.SetKeyboardFocusable(true);
   Stage::GetCurrent().Add(second);
 
-  // Create the second actor and add it to the stage
+  // Create the third actor and add it to the stage
   Actor third = Actor::New();
   third.SetKeyboardFocusable(true);
   Stage::GetCurrent().Add(third);
+
+  // Create the fourth actor and add it to the stage
+  Actor fourth = Actor::New();
+  fourth.SetKeyboardFocusable(true);
+  Stage::GetCurrent().Add(fourth);
 
   // Check that the focus is set on the second actor
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
@@ -1007,24 +1003,45 @@ int UtcDaliKeyboardFocusManagerMoveFocusBackward(void)
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(third) == true);
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
 
+  // Check that the focus is set on the third  actor
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(fourth) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == fourth);
+
   // Move the focus backward
   manager.MoveFocusBackward();
 
-  // Check that it current focused actor is second actor
-  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
-
-  // Check that the focus is set on the third actor
-  DALI_TEST_CHECK(manager.SetCurrentFocusActor(third) == true);
+  // Check that it current focused actor is third actor
   DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
 
   // Remove the second actor on stage
   second.Unparent();
 
+  // Reset the first actor
+  first.Unparent();
+  first.Reset();
+
   // Move the focus backward
   manager.MoveFocusBackward();
 
-  // Check that it current focused actor is first actor
-  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+  // Check that it current focused actor is third actor
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == third);
+
+  // Make history stack full
+  for(int i = 0 ; i < 31 ; i ++)
+  {
+    Actor actor = Actor::New();
+    actor.SetKeyboardFocusable(true);
+    Stage::GetCurrent().Add(actor);
+    manager.SetCurrentFocusActor(actor);
+  }
+
+  for(int i = 0 ; i < 31 ; i ++)
+  {
+    manager.MoveFocusBackward();
+  }
+
+  // Check that it current focused actor is not second actor
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() != second);
 
   END_TEST;
 }
@@ -1046,12 +1063,12 @@ int UtcDaliKeyboardFocusManagerChangeFocusDirectionByKeyEvents(void)
   FocusChangedCallback focusChangedCallback(focusChangedSignalVerified);
   manager.FocusChangedSignal().Connect( &focusChangedCallback, &FocusChangedCallback::Callback );
 
-  Integration::KeyEvent leftEvent( "Left", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
-  Integration::KeyEvent rightEvent( "Right", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
-  Integration::KeyEvent upEvent( "Up", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
-  Integration::KeyEvent downEvent( "Down", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
-  Integration::KeyEvent pageUpEvent( "Prior", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
-  Integration::KeyEvent pageDownEvent( "Next", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, DevelKeyEvent::DeviceClass::NONE );
+  Integration::KeyEvent leftEvent( "Left", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent rightEvent( "Right", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent upEvent( "Up", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent downEvent( "Down", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent pageUpEvent( "Prior", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  Integration::KeyEvent pageDownEvent( "Next", "", 0, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
 
   // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
   // It makes mIsFocusIndicatorEnabled true

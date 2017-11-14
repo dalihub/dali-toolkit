@@ -34,8 +34,7 @@
 #include <dali-toolkit/public-api/controls/scroll-bar/scroll-bar.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view.h>
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-constraints.h>
-#include <dali-toolkit/devel-api/controls/scrollable/scroll-view/scroll-view-devel.h>
-#include <dali-toolkit/devel-api/controls/scrollable/scroll-view/scroll-mode.h>
+#include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-mode.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-overshoot-indicator-impl.h>
 #include <dali-toolkit/internal/controls/scrollable/scroll-view/scroll-view-effect-impl.h>
 
@@ -252,7 +251,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wrapEnabled",                B
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "panningEnabled",             BOOLEAN,   PANNING_ENABLED             )
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "axisAutoLockEnabled",        BOOLEAN,   AXIS_AUTO_LOCK_ENABLED      )
 DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "wheelScrollDistanceStep",    VECTOR2,   WHEEL_SCROLL_DISTANCE_STEP  )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollMode", MAP, SCROLL_MODE )
+DALI_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollMode",                 MAP,       SCROLL_MODE )
 
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollPosition",  VECTOR2, SCROLL_POSITION)
 DALI_ANIMATABLE_PROPERTY_REGISTRATION( Toolkit, ScrollView, "scrollPrePosition",   VECTOR2, SCROLL_PRE_POSITION)
@@ -2909,7 +2908,7 @@ void ScrollView::SetProperty( BaseObject* object, Property::Index index, const P
         scrollViewImpl.SetWheelScrollDistanceStep( value.Get<Vector2>() );
         break;
       }
-      case Toolkit::DevelScrollView::Property::SCROLL_MODE:
+      case Toolkit::ScrollView::Property::SCROLL_MODE:
       {
         Property::Map* map = value.GetMap();
         if( map )

@@ -23,6 +23,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/actors/custom-actor-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -125,9 +126,19 @@ void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Bas
   DevelControl::RegisterVisual( *this, index, visual );
 }
 
+void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex )
+{
+  DevelControl::RegisterVisual( *this, index, visual, depthIndex );
+}
+
 void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
 {
   DevelControl::RegisterVisual( *this, index, visual, enabled );
+}
+
+void ControlWrapper::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex )
+{
+  DevelControl::RegisterVisual( *this, index, visual, enabled, depthIndex );
 }
 
 void ControlWrapper::UnregisterVisual( Property::Index index )
@@ -167,6 +178,11 @@ void ControlWrapper::ApplyThemeStyle()
     // Apply the current style
     styleManagerImpl.ApplyThemeStyle( Toolkit::Control( GetOwner() ) );
   }
+}
+
+Dali::TypeInfo ControlWrapper::GetTypeInfo()
+{
+  return DevelCustomActor::GetTypeInfo(Self());
 }
 
 } // namespace Internal

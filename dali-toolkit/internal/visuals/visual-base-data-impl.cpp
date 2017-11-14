@@ -25,7 +25,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/helpers/property-helper.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -60,8 +60,8 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Align, BOTTOM_END )
 DALI_ENUM_TO_STRING_TABLE_END( ALIGN )
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN( POLICY )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual::Transform::Policy, RELATIVE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual::Transform::Policy, ABSOLUTE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual::Transform::Policy, RELATIVE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual::Transform::Policy, ABSOLUTE )
 DALI_ENUM_TO_STRING_TABLE_END( POLICY )
 
 Dali::Vector2 PointToVector2( Toolkit::Align::Type point, Toolkit::Direction::Type direction )
@@ -97,11 +97,11 @@ bool GetPolicyFromValue( const Property::Value& value, Vector2& policy )
     Property::Array* array = value.GetArray();
     if( array && array->Size() == 2 )
     {
-      DevelVisual::Transform::Policy::Type xPolicy = static_cast< DevelVisual::Transform::Policy::Type >( -1 ); // Assign an invalid value so definitely changes
-      DevelVisual::Transform::Policy::Type yPolicy = static_cast< DevelVisual::Transform::Policy::Type >( -1 ); // Assign an invalid value so definitely changes
+      Toolkit::Visual::Transform::Policy::Type xPolicy = static_cast< Toolkit::Visual::Transform::Policy::Type >( -1 ); // Assign an invalid value so definitely changes
+      Toolkit::Visual::Transform::Policy::Type yPolicy = static_cast< Toolkit::Visual::Transform::Policy::Type >( -1 ); // Assign an invalid value so definitely changes
 
-      if( Scripting::GetEnumerationProperty< DevelVisual::Transform::Policy::Type >( array->GetElementAt( 0 ), POLICY_TABLE, POLICY_TABLE_COUNT, xPolicy ) &&
-          Scripting::GetEnumerationProperty< DevelVisual::Transform::Policy::Type >( array->GetElementAt( 1 ), POLICY_TABLE, POLICY_TABLE_COUNT, yPolicy ) )
+      if( Scripting::GetEnumerationProperty< Toolkit::Visual::Transform::Policy::Type >( array->GetElementAt( 0 ), POLICY_TABLE, POLICY_TABLE_COUNT, xPolicy ) &&
+          Scripting::GetEnumerationProperty< Toolkit::Visual::Transform::Policy::Type >( array->GetElementAt( 1 ), POLICY_TABLE, POLICY_TABLE_COUNT, yPolicy ) )
       {
         policy.x = xPolicy;
         policy.y = yPolicy;
@@ -125,7 +125,7 @@ Internal::Visual::Base::Impl::Impl()
   mMixColorIndex( Property::INVALID_INDEX ),
   mOpacityIndex( Property::INVALID_INDEX ),
   mFlags( 0 ),
-  mResourceReady( false )
+  mResourceStatus( Toolkit::Visual::ResourceStatus::PREPARING )
 {
 }
 
@@ -233,7 +233,7 @@ void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap( Property::Ma
       customShader.Insert( Toolkit::Visual::Shader::Property::HINTS, static_cast< int >( mHints ) );
     }
 
-    map.Insert( Toolkit::DevelVisual::Property::SHADER, customShader );
+    map.Insert( Toolkit::Visual::Property::SHADER, customShader );
   }
 }
 
@@ -241,8 +241,8 @@ Internal::Visual::Base::Impl::Transform::Transform()
 : mOffset( 0.0f,0.0f ),
   mSize( 1.0f,1.0f ),
   mOffsetSizeMode( 0.0f,0.0f,0.0f,0.0f ),
-  mOrigin( Toolkit::Align::CENTER ),
-  mAnchorPoint( Toolkit::Align::CENTER )
+  mOrigin( Toolkit::Align::TOP_BEGIN ),
+  mAnchorPoint( Toolkit::Align::TOP_BEGIN )
 {
 }
 
@@ -252,8 +252,8 @@ void Internal::Visual::Base::Impl::Transform::SetPropertyMap( const Property::Ma
   mOffset = Vector2( 0.0f,0.0f );
   mSize = Vector2( 1.0f,1.0f );
   mOffsetSizeMode = Vector4( 0.0f,0.0f,0.0f,0.0f );
-  mOrigin = Toolkit::Align::CENTER;
-  mAnchorPoint = Toolkit::Align::CENTER;
+  mOrigin = Toolkit::Align::TOP_BEGIN;
+  mAnchorPoint = Toolkit::Align::TOP_BEGIN;
 
   UpdatePropertyMap( map );
 }
@@ -267,27 +267,27 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap( const Property:
     {
       switch( keyValue.first.indexKey )
       {
-        case Toolkit::DevelVisual::Transform::Property::OFFSET:
+        case Toolkit::Visual::Transform::Property::OFFSET:
         {
           keyValue.second.Get( mOffset );
           break;
         }
-        case Toolkit::DevelVisual::Transform::Property::SIZE:
+        case Toolkit::Visual::Transform::Property::SIZE:
         {
           keyValue.second.Get( mSize );
           break;
         }
-        case Toolkit::DevelVisual::Transform::Property::ORIGIN:
+        case Toolkit::Visual::Transform::Property::ORIGIN:
         {
           Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mOrigin );
           break;
         }
-        case Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT:
+        case Toolkit::Visual::Transform::Property::ANCHOR_POINT:
         {
           Scripting::GetEnumerationProperty< Toolkit::Align::Type >( keyValue.second, ALIGN_TABLE, ALIGN_TABLE_COUNT, mAnchorPoint );
           break;
         }
-        case Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY:
+        case Toolkit::Visual::Transform::Property::OFFSET_POLICY:
         {
           Vector2 policy;
           if( GetPolicyFromValue( keyValue.second, policy ) )
@@ -297,7 +297,7 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap( const Property:
           }
           break;
         }
-        case Toolkit::DevelVisual::Transform::Property::SIZE_POLICY:
+        case Toolkit::Visual::Transform::Property::SIZE_POLICY:
         {
           Vector2 policy;
           if( GetPolicyFromValue( keyValue.second, policy ) )
@@ -352,12 +352,12 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap( const Property:
 void Internal::Visual::Base::Impl::Transform::GetPropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Add( Toolkit::DevelVisual::Transform::Property::OFFSET, mOffset )
-     .Add( Toolkit::DevelVisual::Transform::Property::SIZE, mSize )
-     .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, mOrigin )
-     .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, mAnchorPoint )
-     .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( mOffsetSizeMode.x, mOffsetSizeMode.y ) )
-     .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( mOffsetSizeMode.z, mOffsetSizeMode.w ) );
+  map.Add( Toolkit::Visual::Transform::Property::OFFSET, mOffset )
+     .Add( Toolkit::Visual::Transform::Property::SIZE, mSize )
+     .Add( Toolkit::Visual::Transform::Property::ORIGIN, mOrigin )
+     .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, mAnchorPoint )
+     .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( mOffsetSizeMode.x, mOffsetSizeMode.y ) )
+     .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( mOffsetSizeMode.z, mOffsetSizeMode.w ) );
 }
 
 void Internal::Visual::Base::Impl::Transform::RegisterUniforms( Dali::Renderer renderer, Toolkit::Direction::Type direction )

@@ -16,7 +16,6 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-adaptor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-application.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-bitmap-loader.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-color-controller.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
@@ -61,7 +60,8 @@ PKG_CHECK_MODULES(DALI_ADAPTOR REQUIRED
   dali-adaptor
 )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 -ggdb --coverage -Wall -Werror")
+ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
+ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )
 
@@ -79,7 +79,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
   ${${CAPI_LIB}_LIBRARIES}
-  -lpthread -ldl
+  -lpthread -ldl --coverage
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

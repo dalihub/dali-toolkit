@@ -187,6 +187,14 @@ class DALI_IMPORT_API Builder : public BaseHandle
   void AddConstant( const std::string& key, const Property::Value& value );
 
   /**
+   * @brief Gets all currently defined configurations.
+   *
+   * @pre The Builder has been initialized.
+   * @return A reference to the currently defined configurations.
+   */
+  const Property::Map& GetConfigurations() const;
+
+  /**
    * @brief Gets all currently defined constants.
    *
    * e.g.

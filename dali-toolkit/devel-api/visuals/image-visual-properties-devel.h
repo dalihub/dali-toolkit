@@ -30,6 +30,42 @@ namespace Toolkit
 namespace DevelImageVisual
 {
 
+/**
+ * @brief The policy determining if the image is loaded when the visual is staged or created.
+ */
+namespace LoadPolicy
+{
+
+/**
+ * @brief The available named elements that define the LoadPolicy.
+ */
+enum Type
+{
+  IMMEDIATE = 0,  ///< The image is loaded when the ImageVisual is created.
+  ATTACHED        ///< The image is loaded when the ImageVisual is attached to the stage.
+};
+
+} // namespace LoadPolicy
+
+/**
+ * @brief The policy determining when a image is deleted from the cache in relation to the ImageVisual lifetime.
+ * @note If the texture is being shared by another visual it persist if still required.
+ */
+namespace ReleasePolicy
+{
+
+/**
+ * @brief The available named elements that define the ReleasePolicy.
+ */
+enum Type
+{
+  DETACHED = 0,  ///<  Image deleted from cache when ImageVisual detached from stage.
+  DESTROYED,     ///<  Image deleted from cache when ImageVisual destroyed.
+  NEVER          ///<  Image is never deleted, will survive the lifetime of the application.
+};
+
+} // namespace ReleasePolicy;
+
 namespace Property
 {
 
@@ -45,25 +81,37 @@ enum Type
   PIXEL_AREA          = Dali::Toolkit::ImageVisual::Property::PIXEL_AREA,
   WRAP_MODE_U         = Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U,
   WRAP_MODE_V         = Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V,
+  BORDER              = Dali::Toolkit::ImageVisual::Property::BORDER,
+  ATLASING            = Dali::Toolkit::ImageVisual::Property::ATLASING,
+  ALPHA_MASK_URL      = Dali::Toolkit::ImageVisual::Property::ALPHA_MASK_URL,
+  BATCH_SIZE          = Dali::Toolkit::ImageVisual::Property::BATCH_SIZE,
+  CACHE_SIZE          = Dali::Toolkit::ImageVisual::Property::CACHE_SIZE,
+  FRAME_DELAY         = Dali::Toolkit::ImageVisual::Property::FRAME_DELAY,
+  MASK_CONTENT_SCALE  = Dali::Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE,
+  CROP_TO_MASK        = Dali::Toolkit::ImageVisual::Property::CROP_TO_MASK,
 
   /**
-   * @brief The border of the image
-   * @details Name "border", type Property::RECTANGLE or Property::VECTOR4
-   *          The border of the image in the order: left, right, bottom, top.
-   *
-   * @note Optional.
-   * @note For N-Patch images only.
+   * @brief The policy to determine when an image should be loaded.
+   * @details Name "loadPolicy",  Type LoadPolicy::Type (Property::INTEGER)or Property::STRING.
+   * @note Default LoadPolicy::ATTACHED
+   * @see LoadPolicy::Type
    */
-  BORDER = WRAP_MODE_V + 1,
+  LOAD_POLICY = CROP_TO_MASK + 1,
 
   /**
-   * @brief Whether to use the texture atlas
-   * @details Name "atlasing", type Property::BOOLEAN, true to enable texture atlas
-   *
-   * @note Optional. By default atlasing is off.
+   * @brief The policy to determine when an image should no longer be cached.
+   * @details Name "releasePolicy", Type ReleasePolicy::Type (Property::INTEGER) or Property::STRING
+   * @note Default ReleasePolicy::DESTROYED
+   * @see ReleasePolicy::Type
    */
+  RELEASE_POLICY = CROP_TO_MASK + 2,
 
-  ATLASING = WRAP_MODE_V + 2,
+  /**
+   * @brief Determines if image orientation should be corrected so the image displays as it was intended.
+   * @details Name "orientationCorrection", Type Property::BOOLEAN, if true the image's orientation will be corrected.
+   * @note Default true
+   */
+  ORIENTATION_CORRECTION = CROP_TO_MASK + 3,
 };
 
 } //namespace Property

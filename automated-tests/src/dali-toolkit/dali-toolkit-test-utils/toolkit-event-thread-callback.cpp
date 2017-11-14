@@ -99,10 +99,8 @@ CallbackBase* EventThreadCallback::GetCallback()
 namespace Test
 {
 
-bool WaitForEventThreadTrigger( int triggerCount )
+bool WaitForEventThreadTrigger( int triggerCount, int timeoutInSeconds )
 {
-  const int TEST_TIMEOUT(30);
-
   struct timespec startTime;
   struct timespec now;
   clock_gettime( CLOCK_REALTIME, &startTime );
@@ -129,7 +127,7 @@ bool WaitForEventThreadTrigger( int triggerCount )
       }
     }
     clock_gettime( CLOCK_REALTIME, &now );
-    if( now.tv_sec - startTime.tv_sec > TEST_TIMEOUT )
+    if( now.tv_sec - startTime.tv_sec > timeoutInSeconds )
     {
       // Ensure we break out of the loop if elapsed time has passed
       break;

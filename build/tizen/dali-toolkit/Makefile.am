@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2016 Samsung Electronics Co., Ltd.
+# Copyright (c) 2017 Samsung Electronics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -53,10 +53,7 @@ dalisound_DATA = ${dali_toolkit_sound_files}
 package_doxy_dir = ../../../doc
 include ../../../doc/file.list
 
-# The library
-lib_LTLIBRARIES = libdali-toolkit.la
-
-libdali_toolkit_la_SOURCES = \
+LIBDALI_TOOLKIT_LA_SOURCES = \
                      $(toolkit_src_files) \
                      $(public_api_src_files) \
                      $(devel_api_src_files) \
@@ -70,7 +67,7 @@ dalistyleimages_DATA = ${dali_toolkit_style_images}
 
 libdali_toolkit_la_DEPENDENCIES =
 
-libdali_toolkit_la_CXXFLAGS = -DDALI_COMPILATION \
+LIBDALI_TOOLKIT_LA_CXXFLAGS = -DDALI_COMPILATION \
                       -DDALI_IMAGE_DIR="\"${daliimagedir}\"" \
                       -DDALI_SOUND_DIR="\"${dalisounddir}\"" \
                       -DDALI_STYLE_DIR="\"${dalistyledir}\"" \
@@ -84,14 +81,49 @@ libdali_toolkit_la_CXXFLAGS = -DDALI_COMPILATION \
                       $(FRIBIDI_CFLAGS) \
                       $(HTMLCXX_CFLAGS)
 
-libdali_toolkit_la_LIBADD = \
+LIBDALI_TOOLKIT_LA_LIBADD = \
                       $(DALICORE_LIBS) \
                       $(DLOG_LIBS) \
                       $(FRIBIDI_LIBS) \
                       $(HTMLCXX_LIBS)
 
-# Install headers
 
+# The library
+if ENABLE_CXX03_ABI
+
+lib_LTLIBRARIES = libdali-toolkit.la
+libdali_toolkit_la_SOURCES = $(LIBDALI_TOOLKIT_LA_SOURCES)
+libdali_toolkit_la_LIBADD = $(LIBDALI_TOOLKIT_LA_LIBADD)
+libdali_toolkit_la_CXXFLAGS = $(LIBDALI_TOOLKIT_LA_CXXFLAGS)
+libdali_toolkit_la_CFLAGS = $(LIBDALI_TOOLKTI_LA_CFLAGS)
+
+if ENABLE_RENAME_SO
+#rename
+install: install-am
+	rm -rf $(libdir)/libdali-toolkit.so
+	rm -rf $(libdir)/libdali-toolkit-cxx03.so
+	ln -s $(libdir)/libdali-toolkit.so.0.0.* $(libdir)/libdali-toolkit-cxx03.so
+endif
+
+else
+
+lib_LTLIBRARIES = libdali-toolkit-cxx11.la
+libdali_toolkit_cxx11_la_SOURCES = $(LIBDALI_TOOLKIT_LA_SOURCES)
+libdali_toolkit_cxx11_la_LIBADD = $(LIBDALI_TOOLKIT_LA_LIBADD)
+libdali_toolkit_cxx11_la_CXXFLAGS = $(LIBDALI_TOOLKIT_LA_CXXFLAGS)
+libdali_toolkit_cxx11_la_CFLAGS = $(LIBDALI_TOOLKTI_LA_CFLAGS)
+
+if ENABLE_RENAME_SO
+#rename
+install: install-am
+	rm -rf $(libdir)/libdali-toolkit-cxx11.so
+	rm -rf $(libdir)/libdali-toolkit.so
+	ln -s $(libdir)/libdali-toolkit-cxx11.so.0.0.* $(libdir)/libdali-toolkit.so
+endif
+
+endif
+
+# Install headers
 topleveldir = $(devincludepath)/dali-toolkit
 toplevel_HEADERS = ../../../dali-toolkit/dali-toolkit.h
 
@@ -105,19 +137,16 @@ develapibuttonsdir =            $(develapicontrolsdir)/buttons
 develapieffectsviewdir =        $(develapicontrolsdir)/effects-view
 develapigaussianblurviewdir =   $(develapicontrolsdir)/gaussian-blur-view
 develapimagnifierdir =          $(develapicontrolsdir)/magnifier
-develapiitemviewdir =           $(develapicontrolsdir)/scrollable/item-view
-develapiscrollviewdir =         $(develapicontrolsdir)/scrollable/scroll-view
-develapiscrollbardir =          $(develapicontrolsdir)/scroll-bar
 develapinavigationviewdir =     $(develapicontrolsdir)/navigation-view
 develapipageturnviewdir =       $(develapicontrolsdir)/page-turn-view
 develapipopupdir =              $(develapicontrolsdir)/popup
-develapiprogressbardir =        $(develapicontrolsdir)/progress-bar
 develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
 develapisuperblurviewdir =      $(develapicontrolsdir)/super-blur-view
 develapifocusmanagerdir =       $(develapidir)/focus-manager
 develapiimageloaderdir =        $(develapidir)/image-loader
 develapiscriptingdir =          $(develapidir)/scripting
 develapishadereffectsdir =      $(develapidir)/shader-effects
+develapistylingdir =            $(develapidir)/styling
 develapitransitioneffectsdir =  $(develapidir)/transition-effects
 develapitoolbardir =            $(develapicontrolsdir)/tool-bar
 develapitooltipdir =            $(develapicontrolsdir)/tooltip
@@ -136,19 +165,16 @@ develapieffectsview_HEADERS =       $(devel_api_effects_view_header_files)
 develapifocusmanager_HEADERS =      $(devel_api_focus_manager_header_files)
 develapigaussianblurview_HEADERS =  $(devel_api_gaussian_blur_view_header_files)
 develapiimageloader_HEADERS =       $(devel_api_image_loader_header_files)
-develapiitemview_HEADERS =          $(devel_api_item_view_header_files)
-develapiscrollview_HEADERS =        $(devel_api_scroll_view_header_files)
-develapiscrollbar_HEADERS =         $(devel_api_scroll_bar_header_files)
 develapimagnifier_HEADERS =         $(devel_api_magnifier_header_files)
 develapinavigationview_HEADERS =    $(devel_api_navigation_view_header_files)
 develapipageturnview_HEADERS =      $(devel_api_page_turn_view_header_files)
 develapipopup_HEADERS =             $(devel_api_popup_header_files)
-develapiprogressbar_HEADERS =       $(devel_api_progress_bar_header_files)
 develapivisualfactory_HEADERS =     $(devel_api_visual_factory_header_files)
 develapivisuals_HEADERS =           $(devel_api_visuals_header_files)
 develapiscripting_HEADERS =         $(devel_api_scripting_header_files)
 develapishadowview_HEADERS =        $(devel_api_shadow_view_header_files)
 develapishadereffects_HEADERS =     $(devel_api_shader_effects_header_files)
+develapistyling_HEADERS =           $(devel_api_styling_header_files)
 develapisuperblurview_HEADERS =     $(devel_api_super_blur_view_header_files)
 develapitoolbar_HEADERS =           $(devel_api_tool_bar_header_files)
 develapitooltip_HEADERS =           $(devel_api_tooltip_header_files)
@@ -167,6 +193,7 @@ publicapiflexcontainerdir =        $(publicapicontrolsdir)/flex-container
 publicapiimageviewdir =            $(publicapicontrolsdir)/image-view
 publicapivideoviewdir =            $(publicapicontrolsdir)/video-view
 publicapimodel3dviewdir =          $(publicapicontrolsdir)/model3d-view
+publicapiprogressbardir =          $(publicapicontrolsdir)/progress-bar
 publicapiscrollbardir =            $(publicapicontrolsdir)/scroll-bar
 publicapiscrollabledir =           $(publicapicontrolsdir)/scrollable
 publicapiscrollviewdir =           $(publicapicontrolsdir)/scrollable/scroll-view
@@ -175,7 +202,7 @@ publicapistylingdir =              $(publicapidir)/styling
 publicapitableviewdir =            $(publicapicontrolsdir)/table-view
 publicapitextcontrolsdir =         $(publicapicontrolsdir)/text-controls
 publicapifocusmanagerdir =         $(publicapidir)/focus-manager
-publicapirenderingbackenddir =     $(publicapidir)/text
+publicapitextdir =                 $(publicapidir)/text
 publicapisliderdir =               $(publicapicontrolsdir)/slider
 publicapivisualsdir =              $(publicapidir)/visuals
 
@@ -192,6 +219,7 @@ publicapiimageview_HEADERS =            $(public_api_image_view_header_files)
 publicapivideoview_HEADERS =            $(public_api_video_view_header_files)
 publicapiitemview_HEADERS =             $(public_api_item_view_header_files)
 publicapimodel3dview_HEADERS =          $(public_api_model3d_view_header_files)
+publicapiprogressbar_HEADERS =          $(public_api_progress_bar_header_files)
 publicapiscrollbar_HEADERS =            $(public_api_scroll_bar_header_files)
 publicapiscrollable_HEADERS =           $(public_api_scrollable_header_files)
 publicapiscrollview_HEADERS =           $(public_api_scroll_view_header_files)
@@ -199,7 +227,7 @@ publicapistyling_HEADERS =              $(public_api_styling_header_files)
 publicapitableview_HEADERS =            $(public_api_table_view_header_files)
 publicapitextcontrols_HEADERS =         $(public_api_text_controls_header_files)
 publicapifocusmanager_HEADERS =         $(public_api_focus_manager_header_files)
-publicapirenderingbackend_HEADERS =     $(public_api_rendering_backend_header_files)
+publicapitext_HEADERS =                 $(public_api_text_header_files)
 publicapislider_HEADERS =               $(public_api_slider_header_files)
 publicapivisuals_HEADERS =              $(public_api_visuals_header_files)
 

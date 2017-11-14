@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/stage.h>
-#include <dali/devel-api/adaptor-framework/bitmap-loader.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <fstream>
 
 //INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -46,12 +46,12 @@ namespace
   Texture LoadTexture( const char* imageUrl, bool generateMipmaps )
   {
     Texture texture;
-    Dali::BitmapLoader loader = Dali::BitmapLoader::New( imageUrl );
-    loader.Load();
-    PixelData pixelData = loader.GetPixelData();
-    if( pixelData )
+
+    Devel::PixelBuffer pixelBuffer = LoadImageFromFile( imageUrl );
+    if( pixelBuffer )
     {
-      texture = Texture::New( TextureType::TEXTURE_2D, pixelData.GetPixelFormat(), pixelData.GetWidth(), pixelData.GetHeight() );
+      texture = Texture::New( TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight() );
+      PixelData pixelData = Devel::PixelBuffer::Convert( pixelBuffer );
       texture.Upload( pixelData );
 
       if( generateMipmaps )
@@ -520,13 +520,13 @@ void MeshVisual::DoSetOnStage( Actor& actor )
   actor.AddRenderer( mImpl->mRenderer );
 
   // Mesh loaded and ready to display
-  ResourceReady();
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 void MeshVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::MESH );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::MESH );
   map.Insert( Toolkit::MeshVisual::Property::OBJECT_URL, mObjectUrl );
   map.Insert( Toolkit::MeshVisual::Property::MATERIAL_URL, mMaterialUrl );
   map.Insert( Toolkit::MeshVisual::Property::TEXTURES_PATH, mTexturesPath );

@@ -116,7 +116,7 @@ int UtcDaliTextRenderingControllerRender(void)
   DALI_TEST_EQUALS( Pixel::RGBA8888, bitmap.GetPixelFormat(), TEST_LOCATION );
 
   // Changes vertical alignment.
-  controller->SetVerticalAlignment( Layout::VERTICAL_ALIGN_CENTER );
+  controller->SetVerticalAlignment( Text::VerticalAlignment::CENTER );
   controller->Relayout( relayoutSize );
 
   // Renders the text and creates the final bitmap.
@@ -127,7 +127,7 @@ int UtcDaliTextRenderingControllerRender(void)
   DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
   DALI_TEST_EQUALS( Pixel::RGBA8888, bitmap.GetPixelFormat(), TEST_LOCATION );
 
-  controller->SetVerticalAlignment( Layout::VERTICAL_ALIGN_BOTTOM );
+  controller->SetVerticalAlignment( Text::VerticalAlignment::BOTTOM );
   controller->Relayout( relayoutSize );
 
   // Renders the text and creates the final bitmap.

@@ -27,15 +27,17 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <cstring>
+#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
 
 namespace Dali
 {
@@ -83,10 +85,10 @@ void Remove( DictionaryKeys& keys, const std::string& name )
   }
 }
 
-Toolkit::DevelVisual::Type GetVisualTypeFromMap( const Property::Map& map )
+Toolkit::Visual::Type GetVisualTypeFromMap( const Property::Map& map )
 {
-  Property::Value* typeValue = map.Find( Toolkit::DevelVisual::Property::TYPE, VISUAL_TYPE  );
-  Toolkit::DevelVisual::Type type = Toolkit::DevelVisual::IMAGE;
+  Property::Value* typeValue = map.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE  );
+  Toolkit::Visual::Type type = Toolkit::Visual::IMAGE;
   if( typeValue )
   {
     Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, type );
@@ -146,6 +148,19 @@ Toolkit::Visual::Base GetVisualByName(
     }
   }
   return visualHandle;
+}
+
+/**
+ * Move visual from source to destination container
+ */
+void MoveVisual( RegisteredVisualContainer::Iterator sourceIter, RegisteredVisualContainer& source, RegisteredVisualContainer& destination )
+{
+   Toolkit::Visual::Base visual = (*sourceIter)->visual;
+   if( visual )
+   {
+     RegisteredVisual* rv = source.Release( sourceIter );
+     destination.PushBack( rv );
+   }
 }
 
 /**
@@ -260,6 +275,24 @@ TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &Do
 
 DALI_TYPE_REGISTRATION_END()
 
+/**
+ * @brief Iterate through given container and setOffStage any visual found
+ *
+ * @param[in] container Container of visuals
+ * @param[in] parent Parent actor to remove visuals from
+ */
+void SetVisualsOffStage( const RegisteredVisualContainer& container, Actor parent )
+{
+  for( auto iter = container.Begin(), end = container.End() ; iter!= end; iter++)
+  {
+    if( (*iter)->visual )
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::SetOffStage Setting visual(%d) off stage\n", (*iter)->index );
+      Toolkit::GetImplementation((*iter)->visual).SetOffStage( parent );
+    }
+  }
+}
+
 } // unnamed namespace
 
 
@@ -269,14 +302,15 @@ const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "backgro
 const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgroundImage",        Toolkit::Control::Property::BACKGROUND_IMAGE,             Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",          Toolkit::Control::Property::KEY_INPUT_FOCUS,              Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",             Toolkit::Control::Property::BACKGROUND,                   Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "tooltip",                Toolkit::DevelControl::Property::TOOLTIP,                 Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "state",                  Toolkit::DevelControl::Property::STATE,                   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_8( typeRegistration, "subState",               Toolkit::DevelControl::Property::SUB_STATE,               Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_9( typeRegistration, "leftFocusableActorId",   Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_10( typeRegistration, "rightFocusableActorId", Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID,Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_11( typeRegistration, "upFocusableActorId",    Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,   Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_12( typeRegistration, "downFocusableActorId",  Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-
+const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "margin",                 Toolkit::Control::Property::MARGIN,                       Property::EXTENTS, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "padding",                Toolkit::Control::Property::PADDING,                      Property::EXTENTS, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_8( typeRegistration, "tooltip",                Toolkit::DevelControl::Property::TOOLTIP,                 Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_9( typeRegistration, "state",                  Toolkit::DevelControl::Property::STATE,                   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_10( typeRegistration, "subState",               Toolkit::DevelControl::Property::SUB_STATE,               Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_11( typeRegistration, "leftFocusableActorId",   Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_12( typeRegistration, "rightFocusableActorId", Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID,Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_13( typeRegistration, "upFocusableActorId",    Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,   Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_14( typeRegistration, "downFocusableActorId",  Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 
 Control::Impl::Impl( Control& controlImpl )
@@ -290,6 +324,8 @@ Control::Impl::Impl( Control& controlImpl )
   mStyleName(""),
   mBackgroundColor(Color::TRANSPARENT),
   mStartingPinchScale( NULL ),
+  mMargin( 0, 0, 0, 0 ),
+  mPadding( 0, 0, 0, 0 ),
   mKeyEventSignal(),
   mPinchGestureDetector(),
   mPanGestureDetector(),
@@ -339,73 +375,91 @@ void Control::Impl::LongPressDetected(Actor actor, const LongPressGesture& longP
   mControlImpl.OnLongPress(longPress);
 }
 
-// Called by a Visual when it's resource is ready
-void Control::Impl::ResourceReady( Visual::Base& object)
-{
-
-  // go through and check if all the visuals are ready, if they are emit a signal
-  for ( RegisteredVisualContainer::ConstIterator visualIter = mVisuals.Begin();
-        visualIter != mVisuals.End(); ++visualIter )
-  {
-    const Toolkit::Visual::Base visual = (*visualIter)->visual;
-    const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
-
-    // one of the visuals is not ready
-    if( !visualImpl.IsResourceReady() )
-    {
-      return;
-    }
-  }
-
-  // all the visuals are ready
-  Dali::Toolkit::Control handle( mControlImpl.GetOwner() );
-  mResourceReadySignal.Emit( handle );
-
-}
-
-bool Control::Impl::IsResourceReady() const
-{
-  // go through and check all the visuals are ready
-  for ( RegisteredVisualContainer::ConstIterator visualIter = mVisuals.Begin();
-         visualIter != mVisuals.End(); ++visualIter )
-   {
-     const Toolkit::Visual::Base visual = (*visualIter)->visual;
-     const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
-
-     // one of the visuals is not ready
-     if( !visualImpl.IsResourceReady()  )
-     {
-       return false;
-     }
-   }
-  return true;
-}
-
 void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual )
 {
-  RegisterVisual( index, visual, true );
+  RegisterVisual( index, visual, VisualState::ENABLED, DepthIndexValue::NOT_SET );
+}
+
+void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, int depthIndex )
+{
+  RegisterVisual( index, visual, VisualState::ENABLED, DepthIndexValue::SET, depthIndex );
 }
 
 void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled )
 {
+  RegisterVisual( index, visual, ( enabled ? VisualState::ENABLED : VisualState::DISABLED ), DepthIndexValue::NOT_SET );
+}
+
+void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex )
+{
+  RegisterVisual( index, visual, ( enabled ? VisualState::ENABLED : VisualState::DISABLED ), DepthIndexValue::SET, depthIndex );
+}
+
+void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base& visual, VisualState::Type enabled, DepthIndexValue::Type depthIndexValueSet, int depthIndex )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "RegisterVisual:%d \n", index );
+
   bool visualReplaced ( false );
   Actor self = mControlImpl.Self();
 
+  // Set the depth index, if not set by caller this will be either the current visual depth, max depth of all visuals
+  // or zero.
+  int requiredDepthIndex = visual.GetDepthIndex();
+
+  if( depthIndexValueSet == DepthIndexValue::SET )
+  {
+    requiredDepthIndex = depthIndex;
+  }
+
+  // Visual replacement, existing visual should only be removed from stage when replacement ready.
   if( !mVisuals.Empty() )
   {
-    RegisteredVisualContainer::Iterator iter;
-    // Check if visual (index) is already registered.  Replace if so.
-    if ( FindVisual( index, mVisuals, iter ) )
+    RegisteredVisualContainer::Iterator registeredVisualsiter;
+    // Check if visual (index) is already registered, this is the current visual.
+    if( FindVisual( index, mVisuals, registeredVisualsiter ) )
     {
-      if( (*iter)->visual && self.OnStage() )
+      Toolkit::Visual::Base& currentRegisteredVisual = (*registeredVisualsiter)->visual;
+      if( currentRegisteredVisual )
       {
-        Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+        // Store current visual depth index as may need to set the replacement visual to same depth
+        const int currentDepthIndex = (*registeredVisualsiter)->visual.GetDepthIndex();
+
+        // No longer required to know if the replaced visual's resources are ready
+        StopObservingVisual( currentRegisteredVisual );
+
+        // If control staged and visual enabled then visuals will be swapped once ready
+        if(  self.OnStage() && enabled )
+        {
+          // Check if visual is currently in the process of being replaced ( is in removal container )
+          RegisteredVisualContainer::Iterator visualQueuedForRemoval;
+          if ( FindVisual( index, mRemoveVisuals, visualQueuedForRemoval ) )
+          {
+            // Visual with same index is already in removal container so current visual pending
+            // Only the the last requested visual will be displayed so remove current visual which is staged but not ready.
+            Toolkit::GetImplementation( currentRegisteredVisual ).SetOffStage( self );
+            mVisuals.Erase( registeredVisualsiter );
+          }
+          else
+          {
+            // current visual not already in removal container so add now.
+            DALI_LOG_INFO( gLogFilter, Debug::Verbose, "RegisterVisual Move current registered visual to removal Queue: %d \n", index );
+            MoveVisual( registeredVisualsiter, mVisuals, mRemoveVisuals );
+          }
+        }
+        else
+        {
+          // Control not staged or visual disabled so can just erase from registered visuals and new visual will be added later.
+          mVisuals.Erase( registeredVisualsiter );
+        }
+
+        // If we've not set the depth-index value and the new visual does not have a depth index applied to it, then use the previously set depth-index for this index
+        if( ( depthIndexValueSet == DepthIndexValue::NOT_SET ) &&
+            ( visual.GetDepthIndex() == 0 ) )
+        {
+          requiredDepthIndex = currentDepthIndex;
+        }
       }
 
-      StopObservingVisual( (*iter)->visual );
-      StartObservingVisual( visual );
-
-      (*iter)->visual = visual;
       visualReplaced = true;
     }
   }
@@ -414,53 +468,96 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
   // ( If the control has been type registered )
   if( visual.GetName().empty() )
   {
-    // Check if the control has been type registered:
-    TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid( mControlImpl ) );
-    if( typeInfo )
+    try
     {
-      // Check if the property index has been registered:
-      Property::IndexContainer indices;
-      typeInfo.GetPropertyIndices( indices );
-      Property::IndexContainer::Iterator iter = std::find( indices.Begin(), indices.End(), index );
-      if( iter != indices.End() )
+      std::string visualName = self.GetPropertyName( index );
+      if( !visualName.empty() )
       {
-        // If it has, then get it's name and use that for the visual
-        std::string visualName = typeInfo.GetPropertyName( index );
+        DALI_LOG_INFO( gLogFilter, Debug::Concise, "Setting visual name for property %d to %s\n",
+                       index, visualName.c_str() );
         visual.SetName( visualName );
       }
+    }
+    catch( Dali::DaliException e )
+    {
+      DALI_LOG_WARNING( "Attempting to register visual without a registered property, index: %d\n", index );
     }
   }
 
   if( !visualReplaced ) // New registration entry
   {
-    mVisuals.PushBack( new RegisteredVisual( index, visual, enabled ) );
-
-    // monitor when the visuals resources are ready
+    // monitor when the visual resources are ready
     StartObservingVisual( visual );
 
+    // If we've not set the depth-index value, we have more than one visual and the visual does not have a depth index, then set it to be the highest
+    if( ( depthIndexValueSet == DepthIndexValue::NOT_SET ) &&
+        ( mVisuals.Size() > 0 ) &&
+        ( visual.GetDepthIndex() == 0 ) )
+    {
+      int maxDepthIndex = std::numeric_limits< int >::min();
+
+      RegisteredVisualContainer::ConstIterator iter;
+      const RegisteredVisualContainer::ConstIterator endIter = mVisuals.End();
+      for ( iter = mVisuals.Begin(); iter != endIter; iter++ )
+      {
+        const int visualDepthIndex = (*iter)->visual.GetDepthIndex();
+        if ( visualDepthIndex > maxDepthIndex )
+        {
+          maxDepthIndex = visualDepthIndex;
+        }
+      }
+      ++maxDepthIndex; // Add one to the current maximum depth index so that our added visual appears on top
+      requiredDepthIndex = std::max( 0, maxDepthIndex ); // Start at zero if maxDepth index belongs to a background
+    }
   }
 
-  if( visual && self.OnStage() && enabled )
+  if( visual )
   {
-    Toolkit::GetImplementation(visual).SetOnStage( self );
+    // Set determined depth index
+    visual.SetDepthIndex( requiredDepthIndex );
+
+    // Monitor when the visual resources are ready
+    StartObservingVisual( visual );
+
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "New Visual registration index[%d] depth[%d]\n", index, requiredDepthIndex );
+    RegisteredVisual* newRegisteredVisual  = new RegisteredVisual( index, visual,
+                                             ( enabled == VisualState::ENABLED ? true : false ),
+                                             ( visualReplaced && enabled ) ) ;
+    mVisuals.PushBack( newRegisteredVisual );
+
+    // Put on stage if enabled and the control is already on the stage
+    // Visual must be set on stage for the renderer to be created and the ResourceReady triggered.
+    if( ( enabled == VisualState::ENABLED ) && self.OnStage() )
+    {
+      Toolkit::GetImplementation(visual).SetOnStage( self );
+    }
   }
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::RegisterVisual() Registered %s(%d), enabled:%s\n",  visual.GetName().c_str(), index, enabled?"T":"F" );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::RegisterVisual() Registered %s(%d), enabled:%s\n",  visual.GetName().c_str(), index, enabled?"true":"false" );
 }
 
 void Control::Impl::UnregisterVisual( Property::Index index )
 {
-   RegisteredVisualContainer::Iterator iter;
-   if ( FindVisual( index, mVisuals, iter ) )
-   {
-     // stop observing visual
-     StopObservingVisual( (*iter)->visual );
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mVisuals, iter ) )
+  {
+    // stop observing visual
+    StopObservingVisual( (*iter)->visual );
 
-     Actor self( mControlImpl.Self() );
-     Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
-     (*iter)->visual.Reset();
-     mVisuals.Erase( iter );
-   }
+    Actor self( mControlImpl.Self() );
+    Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+    (*iter)->visual.Reset();
+    mVisuals.Erase( iter );
+  }
+
+  if( FindVisual( index, mRemoveVisuals, iter ) )
+  {
+    Actor self( mControlImpl.Self() );
+    Toolkit::GetImplementation( (*iter)->visual ).SetOffStage( self );
+    (*iter)->pending = false;
+    (*iter)->visual.Reset();
+    mRemoveVisuals.Erase( iter );
+  }
 }
 
 Toolkit::Visual::Base Control::Impl::GetVisual( Property::Index index ) const
@@ -476,6 +573,8 @@ Toolkit::Visual::Base Control::Impl::GetVisual( Property::Index index ) const
 
 void Control::Impl::EnableVisual( Property::Index index, bool enable )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Visual (%d)\n", index);
+
   RegisteredVisualContainer::Iterator iter;
   if ( FindVisual( index, mVisuals, iter ) )
   {
@@ -529,6 +628,77 @@ void Control::Impl::StartObservingVisual( Toolkit::Visual::Base& visual)
   visualImpl.AddResourceObserver( *this );
 }
 
+// Called by a Visual when it's resource is ready
+void Control::Impl::ResourceReady( Visual::Base& object)
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "ResourceReady replacements pending[%d]\n", mRemoveVisuals.Count() );
+
+  Actor self = mControlImpl.Self();
+
+  // A resource is ready, find resource in the registered visuals container and get its index
+  for( auto registeredIter = mVisuals.Begin(),  end = mVisuals.End(); registeredIter != end; ++registeredIter )
+  {
+    Internal::Visual::Base& registeredVisualImpl = Toolkit::GetImplementation( (*registeredIter)->visual );
+
+    if( &object == &registeredVisualImpl )
+    {
+      RegisteredVisualContainer::Iterator visualToRemoveIter;
+      // Find visual with the same index in the removal container
+      // Set if off stage as it's replacement is now ready.
+      // Remove if from removal list as now removed from stage.
+      // Set Pending flag on the ready visual to false as now ready.
+      if( FindVisual( (*registeredIter)->index, mRemoveVisuals, visualToRemoveIter ) )
+      {
+        (*registeredIter)->pending = false;
+        Toolkit::GetImplementation( (*visualToRemoveIter)->visual ).SetOffStage( self );
+        mRemoveVisuals.Erase( visualToRemoveIter );
+      }
+      break;
+    }
+  }
+
+  // A visual is ready so control may need relayouting
+  mControlImpl.RelayoutRequest();
+
+  // Emit signal if all enabled visuals registered by the control are ready.
+  if( IsResourceReady() )
+  {
+    Dali::Toolkit::Control handle( mControlImpl.GetOwner() );
+    mResourceReadySignal.Emit( handle );
+  }
+}
+
+bool Control::Impl::IsResourceReady() const
+{
+  // Iterate through and check all the enabled visuals are ready
+  for( auto visualIter = mVisuals.Begin();
+         visualIter != mVisuals.End(); ++visualIter )
+  {
+    const Toolkit::Visual::Base visual = (*visualIter)->visual;
+    const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+
+    // one of the enabled visuals is not ready
+    if( !visualImpl.IsResourceReady() && (*visualIter)->enabled )
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+Toolkit::Visual::ResourceStatus Control::Impl::GetVisualResourceStatus( Property::Index index ) const
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mVisuals, iter ) )
+  {
+    const Toolkit::Visual::Base visual = (*iter)->visual;
+    const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+    return visualImpl.GetResourceStatus( );
+  }
+
+  return Toolkit::Visual::ResourceStatus::PREPARING;
+}
+
 Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& handle )
 {
   Dali::Animation transition;
@@ -547,11 +717,23 @@ Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& 
 
       if( visual )
       {
+#if defined(DEBUG_ENABLED)
+        Dali::TypeInfo typeInfo;
+        ControlWrapper* controlWrapperImpl = dynamic_cast<ControlWrapper*>(&mControlImpl);
+        if( controlWrapperImpl )
+        {
+          typeInfo = controlWrapperImpl->GetTypeInfo();
+        }
+
+        DALI_LOG_INFO( gLogFilter, Debug::Concise, "CreateTransition: Found %s visual for %s\n",
+                       visual.GetName().c_str(), typeInfo?typeInfo.GetName().c_str():"Unknown" );
+#endif
         Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
         visualImpl.AnimateProperty( transition, *animator );
       }
       else
       {
+        DALI_LOG_INFO( gLogFilter, Debug::Concise, "CreateTransition: Could not find visual. Trying actors");
         // Otherwise, try any actor children of control (Including the control)
         Actor child = mControlImpl.Self().FindChildByName( animator->objectName );
         if( child )
@@ -737,8 +919,7 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
           Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( url, ImageDimensions() );
           if( visual )
           {
-            controlImpl.mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual );
-            visual.SetDepthIndex( DepthIndex::BACKGROUND );
+            controlImpl.mImpl->RegisterVisual( Toolkit::Control::Property::BACKGROUND, visual, DepthIndex::BACKGROUND );
           }
         }
         else if( value.Get( color ) )
@@ -753,6 +934,26 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
         break;
       }
 
+      case Toolkit::Control::Property::MARGIN:
+      {
+        Extents margin;
+        if( value.Get( margin ) )
+        {
+          controlImpl.mImpl->SetMargin( margin );
+        }
+        break;
+      }
+
+      case Toolkit::Control::Property::PADDING:
+      {
+        Extents padding;
+        if( value.Get( padding ) )
+        {
+          controlImpl.mImpl->SetPadding( padding );
+        }
+        break;
+      }
+
       case Toolkit::DevelControl::Property::TOOLTIP:
       {
         TooltipPtr& tooltipPtr = controlImpl.mImpl->mTooltip;
@@ -761,7 +962,9 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
           tooltipPtr = Tooltip::New( control );
         }
         tooltipPtr->SetProperties( value );
+        break;
       }
+
     }
   }
 }
@@ -859,6 +1062,18 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
         break;
       }
 
+      case Toolkit::Control::Property::MARGIN:
+      {
+        value = controlImpl.mImpl->GetMargin();
+        break;
+      }
+
+      case Toolkit::Control::Property::PADDING:
+      {
+        value = controlImpl.mImpl->GetPadding();
+        break;
+      }
+
       case Toolkit::DevelControl::Property::TOOLTIP:
       {
         Property::Map map;
@@ -869,7 +1084,6 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
         value = map;
         break;
       }
-
     }
   }
 
@@ -938,8 +1152,8 @@ void Control::Impl::RecreateChangedVisuals( Dictionary<Property::Map>& stateVisu
       Property::Map fromMap;
       visual.CreatePropertyMap( fromMap );
 
-      Toolkit::DevelVisual::Type fromType = GetVisualTypeFromMap( fromMap );
-      Toolkit::DevelVisual::Type toType = GetVisualTypeFromMap( toMap );
+      Toolkit::Visual::Type fromType = GetVisualTypeFromMap( fromMap );
+      Toolkit::Visual::Type toType = GetVisualTypeFromMap( toMap );
 
       if( fromType != toType )
       {
@@ -947,8 +1161,8 @@ void Control::Impl::RecreateChangedVisuals( Dictionary<Property::Map>& stateVisu
       }
       else
       {
-        if( fromType == Toolkit::DevelVisual::IMAGE || fromType == Toolkit::DevelVisual::N_PATCH
-            || fromType == Toolkit::DevelVisual::SVG || fromType == Toolkit::DevelVisual::ANIMATED_IMAGE )
+        if( fromType == Toolkit::Visual::IMAGE || fromType == Toolkit::Visual::N_PATCH
+            || fromType == Toolkit::Visual::SVG || fromType == Toolkit::Visual::ANIMATED_IMAGE )
         {
           Property::Value* fromUrl = fromMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
           Property::Value* toUrl = toMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
@@ -1113,6 +1327,52 @@ void Control::Impl::SetSubState( const std::string& subStateName, bool withTrans
 
     mSubStateName = subStateName;
   }
+}
+
+void Control::Impl::OnStageDisconnection()
+{
+  Actor self = mControlImpl.Self();
+
+  // Any visuals set for replacement but not yet ready should still be registered.
+  // Reason: If a request was made to register a new visual but the control removed from stage before visual was ready
+  // then when this control appears back on stage it should use that new visual.
+
+  // Iterate through all registered visuals and set off stage
+  SetVisualsOffStage( mVisuals, self );
+
+  // Visuals pending replacement can now be taken out of the removal list and set off stage
+  // Iterate through all replacement visuals and add to a move queue then set off stage
+  for( auto removalIter = mRemoveVisuals.Begin(), end = mRemoveVisuals.End(); removalIter != end; removalIter++ )
+  {
+    Toolkit::GetImplementation((*removalIter)->visual).SetOffStage( self );
+  }
+
+  for( auto replacedIter = mVisuals.Begin(), end = mVisuals.End(); replacedIter != end; replacedIter++ )
+  {
+    (*replacedIter)->pending = false;
+  }
+
+  mRemoveVisuals.Clear();
+}
+
+void Control::Impl::SetMargin( Extents margin )
+{
+  mControlImpl.mImpl->mMargin = margin;
+}
+
+Extents Control::Impl::GetMargin() const
+{
+  return mControlImpl.mImpl->mMargin;
+}
+
+void Control::Impl::SetPadding( Extents padding )
+{
+  mControlImpl.mImpl->mPadding = padding;
+}
+
+Extents Control::Impl::GetPadding() const
+{
+  return mControlImpl.mImpl->mPadding;
 }
 
 } // namespace Internal

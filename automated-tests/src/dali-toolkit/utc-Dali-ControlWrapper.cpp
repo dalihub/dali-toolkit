@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,10 @@
 
 #include <dali.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/actors/custom-actor-devel.h>
+#include <dali/devel-api/object/csharp-type-registry.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
@@ -52,13 +55,14 @@ bool gOnRelayout = false;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 namespace Impl
 {
 struct TestCustomControl : public Toolkit::Internal::ControlWrapper
 {
   /**
-  * Constructor
-  */
+   * Constructor
+   */
   TestCustomControl()  : Toolkit::Internal::ControlWrapper( CustomControlBehaviour( Toolkit::Internal::ControlWrapper::DISABLE_STYLE_CHANGE_SIGNALS |
           Toolkit::Internal::ControlWrapper::REQUIRES_KEYBOARD_NAVIGATION_SUPPORT )) ,
           mDaliProperty( Property::INVALID_INDEX ),
@@ -97,26 +101,33 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
   virtual void OnStageConnection( int depth )
   {
     mDepth = depth;
+    Control::OnStageConnection(depth);
   }
   virtual void OnStageDisconnection()
   {
+    Control::OnStageDisconnection();
   }
   virtual void OnChildAdd( Actor& child )
   {
+    Control::OnChildAdd(child);
   }
   virtual void OnChildRemove( Actor& child )
   {
+    Control::OnChildRemove(child);
   }
   virtual void OnPropertySet( Property::Index index, Property::Value propertyValue )
   {
+    Control::OnPropertySet(index, propertyValue);
   }
   virtual void OnSizeSet( const Vector3& targetSize )
   {
     mSizeSet = targetSize;
+    Control::OnSizeSet( targetSize );
   }
   virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize )
   {
     mTargetSize = targetSize;
+    Control::OnSizeAnimation( animation, targetSize );
   }
   virtual bool OnTouchEvent( const TouchEvent& event )
   {
@@ -155,9 +166,27 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
     return 0.0f;
   }
 
+  void TestRegisterVisual( Property::Index index, Toolkit::Visual::Base visual )
+  {
+    ControlWrapper::RegisterVisual( index, visual );
+
+    VisualIndices::iterator iter = std::find( mRegisteredVisualIndices.begin(), mRegisteredVisualIndices.end(), index );
+    if( iter == mRegisteredVisualIndices.end() )
+    {
+      mRegisteredVisualIndices.push_back(index);
+    }
+  }
+
   virtual void OnRelayout( const Vector2& size, RelayoutContainer& container )
   {
     gOnRelayout = true;
+
+    for( VisualIndices::iterator iter = mRegisteredVisualIndices.begin(); iter != mRegisteredVisualIndices.end() ; ++iter )
+    {
+      Visual::Base visual = GetVisual(*iter);
+      Property::Map map; // empty map enforces defaults
+      visual.SetTransformAndSize( map, size );
+    }
   }
 
   virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
@@ -216,12 +245,18 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
   Vector3 mTargetSize;
   bool mNego;
   unsigned int mDepth;
+
+  typedef std::vector<Property::Index> VisualIndices;
+  VisualIndices mRegisteredVisualIndices;
 };
+
+
 
 }
 
-static std::string customControlTypeName = "TestCustomControl";
+static std::string customControlTypeName = "MyTestCustomControl";
 static TypeRegistration customControl( customControlTypeName, typeid(Dali::Toolkit::Control), NULL );
+
 
 int UtcDaliControlWrapperConstructor(void)
 {
@@ -235,6 +270,11 @@ int UtcDaliControlWrapperConstructor(void)
   controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
 
   DALI_TEST_CHECK( ControlWrapper::DownCast( controlWrapper ) );
+
+  Dali::TypeInfo typeInfo = DevelCustomActor::GetTypeInfo( controlWrapper );
+
+  DALI_TEST_EQUALS( typeInfo.GetName(), customControlTypeName, TEST_LOCATION);
+
 
   END_TEST;
 }
@@ -405,6 +445,43 @@ int UtcDaliControlWrapperRegisterVisualToSelf(void)
   END_TEST;
 }
 
+int UtcDaliControlWrapperRegisterVisualWithDepthIndexToSelf(void)
+{
+  ToolkitTestApplication application;
+
+  Test::ObjectDestructionTracker objectDestructionTracker;
+
+  {
+    Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
+    ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
+
+    objectDestructionTracker.Start( controlWrapper );
+
+    Property::Index index = 1;
+
+    Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+    Toolkit::Visual::Base visual;
+
+    Property::Map map;
+    map[Visual::Property::TYPE] = Visual::COLOR;
+    map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+    visual = visualFactory.CreateVisual( map );
+    DALI_TEST_CHECK( visual );
+
+    // Register to self
+    controlWrapperImpl->RegisterVisual( index, visual, 4 );
+
+    DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), false, TEST_LOCATION ); // Control not destroyed yet
+    DALI_TEST_EQUALS( controlWrapperImpl->GetVisual( index ), visual, TEST_LOCATION );
+    DALI_TEST_EQUALS( visual.GetDepthIndex(), 4, TEST_LOCATION );
+  }
+
+  DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), true, TEST_LOCATION ); // Should be destroyed
+
+  END_TEST;
+}
+
 int UtcDaliControlWrapperRegisterDisabledVisual(void)
 {
   ToolkitTestApplication application;
@@ -429,6 +506,49 @@ int UtcDaliControlWrapperRegisterDisabledVisual(void)
 
   DALI_TEST_EQUALS( controlWrapperImpl->GetVisual( TEST_PROPERTY ), visual, TEST_LOCATION );
   DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), false, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( controlWrapper );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), false, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controlWrapper.OnStage(), true, TEST_LOCATION );
+
+  controlWrapperImpl->EnableVisual( TEST_PROPERTY, true );
+
+  DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlWrapperRegisterDisabledVisualWithDepthIndex(void)
+{
+  ToolkitTestApplication application;
+
+  Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
+
+  Property::Index TEST_PROPERTY = 1;
+
+  Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+  Toolkit::Visual::Base visual;
+
+  Property::Map map;
+  map[Visual::Property::TYPE] = Visual::COLOR;
+  map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+  visual = visualFactory.CreateVisual( map );
+  DALI_TEST_CHECK(visual);
+
+  // Register index with a color visual
+  controlWrapperImpl->RegisterVisual( TEST_PROPERTY, visual, false, 10 );
+
+  DALI_TEST_EQUALS( controlWrapperImpl->GetVisual( TEST_PROPERTY ), visual, TEST_LOCATION );
+  DALI_TEST_EQUALS( controlWrapperImpl->IsVisualEnabled( TEST_PROPERTY ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( visual.GetDepthIndex(), 10, TEST_LOCATION );
 
   Stage::GetCurrent().Add( controlWrapper );
 
@@ -574,8 +694,8 @@ int UtcDaliControlWrapperTestControlProperties(void)
   controlWrapper.SetProperty( Control::Property::BACKGROUND, rendererMap );
   Property::Value propertyValue = controlWrapper.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propertyValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE ) );
-  DALI_TEST_EQUALS( resultMap->Find( Visual::Property::TYPE )->Get<int>(), (int)Visual::COLOR, TEST_LOCATION );
+  DALI_TEST_CHECK( resultMap->Find( Toolkit::Visual::Property::TYPE ) );
+  DALI_TEST_EQUALS( resultMap->Find( Toolkit::Visual::Property::TYPE )->Get<int>(), (int)Visual::COLOR, TEST_LOCATION );
   DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR ) );
   DALI_TEST_EQUALS( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>(), Color::RED, TEST_LOCATION );
 
@@ -600,6 +720,90 @@ int UtcDaliControlWrapperTypeRegistryCreation(void)
   // Check that we can't create a ControlWrapper instance
   BaseHandle baseHandle = typeInfo.CreateInstance();
   DALI_TEST_CHECK( !baseHandle )
+
+  END_TEST;
+}
+
+void SetProperty(BaseObject* object, const char* const name, Property::Value* value)
+{
+}
+Property::Value* GetProperty(BaseObject* object, const char* const name )
+{
+  return NULL;
+}
+
+int UtcDaliControlWrapperAnimateVisual(void)
+{
+  tet_infoline("Test that the control wrapper's visuals can be animated by name when registered");
+
+  ToolkitTestApplication application;
+  Test::ObjectDestructionTracker objectDestructionTracker;
+
+  {
+    Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
+    ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
+
+    Property::Index index = Control::CONTROL_PROPERTY_END_INDEX+1;
+    std::string visualName("colorVisual");
+    CSharpTypeRegistry::RegisterProperty( customControlTypeName, visualName, index, Property::VECTOR4, SetProperty, GetProperty );
+
+    objectDestructionTracker.Start( controlWrapper );
+
+    Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
+    Toolkit::Visual::Base visual;
+
+    Property::Map map;
+    map[Visual::Property::TYPE] = Visual::COLOR;
+    map[ColorVisual::Property::MIX_COLOR] = Color::RED;
+
+    visual = visualFactory.CreateVisual( map );
+    DALI_TEST_CHECK( visual );
+
+    // Register to self
+    controlWrapperImpl->TestRegisterVisual( index, visual );
+
+    Stage::GetCurrent().Add( controlWrapper );
+    controlWrapper.SetSize( 100, 100 );
+    application.SendNotification();
+    application.Render(0); // Trigger animation start
+
+    Property::Map transition;
+    transition["target"] = visualName;
+    transition["property"] = "mixColor";
+    transition["targetValue"] = Color::GREEN;
+    Property::Map animator;
+    animator["alphaFunction"] = "LINEAR";
+    animator["duration"] = 1.0f;
+    animator["delay"] = 0.0f;
+    transition["animator"] = animator;
+
+    TransitionData transitionData = TransitionData::New(transition);
+    Animation anim = DevelControl::CreateTransition( *controlWrapperImpl, transitionData );
+    anim.Play();
+
+    application.SendNotification();
+    application.Render(0); // Trigger animation start
+
+    application.Render(1000); // animation end
+    application.Render(  10);
+
+    Property::Map visualMap;
+    visual.CreatePropertyMap( visualMap );
+    Property::Value* value = visualMap.Find(ColorVisual::Property::MIX_COLOR, "mixColor");
+    DALI_TEST_CHECK( value != NULL );
+    if( value )
+    {
+      Vector4 testColor = value->Get<Vector4>();
+      DALI_TEST_EQUALS( testColor, Color::GREEN, 0.001f, TEST_LOCATION );
+    }
+
+    DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), false, TEST_LOCATION ); // Control not destroyed yet
+    DALI_TEST_EQUALS( controlWrapperImpl->GetVisual( index ), visual, TEST_LOCATION );
+
+    Stage::GetCurrent().Remove( controlWrapper );
+  }
+
+  DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), true, TEST_LOCATION ); // Should be destroyed
 
   END_TEST;
 }

@@ -15,11 +15,10 @@
  *
  */
 
-// CLASS HEADER
-#include "toolkit-video-player.h"
-
-// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/video-player.h>
 #include <dali/public-api/object/any.h>
+#include <dali/public-api/object/base-object.h>
+#include <toolkit-application.h>
 
 namespace Dali
 {
@@ -58,6 +57,14 @@ public:
   bool IsLooping()
   {
     return mLooping;
+  }
+
+  void Stop()
+  {
+    if( !mFinishedSignal.Empty() )
+    {
+      mFinishedSignal.Emit();
+    }
   }
 
 public:
@@ -163,6 +170,7 @@ void VideoPlayer::Pause()
 
 void VideoPlayer::Stop()
 {
+  Internal::Adaptor::GetImplementation( *this ).Stop();
 }
 
 void VideoPlayer::SetMute( bool mute )
@@ -200,6 +208,10 @@ int VideoPlayer::GetPlayPosition()
   return 0;
 }
 
+void VideoPlayer::SetDisplayArea( DisplayArea area )
+{
+}
+
 void VideoPlayer::SetDisplayRotation( Dali::VideoPlayerPlugin::DisplayRotation rotation )
 {
 }
@@ -212,6 +224,19 @@ Dali::VideoPlayerPlugin::DisplayRotation VideoPlayer::GetDisplayRotation()
 Dali::VideoPlayerPlugin::VideoPlayerSignalType& VideoPlayer::FinishedSignal()
 {
   return Internal::Adaptor::GetImplementation( *this ).mFinishedSignal;
+}
+
+void VideoPlayer::Forward( int millisecond )
+{
+}
+
+void VideoPlayer::Backward( int millisecond )
+{
+}
+
+bool VideoPlayer::IsVideoTextureSupported() const
+{
+  return ToolkitApplication::DECODED_IMAGES_SUPPORTED;
 }
 
 } // namespace Dali;

@@ -31,6 +31,34 @@ const char* const VOLUME_LEFT( "volumeLeft" );
 const char* const VOLUME_RIGHT( "volumeRight" );
 const char* const RENDERING_TYPE( "renderingTarget" );
 
+const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  varying mediump vec2 vTexCoord;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
+    vertexPosition.xyz *= uSize;\n
+    vertexPosition = uMvpMatrix * vertexPosition;\n
+    \n
+    vTexCoord = aPosition + vec2(0.5);\n
+    gl_Position = vertexPosition;\n
+  }\n
+);
+
+const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform lowp vec4 uColor;\n
+  \n
+  void main()\n
+  {\n
+    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n
+  }\n
+);
+
 }
 
 void video_view_startup(void)
@@ -309,6 +337,119 @@ int UtcDaliVideoViewMethodsForRenderType(void)
 
   DALI_TEST_CHECK( type );
   DALI_TEST_EQUALS( "nativeImageTarget", type->Get<std::string>(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewCustomShaderForCoverage(void)
+{
+  ToolkitTestApplication application;
+  VideoView videoView = VideoView::New();
+  DALI_TEST_CHECK( videoView );
+
+  Stage::GetCurrent().Add( videoView );
+  videoView.SetProperty( VideoView::Property::VIDEO, "testvideo" );
+
+  Property::Map customShader;
+  customShader.Insert( "vertexShader", VERTEX_SHADER );
+  customShader.Insert( "fragmentShader", FRAGMENT_SHADER );
+
+  Property::Map map;
+  map.Insert( "shader", customShader );
+
+  videoView.SetProperty( VideoView::Property::VIDEO, map );
+
+  Property::Map map2;
+  Property::Value value = videoView.GetProperty( VideoView::Property::VIDEO );
+
+  DALI_TEST_CHECK( !value.Get( map2 ) );
+  END_TEST;
+}
+
+int UtcDaliVideoViewMethodsForCoverage2(void)
+{
+  ToolkitTestApplication application;
+  VideoView videoView = VideoView::New();
+  DALI_TEST_CHECK( videoView );
+
+  Property::Map windowSurfaceTarget;
+
+  windowSurfaceTarget.Insert( RENDERING_TYPE, "windowSurfaceTarget" );
+
+  Stage::GetCurrent().Add( videoView );
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map map;
+  Property::Value value;
+  videoView.SetProperty( VideoView::Property::VIDEO, windowSurfaceTarget );
+
+  value = videoView.GetProperty( VideoView::Property::VIDEO );
+  DALI_TEST_CHECK( value.Get( map ) );
+
+  Property::Value* type = map.Find( RENDERING_TYPE );
+  DALI_TEST_CHECK( type );
+  DALI_TEST_EQUALS( "windowSurfaceTarget", type->Get<std::string>(), TEST_LOCATION );
+
+  Vector3 vector(100.0f, 100.0f, 0.0f);
+
+  DALI_TEST_CHECK(vector != videoView.GetCurrentSize());
+  videoView.SetSize( vector );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check the size in the new frame
+  DALI_TEST_CHECK(vector == videoView.GetCurrentSize());
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewPropertyUnderlay(void)
+{
+  ToolkitTestApplication application;
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+
+  VideoView view = VideoView::New();
+  DALI_TEST_CHECK( view );
+
+  Stage::GetCurrent().Add( view );
+  view.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  bool isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( isUnderlay );
+
+  view.Play();
+  view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, false );
+  isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( !isUnderlay );
+
+  view.Play();
+  view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, true );
+  isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( isUnderlay );
+
+  // If platform api doesn't provide any API or feature for decoded images of video,
+  // UNDERLAY should be true
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = false;
+
+  view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, false );
+  isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( isUnderlay );
+
+  // For coverage
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+
+  view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, true );
+  view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, false );
+  isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( !isUnderlay );
+
+  view.Stop();
 
   END_TEST;
 }

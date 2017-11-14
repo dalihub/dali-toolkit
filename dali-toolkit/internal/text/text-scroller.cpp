@@ -20,13 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/images/frame-buffer-image.h>
-#include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/public-api/rendering/geometry.h>
-#include <dali/public-api/rendering/renderer.h>
-#include <dali/public-api/rendering/sampler.h>
-#include <dali/public-api/rendering/shader.h>
-#include <dali/devel-api/images/texture-set-image.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -50,191 +43,107 @@ const int MINIMUM_SCROLL_SPEED = 1; // Speed should be set by Property system.
 const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying highp vec2 vTexCoord;\n
-  varying highp float vRatio;\n
+  uniform mediump vec3 uSize;\n
+  uniform mediump float uDelta;\n
+  uniform mediump vec2 uTextureSize;\n
+  uniform mediump float uGap;\n
+  uniform mediump float uHorizontalAlign;\n
+  uniform mediump float uVerticalAlign;\n
+  \n
   uniform mediump mat4 uModelMatrix;\n
   uniform mediump mat4 uViewMatrix;\n
   uniform mediump mat4 uProjection;\n
-  uniform mediump vec3 uSize;\n
-  uniform mediump float uDelta;\n
-  uniform mediump vec2 uTextureSize;
-  uniform mediump float uGap;\n
-  uniform mediump float uAlign;\n
   \n
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+
   void main()\n
   {\n
-    {\n
-      highp vec4 vertexPosition = vec4(aPosition*uSize.xy, 0.0, 1.0);\n
-      vertexPosition = uViewMatrix *  uModelMatrix  * vertexPosition ;\n
-      vertexPosition.x = floor( vertexPosition.x ) + 0.5;
-      vertexPosition.y = floor( vertexPosition.y ) + 0.5;
-      float smallTextPadding = max(uSize.x - uTextureSize.x, 0. );\n
-      float gap = max( uGap, smallTextPadding );\n
-      float delta = floor ( uDelta ) + 0.5;
-      vTexCoord.x = ( delta  + ( uAlign * ( uTextureSize.x - uSize.x ) ) + (  aPosition.x * uSize.x ) )/ ( uTextureSize.x + gap );\n
-      vTexCoord.y = ( 0.5 + floor(  aPosition.y * uSize.y ) )/ ( uTextureSize.y ) ;\n
-      vRatio = uTextureSize.x / ( uTextureSize.x + gap );\n
-      gl_Position = uProjection * vertexPosition;
-    }\n
+    mediump vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy );\n
+    mediump vec2 visualSize = mix( uSize.xy * size, size, offsetSizeMode.zw );\n
+    \n
+    mediump float delta = floor ( uDelta ) + 0.5;\n
+    vTexCoord.x = ( delta + uHorizontalAlign * ( uTextureSize.x - visualSize.x - uGap ) + floor( aPosition.x * visualSize.x ) + 0.5 - uGap * 0.5 ) / uTextureSize.x + 0.5;\n
+    vTexCoord.y = ( uVerticalAlign * ( uTextureSize.y - visualSize.y ) + floor( aPosition.y * visualSize.y ) + 0.5 ) / ( uTextureSize.y ) + 0.5;\n
+    \n
+    mediump vec4 vertexPosition = vec4( floor( ( aPosition + anchorPoint ) * visualSize + ( visualOffset + origin ) * uSize.xy ), 0.0, 1.0 );\n
+    mediump vec4 nonAlignedVertex = uViewMatrix * uModelMatrix * vertexPosition;\n
+    mediump vec4 pixelAlignedVertex = vec4 ( floor( nonAlignedVertex.xyz ), 1.0 );\n
+    \n
+    gl_Position = uProjection * pixelAlignedVertex;\n
   }\n
 );
 
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying highp vec2 vTexCoord;\n
-  varying highp float vRatio;\n
   uniform sampler2D sTexture;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
+  uniform lowp float preMultipliedAlpha;\n
+  \n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
+  }\n
   \n
   void main()\n
   {\n
-    highp vec2 texCoord;\n
-    texCoord.y = vTexCoord.y;\n
-    texCoord.x = fract( vTexCoord.x ) / vRatio;\n
-    if ( texCoord.x > 1.0 )\n
+    if ( vTexCoord.y > 1.0 )\n
       discard;\n
     \n
-    gl_FragColor = texture2D( sTexture, texCoord );\n
+    mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
+    textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
+    \n
+    gl_FragColor = textTexture * uColor * visualMixColor();
   }\n
 );
 
 /**
- * @brief How the text should be aligned when scrolling the text.
+ * @brief How the text should be aligned horizontally when scrolling the text.
  *
- * 0.0f aligns the text to the left, 1.0f aligns the text to the right.
- * The final alignment depends on three factors:
- *   1) The alignment value of the text label (Use Text::Layout::HorizontalAlignment enumerations).
+ * -0.5f aligns the text to the left, 0.0f aligns the text to the center, 0.5f aligns the text to the right.
+ * The final alignment depends on two factors:
+ *   1) The alignment value of the text label (Use Text::HorizontalAlignment enumerations).
  *   2) The text direction, i.e. whether it's LTR or RTL (0 = LTR, 1 = RTL).
- *   3) Whether the text is greater than the size of the control ( 0 = Text width <= Control width, 1 = Text width > Control width ).
  */
-const float ALIGNMENT_TABLE[ Text::Layout::HORIZONTAL_ALIGN_COUNT ][ 2 ][ 2 ] =
+const float HORIZONTAL_ALIGNMENT_TABLE[ Text::HorizontalAlignment::END+1 ][ 2 ] =
 {
-  // HORIZONTAL_ALIGN_BEGIN
+  // HorizontalAlignment::BEGIN
   {
-    { // LTR
-      0.0f, // Text width <= Control width
-      0.0f  // Text width >  Control width
-    },
-    { // RTL
-      1.0f, // Text width <= Control width
-      1.0f  // Text width >  Control width
-    }
+    -0.5f, // LTR
+    0.5f   // RTL
   },
 
-  // HORIZONTAL_ALIGN_CENTER
+  // HorizontalAlignment::CENTER
   {
-    { // LTR
-      0.5f, // Text width <= Control width
-      0.0f  // Text width >  Control width
-    },
-    { // RTL
-      0.5f, // Text width <= Control width
-      1.0f  // Text width >  Control width
-    }
+    0.0f,  // LTR
+    0.0f   // RTL
   },
 
-  // HORIZONTAL_ALIGN_END
+  // HorizontalAlignment::END
   {
-    { // LTR
-      1.0f, // Text width <= Control width
-      0.0f  // Text width >  Control width
-    },
-    { // RTL
-      0.0f, // Text width <= Control width
-      1.0f  // Text width >  Control width
-    }
+    0.5f,  // LTR
+    -0.5f  // RTL
   }
 };
 
 /**
- * @brief Create and set up a camera for the render task to use
+ * @brief How the text should be aligned vertically when scrolling the text.
  *
- * @param[in] sizeOfTarget size of the source camera to look at
- * @param[out] offscreenCamera custom camera
+ * -0.5f aligns the text to the top, 0.0f aligns the text to the center, 0.5f aligns the text to the bottom.
+ * The alignment depends on the alignment value of the text label (Use Text::VerticalAlignment enumerations).
  */
-void CreateCameraActor( const Size& sizeOfTarget, CameraActor& offscreenCamera )
+const float VERTICAL_ALIGNMENT_TABLE[ Text::VerticalAlignment::BOTTOM+1 ] =
 {
-  offscreenCamera = CameraActor::New();
-  offscreenCamera.SetOrthographicProjection( sizeOfTarget );
-  offscreenCamera.SetInvertYAxis( true );
-}
-
-/**
- * @brief Create a render task
- *
- * @param[in] sourceActor actor to be used as source
- * @param[in] cameraActor camera looking at source
- * @param[in] offscreenTarget resulting image from render task
- * @param[out] renderTask render task that has been setup
- */
-void CreateRenderTask( Actor sourceActor, CameraActor cameraActor , FrameBufferImage offscreenTarget, RenderTask& renderTask )
-{
-  Stage stage = Stage::GetCurrent();
-  RenderTaskList taskList = stage.GetRenderTaskList();
-  renderTask = taskList.CreateTask();
-  renderTask.SetSourceActor( sourceActor );
-  renderTask.SetExclusive( true );
-  renderTask.SetInputEnabled( false );
-  renderTask.SetClearEnabled( true );
-  renderTask.SetCameraActor( cameraActor );
-  renderTask.SetTargetFrameBuffer( offscreenTarget );
-  renderTask.SetClearColor( Color::TRANSPARENT );
-  renderTask.SetCullMode( false );
-}
-
-/**
- * @brief Create quad geometry for the mesh
- *
- * @param[out] geometry quad geometry that can be used for a mesh
- */
-void CreateGeometry( Geometry& geometry )
-{
-  struct QuadVertex { Vector2 position;  };
-
-  QuadVertex quadVertexData[4] =
-  {
-      { Vector2( 0.0f, 0.0f) },
-      { Vector2( 1.0f, 0.0f) },
-      { Vector2( 0.0f, 1.0f) },
-      { Vector2( 1.0f, 1.0f) },
-  };
-
-  const unsigned short indices[6] =
-  {
-     3,1,0,0,2,3
-  };
-
-  Property::Map quadVertexFormat;
-  quadVertexFormat["aPosition"] = Property::VECTOR2;
-  PropertyBuffer quadVertices = PropertyBuffer::New( quadVertexFormat );
-  quadVertices.SetData(quadVertexData, 4 );
-
-  geometry = Geometry::New();
-  geometry.AddVertexBuffer( quadVertices );
-  geometry.SetIndexBuffer( indices, sizeof(indices)/sizeof(indices[0]) );
-}
-
-
-/**
- * @brief Create a renderer
- *
- * @param[in] frameBufferImage texture to be used
- * @param[out] renderer mesh renderer using the supplied texture
- */
-void CreateRenderer( FrameBufferImage frameBufferImage, Dali::Renderer& renderer )
-{
-  Shader shader = Shader::New( VERTEX_SHADER_SCROLL , FRAGMENT_SHADER, Shader::Hint::NONE );
-
-  Sampler sampler = Sampler::New();
-  sampler.SetFilterMode(FilterMode::LINEAR, FilterMode::LINEAR );
-
-  TextureSet textureSet = TextureSet::New();
-  TextureSetImage( textureSet, 0u, frameBufferImage );
-  textureSet.SetSampler( 0u, sampler );
-
-  Geometry meshGeometry;
-  CreateGeometry( meshGeometry );
-
-  renderer = Renderer::New( meshGeometry, shader );
-  renderer.SetTextures( textureSet );
-}
+  -0.5f, // VerticalAlignment::TOP
+  0.0f,  // VerticalAlignment::CENTER
+  0.5f   // VerticalAlignment::BOTTOM
+};
 
 } // namespace
 
@@ -295,9 +204,9 @@ float TextScroller::GetLoopDelay() const
   return mLoopDelay;
 }
 
-void TextScroller::SetStopMode( DevelTextLabel::AutoScrollStopMode::Type stopMode )
+void TextScroller::SetStopMode( TextLabel::AutoScrollStopMode::Type stopMode )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetAutoScrollStopMode [%s]\n",(stopMode == DevelTextLabel::AutoScrollStopMode::IMMEDIATE)?"IMMEDIATE":"FINISH_LOOP" );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetAutoScrollStopMode [%s]\n",(stopMode == TextLabel::AutoScrollStopMode::IMMEDIATE)?"IMMEDIATE":"FINISH_LOOP" );
   mStopMode = stopMode;
 }
 
@@ -307,170 +216,133 @@ void TextScroller::StopScrolling()
   {
     switch( mStopMode )
     {
-      case DevelTextLabel::AutoScrollStopMode::IMMEDIATE:
+      case TextLabel::AutoScrollStopMode::IMMEDIATE:
       {
         mScrollAnimation.Stop();
+        mScrollerInterface.ScrollingFinished();
         break;
       }
-      case DevelTextLabel::AutoScrollStopMode::FINISH_LOOP:
+      case TextLabel::AutoScrollStopMode::FINISH_LOOP:
       {
         mScrollAnimation.SetLoopCount( 1 ); // As animation already playing this allows the current animation to finish instead of trying to stop mid-way
         break;
       }
       default:
       {
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n" );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Undifined AutoScrollStopMode\n" );
       }
     }
   }
+  else
+  {
+    mScrollerInterface.ScrollingFinished();
+  }
 }
 
-DevelTextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const
+TextLabel::AutoScrollStopMode::Type TextScroller::GetStopMode() const
 {
   return mStopMode;
 }
 
-Actor TextScroller::GetSourceCamera() const
-{
-  return mOffscreenCameraActor;
-}
-
-Actor TextScroller::GetScrollingText() const
-{
-  return mScrollingTextActor;
-}
-
-TextScroller::TextScroller( ScrollerInterface& scrollerInterface ) : mScrollerInterface( scrollerInterface ),
-                            mScrollDeltaIndex( Property::INVALID_INDEX ),
-                            mScrollSpeed( MINIMUM_SCROLL_SPEED ),
-                            mLoopCount( 1 ),
-                            mLoopDelay( 0.0f ),
-                            mWrapGap( 0.0f ),
-                            mStopMode( DevelTextLabel::AutoScrollStopMode::FINISH_LOOP )
+TextScroller::TextScroller( ScrollerInterface& scrollerInterface )
+: mScrollerInterface( scrollerInterface ),
+  mScrollDeltaIndex( Property::INVALID_INDEX ),
+  mScrollSpeed( MINIMUM_SCROLL_SPEED ),
+  mLoopCount( 1 ),
+  mLoopDelay( 0.0f ),
+  mWrapGap( 0.0f ),
+  mStopMode( TextLabel::AutoScrollStopMode::FINISH_LOOP )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller Default Constructor\n" );
 }
 
 TextScroller::~TextScroller()
 {
-  CleanUp();
 }
 
-void TextScroller::SetParameters( Actor sourceActor, const Size& controlSize, const Size& offScreenSize, CharacterDirection direction, float alignmentOffset, Layout::HorizontalAlignment horizontalAlignment )
+void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] offscreenSize[%f,%f] direction[%d] alignmentOffset[%f]\n",
-                 controlSize.x, controlSize.y, offScreenSize.x, offScreenSize.y, direction, alignmentOffset );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] textureSize[%f,%f] direction[%d]\n",
+                 controlSize.x, controlSize.y, textureSize.x, textureSize.y, direction );
 
-  CleanUp(); //  If already scrolling then restart with new parameters
+  mRenderer = renderer;
 
+  float animationProgress = 0.0f;
+  int   remainedLoop = mLoopCount;
   if ( mScrollAnimation )
   {
+    if( mScrollAnimation.GetState() == Animation::PLAYING )
+    {
+      animationProgress = mScrollAnimation.GetCurrentProgress();
+
+      if( mLoopCount > 0 ) // If not a ininity loop, then calculate remained loop
+      {
+        remainedLoop = mLoopCount - ( mScrollAnimation.GetCurrentLoop() );
+        remainedLoop = ( remainedLoop <= 0 ? 1 : remainedLoop );
+      }
+    }
     mScrollAnimation.Clear();
+
+    // Reset to the original shader and texture before scrolling
+    mRenderer.SetShader(mShader);
+    mRenderer.SetTextures( mTextureSet );
   }
 
-  FrameBufferImage offscreenRenderTargetForText = FrameBufferImage::New( offScreenSize.width, offScreenSize.height, Pixel::RGBA8888 );
-  Renderer renderer;
+  mShader = mRenderer.GetShader();
+  mTextureSet = mRenderer.GetTextures();
 
-  CreateCameraActor( offScreenSize, mOffscreenCameraActor );
-  CreateRenderer( offscreenRenderTargetForText, renderer );
-  CreateRenderTask( sourceActor, mOffscreenCameraActor, offscreenRenderTargetForText, mRenderTask );
+  // Set the shader and texture for scrolling
+  Shader shader = Shader::New( VERTEX_SHADER_SCROLL, FRAGMENT_SHADER, Shader::Hint::NONE );
+  mRenderer.SetShader( shader );
+  mRenderer.SetTextures( textureSet );
 
-  float xPosition = 0.0f;
-  switch( horizontalAlignment )
-  {
-    case Layout::HORIZONTAL_ALIGN_BEGIN:
-    {
-      // Reposition camera to match alignment of target, RTL text has direction=true
-      if ( direction )
-      {
-        xPosition = alignmentOffset + offScreenSize.width * 0.5f;
-      }
-      else
-      {
-        xPosition = offScreenSize.width * 0.5f;
-      }
-      break;
-    }
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters wrapGap[%f]\n", wrapGap );
 
-    case Layout::HORIZONTAL_ALIGN_CENTER:
-    {
-      xPosition = controlSize.width * 0.5f;
-      break;
-    }
+  const float horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[ horizontalAlignment ][ direction ];
+  const float verticalAlign = VERTICAL_ALIGNMENT_TABLE[ verticalAlignment ];
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters horizontalAlign[%f], verticalAlign[%f]\n", horizontalAlign, verticalAlign );
 
-    case Layout::HORIZONTAL_ALIGN_END:
-    {
-      // Reposition camera to match alignment of target, RTL text has direction=true
-      if ( direction )
-      {
-        xPosition = offScreenSize.width * 0.5f;
-      }
-      else
-      {
-        xPosition = alignmentOffset + offScreenSize.width * 0.5f;
-      }
-      break;
-    }
-  }
+  scrollingTextActor.RegisterProperty( "uTextureSize", textureSize );
+  scrollingTextActor.RegisterProperty( "uHorizontalAlign", horizontalAlign );
+  scrollingTextActor.RegisterProperty( "uVerticalAlign", verticalAlign );
+  scrollingTextActor.RegisterProperty( "uGap", wrapGap );
+  mScrollDeltaIndex = scrollingTextActor.RegisterProperty( "uDelta", 0.0f );
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters xPosition[%f]\n", xPosition );
-
-  mOffscreenCameraActor.SetX( xPosition );
-  mOffscreenCameraActor.SetY( offScreenSize.height * 0.5f );
-
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters mWrapGap[%f]\n", mWrapGap );
-
-  const float align = ALIGNMENT_TABLE[ horizontalAlignment ][ direction ][ offScreenSize.width > controlSize.width ];
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters align[%f]\n", align );
-
-  mScrollingTextActor = Actor::New();
-  mScrollingTextActor.AddRenderer( renderer );
-  mScrollingTextActor.RegisterProperty( "uTextureSize", offScreenSize );
-  mScrollingTextActor.RegisterProperty( "uAlign", align );
-  mScrollingTextActor.RegisterProperty( "uGap", mWrapGap );
-  mScrollingTextActor.SetSize( controlSize.width, std::min( offScreenSize.height, controlSize.height ) );
-  mScrollDeltaIndex = mScrollingTextActor.RegisterProperty( "uDelta", 0.0f );
-
-  float scrollAmount = std::max( offScreenSize.width + mWrapGap, controlSize.width );
+  float scrollAmount = std::max( textureSize.width, controlSize.width );
   float scrollDuration =  scrollAmount / mScrollSpeed;
 
   if ( direction  )
   {
-     scrollAmount = -scrollAmount; // reverse direction of scrollung
+     scrollAmount = -scrollAmount; // reverse direction of scrolling
   }
 
-  StartScrolling( scrollAmount, scrollDuration, mLoopCount );
+  StartScrolling( scrollingTextActor, scrollAmount, scrollDuration, remainedLoop );
+  mScrollAnimation.SetCurrentProgress(animationProgress);
 }
 
 void TextScroller::AutoScrollAnimationFinished( Dali::Animation& animation )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::AutoScrollAnimationFinished\n" );
-  CleanUp();
   mScrollerInterface.ScrollingFinished();
+
+  // Revert to the original shader and texture after scrolling
+  mRenderer.SetShader(mShader);
+  if ( mTextureSet )
+  {
+    mRenderer.SetTextures( mTextureSet );
+  }
 }
 
-void TextScroller::StartScrolling( float scrollAmount, float scrollDuration, int loopCount )
+void TextScroller::StartScrolling( Actor scrollingTextActor, float scrollAmount, float scrollDuration, int loopCount )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::StartScrolling scrollAmount[%f] scrollDuration[%f], loop[%d] speed[%d]\n", scrollAmount, scrollDuration, loopCount, mScrollSpeed );
 
   mScrollAnimation = Animation::New( scrollDuration );
-  mScrollAnimation.AnimateTo( Property( mScrollingTextActor, mScrollDeltaIndex ), scrollAmount, TimePeriod( mLoopDelay, scrollDuration ) );
+  mScrollAnimation.AnimateTo( Property( scrollingTextActor, mScrollDeltaIndex ), scrollAmount, TimePeriod( mLoopDelay, scrollDuration ) );
   mScrollAnimation.SetEndAction( Animation::Discard );
   mScrollAnimation.SetLoopCount( loopCount );
   mScrollAnimation.FinishedSignal().Connect( this, &TextScroller::AutoScrollAnimationFinished );
   mScrollAnimation.Play();
-}
-
-void TextScroller::CleanUp()
-{
-  if ( Stage::IsInstalled() )
-  {
-    Stage stage = Stage::GetCurrent();
-    RenderTaskList taskList = stage.GetRenderTaskList();
-    UnparentAndReset( mScrollingTextActor );
-    UnparentAndReset( mOffscreenCameraActor );
-    taskList.RemoveTask( mRenderTask );
-  }
 }
 
 } // namespace Text
