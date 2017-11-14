@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_CACHE_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,11 @@
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/devel-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
-#include <dali-toolkit/internal/visuals/texture-manager.h>
+#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 
 namespace Dali
 {
@@ -69,7 +68,12 @@ public:
     IMAGE_SHADER_ATLAS_CUSTOM_WRAP,
     NINE_PATCH_SHADER,
     SVG_SHADER,
-    TEXT_SHADER,
+    TEXT_SHADER_MULTI_COLOR_TEXT,
+    TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE,
+    TEXT_SHADER_SINGLE_COLOR_TEXT,
+    TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE,
+    TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI,
+    TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI,
     WIREFRAME_SHADER,
     SHADER_TYPE_MAX = WIREFRAME_SHADER
   };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -164,7 +162,7 @@ int UtcDaliRadioButtonLabelProperty(void)
   RadioButton radioButton = RadioButton::New();
 
   radioButton.SetProperty( Toolkit::Button::Property::LABEL,
-                          Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                          Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT )
                                          .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
                         );
 
@@ -350,7 +348,7 @@ int UtcDaliRadioButtonLabelActor(void)
   RadioButton radioButton = RadioButton::New();
 
   radioButton.SetProperty( Toolkit::Button::Property::LABEL,
-                          Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::DevelVisual::TEXT )
+                          Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::TEXT )
                                          .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f )
                         );
 

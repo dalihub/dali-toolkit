@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
-#include <dali/devel-api/object/weak-handle.h>
+#include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
 // INTERNAL INCLUDES
@@ -264,6 +264,8 @@ private:
   bool mFocusGroupLoopEnabled:1; ///< Whether the focus movement is looped within the same focus group
 
   bool mIsWaitingKeyboardFocusChangeCommit:1; /// A flag to indicate PreFocusChangeSignal emitted but the proposed focus actor is not commited by the application yet.
+
+  bool mClearFocusOnTouch:1; ///< Whether clear focus on touch.
 
   FocusStack mFocusHistory; ///< Stack to contain pre-focused actor's BaseObject*
 

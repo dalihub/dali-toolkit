@@ -234,6 +234,20 @@ public:
   const Vector4& GetShadowColor() const;
 
   /**
+   * @brief Set the shadow blur radius.
+   *
+   * @param[in] shadowBlurRadius The shadow blur radius, 0,0 indicates no blur.
+   */
+  void SetShadowBlurRadius( const float& shadowBlurRadius );
+
+  /**
+   * @brief Retrieve the shadow blur radius.
+   *
+   * @return The shadow blur radius.
+   */
+  const float& GetShadowBlurRadius() const;
+
+  /**
    * @brief Sets the text's underline color.
    *
    * @param[in] color The text's underline color.
@@ -280,6 +294,41 @@ public:
    */
   float GetUnderlineHeight() const;
 
+  /**
+   * @brief Retrieves the number of underline runs.
+   *
+   * @return The number of underline runs.
+   */
+  Length GetNumberOfUnderlineRuns() const;
+
+  /**
+   * @brief Set the outline color.
+   *
+   * @param[in] color color of outline.
+   */
+  void SetOutlineColor( const Vector4& color );
+
+  /**
+   * @brief Retrieve the outline color.
+   *
+   * @return The outline color.
+   */
+  const Vector4& GetOutlineColor() const;
+
+  /**
+   * @brief Set the outline width
+   *
+   * @param[in] width The width in pixels of the outline, 0 indicates no outline
+   */
+  void SetOutlineWidth( float width );
+
+  /**
+   * @brief Retrieves the width of an outline
+   *
+   * @return The width of the outline.
+   */
+  float GetOutlineWidth() const;
+
 protected:
 
   /**
@@ -316,9 +365,12 @@ public:
   Vector4                mTextColor;            ///< The text color
   Vector4                mShadowColor;          ///< Color of drop shadow
   Vector4                mUnderlineColor;       ///< Color of underline
+  Vector4                mOutlineColor;         ///< Color of outline
   Size                   mControlSize;          ///< The size of the UI control.
   Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
   float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
+  float                  mOutlineWidth;         ///< Width of outline.
+  float                  mShadowBlurRadius;     ///< Blur radius of shadow, 0 indicates no blur.
 
 private:
 

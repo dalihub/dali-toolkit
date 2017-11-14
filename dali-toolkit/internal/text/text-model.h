@@ -22,8 +22,7 @@
 #include <dali/public-api/object/ref-object.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/layouts/layout-alignment.h>
-#include <dali-toolkit/internal/text/layouts/layout-wrap-mode.h>
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 #include <dali-toolkit/internal/text/visual-model-impl.h>
@@ -77,12 +76,12 @@ public:
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  virtual Layout::HorizontalAlignment GetHorizontalAlignment() const;
+  virtual HorizontalAlignment::Type GetHorizontalAlignment() const;
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  virtual Layout::VerticalAlignment GetVerticalAlignment() const;
+  virtual VerticalAlignment::Type GetVerticalAlignment() const;
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()
@@ -98,6 +97,16 @@ public:
    * @copydoc ModelInterface::GetLines()
    */
   virtual const LineRun* const GetLines() const;
+
+  /**
+   * @copydoc ModelInterface::GetNumberOfScripts()
+   */
+  virtual Length GetNumberOfScripts() const;
+
+  /**
+   * @copydoc ModelInterface::GetScriptRuns()
+   */
+  virtual const ScriptRun* const GetScriptRuns() const;
 
   /**
    * @copydoc ModelInterface::GetNumberOfGlyphs()
@@ -129,6 +138,56 @@ public:
    */
   virtual const Vector4& GetDefaultColor() const;
 
+  /**
+   * @copydoc ModelInterface::GetShadowOffset()
+   */
+  virtual const Vector2& GetShadowOffset() const;
+
+  /**
+   * @copydoc ModelInterface::GetShadowColor()
+   */
+  virtual const Vector4& GetShadowColor() const;
+
+  /**
+   * @copydoc ModelInterface::GetShadowBlurRadius()
+   */
+  virtual const float& GetShadowBlurRadius() const;
+
+  /**
+   * @copydoc ModelInterface::GetUnderlineColor()
+   */
+  virtual const Vector4& GetUnderlineColor() const;
+
+  /**
+   * @copydoc ModelInterface::IsUnderlineEnabled()
+   */
+  virtual bool IsUnderlineEnabled() const;
+
+  /**
+   * @copydoc ModelInterface::GetUnderlineHeight()
+   */
+  virtual float GetUnderlineHeight() const;
+
+  /**
+   * @copydoc ModelInterface::GetNumberOfUnderlineRuns()
+   */
+  virtual Length GetNumberOfUnderlineRuns() const;
+
+  /**
+   * @copydoc ModelInterface::GetUnderlineRuns()
+   */
+  virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const;
+
+  /**
+   * @copydoc ModelInterface::GetOutlineColor()
+   */
+  virtual const Vector4& GetOutlineColor() const;
+
+  /**
+   * @copydoc ModelInterface::GetOutlineWidth()
+   */
+  virtual float GetOutlineWidth() const;
+
 private: // Private contructors & copy operator.
 
   /**
@@ -156,13 +215,13 @@ public:
    * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
    * Typically this will have a negative value with scrolling occurs.
    */
-  Vector2                     mScrollPosition;      ///< The text is offset by this position when scrolling.
-  Vector2                     mScrollPositionLast;  ///< The last offset value of mScrollPosition
-  Layout::HorizontalAlignment mHorizontalAlignment; ///< The layout's horizontal alignment.
-  Layout::VerticalAlignment   mVerticalAlignment;   ///< The layout's vertical alignment.
-  Layout::LineWrap::Mode      mLineWrapMode;        ///< The text wrap mode
-  float                       mAlignmentOffset;     ///< The alignment offset.
-  bool                        mElideEnabled:1;      ///< Whether the text's elide is enabled.
+  Vector2                            mScrollPosition;      ///< The text is offset by this position when scrolling.
+  Vector2                            mScrollPositionLast;  ///< The last offset value of mScrollPosition
+  HorizontalAlignment::Type          mHorizontalAlignment; ///< The layout's horizontal alignment.
+  VerticalAlignment::Type            mVerticalAlignment;   ///< The layout's vertical alignment.
+  Text::LineWrap::Mode               mLineWrapMode;        ///< The text wrap mode
+  float                              mAlignmentOffset;     ///< The alignment offset.
+  bool                               mElideEnabled:1;      ///< Whether the text's elide is enabled.
 };
 
 } // namespace Text

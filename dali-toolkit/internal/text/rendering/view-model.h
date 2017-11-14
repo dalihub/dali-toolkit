@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
 
 namespace Dali
@@ -74,12 +75,12 @@ public:
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  virtual Layout::HorizontalAlignment GetHorizontalAlignment() const;
+  virtual Text::HorizontalAlignment::Type GetHorizontalAlignment() const;
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  virtual Layout::VerticalAlignment GetVerticalAlignment() const;
+  virtual Text::VerticalAlignment::Type GetVerticalAlignment() const;
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()
@@ -95,6 +96,16 @@ public:
    * @copydoc ModelInterface::GetLines()
    */
   virtual const LineRun* const GetLines() const;
+
+  /**
+   * @copydoc ModelInterface::GetNumberOfScripts()
+   */
+  virtual Length GetNumberOfScripts() const;
+
+  /**
+   * @copydoc ModelInterface::GetScriptRuns()
+   */
+  virtual const ScriptRun* const GetScriptRuns() const;
 
   /**
    * @copydoc ModelInterface::GetNumberOfGlyphs()
@@ -127,6 +138,56 @@ public:
   virtual const Vector4& GetDefaultColor() const;
 
   /**
+   * @copydoc ModelInterface::GetShadowOffset()
+   */
+  virtual const Vector2& GetShadowOffset() const;
+
+  /**
+   * @copydoc ModelInterface::GetShadowColor()
+   */
+  virtual const Vector4& GetShadowColor() const;
+
+  /**
+   * @copydoc ModelInterface::GetShadowBlurRadius()
+   */
+  virtual const float& GetShadowBlurRadius() const;
+
+  /**
+   * @copydoc ModelInterface::GetUnderlineColor()
+   */
+  virtual const Vector4& GetUnderlineColor() const;
+
+  /**
+   * @copydoc ModelInterface::IsUnderlineEnabled()
+   */
+  virtual bool IsUnderlineEnabled() const;
+
+  /**
+   * @copydoc ModelInterface::GetUnderlineHeight()
+   */
+  virtual float GetUnderlineHeight() const;
+
+  /**
+   * @copydoc ModelInterface::GetNumberOfUnderlineRuns()
+   */
+  virtual Length GetNumberOfUnderlineRuns() const;
+
+  /**
+   * @copydoc ModelInterface::GetUnderlineRuns()
+   */
+  virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const;
+
+  /**
+   * @copydoc ModelInterface::GetOutlineColor()
+   */
+  virtual const Vector4& GetOutlineColor() const;
+
+  /**
+   * @copydoc ModelInterface::GetOutlineWidth()
+   */
+  virtual float GetOutlineWidth() const;
+
+ /**
    * @brief Does the text elide.
    *
    * It stores a copy of the visible glyphs and removes as many glyphs as needed

@@ -35,22 +35,6 @@ namespace Toolkit
 namespace DevelControl
 {
 
-ResourceReadySignalType&  ResourceReadySignal( Control& control )
-{
-  Internal::Control& internalControl = Toolkit::Internal::GetImplementation(control);
-  Internal::Control::Impl& controlImpl = Internal::Control::Impl::Get( internalControl );
-
-  return controlImpl.mResourceReadySignal;
-}
-
-bool IsResourceReady( const Control& control )
-{
-  const Internal::Control& internalControl = Toolkit::Internal::GetImplementation(control);
-  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
-
-  return controlDataImpl.IsResourceReady();
-}
-
 void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual )
 {
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
@@ -97,6 +81,12 @@ bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index in
 {
   const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
   return controlDataImpl.IsVisualEnabled( index );
+}
+
+Toolkit::Visual::ResourceStatus GetVisualResourceStatus( const Internal::Control& control, Dali::Property::Index index )
+{
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  return controlDataImpl.GetVisualResourceStatus( index );
 }
 
 Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& handle )

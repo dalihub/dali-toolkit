@@ -36,12 +36,12 @@
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
@@ -60,13 +60,70 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_CONTROL_VISUALS");
 #endif
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( CLIPPING_MODE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ClippingMode, DISABLED )
-DALI_ENUM_TO_STRING_WITH_SCOPE( ClippingMode, CLIP_CHILDREN )
-DALI_ENUM_TO_STRING_TABLE_END( CLIPPING_MODE )
+/**
+ * @brief Creates a clipping renderer if required.
+ * (EG. If no renders exist and clipping is enabled).
+ * @param[in] controlImpl The control implementation.
+ */
+void CreateClippingRenderer( Control& controlImpl )
+{
+  // We want to add a transparent background if we do not have one for clipping.
+  Actor self( controlImpl.Self() );
+  int clippingMode = ClippingMode::DISABLED;
+  if( self.GetProperty( Actor::Property::CLIPPING_MODE ).Get( clippingMode ) )
+  {
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
+
+    if( ( clippingMode == ClippingMode::CLIP_CHILDREN ) &&
+        controlDataImpl.mVisuals.Empty() &&
+        ( self.GetRendererCount() == 0u ) )
+    {
+      controlImpl.SetBackgroundColor( Color::TRANSPARENT );
+    }
+  }
+}
+
+/**
+ * @brief Sets Control::Property::BACKGROUND visual
+ * @param[in] controlImpl The control implementation
+ * @param[in] visual The control background visual
+ * @param[in] size The current size
+ */
+void SetBackgroundVisual( Control::Impl& controlImpl, Toolkit::Visual::Base& visual, const Vector2& size )
+{
+  Property::Map transformMap = Property::Map();
+
+  Vector2 newSize( 0.f, 0.f );
+  newSize.width = size.width + ( controlImpl.mPadding.start + controlImpl.mPadding.end );
+  newSize.height = size.height + ( controlImpl.mPadding.top + controlImpl.mPadding.bottom );
+
+  if( ( controlImpl.mMargin.start != 0 ) ||
+      ( controlImpl.mMargin.end != 0 ) ||
+      ( controlImpl.mMargin.top != 0 ) ||
+      ( controlImpl.mMargin.bottom != 0 ) )
+  {
+    transformMap.Add( Toolkit::Visual::Transform::Property::SIZE, newSize )
+                .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( controlImpl.mMargin.start, controlImpl.mMargin.top ) )
+                .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
+  }
+  else if( ( controlImpl.mPadding.start != 0 ) ||
+           ( controlImpl.mPadding.end != 0 ) ||
+           ( controlImpl.mPadding.top != 0 ) ||
+           ( controlImpl.mPadding.bottom != 0 ) )
+  {
+    transformMap.Add( Toolkit::Visual::Transform::Property::SIZE, newSize )
+                .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
+  }
+
+  visual.SetTransformAndSize( transformMap, newSize ); // Send an empty map as we do not want to modify the visual's set transform
+}
 
 } // unnamed namespace
-
 
 
 Toolkit::Control Control::New()
@@ -108,7 +165,7 @@ void Control::SetBackgroundColor( const Vector4& color )
 {
   mImpl->mBackgroundColor = color;
   Property::Map map;
-  map[ Toolkit::DevelVisual::Property::TYPE ] = Toolkit::Visual::COLOR;
+  map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
   map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
 
   SetBackground( map );
@@ -498,21 +555,8 @@ void Control::OnStageConnection( int depth )
     }
   }
 
-  if( mImpl->mVisuals.Empty() && ! self.GetRendererCount() )
-  {
-    Property::Value clippingValue = self.GetProperty( Actor::Property::CLIPPING_MODE );
-    int clippingMode = ClippingMode::DISABLED;
-    if( clippingValue.Get( clippingMode ) )
-    {
-      // Add a transparent background if we do not have any renderers or visuals so we clip our children
-
-      if( clippingMode == ClippingMode::CLIP_CHILDREN )
-      {
-        // Create a transparent background visual which will also get staged.
-        SetBackgroundColor( Color::TRANSPARENT );
-      }
-    }
-  }
+  // The clipping renderer is only created if required.
+  CreateClippingRenderer( *this );
 }
 
 void Control::OnStageDisconnection()
@@ -544,24 +588,12 @@ void Control::OnChildRemove(Actor& child)
 
 void Control::OnPropertySet( Property::Index index, Property::Value propertyValue )
 {
-  Actor self( Self() );
-  if( index == Actor::Property::CLIPPING_MODE )
+  // If the clipping mode has been set, we may need to create a renderer.
+  // Only do this if we are already on-stage as the OnStageConnection will handle the off-stage clipping controls.
+  if( ( index == Actor::Property::CLIPPING_MODE ) && Self().OnStage() )
   {
-    // Only set the background if we're already on the stage and have no renderers or visuals
-
-    if( mImpl->mVisuals.Empty() && ! self.GetRendererCount() && self.OnStage() )
-    {
-      ClippingMode::Type clippingMode = ClippingMode::DISABLED;
-      if( Scripting::GetEnumerationProperty< ClippingMode::Type >( propertyValue, CLIPPING_MODE_TABLE, CLIPPING_MODE_TABLE_COUNT, clippingMode ) )
-      {
-        // Add a transparent background if we do not have one so we clip children
-
-        if( clippingMode == ClippingMode::CLIP_CHILDREN )
-        {
-          SetBackgroundColor( Color::TRANSPARENT );
-        }
-      }
-    }
+    // Note: This method will handle whether creation of the renderer is required.
+    CreateClippingRenderer( *this );
   }
 }
 
@@ -571,7 +603,8 @@ void Control::OnSizeSet(const Vector3& targetSize)
   if( visual )
   {
     Vector2 size( targetSize );
-    visual.SetTransformAndSize( Property::Map(), size ); // Send an empty map as we do not want to modify the visual's set transform
+    SetBackgroundVisual( *mImpl, visual, size );
+
   }
 }
 
@@ -604,13 +637,30 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   for( unsigned int i = 0, numChildren = Self().GetChildCount(); i < numChildren; ++i )
   {
-    container.Add( Self().GetChildAt( i ), size );
+    Actor child = Self().GetChildAt( i );
+    Vector2 newChildSize( size );
+
+    // When set the padding or margin on the control, child should be resized and repositioned.
+    if( ( mImpl->mPadding.start != 0 ) || ( mImpl->mPadding.end != 0 ) || ( mImpl->mPadding.top != 0 ) || ( mImpl->mPadding.bottom != 0 ) ||
+        ( mImpl->mMargin.start != 0 ) || ( mImpl->mMargin.end != 0 ) || ( mImpl->mMargin.top != 0 ) || ( mImpl->mMargin.bottom != 0 ) )
+    {
+      newChildSize.width = size.width - ( mImpl->mPadding.start + mImpl->mPadding.end );
+      newChildSize.height = size.height - ( mImpl->mPadding.top + mImpl->mPadding.bottom );
+
+      Vector3 childPosition = child.GetTargetSize();
+      childPosition.x += ( mImpl->mMargin.start + mImpl->mPadding.start );
+      childPosition.y += ( mImpl->mMargin.top + mImpl->mPadding.top );
+
+      child.SetPosition( childPosition );
+    }
+
+    container.Add( child, newChildSize );
   }
 
   Toolkit::Visual::Base visual = mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
   if( visual )
   {
-    visual.SetTransformAndSize( Property::Map(), size ); // Send an empty map as we do not want to modify the visual's set transform
+    SetBackgroundVisual( *mImpl, visual, size );
   }
 }
 
@@ -625,6 +675,8 @@ Vector3 Control::GetNaturalSize()
   {
     Vector2 naturalSize;
     visual.GetNaturalSize( naturalSize );
+    naturalSize.width += ( mImpl->mPadding.start + mImpl->mPadding.end );
+    naturalSize.height += ( mImpl->mPadding.top + mImpl->mPadding.bottom );
     return Vector3( naturalSize );
   }
   return Vector3::ZERO;

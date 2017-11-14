@@ -62,6 +62,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "video", MAP, VIDEO )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "looping", BOOLEAN, LOOPING )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "muted", BOOLEAN, MUTED )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "volume", MAP, VOLUME )
+DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "underlay", BOOLEAN, UNDERLAY )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, VideoView, "finished", FINISHED_SIGNAL )
 
@@ -75,6 +76,8 @@ DALI_TYPE_REGISTRATION_END()
 
 const char* const VOLUME_LEFT( "volumeLeft" );
 const char* const VOLUME_RIGHT( "volumeRight" );
+
+// 3.0 TC uses RENDERING_TARGET. It should be removed in next release
 const char* const RENDERING_TARGET( "renderingTarget" );
 const char* const WINDOW_SURFACE_TARGET( "windowSurfaceTarget" );
 const char* const NATIVE_IMAGE_TARGET( "nativeImageTarget" );
@@ -103,48 +106,19 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   }\n
 );
 
-struct TriggerFunctor
-{
-  TriggerFunctor( TriggerEventInterface* notification )
-  : mNotification( notification )
-  {
-  }
-
-  void operator()( bool& current, const PropertyInputContainer& inputs )
-  {
-    if( mNotification != NULL )
-    {
-      mNotification->Trigger();
-    }
-  }
-
-  TriggerEventInterface* mNotification;
-};
-
 } // anonymous namepsace
 
 VideoView::VideoView()
 : Control( ControlBehaviour( ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS ) ),
-  mUpdateTriggerPropertyIndex( Property::INVALID_INDEX),
-  mNotification( NULL ),
   mCurrentVideoPlayPosition( 0 ),
-  mIsNativeImageTarget( true ),
   mIsPlay( false ),
-  mIsPause( false )
+  mIsUnderlay( true )
 {
   mVideoPlayer = Dali::VideoPlayer::New();
-
-  TriggerEventFactory triggerEventFactory;
-  mNotification = triggerEventFactory.CreateTriggerEvent( MakeCallback(this, &VideoView::UpdateDisplayArea ),
-                                                               TriggerEventInterface::KEEP_ALIVE_AFTER_TRIGGER);
 }
 
 VideoView::~VideoView()
 {
-  if( mNotification != NULL )
-  {
-    delete mNotification;
-  }
 }
 
 Toolkit::VideoView VideoView::New()
@@ -159,14 +133,8 @@ Toolkit::VideoView VideoView::New()
 
 void VideoView::OnInitialize()
 {
-  Any source;
-  Dali::NativeImageSourcePtr nativeImageSourcePtr = Dali::NativeImageSource::New( source );
-  mNativeImage = Dali::NativeImage::New( *nativeImageSourcePtr );
-
-  mVideoPlayer.SetRenderingTarget( nativeImageSourcePtr );
   mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
-
-  mUpdateTriggerPropertyIndex = Self().RegisterProperty( "updateTrigger", true );
+  SetWindowSurfaceTarget();
 }
 
 void VideoView::SetUrl( const std::string& url )
@@ -177,7 +145,7 @@ void VideoView::SetUrl( const std::string& url )
     mPropertyMap.Clear();
   }
 
-  if( mIsNativeImageTarget )
+  if( !mIsUnderlay )
   {
     Actor self( Self() );
     Internal::InitializeVisual( self, mVisual, mNativeImage );
@@ -218,11 +186,13 @@ void VideoView::SetPropertyMap( Property::Map map )
 
   if( target && target->Get( targetType ) && targetType == WINDOW_SURFACE_TARGET )
   {
-    this->SetWindowSurfaceTarget();
+    mIsUnderlay = true;
+    SetWindowSurfaceTarget();
   }
   else if( target && target->Get( targetType ) && targetType == NATIVE_IMAGE_TARGET )
   {
-    this->SetNativeImageTarget();
+    mIsUnderlay = false;
+    SetNativeImageTarget();
   }
 
   RelayoutRequest();
@@ -245,23 +215,25 @@ bool VideoView::IsLooping()
 
 void VideoView::Play()
 {
+  if( mIsUnderlay )
+  {
+    Self().AddRenderer( mRenderer );
+  }
+
   mVideoPlayer.Play();
   mIsPlay = true;
-  mIsPause = false;
 }
 
 void VideoView::Pause()
 {
   mVideoPlayer.Pause();
   mIsPlay = false;
-  mIsPause = true;
 }
 
 void VideoView::Stop()
 {
   mVideoPlayer.Stop();
   mIsPlay = false;
-  mIsPause = false;
 }
 
 void VideoView::Forward( int millisecond )
@@ -310,6 +282,11 @@ Dali::Toolkit::VideoView::VideoViewSignalType& VideoView::FinishedSignal()
 
 void VideoView::EmitSignalFinish()
 {
+  if( mIsUnderlay )
+  {
+    Self().RemoveRenderer( mRenderer );
+  }
+
   if ( !mFinishedSignal.Empty() )
   {
     Dali::Toolkit::VideoView handle( GetOwner() );
@@ -465,6 +442,15 @@ void VideoView::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::VideoView::Property::UNDERLAY:
+      {
+        bool underlay;
+        if( value.Get( underlay ) )
+        {
+          impl.SetUnderlay( underlay );
+        }
+        break;
+      }
     }
   }
 }
@@ -511,6 +497,11 @@ Property::Value VideoView::GetProperty( BaseObject* object, Property::Index prop
         map.Insert( VOLUME_LEFT, left );
         map.Insert( VOLUME_RIGHT, right );
         value = map;
+        break;
+      }
+      case Toolkit::VideoView::Property::UNDERLAY:
+      {
+        value = impl.IsUnderlay();
         break;
       }
     }
@@ -601,43 +592,68 @@ void VideoView::SetWindowSurfaceTarget()
     mVisual.Reset();
   }
 
-  Constraint constraint = Constraint::New<bool>( self, mUpdateTriggerPropertyIndex, TriggerFunctor( mNotification ) );
-  constraint.AddSource( Source( self, Actor::Property::POSITION ) );
-  constraint.AddSource( Source( self, Actor::Property::SIZE ) );
-  constraint.Apply();
+  if( mIsPlay )
+  {
+    mVideoPlayer.Pause();
+  }
+
+  mPositionUpdateNotification = self.AddPropertyNotification( Actor::Property::WORLD_POSITION, StepCondition( 1.0f, 1.0f ) );
+  mSizeUpdateNotification = self.AddPropertyNotification( Actor::Property::SIZE, StepCondition( 1.0f, 1.0f ) );
+  mScaleUpdateNotification = self.AddPropertyNotification( Actor::Property::WORLD_SCALE, StepCondition( 0.1f, 1.0f ) );
+  mPositionUpdateNotification.NotifySignal().Connect( this, &VideoView::UpdateDisplayArea );
+  mSizeUpdateNotification.NotifySignal().Connect( this, &VideoView::UpdateDisplayArea );
+  mScaleUpdateNotification.NotifySignal().Connect( this, &VideoView::UpdateDisplayArea );
 
   mVideoPlayer.SetRenderingTarget( Dali::Adaptor::Get().GetNativeWindowHandle() );
   mVideoPlayer.SetUrl( mUrl );
 
-  mIsNativeImageTarget = false;
+  if( !mRenderer )
+  {
+    // For underlay rendering mode, video display area have to be transparent.
+    Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
+    Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    mRenderer = Renderer::New( geometry, shader );
+
+    mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+    mRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::ONE );
+    mRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ZERO );
+    mRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE );
+    mRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ZERO );
+  }
 
   if( mIsPlay )
   {
-    mVideoPlayer.Play();
+    Play();
   }
-  if( mIsPause )
+
+  if( curPos > 0 )
   {
-    mVideoPlayer.Play();
-    mVideoPlayer.Pause();
+    mVideoPlayer.SetPlayPosition( curPos );
   }
-  mVideoPlayer.SetPlayPosition( curPos );
-
-  // For underlay rendering mode, video display area have to be transparent.
-  Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-  Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-  Renderer renderer = Renderer::New( geometry, shader );
-
-  renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::ONE );
-  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ZERO );
-  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE );
-  renderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ZERO );
-  self.AddRenderer( renderer );
 }
 
 void VideoView::SetNativeImageTarget()
 {
+  if( mVideoPlayer.IsVideoTextureSupported() == false )
+  {
+    DALI_LOG_ERROR( "Platform doesn't support decoded video frame images\n" );
+    mIsUnderlay = true;
+    return;
+  }
+
+  if( mIsPlay )
+  {
+    mVideoPlayer.Pause();
+  }
+
   Actor self( Self() );
+  self.RemoveRenderer( mRenderer );
+  Dali::Stage::GetCurrent().KeepRendering( 0.0f );
+
+  self.RemovePropertyNotification( mPositionUpdateNotification );
+  self.RemovePropertyNotification( mSizeUpdateNotification );
+  self.RemovePropertyNotification( mScaleUpdateNotification );
+
   int curPos = mVideoPlayer.GetPlayPosition();
 
   Any source;
@@ -648,23 +664,26 @@ void VideoView::SetNativeImageTarget()
   mVideoPlayer.SetUrl( mUrl );
 
   Internal::InitializeVisual( self, mVisual, mNativeImage );
-  mIsNativeImageTarget = true;
+  Self().RemoveRenderer( mRenderer );
 
   if( mIsPlay )
   {
-    mVideoPlayer.Play();
+    Play();
   }
 
-  if( mIsPause )
+  if( curPos > 0 )
   {
-    mVideoPlayer.Play();
-    mVideoPlayer.Pause();
+    mVideoPlayer.SetPlayPosition( curPos );
   }
-  mVideoPlayer.SetPlayPosition( curPos );
 }
 
-void VideoView::UpdateDisplayArea()
+void VideoView::UpdateDisplayArea( Dali::PropertyNotification& source )
 {
+  if( !mIsUnderlay )
+  {
+    return;
+  }
+
   Actor self( Self() );
 
   bool positionUsesAnchorPoint = self.GetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >();
@@ -679,6 +698,30 @@ void VideoView::UpdateDisplayArea()
   mDisplayArea.height = actorSize.y;
 
   mVideoPlayer.SetDisplayArea( mDisplayArea );
+}
+
+void VideoView::SetUnderlay( bool set )
+{
+  if( set != mIsUnderlay )
+  {
+    mIsUnderlay = set;
+
+    if( mIsUnderlay )
+    {
+      SetWindowSurfaceTarget();
+    }
+    else
+    {
+      SetNativeImageTarget();
+    }
+
+    RelayoutRequest();
+  }
+}
+
+bool VideoView::IsUnderlay()
+{
+  return mIsUnderlay;
 }
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_IMPL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,11 @@ public:
    * @copydoc Toolkit::RenderFactory::CreateVisual( const std::string&, ImageDimensions )
    */
   Toolkit::Visual::Base CreateVisual( const std::string& image, ImageDimensions size );
+
+  /**
+   * @return the reference to texture manager
+   */
+  Internal::TextureManager& GetTextureManager();
 
 protected:
 

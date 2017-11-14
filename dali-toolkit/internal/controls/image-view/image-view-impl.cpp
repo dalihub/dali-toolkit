@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -91,7 +91,7 @@ void ImageView::OnInitialize()
 {
   // ImageView can relayout in the OnImageReady, alternative to a signal would be to have a upcall from the Control to ImageView
   Dali::Toolkit::Control handle( GetOwner() );
-  Toolkit::DevelControl::ResourceReadySignal( handle ).Connect( this, &ImageView::OnResourceReady );
+  handle.ResourceReadySignal().Connect( this, &ImageView::OnResourceReady );
 }
 
 void ImageView::SetImage( Image image )
@@ -102,12 +102,23 @@ void ImageView::SetImage( Image image )
   mPropertyMap.Clear();
 
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( image );
-  if (!mVisual)
+  if( visual )
   {
-    mVisual = visual;
-  }
+    if( !mVisual )
+    {
+      mVisual = visual;
+    }
 
-  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
+    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
+  }
+  else
+  {
+    // Unregister the exsiting visual
+    DevelControl::UnregisterVisual( *this, Toolkit::ImageView::Property::IMAGE );
+
+    // Trigger a size negotiation request that may be needed when unregistering a visual.
+    RelayoutRequest();
+  }
 }
 
 void ImageView::SetImage( const Property::Map& map )
@@ -118,13 +129,24 @@ void ImageView::SetImage( const Property::Map& map )
   mImage.Reset();
 
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( mPropertyMap );
-  // Don't set mVisual until it is ready and shown. Getters will still use current visual.
-  if (!mVisual)
+  if( visual )
   {
-    mVisual = visual;
-  }
+    // Don't set mVisual until it is ready and shown. Getters will still use current visual.
+    if( !mVisual )
+    {
+      mVisual = visual;
+    }
 
-  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
+    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
+  }
+  else
+  {
+    // Unregister the exsiting visual
+    DevelControl::UnregisterVisual( *this, Toolkit::ImageView::Property::IMAGE );
+
+    // Trigger a size negotiation request that may be needed when unregistering a visual.
+    RelayoutRequest();
+  }
 }
 
 void ImageView::SetImage( const std::string& url, ImageDimensions size )
@@ -136,12 +158,23 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
 
   // Don't set mVisual until it is ready and shown. Getters will still use current visual.
   Toolkit::Visual::Base visual =  Toolkit::VisualFactory::Get().CreateVisual( url, size );
-  if (!mVisual)
+  if( visual )
   {
-    mVisual = visual;
-  }
+    if( !mVisual )
+    {
+      mVisual = visual;
+    }
 
-  DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual );
+    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual );
+  }
+  else
+  {
+    // Unregister the exsiting visual
+    DevelControl::UnregisterVisual( *this, Toolkit::ImageView::Property::IMAGE );
+
+    // Trigger a size negotiation request that may be needed when unregistering a visual.
+    RelayoutRequest();
+  }
 }
 
 Image ImageView::GetImage() const
@@ -180,6 +213,12 @@ Vector3 ImageView::GetNaturalSize()
   {
     Vector2 rendererNaturalSize;
     mVisual.GetNaturalSize( rendererNaturalSize );
+
+    Extents padding;
+    padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
+    rendererNaturalSize.width += ( padding.start + padding.end );
+    rendererNaturalSize.height += ( padding.top + padding.bottom );
     return Vector3( rendererNaturalSize );
   }
 
@@ -189,25 +228,31 @@ Vector3 ImageView::GetNaturalSize()
 
 float ImageView::GetHeightForWidth( float width )
 {
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
   if( mVisual )
   {
-    return mVisual.GetHeightForWidth( width );
+    return mVisual.GetHeightForWidth( width ) + padding.top + padding.bottom;
   }
   else
   {
-    return Control::GetHeightForWidth( width );
+    return Control::GetHeightForWidth( width ) + padding.top + padding.bottom;
   }
 }
 
 float ImageView::GetWidthForHeight( float height )
 {
+  Extents padding;
+  padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
   if( mVisual )
   {
-    return mVisual.GetWidthForHeight( height );
+    return mVisual.GetWidthForHeight( height ) + padding.start + padding.end;
   }
   else
   {
-    return Control::GetWidthForHeight( height );
+    return Control::GetWidthForHeight( height ) + padding.start + padding.end;
   }
 }
 
@@ -217,9 +262,21 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
   if( mVisual )
   {
-    // Pass in an empty map which uses default transform values meaning our visual fills the control
+    Extents padding;
+    padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
+    Property::Map transformMap = Property::Map();
+
+    if( ( padding.start != 0 ) || ( padding.end != 0 ) || ( padding.top != 0 ) || ( padding.bottom != 0 ) )
+    {
+      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( padding.start, padding.top ) )
+                  .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                  .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                  .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
+    }
+
     // Should provide a transform that handles aspect ratio according to image size
-    mVisual.SetTransformAndSize( Property::Map(), size );
+    mVisual.SetTransformAndSize( transformMap, size );
   }
 }
 
@@ -267,7 +324,7 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
           map = value.GetMap();
           if( map )
           {
-            Property::Value* shaderValue = map->Find( Toolkit::DevelVisual::Property::SHADER, CUSTOM_SHADER );
+            Property::Value* shaderValue = map->Find( Toolkit::Visual::Property::SHADER, CUSTOM_SHADER );
             // set image only if property map contains image information other than custom shader
             if( map->Count() > 1u ||  !shaderValue )
             {

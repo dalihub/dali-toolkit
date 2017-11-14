@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,12 @@ TextEditor::TextChangedSignalType& TextEditor::TextChangedSignal()
 TextEditor::InputStyleChangedSignalType& TextEditor::InputStyleChangedSignal()
 {
   return Dali::Toolkit::GetImpl( *this ).InputStyleChangedSignal();
+}
+
+
+TextEditor::ScrollStateChangedSignalType& TextEditor::ScrollStateChangedSignal()
+{
+  return Dali::Toolkit::GetImpl( *this ).ScrollStateChangedSignal();
 }
 
 TextEditor::TextEditor( Internal::TextEditor& implementation )

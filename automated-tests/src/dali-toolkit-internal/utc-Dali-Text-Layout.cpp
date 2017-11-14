@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,8 +169,8 @@ bool LayoutTextTest( const LayoutTextData& data )
                                        visualModel->mCharactersToGlyph.Begin(),
                                        visualModel->mGlyphsPerCharacter.Begin(),
                                        totalNumberOfGlyphs,
-                                       Layout::HORIZONTAL_ALIGN_BEGIN,
-                                       Layout::LineWrap::WORD );
+                                       Text::HorizontalAlignment::BEGIN,
+                                       Text::LineWrap::WORD );
 
   layoutParameters.isLastNewParagraph = isLastNewParagraph;
 
@@ -385,8 +385,8 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                                        visualModel->mCharactersToGlyph.Begin(),
                                        visualModel->mGlyphsPerCharacter.Begin(),
                                        visualModel->mGlyphs.Count(),
-                                       Layout::HORIZONTAL_ALIGN_BEGIN,
-                                       Layout::LineWrap::WORD );
+                                       Text::HorizontalAlignment::BEGIN,
+                                       Text::LineWrap::WORD );
 
   layoutParameters.numberOfBidirectionalInfoRuns = logicalModel->mBidirectionalLineInfo.Count();
   layoutParameters.lineBidirectionalInfoRunsBuffer = logicalModel->mBidirectionalLineInfo.Begin();
@@ -428,17 +428,17 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
 
 struct AlignData
 {
-  std::string                 description;
-  std::string                 text;
-  Size                        textArea;
-  unsigned int                numberOfFonts;
-  FontDescriptionRun*         fontDescriptions;
-  Layout::HorizontalAlignment horizontalAlignment;
-  Layout::VerticalAlignment   verticalAlignment;
-  unsigned int                startIndex;
-  unsigned int                numberOfCharacters;
-  unsigned int                numberOfLines;
-  float*                      lineOffsets;
+  std::string                       description;
+  std::string                       text;
+  Size                              textArea;
+  unsigned int                      numberOfFonts;
+  FontDescriptionRun*               fontDescriptions;
+  Text::HorizontalAlignment::Type   horizontalAlignment;
+  Text::VerticalAlignment::Type     verticalAlignment;
+  unsigned int                      startIndex;
+  unsigned int                      numberOfCharacters;
+  unsigned int                      numberOfLines;
+  float*                            lineOffsets;
 };
 
 bool AlignTest( const AlignData& data )
@@ -4141,8 +4141,8 @@ int UtcDaliTextAlign01(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    Layout::HORIZONTAL_ALIGN_BEGIN,
-    Layout::VERTICAL_ALIGN_TOP,
+    Text::HorizontalAlignment::BEGIN,
+    Text::VerticalAlignment::TOP,
     0u,
     22u,
     6u,
@@ -4260,8 +4260,8 @@ int UtcDaliTextAlign02(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    Layout::HORIZONTAL_ALIGN_BEGIN,
-    Layout::VERTICAL_ALIGN_TOP,
+    Text::HorizontalAlignment::BEGIN,
+    Text::VerticalAlignment::TOP,
     22u,
     26u,
     6u,
@@ -4379,8 +4379,8 @@ int UtcDaliTextAlign03(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    Layout::HORIZONTAL_ALIGN_BEGIN,
-    Layout::VERTICAL_ALIGN_TOP,
+    Text::HorizontalAlignment::BEGIN,
+    Text::VerticalAlignment::TOP,
     48u,
     26u,
     6u,
@@ -4498,8 +4498,8 @@ int UtcDaliTextAlign04(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    Layout::HORIZONTAL_ALIGN_CENTER,
-    Layout::VERTICAL_ALIGN_TOP,
+    Text::HorizontalAlignment::CENTER,
+    Text::VerticalAlignment::TOP,
     0u,
     22u,
     6u,
@@ -4617,8 +4617,8 @@ int UtcDaliTextAlign05(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    Layout::HORIZONTAL_ALIGN_CENTER,
-    Layout::VERTICAL_ALIGN_TOP,
+    Text::HorizontalAlignment::CENTER,
+    Text::VerticalAlignment::TOP,
     22u,
     26u,
     6u,
@@ -4736,8 +4736,8 @@ int UtcDaliTextAlign06(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    Layout::HORIZONTAL_ALIGN_CENTER,
-    Layout::VERTICAL_ALIGN_TOP,
+    Text::HorizontalAlignment::CENTER,
+    Text::VerticalAlignment::TOP,
     48u,
     26u,
     6u,
@@ -4855,8 +4855,8 @@ int UtcDaliTextAlign07(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    Layout::HORIZONTAL_ALIGN_END,
-    Layout::VERTICAL_ALIGN_TOP,
+    Text::HorizontalAlignment::END,
+    Text::VerticalAlignment::TOP,
     0u,
     22u,
     6u,
@@ -4974,8 +4974,8 @@ int UtcDaliTextAlign08(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    Layout::HORIZONTAL_ALIGN_END,
-    Layout::VERTICAL_ALIGN_TOP,
+    Text::HorizontalAlignment::END,
+    Text::VerticalAlignment::TOP,
     22u,
     26u,
     6u,
@@ -5093,8 +5093,8 @@ int UtcDaliTextAlign09(void)
     textArea,
     6u,
     fontDescriptionRuns.Begin(),
-    Layout::HORIZONTAL_ALIGN_END,
-    Layout::VERTICAL_ALIGN_TOP,
+    Text::HorizontalAlignment::END,
+    Text::VerticalAlignment::TOP,
     48u,
     26u,
     6u,

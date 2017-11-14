@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,6 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali-toolkit/devel-api/controls/scrollable/item-view/default-item-layout-property.h>
-#include <dali-toolkit/devel-api/controls/scrollable/item-view/item-view-devel.h>
-
 
 using namespace Dali;
 using namespace Toolkit;
@@ -1002,7 +999,7 @@ int UtcDaliItemViewSetGetProperty(void)
   DALI_TEST_EQUALS( view.GetProperty(ItemView::Property::REFRESH_INTERVAL).Get<float>(), 11.0f, TEST_LOCATION );
 
   // Test "layout" property
-  DALI_TEST_CHECK( view.GetPropertyIndex("layout") == DevelItemView::Property::LAYOUT  );
+  DALI_TEST_CHECK( view.GetPropertyIndex("layout") == ItemView::Property::LAYOUT  );
   Property::Map gridLayoutProperty;
   gridLayoutProperty.Insert( DefaultItemLayoutProperty::TYPE, Dali::Property::Value((int)DefaultItemLayout::GRID) );
   gridLayoutProperty.Insert( DefaultItemLayoutProperty::ITEM_SIZE, Dali::Property::Value(Vector3(200, 200,50)) );
@@ -1030,10 +1027,10 @@ int UtcDaliItemViewSetGetProperty(void)
   layoutArray.PushBack(spiralLayoutPrperty);
   layoutArray.PushBack(listLayoutPrperty);
 
-  view.SetProperty( DevelItemView::Property::LAYOUT, layoutArray);
+  view.SetProperty( ItemView::Property::LAYOUT, layoutArray);
 
   Property::Array getLayoutArray;
-  DALI_TEST_CHECK( view.GetProperty(DevelItemView::Property::LAYOUT ).Get( getLayoutArray ) );
+  DALI_TEST_CHECK( view.GetProperty( ItemView::Property::LAYOUT ).Get( getLayoutArray ) );
 
   //Check that the result is the same as
   DALI_TEST_EQUALS( layoutArray.Count(), getLayoutArray.Count(), TEST_LOCATION );
@@ -1063,7 +1060,7 @@ int UtcDaliItemViewSetGetProperty(void)
       DALI_TEST_EQUALS(number, 4, TEST_LOCATION );
     }
   }
-  view.SetProperty( DevelItemView::Property::LAYOUT, layoutArray);
+  view.SetProperty( ItemView::Property::LAYOUT, layoutArray);
 
 
   // Test "overshootEnabled" property

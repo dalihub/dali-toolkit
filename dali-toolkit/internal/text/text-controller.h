@@ -23,13 +23,12 @@
 #include <dali/public-api/events/gesture.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
-#include <dali-toolkit/internal/text/layouts/layout-wrap-mode.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
-
 
 namespace Dali
 {
@@ -325,36 +324,36 @@ public: // Configure the text controller.
    *
    * @param[in] alignment The horizontal alignment.
    */
-  void SetHorizontalAlignment( Layout::HorizontalAlignment alignment );
+  void SetHorizontalAlignment( HorizontalAlignment::Type alignment );
 
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  Layout::HorizontalAlignment GetHorizontalAlignment() const;
+  HorizontalAlignment::Type GetHorizontalAlignment() const;
 
   /**
    * @brief Sets the text's vertical alignment.
    *
    * @param[in] alignment The vertical alignment.
    */
-  void SetVerticalAlignment( Layout::VerticalAlignment alignment );
+  void SetVerticalAlignment( VerticalAlignment::Type alignment );
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  Layout::VerticalAlignment GetVerticalAlignment() const;
+  VerticalAlignment::Type GetVerticalAlignment() const;
 
   /**
    * @brief Sets the text's wrap mode
    * @param[in] text wrap mode The unit of wrapping
    */
-  void SetLineWrapMode( Layout::LineWrap::Mode textWarpMode );
+  void SetLineWrapMode( Text::LineWrap::Mode textWarpMode );
 
   /**
    * @brief Retrieve text wrap mode previously set.
    * @return text wrap mode
    */
-  Layout::LineWrap::Mode GetLineWrapMode() const;
+  Text::LineWrap::Mode GetLineWrapMode() const;
 
   /**
    * @brief Enable or disable the text elide.
@@ -367,6 +366,18 @@ public: // Configure the text controller.
    * @copydoc ModelInterface::IsTextElideEnabled()
    */
   bool IsTextElideEnabled() const;
+
+  /**
+   * @brief Enable or disable the placeholder text elide.
+   * @param enabled Whether to enable the placeholder text elide.
+   */
+  void SetPlaceholderTextElideEnabled( bool enabled );
+
+  /**
+   * @brief Whether the placeholder text elide property is enabled.
+   * @return True if the placeholder text elide property is enabled, false otherwise.
+   */
+  bool IsPlaceholderTextElideEnabled() const;
 
   /**
    * @brief Enable or disable the text selection.
@@ -447,6 +458,18 @@ public: // Configure the text controller.
    * @param[in] bool, true if set by string
    */
   void ShadowSetByString( bool setByString );
+
+  /**
+   * @brief Query if outline settings were provided by string or map
+   * @return bool true if set by string
+   */
+  bool IsOutlineSetByString();
+
+  /**
+   * Set method outline setting were set by
+   * @param[in] bool, true if set by string
+   */
+  void OutlineSetByString( bool setByString );
 
   /**
    * @brief Query if font style settings were provided by string or map
@@ -735,6 +758,20 @@ public: // Default style & Input style
   const Vector4& GetShadowColor() const;
 
   /**
+   * @brief Set the shadow blur radius.
+   *
+   * @param[in] shadowBlurRadius The shadow blur radius, 0,0 indicates no blur.
+   */
+  void SetShadowBlurRadius( const float& shadowBlurRadius );
+
+  /**
+   * @brief Retrieve the shadow blur radius.
+   *
+   * @return The shadow blur radius.
+   */
+  const float& GetShadowBlurRadius() const;
+
+  /**
    * @brief Set the underline color.
    *
    * @param[in] color color of underline.
@@ -775,6 +812,34 @@ public: // Default style & Input style
    * @return The height of the underline, or 0 if height is not overrided.
    */
   float GetUnderlineHeight() const;
+
+  /**
+   * @brief Set the outline color.
+   *
+   * @param[in] color color of outline.
+   */
+  void SetOutlineColor( const Vector4& color );
+
+  /**
+   * @brief Retrieve the outline color.
+   *
+   * @return The outline color.
+   */
+  const Vector4& GetOutlineColor() const;
+
+  /**
+   * @brief Set the outline width
+   *
+   * @param[in] width The width in pixels of the outline, 0 indicates no outline
+   */
+  void SetOutlineWidth( float width );
+
+  /**
+   * @brief Retrieves the width of an outline
+   *
+   * @return The width of the outline.
+   */
+  float GetOutlineWidth() const;
 
   /**
    * @brief Sets the emboss's properties string.
@@ -998,6 +1063,13 @@ public: // Default style & Input style
    * @return The outline's properties string.
    */
   const std::string& GetInputOutlineProperties() const;
+
+  /**
+   * @brief Set the control's interface.
+   *
+   * @param[in] controlInterface The control's interface.
+   */
+  void SetControlInterface( ControlInterface* controlInterface );
 
 public: // Queries & retrieves.
 

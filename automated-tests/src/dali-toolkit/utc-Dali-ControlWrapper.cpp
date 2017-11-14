@@ -694,8 +694,8 @@ int UtcDaliControlWrapperTestControlProperties(void)
   controlWrapper.SetProperty( Control::Property::BACKGROUND, rendererMap );
   Property::Value propertyValue = controlWrapper.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propertyValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE ) );
-  DALI_TEST_EQUALS( resultMap->Find( Visual::Property::TYPE )->Get<int>(), (int)Visual::COLOR, TEST_LOCATION );
+  DALI_TEST_CHECK( resultMap->Find( Toolkit::Visual::Property::TYPE ) );
+  DALI_TEST_EQUALS( resultMap->Find( Toolkit::Visual::Property::TYPE )->Get<int>(), (int)Visual::COLOR, TEST_LOCATION );
   DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR ) );
   DALI_TEST_EQUALS( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>(), Color::RED, TEST_LOCATION );
 

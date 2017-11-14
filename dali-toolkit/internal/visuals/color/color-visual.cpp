@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -99,7 +99,7 @@ ColorVisual::~ColorVisual()
 void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
 {
   // By virtue of DoSetProperties being called last, this will override
-  // anything set by DevelVisual::Property::MIX_COLOR
+  // anything set by Toolkit::Visual::Property::MIX_COLOR
   Property::Value* colorValue = propertyMap.Find( Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR );
   if( colorValue )
   {
@@ -131,13 +131,13 @@ void ColorVisual::DoSetOnStage( Actor& actor )
   actor.AddRenderer( mImpl->mRenderer );
 
   // Color Visual generated and ready to display
-  ResourceReady();
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::COLOR );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR );
   map.Insert( Toolkit::ColorVisual::Property::MIX_COLOR, mImpl->mMixColor );
 }
 

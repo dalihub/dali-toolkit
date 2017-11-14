@@ -19,13 +19,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-timer.h>
 #include <toolkit-event-thread-callback.h>
-#include <dali/public-api/rendering/renderer.h>
-#include <dali/public-api/rendering/texture-set.h>
-#include <dali/public-api/rendering/shader.h>
 #include <dali/devel-api/images/nine-patch-image.h>
-#include <dali-toolkit/devel-api/align-enums.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include "dummy-control.h"
@@ -55,12 +49,12 @@ Property::Map DefaultTransform()
 {
   Property::Map transformMap;
   transformMap
-    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
-    .Add( Toolkit::DevelVisual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
-    .Add( Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::DevelVisual::Transform::Policy::RELATIVE, Toolkit::DevelVisual::Transform::Policy::RELATIVE ) )
-    .Add( Toolkit::DevelVisual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::DevelVisual::Transform::Policy::RELATIVE, Toolkit::DevelVisual::Transform::Policy::RELATIVE ) );
+    .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2(0.0f, 0.0f) )
+    .Add( Toolkit::Visual::Transform::Property::SIZE, Vector2(1.0f, 1.0f) )
+    .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::CENTER )
+    .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::CENTER )
+    .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE ) )
+    .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE ) );
   return transformMap;
 }
 
@@ -340,7 +334,7 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
 
   Vector4 testColor( 1.f, 0.5f, 0.3f, 0.2f );
   Dali::Property::Map map;
-  map[ Visual::Property::TYPE ] = Visual::COLOR;
+  map[ Toolkit::Visual::Property::TYPE ] = Visual::COLOR;
   map[ ColorVisual::Property::MIX_COLOR ] = testColor;
   Visual::Base visual = factory.CreateVisual( map );
   DALI_TEST_CHECK( visual );
@@ -422,7 +416,7 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
   float testSize = 5.f;
 
   Dali::Property::Map propertyMap;
-  propertyMap[ Visual::Property::TYPE ] = Visual::BORDER;
+  propertyMap[ Toolkit::Visual::Property::TYPE ] = Visual::BORDER;
   propertyMap[ BorderVisual::Property::COLOR  ] = testColor;
   propertyMap[ BorderVisual::Property::SIZE   ] = testSize;
   Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -457,7 +451,7 @@ int UtcDaliVisualFactoryGetBorderVisual2(void)
 
   // enable the anti-aliasing
   Dali::Property::Map map;
-  map[ Visual::Property::TYPE ] = Visual::BORDER;
+  map[ Toolkit::Visual::Property::TYPE ] = Visual::BORDER;
   map[ BorderVisual::Property::COLOR  ] = testColor;
   map[ BorderVisual::Property::SIZE   ] = testSize;
   map[ BorderVisual::Property::ANTI_ALIASING   ] = true;
@@ -610,7 +604,7 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   {
     tet_infoline( "whole grid" );
@@ -660,9 +654,9 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
   propertyMap.Insert( ImageVisual::Property::URL, gImage_34_RGBA );
-  propertyMap.Insert( DevelImageVisual::Property::BORDER, Rect< int >( 2, 2, 2, 2 ) );
+  propertyMap.Insert( ImageVisual::Property::BORDER, Rect< int >( 2, 2, 2, 2 ) );
   {
     tet_infoline( "whole grid" );
     Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -695,9 +689,9 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
   }
 
   propertyMap.Clear();
-  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
   propertyMap.Insert( ImageVisual::Property::URL, gImage_34_RGBA );
-  propertyMap.Insert( DevelImageVisual::Property::BORDER, Rect< int >( 1, 1, 1, 1 ) );
+  propertyMap.Insert( ImageVisual::Property::BORDER, Rect< int >( 1, 1, 1, 1 ) );
   {
     tet_infoline( "whole grid" );
     Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -738,7 +732,7 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
   Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   {
     Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -904,7 +898,7 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, DevelVisual::N_PATCH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
   propertyMap.Insert( ImageVisual::Property::URL,  "ERROR.9.jpg" );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -941,7 +935,7 @@ int UtcDaliVisualFactoryGetNPatchVisualN3(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  111 );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  111 );
   propertyMap.Insert( ImageVisual::Property::URL,  "ERROR.9.jpg" );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -1008,6 +1002,52 @@ int UtcDaliVisualFactoryGetSvgVisualLarge(void)
   actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS ); // Only rasterizes when it knows control size.
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  // renderer is not added to actor until the rasterization is completed.
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  // renderer is added to actor
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  // waiting for the resource uploading
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetSvgVisualAtlas(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetSvgVisual: Request svg visual with enabled atlas" );
+
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::SVG );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_SVG_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::ATLASING, true );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl actor = DummyControl::New(true);
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+  actor.SetSize( 200.f, 200.f );
+  Stage::GetCurrent().Add( actor );
+  visual.SetTransformAndSize(DefaultTransform(), Vector2(200.f, 200.f) );
 
   application.SendNotification();
   application.Render();
@@ -1122,7 +1162,7 @@ int UtcDaliVisualFactoryGetMeshVisual1(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE,  Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
 
   //Test to see if mesh loads correctly.
@@ -1142,7 +1182,7 @@ int UtcDaliVisualFactoryGetMeshVisual2(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, "" );
   propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, "" );
@@ -1163,7 +1203,7 @@ int UtcDaliVisualFactoryGetMeshVisual3b(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::USE_MIPMAPPING, Color::GREEN ); // Test that wrong property types don't prevent the object load
@@ -1187,7 +1227,7 @@ int UtcDaliVisualFactoryGetMeshVisual3(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::USE_MIPMAPPING, false );
@@ -1212,7 +1252,7 @@ int UtcDaliVisualFactoryGetMeshVisual4(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_SIMPLE_MTL_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
@@ -1233,7 +1273,7 @@ int UtcDaliVisualFactoryGetMeshVisual5(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( "objectUrl", TEST_OBJ_FILE_NAME );
   propertyMap.Insert( "materialUrl", TEST_MTL_FILE_NAME );
   propertyMap.Insert( "texturesPath", TEST_RESOURCE_DIR "/" );
@@ -1259,7 +1299,7 @@ int UtcDaliVisualFactoryGetMeshVisual6(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
@@ -1281,7 +1321,7 @@ int UtcDaliVisualFactoryGetMeshVisual7(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
@@ -1304,7 +1344,7 @@ int UtcDaliVisualFactoryGetMeshVisual8(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_SIMPLE_OBJ_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
@@ -1325,7 +1365,7 @@ int UtcDaliVisualFactoryGetMeshVisualN1(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
 
@@ -1346,7 +1386,7 @@ int UtcDaliVisualFactoryGetMeshVisualN2(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::OBJECT_URL, TEST_OBJ_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, "invalid" );
   propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, "also invalid" );
@@ -1368,7 +1408,7 @@ int UtcDaliVisualFactoryGetMeshVisualN3(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::MESH );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::MESH );
   propertyMap.Insert( MeshVisual::Property::OBJECT_URL, "invalid" );
   propertyMap.Insert( MeshVisual::Property::MATERIAL_URL, TEST_MTL_FILE_NAME );
   propertyMap.Insert( MeshVisual::Property::TEXTURES_PATH, TEST_RESOURCE_DIR "/" );
@@ -1428,7 +1468,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual1(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CUBE );
 
   //Test to see if shape loads correctly.
@@ -1447,7 +1487,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual2(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CUBE );
   propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
@@ -1476,7 +1516,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual3(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
   propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
@@ -1498,7 +1538,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual4(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONICAL_FRUSTRUM );
   propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
@@ -1522,7 +1562,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual5(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::BEVELLED_CUBE );
   propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::BEVEL_PERCENTAGE, 0.7f );
@@ -1543,7 +1583,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual6(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::OCTAHEDRON );
   propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
 
@@ -1563,7 +1603,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual7(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONE );
   propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
@@ -1586,7 +1626,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual8(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
   propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
   propertyMap.Insert( MeshVisual::Property::LIGHT_POSITION, Vector3( 0.0, 1.0, 2.0 ) );
@@ -1607,7 +1647,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual9(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, Property::Value( 1000000 ) );
 
@@ -1627,7 +1667,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual10(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
   propertyMap.Insert( PrimitiveVisual::Property::SLICES, Property::Value( 2 ) );
 
@@ -1647,7 +1687,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual11(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
   propertyMap.Insert( PrimitiveVisual::Property::STACKS, Property::Value( 1000000 ) );
 
@@ -1667,7 +1707,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual12(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
   propertyMap.Insert( PrimitiveVisual::Property::STACKS, Property::Value( 1 ) );
 
@@ -1687,7 +1727,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual13(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
   propertyMap.Insert( PrimitiveVisual::Property::SCALE_DIMENSIONS, Vector3::ZERO );
 
@@ -1707,7 +1747,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual14(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
   propertyMap.Insert( PrimitiveVisual::Property::BEVEL_PERCENTAGE, Property::Value( -1.0f ) );
 
@@ -1727,7 +1767,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual15(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
   propertyMap.Insert( PrimitiveVisual::Property::BEVEL_PERCENTAGE, Property::Value( 2.0f ) );
 
@@ -1747,7 +1787,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual16(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
   propertyMap.Insert( PrimitiveVisual::Property::BEVEL_SMOOTHNESS, Property::Value( -1.0f ) );
 
@@ -1767,7 +1807,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisual17(void)
 
   //Set up visual properties.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
   propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::SPHERE );
   propertyMap.Insert( PrimitiveVisual::Property::BEVEL_SMOOTHNESS, Property::Value( 2.0f ) );
 
@@ -1787,7 +1827,7 @@ int UtcDaliVisualFactoryGetPrimitiveVisualN1(void)
 
   //Set up visual properties, without supplying shape.
   Property::Map propertyMap;
-  propertyMap.Insert( Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
 
   //Test to see if shape loads regardless of missing input.
   TestPrimitiveVisualWithProperties( propertyMap, application );
@@ -1882,7 +1922,7 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual2(void)
 
   const Vector4 pixelArea(-0.5f, -0.5f, 2.f, 2.f);
   Property::Map propertyMap;
-  propertyMap.Add( Visual::Property::TYPE,  Visual::IMAGE  )
+  propertyMap.Add( Toolkit::Visual::Property::TYPE,  Visual::IMAGE  )
              .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME  )
              .Add( ImageVisual::Property::PIXEL_AREA, pixelArea )
              .Add( ImageVisual::Property::WRAP_MODE_U, WrapMode::MIRRORED_REPEAT )

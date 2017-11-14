@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include <dali-toolkit-test-suite-utils.h>
-#include <dali-toolkit/internal/visuals/texture-manager.h>
+#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 
 using namespace Dali::Toolkit::Internal;
@@ -60,7 +60,8 @@ int UtcTextureManagerRequestLoad(void)
     FittingMode::SCALE_TO_FILL,
     SamplingMode::BOX_THEN_LINEAR,
     TextureManager::NO_ATLAS,
-    &observer );
+    &observer,
+    true );
 
   const VisualUrl& url = textureManager.GetVisualUrl( textureId );
 

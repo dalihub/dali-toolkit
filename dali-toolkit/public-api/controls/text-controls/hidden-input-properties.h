@@ -1,5 +1,5 @@
-#ifndef __DALI_HIDDEN_TEXT_PROPERTIES_H__
-#define __DALI_HIDDEN_TEXT_PROPERTIES_H__
+#ifndef DALI_HIDDEN_INPUT_PROPERTIES_H
+#define DALI_HIDDEN_INPUT_PROPERTIES_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -18,36 +18,37 @@
  *
  */
 
-// EXTERNAL INCLUDES
-
-// INTERNAL INCLUDES
-
 namespace Dali
 {
 
 namespace Toolkit
 {
 
+/**
+ * @addtogroup dali_toolkit_controls_text_controls
+ * @{
+ */
+
 namespace HiddenInput
 {
 
 /**
- * @brief HiddenInput Property
- * @SINCE_1_2.33
+ * @brief HiddenInput Property.
+ * @SINCE_1_2.60
  */
 namespace Property
 {
 
 /**
- * @brief HiddenInput Property
- * @SINCE_1_2.33
+ * @brief HiddenInput Property.
+ * @SINCE_1_2.60
  */
 enum
 {
   /**
    * @brief The mode for input text display.
-   * @details Name "mode", type HiddenInput::Mode or INTEGER.
-   * @SINCE_1_2.33
+   * @details Name "mode", type HiddenInput::Mode (Property::INTEGER).
+   * @SINCE_1_2.60
    * @note Optional.
    * @see HiddenInput::Mode
    */
@@ -55,57 +56,61 @@ enum
 
   /**
    * @brief All input characters are substituted by this character.
-   * @details Name "substituteCharacter", type INTEGER.
-   * @SINCE_1_2.33
+   * @details Name "substituteCharacter", type Property::INTEGER.
+   * @SINCE_1_2.60
    * @note Optional.
    */
   SUBSTITUTE_CHARACTER,
 
   /**
    * @brief Length of text to show or hide, available when HIDE_COUNT/SHOW_COUNT mode is used.
-   * @details Name "substituteCount", type INTEGER.
-   * @SINCE_1_2.33
+   * @details Name "substituteCount", type Property::INTEGER.
+   * @SINCE_1_2.60
    * @note Optional.
    */
   SUBSTITUTE_COUNT,
 
   /**
    * @brief Hide last character after this duration, available when SHOW_LAST_CHARACTER mode.
-   * @details Name "showDuration", type INTEGER.
-   * @SINCE_1_2.33
+   * @details Name "showDuration", type Property::INTEGER.
+   * @SINCE_1_2.60
    * @note Optional.
    */
-  SHOW_DURATION
+  SHOW_LAST_CHARACTER_DURATION
 };
 
 } // namespace Property
 
 /**
  * @brief The type for HiddenInput::Property::MODE.
- * @SINCE_1_2.33
+ * @SINCE_1_2.60
  */
 namespace Mode
 {
 
 /**
  * @brief The type for HiddenInput::Property::MODE.
- * @SINCE_1_2.33
+ * @SINCE_1_2.60
  */
 enum Type
 {
-  HIDE_NONE,  ///< Don't hide text
-  HIDE_ALL,   ///< Hide all the input text
-  HIDE_COUNT,  ///< Hide n characters from start
-  SHOW_COUNT,  ///< Show n characters from start
-  SHOW_LAST_CHARACTER  ///< Show last character for the duration(use SHOW_DURATION property to modify duration)
+  HIDE_NONE,            ///< Do not hide text. @SINCE_1_2.60
+  HIDE_ALL,             ///< Hide all the input text. @SINCE_1_2.60
+  HIDE_COUNT,           ///< Hide n characters from start. @SINCE_1_2.60
+  SHOW_COUNT,           ///< Show n characters from start. @SINCE_1_2.60
+  SHOW_LAST_CHARACTER   ///< Show last character for the duration (use Property::SHOW_LAST_CHARACTER_DURATION to modify duration). @SINCE_1_2.60
 };
 
 } // namespace Mode
 
 } // namespace HiddenInput
 
+/**
+ * @}
+ */
+
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // __DALI_HIDDEN_TEXT_PROPERTIES_H__
+#endif // DALI_HIDDEN_INPUT_PROPERTIES_H

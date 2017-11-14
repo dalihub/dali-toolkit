@@ -37,8 +37,8 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/helpers/color-conversion.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 

@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,8 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
-#include <dali-toolkit/devel-api/visuals/text-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
@@ -88,8 +87,8 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
   Visual::BasePtr visualPtr;
 
-  Property::Value* typeValue = propertyMap.Find( Toolkit::DevelVisual::Property::TYPE, VISUAL_TYPE );
-  Toolkit::DevelVisual::Type visualType = Toolkit::DevelVisual::IMAGE; // Default to IMAGE type.
+  Property::Value* typeValue = propertyMap.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE );
+  Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type.
   if( typeValue )
   {
     Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType );
@@ -123,29 +122,32 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       {
         if( imageURLValue->Get( imageUrl ) )
         {
-          VisualUrl visualUrl( imageUrl );
-
-          switch( visualUrl.GetType() )
+          if( !imageUrl.empty() )
           {
-            case VisualUrl::N_PATCH:
+            VisualUrl visualUrl( imageUrl );
+
+            switch( visualUrl.GetType() )
             {
-              visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-              break;
-            }
-            case VisualUrl::SVG:
-            {
-              visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-              break;
-            }
-            case VisualUrl::GIF:
-            {
-              visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-              break;
-            }
-            case VisualUrl::REGULAR_IMAGE:
-            {
-              visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
-              break;
+              case VisualUrl::N_PATCH:
+              {
+                visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                break;
+              }
+              case VisualUrl::SVG:
+              {
+                visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                break;
+              }
+              case VisualUrl::GIF:
+              {
+                visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                break;
+              }
+              case VisualUrl::REGULAR_IMAGE:
+              {
+                visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                break;
+              }
             }
           }
         }
@@ -179,13 +181,13 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       break;
     }
 
-    case Toolkit::DevelVisual::TEXT:
+    case Toolkit::Visual::TEXT:
     {
       visualPtr = TextVisual::New( *( mFactoryCache.Get() ), propertyMap );
       break;
     }
 
-    case Toolkit::DevelVisual::N_PATCH:
+    case Toolkit::Visual::N_PATCH:
     {
       Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
       std::string imageUrl;
@@ -196,7 +198,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       break;
     }
 
-    case Toolkit::DevelVisual::SVG:
+    case Toolkit::Visual::SVG:
     {
       Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
       std::string imageUrl;
@@ -207,7 +209,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       break;
     }
 
-    case Toolkit::DevelVisual::ANIMATED_IMAGE:
+    case Toolkit::Visual::ANIMATED_IMAGE:
     {
       Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
       std::string imageUrl;
@@ -235,7 +237,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     DALI_LOG_ERROR( "Renderer type unknown\n" );
   }
 
-  if( mDebugEnabled && visualType !=  Toolkit::DevelVisual::WIREFRAME )
+  if( mDebugEnabled && visualType !=  Toolkit::Visual::WIREFRAME )
   {
     //Create a WireframeVisual if we have debug enabled
     visualPtr = WireframeVisual::New( *( mFactoryCache.Get() ), visualPtr, propertyMap );
@@ -253,14 +255,17 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
 
   Visual::BasePtr visualPtr;
 
-  NinePatchImage npatchImage = NinePatchImage::DownCast( image );
-  if( npatchImage )
+  if( image )
   {
-    visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), npatchImage );
-  }
-  else
-  {
-    visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), image );
+    NinePatchImage npatchImage = NinePatchImage::DownCast( image );
+    if( npatchImage )
+    {
+      visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), npatchImage );
+    }
+    else
+    {
+      visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), image );
+    }
   }
 
   if( mDebugEnabled )
@@ -281,29 +286,32 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
 
   Visual::BasePtr visualPtr;
 
-  // first resolve url type to know which visual to create
-  VisualUrl visualUrl( url );
-  switch( visualUrl.GetType() )
+  if( !url.empty() )
   {
-    case VisualUrl::N_PATCH:
+    // first resolve url type to know which visual to create
+    VisualUrl visualUrl( url );
+    switch( visualUrl.GetType() )
     {
-      visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl );
-      break;
-    }
-    case VisualUrl::SVG:
-    {
-      visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl );
-      break;
-    }
-    case VisualUrl::GIF:
-    {
-      visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl );
-      break;
-    }
-    case VisualUrl::REGULAR_IMAGE:
-    {
-      visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, size );
-      break;
+      case VisualUrl::N_PATCH:
+      {
+        visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl );
+        break;
+      }
+      case VisualUrl::SVG:
+      {
+        visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl );
+        break;
+      }
+      case VisualUrl::GIF:
+      {
+        visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl );
+        break;
+      }
+      case VisualUrl::REGULAR_IMAGE:
+      {
+        visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, size );
+        break;
+      }
     }
   }
 
@@ -314,6 +322,15 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
   }
 
   return Toolkit::Visual::Base( visualPtr.Get() );
+}
+
+Internal::TextureManager& VisualFactory::GetTextureManager()
+{
+  if( !mFactoryCache )
+  {
+    mFactoryCache = new VisualFactoryCache();
+  }
+  return mFactoryCache->GetTextureManager();
 }
 
 } // namespace Internal

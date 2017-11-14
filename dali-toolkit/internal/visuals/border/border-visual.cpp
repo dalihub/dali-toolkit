@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -217,13 +217,13 @@ void BorderVisual::DoSetOnStage( Actor& actor )
   actor.AddRenderer( mImpl->mRenderer );
 
   // Border Visual Generated and ready to display
-  ResourceReady();
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 void BorderVisual::DoCreatePropertyMap( Property::Map& map ) const
 {
   map.Clear();
-  map.Insert( Toolkit::DevelVisual::Property::TYPE, Toolkit::Visual::BORDER );
+  map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::BORDER );
   map.Insert( Toolkit::BorderVisual::Property::COLOR, mBorderColor );
   map.Insert( Toolkit::BorderVisual::Property::SIZE, mBorderSize );
   map.Insert( Toolkit::BorderVisual::Property::ANTI_ALIASING, mAntiAliasing );

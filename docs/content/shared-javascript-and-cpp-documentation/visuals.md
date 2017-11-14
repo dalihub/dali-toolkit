@@ -28,12 +28,12 @@ Visuals have a **transform** field in the property map to allow layouting within
 
 | Property                                                       | String       | Type              | Required | Description                                                                                 |
 |----------------------------------------------------------------|--------------|:-----------------:|:--------:|---------------------------------------------------------------------------------------------|
-| Dali::Toolkit::DevelVisual::Transform::Property::OFFSET        | offset       | VECTOR2           | No       | The offset of the visual.                                                                   |
-| Dali::Toolkit::DevelVisual::Transform::Property::SIZE          | size         | VECTOR2           | No       | The size of the visual.                                                                     |
-| Dali::Toolkit::DevelVisual::Transform::Property::OFFSET_POLICY | offsetPolicy | VECTOR4           | No       | Whether the offset components are Relative or Absolute [More info](@ref offset-size-policy) |
-| Dali::Toolkit::DevelVisual::Transform::Property::SIZE_POLICY   | sizePolicy   | VECTOR4           | No       | Whether the size components are Relative or Absolute [More info](@ref offset-size-policy)   |
-| Dali::Toolkit::DevelVisual::Transform::Property::ORIGIN        | origin       | INTEGER or STRING | No       | The origin of the visual within the control's area. [More info](@ref align-type)            |
-| Dali::Toolkit::DevelVisual::Transform::Property::ANCHOR_POINT  | anchorPoint  | INTEGER or STRING | No       | The anchor point of the visual. [More info](@ref align-type)                                |
+| Dali::Toolkit::Visual::Transform::Property::OFFSET        | offset       | VECTOR2           | No       | The offset of the visual.                                                                   |
+| Dali::Toolkit::Visual::Transform::Property::SIZE          | size         | VECTOR2           | No       | The size of the visual.                                                                     |
+| Dali::Toolkit::Visual::Transform::Property::OFFSET_POLICY | offsetPolicy | VECTOR4           | No       | Whether the offset components are Relative or Absolute [More info](@ref offset-size-policy) |
+| Dali::Toolkit::Visual::Transform::Property::SIZE_POLICY   | sizePolicy   | VECTOR4           | No       | Whether the size components are Relative or Absolute [More info](@ref offset-size-policy)   |
+| Dali::Toolkit::Visual::Transform::Property::ORIGIN        | origin       | INTEGER or STRING | No       | The origin of the visual within the control's area. [More info](@ref align-type)            |
+| Dali::Toolkit::Visual::Transform::Property::ANCHOR_POINT  | anchorPoint  | INTEGER or STRING | No       | The anchor point of the visual. [More info](@ref align-type)                                |
  
 
 ## Offset & Size Policy  {#offset-size-policy}
@@ -42,8 +42,8 @@ The offset and size policies can be either Relative or Absolute.
 
 | Enumeration                                             | String   | Description                                                                   |
 |---------------------------------------------------------|----------|-------------------------------------------------------------------------------|
-| Dali::Toolkit::DevelVisual::Transform::Policy::RELATIVE | RELATIVE | *Default*. The size or offset value represents a ratio of the control's size  |
-| Dali::Toolkit::DevelVisual::Transform::Policy::ABSOLUTE | ABSOLUTE | The size or offset value represents world units (pixels)                      |
+| Dali::Toolkit::Visual::Transform::Policy::RELATIVE | RELATIVE | *Default*. The size or offset value represents a ratio of the control's size  |
+| Dali::Toolkit::Visual::Transform::Policy::ABSOLUTE | ABSOLUTE | The size or offset value represents world units (pixels)                      |
 
 For example, an offsetPolicy of [ RELATIVE, RELATIVE ], a sizePolicy of [ ABSOLUTE, ABSOLUTE ], an offset of ( 0, 0.25 ) and a size of ( 20, 20 ) means the visual will be 20 pixels by 20 pixels in size, positioned 25% above the center of the control.
 

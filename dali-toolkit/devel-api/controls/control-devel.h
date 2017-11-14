@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 
 namespace Dali
 {
@@ -54,6 +55,8 @@ enum
   BACKGROUND_IMAGE  = Control::Property::BACKGROUND_IMAGE,
   KEY_INPUT_FOCUS   = Control::Property::KEY_INPUT_FOCUS,
   BACKGROUND        = Control::Property::BACKGROUND,
+  MARGIN            = Control::Property::MARGIN,
+  PADDING           = Control::Property::PADDING,
 
   /**
    * @brief Displays a tooltip when the control is hovered over.
@@ -66,7 +69,7 @@ enum
    * @note When retrieved, a Property::MAP is returned.
    * @see Toolkit::Tooltip
    */
-  TOOLTIP = BACKGROUND + 1,
+  TOOLTIP = PADDING + 1,
 
   /**
    * @brief The current state of the control.
@@ -74,7 +77,7 @@ enum
    *
    * @see DevelControl::State
    */
-  STATE = BACKGROUND + 2,
+  STATE = PADDING + 2,
 
   /**
    * @brief The current sub state of the control.
@@ -82,63 +85,38 @@ enum
    *
    * @see DevelControl::State
    */
-  SUB_STATE = BACKGROUND + 3,
+  SUB_STATE = PADDING + 3,
 
   /**
    * @brief The actor ID of the left focusable control.
    * @details Name "leftFocusableActorId", type Property::INTEGER.
    *
    */
-  LEFT_FOCUSABLE_ACTOR_ID = BACKGROUND + 4,
+  LEFT_FOCUSABLE_ACTOR_ID = PADDING + 4,
 
   /**
    * @brief The actor ID of the right focusable control.
    * @details Name "rightFocusableActorId", type Property::INTEGER.
    *
    */
-  RIGHT_FOCUSABLE_ACTOR_ID = BACKGROUND + 5,
+  RIGHT_FOCUSABLE_ACTOR_ID = PADDING + 5,
 
   /**
    * @brief The actor ID of the up focusable control.
    * @details Name "upFocusableActorId", type Property::INTEGER.
    *
    */
-  UP_FOCUSABLE_ACTOR_ID = BACKGROUND + 6,
+  UP_FOCUSABLE_ACTOR_ID = PADDING + 6,
 
   /**
    * @brief The actor ID of the down focusable control.
    * @details Name "downFocusableActorId", type Property::INTEGER.
    *
    */
-  DOWN_FOCUSABLE_ACTOR_ID = BACKGROUND + 7
+  DOWN_FOCUSABLE_ACTOR_ID = PADDING + 7
 };
 
 } // namespace Property
-
-/// @brief ResourceReady signal type;
-typedef Signal<void ( Control ) > ResourceReadySignalType;
-
-/**
- * @brief This signal is emitted after all resources required
- * by a control are loaded and ready.
- * Most resources are only loaded when the control is placed on stage.
- *
- * @note A RelayoutRequest is queued by Control before this signal is emitted
- *
- * A callback of the following type may be connected:
- * @code
- *   void YourCallbackName( Control control );
- * @endcode
- */
-DALI_IMPORT_API ResourceReadySignalType& ResourceReadySignal( Control& control );
-
-/**
- * @brief Query if all resources required by a control are loaded and ready.
- * Most resources are only loaded when the control is placed on stage.
- * @return true if the resources are loaded and ready, false otherwise
- *
- */
-DALI_IMPORT_API bool IsResourceReady( const Control& control );
 
 /**
  * @brief Register a visual by Property Index.
@@ -235,6 +213,15 @@ DALI_IMPORT_API void EnableVisual( Internal::Control& control, Dali::Property::I
  * @return bool whether visual is enabled or not
  */
 DALI_IMPORT_API bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index index );
+
+/**
+ * @brief Get the loading state of the visual resource.
+ *
+ * @param[in] control The control
+ * @param[in] index The Property index of the visual
+ * @return Return the loading status (PREPARING, READY and FAILED) of visual resource
+ */
+DALI_IMPORT_API Toolkit::Visual::ResourceStatus GetVisualResourceStatus( const Internal::Control& control, Dali::Property::Index index );
 
 /**
  * @brief Create a transition effect on the control.

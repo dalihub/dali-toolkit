@@ -159,6 +159,8 @@ struct EventData
   bool mPasswordInput                   : 1;   ///< True if password input is enabled.
   bool mCheckScrollAmount               : 1;   ///< Whether to check scrolled amount after updating the position
   bool mIsPlaceholderPixelSize          : 1;   ///< True if the placeholder font size is set as pixel size.
+  bool mIsPlaceholderElideEnabled       : 1;   ///< True if the placeholder text's elide is enabled.
+  bool mPlaceholderEllipsisFlag         : 1;   ///< True if the text controller sets the placeholder ellipsis.
 };
 
 struct ModifyEvent
@@ -322,6 +324,7 @@ struct Controller::Impl
     mAutoScrollDirectionRTL( false ),
     mUnderlineSetByString( false ),
     mShadowSetByString( false ),
+    mOutlineSetByString( false ),
     mFontStyleSetByString( false ),
     mShouldClearFocusOnEscape( true )
   {
@@ -743,6 +746,7 @@ public:
 
   bool mUnderlineSetByString:1;            ///< Set when underline is set by string (legacy) instead of map
   bool mShadowSetByString:1;               ///< Set when shadow is set by string (legacy) instead of map
+  bool mOutlineSetByString:1;              ///< Set when outline is set by string (legacy) instead of map
   bool mFontStyleSetByString:1;            ///< Set when font style is set by string (legacy) instead of map
   bool mShouldClearFocusOnEscape:1;        ///< Whether text control should clear key input focus
 };

@@ -54,7 +54,7 @@ enum
 {
   /**
    * @brief The URL of the image.
-   * @details Name "url", type Property::STRING or Property::ARRAY of Property::STRING
+   * @details Name "url", type Property::STRING or Property::ARRAY of Property::STRING.
    * @note The array form is used for generating animated image visuals.
    * @note The number of threads used for local and remote image loading can be controlled by the
    *       environment variables DALI_TEXTURE_LOCAL_THREADS and DALI_TEXTURE_REMOTE_THREADS respectively.
@@ -133,7 +133,7 @@ enum
 
   /**
    * @brief The wrap mode for u coordinate.
-   * @details Name "wrapModeU", type Dali::WrapMode::Type (Property::INTEGER) or Property::STRING
+   * @details Name "wrapModeU", type Dali::WrapMode::Type (Property::INTEGER) or Property::STRING.
    *          It decides how the texture should be sampled when the u coordinate exceeds the range of 0.0 to 1.0.
    * @SINCE_1_2.1
    * @note Optional. If not specified, the default is CLAMP.
@@ -143,13 +143,95 @@ enum
 
   /**
    * @brief The wrap mode for v coordinate.
-   * @details Name "wrapModeV", type Dali::WrapMode::Type (Property::INTEGER) or Property::STRING
+   * @details Name "wrapModeV", type Dali::WrapMode::Type (Property::INTEGER) or Property::STRING.
    *          it decides how the texture should be sampled when the v coordinate exceeds the range of 0.0 to 1.0.
    * @SINCE_1_2.1
    * @note Optional. If not specified, the default is CLAMP.
    * @note For Normal QUAD image only.
    */
   WRAP_MODE_V,
+
+  /**
+   * @brief The border of the image.
+   * @details Name "border", type Property::RECTANGLE or Property::VECTOR4.
+   *          The border of the image in the order: left, right, bottom, top.
+   * @SINCE_1_2.60
+   * @note Optional.
+   * @note For N-Patch images only.
+   */
+  BORDER,
+
+  /**
+   * @brief Whether to use the texture atlas
+   * @details Name "atlasing", type Property::BOOLEAN.
+   * @SINCE_1_2.60
+   * @note Optional. By default atlasing is off.
+   */
+  ATLASING,
+
+  /**
+   * @brief URL of a masking image
+   * @details Name "alphaMaskUrl", type Property::STRING, URL of image to apply as
+   * a mask after image loading. If set after the main URL has finished loading, this
+   * may necessitate a re-load of the main image. The alpha mask image will be scaled
+   * on load to match the size of the main image, then applied to the pixel data
+   * before uploading to GL.
+   * @SINCE_1_2.60
+   * @note Optional.
+   */
+  ALPHA_MASK_URL,
+
+  /**
+   * @brief Defines the batch size for pre-loading images in the AnimatedImageVisual
+   * @details Name "batchSize", type Property::INTEGER, number of images to pre-load
+   * before starting to play. Default value: 1
+   * @SINCE_1_2.60
+   * @note Optional.
+   */
+  BATCH_SIZE,
+
+  /**
+   * @brief Defines the cache size for loading images in the AnimatedImageVisual
+   * @details Name "cacheSize", type Property::INTEGER, number of images to keep
+   * cached ahead during playback. Default value: 1
+   *
+   * @SINCE_1_2.60
+   * @note Optional.
+   * @note, cacheSize should be >= batchSize.
+   * If it isn't, then the cache will automatically be changed to batchSize.
+   * @note, because of the defaults, it is expected that the application developer
+   * tune the batch and cache sizes to their particular use case.
+   */
+  CACHE_SIZE,
+
+  /**
+   * @brief The number of milliseconds between each frame in the AnimatedImageVisual
+   * @details Name "frameDelay", type Property::INTEGER, The number of milliseconds between each frame.
+   * @SINCE_1_2.60
+   * @note Optional.
+   * @note This is only used when multiple URLs are provided.
+   */
+  FRAME_DELAY,
+
+  /**
+   * @brief The scale factor to apply to the content image before masking
+   * @details Name "maskContentScale", type Property::FLOAT, The scale factor
+   * to apply to the content before masking. Note, scaled images are cropped to
+   * the same size as the alpha mask.
+   * @SINCE_1_2.60
+   * @note Optional.
+   */
+  MASK_CONTENT_SCALE,
+
+  /**
+   * @brief Whether to crop image to mask or scale mask to fit image
+   * @details Name "cropToMask", type Property::BOOLEAN, True if the image should
+   * be cropped to match the mask size, or false if the image should remain the same size.
+   * @SINCE_1_2.60
+   * @note Optional.
+   * @note If this is false, then the mask is scaled to fit the image before being applied.
+   */
+  CROP_TO_MASK,
 };
 
 } // namespace Property

@@ -18,6 +18,10 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/weak-handle.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
@@ -80,6 +84,35 @@ public:
    * @param[in,out] propertyMap containing string keys or a mix of strings and indexes. Will be changed to index keys.
    */
   static void ConvertStringKeysToIndexKeys( Property::Map& propertyMap );
+
+  /**
+   * @brief Retrieve the text's controller.
+   * @param[in] visual The text visual.
+   * @return The text controller
+   */
+  static Text::ControllerPtr GetController( Toolkit::Visual::Base visual )
+  {
+    return GetVisualObject( visual ).mController;
+  };
+
+  /**
+   * @brief Set the index of the animatable text color property.
+   * @param[in] visual The text visual.
+   * @param[in] animatablePropertyIndex The index of the animatable property
+   */
+  static void SetAnimatableTextColorProperty( Toolkit::Visual::Base visual, Property::Index animatablePropertyIndex )
+  {
+    GetVisualObject( visual ).mAnimatableTextColorPropertyIndex = animatablePropertyIndex;
+  };
+
+  /**
+   * @brief Set the flag to trigger the textures to be initialized and renderer to be added to the control.
+   * @param[in] visual The text visual.
+   */
+  static void EnableRendererUpdate( Toolkit::Visual::Base visual )
+  {
+    GetVisualObject( visual ).mRendererUpdateNeeded = true;
+  };
 
 public: // from Visual::Base
 
@@ -151,19 +184,66 @@ private:
 
   /**
    * @brief Updates the text's renderer.
-   * @param[in] initializeRendererAndTexture Set flag to true to initialize textures and add renderer to control.
    */
-  void UpdateRenderer( bool initializeRendererAndTexture );
+  void UpdateRenderer();
 
   /**
    * @brief Removes the texture set from the renderer.
    */
   void RemoveTextureSet();
 
+  /**
+   * Get the texture of the text for rendering.
+   * @param[in] size The texture size.
+   * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
+   * @param[in] containsEmoji Whether the text contains emoji.
+   * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
+   */
+  TextureSet GetTextTexture( const Vector2& size, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled );
+
+  /**
+   * Get the text rendering shader.
+   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
+   * @param[in] containsEmoji Whether the text contains emoji.
+   * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
+   */
+  Shader GetTextShader( VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled );
+
+  /**
+   * @brief Retrieve the text's controller.
+   * @param[in] visual The text visual.
+   * @return The text controller
+   */
+  static TextVisual& GetVisualObject( Toolkit::Visual::Base visual )
+  {
+    return static_cast<TextVisual&>( visual.GetBaseObject() );
+  };
+
 private:
-  Text::ControllerPtr mController; ///< The text's controller.
-  Text::TypesetterPtr mTypesetter; ///< The text's typesetter.
-  WeakHandle<Actor>   mControl;    ///< The control where the renderer is added.
+
+  /**
+   * Used as an alternative to boolean so that it is obvious whether the text contains single or multiple text colors, and emoji and styles.
+   */
+  struct TextType
+  {
+    enum Type
+    {
+      SINGLE_COLOR_TEXT = 0, ///< The text contains single color only.
+      MULTI_COLOR_TEXT = 1,  ///< The text contains multiple colorｓ.
+      NO_EMOJI = 0,          ///< The text contains no emoji.
+      HAS_EMOJI = 1,         ///< The text contains emoji.
+      NO_STYLES = 0,         ///< The text contains contains no styles.
+      HAS_SYLES = 1          ///< The text contains contains styles.
+    };
+  };
+
+private:
+  Text::ControllerPtr mController;                        ///< The text's controller.
+  Text::TypesetterPtr mTypesetter;                        ///< The text's typesetter.
+  WeakHandle<Actor>   mControl;                           ///< The control where the renderer is added.
+  Property::Index     mAnimatableTextColorPropertyIndex;  ///< The index of animatable text color property registered by the control.
+  bool                mRendererUpdateNeeded:1;            ///< The flag to indicate whether the renderer needs to be updated.
 };
 
 } // namespace Internal

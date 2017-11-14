@@ -22,13 +22,14 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali/public-api/rendering/renderer.h>
+#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 
 #include <test-native-image.h>
 #include <sstream>
 #include <unistd.h>
+
 
 #include "dummy-control.h"
 
@@ -472,10 +473,11 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
   imageMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
   imageMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 34;
   imageMap[ ImageVisual::Property::DESIRED_WIDTH ] = 34;
-  imageMap[ DevelImageVisual::Property::ATLASING] = true;
+  imageMap[ ImageVisual::Property::ATLASING] = true;
 
   ImageView imageView = ImageView::New();
   imageView.SetProperty( ImageView::Property::IMAGE, imageMap );
+  imageView.SetProperty( Toolkit::Control::Property::PADDING, Extents( 10u, 10u, 10u, 10u ) );
 
   // By default, Aysnc loading is used
   // loading is not started if the actor is offStage
@@ -551,7 +553,7 @@ int UtcDaliImageViewSyncLoading(void)
 
   Property::Map syncLoadingMap;
   syncLoadingMap[ ImageVisual::Property::SYNCHRONOUS_LOADING ] = true;
-  syncLoadingMap[ DevelImageVisual::Property::ATLASING ] = true;
+  syncLoadingMap[ ImageVisual::Property::ATLASING ] = true;
 
   // Sync loading, no atlasing for big size image
   {
@@ -589,7 +591,6 @@ int UtcDaliImageViewSyncLoading(void)
   END_TEST;
 }
 
-
 int UtcDaliImageViewSyncLoading02(void)
 {
   ToolkitTestApplication application;
@@ -623,6 +624,30 @@ int UtcDaliImageViewSyncLoading02(void)
     DALI_TEST_EQUALS( callStack.FindMethodAndParams( "TexSubImage2D", params ),
                       true, TEST_LOCATION );
   }
+  END_TEST;
+}
+
+int UtcDaliImageViewAddedTexture(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing image view with texture provided manager url");
+
+  ImageView imageView = ImageView::New();
+
+  // empty texture is ok, though pointless from app point of view
+  TextureSet  empty;
+  std::string url = TextureManager::AddTexture(empty);
+  DALI_TEST_CHECK(url.size() > 0u);
+
+  Property::Map propertyMap;
+  propertyMap[ImageVisual::Property::URL] = url;
+  imageView.SetProperty(ImageView::Property::IMAGE, propertyMap);
+
+  Stage::GetCurrent().Add( imageView );
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
 
@@ -856,9 +881,9 @@ int UtcDaliImageViewCheckResourceReady(void)
 
   imageView.SetBackgroundImage( image );
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
 
-  Toolkit::DevelControl::ResourceReadySignal( imageView ).Connect( &ResourceReadySignal);
+  imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
 
   Stage::GetCurrent().Add( imageView );
 
@@ -866,7 +891,7 @@ int UtcDaliImageViewCheckResourceReady(void)
   application.Render(16);
 
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
 
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
@@ -932,43 +957,119 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
   ToolkitTestApplication application;
 
   ImageView imageView = ImageView::New();
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( imageView );
 
+  Stage::GetCurrent().Add( imageView );
 
   std::string url;
   Property::Map map;
+  Toolkit::Visual::Base visual;
 
   Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  application.SendNotification();
+  application.Render( 16 );
+
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
   DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+  DALI_TEST_CHECK( ! visual );           // Visual should be invalid
 
   // Set a URL
   imageView.SetImage( "TEST_URL" );
+
+  application.SendNotification();
+  application.Render( 16 );
+
   value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
 
   DALI_TEST_CHECK( value.Get( url ) );   // Value should NOT be empty
   DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+  DALI_TEST_CHECK( visual );             // Visual should be valid
 
   // Set an empty Image
   imageView.SetImage( Image() );
+
+  application.SendNotification();
+  application.Render( 16 );
+
   value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
 
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
   DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+  DALI_TEST_CHECK( ! visual );           // Visual should be invalid
 
   // Set an Image
   ResourceImage image1 = ResourceImage::New( TEST_IMAGE_FILE_NAME );
   imageView.SetImage( image1 );
+
+  application.SendNotification();
+  application.Render( 16 );
+
   value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
 
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
   DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( visual );             // Visual should be valid
 
   // Set an empty URL
   imageView.SetImage( "" );
+
+  application.SendNotification();
+  application.Render( 16 );
+
   value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
 
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
   DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+  DALI_TEST_CHECK( ! visual );           // Visual should be invalid
+
+  // Set a URL in property map
+  Property::Map propertyMap;
+  propertyMap[ImageVisual::Property::URL] = TEST_IMAGE_FILE_NAME;
+  imageView.SetProperty( ImageView::Property::IMAGE, propertyMap );
+
+  application.SendNotification();
+  application.Render( 16 );
+
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( visual );             // Visual should be valid
+
+  // Set a URL in property map again
+  propertyMap[ImageVisual::Property::URL] = gImage_34_RGBA;
+  imageView.SetProperty( ImageView::Property::IMAGE, propertyMap );
+
+  application.SendNotification();
+  application.Render( 16 );
+
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( visual );             // Visual should be valid
+
+  // Set an empty URL in property map
+  propertyMap[ImageVisual::Property::URL] = std::string();
+  imageView.SetProperty( ImageView::Property::IMAGE, propertyMap );
+
+  application.SendNotification();
+  application.Render( 16 );
+
+  value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
+  visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+
+  DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
+  DALI_TEST_CHECK( value.Get( map ) );   // Value should NOT be empty
+  DALI_TEST_CHECK( ! visual );           // Visual should be invalid
 
   END_TEST;
 }
@@ -1323,9 +1424,9 @@ int UtcDaliImageViewReplaceImage(void)
   // Check ImageView with background and main image, to ensure both visuals are marked as loaded
   ImageView imageView = ImageView::New( TEST_IMAGE_1 );
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
 
-  Toolkit::DevelControl::ResourceReadySignal( imageView ).Connect( &ResourceReadySignal);
+  imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
 
   Stage::GetCurrent().Add( imageView );
 
@@ -1351,7 +1452,7 @@ int UtcDaliImageViewReplaceImage(void)
 
   DALI_TEST_EQUALS( imageView.GetRendererCount(), 1u, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( Toolkit::DevelControl::IsResourceReady( imageView ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
 
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 

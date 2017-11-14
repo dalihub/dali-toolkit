@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_TEXT_LAYOUT_WRAPMODE_H
-#define DALI_TOOLKIT_TEXT_LAYOUT_WRAPMODE_H
+#ifndef DALI_TOOLKIT_TEXT_XHTML_ENTITIES_H
+#define DALI_TOOLKIT_TEXT_XHTML_ENTITIES_H
 
 /*
  * Copyright (c) 2017 Samsung Electronics Co., Ltd.
@@ -26,38 +26,15 @@ namespace Toolkit
 
 namespace Text
 {
-
-namespace Layout
-{
-
 /**
- * @brief Unit of wrapping for moving to next line
+ * @brief Retrieves UTF8 entity code for corresponding XHTML named Entity.
  *
- * If layout width too short to show full text,
- * WRAP_MODE_WORD mode will move word to next line,
- * +---------+
- * |HELLO    |
- * |WORLLD   |
- * +---------+
+ * @param[in] markupText The XHTML named entity.
+ * @param[int] len Length of markupText.
  *
- * but WRAP_MODE_CHARACTER mode will move character by character to next line
- * +---------+
- * |HELLO WOR|
- * |LD       |
- * +---------+
+ * @return pointer to UTF8 entity code if namedEntity found in table otherwise NULL
  */
-
-namespace LineWrap {
-
-enum Mode
-{
-  WORD,
-  CHARACTER
-};
-
-} // namespace LineWrap
-
-} // namespace Layout
+const char* const NamedEntityToUtf8( const char* const markupText, unsigned int len );
 
 } // namespace Text
 
@@ -65,4 +42,4 @@ enum Mode
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_TEXT_LAYOUT_WRAPMODE_H
+#endif // DALI_TOOLKIT_TEXT_XHTML_ENTITIES_H

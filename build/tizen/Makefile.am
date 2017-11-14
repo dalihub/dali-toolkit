@@ -58,7 +58,7 @@ rename_cov_data:
 	@rm -f $(COVERAGE_DIR)/*
 	@cp dali-toolkit/.libs/*.gcda dali-toolkit/.libs/*.gcno  $(COVERAGE_DIR)
 	@for i in `find $(COVERAGE_DIR) -name "libdali_toolkit*_la-*.gcda" -o -name "libdali_toolkit*_la-*.gcno"` ;\
-		do mv $$i `echo $$i | sed s/libdali_toolkit*_la-//` ; echo $$i ; done
+		do dest=`echo $$i | sed s/libdali_.*_la-//` ; mv $$i $$dest ; echo $$i ; done
 
 cov_data: rename_cov_data
 	@cd $(COVERAGE_DIR) ; lcov $(LCOV_OPTS) --base-directory . --directory . -c -o dali.info

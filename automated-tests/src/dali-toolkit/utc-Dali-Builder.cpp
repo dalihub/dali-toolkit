@@ -1727,7 +1727,8 @@ int UtcDaliBuilderTypeCasts(void)
          "\"sensitive\":   { \"typeCast\":\"boolean\", \"value\":false },"
          "\"orientation\": { \"typeCast\":\"rotation\", \"value\":[10,10,10,10] },"
          "\"colorMode\":   { \"typeCast\":\"string\", \"value\":\"USE_OWN_MULTIPLY_PARENT_COLOR\" },"
-         "\"clippingBox\": { \"typeCast\":\"rect\", \"value\":[10,10,10,10] }"
+         "\"clippingBox\": { \"typeCast\":\"rect\", \"value\":[10,10,10,10] },"
+         "\"padding\":     { \"typeCast\":\"extents\", \"value\":[10,10,10,10] }"
       "}]"
     "}"
   );

@@ -34,7 +34,7 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
@@ -85,10 +85,10 @@ void Remove( DictionaryKeys& keys, const std::string& name )
   }
 }
 
-Toolkit::DevelVisual::Type GetVisualTypeFromMap( const Property::Map& map )
+Toolkit::Visual::Type GetVisualTypeFromMap( const Property::Map& map )
 {
-  Property::Value* typeValue = map.Find( Toolkit::DevelVisual::Property::TYPE, VISUAL_TYPE  );
-  Toolkit::DevelVisual::Type type = Toolkit::DevelVisual::IMAGE;
+  Property::Value* typeValue = map.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE  );
+  Toolkit::Visual::Type type = Toolkit::Visual::IMAGE;
   if( typeValue )
   {
     Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, type );
@@ -302,14 +302,15 @@ const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "backgro
 const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgroundImage",        Toolkit::Control::Property::BACKGROUND_IMAGE,             Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",          Toolkit::Control::Property::KEY_INPUT_FOCUS,              Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",             Toolkit::Control::Property::BACKGROUND,                   Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "tooltip",                Toolkit::DevelControl::Property::TOOLTIP,                 Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "state",                  Toolkit::DevelControl::Property::STATE,                   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_8( typeRegistration, "subState",               Toolkit::DevelControl::Property::SUB_STATE,               Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_9( typeRegistration, "leftFocusableActorId",   Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_10( typeRegistration, "rightFocusableActorId", Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID,Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_11( typeRegistration, "upFocusableActorId",    Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,   Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_12( typeRegistration, "downFocusableActorId",  Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-
+const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "margin",                 Toolkit::Control::Property::MARGIN,                       Property::EXTENTS, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_7( typeRegistration, "padding",                Toolkit::Control::Property::PADDING,                      Property::EXTENTS, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_8( typeRegistration, "tooltip",                Toolkit::DevelControl::Property::TOOLTIP,                 Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_9( typeRegistration, "state",                  Toolkit::DevelControl::Property::STATE,                   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_10( typeRegistration, "subState",               Toolkit::DevelControl::Property::SUB_STATE,               Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_11( typeRegistration, "leftFocusableActorId",   Toolkit::DevelControl::Property::LEFT_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_12( typeRegistration, "rightFocusableActorId", Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID,Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_13( typeRegistration, "upFocusableActorId",    Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,   Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_14( typeRegistration, "downFocusableActorId",  Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 
 Control::Impl::Impl( Control& controlImpl )
@@ -323,6 +324,8 @@ Control::Impl::Impl( Control& controlImpl )
   mStyleName(""),
   mBackgroundColor(Color::TRANSPARENT),
   mStartingPinchScale( NULL ),
+  mMargin( 0, 0, 0, 0 ),
+  mPadding( 0, 0, 0, 0 ),
   mKeyEventSignal(),
   mPinchGestureDetector(),
   mPanGestureDetector(),
@@ -535,17 +538,26 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
 
 void Control::Impl::UnregisterVisual( Property::Index index )
 {
-   RegisteredVisualContainer::Iterator iter;
-   if ( FindVisual( index, mVisuals, iter ) )
-   {
-     // stop observing visual
-     StopObservingVisual( (*iter)->visual );
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mVisuals, iter ) )
+  {
+    // stop observing visual
+    StopObservingVisual( (*iter)->visual );
 
-     Actor self( mControlImpl.Self() );
-     Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
-     (*iter)->visual.Reset();
-     mVisuals.Erase( iter );
-   }
+    Actor self( mControlImpl.Self() );
+    Toolkit::GetImplementation((*iter)->visual).SetOffStage( self );
+    (*iter)->visual.Reset();
+    mVisuals.Erase( iter );
+  }
+
+  if( FindVisual( index, mRemoveVisuals, iter ) )
+  {
+    Actor self( mControlImpl.Self() );
+    Toolkit::GetImplementation( (*iter)->visual ).SetOffStage( self );
+    (*iter)->pending = false;
+    (*iter)->visual.Reset();
+    mRemoveVisuals.Erase( iter );
+  }
 }
 
 Toolkit::Visual::Base Control::Impl::GetVisual( Property::Index index ) const
@@ -674,6 +686,18 @@ bool Control::Impl::IsResourceReady() const
   return true;
 }
 
+Toolkit::Visual::ResourceStatus Control::Impl::GetVisualResourceStatus( Property::Index index ) const
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( index, mVisuals, iter ) )
+  {
+    const Toolkit::Visual::Base visual = (*iter)->visual;
+    const Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+    return visualImpl.GetResourceStatus( );
+  }
+
+  return Toolkit::Visual::ResourceStatus::PREPARING;
+}
 
 Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& handle )
 {
@@ -910,6 +934,26 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
         break;
       }
 
+      case Toolkit::Control::Property::MARGIN:
+      {
+        Extents margin;
+        if( value.Get( margin ) )
+        {
+          controlImpl.mImpl->SetMargin( margin );
+        }
+        break;
+      }
+
+      case Toolkit::Control::Property::PADDING:
+      {
+        Extents padding;
+        if( value.Get( padding ) )
+        {
+          controlImpl.mImpl->SetPadding( padding );
+        }
+        break;
+      }
+
       case Toolkit::DevelControl::Property::TOOLTIP:
       {
         TooltipPtr& tooltipPtr = controlImpl.mImpl->mTooltip;
@@ -918,7 +962,9 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
           tooltipPtr = Tooltip::New( control );
         }
         tooltipPtr->SetProperties( value );
+        break;
       }
+
     }
   }
 }
@@ -1016,6 +1062,18 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
         break;
       }
 
+      case Toolkit::Control::Property::MARGIN:
+      {
+        value = controlImpl.mImpl->GetMargin();
+        break;
+      }
+
+      case Toolkit::Control::Property::PADDING:
+      {
+        value = controlImpl.mImpl->GetPadding();
+        break;
+      }
+
       case Toolkit::DevelControl::Property::TOOLTIP:
       {
         Property::Map map;
@@ -1026,7 +1084,6 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
         value = map;
         break;
       }
-
     }
   }
 
@@ -1095,8 +1152,8 @@ void Control::Impl::RecreateChangedVisuals( Dictionary<Property::Map>& stateVisu
       Property::Map fromMap;
       visual.CreatePropertyMap( fromMap );
 
-      Toolkit::DevelVisual::Type fromType = GetVisualTypeFromMap( fromMap );
-      Toolkit::DevelVisual::Type toType = GetVisualTypeFromMap( toMap );
+      Toolkit::Visual::Type fromType = GetVisualTypeFromMap( fromMap );
+      Toolkit::Visual::Type toType = GetVisualTypeFromMap( toMap );
 
       if( fromType != toType )
       {
@@ -1104,8 +1161,8 @@ void Control::Impl::RecreateChangedVisuals( Dictionary<Property::Map>& stateVisu
       }
       else
       {
-        if( fromType == Toolkit::DevelVisual::IMAGE || fromType == Toolkit::DevelVisual::N_PATCH
-            || fromType == Toolkit::DevelVisual::SVG || fromType == Toolkit::DevelVisual::ANIMATED_IMAGE )
+        if( fromType == Toolkit::Visual::IMAGE || fromType == Toolkit::Visual::N_PATCH
+            || fromType == Toolkit::Visual::SVG || fromType == Toolkit::Visual::ANIMATED_IMAGE )
         {
           Property::Value* fromUrl = fromMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
           Property::Value* toUrl = toMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
@@ -1296,6 +1353,26 @@ void Control::Impl::OnStageDisconnection()
   }
 
   mRemoveVisuals.Clear();
+}
+
+void Control::Impl::SetMargin( Extents margin )
+{
+  mControlImpl.mImpl->mMargin = margin;
+}
+
+Extents Control::Impl::GetMargin() const
+{
+  return mControlImpl.mImpl->mMargin;
+}
+
+void Control::Impl::SetPadding( Extents padding )
+{
+  mControlImpl.mImpl->mPadding = padding;
+}
+
+Extents Control::Impl::GetPadding() const
+{
+  return mControlImpl.mImpl->mPadding;
 }
 
 } // namespace Internal

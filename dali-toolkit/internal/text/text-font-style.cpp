@@ -45,10 +45,6 @@ const std::string TYPE_KEY( "type" );
 
 const std::string SYSTEM_TOKEN( "system" );
 
-#if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New(Debug::Concise, true, "LOG_TEXT_CONTROLS");
-#endif
-
 } // namespace
 
 void SetFontFamilyProperty( ControllerPtr controller, const Property::Value& value )

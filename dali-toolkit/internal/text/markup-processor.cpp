@@ -18,11 +18,18 @@
 // FILE HEADER
 #include <dali-toolkit/internal/text/markup-processor.h>
 
+// EXTERNAL INCLUDES
+#include <climits>  // for ULONG_MAX
+#include <dali/integration-api/debug.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/markup-processor-color.h>
 #include <dali-toolkit/internal/text/markup-processor-font.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
+#include <dali-toolkit/internal/text/xhtml-entities.h>
+
+
 
 namespace Dali
 {
@@ -53,11 +60,25 @@ const char EQUAL          = '=';
 const char QUOTATION_MARK = '\'';
 const char SLASH          = '/';
 const char BACK_SLASH     = '\\';
+const char AMPERSAND      = '&';
+const char HASH           = '#';
+const char SEMI_COLON     = ';';
+const char CHAR_ARRAY_END = '\0';
+const char HEX_CODE       = 'x';
 
 const char WHITE_SPACE    = 0x20; // ASCII value of the white space.
 
+// Range 1 0x0u < XHTML_DECIMAL_ENTITY_RANGE <= 0xD7FFu
+// Range 2 0xE000u < XHTML_DECIMAL_ENTITY_RANGE <= 0xFFFDu
+// Range 3 0x10000u < XHTML_DECIMAL_ENTITY_RANGE <= 0x10FFFFu
+const unsigned long XHTML_DECIMAL_ENTITY_RANGE[] = { 0x0u, 0xD7FFu, 0xE000u, 0xFFFDu, 0x10000u, 0x10FFFFu };
+
 const unsigned int MAX_NUM_OF_ATTRIBUTES =  5u; ///< The font tag has the 'family', 'size' 'weight', 'width' and 'slant' attrubutes.
 const unsigned int DEFAULT_VECTOR_SIZE   = 16u; ///< Default size of run vectors.
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_MARKUP_PROCESSOR");
+#endif
 
 /**
  * @brief Struct used to retrieve the style runs from the mark-up string.
@@ -354,6 +375,88 @@ bool IsTag( const char*& markupStringBuffer,
   return isTag;
 }
 
+/**
+ * @brief Returns length of XHTML entity by parsing the text. It also determines if it is XHTML entity or not.
+ *
+ * @param[in] markupStringBuffer The mark-up string buffer. It's a const iterator pointing the current character.
+ * @param[in] markupStringEndBuffer Pointing to end of mark-up string buffer.
+ *
+ * @return Length of markupText in case of XHTML entity otherwise return 0.
+ */
+unsigned int GetXHTMLEntityLength( const char*& markupStringBuffer,
+                                   const char* const markupStringEndBuffer )
+{
+  char character = *markupStringBuffer;
+  if( AMPERSAND == character ) // '&'
+  {
+    // if the iterator is pointing to a '&' character, then check for ';' to find end to XHTML entity.
+    ++markupStringBuffer;
+    if( markupStringBuffer < markupStringEndBuffer )
+    {
+      unsigned int len = 1u;
+      for( ; markupStringBuffer < markupStringEndBuffer ; ++markupStringBuffer )
+      {
+        character = *markupStringBuffer;
+        ++len;
+        if( SEMI_COLON == character ) // ';'
+        {
+          // found end of XHTML entity
+          ++markupStringBuffer;
+          return len;
+        }
+        else if( ( AMPERSAND == character ) || ( BACK_SLASH == character ) || ( LESS_THAN == character ))
+        {
+          return 0;
+        }
+      }
+    }
+  }
+  return 0;
+}
+
+/**
+ * @brief It parses a XHTML string which has hex/decimal entity and fill its corresponging utf-8 string.
+ *
+ * @param[in] markupText The mark-up text buffer.
+ * @param[out] utf-8 text Corresponding to markup Text
+ *
+ * @return true if string is successfully parsed otherwise false
+ */
+bool XHTMLNumericEntityToUtf8 ( const char* markupText, char* utf8 )
+{
+  bool result = false;
+
+  if( NULL != markupText )
+  {
+    bool isHex = false;
+
+    // check if hex or decimal entity
+    if( ( CHAR_ARRAY_END != *markupText ) && ( HEX_CODE == *markupText ) )
+    {
+      isHex = true;
+      ++markupText;
+    }
+
+    char* end = NULL;
+    unsigned long l = strtoul( markupText, &end, ( isHex ? 16 : 10 ) );  // l contains UTF-32 code in case of correct XHTML entity
+
+    // check for valid XHTML numeric entities (between '#' or "#x" and ';')
+    if( ( l > 0 ) && ( l < ULONG_MAX ) && ( *end == SEMI_COLON ) ) // in case wrong XHTML entity is set eg. "&#23abcdefs;" in that case *end will be 'a'
+    {
+      /* characters XML 1.1 permits */
+      if( ( ( XHTML_DECIMAL_ENTITY_RANGE[0] < l ) && ( l <= XHTML_DECIMAL_ENTITY_RANGE[1] ) ) ||
+        ( ( XHTML_DECIMAL_ENTITY_RANGE[2] <= l ) && ( l <= XHTML_DECIMAL_ENTITY_RANGE[3] ) ) ||
+        ( ( XHTML_DECIMAL_ENTITY_RANGE[4] <= l ) && ( l <= XHTML_DECIMAL_ENTITY_RANGE[5] ) ) )
+      {
+        // Convert UTF32 code to UTF8
+        Utf32ToUtf8( reinterpret_cast<const uint32_t* const>( &l ), 1, reinterpret_cast<uint8_t*>( utf8 ) );
+        result = true;
+       }
+    }
+  }
+  return result;
+}
+
 } // namespace
 
 void ProcessMarkupString( const std::string& markupString, MarkupProcessData& markupProcessData )
@@ -547,32 +650,84 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
         }
       } // <outline></outline>
     }  // end if( IsTag() )
-    else
+    else if( markupStringBuffer < markupStringEndBuffer )
     {
       unsigned char character = *markupStringBuffer;
+      const char* markupBuffer = markupStringBuffer;
+      unsigned char count = GetUtf8Length( character );
+      char utf8[8];
 
       if( ( BACK_SLASH == character ) && ( markupStringBuffer + 1u < markupStringEndBuffer ) )
       {
-        // Adding < or > special character.
+        // Adding < , >  or & special character.
         const unsigned char nextCharacter = *( markupStringBuffer + 1u );
-        if( ( LESS_THAN == nextCharacter ) || ( GREATER_THAN == nextCharacter ) )
+        if( ( LESS_THAN == nextCharacter ) || ( GREATER_THAN == nextCharacter ) || ( AMPERSAND == nextCharacter ) )
         {
           character = nextCharacter;
           ++markupStringBuffer;
+
+          count = GetUtf8Length( character );
+          markupBuffer = markupStringBuffer;
+        }
+      }
+      else   // checking if conatins XHTML entity or not
+      {
+        const unsigned int len =  GetXHTMLEntityLength( markupStringBuffer, markupStringEndBuffer);
+
+        // Parse markupStringTxt if it contains XHTML Entity between '&' and ';'
+        if( len > 0 )
+        {
+          char* entityCode = NULL;
+          bool result = false;
+          count = 0;
+
+          // Checking if XHTML Numeric Entity
+          if( HASH == *( markupBuffer + 1u ) )
+          {
+            entityCode = &utf8[0];
+            // markupBuffer is currently pointing to '&'. By adding 2u to markupBuffer it will point to numeric string by skipping "&#'
+            result = XHTMLNumericEntityToUtf8( ( markupBuffer + 2u ), entityCode );
+          }
+          else    // Checking if XHTML Named Entity
+          {
+            entityCode = const_cast<char*> ( NamedEntityToUtf8( markupBuffer, len ) );
+            result = ( entityCode != NULL );
+          }
+          if ( result )
+          {
+            markupBuffer = entityCode; //utf8 text assigned to markupBuffer
+            character = markupBuffer[0];
+          }
+          else
+          {
+            DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Not valid XHTML entity : (%.*s) \n", len, markupBuffer );
+            markupBuffer = NULL;
+          }
+        }
+        else    // in case string conatins Start of XHTML Entity('&') but not its end character(';')
+        {
+          if( character == AMPERSAND )
+          {
+            markupBuffer = NULL;
+            DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Not Well formed XHTML content \n" );
+          }
         }
       }
 
-      const unsigned char numberOfBytes = GetUtf8Length( character );
-
-      markupProcessData.markupProcessedText.push_back( character );
-      for( unsigned char i = 1u; i < numberOfBytes; ++i )
+      if( markupBuffer != NULL )
       {
-        ++markupStringBuffer;
-        markupProcessData.markupProcessedText.push_back( *markupStringBuffer );
-      }
+        const unsigned char numberOfBytes = GetUtf8Length( character );
+        markupProcessData.markupProcessedText.push_back( character );
 
-      ++characterIndex;
-      ++markupStringBuffer;
+        for( unsigned char i = 1u; i < numberOfBytes; ++i )
+        {
+          ++markupBuffer;
+          markupProcessData.markupProcessedText.push_back( *markupBuffer );
+        }
+
+        ++characterIndex;
+        markupStringBuffer += count;
+      }
     }
   }
 

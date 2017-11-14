@@ -24,8 +24,7 @@
 
 #include <dali.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
-#include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <toolkit-event-thread-callback.h>
@@ -437,8 +436,8 @@ int UtcDaliControlBackgroundColor(void)
 
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE ) );
-  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE )->Get<int>() == Visual::COLOR );
+  DALI_TEST_CHECK( resultMap->Find( Toolkit::Visual::Property::TYPE ) );
+  DALI_TEST_CHECK( resultMap->Find( Toolkit::Visual::Property::TYPE )->Get<int>() == Visual::COLOR );
   DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR ) );
   DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>() == Color::RED );
 
@@ -468,8 +467,8 @@ int UtcDaliControlBackgroundImage(void)
 
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE ) );
-  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE )->Get<int>() == Visual::IMAGE );
+  DALI_TEST_CHECK( resultMap->Find( Toolkit::Visual::Property::TYPE ) );
+  DALI_TEST_CHECK( resultMap->Find( Toolkit::Visual::Property::TYPE )->Get<int>() == Visual::IMAGE );
   DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL ) );
   DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL )->Get<std::string>() == "TestImage" );
 
@@ -493,13 +492,13 @@ int UtcDaliControlBackgroundProperties(void)
   DALI_TEST_CHECK( control.GetProperty( Control::Property::BACKGROUND ).Get< Property::Map >().Empty() );
 
   Property::Map imageMap;
-  imageMap[ Visual::Property::TYPE ] = Visual::IMAGE;
+  imageMap[ Toolkit::Visual::Property::TYPE ] = Visual::IMAGE;
   imageMap[ ImageVisual::Property::URL ] = "TestImage";
   control.SetProperty( Control::Property::BACKGROUND, imageMap );
   Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE ) );
-  DALI_TEST_EQUALS( resultMap->Find( Visual::Property::TYPE )->Get<int>(),(int)Visual::IMAGE, TEST_LOCATION );
+  DALI_TEST_CHECK( resultMap->Find( Toolkit::Visual::Property::TYPE ) );
+  DALI_TEST_EQUALS( resultMap->Find( Toolkit::Visual::Property::TYPE )->Get<int>(),(int)Visual::IMAGE, TEST_LOCATION );
   DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL ) );
   DALI_TEST_EQUALS( resultMap->Find( ImageVisual::Property::URL )->Get<std::string>(), "TestImage", TEST_LOCATION );
 
@@ -509,8 +508,8 @@ int UtcDaliControlBackgroundProperties(void)
   control.SetProperty( Control::Property::BACKGROUND, rendererMap );
   propValue = control.GetProperty( Control::Property::BACKGROUND );
   resultMap = propValue.GetMap();
-  DALI_TEST_CHECK( resultMap->Find( Visual::Property::TYPE ) );
-  DALI_TEST_EQUALS( resultMap->Find( Visual::Property::TYPE )->Get<int>(), (int)Visual::COLOR, TEST_LOCATION );
+  DALI_TEST_CHECK( resultMap->Find( Toolkit::Visual::Property::TYPE ) );
+  DALI_TEST_EQUALS( resultMap->Find( Toolkit::Visual::Property::TYPE )->Get<int>(), (int)Visual::COLOR, TEST_LOCATION );
   DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR ) );
   DALI_TEST_EQUALS( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>(), Color::CYAN, TEST_LOCATION );
 
@@ -522,14 +521,14 @@ int UtcDaliControlBackgroundProperties(void)
   control.SetProperty( Control::Property::BACKGROUND, "Foobar.png" );
   propValue = control.GetProperty( Control::Property::BACKGROUND );
   resultMap = propValue.GetMap();
-  DALI_TEST_EQUALS( resultMap->Find( Visual::Property::TYPE )->Get<int>(), (int)Visual::IMAGE, TEST_LOCATION );
+  DALI_TEST_EQUALS( resultMap->Find( Toolkit::Visual::Property::TYPE )->Get<int>(), (int)Visual::IMAGE, TEST_LOCATION );
   DALI_TEST_EQUALS( resultMap->Find( ImageVisual::Property::URL )->Get<std::string>(), "Foobar.png", TEST_LOCATION );
 
   // set as Color
   control.SetProperty( Control::Property::BACKGROUND, Color::RED );
   propValue = control.GetProperty( Control::Property::BACKGROUND );
   resultMap = propValue.GetMap();
-  DALI_TEST_EQUALS( resultMap->Find( Visual::Property::TYPE )->Get<int>(), (int)Visual::COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( resultMap->Find( Toolkit::Visual::Property::TYPE )->Get<int>(), (int)Visual::COLOR, TEST_LOCATION );
   DALI_TEST_EQUALS( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>(), Color::RED, TEST_LOCATION );
 
   // Deprecated Properties
@@ -682,7 +681,7 @@ int UtcDaliControlAutoClippingN(void)
 {
   ToolkitTestApplication application;
   Control control = Control::New();
-  control.SetProperty( Control::Property::BACKGROUND, Property::Map().Add( Visual::Property::TYPE, Visual::COLOR )
+  control.SetProperty( Control::Property::BACKGROUND, Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::COLOR )
                                                                      .Add( ColorVisual::Property::MIX_COLOR, Color::RED ) );
 
   tet_infoline( "Test to ensure that a renderer does NOT get added when we are clipping children and already have renderers/visuals" );
@@ -739,7 +738,7 @@ int UtcDaliControlAutoClippingWhenAlreadyOnStageN(void)
 {
   ToolkitTestApplication application;
   Control control = Control::New();
-  control.SetProperty( Control::Property::BACKGROUND, Property::Map().Add( Visual::Property::TYPE, Visual::COLOR )
+  control.SetProperty( Control::Property::BACKGROUND, Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::COLOR )
                                                                      .Add( ColorVisual::Property::MIX_COLOR, Color::RED ) );
 
   tet_infoline( "Test to ensure that a renderer does NOT get added when we are clipping children and already have renderers/visuals and when already on stage" );
@@ -777,13 +776,13 @@ int UtcDaliControlSetTransformSize(void)
   Control control = Control::New();
 
   Property::Map transformMap;
-  transformMap.Add( DevelVisual::Transform::Property::OFFSET, Vector2( 10, 10 ) )
-              .Add( DevelVisual::Transform::Property::ANCHOR_POINT, Align::BOTTOM_END )
-              .Add( DevelVisual::Transform::Property::ORIGIN, Align::BOTTOM_END )
-              .Add( DevelVisual::Transform::Property::SIZE, Vector2( 10, 20 ) );
+  transformMap.Add( Visual::Transform::Property::OFFSET, Vector2( 10, 10 ) )
+              .Add( Visual::Transform::Property::ANCHOR_POINT, Align::BOTTOM_END )
+              .Add( Visual::Transform::Property::ORIGIN, Align::BOTTOM_END )
+              .Add( Visual::Transform::Property::SIZE, Vector2( 10, 20 ) );
 
-  control.SetProperty( Control::Property::BACKGROUND, Property::Map().Add( Visual::Property::TYPE, Visual::COLOR )
-                                                                     .Add( DevelVisual::Property::TRANSFORM, transformMap ) );
+  control.SetProperty( Control::Property::BACKGROUND, Property::Map().Add( Toolkit::Visual::Property::TYPE, Visual::COLOR )
+                                                                     .Add( Visual::Property::TRANSFORM, transformMap ) );
 
   tet_infoline( "Test to ensure that the control background transform does not get overwritten when adding to the stage" );
 
@@ -796,15 +795,15 @@ int UtcDaliControlSetTransformSize(void)
   Property::Value value = control.GetProperty( Control::Property::BACKGROUND );
   Property::Map* map = value.GetMap();
   DALI_TEST_CHECK( map );
-  Property::Value* transformValue = map->Find( DevelVisual::Property::TRANSFORM );
+  Property::Value* transformValue = map->Find( Visual::Property::TRANSFORM );
   DALI_TEST_CHECK( transformValue );
 
   Property::Map* retMap = transformValue->GetMap();
   DALI_TEST_CHECK( retMap );
-  DALI_TEST_EQUALS( retMap->Find( DevelVisual::Transform::Property::OFFSET )->Get< Vector2 >(), Vector2( 10, 10 ), TEST_LOCATION );
-  DALI_TEST_EQUALS( retMap->Find( DevelVisual::Transform::Property::ANCHOR_POINT )->Get< int >(), (int)Align::BOTTOM_END, TEST_LOCATION );
-  DALI_TEST_EQUALS( retMap->Find( DevelVisual::Transform::Property::ORIGIN )->Get< int >(), (int)Align::BOTTOM_END, TEST_LOCATION );
-  DALI_TEST_EQUALS( retMap->Find( DevelVisual::Transform::Property::SIZE )->Get< Vector2 >(), Vector2( 10, 20 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( retMap->Find( Visual::Transform::Property::OFFSET )->Get< Vector2 >(), Vector2( 10, 10 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( retMap->Find( Visual::Transform::Property::ANCHOR_POINT )->Get< int >(), (int)Align::BOTTOM_END, TEST_LOCATION );
+  DALI_TEST_EQUALS( retMap->Find( Visual::Transform::Property::ORIGIN )->Get< int >(), (int)Align::BOTTOM_END, TEST_LOCATION );
+  DALI_TEST_EQUALS( retMap->Find( Visual::Transform::Property::SIZE )->Get< Vector2 >(), Vector2( 10, 20 ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -819,11 +818,11 @@ int UtcDaliControlResourcesReady(void)
   DALI_TEST_CHECK( factory );
 
   Property::Map propertyMapLarge;
-  propertyMapLarge.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMapLarge.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMapLarge.Insert( ImageVisual::Property::URL,  TEST_LARGE_IMAGE_FILE_NAME );
 
   Property::Map propertyMapSmall;
-  propertyMapSmall.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMapSmall.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMapSmall.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
 
   Visual::Base smallVisual = factory.CreateVisual( propertyMapSmall );
@@ -835,8 +834,11 @@ int UtcDaliControlResourcesReady(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, smallVisual );
 
   actor.SetSize( 200.f, 200.f );
+
+  Toolkit::Visual::ResourceStatus resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL);
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::PREPARING), TEST_LOCATION );
 
   Stage::GetCurrent().Add( actor );
   application.SendNotification();
@@ -847,8 +849,10 @@ int UtcDaliControlResourcesReady(void)
   application.SendNotification();
   application.Render();
 
+  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL);
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::READY), TEST_LOCATION );
 
   Visual::Base largeVisual = factory.CreateVisual( propertyMapLarge );
   largeVisual.SetName("largeVisual");
@@ -858,11 +862,74 @@ int UtcDaliControlResourcesReady(void)
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, largeVisual, false );
 
+  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL2);
+  DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::PREPARING), TEST_LOCATION );
+
+  application.SendNotification();
+
+  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL2);
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::PREPARING), TEST_LOCATION );
+
+  dummyImpl.EnableVisual( DummyControl::Property::TEST_VISUAL2, true );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+
+  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL2);
+  DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::READY), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlMarginProperty(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetBackgroundColor( Color::BLUE );
+
+  control.SetProperty( Control::Property::MARGIN, Extents( 20, 10, 0, 0 ) );
+
+  Stage::GetCurrent().Add( control );
+
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( DevelControl::IsResourceReady( actor ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetProperty<Extents>( Control::Property::MARGIN ), Extents( 20, 10, 0, 0 ), TEST_LOCATION );
+
+  // Parent control has one ImageView as a Child.
+  ImageView image = ImageView::New();
+  image.SetBackgroundColor( Color::RED );
+  image.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+  image.SetProperty( Control::Property::PADDING, Extents( 10, 10, 10, 10 ) );
+  control.Add( image );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( image.GetProperty<Extents>( Control::Property::PADDING ), Extents( 10, 10, 10, 10 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlPaddingProperty(void)
+{
+  ToolkitTestApplication application;
+
+  Control control = Control::New();
+  control.SetBackgroundColor( Color::BLUE );
+
+  control.SetProperty( Control::Property::PADDING, Extents( 10, 10, 10, 10 ) );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( control.GetProperty<Extents>( Control::Property::PADDING ), Extents( 10, 10, 10, 10 ), TEST_LOCATION );
 
   END_TEST;
 }

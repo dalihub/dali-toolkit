@@ -61,12 +61,12 @@ const Vector2& ViewModel::GetScrollPosition() const
   return mModel->GetScrollPosition();
 }
 
-Layout::HorizontalAlignment ViewModel::GetHorizontalAlignment() const
+HorizontalAlignment::Type ViewModel::GetHorizontalAlignment() const
 {
   return mModel->GetHorizontalAlignment();
 }
 
-Layout::VerticalAlignment ViewModel::GetVerticalAlignment() const
+VerticalAlignment::Type ViewModel::GetVerticalAlignment() const
 {
   return mModel->GetVerticalAlignment();
 }
@@ -84,6 +84,16 @@ Length ViewModel::GetNumberOfLines() const
 const LineRun* const ViewModel::GetLines() const
 {
   return mModel->GetLines();
+}
+
+Length ViewModel::GetNumberOfScripts() const
+{
+  return mModel->GetNumberOfScripts();
+}
+
+const ScriptRun* const ViewModel::GetScriptRuns() const
+{
+  return mModel->GetScriptRuns();
 }
 
 Length ViewModel::GetNumberOfGlyphs() const
@@ -141,6 +151,56 @@ const ColorIndex* const ViewModel::GetColorIndices() const
 const Vector4& ViewModel::GetDefaultColor() const
 {
   return mModel->GetDefaultColor();
+}
+
+const Vector2& ViewModel::GetShadowOffset() const
+{
+  return mModel->GetShadowOffset();
+}
+
+const Vector4& ViewModel::GetShadowColor() const
+{
+  return mModel->GetShadowColor();
+}
+
+const float& ViewModel::GetShadowBlurRadius() const
+{
+  return mModel->GetShadowBlurRadius();
+}
+
+const Vector4& ViewModel::GetUnderlineColor() const
+{
+  return mModel->GetUnderlineColor();
+}
+
+bool ViewModel::IsUnderlineEnabled() const
+{
+  return mModel->IsUnderlineEnabled();
+}
+
+float ViewModel::GetUnderlineHeight() const
+{
+  return mModel->GetUnderlineHeight();
+}
+
+Length ViewModel::GetNumberOfUnderlineRuns() const
+{
+  return mModel->GetNumberOfUnderlineRuns();
+}
+
+void ViewModel::GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const
+{
+  mModel->GetUnderlineRuns( underlineRuns, index, numberOfRuns );
+}
+
+const Vector4& ViewModel::GetOutlineColor() const
+{
+  return mModel->GetOutlineColor();
+}
+
+float ViewModel::GetOutlineWidth() const
+{
+  return mModel->GetOutlineWidth();
 }
 
 void ViewModel::ElideGlyphs()

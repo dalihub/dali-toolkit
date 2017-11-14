@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-resource-observer.h>
-#include <dali-toolkit/devel-api/align-enums.h>
+#include <dali-toolkit/public-api/align-enumerations.h>
 
 namespace Dali
 {
@@ -125,7 +125,7 @@ struct Base::Impl
   Property::Index mMixColorIndex;
   Property::Index mOpacityIndex;
   int             mFlags;
-  bool            mResourceReady:1;
+  Toolkit::Visual::ResourceStatus  mResourceStatus;
 };
 
 } // namespace Visual

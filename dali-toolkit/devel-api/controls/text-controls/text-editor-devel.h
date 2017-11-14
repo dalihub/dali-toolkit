@@ -74,130 +74,31 @@ namespace Property
       INPUT_EMBOSS = Dali::Toolkit::TextEditor::Property::INPUT_EMBOSS,
       OUTLINE = Dali::Toolkit::TextEditor::Property::OUTLINE,
       INPUT_OUTLINE = Dali::Toolkit::TextEditor::Property::INPUT_OUTLINE,
-
-      /**
-       * @brief name "smoothScroll", type bool
-       * @details Enable or disable the smooth scroll animation
-       * @note This property is currently being used for some applications, so it can't be changed.
-       */
-      SMOOTH_SCROLL = INPUT_OUTLINE + 1,
-
-      /**
-       * @brief name "smoothScrollDuration", type float
-       * @details Sets the duration of smooth scroll animation
-       * @note This property is currently being used for some applications, so it can't be changed.
-       */
-      SMOOTH_SCROLL_DURATION,
-
-      /**
-       * @brief name "enableScrollBar", type bool
-       * @details Enable or disable the scroll bar
-       * @note This property is currently being used for some applications, so it can't be changed.
-       */
-      ENABLE_SCROLL_BAR,
-
-      /**
-       * @brief name "scrollBarShowDuration", type float
-       * @details Sets the duration of scroll bar to show
-       * @note This property is currently being used for some applications, so it can't be changed.
-       */
-      SCROLL_BAR_SHOW_DURATION,
-
-      /**
-       * @brief name "scrollBarFadeDuration", type float
-       * @details Sets the duration of scroll bar to fade out
-       * @note This property is currently being used for some applications, so it can't be changed.
-       */
-      SCROLL_BAR_FADE_DURATION,
-
-      /**
-       * @brief The size of font in pixels.
-       *
-       * Conversion from Point size to Pixel size :
-       *  Pixel size = Point size * DPI / 72
-       * @details name "pixelSize", type float
-       */
-      PIXEL_SIZE,
-
-      /**
-       * @brief The line count of text.
-       * @details name "lineCount", type int
-       * @note this property is read-only.
-       */
-      LINE_COUNT,
+      SMOOTH_SCROLL = Dali::Toolkit::TextEditor::Property::SMOOTH_SCROLL,
+      SMOOTH_SCROLL_DURATION = Dali::Toolkit::TextEditor::Property::SMOOTH_SCROLL_DURATION,
+      ENABLE_SCROLL_BAR = Dali::Toolkit::TextEditor::Property::ENABLE_SCROLL_BAR,
+      SCROLL_BAR_SHOW_DURATION = Dali::Toolkit::TextEditor::Property::SCROLL_BAR_SHOW_DURATION,
+      SCROLL_BAR_FADE_DURATION = Dali::Toolkit::TextEditor::Property::SCROLL_BAR_FADE_DURATION,
+      PIXEL_SIZE = Dali::Toolkit::TextEditor::Property::PIXEL_SIZE,
+      LINE_COUNT = Dali::Toolkit::TextEditor::Property::LINE_COUNT,
+      ENABLE_SELECTION = Dali::Toolkit::TextEditor::Property::ENABLE_SELECTION,
+      PLACEHOLDER = Dali::Toolkit::TextEditor::Property::PLACEHOLDER,
+      LINE_WRAP_MODE = Dali::Toolkit::TextEditor::Property::LINE_WRAP_MODE,
 
       /**
        * @brief The text to display when the TextEditor is empty and inactive.
-       * @details name "placeholderText", type string
+       * @details Name "placeholderText", type Property::STRING.
        */
       PLACEHOLDER_TEXT,
 
       /**
        * @brief The placeholder-text color.
-       * @details name "placeholderTextColor", type vector4
+       * @details Name "placeholderTextColor", type Property::VECTOR4.
        */
       PLACEHOLDER_TEXT_COLOR,
-
-      /**
-       * @brief Enables Text selection, such as the cursor, handle, clipboard, and highlight color.
-       * @details name "enableSelection", type bool
-       */
-      ENABLE_SELECTION,
-
-      /**
-       * @brief Sets the placeholder : text, color, font family, font style, point size, and pixel size.
-       *
-       * @code
-       *   Property::Map propertyMap;
-       *   propertyMap["placeholderText"] = "Setting Placeholder Text";
-       *   propertyMap["placeholderTextFocused"] = "Setting Placeholder Text Focused";
-       *   propertyMap["placeholderColor"] = Color::RED;
-       *   propertyMap["placeholderFontFamily"] = "Arial";
-       *   propertyMap["placeholderPointSize"] = 12.0f;
-       *
-       *   Property::Map fontStyleMap;
-       *   fontStyleMap.Insert( "weight", "bold" );
-       *   fontStyleMap.Insert( "width", "condensed" );
-       *   fontStyleMap.Insert( "slant", "italic" );
-       *   propertyMap["placeholderFontStyle"] = fontStyleMap;
-       *
-       *   editor.SetProperty( DevelTextEditor::Property::PLACEHOLDER, propertyMap );
-       * @endcode
-       *
-       * @details name "placeholder", type MAP
-       */
-      PLACEHOLDER,
-
-      /**
-       * @brief line wrap mode when the text lines over layout width.
-       * @details name "lineWrapMode", type string.
-       */
-      LINE_WRAP_MODE
   };
+
 } // namespace Property
-
-namespace Scroll
-{
-  enum Type
-  {
-    STARTED,   ///< Scrolling is started.
-    FINISHED   ///< Scrolling is finished.
-  };
-} // namespace Scroll
-
-typedef Signal< void ( TextEditor, Scroll::Type ) > ScrollStateChangedSignalType;
-
-/**
- * @brief This signal is emitted when TextEditor scrolling is started or finished.
- *
- * A callback of the following type may be connected:
- * @code
- *   void YourCallbackName( ScrollState::Type type );
- * @endcode
- * type: Whether the scrolling is started or finished.
- * @return The signal to connect to
- */
-DALI_IMPORT_API ScrollStateChangedSignalType& ScrollStateChangedSignal( TextEditor textEditor );
 
 } // namespace DevelTextEditor
 

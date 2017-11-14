@@ -16,11 +16,14 @@
  */
 
 // CLASS HEADER
-#include "texture-manager.h"
+#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 
 // EXTERNAL HEADERS
 #include <cstdlib>
+#include <string>
+#include <dali/public-api/math/vector4.h>
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
@@ -29,6 +32,7 @@
 // INTERNAL HEADERS
 #include <dali-toolkit/internal/image-loader/image-atlas-impl.h>
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
+#include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
 namespace
 {
@@ -83,12 +87,138 @@ const int           INVALID_CACHE_INDEX( -1 ); ///< Invalid Cache index
 
 } // Anonymous namespace
 
+TextureManager::MaskingData::MaskingData()
+: mAlphaMaskUrl(),
+  mAlphaMaskId( INVALID_TEXTURE_ID ),
+  mContentScaleFactor( 1.0f ),
+  mCropToMask( true )
+{
+}
 
 TextureManager::TextureManager()
-: mCurrentTextureId( 0 ),
-  mAsyncLocalLoaders( GetNumberOfLocalLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
-  mAsyncRemoteLoaders( GetNumberOfRemoteLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } )
+: mAsyncLocalLoaders( GetNumberOfLocalLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
+  mAsyncRemoteLoaders( GetNumberOfRemoteLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
+  mCurrentTextureId( 0 )
 {
+}
+
+TextureSet TextureManager::LoadTexture(
+    VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode,
+    Dali::SamplingMode::Type samplingMode, const MaskingDataPointer& maskInfo,
+    bool synchronousLoading, TextureManager::TextureId& textureId, Vector4& textureRect,
+    bool& atlasingStatus, bool& loadingStatus, Dali::WrapMode::Type wrapModeU,
+    Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
+    AtlasUploadObserver* atlasObserver, ImageAtlasManagerPtr imageAtlasManager, bool orientationCorrection )
+{
+  TextureSet textureSet;
+
+  loadingStatus = false;
+  textureRect = FULL_ATLAS_RECT;
+
+  if( VisualUrl::TEXTURE == url.GetProtocolType())
+  {
+    std::string location = url.GetLocation();
+    if( location.size() > 0u )
+    {
+      TextureId id = std::stoi( location );
+      for( auto&& elem : mExternalTextures )
+      {
+        if( elem.textureId == id )
+        {
+          return elem.textureSet;
+        }
+      }
+    }
+  }
+  else if( synchronousLoading )
+  {
+    PixelData data;
+    if( url.IsValid() )
+    {
+      Devel::PixelBuffer pixelBuffer = LoadImageFromFile( url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection  );
+      if( pixelBuffer )
+      {
+        data = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
+      }
+    }
+    if( !data )
+    {
+      // use broken image
+      textureSet = TextureSet::New();
+      Devel::PixelBuffer pixelBuffer = LoadImageFromFile( BROKEN_IMAGE_URL );
+      if( pixelBuffer )
+      {
+        data = Devel::PixelBuffer::Convert(pixelBuffer); // takes ownership of buffer
+      }
+      Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(),
+                                      data.GetWidth(), data.GetHeight() );
+      texture.Upload( data );
+      textureSet = TextureSet::New();
+      textureSet.SetTexture( 0u, texture );
+    }
+    else
+    {
+      if( atlasingStatus ) // attempt atlasing
+      {
+        textureSet = imageAtlasManager->Add( textureRect, data );
+      }
+      if( !textureSet ) // big image, no atlasing or atlasing failed
+      {
+        atlasingStatus = false;
+        Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, data.GetPixelFormat(),
+                                        data.GetWidth(), data.GetHeight() );
+        texture.Upload( data );
+        textureSet = TextureSet::New();
+        textureSet.SetTexture( 0u, texture );
+      }
+    }
+  }
+  else
+  {
+    loadingStatus = true;
+    if( atlasingStatus )
+    {
+      textureSet = imageAtlasManager->Add( textureRect, url.GetUrl(), desiredSize, fittingMode, true, atlasObserver );
+    }
+    if( !textureSet ) // big image, no atlasing or atlasing failed
+    {
+      atlasingStatus = false;
+      if( !maskInfo )
+      {
+        textureId = RequestLoad( url, desiredSize, fittingMode, samplingMode, TextureManager::NO_ATLAS, textureObserver, orientationCorrection );
+      }
+      else
+      {
+        textureId = RequestLoad( url,
+                                 maskInfo->mAlphaMaskId,
+                                 maskInfo->mContentScaleFactor,
+                                 desiredSize,
+                                 fittingMode, samplingMode,
+                                 TextureManager::NO_ATLAS,
+                                 maskInfo->mCropToMask,
+                                 textureObserver,
+                                 orientationCorrection);
+      }
+
+      TextureManager::LoadState loadState = GetTextureState( textureId );
+      loadingStatus = ( loadState == TextureManager::LOADING );
+
+      if( loadState == TextureManager::UPLOADED )
+      {
+        // UploadComplete has already been called - keep the same texture set
+        textureSet = GetTextureSet( textureId );
+      }
+    }
+  }
+
+  if( ! atlasingStatus && textureSet )
+  {
+    Sampler sampler = Sampler::New();
+    sampler.SetWrapMode(  wrapModeU, wrapModeV  );
+    textureSet.SetSampler( 0u, sampler );
+  }
+
+  return textureSet;
 }
 
 TextureManager::TextureId TextureManager::RequestLoad(
@@ -97,9 +227,10 @@ TextureManager::TextureId TextureManager::RequestLoad(
   FittingMode::Type        fittingMode,
   Dali::SamplingMode::Type samplingMode,
   const UseAtlas           useAtlas,
-  TextureUploadObserver*   observer )
+  TextureUploadObserver*   observer,
+  bool                     orientationCorrection )
 {
-  return RequestLoadInternal( url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, useAtlas, false, UPLOAD_TO_TEXTURE, observer );
+  return RequestLoadInternal( url, INVALID_TEXTURE_ID, 1.0f, desiredSize, fittingMode, samplingMode, useAtlas, false, UPLOAD_TO_TEXTURE, observer, orientationCorrection );
 }
 
 TextureManager::TextureId TextureManager::RequestLoad(
@@ -111,17 +242,17 @@ TextureManager::TextureId TextureManager::RequestLoad(
   Dali::SamplingMode::Type samplingMode,
   const UseAtlas           useAtlas,
   bool                     cropToMask,
-  TextureUploadObserver*   observer )
+  TextureUploadObserver*   observer,
+  bool                     orientationCorrection )
 {
-  return RequestLoadInternal( url, maskTextureId, contentScale, desiredSize, fittingMode, samplingMode, useAtlas, cropToMask, UPLOAD_TO_TEXTURE, observer );
+  return RequestLoadInternal( url, maskTextureId, contentScale, desiredSize, fittingMode, samplingMode, useAtlas, cropToMask, UPLOAD_TO_TEXTURE, observer, orientationCorrection );
 }
 
 TextureManager::TextureId TextureManager::RequestMaskLoad( const VisualUrl& maskUrl )
 {
   // Use the normal load procedure to get the alpha mask.
-  return RequestLoadInternal( maskUrl, INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, false, KEEP_PIXEL_BUFFER, NULL );
+  return RequestLoadInternal( maskUrl, INVALID_TEXTURE_ID, 1.0f, ImageDimensions(), FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, NO_ATLAS, false, KEEP_PIXEL_BUFFER, NULL, true );
 }
-
 
 TextureManager::TextureId TextureManager::RequestLoadInternal(
   const VisualUrl&         url,
@@ -133,7 +264,8 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
   UseAtlas                 useAtlas,
   bool                     cropToMask,
   StorageType              storageType,
-  TextureUploadObserver*   observer )
+  TextureUploadObserver*   observer,
+  bool                     orientationCorrection )
 {
   // First check if the requested Texture is cached.
   const TextureHash textureHash = GenerateHash( url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas, maskTextureId );
@@ -159,7 +291,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     textureId = GenerateUniqueTextureId();
     mTextureInfoContainer.push_back( TextureInfo( textureId, maskTextureId, url.GetUrl(),
                                                   desiredSize, contentScale, fittingMode, samplingMode,
-                                                  false, cropToMask, useAtlas, textureHash ) );
+                                                  false, cropToMask, useAtlas, textureHash, orientationCorrection ) );
     cacheIndex = mTextureInfoContainer.size() - 1u;
 
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::RequestLoad( url=%s observer=%p ) New texture, cacheIndex:%d, textureId=%d\n", url.GetUrl().c_str(), observer, cacheIndex, textureId );
@@ -171,6 +303,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
   TextureInfo& textureInfo( mTextureInfoContainer[ cacheIndex ] );
   textureInfo.maskTextureId = maskTextureId;
   textureInfo.storageType = storageType;
+  textureInfo.orientationCorrection = orientationCorrection;
 
   DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureInfo loadState:%s\n",
                  textureInfo.loadState == TextureManager::NOT_STARTED ? "NOT_STARTED" :
@@ -309,6 +442,43 @@ TextureSet TextureManager::GetTextureSet( TextureId textureId )
   return textureSet;
 }
 
+std::string TextureManager::AddExternalTexture( TextureSet& textureSet )
+{
+  TextureManager::ExternalTextureInfo info;
+  info.textureId = GenerateUniqueTextureId();
+  info.textureSet = textureSet;
+  mExternalTextures.emplace_back( info );
+  return VisualUrl::CreateTextureUrl( std::to_string( info.textureId ) );
+}
+
+TextureSet TextureManager::RemoveExternalTexture( const std::string& url )
+{
+  if( url.size() > 0u )
+  {
+    // get the location from the Url
+    VisualUrl parseUrl( url );
+    if( VisualUrl::TEXTURE == parseUrl.GetProtocolType() )
+    {
+      std::string location = parseUrl.GetLocation();
+      if( location.size() > 0u )
+      {
+        TextureId id = std::stoi( location );
+        const auto end = mExternalTextures.end();
+        for( auto iter = mExternalTextures.begin(); iter != end; ++iter )
+        {
+          if( iter->textureId == id )
+          {
+            auto textureSet = iter->textureSet;
+            mExternalTextures.erase( iter );
+            return textureSet;
+          }
+        }
+      }
+    }
+  }
+  return TextureSet();
+}
+
 bool TextureManager::LoadTexture( TextureInfo& textureInfo )
 {
   bool success = true;
@@ -319,12 +489,12 @@ bool TextureManager::LoadTexture( TextureInfo& textureInfo )
 
     if( !textureInfo.loadSynchronously )
     {
-      auto& loadersContainer = textureInfo.url.IsLocal() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
+      auto& loadersContainer = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
       auto loadingHelperIt = loadersContainer.GetNext();
       DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
       loadingHelperIt->Load(textureInfo.textureId, textureInfo.url,
                             textureInfo.desiredSize, textureInfo.fittingMode,
-                            textureInfo.samplingMode, true);
+                            textureInfo.samplingMode, textureInfo.orientationCorrection );
     }
   }
 
@@ -675,10 +845,6 @@ void TextureManager::ObserverDestroyed( TextureUploadObserver* observer )
       }
     }
   }
-}
-
-TextureManager::~TextureManager()
-{
 }
 
 TextureManager::AsyncLoadingHelper::AsyncLoadingHelper(TextureManager& textureManager)

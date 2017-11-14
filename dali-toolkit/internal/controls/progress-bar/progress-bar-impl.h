@@ -22,7 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali-toolkit/devel-api/controls/progress-bar/progress-bar.h>
+#include <dali-toolkit/public-api/controls/progress-bar/progress-bar.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 
 namespace Dali

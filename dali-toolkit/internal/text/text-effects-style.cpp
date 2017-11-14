@@ -35,6 +35,8 @@ namespace
 {
 const std::string COLOR_KEY( "color" );
 const std::string OFFSET_KEY( "offset" );
+const std::string BLUR_RADIUS_KEY( "blurRadius" );
+const std::string WIDTH_KEY( "width" );
 const std::string HEIGHT_KEY( "height" );
 const std::string ENABLE_KEY( "enable" );
 const std::string TRUE_TOKEN( "true" );
@@ -45,7 +47,9 @@ bool ParseShadowProperties( const Property::Map& shadowPropertiesMap,
                             bool& colorDefined,
                             Vector4& color,
                             bool& offsetDefined,
-                            Vector2& offset )
+                            Vector2& offset,
+                            bool& blurRadiusDefined,
+                            float& blurRadius )
 {
   const unsigned int numberOfItems = shadowPropertiesMap.Count();
 
@@ -59,18 +63,45 @@ bool ParseShadowProperties( const Property::Map& shadowPropertiesMap,
       /// Color key.
       colorDefined = true;
 
-      const std::string colorStr = valueGet.second.Get<std::string>();
-
-      Text::ColorStringToVector4( colorStr.c_str(), colorStr.size(), color );
+      if( valueGet.second.GetType() == Dali::Property::STRING )
+      {
+        const std::string colorStr = valueGet.second.Get<std::string>();
+        Text::ColorStringToVector4( colorStr.c_str(), colorStr.size(), color );
+      }
+      else
+      {
+        color = valueGet.second.Get<Vector4>();
+      }
     }
     else if( OFFSET_KEY == valueGet.first.stringKey )
     {
       /// Offset key.
       offsetDefined = true;
 
-      const std::string offsetStr = valueGet.second.Get<std::string>();
+      if( valueGet.second.GetType() == Dali::Property::STRING )
+      {
+        const std::string offsetStr = valueGet.second.Get<std::string>();
+        StringToVector2( offsetStr.c_str(), offsetStr.size(), offset );
+      }
+      else
+      {
+        offset = valueGet.second.Get<Vector2>();
+      }
+    }
+    else if( BLUR_RADIUS_KEY == valueGet.first.stringKey )
+    {
+      /// Blur radius key.
+      blurRadiusDefined = true;
 
-      StringToVector2( offsetStr.c_str(), offsetStr.size(), offset );
+      if( valueGet.second.GetType() == Dali::Property::STRING )
+      {
+        const std::string blurRadiusStr = valueGet.second.Get<std::string>();
+        blurRadius = StringToFloat( blurRadiusStr.c_str() );
+      }
+      else
+      {
+        blurRadius = valueGet.second.Get<float>();
+      }
     }
   }
 
@@ -114,6 +145,36 @@ bool ParseUnderlineProperties( const Property::Map& underlinePropertiesMap,
       const std::string heightStr = valueGet.second.Get<std::string>();
 
       height = StringToFloat( heightStr.c_str() );
+    }
+  }
+
+  return 0u == numberOfItems;
+}
+
+bool ParseOutlineProperties( const Property::Map& underlinePropertiesMap,
+                               bool& colorDefined,
+                               Vector4& color,
+                               bool& widthDefined,
+                               float& width )
+{
+  const unsigned int numberOfItems = underlinePropertiesMap.Count();
+
+  // Parses and applies the style.
+  for( unsigned int index = 0u; index < numberOfItems; ++index )
+  {
+    const KeyValuePair& valueGet = underlinePropertiesMap.GetKeyValue( index );
+
+    if( COLOR_KEY == valueGet.first.stringKey )
+    {
+      /// Color key.
+      colorDefined = true;
+      color = valueGet.second.Get<Vector4>();
+    }
+    else if( WIDTH_KEY == valueGet.first.stringKey )
+    {
+      /// Width key.
+      widthDefined = true;
+      width = valueGet.second.Get<float>();
     }
   }
 
@@ -290,6 +351,8 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
         Vector4 color;
         bool offsetDefined = false;
         Vector2 offset;
+        bool blurRadiusDefined = false;
+        float blurRadius;
 
         bool empty = true;
 
@@ -305,7 +368,9 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
                                           colorDefined,
                                           color,
                                           offsetDefined,
-                                          offset );
+                                          offset,
+                                          blurRadiusDefined,
+                                          blurRadius );
 
            controller->ShadowSetByString( !empty );
 
@@ -316,7 +381,9 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
                                          colorDefined,
                                          color,
                                          offsetDefined,
-                                         offset );
+                                         offset,
+                                         blurRadiusDefined,
+                                         blurRadius );
 
           controller->ShadowSetByString( false );
         }
@@ -333,6 +400,12 @@ bool SetShadowProperties( ControllerPtr controller, const Property::Value& value
           if( offsetDefined && ( controller->GetShadowOffset() != offset ) )
           {
             controller->SetShadowOffset( offset );
+            update = true;
+          }
+
+          if( blurRadiusDefined && ( controller->GetShadowBlurRadius() != blurRadius ) )
+          {
+            controller->SetShadowBlurRadius( blurRadius );
             update = true;
           }
         }
@@ -369,6 +442,7 @@ void GetShadowProperties( ControllerPtr controller, Property::Value& value, Effe
       {
         const Vector4& color = controller->GetShadowColor();
         const Vector2& offset = controller->GetShadowOffset();
+        const float& blurRadius = controller->GetShadowBlurRadius();
 
         if ( controller->IsShadowSetByString() )
         {
@@ -380,7 +454,11 @@ void GetShadowProperties( ControllerPtr controller, Property::Value& value, Effe
 
           std::string offsetStr;
           Vector2ToString( offset, offsetStr );
-          shadowProperties += "\"offset\":\"" + offsetStr + "\"}";
+          shadowProperties += "\"offset\":\"" + offsetStr + "\",";
+
+          std::string blurRadiusStr;
+          FloatToString( blurRadius, blurRadiusStr );
+          shadowProperties += "\"blurRadius\":\"" + blurRadiusStr + "\"}";
 
           value = shadowProperties;
         }
@@ -388,13 +466,9 @@ void GetShadowProperties( ControllerPtr controller, Property::Value& value, Effe
         {
           Property::Map map;
 
-          std::string colorStr;
-          Vector4ToColorString( color, colorStr );
-          map.Insert( COLOR_KEY, colorStr );
-
-          std::string offsetStr;
-          Vector2ToString( offset, offsetStr );
-          map.Insert( OFFSET_KEY, offsetStr );
+          map.Insert( COLOR_KEY, color );
+          map.Insert( OFFSET_KEY, offset );
+          map.Insert( BLUR_RADIUS_KEY, blurRadius );
 
           value = map;
         }
@@ -463,24 +537,76 @@ bool SetOutlineProperties( ControllerPtr controller, const Property::Value& valu
 
   if( controller )
   {
-    const std::string properties = value.Get< std::string >();
-
     switch( type )
     {
       case EffectStyle::DEFAULT:
       {
-        // Stores the default outline's properties string to be recovered by the GetOutlineProperties() function.
-        controller->SetDefaultOutlineProperties( properties );
+        const Property::Map& propertiesMap = value.Get<Property::Map>();
+
+        bool colorDefined = false;
+        Vector4 color;
+        bool widthDefined = false;
+        float width = 0.f;
+
+        bool empty = true;
+
+        if ( propertiesMap.Empty() )
+        {
+           // Map empty so check if a string provided
+           // This is purely to maintain backward compatibility, but we don't parse the string to be a property map.
+           const std::string propertyString = value.Get<std::string>();
+
+           // Stores the default outline's properties string to be recovered by the GetOutlineProperties() function.
+           controller->SetDefaultOutlineProperties( propertyString );
+
+           controller->OutlineSetByString( true );
+        }
+        else
+        {
+           empty = ParseOutlineProperties( propertiesMap,
+                                           colorDefined,
+                                           color,
+                                           widthDefined,
+                                           width );
+
+           controller->OutlineSetByString( false );
+        }
+
+        if( !empty )
+        {
+          // Sets the default outline values.
+          if( colorDefined && ( controller->GetOutlineColor() != color ) )
+          {
+            controller->SetOutlineColor( color );
+            update = true;
+          }
+
+          if( widthDefined && ( fabsf( controller->GetOutlineWidth() - width ) > Math::MACHINE_EPSILON_1000 ) )
+          {
+            controller->SetOutlineWidth( width );
+            update = true;
+          }
+        }
+        else
+        {
+          // Disable outline
+          if( fabsf( controller->GetOutlineWidth() ) > Math::MACHINE_EPSILON_1000 )
+          {
+            controller->SetOutlineWidth( 0.0f );
+            update = true;
+          }
+        }
         break;
       }
       case EffectStyle::INPUT:
       {
-        // Stores the input outline's properties string to be recovered by the GetOutlineProperties() function.
-        controller->SetInputOutlineProperties( properties );
+        const std::string& outlineProperties = value.Get<std::string>();
+
+        controller->SetInputOutlineProperties( outlineProperties );
         break;
       }
-    }
-  }
+    } // switch
+  } // if( controller )
 
   return update;
 }
@@ -493,8 +619,30 @@ void GetOutlineProperties( ControllerPtr controller, Property::Value& value, Eff
     {
       case EffectStyle::DEFAULT:
       {
-        value = controller->GetDefaultOutlineProperties();
-        break;
+        if ( controller->IsOutlineSetByString() )
+        {
+          value = controller->GetDefaultOutlineProperties();
+          break;
+        }
+        else
+        {
+          const Vector4& color = controller->GetOutlineColor();
+          const float width = controller->GetOutlineWidth();
+
+          Property::Map map;
+
+          std::string colorStr;
+          Vector4ToColorString( color, colorStr );
+          map.Insert( COLOR_KEY, colorStr );
+
+          std::string widthStr;
+          FloatToString( width, widthStr );
+          map.Insert( WIDTH_KEY, widthStr );
+
+          value = map;
+
+          break;
+        }
       }
       case EffectStyle::INPUT:
       {

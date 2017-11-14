@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SCROLL_BAR_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,59 +78,84 @@ public:
     enum
     {
       /**
-       * @brief name "scrollDirection", type std::string.
+       * @brief The scrolling direction of the indicator.
+       * @details Name "scrollDirection", type Property::STRING.
+       *          Possible values are "Vertical" and "Horizontal".
        * @SINCE_1_0.0
        * @see SetScrollDirection()
        */
       SCROLL_DIRECTION = PROPERTY_START_INDEX,
+
       /**
-       * @brief name "indicatorHeightPolicy", type std::string.
+       * @brief The indicator height policy.
+       * @details Name "indicatorHeightPolicy", type Property::STRING.
+       *          Possible values are "Variable" and "Fixed".
        * @SINCE_1_0.0
        * @see SetIndicatorHeightPolicy()
        */
       INDICATOR_HEIGHT_POLICY,
+
       /**
-       * @brief name "indicatorFixedHeight", type float.
+       * @brief The fixed height of the indicator.
+       * @details Name "indicatorFixedHeight", type Property::FLOAT.
        * @SINCE_1_0.0
        * @see SetIndicatorFixedHeight()
        */
       INDICATOR_FIXED_HEIGHT,
+
       /**
-       * @brief name "indicatorShowDuration", type float.
+       * @brief The duration in seconds to show the indicator.
+       * @details Name "indicatorShowDuration", type Property::FLOAT.
        * @SINCE_1_0.0
        * @see SetIndicatorShowDuration()
        */
       INDICATOR_SHOW_DURATION,
+
       /**
-       * @brief name "indicatorHideDuration", type float.
+       * @brief The duration in seconds to hide the indicator.
+       * @details Name "indicatorHideDuration", type Property::FLOAT.
        * @SINCE_1_0.0
        * @see SetIndicatorHideDuration()
        */
       INDICATOR_HIDE_DURATION,
+
       /**
-       * @brief name "scrollPositionIntervals", type Property::Array.
+       * @brief The intervals at which point a notification is emitted.
+       * @details Name "scrollPositionIntervals", type Property::ARRAY.
        * @SINCE_1_0.0
        * @see SetScrollPositionIntervals()
        */
       SCROLL_POSITION_INTERVALS,
+
       /**
-       * @brief name "indicatorMinimumHeight", type float.
-       * The minimum height for a variable size indicator.
+       * @brief The minimum height for a variable size indicator.
+       * @details Name "indicatorMinimumHeight", type Property::FLOAT.
        * @SINCE_1_1.36
        */
       INDICATOR_MINIMUM_HEIGHT,
+
       /**
-       * @brief name "indicatorStartPadding", type float.
-       * The padding at the start of the indicator. For example, the top if scrollDirection is Vertical.
+       * @brief The padding at the start of the indicator.
+       * @details Name "indicatorStartPadding", type Property::FLOAT.
+       *          For example, the padding at the top if scrollDirection is Vertical.
        * @SINCE_1_1.36
        */
       INDICATOR_START_PADDING,
+
       /**
-       * @brief name "indicatorEndPadding", type float.
-       * The padding at the end of the indicator. For example, the bottom if scrollDirection is Vertical.
+       * @brief The padding at the end of the indicator.
+       * @details Name "indicatorEndPadding", type Property::FLOAT.
+       *          For example, the padding at the bottom if scrollDirection is Vertical.
        * @SINCE_1_1.36
        */
-      INDICATOR_END_PADDING
+      INDICATOR_END_PADDING,
+
+      /**
+       * @brief The duration that transient indicators will remain fully visible.
+       * @details name "indicatorTransientDuration", type Property::FLOAT.
+       * @SINCE_1_2.60
+       */
+      INDICATOR_TRANSIENT_DURATION,
     };
   };
 

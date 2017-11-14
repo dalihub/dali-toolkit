@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_ITEM_VIEW_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,20 +93,103 @@ public:
      */
     enum
     {
-      // Event side properties
-      MINIMUM_SWIPE_SPEED = PROPERTY_START_INDEX,        ///< Property, name "minimumSwipeSpeed",        @see SetMinimumSwipeSpeed(),       type float,    @SINCE_1_1.18
-      MINIMUM_SWIPE_DISTANCE,                            ///< Property, name "minimumSwipeDistance",     @see SetMinimumSwipeDistance(),    type float,    @SINCE_1_1.18
-      WHEEL_SCROLL_DISTANCE_STEP,                        ///< Property, name "wheelScrollDistanceStep",  @see SetWheelScrollDistanceStep(), type float,    @SINCE_1_1.18
-      SNAP_TO_ITEM_ENABLED,                              ///< Property, name "snapToItemEnabled",        @see SetAnchoring(),               type bool,     @SINCE_1_1.18
-      REFRESH_INTERVAL,                                  ///< Property, name "refreshInterval",          @see SetRefreshInterval(),         type float,    @SINCE_1_1.18
+      ///////////////////////////////////////////////////////////////////////////////
+      // Event side (non-animatable) properties
+      ///////////////////////////////////////////////////////////////////////////////
 
-      // Animatable properties
-      LAYOUT_POSITION = ANIMATABLE_PROPERTY_START_INDEX, ///< Property, name "layoutPosition",           type float @SINCE_1_0.0
-      SCROLL_SPEED,                                      ///< Property, name "scrollSpeed",              type float @SINCE_1_0.0
-      OVERSHOOT,                                         ///< Property, name "overshoot",                type float @SINCE_1_0.0
-      SCROLL_DIRECTION,                                  ///< Property, name "scrollDirection",          type Vector2 @SINCE_1_0.0
-      LAYOUT_ORIENTATION,                                ///< Property, name "layoutOrientation",        type integer @SINCE_1_0.0
-      SCROLL_CONTENT_SIZE                                ///< Property, name "scrollContentSize",        type float @SINCE_1_0.0
+      /**
+       * @brief The minimum swipe speed in pixels per second.
+       * @details Name "minimumSwipeSpeed", type Property::FLOAT.
+       * @SINCE_1_1.18
+       * @see SetMinimumSwipeSpeed()
+       */
+      MINIMUM_SWIPE_SPEED = PROPERTY_START_INDEX,
+
+      /**
+       * @brief The minimum swipe distance in actor coordinates.
+       * @details Name "minimumSwipeDistance", type Property::FLOAT.
+       * @SINCE_1_1.18
+       * @see SetMinimumSwipeDistance()
+       */
+      MINIMUM_SWIPE_DISTANCE,
+
+      /**
+       * @brief The step of scroll distance in actor coordinates for each wheel event received.
+       * @details Name "wheelScrollDistanceStep", type Property::FLOAT.
+       * @SINCE_1_1.18
+       * @see SetWheelScrollDistanceStep()
+       */
+      WHEEL_SCROLL_DISTANCE_STEP,
+
+      /**
+       * @brief Whether the animation for the layout to scroll to its anchor position after dragging or swiping is enabled.
+       * @details Name "snapToItemEnabled", type Property::BOOLEAN.
+       * @SINCE_1_1.18
+       * @see SetAnchoring()
+       */
+      SNAP_TO_ITEM_ENABLED,
+
+      /**
+       * @brief The interval between refreshes.
+       * @details Name "refreshInterval", type Property::FLOAT.
+       * @SINCE_1_1.18
+       * @see SetRefreshInterval()
+       */
+      REFRESH_INTERVAL,
+
+      /**
+       * @brief The layout used.
+       * @details Name "layout", type Property::ARRAY.
+       * @SINCE_1_2.60
+       * @see Dali::Toolkit::DefaultItemLayoutProperty
+       */
+      LAYOUT,
+
+      ///////////////////////////////////////////////////////////////////////////////
+      // Animatable Properties
+      ///////////////////////////////////////////////////////////////////////////////
+
+      /**
+       * @brief The current logical position within the layout.
+       * @details Name "layoutPosition", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      LAYOUT_POSITION = ANIMATABLE_PROPERTY_START_INDEX,
+
+      /**
+       * @brief The scrolling speed when playing the flick animation.
+       * @details Name "scrollSpeed", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      SCROLL_SPEED,
+
+      /**
+       * @brief The amount that we can scroll beyond the boundary.
+       * @details Name "overshoot", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      OVERSHOOT,
+
+      /**
+       * @brief The current scrolling direction.
+       * @details Name "scrollDirection", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      SCROLL_DIRECTION,
+
+      /**
+       * @brief The current orientation of the layout.
+       * @details Name "layoutOrientation", type Property::INTEGER.
+       * @SINCE_1_0.0
+       */
+      LAYOUT_ORIENTATION,
+
+      /**
+       * @brief The size of the content.
+       * @details Name "scrollContentSize", type Property::FLOAT.
+       * @SINCE_1_0.0
+       */
+      SCROLL_CONTENT_SIZE,
     };
   };
 

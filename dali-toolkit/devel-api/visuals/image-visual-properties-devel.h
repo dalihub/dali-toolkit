@@ -30,6 +30,42 @@ namespace Toolkit
 namespace DevelImageVisual
 {
 
+/**
+ * @brief The policy determining if the image is loaded when the visual is staged or created.
+ */
+namespace LoadPolicy
+{
+
+/**
+ * @brief The available named elements that define the LoadPolicy.
+ */
+enum Type
+{
+  IMMEDIATE = 0,  ///< The image is loaded when the ImageVisual is created.
+  ATTACHED        ///< The image is loaded when the ImageVisual is attached to the stage.
+};
+
+} // namespace LoadPolicy
+
+/**
+ * @brief The policy determining when a image is deleted from the cache in relation to the ImageVisual lifetime.
+ * @note If the texture is being shared by another visual it persist if still required.
+ */
+namespace ReleasePolicy
+{
+
+/**
+ * @brief The available named elements that define the ReleasePolicy.
+ */
+enum Type
+{
+  DETACHED = 0,  ///<  Image deleted from cache when ImageVisual detached from stage.
+  DESTROYED,     ///<  Image deleted from cache when ImageVisual destroyed.
+  NEVER          ///<  Image is never deleted, will survive the lifetime of the application.
+};
+
+} // namespace ReleasePolicy;
+
 namespace Property
 {
 
@@ -45,79 +81,37 @@ enum Type
   PIXEL_AREA          = Dali::Toolkit::ImageVisual::Property::PIXEL_AREA,
   WRAP_MODE_U         = Dali::Toolkit::ImageVisual::Property::WRAP_MODE_U,
   WRAP_MODE_V         = Dali::Toolkit::ImageVisual::Property::WRAP_MODE_V,
+  BORDER              = Dali::Toolkit::ImageVisual::Property::BORDER,
+  ATLASING            = Dali::Toolkit::ImageVisual::Property::ATLASING,
+  ALPHA_MASK_URL      = Dali::Toolkit::ImageVisual::Property::ALPHA_MASK_URL,
+  BATCH_SIZE          = Dali::Toolkit::ImageVisual::Property::BATCH_SIZE,
+  CACHE_SIZE          = Dali::Toolkit::ImageVisual::Property::CACHE_SIZE,
+  FRAME_DELAY         = Dali::Toolkit::ImageVisual::Property::FRAME_DELAY,
+  MASK_CONTENT_SCALE  = Dali::Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE,
+  CROP_TO_MASK        = Dali::Toolkit::ImageVisual::Property::CROP_TO_MASK,
 
   /**
-   * @brief The border of the image
-   * @details Name "border", type Property::RECTANGLE or Property::VECTOR4
-   *          The border of the image in the order: left, right, bottom, top.
-   *
-   * @note Optional.
-   * @note For N-Patch images only.
+   * @brief The policy to determine when an image should be loaded.
+   * @details Name "loadPolicy",  Type LoadPolicy::Type (Property::INTEGER)or Property::STRING.
+   * @note Default LoadPolicy::ATTACHED
+   * @see LoadPolicy::Type
    */
-  BORDER = WRAP_MODE_V + 1,
+  LOAD_POLICY = CROP_TO_MASK + 1,
 
   /**
-   * @brief Whether to use the texture atlas
-   * @details Name "atlasing", type Property::BOOLEAN, true to enable texture atlas
-   *
-   * @note Optional. By default atlasing is off.
+   * @brief The policy to determine when an image should no longer be cached.
+   * @details Name "releasePolicy", Type ReleasePolicy::Type (Property::INTEGER) or Property::STRING
+   * @note Default ReleasePolicy::DESTROYED
+   * @see ReleasePolicy::Type
    */
-
-  ATLASING = WRAP_MODE_V + 2,
+  RELEASE_POLICY = CROP_TO_MASK + 2,
 
   /**
-   * @brief URL of a masking image
-   * @details Name "alphaMaskUrl", type Property::STRING, URL of image to apply as
-   * a mask after image loading. If set after the main URL has finished loading, this
-   * may necessitate a re-load of the main image. The alpha mask image will be scaled
-   * on load to match the size of the main image, then applied to the pixel data
-   * before uploading to GL.
-   * @note Optional.
+   * @brief Determines if image orientation should be corrected so the image displays as it was intended.
+   * @details Name "orientationCorrection", Type Property::BOOLEAN, if true the image's orientation will be corrected.
+   * @note Default true
    */
-
-  ALPHA_MASK_URL = WRAP_MODE_V + 3,
-
-  /**
-   * @brief Defines the batch size for pre-loading images in the AnimatedImageVisual
-   * @details Name "batchSize", type Property::INTEGER, number of images to pre-load
-   * before starting to play. Default value: 1
-   */
-  BATCH_SIZE = WRAP_MODE_V + 4,
-
-  /**
-   * @brief Defines the cache size for loading images in the AnimatedImageVisual
-   * @details Name "cacheSize", type Property::INTEGER, number of images to keep
-   * cached ahead during playback. Default value: 1
-   *
-   * @note, cacheSize should be >= batchSize.
-   * If it isn't, then the cache will automatically be changed to batchSize.
-   * @note, because of the defaults, it is expected that the application developer
-   * tune the batch and cache sizes to their particular use case.
-   */
-  CACHE_SIZE = WRAP_MODE_V + 5,
-
-  /**
-   * @brief The number of milliseconds between each frame in the AnimatedImageVisual
-   * @details Name "frameDelay", type Property::INTEGER, The number of milliseconds between each frame. Note, this is only used with the URLS property above.
-   */
-  FRAME_DELAY = WRAP_MODE_V + 6,
-
-  /**
-   * @brief The scale factor to apply to the content image before masking
-   * @details Name "maskContentScale", type Property::FLOAT, The scale factor
-   * to apply to the content before masking. Note, scaled images are cropped to
-   * the same size as the alpha mask.
-   */
-  MASK_CONTENT_SCALE = WRAP_MODE_V + 7,
-
-  /**
-   * @brief Whether to crop image to mask or scale mask to fit image
-   * @details Name "cropToMask", type Property::BOOLEAN, True if the image should
-   * be cropped to match the mask size, or false if the image should remain the same size.
-   * Note, if this is false, then the mask is scaled to fit the image before being applied.
-   */
-  CROP_TO_MASK = WRAP_MODE_V + 8,
-
+  ORIENTATION_CORRECTION = CROP_TO_MASK + 3,
 };
 
 } //namespace Property
