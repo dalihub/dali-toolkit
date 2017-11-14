@@ -276,14 +276,17 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mMaskingData( ),
   mDesiredSize( size ),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
+  mTextures(),
   mFittingMode( fittingMode ),
   mSamplingMode( samplingMode ),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
   mLoadPolicy( DevelImageVisual::LoadPolicy::ATTACHED ),
   mReleasePolicy( DevelImageVisual::ReleasePolicy::DETACHED ),
+  mAtlasRect( 0.0f, 0.0f, 0.0f, 0.0f ),
   mAttemptAtlasing( false ),
-  mLoading( false )
+  mLoading( false ),
+  mOrientationCorrection( true )
 {
 }
 
@@ -296,12 +299,14 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mMaskingData( ),
   mDesiredSize(),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
+  mTextures(),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
   mLoadPolicy( DevelImageVisual::LoadPolicy::ATTACHED ),
   mReleasePolicy( DevelImageVisual::ReleasePolicy::DESTROYED ),
+  mAtlasRect( 0.0f, 0.0f, 0.0f, 0.0f ),
   mAttemptAtlasing( false ),
   mLoading( false ),
   mOrientationCorrection( true )
