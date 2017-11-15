@@ -470,6 +470,7 @@ struct Engine::Impl
 
   void SetGlyphPositions( const GlyphInfo* const glyphsBuffer,
                           Length numberOfGlyphs,
+                          float outlineWidth,
                           Vector2* glyphPositionsBuffer )
   {
     // Traverse the glyphs and set the positions.
@@ -479,7 +480,8 @@ struct Engine::Impl
     // so the penX position needs to be moved to the right.
 
     const GlyphInfo& glyph = *glyphsBuffer;
-    float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
+    float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing + outlineWidth : outlineWidth;
+
 
     for( GlyphIndex i = 0u; i < numberOfGlyphs; ++i )
     {
@@ -604,6 +606,7 @@ struct Engine::Impl
 
       SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun->glyphRun.glyphIndex,
                          ellipsisLayout.numberOfGlyphs,
+                         layoutParameters.outlineWidth,
                          glyphPositionsBuffer + lineRun->glyphRun.glyphIndex - layoutParameters.startGlyphIndex );
     }
 
@@ -963,6 +966,7 @@ struct Engine::Impl
         // Sets the positions of the glyphs.
         SetGlyphPositions( layoutParameters.glyphsBuffer + index,
                            layout.numberOfGlyphs,
+                           layoutParameters.outlineWidth,
                            glyphPositionsBuffer + index - layoutParameters.startGlyphIndex );
 
         // Updates the vertical pen's position.
@@ -1043,7 +1047,7 @@ struct Engine::Impl
       const CharacterIndex characterVisualIndex = bidiLine.characterRun.characterIndex + *bidiLine.visualToLogicalMap;
       const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) );
 
-      float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f;
+      float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing - layoutParameters.outlineWidth : -layoutParameters.outlineWidth;
 
       Vector2* glyphPositionsBuffer = glyphPositions.Begin();
 
