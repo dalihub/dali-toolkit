@@ -73,7 +73,8 @@ struct Parameters
               const Length* const glyphsPerCharacterBuffer,
               Length totalNumberOfGlyphs,
               Text::HorizontalAlignment::Type horizontalAlignment,
-              Text::LineWrap::Mode lineWrapMode )
+              Text::LineWrap::Mode lineWrapMode,
+              float outlineWidth )
   : boundingBox( boundingBox ),
     textBuffer( textBuffer ),
     lineBreakInfoBuffer( lineBreakInfoBuffer ),
@@ -93,7 +94,8 @@ struct Parameters
     startLineIndex( 0u ),
     estimatedNumberOfLines( 0u ),
     lineWrapMode( lineWrapMode ),
-    isLastNewParagraph( false )
+    isLastNewParagraph( false ),
+    outlineWidth( outlineWidth )
   {}
 
   Vector2                         boundingBox;                     ///< The size of the box containing the text.
@@ -116,6 +118,7 @@ struct Parameters
   Length                          estimatedNumberOfLines;          ///< The estimated number of lines.
   Text::LineWrap::Mode            lineWrapMode;                    ///< The line wrap mode for moving to next line.
   bool                            isLastNewParagraph;              ///< Whether the last character is a new paragraph character.
+  float                           outlineWidth;                    ///< The outline width.
 };
 
 } // namespace Layout

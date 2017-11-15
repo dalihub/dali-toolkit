@@ -3326,6 +3326,7 @@ bool Controller::DoRelayout( const Size& size,
     const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mModel->mVisualModel->mGlyphsToCharacters;
     const Vector<Length>& charactersPerGlyph = mImpl->mModel->mVisualModel->mCharactersPerGlyph;
     const Character* const textBuffer = mImpl->mModel->mLogicalModel->mText.Begin();
+    float outlineWidth = mImpl->mModel->GetOutlineWidth();
 
     // Set the layout parameters.
     Layout::Parameters layoutParameters( size,
@@ -3340,7 +3341,8 @@ bool Controller::DoRelayout( const Size& size,
                                          glyphsPerCharacterBuffer,
                                          totalNumberOfGlyphs,
                                          mImpl->mModel->mHorizontalAlignment,
-                                         mImpl->mModel->mLineWrapMode );
+                                         mImpl->mModel->mLineWrapMode,
+                                         outlineWidth );
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mModel->mVisualModel->mGlyphPositions;

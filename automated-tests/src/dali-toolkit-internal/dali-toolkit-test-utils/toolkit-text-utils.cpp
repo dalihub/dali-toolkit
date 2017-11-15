@@ -269,7 +269,7 @@ void CreateTextModel( const std::string& text,
   // Set the layout parameters.
   const Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   const Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
-
+  float outlineWidth = visualModel->GetOutlineWidth();
   Layout::Parameters layoutParameters( textArea,
                                        utf32Characters.Begin(),
                                        lineBreakInfo.Begin(),
@@ -282,7 +282,8 @@ void CreateTextModel( const std::string& text,
                                        glyphsPerCharacter.Begin(),
                                        numberOfGlyphs,
                                        Text::HorizontalAlignment::BEGIN,
-                                       Text::LineWrap::WORD );
+                                       Text::LineWrap::WORD,
+                                       outlineWidth );
 
   Vector<LineRun>& lines = visualModel->mLines;
 
