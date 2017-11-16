@@ -223,6 +223,11 @@ void Visual::Base::GetNaturalSize( Vector2& naturalSize )
   naturalSize = Vector2::ZERO;
 }
 
+void Visual::Base::DoAction( const Property::Index actionId, const Property::Value attributes )
+{
+  OnDoAction( actionId, attributes );
+}
+
 void Visual::Base::SetDepthIndex( int index )
 {
   mImpl->mDepthIndex = index;
@@ -335,6 +340,11 @@ void Visual::Base::DoSetOffStage( Actor& actor )
 bool Visual::Base::IsOnStage() const
 {
   return mImpl->mFlags & Impl::IS_ON_STAGE;
+}
+
+void Visual::Base::OnDoAction( const Property::Index actionId, const Property::Value attributes )
+{
+  // May be overriden by derived class
 }
 
 void Visual::Base::RegisterMixColor()
