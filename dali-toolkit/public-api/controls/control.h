@@ -450,6 +450,23 @@ public:
    *
    * Most resources are only loaded when the control is placed on stage.
    *
+   * If resources are shared between ImageViews, they are cached.
+   * In this case, the ResourceReady signal may be sent before there is an object to connect to.
+   * To protect against this, IsResourceReady() can be checked first.
+   *
+   * @code
+   *    auto newControl = Control::New();
+   *    newControl.SetResource( resourceUrl );
+   *    if ( newControl.IsResourceReady() )
+   *    {
+   *       // do something
+   *    }
+   *    else
+   *    {
+   *      newControl.ResourceReadySignal.Connect( .... )
+   *    }
+   * @endcode
+   *
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName( Control control );
