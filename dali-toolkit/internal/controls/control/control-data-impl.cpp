@@ -783,6 +783,15 @@ Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& 
   return transition;
 }
 
+void Control::Impl::DoAction( Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes )
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( visualIndex, mVisuals, iter ) )
+  {
+    Toolkit::GetImplementation((*iter)->visual).DoAction( actionId, attributes );
+  }
+}
+
 void Control::Impl::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );

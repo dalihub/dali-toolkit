@@ -238,6 +238,18 @@ DALI_IMPORT_API Toolkit::Visual::ResourceStatus GetVisualResourceStatus( const I
  */
 DALI_IMPORT_API Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& transitionData );
 
+/**
+ * @brief Perform an action on a visual registered to this control.
+ *
+ * Visuals will have actions, this API is used to perform one of these actions with the given attributes.
+ *
+ * @param[in] control The control.
+ * @param[in] visualIndex The Property index of the visual.
+ * @param[in] actionId The action to perform.  See Visual to find supported actions.
+ * @param[in] attributes Optional attributes for the action.
+ */
+DALI_IMPORT_API void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes );
+
 } // namespace DevelControl
 
 } // namespace Toolkit

@@ -155,6 +155,12 @@ Animation DummyControlImpl::CreateTransition( const Toolkit::TransitionData& tra
   return DevelControl::CreateTransition( *this, transition );
 }
 
+void DummyControlImpl::DoAction( Dali::Property::Index index, Dali::Property::Index action, const Dali::Property::Value attributes )
+{
+  DummyControl control( *this );
+  DevelControl::DoAction(  control, index, action, attributes);
+}
+
 void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value )
 {
   Toolkit::DummyControl control = Toolkit::DummyControl::DownCast( Dali::BaseHandle( object ) );

@@ -189,6 +189,11 @@ public:
   Dali::Animation CreateTransition( const Toolkit::TransitionData& transitionData );
 
   /**
+   * @copydoc Dali::Toolkit::DevelControl::DoAction()
+   */
+  void DoAction( Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes );
+
+  /**
    * @brief Function used to set control properties.
    * @param[in] object The object whose property to set
    * @param[in] index The index of the property to set
