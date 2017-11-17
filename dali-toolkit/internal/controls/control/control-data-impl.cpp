@@ -525,12 +525,17 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
                                              ( visualReplaced && enabled ) ) ;
     mVisuals.PushBack( newRegisteredVisual );
 
+    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
     // Put on stage if enabled and the control is already on the stage
-    // Visual must be set on stage for the renderer to be created and the ResourceReady triggered.
     if( ( enabled == VisualState::ENABLED ) && self.OnStage() )
     {
-      Toolkit::GetImplementation(visual).SetOnStage( self );
+      visualImpl.SetOnStage( self );
     }
+    else if( visualImpl.IsResourceReady() ) // When not being staged, check if visual already 'ResourceReady' before it was Registered. ( Resource may have been loaded already )
+    {
+      ResourceReady( visualImpl );
+    }
+
   }
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::RegisterVisual() Registered %s(%d), enabled:%s\n",  visual.GetName().c_str(), index, enabled?"true":"false" );
@@ -657,8 +662,11 @@ void Control::Impl::ResourceReady( Visual::Base& object)
     }
   }
 
-  // A visual is ready so control may need relayouting
-  mControlImpl.RelayoutRequest();
+  // A visual is ready so control may need relayouting if staged
+  if ( self.OnStage() )
+  {
+    mControlImpl.RelayoutRequest();
+  }
 
   // Emit signal if all enabled visuals registered by the control are ready.
   if( IsResourceReady() )

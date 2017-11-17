@@ -25,6 +25,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 
 #include <test-native-image.h>
 #include <sstream>
@@ -1504,6 +1505,111 @@ int UtcDaliImageViewReplaceImageAndGetNaturalSize(void)
 
   DALI_TEST_EQUALS( gNaturalSize.width, 600.0f, TEST_LOCATION );
   DALI_TEST_EQUALS( gNaturalSize.height, 600.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewResourceReadySignalWithImmediateLoad(void)
+{
+  tet_infoline("Test Setting Image with IMMEDIATE load and receving ResourceReadySignal before staged.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalFired = false;
+
+  Property::Map imageMap;
+
+  imageMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
+  imageMap[ DevelImageVisual::Property::LOAD_POLICY ] =  DevelImageVisual::LoadPolicy::IMMEDIATE;
+
+  tet_infoline("Creating ImageView without URL so image does not start loading");
+  ImageView imageView = ImageView::New();
+  tet_infoline("Connect to image loaded signal before setting image");
+  imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
+  tet_infoline("Setting Image with IMMEDIATE load, signal already connected so will be triggered.");
+  imageView.SetProperty( ImageView::Property::IMAGE, imageMap );
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewResourceReadySignalWithReusedImage(void)
+{
+  tet_infoline("Test Setting Image that was already loaded by another ImageView and still getting ResourceReadySignal.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalFired = false;
+
+  Property::Map imageMap;
+
+  imageMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
+  imageMap[ DevelImageVisual::Property::LOAD_POLICY ] =  DevelImageVisual::LoadPolicy::IMMEDIATE;
+
+  ImageView imageView = ImageView::New();
+  imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
+  imageView.SetProperty( ImageView::Property::IMAGE, imageMap );
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(16);
+
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+  gResourceReadySignalFired = false;
+
+  ImageView imageViewWithExistingImage = ImageView::New();
+  imageViewWithExistingImage.ResourceReadySignal().Connect( &ResourceReadySignal);
+  imageViewWithExistingImage.SetProperty( ImageView::Property::IMAGE, imageMap );
+
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewResourceReadySignalWithReusedImage02(void)
+{
+  tet_infoline("Test Setting Image that was already loaded by another ImageView and still getting ResourceReadySignal when staged.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalFired = false;
+
+  Property::Map imageImmediateLoadingMap;
+  imageImmediateLoadingMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
+  imageImmediateLoadingMap[ DevelImageVisual::Property::LOAD_POLICY ] =  DevelImageVisual::LoadPolicy::IMMEDIATE;
+
+  tet_infoline("Immediate load an image");
+  ImageView imageView = ImageView::New();
+  imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
+  imageView.SetProperty( ImageView::Property::IMAGE, imageImmediateLoadingMap );
+
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(16);
+
+  tet_infoline("Check image loaded");
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+  gResourceReadySignalFired = false;
+
+  tet_infoline("Create another ImageView with the same URL");
+  ImageView imageViewWithExistingImage = ImageView::New( gImage_34_RGBA );
+  tet_infoline("Connect to ResourceReady signal for second ImageView, it should still fire as resource is ready");
+  imageViewWithExistingImage.ResourceReadySignal().Connect( &ResourceReadySignal);
+
+  Stage::GetCurrent().Add( imageViewWithExistingImage );
+
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
   END_TEST;
 }
