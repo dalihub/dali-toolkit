@@ -342,7 +342,7 @@ bool Visual::Base::IsOnStage() const
   return mImpl->mFlags & Impl::IS_ON_STAGE;
 }
 
-void Visual::Base::OnDoAction( const Property::Index actionId, const Property::Value attributes )
+void Visual::Base::OnDoAction( const Property::Index actionId, const Property::Value& attributes )
 {
   // May be overriden by derived class
 }
