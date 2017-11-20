@@ -70,7 +70,7 @@ void DummyVisual::DoSetOnStage( Actor& actor )
   // Implement if required
 }
 
-void DummyVisual::OnDoAction( const Property::Index actionName, const Property::Value attributes )
+void DummyVisual::OnDoAction( const Property::Index actionName, const Property::Value& attributes )
 {
   if ( DummyVisual::TEST_ACTION == actionName )
   {

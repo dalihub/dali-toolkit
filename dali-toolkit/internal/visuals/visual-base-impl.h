@@ -315,7 +315,7 @@ protected:
    * @param[in] actionId The action to perform
    * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
    */
-  virtual void OnDoAction( const Property::Index actionId, const Property::Value attributes );
+  virtual void OnDoAction( const Property::Index actionId, const Property::Value& attributes );
 
 protected:
 

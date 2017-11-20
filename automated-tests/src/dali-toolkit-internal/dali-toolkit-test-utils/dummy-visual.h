@@ -80,7 +80,7 @@ protected:
   virtual void DoSetProperties( const Property::Map& propertyMap ) override;
   virtual void OnSetTransform() override;
   virtual void DoSetOnStage( Actor& actor ) override;
-  virtual void OnDoAction( const Property::Index actionName, const Property::Value attributes );
+  virtual void OnDoAction( const Property::Index actionName, const Property::Value& attributes ) override;
 
 private:
   unsigned int mActionCounter;

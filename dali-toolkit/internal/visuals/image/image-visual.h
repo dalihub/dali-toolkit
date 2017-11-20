@@ -177,6 +177,11 @@ public:  // from Visual
    */
   virtual void DoCreateInstancePropertyMap( Property::Map& map ) const;
 
+  /**
+   * @copydoc Visual::Base::OnDoAction
+   */
+  virtual void OnDoAction( const Dali::Property::Index actionName, const Dali::Property::Value& attributes ) override;
+
 protected:
 
   /**
@@ -222,12 +227,12 @@ protected:
   /**
    * @copydoc Visual::Base::DoSetOffStage
    */
-  virtual void DoSetOffStage( Actor& actor );
+  virtual void DoSetOffStage( Actor& actor ) ;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
    */
-  virtual void OnSetTransform();
+  virtual void OnSetTransform() ;
 
   /**
    * @copydoc Visual::Base::IsResourceReady
@@ -280,8 +285,15 @@ private:
    * @param[out] atlasRect if atlasing is used this the texture area of the image in the atlas.
    * @param[out] textures resulting texture set from the image loading.
    * @param[in] orientationCorrection flag determines if orientation correction should be performed
+   * @param[in] forceReload flag determines if the texture should be reloaded from its source or use the cached texture.
    */
-  void LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection );
+  void LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection, TextureManager::ReloadPolicy forceReload );
+
+  /**
+   * @brief Checks if atlasing should be attempted
+   * @return bool returns true if atlasing can be attempted.
+   */
+  bool AttemptAtlasing();
 
   /**
    * @brief Initializes the Dali::Renderer from the image url
