@@ -1377,11 +1377,12 @@ private: // Events.
   void SelectEvent( float x, float y, bool selectAll );
 
   /**
-   * @brief Helper to KeyEvent() to handle the backspace case.
+   * @brief Helper to KeyEvent() to handle the backspace or delete key case.
    *
+   * @param[in] keyCode The keycode for the key pressed
    * @return True if a character was deleted.
    */
-  bool BackspaceKeyEvent();
+  bool DeleteEvent( int keyCode );
 
 private: // Helpers.
 
