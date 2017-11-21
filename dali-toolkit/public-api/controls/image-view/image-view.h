@@ -65,7 +65,7 @@ class ImageView;
  * OR Connect to signal before setting resource
  *
  * @code
- *    auto myImageView = ImageView::New( resourceUrl );
+ *    auto myImageView = ImageView::New();
  *    myImageView.ResourceReadySignal.Connect( .... )
  *    myImageView.SetProperty( ImageView::Property::IMAGE, resourceUrl );
  * @endcode
