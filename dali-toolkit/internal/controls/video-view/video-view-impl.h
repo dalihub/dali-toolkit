@@ -284,7 +284,6 @@ private:
 
   int mCurrentVideoPlayPosition;
   bool mIsPlay;
-  bool mIsPause;
   bool mIsUnderlay;
 };
 
