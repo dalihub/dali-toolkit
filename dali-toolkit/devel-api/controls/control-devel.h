@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -215,6 +215,23 @@ DALI_IMPORT_API void EnableVisual( Internal::Control& control, Dali::Property::I
  */
 DALI_IMPORT_API bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index index );
 
+
+/**
+ * @brief Add a transition effect on the control to the given animation
+ *
+ * Only generates an animator if the properties described in the transition
+ * data are staged (e.g. the visual is Enabled and the control is on stage).
+ * Otherwise the target values are stored, and will get set onto the properties
+ * when the visual is next staged.
+ *
+ * @param[in] control The control
+ * @param[in] animation The Animation to add valid transitions to
+ * @param[in] transitionData The transition data describing the effect to create
+ */
+DALI_IMPORT_API void AddTransitions( Internal::Control& control,
+                                     Dali::Animation animation,
+                                     const Toolkit::TransitionData& transitionData );
+
 /**
  * @brief Create a transition effect on the control.
  *
@@ -228,7 +245,8 @@ DALI_IMPORT_API bool IsVisualEnabled( const Internal::Control& control, Dali::Pr
  * @return A handle to an animation defined with the given effect, or an empty
  * handle if no properties match.
  */
-DALI_IMPORT_API Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& transitionData );
+DALI_IMPORT_API Dali::Animation CreateTransition( Internal::Control& control,
+                                                  const Toolkit::TransitionData& transitionData );
 
 /**
  * @brief Perform an action on a visual registered to this control.
