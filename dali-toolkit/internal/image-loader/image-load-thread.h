@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_IMAGE_LOAD_THREAD_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <dali/devel-api/threading/thread.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali/integration-api/adaptors/log-factory-interface.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
@@ -162,10 +163,11 @@ private:
 
   Vector< LoadingTask* > mLoadQueue;     ///<The task queue with images for loading.
   Vector< LoadingTask* > mCompleteQueue; ///<The task queue with images loaded.
+  EventThreadCallback*   mTrigger;
+  const Dali::LogFactoryInterface& mLogFactory; ///< The log factory
 
   ConditionalWait        mConditionalWait;
   Dali::Mutex            mMutex;
-  EventThreadCallback*   mTrigger;
 };
 
 } // namespace Internal
