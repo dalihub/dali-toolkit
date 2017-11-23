@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DATA_IMPL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,6 +184,16 @@ public:
    * @copydoc Dali::Toolkit::DevelControl::GetVisualResourceStatus()
    */
   Toolkit::Visual::ResourceStatus GetVisualResourceStatus( Property::Index index ) const;
+
+  /**
+   * @param[in,out] animation Handle to existing animation, or an empty handle that
+   * can be set to a New animation if createAnimation is true
+   * @param[in] transitionData The transition data describing the animation
+   * @param[in] createAnimation True if the animation should be created
+   */
+  void AddTransitions( Dali::Animation& animation,
+                       const Toolkit::TransitionData& transitionData,
+                       bool createAnimation = false );
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::CreateTransition()
