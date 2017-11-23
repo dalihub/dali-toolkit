@@ -347,6 +347,7 @@ void Controller::SetMultiLineEnabled( bool enable )
                                                                           ALIGN              |
                                                                           REORDER );
 
+    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | layoutOperations );
 
     mImpl->RequestRelayout();
