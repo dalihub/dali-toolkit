@@ -93,6 +93,14 @@ public:
   void SetTransformAndSize( const Property::Map& transform, Size controlSize );
 
   /**
+   * @brief Performs an action on the visual with the given action name and attributes.
+   *
+   * @param[in] actionName The name of the action to perform this API only takes an Index
+   * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
+   */
+  void DoAction( const Dali::Property::Index actionName, const Dali::Property::Value attributes );
+
+  /**
    * @copydoc Toolkit::Visual::Base::GetHeightForWidth
    */
   virtual float GetHeightForWidth( float width );
@@ -292,7 +300,7 @@ protected:
    *
    * @param[in] actor The actor applying this visual.
    */
-  virtual void DoSetOnStage( Actor& actor )=0;
+  virtual void DoSetOnStage( Actor& actor ) = 0;
 
   /**
    * @brief Called by SetOffStage() allowing sub classes to respond to the SetOffStage event
@@ -300,6 +308,14 @@ protected:
    * @param[in] actor The actor applying this visual.
    */
   virtual void DoSetOffStage( Actor& actor );
+
+  /**
+   * @brief Called by DoAction() allowing sub classes to do the given action.
+   *
+   * @param[in] actionId The action to perform
+   * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
+   */
+  virtual void OnDoAction( const Property::Index actionId, const Property::Value attributes );
 
 protected:
 

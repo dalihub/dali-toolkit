@@ -26,12 +26,14 @@
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/border/border-visual.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/gradient/gradient-visual.h>
+#include <dali-toolkit/internal/visuals/animated-gradient/animated-gradient-visual.h>
 #include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/internal/visuals/mesh/mesh-visual.h>
 #include <dali-toolkit/internal/visuals/npatch/npatch-visual.h>
@@ -88,7 +90,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   Visual::BasePtr visualPtr;
 
   Property::Value* typeValue = propertyMap.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE );
-  Toolkit::Visual::Type visualType = Toolkit::Visual::IMAGE; // Default to IMAGE type.
+  Toolkit::DevelVisual::Type visualType = Toolkit::DevelVisual::IMAGE; // Default to IMAGE type.
   if( typeValue )
   {
     Scripting::GetEnumerationProperty( *typeValue, VISUAL_TYPE_TABLE, VISUAL_TYPE_TABLE_COUNT, visualType );
@@ -230,6 +232,12 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       }
       break;
     }
+
+    case Toolkit::DevelVisual::ANIMATED_GRADIENT:
+    {
+      visualPtr = AnimatedGradientVisual::New( *( mFactoryCache.Get() ), propertyMap );
+      break;
+    }
   }
 
   if( !visualPtr )
@@ -237,7 +245,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     DALI_LOG_ERROR( "Renderer type unknown\n" );
   }
 
-  if( mDebugEnabled && visualType !=  Toolkit::Visual::WIREFRAME )
+  if( mDebugEnabled && visualType !=  Toolkit::DevelVisual::WIREFRAME )
   {
     //Create a WireframeVisual if we have debug enabled
     visualPtr = WireframeVisual::New( *( mFactoryCache.Get() ), visualPtr, propertyMap );

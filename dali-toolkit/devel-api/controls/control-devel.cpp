@@ -95,6 +95,12 @@ Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::Tra
   return controlDataImpl.CreateTransition( handle );
 }
 
+void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes )
+{
+  Internal::Control& controlInternal = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlInternal );
+  controlDataImpl.DoAction( visualIndex, actionId, attributes );
+}
 
 } // namespace DevelControl
 

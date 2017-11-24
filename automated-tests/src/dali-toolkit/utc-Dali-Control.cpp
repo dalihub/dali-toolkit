@@ -922,14 +922,33 @@ int UtcDaliControlPaddingProperty(void)
   Control control = Control::New();
   control.SetBackgroundColor( Color::BLUE );
 
-  control.SetProperty( Control::Property::PADDING, Extents( 10, 10, 10, 10 ) );
+  control.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
 
   Stage::GetCurrent().Add( control );
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( control.GetProperty<Extents>( Control::Property::PADDING ), Extents( 10, 10, 10, 10 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetProperty<Extents>( Control::Property::PADDING ), Extents( 15, 10, 5, 10 ), TEST_LOCATION );
+
+  Control child = Control::New();
+  control.Add(child);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( child.GetProperty<Vector3>( Dali::Actor::Property::POSITION ), Vector3( 15, 5, 0 ), TEST_LOCATION );
+
+  control.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION,  Dali::LayoutDirection::RIGHT_TO_LEFT);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( child.GetProperty<Vector3>( Dali::Actor::Property::POSITION ), Vector3( 10, 5, 0 ), TEST_LOCATION );
+
+  control.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION,  Dali::LayoutDirection::LEFT_TO_RIGHT);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( child.GetProperty<Vector3>( Dali::Actor::Property::POSITION ), Vector3( 15, 5, 0 ), TEST_LOCATION );
 
   END_TEST;
 }

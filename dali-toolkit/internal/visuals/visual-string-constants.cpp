@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 namespace Dali
 {
@@ -42,6 +43,7 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, N_PATCH )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, SVG )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, ANIMATED_IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, ANIMATED_GRADIENT )
 DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
 
 // Visual Type

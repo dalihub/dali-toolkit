@@ -9,6 +9,7 @@ SET(CAPI_LIB "dali-toolkit-internal")
 SET(TC_SOURCES
  utc-Dali-BidirectionalSupport.cpp
  utc-Dali-ColorConversion.cpp
+ utc-Dali-Control-internal.cpp
  utc-Dali-DebugRendering.cpp
  utc-Dali-ItemView-internal.cpp
  utc-Dali-LogicalModel.cpp
@@ -24,6 +25,7 @@ SET(TC_SOURCES
  utc-Dali-Text-Typesetter.cpp
  utc-Dali-Text-ViewModel.cpp
  utc-Dali-TextureManager.cpp
+ utc-Dali-Visuals-internal.cpp
  utc-Dali-VisualModel.cpp
  utc-Dali-VisualUrl.cpp
 )
@@ -59,6 +61,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-trace-call-stack.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-native-image.cpp
    dali-toolkit-test-utils/toolkit-text-utils.cpp
+   dali-toolkit-test-utils/dummy-visual.cpp
 )
 
 

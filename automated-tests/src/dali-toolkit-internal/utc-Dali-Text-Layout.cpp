@@ -157,6 +157,7 @@ bool LayoutTextTest( const LayoutTextData& data )
   engine.SetLayout( data.layout );
 
   const Length totalNumberOfGlyphs = visualModel->mGlyphs.Count();
+  float outlineWidth = visualModel->GetOutlineWidth();
 
   Layout::Parameters layoutParameters( data.textArea,
                                        logicalModel->mText.Begin(),
@@ -170,7 +171,8 @@ bool LayoutTextTest( const LayoutTextData& data )
                                        visualModel->mGlyphsPerCharacter.Begin(),
                                        totalNumberOfGlyphs,
                                        Text::HorizontalAlignment::BEGIN,
-                                       Text::LineWrap::WORD );
+                                       Text::LineWrap::WORD,
+                                       outlineWidth );
 
   layoutParameters.isLastNewParagraph = isLastNewParagraph;
 
@@ -374,6 +376,7 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
   Layout::Engine engine;
   engine.SetMetrics( metrics );
 
+  float outlineWidth = visualModel->GetOutlineWidth();
   Layout::Parameters layoutParameters( data.textArea,
                                        logicalModel->mText.Begin(),
                                        logicalModel->mLineBreakInfo.Begin(),
@@ -386,7 +389,8 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                                        visualModel->mGlyphsPerCharacter.Begin(),
                                        visualModel->mGlyphs.Count(),
                                        Text::HorizontalAlignment::BEGIN,
-                                       Text::LineWrap::WORD );
+                                       Text::LineWrap::WORD,
+                                       outlineWidth );
 
   layoutParameters.numberOfBidirectionalInfoRuns = logicalModel->mBidirectionalLineInfo.Count();
   layoutParameters.lineBidirectionalInfoRunsBuffer = logicalModel->mBidirectionalLineInfo.Begin();

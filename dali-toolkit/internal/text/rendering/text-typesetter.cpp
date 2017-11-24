@@ -590,11 +590,14 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
         // Don't render outline for other styles
         outlineWidth = 0.0f;
       }
+      if( style != Typesetter::STYLE_UNDERLINE )
+      {
+        fontClient.CreateBitmap( glyphInfo->fontId,
+                                 glyphInfo->index,
+                                 glyphData.glyphBitmap,
+                                 outlineWidth );
+      }
 
-      fontClient.CreateBitmap( glyphInfo->fontId,
-                               glyphInfo->index,
-                               glyphData.glyphBitmap,
-                               outlineWidth );
 
       // Sets the glyph's bitmap into the bitmap of the whole text.
       if( NULL != glyphData.glyphBitmap.buffer )

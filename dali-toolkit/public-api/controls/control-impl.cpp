@@ -644,12 +644,22 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
     if( ( mImpl->mPadding.start != 0 ) || ( mImpl->mPadding.end != 0 ) || ( mImpl->mPadding.top != 0 ) || ( mImpl->mPadding.bottom != 0 ) ||
         ( mImpl->mMargin.start != 0 ) || ( mImpl->mMargin.end != 0 ) || ( mImpl->mMargin.top != 0 ) || ( mImpl->mMargin.bottom != 0 ) )
     {
-      newChildSize.width = size.width - ( mImpl->mPadding.start + mImpl->mPadding.end );
-      newChildSize.height = size.height - ( mImpl->mPadding.top + mImpl->mPadding.bottom );
+      Extents padding = mImpl->mPadding;
+
+      Dali::CustomActor ownerActor(GetOwner());
+      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( ownerActor.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+
+      if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
+      {
+        std::swap( padding.start, padding.end );
+      }
+
+      newChildSize.width = size.width - ( padding.start + padding.end );
+      newChildSize.height = size.height - ( padding.top + padding.bottom );
 
       Vector3 childPosition = child.GetTargetSize();
-      childPosition.x += ( mImpl->mMargin.start + mImpl->mPadding.start );
-      childPosition.y += ( mImpl->mMargin.top + mImpl->mPadding.top );
+      childPosition.x += ( mImpl->mMargin.start + padding.start );
+      childPosition.y += ( mImpl->mMargin.top + padding.top );
 
       child.SetPosition( childPosition );
     }

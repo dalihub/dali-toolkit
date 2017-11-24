@@ -45,9 +45,6 @@ devel_api_src_files = \
 devel_api_header_files = \
   $(devel_api_src_dir)/direction-enums.h
 
-devel_api_visuals_header_files = \
-  $(devel_api_src_dir)/visuals/image-visual-properties-devel.h
-
 devel_api_controls_header_files = \
   $(devel_api_src_dir)/controls/control-depth-index-ranges.h \
   $(devel_api_src_dir)/controls/control-devel.h \
@@ -92,6 +89,11 @@ devel_api_visual_factory_header_files = \
   $(devel_api_src_dir)/visual-factory/transition-data.h \
   $(devel_api_src_dir)/visual-factory/visual-factory.h \
   $(devel_api_src_dir)/visual-factory/visual-base.h
+
+devel_api_visuals_header_files = \
+  $(devel_api_src_dir)/visuals/image-visual-properties-devel.h \
+  $(devel_api_src_dir)/visuals/animated-gradient-visual-properties-devel.h \
+  $(devel_api_src_dir)/visuals/visual-properties-devel.h
 
 devel_api_shadow_view_header_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.h
