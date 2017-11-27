@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/adaptor-framework/key-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/placeholder-properties.h>
@@ -2377,9 +2378,10 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       // Will request for relayout.
       relayoutNeeded = true;
     }
-    else if( Dali::DALI_KEY_BACKSPACE == keyCode )
+    else if( ( Dali::DALI_KEY_BACKSPACE == keyCode ) ||
+             ( Dali::DevelKey::DALI_KEY_DELETE == keyCode ) )
     {
-      textChanged = BackspaceKeyEvent();
+      textChanged = DeleteEvent( keyCode );
 
       // Will request for relayout.
       relayoutNeeded = true;
@@ -3624,9 +3626,9 @@ void Controller::SelectEvent( float x, float y, bool selectAll )
   }
 }
 
-bool Controller::BackspaceKeyEvent()
+bool Controller::DeleteEvent( int keyCode )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE\n", this );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p KeyCode : %d \n", this, keyCode );
 
   bool removed = false;
 
@@ -3642,10 +3644,17 @@ bool Controller::BackspaceKeyEvent()
   {
     removed = RemoveSelectedText();
   }
-  else if( mImpl->mEventData->mPrimaryCursorPosition > 0 )
+  else if( ( mImpl->mEventData->mPrimaryCursorPosition > 0 ) && ( keyCode == Dali::DALI_KEY_BACKSPACE) )
   {
     // Remove the character before the current cursor position
     removed = RemoveText( -1,
+                          1,
+                          UPDATE_INPUT_STYLE );
+  }
+  else if( ( mImpl->mEventData->mPrimaryCursorPosition >= 0 ) && ( keyCode == Dali::DevelKey::DALI_KEY_DELETE ) )
+  {
+    // Remove the character after the current cursor position
+    removed = RemoveText( 0,
                           1,
                           UPDATE_INPUT_STYLE );
   }
