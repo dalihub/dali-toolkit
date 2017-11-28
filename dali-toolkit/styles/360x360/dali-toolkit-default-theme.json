@@ -1,0 +1,385 @@
+/*
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ *
+ * This file is part of Dali Toolkit
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+//******************************************************************************
+//
+// Default Reference style theme for a 480x800 resolution, The values determined by UX design specification.
+// This file can be copied to a new folder within the styles/ directory and amended with new default values.
+// Can be overriden if StyleManager applies another style sheet.
+//
+//******************************************************************************
+
+{
+  "config":
+  {
+    "alwaysShowFocus":false,
+    "clearFocusOnEscape":true
+  },
+  "styles":
+  {
+    "TextLabel":
+    {
+      "pointSize":18,
+      "enableAutoScroll":false,
+      "autoScrollLoopCount":2,
+      "autoScrollGap":50,
+      "autoScrollSpeed":80
+    },
+
+    "TextLabelFontSize0":
+    {
+      "pointSize":8
+    },
+    "TextLabelFontSize1":
+    {
+      "pointSize":10
+    },
+    "TextLabelFontSize2":
+    {
+      "pointSize":15
+    },
+    "TextLabelFontSize3":
+    {
+      "pointSize":19
+    },
+    "TextLabelFontSize4":
+    {
+      "pointSize":25
+    },
+    "TextField":
+    {
+      "pointSize":18,
+      "primaryCursorColor":[0.0,0.72,0.9,1.0],
+      "secondaryCursorColor":[0.0,0.72,0.9,1.0],
+      "cursorWidth":3,
+      "selectionHighlightColor":[0.75,0.96,1.0,1.0],
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" },
+      "enableSelection":true
+    },
+
+    "TextFieldFontSize0":
+    {
+      "pointSize":10
+    },
+    "TextFieldFontSize1":
+    {
+      "pointSize":10
+    },
+    "TextFieldFontSize2":
+    {
+      "pointSize":10
+    },
+    "TextFieldFontSize3":
+    {
+      "pointSize":10
+    },
+    "TextFieldFontSize4":
+    {
+      "pointSize":10
+    },
+    "TextSelectionPopup":
+    {
+      "popupMaxSize":[656,72],
+      "optionDividerSize":[2,0],
+      "popupDividerColor":[0.23,0.72,0.8,0.11],
+      "popupIconColor":[1.0,1.0,1.0,1.0],
+      "popupPressedColor":[0.24,0.72,0.8,0.11],
+      "background": {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}selection-popup-background.9.png"
+        },
+      "backgroundBorder": {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}selection-popup-border.9.png",
+        "mixColor":[0.24,0.72,0.8,1.0]
+        },
+      "popupFadeInDuration":0.25,
+      "popupFadeOutDuration":0.25
+    },
+    "TextSelectionPopupButton":
+    {
+      "label":
+      {
+        "visualType":"TEXT",
+        "pointSize":8
+      },
+      "unselectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": ""
+      },
+      "selectedBackgroundVisual":
+      {
+        "visualType": "IMAGE",
+        "url": ""
+      }
+    },
+    "TextSelectionToolbar":
+    {
+      "enableOvershoot":true,
+      "enableScrollBar":true,
+      "scrollView":
+      {
+        "overshootAnimationSpeed":360.0,
+        "overshootSize":[720.0,130.0]
+      }
+    },
+    "TextSelectionScrollBar":
+    {
+      "indicatorShowDuration":0.25,
+      "indicatorHideDuration":0.25,
+      "indicatorTransientDuration":1.0
+    },
+    "TextSelectionScrollIndicator":
+    {
+      "image":
+      {
+        "visualType":"IMAGE",
+        "url":"{DALI_IMAGE_DIR}text_selection_scroll_indicator.9.png"
+      },
+      "color":[0.0,0.72,0.9,0.7]
+    },
+    "ScrollView":
+    {
+      "overshootEffectColor":"B018",
+      "overshootAnimationSpeed":360.0,
+      "overshootSize":[720.0,130.0]
+    },
+    "ItemView":
+    {
+      "overshootEffectColor":"B018",
+      "overshootAnimationSpeed":360.0,
+      "overshootSize":[720.0,130.0]
+    },
+    "ScrollBar":
+    {
+      "indicatorShowDuration":0.25,
+      "indicatorHideDuration":0.25,
+      "color":[0.0,0.72,0.9,0.7]
+    },
+    "TextEditor":
+    {
+      "pointSize":18,
+      "primaryCursorColor":[0.0,0.72,0.9,1.0],
+      "secondaryCursorColor":[0.0,0.72,0.9,1.0],
+      "cursorWidth":3,
+      "selectionHighlightColor":[0.75,0.96,1.0,1.0],
+      "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
+      "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
+      "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" },
+      "enableScrollBar":true,
+      "scrollBarShowDuration":0.8,
+      "scrollBarFadeDuration":0.5,
+      "enableSelection":true
+    },
+    "Popup":
+    {
+      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png",
+      "tailUpImage":"{DALI_IMAGE_DIR}popup_tail_up.png",
+      "tailDownImage":"{DALI_IMAGE_DIR}popup_tail_down.png",
+      "tailLeftImage":"{DALI_IMAGE_DIR}popup_tail_left.png",
+      "tailRightImage":"{DALI_IMAGE_DIR}popup_tail_right.png",
+      "popupBackgroundBorder":[17,17,13,13]
+    },
+    "ConfirmationPopup":
+    {
+      "popupBackgroundImage":"{DALI_IMAGE_DIR}00_popup_bg.9.png",
+      "tailUpImage":"{DALI_IMAGE_DIR}popup_tail_up.png",
+      "tailDownImage":"{DALI_IMAGE_DIR}popup_tail_down.png",
+      "tailLeftImage":"{DALI_IMAGE_DIR}popup_tail_left.png",
+      "tailRightImage":"{DALI_IMAGE_DIR}popup_tail_right.png",
+      "popupBackgroundBorder":[17,17,13,13]
+    },
+    "Slider":
+    {
+      "showPopup": true,
+      "showValue": true,
+      "valuePrecision": 0,
+      "trackVisual":{
+        "url":"{DALI_IMAGE_DIR}slider-skin.9.png",
+        "size":[27,27]
+      },
+      "progressVisual":{
+        "url":"{DALI_IMAGE_DIR}slider-skin-progress.9.png",
+        "size":[27,27]
+      },
+      "handleVisual":{
+        "url":"{DALI_IMAGE_DIR}slider-skin-handle.png",
+        "size":[72,72]
+      },
+      "popupVisual":"{DALI_IMAGE_DIR}slider-popup.9.png",
+      "popupArrowVisual":"{DALI_IMAGE_DIR}slider-popup-arrow.9.png",
+      "disableColor":[0.5, 0.5, 0.5, 1.0],
+      "popupTextColor":[0.5,0.5,0.5,1.0],
+      "hitRegion":[0, 72],
+      "marks":[],
+      "snapToMarks":false,
+      "markTolerance":0.05
+    },
+    "SliderHandleTextLabel":
+    {
+      "textColor":[0.8,0.8,1,1]
+    },
+    "ProgressBar":
+    {
+      "trackVisual":{
+        "visualType":"IMAGE",
+        "url":"{DALI_IMAGE_DIR}progress-bar-skin-track.9.png"
+      },
+      "progressVisual":{
+        "visualType":"IMAGE",
+        "url":"{DALI_IMAGE_DIR}progress-bar-skin-progress.9.png"
+      },
+      "secondaryProgressVisual":{
+        "visualType":"IMAGE",
+        "url":"{DALI_IMAGE_DIR}progress-bar-skin-secondary-progress.9.png"
+      },
+      "indeterminateVisual":{
+        "visualType":"IMAGE",
+        "pixelArea":[0.0, 0.0, 10.0, 1.0],
+        "wrapModeU":"REPEAT",
+        "url":"{DALI_IMAGE_DIR}progress-bar-skin-indeterminate.png"
+      },
+      "indeterminateVisualAnimation":
+      [
+        {
+          "target":"indeterminateVisual",
+          "property":"pixelArea",
+          "initialValue":[0.0, 0.0, 10.0, 1.0],
+          "targetValue":[-1.0, 0.0, 10.0, 1.0],
+          "animator":
+          {
+            "alphaFunction":"DEFAULT",
+            "timePeriod":
+            {
+              "duration":0.8,
+              "delay":0
+            }
+          }
+        }
+      ],
+      "labelVisual":{
+        "visualType": "TEXT",
+        "textColor": [ 1.0, 1.0, 1.0, 1.0 ],
+        "pointSize" : 12.0, // Point size must always be provided to Text Visual
+        "horizontalAlignment": "CENTER",
+        "verticalAlignment": "CENTER"
+      },
+      "progressValue": 0.0,
+      "secondaryProgressValue":0.0,
+      "indeterminate": false
+    },
+    "Button":
+    {
+      "initialAutoRepeatingDelay":2.0,
+      "nextAutoRepeatingDelay":0.9
+      // Note: Visuals added to Button will be used in all derived buttons unless overridden.
+    },
+    "PushButton":
+    {
+      "anchorPoint": [ 0.5, 1.0, 0.5 ],
+      "parentOrigin": [ 0.5, 1.0, 0,5 ],
+      "label":
+       {
+         "visualType": "TEXT",
+         "text" : "BOTTOM_BTN",
+         "horizontalAlignment": "CENTER",
+         "verticalAlignment": "CENTER",
+         "pointSize" : 6.0,
+         "textColor": [0.98,0.98,0.98,1.0]
+       },
+      "background":
+       {
+         "visualType": "IMAGE",
+         "url": "{DALI_STYLE_IMAGE_DIR}tw_bottom_btn_bg.png",
+         "mixColor": [0.0,0.21,0.29,0.9]
+       },
+       "selectedStateImage":
+       {
+         "visualType": "IMAGE",
+         "url": "{DALI_STYLE_IMAGE_DIR}tw_bottom_btn_bg.png",
+         "mixColor": [0.0,0.57,0.8,0.3]
+       }
+    },
+    "CheckBoxButton":
+    {
+      "styles":["Button"],
+      "labelPadding":[ 12.0, 12.0, 0.0, 0.0 ],
+      "label":
+       {
+         "visualType": "TEXT",
+         "pointSize" : 10.0, // Point size must always be provided to Text Visual
+         "verticalAlignment": "CENTER"
+       },
+      "unselectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-unselected.png"
+      },
+      "selectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-selected.png"
+      },
+      "disabledUnselectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-unselected-disabled.png"
+      },
+      "disabledSelectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}checkbox-selected-disabled.png"
+      }
+    },
+    "RadioButton":
+    {
+      "styles":["Button"],
+      "labelPadding":[ 12.0, 12.0, 0.0, 0.0 ],
+      "label":
+       {
+         "visualType": "TEXT",
+         "pointSize" : 10.0, // Point size must always be provided to Text Visual
+         "verticalAlignment": "CENTER"
+       },
+      "unselectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-unselected.png"
+      },
+      "selectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-selected.png"
+      },
+      "disabledUnselectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-unselected-disabled.png"
+      },
+      "disabledSelectedVisual":
+      {
+        "visualType": "IMAGE",
+        "url": "{DALI_IMAGE_DIR}radio-button-selected-disabled.png"
+      }
+    }
+  }
+}
