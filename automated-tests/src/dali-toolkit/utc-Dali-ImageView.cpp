@@ -489,6 +489,12 @@ int UtcDaliImageViewAsyncLoadingWithAtlasing(void)
   application.Render(16);
   application.SendNotification();
 
+  imageView.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION,  Dali::LayoutDirection::RIGHT_TO_LEFT );
+  application.SendNotification();
+  application.Render(16);
+  application.Render(16);
+  application.SendNotification();
+
   // loading started, this waits for the loader thread for max 30 seconds
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 

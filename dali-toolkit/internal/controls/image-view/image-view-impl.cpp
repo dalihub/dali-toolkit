@@ -285,6 +285,13 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
     if( ( padding.start != 0 ) || ( padding.end != 0 ) || ( padding.top != 0 ) || ( padding.bottom != 0 ) )
     {
+      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>() );
+
+      if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
+      {
+        std::swap(padding.start, padding.end);
+      }
+
       transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( padding.start, padding.top ) )
                   .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
                   .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
