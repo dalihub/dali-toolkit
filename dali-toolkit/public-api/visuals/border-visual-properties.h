@@ -40,14 +40,14 @@ namespace BorderVisual
 {
 
 /**
- * @brief BorderVisual Property
+ * @brief BorderVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
 
 /**
- * @brief BorderVisual Property
+ * @brief Enumeration for the instance of properties belonging to the BorderVisual.
  * @SINCE_1_1.45
  */
 enum

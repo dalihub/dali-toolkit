@@ -473,6 +473,7 @@ public:
    * @endcode
    *
    * @SINCE_1_2.60
+   * @return The signal to connect to
    * @note A RelayoutRequest is queued by Control before this signal is emitted
    */
   ResourceReadySignalType& ResourceReadySignal();
