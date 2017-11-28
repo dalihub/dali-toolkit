@@ -64,11 +64,15 @@ public:
   };
 
   /**
-   * @brief An enumeration of properties belonging to the ProgressBar class.
+   * @brief Enumeration of properties belonging to the ProgressBar class.
    * @SINCE_1_2.60
    */
   struct Property
   {
+    /**
+     * @brief Enumeration for the instance of properties belonging to the ProgressBar class.
+     * @SINCE_1_2.60
+     */
     enum
     {
       /**
@@ -171,6 +175,7 @@ public:
    *
    * Creates another handle that points to the same real object.
    * @SINCE_1_2.60
+   * @param[in] handle Handle to an object
    */
   ProgressBar( const ProgressBar& handle );
 
@@ -179,6 +184,8 @@ public:
    *
    * Changes this handle to point to another real object.
    * @SINCE_1_2.60
+   * @param[in] handle Handle to an object
+   * @return A reference to this
    */
   ProgressBar& operator=( const ProgressBar& handle );
 

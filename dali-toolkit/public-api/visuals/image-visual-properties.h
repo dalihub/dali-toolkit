@@ -40,14 +40,14 @@ namespace ImageVisual
 {
 
 /**
- * @brief ImageVisual Property
+ * @brief ImageVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
 
 /**
- * @brief ImageVisual Property
+ * @brief Enumeration for the instance of properties belonging to the ImageVisual.
  * @SINCE_1_1.45
  */
 enum

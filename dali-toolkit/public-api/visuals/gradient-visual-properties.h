@@ -40,14 +40,14 @@ namespace GradientVisual
 {
 
 /**
- * @brief GradientVisual Property
+ * @brief GradientVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
 
 /**
- * @brief GradientVisual Property
+ * @brief Enumeration for the instance of properties belonging to the GradientVisual.
  * @SINCE_1_1.45
  */
 enum

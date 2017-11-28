@@ -40,14 +40,14 @@ namespace MeshVisual
 {
 
 /**
- * @brief MeshVisual Property
+ * @brief MeshVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
 
 /**
- * @brief MeshVisual Property
+ * @brief Enumeration for the instance of properties belonging to the MeshVisual.
  * @SINCE_1_1.45
  */
 enum
