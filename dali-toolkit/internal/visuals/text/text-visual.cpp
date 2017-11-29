@@ -332,6 +332,15 @@ Dali::Property::Index StringKeyToIndexKey( const std::string& stringKey )
   return result;
 }
 
+void TextColorConstraint( Vector4& current, const PropertyInputContainer& inputs )
+{
+  Vector4 color = inputs[0]->GetVector4();
+  current.r = color.r * color.a;
+  current.g = color.g * color.a;
+  current.b = color.b * color.a;
+  current.a = color.a;
+}
+
 } // unnamed namespace
 
 TextVisualPtr TextVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
@@ -477,7 +486,7 @@ void TextVisual::DoSetOnStage( Actor& actor )
     // Create constraint for the animatable text's color Property with uTextColorAnimatable in the renderer.
     if( shaderTextColorIndex != Property::INVALID_INDEX )
     {
-      Constraint constraint = Constraint::New<Vector4>( mImpl->mRenderer, shaderTextColorIndex, EqualToConstraint() );
+      Constraint constraint = Constraint::New<Vector4>( mImpl->mRenderer, shaderTextColorIndex, TextColorConstraint );
       constraint.AddSource( Source( actor, mAnimatableTextColorPropertyIndex ) );
       constraint.Apply();
     }

@@ -221,7 +221,7 @@ void TypesetGlyph( GlyphData& data,
           {
             // Check alpha of overlapped pixels
             uint8_t& currentAlpha = *( bitmapBuffer + verticalOffset + xOffsetIndex );
-            uint8_t newAlpha = static_cast<uint8_t>( color->a * static_cast<float>( alpha ) );
+            uint8_t newAlpha = static_cast<uint8_t>( static_cast<float>( alpha ) );
 
             // For any pixel overlapped with the pixel in previous glyphs, make sure we don't
             // overwrite a previous bigger alpha with a smaller alpha (in order to avoid
