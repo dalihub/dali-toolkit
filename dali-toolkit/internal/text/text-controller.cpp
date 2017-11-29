@@ -49,6 +49,10 @@ const float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const std::string EMPTY_STRING("");
 
+const std::string KEY_C_NAME = "c";
+const std::string KEY_V_NAME = "v";
+const std::string KEY_X_NAME = "x";
+
 const char * const PLACEHOLDER_TEXT = "text";
 const char * const PLACEHOLDER_TEXT_FOCUSED = "textFocused";
 const char * const PLACEHOLDER_COLOR = "color";
@@ -2340,6 +2344,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
   {
     int keyCode = keyEvent.keyCode;
     const std::string& keyString = keyEvent.keyPressed;
+    const std::string keyName = keyEvent.keyPressedName;
 
     const bool isNullKey = ( 0 == keyCode ) && ( keyString.empty() );
 
@@ -2385,10 +2390,42 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       mImpl->mEventData->mCheckScrollAmount = true;
       Event event( Event::CURSOR_KEY_EVENT );
       event.p1.mInt = keyCode;
+      event.p2.mBool = keyEvent.IsShiftModifier();
       mImpl->mEventData->mEventQueue.push_back( event );
 
       // Will request for relayout.
       relayoutNeeded = true;
+    }
+    else if ( Dali::DevelKey::DALI_KEY_CONTROL_LEFT == keyCode || Dali::DevelKey::DALI_KEY_CONTROL_RIGHT == keyCode )
+    {
+      // Left or Right Control key event is received before Ctrl-C/V/X key event is received
+      // If not handle it here, any selected text will be deleted
+
+      // Do nothing
+      return false;
+    }
+    else if ( keyEvent.IsCtrlModifier() )
+    {
+      bool consumed = false;
+      if (keyName == KEY_C_NAME)
+      {
+        // Ctrl-C to copy the selected text
+        TextPopupButtonTouched( Toolkit::TextSelectionPopup::COPY );
+        consumed = true;
+      }
+      else if (keyName == KEY_V_NAME)
+      {
+        // Ctrl-V to paste the copied text
+        TextPopupButtonTouched( Toolkit::TextSelectionPopup::PASTE );
+        consumed = true;
+      }
+      else if (keyName == KEY_X_NAME)
+      {
+        // Ctrl-X to cut the selected text
+        TextPopupButtonTouched( Toolkit::TextSelectionPopup::CUT );
+        consumed = true;
+      }
+      return consumed;
     }
     else if( ( Dali::DALI_KEY_BACKSPACE == keyCode ) ||
              ( Dali::DevelKey::DALI_KEY_DELETE == keyCode ) )
@@ -3561,6 +3598,10 @@ void Controller::ProcessModifyEvents()
   {
     // When the text is being modified, delay cursor blinking
     mImpl->mEventData->mDecorator->DelayCursorBlink();
+
+    // Update selection position after modifying the text
+    mImpl->mEventData->mLeftSelectionPosition = mImpl->mEventData->mPrimaryCursorPosition;
+    mImpl->mEventData->mRightSelectionPosition = mImpl->mEventData->mPrimaryCursorPosition;
   }
 
   // Discard temporary text

@@ -118,7 +118,13 @@ const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
 const int KEY_A_CODE = 38;
 const int KEY_D_CODE = 40;
+const int KEY_C_CODE = 54;
+const int KEY_V_CODE = 55;
+const int KEY_X_CODE = 53;
 const int KEY_WHITE_SPACE_CODE = 65;
+
+const int KEY_SHIFT_MODIFIER = 257;
+const int KEY_CONTROL_MODIFIER = 258;
 
 const char* HANDLE_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/insertpoint-icon.png";
 
@@ -2034,6 +2040,113 @@ int utcDaliTextEditorEvent06(void)
   application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
+
+  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
+
+  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_RIGHT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int utcDaliTextEditorEvent07(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorEvent07");
+
+  // Checks if the highlight actor is created.
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+
+  Stage::GetCurrent().Add( editor );
+
+  editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
+  editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
+  editor.SetSize( 100.f, 50.f );
+  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Tap on the text editor
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move to second line of the text.
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Select some text in the right of the current cursor position
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Cut the selected text
+  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "x", "x", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( "Hello\nld\nHello world", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
+
+  // Select some text in the left of the current cursor position
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Copy the selected text
+  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "c", "c", KEY_C_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Move the cursor to the third line
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Paste the selected text at the current cursor position
+  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "v", "v", KEY_V_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( "Hello\nld\nHello lo\nworld", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   END_TEST;
 }

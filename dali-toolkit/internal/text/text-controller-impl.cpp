@@ -1162,6 +1162,9 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
   }
 
   int keyCode = event.p1.mInt;
+  bool isShiftModifier = event.p2.mBool;
+
+  CharacterIndex previousPrimaryCursorPosition = mEventData->mPrimaryCursorPosition;
 
   if( Dali::DALI_KEY_CURSOR_LEFT == keyCode )
   {
@@ -1177,8 +1180,10 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
       mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition );
     }
   }
-  else if( Dali::DALI_KEY_CURSOR_UP == keyCode )
+  else if( Dali::DALI_KEY_CURSOR_UP == keyCode && !isShiftModifier )
   {
+    // Ignore Shift-Up for text selection for now.
+
     // Get first the line index of the current cursor position index.
     CharacterIndex characterIndex = 0u;
 
@@ -1211,8 +1216,10 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
                                                                       CharacterHitTest::TAP,
                                                                       matchedCharacter );
   }
-  else if( Dali::DALI_KEY_CURSOR_DOWN == keyCode )
+  else if( Dali::DALI_KEY_CURSOR_DOWN == keyCode && !isShiftModifier )
   {
+    // Ignore Shift-Down for text selection for now.
+
     // Get first the line index of the current cursor position index.
     CharacterIndex characterIndex = 0u;
 
@@ -1248,7 +1255,64 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
     }
   }
 
-  mEventData->mUpdateCursorPosition = true;
+  if ( !isShiftModifier && mEventData->mState != EventData::SELECTING )
+  {
+    // Update selection position after moving the cursor
+    mEventData->mLeftSelectionPosition = mEventData->mPrimaryCursorPosition;
+    mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
+  }
+
+  if ( isShiftModifier && IsShowingRealText() )
+  {
+    // Handle text selection
+    bool selecting = false;
+
+    if ( Dali::DALI_KEY_CURSOR_LEFT == keyCode || Dali::DALI_KEY_CURSOR_RIGHT == keyCode )
+    {
+      // Shift-Left/Right to select the text
+      int cursorPositionDelta = mEventData->mPrimaryCursorPosition - previousPrimaryCursorPosition;
+      if ( cursorPositionDelta > 0 || mEventData->mRightSelectionPosition > 0u ) // Check the boundary
+      {
+        mEventData->mRightSelectionPosition += cursorPositionDelta;
+      }
+      selecting = true;
+    }
+    else if ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition )
+    {
+      // Show no grab handles and text highlight if Shift-Up/Down pressed but no selected text
+      selecting = true;
+    }
+
+    if ( selecting )
+    {
+      // Notify the cursor position to the imf manager.
+      if( mEventData->mImfManager )
+      {
+        mEventData->mImfManager.SetCursorPosition( mEventData->mPrimaryCursorPosition );
+        mEventData->mImfManager.NotifyCursorPosition();
+      }
+
+      ChangeState( EventData::SELECTING );
+
+      mEventData->mUpdateLeftSelectionPosition = true;
+      mEventData->mUpdateRightSelectionPosition = true;
+      mEventData->mUpdateGrabHandlePosition = true;
+      mEventData->mUpdateHighlightBox = true;
+
+      // Hide the text selection popup if select the text using keyboard instead of moving grab handles
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
+        mEventData->mDecorator->SetPopupActive( false );
+      }
+    }
+  }
+  else
+  {
+    // Handle normal cursor move
+    ChangeState( EventData::EDITING );
+    mEventData->mUpdateCursorPosition = true;
+  }
+
   mEventData->mUpdateInputStyle = true;
   mEventData->mScrollAfterUpdatePosition = true;
 }
@@ -1287,6 +1351,10 @@ void Controller::Impl::OnTapEvent( const Event& event )
       {
         mEventData->mPrimaryCursorPosition = 0u;
       }
+
+      // Update selection position after tapping
+      mEventData->mLeftSelectionPosition = mEventData->mPrimaryCursorPosition;
+      mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
 
       mEventData->mUpdateCursorPosition = true;
       mEventData->mUpdateGrabHandlePosition = true;

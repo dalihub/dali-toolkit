@@ -64,6 +64,7 @@ struct Event
     int mInt;
     unsigned int mUint;
     float mFloat;
+    bool mBool;
   };
 
   Event( Type eventType )
