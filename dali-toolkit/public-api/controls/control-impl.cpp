@@ -657,11 +657,13 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
       newChildSize.width = size.width - ( padding.start + padding.end );
       newChildSize.height = size.height - ( padding.top + padding.bottom );
 
-      Vector3 childPosition = child.GetTargetSize();
-      childPosition.x += ( mImpl->mMargin.start + padding.start );
-      childPosition.y += ( mImpl->mMargin.top + padding.top );
+      // Cannot use childs Position property as it can already have padding and margin applied on it,
+      // so we end up cumulatively applying them over and over again.
+      Vector2 childOffset( 0.f, 0.f );
+      childOffset.x += ( mImpl->mMargin.start + padding.start );
+      childOffset.y += ( mImpl->mMargin.top + padding.top );
 
-      child.SetPosition( childPosition );
+      child.SetPosition( childOffset.x, childOffset.y );
     }
 
     container.Add( child, newChildSize );
