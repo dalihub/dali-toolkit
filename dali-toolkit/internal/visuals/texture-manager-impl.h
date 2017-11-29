@@ -376,7 +376,7 @@ private:
     }
 
     TextureId           textureId;   ///< The external Texture Id assigned to this load
-    unsigned short      loadId;      ///< The load Id used by the async loader to reference this load
+    uint32_t            loadId;      ///< The load Id used by the async loader to reference this load
   };
 
   // Private typedefs:
