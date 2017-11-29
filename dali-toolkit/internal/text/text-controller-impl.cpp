@@ -423,7 +423,8 @@ void Controller::Impl::CalculateTextUpdateIndices( Length& numberOfCharacters )
     mTextUpdateInfo.mParagraphCharacterIndex = 0u;
     numberOfCharacters = 0u;
 
-    mTextUpdateInfo.mRequestedNumberOfCharacters = mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
+    // prevent mTextUpdateInfo.mRequestedNumberOfCharacters value underflow
+    mTextUpdateInfo.mRequestedNumberOfCharacters = ( mTextUpdateInfo.mNumberOfCharactersToAdd < mTextUpdateInfo.mNumberOfCharactersToRemove ? 0u : mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove );
 
     // Nothing else to do if there are no paragraphs.
     return;
@@ -439,7 +440,9 @@ void Controller::Impl::CalculateTextUpdateIndices( Length& numberOfCharacters )
       // Text is being added in a new paragraph after the last character of the text.
       mTextUpdateInfo.mParagraphCharacterIndex = mTextUpdateInfo.mPreviousNumberOfCharacters;
       numberOfCharacters = 0u;
-      mTextUpdateInfo.mRequestedNumberOfCharacters = mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
+
+      // prevent mTextUpdateInfo.mRequestedNumberOfCharacters value underflow
+      mTextUpdateInfo.mRequestedNumberOfCharacters = ( mTextUpdateInfo.mNumberOfCharactersToAdd < mTextUpdateInfo.mNumberOfCharactersToRemove ? 0u : mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove );
 
       mTextUpdateInfo.mStartGlyphIndex = mModel->mVisualModel->mGlyphs.Count();
       mTextUpdateInfo.mStartLineIndex = mModel->mVisualModel->mLines.Count() - 1u;
@@ -491,7 +494,15 @@ void Controller::Impl::CalculateTextUpdateIndices( Length& numberOfCharacters )
     }
   }
 
-  mTextUpdateInfo.mRequestedNumberOfCharacters = numberOfCharacters + mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
+  // prevent mTextUpdateInfo.mRequestedNumberOfCharacters value underflow
+  if( numberOfCharacters + mTextUpdateInfo.mNumberOfCharactersToAdd < mTextUpdateInfo.mNumberOfCharactersToRemove )
+  {
+    mTextUpdateInfo.mRequestedNumberOfCharacters = 0u;
+  }
+  else
+  {
+    mTextUpdateInfo.mRequestedNumberOfCharacters = numberOfCharacters + mTextUpdateInfo.mNumberOfCharactersToAdd - mTextUpdateInfo.mNumberOfCharactersToRemove;
+  }
   mTextUpdateInfo.mStartGlyphIndex = *( mModel->mVisualModel->mCharactersToGlyph.Begin() + mTextUpdateInfo.mParagraphCharacterIndex );
 }
 
