@@ -2106,6 +2106,17 @@ void Controller::GetPlaceholderProperty( Property::Map& map )
   }
 }
 
+Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
+{
+  const LineRun* const firstline = mImpl->mModel->mVisualModel->mLines.Begin();
+  if ( firstline && firstline->direction )
+  {
+    return Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT;
+  }
+
+  return Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT;
+}
+
 // public : Relayout.
 
 Controller::UpdateTextType Controller::Relayout( const Size& size )
