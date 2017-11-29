@@ -1125,3 +1125,32 @@ int UtcDaliToolkitTextlabelTextStyle01(void)
 
   END_TEST;
 }
+
+int UtcDaliToolkitTextlabelMultiline(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelMultiline");
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty( TextLabel::Property::TEXT, "Hello world Hello world Hello world Hello world Hello world Hello world" );
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 20 );
+  label.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  Stage::GetCurrent().Add( label );
+
+  application.SendNotification();
+  application.Render();
+
+  int lineCount =  label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 1, TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::MULTI_LINE, true );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount =  label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( true, (lineCount > 1) , TEST_LOCATION );
+
+
+  END_TEST;
+}
