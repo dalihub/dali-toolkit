@@ -90,6 +90,8 @@ const char * const CROP_TO_MASK_NAME("cropToMask");
 const char * const LOAD_POLICY_NAME("loadPolicy");
 const char * const RELEASE_POLICY_NAME("releasePolicy");
 const char * const ORIENTATION_CORRECTION_NAME("orientationCorrection");
+const char * const AUXILIARY_IMAGE_NAME("auxiliaryImage");
+const char * const AUXILIARY_IMAGE_ALPHA_NAME("auxiliaryImageAlpha");
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );

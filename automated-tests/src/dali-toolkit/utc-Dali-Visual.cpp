@@ -25,8 +25,10 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/animated-gradient-visual-properties-devel.h>
 #include <dali-toolkit/dali-toolkit.h>
+
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -36,11 +38,12 @@ namespace
 {
 const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/gallery-small-1.jpg";
-const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
+const char* TEST_NPATCH_FILE_NAME =  TEST_RESOURCE_DIR "/button-up.9.png";
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
+
 
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
@@ -764,6 +767,8 @@ int UtcDaliVisualGetPropertyMap6(void)
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
   propertyMap.Insert( ImageVisual::Property::BORDER, border );
+  propertyMap.Insert( DevelImageVisual::Property::AUXILIARY_IMAGE, "application-icon-30.png" );
+  propertyMap.Insert( DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA, 0.9f );
   Visual::Base nPatchVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -789,6 +794,14 @@ int UtcDaliVisualGetPropertyMap6(void)
   value = resultMap.Find( ImageVisual::Property::BORDER,  Property::RECTANGLE );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get< Rect< int > >() == border );
+
+  value = resultMap.Find( DevelImageVisual::Property::AUXILIARY_IMAGE, Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == "application-icon-30.png" );
+
+  value = resultMap.Find( DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<float>() == 0.9f );
 
   Vector4 border1( 1.0f, 1.0f, 1.0f, 1.0f );
 
