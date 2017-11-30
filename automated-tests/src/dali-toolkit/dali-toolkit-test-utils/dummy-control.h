@@ -162,6 +162,7 @@ private: // From Internal::Control
   virtual void OnPan(const PanGesture& pan);
   virtual void OnTap(const TapGesture& tap);
   virtual void OnLongPress(const LongPressGesture& longPress);
+  virtual Vector3 GetNaturalSize();
 
 private: // From CustomActorImpl
 
