@@ -25,6 +25,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
@@ -1153,6 +1155,12 @@ public: // Queries & retrieves.
    * @param[out] map The property map
    */
   void GetPlaceholderProperty( Property::Map& map );
+
+  /**
+   * @brief Checks text direction.
+   * @return The text direction.
+   */
+  Toolkit::DevelText::TextDirection::Type GetTextDirection();
 
 public: // Relayout.
 
