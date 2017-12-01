@@ -105,7 +105,7 @@ void FixedImageCache::LoadBatch()
     mImageUrls[ mUrlIndex ].mTextureId =
       mTextureManager.RequestLoad( url, ImageDimensions(), FittingMode::SCALE_TO_FILL,
                                    SamplingMode::BOX_THEN_LINEAR, TextureManager::NO_ATLAS,
-                                   this, ENABLE_ORIENTATION_CORRECTION );
+                                   this, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED  );
     mRequestingLoad = false;
     ++mUrlIndex;
   }

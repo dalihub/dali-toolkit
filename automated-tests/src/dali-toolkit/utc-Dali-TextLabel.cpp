@@ -21,6 +21,8 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -1122,6 +1124,58 @@ int UtcDaliToolkitTextlabelTextStyle01(void)
   }
 
   DALI_TEST_EQUALS( colorMatched, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelMultiline(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelMultiline");
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty( TextLabel::Property::TEXT, "Hello world Hello world Hello world Hello world Hello world Hello world" );
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 20 );
+  label.SetProperty( TextLabel::Property::MULTI_LINE, false );
+  Stage::GetCurrent().Add( label );
+
+  application.SendNotification();
+  application.Render();
+
+  int lineCount =  label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( lineCount, 1, TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::MULTI_LINE, true );
+
+  application.SendNotification();
+  application.Render();
+
+  lineCount =  label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
+  DALI_TEST_EQUALS( true, (lineCount > 1) , TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelTextDirection(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelTextDirection");
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 20 );
+  Stage::GetCurrent().Add( label );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::TEXT_DIRECTION ), static_cast< int >( Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+
+  label.SetProperty( TextLabel::Property::TEXT, "ﻡﺮﺤﺑﺍ ﺏﺎﻠﻋﺎﻠﻣ ﻡﺮﺤﺑﺍ" );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::TEXT_DIRECTION ), static_cast< int >( Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
 
   END_TEST;
 }

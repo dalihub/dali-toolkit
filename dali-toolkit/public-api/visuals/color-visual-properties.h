@@ -40,14 +40,14 @@ namespace ColorVisual
 {
 
 /**
- * @brief ColorVisual Property
+ * @brief ColorVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
 
 /**
- * @brief ColorVisual Property
+ * @brief Enumeration for the instance of properties belonging to the ColorVisual.
  * @SINCE_1_1.45
  */
 enum

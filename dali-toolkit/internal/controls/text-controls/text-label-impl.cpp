@@ -44,6 +44,8 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+
 using namespace Dali::Toolkit::Text;
 
 namespace Dali
@@ -113,6 +115,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "autoScrollLoopDelay",
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "autoScrollStopMode",        STRING,  AUTO_SCROLL_STOP_MODE      )
 DALI_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "lineCount",                 INTEGER, LINE_COUNT                 )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "lineWrapMode",              INTEGER, LINE_WRAP_MODE             )
+DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "textDirection",       INTEGER, TEXT_DIRECTION             )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -747,6 +750,14 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         {
           float width = label.GetProperty( Actor::Property::SIZE_WIDTH ).Get<float>();
           value = impl.mController->GetLineCount( width );
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::TEXT_DIRECTION:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetTextDirection();
         }
         break;
       }

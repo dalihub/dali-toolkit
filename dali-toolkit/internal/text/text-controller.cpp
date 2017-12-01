@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/adaptor-framework/key-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/placeholder-properties.h>
@@ -47,6 +48,10 @@ namespace
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const std::string EMPTY_STRING("");
+
+const std::string KEY_C_NAME = "c";
+const std::string KEY_V_NAME = "v";
+const std::string KEY_X_NAME = "x";
 
 const char * const PLACEHOLDER_TEXT = "text";
 const char * const PLACEHOLDER_TEXT_FOCUSED = "textFocused";
@@ -346,6 +351,7 @@ void Controller::SetMultiLineEnabled( bool enable )
                                                                           ALIGN              |
                                                                           REORDER );
 
+    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | layoutOperations );
 
     mImpl->RequestRelayout();
@@ -2097,6 +2103,17 @@ void Controller::GetPlaceholderProperty( Property::Map& map )
   }
 }
 
+Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
+{
+  const LineRun* const firstline = mImpl->mModel->mVisualModel->mLines.Begin();
+  if ( firstline && firstline->direction )
+  {
+    return Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT;
+  }
+
+  return Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT;
+}
+
 // public : Relayout.
 
 Controller::UpdateTextType Controller::Relayout( const Size& size )
@@ -2320,6 +2337,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
   {
     int keyCode = keyEvent.keyCode;
     const std::string& keyString = keyEvent.keyPressed;
+    const std::string keyName = keyEvent.keyPressedName;
 
     const bool isNullKey = ( 0 == keyCode ) && ( keyString.empty() );
 
@@ -2365,14 +2383,47 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       mImpl->mEventData->mCheckScrollAmount = true;
       Event event( Event::CURSOR_KEY_EVENT );
       event.p1.mInt = keyCode;
+      event.p2.mBool = keyEvent.IsShiftModifier();
       mImpl->mEventData->mEventQueue.push_back( event );
 
       // Will request for relayout.
       relayoutNeeded = true;
     }
-    else if( Dali::DALI_KEY_BACKSPACE == keyCode )
+    else if ( Dali::DevelKey::DALI_KEY_CONTROL_LEFT == keyCode || Dali::DevelKey::DALI_KEY_CONTROL_RIGHT == keyCode )
     {
-      textChanged = BackspaceKeyEvent();
+      // Left or Right Control key event is received before Ctrl-C/V/X key event is received
+      // If not handle it here, any selected text will be deleted
+
+      // Do nothing
+      return false;
+    }
+    else if ( keyEvent.IsCtrlModifier() )
+    {
+      bool consumed = false;
+      if (keyName == KEY_C_NAME)
+      {
+        // Ctrl-C to copy the selected text
+        TextPopupButtonTouched( Toolkit::TextSelectionPopup::COPY );
+        consumed = true;
+      }
+      else if (keyName == KEY_V_NAME)
+      {
+        // Ctrl-V to paste the copied text
+        TextPopupButtonTouched( Toolkit::TextSelectionPopup::PASTE );
+        consumed = true;
+      }
+      else if (keyName == KEY_X_NAME)
+      {
+        // Ctrl-X to cut the selected text
+        TextPopupButtonTouched( Toolkit::TextSelectionPopup::CUT );
+        consumed = true;
+      }
+      return consumed;
+    }
+    else if( ( Dali::DALI_KEY_BACKSPACE == keyCode ) ||
+             ( Dali::DevelKey::DALI_KEY_DELETE == keyCode ) )
+    {
+      textChanged = DeleteEvent( keyCode );
 
       // Will request for relayout.
       relayoutNeeded = true;
@@ -3540,6 +3591,10 @@ void Controller::ProcessModifyEvents()
   {
     // When the text is being modified, delay cursor blinking
     mImpl->mEventData->mDecorator->DelayCursorBlink();
+
+    // Update selection position after modifying the text
+    mImpl->mEventData->mLeftSelectionPosition = mImpl->mEventData->mPrimaryCursorPosition;
+    mImpl->mEventData->mRightSelectionPosition = mImpl->mEventData->mPrimaryCursorPosition;
   }
 
   // Discard temporary text
@@ -3617,9 +3672,9 @@ void Controller::SelectEvent( float x, float y, bool selectAll )
   }
 }
 
-bool Controller::BackspaceKeyEvent()
+bool Controller::DeleteEvent( int keyCode )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p DALI_KEY_BACKSPACE\n", this );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p KeyCode : %d \n", this, keyCode );
 
   bool removed = false;
 
@@ -3635,10 +3690,17 @@ bool Controller::BackspaceKeyEvent()
   {
     removed = RemoveSelectedText();
   }
-  else if( mImpl->mEventData->mPrimaryCursorPosition > 0 )
+  else if( ( mImpl->mEventData->mPrimaryCursorPosition > 0 ) && ( keyCode == Dali::DALI_KEY_BACKSPACE) )
   {
     // Remove the character before the current cursor position
     removed = RemoveText( -1,
+                          1,
+                          UPDATE_INPUT_STYLE );
+  }
+  else if( ( mImpl->mEventData->mPrimaryCursorPosition >= 0 ) && ( keyCode == Dali::DevelKey::DALI_KEY_DELETE ) )
+  {
+    // Remove the character after the current cursor position
+    removed = RemoveText( 0,
                           1,
                           UPDATE_INPUT_STYLE );
   }

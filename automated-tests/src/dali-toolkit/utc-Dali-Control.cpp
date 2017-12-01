@@ -27,6 +27,9 @@
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
+
+
 #include <toolkit-event-thread-callback.h>
 
 #include "dummy-control.h"
@@ -949,6 +952,99 @@ int UtcDaliControlPaddingProperty(void)
   application.Render();
 
   DALI_TEST_EQUALS( child.GetProperty<Vector3>( Dali::Actor::Property::POSITION ), Vector3( 15, 5, 0 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlDoAction(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "DoAction on a visual registered with a control" );
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable( true );
+
+  //Created AnimatedImageVisual
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base imageVisual = factory.CreateVisual( TEST_IMAGE_FILE_NAME, ImageDimensions() );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  dummyControl.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( dummyControl );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
+
+  Property::Map attributes;
+  DevelControl::DoAction( dummyControl,  DummyControl::Property::TEST_VISUAL, DevelImageVisual::Action::RELOAD, attributes );
+
+  tet_infoline( "Perform RELOAD action. should reload Image and generate a texture" );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliControlDoActionWhenNotStage(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "DoAction on a visual registered with a control but not staged" );
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable( true );
+
+  //Created AnimatedImageVisual
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base imageVisual = factory.CreateVisual( TEST_IMAGE_FILE_NAME, ImageDimensions() );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  dummyControl.SetSize(200.f, 200.f);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+  textureTrace.Reset();
+
+  Property::Map attributes;
+  DevelControl::DoAction( dummyControl,  DummyControl::Property::TEST_VISUAL, DevelImageVisual::Action::RELOAD, attributes );
+
+  tet_infoline( "Perform RELOAD action. should reload Image and generate a texture" );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
+
+  tet_infoline( "Adding control to stage will in turn add the visual to the stage" );
+
+  Stage::GetCurrent().Add( dummyControl );
+  application.SendNotification();
+  application.Render();
+  tet_infoline( "No change in textures could occurs as already loaded and cached texture will be used" );
+
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+  textureTrace.Reset();
 
   END_TEST;
 }

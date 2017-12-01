@@ -104,6 +104,15 @@ public:
     LOAD_FAILED      ///< Async loading failed, e.g. connection problem
   };
 
+  /**
+  * @breif Types of reloading policies
+  */
+  enum class ReloadPolicy
+  {
+    CACHED = 0,             ///< Loads cached texture if it exists.
+    FORCED                  ///< Forces reloading of texture.
+  };
+
 public:
 
   struct MaskingData
@@ -139,7 +148,8 @@ public:
                          Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
                          AtlasUploadObserver* atlasObserver,
                          ImageAtlasManagerPtr imageAtlasManager,
-                         bool orientationCorrection );
+                         bool orientationCorrection,
+                         TextureManager::ReloadPolicy reloadPolicy );
 
   /**
    * @brief Requests an image load of the given URL.
@@ -158,15 +168,17 @@ public:
    * @param[in] observer              The client object should inherit from this and provide the "UploadCompleted" virtual.
    *                                  This is called when an image load completes (or fails).
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
+   * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
    * @return                          A TextureId to use as a handle to reference this Texture
    */
-  TextureId RequestLoad( const VisualUrl&         url,
-                         const ImageDimensions    desiredSize,
-                         FittingMode::Type        fittingMode,
-                         Dali::SamplingMode::Type samplingMode,
-                         const UseAtlas           useAtlasing,
-                         TextureUploadObserver*   observer,
-                         bool                     orientationCorrection );
+  TextureId RequestLoad( const VisualUrl&                   url,
+                         const ImageDimensions              desiredSize,
+                         FittingMode::Type                  fittingMode,
+                         Dali::SamplingMode::Type           samplingMode,
+                         const UseAtlas                     useAtlasing,
+                         TextureUploadObserver*             observer,
+                         bool                               orientationCorrection,
+                         TextureManager::ReloadPolicy       reloadPolicy );
 
   /**
    * @brief Requests an image load of the given URL, when the texture has
@@ -179,29 +191,36 @@ public:
    * When the client has finished with the Texture, Remove() should be called.
    *
    * @param[in] url                   The URL of the image to load
-   * @param[in] maskTextureId         The texture id of an image to mask this with (can be INVALID if no masking required)
+   * @param[in] maskTextureId         The texture id of an image to mask this with
+   *                                  (can be INVALID if no masking required)
    * @param[in] contentScale          The scale factor to apply to the image before masking
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
-   * @param[in] useAtlasing           Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still be loaded, and marked successful,
-   *                                  but "useAtlasing" will be set to false in the "UploadCompleted" callback from the TextureManagerUploadObserver.
-   * @param[in] cropToMask            Only used with masking, this will crop the scaled image to the mask size. If false, then the mask will be scaled to fit the image before being applied.
-   * @param[in] observer              The client object should inherit from this and provide the "UploadCompleted" virtual.
+   * @param[in] useAtlasing           Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still
+   *                                  be loaded, and marked successful,
+   *                                  but "useAtlasing" will be set to false in the "UploadCompleted" callback from
+   *                                  the TextureManagerUploadObserver.
+   * @param[in] cropToMask            Only used with masking, this will crop the scaled image to the mask size.
+   *                                  If false, then the mask will be scaled to fit the image before being applied.
+   * @param[in] observer              The client object should inherit from this and provide the "UploadCompleted"
+   *                                  virtual.
    *                                  This is called when an image load completes (or fails).
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
+   * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
    * @return                          A TextureId to use as a handle to reference this Texture
    */
-  TextureId RequestLoad( const VisualUrl&         url,
-                         TextureId                maskTextureId,
-                         float                    contentScale,
-                         const ImageDimensions    desiredSize,
-                         FittingMode::Type        fittingMode,
-                         Dali::SamplingMode::Type samplingMode,
-                         const UseAtlas           useAtlasing,
-                         bool                     cropToMask,
-                         TextureUploadObserver*   observer,
-                         bool                     orientationCorrection );
+  TextureId RequestLoad( const VisualUrl&                   url,
+                         TextureId                          maskTextureId,
+                         float                              contentScale,
+                         const ImageDimensions              desiredSize,
+                         FittingMode::Type                  fittingMode,
+                         Dali::SamplingMode::Type           samplingMode,
+                         const UseAtlas                     useAtlasing,
+                         bool                               cropToMask,
+                         TextureUploadObserver*             observer,
+                         bool                               orientationCorrection,
+                         TextureManager::ReloadPolicy       reloadPolicy );
 
   /**
    * Requests a masking image to be loaded. This mask is not uploaded to GL,
@@ -266,32 +285,38 @@ private:
    * When the client has finished with the Texture, Remove() should be called.
    *
    * @param[in] url                   The URL of the image to load
-   * @param[in] maskTextureId         The texture id of an image to use as a mask. If no mask is required, then set to INVALID_TEXTURE_ID
+   * @param[in] maskTextureId         The texture id of an image to use as a mask. If no mask is required, then set
+   *                                  to INVALID_TEXTURE_ID
    * @param[in] contentScale          The scaling factor to apply to the content when masking
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
-   * @param[in] useAtlasing           Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still be loaded, and marked successful,
-   *                                  but "useAtlasing" will be set to false in the "UploadCompleted" callback from the TextureManagerUploadObserver.
-   * @param[in] cropToMask            Whether to crop the target after masking, or scale the mask to the image before masking.
+   * @param[in] useAtlasing           Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still be
+   *                                  loaded, and marked successful, but "useAtlasing" will be set to false in the
+   *                                  "UploadCompleted" callback from the TextureManagerUploadObserver.
+   * @param[in] cropToMask            Whether to crop the target after masking, or scale the mask to the image before
+   *                                  masking.
    * @param[in] storageType,          Whether the pixel data is stored in the cache or uploaded to the GPU
-   * @param[in] observer              The client object should inherit from this and provide the "UploadCompleted" virtual.
+   * @param[in] observer              The client object should inherit from this and provide the "UploadCompleted"
+   *                                  virtual.
    *                                  This is called when an image load completes (or fails).
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
+   * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoadInternal(
-    const VisualUrl&         url,
-    TextureId                maskTextureId,
-    float                    contentScale,
-    const ImageDimensions    desiredSize,
-    FittingMode::Type        fittingMode,
-    Dali::SamplingMode::Type samplingMode,
-    UseAtlas                 useAtlas,
-    bool                     cropToMask,
-    StorageType              storageType,
-    TextureUploadObserver*   observer,
-    bool                     orientationCorrection );
+    const VisualUrl&                    url,
+    TextureId                           maskTextureId,
+    float                               contentScale,
+    const ImageDimensions               desiredSize,
+    FittingMode::Type                   fittingMode,
+    Dali::SamplingMode::Type            samplingMode,
+    UseAtlas                            useAtlas,
+    bool                                cropToMask,
+    StorageType                         storageType,
+    TextureUploadObserver*              observer,
+    bool                                orientationCorrection,
+    TextureManager::ReloadPolicy        reloadPolicy );
 
 
   typedef size_t TextureHash; ///< The type used to store the hash used for Texture caching.
@@ -356,7 +381,8 @@ private:
     Dali::SamplingMode::Type samplingMode:3; ///< The requested SamplingMode
     StorageType storageType:1;     ///< CPU storage / GPU upload;
     bool loadSynchronously:1;      ///< True if synchronous loading was requested
-    UseAtlas useAtlas:1;           ///< USE_ATLAS if an atlas was requested. This is updated to false if atlas is not used
+    UseAtlas useAtlas:1;           ///< USE_ATLAS if an atlas was requested.
+                                   ///< This is updated to false if atlas is not used
     bool cropToMask:1;             ///< true if the image should be cropped to the mask size.
     bool orientationCorrection:1;  ///< true if the image should be rotated to match exif orientation data
   };
@@ -376,7 +402,7 @@ private:
     }
 
     TextureId           textureId;   ///< The external Texture Id assigned to this load
-    unsigned short      loadId;      ///< The load Id used by the async loader to reference this load
+    uint32_t            loadId;      ///< The load Id used by the async loader to reference this load
   };
 
   // Private typedefs:
@@ -537,10 +563,12 @@ private:
      * @brief Load a new texture.
      * @param[in] textureId             TextureId to reference the texture that will be loaded
      * @param[in] url                   The URL of the image to load
-     * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
+     * @param[in] desiredSize           The size the image is likely to appear at.
+     *                                  This can be set to 0,0 for automatic
      * @param[in] fittingMode           The FittingMode to use
      * @param[in] samplingMode          The SamplingMode to use
-     * @param[in] orientationCorrection Whether to use image metadata to rotate or flip the image, e.g., from portrait to landscape
+     * @param[in] orientationCorrection Whether to use image metadata to rotate or flip the image,
+     *                                  e.g., from portrait to landscape
      */
     void Load(TextureId textureId,
               const VisualUrl& url,

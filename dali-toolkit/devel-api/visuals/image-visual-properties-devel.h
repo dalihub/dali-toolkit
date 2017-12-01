@@ -112,6 +112,26 @@ enum Type
    * @note Default true
    */
   ORIENTATION_CORRECTION = CROP_TO_MASK + 3,
+
+  /**
+   * @brief Overlays the auxiliary iamge on top of an NPatch image.
+   *
+   * The resulting visual image will be at least as large as the
+   * smallest possible n-patch or the auxiliary image, whichever is
+   * larger.
+   *
+   * @details Name "auxiliaryImage", Type Property::STRING, URL of the image.
+   * @note Default true
+   */
+  AUXILIARY_IMAGE = CROP_TO_MASK + 4,
+
+  /**
+   * @brief An alpha value for mixing between the masked main NPatch image and the auxiliary image
+   * @details Name "auxiliaryImageAlpha", Type Property::FLOAT, between 0 and 1
+   * @note Default 0
+   */
+  AUXILIARY_IMAGE_ALPHA = CROP_TO_MASK + 5,
+
 };
 
 } //namespace Property

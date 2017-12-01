@@ -33,7 +33,7 @@ namespace Toolkit
  */
 
 /**
- * @brief All the visual types
+ * @brief All the visual types.
  * @SINCE_1_1.45
  */
 namespace Visual
@@ -59,14 +59,14 @@ enum Type
 };
 
 /**
- * @brief Visual Property
+ * @brief Visual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
 
 /**
- * @brief Visual Property
+ * @brief Enumeration for the instance of properties belonging to the Visual Property.
  * @SINCE_1_1.45
  */
 enum
@@ -128,28 +128,43 @@ enum
 
 } // namespace Property
 
+/**
+ * @brief Visual Transfrom for the offset or size.
+ * @SINCE_1_2.60
+ */
 namespace Transform
 {
 
 /**
  * @brief Policies used by the transform for the offset or size.
  * @SINCE_1_2.60
- *
  */
 namespace Policy
 {
 
+/**
+ * @brief Enumeration for the type of Transform Policy.
+ * @SINCE_1_2.60
+ */
 enum Type
 {
-  RELATIVE = 0,   ///< Relative to the control (percentage [0.0f to 1.0f] of the control).
-  ABSOLUTE = 1    ///< Absolute value in world units.
+  RELATIVE = 0,   ///< Relative to the control (percentage [0.0f to 1.0f] of the control). @SINCE_1_2.60
+  ABSOLUTE = 1    ///< Absolute value in world units. @SINCE_1_2.60
 };
 
 } // namespace Policy
 
+/**
+ * @brief Visual Transform Property.
+ * @SINCE_1_2.60
+ */
 namespace Property
 {
 
+/**
+ * @brief Enumeration for the type of Transfrom Property.
+ * @SINCE_1_2.60
+ */
 enum Type
 {
   /**
@@ -237,21 +252,21 @@ enum Type
 } // namespace Transform
 
 /**
- * @brief Shader for Visuals
+ * @brief Shader for Visuals.
  * @SINCE_1_1.45
  */
 namespace Shader
 {
 
 /**
- * @brief Shader Property
+ * @brief Shader Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
 
 /**
- * @brief The type of Shader
+ * @brief The type of Shader.
  * @SINCE_1_1.45
  */
 enum

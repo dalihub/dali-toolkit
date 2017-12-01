@@ -192,6 +192,7 @@ Property::Value DummyControlImpl::GetProperty( BaseObject* object, Dali::Propert
   return value;
 }
 
+
 Toolkit::DummyControl Impl::DummyControl::New()
 {
   IntrusivePtr< Toolkit::Impl::DummyControl > impl = new Toolkit::Impl::DummyControl;
@@ -299,6 +300,23 @@ void Impl::DummyControl::SetRelayoutCallback( RelayoutCallbackFunc callback  )
 {
   mRelayoutCallback = callback;
 }
+
+Vector3 Impl::DummyControl::GetNaturalSize()
+{
+  Vector2 currentSize;
+
+  for( auto elem : mRegisteredVisualIndices )
+  {
+    Vector2 naturalSize;
+    Visual::Base visual = GetVisual(elem);
+    visual.GetNaturalSize( naturalSize );
+    currentSize.width = std::max( naturalSize.width, currentSize.width );
+    currentSize.height = std::max( naturalSize.height, currentSize.height );
+  }
+
+  return Vector3( currentSize );
+}
+
 
 
 DummyControl DummyControl::New( bool override )

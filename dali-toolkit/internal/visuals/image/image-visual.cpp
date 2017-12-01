@@ -33,6 +33,7 @@
 // INTERNAL HEADERS
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -411,12 +412,12 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       }
     }
   }
-
   // Load image immediately if LOAD_POLICY requires it
   if ( mLoadPolicy == DevelImageVisual::LoadPolicy::IMMEDIATE )
   {
-    auto attemptAtlasing = mAttemptAtlasing;
-    LoadTexture( attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection );
+    auto attemptAtlasing = AttemptAtlasing();
+    LoadTexture( attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection,
+                 TextureManager::ReloadPolicy::CACHED  );
   }
 }
 
@@ -759,7 +760,8 @@ bool ImageVisual::IsSynchronousResourceLoading() const
   return mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
 }
 
-void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection )
+void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection,
+                               TextureManager::ReloadPolicy forceReload )
 {
   TextureManager& textureManager = mFactoryCache.GetTextureManager();
 
@@ -776,28 +778,35 @@ void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& t
   textures = textureManager.LoadTexture( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode,
                                          mMaskingData, IsSynchronousResourceLoading(), mTextureId,
                                          atlasRect, atlasing, mLoading, mWrapModeU,
-                                         mWrapModeV, textureObserver, atlasUploadObserver, atlasManager, mOrientationCorrection );
-}
+                                         mWrapModeV, textureObserver, atlasUploadObserver, atlasManager,
+                                         mOrientationCorrection,
+                                         forceReload );
 
-void ImageVisual::InitializeRenderer()
-{
-  auto attemptAtlasing = ( ! mImpl->mCustomShader && mImageUrl.GetProtocolType() == VisualUrl::LOCAL && mAttemptAtlasing );
-
-  // texture set has to be created first as we need to know if atlasing succeeded or not
-  // when selecting the shader
-
-  if( mTextureId == TextureManager::INVALID_TEXTURE_ID && ! mTextures ) // Only load the texture once
-  {
-    LoadTexture( attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection );
-  }
-
-  if( attemptAtlasing ) // Flag needs to be set before creating renderer
+  if( atlasing ) // Flag needs to be set before creating renderer
   {
     mImpl->mFlags |= Impl::IS_ATLASING_APPLIED;
   }
   else
   {
     mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
+  }
+}
+
+bool ImageVisual::AttemptAtlasing()
+{
+  return ( ! mImpl->mCustomShader && mImageUrl.GetProtocolType() == VisualUrl::LOCAL && mAttemptAtlasing );
+}
+
+void ImageVisual::InitializeRenderer()
+{
+  auto attemptAtlasing = AttemptAtlasing();
+  // texture set has to be created first as we need to know if atlasing succeeded or not
+  // when selecting the shader
+
+  if( mTextureId == TextureManager::INVALID_TEXTURE_ID && ! mTextures ) // Only load the texture once
+  {
+    LoadTexture( attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection,
+                 TextureManager::ReloadPolicy::CACHED );
   }
 
   CreateRenderer( mTextures );
@@ -960,6 +969,22 @@ void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
   }
 }
 
+void ImageVisual::OnDoAction( const Dali::Property::Index actionName, const Dali::Property::Value& attributes )
+{
+  // Check if action is valid for this visual type and perform action if possible
+
+  switch ( actionName )
+  {
+    case DevelImageVisual::Action::RELOAD:
+    {
+      auto attemptAtlasing = AttemptAtlasing();
+      LoadTexture( attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection,
+                   TextureManager::ReloadPolicy::FORCED );
+      break;
+    }
+  }
+}
+
 void ImageVisual::OnSetTransform()
 {
   if( mImpl->mRenderer )
@@ -1031,7 +1056,8 @@ void ImageVisual::ApplyImageToSampler( const Image& image )
 // From existing atlas manager
 void ImageVisual::UploadCompleted()
 {
-  // Texture has been uploaded. If weak handle is holding a placement actor, it is the time to add the renderer to actor.
+  // Texture has been uploaded. If weak handle is holding a placement actor,
+  // it is the time to add the renderer to actor.
   Actor actor = mPlacementActor.GetHandle();
   if( actor )
   {
@@ -1046,7 +1072,8 @@ void ImageVisual::UploadCompleted()
 }
 
 // From Texture Manager
-void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle )
+void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, TextureSet textureSet, bool usingAtlas,
+                                  const Vector4& atlasRectangle )
 {
   Toolkit::Visual::ResourceStatus resourceStatus;
   Actor actor = mPlacementActor.GetHandle();
