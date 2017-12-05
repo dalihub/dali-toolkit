@@ -717,21 +717,27 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     {
       // Current run needs to be stored and a new one initialized.
 
-      if( 0u != currentFontRun.characterRun.numberOfCharacters )
+      if(0u != currentFontRun.characterRun.numberOfCharacters)
       {
         // Store the font run.
-        fonts.Insert( fonts.Begin() + fontIndex, currentFontRun );
+        fonts.Insert(fonts.Begin() + fontIndex, currentFontRun);
         ++fontIndex;
+
+        // Initialize the new one.
+        currentFontRun.characterRun.characterIndex = currentFontRun.characterRun.characterIndex +
+                                                     currentFontRun.characterRun.numberOfCharacters;
+        currentFontRun.characterRun.numberOfCharacters = 0u;
+        currentFontRun.fontId                          = fontId;
+
+        if(isNewParagraphCharacter)
+        {
+          isFirstSetToBeValidated = true;
+        }
       }
-
-      // Initialize the new one.
-      currentFontRun.characterRun.characterIndex = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
-      currentFontRun.characterRun.numberOfCharacters = 0u;
-      currentFontRun.fontId = fontId;
-
-      if( isNewParagraphCharacter )
+      else
       {
-        isFirstSetToBeValidated = true;
+        // Previous character will be in the next run
+        ++currentFontRun.characterRun.numberOfCharacters;
       }
     }
 
