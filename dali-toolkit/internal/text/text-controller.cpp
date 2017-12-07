@@ -1191,14 +1191,14 @@ const Vector4& Controller::GetOutlineColor() const
   return mImpl->mModel->mVisualModel->GetOutlineColor();
 }
 
-void Controller::SetOutlineWidth( float width )
+void Controller::SetOutlineWidth( unsigned int width )
 {
   mImpl->mModel->mVisualModel->SetOutlineWidth( width );
 
   mImpl->RequestRelayout();
 }
 
-float Controller::GetOutlineWidth() const
+unsigned int Controller::GetOutlineWidth() const
 {
   return mImpl->mModel->mVisualModel->GetOutlineWidth();
 }
@@ -3407,7 +3407,7 @@ bool Controller::DoRelayout( const Size& size,
     const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mModel->mVisualModel->mGlyphsToCharacters;
     const Vector<Length>& charactersPerGlyph = mImpl->mModel->mVisualModel->mCharactersPerGlyph;
     const Character* const textBuffer = mImpl->mModel->mLogicalModel->mText.Begin();
-    float outlineWidth = mImpl->mModel->GetOutlineWidth();
+    const float outlineWidth = static_cast<float>( mImpl->mModel->GetOutlineWidth() );
 
     // Set the layout parameters.
     Layout::Parameters layoutParameters( size,

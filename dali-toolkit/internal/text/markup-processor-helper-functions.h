@@ -121,6 +121,14 @@ float StringToFloat( const char* const floatStr );
 void FloatToString( float value, std::string& floatStr );
 
 /**
+ * @brief Converts an unsigned int into a string.
+ *
+ * @param[in] value The unsigned int value.
+ * @param[out] uIntStr The string.
+ */
+void UintToString( unsigned int value, std::string& uIntStr );
+
+/**
  * @brief Converts an ARGB color packed in 4 byte unsigned int into a Vector4 color used in Dali.
  *
  * @param[in] color An ARGB color packed in an unsigned int.
