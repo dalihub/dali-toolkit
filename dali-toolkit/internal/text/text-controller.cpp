@@ -3850,6 +3850,7 @@ void Controller::ClearFontData()
   mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                            VALIDATE_FONTS            |
                                                            SHAPE_TEXT                |
+                                                           BIDI_INFO                 |
                                                            GET_GLYPH_METRICS         |
                                                            LAYOUT                    |
                                                            UPDATE_LAYOUT_SIZE        |
