@@ -109,6 +109,13 @@ void FloatToString( float value, std::string& floatStr )
   floatStr = ss.str();
 }
 
+void UintToString( unsigned int value, std::string& uIntStr )
+{
+  std::stringstream ss;
+  ss << value;
+  uIntStr = ss.str();
+}
+
 void UintColorToVector4( unsigned int color, Vector4& retColor )
 {
   retColor.a = static_cast<float>( ( color & 0xFF000000 ) >> 24u ) / 255.f;

@@ -1182,14 +1182,14 @@ const Vector4& Controller::GetOutlineColor() const
   return mImpl->mModel->mVisualModel->GetOutlineColor();
 }
 
-void Controller::SetOutlineWidth( float width )
+void Controller::SetOutlineWidth( unsigned int width )
 {
   mImpl->mModel->mVisualModel->SetOutlineWidth( width );
 
   mImpl->RequestRelayout();
 }
 
-float Controller::GetOutlineWidth() const
+unsigned int Controller::GetOutlineWidth() const
 {
   return mImpl->mModel->mVisualModel->GetOutlineWidth();
 }

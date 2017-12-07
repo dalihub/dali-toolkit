@@ -402,6 +402,24 @@ void View::GetUnderlineRuns( GlyphRun* underlineRuns,
   }
 }
 
+const Vector4& View::GetOutlineColor() const
+{
+  if( mImpl->mVisualModel )
+  {
+    return mImpl->mVisualModel->GetOutlineColor();
+  }
+  return Vector4::ZERO;
+}
+
+unsigned int View::GetOutlineWidth() const
+{
+  if( mImpl->mVisualModel )
+  {
+    return mImpl->mVisualModel->GetOutlineWidth();
+  }
+  return 0u;
+}
+
 } // namespace Text
 
 } // namespace Toolkit
