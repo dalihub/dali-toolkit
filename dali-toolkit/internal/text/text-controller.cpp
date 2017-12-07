@@ -45,6 +45,8 @@ namespace
   Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_TEXT_CONTROLS");
 #endif
 
+const int MAX_NUMBER_OF_CHARACTERS = 200000;
+
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 
 const std::string EMPTY_STRING("");
@@ -3218,6 +3220,9 @@ bool Controller::RemoveText( int cursorOffset,
 {
   bool removed = false;
 
+  // When the users press "Delete All" button, the IME sends numberOfCharacters as '200000' value which means the max number of characters.
+  const bool deleteAll = ( numberOfCharacters >= MAX_NUMBER_OF_CHARACTERS );
+
   if( NULL == mImpl->mEventData )
   {
     return removed;
@@ -3246,7 +3251,7 @@ bool Controller::RemoveText( int cursorOffset,
     }
 
     if( mImpl->mEventData->mPreEditFlag || // If the preedit flag is enabled, it means two (or more) of them came together i.e. when two keys have been pressed at the same time.
-        ( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters ) )
+        ( ( cursorIndex + numberOfCharacters ) <= mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters ) || deleteAll /*'Delete All' button clicked*/ )
     {
       // Mark the paragraphs to be updated.
       if( Layout::Engine::SINGLE_LINE_BOX == mImpl->mLayoutEngine.GetLayout() )
