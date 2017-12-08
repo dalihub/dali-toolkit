@@ -48,7 +48,7 @@ class ImageView;
  * ResouceReadySignal is done after the resource is set then signal will be missed.
  *
  * To protect against this, IsResourceReady() can be checked before connecting to ResourceReadySignal,
- * or the signal connection can be done before setting the resource"
+ * or the signal connection can be done before setting the resource.
  *
  * @code
  *    auto myImageView = ImageView::New( resourceUrl );
