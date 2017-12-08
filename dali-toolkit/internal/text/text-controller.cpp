@@ -2443,7 +2443,8 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       relayoutNeeded = true;
     }
     else if( IsKey( keyEvent, Dali::DALI_KEY_POWER ) ||
-             IsKey( keyEvent, Dali::DALI_KEY_MENU ) ||
+             IsKey( keyEvent, Dali::DALI_KEY_MENU )  ||
+             IsKey( keyEvent, static_cast<Dali::KEY>(Dali::DevelKey::DALI_KEY_SOURCE) ) ||
              IsKey( keyEvent, Dali::DALI_KEY_HOME ) )
     {
       // Power key/Menu/Home key behaviour does not allow edit mode to resume.
