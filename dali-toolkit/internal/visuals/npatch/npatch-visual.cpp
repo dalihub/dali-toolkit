@@ -570,8 +570,8 @@ void NPatchVisual::ApplyTextureAndUniforms()
       Uint16Pair stretchX = data->stretchPixelsX[ 0 ];
       Uint16Pair stretchY = data->stretchPixelsY[ 0 ];
 
-      uint16_t stretchWidth = stretchX.GetY() - stretchX.GetX();
-      uint16_t stretchHeight = stretchY.GetY() - stretchY.GetX();
+      uint16_t stretchWidth = ( stretchX.GetY() >= stretchX.GetX() ) ? stretchX.GetY() - stretchX.GetX() : 0;
+      uint16_t stretchHeight = ( stretchY.GetY() >= stretchY.GetX() ) ? stretchY.GetY() - stretchY.GetX() : 0;
 
       mImpl->mRenderer.RegisterProperty( "uFixed[0]", Vector2::ZERO );
       mImpl->mRenderer.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
