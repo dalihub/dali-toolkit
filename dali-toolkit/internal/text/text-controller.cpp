@@ -2744,7 +2744,17 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
 
   if( retrieveText )
   {
-    mImpl->GetText( numberOfWhiteSpaces, text );
+    if( !mImpl->IsShowingPlaceholderText() )
+    {
+      // Retrieves the normal text string.
+      mImpl->GetText( numberOfWhiteSpaces, text );
+    }
+    else
+    {
+      // When the current text is Placeholder Text, the surrounding text should be empty string.
+      // It means DALi should send empty string ("") to IME.
+      text = "";
+    }
   }
 
   ImfManager::ImfCallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );

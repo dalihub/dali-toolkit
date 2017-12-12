@@ -184,8 +184,15 @@ int UtcDaliTextControllerImfEvent(void)
   // Enables the text input.
   controller->EnableTextInput( decorator );
 
+  // Set the placeholder text.
+  controller->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, "Hello Dali" );
+
   // Creates an ImfManager.
   ImfManager imfManager = ImfManager::Get();
+
+  // For coverage.
+  imfEvent = ImfManager::ImfEventData( ImfManager::GETSURROUNDING, "", 0, 0 );
+  controller->OnImfEvent( imfManager, imfEvent );
 
   // Send VOID event.
   imfEvent = ImfManager::ImfEventData( ImfManager::VOID, "", 0, 0 );
