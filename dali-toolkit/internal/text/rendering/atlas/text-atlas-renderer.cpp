@@ -211,6 +211,199 @@ struct AtlasRenderer::Impl
     return false;
   }
 
+  void CacheGlyph( const GlyphInfo& glyph, FontId lastFontId, AtlasManager::AtlasSlot& slot )
+  {
+    bool glyphNotCached = !mGlyphManager.IsCached( glyph.fontId, glyph.index, slot );  // Check FontGlyphRecord vector for entry with glyph index and fontId
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "AddGlyphs fontID[%u] glyphIndex[%u] [%s]\n", glyph.fontId, glyph.index, (glyphNotCached)?"not cached":"cached" );
+
+    if( glyphNotCached )
+    {
+      MaxBlockSize& blockSize = mBlockSizes[0u];
+
+      if ( lastFontId != glyph.fontId )
+      {
+        uint32_t index = 0u;
+        // Looks through all stored block sizes until finds the one which mataches required glyph font it.  Ensures new atlas block size will match existing for same font id.
+        // CalculateBlocksSize() above ensures a block size entry exists.
+        for( std::vector<MaxBlockSize>::const_iterator it = mBlockSizes.begin(),
+               endIt = mBlockSizes.end();
+             it != endIt;
+             ++it, ++index )
+        {
+          const MaxBlockSize& blockSizeEntry = *it;
+          if( blockSizeEntry.mFontId == glyph.fontId )
+          {
+            blockSize = mBlockSizes[index];
+          }
+        }
+      }
+
+      // Create a new image for the glyph
+      PixelData bitmap;
+
+      // Whether the current glyph is a color one.
+      const bool isColorGlyph = mFontClient.IsColorGlyph( glyph.fontId, glyph.index );
+
+      // Retrieve the emoji's bitmap.
+      TextAbstraction::FontClient::GlyphBufferData glyphBufferData;
+      glyphBufferData.width = isColorGlyph ? glyph.width : 0;   // Desired width and height.
+      glyphBufferData.height = isColorGlyph ? glyph.height : 0;
+
+      mFontClient.CreateBitmap( glyph.fontId,
+                                glyph.index,
+                                glyphBufferData,
+                                NO_OUTLINE );
+
+      // Create the pixel data.
+      bitmap = PixelData::New( glyphBufferData.buffer,
+                               glyph.width * glyph.height * GetBytesPerPixel( glyphBufferData.format ),
+                               glyph.width,
+                               glyph.height,
+                               glyphBufferData.format,
+                               PixelData::DELETE_ARRAY );
+
+      if( bitmap )
+      {
+        // Ensure that the next image will fit into the current block size
+        if( bitmap.GetWidth() > blockSize.mNeededBlockWidth )
+        {
+          blockSize.mNeededBlockWidth = bitmap.GetWidth();
+        }
+
+        if( bitmap.GetHeight() > blockSize.mNeededBlockHeight )
+        {
+          blockSize.mNeededBlockHeight = bitmap.GetHeight();
+        }
+
+        // If CheckAtlas in AtlasManager::Add can't fit the bitmap in the current atlas it will create a new atlas
+
+        // Setting the block size and size of new atlas does not mean a new one will be created. An existing atlas may still surffice.
+        mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
+                                       DEFAULT_ATLAS_HEIGHT,
+                                       blockSize.mNeededBlockWidth,
+                                       blockSize.mNeededBlockHeight );
+
+        // Locate a new slot for our glyph
+        mGlyphManager.Add( glyph, bitmap, slot ); // slot will be 0 is glyph not added
+      }
+    }
+    else
+    {
+      // We have 2+ copies of the same glyph
+      mGlyphManager.AdjustReferenceCount( glyph.fontId, glyph.index, 1/*increment*/ );
+    }
+  }
+
+  void GenerateMesh( const GlyphInfo& glyph,
+                     const Vector2& position,
+                     const Vector4& color,
+                     AtlasManager::AtlasSlot& slot,
+                     bool underlineGlyph,
+                     float currentUnderlinePosition,
+                     float currentUnderlineThickness,
+                     std::vector<MeshRecord>& meshContainer,
+                     Vector<TextCacheEntry>& newTextCache,
+                     Vector<Extent>& extents )
+  {
+    // Generate mesh data for this quad, plugging in our supplied position
+    AtlasManager::Mesh2D newMesh;
+    mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
+
+    TextCacheEntry textCacheEntry;
+    textCacheEntry.mFontId = glyph.fontId;
+    textCacheEntry.mImageId = slot.mImageId;
+    textCacheEntry.mIndex = glyph.index;
+
+    newTextCache.PushBack( textCacheEntry );
+
+    AtlasManager::Vertex2D* verticesBuffer = newMesh.mVertices.Begin();
+
+    for( unsigned int index = 0u, size = newMesh.mVertices.Count();
+         index < size;
+         ++index )
+    {
+      AtlasManager::Vertex2D& vertex = *( verticesBuffer + index );
+
+      // Set the color of the vertex.
+      vertex.mColor = color;
+    }
+
+    // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
+    StitchTextMesh( meshContainer,
+                    newMesh,
+                    extents,
+                    position.y + glyph.yBearing,
+                    underlineGlyph,
+                    currentUnderlinePosition,
+                    currentUnderlineThickness,
+                    slot );
+  }
+
+  void CreateActors( const std::vector<MeshRecord>& meshContainer,
+                     const Size& textSize,
+                     const Vector4& defaultColor,
+                     const Vector4& shadowColor,
+                     const Vector2& shadowOffset,
+                     Style style,
+                     Actor textControl,
+                     Property::Index animatablePropertyIndex )
+  {
+    if( !mActor )
+    {
+      // Create a container actor to act as a common parent for text and shadow, to avoid color inheritence issues.
+      mActor = Actor::New();
+      mActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+      mActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      mActor.SetSize( textSize );
+      mActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+    }
+
+    for( std::vector< MeshRecord >::const_iterator it = meshContainer.begin(),
+           endIt = meshContainer.end();
+         it != endIt; ++it )
+    {
+      const MeshRecord& meshRecord = *it;
+
+      Actor actor = CreateMeshActor( textControl, animatablePropertyIndex, defaultColor, meshRecord, textSize, STYLE_NORMAL );
+
+      // Whether the actor has renderers.
+      const bool hasRenderer = actor.GetRendererCount() > 0u;
+
+      // Create an effect if necessary
+      if( hasRenderer &&
+          ( style == STYLE_DROP_SHADOW ) )
+      {
+        // Change the color of the vertices.
+        for( Vector<AtlasManager::Vertex2D>::Iterator vIt =  meshRecord.mMesh.mVertices.Begin(),
+               vEndIt = meshRecord.mMesh.mVertices.End();
+             vIt != vEndIt;
+             ++vIt )
+        {
+          AtlasManager::Vertex2D& vertex = *vIt;
+
+          vertex.mColor = shadowColor;
+        }
+
+        Actor shadowActor = CreateMeshActor(textControl, animatablePropertyIndex, defaultColor, meshRecord, textSize, STYLE_DROP_SHADOW );
+#if defined(DEBUG_ENABLED)
+        shadowActor.SetName( "Text Shadow renderable actor" );
+#endif
+        // Offset shadow in x and y
+        shadowActor.RegisterProperty("uOffset", shadowOffset );
+        Dali::Renderer renderer( shadowActor.GetRendererAt( 0 ) );
+        int depthIndex = renderer.GetProperty<int>(Dali::Renderer::Property::DEPTH_INDEX);
+        renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, depthIndex - 1 );
+        mActor.Add( shadowActor );
+      }
+
+      if( hasRenderer )
+      {
+        mActor.Add( actor );
+      }
+    }
+  }
+
   void AddGlyphs( Text::ViewInterface& view,
                   Actor textControl,
                   Property::Index animatablePropertyIndex,
@@ -225,7 +418,6 @@ struct AtlasRenderer::Impl
     AtlasManager::AtlasSlot slot;
     std::vector< MeshRecord > meshContainer;
     Vector< Extent > extents;
-    TextCacheEntry textCacheEntry;
     mDepth = depth;
 
     const Vector2& textSize( view.GetLayoutSize() );
@@ -250,7 +442,6 @@ struct AtlasRenderer::Impl
 
     float currentUnderlinePosition = ZERO;
     float currentUnderlineThickness = underlineHeight;
-    uint32_t currentBlockSize = 0;
     FontId lastFontId = 0;
     FontId lastUnderlinedFontId = 0;
     Style style = STYLE_NORMAL;
@@ -316,125 +507,28 @@ struct AtlasRenderer::Impl
           lastUnderlinedFontId = glyph.fontId;
         } // underline
 
-        bool glyphNotCached = !mGlyphManager.IsCached( glyph.fontId, glyph.index, slot );  // Check FontGlyphRecord vector for entry with glyph index and fontId
-
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "AddGlyphs fontID[%u] glyphIndex[%u] [%s]\n", glyph.fontId, glyph.index, (glyphNotCached)?"not cached":"cached" );
-
-        if( glyphNotCached )
-        {
-          MaxBlockSize& blockSize = mBlockSizes[currentBlockSize];
-
-          if ( lastFontId != glyph.fontId )
-          {
-            uint32_t index = 0u;
-            // Looks through all stored block sizes until finds the one which mataches required glyph font it.  Ensures new atlas block size will match existing for same font id.
-            // CalculateBlocksSize() above ensures a block size entry exists.
-            for( std::vector<MaxBlockSize>::const_iterator it = mBlockSizes.begin(),
-                   endIt = mBlockSizes.end();
-                 it != endIt;
-                 ++it, ++index )
-            {
-              const MaxBlockSize& blockSizeEntry = *it;
-              if( blockSizeEntry.mFontId == glyph.fontId )
-              {
-                blockSize = mBlockSizes[index];
-              }
-            }
-          }
-
-          // Create a new image for the glyph
-          PixelData bitmap;
-
-          // Whether the current glyph is a color one.
-          const bool isColorGlyph = mFontClient.IsColorGlyph( glyph.fontId, glyph.index );
-
-          // Retrieve the emoji's bitmap.
-          TextAbstraction::FontClient::GlyphBufferData glyphBufferData;
-          glyphBufferData.width = isColorGlyph ? glyph.width : 0;   // Desired width and height.
-          glyphBufferData.height = isColorGlyph ? glyph.height : 0;
-
-          mFontClient.CreateBitmap( glyph.fontId,
-                                    glyph.index,
-                                    glyphBufferData,
-                                    NO_OUTLINE );
-
-          // Create the pixel data.
-          bitmap = PixelData::New( glyphBufferData.buffer,
-                                   glyph.width * glyph.height * GetBytesPerPixel( glyphBufferData.format ),
-                                   glyph.width,
-                                   glyph.height,
-                                   glyphBufferData.format,
-                                   PixelData::DELETE_ARRAY );
-
-          if( bitmap )
-          {
-            // Ensure that the next image will fit into the current block size
-            if( bitmap.GetWidth() > blockSize.mNeededBlockWidth )
-            {
-              blockSize.mNeededBlockWidth = bitmap.GetWidth();
-            }
-
-            if( bitmap.GetHeight() > blockSize.mNeededBlockHeight )
-            {
-              blockSize.mNeededBlockHeight = bitmap.GetHeight();
-            }
-
-            // If CheckAtlas in AtlasManager::Add can't fit the bitmap in the current atlas it will create a new atlas
-
-            // Setting the block size and size of new atlas does not mean a new one will be created. An existing atlas may still surffice.
-            mGlyphManager.SetNewAtlasSize( DEFAULT_ATLAS_WIDTH,
-                                           DEFAULT_ATLAS_HEIGHT,
-                                           blockSize.mNeededBlockWidth,
-                                           blockSize.mNeededBlockHeight );
-
-            // Locate a new slot for our glyph
-            mGlyphManager.Add( glyph, bitmap, slot ); // slot will be 0 is glyph not added
-          }
-        }
-        else
-        {
-          // We have 2+ copies of the same glyph
-          mGlyphManager.AdjustReferenceCount( glyph.fontId, glyph.index, 1/*increment*/ );
-        }
+        // Retrieves and caches the glyph's bitmap.
+        CacheGlyph( glyph, lastFontId, slot );
 
         // Move the origin (0,0) of the mesh to the center of the actor
         const Vector2 position = *( positionsBuffer + i ) - halfTextSize - lineOffsetPosition;
 
         if ( 0u != slot.mImageId ) // invalid slot id, glyph has failed to be added to atlas
         {
-          // Generate mesh data for this quad, plugging in our supplied position
-          AtlasManager::Mesh2D newMesh;
-          mGlyphManager.GenerateMeshData( slot.mImageId, position, newMesh );
-          textCacheEntry.mFontId = glyph.fontId;
-          textCacheEntry.mImageId = slot.mImageId;
-          textCacheEntry.mIndex = glyph.index;
-          newTextCache.PushBack( textCacheEntry );
-
-          AtlasManager::Vertex2D* verticesBuffer = newMesh.mVertices.Begin();
-
           // Get the color of the character.
           const ColorIndex colorIndex = useDefaultColor ? 0u : *( colorIndicesBuffer + i );
           const Vector4& color = ( useDefaultColor || ( 0u == colorIndex ) ) ? defaultColor : *( colorsBuffer + colorIndex - 1u );
 
-          for( unsigned int index = 0u, size = newMesh.mVertices.Count();
-               index < size;
-               ++index )
-          {
-            AtlasManager::Vertex2D& vertex = *( verticesBuffer + index );
-
-            // Set the color of the vertex.
-            vertex.mColor = color;
-          }
-
-          // Find an existing mesh data object to attach to ( or create a new one, if we can't find one using the same atlas)
-          StitchTextMesh( meshContainer,
-                          newMesh,
-                          extents,
-                          position.y + glyph.yBearing,
-                          underlineGlyph,
-                          currentUnderlinePosition,
-                          currentUnderlineThickness,
-                          slot );
+          GenerateMesh( glyph,
+                        position,
+                        color,
+                        slot,
+                        underlineGlyph,
+                        currentUnderlinePosition,
+                        currentUnderlineThickness,
+                        meshContainer,
+                        newTextCache,
+                        extents);
 
           lastFontId = glyph.fontId; // Prevents searching for existing blocksizes when string of the same fontId.
         }
@@ -454,60 +548,16 @@ struct AtlasRenderer::Impl
     // For each MeshData object, create a mesh actor and add to the renderable actor
     if( !meshContainer.empty() )
     {
-      if( !mActor )
-      {
-        // Create a container actor to act as a common parent for text and shadow, to avoid color inheritence issues.
-        mActor = Actor::New();
-        mActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-        mActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-        mActor.SetSize( textSize );
-        mActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
-      }
-
-      for( std::vector< MeshRecord >::iterator it = meshContainer.begin(),
-              endIt = meshContainer.end();
-            it != endIt; ++it )
-      {
-        MeshRecord& meshRecord = *it;
-
-        Actor actor = CreateMeshActor( textControl, animatablePropertyIndex, defaultColor, meshRecord, textSize, STYLE_NORMAL );
-
-        // Whether the actor has renderers.
-        const bool hasRenderer = actor.GetRendererCount() > 0u;
-
-        // Create an effect if necessary
-        if( hasRenderer &&
-            ( style == STYLE_DROP_SHADOW ) )
-        {
-          // Change the color of the vertices.
-          for( Vector<AtlasManager::Vertex2D>::Iterator vIt =  meshRecord.mMesh.mVertices.Begin(),
-                 vEndIt = meshRecord.mMesh.mVertices.End();
-               vIt != vEndIt;
-               ++vIt )
-          {
-            AtlasManager::Vertex2D& vertex = *vIt;
-
-            vertex.mColor = shadowColor;
-          }
-
-          Actor shadowActor = CreateMeshActor(textControl, animatablePropertyIndex, defaultColor, meshRecord, textSize, STYLE_DROP_SHADOW );
-#if defined(DEBUG_ENABLED)
-          shadowActor.SetName( "Text Shadow renderable actor" );
-#endif
-          // Offset shadow in x and y
-          shadowActor.RegisterProperty("uOffset", shadowOffset );
-          Dali::Renderer renderer( shadowActor.GetRendererAt( 0 ) );
-          int depthIndex = renderer.GetProperty<int>(Dali::Renderer::Property::DEPTH_INDEX);
-          renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, depthIndex - 1 );
-          mActor.Add( shadowActor );
-        }
-
-        if( hasRenderer )
-        {
-          mActor.Add( actor );
-        }
-      }
+      CreateActors( meshContainer,
+                    textSize,
+                    defaultColor,
+                    shadowColor,
+                    shadowOffset,
+                    style,
+                    textControl,
+                    animatablePropertyIndex );
     }
+
 #if defined(DEBUG_ENABLED)
     Toolkit::AtlasGlyphManager::Metrics metrics = mGlyphManager.GetMetrics();
     DALI_LOG_INFO( gLogFilter, Debug::General, "TextAtlasRenderer::GlyphManager::GlyphCount: %i, AtlasCount: %i, TextureMemoryUse: %iK\n",
