@@ -3697,7 +3697,7 @@ bool Controller::DeleteEvent( int keyCode )
                           1,
                           UPDATE_INPUT_STYLE );
   }
-  else if( ( mImpl->mEventData->mPrimaryCursorPosition >= 0 ) && ( keyCode == Dali::DevelKey::DALI_KEY_DELETE ) )
+  else if( keyCode == Dali::DevelKey::DALI_KEY_DELETE )
   {
     // Remove the character after the current cursor position
     removed = RemoveText( 0,
