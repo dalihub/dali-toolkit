@@ -2114,8 +2114,15 @@ void Controller::GetPlaceholderProperty( Property::Map& map )
 
 Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
 {
-  const LineRun* const firstline = mImpl->mModel->mVisualModel->mLines.Begin();
-  if ( firstline && firstline->direction )
+  if( ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) )
+  {
+    return Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT;
+  }
+
+  const Character character = mImpl->mModel->mLogicalModel->mText[0];
+  Script script = TextAbstraction::GetCharacterScript( character );
+
+  if( TextAbstraction::IsRightToLeftScript( script ) )
   {
     return Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT;
   }

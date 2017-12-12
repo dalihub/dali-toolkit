@@ -1163,18 +1163,15 @@ int UtcDaliToolkitTextlabelTextDirection(void)
   tet_infoline(" UtcDaliToolkitTextlabelTextDirection");
 
   TextLabel label = TextLabel::New();
+  DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::TEXT_DIRECTION ), static_cast< int >( Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+
   label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
   label.SetProperty( TextLabel::Property::POINT_SIZE, 20 );
   Stage::GetCurrent().Add( label );
 
-  application.SendNotification();
-  application.Render();
-
   DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::TEXT_DIRECTION ), static_cast< int >( Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
 
   label.SetProperty( TextLabel::Property::TEXT, "ﻡﺮﺤﺑﺍ ﺏﺎﻠﻋﺎﻠﻣ ﻡﺮﺤﺑﺍ" );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::TEXT_DIRECTION ), static_cast< int >( Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
 
   END_TEST;
