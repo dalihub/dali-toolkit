@@ -888,7 +888,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       TextAbstraction::FontDescription defaultFontDescription;
       TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
 
-      if( IsShowingPlaceholderText() && ( NULL != mEventData->mPlaceholderFont ) )
+      if( IsShowingPlaceholderText() && mEventData && ( NULL != mEventData->mPlaceholderFont ) )
       {
         // If the placeholder font is set specifically, only placeholder font is changed.
         defaultFontDescription = mEventData->mPlaceholderFont->mFontDescription;
