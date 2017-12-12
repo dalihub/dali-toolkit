@@ -1144,7 +1144,7 @@ float Controller::Impl::GetDefaultFontLineHeight()
 
 void Controller::Impl::OnCursorKeyEvent( const Event& event )
 {
-  if( NULL == mEventData )
+  if( NULL == mEventData || !IsShowingRealText() )
   {
     // Nothing to do if there is no text input.
     return;

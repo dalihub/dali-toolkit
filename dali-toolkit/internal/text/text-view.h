@@ -131,6 +131,16 @@ public:
                                  UnderlineRunIndex index,
                                  Length numberOfRuns ) const;
 
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetOutlineColor()
+   */
+  virtual const Vector4& GetOutlineColor() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetOutlineWidth()
+   */
+  virtual unsigned int GetOutlineWidth() const;
+
 private:
 
   // Undefined

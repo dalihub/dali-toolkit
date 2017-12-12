@@ -84,7 +84,7 @@ bool ParseOutlineProperties( const Property::Map& outlineProperties,
                                bool& colorDefined,
                                Vector4& color,
                                bool& widthDefined,
-                               float& width );
+                               unsigned int& width );
 
 /**
  * @brief Sets the underline properties.

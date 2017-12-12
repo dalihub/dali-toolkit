@@ -51,6 +51,7 @@ public:
   struct GlyphRecordEntry
   {
     Text::GlyphIndex mIndex;
+    uint32_t mOutlineWidth;
     uint32_t mImageId;
     int32_t mCount;
   };
@@ -70,6 +71,7 @@ public:
    * @copydoc Toolkit::AtlasGlyphManager::Add
    */
   void Add( const Text::GlyphInfo& glyph,
+            const uint32_t outlineWidth,
             const PixelData& bitmap,
             Dali::Toolkit::AtlasManager::AtlasSlot& slot );
 
@@ -85,6 +87,7 @@ public:
    */
   bool IsCached( Text::FontId fontId,
                  Text::GlyphIndex index,
+                 uint32_t outlineWidth,
                  Dali::Toolkit::AtlasManager::AtlasSlot& slot );
 
   /**
@@ -105,7 +108,7 @@ public:
   /**
    * @copydoc toolkit::AtlasGlyphManager::AdjustReferenceCount
    */
-  void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, int32_t delta );
+  void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, uint32_t outlineWidth, int32_t delta );
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::GetTextures

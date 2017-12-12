@@ -834,14 +834,14 @@ public: // Default style & Input style
    *
    * @param[in] width The width in pixels of the outline, 0 indicates no outline
    */
-  void SetOutlineWidth( float width );
+  void SetOutlineWidth( unsigned int width );
 
   /**
    * @brief Retrieves the width of an outline
    *
    * @return The width of the outline.
    */
-  float GetOutlineWidth() const;
+  unsigned int GetOutlineWidth() const;
 
   /**
    * @brief Sets the emboss's properties string.
