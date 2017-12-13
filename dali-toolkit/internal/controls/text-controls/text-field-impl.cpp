@@ -35,6 +35,7 @@
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -127,6 +128,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "pixelSize",                    
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableSelection",                      BOOLEAN,   ENABLE_SELECTION                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder",                          MAP,       PLACEHOLDER                          )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "ellipsis",                             BOOLEAN,   ELLIPSIS                             )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableShiftSelection",           BOOLEAN,   ENABLE_SHIFT_SELECTION               )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -758,6 +760,17 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::ENABLE_SHIFT_SELECTION:
+      {
+        if( impl.mController )
+        {
+          const bool shiftSelection = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p ENABLE_SHIFT_SELECTION %d\n", impl.mController.Get(), shiftSelection );
+
+          impl.mController->SetShiftSelectionEnabled( shiftSelection );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -1154,6 +1167,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           value = impl.mController->IsTextElideEnabled();
+        }
+        break;
+      }
+      case Toolkit::DevelTextField::Property::ENABLE_SHIFT_SELECTION:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsShiftSelectionEnabled();
         }
         break;
       }
