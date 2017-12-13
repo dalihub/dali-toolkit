@@ -649,14 +649,8 @@ void GetOutlineProperties( ControllerPtr controller, Property::Value& value, Eff
           const unsigned int width = controller->GetOutlineWidth();
 
           Property::Map map;
-
-          std::string colorStr;
-          Vector4ToColorString( color, colorStr );
-          map.Insert( COLOR_KEY, colorStr );
-
-          std::string widthStr;
-          UintToString( width, widthStr );
-          map.Insert( WIDTH_KEY, widthStr );
+          map.Insert( COLOR_KEY, color );
+          map.Insert( WIDTH_KEY, static_cast<int>( width ) );
 
           value = map;
 

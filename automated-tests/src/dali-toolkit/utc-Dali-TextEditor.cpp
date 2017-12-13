@@ -314,9 +314,38 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
 
       if( NULL != valueSet )
       {
-        if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
+        if( valueSet->GetType() == Dali::Property::STRING && ( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() ) )
         {
-          tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          tet_printf( "Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::BOOLEAN && ( valueGet.second.Get<bool>() != valueSet->Get<bool>() ) )
+        {
+          tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<bool>(), valueSet->Get<bool>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::INTEGER && ( valueGet.second.Get<int>() != valueSet->Get<int>() ) )
+        {
+          tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<int>(), valueSet->Get<int>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::FLOAT && ( valueGet.second.Get<float>() != valueSet->Get<float>() ) )
+        {
+          tet_printf( "Value got : [%f], expected : [%f]", valueGet.second.Get<float>(), valueSet->Get<float>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::VECTOR2 && ( valueGet.second.Get<Vector2>() != valueSet->Get<Vector2>() ) )
+        {
+          Vector2 vector2Get = valueGet.second.Get<Vector2>();
+          Vector2 vector2Set = valueSet->Get<Vector2>();
+          tet_printf( "Value got : [%f, %f], expected : [%f, %f]", vector2Get.x, vector2Get.y, vector2Set.x, vector2Set.y );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::VECTOR4 && ( valueGet.second.Get<Vector4>() != valueSet->Get<Vector4>() ) )
+        {
+          Vector4 vector4Get = valueGet.second.Get<Vector4>();
+          Vector4 vector4Set = valueSet->Get<Vector4>();
+          tet_printf( "Value got : [%f, %f, %f, %f], expected : [%f, %f, %f, %f]", vector4Get.r, vector4Get.g, vector4Get.b, vector4Get.a, vector4Set.r, vector4Set.g, vector4Set.b, vector4Set.a );
           return false;
         }
       }
@@ -785,8 +814,6 @@ int UtcDaliTextEditorSetPropertyP(void)
 
   editor.SetProperty( TextEditor::Property::OUTLINE, outlineMapSet );
 
-  outlineMapSet["color"] = "red";
-  outlineMapSet["width"] = "2";
   outlineMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::OUTLINE );
   DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
