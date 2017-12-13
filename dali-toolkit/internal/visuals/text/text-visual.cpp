@@ -24,6 +24,7 @@
 
 // INTERNAL HEADER
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties-devel.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
@@ -58,6 +59,7 @@ const char * const TEXT_COLOR_PROPERTY( "textColor" );
 const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
 const char * const SHADOW_PROPERTY( "shadow" );
 const char * const UNDERLINE_PROPERTY( "underline" );
+const char * const OUTLINE_PROPERTY( "outline" );
 
 const Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
 
@@ -328,6 +330,10 @@ Dali::Property::Index StringKeyToIndexKey( const std::string& stringKey )
   {
     result = Toolkit::TextVisual::Property::UNDERLINE;
   }
+  else if( stringKey == OUTLINE_PROPERTY )
+  {
+    result = Toolkit::DevelTextVisual::Property::OUTLINE;
+  }
 
   return result;
 }
@@ -414,6 +420,9 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   GetUnderlineProperties( mController, value, Text::EffectStyle::DEFAULT );
   map.Insert( Toolkit::TextVisual::Property::UNDERLINE, value );
+
+  GetOutlineProperties( mController, value, Text::EffectStyle::DEFAULT );
+  map.Insert( Toolkit::DevelTextVisual::Property::OUTLINE, value );
 }
 
 void TextVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -600,6 +609,11 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
     case Toolkit::TextVisual::Property::UNDERLINE:
     {
       SetUnderlineProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
+      break;
+    }
+    case Toolkit::DevelTextVisual::Property::OUTLINE:
+    {
+      SetOutlineProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
       break;
     }
   }

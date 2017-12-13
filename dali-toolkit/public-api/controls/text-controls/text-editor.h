@@ -301,9 +301,7 @@ public:
       INPUT_LINE_SPACING,
 
       /**
-       * @brief The default underline parameters.
-       * @details Name "underline", type Property::MAP.
-       * @SINCE_1_2.13
+       * @copydoc Dali::Toolkit::TextLabel::Property::UNDERLINE
        */
       UNDERLINE,
 
@@ -315,9 +313,7 @@ public:
       INPUT_UNDERLINE,
 
       /**
-       * @brief The default shadow parameters.
-       * @details Name "shadow", type Property::MAP.
-       * @SINCE_1_2.13
+       * @copydoc Dali::Toolkit::TextLabel::Property::SHADOW
        */
       SHADOW,
 
@@ -343,9 +339,7 @@ public:
       INPUT_EMBOSS,
 
       /**
-       * @brief The default outline parameters.
-       * @details Name "outline", type Property::MAP.
-       * @SINCE_1_2.13
+       * @copydoc Dali::Toolkit::TextLabel::Property::OUTLINE
        */
       OUTLINE,
 
