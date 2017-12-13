@@ -569,7 +569,7 @@ struct AtlasRenderer::Impl
           lastFontId = glyph.fontId; // Prevents searching for existing blocksizes when string of the same fontId.
         }
 
-        if( isOutline&& ( 0u != slotOutline.mImageId ) ) // invalid slot id, glyph has failed to be added to atlas
+        if( isOutline && ( 0u != slotOutline.mImageId ) ) // invalid slot id, glyph has failed to be added to atlas
         {
           GenerateMesh( glyph,
                         position,

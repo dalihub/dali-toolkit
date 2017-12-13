@@ -2291,7 +2291,7 @@ void Controller::Impl::RepositionSelectionHandles()
   const SelectionBoxInfo& firstSelectionBoxLineInfo = *( selectionBoxLinesInfo.Begin() );
   highLightPosition.y = firstSelectionBoxLineInfo.lineOffset;
 
-  mEventData->mDecorator->SetHighLightBox( highLightPosition, highLightSize );
+  mEventData->mDecorator->SetHighLightBox( highLightPosition, highLightSize, static_cast<float>( mModel->GetOutlineWidth() ) );
 
   if( !mEventData->mDecorator->IsSmoothHandlePanEnabled() )
   {
@@ -2710,6 +2710,13 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
 
   Text::GetCursorPosition( parameters,
                            cursorInfo );
+
+  // Adds Outline offset.
+  const float outlineWidth = static_cast<float>( mModel->GetOutlineWidth() );
+  cursorInfo.primaryPosition.x += outlineWidth;
+  cursorInfo.primaryPosition.y += outlineWidth;
+  cursorInfo.secondaryPosition.x += outlineWidth;
+  cursorInfo.secondaryPosition.y += outlineWidth;
 
   if( isMultiLine )
   {

@@ -3387,7 +3387,7 @@ bool Controller::DoRelayout( const Size& size,
     const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mModel->mVisualModel->mGlyphsToCharacters;
     const Vector<Length>& charactersPerGlyph = mImpl->mModel->mVisualModel->mCharactersPerGlyph;
     const Character* const textBuffer = mImpl->mModel->mLogicalModel->mText.Begin();
-    float outlineWidth = mImpl->mModel->GetOutlineWidth();
+    const float outlineWidth = static_cast<float>( mImpl->mModel->GetOutlineWidth() );
 
     // Set the layout parameters.
     Layout::Parameters layoutParameters( size,

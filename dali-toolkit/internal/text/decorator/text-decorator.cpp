@@ -236,6 +236,9 @@ struct Decorator::Impl : public ConnectionTracker
     mBoundingBox(),
     mHighlightColor( LIGHT_BLUE ),
     mHighlightPosition( Vector2::ZERO ),
+    mHighlightSize( Vector2::ZERO ),
+    mControlSize( Vector2::ZERO ),
+    mHighlightOutlineOffset( 0.f ),
     mActiveCursor( ACTIVE_CURSOR_NONE ),
     mCursorBlinkInterval( CURSOR_BLINK_INTERVAL ),
     mCursorBlinkDuration( 0.0f ),
@@ -1163,8 +1166,8 @@ struct Decorator::Impl : public ConnectionTracker
     if ( mHighlightActor )
     {
       // Sets the position of the highlight actor inside the decorator.
-      mHighlightActor.SetPosition( mHighlightPosition.x,
-                                   mHighlightPosition.y );
+      mHighlightActor.SetPosition( mHighlightPosition.x + mHighlightOutlineOffset,
+                                   mHighlightPosition.y + mHighlightOutlineOffset );
 
       const unsigned int numberOfQuads = mHighlightQuadList.Count();
       if( 0u != numberOfQuads )
@@ -1912,6 +1915,7 @@ struct Decorator::Impl : public ConnectionTracker
   Vector2             mHighlightPosition;         ///< The position of the highlight actor.
   Size                mHighlightSize;             ///< The size of the highlighted text.
   Size                mControlSize;               ///< The control's size. Set by the Relayout.
+  float               mHighlightOutlineOffset;    ///< The outline's offset.
 
   unsigned int        mActiveCursor;
   unsigned int        mCursorBlinkInterval;
@@ -2199,16 +2203,18 @@ void Decorator::AddHighlight( unsigned int index, const Vector4& quad )
   *( mImpl->mHighlightQuadList.Begin() + index ) = quad;
 }
 
-void Decorator::SetHighLightBox( const Vector2& position, const Size& size )
+void Decorator::SetHighLightBox( const Vector2& position, const Size& size, float outlineOffset )
 {
   mImpl->mHighlightPosition = position;
   mImpl->mHighlightSize = size;
+  mImpl->mHighlightOutlineOffset = outlineOffset;
 }
 
 void Decorator::ClearHighlights()
 {
   mImpl->mHighlightQuadList.Clear();
   mImpl->mHighlightPosition = Vector2::ZERO;
+  mImpl->mHighlightOutlineOffset = 0.f;
 }
 
 void Decorator::ResizeHighlightQuads( unsigned int numberOfQuads )
