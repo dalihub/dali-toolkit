@@ -96,6 +96,12 @@ namespace Property
        * @details Name "placeholderTextColor", type Property::VECTOR4.
        */
       PLACEHOLDER_TEXT_COLOR,
+
+      /**
+       * @brief Enables Text selection using Shift key.
+       * @details Name "enableShiftSelection", type Property::BOOLEAN.
+       */
+      ENABLE_SHIFT_SELECTION
   };
 
 } // namespace Property

@@ -27,6 +27,7 @@
 #include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include "toolkit-clipboard.h"
 
 using namespace Dali;
@@ -99,6 +100,7 @@ const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSiz
 const char* const PROPERTY_NAME_ENABLE_SELECTION                     = "enableSelection";
 const char* const PROPERTY_NAME_PLACEHOLDER                          = "placeholder";
 const char* const PROPERTY_NAME_ELLIPSIS                             = "ellipsis";
+const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableShiftSelection";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -539,6 +541,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == TextField::Property::ENABLE_SELECTION );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == TextField::Property::PLACEHOLDER );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextField::Property::ELLIPSIS );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextField::Property::ENABLE_SHIFT_SELECTION );
 
   END_TEST;
 }
@@ -2744,6 +2747,34 @@ int UtcDaliTextFieldSetPaddingProperty(void)
   DALI_TEST_EQUALS( originalSize.width + 10 + 10 , paddingAddedSize.width, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   DALI_TEST_EQUALS( originalSize.height + 10 + 10 , paddingAddedSize.height, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldEnableShiftSelectionProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextFieldEnableShiftSelectionProperty");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( field );
+
+  application.SendNotification();
+  application.Render();
+
+  // The default value of ENABLE_SHIFT_SELECTION is 'true'.
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_SHIFT_SELECTION ), true, TEST_LOCATION );
+
+  // Check the enable shift selection property
+  field.SetProperty( DevelTextField::Property::ENABLE_SHIFT_SELECTION, false );
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_SHIFT_SELECTION ), false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

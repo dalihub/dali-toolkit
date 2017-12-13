@@ -394,6 +394,18 @@ public: // Configure the text controller.
   bool IsSelectionEnabled() const;
 
   /**
+   * @brief Enable or disable the text selection using Shift key.
+   * @param enabled Whether to enable the text selection using Shift key
+   */
+  void SetShiftSelectionEnabled( bool enabled );
+
+  /**
+   * @brief Whether the text selection using Shift key is enabled or not.
+   * @return True if the text selection using Shift key is enabled
+   */
+  bool IsShiftSelectionEnabled() const;
+
+  /**
    * @brief Sets input type to password
    *
    * @note The string is displayed hidden character

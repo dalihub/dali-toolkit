@@ -99,6 +99,7 @@ const char* const PROPERTY_NAME_PLACEHOLDER_TEXT                     = "placehol
 const char* const PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR               = "placeholderTextColor";
 const char* const PROPERTY_NAME_ENABLE_SELECTION                     = "enableSelection";
 const char* const PROPERTY_NAME_PLACEHOLDER                          = "placeholder";
+const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableShiftSelection";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -536,6 +537,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == TextEditor::Property::PLACEHOLDER );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == DevelTextEditor::Property::PLACEHOLDER_TEXT );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextEditor::Property::ENABLE_SHIFT_SELECTION );
 
   END_TEST;
 }
@@ -2175,6 +2177,52 @@ int utcDaliTextEditorEvent07(void)
 
   DALI_TEST_EQUALS( "Hello\nld\nHello lo\nworld", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
+
+  // Disable Shift Selection
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION, false );
+
+  // Test to select some text in the right of the current cursor position
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Cut the selected text
+  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "x", "x", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // The text isn't selected and not changed because of 'SetProperty( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION, false )'
+  DALI_TEST_EQUALS( "Hello\nld\nHello lo\nworld", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
+
+  // Test to select some text in the left of the current cursor position
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Copy the selected text
+  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "c", "c", KEY_C_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // The text is not selected and not changed because of 'SetProperty( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION, false )'
+  DALI_TEST_EQUALS( "Hello\nld\nHello lo\nworld", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -2507,6 +2555,34 @@ int UtcDaliTextEditorSetPaddingProperty(void)
   DALI_TEST_EQUALS( originalSize.width + 10 + 10 , paddingAddedSize.width, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   DALI_TEST_EQUALS( originalSize.height + 10 + 10 , paddingAddedSize.height, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorEnableShiftSelectionProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorEnableShiftSelectionProperty");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+  editor.SetSize( 300.f, 50.f );
+  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( editor );
+
+  application.SendNotification();
+  application.Render();
+
+  // The default value of ENABLE_SHIFT_SELECTION is 'true'.
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION ), true, TEST_LOCATION );
+
+  // Check the enable shift selection property
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION, false );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION ), false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
