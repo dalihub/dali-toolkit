@@ -71,6 +71,11 @@ VerticalAlignment::Type ViewModel::GetVerticalAlignment() const
   return mModel->GetVerticalAlignment();
 }
 
+DevelText::VerticalLineAlignment::Type ViewModel::GetVerticalLineAlignment() const
+{
+  return mModel->GetVerticalLineAlignment();
+}
+
 bool ViewModel::IsTextElideEnabled() const
 {
   return mModel->IsTextElideEnabled();

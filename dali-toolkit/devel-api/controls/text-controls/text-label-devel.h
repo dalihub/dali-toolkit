@@ -67,10 +67,19 @@ namespace Property
 
     /**
      * @brief The direction of the layout.
-     * @details Name "textDirection", type Property::Integer, Read-Only.
+     * @details Name "textDirection", type [Type](@ref Dali::Toolkit::DevelText::TextDirection::Type) (Property::INTEGER), Read/Write
+     * @note The text direction can be changed only by replacing the text itself.
      * @see TextDirection::Type for supported values.
      */
     TEXT_DIRECTION,
+
+    /**
+     * @brief Alignment of text within area of single line
+     * @details Name "verticalLineAlignment", type [Type](@ref Dali::Toolkit::DevelText::VerticalLineAlignment::Type) (Property::INTEGER), Read/Write
+     * @note The default value is TOP
+     * @see VerticalLineAlignment::Type for supported values
+     */
+    VERTICAL_LINE_ALIGNMENT,
   };
 
 } // namespace Property
