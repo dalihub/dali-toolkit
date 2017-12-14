@@ -49,8 +49,8 @@ size_t GetNumberOfThreads(const char* environmentVariable, size_t defaultValue)
   auto numberString = GetEnvironmentVariable(environmentVariable);
   auto numberOfThreads = numberString ? std::strtoul(numberString, nullptr, 10) : 0;
   constexpr auto MAX_NUMBER_OF_THREADS = 100u;
-  DALI_ASSERT_ALWAYS( numberOfThreads < MAX_NUMBER_OF_THREADS );
-  return (numberOfThreads > 0) ? numberOfThreads : defaultValue;
+  DALI_ASSERT_DEBUG( numberOfThreads < MAX_NUMBER_OF_THREADS );
+  return ( numberOfThreads > 0 && numberOfThreads < MAX_NUMBER_OF_THREADS ) ? numberOfThreads : defaultValue;
 }
 
 size_t GetNumberOfLocalLoaderThreads()
