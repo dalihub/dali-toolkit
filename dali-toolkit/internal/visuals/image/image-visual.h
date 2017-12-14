@@ -251,6 +251,16 @@ public:
   static Shader GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping );
 
   /**
+   * Get the standard vertex shader code.
+   */
+  static const char* GetStandardVertexShader();
+
+  /**
+   * Get the standard fragment shader code.
+   */
+  static const char* GetStandardFrgamentShader();
+
+  /**
    * @copydoc AtlasUploadObserver::UploadCompleted
    *
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.

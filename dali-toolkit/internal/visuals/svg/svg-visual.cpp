@@ -125,7 +125,20 @@ void SvgVisual::DoSetProperty( Property::Index index, const Property::Value& val
 
 void SvgVisual::DoSetOnStage( Actor& actor )
 {
-  Shader shader = ImageVisual::GetImageShader( mFactoryCache, mAttemptAtlasing, true );
+  Shader shader;
+  if( !mImpl->mCustomShader )
+  {
+    shader = ImageVisual::GetImageShader( mFactoryCache, mAttemptAtlasing, true );
+  }
+  else
+  {
+    shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? ImageVisual::GetStandardVertexShader() : mImpl->mCustomShader->mVertexShader,
+                           mImpl->mCustomShader->mFragmentShader.empty() ? ImageVisual::GetStandardFrgamentShader() : mImpl->mCustomShader->mFragmentShader,
+                           mImpl->mCustomShader->mHints );
+
+    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+  }
+
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
   TextureSet textureSet = TextureSet::New();
   mImpl->mRenderer = Renderer::New( geometry, shader );
@@ -216,7 +229,7 @@ void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
 
     TextureSet textureSet;
 
-    if( mAttemptAtlasing )
+    if( mAttemptAtlasing && !mImpl->mCustomShader )
     {
       Vector4 atlasRect;
       textureSet = mFactoryCache.GetAtlasManager()->Add(atlasRect, rasterizedPixelData );

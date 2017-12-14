@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-event-thread-callback.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -2994,6 +2995,133 @@ int UtcDaliNPatchVisualCustomShader(void)
 
   Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
   DALI_TEST_EQUALS( vertexShader, vertex->Get<std::string>(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliSvgVisualCustomShader(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "SvgVisual with custom shader" );
+
+  // Vertex & fragment shader
+  const std::string vertexShader = "Foobar";
+  const std::string fragmentShader = "Foobar";
+  Property::Map properties;
+  Property::Map shaderProperty1;
+  shaderProperty1[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER] = vertexShader;
+  shaderProperty1[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+
+  properties[Visual::Property::TYPE] = Visual::SVG;
+  properties[Visual::Property::SHADER] = shaderProperty1;
+  properties[ImageVisual::Property::URL] = TEST_SVG_FILE_NAME;
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base visual = factory.CreateVisual( properties );
+
+  // trigger creation through setting on stage
+  DummyControl dummy = DummyControl::New( true );
+  Impl::DummyControl& dummyImpl1 = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+
+  dummyImpl1.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+  dummy.SetSize( 200, 200 );
+  Stage::GetCurrent().Add( dummy );
+
+  visual.SetTransformAndSize( DefaultTransform(), Vector2( 100, 100 ) );
+
+  application.SendNotification();
+
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  Renderer renderer = dummy.GetRendererAt( 0 );
+  Shader shader = renderer.GetShader();
+  Property::Value value = shader.GetProperty( Shader::Property::PROGRAM );
+  Property::Map* map = value.GetMap();
+  DALI_TEST_CHECK( map );
+
+  Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
+  DALI_TEST_EQUALS( vertexShader, vertex->Get< std::string >(), TEST_LOCATION );
+
+  Property::Value* fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
+  DALI_TEST_EQUALS( fragmentShader, fragment->Get< std::string >(), TEST_LOCATION );
+
+  // Vertex shader only
+  Property::Map shaderProperty2;
+  shaderProperty2[Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER] = vertexShader;
+
+  properties[Visual::Property::TYPE] = Visual::SVG;
+  properties[Visual::Property::SHADER] = shaderProperty2;
+  properties[ImageVisual::Property::URL] = TEST_SVG_FILE_NAME;
+
+  visual = factory.CreateVisual( properties );
+
+  // trigger creation through setting on stage
+  dummy = DummyControl::New( true );
+  Impl::DummyControl& dummyImpl2 = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+
+  dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+  dummy.SetSize( 200, 200 );
+  Stage::GetCurrent().Add( dummy );
+
+  visual.SetTransformAndSize( DefaultTransform(), Vector2( 100, 100 ) );
+
+  application.SendNotification();
+
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  renderer = dummy.GetRendererAt( 0 );
+  shader = renderer.GetShader();
+  value = shader.GetProperty( Shader::Property::PROGRAM );
+  map = value.GetMap();
+  DALI_TEST_CHECK( map );
+
+  vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
+  DALI_TEST_EQUALS( vertexShader, vertex->Get< std::string >(), TEST_LOCATION );
+
+  // Fragment shader only
+  Property::Map shaderProperty3;
+  shaderProperty3[Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+
+  properties[Visual::Property::TYPE] = Visual::SVG;
+  properties[Visual::Property::SHADER] = shaderProperty3;
+  properties[ImageVisual::Property::URL] = TEST_SVG_FILE_NAME;
+
+  visual = factory.CreateVisual( properties );
+
+  // trigger creation through setting on stage
+  dummy = DummyControl::New( true );
+  Impl::DummyControl& dummyImpl3 = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+
+  dummyImpl3.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+  dummy.SetSize( 200, 200 );
+  Stage::GetCurrent().Add( dummy );
+
+  visual.SetTransformAndSize( DefaultTransform(), Vector2( 100, 100 ) );
+
+  application.SendNotification();
+
+  // Wait for image to load
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  renderer = dummy.GetRendererAt( 0 );
+  shader = renderer.GetShader();
+  value = shader.GetProperty( Shader::Property::PROGRAM );
+  map = value.GetMap();
+  DALI_TEST_CHECK( map );
+
+  fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
+  DALI_TEST_EQUALS( fragmentShader, fragment->Get< std::string >(), TEST_LOCATION );
 
   END_TEST;
 }

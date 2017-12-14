@@ -1039,6 +1039,16 @@ Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlas
   return shader;
 }
 
+const char* ImageVisual::GetStandardVertexShader()
+{
+  return VERTEX_SHADER;
+}
+
+const char* ImageVisual::GetStandardFrgamentShader()
+{
+  return FRAGMENT_SHADER_NO_ATLAS;
+}
+
 void ImageVisual::ApplyImageToSampler( const Image& image )
 {
   if( image )
