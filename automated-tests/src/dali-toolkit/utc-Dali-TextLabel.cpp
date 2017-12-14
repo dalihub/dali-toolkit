@@ -429,14 +429,35 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::FINISH_LOOP );
   DALI_TEST_EQUALS( STOP_FINISH_LOOP, label.GetProperty<std::string>( TextLabel::Property::AUTO_SCROLL_STOP_MODE ), TEST_LOCATION );
 
+  // test natural size with multi-line and line spacing
+  {
+    TextLabel label3 = TextLabel::New("Some text here\nend there\nend here");
+    Vector3 expected0(414.f, 192.f, 0.0f);
+    Vector3 expected1(414.f, 252.f, 0.0f);
+    label3.SetProperty(TextLabel::Property::MULTI_LINE, true);
+    label3.SetProperty(TextLabel::Property::LINE_SPACING, 0);
+    DALI_TEST_EQUALS(expected0, label3.GetNaturalSize(), TEST_LOCATION);
+    label3.SetProperty(TextLabel::Property::LINE_SPACING, 20);
+    DALI_TEST_EQUALS(expected1, label3.GetNaturalSize(), TEST_LOCATION);
+  }
 
+  // single line, line spacing must not affect natural size
+  {
+    const Vector3 expected0(948.f, 64.f, 0.0f);
+    const Vector3 expected1(948.f, 84.f, 0.0f);
+    TextLabel label3 = TextLabel::New("Some text here end there end here");
+    label3.SetProperty(TextLabel::Property::MULTI_LINE, false);
+    label3.SetProperty(TextLabel::Property::LINE_SPACING, 0);
+    DALI_TEST_EQUALS(expected0, label3.GetNaturalSize(), TEST_LOCATION);
+    label3.SetProperty(TextLabel::Property::LINE_SPACING, 20);
+    DALI_TEST_EQUALS(expected1, label3.GetNaturalSize(), TEST_LOCATION);
+  }
   // Check the line spacing property
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
   label.SetProperty( TextLabel::Property::LINE_SPACING, 10.f );
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 10.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the underline property
-
   underlineMapSet.Clear();
   underlineMapSet.Insert( "enable", "true" );
   underlineMapSet.Insert( "color", "red" );
@@ -1217,6 +1238,29 @@ int UtcDaliToolkitTextlabelTextDirection(void)
 
   label.SetProperty( TextLabel::Property::TEXT, "ﻡﺮﺤﺑﺍ ﺏﺎﻠﻋﺎﻠﻣ ﻡﺮﺤﺑﺍ" );
   DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::TEXT_DIRECTION ), static_cast< int >( Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelVerticalLineAlignment(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelVerticalLineAlignment");
+
+  TextLabel label = TextLabel::New();
+
+  label.SetProperty( DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT, DevelText::VerticalLineAlignment::TOP  );
+  label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 15 );
+  label.SetProperty( TextLabel::Property::LINE_SPACING, 12 );
+  Stage::GetCurrent().Add( label );
+  DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT ), static_cast< int >( Toolkit::DevelText::VerticalLineAlignment::TOP ), TEST_LOCATION );
+
+  label.SetProperty( DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT, DevelText::VerticalLineAlignment::MIDDLE  );
+  DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT ), static_cast< int >( Toolkit::DevelText::VerticalLineAlignment::MIDDLE ), TEST_LOCATION );
+
+  label.SetProperty( DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT, DevelText::VerticalLineAlignment::BOTTOM  );
+  DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT ), static_cast< int >( Toolkit::DevelText::VerticalLineAlignment::BOTTOM ), TEST_LOCATION );
 
   END_TEST;
 }

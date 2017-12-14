@@ -38,6 +38,18 @@ enum Type
 
 } // namespace TextDirection
 
+namespace VerticalLineAlignment
+{
+
+enum Type
+{
+  TOP,
+  MIDDLE,
+  BOTTOM
+};
+
+} // namespace VerticalLineAlignment
+
 } // namespace DevelText
 
 } // namespace Toolkit

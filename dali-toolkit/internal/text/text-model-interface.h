@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 namespace Dali
 {
@@ -82,6 +83,13 @@ public:
    * @return The vertical alignment.
    */
   virtual VerticalAlignment::Type GetVerticalAlignment() const = 0;
+
+  /**
+   * @brief Retrieves the text's vertical line alignment.
+   *
+   * @return The vertical line alignment.
+   */
+  virtual DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const = 0;
 
   /**
    * @brief Whether the text elide property is enabled.
