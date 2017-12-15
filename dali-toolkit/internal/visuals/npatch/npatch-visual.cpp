@@ -56,6 +56,7 @@ const char * const AUXILIARY_IMAGE_ALPHA_NAME( "auxiliaryImageAlpha" );
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying mediump vec2 vTexCoord;\n
+  varying mediump vec2 vMaskTexCoord;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   uniform mediump vec2 uNinePatchFactorsX[ FACTOR_SIZE_X ];\n
@@ -83,7 +84,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     mediump vec4 gridPosition = vec4( fixedFactor + ( visualSize.xy - fixedTotal ) * stretch / stretchTotal, 0.0, 1.0 );\n
     mediump vec4 vertexPosition = gridPosition;\n
     vertexPosition.xy -= visualSize.xy * vec2( 0.5, 0.5 );\n
-    vertexPostion.xy += anchorPoint*visualSize + (visualOffset + origin)*uSize.xy;\n
+    vertexPosition.xy += anchorPoint*visualSize + (visualOffset + origin)*uSize.xy;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
     \n
     vTexCoord = ( fixedFactor + stretch ) / ( fixedTotal + stretchTotal );\n
@@ -569,8 +570,8 @@ void NPatchVisual::ApplyTextureAndUniforms()
       Uint16Pair stretchX = data->stretchPixelsX[ 0 ];
       Uint16Pair stretchY = data->stretchPixelsY[ 0 ];
 
-      uint16_t stretchWidth = stretchX.GetY() - stretchX.GetX();
-      uint16_t stretchHeight = stretchY.GetY() - stretchY.GetX();
+      uint16_t stretchWidth = ( stretchX.GetY() >= stretchX.GetX() ) ? stretchX.GetY() - stretchX.GetX() : 0;
+      uint16_t stretchHeight = ( stretchY.GetY() >= stretchY.GetX() ) ? stretchY.GetY() - stretchY.GetX() : 0;
 
       mImpl->mRenderer.RegisterProperty( "uFixed[0]", Vector2::ZERO );
       mImpl->mRenderer.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );

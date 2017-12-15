@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/animated-gradient-visual-properties-devel.h>
 #include <dali-toolkit/dali-toolkit.h>
 
@@ -68,18 +69,64 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
     {
       const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
 
-      Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      Property::Value* valueSet = NULL;
+      if ( valueGet.first.type == Property::Key::INDEX )
+      {
+        valueSet = fontStyleMapSet.Find( valueGet.first.indexKey );
+      }
+      else
+      {
+        // Get Key is a string so searching Set Map for a string key
+        valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      }
+
       if( NULL != valueSet )
       {
-        if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
+        if( valueSet->GetType() == Dali::Property::STRING && ( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() ) )
         {
-          tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          tet_printf( "Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::BOOLEAN && ( valueGet.second.Get<bool>() != valueSet->Get<bool>() ) )
+        {
+          tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<bool>(), valueSet->Get<bool>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::INTEGER && ( valueGet.second.Get<int>() != valueSet->Get<int>() ) )
+        {
+          tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<int>(), valueSet->Get<int>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::FLOAT && ( valueGet.second.Get<float>() != valueSet->Get<float>() ) )
+        {
+          tet_printf( "Value got : [%f], expected : [%f]", valueGet.second.Get<float>(), valueSet->Get<float>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::VECTOR2 && ( valueGet.second.Get<Vector2>() != valueSet->Get<Vector2>() ) )
+        {
+          Vector2 vector2Get = valueGet.second.Get<Vector2>();
+          Vector2 vector2Set = valueSet->Get<Vector2>();
+          tet_printf( "Value got : [%f, %f], expected : [%f, %f]", vector2Get.x, vector2Get.y, vector2Set.x, vector2Set.y );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::VECTOR4 && ( valueGet.second.Get<Vector4>() != valueSet->Get<Vector4>() ) )
+        {
+          Vector4 vector4Get = valueGet.second.Get<Vector4>();
+          Vector4 vector4Set = valueSet->Get<Vector4>();
+          tet_printf( "Value got : [%f, %f, %f, %f], expected : [%f, %f, %f, %f]", vector4Get.r, vector4Get.g, vector4Get.b, vector4Get.a, vector4Set.r, vector4Set.g, vector4Set.b, vector4Set.a );
           return false;
         }
       }
       else
       {
-        tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        if ( valueGet.first.type == Property::Key::INDEX )
+        {
+          tet_printf( "  The key %d doesn't exist.", valueGet.first.indexKey );
+        }
+        else
+        {
+          tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        }
         return false;
       }
     }
@@ -1070,6 +1117,16 @@ int UtcDaliVisualGetPropertyMap10(void)
   propertyMap.Insert( "horizontalAlignment", "CENTER" );
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
+
+  Property::Map shadowMapSet;
+  propertyMap.Insert( "shadow", shadowMapSet.Add("color", Color::RED).Add("offset", Vector2(2.0f, 2.0f)).Add("blurRadius", 3.0f) );
+
+  Property::Map underlineMapSet;
+  propertyMap.Insert( "underline", underlineMapSet.Add("enable", "true").Add("color", "green").Add("height", "1") );
+
+  Property::Map outlineMapSet;
+  propertyMap.Insert( "outline", outlineMapSet.Add("color", Color::YELLOW).Add("width", 1) );
+
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -1122,6 +1179,27 @@ int UtcDaliVisualGetPropertyMap10(void)
   value = resultMap.Find( TextVisual::Property::ENABLE_MARKUP, Property::BOOLEAN );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( !value->Get<bool>() );
+
+  value = resultMap.Find( TextVisual::Property::SHADOW, Property::MAP );
+  DALI_TEST_CHECK( value );
+
+  Property::Map shadowMapGet = value->Get<Property::Map>();
+  DALI_TEST_EQUALS( shadowMapGet.Count(), shadowMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( shadowMapGet, shadowMapSet ), true, TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::UNDERLINE, Property::MAP );
+  DALI_TEST_CHECK( value );
+
+  Property::Map underlineMapGet = value->Get<Property::Map>();
+  DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
+
+  value = resultMap.Find( DevelTextVisual::Property::OUTLINE, Property::MAP );
+  DALI_TEST_CHECK( value );
+
+  Property::Map outlineMapGet = value->Get<Property::Map>();
+  DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
 
   END_TEST;
 }

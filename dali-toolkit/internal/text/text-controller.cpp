@@ -1182,14 +1182,14 @@ const Vector4& Controller::GetOutlineColor() const
   return mImpl->mModel->mVisualModel->GetOutlineColor();
 }
 
-void Controller::SetOutlineWidth( float width )
+void Controller::SetOutlineWidth( unsigned int width )
 {
   mImpl->mModel->mVisualModel->SetOutlineWidth( width );
 
   mImpl->RequestRelayout();
 }
 
-float Controller::GetOutlineWidth() const
+unsigned int Controller::GetOutlineWidth() const
 {
   return mImpl->mModel->mVisualModel->GetOutlineWidth();
 }
@@ -2105,8 +2105,15 @@ void Controller::GetPlaceholderProperty( Property::Map& map )
 
 Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
 {
-  const LineRun* const firstline = mImpl->mModel->mVisualModel->mLines.Begin();
-  if ( firstline && firstline->direction )
+  if( ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) )
+  {
+    return Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT;
+  }
+
+  const Character character = mImpl->mModel->mLogicalModel->mText[0];
+  Script script = TextAbstraction::GetCharacterScript( character );
+
+  if( TextAbstraction::IsRightToLeftScript( script ) )
   {
     return Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT;
   }
@@ -2737,7 +2744,17 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
 
   if( retrieveText )
   {
-    mImpl->GetText( numberOfWhiteSpaces, text );
+    if( !mImpl->IsShowingPlaceholderText() )
+    {
+      // Retrieves the normal text string.
+      mImpl->GetText( numberOfWhiteSpaces, text );
+    }
+    else
+    {
+      // When the current text is Placeholder Text, the surrounding text should be empty string.
+      // It means DALi should send empty string ("") to IME.
+      text = "";
+    }
   }
 
   ImfManager::ImfCallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );
@@ -3370,7 +3387,7 @@ bool Controller::DoRelayout( const Size& size,
     const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mModel->mVisualModel->mGlyphsToCharacters;
     const Vector<Length>& charactersPerGlyph = mImpl->mModel->mVisualModel->mCharactersPerGlyph;
     const Character* const textBuffer = mImpl->mModel->mLogicalModel->mText.Begin();
-    float outlineWidth = mImpl->mModel->GetOutlineWidth();
+    const float outlineWidth = static_cast<float>( mImpl->mModel->GetOutlineWidth() );
 
     // Set the layout parameters.
     Layout::Parameters layoutParameters( size,
@@ -3697,7 +3714,7 @@ bool Controller::DeleteEvent( int keyCode )
                           1,
                           UPDATE_INPUT_STYLE );
   }
-  else if( ( mImpl->mEventData->mPrimaryCursorPosition >= 0 ) && ( keyCode == Dali::DevelKey::DALI_KEY_DELETE ) )
+  else if( keyCode == Dali::DevelKey::DALI_KEY_DELETE )
   {
     // Remove the character after the current cursor position
     removed = RemoveText( 0,

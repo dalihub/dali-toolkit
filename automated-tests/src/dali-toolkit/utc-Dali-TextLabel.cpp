@@ -82,18 +82,64 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
     {
       const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
 
-      Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      Property::Value* valueSet = NULL;
+      if ( valueGet.first.type == Property::Key::INDEX )
+      {
+        valueSet = fontStyleMapSet.Find( valueGet.first.indexKey );
+      }
+      else
+      {
+        // Get Key is a string so searching Set Map for a string key
+        valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      }
+
       if( NULL != valueSet )
       {
-        if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
+        if( valueSet->GetType() == Dali::Property::STRING && ( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() ) )
         {
-          tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          tet_printf( "Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::BOOLEAN && ( valueGet.second.Get<bool>() != valueSet->Get<bool>() ) )
+        {
+          tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<bool>(), valueSet->Get<bool>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::INTEGER && ( valueGet.second.Get<int>() != valueSet->Get<int>() ) )
+        {
+          tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<int>(), valueSet->Get<int>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::FLOAT && ( valueGet.second.Get<float>() != valueSet->Get<float>() ) )
+        {
+          tet_printf( "Value got : [%f], expected : [%f]", valueGet.second.Get<float>(), valueSet->Get<float>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::VECTOR2 && ( valueGet.second.Get<Vector2>() != valueSet->Get<Vector2>() ) )
+        {
+          Vector2 vector2Get = valueGet.second.Get<Vector2>();
+          Vector2 vector2Set = valueSet->Get<Vector2>();
+          tet_printf( "Value got : [%f, %f], expected : [%f, %f]", vector2Get.x, vector2Get.y, vector2Set.x, vector2Set.y );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::VECTOR4 && ( valueGet.second.Get<Vector4>() != valueSet->Get<Vector4>() ) )
+        {
+          Vector4 vector4Get = valueGet.second.Get<Vector4>();
+          Vector4 vector4Set = valueSet->Get<Vector4>();
+          tet_printf( "Value got : [%f, %f, %f, %f], expected : [%f, %f, %f, %f]", vector4Get.r, vector4Get.g, vector4Get.b, vector4Get.a, vector4Set.r, vector4Set.g, vector4Set.b, vector4Set.a );
           return false;
         }
       }
       else
       {
-        tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        if ( valueGet.first.type == Property::Key::INDEX )
+        {
+          tet_printf( "  The key %d doesn't exist.", valueGet.first.indexKey );
+        }
+        else
+        {
+          tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        }
         return false;
       }
     }
@@ -463,8 +509,6 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   outlineMapSet["width"] = 2.0f;
   label.SetProperty( TextLabel::Property::OUTLINE, outlineMapSet );
 
-  outlineMapSet["color"] = "red";
-  outlineMapSet["width"] = "2";
   outlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::OUTLINE );
   DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
@@ -1163,18 +1207,15 @@ int UtcDaliToolkitTextlabelTextDirection(void)
   tet_infoline(" UtcDaliToolkitTextlabelTextDirection");
 
   TextLabel label = TextLabel::New();
+  DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::TEXT_DIRECTION ), static_cast< int >( Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
+
   label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
   label.SetProperty( TextLabel::Property::POINT_SIZE, 20 );
   Stage::GetCurrent().Add( label );
 
-  application.SendNotification();
-  application.Render();
-
   DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::TEXT_DIRECTION ), static_cast< int >( Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT ), TEST_LOCATION );
 
   label.SetProperty( TextLabel::Property::TEXT, "ﻡﺮﺤﺑﺍ ﺏﺎﻠﻋﺎﻠﻣ ﻡﺮﺤﺑﺍ" );
-  application.SendNotification();
-  application.Render();
   DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::TEXT_DIRECTION ), static_cast< int >( Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
 
   END_TEST;

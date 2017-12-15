@@ -888,7 +888,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       TextAbstraction::FontDescription defaultFontDescription;
       TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
 
-      if( IsShowingPlaceholderText() && ( NULL != mEventData->mPlaceholderFont ) )
+      if( IsShowingPlaceholderText() && mEventData && ( NULL != mEventData->mPlaceholderFont ) )
       {
         // If the placeholder font is set specifically, only placeholder font is changed.
         defaultFontDescription = mEventData->mPlaceholderFont->mFontDescription;
@@ -1144,7 +1144,7 @@ float Controller::Impl::GetDefaultFontLineHeight()
 
 void Controller::Impl::OnCursorKeyEvent( const Event& event )
 {
-  if( NULL == mEventData )
+  if( NULL == mEventData || !IsShowingRealText() )
   {
     // Nothing to do if there is no text input.
     return;
@@ -2291,7 +2291,7 @@ void Controller::Impl::RepositionSelectionHandles()
   const SelectionBoxInfo& firstSelectionBoxLineInfo = *( selectionBoxLinesInfo.Begin() );
   highLightPosition.y = firstSelectionBoxLineInfo.lineOffset;
 
-  mEventData->mDecorator->SetHighLightBox( highLightPosition, highLightSize );
+  mEventData->mDecorator->SetHighLightBox( highLightPosition, highLightSize, static_cast<float>( mModel->GetOutlineWidth() ) );
 
   if( !mEventData->mDecorator->IsSmoothHandlePanEnabled() )
   {
@@ -2710,6 +2710,13 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
 
   Text::GetCursorPosition( parameters,
                            cursorInfo );
+
+  // Adds Outline offset.
+  const float outlineWidth = static_cast<float>( mModel->GetOutlineWidth() );
+  cursorInfo.primaryPosition.x += outlineWidth;
+  cursorInfo.primaryPosition.y += outlineWidth;
+  cursorInfo.secondaryPosition.x += outlineWidth;
+  cursorInfo.secondaryPosition.y += outlineWidth;
 
   if( isMultiLine )
   {

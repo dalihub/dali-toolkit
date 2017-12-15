@@ -370,7 +370,7 @@ void VisualModel::SetUnderlineHeight( float height )
   mUnderlineHeight = height;
 }
 
-void VisualModel::SetOutlineWidth( float width )
+void VisualModel::SetOutlineWidth( unsigned int width )
 {
   mOutlineWidth = width;
 }
@@ -415,7 +415,7 @@ float VisualModel::GetUnderlineHeight() const
   return mUnderlineHeight;
 }
 
-float VisualModel::GetOutlineWidth() const
+unsigned int VisualModel::GetOutlineWidth() const
 {
   return mOutlineWidth;
 }
@@ -449,7 +449,7 @@ VisualModel::VisualModel()
   mControlSize(),
   mShadowOffset(),
   mUnderlineHeight( 0.0f ),
-  mOutlineWidth( 0.0f ),
+  mOutlineWidth( 0u ),
   mShadowBlurRadius( 0.0f ),
   mNaturalSize(),
   mLayoutSize(),
