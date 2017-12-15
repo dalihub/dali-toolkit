@@ -23,7 +23,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
+#include <dali-toolkit/public-api/image-loader/texture-manager.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 
@@ -1526,7 +1526,7 @@ int UtcDaliImageViewResourceReadySignalWithImmediateLoad(void)
   Property::Map imageMap;
 
   imageMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
-  imageMap[ DevelImageVisual::Property::LOAD_POLICY ] =  DevelImageVisual::LoadPolicy::IMMEDIATE;
+  imageMap[ ImageVisual::Property::LOAD_POLICY ] =  ImageVisual::LoadPolicy::IMMEDIATE;
 
   tet_infoline("Creating ImageView without URL so image does not start loading");
   ImageView imageView = ImageView::New();
@@ -1557,7 +1557,7 @@ int UtcDaliImageViewResourceReadySignalWithReusedImage(void)
   Property::Map imageMap;
 
   imageMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
-  imageMap[ DevelImageVisual::Property::LOAD_POLICY ] =  DevelImageVisual::LoadPolicy::IMMEDIATE;
+  imageMap[ ImageVisual::Property::LOAD_POLICY ] =  ImageVisual::LoadPolicy::IMMEDIATE;
 
   ImageView imageView = ImageView::New();
   imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
@@ -1591,7 +1591,7 @@ int UtcDaliImageViewResourceReadySignalWithReusedImage02(void)
 
   Property::Map imageImmediateLoadingMap;
   imageImmediateLoadingMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
-  imageImmediateLoadingMap[ DevelImageVisual::Property::LOAD_POLICY ] =  DevelImageVisual::LoadPolicy::IMMEDIATE;
+  imageImmediateLoadingMap[ ImageVisual::Property::LOAD_POLICY ] =  ImageVisual::LoadPolicy::IMMEDIATE;
 
   tet_infoline("Immediate load an image");
   ImageView imageView = ImageView::New();

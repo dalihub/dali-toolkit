@@ -28,7 +28,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/image-loader/async-image-loader-devel.cpp \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
   $(devel_api_src_dir)/image-loader/image-atlas.cpp \
-  $(devel_api_src_dir)/image-loader/texture-manager.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
   $(devel_api_src_dir)/styling/style-manager-devel.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
@@ -107,8 +106,7 @@ devel_api_focus_manager_header_files = \
 devel_api_image_loader_header_files = \
   $(devel_api_src_dir)/image-loader/async-image-loader-devel.h \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.h \
-  $(devel_api_src_dir)/image-loader/image-atlas.h \
-  $(devel_api_src_dir)/image-loader/texture-manager.h
+  $(devel_api_src_dir)/image-loader/image-atlas.h
 
 devel_api_scripting_header_files = \
   $(devel_api_src_dir)/scripting/script.h \
