@@ -3422,7 +3422,8 @@ bool Controller::DoRelayout( const Size& size,
     const float outlineWidth = static_cast<float>( mImpl->mModel->GetOutlineWidth() );
 
     // Set the layout parameters.
-    Layout::Parameters layoutParameters( size,
+    const Vector2 sizeOffset = Vector2(outlineWidth * 2.0f, outlineWidth * 2.0f); // The outline should be fit into the bounding box
+    Layout::Parameters layoutParameters( size - sizeOffset,
                                          textBuffer,
                                          lineBreakInfo.Begin(),
                                          wordBreakInfo.Begin(),

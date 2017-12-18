@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 #include <dali-toolkit/internal/text/rendering/view-model.h>
 #include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -108,7 +109,7 @@ int UtcDaliTextRenderingControllerRender(void)
   DALI_TEST_CHECK( renderingController );
 
   // Renders the text and creates the final bitmap.
-  PixelData bitmap = renderingController->Render( relayoutSize );
+  PixelData bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
   DALI_TEST_CHECK( bitmap );
 
   DALI_TEST_EQUALS( 120u, bitmap.GetWidth(), TEST_LOCATION );
@@ -120,7 +121,7 @@ int UtcDaliTextRenderingControllerRender(void)
   controller->Relayout( relayoutSize );
 
   // Renders the text and creates the final bitmap.
-  bitmap = renderingController->Render( relayoutSize );
+  bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
   DALI_TEST_CHECK( bitmap );
 
   DALI_TEST_EQUALS( 120u, bitmap.GetWidth(), TEST_LOCATION );
@@ -131,7 +132,7 @@ int UtcDaliTextRenderingControllerRender(void)
   controller->Relayout( relayoutSize );
 
   // Renders the text and creates the final bitmap.
-  bitmap = renderingController->Render( relayoutSize );
+  bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
   DALI_TEST_CHECK( bitmap );
 
   DALI_TEST_EQUALS( 120u, bitmap.GetWidth(), TEST_LOCATION );
@@ -166,29 +167,29 @@ int UtcDaliTextTypesetterVerticalLineAlignment(void)
   DALI_TEST_CHECK( renderingController );
 
   {
-    controller->SetVerticalLineAlignment(Dali::Toolkit::DevelText::VerticalLineAlignment::TOP);
-    controller->Relayout(relayoutSize);
+    controller->SetVerticalLineAlignment( Dali::Toolkit::DevelText::VerticalLineAlignment::TOP );
+    controller->Relayout( relayoutSize );
 
     // Renders the text and creates the final bitmap.
-    auto bitmap = renderingController->Render(relayoutSize);
+    auto bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
     DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
   }
 
   {
-    controller->SetVerticalLineAlignment(Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE);
-    controller->Relayout(relayoutSize);
+    controller->SetVerticalLineAlignment( Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE );
+    controller->Relayout( relayoutSize );
 
     // Renders the text and creates the final bitmap.
-    auto bitmap = renderingController->Render(relayoutSize);
+    auto bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
     DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
   }
 
   {
-    controller->SetVerticalLineAlignment(Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM);
-    controller->Relayout(relayoutSize);
+    controller->SetVerticalLineAlignment( Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM );
+    controller->Relayout( relayoutSize );
 
     // Renders the text and creates the final bitmap.
-    auto bitmap = renderingController->Render(relayoutSize);
+    auto bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
     DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
   }
 

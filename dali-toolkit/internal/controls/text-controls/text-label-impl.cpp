@@ -60,6 +60,19 @@ namespace Internal
 namespace
 {
   const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+
+  /**
+   * @brief How the text visual should be aligned vertically inside the control.
+   *
+   * 0.0f aligns the text to the top, 0.5f aligns the text to the center, 1.0f aligns the text to the bottom.
+   * The alignment depends on the alignment value of the text label (Use Text::VerticalAlignment enumerations).
+   */
+  const float VERTICAL_ALIGNMENT_TABLE[ Text::VerticalAlignment::BOTTOM + 1 ] =
+  {
+    0.0f,  // VerticalAlignment::TOP
+    0.5f,  // VerticalAlignment::CENTER
+    1.0f   // VerticalAlignment::BOTTOM
+  };
 }
 
 namespace
@@ -940,10 +953,29 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
       std::swap( padding.start, padding.end );
     }
 
+    // Calculate the size of the visual that can fit the text
+    Size layoutSize = mController->GetTextModel()->GetLayoutSize();
+    layoutSize.x = contentSize.x;
+
+    const Vector2& shadowOffset = mController->GetTextModel()->GetShadowOffset();
+    if ( shadowOffset.y > Math::MACHINE_EPSILON_1 )
+    {
+      layoutSize.y += shadowOffset.y;
+    }
+
+    float outlineWidth = mController->GetTextModel()->GetOutlineWidth();
+    layoutSize.y += outlineWidth * 2.0f;
+    layoutSize.y = std::min( layoutSize.y, contentSize.y );
+
+    // Calculate the offset for vertical alignment only, as the layout engine will do the horizontal alignment.
+    Vector2 alignmentOffset;
+    alignmentOffset.x = 0.0f;
+    alignmentOffset.y = ( contentSize.y - layoutSize.y ) * VERTICAL_ALIGNMENT_TABLE[mController->GetVerticalAlignment()];
+
     Property::Map visualTransform;
-    visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, contentSize )
+    visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, layoutSize )
                    .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( padding.start, padding.top ) )
+                   .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( padding.start, padding.top ) + alignmentOffset )
                    .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
                    .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
                    .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
@@ -1003,7 +1035,7 @@ void TextLabel::SetUpAutoScrolling()
 
   Text::TypesetterPtr typesetter = Text::Typesetter::New( mController->GetTextModel() );
 
-  PixelData data = typesetter->Render( verifiedSize, Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888 ); // ignore the horizontal alignment
+  PixelData data = typesetter->Render( verifiedSize, mController->GetTextDirection(), Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888 ); // ignore the horizontal alignment
   Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
                                   data.GetPixelFormat(),
                                   data.GetWidth(),
