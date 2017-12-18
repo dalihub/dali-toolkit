@@ -1939,6 +1939,7 @@ float Controller::GetHeightForWidth( float width )
 
     // Clear the update info. This info will be set the next time the text is updated.
     mImpl->mTextUpdateInfo.Clear();
+    mImpl->mTextUpdateInfo.mClearAll = true;
 
     // Restore the actual control's width.
     mImpl->mModel->mVisualModel->mControlSize.width = actualControlWidth;
