@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-resource-observer.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
