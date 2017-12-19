@@ -19,7 +19,6 @@
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/animated-gradient-visual-properties-devel.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>

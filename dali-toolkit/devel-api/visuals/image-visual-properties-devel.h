@@ -30,6 +30,42 @@ namespace Toolkit
 namespace DevelImageVisual
 {
 
+/**
+ * @brief The policy determining if the image is loaded when the visual is staged or created.
+ */
+namespace LoadPolicy
+{
+
+/**
+ * @brief The available named elements that define the LoadPolicy.
+ */
+enum Type
+{
+  IMMEDIATE = 0,  ///< The image is loaded when the ImageVisual is created.
+  ATTACHED        ///< The image is loaded when the ImageVisual is attached to the stage.
+};
+
+} // namespace LoadPolicy
+
+/**
+ * @brief The policy determining when a image is deleted from the cache in relation to the ImageVisual lifetime.
+ * @note If the texture is being shared by another visual it persist if still required.
+ */
+namespace ReleasePolicy
+{
+
+/**
+ * @brief The available named elements that define the ReleasePolicy.
+ */
+enum Type
+{
+  DETACHED = 0,  ///<  Image deleted from cache when ImageVisual detached from stage.
+  DESTROYED,     ///<  Image deleted from cache when ImageVisual destroyed.
+  NEVER          ///<  Image is never deleted, will survive the lifetime of the application.
+};
+
+} // namespace ReleasePolicy;
+
 namespace Property
 {
 
@@ -53,9 +89,29 @@ enum Type
   FRAME_DELAY         = Dali::Toolkit::ImageVisual::Property::FRAME_DELAY,
   MASK_CONTENT_SCALE  = Dali::Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE,
   CROP_TO_MASK        = Dali::Toolkit::ImageVisual::Property::CROP_TO_MASK,
-  LOAD_POLICY         = Dali::Toolkit::ImageVisual::Property::LOAD_POLICY,
-  RELEASE_POLICY      = Dali::Toolkit::ImageVisual::Property::RELEASE_POLICY,
-  ORIENTATION_CORRECTION = Dali::Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION,
+
+  /**
+   * @brief The policy to determine when an image should be loaded.
+   * @details Name "loadPolicy",  Type LoadPolicy::Type (Property::INTEGER)or Property::STRING.
+   * @note Default LoadPolicy::ATTACHED
+   * @see LoadPolicy::Type
+   */
+  LOAD_POLICY = CROP_TO_MASK + 1,
+
+  /**
+   * @brief The policy to determine when an image should no longer be cached.
+   * @details Name "releasePolicy", Type ReleasePolicy::Type (Property::INTEGER) or Property::STRING
+   * @note Default ReleasePolicy::DESTROYED
+   * @see ReleasePolicy::Type
+   */
+  RELEASE_POLICY = CROP_TO_MASK + 2,
+
+  /**
+   * @brief Determines if image orientation should be corrected so the image displays as it was intended.
+   * @details Name "orientationCorrection", Type Property::BOOLEAN, if true the image's orientation will be corrected.
+   * @note Default true
+   */
+  ORIENTATION_CORRECTION = CROP_TO_MASK + 3,
 
   /**
    * @brief Overlays the auxiliary iamge on top of an NPatch image.
@@ -67,14 +123,14 @@ enum Type
    * @details Name "auxiliaryImage", Type Property::STRING, URL of the image.
    * @note Default true
    */
-  AUXILIARY_IMAGE = ORIENTATION_CORRECTION + 1,
+  AUXILIARY_IMAGE = CROP_TO_MASK + 4,
 
   /**
    * @brief An alpha value for mixing between the masked main NPatch image and the auxiliary image
    * @details Name "auxiliaryImageAlpha", Type Property::FLOAT, between 0 and 1
    * @note Default 0
    */
-  AUXILIARY_IMAGE_ALPHA = ORIENTATION_CORRECTION + 2,
+  AUXILIARY_IMAGE_ALPHA = CROP_TO_MASK + 5,
 
 };
 

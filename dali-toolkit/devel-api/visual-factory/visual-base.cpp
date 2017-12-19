@@ -61,7 +61,7 @@ const std::string& Visual::Base::GetName()
   return GetImplementation( *this ).GetName();
 }
 
-void Visual::Base::SetTransformAndSize( const Dali::Property::Map& transform, Size controlSize )
+void Visual::Base::SetTransformAndSize( const Property::Map& transform, Size controlSize )
 {
   GetImplementation( *this ).SetTransformAndSize( transform, controlSize );
 }
@@ -91,7 +91,7 @@ int Visual::Base::GetDepthIndex() const
   return GetImplementation( *this ).GetDepthIndex();
 }
 
-void Visual::Base::CreatePropertyMap( Dali::Property::Map& map ) const
+void Visual::Base::CreatePropertyMap( Property::Map& map ) const
 {
   GetImplementation( *this ).CreatePropertyMap( map );
 }
