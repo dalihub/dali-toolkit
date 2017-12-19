@@ -466,6 +466,16 @@ bool Controller::IsSelectionEnabled() const
   return mImpl->mEventData->mSelectionEnabled;
 }
 
+void Controller::SetShiftSelectionEnabled( bool enabled )
+{
+  mImpl->mEventData->mShiftSelectionFlag = enabled;
+}
+
+bool Controller::IsShiftSelectionEnabled() const
+{
+  return mImpl->mEventData->mShiftSelectionFlag;
+}
+
 // public : Update
 
 void Controller::SetText( const std::string& text )

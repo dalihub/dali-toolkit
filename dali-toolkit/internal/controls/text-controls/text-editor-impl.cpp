@@ -135,6 +135,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholder",                 
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineWrapMode",                         INTEGER,   LINE_WRAP_MODE                       )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderText",                STRING,    PLACEHOLDER_TEXT                     )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",           VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableShiftSelection",           BOOLEAN,   ENABLE_SHIFT_SELECTION               )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -708,9 +709,20 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
           Text::LineWrap::Mode lineWrapMode( static_cast< Text::LineWrap::Mode >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
           if( GetLineWrapModeEnumeration( value, lineWrapMode ) )
           {
-            DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p LineWrap::MODE %d\n", impl.mController.Get(), lineWrapMode );
+            DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p LineWrap::MODE %d\n", impl.mController.Get(), lineWrapMode );
             impl.mController->SetLineWrapMode( lineWrapMode );
           }
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ENABLE_SHIFT_SELECTION:
+      {
+        if( impl.mController )
+        {
+          const bool shiftSelection = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_SHIFT_SELECTION %d\n", impl.mController.Get(), shiftSelection );
+
+          impl.mController->SetShiftSelectionEnabled( shiftSelection );
         }
         break;
       }
@@ -1094,6 +1106,15 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         {
           value = impl.mController->GetLineWrapMode();
         }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ENABLE_SHIFT_SELECTION:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsShiftSelectionEnabled();
+        }
+        break;
       }
     } //switch
   }
