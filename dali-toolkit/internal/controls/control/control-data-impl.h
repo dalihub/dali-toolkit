@@ -31,7 +31,6 @@
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 #include <dali-toolkit/internal/builder/style.h>
 #include <dali-toolkit/internal/builder/dictionary.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {

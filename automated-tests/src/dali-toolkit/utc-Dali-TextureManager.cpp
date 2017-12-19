@@ -19,7 +19,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/texture.h>
-#include <dali-toolkit/public-api/image-loader/texture-manager.h>
+#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;

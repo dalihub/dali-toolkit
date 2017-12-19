@@ -33,7 +33,6 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
-#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 namespace Dali
 {
@@ -370,8 +369,8 @@ private:
   Dali::SamplingMode::Type mSamplingMode:4;
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
-  Dali::Toolkit::ImageVisual::LoadPolicy::Type mLoadPolicy;
-  Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
+  DevelImageVisual::LoadPolicy::Type mLoadPolicy;
+  DevelImageVisual::ReleasePolicy::Type mReleasePolicy;
   Vector4 mAtlasRect;
   bool mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
   bool mLoading;  ///< True if the texture is still loading.

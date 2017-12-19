@@ -94,15 +94,15 @@ DALI_ENUM_TO_STRING_TABLE_END( WRAP_MODE )
 
 // load policies
 DALI_ENUM_TO_STRING_TABLE_BEGIN( LOAD_POLICY )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::ImageVisual::LoadPolicy, IMMEDIATE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::ImageVisual::LoadPolicy, ATTACHED )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelImageVisual::LoadPolicy, IMMEDIATE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelImageVisual::LoadPolicy, ATTACHED )
 DALI_ENUM_TO_STRING_TABLE_END( LOAD_POLICY )
 
 // release policies
 DALI_ENUM_TO_STRING_TABLE_BEGIN( RELEASE_POLICY )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::ImageVisual::ReleasePolicy, DETACHED )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::ImageVisual::ReleasePolicy, DESTROYED )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::ImageVisual::ReleasePolicy, NEVER )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelImageVisual::ReleasePolicy, DETACHED )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelImageVisual::ReleasePolicy, DESTROYED )
+DALI_ENUM_TO_STRING_WITH_SCOPE( DevelImageVisual::ReleasePolicy, NEVER )
 DALI_ENUM_TO_STRING_TABLE_END( RELEASE_POLICY )
 
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
@@ -282,8 +282,8 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mSamplingMode( samplingMode ),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
-  mLoadPolicy( Toolkit::ImageVisual::LoadPolicy::ATTACHED ),
-  mReleasePolicy( Toolkit::ImageVisual::ReleasePolicy::DETACHED ),
+  mLoadPolicy( DevelImageVisual::LoadPolicy::ATTACHED ),
+  mReleasePolicy( DevelImageVisual::ReleasePolicy::DETACHED ),
   mAtlasRect( 0.0f, 0.0f, 0.0f, 0.0f ),
   mAttemptAtlasing( false ),
   mLoading( false ),
@@ -305,8 +305,8 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
-  mLoadPolicy( Toolkit::ImageVisual::LoadPolicy::ATTACHED ),
-  mReleasePolicy( Toolkit::ImageVisual::ReleasePolicy::DESTROYED ),
+  mLoadPolicy( DevelImageVisual::LoadPolicy::ATTACHED ),
+  mReleasePolicy( DevelImageVisual::ReleasePolicy::DESTROYED ),
   mAtlasRect( 0.0f, 0.0f, 0.0f, 0.0f ),
   mAttemptAtlasing( false ),
   mLoading( false ),
@@ -331,7 +331,7 @@ ImageVisual::~ImageVisual()
     }
 
     // ImageVisual destroyed so remove texture unless ReleasePolicy is set to never release
-    if( ( mTextureId != TextureManager::INVALID_TEXTURE_ID  ) && ( mReleasePolicy != Toolkit::ImageVisual::ReleasePolicy::NEVER ) )
+    if( ( mTextureId != TextureManager::INVALID_TEXTURE_ID  ) && ( mReleasePolicy != DevelImageVisual::ReleasePolicy::NEVER ) )
     {
       RemoveTexture();
     }
@@ -400,20 +400,20 @@ void ImageVisual::DoSetProperties( const Property::Map& propertyMap )
       }
       else if ( keyValue.first == LOAD_POLICY_NAME )
       {
-        DoSetProperty( Toolkit::ImageVisual::Property::LOAD_POLICY, keyValue.second );
+        DoSetProperty( Toolkit::DevelImageVisual::Property::LOAD_POLICY, keyValue.second );
       }
       else if( keyValue.first == RELEASE_POLICY_NAME )
       {
-        DoSetProperty( Toolkit::ImageVisual::Property::RELEASE_POLICY, keyValue.second );
+        DoSetProperty( Toolkit::DevelImageVisual::Property::RELEASE_POLICY, keyValue.second );
       }
       else if( keyValue.first == ORIENTATION_CORRECTION_NAME )
       {
-        DoSetProperty( Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION, keyValue.second );
+        DoSetProperty( Toolkit::DevelImageVisual::Property::ORIENTATION_CORRECTION, keyValue.second );
       }
     }
   }
   // Load image immediately if LOAD_POLICY requires it
-  if ( mLoadPolicy == Toolkit::ImageVisual::LoadPolicy::IMMEDIATE )
+  if ( mLoadPolicy == DevelImageVisual::LoadPolicy::IMMEDIATE )
   {
     auto attemptAtlasing = AttemptAtlasing();
     LoadTexture( attemptAtlasing, mAtlasRect, mTextures, mOrientationCorrection,
@@ -554,22 +554,22 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
       break;
     }
 
-    case Toolkit::ImageVisual::Property::RELEASE_POLICY:
+    case Toolkit::DevelImageVisual::Property::RELEASE_POLICY:
     {
       int releasePolicy;
       Scripting::GetEnumerationProperty( value, RELEASE_POLICY_TABLE, RELEASE_POLICY_TABLE_COUNT, releasePolicy );
-      mReleasePolicy = Toolkit::ImageVisual::ReleasePolicy::Type( releasePolicy );
+      mReleasePolicy = DevelImageVisual::ReleasePolicy::Type( releasePolicy );
       break;
     }
 
-    case Toolkit::ImageVisual::Property::LOAD_POLICY:
+    case Toolkit::DevelImageVisual::Property::LOAD_POLICY:
     {
       int loadPolicy;
       Scripting::GetEnumerationProperty( value, LOAD_POLICY_TABLE, LOAD_POLICY_TABLE_COUNT, loadPolicy );
-      mLoadPolicy = Toolkit::ImageVisual::LoadPolicy::Type( loadPolicy );
+      mLoadPolicy = DevelImageVisual::LoadPolicy::Type( loadPolicy );
       break;
     }
-    case Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION:
+    case Toolkit::DevelImageVisual::Property::ORIENTATION_CORRECTION:
     {
       bool orientationCorrection( mOrientationCorrection );
       if( value.Get( orientationCorrection ) )
@@ -892,7 +892,7 @@ void ImageVisual::DoSetOffStage( Actor& actor )
 
   // Image release is dependent on the ReleasePolicy, renderer is destroyed.
   actor.RemoveRenderer( mImpl->mRenderer);
-  if( mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED )
+  if( mReleasePolicy == DevelImageVisual::ReleasePolicy::DETACHED )
   {
     RemoveTexture(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
   }
@@ -948,9 +948,9 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
     map.Insert( Toolkit::ImageVisual::Property::CROP_TO_MASK, mMaskingData->mCropToMask );
   }
 
-  map.Insert( Toolkit::ImageVisual::Property::LOAD_POLICY, mLoadPolicy );
-  map.Insert( Toolkit::ImageVisual::Property::RELEASE_POLICY, mReleasePolicy );
-  map.Insert( Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION, mOrientationCorrection );
+  map.Insert( Toolkit::DevelImageVisual::Property::LOAD_POLICY, mLoadPolicy );
+  map.Insert( Toolkit::DevelImageVisual::Property::RELEASE_POLICY, mReleasePolicy );
+  map.Insert( Toolkit::DevelImageVisual::Property::ORIENTATION_CORRECTION, mOrientationCorrection );
 }
 
 void ImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const

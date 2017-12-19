@@ -247,7 +247,7 @@ int UtcDaliImageVisualTextureReuse1(void)
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_LARGE_IMAGE_FILE_NAME );
-  propertyMap.Insert( ImageVisual::Property::RELEASE_POLICY,  ImageVisual::ReleasePolicy::DETACHED );
+  propertyMap.Insert( DevelImageVisual::Property::RELEASE_POLICY,  DevelImageVisual::ReleasePolicy::DETACHED );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& textureTrace = gl.GetTextureTrace();
@@ -1213,7 +1213,7 @@ int UtcDaliImageVisualReleasePolicy01(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliImageVisualReleasePolicy01 Detached Policy, disabling visual with this policy deletes texture" );
 
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DETACHED );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::DETACHED );
   DALI_TEST_CHECK( imageVisual );
 
   // Set up debug trace
@@ -1263,7 +1263,7 @@ int UtcDaliImageVisualReleasePolicy02(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliImageVisualReleasePolicy02 Destroyed Policy, Texture should be deleted when visual destroyed" );
 
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::DESTROYED );
   DALI_TEST_CHECK( imageVisual );
 
   // Setup debug trace
@@ -1315,7 +1315,7 @@ int UtcDaliImageVisualReleasePolicy03(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliImageVisualReleasePolicy03 Never Policy, texture should not be deleted after visual destroyed" );
 
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::NEVER );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::NEVER );
   DALI_TEST_CHECK( imageVisual );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -1365,10 +1365,10 @@ int UtcDaliImageVisualReleasePolicy04(void)
   tet_infoline( "UtcDaliImageVisualReleasePolicy04 Two visuals with different policies sharing a texture" );
 
   tet_infoline( "Create first visual with Never release policy" );
-  Visual::Base imageVisualNever = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::NEVER );
+  Visual::Base imageVisualNever = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::NEVER );
 
   tet_infoline( "Create second visual with Destroyed release policy");
-    Visual::Base imageVisualDestroyed = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED );
+    Visual::Base imageVisualDestroyed = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::DESTROYED );
 
   // Set up trace debug
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -1444,7 +1444,7 @@ int UtcDaliImageVisualReleasePolicy05(void)
   imageVisualNever.CreatePropertyMap( resultMap );
   DALI_TEST_CHECK( ! resultMap.Empty() );
 
-  DALI_TEST_EQUALS( ( resultMap.Find( ImageVisual::Property::RELEASE_POLICY ) )->Get<int>(), (int)ImageVisual::ReleasePolicy::NEVER, TEST_LOCATION );
+  DALI_TEST_EQUALS( ( resultMap.Find( DevelImageVisual::Property::RELEASE_POLICY ) )->Get<int>(), (int)DevelImageVisual::ReleasePolicy::NEVER, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1454,7 +1454,7 @@ int UtcDaliImageVisualReleasePolicy06(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliImageVisualReleasePolicy06 Never Policy, texture should not be affected by Disabling and Enabling visual" );
 
-  Visual::Base imageVisual= CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::NEVER );
+  Visual::Base imageVisual= CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::NEVER );
   DALI_TEST_CHECK( imageVisual );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -1514,11 +1514,11 @@ int UtcDaliImageVisualReleasePolicy07(void)
   tet_infoline( "UtcDaliImageVisualReleasePolicy07 Two visuals with different policies sharing a texture DETACHED and DESTROYED" );
 
   tet_infoline( "Create first visual with DESTROYED release policy" );
-  Visual::Base imageVisualDestroyed = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED );
+  Visual::Base imageVisualDestroyed = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::DESTROYED );
 
 
   tet_infoline( "Create second visual with DETACHED release policy");
-  Visual::Base imageVisualDetached = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DETACHED );
+  Visual::Base imageVisualDetached = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::DETACHED );
 
   // Set up trace debug
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -1584,7 +1584,7 @@ int UtcDaliImageVisualLoadPolicy01(void)
   textureTrace.Enable(true);
 
   tet_infoline( "Create visual with IMMEDIATE load policy" );
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::IMMEDIATE );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
@@ -1637,7 +1637,7 @@ int UtcDaliImageVisualLoadPolicy02(void)
   textureTrace.Enable(true);
 
   tet_infoline( "Create visual with IMMEDIATE load policy" );
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::ATTACHED );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::ATTACHED );
 
   const unsigned int TIME_OUT_3_SECONDS = 3;
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1, TIME_OUT_3_SECONDS ), false, TEST_LOCATION );
@@ -1699,7 +1699,7 @@ int UtcDaliImageVisualLoadPolicy03(void)
   actor.SetSize(200.f, 200.f);
 
   tet_infoline( "Create visual with IMMEDIATE load policy" );
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::IMMEDIATE );
 
   tet_infoline( "Registering visual allows control to get a signal once loaded even if visual not enabled( not staged )" );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual, VISUAL_NOT_ENABLED );
@@ -1737,7 +1737,7 @@ int UtcDaliImageVisualLoadPolicy04(void)
   actor.SetSize(200.f, 200.f);
 
   tet_infoline( "Create visual with IMMEDIATE load policy" );
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::IMMEDIATE );
 
   tet_infoline( "Registering visual allows control to get a signal once loaded even if visual not enabled( staged )" );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual, VISUAL_NOT_ENABLED );
@@ -1755,7 +1755,7 @@ int UtcDaliImageVisualLoadPolicy04(void)
   tet_infoline( "Original control correctly signalled, now testing for signal with new Control reusing the image" );
 
   gResourceReadySignalFired = false; // Reset signal check ready for testing next Control
-  Visual::Base imageVisual2 = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
+  Visual::Base imageVisual2 = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::IMMEDIATE );
   DummyControl actor2 = DummyControl::New(true);
   Impl::DummyControl& dummyImpl2 = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   actor2.ResourceReadySignal().Connect( &ResourceReadySignal);
@@ -1788,7 +1788,7 @@ int UtcDaliImageVisualLoadPolicy05(void)
   Stage::GetCurrent().Add( actor );
 
   tet_infoline( "Create visual with ATTACHED load policy" );
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::ATTACHED );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::ATTACHED );
 
   tet_infoline( "Registering visual allows control to get a signal once loaded" );
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
@@ -1806,7 +1806,7 @@ int UtcDaliImageVisualLoadPolicy05(void)
   tet_infoline( "Original control correctly signalled, now testing for signal with new Control reusing the image" );
 
   gResourceReadySignalFired = false; // Reset signal check ready for testing next Control
-  Visual::Base imageVisual2 = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::ATTACHED );
+  Visual::Base imageVisual2 = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::ATTACHED );
   DummyControl actor2 = DummyControl::New(true);
   Impl::DummyControl& dummyImpl2 = static_cast<Impl::DummyControl&>(actor.GetImplementation());
   actor2.ResourceReadySignal().Connect( &ResourceReadySignal);
@@ -1832,7 +1832,7 @@ int UtcDaliImageVisualOrientationCorrection(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_ROTATED_IMAGE );
-  propertyMap.Insert( ImageVisual::Property::ORIENTATION_CORRECTION, false );
+  propertyMap.Insert( DevelImageVisual::Property::ORIENTATION_CORRECTION, false );
   Visual::Base imageVisual = factory.CreateVisual( propertyMap );
 
   tet_infoline( "Create control for visual, need to loaded it" );
@@ -1857,7 +1857,7 @@ int UtcDaliImageVisualOrientationCorrection(void)
   propertyMap.Clear();
   propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_ROTATED_IMAGE );
-  propertyMap.Insert( ImageVisual::Property::ORIENTATION_CORRECTION, true );
+  propertyMap.Insert( DevelImageVisual::Property::ORIENTATION_CORRECTION, true );
   imageVisual = factory.CreateVisual( propertyMap );
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
@@ -1874,7 +1874,7 @@ int UtcDaliImageVisualOrientationCorrection(void)
   imageVisual.CreatePropertyMap( resultMap );
 
   // check the Property::ORIENTATION_CORRECTION value from the returned map
-  Property::Value* typeValue = resultMap.Find( ImageVisual::Property::ORIENTATION_CORRECTION,  Property::BOOLEAN );
+  Property::Value* typeValue = resultMap.Find( DevelImageVisual::Property::ORIENTATION_CORRECTION,  Property::BOOLEAN );
   DALI_TEST_EQUALS( typeValue->Get<bool>(), true, TEST_LOCATION );
 
   END_TEST;

@@ -54,7 +54,6 @@
 
 #include <dali-toolkit/public-api/image-loader/async-image-loader.h>
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
-#include <dali-toolkit/public-api/image-loader/texture-manager.h>
 
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 

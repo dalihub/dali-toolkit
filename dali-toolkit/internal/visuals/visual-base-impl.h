@@ -32,7 +32,6 @@
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/devel-api/direction-enums.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {

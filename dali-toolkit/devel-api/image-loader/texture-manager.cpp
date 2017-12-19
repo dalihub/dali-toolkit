@@ -15,7 +15,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/public-api/image-loader/texture-manager.h>
+#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -50,8 +50,8 @@ TextureSet RemoveTexture( const std::string& textureUrl )
   return textureMgr.RemoveExternalTexture( textureUrl );
 }
 
-} // namespace TextureManager
+} // TextureManager
 
-} // namespace Toolkit
+} // Toolkit
 
-} // namespace Dali
+} // Dali
