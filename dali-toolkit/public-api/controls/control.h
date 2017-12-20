@@ -28,6 +28,9 @@
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/images/image.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
+
 namespace Dali
 {
 
@@ -394,6 +397,15 @@ public:
    * @return true if the resources are loaded and ready, false otherwise
    */
   bool IsResourceReady() const;
+
+  /**
+   * @brief Get the loading state of the visual resource.
+   *
+   * @SINCE_1_3_5
+   * @param[in] index The Property index of the visual
+   * @return Return the loading status (PREPARING, READY and FAILED) of visual resource
+   */
+  Visual::ResourceStatus GetVisualResourceStatus( const Dali::Property::Index index );
 
   // Signals
 
