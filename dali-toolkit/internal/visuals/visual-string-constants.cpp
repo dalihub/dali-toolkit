@@ -72,6 +72,9 @@ const char * const PREMULTIPLIED_ALPHA( "premultipliedAlpha" );
 const char * const MIX_COLOR( "mixColor" );
 const char * const OPACITY( "opacity" );
 
+// Color visual
+const char * const RENDER_IF_TRANSPARENT_NAME( "renderIfTransparent" );
+
 // Image visual
 const char * const IMAGE_URL_NAME( "url" );
 const char * const ATLAS_RECT_UNIFORM_NAME( "uAtlasRect" );
