@@ -58,6 +58,9 @@ extern const char * const PREMULTIPLIED_ALPHA;
 extern const char * const MIX_COLOR;
 extern const char * const OPACITY;
 
+// Color visual
+extern const char * const RENDER_IF_TRANSPARENT_NAME;
+
 // Image visual
 extern const char * const IMAGE_URL_NAME;
 extern const char * const ATLAS_RECT_UNIFORM_NAME;
