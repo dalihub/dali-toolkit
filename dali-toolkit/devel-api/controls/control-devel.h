@@ -215,15 +215,6 @@ DALI_IMPORT_API void EnableVisual( Internal::Control& control, Dali::Property::I
 DALI_IMPORT_API bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index index );
 
 /**
- * @brief Get the loading state of the visual resource.
- *
- * @param[in] control The control
- * @param[in] index The Property index of the visual
- * @return Return the loading status (PREPARING, READY and FAILED) of visual resource
- */
-DALI_IMPORT_API Toolkit::Visual::ResourceStatus GetVisualResourceStatus( const Internal::Control& control, Dali::Property::Index index );
-
-/**
  * @brief Create a transition effect on the control.
  *
  * Only generates an animation if the properties described in the transition

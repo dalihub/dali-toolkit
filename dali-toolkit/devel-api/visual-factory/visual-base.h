@@ -38,13 +38,6 @@ class Base;
 namespace Visual
 {
 
-enum class ResourceStatus
-{
-  PREPARING,
-  READY,
-  FAILED
-};
-
 /**
  * @brief A Visual provides a renderer for drawing a control component. A control may have multiple visuals.
  *
