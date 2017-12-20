@@ -66,15 +66,12 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
     mediump vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy );\n
     mediump vec2 visualSize = mix( uSize.xy * size, size, offsetSizeMode.zw );\n
     \n
-    mediump float delta = floor ( uDelta ) + 0.5;\n
-    vTexCoord.x = ( delta + uHorizontalAlign * ( uTextureSize.x - visualSize.x - uGap ) + floor( aPosition.x * visualSize.x ) + 0.5 - uGap * 0.5 ) / uTextureSize.x + 0.5;\n
+    vTexCoord.x = ( uDelta + uHorizontalAlign * ( uTextureSize.x - visualSize.x - uGap ) + floor( aPosition.x * visualSize.x ) + 0.5 - uGap * 0.5 ) / uTextureSize.x + 0.5;\n
     vTexCoord.y = ( uVerticalAlign * ( uTextureSize.y - visualSize.y ) + floor( aPosition.y * visualSize.y ) + 0.5 ) / ( uTextureSize.y ) + 0.5;\n
     \n
     mediump vec4 vertexPosition = vec4( floor( ( aPosition + anchorPoint ) * visualSize + ( visualOffset + origin ) * uSize.xy ), 0.0, 1.0 );\n
-    mediump vec4 nonAlignedVertex = uViewMatrix * uModelMatrix * vertexPosition;\n
-    mediump vec4 pixelAlignedVertex = vec4 ( floor( nonAlignedVertex.xyz ), 1.0 );\n
     \n
-    gl_Position = uProjection * pixelAlignedVertex;\n
+    gl_Position = uProjection * uViewMatrix * uModelMatrix * vertexPosition;\n
   }\n
 );
 
