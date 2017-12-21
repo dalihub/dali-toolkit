@@ -325,6 +325,18 @@ enum
 
 } // namespace Shader
 
+
+/**
+ * @brief Status of resource which is used for visual.
+ * @SINCE_1_3_5
+ */
+enum class ResourceStatus
+{
+  PREPARING, /// Resource is prepared.    @SINCE_1_3_5
+  READY,     /// Resource is ready.       @SINCE_1_3_5
+  FAILED     /// Resource is fail to load @SINCE_1_3_5
+};
+
 } // namespace Visual
 
 /**

@@ -61,7 +61,7 @@ DALI_IMPORT_API std::string AddTexture( TextureSet& textureSet );
  */
 DALI_IMPORT_API TextureSet RemoveTexture( const std::string& textureUrl );
 
-}
+} // TextureManager
 
 } // Toolkit
 
