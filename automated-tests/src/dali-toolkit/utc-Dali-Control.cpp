@@ -75,6 +75,18 @@ static void TestKeyInputFocusCallback( Control control )
 const char* TEST_LARGE_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/tbcol.png";
 const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 
+Vector4 GetControlBackgroundColor( Control& control )
+{
+  Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
+  Property::Map* resultMap = propValue.GetMap();
+  DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR ) );
+
+  Vector4 color;
+  resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get( color );
+
+  return color;
+}
+
 } // namespace
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -454,6 +466,80 @@ int UtcDaliControlBackgroundColor(void)
   DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>() == Color::YELLOW );
 
   DALI_TEST_EQUALS( control.GetBackgroundColor(), Color::YELLOW, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlBackgroundColorRendererCount(void)
+{
+  tet_infoline( "Test ensures we only create renderers when non-transparent color is requested or if we our clipping-mode is set to CLIP_CHILDREN" );
+
+  ToolkitTestApplication application;
+  Control control = Control::New();
+  Stage::GetCurrent().Add( control );
+
+  tet_infoline( "Set transparent, no renderers should be created" );
+  control.SetBackgroundColor( Color::TRANSPARENT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+
+  tet_infoline( "Set transparent alpha with positive RGB values, no renderers should be created, but returned color should reflect what we set" );
+  const Vector4 alphaZero( 1.0f, 0.5f, 0.25f, 0.0f );
+  control.SetBackgroundColor( alphaZero );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), alphaZero, TEST_LOCATION );
+
+  tet_infoline( "Set semi transparent alpha with positive RGB values, 1 renderer should be created, but returned color should reflect what we set" );
+  const Vector4 semiTransparent( 1.0f, 0.75f, 0.5f, 0.5f );
+  control.SetBackgroundColor( semiTransparent );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), semiTransparent, TEST_LOCATION );
+
+  tet_infoline( "Set transparent, ensure no renderers are created" );
+  control.SetBackgroundColor( Color::TRANSPARENT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
+
+  tet_infoline( "Set control to clip its children, a renderer should be created which will be transparent" );
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
+
+  tet_infoline( "Set a color, only 1 renderer should exist" );
+  control.SetBackgroundColor( Color::RED );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::RED, TEST_LOCATION );
+
+  tet_infoline( "Clear the background, no renderers" );
+  control.ClearBackground();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+
+  tet_infoline( "Set control to clip its children again, a renderer should be created which will be transparent" );
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
+
+  tet_infoline( "Disable clipping, no renderers" );
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
 
   END_TEST;
 }
