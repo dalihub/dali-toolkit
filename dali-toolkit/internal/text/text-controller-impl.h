@@ -162,6 +162,7 @@ struct EventData
   bool mIsPlaceholderPixelSize          : 1;   ///< True if the placeholder font size is set as pixel size.
   bool mIsPlaceholderElideEnabled       : 1;   ///< True if the placeholder text's elide is enabled.
   bool mPlaceholderEllipsisFlag         : 1;   ///< True if the text controller sets the placeholder ellipsis.
+  bool mShiftSelectionFlag              : 1;   ///< True if the text selection using Shift key is enabled.
 };
 
 struct ModifyEvent

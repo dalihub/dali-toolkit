@@ -466,6 +466,16 @@ bool Controller::IsSelectionEnabled() const
   return mImpl->mEventData->mSelectionEnabled;
 }
 
+void Controller::SetShiftSelectionEnabled( bool enabled )
+{
+  mImpl->mEventData->mShiftSelectionFlag = enabled;
+}
+
+bool Controller::IsShiftSelectionEnabled() const
+{
+  return mImpl->mEventData->mShiftSelectionFlag;
+}
+
 // public : Update
 
 void Controller::SetText( const std::string& text )
@@ -1234,10 +1244,15 @@ const std::string& Controller::GetDefaultOutlineProperties() const
   return EMPTY_STRING;
 }
 
-void Controller::SetDefaultLineSpacing( float lineSpacing )
+bool Controller::SetDefaultLineSpacing( float lineSpacing )
 {
-  //TODO finish implementation
-  mImpl->mLayoutEngine.SetDefaultLineSpacing( lineSpacing );
+  if( std::abs(lineSpacing - mImpl->mLayoutEngine.GetDefaultLineSpacing()) > Math::MACHINE_EPSILON_1000 )
+  {
+    mImpl->mLayoutEngine.SetDefaultLineSpacing(lineSpacing);
+    mImpl->mRecalculateNaturalSize = true;
+    return true;
+  }
+  return false;
 }
 
 float Controller::GetDefaultLineSpacing() const
@@ -2119,6 +2134,16 @@ Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
   }
 
   return Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT;
+}
+
+Toolkit::DevelText::VerticalLineAlignment::Type Controller::GetVerticalLineAlignment() const
+{
+  return mImpl->mModel->GetVerticalLineAlignment();
+}
+
+void Controller::SetVerticalLineAlignment( Toolkit::DevelText::VerticalLineAlignment::Type alignment )
+{
+  mImpl->mModel->mVerticalLineAlignment = alignment;
 }
 
 // public : Relayout.

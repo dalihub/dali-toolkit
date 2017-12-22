@@ -108,7 +108,8 @@ EventData::EventData( DecoratorPtr decorator )
   mPasswordInput( false ),
   mIsPlaceholderPixelSize( false ),
   mIsPlaceholderElideEnabled( false ),
-  mPlaceholderEllipsisFlag( false )
+  mPlaceholderEllipsisFlag( false ),
+  mShiftSelectionFlag( true )
 {
   mImfManager = ImfManager::Get();
 }
@@ -1251,7 +1252,7 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
     mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
   }
 
-  if ( isShiftModifier && IsShowingRealText() )
+  if ( isShiftModifier && IsShowingRealText() && mEventData->mShiftSelectionFlag )
   {
     // Handle text selection
     bool selecting = false;

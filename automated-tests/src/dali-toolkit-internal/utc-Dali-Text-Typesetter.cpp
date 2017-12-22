@@ -141,3 +141,57 @@ int UtcDaliTextRenderingControllerRender(void)
   tet_result(TET_PASS);
   END_TEST;
 }
+
+int UtcDaliTextTypesetterVerticalLineAlignment(void)
+{
+  tet_infoline(" UtcDaliTextTypesetter");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  // Configures the text controller similarly to the text-label.
+  ConfigureTextLabel( controller );
+
+  // Sets the text.
+  controller->SetMarkupProcessorEnabled( true );
+  controller->SetText( "<font family='TizenSansRegular'>Hello world</font>" );
+
+  // Creates the text's model and relais-out the text.
+  const Size relayoutSize( 120.f, 60.f );
+  controller->Relayout( relayoutSize );
+
+  // Tests the rendering controller has been created.
+  TypesetterPtr renderingController = Typesetter::New( controller->GetTextModel() );
+  DALI_TEST_CHECK( renderingController );
+
+  {
+    controller->SetVerticalLineAlignment(Dali::Toolkit::DevelText::VerticalLineAlignment::TOP);
+    controller->Relayout(relayoutSize);
+
+    // Renders the text and creates the final bitmap.
+    auto bitmap = renderingController->Render(relayoutSize);
+    DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
+  }
+
+  {
+    controller->SetVerticalLineAlignment(Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE);
+    controller->Relayout(relayoutSize);
+
+    // Renders the text and creates the final bitmap.
+    auto bitmap = renderingController->Render(relayoutSize);
+    DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
+  }
+
+  {
+    controller->SetVerticalLineAlignment(Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM);
+    controller->Relayout(relayoutSize);
+
+    // Renders the text and creates the final bitmap.
+    auto bitmap = renderingController->Render(relayoutSize);
+    DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}

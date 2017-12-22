@@ -83,12 +83,6 @@ bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index in
   return controlDataImpl.IsVisualEnabled( index );
 }
 
-Toolkit::Visual::ResourceStatus GetVisualResourceStatus( const Internal::Control& control, Dali::Property::Index index )
-{
-  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
-  return controlDataImpl.GetVisualResourceStatus( index );
-}
-
 Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& handle )
 {
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
