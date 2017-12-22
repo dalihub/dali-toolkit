@@ -2178,6 +2178,13 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mModel->mVisualModel->mControlSize.width, mImpl->mModel->mVisualModel->mControlSize.height );
 
+    if( ( 0 == mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd ) &&
+        ( 0 == mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters ) &&
+        ( ( mImpl->mModel->mVisualModel->mControlSize.width < Math::MACHINE_EPSILON_1000 ) || ( mImpl->mModel->mVisualModel->mControlSize.height < Math::MACHINE_EPSILON_1000 ) ) )
+    {
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
+    }
+
     // Layout operations that need to be done if the size changes.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
                                                              LAYOUT                    |
