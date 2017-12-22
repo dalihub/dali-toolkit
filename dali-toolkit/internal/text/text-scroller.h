@@ -70,8 +70,9 @@ public:
    * @param[in] direction text direction true for right to left text
    * @param[in] horizontalAlignment horizontal alignment of the text
    * @param[in] verticalAlignment vertical alignment of the text
+   * @param[in] isTextElided whether text is elided or not
    */
-  void SetParameters( Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment );
+  void SetParameters( Actor scrollingTextActor, Dali::Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment, bool isTextElided );
 
   /**
    * @brief Set the gap distance to elapse before the text wraps around
