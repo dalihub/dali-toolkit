@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, MIRRORED_REPEAT )
 DALI_ENUM_TO_STRING_TABLE_END( WRAP_MODE )
 
 const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
+constexpr auto LOOP_FOREVER = -1;
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ANIMATED_IMAGE");
@@ -171,6 +172,8 @@ AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache )
   mCacheSize( 1 ),
   mBatchSize( 1 ),
   mFrameDelay( 100 ),
+  mLoopCount( LOOP_FOREVER ),
+  mCurrentLoopIndex( 0 ),
   mUrlIndex( 0 ),
   mFrameCount( 0 ),
   mImageSize(),
@@ -231,6 +234,7 @@ void AnimatedImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::BATCH_SIZE, static_cast<int>(mBatchSize) );
   map.Insert( Toolkit::ImageVisual::Property::CACHE_SIZE, static_cast<int>(mCacheSize) );
   map.Insert( Toolkit::ImageVisual::Property::FRAME_DELAY, static_cast<int>(mFrameDelay) );
+  map.Insert( Toolkit::DevelImageVisual::Property::LOOP_COUNT, static_cast<int>(mLoopCount) );
 }
 
 void AnimatedImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -274,6 +278,10 @@ void AnimatedImageVisual::DoSetProperties( const Property::Map& propertyMap )
       else if( keyValue.first == FRAME_DELAY_NAME )
       {
         DoSetProperty( Toolkit::ImageVisual::Property::FRAME_DELAY, keyValue.second );
+      }
+      else if( keyValue.first == LOOP_COUNT_NAME )
+      {
+        DoSetProperty( Toolkit::DevelImageVisual::Property::LOOP_COUNT, keyValue.second );
       }
     }
   }
@@ -342,6 +350,16 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
       if( value.Get( frameDelay ) )
       {
         mFrameDelay = frameDelay;
+      }
+      break;
+    }
+
+    case Toolkit::DevelImageVisual::Property::LOOP_COUNT:
+    {
+      int loopCount;
+      if( value.Get( loopCount ) )
+      {
+        mLoopCount = loopCount;
       }
       break;
     }
@@ -547,7 +565,20 @@ bool AnimatedImageVisual::DisplayNextFrame()
   {
     // Wrap the frame index
     ++mCurrentFrameIndex;
-    mCurrentFrameIndex %= mFrameCount;
+
+    if( mLoopCount < 0 || mCurrentLoopIndex <= mLoopCount)
+    {
+      mCurrentFrameIndex %= mFrameCount;
+      if( mCurrentFrameIndex == 0 )
+      {
+        ++mCurrentLoopIndex;
+      }
+    }
+    else
+    {
+      // This will stop timer
+      return false;
+    }
   }
   DALI_LOG_INFO( gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::DisplayNextFrame(this:%p) FrameCount:%d\n", this, mCurrentFrameIndex);
 

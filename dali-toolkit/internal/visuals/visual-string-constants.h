@@ -74,6 +74,7 @@ extern const char * const ANIMATED_IMAGE_URLS_NAME;
 extern const char * const BATCH_SIZE_NAME;
 extern const char * const CACHE_SIZE_NAME;
 extern const char * const FRAME_DELAY_NAME;
+extern const char * const LOOP_COUNT_NAME;
 extern const char * const MASK_CONTENT_SCALE_NAME;
 extern const char * const CROP_TO_MASK_NAME;
 extern const char * const LOAD_POLICY_NAME;

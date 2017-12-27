@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -118,6 +119,7 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
     .Add( "url", urls )
     .Add( "batchSize", 4 )
     .Add( "cacheSize", 8 )
+    .Add( "loopCount", 10 )
     .Add( "frameDelay", 200 )
     .Add( "pixelArea", Vector4() )
     .Add( "wrapModeU", WrapMode::REPEAT )
@@ -143,6 +145,10 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
   value = resultMap.Find( ImageVisual::Property::CACHE_SIZE, "cacheSize" );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get<int>(), 8, TEST_LOCATION );
+
+  value = resultMap.Find( Toolkit::DevelImageVisual::Property::LOOP_COUNT, "loopCount" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<int>(), 10, TEST_LOCATION );
 
   value = resultMap.Find( ImageVisual::Property::FRAME_DELAY, "frameDelay" );
   DALI_TEST_CHECK( value );
@@ -546,6 +552,100 @@ int UtcDaliAnimatedImageVisualMultiImage05(void)
   application.SendNotification();
   application.Render(16);
   DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+void TestLoopCount( ToolkitTestApplication &application, DummyControl &dummyControl, uint16_t frameCount, uint16_t loopCount, const char * location )
+{
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+
+  textureTrace.Enable(true);
+  Stage::GetCurrent().Add( dummyControl );
+  application.SendNotification();
+  application.Render(16);
+
+  tet_infoline( "Test that a timer has been created" );
+  DALI_TEST_EQUALS( Test::GetTimerCount(), 1, TEST_INNER_LOCATION( location ) );
+
+  for ( uint16_t i = 0; i <= loopCount; i++ )
+  {
+    for ( uint16_t j = 0; j < frameCount; j++ )
+    {
+      tet_printf( "Test that after %u ticks, and we have %u frame \n", j + 1u, j + 1u );
+      Test::EmitGlobalTimerSignal();
+      application.SendNotification();
+      application.Render(16);
+      DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 1, TEST_INNER_LOCATION( location ) );
+      DALI_TEST_EQUALS( Test::AreTimersRunning(), true, TEST_INNER_LOCATION( location ) );
+    }
+    tet_printf( "\nTest Loop %u \n", i );
+  }
+
+  tet_printf( "Test that after %u loops, and we have no frame. Timer should stop \n", loopCount );
+  Test::EmitGlobalTimerSignal();
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_EQUALS( Test::AreTimersRunning(), false, TEST_INNER_LOCATION( location ) );
+
+  dummyControl.Unparent();
+}
+
+int UtcDaliAnimatedImageVisualLoopCount(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliAnimatedImageVisualLoopCount" );
+
+  {
+    // request AnimatedImageVisual with a property map
+    // Test with no (0) loop count
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base animatedImageVisual = factory.CreateVisual(
+      Property::Map()
+      .Add( Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE )
+      .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME )
+      .Add( ImageVisual::Property::PIXEL_AREA, Vector4() )
+      .Add( ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT )
+      .Add( ImageVisual::Property::WRAP_MODE_V, WrapMode::DEFAULT )
+      .Add( DevelImageVisual::Property::LOOP_COUNT, 0 ));
+
+    DummyControl dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, animatedImageVisual );
+    dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+
+    TestLoopCount( application, dummyControl, 4, 0, TEST_LOCATION );
+
+    // Test with no (1) loop count. Request AnimatedImageVisual with a property map
+    animatedImageVisual = factory.CreateVisual(
+      Property::Map()
+      .Add( Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE )
+      .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME )
+      .Add( ImageVisual::Property::PIXEL_AREA, Vector4() )
+      .Add( ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT )
+      .Add( ImageVisual::Property::WRAP_MODE_V, WrapMode::DEFAULT )
+      .Add( DevelImageVisual::Property::LOOP_COUNT, 1 ));
+
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, animatedImageVisual );
+
+    TestLoopCount( application, dummyControl, 4, 1, TEST_LOCATION );
+
+    // Test with no (100) loop count. Request AnimatedImageVisual with a property map
+    animatedImageVisual = factory.CreateVisual(
+      Property::Map()
+      .Add( Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE )
+      .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME )
+      .Add( ImageVisual::Property::PIXEL_AREA, Vector4() )
+      .Add( ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT )
+      .Add( ImageVisual::Property::WRAP_MODE_V, WrapMode::DEFAULT )
+      .Add( DevelImageVisual::Property::LOOP_COUNT, 100 ));
+
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, animatedImageVisual );
+
+    TestLoopCount( application, dummyControl, 4, 100, TEST_LOCATION );
+  }
 
   END_TEST;
 }

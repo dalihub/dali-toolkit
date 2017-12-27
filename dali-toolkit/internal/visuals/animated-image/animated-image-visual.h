@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -242,6 +242,8 @@ private:
   uint16_t mCacheSize;
   uint16_t mBatchSize;
   uint16_t mFrameDelay;
+  int16_t mLoopCount;
+  int16_t mCurrentLoopIndex;
   uint16_t mUrlIndex;
 
   // Shared variables

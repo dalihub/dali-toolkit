@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ typedef IntrusivePtr<Timer> TimerPtr;
 
 Dali::Timer::TimerSignalType gTickSignal;
 int gTimerCount = 0;
+bool gKeepTimersRunning = false;
 
 /**
  * Implementation of the timer
@@ -70,6 +71,7 @@ private: // Implementation
 private: // Data
 
   unsigned int mInterval;
+  bool mRunning;
 };
 
 inline Timer& GetImplementation(Dali::Timer& timer)
@@ -97,7 +99,8 @@ TimerPtr Timer::New( unsigned int milliSec )
 }
 
 Timer::Timer( unsigned int milliSec )
-: mInterval( milliSec )
+: mInterval( milliSec ),
+  mRunning( false )
 {
   ++gTimerCount;
 }
@@ -109,10 +112,12 @@ Timer::~Timer()
 
 void Timer::Start()
 {
+  mRunning = true;
 }
 
 void Timer::Stop()
 {
+  mRunning = false;
 }
 
 void Timer::SetInterval( unsigned int interval )
@@ -127,7 +132,7 @@ unsigned int Timer::GetInterval() const
 
 bool Timer::IsRunning() const
 {
-  return true;
+  return mRunning;
 }
 
 bool Timer::Tick()
@@ -150,7 +155,6 @@ void Timer::MockEmitSignal()
     gTickSignal.Emit();
   }
 }
-
 
 } // namespace Adaptor
 
@@ -193,6 +197,7 @@ Timer::~Timer()
 void Timer::Start()
 {
   Internal::Adaptor::GetImplementation( *this ).Start();
+  Dali::Internal::Adaptor::gKeepTimersRunning = true;
 }
 
 void Timer::Stop()
@@ -245,7 +250,13 @@ int GetTimerCount()
 
 void EmitGlobalTimerSignal()
 {
-  Dali::Internal::Adaptor::gTickSignal.Emit();
+  // @todo Multiplex timers properly.
+  Dali::Internal::Adaptor::gKeepTimersRunning = Dali::Internal::Adaptor::gTickSignal.Emit();
+}
+
+bool AreTimersRunning()
+{
+  return Dali::Internal::Adaptor::gKeepTimersRunning;
 }
 
 }
