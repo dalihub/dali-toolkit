@@ -57,11 +57,6 @@ VerticalAlignment::Type Model::GetVerticalAlignment() const
   return mVerticalAlignment;
 }
 
-DevelText::VerticalLineAlignment::Type Model::GetVerticalLineAlignment() const
-{
-  return mVerticalLineAlignment;
-}
-
 bool Model::IsTextElideEnabled() const
 {
   return mElideEnabled;
@@ -174,7 +169,6 @@ Model::Model()
   mScrollPositionLast(),
   mHorizontalAlignment( Text::HorizontalAlignment::BEGIN ),
   mVerticalAlignment( Text::VerticalAlignment::TOP ),
-  mVerticalLineAlignment( DevelText::VerticalLineAlignment::TOP ),
   mLineWrapMode( Text::LineWrap::WORD ),
   mAlignmentOffset( 0.0f ),
   mElideEnabled( false )

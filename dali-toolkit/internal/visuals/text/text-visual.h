@@ -114,15 +114,6 @@ public:
     GetVisualObject( visual ).mRendererUpdateNeeded = true;
   };
 
-  /**
-   * @brief Instantly updates the renderer
-   * @param[in] visual The text visual.
-   */
-  static void UpdateRenderer( Toolkit::Visual::Base visual )
-  {
-    GetVisualObject( visual ).UpdateRenderer();
-  };
-
 public: // from Visual::Base
 
   /**

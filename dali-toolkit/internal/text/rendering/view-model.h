@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
-#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 namespace Dali
 {
@@ -82,11 +81,6 @@ public:
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
   virtual Text::VerticalAlignment::Type GetVerticalAlignment() const;
-
-  /**
- * @copydoc ModelInterface::GetVerticalLineAlignment()
- */
-  virtual DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const;
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()

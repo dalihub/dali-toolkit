@@ -511,14 +511,8 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mController )
         {
-
-          // The line spacing isn't supported by the TextEditor. Since it's supported
-          // by the TextLabel for now it must be ignored. The property is being shadowed
-          // locally so its value isn't affected.
           const float lineSpacing = value.Get<float>();
-          impl.mLineSpacing = lineSpacing;
-          // set it to 0.0 due to missing implementation
-          impl.mController->SetDefaultLineSpacing( 0.0f );
+          impl.mController->SetDefaultLineSpacing( lineSpacing );
           impl.mRenderer.Reset();
         }
         break;
@@ -979,9 +973,7 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       {
         if( impl.mController )
         {
-          // LINE_SPACING isn't implemented for the TextEditor. Returning
-          // only shadowed value, not the real one.
-          value = impl.mLineSpacing;
+          value = impl.mController->GetDefaultLineSpacing();
         }
         break;
       }
@@ -1807,7 +1799,6 @@ TextEditor::TextEditor()
   mIdleCallback( NULL ),
   mAlignmentOffset( 0.f ),
   mScrollAnimationDuration( 0.f ),
-  mLineSpacing( 0.f ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mHasBeenStaged( false ),
   mScrollAnimationEnabled( false ),

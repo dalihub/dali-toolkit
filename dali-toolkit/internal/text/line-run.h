@@ -43,7 +43,6 @@ struct LineRun
   float              descender;       ///< The line's descender.
   float              extraLength;     ///< The length of the white spaces at the end of the line.
   float              alignmentOffset; ///< The horizontal alignment offset.
-  float              lineSpacing;     ///< The line's spacing
   CharacterDirection direction : 1;   ///< Direction of the first character of the paragraph.
   bool               ellipsis  : 1;   ///< Wheter ellipsis is added to the line.
 };

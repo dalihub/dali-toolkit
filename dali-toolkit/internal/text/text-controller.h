@@ -891,10 +891,8 @@ public: // Default style & Input style
    * @brief Sets the default line spacing.
    *
    * @param[in] lineSpacing The line spacing.
-   *
-   * @return True if lineSpacing has been updated, false otherwise
    */
-  bool SetDefaultLineSpacing( float lineSpacing );
+  void SetDefaultLineSpacing( float lineSpacing );
 
   /**
    * @brief Retrieves the default line spacing.
@@ -1175,18 +1173,6 @@ public: // Queries & retrieves.
    * @return The text direction.
    */
   Toolkit::DevelText::TextDirection::Type GetTextDirection();
-
-  /**
-   * @brief Retrieves vertical line alignment
-   * @return The vertical line alignment
-   */
-  Toolkit::DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const;
-
-  /**
-   * @brief Sets vertical line alignment
-   * @param[in] alignment The vertical line alignment for the text
-   */
-  void SetVerticalLineAlignment( Toolkit::DevelText::VerticalLineAlignment::Type alignment );
 
 public: // Relayout.
 

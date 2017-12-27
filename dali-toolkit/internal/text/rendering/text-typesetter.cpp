@@ -19,13 +19,12 @@
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 
 // EXTERNAL INCLUDES
-#include <memory.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <memory.h>
 #include <dali/public-api/common/constants.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/view-model.h>
-#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 
 namespace Dali
 {
@@ -299,29 +298,6 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
     }
   }
 
-  // Calculate vertical line alignment
-  switch( mModel->GetVerticalLineAlignment() )
-  {
-    case DevelText::VerticalLineAlignment::TOP:
-    {
-      break;
-    }
-    case DevelText::VerticalLineAlignment::MIDDLE:
-    {
-      const auto& line = *mModel->GetLines();
-      penY -= line.descender;
-      penY += static_cast<int>(line.lineSpacing*0.5f + line.descender);
-      break;
-    }
-    case DevelText::VerticalLineAlignment::BOTTOM:
-    {
-      const auto& line = *mModel->GetLines();
-      const auto lineHeight = line.ascender + (-line.descender) + line.lineSpacing;
-      penY += static_cast<int>(lineHeight - (line.ascender - line.descender));
-      break;
-    }
-  }
-
   // Generate the image buffers of the text for each different style first,
   // then combine all of them together as one final image buffer. We try to
   // do all of these in CPU only, so that once the final texture is generated,
@@ -454,12 +430,6 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
 
     // Increases the vertical offset with the line's ascender.
     glyphData.verticalOffset += static_cast<int>( line.ascender );
-
-    // Include line spacing after first line
-    if( lineIndex > 0u )
-    {
-      glyphData.verticalOffset += static_cast<int>( line.lineSpacing );
-    }
 
     // Retrieves the glyph's outline width
     float outlineWidth = mModel->GetOutlineWidth();

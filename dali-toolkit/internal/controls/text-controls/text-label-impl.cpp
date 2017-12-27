@@ -116,7 +116,6 @@ DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "autoScrollStopMode", 
 DALI_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "lineCount",                 INTEGER, LINE_COUNT                 )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "lineWrapMode",              INTEGER, LINE_WRAP_MODE             )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "textDirection",       INTEGER, TEXT_DIRECTION             )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "verticalLineAlignment",         INTEGER, VERTICAL_LINE_ALIGNMENT    )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -411,12 +410,8 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           const float lineSpacing = value.Get<float>();
-
-          // Don't trigger anything if the line spacing didn't change
-          if( impl.mController->SetDefaultLineSpacing( lineSpacing ) )
-          {
-            impl.mTextUpdateNeeded = true;
-          }
+          impl.mController->SetDefaultLineSpacing( lineSpacing );
+          impl.mTextUpdateNeeded = true;
         }
         break;
       }
@@ -494,37 +489,8 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
-      case Toolkit::DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT:
-      {
-        if( impl.mController && impl.mController->GetTextModel() )
-        {
-          DevelText::VerticalLineAlignment::Type alignment = static_cast<DevelText::VerticalLineAlignment::Type>( value.Get<int>() );
-
-          impl.mController->SetVerticalLineAlignment( alignment );
-
-          // Property doesn't affect the layout, only Visual must be updated
-          TextVisual::EnableRendererUpdate( impl.mVisual );
-
-          // No need to trigger full re-layout. Instead call UpdateRenderer() directly
-          TextVisual::UpdateRenderer( impl.mVisual );
-        }
-        break;
-      }
-    }
-
-    // Request relayout when text update is needed. It's necessary to call it
-    // as changing the property not via UI interaction brings no effect if only
-    // the mTextUpdateNeeded is changed.
-    if( impl.mTextUpdateNeeded )
-    {
-      // need to request relayout as size of text may have changed
-      impl.RequestTextRelayout();
     }
   }
-
-
-
-
 }
 
 Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index index )
@@ -792,14 +758,6 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           value = impl.mController->GetTextDirection();
-        }
-        break;
-      }
-      case Toolkit::DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT:
-      {
-        if( impl.mController )
-        {
-          value = impl.mController->GetVerticalLineAlignment();
         }
         break;
       }

@@ -70,8 +70,7 @@ struct LineLayout
     extraWidth( 0.f ),
     wsLengthEndOfLine( 0.f ),
     ascender( 0.f ),
-    descender( MAX_FLOAT ),
-    lineSpacing( 0.f )
+    descender( MAX_FLOAT )
   {}
 
   ~LineLayout()
@@ -101,7 +100,6 @@ struct LineLayout
   float          wsLengthEndOfLine;  ///< The length of the white spaces at the end of the line.
   float          ascender;           ///< The maximum ascender of all fonts in the line.
   float          descender;          ///< The minimum descender of all fonts in the line.
-  float          lineSpacing;        ///< The line spacing
 };
 
 struct Engine::Impl
@@ -135,9 +133,6 @@ struct Engine::Impl
     {
       lineLayout.descender = fontMetrics.descender;
     }
-
-    // set the line spacing
-    lineLayout.lineSpacing = mDefaultLineSpacing;
   }
 
   /**
@@ -570,7 +565,7 @@ struct Engine::Impl
         // Get the last line and layout it again with the 'completelyFill' flag to true.
         lineRun = linesBuffer + ( numberOfLines - 1u );
 
-        penY -= layout.ascender - lineRun->descender + lineRun->lineSpacing;
+        penY -= layout.ascender - lineRun->descender;
 
         ellipsisLayout.glyphIndex = lineRun->glyphRun.glyphIndex;
       }
@@ -603,7 +598,7 @@ struct Engine::Impl
       layoutSize.width = layoutParameters.boundingBox.width;
       if( layoutSize.height < Math::MACHINE_EPSILON_1000 )
       {
-        layoutSize.height += ( lineRun->ascender + -lineRun->descender ) + lineRun->lineSpacing;
+        layoutSize.height += ( lineRun->ascender + -lineRun->descender );
       }
 
       SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun->glyphRun.glyphIndex,
@@ -641,8 +636,6 @@ struct Engine::Impl
     lineRun.glyphRun.numberOfGlyphs = layout.numberOfGlyphs;
     lineRun.characterRun.characterIndex = layout.characterIndex;
     lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
-    lineRun.lineSpacing = mDefaultLineSpacing;
-
     if( isLastLine && !layoutParameters.isLastNewParagraph )
     {
       const float width = layout.extraBearing + layout.length + layout.extraWidth + layout.wsLengthEndOfLine;
@@ -673,7 +666,7 @@ struct Engine::Impl
       layoutSize.width = lineRun.width;
     }
 
-    layoutSize.height += ( lineRun.ascender + -lineRun.descender ) + lineRun.lineSpacing;
+    layoutSize.height += ( lineRun.ascender + -lineRun.descender );
   }
 
   /**
@@ -713,9 +706,8 @@ struct Engine::Impl
     lineRun.alignmentOffset = 0.f;
     lineRun.direction = !RTL;
     lineRun.ellipsis = false;
-    lineRun.lineSpacing = mDefaultLineSpacing;
 
-    layoutSize.height += ( lineRun.ascender + -lineRun.descender ) + lineRun.lineSpacing;
+    layoutSize.height += ( lineRun.ascender + -lineRun.descender );
   }
 
   /**
@@ -739,7 +731,7 @@ struct Engine::Impl
         layoutSize.width = line.width;
       }
 
-      layoutSize.height += ( line.ascender + -line.descender ) + line.lineSpacing;
+      layoutSize.height += ( line.ascender + -line.descender );
     }
   }
 
@@ -975,7 +967,7 @@ struct Engine::Impl
                            glyphPositionsBuffer + index - layoutParameters.startGlyphIndex );
 
         // Updates the vertical pen's position.
-        penY += -layout.descender + layout.lineSpacing + mDefaultLineSpacing;
+        penY += -layout.descender;
 
         // Increase the glyph index.
         index = nextIndex;
@@ -1208,7 +1200,6 @@ struct Engine::Impl
     line.alignmentOffset = 0.f;
     line.direction = !RTL;
     line.ellipsis = false;
-    line.lineSpacing = mDefaultLineSpacing;
   }
 
   Type mLayout;

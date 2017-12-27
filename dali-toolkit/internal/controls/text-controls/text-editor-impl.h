@@ -300,7 +300,6 @@ private: // Data
 
   float mAlignmentOffset;
   float mScrollAnimationDuration;
-  float mLineSpacing;
   int mRenderingBackend;
   bool mHasBeenStaged:1;
   bool mScrollAnimationEnabled:1;
