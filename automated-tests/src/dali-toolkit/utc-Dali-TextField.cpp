@@ -25,6 +25,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali/integration-api/events/long-press-gesture-event.h>
+#include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
@@ -1627,6 +1628,12 @@ int utcDaliTextFieldEvent01(void)
   application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
   application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
 
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Pressing delete key should be fine even if there is no text in TextField.
+  application.ProcessEvent( GenerateKey( "Delete", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   // Render and notify
   application.SendNotification();
   application.Render();
