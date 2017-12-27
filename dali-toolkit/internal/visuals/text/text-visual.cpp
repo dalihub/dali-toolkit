@@ -644,7 +644,10 @@ void TextVisual::UpdateRenderer()
     animatableTextColor = control.GetProperty< Vector4 >( mAnimatableTextColorPropertyIndex );
   }
 
-  if( ( fabsf( relayoutSize.width ) < Math::MACHINE_EPSILON_1000 ) || ( fabsf( relayoutSize.height ) < Math::MACHINE_EPSILON_1000 ) )
+  std::string text;
+  mController->GetText( text );
+
+  if( ( fabsf( relayoutSize.width ) < Math::MACHINE_EPSILON_1000 ) || ( fabsf( relayoutSize.height ) < Math::MACHINE_EPSILON_1000 ) || text.empty() )
   {
     // Removes the texture set.
     RemoveTextureSet();
