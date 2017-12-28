@@ -295,7 +295,17 @@ void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, T
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters wrapGap[%f]\n", wrapGap );
 
-  const float horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[ horizontalAlignment ][ direction ];
+  float horizontalAlign;
+
+  if( textureSize.x > controlSize.x )
+  {
+    // if Text is elided, scroll should start at the begin of text.
+    horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[HorizontalAlignment::BEGIN][ direction ];
+  }
+  else
+  {
+    horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[ horizontalAlignment ][ direction ];
+  }
   const float verticalAlign = VERTICAL_ALIGNMENT_TABLE[ verticalAlignment ];
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters horizontalAlign[%f], verticalAlign[%f]\n", horizontalAlign, verticalAlign );
 
