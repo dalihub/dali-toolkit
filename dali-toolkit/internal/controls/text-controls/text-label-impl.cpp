@@ -1021,7 +1021,7 @@ void TextLabel::SetUpAutoScrolling()
 
   // Set parameters for scrolling
   Renderer renderer = static_cast<Internal::Visual::Base&>( GetImplementation( mVisual ) ).GetRenderer();
-  mTextScroller->SetParameters( Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment(), mController->IsTextElideEnabled() );
+  mTextScroller->SetParameters( Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment() );
 }
 
 void TextLabel::ScrollingFinished()
