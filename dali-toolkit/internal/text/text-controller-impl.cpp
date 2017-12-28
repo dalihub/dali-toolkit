@@ -1952,6 +1952,8 @@ void Controller::Impl::RepositionSelectionHandles()
   if( selectionStart == selectionEnd )
   {
     // Nothing to select if handles are in the same place.
+    // So, deactive Highlight box.
+    mEventData->mDecorator->SetHighlightActive( false );
     return;
   }
 
@@ -2329,9 +2331,6 @@ void Controller::Impl::RepositionSelectionHandles()
                                          secondaryCursorInfo.lineOffset + mModel->mScrollPosition.y,
                                          secondaryCursorInfo.lineHeight );
   }
-
-  // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
-  mEventData->mPrimaryCursorPosition = ( indicesSwapped ) ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition;
 
   // Set the flag to update the decorator.
   mEventData->mDecoratorUpdated = true;
