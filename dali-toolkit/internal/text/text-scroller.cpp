@@ -90,7 +90,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   \n
   void main()\n
   {\n
-    if ( vTexCoord.y > 1.0 )\n
+    if ( vTexCoord.y > 1.0 || vTexCoord.y < 0.0 )\n
       discard;\n
     \n
     mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
