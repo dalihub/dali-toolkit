@@ -179,6 +179,7 @@ AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache )
   mImageSize(),
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
+  mActionStatus( DevelAnimatedImageVisual::Action::PLAY ),
   mStartFirstFrame(false)
 {}
 
@@ -240,6 +241,38 @@ void AnimatedImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 void AnimatedImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 {
   // Do nothing
+}
+
+void AnimatedImageVisual::OnDoAction( const Dali::Property::Index actionId, const Dali::Property::Value& attributes )
+{
+  // Check if action is valid for this visual type and perform action if possible
+
+  switch ( actionId )
+  {
+    case DevelAnimatedImageVisual::Action::PAUSE:
+    {
+      // Pause will be executed on next timer tick
+      mActionStatus = DevelAnimatedImageVisual::Action::PAUSE;
+      break;
+    }
+    case DevelAnimatedImageVisual::Action::PLAY:
+    {
+      if( IsOnStage() && mActionStatus != DevelAnimatedImageVisual::Action::PLAY )
+      {
+        mFrameDelayTimer.Start();
+      }
+      mActionStatus = DevelAnimatedImageVisual::Action::PLAY;
+      break;
+    }
+    case DevelAnimatedImageVisual::Action::STOP:
+    {
+      // STOP reset functionality will actually be done in a future change
+      // Stop will be executed on next timer tick
+      mCurrentFrameIndex = 0;
+      mActionStatus = DevelAnimatedImageVisual::Action::STOP;
+      break;
+    }
+  }
 }
 
 void AnimatedImageVisual::DoSetProperties( const Property::Map& propertyMap )
@@ -561,6 +594,10 @@ void AnimatedImageVisual::FrameReady( TextureSet textureSet )
 
 bool AnimatedImageVisual::DisplayNextFrame()
 {
+  if( mActionStatus == DevelAnimatedImageVisual::Action::STOP || mActionStatus == DevelAnimatedImageVisual::Action::PAUSE )
+  {
+    return false;
+  }
   if( mFrameCount > 1 )
   {
     // Wrap the frame index
@@ -593,12 +630,14 @@ bool AnimatedImageVisual::DisplayNextFrame()
   }
 
   TextureSet textureSet;
-  if (mImageCache)
-    textureSet = mImageCache->NextFrame();
-  if( textureSet )
+  if( mImageCache )
   {
-    SetImageSize( textureSet );
-    mImpl->mRenderer.SetTextures( textureSet );
+    textureSet = mImageCache->NextFrame();
+    if( textureSet )
+    {
+      SetImageSize( textureSet );
+      mImpl->mRenderer.SetTextures( textureSet );
+    }
   }
 
   // Keep timer ticking

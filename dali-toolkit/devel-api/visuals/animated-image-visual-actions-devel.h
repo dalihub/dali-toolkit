@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_DEVEL_API_VISUALS_IMAGE_VISUAL_ACTIONS_DEVEL_H
-#define DALI_TOOLKIT_DEVEL_API_VISUALS_IMAGE_VISUAL_ACTIONS_DEVEL_H
+#ifndef DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_IMAGE_VISUAL_ACTIONS_DEVEL_H
+#define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_IMAGE_VISUAL_ACTIONS_DEVEL_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -24,11 +24,11 @@ namespace Dali
 namespace Toolkit
 {
 
-namespace DevelImageVisual
+namespace DevelAnimatedImageVisual
 {
 
 /**
- * @brief Actions that the image visual can perform.  These actions are called through the Visual::Base::DoAction API.
+ * @brief Actions that the animated image visual can perform.  These actions are called through the Visual::Base::DoAction API.
  */
 namespace Action
 {
@@ -37,15 +37,17 @@ namespace Action
  */
 enum Type
 {
-  RELOAD = 0  ///< Force reloading of the image, all visuals using this image will get the latest one.
+  PLAY,        ///< Play the animated GIF. This is also Default playback mode.
+  PAUSE,       ///< Pause the animated GIF.
+  STOP         ///< Stop the animated GIF.
 };
 
-} // namespace Actions
+} // namespace Action
 
-} // namespace DevelImageVisual
+} // namespace DevelAnimatedImageVisual
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_DEVEL_API_VISUALS_IMAGE_VISUAL_ACTIONS_DEVEL_H
+#endif // DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_IMAGE_VISUAL_ACTIONS_DEVEL_H
