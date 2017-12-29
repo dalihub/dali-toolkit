@@ -24,6 +24,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/animated-image-visual-actions-devel.h>
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -645,6 +646,80 @@ int UtcDaliAnimatedImageVisualLoopCount(void)
     dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, animatedImageVisual );
 
     TestLoopCount( application, dummyControl, 4, 100, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedImageVisualPlayback(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+
+  tet_infoline( "UtcDaliAnimatedImageVisualPlayback" );
+
+  {
+    // request AnimatedImageVisual with a property map
+    // Test with forever (-1) loop count
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base animatedImageVisual = factory.CreateVisual(
+      Property::Map()
+      .Add( Toolkit::Visual::Property::TYPE, Visual::ANIMATED_IMAGE )
+      .Add( ImageVisual::Property::URL, TEST_GIF_FILE_NAME )
+      .Add( ImageVisual::Property::PIXEL_AREA, Vector4() )
+      .Add( ImageVisual::Property::WRAP_MODE_U, WrapMode::REPEAT )
+      .Add( ImageVisual::Property::WRAP_MODE_V, WrapMode::DEFAULT )
+      .Add( DevelImageVisual::Property::LOOP_COUNT, -1 ));
+
+    DummyControl dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, animatedImageVisual );
+    dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+
+    textureTrace.Enable(true);
+    Stage::GetCurrent().Add( dummyControl );
+    application.SendNotification();
+    application.Render(16);
+
+    tet_infoline( "Test that a timer has been created" );
+    DALI_TEST_EQUALS( Test::GetTimerCount(), 1, TEST_LOCATION );
+
+    Test::EmitGlobalTimerSignal();
+    application.SendNotification();
+    application.Render(16);
+    DALI_TEST_EQUALS( Test::AreTimersRunning(), true, TEST_LOCATION );
+
+    Property::Map attributes;
+    tet_infoline( "Test Pause action. Timer should stop after Pause action" );
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::PAUSE, attributes );
+    Test::EmitGlobalTimerSignal();
+    application.SendNotification();
+    application.Render(16);
+    DALI_TEST_EQUALS( Test::AreTimersRunning(), false, TEST_LOCATION );
+
+    tet_infoline( "Test Play action. Timer should Restart after Play action" );
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::PLAY, attributes );
+    Test::EmitGlobalTimerSignal();
+    application.SendNotification();
+    application.Render(16);
+    DALI_TEST_EQUALS( Test::AreTimersRunning(), true, TEST_LOCATION );
+
+    tet_infoline( "Test Stop action. Timer should stop after Stop action" );
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::STOP, attributes );
+    Test::EmitGlobalTimerSignal();
+    application.SendNotification();
+    application.Render(16);
+    DALI_TEST_EQUALS( Test::AreTimersRunning(), false, TEST_LOCATION );
+
+    tet_infoline( "Test Play action. Timer should Restart after Play action" );
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::PLAY, attributes );
+    Test::EmitGlobalTimerSignal();
+    application.SendNotification();
+    application.Render(16);
+    DALI_TEST_EQUALS( Test::AreTimersRunning(), true, TEST_LOCATION );
+
+    dummyControl.Unparent();
   }
 
   END_TEST;

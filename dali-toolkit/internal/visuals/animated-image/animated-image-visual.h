@@ -30,6 +30,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/internal/visuals/animated-image/image-cache.h>
+#include <dali-toolkit/devel-api/visuals/animated-image-visual-actions-devel.h>
 
 namespace Dali
 {
@@ -129,6 +130,11 @@ public:  // from Visual
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
   virtual void DoCreateInstancePropertyMap( Property::Map& map ) const;
+
+  /**
+   * @copydoc Visual::Base::OnDoAction
+   */
+  virtual void OnDoAction( const Dali::Property::Index actionName, const Dali::Property::Value& attributes ) override;
 
 protected:
 
@@ -252,6 +258,7 @@ private:
 
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
+  DevelAnimatedImageVisual::Action::Type mActionStatus:2;
   bool mStartFirstFrame:1;
 };
 
