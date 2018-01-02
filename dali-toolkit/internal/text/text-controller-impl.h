@@ -323,7 +323,8 @@ struct Controller::Impl
     mMarkupProcessorEnabled( false ),
     mClipboardHideEnabled( true ),
     mIsAutoScrollEnabled( false ),
-    mAutoScrollDirectionRTL( false ),
+    mUpdateTextDirection( true ),
+    mIsTextDirectionRTL( false ),
     mUnderlineSetByString( false ),
     mShadowSetByString( false ),
     mOutlineSetByString( false ),
@@ -744,7 +745,8 @@ public:
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
   bool mClipboardHideEnabled:1;            ///< Whether the ClipboardHide function work or not
   bool mIsAutoScrollEnabled:1;             ///< Whether auto text scrolling is enabled.
-  CharacterDirection mAutoScrollDirectionRTL:1;  ///< Direction of auto scrolling, true if rtl
+  bool mUpdateTextDirection:1;             ///< Whether the text direction needs to be updated.
+  CharacterDirection mIsTextDirectionRTL:1;  ///< Whether the text direction is right to left or not
 
   bool mUnderlineSetByString:1;            ///< Set when underline is set by string (legacy) instead of map
   bool mShadowSetByString:1;               ///< Set when shadow is set by string (legacy) instead of map
