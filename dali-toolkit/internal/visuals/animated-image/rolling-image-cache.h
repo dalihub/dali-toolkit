@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ROLLING_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,8 +119,8 @@ private:
    */
   struct ImageFrame
   {
-    unsigned int mUrlIndex;
-    bool mReady;
+    unsigned int mUrlIndex = 0u;
+    bool mReady = false;
   };
 
   std::vector<UrlStore>& mImageUrls;
