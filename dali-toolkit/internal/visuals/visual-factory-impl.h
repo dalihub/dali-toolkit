@@ -35,7 +35,6 @@ namespace Internal
 {
 
 class VisualFactoryCache;
-typedef IntrusivePtr<VisualFactoryCache> VisualFactoryCachePtr;
 
 /**
  * @copydoc Toolkit::VisualFactory
@@ -99,10 +98,9 @@ private:
   VisualFactory& operator=(const VisualFactory& rhs) = delete;
 
 private:
-
-  VisualFactoryCachePtr   mFactoryCache;
-  bool                    mDebugEnabled:1;
-  bool                    mPreMultiplyOnLoad:1; ///< Local store for this flag ( as mFactoryCache is lazy laoded )
+  std::unique_ptr<VisualFactoryCache> mFactoryCache;
+  bool                                mDebugEnabled:1;
+  bool                                mPreMultiplyOnLoad:1; ///< Local store for this flag
 };
 
 /**

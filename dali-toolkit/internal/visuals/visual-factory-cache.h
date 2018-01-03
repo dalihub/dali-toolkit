@@ -47,7 +47,7 @@ typedef IntrusivePtr<ImageAtlasManager> ImageAtlasManagerPtr;
 /**
  * Caches shaders and geometries. Owned by VisualFactory.
  */
-class VisualFactoryCache : public RefObject
+class VisualFactoryCache
 {
 public:
 
@@ -112,6 +112,11 @@ public:
    * @param[in] preMultiplyOnLoad True if image visuals should pre-multiply alpha on image load.
    */
   VisualFactoryCache( bool preMultiplyOnLoad );
+
+  /**
+   * @brief Destructor
+   */
+  ~VisualFactoryCache();
 
   /**
    * Request geometry of the given type.
@@ -201,11 +206,6 @@ private: // for svg rasterization thread
   void ApplyRasterizedSVGToSampler();
 
 protected:
-
-  /**
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  virtual ~VisualFactoryCache();
 
   /**
    * Undefined copy constructor.

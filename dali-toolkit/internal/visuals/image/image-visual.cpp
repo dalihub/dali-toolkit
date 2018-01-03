@@ -759,7 +759,6 @@ void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
-
 bool ImageVisual::IsSynchronousResourceLoading() const
 {
   return mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
@@ -790,7 +789,7 @@ void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& t
                                          mWrapModeV, textureObserver, atlasUploadObserver, atlasManager,
                                          mOrientationCorrection, forceReload, preMultiplyOnLoad);
 
-  if( preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD)
+  if( textures && preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD)
   {
     EnablePreMultipliedAlpha( true );
   }
@@ -1096,7 +1095,7 @@ void ImageVisual::UploadCompleted()
 
 // From Texture Manager
 void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, TextureSet textureSet, bool usingAtlas,
-                                  const Vector4& atlasRectangle )
+                                  const Vector4& atlasRectangle, bool preMultiplied )
 {
   Toolkit::Visual::ResourceStatus resourceStatus;
   Actor actor = mPlacementActor.GetHandle();
@@ -1107,6 +1106,10 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
       if( usingAtlas )
       {
         mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, mAtlasRect );
+      }
+      else if( preMultiplied )
+      {
+        EnablePreMultipliedAlpha( true );
       }
 
       actor.AddRenderer( mImpl->mRenderer );

@@ -340,9 +340,9 @@ Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
 {
   if( !mFactoryCache )
   {
-    mFactoryCache = new VisualFactoryCache( mPreMultiplyOnLoad );
+    mFactoryCache = std::unique_ptr<VisualFactoryCache>( new VisualFactoryCache( mPreMultiplyOnLoad ) );
   }
-  return *(mFactoryCache.Get());
+  return *mFactoryCache;
 }
 
 } // namespace Internal

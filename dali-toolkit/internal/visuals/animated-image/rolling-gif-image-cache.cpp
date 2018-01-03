@@ -147,6 +147,7 @@ void RollingGifImageCache::LoadBatch()
       AtlasUploadObserver* atlasObserver = nullptr;
       ImageAtlasManagerPtr imageAtlasManager = nullptr;
       Vector4 textureRect;
+      auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
       mTextureManager.LoadTexture(
         mImageUrls[ imageFrame.mFrameNumber ].mUrl, ImageDimensions(), FittingMode::SCALE_TO_FILL,
@@ -154,7 +155,7 @@ void RollingGifImageCache::LoadBatch()
         synchronousLoading, mImageUrls[ imageFrame.mFrameNumber ].mTextureId, textureRect,
         atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT,
         Dali::WrapMode::Type::DEFAULT, NULL,
-        atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY );
+        atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, preMultiply );
     }
 
     mFrameIndex += batchSize;

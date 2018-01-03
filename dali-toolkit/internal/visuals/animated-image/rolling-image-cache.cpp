@@ -148,6 +148,7 @@ void RollingImageCache::LoadBatch()
     AtlasUploadObserver* atlasObserver = nullptr;
     ImageAtlasManagerPtr imageAtlasManager = nullptr;
     Vector4 textureRect;
+    auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     mTextureManager.LoadTexture(
       url, ImageDimensions(), FittingMode::SCALE_TO_FILL,
@@ -156,7 +157,7 @@ void RollingImageCache::LoadBatch()
       atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT,
       Dali::WrapMode::Type::DEFAULT, this,
       atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED,
-      TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY );
+      preMultiply );
 
     mRequestingLoad = false;
   }
@@ -201,7 +202,8 @@ void RollingImageCache::UploadComplete(
   int32_t        textureId,
   TextureSet     textureSet,
   bool           useAtlasing,
-  const Vector4& atlasRect )
+  const Vector4& atlasRect,
+  bool           preMultiplied )
 {
   DALI_LOG_INFO(gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::UploadComplete(textureId:%d) start\n", textureId);
   LOG_CACHE;
