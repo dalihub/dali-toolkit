@@ -40,8 +40,9 @@ namespace Toolkit
 namespace Internal
 {
 
-VisualFactoryCache::VisualFactoryCache()
-: mSvgRasterizeThread( NULL )
+VisualFactoryCache::VisualFactoryCache( bool preMultiplyOnLoad )
+: mSvgRasterizeThread( NULL ),
+  mPreMultiplyOnLoad( preMultiplyOnLoad )
 {
 }
 
@@ -212,6 +213,16 @@ Geometry VisualFactoryCache::CreateGridGeometry( Uint16Pair gridSize )
 Image VisualFactoryCache::GetBrokenVisualImage()
 {
   return ResourceImage::New( BROKEN_VISUAL_IMAGE_URL );
+}
+
+void VisualFactoryCache::SetPreMultiplyOnLoad( bool preMultiply )
+{
+  mPreMultiplyOnLoad = preMultiply;
+}
+
+bool VisualFactoryCache::GetPreMultiplyOnLoad()
+{
+  return mPreMultiplyOnLoad;
 }
 
 } // namespace Internal

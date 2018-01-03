@@ -34,7 +34,8 @@ public:
   {
   }
 
-  void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect )
+  virtual void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet,
+                               bool useAtlasing, const Vector4& atlasRect, bool preMultiplied ) override
   {
     mLoaded = loadSuccess;
     mObserverCalled = true;
@@ -53,7 +54,7 @@ int UtcTextureManagerRequestLoad(void)
 
   TestObserver observer;
   std::string filename("image.png");
-
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
   TextureManager::TextureId textureId = textureManager.RequestLoad(
     filename,
     ImageDimensions(),
@@ -62,7 +63,8 @@ int UtcTextureManagerRequestLoad(void)
     TextureManager::NO_ATLAS,
     &observer,
     true,
-    TextureManager::ReloadPolicy::CACHED );
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
 
   const VisualUrl& url = textureManager.GetVisualUrl( textureId );
 
