@@ -154,6 +154,63 @@ int UtcDaliImageVisualPropertyMap(void)
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
+  factory.SetPreMultiplyOnLoad( true );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_LARGE_IMAGE_FILE_NAME );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
+  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  actor.SetSize( 200.f, 200.f );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  auto renderer = actor.GetRendererAt(0);
+  auto preMultipliedIndex = renderer.GetPropertyIndex( "preMultipliedAlpha" );
+  DALI_TEST_CHECK( preMultipliedIndex != Property::INVALID_INDEX );
+  auto preMultipliedAlpha = renderer.GetProperty<float>( preMultipliedIndex );
+  auto preMultipliedAlpha2 = renderer.GetProperty<bool>( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_EQUALS( preMultipliedAlpha, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( preMultipliedAlpha2, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  Stage::GetCurrent().Remove( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+
+int UtcDaliImageVisualNoPremultipliedAlpha01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Request image visual without pre-multiplied alpha" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+  factory.SetPreMultiplyOnLoad( false );
 
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
@@ -186,6 +243,14 @@ int UtcDaliImageVisualPropertyMap(void)
   application.Render();
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  auto renderer = actor.GetRendererAt(0);
+  auto preMultipliedIndex = renderer.GetPropertyIndex( "preMultipliedAlpha" );
+  DALI_TEST_CHECK( preMultipliedIndex != Property::INVALID_INDEX );
+  auto preMultipliedAlpha = renderer.GetProperty<bool>( preMultipliedIndex );
+  auto preMultipliedAlpha2 = renderer.GetProperty<bool>( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+
+  DALI_TEST_EQUALS( preMultipliedAlpha, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( preMultipliedAlpha2, false, TEST_LOCATION );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 

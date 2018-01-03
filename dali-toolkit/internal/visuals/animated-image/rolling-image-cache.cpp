@@ -155,7 +155,8 @@ void RollingImageCache::LoadBatch()
       synchronousLoading, mImageUrls[ imageFrame.mUrlIndex ].mTextureId, textureRect,
       atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT,
       Dali::WrapMode::Type::DEFAULT, this,
-      atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED );
+      atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED,
+      TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY );
 
     mRequestingLoad = false;
   }

@@ -154,7 +154,7 @@ void RollingGifImageCache::LoadBatch()
         synchronousLoading, mImageUrls[ imageFrame.mFrameNumber ].mTextureId, textureRect,
         atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT,
         Dali::WrapMode::Type::DEFAULT, NULL,
-        atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED );
+        atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED, TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY );
     }
 
     mFrameIndex += batchSize;

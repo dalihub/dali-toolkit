@@ -108,8 +108,10 @@ public:
 
   /**
    * @brief Constructor
+   *
+   * @param[in] preMultiplyOnLoad True if image visuals should pre-multiply alpha on image load.
    */
-  VisualFactoryCache();
+  VisualFactoryCache( bool preMultiplyOnLoad );
 
   /**
    * Request geometry of the given type.
@@ -155,6 +157,16 @@ public:
    * @return The broken image handle.
    */
   static Image GetBrokenVisualImage();
+
+  /**
+   * @copydoc Toolkit::VisualFactory::SetPreMultiplyOnLoad()
+   */
+  void SetPreMultiplyOnLoad( bool preMultiply );
+
+  /**
+   * @copydoc Toolkit::VisualFactory::GetPreMultiplyOnLoad()
+   */
+  bool GetPreMultiplyOnLoad();
 
 public:
   /**
@@ -213,6 +225,7 @@ private:
   TextureManager       mTextureManager;
   NPatchLoader         mNPatchLoader;
   SvgRasterizeThread*  mSvgRasterizeThread;
+  bool                 mPreMultiplyOnLoad;
 };
 
 } // namespace Internal

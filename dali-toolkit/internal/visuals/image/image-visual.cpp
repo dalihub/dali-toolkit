@@ -698,6 +698,11 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
 
   //Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+
+  if( IsPreMultipliedAlphaEnabled() )
+  {
+    EnablePreMultipliedAlpha( true );
+  }
 }
 
 void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
@@ -775,12 +780,20 @@ void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& t
     atlasUploadObserver = this;
   }
 
+  auto preMultiplyOnLoad = mFactoryCache.GetPreMultiplyOnLoad()
+    ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
+    : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
   textures = textureManager.LoadTexture( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode,
                                          mMaskingData, IsSynchronousResourceLoading(), mTextureId,
                                          atlasRect, atlasing, mLoading, mWrapModeU,
                                          mWrapModeV, textureObserver, atlasUploadObserver, atlasManager,
-                                         mOrientationCorrection,
-                                         forceReload );
+                                         mOrientationCorrection, forceReload, preMultiplyOnLoad);
+
+  if( preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD)
+  {
+    EnablePreMultipliedAlpha( true );
+  }
 
   if( atlasing ) // Flag needs to be set before creating renderer
   {

@@ -32,7 +32,7 @@ typedef IntrusivePtr<VisualFactoryCache> VisualFactoryCachePtr;
 
 DummyVisualPtr DummyVisual::New( const Property::Map& properties )
 {
-  VisualFactoryCachePtr factoryCache = new VisualFactoryCache;
+  VisualFactoryCachePtr factoryCache = new VisualFactoryCache(false);
 
   DummyVisualPtr dummyVisualPtr( new DummyVisual( *( factoryCache.Get() ) ) );
 

@@ -62,7 +62,8 @@ int UtcTextureManagerRequestLoad(void)
     TextureManager::NO_ATLAS,
     &observer,
     true,
-    TextureManager::ReloadPolicy::CACHED );
+    TextureManager::ReloadPolicy::CACHED,
+    TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY );
 
   const VisualUrl& url = textureManager.GetVisualUrl( textureId );
 

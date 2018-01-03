@@ -109,6 +109,16 @@ Visual::Base VisualFactory::CreateVisual( const std::string& url, ImageDimension
   return GetImplementation( *this ).CreateVisual( url, size );
 }
 
+void VisualFactory::SetPreMultiplyOnLoad( bool preMultiply )
+{
+  GetImplementation( *this ).SetPreMultiplyOnLoad( preMultiply );
+}
+
+bool VisualFactory::GetPreMultiplyOnLoad() const
+{
+  return GetImplementation( *this ).GetPreMultiplyOnLoad();
+}
+
 } // namespace Toolkit
 
 } // namespace Dali
