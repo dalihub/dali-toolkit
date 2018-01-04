@@ -257,7 +257,7 @@ TextScroller::~TextScroller()
 {
 }
 
-void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment, bool isTextElided )
+void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, TextureSet textureSet, const Size& controlSize, const Size& textureSize, const float wrapGap, CharacterDirection direction, HorizontalAlignment::Type horizontalAlignment, VerticalAlignment::Type verticalAlignment )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters controlSize[%f,%f] textureSize[%f,%f] direction[%d]\n",
                  controlSize.x, controlSize.y, textureSize.x, textureSize.y, direction );
@@ -297,7 +297,7 @@ void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, T
 
   float horizontalAlign;
 
-  if( isTextElided )
+  if( textureSize.x > controlSize.x )
   {
     // if Text is elided, scroll should start at the begin of text.
     horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[HorizontalAlignment::BEGIN][ direction ];
@@ -306,7 +306,9 @@ void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, T
   {
     horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[ horizontalAlignment ][ direction ];
   }
+
   const float verticalAlign = VERTICAL_ALIGNMENT_TABLE[ verticalAlignment ];
+
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters horizontalAlign[%f], verticalAlign[%f]\n", horizontalAlign, verticalAlign );
 
   scrollingTextActor.RegisterProperty( "uTextureSize", textureSize );
