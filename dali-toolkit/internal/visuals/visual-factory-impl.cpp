@@ -71,7 +71,8 @@ DALI_TYPE_REGISTRATION_END()
 } // namespace
 
 VisualFactory::VisualFactory( bool debugEnabled )
-:mDebugEnabled( debugEnabled )
+: mDebugEnabled( debugEnabled ),
+  mPreMultiplyOnLoad( true )
 {
 }
 
@@ -81,12 +82,6 @@ VisualFactory::~VisualFactory()
 
 Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& propertyMap )
 {
-  // Create factory cache if it hasn't already been
-  if( !mFactoryCache )
-  {
-    mFactoryCache = new VisualFactoryCache();
-  }
-
   Visual::BasePtr visualPtr;
 
   Property::Value* typeValue = propertyMap.Find( Toolkit::Visual::Property::TYPE, VISUAL_TYPE );
@@ -100,19 +95,19 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   {
     case Toolkit::Visual::BORDER:
     {
-      visualPtr = BorderVisual::New( *( mFactoryCache.Get() ), propertyMap );
+      visualPtr = BorderVisual::New( GetFactoryCache(), propertyMap );
       break;
     }
 
     case Toolkit::Visual::COLOR:
     {
-      visualPtr = ColorVisual::New( *( mFactoryCache.Get() ), propertyMap );
+      visualPtr = ColorVisual::New( GetFactoryCache(), propertyMap );
       break;
     }
 
     case Toolkit::Visual::GRADIENT:
     {
-      visualPtr = GradientVisual::New( *( mFactoryCache.Get() ), propertyMap );
+      visualPtr = GradientVisual::New( GetFactoryCache(), propertyMap );
       break;
     }
 
@@ -132,22 +127,22 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
             {
               case VisualUrl::N_PATCH:
               {
-                visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                visualPtr = NPatchVisual::New( GetFactoryCache(), visualUrl, propertyMap );
                 break;
               }
               case VisualUrl::SVG:
               {
-                visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                visualPtr = SvgVisual::New( GetFactoryCache(), visualUrl, propertyMap );
                 break;
               }
               case VisualUrl::GIF:
               {
-                visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                visualPtr = AnimatedImageVisual::New( GetFactoryCache(), visualUrl, propertyMap );
                 break;
               }
               case VisualUrl::REGULAR_IMAGE:
               {
-                visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, propertyMap );
+                visualPtr = ImageVisual::New( GetFactoryCache(), visualUrl, propertyMap );
                 break;
               }
             }
@@ -158,7 +153,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
           Property::Array* array = imageURLValue->GetArray();
           if( array )
           {
-            visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), *array, propertyMap );
+            visualPtr = AnimatedImageVisual::New( GetFactoryCache(), *array, propertyMap );
           }
         }
       }
@@ -167,25 +162,25 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
     case Toolkit::Visual::MESH:
     {
-      visualPtr = MeshVisual::New( *( mFactoryCache.Get() ), propertyMap );
+      visualPtr = MeshVisual::New( GetFactoryCache(), propertyMap );
       break;
     }
 
     case Toolkit::Visual::PRIMITIVE:
     {
-      visualPtr = PrimitiveVisual::New( *( mFactoryCache.Get() ), propertyMap );
+      visualPtr = PrimitiveVisual::New( GetFactoryCache(), propertyMap );
       break;
     }
 
     case Toolkit::Visual::WIREFRAME:
     {
-      visualPtr = WireframeVisual::New( *( mFactoryCache.Get() ), propertyMap );
+      visualPtr = WireframeVisual::New( GetFactoryCache(), propertyMap );
       break;
     }
 
     case Toolkit::Visual::TEXT:
     {
-      visualPtr = TextVisual::New( *( mFactoryCache.Get() ), propertyMap );
+      visualPtr = TextVisual::New( GetFactoryCache(), propertyMap );
       break;
     }
 
@@ -195,7 +190,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       std::string imageUrl;
       if( imageURLValue && imageURLValue->Get( imageUrl ) )
       {
-        visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
+        visualPtr = NPatchVisual::New( GetFactoryCache(), imageUrl, propertyMap );
       }
       break;
     }
@@ -206,7 +201,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       std::string imageUrl;
       if( imageURLValue && imageURLValue->Get( imageUrl ) )
       {
-        visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
+        visualPtr = SvgVisual::New( GetFactoryCache(), imageUrl, propertyMap );
       }
       break;
     }
@@ -219,14 +214,14 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       {
         if( imageURLValue->Get( imageUrl ) )
         {
-          visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), imageUrl, propertyMap );
+          visualPtr = AnimatedImageVisual::New( GetFactoryCache(), imageUrl, propertyMap );
         }
         else
         {
           Property::Array* array = imageURLValue->GetArray();
           if( array )
           {
-            visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), *array, propertyMap );
+            visualPtr = AnimatedImageVisual::New( GetFactoryCache(), *array, propertyMap );
           }
         }
       }
@@ -235,7 +230,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
     case Toolkit::DevelVisual::ANIMATED_GRADIENT:
     {
-      visualPtr = AnimatedGradientVisual::New( *( mFactoryCache.Get() ), propertyMap );
+      visualPtr = AnimatedGradientVisual::New( GetFactoryCache(), propertyMap );
       break;
     }
   }
@@ -248,7 +243,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
   if( mDebugEnabled && visualType !=  Toolkit::DevelVisual::WIREFRAME )
   {
     //Create a WireframeVisual if we have debug enabled
-    visualPtr = WireframeVisual::New( *( mFactoryCache.Get() ), visualPtr, propertyMap );
+    visualPtr = WireframeVisual::New(GetFactoryCache(), visualPtr, propertyMap );
   }
 
   return Toolkit::Visual::Base( visualPtr.Get() );
@@ -256,11 +251,6 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
 
 Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
 {
-  if( !mFactoryCache )
-  {
-    mFactoryCache = new VisualFactoryCache();
-  }
-
   Visual::BasePtr visualPtr;
 
   if( image )
@@ -268,18 +258,18 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
     NinePatchImage npatchImage = NinePatchImage::DownCast( image );
     if( npatchImage )
     {
-      visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), npatchImage );
+      visualPtr = NPatchVisual::New( GetFactoryCache(), npatchImage );
     }
     else
     {
-      visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), image );
+      visualPtr = ImageVisual::New(GetFactoryCache(), image );
     }
   }
 
   if( mDebugEnabled )
   {
     //Create a WireframeVisual if we have debug enabled
-    visualPtr = WireframeVisual::New( *( mFactoryCache.Get() ), visualPtr );
+    visualPtr = WireframeVisual::New( GetFactoryCache(), visualPtr );
   }
 
   return Toolkit::Visual::Base( visualPtr.Get() );
@@ -287,11 +277,6 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
 
 Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, ImageDimensions size )
 {
-  if( !mFactoryCache )
-  {
-    mFactoryCache = new VisualFactoryCache();
-  }
-
   Visual::BasePtr visualPtr;
 
   if( !url.empty() )
@@ -302,22 +287,22 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
     {
       case VisualUrl::N_PATCH:
       {
-        visualPtr = NPatchVisual::New( *( mFactoryCache.Get() ), visualUrl );
+        visualPtr = NPatchVisual::New( GetFactoryCache(), visualUrl );
         break;
       }
       case VisualUrl::SVG:
       {
-        visualPtr = SvgVisual::New( *( mFactoryCache.Get() ), visualUrl );
+        visualPtr = SvgVisual::New( GetFactoryCache(), visualUrl );
         break;
       }
       case VisualUrl::GIF:
       {
-        visualPtr = AnimatedImageVisual::New( *( mFactoryCache.Get() ), visualUrl );
+        visualPtr = AnimatedImageVisual::New( GetFactoryCache(), visualUrl );
         break;
       }
       case VisualUrl::REGULAR_IMAGE:
       {
-        visualPtr = ImageVisual::New( *( mFactoryCache.Get() ), visualUrl, size );
+        visualPtr = ImageVisual::New(GetFactoryCache(), visualUrl, size );
         break;
       }
     }
@@ -326,19 +311,38 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
   if( mDebugEnabled )
   {
     //Create a WireframeVisual if we have debug enabled
-    visualPtr = WireframeVisual::New( *( mFactoryCache.Get() ), visualPtr );
+    visualPtr = WireframeVisual::New( GetFactoryCache(), visualPtr );
   }
 
   return Toolkit::Visual::Base( visualPtr.Get() );
 }
 
+void VisualFactory::SetPreMultiplyOnLoad( bool preMultiply )
+{
+  if( mPreMultiplyOnLoad != preMultiply )
+  {
+    GetFactoryCache().SetPreMultiplyOnLoad( preMultiply );
+  }
+  mPreMultiplyOnLoad = preMultiply;
+}
+
+bool VisualFactory::GetPreMultiplyOnLoad() const
+{
+  return mPreMultiplyOnLoad;
+}
+
 Internal::TextureManager& VisualFactory::GetTextureManager()
+{
+  return GetFactoryCache().GetTextureManager();
+}
+
+Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
 {
   if( !mFactoryCache )
   {
-    mFactoryCache = new VisualFactoryCache();
+    mFactoryCache = std::unique_ptr<VisualFactoryCache>( new VisualFactoryCache( mPreMultiplyOnLoad ) );
   }
-  return mFactoryCache->GetTextureManager();
+  return *mFactoryCache;
 }
 
 } // namespace Internal

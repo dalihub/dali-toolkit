@@ -117,6 +117,25 @@ public:
    */
   Visual::Base CreateVisual( const std::string& url, ImageDimensions size );
 
+  /**
+   * @brief Enable or disable premultiplying alpha in images and image visuals.
+   *
+   * The default is to enable pre-multiplication on load.
+   *
+   * Applications that have assets with pre-multiplied alpha already applied should turn this option off.
+   *
+   * @param[in] preMultiply True if loaded images for image visuals should have alpha multiplied into the color
+   * channels.
+   */
+  void SetPreMultiplyOnLoad( bool preMultiply );
+
+  /**
+   * @brief Get the setting for automatically pre-multiplying image visual images on load.
+   *
+   * @return True if loaded images have pre-multiplied alpha applied on load, false otherwise.
+   */
+  bool GetPreMultiplyOnLoad() const;
+
 private:
 
   explicit DALI_INTERNAL VisualFactory(Internal::VisualFactory *impl);

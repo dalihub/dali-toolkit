@@ -95,7 +95,8 @@ protected:
     int32_t        textureId,
     TextureSet     textureSet,
     bool           useAtlasing,
-    const Vector4& atlasRect );
+    const Vector4& atlasRect,
+    bool           premultiplied) override;
 
 private:
   std::vector<UrlStore>& mImageUrls;
