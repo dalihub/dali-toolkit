@@ -97,7 +97,7 @@ struct EventData
     TEXT_PANNING
   };
 
-  EventData( DecoratorPtr decorator );
+  EventData( DecoratorPtr decorator, InputMethodContext& inputMethodContext );
 
   ~EventData();
 
@@ -107,7 +107,7 @@ struct EventData
   }
 
   DecoratorPtr       mDecorator;               ///< Pointer to the decorator.
-  ImfManager         mImfManager;              ///< The Input Method Framework Manager.
+  InputMethodContext mInputMethodContext;      ///< The Input Method Framework Manager.
   FontDefaults*      mPlaceholderFont;         ///< The placeholder default font.
   std::string        mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus.
   std::string        mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive.
@@ -455,14 +455,14 @@ struct Controller::Impl
     }
   }
 
-  void ResetImfManager()
+  void ResetInputMethodContext()
   {
     if( mEventData )
     {
       // Reset incase we are in a pre-edit state.
-      if( mEventData->mImfManager )
+      if( mEventData->mInputMethodContext )
       {
-        mEventData->mImfManager.Reset(); // Will trigger a message ( commit, get surrounding )
+        mEventData->mInputMethodContext.Reset(); // Will trigger a message ( commit, get surrounding )
       }
 
       ClearPreEditFlag();
@@ -470,14 +470,14 @@ struct Controller::Impl
   }
 
   /**
-   * @brief Helper to notify IMF manager with surrounding text & cursor changes.
+   * @brief Helper to notify InputMethodContext with surrounding text & cursor changes.
    */
-  void NotifyImfManager();
+  void NotifyInputMethodContext();
 
   /**
-   * @brief Helper to notify IMF manager with multi line status.
+   * @brief Helper to notify InputMethodContext with multi line status.
    */
-  void NotifyImfMultiLineStatus();
+  void NotifyInputMethodContextMultiLineStatus();
 
   /**
    * @brief Retrieve the current cursor position.

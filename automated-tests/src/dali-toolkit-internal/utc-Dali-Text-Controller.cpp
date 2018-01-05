@@ -146,9 +146,9 @@ int UtcDaliTextControllerEnableCursorBlinking(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
                                                        *controller );
-
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   // Enables the cursor blink.
   controller->SetEnableCursorBlink( true );
@@ -173,7 +173,7 @@ int UtcDaliTextControllerImfEvent(void)
   ControllerPtr controller = Controller::New();
 
   std::string text;
-  ImfManager::ImfEventData imfEvent;
+  InputMethodContext::EventData imfEvent;
 
   DALI_TEST_CHECK( controller );
 
@@ -182,41 +182,39 @@ int UtcDaliTextControllerImfEvent(void)
   Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
                                                        *controller );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   // Set the placeholder text.
   controller->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, "Hello Dali" );
 
-  // Creates an ImfManager.
-  ImfManager imfManager = ImfManager::Get();
-
   // For coverage.
-  imfEvent = ImfManager::ImfEventData( ImfManager::GETSURROUNDING, "", 0, 0 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  imfEvent = InputMethodContext::EventData( InputMethodContext::GET_SURROUNDING, "", 0, 0 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   // Send VOID event.
-  imfEvent = ImfManager::ImfEventData( ImfManager::VOID, "", 0, 0 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  imfEvent = InputMethodContext::EventData( InputMethodContext::VOID, "", 0, 0 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   controller->GetText( text );
   DALI_TEST_CHECK( text.empty() );
 
-  imfEvent = ImfManager::ImfEventData( ImfManager::COMMIT, "Hello ", 0, 6 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  imfEvent = InputMethodContext::EventData( InputMethodContext::COMMIT, "Hello ", 0, 6 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
   controller->GetNaturalSize();
 
   // Check 'Delete All' key which means the input panel send a big range
-  imfEvent = ImfManager::ImfEventData( ImfManager::DELETESURROUNDING, "", -100, 100 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  imfEvent = InputMethodContext::EventData( InputMethodContext::DELETE_SURROUNDING, "", -100, 100 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
   controller->GetNaturalSize();
 
   controller->GetText( text );
   DALI_TEST_EQUALS( "", text, TEST_LOCATION );
 
   // Send COMMIT event.
-  imfEvent = ImfManager::ImfEventData( ImfManager::COMMIT, "Hello ", 0, 6 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  imfEvent = InputMethodContext::EventData( InputMethodContext::COMMIT, "Hello ", 0, 6 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   // Force to update the model.
   controller->GetNaturalSize();
@@ -224,9 +222,9 @@ int UtcDaliTextControllerImfEvent(void)
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello ", text, TEST_LOCATION );
 
-  // Send PREEDIT event
-  imfEvent = ImfManager::ImfEventData( ImfManager::PREEDIT, "w", 6, 1 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  // Send PRE_EDIT event
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   // Force to update the model.
   controller->GetNaturalSize();
@@ -234,9 +232,9 @@ int UtcDaliTextControllerImfEvent(void)
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello w", text, TEST_LOCATION );
 
-  // Send DELETESURROUNDING event
-  imfEvent = ImfManager::ImfEventData( ImfManager::DELETESURROUNDING, "", -1, 1 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  // Send DELETE_SURROUNDING event
+  imfEvent = InputMethodContext::EventData( InputMethodContext::DELETE_SURROUNDING, "", -1, 1 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   // Force to update the model.
   controller->GetNaturalSize();
@@ -244,9 +242,9 @@ int UtcDaliTextControllerImfEvent(void)
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello ", text, TEST_LOCATION );
 
-  // Send PREEDIT event
-  imfEvent = ImfManager::ImfEventData( ImfManager::PREEDIT, "wo", 6, 2 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  // Send PRE_EDIT event
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "wo", 6, 2 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   // Force to update the model.
   controller->GetNaturalSize();
@@ -254,16 +252,16 @@ int UtcDaliTextControllerImfEvent(void)
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello wo", text, TEST_LOCATION );
 
-  // Send GETSURROUNDING event
-  imfEvent = ImfManager::ImfEventData( ImfManager::GETSURROUNDING, "", 0, 0 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  // Send GET_SURROUNDING event
+  imfEvent = InputMethodContext::EventData( InputMethodContext::GET_SURROUNDING, "", 0, 0 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello wo", text, TEST_LOCATION );
 
-  // Send PRIVATECOMMAND event
-  imfEvent = ImfManager::ImfEventData( ImfManager::PRIVATECOMMAND, "", 0, 0 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  // Send PRIVATE_COMMAND event
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRIVATE_COMMAND, "", 0, 0 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello wo", text, TEST_LOCATION );
@@ -291,8 +289,9 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
                                                        *controller );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   // Creates the text's popup.
   TextSelectionPopupCallbackInterface& callbackInterface = *controller;
@@ -479,8 +478,9 @@ int UtcDaliTextControllerSetGetCheckProperty(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator = Text::Decorator::New( *controller, *controller );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   DALI_TEST_CHECK( !controller->IsInputModePassword() );
 
@@ -523,8 +523,9 @@ int UtcDaliTextControllerSetGetTapLongPressAction(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator = Text::Decorator::New( *controller, *controller );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   DALI_TEST_EQUALS( Controller::NoTextTap::NO_ACTION, controller->GetNoTextDoubleTapAction(), TEST_LOCATION );
   controller->SetNoTextDoubleTapAction( Controller::NoTextTap::HIGHLIGHT );

@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/imf-manager.h>
+#include <dali/devel-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/events/gesture.h>
 
 // INTERNAL INCLUDES
@@ -88,7 +88,7 @@ public: // Enumerated types.
   };
 
   /**
-   * @brief Used to distinguish between regular key events and IMF events
+   * @brief Used to distinguish between regular key events and InputMethodContext events
    */
   enum InsertType
   {
@@ -179,8 +179,9 @@ public: // Configure the text controller.
    *
    * @note Selectable or editable controls should call this once after Controller::New().
    * @param[in] decorator Used to create cursor, selection handle decorations etc.
+   * @param[in] inputMethodContext Used to manager ime.
    */
-  void EnableTextInput( DecoratorPtr decorator );
+  void EnableTextInput( DecoratorPtr decorator, InputMethodContext& inputMethodContext );
 
   /**
    * @brief Used to switch between bitmap & vector based glyphs
@@ -1278,7 +1279,7 @@ public: // Text-input Event Queuing.
    * @brief Called by editable UI controls when key events are received.
    *
    * @param[in] event The key event.
-   * @param[in] type Used to distinguish between regular key events and IMF events.
+   * @param[in] type Used to distinguish between regular key events and InputMethodContext events.
    */
   bool KeyEvent( const Dali::KeyEvent& event );
 
@@ -1308,13 +1309,13 @@ public: // Text-input Event Queuing.
   void LongPressEvent( Gesture::State state, float x, float y );
 
   /**
-   * @brief Event received from IMF manager
+   * @brief Event received from input method context
    *
-   * @param[in] imfManager The IMF manager.
-   * @param[in] imfEvent The event received.
+   * @param[in] inputMethodContext The input method context.
+   * @param[in] inputMethodContextEvent The event received.
    * @return A data struture indicating if update is needed, cursor position and current text.
    */
-  ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
+  InputMethodContext::CallbackData OnInputMethodContextEvent( InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent );
 
   /**
    * @brief Event from Clipboard notifying an Item has been selected for pasting
@@ -1365,7 +1366,7 @@ private: // Update.
    * @brief Called by editable UI controls when key events are received.
    *
    * @param[in] text The text to insert.
-   * @param[in] type Used to distinguish between regular key events and IMF events.
+   * @param[in] type Used to distinguish between regular key events and InputMethodContext events.
    */
   void InsertText( const std::string& text, InsertType type );
 

@@ -465,13 +465,15 @@ bool Control::EmitKeyEventSignal( const KeyEvent& event )
 
   bool consumed = false;
 
+  consumed = mImpl->FilterKeyEvent( event );
+
   // signals are allocated dynamically when someone connects
-  if ( !mImpl->mKeyEventSignal.Empty() )
+  if ( !consumed && !mImpl->mKeyEventSignal.Empty() )
   {
     consumed = mImpl->mKeyEventSignal.Emit( handle, event );
   }
 
-  if (!consumed)
+  if ( !consumed )
   {
     // Notification for derived classes
     consumed = OnKeyEvent(event);

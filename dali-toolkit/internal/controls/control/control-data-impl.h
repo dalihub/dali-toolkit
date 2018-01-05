@@ -300,6 +300,19 @@ public:
    */
   Extents GetPadding() const;
 
+  /**
+   * @brief Set the input method context.
+   * @param[in] inputMethodContext The input method context.
+   */
+  void SetInputMethodContext( InputMethodContext& inputMethodContext );
+
+  /**
+   * @brief Filter an key event.
+   * @param[in] event The key to be filtered.
+   * @return True if the key handled, otherwise false.
+   */
+  bool FilterKeyEvent( const KeyEvent& event );
+
 private:
 
   /**
@@ -369,6 +382,8 @@ public:
 
   // Tooltip
   TooltipPtr mTooltip;
+
+  InputMethodContext mInputMethodContext;
 
   ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.

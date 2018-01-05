@@ -138,7 +138,7 @@ ControllerPtr Controller::New( ControlInterface* controlInterface,
 
 // public : Configure the text controller.
 
-void Controller::EnableTextInput( DecoratorPtr decorator )
+void Controller::EnableTextInput( DecoratorPtr decorator, InputMethodContext& inputMethodContext )
 {
   if( !decorator )
   {
@@ -151,7 +151,7 @@ void Controller::EnableTextInput( DecoratorPtr decorator )
 
   if( NULL == mImpl->mEventData )
   {
-    mImpl->mEventData = new EventData( decorator );
+    mImpl->mEventData = new EventData( decorator, inputMethodContext );
   }
 }
 
@@ -493,7 +493,7 @@ void Controller::SetText( const std::string& text )
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SetText\n" );
 
   // Reset keyboard as text changed
-  mImpl->ResetImfManager();
+  mImpl->ResetInputMethodContext();
 
   // Remove the previously set text and style.
   ResetText();
@@ -2395,7 +2395,7 @@ void Controller::KeyboardFocusGainEvent()
       mImpl->mEventData->mUpdateCursorPosition = true; //If editing started without tap event, cursor update must be triggered.
       mImpl->mEventData->mUpdateInputStyle = true;
     }
-    mImpl->NotifyImfMultiLineStatus();
+    mImpl->NotifyInputMethodContextMultiLineStatus();
     if( mImpl->IsShowingPlaceholderText() )
     {
       // Show alternative placeholder-text when editing
@@ -2554,7 +2554,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     }
     else if( Dali::DALI_KEY_SHIFT_LEFT == keyCode )
     {
-      // DALI_KEY_SHIFT_LEFT is the key code for the Left Shift. It's sent (by the imf?) when the predictive text is enabled
+      // DALI_KEY_SHIFT_LEFT is the key code for the Left Shift. It's sent (by the InputMethodContext?) when the predictive text is enabled
       // and a character is typed after the type of a upper case latin character.
 
       // Do nothing.
@@ -2570,7 +2570,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p keyString %s\n", this, keyString.c_str() );
 
-      // IMF manager is no longer handling key-events
+      // InputMethodContext is no longer handling key-events
       mImpl->ClearPreEditFlag();
 
       InsertText( keyString, COMMIT );
@@ -2587,9 +2587,9 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
          ( Dali::DALI_KEY_VOLUME_UP != keyCode ) &&
          ( Dali::DALI_KEY_VOLUME_DOWN != keyCode ) )
     {
-      // Should not change the state if the key is the shift send by the imf manager.
+      // Should not change the state if the key is the shift send by the InputMethodContext.
       // Otherwise, when the state is SELECTING the text controller can't send the right
-      // surrounding info to the imf.
+      // surrounding info to the InputMethodContext.
       mImpl->ChangeState( EventData::EDITING );
 
       // Will request for relayout.
@@ -2686,7 +2686,7 @@ void Controller::TapEvent( unsigned int tapCount, float x, float y )
   }
 
   // Reset keyboard as tap event has occurred.
-  mImpl->ResetImfManager();
+  mImpl->ResetInputMethodContext();
 }
 
 void Controller::PanEvent( Gesture::State state, const Vector2& displacement )
@@ -2736,8 +2736,8 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
     }
     else if( !mImpl->IsClipboardVisible() )
     {
-      // Reset the imf manager to commit the pre-edit before selecting the text.
-      mImpl->ResetImfManager();
+      // Reset the InputMethodContext to commit the pre-edit before selecting the text.
+      mImpl->ResetInputMethodContext();
 
       Event event( Event::LONG_PRESS_EVENT );
       event.p1.mInt = state;
@@ -2752,35 +2752,35 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
   }
 }
 
-ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
+InputMethodContext::CallbackData Controller::OnInputMethodContextEvent( InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent )
 {
   // Whether the text needs to be relaid-out.
   bool requestRelayout = false;
 
-  // Whether to retrieve the text and cursor position to be sent to the IMF manager.
+  // Whether to retrieve the text and cursor position to be sent to the InputMethodContext.
   bool retrieveText = false;
   bool retrieveCursor = false;
 
-  switch( imfEvent.eventName )
+  switch( inputMethodContextEvent.eventName )
   {
-    case ImfManager::COMMIT:
+    case InputMethodContext::COMMIT:
     {
-      InsertText( imfEvent.predictiveString, Text::Controller::COMMIT );
+      InsertText( inputMethodContextEvent.predictiveString, Text::Controller::COMMIT );
       requestRelayout = true;
       retrieveCursor = true;
       break;
     }
-    case ImfManager::PREEDIT:
+    case InputMethodContext::PRE_EDIT:
     {
-      InsertText( imfEvent.predictiveString, Text::Controller::PRE_EDIT );
+      InsertText( inputMethodContextEvent.predictiveString, Text::Controller::PRE_EDIT );
       requestRelayout = true;
       retrieveCursor = true;
       break;
     }
-    case ImfManager::DELETESURROUNDING:
+    case InputMethodContext::DELETE_SURROUNDING:
     {
-      const bool textDeleted = RemoveText( imfEvent.cursorOffset,
-                                           imfEvent.numberOfChars,
+      const bool textDeleted = RemoveText( inputMethodContextEvent.cursorOffset,
+                                           inputMethodContextEvent.numberOfChars,
                                            DONT_UPDATE_INPUT_STYLE );
 
       if( textDeleted )
@@ -2801,20 +2801,20 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
       }
       break;
     }
-    case ImfManager::GETSURROUNDING:
+    case InputMethodContext::GET_SURROUNDING:
     {
       retrieveText = true;
       retrieveCursor = true;
       break;
     }
-    case ImfManager::PRIVATECOMMAND:
+    case InputMethodContext::PRIVATE_COMMAND:
     {
       // PRIVATECOMMAND event is just for getting the private command message
       retrieveText = true;
       retrieveCursor = true;
       break;
     }
-    case ImfManager::VOID:
+    case InputMethodContext::VOID:
     {
       // do nothing
       break;
@@ -2862,7 +2862,7 @@ ImfManager::ImfCallbackData Controller::OnImfEvent( ImfManager& imfManager, cons
     }
   }
 
-  ImfManager::ImfCallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );
+  InputMethodContext::CallbackData callbackData( ( retrieveText || retrieveCursor ), cursorPosition, text, false );
 
   if( requestRelayout &&
       ( NULL != mImpl->mEditableControlInterface ) )
@@ -2881,7 +2881,7 @@ void Controller::PasteClipboardItemEvent()
   std::string stringToPaste( notifier.GetContent() );
 
   // Commit the current pre-edit text; the contents of the clipboard should be appended
-  mImpl->ResetImfManager();
+  mImpl->ResetInputMethodContext();
 
   // Temporary disable hiding clipboard
   mImpl->SetClipboardHideEnable( false );
@@ -3073,7 +3073,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   // TODO: At the moment the underline runs are only for pre-edit.
   mImpl->mModel->mVisualModel->mUnderlineRuns.Clear();
 
-  // Remove the previous IMF pre-edit.
+  // Remove the previous InputMethodContext pre-edit.
   if( mImpl->mEventData->mPreEditFlag && ( 0u != mImpl->mEventData->mPreEditLength ) )
   {
     removedPrevious = RemoveText( -static_cast<int>( mImpl->mEventData->mPrimaryCursorPosition - mImpl->mEventData->mPreEditStartPosition ),
@@ -3120,10 +3120,10 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
 
     mImpl->ChangeState( EventData::EDITING );
 
-    // Handle the IMF (predicitive text) state changes
+    // Handle the InputMethodContext (predicitive text) state changes
     if( COMMIT == type )
     {
-      // IMF manager is no longer handling key-events
+      // InputMethodContext is no longer handling key-events
       mImpl->ClearPreEditFlag();
     }
     else // PRE_EDIT
@@ -3297,7 +3297,7 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "MaxLengthReached (%d)\n", mImpl->mModel->mLogicalModel->mText.Count() );
 
-    mImpl->ResetImfManager();
+    mImpl->ResetInputMethodContext();
 
     if( NULL != mImpl->mEditableControlInterface )
     {
@@ -3831,7 +3831,7 @@ bool Controller::DeleteEvent( int keyCode )
     return removed;
   }
 
-  // IMF manager is no longer handling key-events
+  // InputMethodContext is no longer handling key-events
   mImpl->ClearPreEditFlag();
 
   if( EventData::SELECTING == mImpl->mEventData->mState )
