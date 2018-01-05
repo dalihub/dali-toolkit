@@ -105,12 +105,21 @@ public:
   };
 
   /**
-  * @breif Types of reloading policies
-  */
+   * @brief Types of reloading policies
+   */
   enum class ReloadPolicy
   {
     CACHED = 0,             ///< Loads cached texture if it exists.
     FORCED                  ///< Forces reloading of texture.
+  };
+
+  /**
+   * @brief Whether to multiply alpha into color channels on load
+   */
+  enum class MultiplyOnLoad
+  {
+    LOAD_WITHOUT_MULTIPLY = 0, ///< Don't modify the image
+    MULTIPLY_ON_LOAD           ///< Multiply alpha into color channels on load
   };
 
 public:
@@ -140,16 +149,59 @@ public:
 
   // TextureManager Main API:
 
-  TextureSet LoadTexture(VisualUrl& url, Dali::ImageDimensions desiredSize,
-                         Dali::FittingMode::Type fittingMode, Dali::SamplingMode::Type samplingMode,
-                         const MaskingDataPointer& maskInfo, bool synchronousLoading,
-                         TextureManager::TextureId& textureId, Vector4& textureRect,
-                         bool& atlasingStatus, bool& loadingStatus, Dali::WrapMode::Type wrapModeU,
-                         Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
-                         AtlasUploadObserver* atlasObserver,
-                         ImageAtlasManagerPtr imageAtlasManager,
-                         bool orientationCorrection,
-                         TextureManager::ReloadPolicy reloadPolicy );
+  /**
+   * @brief Requests an image load of the given URL.
+   *
+   * The parameters are used to specify how the image is loaded.
+   * The observer has the UploadComplete method called when the load is ready.
+   *
+   * When the client has finished with the Texture, Remove() should be called.
+   *
+   * @param[in] url                   The URL of the image to load
+   * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
+   * @param[in] fittingMode           The FittingMode to use
+   * @param[in] samplingMode          The SamplingMode to use
+   * @param[in] maskInfo              Mask info structure
+   * @param[in] synchronousLoading    true if the URL should be loaded synchronously
+   * @param[out] textureId,           The textureId of the URL
+   * @param[out] textureRect          The rectangle within the texture atlas that this URL occupies
+   * @param[in,out] atlasingStatus    Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still
+   *                                  be loaded, and marked successful, but this will be set to false.
+   *                                  If atlasing succeeds, this will be set to true.
+   * @param[out] loadingStatus        The loading status of the texture
+   * @param[in] wrapModeU             Horizontal Wrap mode
+   * @param[in] wrapModeV             Vertical Wrap mode
+   * @param[in] textureObserver       The client object should inherit from this and provide the "UploadCompleted" virtual.
+   *                                  This is called when an image load completes (or fails).
+   * @param[in] atlasObserver         This is used if the texture is atlased, and will be called instead of
+   *                                  textureObserver.UploadCompleted
+   * @param[in] imageAtlasManager     The atlas manager to use for atlasing textures
+   * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
+   * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
+   * @param[in,out] preMultiplyOnLoad True if the image color should be multiplied by it's alpha. Set to false if the
+   *                                  image has no alpha channel
+   *
+   * @return                          The texture set containing the image, or empty if still loading.
+   */
+
+  TextureSet LoadTexture( const VisualUrl&             url,
+                          Dali::ImageDimensions        desiredSize,
+                          Dali::FittingMode::Type      fittingMode,
+                          Dali::SamplingMode::Type     samplingMode,
+                          const MaskingDataPointer&    maskInfo,
+                          bool                         synchronousLoading,
+                          TextureManager::TextureId&   textureId,
+                          Vector4&                     textureRect,
+                          bool&                        atlasingStatus,
+                          bool&                        loadingStatus,
+                          Dali::WrapMode::Type         wrapModeU,
+                          Dali::WrapMode::Type         wrapModeV,
+                          TextureUploadObserver*       textureObserver,
+                          AtlasUploadObserver*         atlasObserver,
+                          ImageAtlasManagerPtr         imageAtlasManager,
+                          bool                         orientationCorrection,
+                          TextureManager::ReloadPolicy reloadPolicy,
+                          MultiplyOnLoad&              preMultiplyOnLoad );
 
   /**
    * @brief Requests an image load of the given URL.
@@ -169,6 +221,7 @@ public:
    *                                  This is called when an image load completes (or fails).
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
    * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
+   * @param[in,out] preMultiplyOnLoad     True if the image color should be multiplied by it's alpha. Set to false if the image has no alpha channel
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoad( const VisualUrl&                   url,
@@ -178,7 +231,8 @@ public:
                          const UseAtlas                     useAtlasing,
                          TextureUploadObserver*             observer,
                          bool                               orientationCorrection,
-                         TextureManager::ReloadPolicy       reloadPolicy );
+                         TextureManager::ReloadPolicy       reloadPolicy,
+                         MultiplyOnLoad&                    preMultiplyOnLoad );
 
   /**
    * @brief Requests an image load of the given URL, when the texture has
@@ -208,6 +262,8 @@ public:
    *                                  This is called when an image load completes (or fails).
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
    * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
+   * @param[in] preMultiplyOnLoad     True if the image color should be multiplied by it's alpha. Set to false if the
+   *                                  image has no alpha channel
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoad( const VisualUrl&                   url,
@@ -220,7 +276,8 @@ public:
                          bool                               cropToMask,
                          TextureUploadObserver*             observer,
                          bool                               orientationCorrection,
-                         TextureManager::ReloadPolicy       reloadPolicy );
+                         TextureManager::ReloadPolicy       reloadPolicy,
+                         MultiplyOnLoad&                    preMultiplyOnLoad );
 
   /**
    * Requests a masking image to be loaded. This mask is not uploaded to GL,
@@ -302,6 +359,8 @@ private:
    *                                  This is called when an image load completes (or fails).
    * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
    * @param[in] reloadPolicy          Forces a reload of the texture even if already cached
+   * @param[in] preMultiplyOnLoad     True if the image color should be multiplied by it's alpha. Set to false if
+   *                                  there is no alpha
    * @return                          A TextureId to use as a handle to reference this Texture
    */
   TextureId RequestLoadInternal(
@@ -316,8 +375,16 @@ private:
     StorageType                         storageType,
     TextureUploadObserver*              observer,
     bool                                orientationCorrection,
-    TextureManager::ReloadPolicy        reloadPolicy );
+    TextureManager::ReloadPolicy        reloadPolicy,
+    MultiplyOnLoad&                     preMultiplyOnLoad );
 
+  /**
+   * @brief Get the current state of a texture
+   * @param[in] textureId The texture id to query
+   * @return The loading state if the texture is valid, or NOT_STARTED if the textureId
+   * is not valid.
+   */
+  LoadState GetTextureStateInternal( TextureId textureId );
 
   typedef size_t TextureHash; ///< The type used to store the hash used for Texture caching.
 
@@ -337,7 +404,8 @@ private:
                  bool cropToMask,
                  UseAtlas useAtlas,
                  TextureManager::TextureHash hash,
-                 bool orientationCorrection )
+                 bool orientationCorrection,
+                 bool preMultiplyOnLoad )
     : url( url ),
       desiredSize( desiredSize ),
       useSize( desiredSize ),
@@ -354,7 +422,9 @@ private:
       loadSynchronously( loadSynchronously ),
       useAtlas( useAtlas ),
       cropToMask( cropToMask ),
-      orientationCorrection( true )
+      orientationCorrection( true ),
+      preMultiplyOnLoad( preMultiplyOnLoad ),
+      preMultiplied( false )
     {
     }
 
@@ -385,6 +455,8 @@ private:
                                    ///< This is updated to false if atlas is not used
     bool cropToMask:1;             ///< true if the image should be cropped to the mask size.
     bool orientationCorrection:1;  ///< true if the image should be rotated to match exif orientation data
+    bool preMultiplyOnLoad:1;      ///< true if the image's color should be multiplied by it's alpha
+    bool preMultiplied:1;          ///< true if the image's color was multiplied by it's alpha
   };
 
   // Structs:
@@ -523,7 +595,8 @@ private:
   TextureHash GenerateHash( const std::string& url, const ImageDimensions size,
                             const FittingMode::Type fittingMode,
                             const Dali::SamplingMode::Type samplingMode, const UseAtlas useAtlas,
-                            TextureId maskTextureId );
+                            TextureId maskTextureId,
+                            MultiplyOnLoad preMultiplyOnLoad);
   /**
    * @brief Looks up a cached texture by its hash.
    * If found, the given parameters are used to check there is no hash-collision.
@@ -543,7 +616,8 @@ private:
     const FittingMode::Type fittingMode,
     const Dali::SamplingMode::Type samplingMode,
     const bool useAtlas,
-    TextureId maskTextureId );
+    TextureId maskTextureId,
+    MultiplyOnLoad preMultiplyOnLoad);
 
 private:
 
@@ -637,7 +711,6 @@ private:  // Member Variables:
   RoundRobinContainerView< AsyncLoadingHelper > mAsyncRemoteLoaders;   ///< The Asynchronous image loaders used to provide all remote async loads
   std::vector< ExternalTextureInfo >            mExternalTextures;     ///< Externally provided textures
   TextureId                                     mCurrentTextureId;     ///< The current value used for the unique Texture Id generation
-
 };
 
 

@@ -35,6 +35,7 @@
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 namespace Dali
 {
@@ -697,7 +698,7 @@ void TextVisual::UpdateRenderer()
 
       const bool styleEnabled = ( shadowEnabled || underlineEnabled || outlineEnabled );
 
-      TextureSet textureSet = GetTextTexture( relayoutSize, hasMultipleTextColors, containsEmoji, styleEnabled );
+      TextureSet textureSet = GetTextTexture( mImpl->mTransform.mSize, hasMultipleTextColors, containsEmoji, styleEnabled );
       mImpl->mRenderer.SetTextures( textureSet );
 
       Shader shader = GetTextShader( mFactoryCache, hasMultipleTextColors, containsEmoji, styleEnabled );
@@ -752,8 +753,11 @@ TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleText
   // Create RGBA texture if the text contains emojis or multiple text colors, otherwise L8 texture
   Pixel::Format textPixelFormat = ( containsEmoji || hasMultipleTextColors ) ? Pixel::RGBA8888 : Pixel::L8;
 
+  // Check the text direction
+  Toolkit::DevelText::TextDirection::Type textDirection = mController->GetTextDirection();
+
   // Create a texture for the text without any styles
-  PixelData data = mTypesetter->Render( size, Text::Typesetter::RENDER_NO_STYLES, false, textPixelFormat );
+  PixelData data = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_NO_STYLES, false, textPixelFormat );
 
   // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
   // In that case, create a texture. TODO: should tile the text.
@@ -771,7 +775,7 @@ TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleText
   if ( styleEnabled )
   {
     // Create RGBA texture for all the text styles (without the text itself)
-    PixelData styleData = mTypesetter->Render( size, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888 );
+    PixelData styleData = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888 );
 
     Texture styleTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
                                          styleData.GetPixelFormat(),
@@ -787,7 +791,7 @@ TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleText
   if ( containsEmoji && !hasMultipleTextColors )
   {
     // Create a L8 texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
-    PixelData maskData = mTypesetter->Render( size, Text::Typesetter::RENDER_MASK, false, Pixel::L8 );
+    PixelData maskData = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_MASK, false, Pixel::L8 );
 
     Texture maskTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
                                         maskData.GetPixelFormat(),

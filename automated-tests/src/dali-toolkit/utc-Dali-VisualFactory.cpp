@@ -1905,13 +1905,13 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualFactoryGetAnimatedImageVisual1: Request animated image visual with a gif url" );
 
-  VisualFactory factory = VisualFactory::Get();
-  Visual::Base visual = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
-  DALI_TEST_CHECK( visual );
-
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base visual = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
+  DALI_TEST_CHECK( visual );
 
   DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -1924,54 +1924,34 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
 
   // renderer is added to actor
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  // test the uniforms which used to handle the atlas rect
-  // the four frames should be located inside atlas as follows: atlas size 100*100
-  // -------------
-  // |     |     |
-  // |  0  |  1  |
-  // -------------
-  // |     |     |
-  // |  2  |  3  |
-  // -------------
-
   Renderer renderer = actor.GetRendererAt( 0u );
   DALI_TEST_CHECK( renderer );
 
-  Property::Value atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
-  // take into consideration the half pixel correction
-  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(0.5f, 0.5f, 49.5f, 49.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
-
-  // waiting for the resource uploading
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
 
   // Force the timer used by the animatedImageVisual to tick,
   Dali::Timer timer = Timer::New( 0 );
   timer.MockEmitSignal();
   application.SendNotification();
   application.Render();
-  atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
-  // take into consideration the half pixel correction
-  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(50.5f, 0.5f, 99.5f, 49.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
+
 
   // Force the timer used by the animatedImageVisual to tick,
   timer.MockEmitSignal();
   application.SendNotification();
   application.Render();
-  atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
-  // take into consideration the half pixel correction
-  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(0.5f, 50.5f, 49.5f, 99.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
 
   // Force the timer used by the animatedImageVisual to tick,
   timer.MockEmitSignal();
   application.SendNotification();
   application.Render();
-  atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
-  // take into consideration the half pixel correction
-  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(50.5f, 50.5f, 99.5f, 99.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
 
   // Test SetOffStage().
   actor.Unparent();

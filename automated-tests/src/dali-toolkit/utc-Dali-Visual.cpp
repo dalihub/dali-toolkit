@@ -24,6 +24,7 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
+#include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/text-visual-properties-devel.h>
@@ -3389,6 +3390,56 @@ int UtcDaliRegisterVisualWithDepthIndex(void)
 
   dummyControl.SetSize(200.f, 200.f);
   Stage::GetCurrent().Add( dummyControl );
+
+  END_TEST;
+}
+
+int UtcDaliColorVisualRenderIfTransparentProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Test the renderIfTransparent property of ColorVisual" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::COLOR );
+  propertyMap.Insert( ColorVisual::Property::MIX_COLOR, Color::BLUE );
+
+  tet_infoline( "Check default value" );
+  {
+    Visual::Base testVisual = factory.CreateVisual( propertyMap );
+    Property::Map returnedMap;
+    testVisual.CreatePropertyMap( returnedMap );
+
+    Property::Value* renderIfTransparentProperty = returnedMap.Find( DevelColorVisual::Property::RENDER_IF_TRANSPARENT );
+    DALI_TEST_CHECK( renderIfTransparentProperty );
+    DALI_TEST_EQUALS( renderIfTransparentProperty->Get< bool >(), false, TEST_LOCATION );
+  }
+
+  propertyMap.Insert( DevelColorVisual::Property::RENDER_IF_TRANSPARENT, true );
+
+  tet_infoline( "Ensure set to value required" );
+  {
+    Visual::Base testVisual = factory.CreateVisual( propertyMap );
+    Property::Map returnedMap;
+    testVisual.CreatePropertyMap( returnedMap );
+
+    Property::Value* renderIfTransparentProperty = returnedMap.Find( DevelColorVisual::Property::RENDER_IF_TRANSPARENT );
+    DALI_TEST_CHECK( renderIfTransparentProperty );
+    DALI_TEST_EQUALS( renderIfTransparentProperty->Get< bool >(), true, TEST_LOCATION );
+  }
+
+  propertyMap[ DevelColorVisual::Property::RENDER_IF_TRANSPARENT ] = Color::BLUE;
+
+  tet_infoline( "Ensure it returns default value if set to wrong type" );
+  {
+    Visual::Base testVisual = factory.CreateVisual( propertyMap );
+    Property::Map returnedMap;
+    testVisual.CreatePropertyMap( returnedMap );
+
+    Property::Value* renderIfTransparentProperty = returnedMap.Find( DevelColorVisual::Property::RENDER_IF_TRANSPARENT );
+    DALI_TEST_CHECK( renderIfTransparentProperty );
+    DALI_TEST_EQUALS( renderIfTransparentProperty->Get< bool >(), false, TEST_LOCATION );
+  }
 
   END_TEST;
 }

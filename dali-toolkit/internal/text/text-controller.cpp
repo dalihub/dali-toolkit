@@ -222,7 +222,7 @@ bool Controller::IsAutoScrollEnabled() const
 
 CharacterDirection Controller::GetAutoScrollDirection() const
 {
-  return mImpl->mAutoScrollDirectionRTL;
+  return mImpl->mIsTextDirectionRTL;
 }
 
 float Controller::GetAutoScrollLineAlignment() const
@@ -553,6 +553,9 @@ void Controller::SetText( const std::string& text )
 
     // The natural size needs to be re-calculated.
     mImpl->mRecalculateNaturalSize = true;
+
+    // The text direction needs to be updated.
+    mImpl->mUpdateTextDirection = true;
 
     // Apply modifications to the model
     mImpl->mOperationsPending = ALL_OPERATIONS;
@@ -2120,20 +2123,39 @@ void Controller::GetPlaceholderProperty( Property::Map& map )
 
 Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
 {
-  if( ( 0u == mImpl->mModel->mLogicalModel->mText.Count() ) )
+  // Make sure the model is up-to-date before layouting
+  ProcessModifyEvents();
+
+  if ( mImpl->mUpdateTextDirection )
   {
-    return Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT;
+    // Operations that can be done only once until the text changes.
+    const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( GET_SCRIPTS       |
+                                                                           VALIDATE_FONTS    |
+                                                                           GET_LINE_BREAKS   |
+                                                                           GET_WORD_BREAKS   |
+                                                                           BIDI_INFO         |
+                                                                           SHAPE_TEXT        );
+
+    // Set the update info to relayout the whole text.
+    mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
+    mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
+
+    // Make sure the model is up-to-date before layouting
+    mImpl->UpdateModel( onlyOnceOperations );
+
+    Vector3 naturalSize;
+    DoRelayout( Size( MAX_FLOAT, MAX_FLOAT ),
+                static_cast<OperationsMask>( onlyOnceOperations |
+                                             LAYOUT | REORDER | UPDATE_DIRECTION ),
+                naturalSize.GetVectorXY() );
+
+    // Clear the update info. This info will be set the next time the text is updated.
+    mImpl->mTextUpdateInfo.Clear();
+
+    mImpl->mUpdateTextDirection = false;
   }
 
-  const Character character = mImpl->mModel->mLogicalModel->mText[0];
-  Script script = TextAbstraction::GetCharacterScript( character );
-
-  if( TextAbstraction::IsRightToLeftScript( script ) )
-  {
-    return Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT;
-  }
-
-  return Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT;
+  return mImpl->mIsTextDirectionRTL ? Toolkit::DevelText::TextDirection::RIGHT_TO_LEFT : Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT;
 }
 
 Toolkit::DevelText::VerticalLineAlignment::Type Controller::GetVerticalLineAlignment() const
@@ -2177,6 +2199,13 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
   if( newSize )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "new size (previous size %f,%f)\n", mImpl->mModel->mVisualModel->mControlSize.width, mImpl->mModel->mVisualModel->mControlSize.height );
+
+    if( ( 0 == mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd ) &&
+        ( 0 == mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters ) &&
+        ( ( mImpl->mModel->mVisualModel->mControlSize.width < Math::MACHINE_EPSILON_1000 ) || ( mImpl->mModel->mVisualModel->mControlSize.height < Math::MACHINE_EPSILON_1000 ) ) )
+    {
+      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
+    }
 
     // Layout operations that need to be done if the size changes.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
@@ -3415,7 +3444,8 @@ bool Controller::DoRelayout( const Size& size,
     const float outlineWidth = static_cast<float>( mImpl->mModel->GetOutlineWidth() );
 
     // Set the layout parameters.
-    Layout::Parameters layoutParameters( size,
+    const Vector2 sizeOffset = Vector2(outlineWidth * 2.0f, outlineWidth * 2.0f); // The outline should be fit into the bounding box
+    Layout::Parameters layoutParameters( size - sizeOffset,
                                          textBuffer,
                                          lineBreakInfo.Begin(),
                                          wordBreakInfo.Begin(),
@@ -3482,7 +3512,7 @@ bool Controller::DoRelayout( const Size& size,
 
       if( NO_OPERATION != ( UPDATE_DIRECTION & operations ) )
       {
-        mImpl->mAutoScrollDirectionRTL = false;
+        mImpl->mIsTextDirectionRTL = false;
       }
 
       // Reorder the lines
@@ -3520,7 +3550,7 @@ bool Controller::DoRelayout( const Size& size,
             const LineRun* const firstline = mImpl->mModel->mVisualModel->mLines.Begin();
             if ( firstline )
             {
-              mImpl->mAutoScrollDirectionRTL = firstline->direction;
+              mImpl->mIsTextDirectionRTL = firstline->direction;
             }
           }
         }
@@ -3553,7 +3583,7 @@ bool Controller::DoRelayout( const Size& size,
 #if defined(DEBUG_ENABLED)
   std::string currentText;
   GetText( currentText );
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mAutoScrollDirectionRTL[%s] [%s]\n", this, (mImpl->mAutoScrollDirectionRTL)?"true":"false",  currentText.c_str() );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Controller::DoRelayout [%p] mImpl->mIsTextDirectionRTL[%s] [%s]\n", this, (mImpl->mIsTextDirectionRTL)?"true":"false",  currentText.c_str() );
 #endif
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--Controller::DoRelayout, view updated %s\n", ( viewUpdated ? "true" : "false" ) );
   return viewUpdated;
@@ -3648,6 +3678,9 @@ void Controller::TextReplacedEvent()
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
+  // The text direction needs to be updated.
+  mImpl->mUpdateTextDirection = true;
+
   // Apply modifications to the model
   mImpl->mOperationsPending = ALL_OPERATIONS;
 }
@@ -3666,6 +3699,9 @@ void Controller::TextInsertedEvent()
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
+  // The text direction needs to be updated.
+  mImpl->mUpdateTextDirection = true;
+
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
 }
@@ -3683,6 +3719,9 @@ void Controller::TextDeletedEvent()
 
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
+
+  // The text direction needs to be updated.
+  mImpl->mUpdateTextDirection = true;
 
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
@@ -3785,6 +3824,9 @@ void Controller::ResetText()
   // The natural size needs to be re-calculated.
   mImpl->mRecalculateNaturalSize = true;
 
+  // The text direction needs to be updated.
+  mImpl->mUpdateTextDirection = true;
+
   // Apply modifications to the model
   mImpl->mOperationsPending = ALL_OPERATIONS;
 }
@@ -3850,6 +3892,9 @@ void Controller::ShowPlaceholderText()
 
     // The natural size needs to be re-calculated.
     mImpl->mRecalculateNaturalSize = true;
+
+    // The text direction needs to be updated.
+    mImpl->mUpdateTextDirection = true;
 
     // Apply modifications to the model
     mImpl->mOperationsPending = ALL_OPERATIONS;

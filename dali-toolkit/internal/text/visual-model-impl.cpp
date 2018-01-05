@@ -264,18 +264,21 @@ void VisualModel::GetLinesOfGlyphRange( LineRun* lines,
 
 LineIndex VisualModel::GetLineOfCharacter( CharacterIndex characterIndex )
 {
-  // 1) Check first in the cached line.
+  // 1) Check line is empty or not.
+  if( mLines.Empty() )
+  {
+    return 0u;
+  }
 
+  // 2) Check in the cached line.
   const LineRun& lineRun = *( mLines.Begin() + mCachedLineIndex );
-
   if( ( lineRun.characterRun.characterIndex <= characterIndex ) &&
       ( characterIndex < lineRun.characterRun.characterIndex + lineRun.characterRun.numberOfCharacters ) )
   {
     return mCachedLineIndex;
   }
 
-  // 2) Is not in the cached line. Check in the other lines.
-
+  // 3) Is not in the cached line. Check in the other lines.
   LineIndex index = characterIndex < lineRun.characterRun.characterIndex ? 0u : mCachedLineIndex + 1u;
 
   for( Vector<LineRun>::ConstIterator it = mLines.Begin() + index,

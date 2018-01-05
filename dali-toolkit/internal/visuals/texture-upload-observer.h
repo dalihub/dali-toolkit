@@ -61,8 +61,10 @@ public:
    * @param[in] textureSet  The TextureSet containing the Texture
    * @param[in] useAtlasing True if atlasing was used (note: this may be different to what was requested)
    * @param[in] atlasRect   If using atlasing, this is the rectangle within the atlas to use.
+   * @param[in] preMultiplied True if the image had pre-multiplied alpha applied
    */
-  virtual void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect ) = 0;
+  virtual void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing,
+                               const Vector4& atlasRect, bool preMultiplied ) = 0;
 
   /**
    * @brief Returns the destruction signal.

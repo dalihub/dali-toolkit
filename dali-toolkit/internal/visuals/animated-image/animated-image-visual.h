@@ -24,6 +24,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/adaptor-framework/timer.h>
+#include <dali/devel-api/adaptor-framework/gif-loading.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -184,6 +185,7 @@ private:
   /**
    * Adds the texture set to the renderer, and the renderer to the
    * placement actor, and starts the frame timer
+   * @param[in] textureSet The texture set to apply
    */
   void StartFirstFrame( TextureSet& textureSet );
 
@@ -193,18 +195,14 @@ private:
   TextureSet PrepareTextureSet();
 
   /**
-   * Load the gif image and pack the frames into atlas.
-   * @return The atlas texture.
-   */
-  TextureSet PrepareAnimatedGifImage();
-
-  /**
    * Set the image size from the texture set
+   * @param[in] textureSet The texture set to get the size from
    */
   void SetImageSize( TextureSet& textureSet );
 
   /**
    * Called when the next frame is ready.
+   * @param[in] textureSet the texture set to apply
    */
   void FrameReady( TextureSet textureSet );
 
@@ -214,6 +212,11 @@ private:
    */
   bool DisplayNextFrame();
 
+  /**
+   * Initialize the gif variables.
+   * @param[in] imageUrl The url of the animated gif
+   */
+  void InitializeGif( const VisualUrl& imageUrl );
 
   // Undefined
   AnimatedImageVisual( const AnimatedImageVisual& animatedImageVisual );
@@ -227,10 +230,10 @@ private:
   WeakHandle<Actor> mPlacementActor;
 
   // Variables for GIF player
-  Dali::Vector<Vector4> mTextureRectContainer;
   Dali::Vector<uint32_t> mFrameDelayContainer;
   Vector4 mPixelArea;
   VisualUrl mImageUrl;
+  std::unique_ptr<Dali::GifLoading> mGifLoading; // Only needed for animated gifs
   uint32_t mCurrentFrameIndex; // Frame index into textureRects
 
   // Variables for Multi-Image player
@@ -242,6 +245,7 @@ private:
   uint16_t mUrlIndex;
 
   // Shared variables
+  uint32_t mFrameCount; // Number of frames
   ImageDimensions mImageSize;
 
   Dali::WrapMode::Type mWrapModeU:3;
