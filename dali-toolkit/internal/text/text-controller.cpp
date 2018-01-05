@@ -1878,6 +1878,7 @@ Vector3 Controller::GetNaturalSize()
 
     // Clear the update info. This info will be set the next time the text is updated.
     mImpl->mTextUpdateInfo.Clear();
+    mImpl->mTextUpdateInfo.mClearAll = true;
 
     // Restore the actual control's size.
     mImpl->mModel->mVisualModel->mControlSize = actualControlSize;
