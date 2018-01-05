@@ -698,7 +698,7 @@ void TextVisual::UpdateRenderer()
 
       const bool styleEnabled = ( shadowEnabled || underlineEnabled || outlineEnabled );
 
-      TextureSet textureSet = GetTextTexture( mImpl->mTransform.mSize, hasMultipleTextColors, containsEmoji, styleEnabled );
+      TextureSet textureSet = GetTextTexture( relayoutSize, hasMultipleTextColors, containsEmoji, styleEnabled );
       mImpl->mRenderer.SetTextures( textureSet );
 
       Shader shader = GetTextShader( mFactoryCache, hasMultipleTextColors, containsEmoji, styleEnabled );
