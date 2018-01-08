@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -269,7 +269,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
                           ImageDimensions size,
                           FittingMode::Type fittingMode,
                           Dali::SamplingMode::Type samplingMode )
-: Visual::Base( factoryCache ),
+: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
   mImage(),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
@@ -292,7 +292,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
 }
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
-: Visual::Base( factoryCache ),
+: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
   mImage( image ),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
