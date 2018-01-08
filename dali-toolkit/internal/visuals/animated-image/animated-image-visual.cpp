@@ -495,21 +495,25 @@ void AnimatedImageVisual::LoadFirstBatch()
   {
     mImageCache = new RollingGifImageCache( textureManager, *mGifLoading, mFrameCount, *this, cacheSize, batchSize );
   }
-  else if( batchSize > 0 && cacheSize > 0 )
+  else if( mImageUrls )
   {
-    if( cacheSize < numUrls )
+    if( batchSize > 0 && cacheSize > 0 )
     {
-      mImageCache = new RollingImageCache( textureManager, *mImageUrls, *this, cacheSize, batchSize );
+      if( cacheSize < numUrls )
+      {
+        mImageCache = new RollingImageCache( textureManager, *mImageUrls, *this, cacheSize, batchSize );
+      }
+      else
+      {
+        mImageCache = new FixedImageCache( textureManager, *mImageUrls, *this, batchSize );
+      }
     }
     else
     {
-      mImageCache = new FixedImageCache( textureManager, *mImageUrls, *this, batchSize );
+      mImageCache = new RollingImageCache( textureManager, *mImageUrls, *this, 1, 1 );
     }
   }
-  else
-  {
-    mImageCache = new RollingImageCache( textureManager, *mImageUrls, *this, 1, 1 );
-  }
+
   if (!mImageCache)
   {
     DALI_LOG_ERROR("mImageCache is null");
