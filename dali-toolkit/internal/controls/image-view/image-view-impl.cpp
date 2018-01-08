@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,22 +265,40 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
     Extents padding;
     padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
 
+    Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(
+            Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>());
+
+    if (Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection)
+    {
+      std::swap(padding.start, padding.end);
+    }
+
+    // remove padding from the size to know how much is left for the visual
+    auto paddedSize = size - Vector2(padding.start + padding.end, padding.top + padding.bottom);
+
+    Vector2 naturalSize;
+    mVisual.GetNaturalSize(naturalSize);
+
+    // scale to fit the padded area
+    auto finalSize =
+        Toolkit::GetImplementation(mVisual).GetFittingMode() == Visual::FittingMode::FILL
+            ? paddedSize
+            : naturalSize * std::min((paddedSize.width / naturalSize.width), (paddedSize.height / naturalSize.height));
+
+    // calculate final offset within the padded area
+    auto finalOffset = Vector2(padding.start, padding.top) + (paddedSize - finalSize) * .5f;
+
+    // populate the transform map
     Property::Map transformMap = Property::Map();
 
-    if( ( padding.start != 0 ) || ( padding.end != 0 ) || ( padding.top != 0 ) || ( padding.bottom != 0 ) )
-    {
-      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>() );
-
-      if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
-      {
-        std::swap(padding.start, padding.end);
-      }
-
-      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( padding.start, padding.top ) )
-                  .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                  .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
-                  .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
-    }
+    transformMap.Add(Toolkit::Visual::Transform::Property::OFFSET, finalOffset)
+        .Add(Toolkit::Visual::Transform::Property::OFFSET_POLICY,
+             Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE))
+        .Add(Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN)
+        .Add(Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN)
+        .Add(Toolkit::Visual::Transform::Property::SIZE, finalSize)
+        .Add(Toolkit::Visual::Transform::Property::SIZE_POLICY,
+             Vector2(Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE));
 
     // Should provide a transform that handles aspect ratio according to image size
     mVisual.SetTransformAndSize( transformMap, size );
