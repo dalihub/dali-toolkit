@@ -35,7 +35,6 @@
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
-#include <dali-toolkit/internal/text/rendering/view-model.h>
 
 namespace Dali
 {
@@ -639,15 +638,13 @@ void TextVisual::UpdateRenderer()
   relayoutSize.width = floorf( 0.5f + ( isWidthRelative ? mImpl->mControlSize.width * mImpl->mTransform.mSize.x : mImpl->mTransform.mSize.width ) );
   relayoutSize.height = floorf( 0.5f + ( isHeightRelative ? mImpl->mControlSize.height * mImpl->mTransform.mSize.y : mImpl->mTransform.mSize.height ) );
 
-  float alpha = control.GetProperty< float >( Actor::Property::COLOR_ALPHA );
   Vector4 animatableTextColor = Color::WHITE;
   if( mAnimatableTextColorPropertyIndex != Property::INVALID_INDEX )
   {
     animatableTextColor = control.GetProperty< Vector4 >( mAnimatableTextColorPropertyIndex );
   }
 
-  if( ( fabsf( relayoutSize.width ) < Math::MACHINE_EPSILON_1000 ) || ( fabsf( relayoutSize.height ) < Math::MACHINE_EPSILON_1000 )
-      || mTypesetter->GetViewModel()->GetNumberOfLines() == 0 || alpha == 0.0f || animatableTextColor.a == 0.0f )
+  if( ( fabsf( relayoutSize.width ) < Math::MACHINE_EPSILON_1000 ) || ( fabsf( relayoutSize.height ) < Math::MACHINE_EPSILON_1000 ) )
   {
     // Removes the texture set.
     RemoveTextureSet();
