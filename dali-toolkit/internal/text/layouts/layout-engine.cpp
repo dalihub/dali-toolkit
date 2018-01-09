@@ -28,6 +28,7 @@
 #include <dali-toolkit/internal/text/cursor-helper-functions.h>
 #include <dali-toolkit/internal/text/glyph-metrics-helper.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
+#include <dali-toolkit/internal/text/character-set-conversion.h>
 
 namespace Dali
 {
@@ -470,7 +471,8 @@ struct Engine::Impl
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--GetLineLayoutForBox\n" );
   }
 
-  void SetGlyphPositions( const GlyphInfo* const glyphsBuffer,
+  void SetGlyphPositions( const Parameters& layoutParameters,
+                          const GlyphInfo* const glyphsBuffer,
                           Length numberOfGlyphs,
                           float outlineWidth,
                           Vector2* glyphPositionsBuffer )
@@ -487,6 +489,11 @@ struct Engine::Impl
 
     for( GlyphIndex i = 0u; i < numberOfGlyphs; ++i )
     {
+      const CharacterIndex characterIndex = *( layoutParameters.glyphsToCharactersBuffer + i );
+      const Character character = *( layoutParameters.textBuffer + characterIndex );
+      std::string text;
+      Utf32ToUtf8( reinterpret_cast<const uint32_t* const>( &character ), 1, text );
+
       const GlyphInfo& glyph = *( glyphsBuffer + i );
       Vector2& position = *( glyphPositionsBuffer + i );
 
@@ -494,6 +501,8 @@ struct Engine::Impl
       position.y = -glyph.yBearing;
 
       penX += glyph.advance;
+
+      DALI_LOG_ERROR("SetGlyphPositions: text: %s, GlyphIndex: %u, glyph.index: %u, glyph.xBearing: %f, glyph.advance: %f, position.x: %f, penX: %f\n", text.c_str(), i, glyph.index, glyph.xBearing, glyph.advance, position.x, penX);
     }
   }
 
@@ -606,7 +615,7 @@ struct Engine::Impl
         layoutSize.height += ( lineRun->ascender + -lineRun->descender ) + lineRun->lineSpacing;
       }
 
-      SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun->glyphRun.glyphIndex,
+      SetGlyphPositions( layoutParameters, layoutParameters.glyphsBuffer + lineRun->glyphRun.glyphIndex,
                          ellipsisLayout.numberOfGlyphs,
                          layoutParameters.outlineWidth,
                          glyphPositionsBuffer + lineRun->glyphRun.glyphIndex - layoutParameters.startGlyphIndex );
@@ -969,7 +978,7 @@ struct Engine::Impl
         } // whether to add a last line.
 
         // Sets the positions of the glyphs.
-        SetGlyphPositions( layoutParameters.glyphsBuffer + index,
+        SetGlyphPositions( layoutParameters, layoutParameters.glyphsBuffer + index,
                            layout.numberOfGlyphs,
                            layoutParameters.outlineWidth,
                            glyphPositionsBuffer + index - layoutParameters.startGlyphIndex );
