@@ -515,6 +515,13 @@ public:
   bool IsHighlightActive() const;
 
   /**
+   * @brief Retreives whether the highlight is shown or not.
+   *
+   * @return true if the highlight is visible, false otherwise.
+   */
+  bool IsHighlightVisible() const;
+
+  /**
    * @brief Sets into the decorator the depth used to render the text.
    *
    * @param[in] depth The text's depth.

@@ -2242,6 +2242,11 @@ bool Decorator::IsHighlightActive() const
   return mImpl->mIsHighlightBoxActive;
 }
 
+bool Decorator::IsHighlightVisible() const
+{
+  return ( mImpl->mHighlightActor && mImpl->mHighlightActor.GetParent() );
+}
+
 void Decorator::SetTextDepth( int textDepth )
 {
   mImpl->mTextDepth = textDepth;
