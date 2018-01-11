@@ -1171,14 +1171,28 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
   {
     if( mEventData->mPrimaryCursorPosition > 0u )
     {
-      mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition - 1u );
+      if ( !isShiftModifier && mEventData->mDecorator->IsHighlightVisible() )
+      {
+        mEventData->mPrimaryCursorPosition = std::min(mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition);
+      }
+      else
+      {
+        mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition - 1u );
+      }
     }
   }
   else if( Dali::DALI_KEY_CURSOR_RIGHT == keyCode )
   {
     if( mModel->mLogicalModel->mText.Count() > mEventData->mPrimaryCursorPosition )
     {
-      mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition );
+      if ( !isShiftModifier && mEventData->mDecorator->IsHighlightVisible() )
+      {
+        mEventData->mPrimaryCursorPosition = std::max(mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition);
+      }
+      else
+      {
+        mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition );
+      }
     }
   }
   else if( Dali::DALI_KEY_CURSOR_UP == keyCode && !isShiftModifier )
@@ -2391,6 +2405,9 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY,
     mEventData->mUpdateCursorPosition = false;
 
     mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
+
+    // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
+    mEventData->mPrimaryCursorPosition = std::max( mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition );
   }
   else if( Controller::NoTextTap::SHOW_SELECTION_POPUP == action )
   {
