@@ -1877,6 +1877,7 @@ Vector3 Controller::GetNaturalSize()
 
     // Clear the update info. This info will be set the next time the text is updated.
     mImpl->mTextUpdateInfo.Clear();
+    mImpl->mTextUpdateInfo.mClearAll = true;
 
     // Restore the actual control's size.
     mImpl->mModel->mVisualModel->mControlSize = actualControlSize;
@@ -2431,13 +2432,24 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
       uint32_t numberOfLines = mImpl->mModel->GetNumberOfLines();
 
       // Logic to determine whether this text control will lose focus or not.
-      if( ( Dali::DALI_KEY_CURSOR_LEFT == keyCode && 0 == cursorPosition ) ||
-          ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode && numberOfCharacters == cursorPosition) ||
+      if( ( Dali::DALI_KEY_CURSOR_LEFT == keyCode && 0 == cursorPosition && !keyEvent.IsShiftModifier() ) ||
+          ( Dali::DALI_KEY_CURSOR_RIGHT == keyCode && numberOfCharacters == cursorPosition && !keyEvent.IsShiftModifier() ) ||
           ( Dali::DALI_KEY_CURSOR_DOWN == keyCode && cursorLine == numberOfLines -1 ) ||
           ( Dali::DALI_KEY_CURSOR_DOWN == keyCode && numberOfCharacters == cursorPosition && cursorLine -1 == numberOfLines -1 ) ||
           ( Dali::DALI_KEY_CURSOR_UP == keyCode && cursorLine == 0 ) ||
           ( Dali::DALI_KEY_CURSOR_UP == keyCode && numberOfCharacters == cursorPosition && cursorLine == 1 ) )
       {
+        // Release the active highlight.
+        if( mImpl->mEventData->mState == EventData::SELECTING )
+        {
+          mImpl->ChangeState( EventData::EDITING );
+
+          // Update selection position.
+          mImpl->mEventData->mLeftSelectionPosition = mImpl->mEventData->mPrimaryCursorPosition;
+          mImpl->mEventData->mRightSelectionPosition = mImpl->mEventData->mPrimaryCursorPosition;
+          mImpl->mEventData->mUpdateCursorPosition = true;
+          mImpl->RequestRelayout();
+        }
         return false;
       }
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/internal/visuals/animated-image/image-cache.h>
+#include <dali-toolkit/devel-api/visuals/animated-image-visual-actions-devel.h>
 
 namespace Dali
 {
@@ -129,6 +130,11 @@ public:  // from Visual
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
   virtual void DoCreateInstancePropertyMap( Property::Map& map ) const;
+
+  /**
+   * @copydoc Visual::Base::OnDoAction
+   */
+  virtual void OnDoAction( const Dali::Property::Index actionName, const Dali::Property::Value& attributes ) override;
 
 protected:
 
@@ -242,6 +248,8 @@ private:
   uint16_t mCacheSize;
   uint16_t mBatchSize;
   uint16_t mFrameDelay;
+  int16_t mLoopCount;
+  int16_t mCurrentLoopIndex;
   uint16_t mUrlIndex;
 
   // Shared variables
@@ -250,6 +258,7 @@ private:
 
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
+  DevelAnimatedImageVisual::Action::Type mActionStatus:2;
   bool mStartFirstFrame:1;
 };
 

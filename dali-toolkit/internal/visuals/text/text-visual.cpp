@@ -630,7 +630,10 @@ void TextVisual::UpdateRenderer()
   relayoutSize.width = floorf( 0.5f + ( isWidthRelative ? mImpl->mControlSize.width * mImpl->mTransform.mSize.x : mImpl->mTransform.mSize.width ) );
   relayoutSize.height = floorf( 0.5f + ( isHeightRelative ? mImpl->mControlSize.height * mImpl->mTransform.mSize.y : mImpl->mTransform.mSize.height ) );
 
-  if( ( fabsf( relayoutSize.width ) < Math::MACHINE_EPSILON_1000 ) || ( fabsf( relayoutSize.height ) < Math::MACHINE_EPSILON_1000 ) )
+  std::string text;
+  mController->GetText( text );
+
+  if( ( fabsf( relayoutSize.width ) < Math::MACHINE_EPSILON_1000 ) || ( fabsf( relayoutSize.height ) < Math::MACHINE_EPSILON_1000 ) || text.empty() )
   {
     // Removes the texture set.
     RemoveTextureSet();
@@ -698,7 +701,7 @@ void TextVisual::UpdateRenderer()
 
       const bool styleEnabled = ( shadowEnabled || underlineEnabled || outlineEnabled );
 
-      TextureSet textureSet = GetTextTexture( mImpl->mTransform.mSize, hasMultipleTextColors, containsEmoji, styleEnabled );
+      TextureSet textureSet = GetTextTexture( relayoutSize, hasMultipleTextColors, containsEmoji, styleEnabled );
       mImpl->mRenderer.SetTextures( textureSet );
 
       Shader shader = GetTextShader( mFactoryCache, hasMultipleTextColors, containsEmoji, styleEnabled );

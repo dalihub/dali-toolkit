@@ -88,6 +88,7 @@ const char * const ANIMATED_IMAGE_URLS_NAME("urls");
 const char * const BATCH_SIZE_NAME("batchSize");
 const char * const CACHE_SIZE_NAME("cacheSize");
 const char * const FRAME_DELAY_NAME("frameDelay");
+const char * const LOOP_COUNT_NAME("loopCount");
 const char * const MASK_CONTENT_SCALE_NAME("maskContentScale");
 const char * const CROP_TO_MASK_NAME("cropToMask");
 const char * const LOAD_POLICY_NAME("loadPolicy");

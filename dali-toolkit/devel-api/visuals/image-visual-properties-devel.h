@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_IMAGE_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,13 @@ enum Type
    * @note Default 0
    */
   AUXILIARY_IMAGE_ALPHA = ORIENTATION_CORRECTION + 2,
+
+  /**
+   * @brief The number of times the AnimatedImageVisual will be looped.
+   * @details Name "loopCount", type Property::INTEGER.
+   * @note For Animated images only. Default -1. if < 0, loop unlimited. else, loop loopCount times.
+   */
+  LOOP_COUNT = ORIENTATION_CORRECTION + 3,
 
 };
 

@@ -779,7 +779,7 @@ void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& t
     atlasUploadObserver = this;
   }
 
-  auto preMultiplyOnLoad = mFactoryCache.GetPreMultiplyOnLoad()
+  auto preMultiplyOnLoad = mFactoryCache.GetPreMultiplyOnLoad() && !mImpl->mCustomShader
     ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
     : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
