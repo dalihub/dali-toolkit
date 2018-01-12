@@ -224,6 +224,21 @@ public:
    */
   bool IsUnderlay();
 
+  /**
+   * @brief Sets sw codec type.
+   */
+  void SetSWCodec( bool on );
+
+  /**
+   * @brief Gets play position.
+   */
+  int GetPlayPosition();
+
+  /**
+   * @brief Sets play position.
+   */
+  void SetPlayPosition( int pos );
+
 private: // From Control
 
   /**
