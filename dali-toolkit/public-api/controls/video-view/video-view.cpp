@@ -65,6 +65,21 @@ VideoView VideoView::New( const std::string& url )
   return videoView;
 }
 
+VideoView VideoView::New( bool swCodec )
+{
+  VideoView videoView = Internal::VideoView::New();
+  Dali::Toolkit::GetImpl( videoView ).SetSWCodec( swCodec );
+  return videoView;
+}
+
+VideoView VideoView::New( const std::string& url, bool swCodec )
+{
+  VideoView videoView = Internal::VideoView::New();
+  Dali::Toolkit::GetImpl( videoView ).SetUrl( url );
+  Dali::Toolkit::GetImpl( videoView ).SetSWCodec( swCodec );
+  return videoView;
+}
+
 VideoView VideoView::DownCast( BaseHandle handle )
 {
   return Control::DownCast< VideoView, Internal::VideoView >( handle );
