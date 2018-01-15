@@ -120,6 +120,7 @@ const float SCROLL_SPEED = 300.f;
 const unsigned int DEFAULT_FONT_SIZE = 1152u;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
+const int KEY_RETURN_CODE = 36;
 const int KEY_A_CODE = 38;
 const int KEY_D_CODE = 40;
 
@@ -1152,6 +1153,11 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
 
   application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
+  DALI_TEST_CHECK( !maxLengthReachedSignal );
+
+  application.ProcessEvent( GenerateKey( "Return", "\r", KEY_RETURN_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
   DALI_TEST_CHECK( !maxLengthReachedSignal );
