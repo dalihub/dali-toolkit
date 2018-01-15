@@ -406,6 +406,20 @@ public: // Configure the text controller.
   bool IsShiftSelectionEnabled() const;
 
   /**
+   * @brief Enable or disable the grab handles for text selection.
+   *
+   * @param[in] enabled Whether to enable the grab handles
+   */
+  void SetGrabHandleEnabled( bool enabled );
+
+  /**
+   * @brief Returns whether the grab handles are enabled.
+   *
+   * @return True if the grab handles are enabled
+   */
+  bool IsGrabHandleEnabled() const;
+
+  /**
    * @brief Sets input type to password
    *
    * @note The string is displayed hidden character

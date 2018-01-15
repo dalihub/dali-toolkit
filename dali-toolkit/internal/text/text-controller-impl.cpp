@@ -2518,8 +2518,11 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
         mEventData->mDecorator->StopCursorBlink();
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+        if ( mEventData->mGrabHandleEnabled )
+        {
+          mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
+          mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+        }
         mEventData->mDecorator->SetHighlightActive( true );
         if( mEventData->mGrabHandlePopupEnabled )
         {
@@ -2563,7 +2566,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
           mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
           mEventData->mDecorator->SetHighlightActive( false );
         }
-        else
+        else if ( mEventData->mGrabHandleEnabled )
         {
           mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
         }
@@ -2585,7 +2588,10 @@ void Controller::Impl::ChangeState( EventData::State newState )
           mEventData->mDecorator->StartCursorBlink();
         }
         // Grab handle is not shown until a tap is received whilst EDITING
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        if ( mEventData->mGrabHandleEnabled )
+        {
+          mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        }
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHighlightActive( false );
@@ -2601,8 +2607,11 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
         mEventData->mDecorator->StopCursorBlink();
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+        if ( mEventData->mGrabHandleEnabled )
+        {
+          mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
+          mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+        }
         mEventData->mDecorator->SetHighlightActive( true );
         if( mEventData->mGrabHandlePopupEnabled )
         {
@@ -2620,7 +2629,10 @@ void Controller::Impl::ChangeState( EventData::State newState )
         {
           mEventData->mDecorator->StartCursorBlink();
         }
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        if ( mEventData->mGrabHandleEnabled )
+        {
+          mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        }
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHighlightActive( false );
@@ -2641,7 +2653,10 @@ void Controller::Impl::ChangeState( EventData::State newState )
           mEventData->mDecorator->StartCursorBlink();
         }
 
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        if ( mEventData->mGrabHandleEnabled )
+        {
+          mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        }
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHighlightActive( false );

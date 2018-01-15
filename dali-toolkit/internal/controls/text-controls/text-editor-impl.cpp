@@ -136,6 +136,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineWrapMode",                
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderText",                STRING,    PLACEHOLDER_TEXT                     )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",           VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableShiftSelection",           BOOLEAN,   ENABLE_SHIFT_SELECTION               )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableGrabHandle",               BOOLEAN,   ENABLE_GRAB_HANDLE                   )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -732,6 +733,17 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         }
         break;
       }
+      case Toolkit::DevelTextEditor::Property::ENABLE_GRAB_HANDLE:
+      {
+        if( impl.mController )
+        {
+          const bool grabHandleEnabled = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_GRAB_HANDLE %d\n", impl.mController.Get(), grabHandleEnabled );
+
+          impl.mController->SetGrabHandleEnabled( grabHandleEnabled );
+        }
+        break;
+      }
     } // switch
   } // texteditor
 }
@@ -1121,6 +1133,14 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         if( impl.mController )
         {
           value = impl.mController->IsShiftSelectionEnabled();
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ENABLE_GRAB_HANDLE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsGrabHandleEnabled();
         }
         break;
       }
