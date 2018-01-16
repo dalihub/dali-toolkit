@@ -152,7 +152,7 @@ public:
    */
   ~VideoView();
 
-  /*
+  /**
    * @brief Copy constructor.
    *
    * @SINCE_1_1.38
