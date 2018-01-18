@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/devel-api/direction-enums.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 namespace Dali
 {
@@ -48,8 +47,6 @@ namespace Visual
 {
 
 class ResourceObserver;
-
-using FittingMode = DevelVisual::FittingMode;
 
 /**
  * Base class for all Control rendering logic. A control may have multiple visuals.
@@ -252,19 +249,14 @@ public:
    */
   Toolkit::Visual::ResourceStatus GetResourceStatus() const;
 
-  /**
-   * @brief Get the fitting mode for the visual
-   */
-  FittingMode GetFittingMode() const;
-
- protected:
+protected:
 
   /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  Base( VisualFactoryCache& factoryCache, FittingMode fittingMode );
+  Base( VisualFactoryCache& factoryCache );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
