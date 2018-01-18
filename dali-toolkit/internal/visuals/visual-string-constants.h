@@ -59,7 +59,7 @@ extern const char * const MIX_COLOR;
 extern const char * const OPACITY;
 
 // Fitting mode
-extern const char * const FITTING_MODE;
+extern const char * const VISUAL_FITTING_MODE;
 
 // Color visual
 extern const char * const RENDER_IF_TRANSPARENT_NAME;
