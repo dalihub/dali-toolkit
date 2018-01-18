@@ -19,7 +19,7 @@
 
 //******************************************************************************
 //
-// Default Reference style theme for a 480x800 resolution, The values determined by UX design specification.
+// Default Reference style theme for a 360x360 resolution, The values determined by UX design specification.
 // This file can be copied to a new folder within the styles/ directory and amended with new default values.
 // Can be overriden if StyleManager applies another style sheet.
 //
@@ -29,7 +29,8 @@
   "config":
   {
     "alwaysShowFocus":false,
-    "clearFocusOnEscape":true
+    "clearFocusOnEscape":true,
+    "ignoreGlobalFontSizeChange":false
   },
   "styles":
   {

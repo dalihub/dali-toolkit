@@ -119,6 +119,12 @@ StyleManager::StyleManager()
 
   // Sound & haptic style
   mFeedbackStyle = new FeedbackStyle();
+
+  if( mStyleMonitor.GetIgnoreGlobalFontSizeChange() == -1 )
+  {
+    Property::Map config = GetConfigurations();
+    mStyleMonitor.SetIgnoreGlobalFontSizeChange( static_cast<int>(config["ignoreGlobalFontSizeChange"].Get<bool>()) );
+  }
 }
 
 StyleManager::~StyleManager()
@@ -461,22 +467,27 @@ void StyleManager::StyleMonitorChange( StyleMonitor styleMonitor, StyleChange::T
     case StyleChange::DEFAULT_FONT_CHANGE:
     {
       mDefaultFontFamily = styleMonitor.GetDefaultFontFamily();
+      EmitStyleChangeSignals( styleChange );
       break;
     }
 
     case StyleChange::DEFAULT_FONT_SIZE_CHANGE:
     {
-      mDefaultFontSize = styleMonitor.GetDefaultFontSize();
+      if( styleMonitor.GetIgnoreGlobalFontSizeChange() == 0 )
+      {
+        mDefaultFontSize = styleMonitor.GetDefaultFontSize();
+        EmitStyleChangeSignals( styleChange );
+      }
       break;
     }
 
     case StyleChange::THEME_CHANGE:
     {
       SetTheme( styleMonitor.GetTheme() );
+      EmitStyleChangeSignals( styleChange );
       break;
     }
   }
-  EmitStyleChangeSignals( styleChange );
 }
 
 void StyleManager::EmitStyleChangeSignals( StyleChange::Type styleChange )

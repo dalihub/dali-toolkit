@@ -29,7 +29,8 @@
   "config":
   {
     "alwaysShowFocus":false,
-    "clearFocusOnEscape":true
+    "clearFocusOnEscape":true,
+    "ignoreGlobalFontSizeChange":false
   },
   "styles":
   {
