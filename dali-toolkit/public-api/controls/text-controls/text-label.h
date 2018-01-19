@@ -337,7 +337,7 @@ public:
        */
       AUTO_SCROLL_STOP_MODE,
 
-      /*
+      /**
        * @brief The line count of text.
        * @details name "lineCount", type Property::INTEGER.
        * @SINCE_1_2.60

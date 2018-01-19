@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cstring>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/object/property-helper-devel.h>
@@ -1571,6 +1572,11 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
     }
 
     return true;
+  }
+  else if( Dali::DevelKey::DALI_KEY_RETURN == event.keyCode )
+  {
+    // Do nothing when enter is comming.
+    return false;
   }
 
   return mController->KeyEvent( event );

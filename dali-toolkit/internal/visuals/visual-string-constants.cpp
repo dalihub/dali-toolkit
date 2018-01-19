@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,9 @@ const char * const PREMULTIPLIED_ALPHA( "premultipliedAlpha" );
 // Mix color
 const char * const MIX_COLOR( "mixColor" );
 const char * const OPACITY( "opacity" );
+
+// Fitting mode
+const char * const VISUAL_FITTING_MODE( "visualFittingMode" );
 
 // Color visual
 const char * const RENDER_IF_TRANSPARENT_NAME( "renderIfTransparent" );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ BorderVisualPtr BorderVisual::New( VisualFactoryCache& factoryCache, const Prope
 }
 
 BorderVisual::BorderVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
   mBorderColor( Color::TRANSPARENT ),
   mBorderSize( 0.f ),
   mBorderColorIndex( Property::INVALID_INDEX ),

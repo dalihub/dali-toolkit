@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,41 @@ enum Type
   SVG            = Dali::Toolkit::Visual::SVG,
   ANIMATED_IMAGE = Dali::Toolkit::Visual::ANIMATED_IMAGE,
 
-  ANIMATED_GRADIENT = ANIMATED_IMAGE + 1,  ///< Renders an animated gradient.
+  ANIMATED_GRADIENT = ANIMATED_IMAGE + 1,  //< Renders an animated gradient.
+};
+
+/**
+ * @brief Visual Properties
+ */
+namespace Property
+{
+enum Type
+{
+  TYPE                = Dali::Toolkit::Visual::Property::TYPE,
+  SHADER              = Dali::Toolkit::Visual::Property::SHADER,
+  TRANSFORM           = Dali::Toolkit::Visual::Property::TRANSFORM,
+  PREMULTIPLIED_ALPHA = Dali::Toolkit::Visual::Property::PREMULTIPLIED_ALPHA,
+  MIX_COLOR           = Dali::Toolkit::Visual::Property::MIX_COLOR,
+  OPACITY             = Dali::Toolkit::Visual::Property::OPACITY,
+
+  /**
+   * @brief The fitting mode of the visual
+   * @details Name "fittingMode", type FittingMode (Property::INTEGER) or Property::STRING.
+   * @see DevelVisual::FittingMode
+   * @note The default is defined by the type of visual (if it's suitable to be stretched or not).
+   */
+  VISUAL_FITTING_MODE = OPACITY + 1,
+};
+
+} // namespace Property
+
+/**
+ * @brief The values of this enum determine how the visual should be fit to the view
+ */
+enum FittingMode
+{
+  FIT_KEEP_ASPECT_RATIO,  ///< The visual should be scaled to fit, preserving aspect ratio
+  FILL,                   ///< The visual should be stretched to fill, not preserving aspect ratio
 };
 
 } // namespace DevelVisual
