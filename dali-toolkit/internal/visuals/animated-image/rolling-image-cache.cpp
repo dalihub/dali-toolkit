@@ -70,10 +70,13 @@ RollingImageCache::RollingImageCache(
 
 RollingImageCache::~RollingImageCache()
 {
-  while( !mQueue.IsEmpty() )
+  if( mTextureManagerAlive )
   {
-    ImageFrame imageFrame = mQueue.PopFront();
-    mTextureManager.Remove( mImageUrls[ imageFrame.mUrlIndex ].mTextureId );
+    while( !mQueue.IsEmpty() )
+    {
+      ImageFrame imageFrame = mQueue.PopFront();
+      mTextureManager.Remove( mImageUrls[ imageFrame.mUrlIndex ].mTextureId );
+    }
   }
 }
 

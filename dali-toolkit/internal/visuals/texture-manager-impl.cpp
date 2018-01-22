@@ -120,6 +120,14 @@ TextureManager::TextureManager()
 {
 }
 
+TextureManager::~TextureManager()
+{
+  for( auto iter = mLifecycleObservers.Begin(), endIter = mLifecycleObservers.End(); iter != endIter; ++iter)
+  {
+    (*iter)->TextureManagerDestroyed();
+  }
+}
+
 TextureSet TextureManager::LoadTexture(
     const VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode,
     Dali::SamplingMode::Type samplingMode, const MaskingDataPointer& maskInfo,
@@ -573,6 +581,31 @@ TextureSet TextureManager::RemoveExternalTexture( const std::string& url )
   }
   return TextureSet();
 }
+
+
+void TextureManager::AddObserver( TextureManager::LifecycleObserver& observer )
+{
+  // make sure an observer doesn't observe the same object twice
+  // otherwise it will get multiple calls to ObjectDestroyed()
+  DALI_ASSERT_DEBUG( mLifecycleObservers.End() == std::find( mLifecycleObservers.Begin(), mLifecycleObservers.End(), &observer));
+  mLifecycleObservers.PushBack( &observer );
+}
+
+void TextureManager::RemoveObserver( TextureManager::LifecycleObserver& observer)
+{
+  // Find the observer...
+  auto endIter =  mLifecycleObservers.End();
+  for( auto iter = mLifecycleObservers.Begin(); iter != endIter; ++iter)
+  {
+    if( (*iter) == &observer)
+    {
+      mLifecycleObservers.Erase( iter );
+      break;
+    }
+  }
+  DALI_ASSERT_DEBUG(endIter != mLifecycleObservers.End());
+}
+
 
 bool TextureManager::LoadTexture( TextureInfo& textureInfo )
 {
