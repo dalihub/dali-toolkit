@@ -1497,9 +1497,12 @@ protected: // Destructor.
    */
   virtual ~Controller();
 
+public:
+
+  struct Impl; ///< Made public for testing purposes
+
 private:
 
-  struct Impl;
   Impl* mImpl;
 };
 

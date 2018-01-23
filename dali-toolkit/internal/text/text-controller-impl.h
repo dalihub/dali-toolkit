@@ -712,6 +712,18 @@ struct Controller::Impl
    */
   void ScrollTextToMatchCursor( const CursorInfo& cursorInfo );
 
+public:
+
+  /**
+   * @brief Gets implementation from the controller handle.
+   * @param controller The text controller
+   * @return The implementation of the Controller
+   */
+  static Impl& GetImplementation( Text::Controller& controller )
+  {
+    return *controller.mImpl;
+  }
+
 private:
   // Declared private and left undefined to avoid copies.
   Impl( const Impl& );

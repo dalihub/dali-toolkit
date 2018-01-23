@@ -3441,6 +3441,22 @@ bool Controller::DoRelayout( const Size& size,
 
     const CharacterIndex lastIndex = startIndex + ( ( requestedNumberOfCharacters > 0u ) ? requestedNumberOfCharacters - 1u : 0u );
     const GlyphIndex startGlyphIndex = mImpl->mTextUpdateInfo.mStartGlyphIndex;
+
+    // Make sure the index is not out of bound
+    if ( charactersToGlyph.Count() != glyphsPerCharacter.Count() ||
+         requestedNumberOfCharacters > charactersToGlyph.Count() ||
+         ( lastIndex >= charactersToGlyph.Count() && charactersToGlyph.Count() > 0u ) )
+    {
+      std::string currentText;
+      GetText( currentText );
+
+      DALI_LOG_ERROR( "Controller::DoRelayout: Attempting to access invalid buffer\n" );
+      DALI_LOG_ERROR( "Current text is: %s\n", currentText.c_str() );
+      DALI_LOG_ERROR( "startIndex: %u, lastIndex: %u, requestedNumberOfCharacters: %u, charactersToGlyph.Count = %lu, glyphsPerCharacter.Count = %lu\n", startIndex, lastIndex, requestedNumberOfCharacters, charactersToGlyph.Count(), glyphsPerCharacter.Count());
+
+      return false;
+    }
+
     const Length numberOfGlyphs = ( requestedNumberOfCharacters > 0u ) ? *( charactersToGlyphBuffer + lastIndex ) + *( glyphsPerCharacterBuffer + lastIndex ) - startGlyphIndex : 0u;
     const Length totalNumberOfGlyphs = mImpl->mModel->mVisualModel->mGlyphs.Count();
 

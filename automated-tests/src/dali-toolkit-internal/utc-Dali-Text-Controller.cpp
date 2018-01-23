@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
+#include <dali-toolkit/internal/text/text-controller-impl.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -656,4 +657,36 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
 
   END_TEST;
 
+}
+
+int UtcDaliTextControllerCheckBufferIndices(void)
+{
+  tet_infoline(" UtcDaliTextControllerCheckBufferIndices");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  // Set the text
+  const std::string text("A Quick Brown Fox Jumps Over The Lazy Dog");
+  controller->SetText(text);
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  // Tweak some parameters to make the indices to access the text buffer invalid
+  mImpl.mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl.mModel->mLogicalModel->mText.Count() * 10u;
+  mImpl.mTextUpdateInfo.mNumberOfCharactersToRemove = 0u;
+  mImpl.mTextUpdateInfo.mPreviousNumberOfCharacters = 0u;
+  mImpl.mOperationsPending = Controller::ALL_OPERATIONS;
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  tet_result(TET_PASS);
+
+  END_TEST;
 }
