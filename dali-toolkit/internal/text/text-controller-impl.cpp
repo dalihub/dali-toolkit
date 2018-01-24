@@ -822,6 +822,36 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   Length paragraphCharacters = 0u;
 
   CalculateTextUpdateIndices( paragraphCharacters );
+
+  // Check whether the indices for updating the text is valid
+  if ( numberOfCharacters > 0u &&
+       ( mTextUpdateInfo.mParagraphCharacterIndex >= numberOfCharacters ||
+         mTextUpdateInfo.mRequestedNumberOfCharacters > numberOfCharacters ) )
+  {
+    std::string currentText;
+    Utf32ToUtf8( mModel->mLogicalModel->mText.Begin(), numberOfCharacters, currentText );
+
+    DALI_LOG_ERROR( "Controller::Impl::UpdateModel: mTextUpdateInfo has invalid indices\n" );
+    DALI_LOG_ERROR( "Number of characters: %d, current text is: %s\n", numberOfCharacters, currentText.c_str() );
+
+    // Dump mTextUpdateInfo
+    DALI_LOG_ERROR( "Dump mTextUpdateInfo:\n" );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mCharacterIndex = %u\n", mTextUpdateInfo.mCharacterIndex );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mNumberOfCharactersToRemove = %u\n", mTextUpdateInfo.mNumberOfCharactersToRemove );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mNumberOfCharactersToAdd = %u\n", mTextUpdateInfo.mNumberOfCharactersToAdd );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mPreviousNumberOfCharacters = %u\n", mTextUpdateInfo.mPreviousNumberOfCharacters );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mParagraphCharacterIndex = %u\n", mTextUpdateInfo.mParagraphCharacterIndex );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mRequestedNumberOfCharacters = %u\n", mTextUpdateInfo.mRequestedNumberOfCharacters );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mStartGlyphIndex = %u\n", mTextUpdateInfo.mStartGlyphIndex );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mStartLineIndex = %u\n", mTextUpdateInfo.mStartLineIndex );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mEstimatedNumberOfLines = %u\n", mTextUpdateInfo.mEstimatedNumberOfLines );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mClearAll = %d\n", mTextUpdateInfo.mClearAll );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mFullRelayoutNeeded = %d\n", mTextUpdateInfo.mFullRelayoutNeeded );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mIsLastCharacterNewParagraph = %d\n", mTextUpdateInfo.mIsLastCharacterNewParagraph );
+
+    return false;
+  }
+
   startIndex = mTextUpdateInfo.mParagraphCharacterIndex;
 
   if( mTextUpdateInfo.mClearAll ||
