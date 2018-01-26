@@ -130,6 +130,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableSelection",              
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder",                          MAP,       PLACEHOLDER                          )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "ellipsis",                             BOOLEAN,   ELLIPSIS                             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableShiftSelection",           BOOLEAN,   ENABLE_SHIFT_SELECTION               )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableGrabHandle",               BOOLEAN,   ENABLE_GRAB_HANDLE                   )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -772,6 +773,17 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::ENABLE_GRAB_HANDLE:
+      {
+        if( impl.mController )
+        {
+          const bool grabHandleEnabled = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p ENABLE_GRAB_HANDLE %d\n", impl.mController.Get(), grabHandleEnabled );
+
+          impl.mController->SetGrabHandleEnabled( grabHandleEnabled );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -1176,6 +1188,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           value = impl.mController->IsShiftSelectionEnabled();
+        }
+        break;
+      }
+      case Toolkit::DevelTextField::Property::ENABLE_GRAB_HANDLE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsGrabHandleEnabled();
         }
         break;
       }

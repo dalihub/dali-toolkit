@@ -102,6 +102,7 @@ const char* const PROPERTY_NAME_ENABLE_SELECTION                     = "enableSe
 const char* const PROPERTY_NAME_PLACEHOLDER                          = "placeholder";
 const char* const PROPERTY_NAME_ELLIPSIS                             = "ellipsis";
 const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableShiftSelection";
+const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGrabHandle";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -544,6 +545,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == TextField::Property::PLACEHOLDER );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextField::Property::ELLIPSIS );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextField::Property::ENABLE_SHIFT_SELECTION );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextField::Property::ENABLE_GRAB_HANDLE );
 
   END_TEST;
 }
@@ -1991,7 +1993,6 @@ int utcDaliTextFieldEvent05(void)
   application.SendNotification();
   application.Render();
 
-
   // Tap first to get the focus.
   application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
   application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
@@ -2785,6 +2786,34 @@ int UtcDaliTextFieldEnableShiftSelectionProperty(void)
   // Check the enable shift selection property
   field.SetProperty( DevelTextField::Property::ENABLE_SHIFT_SELECTION, false );
   DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_SHIFT_SELECTION ), false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldEnableGrabHandleProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextFieldEnableGrabHandleProperty");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( field );
+
+  application.SendNotification();
+  application.Render();
+
+  // The default value of ENABLE_GRAB_HANDLE is 'true'.
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_GRAB_HANDLE ), true, TEST_LOCATION );
+
+  // Check the enable grab handle property
+  field.SetProperty( DevelTextField::Property::ENABLE_GRAB_HANDLE, false );
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_GRAB_HANDLE ), false, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();

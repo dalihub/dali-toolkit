@@ -476,6 +476,16 @@ bool Controller::IsShiftSelectionEnabled() const
   return mImpl->mEventData->mShiftSelectionFlag;
 }
 
+void Controller::SetGrabHandleEnabled( bool enabled )
+{
+  mImpl->mEventData->mGrabHandleEnabled = enabled;
+}
+
+bool Controller::IsGrabHandleEnabled() const
+{
+  return mImpl->mEventData->mGrabHandleEnabled;
+}
+
 // public : Update
 
 void Controller::SetText( const std::string& text )

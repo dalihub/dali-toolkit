@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,7 @@ const char* const PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR               = "placehol
 const char* const PROPERTY_NAME_ENABLE_SELECTION                     = "enableSelection";
 const char* const PROPERTY_NAME_PLACEHOLDER                          = "placeholder";
 const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableShiftSelection";
+const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGrabHandle";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -538,6 +539,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT ) == DevelTextEditor::Property::PLACEHOLDER_TEXT );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextEditor::Property::ENABLE_SHIFT_SELECTION );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextEditor::Property::ENABLE_GRAB_HANDLE );
 
   END_TEST;
 }
@@ -2438,6 +2440,16 @@ int utcDaliTextEditorHandles(void)
   editor.SetProperty( TextEditor::Property::GRAB_HANDLE_IMAGE, HANDLE_IMAGE_FILE_NAME );
   editor.SetProperty( TextEditor::Property::SMOOTH_SCROLL, true );
 
+  Property::Map imagePropertyMap;
+  imagePropertyMap["type"] = "BufferImage";
+  imagePropertyMap["width"] = 40;
+  imagePropertyMap["height"] = 40;
+
+  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_IMAGE_LEFT, imagePropertyMap );
+  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_IMAGE_RIGHT, imagePropertyMap );
+  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_LEFT, imagePropertyMap );
+  editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, imagePropertyMap );
+
   editor.SetSize( 30.f, 500.f );
   editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
   editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
@@ -2512,9 +2524,60 @@ int utcDaliTextEditorHandles(void)
   application.SendNotification();
   application.Render();
 
+  // Tap first to get the focus.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Double tap to select a word and create the selection handles.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 3.f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 3.f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  touchPos = Vector2( 10.0f, 50.0f );
+
+  // Touch the left selection handle to set it as pressed.
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( GetPointDownInside( touchPos ) );
+  application.ProcessEvent( event );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // drag the left selection handle right
+  SendPan(application, Gesture::Possible, touchPos);
+  SendPan(application, Gesture::Started, touchPos);
+  touchPos.x += 5.0f;
+  Wait(application, 100);
+
+  for(int i = 0;i<20;i++)
+  {
+    SendPan(application, Gesture::Continuing, touchPos);
+    touchPos.x += 5.0f;
+    Wait(application);
+  }
+
+  SendPan(application, Gesture::Finished, touchPos);
+  Wait(application);
+
+  // Release the left selection handle.
+  event = Dali::Integration::TouchEvent();
+  event.AddPoint( GetPointUpInside( touchPos ) );
+  application.ProcessEvent( event );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
   END_TEST;
 }
-
 
 int utcDaliTextEditorUnderPropertyStringP(void)
 {
@@ -2777,6 +2840,34 @@ int UtcDaliTextEditorEnableShiftSelectionProperty(void)
   // Check the enable shift selection property
   editor.SetProperty( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION, false );
   DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION ), false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorEnableGrabHandleProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorEnableGrabHandleProperty");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+  editor.SetSize( 300.f, 50.f );
+  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( editor );
+
+  application.SendNotification();
+  application.Render();
+
+  // The default value of ENABLE_GRAB_HANDLE is 'true'.
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_GRAB_HANDLE ), true, TEST_LOCATION );
+
+  // Check the enable grab handle property
+  editor.SetProperty( DevelTextEditor::Property::ENABLE_GRAB_HANDLE, false );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_GRAB_HANDLE ), false, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();

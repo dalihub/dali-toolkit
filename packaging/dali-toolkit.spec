@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    1.3.8
+Version:    1.3.9
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT

@@ -91,7 +91,14 @@ namespace Property
        * @brief Enables Text selection using Shift key.
        * @details Name "enableShiftSelection", type Property::BOOLEAN.
        */
-      ENABLE_SHIFT_SELECTION = ELLIPSIS + 1
+      ENABLE_SHIFT_SELECTION = ELLIPSIS + 1,
+
+      /**
+       * @brief Enables the grab handles for text selection.
+       * @details Name "enableGrabHandle", type Property::BOOLEAN.
+       * @note The default value is true, which means the grab handles are enabled by default.
+       */
+      ENABLE_GRAB_HANDLE = ELLIPSIS + 2
   };
 } // namespace Property
 
