@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -329,6 +329,34 @@ public:
    */
   unsigned int GetOutlineWidth() const;
 
+  /**
+   * @brief Sets the text's background color.
+   *
+   * @param[in] color The text's background color.
+   */
+  void SetBackgroundColor( const Vector4& color );
+
+  /**
+   * @brief Retrieves the text's background color.
+   *
+   * @return The text's background color.
+   */
+  const Vector4& GetBackgroundColor() const;
+
+  /**
+   * @brief Sets whether the text has a background or not.
+   *
+   * @param[in] enabled true if the text has a background.
+   */
+  void SetBackgroundEnabled( bool enabled );
+
+  /**
+   * @brief Returns whether the text has a background or not.
+   *
+   * @return whether the text has a background or not.
+   */
+  bool IsBackgroundEnabled() const;
+
 protected:
 
   /**
@@ -366,6 +394,7 @@ public:
   Vector4                mShadowColor;          ///< Color of drop shadow
   Vector4                mUnderlineColor;       ///< Color of underline
   Vector4                mOutlineColor;         ///< Color of outline
+  Vector4                mBackgroundColor;      ///< Color of text background
   Size                   mControlSize;          ///< The size of the UI control.
   Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
   float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
@@ -384,6 +413,7 @@ public:
 
   bool                   mUnderlineEnabled:1;   ///< Underline enabled flag
   bool                   mUnderlineColorSet:1;  ///< Has the underline color been explicitly set?
+  bool                   mBackgroundEnabled:1;   ///< Background enabled flag
 };
 
 } // namespace Text

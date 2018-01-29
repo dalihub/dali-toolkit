@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1128,6 +1128,9 @@ int UtcDaliVisualGetPropertyMap10(void)
   Property::Map outlineMapSet;
   propertyMap.Insert( "outline", outlineMapSet.Add("color", Color::YELLOW).Add("width", 1) );
 
+  Property::Map backgroundMapSet;
+  propertyMap.Insert( "textBackground", backgroundMapSet.Add("enable", true).Add("color", Color::CYAN) );
+
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -1201,6 +1204,13 @@ int UtcDaliVisualGetPropertyMap10(void)
   Property::Map outlineMapGet = value->Get<Property::Map>();
   DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
+
+  value = resultMap.Find( DevelTextVisual::Property::BACKGROUND, Property::MAP );
+  DALI_TEST_CHECK( value );
+
+  Property::Map backgroundMapGet = value->Get<Property::Map>();
+  DALI_TEST_EQUALS( backgroundMapGet.Count(), backgroundMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( backgroundMapGet, backgroundMapSet ), true, TEST_LOCATION );
 
   END_TEST;
 }

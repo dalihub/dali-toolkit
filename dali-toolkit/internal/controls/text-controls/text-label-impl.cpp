@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "autoScrollStopMode", 
 DALI_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "lineCount",                 INTEGER, LINE_COUNT                 )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "lineWrapMode",              INTEGER, LINE_WRAP_MODE             )
 DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "textDirection",       INTEGER, TEXT_DIRECTION             )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextLabel, "verticalLineAlignment",         INTEGER, VERTICAL_LINE_ALIGNMENT    )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "verticalLineAlignment",     INTEGER, VERTICAL_LINE_ALIGNMENT    )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textBackground",            MAP,     BACKGROUND                 )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -523,6 +524,15 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::BACKGROUND:
+      {
+        const bool update = SetBackgroundProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mTextUpdateNeeded = true;
+        }
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -814,6 +824,11 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         {
           value = impl.mController->GetVerticalLineAlignment();
         }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::BACKGROUND:
+      {
+        GetBackgroundProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
         break;
       }
     }

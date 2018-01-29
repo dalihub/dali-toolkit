@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,6 +194,34 @@ bool ParseOutlineProperties( const Property::Map& underlinePropertiesMap,
       /// Width key.
       widthDefined = true;
       width = static_cast<unsigned int>( valueGet.second.Get<float>() );
+    }
+  }
+
+  return 0u == numberOfItems;
+}
+
+bool ParseBackgroundProperties( const Property::Map& backgroundProperties,
+                                bool& enabled,
+                                bool& colorDefined,
+                                Vector4& color )
+{
+  const unsigned int numberOfItems = backgroundProperties.Count();
+
+  // Parses and applies the style.
+  for( unsigned int index = 0u; index < numberOfItems; ++index )
+  {
+    const KeyValuePair& valueGet = backgroundProperties.GetKeyValue( index );
+
+    if( ENABLE_KEY == valueGet.first.stringKey )
+    {
+      /// Enable key.
+      enabled = valueGet.second.Get<bool>();
+    }
+    else if( COLOR_KEY == valueGet.first.stringKey )
+    {
+      /// Color key.
+      colorDefined = true;
+      color = valueGet.second.Get<Vector4>();
     }
   }
 
@@ -665,6 +693,98 @@ void GetOutlineProperties( ControllerPtr controller, Property::Value& value, Eff
     }
   }
 }
+
+bool SetBackgroundProperties( ControllerPtr controller, const Property::Value& value, EffectStyle::Type type )
+{
+  bool update = false;
+
+  if( controller )
+  {
+    switch( type )
+    {
+      case EffectStyle::DEFAULT:
+      {
+        const Property::Map& propertiesMap = value.Get<Property::Map>();
+
+        bool enabled = false;
+        bool colorDefined = false;
+        Vector4 color;
+
+        bool empty = true;
+
+        if ( !propertiesMap.Empty() )
+        {
+           empty = ParseBackgroundProperties( propertiesMap,
+                                              enabled,
+                                              colorDefined,
+                                              color );
+        }
+
+        if( !empty )
+        {
+          if( enabled != controller->IsBackgroundEnabled() )
+          {
+            controller->SetBackgroundEnabled( enabled );
+            update = true;
+          }
+
+          if( colorDefined && ( controller->GetBackgroundColor() != color ) )
+          {
+            controller->SetBackgroundColor( color );
+            update = true;
+          }
+        }
+        else
+        {
+          // Disable background.
+          if( controller->IsBackgroundEnabled() )
+          {
+            controller->SetBackgroundEnabled( false );
+            update = true;
+          }
+        }
+        break;
+      }
+      case EffectStyle::INPUT:
+      {
+        // Text background is not supported while inputting yet
+        break;
+      }
+    } // switch
+  } // if( controller )
+
+  return update;
+}
+
+void GetBackgroundProperties( ControllerPtr controller, Property::Value& value, EffectStyle::Type type )
+{
+  if( controller )
+  {
+    switch( type )
+    {
+      case EffectStyle::DEFAULT:
+      {
+        const bool enabled = controller->IsBackgroundEnabled();
+        const Vector4& color = controller->GetBackgroundColor();
+
+        Property::Map map;
+        map.Insert( ENABLE_KEY, enabled );
+        map.Insert( COLOR_KEY, color );
+
+        value = map;
+
+        break;
+
+      }
+      case EffectStyle::INPUT:
+      {
+        // Text background is not supported while inputting yet
+        break;
+      }
+    }
+  }
+}
+
 
 } // namespace Text
 
