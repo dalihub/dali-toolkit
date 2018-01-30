@@ -215,15 +215,6 @@ DALI_IMPORT_API void EnableVisual( Internal::Control& control, Dali::Property::I
 DALI_IMPORT_API bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index index );
 
 /**
- * @brief Get the loading state of the visual resource.
- *
- * @param[in] control The control
- * @param[in] index The Property index of the visual
- * @return Return the loading status (PREPARING, READY and FAILED) of visual resource
- */
-DALI_IMPORT_API Toolkit::Visual::ResourceStatus GetVisualResourceStatus( const Internal::Control& control, Dali::Property::Index index );
-
-/**
  * @brief Create a transition effect on the control.
  *
  * Only generates an animation if the properties described in the transition
@@ -237,6 +228,18 @@ DALI_IMPORT_API Toolkit::Visual::ResourceStatus GetVisualResourceStatus( const I
  * handle if no properties match.
  */
 DALI_IMPORT_API Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& transitionData );
+
+/**
+ * @brief Perform an action on a visual registered to this control.
+ *
+ * Visuals will have actions, this API is used to perform one of these actions with the given attributes.
+ *
+ * @param[in] control The control.
+ * @param[in] visualIndex The Property index of the visual.
+ * @param[in] actionId The action to perform.  See Visual to find supported actions.
+ * @param[in] attributes Optional attributes for the action.
+ */
+DALI_IMPORT_API void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes );
 
 } // namespace DevelControl
 

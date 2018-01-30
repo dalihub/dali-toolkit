@@ -172,6 +172,21 @@ public:
   virtual void GetUnderlineRuns( GlyphRun* underlineRuns,
                                  UnderlineRunIndex index,
                                  Length numberOfRuns ) const = 0;
+
+  /**
+   * @brief Retrieve the outline color.
+   *
+   * @return The outline color.
+   */
+  virtual const Vector4& GetOutlineColor() const = 0;
+
+  /**
+   * @brief Retrieves the width of an outline
+   *
+   * @return The width of the outline.
+   */
+  virtual unsigned int GetOutlineWidth() const = 0;
+
 };
 
 } // namespace Text

@@ -32,15 +32,23 @@ namespace Toolkit
  */
 
 /**
- * @brief TextVisual Properties
+ * @brief TextVisual is to render a text.
  * @SINCE_1_2.60
  */
 namespace TextVisual
 {
 
+/**
+ * @brief TextVisual Property.
+ * @SINCE_1_2.60
+ */
 namespace Property
 {
 
+/**
+ * @brief Enumeration for the instance of properties belonging to the TextVisual.
+ * @SINCE_1_2.60
+ */
 enum
 {
   /**

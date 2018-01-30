@@ -45,9 +45,6 @@ devel_api_src_files = \
 devel_api_header_files = \
   $(devel_api_src_dir)/direction-enums.h
 
-devel_api_visuals_header_files = \
-  $(devel_api_src_dir)/visuals/image-visual-properties-devel.h
-
 devel_api_controls_header_files = \
   $(devel_api_src_dir)/controls/control-depth-index-ranges.h \
   $(devel_api_src_dir)/controls/control-devel.h \
@@ -93,6 +90,15 @@ devel_api_visual_factory_header_files = \
   $(devel_api_src_dir)/visual-factory/visual-factory.h \
   $(devel_api_src_dir)/visual-factory/visual-base.h
 
+devel_api_visuals_header_files = \
+  $(devel_api_src_dir)/visuals/animated-gradient-visual-properties-devel.h \
+  $(devel_api_src_dir)/visuals/animated-image-visual-actions-devel.h \
+  $(devel_api_src_dir)/visuals/color-visual-properties-devel.h \
+  $(devel_api_src_dir)/visuals/image-visual-properties-devel.h \
+  $(devel_api_src_dir)/visuals/image-visual-actions-devel.h \
+  $(devel_api_src_dir)/visuals/text-visual-properties-devel.h \
+  $(devel_api_src_dir)/visuals/visual-properties-devel.h
+
 devel_api_shadow_view_header_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.h
 
@@ -126,8 +132,13 @@ devel_api_super_blur_view_header_files = \
 
 devel_api_text_controls_header_files = \
   $(devel_api_src_dir)/controls/text-controls/text-editor-devel.h \
+  $(devel_api_src_dir)/controls/text-controls/text-field-devel.h \
+  $(devel_api_src_dir)/controls/text-controls/text-label-devel.h \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.h \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.h
+
+devel_api_text_header_files = \
+  $(devel_api_src_dir)/text/text-enumerations-devel.h
 
 devel_api_tool_bar_header_files = \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.h

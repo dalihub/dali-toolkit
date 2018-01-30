@@ -59,7 +59,6 @@ void ResourceReadySignal( Control control )
   gResourceReadySignalFired = true;
 }
 
-
 Actor CreateActorWithImageVisual(const Property::Map& map)
 {
   VisualFactory factory = VisualFactory::Get();
@@ -155,6 +154,63 @@ int UtcDaliImageVisualPropertyMap(void)
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
+  factory.SetPreMultiplyOnLoad( true );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_LARGE_IMAGE_FILE_NAME );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
+  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  actor.SetSize( 200.f, 200.f );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  auto renderer = actor.GetRendererAt(0);
+  auto preMultipliedIndex = renderer.GetPropertyIndex( "preMultipliedAlpha" );
+  DALI_TEST_CHECK( preMultipliedIndex != Property::INVALID_INDEX );
+  auto preMultipliedAlpha = renderer.GetProperty<float>( preMultipliedIndex );
+  auto preMultipliedAlpha2 = renderer.GetProperty<bool>( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_EQUALS( preMultipliedAlpha, 1.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( preMultipliedAlpha2, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  Stage::GetCurrent().Remove( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+
+int UtcDaliImageVisualNoPremultipliedAlpha01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Request image visual without pre-multiplied alpha" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+  factory.SetPreMultiplyOnLoad( false );
 
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
@@ -187,6 +243,71 @@ int UtcDaliImageVisualPropertyMap(void)
   application.Render();
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  auto renderer = actor.GetRendererAt(0);
+  auto preMultipliedIndex = renderer.GetPropertyIndex( "preMultipliedAlpha" );
+  DALI_TEST_CHECK( preMultipliedIndex != Property::INVALID_INDEX );
+  auto preMultipliedAlpha = renderer.GetProperty<bool>( preMultipliedIndex );
+  auto preMultipliedAlpha2 = renderer.GetProperty<bool>( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+
+  DALI_TEST_EQUALS( preMultipliedAlpha, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( preMultipliedAlpha2, false, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  Stage::GetCurrent().Remove( actor );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+
+int UtcDaliImageVisualNoPremultipliedAlpha02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Request image visual with no alpha channel" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
+  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+
+  actor.SetSize( 200.f, 200.f );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  auto renderer = actor.GetRendererAt(0);
+  auto preMultipliedIndex = renderer.GetPropertyIndex( "preMultipliedAlpha" );
+  DALI_TEST_CHECK( preMultipliedIndex != Property::INVALID_INDEX );
+  auto preMultipliedAlpha = renderer.GetProperty<bool>( preMultipliedIndex );
+  auto preMultipliedAlpha2 = renderer.GetProperty<bool>( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+
+  DALI_TEST_EQUALS( preMultipliedAlpha, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( preMultipliedAlpha2, false, TEST_LOCATION );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
@@ -248,7 +369,7 @@ int UtcDaliImageVisualTextureReuse1(void)
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_LARGE_IMAGE_FILE_NAME );
-  propertyMap.Insert( DevelImageVisual::Property::RELEASE_POLICY,  DevelImageVisual::ReleasePolicy::DETACHED );
+  propertyMap.Insert( ImageVisual::Property::RELEASE_POLICY,  ImageVisual::ReleasePolicy::DETACHED );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& textureTrace = gl.GetTextureTrace();
@@ -1214,7 +1335,7 @@ int UtcDaliImageVisualReleasePolicy01(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliImageVisualReleasePolicy01 Detached Policy, disabling visual with this policy deletes texture" );
 
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::DETACHED );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DETACHED );
   DALI_TEST_CHECK( imageVisual );
 
   // Set up debug trace
@@ -1264,7 +1385,7 @@ int UtcDaliImageVisualReleasePolicy02(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliImageVisualReleasePolicy02 Destroyed Policy, Texture should be deleted when visual destroyed" );
 
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::DESTROYED );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED );
   DALI_TEST_CHECK( imageVisual );
 
   // Setup debug trace
@@ -1316,7 +1437,7 @@ int UtcDaliImageVisualReleasePolicy03(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliImageVisualReleasePolicy03 Never Policy, texture should not be deleted after visual destroyed" );
 
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::NEVER );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::NEVER );
   DALI_TEST_CHECK( imageVisual );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -1366,10 +1487,10 @@ int UtcDaliImageVisualReleasePolicy04(void)
   tet_infoline( "UtcDaliImageVisualReleasePolicy04 Two visuals with different policies sharing a texture" );
 
   tet_infoline( "Create first visual with Never release policy" );
-  Visual::Base imageVisualNever = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::NEVER );
+  Visual::Base imageVisualNever = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::NEVER );
 
   tet_infoline( "Create second visual with Destroyed release policy");
-    Visual::Base imageVisualDestroyed = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::DESTROYED );
+    Visual::Base imageVisualDestroyed = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED );
 
   // Set up trace debug
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -1445,7 +1566,7 @@ int UtcDaliImageVisualReleasePolicy05(void)
   imageVisualNever.CreatePropertyMap( resultMap );
   DALI_TEST_CHECK( ! resultMap.Empty() );
 
-  DALI_TEST_EQUALS( ( resultMap.Find( DevelImageVisual::Property::RELEASE_POLICY ) )->Get<int>(), (int)DevelImageVisual::ReleasePolicy::NEVER, TEST_LOCATION );
+  DALI_TEST_EQUALS( ( resultMap.Find( ImageVisual::Property::RELEASE_POLICY ) )->Get<int>(), (int)ImageVisual::ReleasePolicy::NEVER, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1455,7 +1576,7 @@ int UtcDaliImageVisualReleasePolicy06(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliImageVisualReleasePolicy06 Never Policy, texture should not be affected by Disabling and Enabling visual" );
 
-  Visual::Base imageVisual= CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::NEVER );
+  Visual::Base imageVisual= CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::NEVER );
   DALI_TEST_CHECK( imageVisual );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -1515,11 +1636,11 @@ int UtcDaliImageVisualReleasePolicy07(void)
   tet_infoline( "UtcDaliImageVisualReleasePolicy07 Two visuals with different policies sharing a texture DETACHED and DESTROYED" );
 
   tet_infoline( "Create first visual with DESTROYED release policy" );
-  Visual::Base imageVisualDestroyed = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::DESTROYED );
+  Visual::Base imageVisualDestroyed = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DESTROYED );
 
 
   tet_infoline( "Create second visual with DETACHED release policy");
-  Visual::Base imageVisualDetached = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::RELEASE_POLICY, DevelImageVisual::ReleasePolicy::DETACHED );
+  Visual::Base imageVisualDetached = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::RELEASE_POLICY, ImageVisual::ReleasePolicy::DETACHED );
 
   // Set up trace debug
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -1585,7 +1706,21 @@ int UtcDaliImageVisualLoadPolicy01(void)
   textureTrace.Enable(true);
 
   tet_infoline( "Create visual with IMMEDIATE load policy" );
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::IMMEDIATE );
+  VisualFactory factory = VisualFactory::Get();
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_WIDTH,   20 );
+  propertyMap.Insert( ImageVisual::Property::DESIRED_HEIGHT,   30 );
+  propertyMap.Insert( "loadPolicy" , ImageVisual::LoadPolicy::IMMEDIATE );
+
+  Visual::Base imageVisual = factory.CreateVisual( propertyMap );
+
+  Property::Map resultMap;
+  imageVisual.CreatePropertyMap( resultMap );
+  DALI_TEST_CHECK( ! resultMap.Empty() );
+  DALI_TEST_EQUALS( ( resultMap.Find( ImageVisual::Property::LOAD_POLICY ) )->Get<int>(), (int)ImageVisual::LoadPolicy::IMMEDIATE, TEST_LOCATION );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
@@ -1638,7 +1773,7 @@ int UtcDaliImageVisualLoadPolicy02(void)
   textureTrace.Enable(true);
 
   tet_infoline( "Create visual with IMMEDIATE load policy" );
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::ATTACHED );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::ATTACHED );
 
   const unsigned int TIME_OUT_3_SECONDS = 3;
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1, TIME_OUT_3_SECONDS ), false, TEST_LOCATION );
@@ -1684,43 +1819,144 @@ int UtcDaliImageVisualLoadPolicy02(void)
 int UtcDaliImageVisualLoadPolicy03(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliImageVisualLoadPolicy03 Load a visual image before attaching to stage and receive ResourceReady signal" );
+  tet_infoline( "UtcDaliImageVisualLoadPolicy03 Load a visual image and receive ResourceReady Signal when loaded" );
+
+  const bool VISUAL_NOT_ENABLED( false ); // Instead of just passing 'false' into an API.
 
   // Set up trace debug
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
-  tet_infoline( "Create visual with IMMEDIATE load policy" );
-  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, DevelImageVisual::Property::LOAD_POLICY, DevelImageVisual::LoadPolicy::IMMEDIATE );
-
-  // Wait for image to load, ResourceReady signal will not be emitted until Visual is registered with a control and on stage.
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
-
-  // Ensure texture has been uploaded
-  application.SendNotification();
-  application.Render();
-
-  tet_infoline( "Ensure texture loading starts after visual created" );
-  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
-  textureTrace.Reset();
-
-  tet_infoline( "Register visuals with control and ensure it has the only handles" );
+  tet_infoline( "Create a control and connect to resource ready signal without adding to stage" );
   DummyControl actor = DummyControl::New(true);
   actor.ResourceReadySignal().Connect( &ResourceReadySignal);
   Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
-
-  tet_infoline( "Registering visual attaches it to stage and trigger the loading signal if Image loaded" );
-  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
-  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
   actor.SetSize(200.f, 200.f);
-  // Adding the Control hence Visual to stage will cause the Visual to trigger ResourceReadySignal if the image is already loaded.
-  Stage::GetCurrent().Add( actor ); // If LoadPolicy was not IMMEDIATE then as this point (after attached to stage) the test would need to wait for Loading
 
+  tet_infoline( "Create visual with IMMEDIATE load policy" );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
+
+  tet_infoline( "Registering visual allows control to get a signal once loaded even if visual not enabled( not staged )" );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual, VISUAL_NOT_ENABLED );
+  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  tet_infoline( "Allow image time to load resource" );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+  application.Render();
+
+  // Ensure texture has been uploaded
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
 
   END_TEST;
 }
+
+int UtcDaliImageVisualLoadPolicy04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualLoadPolicy04 First part  Load a visual image before attaching to stage");
+  tet_infoline( "Second part, Reuse the same image in aonther control and check resource ready signal fired" );
+
+  const bool VISUAL_NOT_ENABLED( false ); // Instead of just passing false into an API.
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Create a control and connect to resource ready signal" );
+  DummyControl actor = DummyControl::New(true);
+  actor.ResourceReadySignal().Connect( &ResourceReadySignal);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  actor.SetSize(200.f, 200.f);
+
+  tet_infoline( "Create visual with IMMEDIATE load policy" );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
+
+  tet_infoline( "Registering visual allows control to get a signal once loaded even if visual not enabled( staged )" );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual, VISUAL_NOT_ENABLED );
+  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  tet_infoline( "Allow image time to load" );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Testing texture is loaded and resource ready signal fired" );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  tet_infoline( "Original control correctly signalled, now testing for signal with new Control reusing the image" );
+
+  gResourceReadySignalFired = false; // Reset signal check ready for testing next Control
+  Visual::Base imageVisual2 = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
+  DummyControl actor2 = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl2 = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  actor2.ResourceReadySignal().Connect( &ResourceReadySignal);
+
+  tet_infoline( "Registering visual this should trigger the loading signal as is already image loaded for previous control" );
+  dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual2 );
+  imageVisual2.Reset(); // reduce ref count so only the control keeps the visual alive.
+  actor2.SetSize(200.f, 200.f);
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 0 ), true, TEST_LOCATION ); // Not expecting any further loading as texture is being reused.
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageVisualLoadPolicy05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualLoadPolicy05 LoadPolicy::ATTACHED (default) First part  Load a visual image before attaching to stage");
+  tet_infoline( "Second part, Reuse the same image in aonther control and check resource ready signal fired" );
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  tet_infoline( "Create a control and connect to resource ready signal" );
+  DummyControl actor = DummyControl::New(true);
+  actor.ResourceReadySignal().Connect( &ResourceReadySignal);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  actor.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( actor );
+
+  tet_infoline( "Create visual with ATTACHED load policy" );
+  Visual::Base imageVisual = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::ATTACHED );
+
+  tet_infoline( "Registering visual allows control to get a signal once loaded" );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  imageVisual.Reset(); // reduce ref count so only the control keeps the visual alive.
+
+  tet_infoline( "Allow image time to load" );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Testing texture is loaded and resource ready signal fired" );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  tet_infoline( "Original control correctly signalled, now testing for signal with new Control reusing the image" );
+
+  gResourceReadySignalFired = false; // Reset signal check ready for testing next Control
+  Visual::Base imageVisual2 = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::ATTACHED );
+  DummyControl actor2 = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl2 = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  actor2.ResourceReadySignal().Connect( &ResourceReadySignal);
+
+  tet_infoline( "Registering visual this should trigger the loading signal as is already image loaded for previous control" );
+  dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual2 );
+  imageVisual2.Reset(); // reduce ref count so only the control keeps the visual alive.
+  actor2.SetSize(200.f, 200.f);
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 0 ), true, TEST_LOCATION ); // Not expecting any further loading as texture is being reused.
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliImageVisualOrientationCorrection(void)
 {
@@ -1732,7 +1968,7 @@ int UtcDaliImageVisualOrientationCorrection(void)
   Property::Map propertyMap;
   propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_ROTATED_IMAGE );
-  propertyMap.Insert( DevelImageVisual::Property::ORIENTATION_CORRECTION, false );
+  propertyMap.Insert( "orientationCorrection", false );
   Visual::Base imageVisual = factory.CreateVisual( propertyMap );
 
   tet_infoline( "Create control for visual, need to loaded it" );
@@ -1757,7 +1993,7 @@ int UtcDaliImageVisualOrientationCorrection(void)
   propertyMap.Clear();
   propertyMap.Insert( Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_ROTATED_IMAGE );
-  propertyMap.Insert( DevelImageVisual::Property::ORIENTATION_CORRECTION, true );
+  propertyMap.Insert( ImageVisual::Property::ORIENTATION_CORRECTION, true );
   imageVisual = factory.CreateVisual( propertyMap );
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
@@ -1774,7 +2010,7 @@ int UtcDaliImageVisualOrientationCorrection(void)
   imageVisual.CreatePropertyMap( resultMap );
 
   // check the Property::ORIENTATION_CORRECTION value from the returned map
-  Property::Value* typeValue = resultMap.Find( DevelImageVisual::Property::ORIENTATION_CORRECTION,  Property::BOOLEAN );
+  Property::Value* typeValue = resultMap.Find( ImageVisual::Property::ORIENTATION_CORRECTION,  Property::BOOLEAN );
   DALI_TEST_EQUALS( typeValue->Get<bool>(), true, TEST_LOCATION );
 
   END_TEST;

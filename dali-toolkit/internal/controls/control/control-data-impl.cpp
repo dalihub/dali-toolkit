@@ -486,9 +486,6 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
 
   if( !visualReplaced ) // New registration entry
   {
-    // monitor when the visual resources are ready
-    StartObservingVisual( visual );
-
     // If we've not set the depth-index value, we have more than one visual and the visual does not have a depth index, then set it to be the highest
     if( ( depthIndexValueSet == DepthIndexValue::NOT_SET ) &&
         ( mVisuals.Size() > 0 ) &&
@@ -525,12 +522,17 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
                                              ( visualReplaced && enabled ) ) ;
     mVisuals.PushBack( newRegisteredVisual );
 
+    Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
     // Put on stage if enabled and the control is already on the stage
-    // Visual must be set on stage for the renderer to be created and the ResourceReady triggered.
     if( ( enabled == VisualState::ENABLED ) && self.OnStage() )
     {
-      Toolkit::GetImplementation(visual).SetOnStage( self );
+      visualImpl.SetOnStage( self );
     }
+    else if( visualImpl.IsResourceReady() ) // When not being staged, check if visual already 'ResourceReady' before it was Registered. ( Resource may have been loaded already )
+    {
+      ResourceReady( visualImpl );
+    }
+
   }
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::RegisterVisual() Registered %s(%d), enabled:%s\n",  visual.GetName().c_str(), index, enabled?"true":"false" );
@@ -657,8 +659,11 @@ void Control::Impl::ResourceReady( Visual::Base& object)
     }
   }
 
-  // A visual is ready so control may need relayouting
-  mControlImpl.RelayoutRequest();
+  // A visual is ready so control may need relayouting if staged
+  if ( self.OnStage() )
+  {
+    mControlImpl.RelayoutRequest();
+  }
 
   // Emit signal if all enabled visuals registered by the control are ready.
   if( IsResourceReady() )
@@ -773,6 +778,15 @@ Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& 
   }
 
   return transition;
+}
+
+void Control::Impl::DoAction( Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes )
+{
+  RegisteredVisualContainer::Iterator iter;
+  if ( FindVisual( visualIndex, mVisuals, iter ) )
+  {
+    Toolkit::GetImplementation((*iter)->visual).DoAction( actionId, attributes );
+  }
 }
 
 void Control::Impl::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )

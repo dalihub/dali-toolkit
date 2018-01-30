@@ -157,6 +157,7 @@ bool LayoutTextTest( const LayoutTextData& data )
   engine.SetLayout( data.layout );
 
   const Length totalNumberOfGlyphs = visualModel->mGlyphs.Count();
+  float outlineWidth = visualModel->GetOutlineWidth();
 
   Layout::Parameters layoutParameters( data.textArea,
                                        logicalModel->mText.Begin(),
@@ -170,7 +171,8 @@ bool LayoutTextTest( const LayoutTextData& data )
                                        visualModel->mGlyphsPerCharacter.Begin(),
                                        totalNumberOfGlyphs,
                                        Text::HorizontalAlignment::BEGIN,
-                                       Text::LineWrap::WORD );
+                                       Text::LineWrap::WORD,
+                                       outlineWidth );
 
   layoutParameters.isLastNewParagraph = isLastNewParagraph;
 
@@ -374,6 +376,7 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
   Layout::Engine engine;
   engine.SetMetrics( metrics );
 
+  float outlineWidth = visualModel->GetOutlineWidth();
   Layout::Parameters layoutParameters( data.textArea,
                                        logicalModel->mText.Begin(),
                                        logicalModel->mLineBreakInfo.Begin(),
@@ -386,7 +389,8 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                                        visualModel->mGlyphsPerCharacter.Begin(),
                                        visualModel->mGlyphs.Count(),
                                        Text::HorizontalAlignment::BEGIN,
-                                       Text::LineWrap::WORD );
+                                       Text::LineWrap::WORD,
+                                       outlineWidth );
 
   layoutParameters.numberOfBidirectionalInfoRuns = logicalModel->mBidirectionalLineInfo.Count();
   layoutParameters.lineBidirectionalInfoRunsBuffer = logicalModel->mBidirectionalLineInfo.Begin();
@@ -712,6 +716,7 @@ int UtcDaliTextLayoutSmallTextArea02(void)
     -5.f,
     0.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -802,6 +807,7 @@ int UtcDaliTextLayoutMultilineText01(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -812,6 +818,7 @@ int UtcDaliTextLayoutMultilineText01(void)
     43.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -826,6 +833,7 @@ int UtcDaliTextLayoutMultilineText01(void)
     -4.f,
     5.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -838,6 +846,7 @@ int UtcDaliTextLayoutMultilineText01(void)
     -4.f,
     5.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -848,6 +857,7 @@ int UtcDaliTextLayoutMultilineText01(void)
     95.f,
     15.f,
     -4.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -997,6 +1007,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1009,6 +1020,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1019,6 +1031,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     34.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -1033,6 +1046,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1045,6 +1059,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1055,6 +1070,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     43.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -1138,6 +1154,7 @@ int UtcDaliTextLayoutMultilineText03(void)
     -5.f,
     0.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1150,6 +1167,7 @@ int UtcDaliTextLayoutMultilineText03(void)
     -5.f,
     0.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1160,6 +1178,7 @@ int UtcDaliTextLayoutMultilineText03(void)
     43.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -1247,6 +1266,7 @@ int UtcDaliTextLayoutMultilineText04(void)
     0.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -1351,6 +1371,7 @@ int UtcDaliTextLayoutMultilineText05(void)
     -8.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1361,6 +1382,7 @@ int UtcDaliTextLayoutMultilineText05(void)
     43.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -1681,6 +1703,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1693,6 +1716,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1703,6 +1727,7 @@ int UtcDaliTextUpdateLayout01(void)
     34.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -1717,6 +1742,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1729,6 +1755,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1739,6 +1766,7 @@ int UtcDaliTextUpdateLayout01(void)
     31.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -1753,6 +1781,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1765,6 +1794,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1775,6 +1805,7 @@ int UtcDaliTextUpdateLayout01(void)
     43.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -1789,6 +1820,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1801,6 +1833,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1811,6 +1844,7 @@ int UtcDaliTextUpdateLayout01(void)
     31.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -1825,6 +1859,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1837,6 +1872,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1847,6 +1883,7 @@ int UtcDaliTextUpdateLayout01(void)
     34.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -1861,6 +1898,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1872,6 +1910,7 @@ int UtcDaliTextUpdateLayout01(void)
     15.f,
     -5.f,
     4.f,
+    0.f,
     0.f,
     false,
     false
@@ -1885,6 +1924,7 @@ int UtcDaliTextUpdateLayout01(void)
     -5.f,
     0.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -1895,6 +1935,7 @@ int UtcDaliTextUpdateLayout01(void)
     0.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2237,6 +2278,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2249,6 +2291,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2259,6 +2302,7 @@ int UtcDaliTextUpdateLayout02(void)
     34.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2273,6 +2317,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2285,6 +2330,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2295,6 +2341,7 @@ int UtcDaliTextUpdateLayout02(void)
     31.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2309,6 +2356,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2321,6 +2369,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2331,6 +2380,7 @@ int UtcDaliTextUpdateLayout02(void)
     43.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2345,6 +2395,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2357,6 +2408,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2367,6 +2419,7 @@ int UtcDaliTextUpdateLayout02(void)
     31.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2381,6 +2434,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2393,6 +2447,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2403,6 +2458,7 @@ int UtcDaliTextUpdateLayout02(void)
     34.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2417,6 +2473,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2428,6 +2485,7 @@ int UtcDaliTextUpdateLayout02(void)
     15.f,
     -5.f,
     4.f,
+    0.f,
     0.f,
     false,
     false
@@ -2441,6 +2499,7 @@ int UtcDaliTextUpdateLayout02(void)
     -5.f,
     0.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2451,6 +2510,7 @@ int UtcDaliTextUpdateLayout02(void)
     0.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2793,6 +2853,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2805,6 +2866,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2815,6 +2877,7 @@ int UtcDaliTextUpdateLayout03(void)
     34.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2829,6 +2892,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2841,6 +2905,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2851,6 +2916,7 @@ int UtcDaliTextUpdateLayout03(void)
     31.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2865,6 +2931,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2877,6 +2944,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2887,6 +2955,7 @@ int UtcDaliTextUpdateLayout03(void)
     43.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2901,6 +2970,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2913,6 +2983,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2923,6 +2994,7 @@ int UtcDaliTextUpdateLayout03(void)
     31.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2937,6 +3009,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2949,6 +3022,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2959,6 +3033,7 @@ int UtcDaliTextUpdateLayout03(void)
     34.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -2973,6 +3048,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     4.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -2984,6 +3060,7 @@ int UtcDaliTextUpdateLayout03(void)
     15.f,
     -5.f,
     4.f,
+    0.f,
     0.f,
     false,
     false
@@ -2997,6 +3074,7 @@ int UtcDaliTextUpdateLayout03(void)
     -5.f,
     0.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -3007,6 +3085,7 @@ int UtcDaliTextUpdateLayout03(void)
     0.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -3100,6 +3179,7 @@ int UtcDaliTextLayoutEllipsis01(void)
     -5.f,
     0.f,
     0.f,
+    0.f,
     false,
     true
   };
@@ -3176,6 +3256,7 @@ int UtcDaliTextLayoutEllipsis02(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -3186,6 +3267,7 @@ int UtcDaliTextLayoutEllipsis02(void)
     93.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,
@@ -3332,6 +3414,7 @@ int UtcDaliTextLayoutEllipsis03(void)
     -5.f,
     0.f,
     0.f,
+    0.f,
     false,
     true
   };
@@ -3474,6 +3557,7 @@ int UtcDaliTextLayoutEllipsis04(void)
     -5.f,
     3.f,
     0.f,
+    0.f,
     false,
     false
   };
@@ -3485,6 +3569,7 @@ int UtcDaliTextLayoutEllipsis04(void)
     15.f,
     -5.f,
     4.f,
+    0.f,
     0.f,
     false,
     true
@@ -3560,6 +3645,7 @@ int UtcDaliTextLayoutEllipsis05(void)
     80.f,
     15.f,
     -5.f,
+    0.f,
     0.f,
     0.f,
     false,

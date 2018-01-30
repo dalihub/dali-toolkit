@@ -25,6 +25,8 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
@@ -390,6 +392,32 @@ public: // Configure the text controller.
    * @return True if the text selection is enabled
    */
   bool IsSelectionEnabled() const;
+
+  /**
+   * @brief Enable or disable the text selection using Shift key.
+   * @param enabled Whether to enable the text selection using Shift key
+   */
+  void SetShiftSelectionEnabled( bool enabled );
+
+  /**
+   * @brief Whether the text selection using Shift key is enabled or not.
+   * @return True if the text selection using Shift key is enabled
+   */
+  bool IsShiftSelectionEnabled() const;
+
+  /**
+   * @brief Enable or disable the grab handles for text selection.
+   *
+   * @param[in] enabled Whether to enable the grab handles
+   */
+  void SetGrabHandleEnabled( bool enabled );
+
+  /**
+   * @brief Returns whether the grab handles are enabled.
+   *
+   * @return True if the grab handles are enabled
+   */
+  bool IsGrabHandleEnabled() const;
 
   /**
    * @brief Sets input type to password
@@ -832,14 +860,14 @@ public: // Default style & Input style
    *
    * @param[in] width The width in pixels of the outline, 0 indicates no outline
    */
-  void SetOutlineWidth( float width );
+  void SetOutlineWidth( unsigned int width );
 
   /**
    * @brief Retrieves the width of an outline
    *
    * @return The width of the outline.
    */
-  float GetOutlineWidth() const;
+  unsigned int GetOutlineWidth() const;
 
   /**
    * @brief Sets the emboss's properties string.
@@ -877,8 +905,10 @@ public: // Default style & Input style
    * @brief Sets the default line spacing.
    *
    * @param[in] lineSpacing The line spacing.
+   *
+   * @return True if lineSpacing has been updated, false otherwise
    */
-  void SetDefaultLineSpacing( float lineSpacing );
+  bool SetDefaultLineSpacing( float lineSpacing );
 
   /**
    * @brief Retrieves the default line spacing.
@@ -1154,6 +1184,24 @@ public: // Queries & retrieves.
    */
   void GetPlaceholderProperty( Property::Map& map );
 
+  /**
+   * @brief Checks text direction.
+   * @return The text direction.
+   */
+  Toolkit::DevelText::TextDirection::Type GetTextDirection();
+
+  /**
+   * @brief Retrieves vertical line alignment
+   * @return The vertical line alignment
+   */
+  Toolkit::DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const;
+
+  /**
+   * @brief Sets vertical line alignment
+   * @param[in] alignment The vertical line alignment for the text
+   */
+  void SetVerticalLineAlignment( Toolkit::DevelText::VerticalLineAlignment::Type alignment );
+
 public: // Relayout.
 
   /**
@@ -1377,11 +1425,12 @@ private: // Events.
   void SelectEvent( float x, float y, bool selectAll );
 
   /**
-   * @brief Helper to KeyEvent() to handle the backspace case.
+   * @brief Helper to KeyEvent() to handle the backspace or delete key case.
    *
+   * @param[in] keyCode The keycode for the key pressed
    * @return True if a character was deleted.
    */
-  bool BackspaceKeyEvent();
+  bool DeleteEvent( int keyCode );
 
 private: // Helpers.
 
@@ -1448,9 +1497,12 @@ protected: // Destructor.
    */
   virtual ~Controller();
 
+public:
+
+  struct Impl; ///< Made public for testing purposes
+
 private:
 
-  struct Impl;
   Impl* mImpl;
 };
 

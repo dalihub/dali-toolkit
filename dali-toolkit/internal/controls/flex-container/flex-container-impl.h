@@ -205,6 +205,13 @@ private: // From Control
    */
   virtual void OnSizeSet( const Vector3& size );
 
+  /**
+  * @copydoc OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type )
+  * @param[in] actor The actor whose layoutDirection is changed.
+  * @param[in] type  The layoutDirection.
+  */
+  void OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type );
+
 private: // Implementation
 
   /**

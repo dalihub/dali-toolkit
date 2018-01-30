@@ -320,14 +320,14 @@ public:
    *
    * @param[in] width The width in pixels of the outline, 0 indicates no outline
    */
-  void SetOutlineWidth( float width );
+  void SetOutlineWidth( unsigned int width );
 
   /**
    * @brief Retrieves the width of an outline
    *
    * @return The width of the outline.
    */
-  float GetOutlineWidth() const;
+  unsigned int GetOutlineWidth() const;
 
 protected:
 
@@ -369,7 +369,7 @@ public:
   Size                   mControlSize;          ///< The size of the UI control.
   Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
   float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
-  float                  mOutlineWidth;         ///< Width of outline.
+  unsigned int           mOutlineWidth;         ///< Width of outline.
   float                  mShadowBlurRadius;     ///< Blur radius of shadow, 0 indicates no blur.
 
 private:

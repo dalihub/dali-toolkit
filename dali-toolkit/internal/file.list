@@ -15,12 +15,14 @@ toolkit_src_files = \
    $(toolkit_src_dir)/visuals/animated-image/image-cache.cpp \
    $(toolkit_src_dir)/visuals/animated-image/fixed-image-cache.cpp \
    $(toolkit_src_dir)/visuals/animated-image/rolling-image-cache.cpp \
+   $(toolkit_src_dir)/visuals/animated-image/rolling-gif-image-cache.cpp \
    $(toolkit_src_dir)/visuals/border/border-visual.cpp \
    $(toolkit_src_dir)/visuals/color/color-visual.cpp \
    $(toolkit_src_dir)/visuals/gradient/gradient-visual.cpp \
    $(toolkit_src_dir)/visuals/gradient/gradient.cpp \
    $(toolkit_src_dir)/visuals/gradient/linear-gradient.cpp \
    $(toolkit_src_dir)/visuals/gradient/radial-gradient.cpp \
+   $(toolkit_src_dir)/visuals/animated-gradient/animated-gradient-visual.cpp \
    $(toolkit_src_dir)/visuals/image-atlas-manager.cpp \
    $(toolkit_src_dir)/visuals/image/image-visual.cpp \
    $(toolkit_src_dir)/visuals/mesh/mesh-visual.cpp \

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,7 @@ bool GetPolicyFromValue( const Property::Value& value, Vector2& policy )
 
 } // unnamed namespace
 
-Internal::Visual::Base::Impl::Impl()
+Internal::Visual::Base::Impl::Impl(FittingMode fittingMode)
 : mCustomShader( NULL ),
   mBlendSlotDelegate( NULL ),
   mResourceObserver( NULL ),
@@ -124,6 +124,7 @@ Internal::Visual::Base::Impl::Impl()
   mDepthIndex( 0.0f ),
   mMixColorIndex( Property::INVALID_INDEX ),
   mOpacityIndex( Property::INVALID_INDEX ),
+  mFittingMode( fittingMode ),
   mFlags( 0 ),
   mResourceStatus( Toolkit::Visual::ResourceStatus::PREPARING )
 {

@@ -40,14 +40,14 @@ namespace PrimitiveVisual
 {
 
 /**
- * @brief PrimitiveVisual Property
+ * @brief PrimitiveVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
 
 /**
- * @brief PrimitiveVisual Property
+ * @brief Enumeration for the instance of properties belonging to the PrimitiveVisual.
  * @SINCE_1_1.45
  */
 enum

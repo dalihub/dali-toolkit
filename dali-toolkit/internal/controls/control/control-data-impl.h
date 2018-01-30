@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 #include <dali-toolkit/internal/builder/style.h>
 #include <dali-toolkit/internal/builder/dictionary.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -187,6 +188,11 @@ public:
    * @copydoc Dali::Toolkit::DevelControl::CreateTransition()
    */
   Dali::Animation CreateTransition( const Toolkit::TransitionData& transitionData );
+
+  /**
+   * @copydoc Dali::Toolkit::DevelControl::DoAction()
+   */
+  void DoAction( Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes );
 
   /**
    * @brief Function used to set control properties.

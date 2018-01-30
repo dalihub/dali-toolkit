@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cstring>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/devel-api/object/property-helper-devel.h>
@@ -35,6 +36,7 @@
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/rendering/text-backend.h>
@@ -127,6 +129,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "pixelSize",                    
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableSelection",                      BOOLEAN,   ENABLE_SELECTION                     )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder",                          MAP,       PLACEHOLDER                          )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "ellipsis",                             BOOLEAN,   ELLIPSIS                             )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableShiftSelection",           BOOLEAN,   ENABLE_SHIFT_SELECTION               )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableGrabHandle",               BOOLEAN,   ENABLE_GRAB_HANDLE                   )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -758,6 +762,28 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::ENABLE_SHIFT_SELECTION:
+      {
+        if( impl.mController )
+        {
+          const bool shiftSelection = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p ENABLE_SHIFT_SELECTION %d\n", impl.mController.Get(), shiftSelection );
+
+          impl.mController->SetShiftSelectionEnabled( shiftSelection );
+        }
+        break;
+      }
+      case Toolkit::DevelTextField::Property::ENABLE_GRAB_HANDLE:
+      {
+        if( impl.mController )
+        {
+          const bool grabHandleEnabled = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p ENABLE_GRAB_HANDLE %d\n", impl.mController.Get(), grabHandleEnabled );
+
+          impl.mController->SetGrabHandleEnabled( grabHandleEnabled );
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -1157,6 +1183,22 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::ENABLE_SHIFT_SELECTION:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsShiftSelectionEnabled();
+        }
+        break;
+      }
+      case Toolkit::DevelTextField::Property::ENABLE_GRAB_HANDLE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsGrabHandleEnabled();
+        }
+        break;
+      }
     } //switch
   }
 
@@ -1550,6 +1592,11 @@ bool TextField::OnKeyEvent( const KeyEvent& event )
     }
 
     return true;
+  }
+  else if( Dali::DevelKey::DALI_KEY_RETURN == event.keyCode )
+  {
+    // Do nothing when enter is comming.
+    return false;
   }
 
   return mController->KeyEvent( event );

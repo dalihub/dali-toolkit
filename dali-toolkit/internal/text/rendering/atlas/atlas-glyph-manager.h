@@ -80,10 +80,12 @@ public:
    * @brief Ask Atlas Manager to add a glyph
    *
    * @param[in] glyph glyph to add to an atlas
+   * @param[in] outlineWidth the outline width of the glyph
    * @param[in] bitmap bitmap to use for glyph addition
    * @param[out] slot information returned by atlas manager for addition
    */
   void Add( const Text::GlyphInfo& glyph,
+            const uint32_t outlineWidth,
             const PixelData& bitmap,
             AtlasManager::AtlasSlot& slot );
 
@@ -103,12 +105,14 @@ public:
    *
    * @param[in] fontId The font that this glyph comes from
    * @param[in] index The GlyphIndex of this glyph
+   * @param[in] outlineWidth The outline width of this glyph
    * @param[out] slot container holding information about the glyph( mImage = 0 indicates not being cached )
    *
    * @return Whether glyph is cached or not ?
    */
   bool IsCached( Text::FontId fontId,
                  Text::GlyphIndex index,
+                 uint32_t outlineWidth,
                  AtlasManager::AtlasSlot& slot );
 
   /**
@@ -160,9 +164,10 @@ public:
    *
    * @param[in] fontId The font this image came from
    * @param[in] index The index of the glyph
+   * @param[in] outlineWidth The outline width of the glyph
    * @param[in] delta The adjustment to make to the reference count
    */
-  void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, int32_t delta );
+  void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, uint32_t outlineWidth, int32_t delta );
 
 private:
 

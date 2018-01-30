@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 namespace Dali
 {
@@ -42,6 +43,7 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, N_PATCH )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, SVG )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, ANIMATED_IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, ANIMATED_GRADIENT )
 DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
 
 // Visual Type
@@ -70,6 +72,12 @@ const char * const PREMULTIPLIED_ALPHA( "premultipliedAlpha" );
 const char * const MIX_COLOR( "mixColor" );
 const char * const OPACITY( "opacity" );
 
+// Fitting mode
+const char * const VISUAL_FITTING_MODE( "visualFittingMode" );
+
+// Color visual
+const char * const RENDER_IF_TRANSPARENT_NAME( "renderIfTransparent" );
+
 // Image visual
 const char * const IMAGE_URL_NAME( "url" );
 const char * const ATLAS_RECT_UNIFORM_NAME( "uAtlasRect" );
@@ -83,11 +91,14 @@ const char * const ANIMATED_IMAGE_URLS_NAME("urls");
 const char * const BATCH_SIZE_NAME("batchSize");
 const char * const CACHE_SIZE_NAME("cacheSize");
 const char * const FRAME_DELAY_NAME("frameDelay");
+const char * const LOOP_COUNT_NAME("loopCount");
 const char * const MASK_CONTENT_SCALE_NAME("maskContentScale");
 const char * const CROP_TO_MASK_NAME("cropToMask");
 const char * const LOAD_POLICY_NAME("loadPolicy");
 const char * const RELEASE_POLICY_NAME("releasePolicy");
 const char * const ORIENTATION_CORRECTION_NAME("orientationCorrection");
+const char * const AUXILIARY_IMAGE_NAME("auxiliaryImage");
+const char * const AUXILIARY_IMAGE_ALPHA_NAME("auxiliaryImageAlpha");
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );

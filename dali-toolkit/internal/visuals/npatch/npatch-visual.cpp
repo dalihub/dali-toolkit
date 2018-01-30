@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,14 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/images/texture-set-image.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -47,17 +50,20 @@ namespace
 {
 const char * const BORDER_ONLY( "borderOnly" );
 const char * const BORDER( "border" );
+const char * const AUXILIARY_IMAGE_NAME( "auxiliaryImage" );
+const char * const AUXILIARY_IMAGE_ALPHA_NAME( "auxiliaryImageAlpha" );
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying mediump vec2 vTexCoord;\n
+  varying mediump vec2 vMaskTexCoord;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   uniform mediump vec2 uNinePatchFactorsX[ FACTOR_SIZE_X ];\n
   uniform mediump vec2 uNinePatchFactorsY[ FACTOR_SIZE_Y ];\n
   \n
 
-  //Visual size and offset
+  // Visual size and offset
   uniform mediump vec2 offset;\n
   uniform mediump vec2 size;\n
   uniform mediump vec4 offsetSizeMode;\n
@@ -72,16 +78,17 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     mediump vec2 fixedTotal   = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].x, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].x );\n
     mediump vec2 stretchTotal = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].y, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].y );\n
     \n
-
     vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
     vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-
-    mediump vec4 vertexPosition = vec4( ( fixedFactor + ( visualSize.xy - fixedTotal ) * stretch / stretchTotal ) +  anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+    \n
+    mediump vec4 gridPosition = vec4( fixedFactor + ( visualSize.xy - fixedTotal ) * stretch / stretchTotal, 0.0, 1.0 );\n
+    mediump vec4 vertexPosition = gridPosition;\n
     vertexPosition.xy -= visualSize.xy * vec2( 0.5, 0.5 );\n
-
+    vertexPosition.xy += anchorPoint*visualSize + (visualOffset + origin)*uSize.xy;\n
     vertexPosition = uMvpMatrix * vertexPosition;\n
     \n
     vTexCoord = ( fixedFactor + stretch ) / ( fixedTotal + stretchTotal );\n
+    vMaskTexCoord = gridPosition.xy / visualSize;\n
     \n
     gl_Position = vertexPosition;\n
   }\n
@@ -90,39 +97,41 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
     attribute mediump vec2 aPosition;\n
     varying mediump vec2 vTexCoord;\n
+    varying mediump vec2 vMaskTexCoord;\n
     uniform mediump mat4 uModelMatrix;\n
     uniform mediump mat4 uMvpMatrix;\n
     uniform mediump vec3 uSize;\n
     uniform mediump vec2 uFixed[ 3 ];\n
     uniform mediump vec2 uStretchTotal;\n
     \n
-
     //Visual size and offset
     uniform mediump vec2 offset;\n
     uniform mediump vec2 size;\n
     uniform mediump vec4 offsetSizeMode;\n
     uniform mediump vec2 origin;\n
     uniform mediump vec2 anchorPoint;\n
-
+    \n
     void main()\n
     {\n
       vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
       vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-
+      \n
       mediump vec2 size         = visualSize.xy;\n
       \n
       mediump vec2 fixedFactor  = vec2( uFixed[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uFixed[ int( ( aPosition.y  + 1.0 ) * 0.5 ) ].y );\n
       mediump vec2 stretch      = floor( aPosition * 0.5 );\n
       mediump vec2 fixedTotal   = uFixed[ 2 ];\n
       \n
-      mediump vec4 vertexPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );
+      mediump vec4 gridPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );\n
+      mediump vec4 vertexPosition = gridPosition;\n
       vertexPosition.xy -= size * vec2( 0.5, 0.5 );\n
-      vertexPosition.xy =  vertexPosition.xy + anchorPoint*size + (visualOffset + origin)*uSize.xy;\
+      vertexPosition.xy += anchorPoint*size + (visualOffset + origin)*uSize.xy;\n
       \n
       vertexPosition = uMvpMatrix * vertexPosition;\n
       \n
       vTexCoord = ( fixedFactor + stretch * uStretchTotal ) / ( fixedTotal + uStretchTotal );\n
       \n
+      vMaskTexCoord = gridPosition.xy / size;\n
       gl_Position = vertexPosition;\n
     }\n
 );
@@ -141,6 +150,36 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   void main()\n
   {\n
     gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * visualMixColor();\n
+  }\n
+);
+
+const char* FRAGMENT_MASK_SHADER = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vTexCoord;\n
+  varying mediump vec2 vMaskTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform sampler2D sMask;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform lowp float opacity;\n
+  uniform lowp float preMultipliedAlpha;\n
+  uniform mediump float auxiliaryImageAlpha;\n
+  lowp vec4 visualMixColor()\n
+  {\n
+    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
+  }\n
+  void main()\n
+  {\n
+      // Where mask image is transparent, all of background image must show through.
+      // where mask image is opaque, only mask should be shown
+      // where mask is translucent, less of background should be shown.
+      // auxiliaryImageAlpha controls how much of mask is visible
+
+      mediump vec4 color = texture2D( sTexture, vTexCoord );\n
+      mediump vec4 mask  = texture2D( sMask, vMaskTexCoord );\n
+
+      mediump vec3 mixedColor = color.rgb * mix( 1.0-mask.a, 1.0, 1.0-auxiliaryImageAlpha)
+                                + mask.rgb*mask.a * auxiliaryImageAlpha;\n
+      gl_FragColor = vec4(mixedColor,1.0) * uColor * visualMixColor();\n
   }\n
 );
 
@@ -256,21 +295,40 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchIm
   return nPatchVisual;
 }
 
+void NPatchVisual::LoadImages()
+{
+  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocalResource() )
+  {
+    mId = mLoader.Load( mImageUrl.GetUrl(), mBorder );
+  }
+
+  if( ! mAuxiliaryPixelBuffer && mAuxiliaryUrl.IsValid() && mAuxiliaryUrl.IsLocalResource() )
+  {
+    // Load the auxiliary image synchronously
+    mAuxiliaryPixelBuffer = Dali::LoadImageFromFile( mAuxiliaryUrl.GetUrl(), ImageDimensions(),
+                                                     FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
+  }
+}
+
 void NPatchVisual::GetNaturalSize( Vector2& naturalSize )
 {
   naturalSize.x = 0u;
   naturalSize.y = 0u;
 
   // load now if not already loaded
-  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocalResource() )
-  {
-    mId = mLoader.Load( mImageUrl.GetUrl(), mBorder );
-  }
+  LoadImages();
+
   const NPatchLoader::Data* data;
   if( mLoader.GetNPatchData( mId, data ) )
   {
     naturalSize.x = data->croppedWidth;
     naturalSize.y = data->croppedHeight;
+  }
+
+  if( mAuxiliaryPixelBuffer )
+  {
+    naturalSize.x = std::max( naturalSize.x, float(mAuxiliaryPixelBuffer.GetWidth()) );
+    naturalSize.y = std::max( naturalSize.y, float(mAuxiliaryPixelBuffer.GetHeight()) );
   }
 }
 
@@ -297,15 +355,28 @@ void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
       mBorder.top = static_cast< int >( border.w );
     }
   }
+
+  Property::Value* auxImage = propertyMap.Find( Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE, AUXILIARY_IMAGE_NAME );
+  if( auxImage )
+  {
+    std::string url;
+    if( auxImage->Get( url ) )
+    {
+      mAuxiliaryUrl = url;
+    }
+  }
+
+  Property::Value* auxImageAlpha = propertyMap.Find( Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA, AUXILIARY_IMAGE_ALPHA_NAME );
+  if( auxImageAlpha )
+  {
+    auxImageAlpha->Get( mAuxiliaryImageAlpha );
+  }
 }
 
 void NPatchVisual::DoSetOnStage( Actor& actor )
 {
   // load when first go on stage
-  if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocalResource() )
-  {
-    mId = mLoader.Load( mImageUrl.GetUrl(), mBorder );
-  }
+  LoadImages();
 
   Geometry geometry = CreateGeometry();
   Shader shader = CreateShader();
@@ -340,20 +411,32 @@ void NPatchVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::URL, mImageUrl.GetUrl() );
   map.Insert( Toolkit::ImageVisual::Property::BORDER_ONLY, mBorderOnly );
   map.Insert( Toolkit::ImageVisual::Property::BORDER, mBorder );
+
+  if( mAuxiliaryUrl.IsValid() )
+  {
+    map.Insert( Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE, mAuxiliaryUrl.GetUrl() );
+    map.Insert( Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA, mAuxiliaryImageAlpha );
+  }
 }
 
 void NPatchVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 {
-  // Do nothing
+  if( mAuxiliaryUrl.IsValid() )
+  {
+    map.Insert( Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE, mAuxiliaryUrl.GetUrl() );
+    map.Insert( Toolkit::DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA, mAuxiliaryImageAlpha );
+  }
 }
 
 NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
   mLoader( factoryCache.GetNPatchLoader() ),
   mImageUrl(),
+  mAuxiliaryUrl(),
   mId( NPatchLoader::UNINITIALIZED_ID ),
   mBorderOnly( false ),
-  mBorder()
+  mBorder(),
+  mAuxiliaryImageAlpha( 0.0f )
 {
 }
 
@@ -401,6 +484,11 @@ Shader NPatchVisual::CreateShader()
   NinePatchImage::StretchRanges::SizeType xStretchCount = 0;
   NinePatchImage::StretchRanges::SizeType yStretchCount = 0;
 
+  auto fragmentShader = mAuxiliaryPixelBuffer ? FRAGMENT_MASK_SHADER
+                                              : FRAGMENT_SHADER;
+  auto shaderType = mAuxiliaryPixelBuffer ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
+                                          : VisualFactoryCache::NINE_PATCH_SHADER;
+
   // ask loader for the regions
   if( mLoader.GetNPatchData( mId, data ) )
   {
@@ -413,11 +501,12 @@ Shader NPatchVisual::CreateShader()
     if( DALI_LIKELY( ( xStretchCount == 1 && yStretchCount == 1 ) ||
                      ( xStretchCount == 0 && yStretchCount == 0 ) ) )
     {
-      shader = mFactoryCache.GetShader( VisualFactoryCache::NINE_PATCH_SHADER );
+      shader = mFactoryCache.GetShader( shaderType );
       if( DALI_UNLIKELY( !shader ) )
       {
-        shader = Shader::New( VERTEX_SHADER_3X3, FRAGMENT_SHADER );
-        mFactoryCache.SaveShader( VisualFactoryCache::NINE_PATCH_SHADER, shader );
+        shader = Shader::New( VERTEX_SHADER_3X3, fragmentShader );
+        // Only cache vanilla 9 patch shaders
+        mFactoryCache.SaveShader( shaderType, shader );
       }
     }
     else if( xStretchCount > 0 || yStretchCount > 0)
@@ -427,12 +516,11 @@ Shader NPatchVisual::CreateShader()
                    << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
                    << VERTEX_SHADER;
 
-      shader = Shader::New( vertexShader.str(), FRAGMENT_SHADER );
+      shader = Shader::New( vertexShader.str(), fragmentShader );
     }
   }
   else
   {
-    const char* fragmentShader = FRAGMENT_SHADER;
     Dali::Shader::Hint::Value hints = Dali::Shader::Hint::NONE;
 
     if( !mImpl->mCustomShader->mFragmentShader.empty() )
@@ -470,18 +558,20 @@ Shader NPatchVisual::CreateShader()
 void NPatchVisual::ApplyTextureAndUniforms()
 {
   const NPatchLoader::Data* data;
+  TextureSet textureSet;
+
   if( mLoader.GetNPatchData( mId, data ) )
   {
-    TextureSet textures( data->textureSet );
-    mImpl->mRenderer.SetTextures( textures );
+    textureSet = data->textureSet;
+
     if( data->stretchPixelsX.Size() == 1 && data->stretchPixelsY.Size() == 1 )
     {
       //special case for 9 patch
       Uint16Pair stretchX = data->stretchPixelsX[ 0 ];
       Uint16Pair stretchY = data->stretchPixelsY[ 0 ];
 
-      uint16_t stretchWidth = stretchX.GetY() - stretchX.GetX();
-      uint16_t stretchHeight = stretchY.GetY() - stretchY.GetX();
+      uint16_t stretchWidth = ( stretchX.GetY() >= stretchX.GetX() ) ? stretchX.GetY() - stretchX.GetX() : 0;
+      uint16_t stretchHeight = ( stretchY.GetY() >= stretchY.GetX() ) ? stretchY.GetY() - stretchY.GetX() : 0;
 
       mImpl->mRenderer.RegisterProperty( "uFixed[0]", Vector2::ZERO );
       mImpl->mRenderer.RegisterProperty( "uFixed[1]", Vector2( stretchX.GetX(), stretchY.GetX()) );
@@ -500,8 +590,8 @@ void NPatchVisual::ApplyTextureAndUniforms()
   else
   {
     DALI_LOG_ERROR("The N patch image '%s' is not a valid N patch image\n", mImageUrl.GetUrl().c_str() );
-    TextureSet textureSet = TextureSet::New();
-    mImpl->mRenderer.SetTextures( textureSet );
+    textureSet = TextureSet::New();
+
     Image croppedImage = VisualFactoryCache::GetBrokenVisualImage();
     TextureSetImage( textureSet, 0u, croppedImage );
     mImpl->mRenderer.RegisterProperty( "uFixed[0]", Vector2::ZERO );
@@ -510,7 +600,31 @@ void NPatchVisual::ApplyTextureAndUniforms()
     mImpl->mRenderer.RegisterProperty( "uStretchTotal", Vector2( croppedImage.GetWidth(), croppedImage.GetHeight() ) );
   }
 
-  //Register transform properties
+  if( mAuxiliaryPixelBuffer )
+  {
+    // If the auxiliary image is smaller than the un-stretched NPatch, use CPU resizing to enlarge it to the
+    // same size as the unstretched NPatch. This will give slightly higher quality results than just relying
+    // on GL interpolation alone.
+    if( mAuxiliaryPixelBuffer.GetWidth() < data->croppedWidth &&
+        mAuxiliaryPixelBuffer.GetHeight() < data->croppedHeight )
+    {
+      mAuxiliaryPixelBuffer.Resize( data->croppedWidth, data->croppedHeight );
+    }
+
+    // Note, this resets mAuxiliaryPixelBuffer handle
+    auto auxiliaryPixelData = Devel::PixelBuffer::Convert( mAuxiliaryPixelBuffer );
+
+    auto texture = Texture::New( TextureType::TEXTURE_2D,
+                                 auxiliaryPixelData.GetPixelFormat(), auxiliaryPixelData.GetWidth(),
+                                 auxiliaryPixelData.GetHeight() );
+    texture.Upload( auxiliaryPixelData );
+    textureSet.SetTexture( 1, texture );
+    DevelHandle::RegisterProperty( mImpl->mRenderer, DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA,
+                                   AUXILIARY_IMAGE_ALPHA_NAME, mAuxiliaryImageAlpha );
+  }
+  mImpl->mRenderer.SetTextures( textureSet );
+
+  // Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 

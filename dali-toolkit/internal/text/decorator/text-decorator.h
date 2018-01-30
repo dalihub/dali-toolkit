@@ -468,9 +468,11 @@ public:
    *
    * @param[in] position The position of the highlighted text in decorator's coords.
    * @param[in] size The size of the highlighted text.
+   * @param[in] outlineOffset The outline's offset.
    */
   void SetHighLightBox( const Vector2& position,
-                        const Size& size );
+                        const Size& size,
+                        float outlineOffset );
 
   /**
    * @brief Removes all of the previously added highlights.
@@ -511,6 +513,13 @@ public:
    * @return @e true if the highlight is active, @e false otherwise.
    */
   bool IsHighlightActive() const;
+
+  /**
+   * @brief Retreives whether the highlight is shown or not.
+   *
+   * @return true if the highlight is visible, false otherwise.
+   */
+  bool IsHighlightVisible() const;
 
   /**
    * @brief Sets into the decorator the depth used to render the text.

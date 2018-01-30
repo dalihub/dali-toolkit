@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TOOLKIT_TIMER_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,7 @@ namespace Test
 {
 int GetTimerCount();
 void EmitGlobalTimerSignal();
+bool AreTimersRunning();
 }
 
 #endif // __DALI_TOOLKIT_TOOLKIT_TIMER_H__

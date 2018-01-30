@@ -25,8 +25,10 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali/integration-api/events/long-press-gesture-event.h>
+#include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
 #include "toolkit-clipboard.h"
 
 using namespace Dali;
@@ -99,6 +101,8 @@ const char* const PROPERTY_NAME_PIXEL_SIZE                           = "pixelSiz
 const char* const PROPERTY_NAME_ENABLE_SELECTION                     = "enableSelection";
 const char* const PROPERTY_NAME_PLACEHOLDER                          = "placeholder";
 const char* const PROPERTY_NAME_ELLIPSIS                             = "ellipsis";
+const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableShiftSelection";
+const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGrabHandle";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -117,6 +121,7 @@ const float SCROLL_SPEED = 300.f;
 const unsigned int DEFAULT_FONT_SIZE = 1152u;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
+const int KEY_RETURN_CODE = 36;
 const int KEY_A_CODE = 38;
 const int KEY_D_CODE = 40;
 
@@ -329,39 +334,65 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
     {
       const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
 
-      if( valueGet.first.type == Property::Key::STRING )
+      Property::Value* valueSet = NULL;
+      if ( valueGet.first.type == Property::Key::INDEX )
       {
-        Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
-        if( NULL != valueSet )
+        valueSet = fontStyleMapSet.Find( valueGet.first.indexKey );
+      }
+      else
+      {
+        // Get Key is a string so searching Set Map for a string key
+        valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      }
+
+      if( NULL != valueSet )
+      {
+        if( valueSet->GetType() == Dali::Property::STRING && ( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() ) )
         {
-          if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
-          {
-            tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
-            return false;
-          }
+          tet_printf( "Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          return false;
         }
-        else
+        else if( valueSet->GetType() == Dali::Property::BOOLEAN && ( valueGet.second.Get<bool>() != valueSet->Get<bool>() ) )
         {
-          tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+          tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<bool>(), valueSet->Get<bool>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::INTEGER && ( valueGet.second.Get<int>() != valueSet->Get<int>() ) )
+        {
+          tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<int>(), valueSet->Get<int>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::FLOAT && ( valueGet.second.Get<float>() != valueSet->Get<float>() ) )
+        {
+          tet_printf( "Value got : [%f], expected : [%f]", valueGet.second.Get<float>(), valueSet->Get<float>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::VECTOR2 && ( valueGet.second.Get<Vector2>() != valueSet->Get<Vector2>() ) )
+        {
+          Vector2 vector2Get = valueGet.second.Get<Vector2>();
+          Vector2 vector2Set = valueSet->Get<Vector2>();
+          tet_printf( "Value got : [%f, %f], expected : [%f, %f]", vector2Get.x, vector2Get.y, vector2Set.x, vector2Set.y );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::VECTOR4 && ( valueGet.second.Get<Vector4>() != valueSet->Get<Vector4>() ) )
+        {
+          Vector4 vector4Get = valueGet.second.Get<Vector4>();
+          Vector4 vector4Set = valueSet->Get<Vector4>();
+          tet_printf( "Value got : [%f, %f, %f, %f], expected : [%f, %f, %f, %f]", vector4Get.r, vector4Get.g, vector4Get.b, vector4Get.a, vector4Set.r, vector4Set.g, vector4Set.b, vector4Set.a );
           return false;
         }
       }
       else
       {
-        Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.indexKey );
-        if( NULL != valueSet )
+        if ( valueGet.first.type == Property::Key::INDEX )
         {
-          if( valueGet.second.Get<int>() != valueSet->Get<int>() )
-          {
-            tet_printf( "  Integer Value got : [%d], expected : [%d]", valueGet.second.Get<int>(), valueSet->Get<int>() );
-            return false;
-          }
+          tet_printf( "  The key %d doesn't exist.", valueGet.first.indexKey );
         }
         else
         {
-          tet_printf( "  The Int key %d doesn't exist.", valueGet.first.indexKey );
-          return false;
+          tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
         }
+        return false;
       }
     }
   }
@@ -513,6 +544,8 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SELECTION ) == TextField::Property::ENABLE_SELECTION );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER ) == TextField::Property::PLACEHOLDER );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextField::Property::ELLIPSIS );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextField::Property::ENABLE_SHIFT_SELECTION );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextField::Property::ENABLE_GRAB_HANDLE );
 
   END_TEST;
 }
@@ -843,8 +876,6 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   field.SetProperty( TextField::Property::OUTLINE, outlineMapSet );
 
-  outlineMapSet["color"] = "red";
-  outlineMapSet["width"] = "2";
   outlineMapGet = field.GetProperty<Property::Map>( TextField::Property::OUTLINE );
   DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
@@ -1124,6 +1155,11 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
 
   application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
+  DALI_TEST_CHECK( !maxLengthReachedSignal );
+
+  application.ProcessEvent( GenerateKey( "Return", "\r", KEY_RETURN_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   DALI_TEST_CHECK( !gMaxCharactersCallBackCalled );
   DALI_TEST_CHECK( !maxLengthReachedSignal );
@@ -1604,6 +1640,12 @@ int utcDaliTextFieldEvent01(void)
   application.SendNotification();
   application.Render();
 
+  // Pressing delete key should be fine even if there is no text in TextField.
+  application.ProcessEvent( GenerateKey( "Delete", "Delete", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
   // Now the text field has the focus, so it can handle the key events.
   application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
@@ -1950,7 +1992,6 @@ int utcDaliTextFieldEvent05(void)
   // Render and notify
   application.SendNotification();
   application.Render();
-
 
   // Tap first to get the focus.
   application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
@@ -2720,6 +2761,62 @@ int UtcDaliTextFieldSetPaddingProperty(void)
   DALI_TEST_EQUALS( originalSize.width + 10 + 10 , paddingAddedSize.width, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   DALI_TEST_EQUALS( originalSize.height + 10 + 10 , paddingAddedSize.height, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldEnableShiftSelectionProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextFieldEnableShiftSelectionProperty");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( field );
+
+  application.SendNotification();
+  application.Render();
+
+  // The default value of ENABLE_SHIFT_SELECTION is 'true'.
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_SHIFT_SELECTION ), true, TEST_LOCATION );
+
+  // Check the enable shift selection property
+  field.SetProperty( DevelTextField::Property::ENABLE_SHIFT_SELECTION, false );
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_SHIFT_SELECTION ), false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliTextFieldEnableGrabHandleProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextFieldEnableGrabHandleProperty");
+
+  TextField field = TextField::New();
+  DALI_TEST_CHECK( field );
+  field.SetSize( 300.f, 50.f );
+  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( field );
+
+  application.SendNotification();
+  application.Render();
+
+  // The default value of ENABLE_GRAB_HANDLE is 'true'.
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_GRAB_HANDLE ), true, TEST_LOCATION );
+
+  // Check the enable grab handle property
+  field.SetProperty( DevelTextField::Property::ENABLE_GRAB_HANDLE, false );
+  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::ENABLE_GRAB_HANDLE ), false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }

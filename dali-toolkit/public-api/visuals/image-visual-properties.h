@@ -40,14 +40,14 @@ namespace ImageVisual
 {
 
 /**
- * @brief ImageVisual Property
+ * @brief ImageVisual Property.
  * @SINCE_1_1.45
  */
 namespace Property
 {
 
 /**
- * @brief ImageVisual Property
+ * @brief Enumeration for the instance of properties belonging to the ImageVisual.
  * @SINCE_1_1.45
  */
 enum
@@ -232,9 +232,77 @@ enum
    * @note If this is false, then the mask is scaled to fit the image before being applied.
    */
   CROP_TO_MASK,
+
+  /**
+   * @brief The policy to determine when an image should be loaded.
+   * @details Name "loadPolicy",  Type LoadPolicy::Type (Property::INTEGER)or Property::STRING.
+   * @SINCE_1_3_5
+   * @note Default LoadPolicy::ATTACHED
+   * @see LoadPolicy::Type
+   */
+
+  LOAD_POLICY,
+
+  /**
+   * @brief The policy to determine when an image should no longer be cached.
+   * @details Name "releasePolicy", Type ReleasePolicy::Type (Property::INTEGER) or Property::STRING
+   * @SINCE_1_3_5
+   * @note Default ReleasePolicy::DESTROYED
+   * @see ReleasePolicy::Type
+   */
+  RELEASE_POLICY,
+
+  /**
+   * @brief Determines if image orientation should be corrected so the image displays as it was intended.
+   * @details Name "orientationCorrection", Type Property::BOOLEAN, if true the image's orientation will be corrected.
+   * @SINCE_1_3_5
+   * @note Default true
+   */
+  ORIENTATION_CORRECTION,
+
 };
 
 } // namespace Property
+
+/**
+ * @brief The policy determining if the image is loaded when the visual is staged or created.
+ * @SINCE_1_3_5
+ */
+namespace LoadPolicy
+{
+
+/**
+ * @brief The available named elements that define the LoadPolicy.
+ * @SINCE_1_3_5
+ */
+enum Type
+{
+  IMMEDIATE = 0,  ///< The image is loaded when the ImageVisual is created.
+  ATTACHED        ///< The image is loaded when the ImageVisual is attached to the stage.
+};
+
+} // namespace LoadPolicy
+
+/**
+ * @brief The policy determining when a image is deleted from the cache in relation to the ImageVisual lifetime.
+ * @SINCE_1_3_5
+ * @note If the texture is being shared by another visual it persist if still required.
+ */
+namespace ReleasePolicy
+{
+
+/**
+ * @brief The available named elements that define the ReleasePolicy.
+ * @SINCE_1_3_5
+ */
+enum Type
+{
+  DETACHED = 0,  ///<  Image deleted from cache when ImageVisual detached from stage.
+  DESTROYED,     ///<  Image deleted from cache when ImageVisual destroyed.
+  NEVER          ///<  Image is never deleted, will survive the lifetime of the application.
+};
+
+} // namespace ReleasePolicy;
 
 } // namespace ImageVisual
 

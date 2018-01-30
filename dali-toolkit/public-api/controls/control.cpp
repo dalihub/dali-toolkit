@@ -140,6 +140,13 @@ bool Control::IsResourceReady() const
   return controlDataImpl.IsResourceReady();
 }
 
+Toolkit::Visual::ResourceStatus Control::GetVisualResourceStatus( Dali::Property::Index index )
+{
+  const Internal::Control& internalControl = Toolkit::Internal::GetImplementation( *this );
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
+  return controlDataImpl.GetVisualResourceStatus( index );
+}
+
 Control::KeyEventSignalType& Control::KeyEventSignal()
 {
   return Internal::GetImplementation(*this).KeyEventSignal();

@@ -451,10 +451,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   FontId previousFontId = 0u;
   bool isPreviousEmojiScript = false;
 
-  // Whether it's the first set of characters to be validated.
-  // Used in case the paragraph starts with characters common to all scripts.
-  bool isFirstSetToBeValidated = true;
-
   CharacterIndex lastCharacter = startIndex + numberOfCharacters;
   for( Length index = startIndex; index < lastCharacter; ++index )
   {
@@ -705,12 +701,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     }
 #endif
 
-    if( isFirstSetToBeValidated && !isCommonScript )
-    {
-      currentFontRun.fontId = fontId;
-      isFirstSetToBeValidated = false;
-    }
-
     // The font is now validated.
     if( ( fontId != currentFontRun.fontId ) ||
         isNewParagraphCharacter )
@@ -728,11 +718,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       currentFontRun.characterRun.characterIndex = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
       currentFontRun.characterRun.numberOfCharacters = 0u;
       currentFontRun.fontId = fontId;
-
-      if( isNewParagraphCharacter )
-      {
-        isFirstSetToBeValidated = true;
-      }
     }
 
     // Add one more character to the run.

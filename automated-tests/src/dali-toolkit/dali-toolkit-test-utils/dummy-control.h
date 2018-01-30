@@ -105,6 +105,7 @@ public:
   int GetVisualCount();
   Toolkit::Visual::Base GetVisual( Property::Index index );
   Animation CreateTransition( const Toolkit::TransitionData& transition );
+  void DoAction( Dali::Property::Index index, Dali::Property::Index action, const Dali::Property::Value attributes );
 
   static void SetProperty( BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value );
 
@@ -161,6 +162,7 @@ private: // From Internal::Control
   virtual void OnPan(const PanGesture& pan);
   virtual void OnTap(const TapGesture& tap);
   virtual void OnLongPress(const LongPressGesture& longPress);
+  virtual Vector3 GetNaturalSize();
 
 private: // From CustomActorImpl
 

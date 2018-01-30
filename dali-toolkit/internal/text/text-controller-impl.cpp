@@ -108,7 +108,8 @@ EventData::EventData( DecoratorPtr decorator )
   mPasswordInput( false ),
   mIsPlaceholderPixelSize( false ),
   mIsPlaceholderElideEnabled( false ),
-  mPlaceholderEllipsisFlag( false )
+  mPlaceholderEllipsisFlag( false ),
+  mShiftSelectionFlag( true )
 {
   mImfManager = ImfManager::Get();
 }
@@ -810,6 +811,36 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
   Length paragraphCharacters = 0u;
 
   CalculateTextUpdateIndices( paragraphCharacters );
+
+  // Check whether the indices for updating the text is valid
+  if ( numberOfCharacters > 0u &&
+       ( mTextUpdateInfo.mParagraphCharacterIndex >= numberOfCharacters ||
+         mTextUpdateInfo.mRequestedNumberOfCharacters > numberOfCharacters ) )
+  {
+    std::string currentText;
+    Utf32ToUtf8( mModel->mLogicalModel->mText.Begin(), numberOfCharacters, currentText );
+
+    DALI_LOG_ERROR( "Controller::Impl::UpdateModel: mTextUpdateInfo has invalid indices\n" );
+    DALI_LOG_ERROR( "Number of characters: %d, current text is: %s\n", numberOfCharacters, currentText.c_str() );
+
+    // Dump mTextUpdateInfo
+    DALI_LOG_ERROR( "Dump mTextUpdateInfo:\n" );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mCharacterIndex = %u\n", mTextUpdateInfo.mCharacterIndex );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mNumberOfCharactersToRemove = %u\n", mTextUpdateInfo.mNumberOfCharactersToRemove );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mNumberOfCharactersToAdd = %u\n", mTextUpdateInfo.mNumberOfCharactersToAdd );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mPreviousNumberOfCharacters = %u\n", mTextUpdateInfo.mPreviousNumberOfCharacters );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mParagraphCharacterIndex = %u\n", mTextUpdateInfo.mParagraphCharacterIndex );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mRequestedNumberOfCharacters = %u\n", mTextUpdateInfo.mRequestedNumberOfCharacters );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mStartGlyphIndex = %u\n", mTextUpdateInfo.mStartGlyphIndex );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mStartLineIndex = %u\n", mTextUpdateInfo.mStartLineIndex );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mEstimatedNumberOfLines = %u\n", mTextUpdateInfo.mEstimatedNumberOfLines );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mClearAll = %d\n", mTextUpdateInfo.mClearAll );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mFullRelayoutNeeded = %d\n", mTextUpdateInfo.mFullRelayoutNeeded );
+    DALI_LOG_ERROR( "     mTextUpdateInfo.mIsLastCharacterNewParagraph = %d\n", mTextUpdateInfo.mIsLastCharacterNewParagraph );
+
+    return false;
+  }
+
   startIndex = mTextUpdateInfo.mParagraphCharacterIndex;
 
   if( mTextUpdateInfo.mClearAll ||
@@ -888,7 +919,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       TextAbstraction::FontDescription defaultFontDescription;
       TextAbstraction::PointSize26Dot6 defaultPointSize = TextAbstraction::FontClient::DEFAULT_POINT_SIZE;
 
-      if( IsShowingPlaceholderText() && ( NULL != mEventData->mPlaceholderFont ) )
+      if( IsShowingPlaceholderText() && mEventData && ( NULL != mEventData->mPlaceholderFont ) )
       {
         // If the placeholder font is set specifically, only placeholder font is changed.
         defaultFontDescription = mEventData->mPlaceholderFont->mFontDescription;
@@ -1144,30 +1175,49 @@ float Controller::Impl::GetDefaultFontLineHeight()
 
 void Controller::Impl::OnCursorKeyEvent( const Event& event )
 {
-  if( NULL == mEventData )
+  if( NULL == mEventData || !IsShowingRealText() )
   {
     // Nothing to do if there is no text input.
     return;
   }
 
   int keyCode = event.p1.mInt;
+  bool isShiftModifier = event.p2.mBool;
+
+  CharacterIndex previousPrimaryCursorPosition = mEventData->mPrimaryCursorPosition;
 
   if( Dali::DALI_KEY_CURSOR_LEFT == keyCode )
   {
     if( mEventData->mPrimaryCursorPosition > 0u )
     {
-      mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition - 1u );
+      if ( !isShiftModifier && mEventData->mDecorator->IsHighlightVisible() )
+      {
+        mEventData->mPrimaryCursorPosition = std::min(mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition);
+      }
+      else
+      {
+        mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition - 1u );
+      }
     }
   }
   else if( Dali::DALI_KEY_CURSOR_RIGHT == keyCode )
   {
     if( mModel->mLogicalModel->mText.Count() > mEventData->mPrimaryCursorPosition )
     {
-      mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition );
+      if ( !isShiftModifier && mEventData->mDecorator->IsHighlightVisible() )
+      {
+        mEventData->mPrimaryCursorPosition = std::max(mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition);
+      }
+      else
+      {
+        mEventData->mPrimaryCursorPosition = CalculateNewCursorIndex( mEventData->mPrimaryCursorPosition );
+      }
     }
   }
-  else if( Dali::DALI_KEY_CURSOR_UP == keyCode )
+  else if( Dali::DALI_KEY_CURSOR_UP == keyCode && !isShiftModifier )
   {
+    // Ignore Shift-Up for text selection for now.
+
     // Get first the line index of the current cursor position index.
     CharacterIndex characterIndex = 0u;
 
@@ -1200,8 +1250,10 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
                                                                       CharacterHitTest::TAP,
                                                                       matchedCharacter );
   }
-  else if( Dali::DALI_KEY_CURSOR_DOWN == keyCode )
+  else if( Dali::DALI_KEY_CURSOR_DOWN == keyCode && !isShiftModifier )
   {
+    // Ignore Shift-Down for text selection for now.
+
     // Get first the line index of the current cursor position index.
     CharacterIndex characterIndex = 0u;
 
@@ -1237,7 +1289,64 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
     }
   }
 
-  mEventData->mUpdateCursorPosition = true;
+  if ( !isShiftModifier && mEventData->mState != EventData::SELECTING )
+  {
+    // Update selection position after moving the cursor
+    mEventData->mLeftSelectionPosition = mEventData->mPrimaryCursorPosition;
+    mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
+  }
+
+  if ( isShiftModifier && IsShowingRealText() && mEventData->mShiftSelectionFlag )
+  {
+    // Handle text selection
+    bool selecting = false;
+
+    if ( Dali::DALI_KEY_CURSOR_LEFT == keyCode || Dali::DALI_KEY_CURSOR_RIGHT == keyCode )
+    {
+      // Shift-Left/Right to select the text
+      int cursorPositionDelta = mEventData->mPrimaryCursorPosition - previousPrimaryCursorPosition;
+      if ( cursorPositionDelta > 0 || mEventData->mRightSelectionPosition > 0u ) // Check the boundary
+      {
+        mEventData->mRightSelectionPosition += cursorPositionDelta;
+      }
+      selecting = true;
+    }
+    else if ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition )
+    {
+      // Show no grab handles and text highlight if Shift-Up/Down pressed but no selected text
+      selecting = true;
+    }
+
+    if ( selecting )
+    {
+      // Notify the cursor position to the imf manager.
+      if( mEventData->mImfManager )
+      {
+        mEventData->mImfManager.SetCursorPosition( mEventData->mPrimaryCursorPosition );
+        mEventData->mImfManager.NotifyCursorPosition();
+      }
+
+      ChangeState( EventData::SELECTING );
+
+      mEventData->mUpdateLeftSelectionPosition = true;
+      mEventData->mUpdateRightSelectionPosition = true;
+      mEventData->mUpdateGrabHandlePosition = true;
+      mEventData->mUpdateHighlightBox = true;
+
+      // Hide the text selection popup if select the text using keyboard instead of moving grab handles
+      if( mEventData->mGrabHandlePopupEnabled )
+      {
+        mEventData->mDecorator->SetPopupActive( false );
+      }
+    }
+  }
+  else
+  {
+    // Handle normal cursor move
+    ChangeState( EventData::EDITING );
+    mEventData->mUpdateCursorPosition = true;
+  }
+
   mEventData->mUpdateInputStyle = true;
   mEventData->mScrollAfterUpdatePosition = true;
 }
@@ -1276,6 +1385,10 @@ void Controller::Impl::OnTapEvent( const Event& event )
       {
         mEventData->mPrimaryCursorPosition = 0u;
       }
+
+      // Update selection position after tapping
+      mEventData->mLeftSelectionPosition = mEventData->mPrimaryCursorPosition;
+      mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
 
       mEventData->mUpdateCursorPosition = true;
       mEventData->mUpdateGrabHandlePosition = true;
@@ -1872,6 +1985,8 @@ void Controller::Impl::RepositionSelectionHandles()
   if( selectionStart == selectionEnd )
   {
     // Nothing to select if handles are in the same place.
+    // So, deactive Highlight box.
+    mEventData->mDecorator->SetHighlightActive( false );
     return;
   }
 
@@ -2223,7 +2338,7 @@ void Controller::Impl::RepositionSelectionHandles()
   const SelectionBoxInfo& firstSelectionBoxLineInfo = *( selectionBoxLinesInfo.Begin() );
   highLightPosition.y = firstSelectionBoxLineInfo.lineOffset;
 
-  mEventData->mDecorator->SetHighLightBox( highLightPosition, highLightSize );
+  mEventData->mDecorator->SetHighLightBox( highLightPosition, highLightSize, static_cast<float>( mModel->GetOutlineWidth() ) );
 
   if( !mEventData->mDecorator->IsSmoothHandlePanEnabled() )
   {
@@ -2249,9 +2364,6 @@ void Controller::Impl::RepositionSelectionHandles()
                                          secondaryCursorInfo.lineOffset + mModel->mScrollPosition.y,
                                          secondaryCursorInfo.lineHeight );
   }
-
-  // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
-  mEventData->mPrimaryCursorPosition = ( indicesSwapped ) ? mEventData->mLeftSelectionPosition : mEventData->mRightSelectionPosition;
 
   // Set the flag to update the decorator.
   mEventData->mDecoratorUpdated = true;
@@ -2312,6 +2424,9 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY,
     mEventData->mUpdateCursorPosition = false;
 
     mEventData->mScrollAfterUpdatePosition = ( mEventData->mLeftSelectionPosition != mEventData->mRightSelectionPosition );
+
+    // Cursor to be positioned at end of selection so if selection interrupted and edit mode restarted the cursor will be at end of selection
+    mEventData->mPrimaryCursorPosition = std::max( mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition );
   }
   else if( Controller::NoTextTap::SHOW_SELECTION_POPUP == action )
   {
@@ -2433,8 +2548,11 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
         mEventData->mDecorator->StopCursorBlink();
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+        if ( mEventData->mGrabHandleEnabled )
+        {
+          mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
+          mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+        }
         mEventData->mDecorator->SetHighlightActive( true );
         if( mEventData->mGrabHandlePopupEnabled )
         {
@@ -2478,7 +2596,7 @@ void Controller::Impl::ChangeState( EventData::State newState )
           mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
           mEventData->mDecorator->SetHighlightActive( false );
         }
-        else
+        else if ( mEventData->mGrabHandleEnabled )
         {
           mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
         }
@@ -2500,7 +2618,10 @@ void Controller::Impl::ChangeState( EventData::State newState )
           mEventData->mDecorator->StartCursorBlink();
         }
         // Grab handle is not shown until a tap is received whilst EDITING
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        if ( mEventData->mGrabHandleEnabled )
+        {
+          mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        }
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHighlightActive( false );
@@ -2516,8 +2637,11 @@ void Controller::Impl::ChangeState( EventData::State newState )
         mEventData->mDecorator->SetActiveCursor( ACTIVE_CURSOR_NONE );
         mEventData->mDecorator->StopCursorBlink();
         mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, false );
-        mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
-        mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+        if ( mEventData->mGrabHandleEnabled )
+        {
+          mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, true );
+          mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, true );
+        }
         mEventData->mDecorator->SetHighlightActive( true );
         if( mEventData->mGrabHandlePopupEnabled )
         {
@@ -2535,7 +2659,10 @@ void Controller::Impl::ChangeState( EventData::State newState )
         {
           mEventData->mDecorator->StartCursorBlink();
         }
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        if ( mEventData->mGrabHandleEnabled )
+        {
+          mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        }
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHighlightActive( false );
@@ -2556,7 +2683,10 @@ void Controller::Impl::ChangeState( EventData::State newState )
           mEventData->mDecorator->StartCursorBlink();
         }
 
-        mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        if ( mEventData->mGrabHandleEnabled )
+        {
+          mEventData->mDecorator->SetHandleActive( GRAB_HANDLE, true );
+        }
         mEventData->mDecorator->SetHandleActive( LEFT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHandleActive( RIGHT_SELECTION_HANDLE, false );
         mEventData->mDecorator->SetHighlightActive( false );
@@ -2642,6 +2772,13 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
 
   Text::GetCursorPosition( parameters,
                            cursorInfo );
+
+  // Adds Outline offset.
+  const float outlineWidth = static_cast<float>( mModel->GetOutlineWidth() );
+  cursorInfo.primaryPosition.x += outlineWidth;
+  cursorInfo.primaryPosition.y += outlineWidth;
+  cursorInfo.secondaryPosition.x += outlineWidth;
+  cursorInfo.secondaryPosition.y += outlineWidth;
 
   if( isMultiLine )
   {

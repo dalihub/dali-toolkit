@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
+#include <dali-toolkit/internal/text/text-controller-impl.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -184,8 +185,15 @@ int UtcDaliTextControllerImfEvent(void)
   // Enables the text input.
   controller->EnableTextInput( decorator );
 
+  // Set the placeholder text.
+  controller->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, "Hello Dali" );
+
   // Creates an ImfManager.
   ImfManager imfManager = ImfManager::Get();
+
+  // For coverage.
+  imfEvent = ImfManager::ImfEventData( ImfManager::GETSURROUNDING, "", 0, 0 );
+  controller->OnImfEvent( imfManager, imfEvent );
 
   // Send VOID event.
   imfEvent = ImfManager::ImfEventData( ImfManager::VOID, "", 0, 0 );
@@ -525,6 +533,160 @@ int UtcDaliTextControllerSetGetTapLongPressAction(void)
   DALI_TEST_EQUALS( Controller::NoTextTap::SHOW_SELECTION_POPUP, controller->GetNoTextLongPressAction(), TEST_LOCATION ); // The default is SHOW_SELECTION_POPUP
   controller->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
   DALI_TEST_EQUALS( Controller::NoTextTap::HIGHLIGHT, controller->GetNoTextLongPressAction(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextControllerSetGetLineSpacingProperty(void)
+{
+  tet_infoline(" UtcDaliTextControllerSetGetLineSpacingProperty");
+  ToolkitTestApplication application;
+
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+
+  // single line text
+  const std::string textSingle("A Quick Brown Fox Jumps Over The Lazy Dog");
+
+  // multi-line text
+  const std::string textMulti("A Quick Brown\nFox Jumps Over\nThe Lazy Dog");
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  // single line, line spacing = 0px
+  {
+    const float EXPECTED_SPACING = 0.0f;
+    const Vector2 EXPECTED_LAYOUT_SIZE( 326.0f, 19.0f);
+    const Vector3 EXPECTED_NATURAL_SIZE( 326.0f, 20.0f, 0.0f );
+
+    controller->SetText(textSingle);
+    controller->Relayout(size);
+    controller->SetMultiLineEnabled( false );
+
+    Vector3 naturalSize  = controller->GetNaturalSize();
+    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
+    float lineSpacing0 = controller->GetDefaultLineSpacing();
+
+    DALI_TEST_EQUALS( EXPECTED_SPACING, lineSpacing0, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION );
+  }
+
+  // single line, line spacing = 20px
+  {
+    const float EXPECTED_SPACING = 20.0f;
+    const Vector2 EXPECTED_LAYOUT_SIZE( 326.0f, 19.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 326.0f, 40.0f, 0.0f );
+
+    controller->SetText(textSingle);
+    controller->Relayout(size);
+    controller->SetDefaultLineSpacing( 20 );
+    controller->SetMultiLineEnabled( false );
+
+    Vector3 naturalSize  = controller->GetNaturalSize();
+    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
+    float lineSpacing0 = controller->GetDefaultLineSpacing();
+
+    DALI_TEST_EQUALS( EXPECTED_SPACING, lineSpacing0, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION );
+  }
+
+  // multi-line, line spacing = 0px
+  {
+    const float EXPECTED_SPACING = 0.0f;
+    const Vector2 EXPECTED_LAYOUT_SIZE( 318.0f, 39.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 58.0f, 0.0f );
+
+    controller->SetText(textMulti);
+    controller->Relayout(size);
+    controller->SetMultiLineEnabled( true );
+    controller->SetDefaultLineSpacing( 0 );
+
+    Vector3 naturalSize  = controller->GetNaturalSize();
+    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
+    float lineSpacing0 = controller->GetDefaultLineSpacing();
+
+    DALI_TEST_EQUALS( EXPECTED_SPACING, lineSpacing0, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION );
+  }
+
+  // multi-line, line spacing = 20px
+  {
+    const float EXPECTED_SPACING = 20.0f;
+    const Vector2 EXPECTED_LAYOUT_SIZE( 115.0f, 57.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 118.0f, 0.0f );
+
+    controller->SetText(textMulti);
+    controller->Relayout(size);
+    controller->SetMultiLineEnabled( true );
+    controller->SetDefaultLineSpacing( 20 );
+
+    Vector3 naturalSize  = controller->GetNaturalSize();
+    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
+    float lineSpacing0 = controller->GetDefaultLineSpacing();
+
+    DALI_TEST_EQUALS( EXPECTED_SPACING, lineSpacing0, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION );
+  }
+
+  // multi-line, line spacing = 30px
+  {
+    const float EXPECTED_SPACING = 30.0f;
+    const Vector2 EXPECTED_LAYOUT_SIZE( 115.0f, 117.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 148.0f, 0.0f );
+
+    controller->SetText(textMulti);
+    controller->Relayout(size);
+    controller->SetMultiLineEnabled( true );
+    controller->SetDefaultLineSpacing( 30 );
+
+    Vector3 naturalSize  = controller->GetNaturalSize();
+    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
+    float lineSpacing0 = controller->GetDefaultLineSpacing();
+
+    DALI_TEST_EQUALS( EXPECTED_SPACING, lineSpacing0, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION );
+  }
+
+
+  END_TEST;
+
+}
+
+int UtcDaliTextControllerCheckBufferIndices(void)
+{
+  tet_infoline(" UtcDaliTextControllerCheckBufferIndices");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  // Set the text
+  const std::string text("A Quick Brown Fox Jumps Over The Lazy Dog");
+  controller->SetText(text);
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  // Tweak some parameters to make the indices to access the text buffer invalid
+  mImpl.mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl.mModel->mLogicalModel->mText.Count() * 10u;
+  mImpl.mTextUpdateInfo.mNumberOfCharactersToRemove = 0u;
+  mImpl.mTextUpdateInfo.mPreviousNumberOfCharacters = 0u;
+  mImpl.mOperationsPending = Controller::ALL_OPERATIONS;
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  tet_result(TET_PASS);
 
   END_TEST;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 // INTERNAL HEADER
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties-devel.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
@@ -34,6 +35,7 @@
 #include <dali-toolkit/internal/text/text-effects-style.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 namespace Dali
 {
@@ -58,6 +60,7 @@ const char * const TEXT_COLOR_PROPERTY( "textColor" );
 const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
 const char * const SHADOW_PROPERTY( "shadow" );
 const char * const UNDERLINE_PROPERTY( "underline" );
+const char * const OUTLINE_PROPERTY( "outline" );
 
 const Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
 
@@ -328,6 +331,10 @@ Dali::Property::Index StringKeyToIndexKey( const std::string& stringKey )
   {
     result = Toolkit::TextVisual::Property::UNDERLINE;
   }
+  else if( stringKey == OUTLINE_PROPERTY )
+  {
+    result = Toolkit::DevelTextVisual::Property::OUTLINE;
+  }
 
   return result;
 }
@@ -405,6 +412,9 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   GetUnderlineProperties( mController, value, Text::EffectStyle::DEFAULT );
   map.Insert( Toolkit::TextVisual::Property::UNDERLINE, value );
+
+  GetOutlineProperties( mController, value, Text::EffectStyle::DEFAULT );
+  map.Insert( Toolkit::DevelTextVisual::Property::OUTLINE, value );
 }
 
 void TextVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -418,7 +428,7 @@ void TextVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 
 
 TextVisual::TextVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache ),
+: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
   mController( Text::Controller::New() ),
   mTypesetter( Text::Typesetter::New( mController->GetTextModel() ) ),
   mAnimatableTextColorPropertyIndex( Property::INVALID_INDEX ),
@@ -593,6 +603,11 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
       SetUnderlineProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
       break;
     }
+    case Toolkit::DevelTextVisual::Property::OUTLINE:
+    {
+      SetOutlineProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
+      break;
+    }
   }
 }
 
@@ -615,7 +630,10 @@ void TextVisual::UpdateRenderer()
   relayoutSize.width = floorf( 0.5f + ( isWidthRelative ? mImpl->mControlSize.width * mImpl->mTransform.mSize.x : mImpl->mTransform.mSize.width ) );
   relayoutSize.height = floorf( 0.5f + ( isHeightRelative ? mImpl->mControlSize.height * mImpl->mTransform.mSize.y : mImpl->mTransform.mSize.height ) );
 
-  if( ( fabsf( relayoutSize.width ) < Math::MACHINE_EPSILON_1000 ) || ( fabsf( relayoutSize.height ) < Math::MACHINE_EPSILON_1000 ) )
+  std::string text;
+  mController->GetText( text );
+
+  if( ( fabsf( relayoutSize.width ) < Math::MACHINE_EPSILON_1000 ) || ( fabsf( relayoutSize.height ) < Math::MACHINE_EPSILON_1000 ) || text.empty() )
   {
     // Removes the texture set.
     RemoveTextureSet();
@@ -738,8 +756,11 @@ TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleText
   // Create RGBA texture if the text contains emojis or multiple text colors, otherwise L8 texture
   Pixel::Format textPixelFormat = ( containsEmoji || hasMultipleTextColors ) ? Pixel::RGBA8888 : Pixel::L8;
 
+  // Check the text direction
+  Toolkit::DevelText::TextDirection::Type textDirection = mController->GetTextDirection();
+
   // Create a texture for the text without any styles
-  PixelData data = mTypesetter->Render( size, Text::Typesetter::RENDER_NO_STYLES, false, textPixelFormat );
+  PixelData data = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_NO_STYLES, false, textPixelFormat );
 
   // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
   // In that case, create a texture. TODO: should tile the text.
@@ -757,7 +778,7 @@ TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleText
   if ( styleEnabled )
   {
     // Create RGBA texture for all the text styles (without the text itself)
-    PixelData styleData = mTypesetter->Render( size, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888 );
+    PixelData styleData = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888 );
 
     Texture styleTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
                                          styleData.GetPixelFormat(),
@@ -773,7 +794,7 @@ TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleText
   if ( containsEmoji && !hasMultipleTextColors )
   {
     // Create a L8 texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
-    PixelData maskData = mTypesetter->Render( size, Text::Typesetter::RENDER_MASK, false, Pixel::L8 );
+    PixelData maskData = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_MASK, false, Pixel::L8 );
 
     Texture maskTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
                                         maskData.GetPixelFormat(),

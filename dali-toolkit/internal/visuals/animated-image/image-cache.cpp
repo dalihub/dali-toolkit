@@ -24,12 +24,10 @@ namespace Internal
 {
 
 ImageCache::ImageCache( TextureManager&                 textureManager,
-                        UrlList&                        urlList,
                         ImageCache::FrameReadyObserver& observer,
                         unsigned int                    batchSize )
 : mTextureManager( textureManager ),
   mObserver( observer ),
-  mImageUrls( urlList ),
   mBatchSize( batchSize ),
   mUrlIndex(0u),
   mWaitingForReadyFrame(false),

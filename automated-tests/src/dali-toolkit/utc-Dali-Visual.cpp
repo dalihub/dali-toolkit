@@ -24,7 +24,13 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
+#include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/text-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/animated-gradient-visual-properties-devel.h>
 #include <dali-toolkit/dali-toolkit.h>
+
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -34,11 +40,12 @@ namespace
 {
 const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/gallery-small-1.jpg";
-const char* TEST_NPATCH_FILE_NAME =  "gallery_image_01.9.jpg";
+const char* TEST_NPATCH_FILE_NAME =  TEST_RESOURCE_DIR "/button-up.9.png";
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_RESOURCE_LOCATION = TEST_RESOURCE_DIR "/";
+
 
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
@@ -63,18 +70,64 @@ bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Ma
     {
       const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
 
-      Property::Value* valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      Property::Value* valueSet = NULL;
+      if ( valueGet.first.type == Property::Key::INDEX )
+      {
+        valueSet = fontStyleMapSet.Find( valueGet.first.indexKey );
+      }
+      else
+      {
+        // Get Key is a string so searching Set Map for a string key
+        valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+      }
+
       if( NULL != valueSet )
       {
-        if( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() )
+        if( valueSet->GetType() == Dali::Property::STRING && ( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() ) )
         {
-          tet_printf( "  Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          tet_printf( "Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::BOOLEAN && ( valueGet.second.Get<bool>() != valueSet->Get<bool>() ) )
+        {
+          tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<bool>(), valueSet->Get<bool>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::INTEGER && ( valueGet.second.Get<int>() != valueSet->Get<int>() ) )
+        {
+          tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<int>(), valueSet->Get<int>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::FLOAT && ( valueGet.second.Get<float>() != valueSet->Get<float>() ) )
+        {
+          tet_printf( "Value got : [%f], expected : [%f]", valueGet.second.Get<float>(), valueSet->Get<float>() );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::VECTOR2 && ( valueGet.second.Get<Vector2>() != valueSet->Get<Vector2>() ) )
+        {
+          Vector2 vector2Get = valueGet.second.Get<Vector2>();
+          Vector2 vector2Set = valueSet->Get<Vector2>();
+          tet_printf( "Value got : [%f, %f], expected : [%f, %f]", vector2Get.x, vector2Get.y, vector2Set.x, vector2Set.y );
+          return false;
+        }
+        else if( valueSet->GetType() == Dali::Property::VECTOR4 && ( valueGet.second.Get<Vector4>() != valueSet->Get<Vector4>() ) )
+        {
+          Vector4 vector4Get = valueGet.second.Get<Vector4>();
+          Vector4 vector4Set = valueSet->Get<Vector4>();
+          tet_printf( "Value got : [%f, %f, %f, %f], expected : [%f, %f, %f, %f]", vector4Get.r, vector4Get.g, vector4Get.b, vector4Get.a, vector4Set.r, vector4Set.g, vector4Set.b, vector4Set.a );
           return false;
         }
       }
       else
       {
-        tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        if ( valueGet.first.type == Property::Key::INDEX )
+        {
+          tet_printf( "  The key %d doesn't exist.", valueGet.first.indexKey );
+        }
+        else
+        {
+          tet_printf( "  The key %s doesn't exist.", valueGet.first.stringKey.c_str() );
+        }
         return false;
       }
     }
@@ -279,6 +332,15 @@ int UtcDaliVisualSize(void)
   gradientVisual.SetTransformAndSize(DefaultTransform(), controlSize );
   gradientVisual.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2::ZERO,TEST_LOCATION );
+
+  // animated gradient visual
+  Vector2 animated_gradient_visual_size(10.f, 10.f);
+  propertyMap.Clear();
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_GRADIENT );
+  Visual::Base animatedGradientVisual = factory.CreateVisual( propertyMap );
+  animatedGradientVisual.GetNaturalSize(naturalSize);
+  animatedGradientVisual.SetTransformAndSize(DefaultTransform(), controlSize );
+  DALI_TEST_EQUALS( naturalSize, Vector2::ZERO, TEST_LOCATION );
 
   // svg visual
   Visual::Base svgVisual = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
@@ -753,6 +815,8 @@ int UtcDaliVisualGetPropertyMap6(void)
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
   propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
   propertyMap.Insert( ImageVisual::Property::BORDER, border );
+  propertyMap.Insert( DevelImageVisual::Property::AUXILIARY_IMAGE, "application-icon-30.png" );
+  propertyMap.Insert( DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA, 0.9f );
   Visual::Base nPatchVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -778,6 +842,14 @@ int UtcDaliVisualGetPropertyMap6(void)
   value = resultMap.Find( ImageVisual::Property::BORDER,  Property::RECTANGLE );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get< Rect< int > >() == border );
+
+  value = resultMap.Find( DevelImageVisual::Property::AUXILIARY_IMAGE, Property::STRING );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<std::string>() == "application-icon-30.png" );
+
+  value = resultMap.Find( DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA, Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<float>() == 0.9f );
 
   Vector4 border1( 1.0f, 1.0f, 1.0f, 1.0f );
 
@@ -1046,6 +1118,16 @@ int UtcDaliVisualGetPropertyMap10(void)
   propertyMap.Insert( "horizontalAlignment", "CENTER" );
   propertyMap.Insert( "verticalAlignment", "CENTER" );
   propertyMap.Insert( "textColor", Color::RED );
+
+  Property::Map shadowMapSet;
+  propertyMap.Insert( "shadow", shadowMapSet.Add("color", Color::RED).Add("offset", Vector2(2.0f, 2.0f)).Add("blurRadius", 3.0f) );
+
+  Property::Map underlineMapSet;
+  propertyMap.Insert( "underline", underlineMapSet.Add("enable", "true").Add("color", "green").Add("height", "1") );
+
+  Property::Map outlineMapSet;
+  propertyMap.Insert( "outline", outlineMapSet.Add("color", Color::YELLOW).Add("width", 1) );
+
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -1098,6 +1180,511 @@ int UtcDaliVisualGetPropertyMap10(void)
   value = resultMap.Find( TextVisual::Property::ENABLE_MARKUP, Property::BOOLEAN );
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( !value->Get<bool>() );
+
+  value = resultMap.Find( TextVisual::Property::SHADOW, Property::MAP );
+  DALI_TEST_CHECK( value );
+
+  Property::Map shadowMapGet = value->Get<Property::Map>();
+  DALI_TEST_EQUALS( shadowMapGet.Count(), shadowMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( shadowMapGet, shadowMapSet ), true, TEST_LOCATION );
+
+  value = resultMap.Find( TextVisual::Property::UNDERLINE, Property::MAP );
+  DALI_TEST_CHECK( value );
+
+  Property::Map underlineMapGet = value->Get<Property::Map>();
+  DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
+
+  value = resultMap.Find( DevelTextVisual::Property::OUTLINE, Property::MAP );
+  DALI_TEST_CHECK( value );
+
+  Property::Map outlineMapGet = value->Get<Property::Map>();
+  DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetPropertyMap11(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetPropertyMap11: AnimatedGradientVisual" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  DevelVisual::ANIMATED_GRADIENT);
+
+  Vector2 start(-0.5f, 0.5f);
+  Vector2 end  (0.5f, -0.0f);
+  Vector4 start_color(1.0f, 0.7f, 0.5f, 1.0f);
+  Vector4 end_color  (0.7f, 0.5f, 1.0f, 1.0f);
+  Vector2 rotate_center(0.0f, 0.4f);
+  float rotate_amount = 1.57f;
+  float offset = 100.f;
+
+  propertyMap.Insert(DevelAnimatedGradientVisual::Property::GRADIENT_TYPE,  DevelAnimatedGradientVisual::GradientType::RADIAL);
+  propertyMap.Insert(DevelAnimatedGradientVisual::Property::UNIT_TYPE,  DevelAnimatedGradientVisual::UnitType::USER_SPACE);
+  propertyMap.Insert(DevelAnimatedGradientVisual::Property::SPREAD_TYPE,  DevelAnimatedGradientVisual::SpreadType::CLAMP);
+
+  propertyMap.Insert(DevelAnimatedGradientVisual::Property::START_POSITION,  start);
+  propertyMap.Insert(DevelAnimatedGradientVisual::Property::END_POSITION,  end);
+  propertyMap.Insert(DevelAnimatedGradientVisual::Property::START_COLOR,  start_color);
+  propertyMap.Insert(DevelAnimatedGradientVisual::Property::END_COLOR,  end_color);
+  propertyMap.Insert(DevelAnimatedGradientVisual::Property::ROTATE_CENTER,  rotate_center);
+  propertyMap.Insert(DevelAnimatedGradientVisual::Property::ROTATE_AMOUNT,  rotate_amount);
+  propertyMap.Insert(DevelAnimatedGradientVisual::Property::OFFSET,  offset);
+
+  Visual::Base animatedGradientVisual = factory.CreateVisual(propertyMap);
+  DALI_TEST_CHECK( animatedGradientVisual );
+
+  Property::Map resultMap;
+  animatedGradientVisual.CreatePropertyMap( resultMap );
+
+  // check the property values from the returned map from visual
+  Property::Value* value = resultMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_GRADIENT );
+
+  value = resultMap.Find( DevelAnimatedGradientVisual::Property::GRADIENT_TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::GradientType::RADIAL );
+
+  value = resultMap.Find( DevelAnimatedGradientVisual::Property::UNIT_TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::UnitType::USER_SPACE );
+
+  value = resultMap.Find( DevelAnimatedGradientVisual::Property::SPREAD_TYPE,  Property::INTEGER );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::SpreadType::CLAMP );
+
+
+  value = resultMap.Find( DevelAnimatedGradientVisual::Property::START_POSITION,  Property::VECTOR2 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector2>(), start , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( DevelAnimatedGradientVisual::Property::END_POSITION,  Property::VECTOR2 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector2>(), end , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( DevelAnimatedGradientVisual::Property::START_COLOR,  Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), start_color , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( DevelAnimatedGradientVisual::Property::END_COLOR,  Property::VECTOR4 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector4>(), end_color , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( DevelAnimatedGradientVisual::Property::ROTATE_CENTER,  Property::VECTOR2 );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<Vector2>(), rotate_center , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( DevelAnimatedGradientVisual::Property::ROTATE_AMOUNT,  Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), rotate_amount , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  value = resultMap.Find( DevelAnimatedGradientVisual::Property::OFFSET,  Property::FLOAT );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get<float>(), offset , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliVisualGetPropertyMap12(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetPropertyMap12: AnimatedGradientVisual with animation param" );
+
+  // Case 1 : Set values by index
+  {
+    tet_printf( " - Set Values by Index\n" );
+    // NOTE : PropertyMap doesn't optimized even delay < -loop_count * (duration + repeat_delay) so this animation will not run
+    // _delay = -10.0f is this case. It will progress (10.0f / 1.5f) amount. and 10.0f / 1.5f > 5.
+    for(float _delay = -10.0f; _delay <= 5.0f; _delay += 5.0f)
+    {
+      tet_printf( "test with delay [%f]\n", _delay );
+      VisualFactory factory = VisualFactory::Get();
+      DALI_TEST_CHECK( factory );
+
+      Property::Map propertyMap;
+      Property::Map animationMap;
+      propertyMap.Insert(Visual::Property::TYPE,  DevelVisual::ANIMATED_GRADIENT);
+
+      float duration = 1.1f;
+      float delay = _delay;
+      float repeat_delay = 0.4f;
+
+      int direction = DevelAnimatedGradientVisual::AnimationParameter::DirectionType::BACKWARD;
+      int loop_count = 5;
+      int motion = DevelAnimatedGradientVisual::AnimationParameter::MotionType::MIRROR;
+      int easing = DevelAnimatedGradientVisual::AnimationParameter::EasingType::OUT;
+
+      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value &start, const Property::Value &target)->Property::Map&
+      {
+        animationMap.Clear();
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::START, start);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::TARGET, target);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DIRECTION, direction);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DURATION, duration);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DELAY, delay);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::REPEAT, loop_count);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::REPEAT_DELAY, repeat_delay);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::MOTION_TYPE, motion);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::EASING_TYPE, easing);
+
+        return animationMap;
+      };
+
+      Vector2 start1(-0.5f, 0.5f);
+      Vector2 end1  (0.5f, -0.5f);
+      Vector4 start_color1(1.0f, 0.7f, 0.5f, 1.0f);
+      Vector4 end_color1  (0.7f, 0.5f, 1.0f, 1.0f);
+      Vector2 rotate_center1(0.0f, 0.4f);
+      float rotate_amount1 = 0.0f;
+      float offset1 = 0.f;
+
+      Vector2 start2(-0.5f, -0.5f);
+      Vector2 end2  (0.5f, 0.5f);
+      Vector4 start_color2(0.0f, 0.1f, 0.8f, 1.0f);
+      Vector4 end_color2  (0.3f, 1.0f, 0.1f, 0.0f);
+      Vector2 rotate_center2(0.0f, -0.4f);
+      float rotate_amount2 = 6.2832f;
+      float offset2 = 2.f;
+
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::GRADIENT_TYPE,  DevelAnimatedGradientVisual::GradientType::LINEAR);
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::UNIT_TYPE,  DevelAnimatedGradientVisual::UnitType::OBJECT_BOUNDING_BOX);
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::SPREAD_TYPE,  DevelAnimatedGradientVisual::SpreadType::REPEAT);
+
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::START_POSITION, buildAnimatedMap(start1        , start2        ));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::END_POSITION,   buildAnimatedMap(end1          , end2          ));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::START_COLOR,    buildAnimatedMap(start_color1  , start_color2  ));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::END_COLOR,      buildAnimatedMap(end_color1    , end_color2    ));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::ROTATE_CENTER,  buildAnimatedMap(rotate_center1, rotate_center2));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::ROTATE_AMOUNT,  buildAnimatedMap(rotate_amount1, rotate_amount2));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::OFFSET,         buildAnimatedMap(offset1       , offset2       ));
+
+      Visual::Base animatedGradientVisual = factory.CreateVisual(propertyMap);
+      DALI_TEST_CHECK( animatedGradientVisual );
+
+      Property::Map resultMap;
+      animatedGradientVisual.CreatePropertyMap( resultMap );
+
+      // check the property values from the returned map from visual
+      Property::Value* value = resultMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_GRADIENT );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::GRADIENT_TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::GradientType::LINEAR );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::UNIT_TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::UnitType::OBJECT_BOUNDING_BOX );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::SPREAD_TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::SpreadType::REPEAT );
+
+      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index &index, const Property::Value &start, const Property::Value &target, int line_num)->void
+      {
+        tet_printf("Check value at %d\n", line_num);
+        value = resultMap.Find( index, Property::MAP );
+        DALI_TEST_CHECK( value );
+        DALI_TEST_CHECK( value->GetType() == Property::MAP );
+        Property::Map *temp_map = value->GetMap();
+        DALI_TEST_CHECK( temp_map );
+
+        auto checkMapValue = [&temp_map](const Property::Index index)->Property::Value
+        {
+          Property::Value *res = temp_map->Find( index );
+          DALI_TEST_CHECK( res );
+          return *res;
+        };
+
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::START)       , start, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::TARGET)      , target, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::DIRECTION)   , Property::Value( direction ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::DURATION)    , Property::Value( duration ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::DELAY)       , Property::Value( delay ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::REPEAT)      , Property::Value( loop_count ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::REPEAT_DELAY), Property::Value( repeat_delay ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::MOTION_TYPE) , Property::Value( motion ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::EASING_TYPE) , Property::Value( easing ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+      };
+
+      // check the animation map data is good
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::START_POSITION, start1        , start2        , __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::END_POSITION  , end1          , end2          , __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::START_COLOR   , start_color1  , start_color2  , __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::END_COLOR     , end_color1    , end_color2    , __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::ROTATE_CENTER , rotate_center1, rotate_center2, __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::ROTATE_AMOUNT , rotate_amount1, rotate_amount2, __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::OFFSET        , offset1       , offset2       , __LINE__);
+    }
+  }
+
+  // Case 2 : Set values by string
+  {
+    tet_printf( " - Set Values by String\n" );
+    // NOTE : PropertyMap doesn't optimized even delay < -loop_count * (duration + repeat_delay) so this animation will not run
+    // _delay = -10.0f is this case. It will progress (10.0f / 1.5f) amount. and 10.0f / 1.5f > 5.
+    for(float _delay = -10.0f; _delay <= 5.0f; _delay += 5.0f)
+    {
+      tet_printf( "test with delay [%f]\n", _delay );
+      VisualFactory factory = VisualFactory::Get();
+      DALI_TEST_CHECK( factory );
+
+      Property::Map propertyMap;
+      Property::Map animationMap;
+      propertyMap.Insert("visualType", "ANIMATED_GRADIENT");
+
+      float duration = 1.1f;
+      float delay = _delay;
+      float repeat_delay = 0.4f;
+
+      int direction = DevelAnimatedGradientVisual::AnimationParameter::DirectionType::BACKWARD;
+      int loop_count = 5;
+      int motion = DevelAnimatedGradientVisual::AnimationParameter::MotionType::MIRROR;
+      int easing = DevelAnimatedGradientVisual::AnimationParameter::EasingType::IN_OUT;
+
+      auto buildAnimatedMap = [&animationMap, &duration, &delay, &loop_count, &repeat_delay](const Property::Value &start, const Property::Value &target)->Property::Map&
+      {
+        animationMap.Clear();
+        animationMap.Insert("startValue"   , start);
+        animationMap.Insert("targetValue"  , target);
+        animationMap.Insert("directionType", "BACKWARD");
+        animationMap.Insert("duration"     , duration);
+        animationMap.Insert("delay"        , delay);
+        animationMap.Insert("repeat"       , loop_count);
+        animationMap.Insert("repeatDelay"  , repeat_delay);
+        animationMap.Insert("motionType"   , "MIRROR");
+        animationMap.Insert("easingType"   , "IN_OUT");
+
+        return animationMap;
+      };
+
+      Vector2 start1(-0.5f, 0.5f);
+      Vector2 end1  (0.5f, -0.5f);
+      Vector4 start_color1(1.0f, 0.7f, 0.5f, 1.0f);
+      Vector4 end_color1  (0.7f, 0.5f, 1.0f, 1.0f);
+      Vector2 rotate_center1(0.0f, 0.4f);
+      float rotate_amount1 = 0.0f;
+      float offset1 = 0.f;
+
+      Vector2 start2(-0.5f, -0.5f);
+      Vector2 end2  (0.5f, 0.5f);
+      Vector4 start_color2(0.0f, 0.1f, 0.8f, 1.0f);
+      Vector4 end_color2  (0.3f, 1.0f, 0.1f, 0.0f);
+      Vector2 rotate_center2(0.0f, -0.4f);
+      float rotate_amount2 = 6.2832f;
+      float offset2 = 2.f;
+
+      // For test mix the type string/index key and string/index value works well.
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::GRADIENT_TYPE,  "RADIAL");
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::UNIT_TYPE,  DevelAnimatedGradientVisual::UnitType::USER_SPACE);
+      propertyMap.Insert("spreadType"  , DevelAnimatedGradientVisual::SpreadType::REFLECT);
+
+      propertyMap.Insert("startPosition", buildAnimatedMap(start1        , start2        ));
+      propertyMap.Insert("endPosition"  , buildAnimatedMap(end1          , end2          ));
+      propertyMap.Insert("startColor"   , buildAnimatedMap(start_color1  , start_color2  ));
+      propertyMap.Insert("endColor"     , buildAnimatedMap(end_color1    , end_color2    ));
+      propertyMap.Insert("rotateCenter" , buildAnimatedMap(rotate_center1, rotate_center2));
+      propertyMap.Insert("rotateAmount" , buildAnimatedMap(rotate_amount1, rotate_amount2));
+      propertyMap.Insert("offset"       , buildAnimatedMap(offset1       , offset2       ));
+
+      Visual::Base animatedGradientVisual = factory.CreateVisual(propertyMap);
+      DALI_TEST_CHECK( animatedGradientVisual );
+
+      Property::Map resultMap;
+      animatedGradientVisual.CreatePropertyMap( resultMap );
+
+      // check the property values from the returned map from visual
+      // Note : resultMap from CreatePropertyMap only contain indexKey
+      Property::Value* value = resultMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_GRADIENT );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::GRADIENT_TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::GradientType::RADIAL );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::UNIT_TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::UnitType::USER_SPACE );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::SPREAD_TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::SpreadType::REFLECT );
+
+      auto checkAnimatedMap = [&value, &resultMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Index &index, const Property::Value &start, const Property::Value &target, int line_num)->void
+      {
+        tet_printf("Check value at %d\n", line_num);
+        value = resultMap.Find( index, Property::MAP );
+        DALI_TEST_CHECK( value );
+        DALI_TEST_CHECK( value->GetType() == Property::MAP );
+        Property::Map *temp_map = value->GetMap();
+        DALI_TEST_CHECK( temp_map );
+
+        auto checkMapValue = [&temp_map](const Property::Index index)->Property::Value
+        {
+          Property::Value *res = temp_map->Find( index );
+          DALI_TEST_CHECK( res );
+          return *res;
+        };
+
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::START)       , start, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::TARGET)      , target, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::DIRECTION)   , Property::Value( direction ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::DURATION)    , Property::Value( duration ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::DELAY)       , Property::Value( delay ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::REPEAT)      , Property::Value( loop_count ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::REPEAT_DELAY), Property::Value( repeat_delay ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::MOTION_TYPE) , Property::Value( motion ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        DALI_TEST_EQUALS( checkMapValue(DevelAnimatedGradientVisual::AnimationParameter::Property::EASING_TYPE) , Property::Value( easing ), Math::MACHINE_EPSILON_100, TEST_LOCATION );
+      };
+
+      // check the animation map data is good
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::START_POSITION, start1        , start2        , __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::END_POSITION  , end1          , end2          , __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::START_COLOR   , start_color1  , start_color2  , __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::END_COLOR     , end_color1    , end_color2    , __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::ROTATE_CENTER , rotate_center1, rotate_center2, __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::ROTATE_AMOUNT , rotate_amount1, rotate_amount2, __LINE__);
+      checkAnimatedMap(DevelAnimatedGradientVisual::Property::OFFSET        , offset1       , offset2       , __LINE__);
+    }
+  }
+
+  END_TEST;
+}
+int UtcDaliVisualGetPropertyMap13(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualGetPropertyMap13: AnimatedGradientVisual when repeat = 0" );
+
+  for(int _direction = 0; _direction <= 1; ++_direction)
+  {
+    for(float _delay = -10.0f; _delay <= 10.0f; _delay += 10.0f)
+    {
+      tet_printf( ((_direction == 0) ? "Forward test with delay [%f]\n" : "Backward test with delay [%f]\n") , _delay );
+      VisualFactory factory = VisualFactory::Get();
+      DALI_TEST_CHECK( factory );
+
+      Property::Map propertyMap;
+      Property::Map animationMap;
+      propertyMap.Insert(Visual::Property::TYPE,  DevelVisual::ANIMATED_GRADIENT);
+
+      float duration = 1.0f;
+      float delay = _delay;
+      float repeat_delay = 0.5f;
+
+      int direction = _direction;
+      int loop_count = 0; // When loop_count is 0, Animation will not be created.
+      int motion = DevelAnimatedGradientVisual::AnimationParameter::MotionType::LOOP;
+      int easing = DevelAnimatedGradientVisual::AnimationParameter::EasingType::IN;
+
+      auto buildAnimatedMap = [&animationMap, &direction, &duration, &delay, &loop_count, &repeat_delay, &motion, &easing](const Property::Value &start, const Property::Value &target)->Property::Map&
+      {
+        animationMap.Clear();
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::START, start);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::TARGET, target);
+        if(direction == 0)animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DIRECTION, DevelAnimatedGradientVisual::AnimationParameter::DirectionType::FORWARD);
+        else animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DIRECTION, DevelAnimatedGradientVisual::AnimationParameter::DirectionType::BACKWARD);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DIRECTION, direction);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DURATION, duration);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DELAY, delay);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::REPEAT, loop_count);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::REPEAT_DELAY, repeat_delay);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::MOTION_TYPE, motion);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::EASING_TYPE, easing);
+
+        return animationMap;
+      };
+
+      Vector2 start1(-0.5f, 0.5f);
+      Vector2 end1  (0.5f, -0.5f);
+      Vector4 start_color1(1.0f, 0.7f, 0.5f, 1.0f);
+      Vector4 end_color1  (0.7f, 0.5f, 1.0f, 1.0f);
+      Vector2 rotate_center1(1.0f, 0.4f);
+      float rotate_amount1 = 2.0f;
+      float offset1 = 1.f;
+
+      Vector2 start2(-0.5f, -0.5f);
+      Vector2 end2  (0.5f, 0.5f);
+      Vector4 start_color2(0.0f, 0.1f, 0.8f, 1.0f);
+      Vector4 end_color2  (0.3f, 1.0f, 0.1f, 0.0f);
+      Vector2 rotate_center2(1.0f, -0.4f);
+      float rotate_amount2 = 1.0f;
+      float offset2 = 3.f;
+
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::GRADIENT_TYPE,  DevelAnimatedGradientVisual::GradientType::LINEAR);
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::UNIT_TYPE,  DevelAnimatedGradientVisual::UnitType::OBJECT_BOUNDING_BOX);
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::SPREAD_TYPE,  DevelAnimatedGradientVisual::SpreadType::REFLECT);
+
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::START_POSITION, buildAnimatedMap(start1        , start2        ));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::END_POSITION,   buildAnimatedMap(end1          , end2          ));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::START_COLOR,    buildAnimatedMap(start_color1  , start_color2  ));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::END_COLOR,      buildAnimatedMap(end_color1    , end_color2    ));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::ROTATE_CENTER,  buildAnimatedMap(rotate_center1, rotate_center2));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::ROTATE_AMOUNT,  buildAnimatedMap(rotate_amount1, rotate_amount2));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::OFFSET,         buildAnimatedMap(offset1       , offset2       ));
+
+      Visual::Base animatedGradientVisual = factory.CreateVisual(propertyMap);
+      DALI_TEST_CHECK( animatedGradientVisual );
+
+      Property::Map resultMap;
+      animatedGradientVisual.CreatePropertyMap( resultMap );
+
+      // check the property values from the returned map from visual
+      Property::Value* value = resultMap.Find( Toolkit::Visual::Property::TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelVisual::ANIMATED_GRADIENT );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::GRADIENT_TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::GradientType::LINEAR );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::UNIT_TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::UnitType::OBJECT_BOUNDING_BOX );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::SPREAD_TYPE,  Property::INTEGER );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_CHECK( value->Get<int>() == DevelAnimatedGradientVisual::SpreadType::REFLECT );
+
+      // If loop_count = 0, Animation doesn't created.
+      // Optimized resultMap only have one value, which is target value
+      // Note: target value will be changed by direction option.
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::START_POSITION,  Property::VECTOR2 );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_EQUALS( value->Get<Vector2>(), direction ? start1 : start2 , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::END_POSITION,  Property::VECTOR2 );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_EQUALS( value->Get<Vector2>(), direction ? end1 : end2 , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::START_COLOR,  Property::VECTOR4 );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_EQUALS( value->Get<Vector4>(), direction ? start_color1 : start_color2 , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::END_COLOR,  Property::VECTOR4 );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_EQUALS( value->Get<Vector4>(), direction ? end_color1 : end_color2 , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::ROTATE_CENTER,  Property::VECTOR2 );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_EQUALS( value->Get<Vector2>(), direction ? rotate_center1 : rotate_center2 , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::ROTATE_AMOUNT,  Property::FLOAT );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_EQUALS( value->Get<float>(), direction ? rotate_amount1 : rotate_amount2 , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+
+      value = resultMap.Find( DevelAnimatedGradientVisual::Property::OFFSET,  Property::FLOAT );
+      DALI_TEST_CHECK( value );
+      DALI_TEST_EQUALS( value->Get<float>(), direction ? offset1 : offset2 , Math::MACHINE_EPSILON_100, TEST_LOCATION );
+    }
+  }
 
   END_TEST;
 }
@@ -1356,6 +1943,614 @@ int UtcDaliVisualAnimatePrimitiveVisual(void)
   END_TEST;
 }
 
+int UtcDaliVisualAnimatedGradientVisual01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatedGradientVisual with default" );
+
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE,  DevelVisual::ANIMATED_GRADIENT);
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+
+    DummyControl actor = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+    actor.SetSize(2000, 2000);
+    actor.SetParentOrigin(ParentOrigin::CENTER);
+    actor.SetColor(Color::BLACK);
+    Stage::GetCurrent().Add(actor);
+
+    application.SendNotification();
+    application.Render(0);
+    application.SendNotification();
+
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+    for(int step_iter = 0; step_iter < 3; step_iter++)
+    {
+      application.SendNotification();
+      application.Render(0);
+      application.Render(750u); // step i/4
+      application.SendNotification();
+
+      DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector2>( "start_point"  , Vector2( -0.5f, 0.0f ) ), true, TEST_LOCATION );
+      DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector2>( "end_point"    , Vector2( 0.5f, 0.0f ) ), true, TEST_LOCATION );
+      DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>( "start_color"  , Vector4( 143.0f, 170.0f, 220.0f, 255.0f ) / 255.0f ), true, TEST_LOCATION );
+      DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>( "end_color"    , Vector4( 255.0f, 163.0f, 163.0f, 255.0f ) / 255.0f ), true, TEST_LOCATION );
+      DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector2>( "rotate_center", Vector2( 0.0f, 0.0f ) ), true, TEST_LOCATION );
+      DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>( "rotate_angle"   , 0.0f ), true, TEST_LOCATION );
+      DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>( "gradient_offset", 0.5f * step_iter + 0.5f ), true, TEST_LOCATION );
+    }
+
+    //Not check here. cause gradient_offset value can be 2.0f or 0.0f
+    application.Render(750u); // go to end
+    application.SendNotification();
+
+    application.Render(10u); // finish
+    application.SendNotification();
+
+    actor.Unparent();
+    application.SendNotification();
+    application.Render(0u);
+    application.SendNotification();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVisualAnimatedGradientVisual02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatedGradientVisual with full-option" );
+
+  {
+    float _delay[4] = {0.0f, -1.35f, 0.15f, -0.4f}; // fract(_delay) must NOT be 1/4, 2/4, 3/4. cause we don't know progress is 1.0f or 0.0f
+    int _direction[2] = {0, 1};
+    int _loop_count[3] = {-1, 0, 1};
+    int _motion[2] = {0, 1};
+    int _easing[4] = {0, 1, 2, 3};
+
+    int test_case_max = 4 * 2 * 3 * 2 * 4;
+    int test_case = 0;
+    int test_case_d = 7; // 7 is the number of animated properties.
+
+    float _duration = 0.4f;
+    float _repeat_delay = _duration * 0.25f; // < _duration. cause real_duration = _duration - _repeat_delay;
+    float noise_maker = 0.0f;
+    // total testing time = ceil((4*2*3*2*4) / 7) * (_duration(=0.4) * 2 + 0.01) = 22.68 seconds
+    for( test_case = 0; test_case < test_case_max + test_case_d; test_case += test_case_d )
+    {
+      tet_printf( "test [%d ~ %d / %d]\n" , test_case, test_case + test_case_d - 1, test_case_max);
+
+      VisualFactory factory = VisualFactory::Get();
+      Property::Map propertyMap;
+      Property::Map animationMap;
+      propertyMap.Insert(Visual::Property::TYPE,  DevelVisual::ANIMATED_GRADIENT);
+
+      int gradient_type = DevelAnimatedGradientVisual::GradientType::LINEAR;
+      int unit_type = DevelAnimatedGradientVisual::UnitType::USER_SPACE;
+      int spread_type = DevelAnimatedGradientVisual::SpreadType::REPEAT;
+
+      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value &start, const Property::Value &target, int tc_offset)->Property::Map&
+      {
+        int tc = (test_case + tc_offset);
+        int idx_easing = tc % 4; tc /= 4;
+        int idx_motion = tc % 2; tc /= 2;
+        int idx_loop_count = tc % 3; tc /= 3;
+        int idx_direction = tc % 2; tc /= 2;
+        int idx_delay = tc % 4; tc /= 4;
+
+        float duration = _duration - _repeat_delay;
+        float repeat_delay = _repeat_delay;
+        float delay = _delay[idx_delay] * _duration;
+        int direction = _direction[idx_direction];
+        int loop_count = _loop_count[idx_loop_count];
+        int motion = _motion[idx_motion];
+        int easing = _easing[idx_easing];
+
+        animationMap.Clear();
+        animationMap.Insert( DevelAnimatedGradientVisual::AnimationParameter::Property::START, start );
+        animationMap.Insert( DevelAnimatedGradientVisual::AnimationParameter::Property::TARGET, target );
+        if( direction == 0 )
+        {
+          animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DIRECTION, DevelAnimatedGradientVisual::AnimationParameter::DirectionType::FORWARD);
+        }
+        else
+        {
+          animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DIRECTION, DevelAnimatedGradientVisual::AnimationParameter::DirectionType::BACKWARD);
+        }
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DURATION, duration);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::DELAY, delay);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::REPEAT, loop_count);
+        animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::REPEAT_DELAY, repeat_delay);
+        if( motion == 0 )
+        {
+          animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::MOTION_TYPE, DevelAnimatedGradientVisual::AnimationParameter::MotionType::LOOP);
+        }
+        else
+        {
+          animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::MOTION_TYPE, DevelAnimatedGradientVisual::AnimationParameter::MotionType::MIRROR);
+        }
+        if( easing == 0 )
+        {
+          animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::EASING_TYPE, DevelAnimatedGradientVisual::AnimationParameter::EasingType::LINEAR);
+        }
+        else if( easing == 1 )
+        {
+          animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::EASING_TYPE, DevelAnimatedGradientVisual::AnimationParameter::EasingType::IN);
+        }
+        else if( easing == 2 )
+        {
+          animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::EASING_TYPE, DevelAnimatedGradientVisual::AnimationParameter::EasingType::OUT);
+        }
+        else
+        {
+          animationMap.Insert(DevelAnimatedGradientVisual::AnimationParameter::Property::EASING_TYPE, DevelAnimatedGradientVisual::AnimationParameter::EasingType::IN_OUT);
+        }
+
+        return animationMap;
+      };
+
+      // Give different values for debuging
+      noise_maker += 1.0f;
+      Vector2 start1(-0.5f + noise_maker * 0.1f, 0.5f + noise_maker * 0.1f);
+      Vector2 end1  (0.5f + noise_maker * 0.1f, -0.5f + noise_maker * 0.1f);
+      Vector4 start_color1(1.0f, 0.7f, 0.5f, 1.0f);
+      Vector4 end_color1  (0.7f, 0.5f, 1.0f, 1.0f);
+      Vector2 rotate_center1(0.0f + noise_maker * 0.1f, 0.4f + noise_maker * 0.1f);
+      float rotate_amount1 = 0.0f + noise_maker * 0.1f;
+      float offset1 = 0.f + noise_maker * 0.1f;
+
+      Vector2 start2(0.2f + noise_maker * 0.1f, -0.7f + noise_maker * 0.1f);
+      Vector2 end2  (0.5f + noise_maker * 0.1f, 0.5f + noise_maker * 0.1f);
+      Vector4 start_color2(0.0f, 0.1f, 0.8f, 1.0f);
+      Vector4 end_color2  (0.3f, 1.0f, 0.1f, 0.0f);
+      Vector2 rotate_center2(0.0f + noise_maker * 0.1f, -0.4f + noise_maker * 0.1f);
+      float rotate_amount2 = 7.0f + noise_maker * 0.1f;
+      float offset2 = 2.f + noise_maker * 0.1f;
+
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::GRADIENT_TYPE, gradient_type);
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::UNIT_TYPE,     unit_type);
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::SPREAD_TYPE,   spread_type);
+
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::START_POSITION, buildAnimatedMap(start1        , start2        ,0));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::END_POSITION,   buildAnimatedMap(end1          , end2          ,1));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::START_COLOR,    buildAnimatedMap(start_color1  , start_color2  ,2));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::END_COLOR,      buildAnimatedMap(end_color1    , end_color2    ,3));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::ROTATE_CENTER,  buildAnimatedMap(rotate_center1, rotate_center2,4));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::ROTATE_AMOUNT,  buildAnimatedMap(rotate_amount1, rotate_amount2,5));
+      propertyMap.Insert(DevelAnimatedGradientVisual::Property::OFFSET,         buildAnimatedMap(offset1       , offset2       ,6));
+
+      Visual::Base visual = factory.CreateVisual( propertyMap );
+
+      DummyControl actor = DummyControl::New( true );
+      Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>( actor.GetImplementation() );
+      dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+      actor.SetSize( 2000, 2000 );
+      actor.SetParentOrigin(ParentOrigin::CENTER);
+      actor.SetColor(Color::BLACK);
+      Stage::GetCurrent().Add(actor);
+
+      application.SendNotification();
+      application.Render( 0 );
+      application.SendNotification();
+
+      DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+      application.SendNotification();
+
+      //Compare between CPU calculated value and Shader Visual calculated value
+      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress)->void
+      {
+        int tc = (test_case + tc_offset);
+        int idx_easing = tc % 4; tc /= 4;
+        int idx_motion = tc % 2; tc /= 2;
+        int idx_loop_count = tc % 3; tc /= 3;
+        int idx_direction = tc % 2; tc /= 2;
+        int idx_delay = tc % 4; tc /= 4;
+
+        float duration = _duration - _repeat_delay;
+        float repeat_delay = _repeat_delay;
+        float delay = _delay[idx_delay] * _duration;
+        int direction = _direction[idx_direction];
+        int loop_count = _loop_count[idx_loop_count];
+        int motion = _motion[idx_motion];
+        int easing = _easing[idx_easing];
+
+        progress -= delay / _duration;
+
+        Property::Value s = start;
+        Property::Value t = target;
+        if( direction == 1 )
+        {
+          s = target;
+          t = start;
+        }
+        float x; ///< Animator progress value
+        if( loop_count == 0 )
+        {
+          x = 1.0f;
+        }
+        else if( loop_count > 0 && progress + 0.01f > loop_count )
+        {
+          x = ( motion == 0 ) ? 1.0f : 0.0f;
+        }
+        else
+        {
+          if( progress < 0.0f )
+          {
+            progress = 0.0f;
+          }
+          progress = fmodf( progress, 1.0f );
+          progress = Dali::Clamp( (progress * (duration + repeat_delay) - repeat_delay) / duration, 0.0f, 1.0f );
+
+          x = progress;
+          if( motion == 1 )
+          {
+            x = progress * 2.0f;
+            if( x > 1.0f )
+            {
+              x = 2.0f - x;
+            }
+          }
+
+          if( easing == 1 ) // EASE_IN
+          {
+            x = x*x;
+          }
+          else if( easing == 2 ) // EASE_OUT
+          {
+            x = 2.0f*x - x*x;
+          }
+          else if( easing == 3 ) // EASE_IN_OUT
+          {
+            x = x * x * (3.0f - 2.0f * x);
+          }
+        }
+        if( value_type == 0 ) // result type is Float
+        {
+          float res;
+          float cur;
+          res = s.Get<float>() * (1.0f - x) + t.Get<float>() * (x);
+          DALI_TEST_EQUALS( application.GetGlAbstraction().GetUniformValue<float>(name, cur), true, TEST_LOCATION );
+          DALI_TEST_EQUALS( res, cur, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        }
+        else if( value_type == 1 ) // result type is Vector2
+        {
+          Vector2 res;
+          Vector2 cur;
+          res = s.Get<Vector2>() * (1.0f - x) + t.Get<Vector2>() * (x);
+          DALI_TEST_EQUALS( application.GetGlAbstraction().GetUniformValue<Vector2>(name, cur), true, TEST_LOCATION );
+          DALI_TEST_EQUALS( res, cur, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        }
+        else if( value_type == 2 ) // result type is Vector3
+        {
+          Vector3 res;
+          Vector3 cur;
+          res = s.Get<Vector3>() * (1.0f - x) + t.Get<Vector3>() * (x);
+          DALI_TEST_EQUALS( application.GetGlAbstraction().GetUniformValue<Vector3>(name, cur), true, TEST_LOCATION );
+          DALI_TEST_EQUALS( res, cur, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        }
+        else // result type is Vector4
+        {
+          Vector4 res;
+          Vector4 cur;
+          res = s.Get<Vector4>() * (1.0f - x) + t.Get<Vector4>() * (x);
+          DALI_TEST_EQUALS( application.GetGlAbstraction().GetUniformValue<Vector4>(name, cur), true, TEST_LOCATION );
+          DALI_TEST_EQUALS( res, cur, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        }
+      };
+
+      float step = 0.0f;
+      for( int iter = 0; iter < 2; iter++ ) // test 2*duration seconds
+      {
+        for( int step_iter = 0; step_iter < 3; step_iter++ )
+        {
+          application.SendNotification();
+          application.Render( _duration * 250.f );  // step i/4
+          application.SendNotification();
+          step += 0.25f;
+
+          testProperty( "start_point"    , Property::Value( start1 )        , Property::Value( start2 )        , 0, 1, step );
+          testProperty( "end_point"      , Property::Value( end1 )          , Property::Value( end2 )          , 1, 1, step );
+          testProperty( "start_color"    , Property::Value( start_color1 )  , Property::Value( start_color2 )  , 2, 3, step );
+          testProperty( "end_color"      , Property::Value( end_color1 )    , Property::Value( end_color2 )    , 3, 3, step );
+          testProperty( "rotate_center"  , Property::Value( rotate_center1 ), Property::Value( rotate_center2 ), 4, 1, step );
+          testProperty( "rotate_angle"   , Property::Value( rotate_amount1 ), Property::Value( rotate_amount2 ), 5, 0, step );
+          testProperty( "gradient_offset", Property::Value( offset1 )       , Property::Value( offset2 )       , 6, 0, step );
+        }
+        application.SendNotification();
+        application.Render(_duration * 250.f);  // step 4/4 will not test
+        application.SendNotification();
+        step += 0.25f;
+      }
+
+      application.SendNotification();
+      actor.Unparent();
+      application.SendNotification();
+      application.Render(10.f);  // tempral time
+      application.SendNotification();
+    }
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVisualAnimatedGradientVisual03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatedGradientVisual with full-option use string key" );
+
+  {
+    float _delay[4] = {0.0f, -1.35f, 0.15f, -0.4f}; // fract(_delay) must NOT be 1/4, 2/4, 3/4. cause we don't know progress is 1.0f or 0.0f
+    int _direction[2] = {0, 1};
+    int _loop_count[3] = {-1, 0, 1};
+    int _motion[2] = {0, 1};
+    int _easing[4] = {0, 1, 2, 3};
+
+    int test_case_max = 4 * 2 * 3 * 2 * 4;
+    int test_case = 0;
+    int test_case_d = 7; // 7 is the number of animated properties.
+
+    float _duration = 0.4f;
+    float _repeat_delay = _duration * 0.25f; // < _duration. cause real_duration = _duration - _repeat_delay;
+    float noise_maker = 0.2f;
+    // total testing time = ceil((4*2*3*2*4) / 7) * (_duration(=0.4) * 2 + 0.01) = 22.68 seconds
+    for( test_case = 0; test_case < test_case_max + test_case_d; test_case += test_case_d )
+    {
+      tet_printf( "test [%d ~ %d / %d]\n" , test_case, test_case + test_case_d - 1, test_case_max);
+
+      VisualFactory factory = VisualFactory::Get();
+      Property::Map propertyMap;
+      Property::Map animationMap;
+      propertyMap.Insert(Visual::Property::TYPE,  DevelVisual::ANIMATED_GRADIENT);
+
+      auto buildAnimatedMap = [&animationMap, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const Property::Value &start, const Property::Value &target, int tc_offset)->Property::Map&
+      {
+        int tc = (test_case + tc_offset);
+        int idx_easing = tc % 4; tc /= 4;
+        int idx_motion = tc % 2; tc /= 2;
+        int idx_loop_count = tc % 3; tc /= 3;
+        int idx_direction = tc % 2; tc /= 2;
+        int idx_delay = tc % 4; tc /= 4;
+
+        float duration = _duration - _repeat_delay;
+        float repeat_delay = _repeat_delay;
+        float delay = _delay[idx_delay] * _duration;
+        int direction = _direction[idx_direction];
+        int loop_count = _loop_count[idx_loop_count];
+        int motion = _motion[idx_motion];
+        int easing = _easing[idx_easing];
+
+        animationMap.Clear();
+        animationMap.Insert( "startValue", start );
+        animationMap.Insert( "targetValue", target );
+        if( direction == 0 )
+        {
+          animationMap.Insert("directionType", "FORWARD");
+        }
+        else
+        {
+          animationMap.Insert("directionType", "BACKWARD");
+        }
+        animationMap.Insert("duration", duration);
+        animationMap.Insert("delay", delay);
+        animationMap.Insert("repeat", loop_count);
+        animationMap.Insert("repeatDelay", repeat_delay);
+        if( motion == 0 )
+        {
+          animationMap.Insert("motionType", "LOOP");
+        }
+        else
+        {
+          animationMap.Insert("motionType", "MIRROR");
+        }
+        if( easing == 0 )
+        {
+          animationMap.Insert("easingType", "LINEAR");
+        }
+        else if( easing == 1 )
+        {
+          animationMap.Insert("easingType", "IN");
+        }
+        else if( easing == 2 )
+        {
+          animationMap.Insert("easingType", "OUT");
+        }
+        else
+        {
+          animationMap.Insert("easingType", "IN_OUT");
+        }
+
+        return animationMap;
+      };
+
+      // Give different values for debuging
+      noise_maker += 0.8f;
+      Vector2 start1(-0.5f + noise_maker * 0.1f, 0.5f + noise_maker * 0.1f);
+      Vector2 end1  (0.5f + noise_maker * 0.1f, -0.5f + noise_maker * 0.1f);
+      Vector4 start_color1(1.0f, 0.7f, 0.5f, 1.0f);
+      Vector4 end_color1  (0.7f, 0.5f, 1.0f, 1.0f);
+      Vector2 rotate_center1(0.0f + noise_maker * 0.1f, 0.4f + noise_maker * 0.1f);
+      float rotate_amount1 = 0.0f + noise_maker * 0.1f;
+      float offset1 = 0.f + noise_maker * 0.1f;
+
+      Vector2 start2(0.2f + noise_maker * 0.1f, -0.7f + noise_maker * 0.1f);
+      Vector2 end2  (0.5f + noise_maker * 0.1f, 0.5f + noise_maker * 0.1f);
+      Vector4 start_color2(0.0f, 0.1f, 0.8f, 1.0f);
+      Vector4 end_color2  (0.3f, 1.0f, 0.1f, 0.0f);
+      Vector2 rotate_center2(0.0f + noise_maker * 0.1f, -0.4f + noise_maker * 0.1f);
+      float rotate_amount2 = 7.0f + noise_maker * 0.1f;
+      float offset2 = 2.f + noise_maker * 0.1f;
+
+      propertyMap.Insert("gradientType", "LINEAR");
+      propertyMap.Insert("unitType",     "USER_SPACE");
+      propertyMap.Insert("spreadType",   "CLAMP");
+
+      propertyMap.Insert("startPosition", buildAnimatedMap(start1        , start2        ,0));
+      propertyMap.Insert("endPosition",   buildAnimatedMap(end1          , end2          ,1));
+      propertyMap.Insert("startColor",    buildAnimatedMap(start_color1  , start_color2  ,2));
+      propertyMap.Insert("endColor",      buildAnimatedMap(end_color1    , end_color2    ,3));
+      propertyMap.Insert("rotateCenter",  buildAnimatedMap(rotate_center1, rotate_center2,4));
+      propertyMap.Insert("rotateAmount",  buildAnimatedMap(rotate_amount1, rotate_amount2,5));
+      propertyMap.Insert("offset",        buildAnimatedMap(offset1       , offset2       ,6));
+
+      Visual::Base visual = factory.CreateVisual( propertyMap );
+
+      DummyControl actor = DummyControl::New( true );
+      Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>( actor.GetImplementation() );
+      dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+      actor.SetSize( 2000, 2000 );
+      actor.SetParentOrigin(ParentOrigin::CENTER);
+      actor.SetColor(Color::BLACK);
+      Stage::GetCurrent().Add(actor);
+
+      application.SendNotification();
+      application.Render( 0 );
+      application.SendNotification();
+
+      DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+      application.SendNotification();
+
+      //Compare between CPU calculated value and Shader Visual calculated value
+      auto testProperty = [&application, &_direction, &_duration, &_delay, &_loop_count, &_repeat_delay, &_motion, &_easing, &test_case](const char* name, const Property::Value& start, const Property::Value& target, int tc_offset, int value_type, float progress)->void
+      {
+        int tc = (test_case + tc_offset);
+        int idx_easing = tc % 4; tc /= 4;
+        int idx_motion = tc % 2; tc /= 2;
+        int idx_loop_count = tc % 3; tc /= 3;
+        int idx_direction = tc % 2; tc /= 2;
+        int idx_delay = tc % 4; tc /= 4;
+
+        float duration = _duration - _repeat_delay;
+        float repeat_delay = _repeat_delay;
+        float delay = _delay[idx_delay] * _duration;
+        int direction = _direction[idx_direction];
+        int loop_count = _loop_count[idx_loop_count];
+        int motion = _motion[idx_motion];
+        int easing = _easing[idx_easing];
+
+        progress -= delay / _duration;
+
+        Property::Value s = start;
+        Property::Value t = target;
+        if( direction == 1 )
+        {
+          s = target;
+          t = start;
+        }
+        float x; ///< Animator progress value
+        if( loop_count == 0 )
+        {
+          x = 1.0f;
+        }
+        else if( loop_count > 0 && progress + 0.01f > loop_count )
+        {
+          x = ( motion == 0 ) ? 1.0f : 0.0f;
+        }
+        else
+        {
+          if( progress < 0.0f )
+          {
+            progress = 0.0f;
+          }
+          progress = fmodf( progress, 1.0f );
+          progress = Dali::Clamp( (progress * (duration + repeat_delay) - repeat_delay) / duration, 0.0f, 1.0f );
+
+          x = progress;
+          if( motion == 1 )
+          {
+            x = progress * 2.0f;
+            if( x > 1.0f )
+            {
+              x = 2.0f - x;
+            }
+          }
+
+          if( easing == 1 ) // EASE_IN
+          {
+            x = x*x;
+          }
+          else if( easing == 2 ) // EASE_OUT
+          {
+            x = 2.0f*x - x*x;
+          }
+          else if( easing == 3 ) // EASE_IN_OUT
+          {
+            x = x * x * (3.0f - 2.0f * x);
+          }
+        }
+        if( value_type == 0 ) // result type is Float
+        {
+          float res;
+          float cur;
+          res = s.Get<float>() * (1.0f - x) + t.Get<float>() * (x);
+          DALI_TEST_EQUALS( application.GetGlAbstraction().GetUniformValue<float>(name, cur), true, TEST_LOCATION );
+          DALI_TEST_EQUALS( res, cur, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        }
+        else if( value_type == 1 ) // result type is Vector2
+        {
+          Vector2 res;
+          Vector2 cur;
+          res = s.Get<Vector2>() * (1.0f - x) + t.Get<Vector2>() * (x);
+          DALI_TEST_EQUALS( application.GetGlAbstraction().GetUniformValue<Vector2>(name, cur), true, TEST_LOCATION );
+          DALI_TEST_EQUALS( res, cur, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        }
+        else if( value_type == 2 ) // result type is Vector3
+        {
+          Vector3 res;
+          Vector3 cur;
+          res = s.Get<Vector3>() * (1.0f - x) + t.Get<Vector3>() * (x);
+          DALI_TEST_EQUALS( application.GetGlAbstraction().GetUniformValue<Vector3>(name, cur), true, TEST_LOCATION );
+          DALI_TEST_EQUALS( res, cur, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        }
+        else // result type is Vector4
+        {
+          Vector4 res;
+          Vector4 cur;
+          res = s.Get<Vector4>() * (1.0f - x) + t.Get<Vector4>() * (x);
+          DALI_TEST_EQUALS( application.GetGlAbstraction().GetUniformValue<Vector4>(name, cur), true, TEST_LOCATION );
+          DALI_TEST_EQUALS( res, cur, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+        }
+      };
+
+      float step = 0.0f;
+      for( int iter = 0; iter < 2; iter++ ) // test 2*duration seconds
+      {
+        for( int step_iter = 0; step_iter < 3; step_iter++ )
+        {
+          application.SendNotification();
+          application.Render( _duration * 250.f );  // step i/4
+          application.SendNotification();
+          step += 0.25f;
+
+          testProperty( "start_point"    , Property::Value( start1 )        , Property::Value( start2 )        , 0, 1, step );
+          testProperty( "end_point"      , Property::Value( end1 )          , Property::Value( end2 )          , 1, 1, step );
+          testProperty( "start_color"    , Property::Value( start_color1 )  , Property::Value( start_color2 )  , 2, 3, step );
+          testProperty( "end_color"      , Property::Value( end_color1 )    , Property::Value( end_color2 )    , 3, 3, step );
+          testProperty( "rotate_center"  , Property::Value( rotate_center1 ), Property::Value( rotate_center2 ), 4, 1, step );
+          testProperty( "rotate_angle"   , Property::Value( rotate_amount1 ), Property::Value( rotate_amount2 ), 5, 0, step );
+          testProperty( "gradient_offset", Property::Value( offset1 )       , Property::Value( offset2 )       , 6, 0, step );
+        }
+        application.SendNotification();
+        application.Render(_duration * 250.f);  // step 4/4 will not test
+        application.SendNotification();
+        step += 0.25f;
+      }
+
+      application.SendNotification();
+      actor.Unparent();
+      application.SendNotification();
+      application.Render(10.f);  // tempral time
+      application.SendNotification();
+    }
+  }
+
+  END_TEST;
+}
 
 int UtcDaliVisualWireframeVisual(void)
 {
@@ -2195,6 +3390,56 @@ int UtcDaliRegisterVisualWithDepthIndex(void)
 
   dummyControl.SetSize(200.f, 200.f);
   Stage::GetCurrent().Add( dummyControl );
+
+  END_TEST;
+}
+
+int UtcDaliColorVisualRenderIfTransparentProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Test the renderIfTransparent property of ColorVisual" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( Visual::Property::TYPE,  Visual::COLOR );
+  propertyMap.Insert( ColorVisual::Property::MIX_COLOR, Color::BLUE );
+
+  tet_infoline( "Check default value" );
+  {
+    Visual::Base testVisual = factory.CreateVisual( propertyMap );
+    Property::Map returnedMap;
+    testVisual.CreatePropertyMap( returnedMap );
+
+    Property::Value* renderIfTransparentProperty = returnedMap.Find( DevelColorVisual::Property::RENDER_IF_TRANSPARENT );
+    DALI_TEST_CHECK( renderIfTransparentProperty );
+    DALI_TEST_EQUALS( renderIfTransparentProperty->Get< bool >(), false, TEST_LOCATION );
+  }
+
+  propertyMap.Insert( DevelColorVisual::Property::RENDER_IF_TRANSPARENT, true );
+
+  tet_infoline( "Ensure set to value required" );
+  {
+    Visual::Base testVisual = factory.CreateVisual( propertyMap );
+    Property::Map returnedMap;
+    testVisual.CreatePropertyMap( returnedMap );
+
+    Property::Value* renderIfTransparentProperty = returnedMap.Find( DevelColorVisual::Property::RENDER_IF_TRANSPARENT );
+    DALI_TEST_CHECK( renderIfTransparentProperty );
+    DALI_TEST_EQUALS( renderIfTransparentProperty->Get< bool >(), true, TEST_LOCATION );
+  }
+
+  propertyMap[ DevelColorVisual::Property::RENDER_IF_TRANSPARENT ] = Color::BLUE;
+
+  tet_infoline( "Ensure it returns default value if set to wrong type" );
+  {
+    Visual::Base testVisual = factory.CreateVisual( propertyMap );
+    Property::Map returnedMap;
+    testVisual.CreatePropertyMap( returnedMap );
+
+    Property::Value* renderIfTransparentProperty = returnedMap.Find( DevelColorVisual::Property::RENDER_IF_TRANSPARENT );
+    DALI_TEST_CHECK( renderIfTransparentProperty );
+    DALI_TEST_EQUALS( renderIfTransparentProperty->Get< bool >(), false, TEST_LOCATION );
+  }
 
   END_TEST;
 }

@@ -357,7 +357,7 @@ public:
    */
   DALI_IMPORT_API virtual float GetFlickSpeedFactor() const;
 
-  /*
+  /**
    * @brief Applies constraints defined by the layout to an actor.
    *
    * @param[in] actor The actor to constrain.

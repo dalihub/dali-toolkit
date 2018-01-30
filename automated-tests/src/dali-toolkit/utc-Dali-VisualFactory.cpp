@@ -20,8 +20,9 @@
 #include <toolkit-timer.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali/devel-api/images/nine-patch-image.h>
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -31,12 +32,13 @@ namespace
 {
 typedef NinePatchImage::StretchRanges StretchRanges;
 
-const char* TEST_NPATCH_FILE_NAME =  TEST_RESOURCE_DIR  "/button-up-1.9.png";
+const char* TEST_NPATCH_FILE_NAME =  TEST_RESOURCE_DIR  "/demo-tile-texture-focused.9.png";
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_SIMPLE_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube-Points-Only.obj";
 const char* TEST_SIMPLE_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal-Simple.mtl";
+const char* TEST_AUX_IMAGE = TEST_RESOURCE_DIR "/folder_appicon_empty_bg.png";
 
 // resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
 const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
@@ -837,7 +839,11 @@ int UtcDaliVisualFactoryGetNPatchVisual5(void)
   stretchRangesY.PushBack( Uint16Pair( 8, 12 ) );
   stretchRangesY.PushBack( Uint16Pair( 15, 16 ) );
   stretchRangesY.PushBack( Uint16Pair( 25, 27 ) );
-  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
+  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application,
+                                                                       ninePatchImageWidth,
+                                                                       ninePatchImageHeight,
+                                                                       stretchRangesX,
+                                                                       stretchRangesY );
 
   Visual::Base visual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( visual );
@@ -855,6 +861,65 @@ int UtcDaliVisualFactoryGetNPatchVisual5(void)
 
   END_TEST;
 }
+
+
+int UtcDaliNPatchVisualAuxiliaryImage(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "NPatchVisual with aux image" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map properties;
+  Property::Map shader;
+
+  Property::Map transformMap;
+  transformMap["size"] = Vector2( 0.5f, 0.5f ) ;
+  transformMap["offset"] = Vector2( 20.0f, 0.0f ) ;
+  transformMap["offsetPolicy"] = Vector2( Visual::Transform::Policy::ABSOLUTE, Visual::Transform::Policy::ABSOLUTE );
+  transformMap["anchorPoint"] = Align::CENTER;
+  transformMap["origin"] = Align::CENTER;
+  properties[Visual::Property::TRANSFORM] = transformMap;
+
+  properties[Visual::Property::TYPE] = Visual::IMAGE;
+  properties[Visual::Property::MIX_COLOR] = Color::BLUE;
+  properties[Visual::Property::SHADER]=shader;
+  properties[ImageVisual::Property::URL] = TEST_NPATCH_FILE_NAME;
+  properties[DevelImageVisual::Property::AUXILIARY_IMAGE] = TEST_AUX_IMAGE;
+  properties[DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA] = 0.9f;
+
+  const unsigned int ninePatchImageWidth =  256;
+  const unsigned int ninePatchImageHeight = 256;
+  StretchRanges stretchRangesX;
+  stretchRangesX.PushBack( Uint16Pair( 10, 246 ) );
+  StretchRanges stretchRangesY;
+  stretchRangesY.PushBack( Uint16Pair( 15, 241 ) );
+  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application,
+                                                                       ninePatchImageWidth,
+                                                                       ninePatchImageHeight,
+                                                                       stretchRangesX,
+                                                                       stretchRangesY );
+
+  Visual::Base visual = factory.CreateVisual( properties );
+
+  // trigger creation through setting on stage
+  DummyControl dummy = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+  dummyImpl.SetLayout( DummyControl::Property::TEST_VISUAL, transformMap );
+  dummy.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  dummy.SetParentOrigin(ParentOrigin::CENTER);
+  Stage::GetCurrent().Add(dummy);
+  application.SendNotification();
+  application.Render();
+
+  Renderer renderer = dummy.GetRendererAt( 0 );
+  auto textures = renderer.GetTextures();
+  DALI_TEST_EQUALS( textures.GetTextureCount(), 2, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
 
 int UtcDaliVisualFactoryGetNPatchVisualN1(void)
 {
@@ -1840,13 +1905,13 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliVisualFactoryGetAnimatedImageVisual1: Request animated image visual with a gif url" );
 
-  VisualFactory factory = VisualFactory::Get();
-  Visual::Base visual = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
-  DALI_TEST_CHECK( visual );
-
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
+
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base visual = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
+  DALI_TEST_CHECK( visual );
 
   DummyControl actor = DummyControl::New(true);
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
@@ -1859,54 +1924,34 @@ int UtcDaliVisualFactoryGetAnimatedImageVisual1(void)
 
   // renderer is added to actor
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-
-  // test the uniforms which used to handle the atlas rect
-  // the four frames should be located inside atlas as follows: atlas size 100*100
-  // -------------
-  // |     |     |
-  // |  0  |  1  |
-  // -------------
-  // |     |     |
-  // |  2  |  3  |
-  // -------------
-
   Renderer renderer = actor.GetRendererAt( 0u );
   DALI_TEST_CHECK( renderer );
 
-  Property::Value atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
-  // take into consideration the half pixel correction
-  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(0.5f, 0.5f, 49.5f, 49.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
-
-  // waiting for the resource uploading
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
 
   // Force the timer used by the animatedImageVisual to tick,
   Dali::Timer timer = Timer::New( 0 );
   timer.MockEmitSignal();
   application.SendNotification();
   application.Render();
-  atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
-  // take into consideration the half pixel correction
-  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(50.5f, 0.5f, 99.5f, 49.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
+
 
   // Force the timer used by the animatedImageVisual to tick,
   timer.MockEmitSignal();
   application.SendNotification();
   application.Render();
-  atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
-  // take into consideration the half pixel correction
-  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(0.5f, 50.5f, 49.5f, 99.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
 
   // Force the timer used by the animatedImageVisual to tick,
   timer.MockEmitSignal();
   application.SendNotification();
   application.Render();
-  atlasRectValue = renderer.GetProperty( renderer.GetPropertyIndex( "uAtlasRect" ) );
-  // take into consideration the half pixel correction
-  DALI_TEST_EQUALS( atlasRectValue.Get<Vector4>(), Vector4(50.5f, 50.5f, 99.5f, 99.5f)/100.f, Math::MACHINE_EPSILON_100, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
 
   // Test SetOffStage().
   actor.Unparent();

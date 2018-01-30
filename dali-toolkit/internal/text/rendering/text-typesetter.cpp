@@ -19,12 +19,13 @@
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/text-abstraction/font-client.h>
 #include <memory.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/public-api/common/constants.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/view-model.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 
 namespace Dali
 {
@@ -266,7 +267,7 @@ ViewModel* Typesetter::GetViewModel()
   return mModel;
 }
 
-PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat )
+PixelData Typesetter::Render( const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat )
 {
   // @todo. This initial implementation for a TextLabel has only one visible page.
 
@@ -276,8 +277,32 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
   // Retrieves the layout size.
   const Size& layoutSize = mModel->GetLayoutSize();
 
+  const float outlineWidth = mModel->GetOutlineWidth();
+
+  // Set the offset for the horizontal alignment according to the text direction and outline width.
+  int penX = 0;
+
+  switch( mModel->GetHorizontalAlignment() )
+  {
+    case HorizontalAlignment::BEGIN:
+    {
+      // No offset to add.
+      break;
+    }
+    case HorizontalAlignment::CENTER:
+    {
+      penX += ( textDirection == Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT ) ? -outlineWidth : outlineWidth;
+      break;
+    }
+    case HorizontalAlignment::END:
+    {
+      penX += ( textDirection == Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT ) ? -outlineWidth * 2.0f : outlineWidth * 2.0f;
+      break;
+    }
+  }
+
   // Set the offset for the vertical alignment.
-  int penY = 0u;
+  int penY = 0;
 
   switch( mModel->GetVerticalAlignment() )
   {
@@ -294,6 +319,29 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
     case VerticalAlignment::BOTTOM:
     {
       penY = static_cast<int>( size.height - layoutSize.height );
+      break;
+    }
+  }
+
+  // Calculate vertical line alignment
+  switch( mModel->GetVerticalLineAlignment() )
+  {
+    case DevelText::VerticalLineAlignment::TOP:
+    {
+      break;
+    }
+    case DevelText::VerticalLineAlignment::MIDDLE:
+    {
+      const auto& line = *mModel->GetLines();
+      penY -= line.descender;
+      penY += static_cast<int>(line.lineSpacing*0.5f + line.descender);
+      break;
+    }
+    case DevelText::VerticalLineAlignment::BOTTOM:
+    {
+      const auto& line = *mModel->GetLines();
+      const auto lineHeight = line.ascender + (-line.descender) + line.lineSpacing;
+      penY += static_cast<int>(lineHeight - (line.ascender - line.descender));
       break;
     }
   }
@@ -316,7 +364,7 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
   if( RENDER_MASK == behaviour )
   {
     // Generate the image buffer as an alpha mask for color glyphs.
-    imageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_MASK, ignoreHorizontalAlignment, pixelFormat, penY, 0u, numberOfGlyphs - 1 );
+    imageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_MASK, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs - 1 );
   }
   else if( RENDER_NO_TEXT == behaviour )
   {
@@ -327,7 +375,7 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
   else
   {
     // Generate the image buffer for the text with no style.
-    imageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_NONE, ignoreHorizontalAlignment, pixelFormat, penY, 0u, numberOfGlyphs -1 );
+    imageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_NONE, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs -1 );
   }
 
   if ( ( RENDER_NO_STYLES != behaviour ) && ( RENDER_MASK != behaviour ) )
@@ -338,7 +386,7 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
     if ( outlineWidth > Math::MACHINE_EPSILON_1 )
     {
       // Create the image buffer for outline
-      Devel::PixelBuffer outlineImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penY, 0u, numberOfGlyphs -1 );
+      Devel::PixelBuffer outlineImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs -1 );
 
       // Combine the two buffers
       imageBuffer = CombineImageBuffer( imageBuffer, outlineImageBuffer, bufferWidth, bufferHeight );
@@ -351,7 +399,7 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
     if ( fabsf( shadowOffset.x ) > Math::MACHINE_EPSILON_1 || fabsf( shadowOffset.y ) > Math::MACHINE_EPSILON_1 )
     {
       // Create the image buffer for shadow
-      Devel::PixelBuffer shadowImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_SHADOW, ignoreHorizontalAlignment, pixelFormat, penY, 0u, numberOfGlyphs - 1 );
+      Devel::PixelBuffer shadowImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_SHADOW, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs - 1 );
 
       // Check whether it will be a soft shadow
       const float& blurRadius = mModel->GetShadowBlurRadius();
@@ -370,7 +418,7 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
     if ( underlineEnabled )
     {
       // Create the image buffer for underline
-      Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, penY, 0u, numberOfGlyphs - 1 );
+      Devel::PixelBuffer underlineImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_UNDERLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs - 1 );
 
       // Combine the two buffers
       imageBuffer = CombineImageBuffer( imageBuffer, underlineImageBuffer, bufferWidth, bufferHeight );
@@ -383,7 +431,7 @@ PixelData Typesetter::Render( const Vector2& size, RenderBehaviour behaviour, bo
   return pixelData;
 }
 
-Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth, const unsigned int bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int verticalOffset, GlyphIndex fromGlyphIndex, GlyphIndex toGlyphIndex )
+Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth, const unsigned int bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset, GlyphIndex fromGlyphIndex, GlyphIndex toGlyphIndex )
 {
   // Retrieve lines, glyphs, positions and colors from the view model.
   const Length modelNumberOfLines = mModel->GetNumberOfLines();
@@ -427,9 +475,16 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
 
     // Sets the horizontal offset of the line.
     glyphData.horizontalOffset = ignoreHorizontalAlignment ? 0 : static_cast<int>( line.alignmentOffset );
+    glyphData.horizontalOffset += horizontalOffset;
 
     // Increases the vertical offset with the line's ascender.
     glyphData.verticalOffset += static_cast<int>( line.ascender );
+
+    // Include line spacing after first line
+    if( lineIndex > 0u )
+    {
+      glyphData.verticalOffset += static_cast<int>( line.lineSpacing );
+    }
 
     // Retrieves the glyph's outline width
     float outlineWidth = mModel->GetOutlineWidth();
@@ -590,11 +645,14 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
         // Don't render outline for other styles
         outlineWidth = 0.0f;
       }
+      if( style != Typesetter::STYLE_UNDERLINE )
+      {
+        fontClient.CreateBitmap( glyphInfo->fontId,
+                                 glyphInfo->index,
+                                 glyphData.glyphBitmap,
+                                 outlineWidth );
+      }
 
-      fontClient.CreateBitmap( glyphInfo->fontId,
-                               glyphInfo->index,
-                               glyphData.glyphBitmap,
-                               outlineWidth );
 
       // Sets the glyph's bitmap into the bitmap of the whole text.
       if( NULL != glyphData.glyphBitmap.buffer )
