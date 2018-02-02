@@ -109,7 +109,8 @@ struct Engine::Impl
   Impl()
   : mLayout( Layout::Engine::SINGLE_LINE_BOX ),
     mCursorWidth( CURSOR_WIDTH ),
-    mDefaultLineSpacing( LINE_SPACING )
+    mDefaultLineSpacing( LINE_SPACING ),
+    mPreviousCharacterExtraWidth( 0.0f )
   {
   }
 
@@ -345,6 +346,7 @@ struct Engine::Impl
 
             const float extraWidth = glyphMetrics.xBearing + glyphMetrics.width - glyphMetrics.advance;
             tmpExtraWidth = ( 0.f < extraWidth ) ? extraWidth : 0.f;
+            tmpExtraWidth = std::max( mPreviousCharacterExtraWidth - glyphMetrics.advance, tmpExtraWidth );
           }
         }
         else
@@ -358,6 +360,7 @@ struct Engine::Impl
 
               const float extraWidth = glyphMetrics.xBearing + glyphMetrics.width - glyphMetrics.advance;
               tmpExtraWidth = ( 0.f < extraWidth ) ? extraWidth : 0.f;
+              tmpExtraWidth = std::max( mPreviousCharacterExtraWidth - glyphMetrics.advance, tmpExtraWidth );
             }
             else // LTR
             {
@@ -385,6 +388,7 @@ struct Engine::Impl
 
               const float extraWidth = glyphMetrics.xBearing + glyphMetrics.width - glyphMetrics.advance;
               tmpExtraWidth = ( 0.f < extraWidth ) ? extraWidth : 0.f;
+              tmpExtraWidth = std::max( mPreviousCharacterExtraWidth - glyphMetrics.advance, tmpExtraWidth );
             }
           }
         }
@@ -392,6 +396,9 @@ struct Engine::Impl
         // Clear the white space length at the end of the line.
         tmpLineLayout.wsLengthEndOfLine = 0.f;
       }
+
+      // Save the current extra width to compare with the next one
+      mPreviousCharacterExtraWidth = tmpExtraWidth;
 
       // Check if the accumulated length fits in the width of the box.
       if( ( completelyFill || isMultiline ) && !isWhiteSpace &&
@@ -1217,6 +1224,7 @@ struct Engine::Impl
   Type mLayout;
   float mCursorWidth;
   float mDefaultLineSpacing;
+  float mPreviousCharacterExtraWidth;
 
   IntrusivePtr<Metrics> mMetrics;
 };
