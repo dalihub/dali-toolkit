@@ -84,6 +84,8 @@ public:
       /**
        * @brief name "video", video file url as string type or Property::Map.
        * @SINCE_1_1.38
+       * @REMARK_INTERNET
+       * @REMARK_STORAGE
        */
       VIDEO = PROPERTY_START_INDEX,
 
