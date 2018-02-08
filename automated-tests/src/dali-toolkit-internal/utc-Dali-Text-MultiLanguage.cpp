@@ -238,7 +238,7 @@ bool ScriptsTest( const ScriptsData& data )
 
     if( scriptRun1.script != scriptRun2.script )
     {
-      tet_printf("ScriptsTest FAIL: different script. %s, should be %s\n", TextAbstraction::ScriptName[scriptRun1.script], TextAbstraction::ScriptName[scriptRun2.script] );
+      tet_printf("ScriptsTest FAIL: script index: %u, different script. %s, should be %s\n", index, TextAbstraction::ScriptName[scriptRun1.script], TextAbstraction::ScriptName[scriptRun2.script] );
       return false;
     }
   }
@@ -959,7 +959,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       0u,
       3u,
     },
-    TextAbstraction::LATIN
+    TextAbstraction::UNKNOWN
   };
   ScriptRun scriptRun1101 =
   {
@@ -967,7 +967,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       3u,
       3u,
     },
-    TextAbstraction::LATIN
+    TextAbstraction::UNKNOWN
   };
   ScriptRun scriptRun1102 =
   {
@@ -983,7 +983,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       25u,
       3u,
     },
-    TextAbstraction::LATIN
+    TextAbstraction::UNKNOWN
   };
   ScriptRun scriptRun1104 =
   {
@@ -991,7 +991,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       28u,
       3u,
     },
-    TextAbstraction::LATIN
+    TextAbstraction::UNKNOWN
   };
   ScriptRun scriptRun1105 =
   {
@@ -1007,7 +1007,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       46u,
       2u,
     },
-    TextAbstraction::LATIN
+    TextAbstraction::UNKNOWN
   };
   ScriptRun scriptRun1107 =
   {
@@ -1015,7 +1015,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       48u,
       2u,
     },
-    TextAbstraction::LATIN
+    TextAbstraction::UNKNOWN
   };
   ScriptRun scriptRun1108 =
   {
@@ -1023,7 +1023,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       50u,
       2u,
     },
-    TextAbstraction::LATIN
+    TextAbstraction::UNKNOWN
   };
   scriptRuns11.PushBack( scriptRun1100 );
   scriptRuns11.PushBack( scriptRun1101 );
@@ -1043,7 +1043,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       0u,
       3u,
     },
-    TextAbstraction::LATIN
+    TextAbstraction::UNKNOWN
   };
   ScriptRun scriptRun1201 =
   {
@@ -1051,7 +1051,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       3u,
       3u,
     },
-    TextAbstraction::LATIN
+    TextAbstraction::UNKNOWN
   };
   ScriptRun scriptRun1202 =
   {
@@ -1059,7 +1059,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       6u,
       3u,
     },
-    TextAbstraction::LATIN
+    TextAbstraction::UNKNOWN
   };
   ScriptRun scriptRun1203 =
   {
@@ -1067,7 +1067,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       9u,
       2u,
     },
-    TextAbstraction::LATIN
+    TextAbstraction::UNKNOWN
   };
   scriptRuns12.PushBack( scriptRun1200 );
   scriptRuns12.PushBack( scriptRun1201 );
@@ -1081,7 +1081,7 @@ int UtcDaliTextMultiLanguageSetScripts(void)
       0u,
       4u,
     },
-    TextAbstraction::LATIN // An unknown script is transformed to LATIN
+    TextAbstraction::UNKNOWN
   };
   scriptRuns13.PushBack( scriptRun1301 );
 
