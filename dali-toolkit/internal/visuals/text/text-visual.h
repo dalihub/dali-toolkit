@@ -205,19 +205,19 @@ private:
    * Get the texture of the text for rendering.
    * @param[in] size The texture size.
    * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
-   * @param[in] containsEmoji Whether the text contains emoji.
+   * @param[in] containsColorGlyph Whether the text contains color glyph.
    * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
    */
-  TextureSet GetTextTexture( const Vector2& size, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled );
+  TextureSet GetTextTexture( const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled );
 
   /**
    * Get the text rendering shader.
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
-   * @param[in] containsEmoji Whether the text contains emoji.
+   * @param[in] containsColorGlyph Whether the text contains color glyph.
    * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
    */
-  Shader GetTextShader( VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled );
+  Shader GetTextShader( VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled );
 
   /**
    * @brief Retrieve the text's controller.
