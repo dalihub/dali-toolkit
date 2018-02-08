@@ -509,7 +509,7 @@ struct Engine::Impl
 
       penX += glyph.advance;
 
-      DALI_LOG_RELEASE_INFO("SetGlyphPositions: text: %s, GlyphIndex: %u, glyph.index: %u, glyph.xBearing: %f, glyph.advance: %f, position.x: %f, penX: %f\n", text.c_str(), i, glyph.index, glyph.xBearing, glyph.advance, position.x, penX);
+      DALI_LOG_ERROR("SetGlyphPositions: text: %s, GlyphIndex: %u, glyph.index: %u, glyph.xBearing: %f, glyph.advance: %f, position.x: %f, penX: %f\n", text.c_str(), i, glyph.index, glyph.xBearing, glyph.advance, position.x, penX);
     }
   }
 
