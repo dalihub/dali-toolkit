@@ -84,6 +84,8 @@ public:
       /**
        * @brief name "video", video file url as string type or Property::Map.
        * @SINCE_1_1.38
+       * @REMARK_INTERNET
+       * @REMARK_STORAGE
        */
       VIDEO = PROPERTY_START_INDEX,
 
@@ -113,7 +115,14 @@ public:
        * @SINCE_1_2.62
        * @REMARK_RAWVIDEO
        */
-      UNDERLAY
+      UNDERLAY,
+
+     /**
+       * @brief The play position (millisecond) of the video.
+       * @details Name "playPosition", type Property::INTEGER
+       * @SINCE_1_3_9
+       */
+      PLAY_POSITION
     };
   };
 
@@ -124,7 +133,6 @@ public:
    * @SINCE_1_1.38
    * @return A handle to a newly allocated Dali ImageView
    *
-   * @note VideoView will not display anything
    */
   static VideoView New();
 
@@ -139,6 +147,31 @@ public:
    * @return A handle to a newly allocated Dali VideoView
    */
   static VideoView New( const std::string& url );
+
+  /**
+   * @brief Creates an initialized VideoView.
+   * @SINCE_1_3_9
+   * @param[in] swCodec Video rendering by H/W codec if false
+   * @return A handle to a newly allocated Dali ImageView
+   *
+   * @note If platform or target does not support sw codec, video-view shows an error message and video by default codec type
+   */
+  static VideoView New( bool swCodec );
+
+  /**
+   * @brief Creates an initialized VideoView.
+   * If the string is empty, VideoView will not display anything.
+   *
+   * @SINCE_1_3_9
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
+   * @param[in] url The url of the video resource to display
+   * @param[in] swCodec Video rendering by H/W codec if false
+   * @return A handle to a newly allocated Dali VideoView
+   *
+   * @note If platform or target does not support sw codec, video-view shows an error message and video by default codec type
+   */
+  static VideoView New( const std::string& url, bool swCodec );
 
   /**
    * @brief Creates an uninitialized VideoView.

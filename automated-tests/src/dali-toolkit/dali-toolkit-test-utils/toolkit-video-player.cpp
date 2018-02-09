@@ -37,6 +37,7 @@ public:
   {
     mMuted = false;
     mLooping = false;
+    mPlayPosition = 0;
   }
 
   void SetMuted( bool muted )
@@ -67,6 +68,16 @@ public:
     }
   }
 
+  int GetPlayPosition()
+  {
+    return mPlayPosition;
+  }
+
+  void SetPlayPosition( int pos )
+  {
+    mPlayPosition = pos;
+  }
+
 public:
 
   std::string mUrl;
@@ -78,6 +89,7 @@ private:
 
   bool mMuted;
   bool mLooping;
+  int mPlayPosition;
 };
 
 inline VideoPlayer& GetImplementation( Dali::VideoPlayer& player )
@@ -201,11 +213,12 @@ void VideoPlayer::SetRenderingTarget( Any target )
 
 void VideoPlayer::SetPlayPosition( int millisecond )
 {
+  Internal::Adaptor::GetImplementation( *this ).SetPlayPosition( millisecond );
 }
 
 int VideoPlayer::GetPlayPosition()
 {
-  return 0;
+  return Internal::Adaptor::GetImplementation( *this ).GetPlayPosition();
 }
 
 void VideoPlayer::SetDisplayArea( DisplayArea area )
@@ -234,9 +247,18 @@ void VideoPlayer::Backward( int millisecond )
 {
 }
 
-bool VideoPlayer::IsVideoTextureSupported() const
+bool VideoPlayer::IsVideoTextureSupported()
 {
   return ToolkitApplication::DECODED_IMAGES_SUPPORTED;
+}
+
+void VideoPlayer::SetCodecType( Dali::VideoPlayerPlugin::CodecType type )
+{
+}
+
+Dali::VideoPlayerPlugin::CodecType VideoPlayer::GetCodecType() const
+{
+  return Dali::VideoPlayerPlugin::CodecType::DEFAULT;
 }
 
 } // namespace Dali;

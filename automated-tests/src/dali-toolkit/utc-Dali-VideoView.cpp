@@ -409,6 +409,7 @@ int UtcDaliVideoViewMethodsForCoverage2(void)
 int UtcDaliVideoViewPropertyUnderlay(void)
 {
   ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewPropertyUnderlay");
   ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
 
   VideoView view = VideoView::New();
@@ -450,6 +451,59 @@ int UtcDaliVideoViewPropertyUnderlay(void)
   DALI_TEST_CHECK( !isUnderlay );
 
   view.Stop();
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewPropertyPlayPosition(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewPropertyPlayPosition");
+
+  VideoView view = VideoView::New();
+  DALI_TEST_CHECK( view );
+
+  Stage::GetCurrent().Add( view );
+  view.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  int playPos = view.GetProperty( Toolkit::VideoView::Property::PLAY_POSITION ).Get< int >();
+  DALI_TEST_CHECK( playPos == 0 );
+
+  view.SetProperty( Toolkit::VideoView::Property::PLAY_POSITION, 10 );
+  playPos = view.GetProperty( Toolkit::VideoView::Property::PLAY_POSITION ).Get< int >();
+  // Actually setting play position will be async
+  // Actual platform result may be different.
+  DALI_TEST_CHECK( playPos == 10 );
+
+  END_TEST;
+}
+
+// For coverage.
+int UtcDaliVideoViewNew2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewNew2");
+
+  VideoView view = VideoView::New( true );
+  DALI_TEST_CHECK( view );
+
+  Stage::GetCurrent().Add( view );
+  view.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  VideoView view2 = VideoView::New( "", false );
+  DALI_TEST_CHECK( view2 );
+
+  Stage::GetCurrent().Add( view2 );
+  view2.Play();
+
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
