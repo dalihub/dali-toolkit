@@ -40,6 +40,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, true, "LOG_MULT
 #endif
 
 const Dali::Toolkit::Text::Character UTF32_A = 0x0041;
+
 }
 
 namespace Text
@@ -98,7 +99,8 @@ void DefaultFonts::Cache( const TextAbstraction::FontDescription& description, F
 
 MultilanguageSupport::MultilanguageSupport()
 : mDefaultFontPerScriptCache(),
-  mValidFontsPerScriptCache()
+  mValidFontsPerScriptCache(),
+  mSlotDelegate( this )
 {
   // Initializes the default font cache to zero (invalid font).
   // Reserves space to cache the default fonts and access them with the script as an index.
@@ -121,6 +123,22 @@ MultilanguageSupport::MultilanguageSupport()
     }
   }
 
+  // Connect LanguageChangedSignal to clear caches when locale is changed.
+  Dali::Adaptor::Get().LanguageChangedSignal().Connect( mSlotDelegate, &Dali::Toolkit::Text::Internal::MultilanguageSupport::OnLanguageChanged );
+}
+
+void MultilanguageSupport::OnLanguageChanged( Dali::Adaptor& adaptor )
+{
+  // When locale is changed, font configuration might provide a different font list.
+  // In this case, the original cached font might not be valid for same script.
+  // Therefore, we need to clear caches.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.ClearCache();
+
+  mDefaultFontPerScriptCache.Clear();
+  mValidFontsPerScriptCache.Clear();
+  mDefaultFontPerScriptCache.Resize( TextAbstraction::UNKNOWN + 1, NULL );
+  mValidFontsPerScriptCache.Resize( TextAbstraction::UNKNOWN + 1, NULL );
 }
 
 MultilanguageSupport::~MultilanguageSupport()
