@@ -120,7 +120,54 @@ public:
        * @details Name "playPosition", type Property::INTEGER
        * @SINCE_1_3_9
        */
-      PLAY_POSITION
+      PLAY_POSITION,
+
+      /**
+        * @brief The display mode of the video.
+        * @SINCE_1_3_15
+        */
+      DISPLAY_MODE
+    };
+  };
+
+  /**
+   * @brief The values of this enum determine how the video should be display mode to the view
+   * @SINCE_1_3_15
+   */
+  struct DisplayMode
+  {
+    enum Type
+    {
+      /**
+       * @brief Letter box
+       * @SINCE_1_3_15
+       */
+      LETTER_BOX = 0,
+      /**
+       * @brief Origin size
+       * @SINCE_1_3_15
+       */
+      ORIGIN_SIZE,
+      /**
+       * @brief Full-screen
+       * @SINCE_1_3_15
+       */
+      FULL_SCREEN,
+      /**
+       * @brief Cropped full-screen
+       * @SINCE_1_3_15
+       */
+      CROPPED_FULL,
+      /**
+       * @brief  Origin size (if surface size is larger than video size(width/height)) or Letter box (if video size(width/height) is larger than surface size)
+       * @SINCE_1_3_15
+       */
+      ORIGIN_OR_LETTER,
+      /**
+       * @brief  Region of Interest
+       * @SINCE_1_3_15
+       */
+      DST_ROI
     };
   };
 

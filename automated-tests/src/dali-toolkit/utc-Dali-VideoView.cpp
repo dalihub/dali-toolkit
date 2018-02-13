@@ -507,3 +507,24 @@ int UtcDaliVideoViewNew2(void)
 
   END_TEST;
 }
+
+int UtcDaliVideoViewPropertyDisplayMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewPropertyDisplayMode");
+
+  VideoView view = VideoView::New();
+  DALI_TEST_CHECK( view );
+
+  Stage::GetCurrent().Add( view );
+  view.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  view.SetProperty( Toolkit::VideoView::Property::DISPLAY_MODE, Toolkit::VideoView::DisplayMode::DST_ROI );
+  int displayMode = view.GetProperty( Toolkit::VideoView::Property::DISPLAY_MODE ).Get< int >();
+  DALI_TEST_CHECK( displayMode == Toolkit::VideoView::DisplayMode::DST_ROI );
+
+  END_TEST;
+}
