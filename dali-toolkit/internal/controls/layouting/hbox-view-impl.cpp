@@ -55,7 +55,7 @@ void HboxView::AddChild( Actor child )
 
     if( ! childLayout )
     {
-      childLayout = LayoutBase::New( child );
+      childLayout = LayoutBase::New( child.GetObjectPtr() );
 
       CustomActorImpl& customActor = static_cast< CustomActorImpl& >( controlImpl );
       auto desiredSize = customActor.GetNaturalSize();
@@ -112,13 +112,15 @@ void HboxView::SetCellHeight( Dali::Toolkit::HboxView::CellPosition cellPosition
 
 void HboxView::OnInitialize()
 {
-  auto layout = HboxLayout::New();
+  IntrusivePtr<RefObject> handle( static_cast<RefObject*>(this) );
+
+  auto layout = Internal::HboxLayout::New( handle );
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( *this );
   controlDataImpl.SetLayout( *layout.Get() );
 }
 
 HboxView::HboxView()
-: Control(ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ))
+: Control(ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT | DISABLE_SIZE_NEGOTIATION))
 {
 }
 

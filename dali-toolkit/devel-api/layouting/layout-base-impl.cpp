@@ -36,21 +36,21 @@ LayoutBase::LayoutBase()
 {
 }
 
-LayoutBasePtr LayoutBase::New( BaseHandle handle )
+LayoutBasePtr LayoutBase::New( IntrusivePtr<RefObject> handle )
 {
   LayoutBasePtr layoutPtr = new LayoutBase();
   layoutPtr->Initialize( handle );
   return layoutPtr;
 }
 
-void LayoutBase::Initialize( BaseHandle handle )
+void LayoutBase::Initialize( IntrusivePtr<RefObject> handle )
 {
-  mImpl->mOwner = &handle.GetBaseObject();
+  mImpl->mOwner = handle.Get();
 }
 
-BaseHandle LayoutBase::GetOwner() const
+IntrusivePtr<RefObject> LayoutBase::GetOwner() const
 {
-  return BaseHandle( mImpl->mOwner );
+  return IntrusivePtr<RefObject>(mImpl->mOwner);
 }
 
 void LayoutBase::SetLayoutData( ChildLayoutDataPtr childLayoutData )
@@ -245,30 +245,18 @@ MeasuredSize LayoutBase::GetMeasuredHeightAndState()
 
 uint16_t LayoutBase::GetSuggestedMinimumWidth()
 {
-  Vector3 naturalSize;
-
-  // Construct a base handle to the owner, and try and cast it to Control.
-  BaseHandle handle( mImpl->mOwner );
-  Toolkit::Control control = Toolkit::Control::DownCast( handle );
-  if( control )
-  {
-    naturalSize = control.GetNaturalSize();
-  }
+  auto customActor = dynamic_cast<CustomActorImpl*>( mImpl->mOwner );
+  auto actor = (customActor != nullptr) ? customActor->Self() : nullptr;
+  auto naturalSize = (actor != nullptr) ? actor.GetNaturalSize() : Vector3::ZERO;
 
   return std::max( mImpl->mMinimumSize.GetWidth(), uint16_t( naturalSize.width ) );
 }
 
 uint16_t LayoutBase::GetSuggestedMinimumHeight()
 {
-  Vector3 naturalSize;
-
-  // Construct a base handle to the owner, and try and cast it to Control.
-  BaseHandle handle( mImpl->mOwner );
-  Toolkit::Control control = Toolkit::Control::DownCast( handle );
-  if( control )
-  {
-    naturalSize = control.GetNaturalSize();
-  }
+  auto customActor = dynamic_cast<CustomActorImpl*>( mImpl->mOwner );
+  auto actor = (customActor != nullptr) ? customActor->Self() : nullptr;
+  auto naturalSize = (actor != nullptr) ? actor.GetNaturalSize() : Vector3::ZERO;
 
   return std::max( mImpl->mMinimumSize.GetHeight(), uint16_t(naturalSize.height) );
 }
@@ -338,11 +326,13 @@ bool LayoutBase::SetFrame( int left, int top, int right, int bottom )
 
 
     // Reflect up to parent control
-    auto control = Toolkit::Control::DownCast( mImpl->mOwner );
-    if( control )
+    auto customActor = dynamic_cast<CustomActorImpl*>( mImpl->mOwner );
+    auto actor = (customActor != nullptr) ? customActor->Self() : nullptr;
+
+    if( actor )
     {
-      control.SetPosition( Vector3( left, top, 0.0f ) );
-      control.SetSize( Vector3( right-left, bottom-top, 0.0f ) );
+      actor.SetPosition( Vector3( left, top, 0.0f ) );
+      actor.SetSize( Vector3( right-left, bottom-top, 0.0f ) );
     }
 
     if( sizeChanged )

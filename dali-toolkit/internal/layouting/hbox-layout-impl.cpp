@@ -21,6 +21,11 @@
 //INTERNAL HEADERS
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
 #include <dali-toolkit/internal/layouting/margin-layout-data-impl.h>
+#include <dali/integration-api/debug.h>
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
+#endif
 
 namespace Dali
 {
@@ -29,14 +34,15 @@ namespace Toolkit
 namespace Internal
 {
 
-HboxLayoutPtr HboxLayout::New()
+HboxLayoutPtr HboxLayout::New( IntrusivePtr<RefObject> owner)
 {
-  HboxLayoutPtr object( new HboxLayout() );
+  HboxLayoutPtr layout( new HboxLayout() );
+  layout->Initialize( owner );
 
   auto layoutController = Toolkit::LayoutController::Get();
-  layoutController.RegisterLayout( Toolkit::HboxLayout(object.Get()) );
+  layoutController.RegisterLayout( Toolkit::HboxLayout(layout.Get()) );
 
-  return object;
+  return layout;
 }
 
 HboxLayout::HboxLayout()
@@ -72,6 +78,19 @@ LayoutSize HboxLayout::GetCellPadding()
 
 void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
 {
+#if defined(DEBUG_ENABLED)
+  CustomActorImpl* customActor = dynamic_cast<CustomActorImpl*>( GetOwner().Get() );
+  Actor actor = (customActor != nullptr) ? customActor->Self() : nullptr;
+  std::ostringstream oss;
+  oss << "HBoxLayout::OnMeasure  ";
+  if( actor )
+  {
+    oss << "Actor Id:" << actor.GetId() << " Name:" << actor.GetName();
+  }
+  oss << "widthMeasureSpec:" << widthMeasureSpec << " heightMeasureSpec:" << heightMeasureSpec << std::endl;
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, oss.str().c_str() );
+#endif
+
   const uint32_t widthMode = widthMeasureSpec.GetMode();
   const uint32_t heightMode = heightMeasureSpec.GetMode();
   bool isExactly = (widthMode == MeasureSpec::EXACTLY);

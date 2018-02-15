@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_BASE_DATA_IMPL_H_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public:
 public:
   Toolkit::LayoutController mLayoutController;
 
-  BaseObject* mOwner; ///< Control or Visual that owns this layout. Raw pointer to avoid cyclic references
+  RefObject* mOwner; ///< Control or Visual that owns this layout. Raw pointer to avoid cyclic references
   LayoutParent* mLayoutParent; ///< The containing layout parent.
   ChildLayoutDataPtr mLayoutData; ///< The layout data for this object ( within it's parent layouter )
 
@@ -49,7 +49,6 @@ public:
 
   Extents mMargin; ///< Distances in pixels from the edges of this view to this view's parent.
   Extents mPadding; ///< Distances in pixels from the edges of this view to this view's content.
-
 
   uint16_t mLeft;
   uint16_t mRight;

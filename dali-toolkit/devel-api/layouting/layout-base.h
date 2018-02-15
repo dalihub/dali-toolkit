@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_LAYOUTING_LAYOUT_BASE_H
 #define DALI_TOOLKIT_LAYOUTING_LAYOUT_BASE_H
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,9 @@ public:
   /**
    * @brief Create an initialized LayoutBase
    *
-   * @param[in] handle A handle to the object that this layout wraps, e.g. a Control or a Visual::Base
+   * @param[in] handle A handle to the object that this layout for, e.g. a Control or a Visual::Base
+   * @warning This is an interim function, and will be deleted when all controls have layouts
+   * @todo Ensure that this warning is implemented
    */
   static LayoutBase New( BaseHandle handle );
 
@@ -82,7 +84,7 @@ public:
    *
    * @return
    */
-  BaseHandle GetOwner();
+  IntrusivePtr<RefObject> GetOwner();
 
   /**
    * @brief Set some layout data on this layout base.
