@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_LAYOUTING_HBOX_LAYOUT_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,12 +37,11 @@ using HboxLayoutPtr = IntrusivePtr<HboxLayout>;
 class HboxLayout : public LayoutGroup
 {
 public:
-  static HboxLayoutPtr New();
+  static HboxLayoutPtr New( IntrusivePtr<RefObject> owner );
 
 public:
   void SetMode( Dali::Toolkit::HboxView::Mode mode );
   Dali::Toolkit::HboxView::Mode GetMode();
-
   void SetCellPadding( LayoutSize size );
   LayoutSize GetCellPadding();
 

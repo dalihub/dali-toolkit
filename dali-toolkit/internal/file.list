@@ -16,6 +16,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/layouting/hbox-layout-impl.cpp \
    $(toolkit_src_dir)/layouting/layout-base-data-impl.cpp \
    $(toolkit_src_dir)/layouting/layout-group-data-impl.cpp \
+   $(toolkit_src_dir)/layouting/layout-controller-debug.cpp \
    $(toolkit_src_dir)/layouting/layout-controller-impl.cpp \
    $(toolkit_src_dir)/layouting/table-layout-impl.cpp \
    $(toolkit_src_dir)/visuals/animated-image/animated-image-visual.cpp \

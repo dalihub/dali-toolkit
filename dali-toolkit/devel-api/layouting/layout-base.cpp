@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ LayoutBase::LayoutBase()
 
 LayoutBase LayoutBase::New( BaseHandle handle )
 {
-  Internal::LayoutBasePtr layout = Internal::LayoutBase::New( handle );
+  Internal::LayoutBasePtr layout = Internal::LayoutBase::New( handle.GetObjectPtr() );
   return LayoutBase( layout.Get() );
 }
 
@@ -50,7 +50,7 @@ LayoutBase::LayoutBase( Internal::LayoutBase* layoutBase )
 {
 }
 
-BaseHandle LayoutBase::GetOwner()
+IntrusivePtr<RefObject> LayoutBase::GetOwner()
 {
   return GetImplementation( *this ).GetOwner();
 }

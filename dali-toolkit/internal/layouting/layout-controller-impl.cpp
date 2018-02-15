@@ -21,6 +21,7 @@
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/layouting/layout-controller-debug.h>
 
 using namespace Dali;
 
@@ -83,7 +84,11 @@ void LayoutController::Process()
 
     // Test how to perform a measure on each control.
     MeasureHierarchy( stage.GetRootLayer(), widthSpec, heightSpec );
+
+    LAYOUT_DEBUG_MEASURE_STATES( stage.GetRootLayer() );
     PerformLayout( stage.GetRootLayer(), 0, 0, stageWidth, stageHeight );
+
+    LAYOUT_DEBUG_AFTER_LAYOUT( stage.GetRootLayer() );
   }
 }
 
@@ -128,6 +133,9 @@ void LayoutController::PerformLayout( Actor root, int left, int top, int right, 
     Internal::Control& controlImpl = GetImplementation( control );
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
     LayoutBasePtr layout = controlDataImpl.GetLayout();
+
+    // This is the first control. Give it the stage size
+    control.SetSize( Vector3(right, bottom, 0.0f) );
 
     if( layout )
     {

@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_BASE_H
 #define DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_BASE_H
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,14 +49,14 @@ protected:
   ~LayoutBase()=default;
 
 public:
-  static LayoutBasePtr New( BaseHandle handle );
+  static LayoutBasePtr New( IntrusivePtr<RefObject> handle );
 
   LayoutBase(const LayoutBase& copy)=delete;
   LayoutBase& operator=(const LayoutBase& rhs)=delete;
 
-  virtual void Initialize( BaseHandle handle );
+  virtual void Initialize( IntrusivePtr<RefObject> handle );
 
-  BaseHandle GetOwner() const;
+  IntrusivePtr<RefObject> GetOwner() const;
 
   void SetLayoutData( ChildLayoutDataPtr childLayoutData );
 
