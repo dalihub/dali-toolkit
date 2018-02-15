@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_LAYOUTING_MEASURE_SPEC_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  */
 
 #include <dali/public-api/common/dali-common.h>
+#include <sstream>
 
 namespace Dali
 {
@@ -67,12 +68,12 @@ public:
     return ( size.mMeasureSpec & ~MeasureSpec::MODE_MASK ) | ( mode & MeasureSpec::MODE_MASK );
   }
 
-  uint32_t GetMode()
+  uint32_t GetMode() const
   {
     return ( mMeasureSpec & MODE_MASK );
   }
 
-  uint32_t GetSize()
+  uint32_t GetSize() const
   {
     return ( mMeasureSpec & ~MODE_MASK );
   }
@@ -102,6 +103,12 @@ public:
   uint32_t mMeasureSpec;
 };
 
+inline std::ostream& operator<< (std::ostream& o, const MeasureSpec& measureSpec )
+{
+  return o << ( (measureSpec.GetMode() == MeasureSpec::UNSPECIFIED ? "Unspecified"
+                 : (measureSpec.GetMode() == MeasureSpec::EXACTLY ? "Exactly":"At most" ) ) )
+           << " " << measureSpec.GetSize();
+}
 
 } //namespace Toolkit
 } //namespace Dali

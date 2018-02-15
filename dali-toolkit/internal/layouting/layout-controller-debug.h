@@ -1,3 +1,6 @@
+#ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_DEBUG_H
+#define DALI_TOOLKIT_INTERNAL_LAYOUTING_DEBUG_H
+
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
@@ -14,8 +17,9 @@
  * limitations under the License.
  */
 
-#include <dali-toolkit/internal/layouting/layout-base-data-impl.h>
-#include <dali-toolkit/devel-api/layouting/measured-size.h>
+#include <dali/public-api/actors/actor.h>
+#include <dali/integration-api/debug.h>
+#include <dali-toolkit/devel-api/layouting/measure-spec.h>
 
 namespace Dali
 {
@@ -24,26 +28,28 @@ namespace Toolkit
 namespace Internal
 {
 
-bool LayoutBase::Impl::sUseZeroUnspecifiedMeasureSpec = false;
+#if defined(DEBUG_ENABLED)
+
+extern void LayoutDebugMeasureState( Actor root );
+extern void LayoutDebugAfterLayout( Actor root );
 
 
-LayoutBase::Impl::Impl( LayoutBase& layoutBase )
-: mLayoutController( Toolkit::LayoutController::Get() ),
-  mOwner( nullptr ),
-  mLayoutParent( nullptr ),
-  mOldWidthMeasureSpec( 0u ),
-  mOldHeightMeasureSpec( 0u ),
-  mMinimumSize(),
-  mMeasuredSize(),
-  mLeft( 0 ),
-  mRight( 0 ),
-  mTop( 0 ),
-  mBottom( 0 ),
-  mViewFlags( 0 ),
-  mPrivateFlags( 0 )
-{
-}
+#define LAYOUT_DEBUG_MEASURE_STATES( root ) \
+  LayoutDebugMeasureState( root )
+
+#define LAYOUT_DEBUG_AFTER_LAYOUT( root ) \
+  LayoutDebugAfterLayout( root )
+
+#else
+
+
+#define LAYOUT_DEBUG_MEASURE_STATES( root )
+#define LAYOUT_DEBUG_AFTER_LAYOUT( root )
+
+#endif
 
 } // namespace Internal
 } // namespace Toolkit
 } // namespace Dali
+
+#endif //DALI_TOOLKIT_INTERNAL_LAYOUTING_DEBUG_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,13 +129,19 @@ void LayoutGroup::MeasureChildren( MeasureSpec widthMeasureSpec, MeasureSpec hei
   }
 }
 
-void LayoutGroup::MeasureChild( LayoutBasePtr child, MeasureSpec parentWidthMeasureSpec, MeasureSpec parentHeightMeasureSpec )
+void LayoutGroup::MeasureChild( LayoutBasePtr child,
+                                MeasureSpec parentWidthMeasureSpec,
+                                MeasureSpec parentHeightMeasureSpec )
 {
   ChildLayoutDataPtr childLayoutData = child->GetLayoutData();
   auto padding = GetPadding();
 
-  const MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec, padding.start + padding.end, childLayoutData->GetWidth());
-  const MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( parentHeightMeasureSpec, padding.top + padding.bottom, childLayoutData->GetHeight());
+  const MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
+                                                                 padding.start + padding.end,
+                                                                 childLayoutData->GetWidth());
+  const MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( parentHeightMeasureSpec,
+                                                                  padding.top + padding.bottom,
+                                                                  childLayoutData->GetHeight());
 
   child->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
 }
