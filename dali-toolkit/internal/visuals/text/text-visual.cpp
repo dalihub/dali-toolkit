@@ -61,6 +61,7 @@ const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
 const char * const SHADOW_PROPERTY( "shadow" );
 const char * const UNDERLINE_PROPERTY( "underline" );
 const char * const OUTLINE_PROPERTY( "outline" );
+const char * const BACKGROUND_PROPERTY( "textBackground" );
 
 const Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
 
@@ -335,6 +336,10 @@ Dali::Property::Index StringKeyToIndexKey( const std::string& stringKey )
   {
     result = Toolkit::DevelTextVisual::Property::OUTLINE;
   }
+  else if( stringKey == BACKGROUND_PROPERTY )
+  {
+    result = Toolkit::DevelTextVisual::Property::BACKGROUND;
+  }
 
   return result;
 }
@@ -415,6 +420,9 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   GetOutlineProperties( mController, value, Text::EffectStyle::DEFAULT );
   map.Insert( Toolkit::DevelTextVisual::Property::OUTLINE, value );
+
+  GetBackgroundProperties( mController, value, Text::EffectStyle::DEFAULT );
+  map.Insert( Toolkit::DevelTextVisual::Property::BACKGROUND, value );
 }
 
 void TextVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -608,6 +616,11 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
       SetOutlineProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
       break;
     }
+    case Toolkit::DevelTextVisual::Property::BACKGROUND:
+    {
+      SetBackgroundProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
+      break;
+    }
   }
 }
 
@@ -702,8 +715,9 @@ void TextVisual::UpdateRenderer()
 
       const bool underlineEnabled = mController->GetTextModel()->IsUnderlineEnabled();
       const bool outlineEnabled = ( mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1 );
+      const bool backgroundEnabled = mController->GetTextModel()->IsBackgroundEnabled();;
 
-      const bool styleEnabled = ( shadowEnabled || underlineEnabled || outlineEnabled );
+      const bool styleEnabled = ( shadowEnabled || underlineEnabled || outlineEnabled || backgroundEnabled );
 
       TextureSet textureSet = GetTextTexture( relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled );
       mImpl->mRenderer.SetTextures( textureSet );

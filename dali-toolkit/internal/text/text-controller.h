@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -868,6 +868,34 @@ public: // Default style & Input style
    * @return The width of the outline.
    */
   unsigned int GetOutlineWidth() const;
+
+  /**
+   * @brief Set the background color.
+   *
+   * @param[in] color color of background.
+   */
+  void SetBackgroundColor( const Vector4& color );
+
+  /**
+   * @brief Retrieve the background color.
+   *
+   * @return The background color.
+   */
+  const Vector4& GetBackgroundColor() const;
+
+  /**
+   * @brief Set the background enabled flag.
+   *
+   * @param[in] enabled The background enabled flag.
+   */
+  void SetBackgroundEnabled( bool enabled );
+
+  /**
+   * @brief Returns whether to enable text background or not.
+   *
+   * @return Whether text background is enabled.
+   */
+  bool IsBackgroundEnabled() const;
 
   /**
    * @brief Sets the emboss's properties string.

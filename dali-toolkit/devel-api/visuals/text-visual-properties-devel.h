@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_TEXT_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,12 @@ enum
    * @brief The default outline parameters.
    * @details name "outline", type Property::MAP.
    */
-  OUTLINE               = UNDERLINE + 1
+  OUTLINE               = UNDERLINE + 1,
+
+  /**
+   * @copydoc Dali::Toolkit::DevelTextLabel::Property::BACKGROUND
+   */
+  BACKGROUND            = UNDERLINE + 2,
 };
 
 

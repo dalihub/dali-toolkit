@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_TEXT_EFFECTS_STYLE_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,20 @@ bool ParseOutlineProperties( const Property::Map& outlineProperties,
                                bool& widthDefined,
                                unsigned int& width );
 
+
+/**
+ * @brief Parses the background properties.
+ *
+ * @param[in] backgroundProperties The map with the background properties.
+ * @param[out] enabled Whether the background is enabled.
+ * @param[out] colorDefined Whether the background color is defined.
+ * @param[out] color The background color.
+ */
+bool ParseBackgroundProperties( const Property::Map& backgroundProperties,
+                                bool& enabled,
+                                bool& colorDefined,
+                                Vector4& color );
+
 /**
  * @brief Sets the underline properties.
  *
@@ -165,6 +179,26 @@ bool SetOutlineProperties( ControllerPtr controller, const Property::Value& valu
  * @param[in] type Whether the property is for the default outline or the input outline.
  */
 void GetOutlineProperties( ControllerPtr controller, Property::Value& value, EffectStyle::Type type );
+
+/**
+ * @brief Sets the background properties.
+ *
+ * @param[in] controller The text's controller.
+ * @param[in] value The values of the background's properties.
+ * @param[in] type Whether the property is for the default background or the input background.
+ *
+ * @return Whether the background properties have been updated.
+ */
+bool SetBackgroundProperties( ControllerPtr controller, const Property::Value& value, EffectStyle::Type type );
+
+/**
+ * @brief Retrieves the background's properties.
+ *
+ * @param[in] controller The text's controller.
+ * @param[out] value The value of the underline's properties.
+ * @param[in] type Whether the property is for the default background or the input background.
+ */
+void GetBackgroundProperties( ControllerPtr controller, Property::Value& value, EffectStyle::Type type );
 
 } // namespace Text
 
