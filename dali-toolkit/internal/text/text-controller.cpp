@@ -2145,7 +2145,8 @@ Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
                                                                            GET_LINE_BREAKS   |
                                                                            GET_WORD_BREAKS   |
                                                                            BIDI_INFO         |
-                                                                           SHAPE_TEXT        );
+                                                                           SHAPE_TEXT        |
+                                                                           GET_GLYPH_METRICS );
 
     // Set the update info to relayout the whole text.
     mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
