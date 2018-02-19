@@ -63,6 +63,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "looping", BOOLEAN, LOOPING )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "muted", BOOLEAN, MUTED )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "volume", MAP, VOLUME )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "underlay", BOOLEAN, UNDERLAY )
+DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "playPosition", INTEGER, PLAY_POSITION )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, VideoView, "finished", FINISHED_SIGNAL )
 
@@ -456,6 +457,15 @@ void VideoView::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::VideoView::Property::PLAY_POSITION:
+      {
+        int pos;
+        if( value.Get( pos ) )
+        {
+          impl.SetPlayPosition( pos );
+        }
+        break;
+      }
     }
   }
 }
@@ -507,6 +517,11 @@ Property::Value VideoView::GetProperty( BaseObject* object, Property::Index prop
       case Toolkit::VideoView::Property::UNDERLAY:
       {
         value = impl.IsUnderlay();
+        break;
+      }
+      case Toolkit::VideoView::Property::PLAY_POSITION:
+      {
+        value = impl.GetPlayPosition();
         break;
       }
     }
@@ -727,6 +742,30 @@ void VideoView::SetUnderlay( bool set )
 bool VideoView::IsUnderlay()
 {
   return mIsUnderlay;
+}
+
+void VideoView::SetSWCodec( bool on )
+{
+  // If setting SW or HW type is failed , video-view shows video by default codec type.
+  // The default codec type is selected by platform.
+  if( on )
+  {
+    mVideoPlayer.SetCodecType( Dali::VideoPlayerPlugin::CodecType::SW );
+  }
+  else
+  {
+    mVideoPlayer.SetCodecType( Dali::VideoPlayerPlugin::CodecType::HW );
+  }
+}
+
+int VideoView::GetPlayPosition()
+{
+  return mVideoPlayer.GetPlayPosition();
+}
+
+void VideoView::SetPlayPosition( int pos )
+{
+  mVideoPlayer.SetPlayPosition( pos );
 }
 
 } // namespace Internal
