@@ -141,15 +141,11 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
+  \n
   void main()\n
   {\n
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * visualMixColor();\n
+    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
 
@@ -160,13 +156,9 @@ const char* FRAGMENT_MASK_SHADER = DALI_COMPOSE_SHADER(
   uniform sampler2D sMask;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
   uniform mediump float auxiliaryImageAlpha;\n
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
+  \n
   void main()\n
   {\n
       // Where mask image is transparent, all of background image must show through.
@@ -179,7 +171,7 @@ const char* FRAGMENT_MASK_SHADER = DALI_COMPOSE_SHADER(
 
       mediump vec3 mixedColor = color.rgb * mix( 1.0-mask.a, 1.0, 1.0-auxiliaryImageAlpha)
                                 + mask.rgb*mask.a * auxiliaryImageAlpha;\n
-      gl_FragColor = vec4(mixedColor,1.0) * uColor * visualMixColor();\n
+      gl_FragColor = vec4(mixedColor,1.0) * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
 

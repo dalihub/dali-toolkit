@@ -126,7 +126,6 @@ struct Base::Impl
   Size            mControlSize;
   int             mDepthIndex;
   Property::Index mMixColorIndex;
-  Property::Index mOpacityIndex;
   FittingMode     mFittingMode;  //< How the contents should fit the view
   int             mFlags;
   Toolkit::Visual::ResourceStatus  mResourceStatus;

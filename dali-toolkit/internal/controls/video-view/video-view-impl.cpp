@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,11 +100,10 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = vec4(mixColor, opacity)*uColor;\n
+    gl_FragColor = vec4(mixColor, 1.0)*uColor;\n
   }\n
 );
 

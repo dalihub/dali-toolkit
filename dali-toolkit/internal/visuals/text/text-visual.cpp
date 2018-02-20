@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/animation/constraints.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 
 // INTERNAL HEADER
@@ -109,13 +110,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
   uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
-  \n
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   \n
   void main()\n
   {\n
@@ -123,7 +118,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
     mediump float textTexture = texture2D( sTexture, texCoord ).r;\n
 
     // Set the color of the text to what it is animated to.
-    gl_FragColor = uTextColorAnimatable * textTexture * uColor * visualMixColor();
+    gl_FragColor = uTextColorAnimatable * textTexture * uColor * vec4( mixColor, 1.0 );
   }\n
 );
 
@@ -133,13 +128,7 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT = DALI_COMPOSE_SHADER(
   uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
-  \n
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   \n
   void main()\n
   {\n
@@ -147,7 +136,7 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT = DALI_COMPOSE_SHADER(
     mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
     textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
-    gl_FragColor = textTexture * uColor * visualMixColor();
+    gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );
   }\n
 );
 
@@ -159,13 +148,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
-  \n
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   \n
   void main()\n
   {\n
@@ -174,7 +157,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
     mediump vec4 styleTexture = texture2D( sStyle, texCoord );\n
 
     // Draw the text as overlay above the style
-    gl_FragColor = ( uTextColorAnimatable * textTexture + styleTexture * ( 1.0 - textTexture ) ) * uColor * visualMixColor();\n
+    gl_FragColor = ( uTextColorAnimatable * textTexture + styleTexture * ( 1.0 - textTexture ) ) * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
 
@@ -185,13 +168,7 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
-  \n
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   \n
   void main()\n
   {\n
@@ -201,7 +178,7 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
     textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     // Draw the text as overlay above the style
-    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * visualMixColor();\n
+    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
 
@@ -213,13 +190,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
   uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
-  \n
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   \n
   void main()\n
   {\n
@@ -234,7 +205,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
     textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture ) * mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     // Draw the text as overlay above the style
-    gl_FragColor = textTexture * uColor * visualMixColor();\n
+    gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
 
@@ -248,13 +219,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOS
   uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
-  \n
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   \n
   void main()\n
   {\n
@@ -270,7 +235,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOS
     textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) ) * mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     // Draw the text as overlay above the style
-    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * visualMixColor();\n
+    gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
 
@@ -342,6 +307,11 @@ Dali::Property::Index StringKeyToIndexKey( const std::string& stringKey )
   }
 
   return result;
+}
+
+void OpacityConstraint( float& current, const PropertyInputContainer& inputs )
+{
+  current = inputs[0]->GetVector4().a;
 }
 
 } // unnamed namespace
@@ -495,9 +465,13 @@ void TextVisual::DoSetOnStage( Actor& actor )
     // Create constraint for the animatable text's color Property with uTextColorAnimatable in the renderer.
     if( shaderTextColorIndex != Property::INVALID_INDEX )
     {
-      Constraint constraint = Constraint::New<Vector4>( mImpl->mRenderer, shaderTextColorIndex, EqualToConstraint() );
-      constraint.AddSource( Source( actor, mAnimatableTextColorPropertyIndex ) );
-      constraint.Apply();
+      Constraint colorConstraint = Constraint::New<Vector4>( mImpl->mRenderer, shaderTextColorIndex, EqualToConstraint() );
+      colorConstraint.AddSource( Source( actor, mAnimatableTextColorPropertyIndex ) );
+      colorConstraint.Apply();
+
+      Constraint opacityConstraint = Constraint::New< float >( mImpl->mRenderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint );
+      opacityConstraint.AddSource( Source( actor, mAnimatableTextColorPropertyIndex ) );
+      opacityConstraint.Apply();
     }
   }
 
