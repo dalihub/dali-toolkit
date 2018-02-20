@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/multi-language-support.h>
+#include <dali/integration-api/adaptors/adaptor.h>
 
 namespace Dali
 {
@@ -133,6 +134,14 @@ public:
    */
   ~MultilanguageSupport();
 
+
+  /**
+   * Dali::MultilanguageSupport::OnLanguageChanged()
+   *
+   * Get notice when system language is changed.
+   */
+  void OnLanguageChanged( Dali::Adaptor& adaptor );
+
   /**
    * @copydoc Dali::MultilanguageSupport::Get()
    */
@@ -159,8 +168,9 @@ public:
                       Vector<FontRun>& fonts );
 
 private:
-  Vector<DefaultFonts*>           mDefaultFontPerScriptCache; ///< Caches default fonts for a script.
-  Vector<ValidateFontsPerScript*> mValidFontsPerScriptCache;  ///< Caches valid fonts for a script.
+  Vector<DefaultFonts*>                  mDefaultFontPerScriptCache; ///< Caches default fonts for a script.
+  Vector<ValidateFontsPerScript*>        mValidFontsPerScriptCache;  ///< Caches valid fonts for a script.
+  SlotDelegate< MultilanguageSupport >   mSlotDelegate; //< SlotDelegate to listen LanguageChangedSignal.
 };
 
 } // namespace Internal
