@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1217,6 +1217,30 @@ unsigned int Controller::GetOutlineWidth() const
   return mImpl->mModel->mVisualModel->GetOutlineWidth();
 }
 
+void Controller::SetBackgroundColor( const Vector4& color )
+{
+  mImpl->mModel->mVisualModel->SetBackgroundColor( color );
+
+  mImpl->RequestRelayout();
+}
+
+const Vector4& Controller::GetBackgroundColor() const
+{
+  return mImpl->mModel->mVisualModel->GetBackgroundColor();
+}
+
+void Controller::SetBackgroundEnabled( bool enabled )
+{
+  mImpl->mModel->mVisualModel->SetBackgroundEnabled( enabled );
+
+  mImpl->RequestRelayout();
+}
+
+bool Controller::IsBackgroundEnabled() const
+{
+  return mImpl->mModel->mVisualModel->IsBackgroundEnabled();
+}
+
 void Controller::SetDefaultEmbossProperties( const std::string& embossProperties )
 {
   if( NULL == mImpl->mEmbossDefaults )
@@ -2145,7 +2169,8 @@ Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
                                                                            GET_LINE_BREAKS   |
                                                                            GET_WORD_BREAKS   |
                                                                            BIDI_INFO         |
-                                                                           SHAPE_TEXT        );
+                                                                           SHAPE_TEXT        |
+                                                                           GET_GLYPH_METRICS );
 
     // Set the update info to relayout the whole text.
     mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
