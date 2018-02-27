@@ -49,20 +49,21 @@ void HboxView::AddChild( Actor child )
   Toolkit::Control control = Toolkit::Control::DownCast( child );
   if( control )
   {
-    Internal::Control& controlImpl = GetImplementation( control );
-    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
-    childLayout = controlDataImpl.GetLayout();
+    Internal::Control& childControlImpl = GetImplementation( control );
+    Internal::Control::Impl& childControlDataImpl = Internal::Control::Impl::Get( childControlImpl );
+    childLayout = childControlDataImpl.GetLayout();
 
     if( ! childLayout )
     {
-      childLayout = LayoutBase::New( child.GetObjectPtr() );
+      childLayout = LayoutBase::New( &childControlImpl );
 
-      CustomActorImpl& customActor = static_cast< CustomActorImpl& >( controlImpl );
+      CustomActorImpl& customActor = static_cast< CustomActorImpl& >( childControlImpl );
       auto desiredSize = customActor.GetNaturalSize();
 
       // HBoxLayout will apply default layout data for this object
       auto layoutData = MarginLayoutData::New( int( desiredSize.width ), int( desiredSize.height ), 0, 0, 0, 0 );
       childLayout->SetLayoutData( layoutData );
+      childControlDataImpl.SetLayout( *childLayout.Get() );
     }
   }
 

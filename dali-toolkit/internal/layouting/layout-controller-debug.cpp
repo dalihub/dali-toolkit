@@ -104,7 +104,7 @@ void LayoutDebugMeasureStateRecurseLayout( LayoutBasePtr layout, int depth )
   }
   else
   {
-    oss << "Owner: " << layout->GetOwner() << " ";
+    oss << "Owner: " << layout->GetOwner().Get() << " ";
   }
 
   GetLayoutMeasureStateString( oss, layout );
@@ -161,8 +161,14 @@ void LayoutDebugAfterLayoutRecurse( Actor root, int depth )
         oss << "No layout data  ";
       }
 
+      auto actorPos  = root.GetProperty<Vector3>( Actor::Property::POSITION );
       auto actorSize = root.GetProperty<Vector3>( Actor::Property::SIZE );
+      oss << "  ActorPos: (" << actorPos.x << ", " << actorPos.y << ")";
       oss << "  ActorSize: (" << actorSize.width << ", " << actorSize.height << ")";
+    }
+    else
+    {
+      // Try getting layout data from parent control
     }
   }
   oss << std::endl;

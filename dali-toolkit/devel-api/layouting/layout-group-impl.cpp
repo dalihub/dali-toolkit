@@ -113,8 +113,9 @@ void LayoutGroup::OnSetLayoutData( ChildLayoutDataPtr layoutData )
 
 ChildLayoutDataPtr LayoutGroup::GenerateDefaultLayoutData()
 {
-  ChildLayoutDataPtr layoutData = ChildLayoutData::New( Toolkit::ChildLayoutData::WRAP_CONTENT,
-                                                        Toolkit::ChildLayoutData::WRAP_CONTENT );
+  ChildLayoutDataPtr layoutData = MarginLayoutData::New( Toolkit::ChildLayoutData::WRAP_CONTENT,
+                                                         Toolkit::ChildLayoutData::WRAP_CONTENT,
+                                                         0u, 0u, 0u, 0u);
   return layoutData;
 }
 
@@ -186,12 +187,7 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
     case MeasureSpec::EXACTLY:
     {
 
-      if (childDimension >= 0)
-      {
-        resultSize = childDimension;
-        resultMode = MeasureSpec::EXACTLY;
-      }
-      else if (childDimension == Toolkit::ChildLayoutData::MATCH_PARENT)
+      if (childDimension == Toolkit::ChildLayoutData::MATCH_PARENT)
       {
         // Child wants to be our size. So be it.
         resultSize = size;
@@ -204,19 +200,19 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
         resultSize = size;
         resultMode = MeasureSpec::AT_MOST;
       }
+      else
+      {
+        resultSize = childDimension;
+        resultMode = MeasureSpec::EXACTLY;
+      }
+
       break;
     }
 
       // Parent has imposed a maximum size on us
     case MeasureSpec::AT_MOST:
     {
-      if (childDimension >= 0)
-      {
-        // Child wants a specific size... so be it
-        resultSize = childDimension;
-        resultMode = MeasureSpec::EXACTLY;
-      }
-      else if (childDimension == Toolkit::ChildLayoutData::MATCH_PARENT)
+      if (childDimension == Toolkit::ChildLayoutData::MATCH_PARENT)
       {
         // Child wants to be our size, but our size is not fixed.
         // Constrain child to not be bigger than us.
@@ -230,19 +226,20 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
         resultSize = size;
         resultMode = MeasureSpec::AT_MOST;
       }
+      else
+      {
+        // Child wants a specific size... so be it
+        resultSize = childDimension;
+        resultMode = MeasureSpec::EXACTLY;
+      }
+
       break;
     }
 
       // Parent asked to see how big we want to be
     case MeasureSpec::UNSPECIFIED:
     {
-      if (childDimension >= 0)
-      {
-        // Child wants a specific size... let him have it
-        resultSize = childDimension;
-        resultMode = MeasureSpec::EXACTLY;
-      }
-      else if (childDimension == Toolkit::ChildLayoutData::MATCH_PARENT)
+      if (childDimension == Toolkit::ChildLayoutData::MATCH_PARENT)
       {
         // Child wants to be our size... find out how big it should be
         resultSize = LayoutBase::Impl::sUseZeroUnspecifiedMeasureSpec ? 0 : size;
@@ -254,6 +251,12 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
         // it should be
         resultSize = LayoutBase::Impl::sUseZeroUnspecifiedMeasureSpec ? 0 : size;
         resultMode = MeasureSpec::UNSPECIFIED;
+      }
+      else
+      {
+        // Child wants a specific size... let him have it
+        resultSize = childDimension;
+        resultMode = MeasureSpec::EXACTLY;
       }
       break;
     }
