@@ -20,7 +20,7 @@
 #include <dali-toolkit/internal/layouting/layout-base-data-impl.h>
 
 #if defined(DEBUG_ENABLED)
-    Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
+    Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::Verbose, false, "LOG_LAYOUT" );
 #endif
 
 
@@ -305,7 +305,7 @@ bool LayoutBase::SetFrame( int left, int top, int right, int bottom )
 {
   bool changed = false;
 
-  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutBase::SetFrame(%d, %d, %d, %d)", left, top, right, bottom );
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutBase::SetFrame(%d, %d, %d, %d)\n", left, top, right, bottom );
 
   if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom )
   {
@@ -326,7 +326,8 @@ bool LayoutBase::SetFrame( int left, int top, int right, int bottom )
 
 
     // Reflect up to parent control
-    auto customActor = dynamic_cast<CustomActorImpl*>( mImpl->mOwner );
+    auto owner = mImpl->mOwner;
+    auto customActor = dynamic_cast<CustomActorImpl*>( owner );
     auto actor = (customActor != nullptr) ? customActor->Self() : nullptr;
 
     if( actor )
