@@ -250,8 +250,9 @@ void HboxLayout::OnLayout( bool changed, int left, int top, int right, int botto
 
 ChildLayoutDataPtr HboxLayout::GenerateDefaultLayoutData()
 {
-  ChildLayoutDataPtr layoutData = ChildLayoutData::New( Toolkit::ChildLayoutData::WRAP_CONTENT,
-                                                        Toolkit::ChildLayoutData::WRAP_CONTENT );
+  ChildLayoutDataPtr layoutData = MarginLayoutData::New( Toolkit::ChildLayoutData::WRAP_CONTENT,
+                                                         Toolkit::ChildLayoutData::WRAP_CONTENT,
+                                                         0u, 0u, 0u, 0u );
   return layoutData;
 }
 
