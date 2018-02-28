@@ -313,6 +313,26 @@ public:
       /**
        * @brief The settings to relating to the System's Input Method, Key and Value.
        * @details Name "inputMethodSettings", type Property::MAP.
+       *
+       * @note VARIATION key can be changed depending on PANEL_LAYOUT.
+       * For example, when PANEL_LAYOUT key is InputMethod::PanelLayout::NORMAL,
+       * then VARIATION would be among NORMAL, WITH_FILENAME, and WITH_PERSON_NAME in Dali::InputMethod::NormalLayout.
+       * For more information, see @ref Dali::InputMethod::Category.
+       *
+       * Example Usage:
+       * @code
+       *   Property::Map propertyMap;
+       *   InputMethod::PanelLayout::Type panelLayout = InputMethod::PanelLayout::NUMBER;
+       *   InputMethod::AutoCapital::Type autoCapital = InputMethod::AutoCapital::WORD;
+       *   InputMethod::ButtonAction::Type buttonAction = InputMethod::ButtonAction::GO;
+       *   int inputVariation = 1;
+       *   propertyMap["PANEL_LAYOUT"] = panelLayout;
+       *   propertyMap["AUTO_CAPITALIZE"] = autoCapital;
+       *   propertyMap["BUTTON_ACTION"] = buttonAction;
+       *   propertyMap["VARIATION"] = inputVariation;
+       *
+       *   field.SetProperty( TextField::Property::INPUT_METHOD_SETTINGS, propertyMap );
+       * @endcode
        * @SINCE_1_0.0
        */
       INPUT_METHOD_SETTINGS,

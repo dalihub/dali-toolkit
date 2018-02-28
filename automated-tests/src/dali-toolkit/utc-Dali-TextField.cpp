@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -727,11 +727,11 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map propertyMap;
   InputMethod::PanelLayout::Type panelLayout = InputMethod::PanelLayout::NUMBER;
   InputMethod::AutoCapital::Type autoCapital = InputMethod::AutoCapital::WORD;
-  InputMethod::ActionButtonTitle::Type actionButton = InputMethod::ActionButtonTitle::GO;
+  InputMethod::ButtonAction::Type buttonAction = InputMethod::ButtonAction::GO;
   int inputVariation = 1;
   propertyMap["PANEL_LAYOUT"] = panelLayout;
-  propertyMap["AUTO_CAPITALISE"] = autoCapital;
-  propertyMap["ACTION_BUTTON"] = actionButton;
+  propertyMap["AUTO_CAPITALIZE"] = autoCapital;
+  propertyMap["BUTTON_ACTION"] = buttonAction;
   propertyMap["VARIATION"] = inputVariation;
   field.SetProperty( TextField::Property::INPUT_METHOD_SETTINGS, propertyMap );
 
@@ -744,12 +744,12 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_EQUALS( static_cast<int>(panelLayout), layout, TEST_LOCATION );
 
   int capital = 0;
-  DALI_TEST_CHECK( map[ "AUTO_CAPITALISE" ].Get( capital ) );
+  DALI_TEST_CHECK( map[ "AUTO_CAPITALIZE" ].Get( capital ) );
   DALI_TEST_EQUALS( static_cast<int>(autoCapital), capital, TEST_LOCATION );
 
   int action = 0;
-  DALI_TEST_CHECK( map[ "ACTION_BUTTON" ].Get( action ) );
-  DALI_TEST_EQUALS( static_cast<int>(actionButton), action, TEST_LOCATION );
+  DALI_TEST_CHECK( map[ "BUTTON_ACTION" ].Get( action ) );
+  DALI_TEST_EQUALS( static_cast<int>(buttonAction), action, TEST_LOCATION );
 
   int variation = 0;
   DALI_TEST_CHECK( map[ "VARIATION" ].Get( variation ) );
