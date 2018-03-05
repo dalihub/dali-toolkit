@@ -73,7 +73,7 @@ enum
   /**
    * @brief The number of slices as you go around the shape.
    * @details Name "slices", type Property::INTEGER.
-   * For spheres and conical frustrums, this determines how many divisions there are as you go around the object.
+   * For spheres and conical frustums, this determines how many divisions there are as you go around the object.
    * @SINCE_1_1.45
    * @note Optional. If not specified, the default is 128.
    * @note Applies to:
@@ -98,7 +98,7 @@ enum
   STACKS,
 
   /**
-   * @brief The scale of the radius of the top circle of a conical frustrum.
+   * @brief The scale of the radius of the top circle of a conical frustum.
    * @details Name "scaleTopRadius", type Property::FLOAT.
    * @SINCE_1_1.45
    * @note Optional. If not specified, the default is 1.0f.
@@ -109,7 +109,7 @@ enum
   SCALE_TOP_RADIUS,
 
   /**
-   * @brief The scale of the radius of the bottom circle of a conical frustrum.
+   * @brief The scale of the radius of the bottom circle of a conical frustum.
    * @details Name "scaleBottomRadius", type Property::FLOAT.
    * @SINCE_1_1.45
    * @note Optional. If not specified, the default is 1.5f.
@@ -209,8 +209,8 @@ enum Type
 {
   SPHERE, ///< A perfectly round geometrical object in three-dimensional space. @SINCE_1_1.45
   CONICAL_FRUSTRUM, ///< The area bound between two circles, i.e. a cone with the tip removed. @SINCE_1_1.45
-  CONE, ///< Equivalent to a conical frustrum with top radius of zero. @SINCE_1_1.45
-  CYLINDER, ///< Equivalent to a conical frustrum with equal radii for the top and bottom circles. @SINCE_1_1.45
+  CONE, ///< Equivalent to a conical frustum with top radius of zero. @SINCE_1_1.45
+  CYLINDER, ///< Equivalent to a conical frustum with equal radii for the top and bottom circles. @SINCE_1_1.45
   CUBE, ///< Equivalent to a bevelled cube with a bevel percentage of zero. @SINCE_1_1.45
   OCTAHEDRON, ///< Equivalent to a bevelled cube with a bevel percentage of one. @SINCE_1_1.45
   BEVELLED_CUBE, ///< A cube/cuboid with all edges flattened to some degree. @SINCE_1_1.45
