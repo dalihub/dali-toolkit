@@ -86,7 +86,7 @@
  * </tr>
  * <tr>
  *    <td style="padding-left:1em">@ref dali_toolkit_controls_image_view</td>
- *    <td>ImageView is a control displying an image.</td>
+ *    <td>ImageView is a control displaying an image.</td>
  * </tr>
  * <tr>
  *    <td style="padding-left:1em">@ref dali_toolkit_controls_scroll_bar</td>
@@ -170,7 +170,7 @@
  *     @brief GaussianBlurView provides a render process that blurs an image.
 
  *     @defgroup dali_toolkit_controls_image_view Image View
- *     @brief ImageView is a control displying an image.
+ *     @brief ImageView is a control displaying an image.
 
  *     @defgroup dali_toolkit_controls_scroll_bar Scroll Bar
  *     @brief ScrollBar is a component that can be linked to the scrollable objects.

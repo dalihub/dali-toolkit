@@ -70,8 +70,8 @@ const char * const LIGHT_POSITION_UNIFORM_NAME( "lightPosition" );
 //Primitive property defaults
 const int     DEFAULT_SLICES =              128; ///< For spheres and conics
 const int     DEFAULT_STACKS =              128; ///< For spheres and conics
-const float   DEFAULT_SCALE_TOP_RADIUS =    1.0; ///< For conical frustrums
-const float   DEFAULT_SCALE_BOTTOM_RADIUS = 1.5; ///< For cones and conical frustrums
+const float   DEFAULT_SCALE_TOP_RADIUS =    1.0; ///< For conical frustums
+const float   DEFAULT_SCALE_BOTTOM_RADIUS = 1.5; ///< For cones and conical frustums
 const float   DEFAULT_SCALE_HEIGHT =        3.0; ///< For all conics
 const float   DEFAULT_SCALE_RADIUS =        1.0; ///< For cylinders
 const float   DEFAULT_BEVEL_PERCENTAGE =    0.0; ///< For bevelled cubes

@@ -722,7 +722,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to focus and read from the
-   * first item on the top continously (by three fingers single tap).
+   * first item on the top continuously (by three fingers single tap).
    *
    * A callback of the following type may be connected:
    * @code
@@ -735,7 +735,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to move the focus to and
-   * read from the next item continously (by three fingers double tap).
+   * read from the next item continuously (by three fingers double tap).
    *
    * A callback of the following type may be connected:
    * @code
