@@ -2164,7 +2164,8 @@ Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
   if ( mImpl->mUpdateTextDirection )
   {
     // Operations that can be done only once until the text changes.
-    const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( GET_SCRIPTS       |
+    const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32  |
+                                                                           GET_SCRIPTS       |
                                                                            VALIDATE_FONTS    |
                                                                            GET_LINE_BREAKS   |
                                                                            GET_WORD_BREAKS   |
@@ -2184,6 +2185,9 @@ Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
                 static_cast<OperationsMask>( onlyOnceOperations |
                                              LAYOUT | REORDER | UPDATE_DIRECTION ),
                 naturalSize.GetVectorXY() );
+
+    // Do not do again the only once operations.
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending & ~onlyOnceOperations );
 
     // Clear the update info. This info will be set the next time the text is updated.
     mImpl->mTextUpdateInfo.Clear();
