@@ -46,12 +46,13 @@ namespace
 // shapes
 DALI_ENUM_TO_STRING_TABLE_BEGIN( SHAPE_TYPE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, SPHERE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CONICAL_FRUSTRUM )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CONICAL_FRUSTRUM ) // deprecated
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CONE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CYLINDER )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CUBE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, OCTAHEDRON )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, BEVELLED_CUBE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CONICAL_FRUSTUM )
 DALI_ENUM_TO_STRING_TABLE_END( SHAPE_TYPE )
 
 //Property names
@@ -90,11 +91,12 @@ const float MAX_SMOOTHNESS =       1.0; ///< Maximum bevel smoothness for bevell
 //Specific shape labels.
 const char * const SPHERE_LABEL( "SPHERE" );
 const char * const CONE_LABEL( "CONE" );
-const char * const CONICAL_FRUSTRUM_LABEL( "CONICAL_FRUSTRUM" );
+const char * const CONICAL_FRUSTRUM_LABEL( "CONICAL_FRUSTRUM" ); // deprecated
 const char * const CYLINDER_LABEL( "CYLINDER" );
 const char * const CUBE_LABEL( "CUBE" );
 const char * const OCTAHEDRON_LABEL( "OCTAHEDRON" );
 const char * const BEVELLED_CUBE_LABEL( "BEVELLED_CUBE" );
+const char * const CONICAL_FRUSTUM_LABEL( "CONICAL_FRUSTUM" );
 
 //Shader properties
 const char * const OBJECT_MATRIX_UNIFORM_NAME( "uObjectMatrix" );
@@ -515,7 +517,7 @@ void PrimitiveVisual::CreateGeometry()
       CreateConic( vertices, indices, 0, mScaleBottomRadius, mScaleHeight, mSlices );
       break;
     }
-    case Toolkit::PrimitiveVisual::Shape::CONICAL_FRUSTRUM:
+    case Toolkit::PrimitiveVisual::Shape::CONICAL_FRUSTRUM: // deprecated
     {
       CreateConic( vertices, indices, mScaleTopRadius, mScaleBottomRadius, mScaleHeight, mSlices );
       break;
@@ -541,6 +543,11 @@ void PrimitiveVisual::CreateGeometry()
     case Toolkit::PrimitiveVisual::Shape::BEVELLED_CUBE:
     {
       CreateBevelledCube( vertices, indices, mScaleDimensions, mBevelPercentage, mBevelSmoothness );
+      break;
+    }
+    case Toolkit::PrimitiveVisual::Shape::CONICAL_FRUSTUM:
+    {
+      CreateConic( vertices, indices, mScaleTopRadius, mScaleBottomRadius, mScaleHeight, mSlices );
       break;
     }
   }

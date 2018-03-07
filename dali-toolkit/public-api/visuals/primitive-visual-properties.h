@@ -78,7 +78,7 @@ enum
    * @note Optional. If not specified, the default is 128.
    * @note Applies to:
    *      - Shape::SPHERE
-   *      - Shape::CONICAL_FRUSTRUM
+   *      - Shape::CONICAL_FRUSTUM
    *      - Shape::CONE
    *      - Shape::CYLINDER
    * @note The range is from 1 to 255.
@@ -103,7 +103,7 @@ enum
    * @SINCE_1_1.45
    * @note Optional. If not specified, the default is 1.0f.
    * @note Applies to:
-   *      - Shape::CONICAL_FRUSTRUM
+   *      - Shape::CONICAL_FRUSTUM
    * @note Only values greater than or equal to 0.0f are accepted.
    */
   SCALE_TOP_RADIUS,
@@ -114,7 +114,7 @@ enum
    * @SINCE_1_1.45
    * @note Optional. If not specified, the default is 1.5f.
    * @note Applies to:
-   *      - Shape::CONICAL_FRUSTRUM
+   *      - Shape::CONICAL_FRUSTUM
    *      - Shape::CONE
    * @note Only values greater than or equal to 0.0f are accepted.
    */
@@ -126,7 +126,7 @@ enum
    * @SINCE_1_1.45
    * @note Optional. If not specified, the default is 3.0f.
    * @note Applies to:
-   *      - Shape::CONICAL_FRUSTRUM
+   *      - Shape::CONICAL_FRUSTUM
    *      - Shape::CONE
    *      - Shape::CYLINDER
    * @note Only values greater than or equal to 0.0f are accepted.
@@ -208,12 +208,13 @@ namespace Shape
 enum Type
 {
   SPHERE, ///< A perfectly round geometrical object in three-dimensional space. @SINCE_1_1.45
-  CONICAL_FRUSTRUM, ///< The area bound between two circles, i.e. a cone with the tip removed. @SINCE_1_1.45
+  CONICAL_FRUSTRUM, ///< @DEPRECATED_1_3.15, use CONICAL_FRUSTUM instead. The area bound between two circles, i.e. a cone with the tip removed. @SINCE_1_1.45
   CONE, ///< Equivalent to a conical frustum with top radius of zero. @SINCE_1_1.45
   CYLINDER, ///< Equivalent to a conical frustum with equal radii for the top and bottom circles. @SINCE_1_1.45
   CUBE, ///< Equivalent to a bevelled cube with a bevel percentage of zero. @SINCE_1_1.45
   OCTAHEDRON, ///< Equivalent to a bevelled cube with a bevel percentage of one. @SINCE_1_1.45
   BEVELLED_CUBE, ///< A cube/cuboid with all edges flattened to some degree. @SINCE_1_1.45
+  CONICAL_FRUSTUM ///< The area bound between two circles, i.e. a cone with the tip removed. @SINCE_1_3.15
 };
 }
 
