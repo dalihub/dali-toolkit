@@ -108,7 +108,9 @@ bool IsActorFocusableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType 
 
 AccessibilityManager::AccessibilityManager()
 : mCurrentFocusActor(FocusIDPair(0, 0)),
+  mCurrentGesturedActor(),
   mFocusIndicatorActor(),
+  mPreviousPosition( 0.0f, 0.0f ),
   mRecursiveFocusMoveCounter(0),
   mIsWrapped(false),
   mIsFocusWithinGroup(false),

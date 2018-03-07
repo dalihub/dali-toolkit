@@ -71,7 +71,8 @@ DALI_TYPE_REGISTRATION_END()
 } // namespace
 
 VisualFactory::VisualFactory( bool debugEnabled )
-: mDebugEnabled( debugEnabled ),
+: mFactoryCache(),
+  mDebugEnabled( debugEnabled ),
   mPreMultiplyOnLoad( true )
 {
 }
