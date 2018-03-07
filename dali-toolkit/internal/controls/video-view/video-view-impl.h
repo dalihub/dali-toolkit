@@ -239,6 +239,16 @@ public:
    */
   void SetPlayPosition( int pos );
 
+  /**
+   * @brief Sets Display mode.
+   */
+  void SetDisplayMode( int mode );
+
+  /**
+   * @brief Gets Display mode.
+   */
+  int GetDisplayMode() const;
+
 private: // From Control
 
   /**
