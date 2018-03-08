@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,6 +94,15 @@ void HboxView::SetCellHeight( CellPosition cellPosition, LayoutLength height )
   GetImpl( *this ).SetCellHeight( cellPosition, height );
 }
 
+void HboxView::SetLayoutData( MarginLayoutData handle )
+{
+  GetImpl( *this ).SetLayoutData( handle );
+}
+
+MarginLayoutData HboxView::GetLayoutData()
+{
+  return GetImpl( *this ).GetLayoutData();
+}
 
 HboxView::HboxView( Dali::Toolkit::Internal::HboxView& object )
 : Control( object )
@@ -108,4 +117,3 @@ HboxView::HboxView( Dali::Internal::CustomActor* internal )
 
 } // namespace Toolkit
 } // namespace Dali
-

@@ -49,6 +49,9 @@ public:
   void SetCellWidth( Dali::Toolkit::HboxView::CellPosition cellPosition, LayoutLength width );
   void SetCellHeight( Dali::Toolkit::HboxView::CellPosition cellPosition, LayoutLength height );
 
+  Toolkit::MarginLayoutData GetLayoutData();
+  void SetLayoutData( Toolkit::MarginLayoutData handle );
+
 protected:
   HboxView();
   virtual ~HboxView();
