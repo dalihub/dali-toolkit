@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_HBOX_VIEW_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
+#include <dali-toolkit/devel-api/layouting/margin-layout-data.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
@@ -59,6 +60,9 @@ public:
   void SetMode( Mode mode );
   void SetCellWidth( CellPosition cellPosition, LayoutLength width );
   void SetCellHeight( CellPosition cellPosition, LayoutLength height );
+
+  MarginLayoutData GetLayoutData();
+  void SetLayoutData( MarginLayoutData handle );
 
 public: // Not intended for application developers
 

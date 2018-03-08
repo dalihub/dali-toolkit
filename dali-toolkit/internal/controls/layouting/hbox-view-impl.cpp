@@ -22,6 +22,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/layouting/hbox-layout-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
+#include <dali-toolkit/devel-api/layouting/margin-layout-data.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/layouting/margin-layout-data-impl.h>
 
@@ -141,6 +142,26 @@ Toolkit::HboxLayout HboxView::GetLayout()
     return hboxLayout;
   }
   return Toolkit::HboxLayout();
+}
+
+Toolkit::MarginLayoutData HboxView::GetLayoutData()
+{
+  Control::Impl& controlDataImpl = Control::Impl::Get( *this );
+  auto layout = Toolkit::LayoutBase( controlDataImpl.GetLayout().Get() );
+  DALI_ASSERT_ALWAYS( layout && "No layout present" );
+
+  auto hboxLayout = Toolkit::HboxLayout::DownCast( layout );
+  auto handle = Toolkit::MarginLayoutData::DownCast( hboxLayout.GetLayoutData() );
+  return handle;
+}
+
+void HboxView::SetLayoutData( Toolkit::MarginLayoutData handle )
+{
+  Control::Impl& controlDataImpl = Control::Impl::Get( *this );
+  auto layout = Toolkit::LayoutBase( controlDataImpl.GetLayout().Get() );
+  DALI_ASSERT_ALWAYS( layout && "No layout present" );
+
+  layout.SetLayoutData( handle );
 }
 
 
