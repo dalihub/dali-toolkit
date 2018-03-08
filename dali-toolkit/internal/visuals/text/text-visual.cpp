@@ -104,7 +104,6 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uTextColorAnimatable;\n
-  uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
@@ -117,8 +116,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
   \n
   void main()\n
   {\n
-    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-    mediump float textTexture = texture2D( sTexture, texCoord ).r;\n
+    mediump float textTexture = texture2D( sTexture, vTexCoord ).r;\n
 
     // Set the color of the text to what it is animated to.
     gl_FragColor = uTextColorAnimatable * textTexture * uColor * visualMixColor();
@@ -128,7 +126,6 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
 const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
-  uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
@@ -141,8 +138,7 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT = DALI_COMPOSE_SHADER(
   \n
   void main()\n
   {\n
-    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-    mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
+    mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
     textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     gl_FragColor = textTexture * uColor * visualMixColor();
@@ -154,7 +150,6 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n
   uniform sampler2D sStyle;\n
   uniform lowp vec4 uTextColorAnimatable;\n
-  uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
@@ -167,9 +162,8 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   \n
   void main()\n
   {\n
-    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-    mediump float textTexture = texture2D( sTexture, texCoord ).r;\n
-    mediump vec4 styleTexture = texture2D( sStyle, texCoord );\n
+    mediump float textTexture = texture2D( sTexture, vTexCoord ).r;\n
+    mediump vec4 styleTexture = texture2D( sStyle, vTexCoord );\n
 
     // Draw the text as overlay above the style
     gl_FragColor = ( uTextColorAnimatable * textTexture + styleTexture * ( 1.0 - textTexture ) ) * uColor * visualMixColor();\n
@@ -180,7 +174,6 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
   uniform sampler2D sStyle;\n
-  uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
@@ -193,9 +186,8 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   \n
   void main()\n
   {\n
-    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-    mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
-    mediump vec4 styleTexture = texture2D( sStyle, texCoord );\n
+    mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
+    mediump vec4 styleTexture = texture2D( sStyle, vTexCoord );\n
     textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     // Draw the text as overlay above the style
@@ -208,7 +200,6 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n
   uniform sampler2D sMask;\n
   uniform lowp vec4 uTextColorAnimatable;\n
-  uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
@@ -221,9 +212,8 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
   \n
   void main()\n
   {\n
-    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-    mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
-    mediump float maskTexture = texture2D( sMask, texCoord ).r;\n
+    mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
+    mediump float maskTexture = texture2D( sMask, vTexCoord ).r;\n
 
     // Set the color of non-transparent pixel in text to what it is animated to.
     // Markup text with multiple text colors are not animated (but can be supported later on if required).
@@ -243,7 +233,6 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOS
   uniform sampler2D sMask;\n
   uniform lowp float uHasMultipleTextColors;\n
   uniform lowp vec4 uTextColorAnimatable;\n
-  uniform mediump vec4 uAtlasRect;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform lowp float opacity;\n
@@ -256,10 +245,9 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOS
   \n
   void main()\n
   {\n
-    mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-    mediump vec4 textTexture = texture2D( sTexture, texCoord );\n
-    mediump vec4 styleTexture = texture2D( sStyle, texCoord );\n
-    mediump float maskTexture = texture2D( sMask, texCoord ).r;\n
+    mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
+    mediump vec4 styleTexture = texture2D( sStyle, vTexCoord );\n
+    mediump float maskTexture = texture2D( sMask, vTexCoord ).r;\n
 
     // Set the color of non-transparent pixel in text to what it is animated to.
     // Markup text with multiple text colors are not animated (but can be supported later on if required).
@@ -727,8 +715,6 @@ void TextVisual::UpdateRenderer()
 
       mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
 
-      Vector4 atlasRect = FULL_TEXTURE_RECT;
-      mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, atlasRect );
       mImpl->mRenderer.RegisterProperty( "uHasMultipleTextColors", static_cast<float>( hasMultipleTextColors ) );
 
       mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON);
