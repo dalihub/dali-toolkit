@@ -55,6 +55,7 @@ void LayoutController::RequestLayout( LayoutBase& layoutBase )
 {
   mLayoutRequested = true;
 
+  // Go up the tree and mark all parents to relayout
   LayoutParent* layoutParent = layoutBase.GetParent();
   if( layoutParent )
   {

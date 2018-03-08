@@ -154,7 +154,7 @@ void LayoutDebugAfterLayoutRecurse( Actor root, int depth )
       auto layoutData = layout->GetLayoutData();
       if( layoutData != nullptr )
       {
-        oss << "LayoutData:" << "( " << layoutData->GetWidth() << ", " << layoutData->GetWidth() << ") ";
+        oss << "LayoutData:" << "( " << layoutData->GetWidth() << ", " << layoutData->GetHeight() << ") ";
       }
       else
       {

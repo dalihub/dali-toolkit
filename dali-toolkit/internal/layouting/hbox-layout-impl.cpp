@@ -48,7 +48,8 @@ HboxLayoutPtr HboxLayout::New( IntrusivePtr<RefObject> owner)
 HboxLayout::HboxLayout()
 : LayoutGroup(),
   mMode( Toolkit::HboxView::FIXED ),
-  mCellPadding( 20, 20 )
+  mCellPadding( 20, 20 ),
+  mTotalLength( 0 )
 {
 }
 
@@ -85,7 +86,7 @@ void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
   oss << "HBoxLayout::OnMeasure  ";
   if( actor )
   {
-    oss << "Actor Id:" << actor.GetId() << " Name:" << actor.GetName();
+    oss << "Actor Id:" << actor.GetId() << " Name:" << actor.GetName() << "  ";
   }
   oss << "widthMeasureSpec:" << widthMeasureSpec << " heightMeasureSpec:" << heightMeasureSpec << std::endl;
   DALI_LOG_INFO( gLogFilter, Debug::Concise, oss.str().c_str() );
