@@ -38,6 +38,7 @@ public:
     mMuted = false;
     mLooping = false;
     mPlayPosition = 0;
+    mDisplyMode = Dali::VideoPlayerPlugin::DisplayMode::DST_ROI;
   }
 
   void SetMuted( bool muted )
@@ -78,6 +79,17 @@ public:
     mPlayPosition = pos;
   }
 
+  Dali::VideoPlayerPlugin::DisplayMode::Type GetDisplayMode() const
+  {
+    return mDisplyMode;
+  }
+
+  void SetDisplayMode( Dali::VideoPlayerPlugin::DisplayMode::Type mDisplyMode )
+  {
+    mDisplyMode = mDisplyMode;
+  }
+
+
 public:
 
   std::string mUrl;
@@ -90,6 +102,7 @@ private:
   bool mMuted;
   bool mLooping;
   int mPlayPosition;
+  Dali::VideoPlayerPlugin::DisplayMode::Type mDisplyMode;
 };
 
 inline VideoPlayer& GetImplementation( Dali::VideoPlayer& player )
@@ -259,6 +272,16 @@ void VideoPlayer::SetCodecType( Dali::VideoPlayerPlugin::CodecType type )
 Dali::VideoPlayerPlugin::CodecType VideoPlayer::GetCodecType() const
 {
   return Dali::VideoPlayerPlugin::CodecType::DEFAULT;
+}
+
+void VideoPlayer::SetDisplayMode( Dali::VideoPlayerPlugin::DisplayMode::Type mode )
+{
+  Internal::Adaptor::GetImplementation( *this ).SetDisplayMode( mode );
+}
+
+Dali::VideoPlayerPlugin::DisplayMode::Type VideoPlayer::GetDisplayMode() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetDisplayMode();
 }
 
 } // namespace Dali;

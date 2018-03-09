@@ -64,6 +64,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "muted", BOOLEAN, MUTED )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "volume", MAP, VOLUME )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "underlay", BOOLEAN, UNDERLAY )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "playPosition", INTEGER, PLAY_POSITION )
+DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "displayMode", INTEGER, DISPLAY_MODE )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, VideoView, "finished", FINISHED_SIGNAL )
 
@@ -461,6 +462,15 @@ void VideoView::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::VideoView::Property::DISPLAY_MODE:
+      {
+        int mode;
+        if( value.Get( mode ) )
+        {
+          impl.SetDisplayMode( mode );
+        }
+        break;
+      }
     }
   }
 }
@@ -517,6 +527,11 @@ Property::Value VideoView::GetProperty( BaseObject* object, Property::Index prop
       case Toolkit::VideoView::Property::PLAY_POSITION:
       {
         value = impl.GetPlayPosition();
+        break;
+      }
+      case Toolkit::VideoView::Property::DISPLAY_MODE:
+      {
+        value = impl.GetDisplayMode();
         break;
       }
     }
@@ -761,6 +776,16 @@ int VideoView::GetPlayPosition()
 void VideoView::SetPlayPosition( int pos )
 {
   mVideoPlayer.SetPlayPosition( pos );
+}
+
+void VideoView::SetDisplayMode( int mode )
+{
+  mVideoPlayer.SetDisplayMode( static_cast< Dali::VideoPlayerPlugin::DisplayMode::Type >( mode ) );
+}
+
+int VideoView::GetDisplayMode() const
+{
+  return static_cast< int >( mVideoPlayer.GetDisplayMode() );
 }
 
 } // namespace Internal
