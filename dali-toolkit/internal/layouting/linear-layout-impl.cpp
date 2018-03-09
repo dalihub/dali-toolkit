@@ -272,7 +272,7 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
   auto height = bottom - top;
 
   // Space available for child
-  auto childSpace = height - padding.top - padding.bottom;
+  auto childSpace = height - (int)padding.top - (int)padding.bottom;
 
   auto count = GetChildCount();
 
@@ -297,11 +297,11 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
       auto childHeight = childLayout->GetMeasuredHeight();
       auto childMargin = childLayout->GetMargin();
 
-      childTop = LayoutLength(padding.top) + ((childSpace - childHeight) / 2) + childMargin.top - childMargin.bottom;
+      childTop = LayoutLength(padding.top) + (int)((childSpace - childHeight) / 2) + (int)childMargin.top - (int)childMargin.bottom;
 
       childLeft += childMargin.start;
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
-      childLeft += childWidth + childMargin.end + mCellPadding.width;
+      childLeft += childWidth + (int)childMargin.end + mCellPadding.width;
     }
   }
 }
@@ -432,7 +432,7 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
   auto width = right - left;
 
   // Space available for child
-  auto childSpace = width - padding.start - padding.end;
+  auto childSpace = width - (int)padding.start - (int)padding.end;
   auto count = GetChildCount();
 
   for( unsigned int childIndex = 0; childIndex < count; childIndex++)
@@ -445,10 +445,10 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
       auto childMargin = childLayout->GetMargin();
 
       childTop += childMargin.top;
-      childLeft = ( childSpace - childWidth ) / 2 + childMargin.start - childMargin.end;
+      childLeft = ( childSpace - childWidth ) / 2 + (int)childMargin.start - (int)childMargin.end;
 
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
-      childTop += childHeight + childMargin.bottom + mCellPadding.height;
+      childTop += childHeight + (int)childMargin.bottom + mCellPadding.height;
     }
   }
 }

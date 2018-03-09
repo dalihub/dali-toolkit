@@ -41,9 +41,9 @@
 //#define ENABLED_SCROLL_STATE_LOGGING
 
 #ifdef ENABLED_SCROLL_STATE_LOGGING
-#define DALI_LOG_SCROLL_STATE(format, args...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, "%s:%d " format "\n", __PRETTY_FUNCTION__, __LINE__, ## args)
+#define DALI_LOG_SCROLL_STATE(format, ...) Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugInfo, "%s:%d " format "\n", __PRETTY_FUNCTION__, __LINE__, ## __VA_ARGS__)
 #else
-#define DALI_LOG_SCROLL_STATE(format, args...)
+#define DALI_LOG_SCROLL_STATE(format, ...)
 #endif
 
 // TODO: Change to two class system:
