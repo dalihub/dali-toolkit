@@ -33,6 +33,19 @@ namespace Toolkit
 namespace Internal
 {
 
+namespace
+{
+BaseHandle Create()
+{
+  return HboxView::New();
+}
+
+Dali::TypeRegistration typeRegistration( typeid( Toolkit::HboxView ), typeid ( Toolkit::Control ), Create );
+
+Dali::ChildPropertyRegistration widthChildProperty( typeRegistration, "width", Toolkit::LayoutBase::ChildProperty::WIDTH, Property::INTEGER );
+
+} // anonymous namespace
+
 Dali::Toolkit::HboxView HboxView::New()
 {
   HboxViewPtr object( new HboxView() );

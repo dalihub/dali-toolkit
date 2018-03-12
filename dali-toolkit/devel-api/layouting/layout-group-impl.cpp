@@ -15,6 +15,7 @@
  */
 
 // CLASS HEADER
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 #include <dali-toolkit/internal/layouting/layout-group-data-impl.h>
 #include <dali-toolkit/internal/layouting/margin-layout-data-impl.h>
@@ -25,6 +26,20 @@ namespace Toolkit
 {
 namespace Internal
 {
+
+namespace
+{
+
+BaseHandle Create()
+{
+  return Toolkit::LayoutGroup(new Internal::LayoutGroup());
+}
+
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::LayoutGroup, Toolkit::LayoutBase, Create );
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, LayoutGroup,  "margin",  EXTENTS,  MARGIN )
+DALI_TYPE_REGISTRATION_END();
+
+} // anonymous namespace
 
 LayoutGroup::LayoutGroup()
 : mImpl( new Impl( *this ) )
@@ -51,6 +66,12 @@ Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutBase& child )
   childLayout.layoutId = mImpl->mNextLayoutId++;
   childLayout.child = &child;
   mImpl->mChildren.emplace_back( childLayout );
+
+
+  if( child.GetPropertyType( Toolkit::LayoutBase::ChildProperty::WIDTH ) != Property::NONE )
+  {
+    GenerateDefaultChildProperties( child );
+  }
 
   if( !child.GetLayoutData() )
   {
@@ -117,6 +138,13 @@ ChildLayoutDataPtr LayoutGroup::GenerateDefaultLayoutData()
                                                          Toolkit::ChildLayoutData::WRAP_CONTENT,
                                                          0u, 0u, 0u, 0u);
   return layoutData;
+}
+
+void LayoutGroup::GenerateDefaultChildProperties( child )
+{
+  child.SetProperty( Toolkit::FlexContainer::ChildProperty::WIDTH, Toolkit::ChildLayoutData::WRAP_CONTENT );
+  child.SetProperty( Toolkit::FlexContainer::ChildProperty::HEIGHT, Toolkit::ChildLayoutData::WRAP_CONTENT );
+  child.SetProperty( Toolkit::FlexContainer::ChildProperty::MARGIN, Extents() );
 }
 
 void LayoutGroup::MeasureChildren( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec)

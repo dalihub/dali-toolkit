@@ -1410,6 +1410,7 @@ Toolkit::Internal::LayoutBasePtr Control::Impl::GetLayout()
 
 void Control::Impl::SetLayout( Toolkit::Internal::LayoutBase& layout )
 {
+
   mLayout = &layout;
 }
 

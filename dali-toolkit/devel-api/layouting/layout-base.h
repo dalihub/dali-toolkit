@@ -22,6 +22,7 @@
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/object/property-index-ranges.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
 #include <dali-toolkit/devel-api/layouting/measure-spec.h>
 
@@ -47,6 +48,21 @@ using LayoutSize = Uint16Pair;
 class DALI_IMPORT_API LayoutBase : public BaseHandle
 {
 public:
+
+  enum PropertyRange
+  {
+    CHILD_PROPERTY_START_INDEX = CHILD_PROPERTY_REGISTRATION_START_INDEX,
+    CHILD_PROPERTY_END_INDEX   = CHILD_PROPERTY_REGISTRATION_START_INDEX+1000
+  };
+
+  struct ChildProperty
+  {
+    enum
+    {
+      WIDTH = CHILD_PROPERTY_START_INDEX,
+      HEIGHT
+    };
+  };
 
   /**
    * @brief Default constructor which provides an uninitialized Dali::LayoutBase.

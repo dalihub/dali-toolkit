@@ -15,6 +15,7 @@
  */
 
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
 #include <dali-toolkit/internal/layouting/layout-base-data-impl.h>
@@ -31,6 +32,24 @@ namespace Toolkit
 namespace Internal
 {
 
+namespace
+{
+
+BaseHandle Create()
+{
+  return Toolkit::LayoutBase::New( BaseHandle() );
+}
+
+DALI_TYPE_REGISTRATION_BEGIN( Toolkit::LayoutBase, Dali::BaseObject, Create );
+
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, LayoutBase,  "width",  INTEGER,  WIDTH )
+DALI_CHILD_PROPERTY_REGISTRATION( Toolkit, LayoutBase,  "height", INTEGER,  HEIGHT )
+
+DALI_TYPE_REGISTRATION_END();
+
+} // anonymous namespace
+
+
 LayoutBase::LayoutBase()
 : mImpl( new Impl(*this) )
 {
@@ -39,6 +58,8 @@ LayoutBase::LayoutBase()
 LayoutBasePtr LayoutBase::New( IntrusivePtr<RefObject> handle )
 {
   LayoutBasePtr layoutPtr = new LayoutBase();
+
+
   layoutPtr->Initialize( handle );
   return layoutPtr;
 }
