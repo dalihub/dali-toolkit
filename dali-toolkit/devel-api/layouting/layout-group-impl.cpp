@@ -15,6 +15,7 @@
  */
 
 // CLASS HEADER
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 #include <dali-toolkit/internal/layouting/layout-group-data-impl.h>
 #include <dali-toolkit/internal/layouting/margin-layout-data-impl.h>
@@ -35,6 +36,19 @@ LayoutGroup::~LayoutGroup()
 {
 }
 
+void LayoutGroup::DoRegisterChildProperties( const std::type_info& containerType )
+{
+  // Chain up to parent class
+  LayoutBase::DoRegisterChildProperties( containerType );
+
+  auto typeInfo = TypeRegistry::Get().GetTypeInfo( containerType );
+  if( typeInfo )
+  {
+    ChildPropertyRegistration( typeInfo.GetName(), "marginSpec", Toolkit::LayoutGroup::ChildProperty::MARGIN, Property::EXTENTS );
+  }
+}
+
+
 Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutBase& child )
 {
   LayoutParent* oldParent = child.GetParent();
@@ -51,6 +65,17 @@ Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutBase& child )
   childLayout.layoutId = mImpl->mNextLayoutId++;
   childLayout.child = &child;
   mImpl->mChildren.emplace_back( childLayout );
+
+  auto owner = child.GetOwner() ;
+  auto actor = dynamic_cast<CustomActorImpl*>( owner.Get() );
+  if( actor )
+  {
+    auto actorHandle = Dali::CustomActor( actor->GetOwner() );
+    if( actorHandle.GetPropertyType( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ) != Property::NONE )
+    {
+      GenerateDefaultChildProperties( actorHandle );
+    }
+  }
 
   if( !child.GetLayoutData() )
   {
@@ -117,6 +142,15 @@ ChildLayoutDataPtr LayoutGroup::GenerateDefaultLayoutData()
                                                          Toolkit::ChildLayoutData::WRAP_CONTENT,
                                                          0u, 0u, 0u, 0u);
   return layoutData;
+}
+
+void LayoutGroup::GenerateDefaultChildProperties( Handle child )
+{
+  child.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION,
+                     Toolkit::ChildLayoutData::WRAP_CONTENT );
+  child.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION,
+                     Toolkit::ChildLayoutData::WRAP_CONTENT );
+  child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN, Extents() );
 }
 
 void LayoutGroup::MeasureChildren( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec)

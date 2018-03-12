@@ -19,9 +19,9 @@
 
 //EXTERNAL HEADERS
 //INTERNAL HEADERS
+#include <dali/integration-api/debug.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
 #include <dali-toolkit/internal/layouting/margin-layout-data-impl.h>
-#include <dali/integration-api/debug.h>
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
@@ -55,6 +55,21 @@ HboxLayout::HboxLayout()
 
 HboxLayout::~HboxLayout()
 {
+}
+
+  /**
+   * @copydoc LayoutBase::DoRegisterChildProperties()
+   */
+void HboxLayout::DoRegisterChildProperties( const std::type_info& containerType )
+{
+  // Must chain up
+  LayoutGroup::DoRegisterChildProperties( containerType );
+
+  auto typeInfo = Dali::TypeRegistry::Get().GetTypeInfo( containerType );
+  if( typeInfo )
+  {
+    ChildPropertyRegistration( typeInfo.GetName(), "weight", Toolkit::LayoutGroup::ChildProperty::WEIGHT, Property::EXTENTS );
+  }
 }
 
 void HboxLayout::SetMode( Dali::Toolkit::HboxView::Mode mode )
@@ -107,12 +122,13 @@ void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
     auto childLayout = GetChild( i );
     if( childLayout )
     {
-      ChildLayoutDataPtr childLayoutData = childLayout->GetLayoutData();
-      MarginLayoutDataPtr marginLayoutData( static_cast<MarginLayoutData*>(childLayoutData.Get()) );
+      auto childOwner = Actor::DownCast( childLayout.GetOwner() );
+      auto widthMeasureSpec = childOwner.GetProperty<int>( LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
+      auto heightMeasureSpec = childOwner.GetProperty<int>( LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
 
       MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, heightMeasureSpec, 0 );
       auto childWidth = childLayout->GetMeasuredWidth();
-      auto childMargin = marginLayoutData->GetMargin();
+      auto childMargin = childOwner.GetProperty<int>( LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
       auto length = childWidth + childMargin.start + childMargin.end;
 
       if( isExactly )

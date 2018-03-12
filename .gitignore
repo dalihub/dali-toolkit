@@ -37,3 +37,4 @@ dali.doxy
 /build/tizen/.cov
 /build/desktop
 /packaging/home*
+.vscode/

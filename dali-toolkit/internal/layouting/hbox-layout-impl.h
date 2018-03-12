@@ -49,6 +49,12 @@ protected:
   HboxLayout();
   virtual ~HboxLayout();
 
+  /**
+   * @copydoc LayoutBase::DoRegisterChildProperties()
+   */
+  virtual void DoRegisterChildProperties( const std::type_info& containerType ) override;
+
+
   virtual void OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec );
   virtual void OnLayout( bool changed, int l, int t, int r, int b, bool animate );
   virtual ChildLayoutDataPtr GenerateDefaultLayoutData();

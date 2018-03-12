@@ -15,6 +15,7 @@
  */
 
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
 #include <dali-toolkit/internal/layouting/layout-base-data-impl.h>
@@ -23,6 +24,11 @@
     Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::Verbose, false, "LOG_LAYOUT" );
 #endif
 
+namespace
+{
+const char* WIDTH_SPECIFICATION_NAME( "widthSpecification" );
+const char* HEIGHT_SPECIFICATION_NAME( "heightSpecification" );
+}
 
 namespace Dali
 {
@@ -36,16 +42,16 @@ LayoutBase::LayoutBase()
 {
 }
 
-LayoutBasePtr LayoutBase::New( IntrusivePtr<RefObject> handle )
+LayoutBasePtr LayoutBase::New( IntrusivePtr<RefObject> owner )
 {
   LayoutBasePtr layoutPtr = new LayoutBase();
-  layoutPtr->Initialize( handle );
+  layoutPtr->Initialize( owner );
   return layoutPtr;
 }
 
-void LayoutBase::Initialize( IntrusivePtr<RefObject> handle )
+void LayoutBase::Initialize( IntrusivePtr<RefObject> owner )
 {
-  mImpl->mOwner = handle.Get();
+  mImpl->mOwner = owner.Get();
 }
 
 IntrusivePtr<RefObject> LayoutBase::GetOwner() const
@@ -53,11 +59,32 @@ IntrusivePtr<RefObject> LayoutBase::GetOwner() const
   return IntrusivePtr<RefObject>(mImpl->mOwner);
 }
 
+void LayoutBase::RegisterChildProperties( const std::type_info& containerType )
+{
+  // Call on derived types
+  if( GetChildPropertyIndex( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION_NAME ) ==
+      Property::INVALID_INDEX )
+  {
+    DoRegisterChildProperties( containerType );
+  }
+}
+
+void LayoutBase::DoRegisterChildProperties( const std::type_info& containerType )
+{
+  auto typeInfo = TypeRegistry::Get().GetTypeInfo( containerType );
+  if( typeInfo )
+  {
+    ChildPropertyRegistration( typeInfo.GetName(), WIDTH_SPECIFICATION_NAME,
+                               Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, Property::INTEGER );
+    ChildPropertyRegistration( typeInfo.GetName(), HEIGHT_SPECIFICATION_NAME,
+                               Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, Property::INTEGER );
+  }
+}
+
 void LayoutBase::SetLayoutData( ChildLayoutDataPtr childLayoutData )
 {
   mImpl->mLayoutData = childLayoutData;
   auto layoutClone = childLayoutData->Clone();
-  OnSetLayoutData( layoutClone );
   RequestLayout();
 }
 
@@ -199,10 +226,6 @@ void LayoutBase::OnLayout( bool changed, int left, int top, int right, int botto
 {
 }
 
-void LayoutBase::OnSetLayoutData( ChildLayoutDataPtr childLayoutData )
-{
-  // Base function does nothing
-}
 
 LayoutParent* LayoutBase::GetParent()
 {

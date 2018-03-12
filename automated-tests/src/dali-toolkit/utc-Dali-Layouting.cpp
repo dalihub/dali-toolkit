@@ -205,8 +205,13 @@ int UtcDaliLayouting_HboxLayout03(void)
   auto hbox2 = HboxView::New();
   hbox1.SetName( "HBox1");
   hbox2.SetName( "HBox2");
-  hbox1.SetLayoutData( MarginLayoutData::New( ChildLayoutData::MATCH_PARENT, ChildLayoutData::MATCH_PARENT, 0,0,0,0 ));
-  hbox2.SetLayoutData( MarginLayoutData::New( ChildLayoutData::MATCH_PARENT, ChildLayoutData::MATCH_PARENT, 0,0,0,0 ));
+  hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  // hbox1.SetLayoutData( MarginLayoutData::New( ChildLayoutData::MATCH_PARENT, , 0,0,0,0 ));
+  // hbox2.SetLayoutData( MarginLayoutData::New( ChildLayoutData::MATCH_PARENT, ChildLayoutData::MATCH_PARENT, 0,0,0,0 ));
 
   std::vector< Control > controls;
   controls.push_back( CreateLeafControl( 20, 40 ) );

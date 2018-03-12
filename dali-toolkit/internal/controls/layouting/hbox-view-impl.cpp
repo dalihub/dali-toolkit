@@ -19,11 +19,12 @@
 
 //EXTERNAL HEADERS
 //INTERNAL HEADERS
+#include <dali-toolkit/devel-api/controls/layouting/hbox-view.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/internal/layouting/hbox-layout-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
 #include <dali-toolkit/devel-api/layouting/margin-layout-data.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/layouting/hbox-layout-impl.h>
 #include <dali-toolkit/internal/layouting/margin-layout-data-impl.h>
 
 namespace Dali
@@ -32,6 +33,18 @@ namespace Toolkit
 {
 namespace Internal
 {
+
+namespace
+{
+BaseHandle Create()
+{
+  return HboxView::New();
+}
+
+Dali::TypeRegistration typeRegistration( typeid( Toolkit::HboxView ), typeid ( Toolkit::Control ), Create );
+
+
+} // anonymous namespace
 
 Dali::Toolkit::HboxView HboxView::New()
 {
@@ -119,6 +132,8 @@ void HboxView::OnInitialize()
   auto layout = Internal::HboxLayout::New( handle );
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( *this );
   controlDataImpl.SetLayout( *layout.Get() );
+
+  layout->RegisterChildProperties( typeid(Dali::Toolkit::HboxView) ); // @todo Must make this work with C# derived types
 }
 
 HboxView::HboxView()

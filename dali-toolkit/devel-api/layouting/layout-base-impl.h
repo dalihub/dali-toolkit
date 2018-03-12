@@ -20,6 +20,7 @@
 
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
@@ -49,7 +50,10 @@ protected:
   ~LayoutBase()=default;
 
 public:
-  static LayoutBasePtr New( IntrusivePtr<RefObject> handle );
+  /**
+   * @param[in] owner The owner (container view ) of this layout
+   */
+  static LayoutBasePtr New( IntrusivePtr<RefObject> owner );
 
   LayoutBase(const LayoutBase& copy)=delete;
   LayoutBase& operator=(const LayoutBase& rhs)=delete;
@@ -57,6 +61,18 @@ public:
   virtual void Initialize( IntrusivePtr<RefObject> handle );
 
   IntrusivePtr<RefObject> GetOwner() const;
+
+  /**
+   * Register child properties of layout
+   * @param[in] containerType The type of the containing view (owner)
+   */
+  void RegisterChildProperties( const std::type_info& containerType );
+
+  /**
+   * Ensure derived types register their child properties
+   * Must chain up to parent.
+   */
+  virtual void DoRegisterChildProperties( const std::type_info& containerType );
 
   void SetLayoutData( ChildLayoutDataPtr childLayoutData );
 

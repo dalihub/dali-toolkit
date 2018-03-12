@@ -35,6 +35,21 @@ class HboxLayout;
 class DALI_IMPORT_API HboxLayout : public LayoutGroup
 {
 public:
+
+  enum PropertyRange
+  {
+    CHILD_PROPERTY_START_INDEX = LayoutGroup::CHILD_PROPERTY_START_INDEX+100,
+    CHILD_PROPERTY_END_INDEX   = CHILD_PROPERTY_START_INDEX+1000
+  };
+
+  struct ChildProperty
+  {
+    enum
+    {
+      WEIGHT = CHILD_PROPERTY_START_INDEX,
+    };
+  };
+
   HboxLayout();
   static HboxLayout New( IntrusivePtr<RefObject> owner);
   static HboxLayout DownCast( BaseHandle handle );

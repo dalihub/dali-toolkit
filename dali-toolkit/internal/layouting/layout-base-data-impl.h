@@ -40,7 +40,6 @@ public:
 
   RefObject* mOwner; ///< Control or Visual that owns this layout. Raw pointer to avoid cyclic references
   LayoutParent* mLayoutParent; ///< The containing layout parent.
-  ChildLayoutDataPtr mLayoutData; ///< The layout data for this object ( within it's parent layouter )
 
   MeasureSpec mOldWidthMeasureSpec;
   MeasureSpec mOldHeightMeasureSpec;

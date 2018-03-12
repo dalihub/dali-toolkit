@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_GROUP_H
 #define DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_GROUP_H
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,6 +97,10 @@ public: // Implementation of LayoutParent
   virtual LayoutParent* GetParent();
 
 protected:
+  /**
+   * @copydoc LayoutBase::DoRegisterChildProperties()
+   */
+  virtual void DoRegisterChildProperties( const std::type_info& containerType ) override;
 
   /**
    * @copydoc LayoutBase::OnSetLayoutData()
@@ -107,6 +111,7 @@ protected:
    * Create default layout data suitable for this layout group or derived layouter
    */
   virtual ChildLayoutDataPtr GenerateDefaultLayoutData();
+  virtual void GenerateDefaultChildProperties( Handle child );
 
   /**
    * Ask all of the children of this view to measure themselves, taking into
