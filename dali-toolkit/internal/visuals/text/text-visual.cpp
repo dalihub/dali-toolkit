@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -428,7 +428,7 @@ void TextVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 
 
 TextVisual::TextVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
+: Visual::Base( factoryCache ),
   mController( Text::Controller::New() ),
   mTypesetter( Text::Typesetter::New( mController->GetTextModel() ) ),
   mAnimatableTextColorPropertyIndex( Property::INVALID_INDEX ),

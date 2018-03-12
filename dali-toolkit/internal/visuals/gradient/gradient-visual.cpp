@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -227,7 +227,7 @@ GradientVisualPtr GradientVisual::New( VisualFactoryCache& factoryCache, const P
 }
 
 GradientVisual::GradientVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+: Visual::Base( factoryCache ),
   mGradientType( LINEAR ),
   mIsOpaque( true )
 {
