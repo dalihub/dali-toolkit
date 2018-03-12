@@ -89,11 +89,32 @@ Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::Tra
   return controlDataImpl.CreateTransition( handle );
 }
 
+
+void AddTransitions( Internal::Control& control,
+                     Dali::Animation animation,
+                     const Toolkit::TransitionData& transitionData )
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.AddTransitions( animation, transitionData );
+}
+
 void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes )
 {
   Internal::Control& controlInternal = Toolkit::Internal::GetImplementation( control );
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlInternal );
   controlDataImpl.DoAction( visualIndex, actionId, attributes );
+}
+
+Toolkit::LayoutBase GetLayout( Internal::Control& control )
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  return Toolkit::LayoutBase( controlDataImpl.GetLayout().Get() );
+}
+
+void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout )
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.SetLayout( GetImplementation( layout ) );
 }
 
 } // namespace DevelControl

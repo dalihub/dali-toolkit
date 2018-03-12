@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -423,6 +423,16 @@ PixelData Typesetter::Render( const Vector2& size, Toolkit::DevelText::TextDirec
       // Combine the two buffers
       imageBuffer = CombineImageBuffer( imageBuffer, underlineImageBuffer, bufferWidth, bufferHeight );
     }
+
+    // Generate the background if enabled
+    const bool backgroundEnabled = mModel->IsBackgroundEnabled();
+    if ( backgroundEnabled )
+    {
+      Devel::PixelBuffer backgroundImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_BACKGROUND, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs -1 );
+
+      // Combine the two buffers
+      imageBuffer = CombineImageBuffer( imageBuffer, backgroundImageBuffer, bufferWidth, bufferHeight );
+    }
   }
 
   // Create the final PixelData for the combined image buffer
@@ -701,6 +711,43 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
           *( underlinePixelBuffer + 3u ) = static_cast<uint8_t>( underlineColor.a * 255.f );
 
           *( bitmapBuffer + y * glyphData.width + x ) = underlinePixel;
+        }
+      }
+    }
+
+    // Draw the background color from the leftmost glyph to the rightmost glyph
+    if ( style == Typesetter::STYLE_BACKGROUND )
+    {
+      Vector4 backgroundColor = mModel->GetBackgroundColor();
+
+      for( int y = glyphData.verticalOffset + baseline - line.ascender; y < glyphData.verticalOffset + baseline - line.descender; y++ )
+      {
+        if( ( y < 0 ) || ( y > static_cast<int>(bufferHeight - 1) ) )
+        {
+          // Do not write out of bounds.
+          continue;
+        }
+
+        for( int x = glyphData.horizontalOffset + lineExtentLeft; x <= glyphData.horizontalOffset + lineExtentRight; x++ )
+        {
+          if( ( x < 0 ) || ( x > static_cast<int>(bufferWidth - 1) ) )
+          {
+            // Do not write out of bounds.
+            continue;
+          }
+
+          // Always RGBA image for text with styles
+          uint32_t* bitmapBuffer = reinterpret_cast< uint32_t* >( glyphData.bitmapBuffer.GetBuffer() );
+          uint32_t backgroundPixel = *( bitmapBuffer + y * glyphData.width + x );
+          uint8_t* backgroundPixelBuffer = reinterpret_cast<uint8_t*>( &backgroundPixel );
+
+          // Write the background color to the pixel buffer
+          *( backgroundPixelBuffer ) = static_cast<uint8_t>( backgroundColor.r * 255.f );
+          *( backgroundPixelBuffer + 1u ) = static_cast<uint8_t>( backgroundColor.g * 255.f );
+          *( backgroundPixelBuffer + 2u ) = static_cast<uint8_t>( backgroundColor.b * 255.f );
+          *( backgroundPixelBuffer + 3u ) = static_cast<uint8_t>( backgroundColor.a * 255.f );
+
+          *( bitmapBuffer + y * glyphData.width + x ) = backgroundPixel;
         }
       }
     }

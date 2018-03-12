@@ -316,7 +316,6 @@ private:
 
   Constraint mIndicatorPositionConstraint;
   Constraint mIndicatorSizeConstraint;
-  Constraint mScrollPositionInCurrentAxisConstraint;
 
   bool mIsPanning                 : 1;                               ///< Whether the scroll bar is being panned.
   bool mIndicatorFirstShow        : 1;                               ///< True if the indicator has never been shown

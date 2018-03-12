@@ -366,7 +366,7 @@ int UtcDaliImageViewSetGetProperty03(void)
   DALI_TEST_CHECK( srcFactorRgb == BlendFactor::ONE );
   DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
   DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
-  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
 
   value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
   DALI_TEST_CHECK( value.Get( enable ) );

@@ -31,12 +31,23 @@ ImageCache::ImageCache( TextureManager&                 textureManager,
   mBatchSize( batchSize ),
   mUrlIndex(0u),
   mWaitingForReadyFrame(false),
-  mRequestingLoad(false)
+  mRequestingLoad(false),
+  mTextureManagerAlive(true)
 {
+  mTextureManager.AddObserver( *this );
 }
 
 ImageCache::~ImageCache()
 {
+  if( mTextureManagerAlive )
+  {
+    mTextureManager.RemoveObserver( *this );
+  }
+}
+
+void ImageCache::TextureManagerDestroyed()
+{
+  mTextureManagerAlive = false;
 }
 
 } //namespace Internal

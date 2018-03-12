@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
  */
 
-#include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include <toolkit-singleton-service.h>
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-object.h>
@@ -74,6 +74,13 @@ public:
     if( singleton )
     {
       mSingletonContainer.insert( SingletonPair( info.name(), singleton ) );
+
+      Integration::Processor* processor = dynamic_cast<Integration::Processor*>( &singleton.GetBaseObject() );
+      if( processor )
+      {
+        Integration::Core& core = mTestApplication->GetCore();
+        core.RegisterProcessor( *processor );
+      }
     }
   }
 
@@ -98,6 +105,11 @@ public:
       object = ( *iter ).second;
     }
     return object;
+  }
+
+  void SetApplication( Dali::TestApplication& testApplication )
+  {
+    mTestApplication = &testApplication;
   }
 
 private:
@@ -132,6 +144,7 @@ private:
   typedef SingletonContainer::const_iterator SingletonConstIter;
 
   SingletonContainer mSingletonContainer; ///< The container to look up singleton by its type name
+  TestApplication* mTestApplication;
 };
 
 } // namespace Adaptor
@@ -192,3 +205,14 @@ SingletonService::SingletonService( Internal::Adaptor::SingletonService* singlet
 }
 
 } // namespace Dali
+
+
+namespace Test
+{
+
+void SetApplication( Dali::SingletonService singletonService, TestApplication& testApplication )
+{
+  GetImplementation( singletonService ).SetApplication( testApplication );
+}
+
+} // Test

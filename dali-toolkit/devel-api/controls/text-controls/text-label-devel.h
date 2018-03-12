@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LABEL_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,20 @@ namespace Property
      * @see VerticalLineAlignment::Type for supported values
      */
     VERTICAL_LINE_ALIGNMENT,
+
+    /**
+     * @brief The default text background parameters.
+     * @details Name "textBackground", type Property::MAP.
+     * @note Use "textBackground" as property name to avoid conflict with Control's "background" property
+     *
+     * The background map contains the following keys:
+     *
+     * | %Property Name       | Type     | Required | Description                                                                                                        |
+     * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
+     * | enable               | BOOLEAN  | No       | True to enable the background or false to disable (the default value is false)                                     |
+     * | color                | VECTOR4  | No       | The color of the background (the default value is Color::CYAN)                                                     |
+     */
+    BACKGROUND,
   };
 
 } // namespace Property

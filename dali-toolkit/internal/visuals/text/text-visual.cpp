@@ -61,6 +61,7 @@ const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
 const char * const SHADOW_PROPERTY( "shadow" );
 const char * const UNDERLINE_PROPERTY( "underline" );
 const char * const OUTLINE_PROPERTY( "outline" );
+const char * const BACKGROUND_PROPERTY( "textBackground" );
 
 const Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
 
@@ -335,6 +336,10 @@ Dali::Property::Index StringKeyToIndexKey( const std::string& stringKey )
   {
     result = Toolkit::DevelTextVisual::Property::OUTLINE;
   }
+  else if( stringKey == BACKGROUND_PROPERTY )
+  {
+    result = Toolkit::DevelTextVisual::Property::BACKGROUND;
+  }
 
   return result;
 }
@@ -415,6 +420,9 @@ void TextVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   GetOutlineProperties( mController, value, Text::EffectStyle::DEFAULT );
   map.Insert( Toolkit::DevelTextVisual::Property::OUTLINE, value );
+
+  GetBackgroundProperties( mController, value, Text::EffectStyle::DEFAULT );
+  map.Insert( Toolkit::DevelTextVisual::Property::BACKGROUND, value );
 }
 
 void TextVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -608,6 +616,11 @@ void TextVisual::DoSetProperty( Dali::Property::Index index, const Dali::Propert
       SetOutlineProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
       break;
     }
+    case Toolkit::DevelTextVisual::Property::BACKGROUND:
+    {
+      SetBackgroundProperties( mController, propertyValue, Text::EffectStyle::DEFAULT );
+      break;
+    }
   }
 }
 
@@ -672,17 +685,21 @@ void TextVisual::UpdateRenderer()
       const Vector4* const colorsBuffer = mController->GetTextModel()->GetColors();
       bool hasMultipleTextColors = ( NULL != colorsBuffer );
 
-      // Check whether the text contains any emoji
-      bool containsEmoji = false;
+      // Check whether the text contains any color glyph
+      bool containsColorGlyph = false;
 
-      Text::ScriptRunIndex numberOfScripts = mController->GetTextModel()->GetNumberOfScripts();
-      const Text::ScriptRun* scripts = mController->GetTextModel()->GetScriptRuns();
-      for ( Text::ScriptRunIndex scriptIndex = 0u; scriptIndex < numberOfScripts; scriptIndex++ )
+      TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+      const Text::GlyphInfo* const glyphsBuffer = mController->GetTextModel()->GetGlyphs();
+      const Text::Length numberOfGlyphs = mController->GetTextModel()->GetNumberOfGlyphs();
+      for ( Text::Length glyphIndex = 0; glyphIndex < numberOfGlyphs; glyphIndex++ )
       {
-        const Text::ScriptRun& scriptRun = *( scripts + scriptIndex );
-        if( TextAbstraction::EMOJI == scriptRun.script )
+        // Retrieve the glyph's info.
+        const Text::GlyphInfo* const glyphInfo = glyphsBuffer + glyphIndex;
+
+        // Whether the current glyph is a color one.
+        if( fontClient.IsColorGlyph( glyphInfo->fontId, glyphInfo->index ) )
         {
-          containsEmoji = true;
+          containsColorGlyph = true;
           break;
         }
       }
@@ -698,13 +715,14 @@ void TextVisual::UpdateRenderer()
 
       const bool underlineEnabled = mController->GetTextModel()->IsUnderlineEnabled();
       const bool outlineEnabled = ( mController->GetTextModel()->GetOutlineWidth() > Math::MACHINE_EPSILON_1 );
+      const bool backgroundEnabled = mController->GetTextModel()->IsBackgroundEnabled();;
 
-      const bool styleEnabled = ( shadowEnabled || underlineEnabled || outlineEnabled );
+      const bool styleEnabled = ( shadowEnabled || underlineEnabled || outlineEnabled || backgroundEnabled );
 
-      TextureSet textureSet = GetTextTexture( relayoutSize, hasMultipleTextColors, containsEmoji, styleEnabled );
+      TextureSet textureSet = GetTextTexture( relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled );
       mImpl->mRenderer.SetTextures( textureSet );
 
-      Shader shader = GetTextShader( mFactoryCache, hasMultipleTextColors, containsEmoji, styleEnabled );
+      Shader shader = GetTextShader( mFactoryCache, hasMultipleTextColors, containsColorGlyph, styleEnabled );
       mImpl->mRenderer.SetShader(shader);
 
       mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
@@ -745,7 +763,7 @@ void TextVisual::RemoveTextureSet()
   }
 }
 
-TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled )
+TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled )
 {
   // Filter mode needs to be set to linear to produce better quality while scaling.
   Sampler sampler = Sampler::New();
@@ -754,7 +772,7 @@ TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleText
   TextureSet textureSet = TextureSet::New();
 
   // Create RGBA texture if the text contains emojis or multiple text colors, otherwise L8 texture
-  Pixel::Format textPixelFormat = ( containsEmoji || hasMultipleTextColors ) ? Pixel::RGBA8888 : Pixel::L8;
+  Pixel::Format textPixelFormat = ( containsColorGlyph || hasMultipleTextColors ) ? Pixel::RGBA8888 : Pixel::L8;
 
   // Check the text direction
   Toolkit::DevelText::TextDirection::Type textDirection = mController->GetTextDirection();
@@ -791,7 +809,7 @@ TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleText
     textureSet.SetSampler( 1u, sampler );
   }
 
-  if ( containsEmoji && !hasMultipleTextColors )
+  if ( containsColorGlyph && !hasMultipleTextColors )
   {
     // Create a L8 texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
     PixelData maskData = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_MASK, false, Pixel::L8 );
@@ -818,7 +836,7 @@ TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleText
   return textureSet;
 }
 
-Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled )
+Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled )
 {
   Shader shader;
 
@@ -844,7 +862,7 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE, shader );
     }
   }
-  else if( !hasMultipleTextColors && !containsEmoji && !styleEnabled )
+  else if( !hasMultipleTextColors && !containsColorGlyph && !styleEnabled )
   {
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT );
     if( !shader )
@@ -854,7 +872,7 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT, shader );
     }
   }
-  else if( !hasMultipleTextColors && !containsEmoji && styleEnabled )
+  else if( !hasMultipleTextColors && !containsColorGlyph && styleEnabled )
   {
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE );
     if( !shader )
@@ -864,7 +882,7 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE, shader );
     }
   }
-  else if( !hasMultipleTextColors && containsEmoji && !styleEnabled )
+  else if( !hasMultipleTextColors && containsColorGlyph && !styleEnabled )
   {
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI );
     if( !shader )
@@ -874,7 +892,7 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI, shader );
     }
   }
-  else // if( !hasMultipleTextColors && containsEmoji && styleEnabled )
+  else // if( !hasMultipleTextColors && containsColorGlyph && styleEnabled )
   {
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI );
     if( !shader )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -317,6 +317,7 @@ Control::Impl::Impl( Control& controlImpl )
 : mControlImpl( controlImpl ),
   mState( Toolkit::DevelControl::NORMAL ),
   mSubStateName(""),
+  mLayout( NULL ),
   mLeftFocusableActorId( -1 ),
   mRightFocusableActorId( -1 ),
   mUpFocusableActorId( -1 ),
@@ -327,6 +328,9 @@ Control::Impl::Impl( Control& controlImpl )
   mMargin( 0, 0, 0, 0 ),
   mPadding( 0, 0, 0, 0 ),
   mKeyEventSignal(),
+  mKeyInputFocusGainedSignal(),
+  mKeyInputFocusLostSignal(),
+  mResourceReadySignal(),
   mPinchGestureDetector(),
   mPanGestureDetector(),
   mTapGestureDetector(),
@@ -704,81 +708,91 @@ Toolkit::Visual::ResourceStatus Control::Impl::GetVisualResourceStatus( Property
   return Toolkit::Visual::ResourceStatus::PREPARING;
 }
 
-Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& handle )
+
+
+void Control::Impl::AddTransitions( Dali::Animation& animation,
+                                    const Toolkit::TransitionData& handle,
+                                    bool createAnimation )
 {
-  Dali::Animation transition;
+  // Setup a Transition from TransitionData.
   const Internal::TransitionData& transitionData = Toolkit::GetImplementation( handle );
-
-  if( transitionData.Count() > 0 )
+  TransitionData::Iterator end = transitionData.End();
+  for( TransitionData::Iterator iter = transitionData.Begin() ;
+       iter != end; ++iter )
   {
-    // Setup a Transition from TransitionData.
-    TransitionData::Iterator end = transitionData.End();
-    for( TransitionData::Iterator iter = transitionData.Begin() ;
-         iter != end; ++iter )
+    TransitionData::Animator* animator = (*iter);
+
+    Toolkit::Visual::Base visual = GetVisualByName( mVisuals, animator->objectName );
+
+    if( visual )
     {
-      TransitionData::Animator* animator = (*iter);
-
-      Toolkit::Visual::Base visual = GetVisualByName( mVisuals, animator->objectName );
-
-      if( visual )
-      {
 #if defined(DEBUG_ENABLED)
-        Dali::TypeInfo typeInfo;
-        ControlWrapper* controlWrapperImpl = dynamic_cast<ControlWrapper*>(&mControlImpl);
-        if( controlWrapperImpl )
-        {
-          typeInfo = controlWrapperImpl->GetTypeInfo();
-        }
-
-        DALI_LOG_INFO( gLogFilter, Debug::Concise, "CreateTransition: Found %s visual for %s\n",
-                       visual.GetName().c_str(), typeInfo?typeInfo.GetName().c_str():"Unknown" );
-#endif
-        Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
-        visualImpl.AnimateProperty( transition, *animator );
-      }
-      else
+      Dali::TypeInfo typeInfo;
+      ControlWrapper* controlWrapperImpl = dynamic_cast<ControlWrapper*>(&mControlImpl);
+      if( controlWrapperImpl )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Concise, "CreateTransition: Could not find visual. Trying actors");
-        // Otherwise, try any actor children of control (Including the control)
-        Actor child = mControlImpl.Self().FindChildByName( animator->objectName );
-        if( child )
+        typeInfo = controlWrapperImpl->GetTypeInfo();
+      }
+
+      DALI_LOG_INFO( gLogFilter, Debug::Concise, "CreateTransition: Found %s visual for %s\n",
+                     visual.GetName().c_str(), typeInfo?typeInfo.GetName().c_str():"Unknown" );
+#endif
+      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+      visualImpl.AnimateProperty( animation, *animator );
+    }
+    else
+    {
+      DALI_LOG_INFO( gLogFilter, Debug::Concise, "CreateTransition: Could not find visual. Trying actors");
+      // Otherwise, try any actor children of control (Including the control)
+      Actor child = mControlImpl.Self().FindChildByName( animator->objectName );
+      if( child )
+      {
+        Property::Index propertyIndex = DevelHandle::GetPropertyIndex( child, animator->propertyKey );
+        if( propertyIndex != Property::INVALID_INDEX )
         {
-          Property::Index propertyIndex = DevelHandle::GetPropertyIndex( child, animator->propertyKey );
-          if( propertyIndex != Property::INVALID_INDEX )
+          if( animator->animate == false )
           {
-            if( animator->animate == false )
+            if( animator->targetValue.GetType() != Property::NONE )
             {
-              if( animator->targetValue.GetType() != Property::NONE )
-              {
-                child.SetProperty( propertyIndex, animator->targetValue );
-              }
+              child.SetProperty( propertyIndex, animator->targetValue );
             }
-            else // animate the property
+          }
+          else // animate the property
+          {
+            if( animator->initialValue.GetType() != Property::NONE )
             {
-              if( animator->initialValue.GetType() != Property::NONE )
-              {
-                child.SetProperty( propertyIndex, animator->initialValue );
-              }
-
-              if( ! transition )
-              {
-                transition = Dali::Animation::New( 0.1f );
-              }
-
-              transition.AnimateTo( Property( child, propertyIndex ),
-                                    animator->targetValue,
-                                    animator->alphaFunction,
-                                    TimePeriod( animator->timePeriodDelay,
-                                                animator->timePeriodDuration ) );
+              child.SetProperty( propertyIndex, animator->initialValue );
             }
+
+            if( createAnimation && !animation )
+            {
+              animation = Dali::Animation::New( 0.1f );
+            }
+
+            animation.AnimateTo( Property( child, propertyIndex ),
+                                 animator->targetValue,
+                                 animator->alphaFunction,
+                                 TimePeriod( animator->timePeriodDelay,
+                                             animator->timePeriodDuration ) );
           }
         }
       }
     }
   }
+}
 
+Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& transitionData )
+{
+  Dali::Animation transition;
+
+  if( transitionData.Count() > 0 )
+  {
+    AddTransitions( transition, transitionData, true );
+  }
   return transition;
 }
+
+
 
 void Control::Impl::DoAction( Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes )
 {
@@ -1387,6 +1401,16 @@ void Control::Impl::SetPadding( Extents padding )
 Extents Control::Impl::GetPadding() const
 {
   return mControlImpl.mImpl->mPadding;
+}
+
+Toolkit::Internal::LayoutBasePtr Control::Impl::GetLayout()
+{
+  return mLayout;
+}
+
+void Control::Impl::SetLayout( Toolkit::Internal::LayoutBase& layout )
+{
+  mLayout = &layout;
 }
 
 } // namespace Internal

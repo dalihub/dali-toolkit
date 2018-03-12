@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,7 @@ const char* const PROPERTY_NAME_UNDERLINE = "underline";
 const char* const PROPERTY_NAME_SHADOW = "shadow";
 const char* const PROPERTY_NAME_EMBOSS = "emboss";
 const char* const PROPERTY_NAME_OUTLINE = "outline";
+const char* const PROPERTY_NAME_BACKGROUND = "textBackground";
 
 const char* const PROPERTY_NAME_PIXEL_SIZE = "pixelSize";
 const char* const PROPERTY_NAME_ELLIPSIS = "ellipsis";
@@ -255,6 +256,7 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_SHADOW ) == TextLabel::Property::SHADOW );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_EMBOSS ) == TextLabel::Property::EMBOSS );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_OUTLINE ) == TextLabel::Property::OUTLINE );
+  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_BACKGROUND ) == DevelTextLabel::Property::BACKGROUND );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_PIXEL_SIZE ) == TextLabel::Property::PIXEL_SIZE );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextLabel::Property::ELLIPSIS );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY ) == TextLabel::Property::AUTO_SCROLL_LOOP_DELAY );
@@ -533,6 +535,18 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   outlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::OUTLINE );
   DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
+
+  // Check the background property
+  Property::Map backgroundMapSet;
+  Property::Map backgroundMapGet;
+
+  backgroundMapSet["enable"] = true;
+  backgroundMapSet["color"] = Color::RED;
+  label.SetProperty( DevelTextLabel::Property::BACKGROUND, backgroundMapSet );
+
+  backgroundMapGet = label.GetProperty<Property::Map>( DevelTextLabel::Property::BACKGROUND );
+  DALI_TEST_EQUALS( backgroundMapGet.Count(), backgroundMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( backgroundMapGet, backgroundMapSet ), true, TEST_LOCATION );
 
   // Check the pixel size of font
   label.SetProperty( TextLabel::Property::PIXEL_SIZE, 20.f );

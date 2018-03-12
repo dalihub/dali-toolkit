@@ -86,6 +86,9 @@ Scrollable::Scrollable()
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
   mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),
   mScrollToAlphaFunction( AlphaFunction::EASE_OUT ),
+  mScrollStartedSignal(),
+  mScrollUpdatedSignal(),
+  mScrollCompletedSignal(),
   mOvershootEnabled(true)
 {
 }
@@ -96,6 +99,9 @@ Scrollable::Scrollable( ControlBehaviour behaviourFlags )
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
   mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),
   mScrollToAlphaFunction( AlphaFunction::EASE_OUT ),
+  mScrollStartedSignal(),
+  mScrollUpdatedSignal(),
+  mScrollCompletedSignal(),
   mOvershootEnabled(true)
 {
 }

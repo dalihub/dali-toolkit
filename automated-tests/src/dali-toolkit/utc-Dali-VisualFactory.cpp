@@ -1882,6 +1882,30 @@ int UtcDaliVisualFactoryGetPrimitiveVisual17(void)
   END_TEST;
 }
 
+//Test if primitive shape loads a conic section correctly.
+int UtcDaliVisualFactoryGetPrimitiveVisual18(void)
+{
+  //Set up test application first, so everything else can be handled.
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliVisualFactoryGetPrimitiveVisual18:  Request primitive visual to display a conic section" );
+
+  //Set up visual properties.
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::PRIMITIVE );
+  propertyMap.Insert( PrimitiveVisual::Property::SHAPE, PrimitiveVisual::Shape::CONICAL_FRUSTUM );
+  propertyMap.Insert( PrimitiveVisual::Property::MIX_COLOR, Vector4( 0.5, 0.5, 0.5, 1.0 ) );
+  propertyMap.Insert( PrimitiveVisual::Property::SLICES, 10 );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_TOP_RADIUS, 30.0f );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_BOTTOM_RADIUS, 40.0f );
+  propertyMap.Insert( PrimitiveVisual::Property::SCALE_HEIGHT, 50.0f );
+
+  //Test to see if shape loads correctly.
+  TestPrimitiveVisualWithProperties( propertyMap, application );
+
+  END_TEST;
+}
+
 //Test if primitive shape visual handles the case of not being passed a specific shape to use.
 int UtcDaliVisualFactoryGetPrimitiveVisualN1(void)
 {
