@@ -70,7 +70,7 @@ enum Type
    * @see DevelVisual::FittingMode
    * @note The default is defined by the type of visual (if it's suitable to be stretched or not).
    */
-  VISUAL_FITTING_MODE = OPACITY + 1,
+  FITTING_MODE        = OPACITY + 1,
 };
 
 } // namespace Property

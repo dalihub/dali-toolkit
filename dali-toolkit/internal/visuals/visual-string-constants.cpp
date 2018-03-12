@@ -73,7 +73,7 @@ const char * const MIX_COLOR( "mixColor" );
 const char * const OPACITY( "opacity" );
 
 // Fitting mode
-const char * const VISUAL_FITTING_MODE( "visualFittingMode" );
+const char * const FITTING_MODE( "fittingMode" );
 
 // Color visual
 const char * const RENDER_IF_TRANSPARENT_NAME( "renderIfTransparent" );

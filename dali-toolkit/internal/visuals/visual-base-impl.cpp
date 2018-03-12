@@ -55,10 +55,10 @@ namespace Internal
 namespace
 {
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( VISUAL_FITTING_MODE )
+DALI_ENUM_TO_STRING_TABLE_BEGIN( FITTING_MODE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Visual::FittingMode, FIT_KEEP_ASPECT_RATIO  )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Visual::FittingMode, FILL  )
-DALI_ENUM_TO_STRING_TABLE_END( VISUAL_FITTING_MODE )
+DALI_ENUM_TO_STRING_TABLE_END( FITTING_MODE )
 
 } // namespace
 
@@ -116,9 +116,9 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
       {
         matchKey = Property::Key( Toolkit::Visual::Property::OPACITY );
       }
-      else if( matchKey == VISUAL_FITTING_MODE )
+      else if( matchKey == FITTING_MODE )
       {
-        matchKey = Property::Key( Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE );
+        matchKey = Property::Key( Toolkit::DevelVisual::Property::FITTING_MODE );
       }
     }
 
@@ -181,10 +181,10 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
         }
         break;
       }
-      case Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE:
+      case Toolkit::DevelVisual::Property::FITTING_MODE:
       {
         Scripting::GetEnumerationProperty< Visual::FittingMode >(
-          value, VISUAL_FITTING_MODE_TABLE, VISUAL_FITTING_MODE_TABLE_COUNT, mImpl->mFittingMode );
+          value, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, mImpl->mFittingMode );
         break;
       }
     }
@@ -318,8 +318,8 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::Visual::Property::OPACITY, mImpl->mMixColor.a );
 
   auto fittingModeString = Scripting::GetLinearEnumerationName< FittingMode >(
-    mImpl->mFittingMode, VISUAL_FITTING_MODE_TABLE, VISUAL_FITTING_MODE_TABLE_COUNT );
-  map.Insert( Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE, fittingModeString );
+    mImpl->mFittingMode, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT );
+  map.Insert( Toolkit::DevelVisual::Property::FITTING_MODE, fittingModeString );
 }
 
 void Visual::Base::CreateInstancePropertyMap( Property::Map& map ) const
