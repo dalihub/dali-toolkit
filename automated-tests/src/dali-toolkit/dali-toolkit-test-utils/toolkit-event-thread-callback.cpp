@@ -77,7 +77,7 @@ bool EventThreadCallback::WaitingForTrigger()
   struct timespec now;
   clock_gettime( CLOCK_REALTIME, &now );
   if( now.tv_nsec < 999900000 ) // 999, 900, 000
-    now.tv_nsec += 100000;
+    now.tv_nsec += 1000;
   else
   {
     now.tv_sec += 1;
@@ -123,6 +123,10 @@ bool WaitForEventThreadTrigger( int triggerCount, int timeoutInSeconds )
           // Semaphore was unlocked - execute the trigger
           Dali::CallbackBase::Execute( *callback );
           triggerCount--;
+        }
+        if( triggerCount <= 0 )
+        {
+          break;
         }
       }
     }
