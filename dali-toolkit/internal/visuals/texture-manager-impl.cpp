@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,10 @@ TextureManager::MaskingData::MaskingData()
 TextureManager::TextureManager()
 : mAsyncLocalLoaders( GetNumberOfLocalLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
   mAsyncRemoteLoaders( GetNumberOfRemoteLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
-  mCurrentTextureId( 0 )
+  mExternalTextures(),
+  mLoadQueue(),
+  mCurrentTextureId( 0 ),
+  mQueueLoadFlag(false)
 {
 }
 
@@ -374,8 +377,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
     case TextureManager::LOAD_FAILED: // Failed notifies observer which then stops observing.
     case TextureManager::NOT_STARTED:
     {
-      LoadTexture( textureInfo );
-      ObserveTexture( textureInfo, observer );
+      LoadOrQueueTexture( textureInfo, observer ); // If called inside NotifyObservers, queues until afterwards
       break;
     }
     case TextureManager::LOADING:
@@ -573,26 +575,67 @@ TextureSet TextureManager::RemoveExternalTexture( const std::string& url )
   return TextureSet();
 }
 
-bool TextureManager::LoadTexture( TextureInfo& textureInfo )
+void TextureManager::LoadOrQueueTexture( TextureInfo& textureInfo, TextureUploadObserver* observer )
 {
-  bool success = true;
-
-  if( textureInfo.loadState == NOT_STARTED )
+  switch( textureInfo.loadState )
   {
-    textureInfo.loadState = LOADING;
-
-    if( !textureInfo.loadSynchronously )
+    case NOT_STARTED:
+    case LOAD_FAILED:
     {
-      auto& loadersContainer = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
-      auto loadingHelperIt = loadersContainer.GetNext();
-      DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
-      loadingHelperIt->Load(textureInfo.textureId, textureInfo.url,
-                            textureInfo.desiredSize, textureInfo.fittingMode,
-                            textureInfo.samplingMode, textureInfo.orientationCorrection );
+      if( mQueueLoadFlag )
+      {
+        QueueLoadTexture( textureInfo, observer );
+      }
+      else
+      {
+        LoadTexture( textureInfo, observer );
+      }
+      break;
+    }
+    case LOADING:
+    case UPLOADED:
+    case CANCELLED:
+    case LOAD_FINISHED:
+    case WAITING_FOR_MASK:
+    {
+      break;
     }
   }
+}
 
-  return success;
+void TextureManager::QueueLoadTexture( TextureInfo& textureInfo, TextureUploadObserver* observer )
+{
+  auto textureId = textureInfo.textureId;
+  mLoadQueue.PushBack( LoadQueueElement( textureId, observer) );
+}
+
+void TextureManager::LoadTexture( TextureInfo& textureInfo, TextureUploadObserver* observer )
+{
+  textureInfo.loadState = LOADING;
+  if( !textureInfo.loadSynchronously )
+  {
+    auto& loadersContainer = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
+    auto loadingHelperIt = loadersContainer.GetNext();
+    DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
+    loadingHelperIt->Load(textureInfo.textureId, textureInfo.url,
+                          textureInfo.desiredSize, textureInfo.fittingMode,
+                          textureInfo.samplingMode, textureInfo.orientationCorrection );
+  }
+  ObserveTexture( textureInfo, observer );
+}
+
+void TextureManager::ProcessQueuedTextures()
+{
+  for( auto&& element : mLoadQueue )
+  {
+    int cacheIndex = GetCacheIndexFromId( element.mTextureId );
+    if( cacheIndex != INVALID_CACHE_INDEX )
+    {
+      TextureInfo& textureInfo( mTextureInfoContainer[cacheIndex] );
+      LoadTexture( textureInfo, element.mObserver );
+    }
+  }
+  mLoadQueue.Clear();
 }
 
 void TextureManager::ObserveTexture( TextureInfo& textureInfo,
@@ -733,7 +776,6 @@ void TextureManager::ApplyMask(
   pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
 }
 
-
 void TextureManager::UploadTexture( Devel::PixelBuffer& pixelBuffer, TextureInfo& textureInfo )
 {
   if( textureInfo.useAtlas != USE_ATLAS )
@@ -773,53 +815,47 @@ void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
 
   // If there is an observer: Notify the load is complete, whether successful or not,
   // and erase it from the list
-  unsigned int observerCount = textureInfo.observerList.Count();
   TextureInfo* info = &textureInfo;
 
-  while( observerCount )
+  mQueueLoadFlag = true;
+
+  while( info->observerList.Count() )
   {
     TextureUploadObserver* observer = info->observerList[0];
 
     // During UploadComplete() a Control ResourceReady() signal is emitted.
     // During that signal the app may add remove /add Textures (e.g. via
-    // ImageViews).  At this point no more observers can be added to the
-    // observerList, because textureInfo.loadState = UPLOADED. However it is
-    // possible for observers to be removed, hence we check the observer list
-    // count every iteration.
-
-    // The reference to the textureInfo struct can also become invalidated,
-    // because new load requests can modify the mTextureInfoContainer list
-    // (e.g. if more requests are pushed back it can cause the list to be
-    // resized invalidating the reference to the TextureInfo ).
+    // ImageViews).
+    // It is possible for observers to be removed from the observer list,
+    // and it is also possible for the mTextureInfoContainer to be modified,
+    // invalidating the reference to the textureInfo struct.
+    // Texture load requests for the same URL are deferred until the end of this
+    // method.
     observer->UploadComplete( success, info->textureId, info->textureSet, info->useAtlas, info->atlasRect,
                               info->preMultiplied );
     observer->DestructionSignal().Disconnect( this, &TextureManager::ObserverDestroyed );
 
-    // Get the textureInfo from the container again as it may have been
-    // invalidated,
-
+    // Get the textureInfo from the container again as it may have been invalidated.
     int textureInfoIndex = GetCacheIndexFromId( textureId );
     if( textureInfoIndex == INVALID_CACHE_INDEX)
     {
       return; // texture has been removed - can stop.
     }
-
     info = &mTextureInfoContainer[ textureInfoIndex ];
-    observerCount = info->observerList.Count();
-    if ( observerCount > 0 )
+
+    // remove the observer that was just triggered if it's still in the list
+    for( TextureInfo::ObserverListType::Iterator j = info->observerList.Begin(); j != info->observerList.End(); ++j )
     {
-      // remove the observer that was just triggered if it's still in the list
-      for( TextureInfo::ObserverListType::Iterator j = info->observerList.Begin(); j != info->observerList.End(); ++j )
+      if( *j == observer )
       {
-        if( *j == observer )
-        {
-          info->observerList.Erase( j );
-          observerCount--;
-          break;
-        }
+        info->observerList.Erase( j );
+        break;
       }
     }
   }
+
+  mQueueLoadFlag = false;
+  ProcessQueuedTextures();
 }
 
 TextureManager::TextureId TextureManager::GenerateUniqueTextureId()

@@ -1619,3 +1619,57 @@ int UtcDaliImageViewResourceReadySignalWithReusedImage02(void)
 
   END_TEST;
 }
+
+
+static int gFailCounter = 0;
+const int MAX_RETRIES(3);
+
+void ReloadImage(ImageView imageView)
+{
+  Property::Map imageImmediateLoadingMap;
+  imageImmediateLoadingMap[ ImageVisual::Property::URL ] = "Non-existant-image.jpg";
+  imageImmediateLoadingMap[ ImageVisual::Property::LOAD_POLICY ] =  ImageVisual::LoadPolicy::IMMEDIATE;
+
+  tet_infoline("Immediate load an image");
+  imageView.SetProperty( ImageView::Property::IMAGE, imageImmediateLoadingMap );
+}
+
+void ResourceFailedReload( Control control )
+{
+  gFailCounter++;
+  if( gFailCounter < MAX_RETRIES )
+  {
+    ReloadImage(ImageView::DownCast(control));
+  }
+}
+
+int UtcDaliImageViewReloadFailedOnResourceReadySignal(void)
+{
+  tet_infoline("Test Setting Image that was already loaded by another ImageView and still getting ResourceReadySignal when staged.");
+
+  ToolkitTestApplication application;
+
+  gFailCounter = 0;
+
+  ImageView imageView = ImageView::New();
+  imageView.ResourceReadySignal().Connect( &ResourceFailedReload );
+  DALI_TEST_EQUALS( gFailCounter, 0, TEST_LOCATION );
+  ReloadImage(imageView);
+
+  // loading started, this waits for the loader thread to complete
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( gFailCounter, 1, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( gFailCounter, 2, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+  DALI_TEST_EQUALS( gFailCounter, 3, TEST_LOCATION );
+
+  END_TEST;
+}
