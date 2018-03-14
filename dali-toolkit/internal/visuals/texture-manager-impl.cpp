@@ -839,6 +839,8 @@ void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
     int textureInfoIndex = GetCacheIndexFromId( textureId );
     if( textureInfoIndex == INVALID_CACHE_INDEX)
     {
+      mQueueLoadFlag = false;
+      ProcessQueuedTextures();
       return; // texture has been removed - can stop.
     }
     info = &mTextureInfoContainer[ textureInfoIndex ];
