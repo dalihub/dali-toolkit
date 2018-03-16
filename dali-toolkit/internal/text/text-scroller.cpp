@@ -88,7 +88,6 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
       discard;\n
     \n
     mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
-    textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
     \n
     gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );
   }\n

@@ -151,7 +151,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
     mediump vec4 styleTexture = texture2D( sStyle, vTexCoord );\n
 
     // Draw the text as overlay above the style
-    gl_FragColor = ( uTextColorAnimatable * textTexture + styleTexture * ( 1.0 - textTexture ) ) * uColor * vec4( mixColor, 1.0 );\n
+    gl_FragColor = ( uTextColorAnimatable * textTexture + styleTexture * ( 1.0 - uTextColorAnimatable.a * textTexture ) ) * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
 
@@ -295,6 +295,15 @@ Dali::Property::Index StringKeyToIndexKey( const std::string& stringKey )
   }
 
   return result;
+}
+
+void TextColorConstraint( Vector4& current, const PropertyInputContainer& inputs )
+{
+  Vector4 color = inputs[0]->GetVector4();
+  current.r = color.r * color.a;
+  current.g = color.g * color.a;
+  current.b = color.b * color.a;
+  current.a = color.a;
 }
 
 void OpacityConstraint( float& current, const PropertyInputContainer& inputs )
@@ -453,7 +462,7 @@ void TextVisual::DoSetOnStage( Actor& actor )
     // Create constraint for the animatable text's color Property with uTextColorAnimatable in the renderer.
     if( shaderTextColorIndex != Property::INVALID_INDEX )
     {
-      Constraint colorConstraint = Constraint::New<Vector4>( mImpl->mRenderer, shaderTextColorIndex, EqualToConstraint() );
+      Constraint colorConstraint = Constraint::New<Vector4>( mImpl->mRenderer, shaderTextColorIndex, TextColorConstraint );
       colorConstraint.AddSource( Source( actor, mAnimatableTextColorPropertyIndex ) );
       colorConstraint.Apply();
 
