@@ -332,7 +332,7 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
     }
     case Toolkit::ImageVisual::Property::WRAP_MODE_U:
     {
-      int wrapMode;
+      int wrapMode = 0;
       if(Scripting::GetEnumerationProperty( value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode ))
       {
         mWrapModeU = Dali::WrapMode::Type(wrapMode);
@@ -345,7 +345,7 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
     }
     case Toolkit::ImageVisual::Property::WRAP_MODE_V:
     {
-      int wrapMode;
+      int wrapMode = 0;
       if(Scripting::GetEnumerationProperty( value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode ))
       {
         mWrapModeV = Dali::WrapMode::Type(wrapMode);

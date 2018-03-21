@@ -66,7 +66,7 @@ int UtcTextureManagerRequestLoad(void)
     TextureManager::ReloadPolicy::CACHED,
     preMultiply);
 
-  const VisualUrl& url = textureManager.GetVisualUrl( textureId );
+  VisualUrl url = textureManager.GetVisualUrl( textureId );
 
   DALI_TEST_EQUALS( url.GetUrl().compare( filename ), 0, TEST_LOCATION );
 

@@ -2753,14 +2753,21 @@ NSVGimage* nsvgParse(char* input, const char* units, float dpi)
 NSVGimage* nsvgParseFromFile(const char* filename, const char* units, float dpi)
 {
 	FILE* fp = NULL;
-	size_t size;
+	size_t size = 0;
+	long value = 0;
 	char* data = NULL;
 	NSVGimage* image = NULL;
 
 	fp = fopen(filename, "rb");
 	if (!fp) goto error;
 	fseek(fp, 0, SEEK_END);
-	size = ftell(fp);
+	value = ftell(fp);
+	/**
+	 * In the original file, unsigned long type 'size' gets a return value. But, the return value of 'ftell()' is
+	 * signed long type. To prevent interpreting an unexpected large value, we put the comparitive condition here.
+	 */
+	if( value < 0 ) goto error;
+	size = value;
 	fseek(fp, 0, SEEK_SET);
 	data = (char*)malloc(size+1);
 	if (data == NULL) goto error;
