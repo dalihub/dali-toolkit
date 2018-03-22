@@ -173,12 +173,11 @@ DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n // sampler1D?
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   varying mediump vec2 vTexCoord;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = texture2D( sTexture, vec2( vTexCoord.y, 0.5 ) ) * vec4(mixColor*opacity, opacity) * uColor;\n
+    gl_FragColor = texture2D( sTexture, vec2( vTexCoord.y, 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
   }\n
 ),
 
@@ -187,12 +186,11 @@ DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n // sampler1D?
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   varying mediump vec2 vTexCoord;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = texture2D( sTexture, vec2( length(vTexCoord), 0.5 ) ) * vec4(mixColor*opacity, opacity) * uColor;\n
+    gl_FragColor = texture2D( sTexture, vec2( length(vTexCoord), 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
   }\n
 )
 };

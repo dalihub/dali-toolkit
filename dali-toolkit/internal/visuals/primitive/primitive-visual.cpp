@@ -169,10 +169,9 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying   mediump vec3  vIllumination;\n
   uniform   lowp    vec4  uColor;\n
   uniform   lowp    vec3  mixColor;\n
-  uniform   lowp    float opacity;\n
   void main()\n
   {\n
-      vec4 baseColor = vec4(mixColor, opacity) * uColor;\n
+      vec4 baseColor = vec4(mixColor, 1.0) * uColor;\n
     gl_FragColor = vec4( vIllumination.rgb * baseColor.rgb, baseColor.a );\n
   }\n
 );

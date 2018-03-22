@@ -152,16 +152,11 @@ const char* FRAGMENT_SHADER_NO_ATLAS = DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
   \n
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   void main()\n
   {\n
-      gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * visualMixColor();\n
+      gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
 
@@ -171,18 +166,12 @@ const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
     uniform mediump vec4 uAtlasRect;\n
     uniform lowp vec4 uColor;\n
     uniform lowp vec3 mixColor;\n
-    uniform lowp float opacity;\n
     uniform lowp float preMultipliedAlpha;\n
-    \n
-    lowp vec4 visualMixColor()\n
-    {\n
-        return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-    }\n
     \n
     void main()\n
     {\n
         mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-        gl_FragColor = texture2D( sTexture, texCoord ) * uColor * visualMixColor();\n
+        gl_FragColor = texture2D( sTexture, texCoord ) * uColor * vec4( mixColor, 1.0 );\n
      }\n
 );
 
@@ -194,7 +183,6 @@ const char* FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP = DALI_COMPOSE_SHADER(
     uniform lowp vec2 wrapMode;\n
     uniform lowp vec4 uColor;\n
     uniform lowp vec3 mixColor;\n
-    uniform lowp float opacity;\n
     uniform lowp float preMultipliedAlpha;\n
     \n
     mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp float wrap )\n
@@ -207,16 +195,11 @@ const char* FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP = DALI_COMPOSE_SHADER(
       return clamp( mix(range.x, range.y, coord), range.x, range.y );
     }\n
     \n
-    lowp vec4 visualMixColor()\n
-    {\n
-      return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-    }\n
-    \n
     void main()\n
     {\n
         mediump vec2 texCoord = vec2( wrapCoordinate( uAtlasRect.xz, vTexCoord.x, wrapMode.x ),
                                       wrapCoordinate( uAtlasRect.yw, vTexCoord.y, wrapMode.y ) );\n
-        gl_FragColor = texture2D( sTexture, texCoord ) * uColor * visualMixColor();\n
+        gl_FragColor = texture2D( sTexture, texCoord ) * uColor * vec4( mixColor, 1.0 );\n
     }\n
 );
 

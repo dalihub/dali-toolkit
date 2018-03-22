@@ -165,16 +165,11 @@ const char* SIMPLE_FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying mediump vec3 vIllumination;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
 
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   void main()\n
   {\n
-    gl_FragColor = vec4( vIllumination.rgb * uColor.rgb, uColor.a ) * visualMixColor();\n
+    gl_FragColor = vec4( vIllumination.rgb * uColor.rgb, uColor.a ) * vec4( mixColor, 1.0 );\n
   }\n
 );
 
@@ -249,17 +244,12 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform sampler2D sDiffuse;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
 
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   void main()\n
   {\n
     vec4 texture = texture2D( sDiffuse, vTexCoord );\n
-    vec4 visualMixColor = visualMixColor();\n
+    vec4 visualMixColor = vec4( mixColor, 1.0 );\n
     gl_FragColor = vec4( vIllumination.rgb * texture.rgb * uColor.rgb * visualMixColor.rgb + vSpecular * 0.3, texture.a * uColor.a * visualMixColor.a );\n
   }\n
 );
@@ -342,19 +332,14 @@ const char* NORMAL_MAP_FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform sampler2D sGloss;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
 
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   void main()\n
   {\n
     vec4 texture = texture2D( sDiffuse, vTexCoord );\n
     vec3 normal = normalize( texture2D( sNormal, vTexCoord ).xyz * 2.0 - 1.0 );\n
     vec4 glossMap = texture2D( sGloss, vTexCoord );\n
-    vec4 visualMixColor = visualMixColor();\n
+    vec4 visualMixColor = vec4( mixColor, 1.0 );\n
 
     float lightDiffuse = max( 0.0, dot( normal, normalize( vLightDirection ) ) );\n
     lightDiffuse = lightDiffuse * 0.5 + 0.5;\n
