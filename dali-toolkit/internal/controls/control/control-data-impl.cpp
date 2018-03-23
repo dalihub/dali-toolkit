@@ -31,13 +31,13 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
-#include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
+#include <dali-toolkit/internal/styling/style-manager-impl.h>
+#include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
 {
@@ -579,7 +579,7 @@ Toolkit::Visual::Base Control::Impl::GetVisual( Property::Index index ) const
 
 void Control::Impl::EnableVisual( Property::Index index, bool enable )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::EnableVisual Visual (%d)\n", index);
+  DALI_LOG_INFO( gLogFilter, Debug::General, "Control::EnableVisual(%d, %s)\n", index, enable?"T":"F");
 
   RegisteredVisualContainer::Iterator iter;
   if ( FindVisual( index, mVisuals, iter ) )
@@ -605,6 +605,10 @@ void Control::Impl::EnableVisual( Property::Index index, bool enable )
         Toolkit::GetImplementation((*iter)->visual).SetOffStage( parentActor );  // No need to call if control not staged.
       }
     }
+  }
+  else
+  {
+    DALI_LOG_WARNING( "Control::EnableVisual(%d, %s) FAILED - NO SUCH VISUAL\n", index, enable?"T":"F" );
   }
 }
 
@@ -637,7 +641,7 @@ void Control::Impl::StartObservingVisual( Toolkit::Visual::Base& visual)
 // Called by a Visual when it's resource is ready
 void Control::Impl::ResourceReady( Visual::Base& object)
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "ResourceReady replacements pending[%d]\n", mRemoveVisuals.Count() );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::Impl::ResourceReady() replacements pending[%d]\n", mRemoveVisuals.Count() );
 
   Actor self = mControlImpl.Self();
 
@@ -1410,6 +1414,7 @@ Toolkit::Internal::LayoutBasePtr Control::Impl::GetLayout()
 
 void Control::Impl::SetLayout( Toolkit::Internal::LayoutBase& layout )
 {
+
   mLayout = &layout;
 }
 

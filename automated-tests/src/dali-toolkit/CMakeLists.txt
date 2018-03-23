@@ -7,6 +7,10 @@ SET(CAPI_LIB "dali-toolkit")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
+  utc-Dali-Layouting.cpp
+  )
+
+SET(OTHER
    utc-Dali-Alignment.cpp
    utc-Dali-AnimatedImageVisual.cpp
    utc-Dali-BloomView.cpp
@@ -22,7 +26,6 @@ SET(TC_SOURCES
    utc-Dali-ImageVisual.cpp
    utc-Dali-JsonParser.cpp
    utc-Dali-KeyInputFocusManager.cpp
-   utc-Dali-Layouting.cpp
    utc-Dali-PageTurnView.cpp
    utc-Dali-Script.cpp
    utc-Dali-ScrollBar.cpp
@@ -111,7 +114,7 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali-toolkit
 )
 
-ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
+ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED)
 ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )

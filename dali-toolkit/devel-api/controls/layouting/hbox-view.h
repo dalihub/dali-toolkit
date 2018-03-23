@@ -19,7 +19,6 @@
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
-#include <dali-toolkit/devel-api/layouting/margin-layout-data.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
@@ -60,9 +59,6 @@ public:
   void SetMode( Mode mode );
   void SetCellWidth( CellPosition cellPosition, LayoutLength width );
   void SetCellHeight( CellPosition cellPosition, LayoutLength height );
-
-  MarginLayoutData GetLayoutData();
-  void SetLayoutData( MarginLayoutData handle );
 
 public: // Not intended for application developers
 

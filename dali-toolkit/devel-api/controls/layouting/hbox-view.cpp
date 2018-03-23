@@ -94,16 +94,6 @@ void HboxView::SetCellHeight( CellPosition cellPosition, LayoutLength height )
   GetImpl( *this ).SetCellHeight( cellPosition, height );
 }
 
-void HboxView::SetLayoutData( MarginLayoutData handle )
-{
-  GetImpl( *this ).SetLayoutData( handle );
-}
-
-MarginLayoutData HboxView::GetLayoutData()
-{
-  return GetImpl( *this ).GetLayoutData();
-}
-
 HboxView::HboxView( Dali::Toolkit::Internal::HboxView& object )
 : Control( object )
 {

@@ -30,7 +30,7 @@ HboxLayout::HboxLayout()
 {
 }
 
-HboxLayout HboxLayout::New( IntrusivePtr<RefObject> owner )
+HboxLayout HboxLayout::New( Handle& owner )
 {
   Internal::HboxLayoutPtr internal = Internal::HboxLayout::New( owner );
   return HboxLayout( internal.Get() );
