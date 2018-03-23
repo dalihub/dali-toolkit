@@ -123,7 +123,6 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode)
   mControlSize( Vector2::ZERO ),
   mDepthIndex( 0.0f ),
   mMixColorIndex( Property::INVALID_INDEX ),
-  mOpacityIndex( Property::INVALID_INDEX ),
   mFittingMode( fittingMode ),
   mFlags( 0 ),
   mResourceStatus( Toolkit::Visual::ResourceStatus::PREPARING )

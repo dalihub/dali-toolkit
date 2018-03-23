@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -316,12 +316,12 @@ int UtcDaliVisualFactoryGetColorVisual1(void)
   TestVisualRender( application, actor, visual );
 
   Vector3 actualValue(Vector4::ZERO);
-  float opacity=0.0f;
+  Vector4 actualColor(Vector4::ZERO);
   TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK( gl.GetUniformValue<Vector3>( "mixColor", actualValue ) );
-  DALI_TEST_CHECK( gl.GetUniformValue<float>( "opacity", opacity ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uColor", actualColor ) );
   DALI_TEST_EQUALS( actualValue, Vector3(testColor), TEST_LOCATION );
-  DALI_TEST_EQUALS( opacity, testColor.a, TEST_LOCATION );
+  DALI_TEST_EQUALS( actualColor.a, testColor.a, TEST_LOCATION );
 
   END_TEST;
 }
@@ -345,12 +345,12 @@ int UtcDaliVisualFactoryGetColorVisual2(void)
   TestVisualRender( application, actor, visual );
 
   Vector3 actualValue;
-  float opacity;
+  Vector4 actualColor;
   TestGlAbstraction& gl = application.GetGlAbstraction();
   DALI_TEST_CHECK( gl.GetUniformValue<Vector3>( "mixColor", actualValue ) );
-  DALI_TEST_CHECK( gl.GetUniformValue<float>( "opacity", opacity ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uColor", actualColor ) );
   DALI_TEST_EQUALS( actualValue, Vector3(testColor), TEST_LOCATION );
-  DALI_TEST_EQUALS( opacity, testColor.a, TEST_LOCATION );
+  DALI_TEST_EQUALS( actualColor.a, testColor.a, TEST_LOCATION );
 
   Stage::GetCurrent().Remove(actor);
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );

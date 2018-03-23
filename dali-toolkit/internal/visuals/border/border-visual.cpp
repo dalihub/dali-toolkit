@@ -83,11 +83,10 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec4 borderColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = vec4(mixColor, opacity)*borderColor*uColor;\n
+    gl_FragColor = vec4(mixColor, 1.0)*borderColor*uColor;\n
   }\n
 );
 
@@ -111,13 +110,12 @@ const char* FRAGMENT_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec4 borderColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform mediump float borderSize;\n
   varying mediump float vAlpha;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = vec4(mixColor, opacity)*borderColor*uColor;\n
+    gl_FragColor = vec4(mixColor, 1.0)*borderColor*uColor;\n
     gl_FragColor.a *= smoothstep(0.0, 1.5, vAlpha)*smoothstep( borderSize+1.5, borderSize, vAlpha );\n
   }\n
 );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,13 +80,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
-  \n
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   \n
   void main()\n
   {\n
@@ -96,7 +90,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
     mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
     textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
     \n
-    gl_FragColor = textTexture * uColor * visualMixColor();
+    gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );
   }\n
 );
 
