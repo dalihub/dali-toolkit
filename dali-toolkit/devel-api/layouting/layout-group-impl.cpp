@@ -15,9 +15,16 @@
  */
 
 // CLASS HEADER
+#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 #include <dali-toolkit/internal/layouting/layout-group-data-impl.h>
-#include <dali-toolkit/internal/layouting/margin-layout-data-impl.h>
+
+
+namespace
+{
+const char* MARGIN_SPECIFICATION_NAME( "marginSpec" );
+}
 
 namespace Dali
 {
@@ -34,6 +41,27 @@ LayoutGroup::LayoutGroup()
 LayoutGroup::~LayoutGroup()
 {
 }
+
+void LayoutGroup::DoRegisterChildProperties( const std::type_info& containerType )
+{
+  // Chain up to parent class
+  LayoutBase::DoRegisterChildProperties( containerType );
+
+  auto typeInfo = TypeRegistry::Get().GetTypeInfo( containerType );
+  if( typeInfo )
+  {
+    Property::IndexContainer indices;
+    typeInfo.GetChildPropertyIndices( indices );
+
+    if( std::find( indices.Begin(), indices.End(), Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION ) ==
+        indices.End() )
+    {
+
+      ChildPropertyRegistration( typeInfo.GetName(), MARGIN_SPECIFICATION_NAME, Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Property::EXTENTS );
+    }
+  }
+}
+
 
 Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutBase& child )
 {
@@ -52,11 +80,18 @@ Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutBase& child )
   childLayout.child = &child;
   mImpl->mChildren.emplace_back( childLayout );
 
-  if( !child.GetLayoutData() )
+  auto owner = child.GetOwner();
+
+  // If there are no LayoutBase child properties, add them
+  if( ! DevelHandle::DoesCustomPropertyExist( owner, Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ) )
   {
-    child.SetLayoutData( GenerateDefaultLayoutData() );
+    GenerateDefaultChildProperties( owner );
   }
 
+  // Now listen to future changes to the child properties.
+  DevelHandle::PropertySetSignal(owner).Connect( this, &LayoutGroup::OnSetChildProperties );
+
+  RequestLayout();
   return childLayout.layoutId;
 }
 
@@ -70,6 +105,7 @@ void LayoutGroup::Remove( Toolkit::LayoutGroup::LayoutId childId )
       break;
     }
   }
+  RequestLayout();
 }
 
 void LayoutGroup::Remove( LayoutBase& child )
@@ -82,6 +118,7 @@ void LayoutGroup::Remove( LayoutBase& child )
       break;
     }
   }
+  RequestLayout();
 }
 
 LayoutBasePtr LayoutGroup::GetChild( Toolkit::LayoutGroup::LayoutId childId )
@@ -106,17 +143,22 @@ LayoutParent* LayoutGroup::GetParent()
   return LayoutBase::GetParent();
 }
 
-void LayoutGroup::OnSetLayoutData( ChildLayoutDataPtr layoutData )
+void LayoutGroup::OnSetChildProperties( Handle& handle, Property::Index index, Property::Value value )
 {
-  RequestLayout();
+  if ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) )
+  {
+    // If any child properties are set, must perform relayout
+    RequestLayout();
+  }
 }
 
-ChildLayoutDataPtr LayoutGroup::GenerateDefaultLayoutData()
+void LayoutGroup::GenerateDefaultChildProperties( Handle child )
 {
-  ChildLayoutDataPtr layoutData = MarginLayoutData::New( Toolkit::ChildLayoutData::WRAP_CONTENT,
-                                                         Toolkit::ChildLayoutData::WRAP_CONTENT,
-                                                         0u, 0u, 0u, 0u);
-  return layoutData;
+  child.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION,
+                     Toolkit::ChildLayoutData::WRAP_CONTENT );
+  child.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION,
+                     Toolkit::ChildLayoutData::WRAP_CONTENT );
+  child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Extents() );
 }
 
 void LayoutGroup::MeasureChildren( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec)
@@ -134,15 +176,18 @@ void LayoutGroup::MeasureChild( LayoutBasePtr child,
                                 MeasureSpec parentWidthMeasureSpec,
                                 MeasureSpec parentHeightMeasureSpec )
 {
-  ChildLayoutDataPtr childLayoutData = child->GetLayoutData();
+  auto childOwner = child->GetOwner();
+  auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
+  auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
+
   auto padding = GetPadding();
 
   const MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
                                                                  padding.start + padding.end,
-                                                                 childLayoutData->GetWidth());
+                                                                 desiredWidth);
   const MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( parentHeightMeasureSpec,
                                                                   padding.top + padding.bottom,
-                                                                  childLayoutData->GetHeight());
+                                                                  desiredHeight);
 
   child->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
 }
@@ -151,18 +196,20 @@ void LayoutGroup::MeasureChildWithMargins( LayoutBasePtr child,
                                            MeasureSpec parentWidthMeasureSpec, uint16_t widthUsed,
                                            MeasureSpec parentHeightMeasureSpec, uint16_t heightUsed)
 {
-  MarginLayoutDataPtr layoutData = static_cast<MarginLayoutData*>( child->GetLayoutData().Get() );
-  const Extents margin = layoutData->GetMargin();
+  auto childOwner = child->GetOwner();
+  auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
+  auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
+  auto desiredMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
 
   MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
                                                            mImpl->mPadding.start + mImpl->mPadding.end +
-                                                           margin.start + margin.end +
-                                                           widthUsed, layoutData->GetWidth() );
+                                                           desiredMargin.start + desiredMargin.end +
+                                                           widthUsed, desiredWidth );
 
   MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( parentHeightMeasureSpec,
                                                             mImpl->mPadding.top + mImpl->mPadding.bottom +
-                                                            margin.top + margin.end +
-                                                            heightUsed, layoutData->GetHeight() );
+                                                            desiredMargin.top + desiredMargin.end +
+                                                            heightUsed, desiredHeight );
 
   child->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
 }

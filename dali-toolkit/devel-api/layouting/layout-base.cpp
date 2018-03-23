@@ -16,7 +16,6 @@
 
 #include <dali-toolkit/devel-api/layouting/layout-base.h>
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
-#include <dali-toolkit/internal/layouting/child-layout-data-impl.h>
 
 namespace Dali
 {
@@ -28,9 +27,9 @@ LayoutBase::LayoutBase()
 {
 }
 
-LayoutBase LayoutBase::New( BaseHandle handle )
+LayoutBase LayoutBase::New( Handle& handle )
 {
-  Internal::LayoutBasePtr layout = Internal::LayoutBase::New( handle.GetObjectPtr() );
+  Internal::LayoutBasePtr layout = Internal::LayoutBase::New( handle );
   return LayoutBase( layout.Get() );
 }
 
@@ -50,24 +49,10 @@ LayoutBase::LayoutBase( Internal::LayoutBase* layoutBase )
 {
 }
 
-IntrusivePtr<RefObject> LayoutBase::GetOwner()
+Handle LayoutBase::GetOwner()
 {
   return GetImplementation( *this ).GetOwner();
 }
-
-void LayoutBase::SetLayoutData( ChildLayoutData& childLayoutData )
-{
-  Internal::ChildLayoutDataPtr childLayoutImpl( &GetImplementation( childLayoutData ) );
-  GetImplementation( *this ).SetLayoutData( childLayoutImpl );
-}
-
-ChildLayoutData LayoutBase::GetLayoutData()
-{
-  Internal::ChildLayoutDataPtr layout = GetImplementation( *this ).GetLayoutData();
-  return ChildLayoutData( layout.Get() );
-}
-
-
 
 } // namespace Toolkit
 

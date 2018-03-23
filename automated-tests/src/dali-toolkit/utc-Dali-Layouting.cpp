@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/devel-api/controls/layouting/hbox-view.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl-debug.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -34,6 +35,50 @@ void utc_dali_toolkit_layouting_startup(void)
 void utc_dali_toolkit_layouting_cleanup(void)
 {
   test_return_value = TET_PASS;
+}
+
+std::string DumpActor( Actor actor )
+{
+  std::ostringstream oss;
+  oss << "{\n  ";
+  const std::string& name = actor.GetName();
+  if( ! name.empty() )
+  {
+    oss << "\"name\":\"" << name << "\",\n";
+  }
+  oss << "\"id\":\"" << actor.GetId() << "\",\n";
+  oss << "\"rendererCount\":" << actor.GetRendererCount() << ",\n";
+  oss << "\"properties\":\n{\n";
+  Toolkit::Internal::DumpProperties( oss, actor ) << "}\n";
+  oss << "}\n";
+  return oss.str();
+}
+
+void DumpControlHierarchy( std::ostream& o, Actor actor )
+{
+  auto control = Control::DownCast( actor );
+  o << "{\n";
+  if( control )
+  {
+    o << Toolkit::Internal::DumpControl( Toolkit::Internal::GetImplementation( control ) );
+  }
+  else
+  {
+    o << DumpActor( actor );
+  }
+  o << "\"children\":{\n";
+  bool first=true;
+  for( auto count=actor.GetChildCount(), i=0u; i<count; ++i )
+  {
+    if( !first )
+    {
+      o << ",";
+    }
+    first = false;
+    o << "\n";
+    DumpControlHierarchy( o, actor.GetChildAt( i ) );
+  }
+  o << "}\n";
 }
 
 Control CreateLeafControl( int width, int height )
@@ -205,8 +250,13 @@ int UtcDaliLayouting_HboxLayout03(void)
   auto hbox2 = HboxView::New();
   hbox1.SetName( "HBox1");
   hbox2.SetName( "HBox2");
-  hbox1.SetLayoutData( MarginLayoutData::New( ChildLayoutData::MATCH_PARENT, ChildLayoutData::MATCH_PARENT, 0,0,0,0 ));
-  hbox2.SetLayoutData( MarginLayoutData::New( ChildLayoutData::MATCH_PARENT, ChildLayoutData::MATCH_PARENT, 0,0,0,0 ));
+  hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  // hbox1.SetLayoutData( MarginLayoutData::New( ChildLayoutData::MATCH_PARENT, , 0,0,0,0 ));
+  // hbox2.SetLayoutData( MarginLayoutData::New( ChildLayoutData::MATCH_PARENT, ChildLayoutData::MATCH_PARENT, 0,0,0,0 ));
 
   std::vector< Control > controls;
   controls.push_back( CreateLeafControl( 20, 40 ) );
@@ -330,6 +380,9 @@ int UtcDaliLayouting_HboxLayout04(void)
   hbox3.AddChild( hbox1 );
   hbox3.AddChild( hbox2 );
   stage.Add( hbox3 );
+
+  std::ostringstream oss;
+  DumpControlHierarchy( oss, Stage::GetCurrent().GetRootLayer() );
 
   // Ensure layouting happens
   application.SendNotification();
