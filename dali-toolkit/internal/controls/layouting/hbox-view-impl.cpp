@@ -19,12 +19,11 @@
 
 //EXTERNAL HEADERS
 //INTERNAL HEADERS
+#include <dali-toolkit/devel-api/controls/layouting/hbox-view.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/internal/layouting/hbox-layout-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
-#include <dali-toolkit/devel-api/layouting/margin-layout-data.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
-#include <dali-toolkit/internal/layouting/margin-layout-data-impl.h>
+#include <dali-toolkit/internal/layouting/hbox-layout-impl.h>
 
 namespace Dali
 {
@@ -32,6 +31,18 @@ namespace Toolkit
 {
 namespace Internal
 {
+
+namespace
+{
+BaseHandle Create()
+{
+  return HboxView::New();
+}
+
+Dali::TypeRegistration typeRegistration( typeid( Toolkit::HboxView ), typeid ( Toolkit::Control ), Create );
+
+
+} // anonymous namespace
 
 Dali::Toolkit::HboxView HboxView::New()
 {
@@ -56,14 +67,14 @@ void HboxView::AddChild( Actor child )
 
     if( ! childLayout )
     {
-      childLayout = LayoutBase::New( &childControlImpl );
-
-      CustomActorImpl& customActor = static_cast< CustomActorImpl& >( childControlImpl );
-      auto desiredSize = customActor.GetNaturalSize();
+      childLayout = LayoutBase::New( control );
+      auto desiredSize = control.GetNaturalSize();
 
       // HBoxLayout will apply default layout data for this object
-      auto layoutData = MarginLayoutData::New( int( desiredSize.width ), int( desiredSize.height ), 0, 0, 0, 0 );
-      childLayout->SetLayoutData( layoutData );
+      child.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, desiredSize.width );
+      child.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, desiredSize.height );
+      child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Extents() );
+
       childControlDataImpl.SetLayout( *childLayout.Get() );
     }
   }
@@ -114,11 +125,12 @@ void HboxView::SetCellHeight( Dali::Toolkit::HboxView::CellPosition cellPosition
 
 void HboxView::OnInitialize()
 {
-  IntrusivePtr<RefObject> handle( static_cast<RefObject*>(this) );
-
-  auto layout = Internal::HboxLayout::New( handle );
+  auto publicControl = Self();
+  auto layout = Internal::HboxLayout::New( publicControl );
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( *this );
   controlDataImpl.SetLayout( *layout.Get() );
+
+  layout->RegisterChildProperties( typeid(Dali::Toolkit::HboxView) ); // @todo Must make this work with C# derived types (Dictionary?)
 }
 
 HboxView::HboxView()
@@ -144,25 +156,6 @@ Toolkit::HboxLayout HboxView::GetLayout()
   return Toolkit::HboxLayout();
 }
 
-Toolkit::MarginLayoutData HboxView::GetLayoutData()
-{
-  Control::Impl& controlDataImpl = Control::Impl::Get( *this );
-  auto layout = Toolkit::LayoutBase( controlDataImpl.GetLayout().Get() );
-  DALI_ASSERT_ALWAYS( layout && "No layout present" );
-
-  auto hboxLayout = Toolkit::HboxLayout::DownCast( layout );
-  auto handle = Toolkit::MarginLayoutData::DownCast( hboxLayout.GetLayoutData() );
-  return handle;
-}
-
-void HboxView::SetLayoutData( Toolkit::MarginLayoutData handle )
-{
-  Control::Impl& controlDataImpl = Control::Impl::Get( *this );
-  auto layout = Toolkit::LayoutBase( controlDataImpl.GetLayout().Get() );
-  DALI_ASSERT_ALWAYS( layout && "No layout present" );
-
-  layout.SetLayoutData( handle );
-}
 
 
 } // namespace Internal

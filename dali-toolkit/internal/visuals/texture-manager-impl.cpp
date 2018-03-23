@@ -116,6 +116,8 @@ TextureManager::MaskingData::MaskingData()
 TextureManager::TextureManager()
 : mAsyncLocalLoaders( GetNumberOfLocalLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
   mAsyncRemoteLoaders( GetNumberOfRemoteLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
+  mExternalTextures(),
+  mLifecycleObservers(),
   mCurrentTextureId( 0 )
 {
 }

@@ -15,6 +15,7 @@
  */
 
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/object/type-registry-helper.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
 #include <dali-toolkit/internal/layouting/layout-base-data-impl.h>
@@ -23,6 +24,11 @@
     Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::Verbose, false, "LOG_LAYOUT" );
 #endif
 
+namespace
+{
+const char* WIDTH_SPECIFICATION_NAME( "widthSpecification" );
+const char* HEIGHT_SPECIFICATION_NAME( "heightSpecification" );
+}
 
 namespace Dali
 {
@@ -36,34 +42,51 @@ LayoutBase::LayoutBase()
 {
 }
 
-LayoutBasePtr LayoutBase::New( IntrusivePtr<RefObject> handle )
+LayoutBasePtr LayoutBase::New( Handle& owner )
 {
   LayoutBasePtr layoutPtr = new LayoutBase();
-  layoutPtr->Initialize( handle );
+  layoutPtr->Initialize( owner );
   return layoutPtr;
 }
 
-void LayoutBase::Initialize( IntrusivePtr<RefObject> handle )
+void LayoutBase::Initialize( Handle& owner )
 {
-  mImpl->mOwner = handle.Get();
+  mImpl->mOwner = &(owner.GetBaseObject());
 }
 
-IntrusivePtr<RefObject> LayoutBase::GetOwner() const
+Handle LayoutBase::GetOwner() const
 {
-  return IntrusivePtr<RefObject>(mImpl->mOwner);
+  return Handle::DownCast(BaseHandle(mImpl->mOwner));
 }
 
-void LayoutBase::SetLayoutData( ChildLayoutDataPtr childLayoutData )
+void LayoutBase::RegisterChildProperties( const std::type_info& containerType )
 {
-  mImpl->mLayoutData = childLayoutData;
-  auto layoutClone = childLayoutData->Clone();
-  OnSetLayoutData( layoutClone );
-  RequestLayout();
+  // Call on derived types
+  auto typeInfo = TypeRegistry::Get().GetTypeInfo( containerType );
+  if( typeInfo )
+  {
+    DoRegisterChildProperties( containerType );
+  }
 }
 
-ChildLayoutDataPtr LayoutBase::GetLayoutData()
+void LayoutBase::DoRegisterChildProperties( const std::type_info& containerType )
 {
-  return mImpl->mLayoutData;
+  auto typeInfo = TypeRegistry::Get().GetTypeInfo( containerType );
+  if( typeInfo )
+  {
+    Property::IndexContainer indices;
+    typeInfo.GetChildPropertyIndices( indices );
+
+    if( std::find( indices.Begin(), indices.End(), Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ) ==
+        indices.End() )
+    {
+      ChildPropertyRegistration( typeInfo.GetName(), WIDTH_SPECIFICATION_NAME,
+                                 Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, Property::INTEGER );
+
+      ChildPropertyRegistration( typeInfo.GetName(), HEIGHT_SPECIFICATION_NAME,
+                                 Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, Property::INTEGER );
+    }
+  }
 }
 
 void LayoutBase::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
@@ -199,10 +222,6 @@ void LayoutBase::OnLayout( bool changed, int left, int top, int right, int botto
 {
 }
 
-void LayoutBase::OnSetLayoutData( ChildLayoutDataPtr childLayoutData )
-{
-  // Base function does nothing
-}
 
 LayoutParent* LayoutBase::GetParent()
 {
@@ -245,18 +264,18 @@ MeasuredSize LayoutBase::GetMeasuredHeightAndState()
 
 uint16_t LayoutBase::GetSuggestedMinimumWidth()
 {
-  auto customActor = dynamic_cast<CustomActorImpl*>( mImpl->mOwner );
-  auto actor = (customActor != nullptr) ? customActor->Self() : nullptr;
-  auto naturalSize = (actor != nullptr) ? actor.GetNaturalSize() : Vector3::ZERO;
+  auto owner = GetOwner();
+  auto actor = Actor::DownCast(owner);
+  auto naturalSize = actor ? actor.GetNaturalSize() : Vector3::ZERO;
 
   return std::max( mImpl->mMinimumSize.GetWidth(), uint16_t( naturalSize.width ) );
 }
 
 uint16_t LayoutBase::GetSuggestedMinimumHeight()
 {
-  auto customActor = dynamic_cast<CustomActorImpl*>( mImpl->mOwner );
-  auto actor = (customActor != nullptr) ? customActor->Self() : nullptr;
-  auto naturalSize = (actor != nullptr) ? actor.GetNaturalSize() : Vector3::ZERO;
+  auto owner = GetOwner();
+  auto actor = Actor::DownCast(owner);
+  auto naturalSize = actor ? actor.GetNaturalSize() : Vector3::ZERO;
 
   return std::max( mImpl->mMinimumSize.GetHeight(), uint16_t(naturalSize.height) );
 }
@@ -326,10 +345,8 @@ bool LayoutBase::SetFrame( int left, int top, int right, int bottom )
 
 
     // Reflect up to parent control
-    auto owner = mImpl->mOwner;
-    auto customActor = dynamic_cast<CustomActorImpl*>( owner );
-    auto actor = (customActor != nullptr) ? customActor->Self() : nullptr;
-
+    auto owner = GetOwner();
+    auto actor = Actor::DownCast(owner);
     if( actor )
     {
       actor.SetPosition( Vector3( left, top, 0.0f ) );
