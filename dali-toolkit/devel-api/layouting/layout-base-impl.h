@@ -20,6 +20,7 @@
 
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
@@ -28,7 +29,6 @@
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
 #include <dali-toolkit/devel-api/layouting/measure-spec.h>
 #include <dali-toolkit/devel-api/layouting/measured-size.h>
-#include <dali-toolkit/internal/layouting/child-layout-data-impl.h>
 
 namespace Dali
 {
@@ -49,18 +49,30 @@ protected:
   ~LayoutBase()=default;
 
 public:
-  static LayoutBasePtr New( IntrusivePtr<RefObject> handle );
+  /**
+   * @param[in] owner The owner (container view / child view / visual ) of this layout
+   */
+  static LayoutBasePtr New( Handle& owner );
 
   LayoutBase(const LayoutBase& copy)=delete;
   LayoutBase& operator=(const LayoutBase& rhs)=delete;
 
-  virtual void Initialize( IntrusivePtr<RefObject> handle );
+  virtual void Initialize( Handle& handle );
 
-  IntrusivePtr<RefObject> GetOwner() const;
+  Handle GetOwner() const;
 
-  void SetLayoutData( ChildLayoutDataPtr childLayoutData );
+  /**
+   * Register child properties of layout
+   * @param[in] containerType The type of the containing view (owner)
+   */
+  void RegisterChildProperties( const std::type_info& containerType );
 
-  ChildLayoutDataPtr GetLayoutData();
+  /**
+   * Ensure derived types register their child properties
+   * Must chain up to parent.
+   */
+  virtual void DoRegisterChildProperties( const std::type_info& containerType );
+
 
   /**
    * <p>
@@ -286,13 +298,6 @@ protected:
    */
   virtual void OnLayout( bool changed, int left, int top, int right, int bottom, bool animate );
 
-  /**
-   * Called after new layout data has been set on this layout.
-   *
-   * May be overridden by deriving layouters.
-   * @param[in] layoutData Base ptr to the layout data
-   */
-  virtual void OnSetLayoutData( ChildLayoutDataPtr layoutData );
 
   /**
    * <p>This method must be called by {@link #OnMeasure(MeasureSpec,MeasureSpec)} to store the

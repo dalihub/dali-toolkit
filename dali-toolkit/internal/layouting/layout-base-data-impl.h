@@ -19,7 +19,6 @@
 
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
-#include <dali-toolkit/internal/layouting/child-layout-data-impl.h>
 
 namespace Dali
 {
@@ -38,9 +37,8 @@ public:
 public:
   Toolkit::LayoutController mLayoutController;
 
-  RefObject* mOwner; ///< Control or Visual that owns this layout. Raw pointer to avoid cyclic references
+  BaseObject* mOwner; ///< Control or Visual that owns this layout. Raw pointer to prevent cyclic references
   LayoutParent* mLayoutParent; ///< The containing layout parent.
-  ChildLayoutDataPtr mLayoutData; ///< The layout data for this object ( within it's parent layouter )
 
   MeasureSpec mOldWidthMeasureSpec;
   MeasureSpec mOldHeightMeasureSpec;

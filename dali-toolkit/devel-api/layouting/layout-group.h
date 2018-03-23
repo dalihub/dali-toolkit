@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_LAYOUTING_LAYOUT_GROUP_H
 #define DALI_TOOLKIT_LAYOUTING_LAYOUT_GROUP_H
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,20 @@ class DALI_IMPORT_API LayoutGroup : public LayoutBase
 {
 public:
   using LayoutId = unsigned int;
+
+  enum PropertyRange
+  {
+    CHILD_PROPERTY_START_INDEX = CHILD_PROPERTY_REGISTRATION_START_INDEX+100,
+    CHILD_PROPERTY_END_INDEX   = CHILD_PROPERTY_START_INDEX+1000
+  };
+
+  struct ChildProperty
+  {
+    enum
+    {
+      MARGIN_SPECIFICATION = CHILD_PROPERTY_START_INDEX,
+    };
+  };
 
   LayoutGroup();
   ~LayoutGroup()=default;
