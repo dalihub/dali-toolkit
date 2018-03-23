@@ -95,16 +95,16 @@ void LayoutDebugMeasureStateRecurseActor( Actor root, int depth )
 void LayoutDebugMeasureStateRecurseLayout( LayoutBasePtr layout, int depth )
 {
   std::ostringstream oss;
-  for(int i=0;i<depth;++i) { oss << "  "; };
-  CustomActorImpl* actorImpl = dynamic_cast<Dali::CustomActorImpl*>( layout->GetOwner().Get() );
-  Actor actor = (actorImpl != nullptr) ? actorImpl->Self() : nullptr;
+  for(int i=0;i<depth;++i) { oss << "  "; }; // indent
+
+  Actor actor = Actor::DownCast( layout->GetOwner() );
   if( actor )
   {
     oss << "Actor " << actor.GetId() << ":" << actor.GetName() << " ";
   }
   else
   {
-    oss << "Owner: " << layout->GetOwner().Get() << " ";
+    oss << "Owner: " << layout->GetOwner().GetObjectPtr() << " ";
   }
 
   GetLayoutMeasureStateString( oss, layout );
@@ -151,15 +151,11 @@ void LayoutDebugAfterLayoutRecurse( Actor root, int depth )
 
     if( layout )
     {
-      auto layoutData = layout->GetLayoutData();
-      if( layoutData != nullptr )
-      {
-        oss << "LayoutData:" << "( " << layoutData->GetWidth() << ", " << layoutData->GetHeight() << ") ";
-      }
-      else
-      {
-        oss << "No layout data  ";
-      }
+      auto childOwner = layout->GetOwner();
+      auto widthMeasureSpec = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
+      auto heightMeasureSpec = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
+
+      oss << "LayoutData:" << "( " << widthMeasureSpec << ", " << heightMeasureSpec << ") ";
 
       auto actorPos  = root.GetProperty<Vector3>( Actor::Property::POSITION );
       auto actorSize = root.GetProperty<Vector3>( Actor::Property::SIZE );

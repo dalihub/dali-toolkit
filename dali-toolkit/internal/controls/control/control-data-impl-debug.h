@@ -1,3 +1,5 @@
+#ifndef DALI_TOOLKIT_INTERNAL_CONTROL_DATA_DEBUG_H
+#define DALI_TOOLKIT_INTERNAL_CONTROL_DATA_DEBUG_H
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
@@ -14,7 +16,12 @@
  * limitations under the License.
  */
 
-#include <dali-toolkit/internal/layouting/table-layout-impl.h>
+#if defined(DEBUG_ENABLED)
+
+#include <dali/public-api/object/handle.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <iostream>
+#include <string>
 
 namespace Dali
 {
@@ -23,29 +30,16 @@ namespace Toolkit
 namespace Internal
 {
 
-TableLayoutPtr TableLayout::New( BaseHandle handle, int rows, int columns )
-{
-  TableLayoutPtr tableLayout = new TableLayout( rows, columns );
-  tableLayout->Initialize( handle.GetObjectPtr() );
-  return tableLayout;
-}
+DALI_IMPORT_API std::ostream& DumpProperties( std::ostream& o, Handle handle );
 
-TableLayout::TableLayout( int rows, int columns )
-{
-}
-
-void TableLayout::OnMeasure( MeasureSpec widthSpec, MeasureSpec heightSpec )
-{
-}
-
-void TableLayout::OnLayout( bool animate )
-{
-}
-
-void TableLayout::OnSetLayoutData()
-{
-}
+DALI_IMPORT_API std::string DumpControl( const Internal::Control& control );
 
 } // namespace Internal
+
 } // namespace Toolkit
+
 } // namespace Dali
+
+#endif
+
+#endif //DALI_TOOLKIT_INTERNAL_CONTROL_DATA_DEBUG_H

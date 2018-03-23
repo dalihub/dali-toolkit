@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_GROUP_H
 #define DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_GROUP_H
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/public-api/signals/connection-tracker.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
@@ -38,10 +39,10 @@ using LayoutGroupPtr = IntrusivePtr<LayoutGroup>;
  * LayoutGroup is an abstract class that provides child layout management and
  * basic measuring and layouting.
  *
- * Implementing classes should ensure that they initialize the object with a
- * weak handle of the control that owns the layout.
+ * Implementing classes should ensure that they initialize the object with
+ * the handle of the control that owns the layout.
  */
-class DALI_IMPORT_API LayoutGroup : public LayoutBase, public LayoutParent
+class DALI_IMPORT_API LayoutGroup : public LayoutBase, public LayoutParent, public ConnectionTracker
 {
 public:
   LayoutGroup();
@@ -97,16 +98,23 @@ public: // Implementation of LayoutParent
   virtual LayoutParent* GetParent();
 
 protected:
+  /**
+   * @copydoc LayoutBase::DoRegisterChildProperties()
+   */
+  virtual void DoRegisterChildProperties( const std::type_info& containerType ) override;
 
   /**
-   * @copydoc LayoutBase::OnSetLayoutData()
+   * Callback when a child property is set on any given child
+   * @param[in] handle The handle to the child
+   * @param[in] index The index of the property that has been set
+   * @param[in] value The new value of the property
    */
-  virtual void OnSetLayoutData( ChildLayoutDataPtr layoutData ) override ;
+  void OnSetChildProperties( Handle& handle, Property::Index index, Property::Value value );
 
   /**
    * Create default layout data suitable for this layout group or derived layouter
    */
-  virtual ChildLayoutDataPtr GenerateDefaultLayoutData();
+  virtual void GenerateDefaultChildProperties( Handle child );
 
   /**
    * Ask all of the children of this view to measure themselves, taking into

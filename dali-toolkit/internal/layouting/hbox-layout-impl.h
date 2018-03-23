@@ -37,7 +37,7 @@ using HboxLayoutPtr = IntrusivePtr<HboxLayout>;
 class HboxLayout : public LayoutGroup
 {
 public:
-  static HboxLayoutPtr New( IntrusivePtr<RefObject> owner );
+  static HboxLayoutPtr New( Handle& owner );
 
 public:
   void SetMode( Dali::Toolkit::HboxView::Mode mode );
@@ -49,9 +49,14 @@ protected:
   HboxLayout();
   virtual ~HboxLayout();
 
-  virtual void OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec );
-  virtual void OnLayout( bool changed, int l, int t, int r, int b, bool animate );
-  virtual ChildLayoutDataPtr GenerateDefaultLayoutData();
+  /**
+   * @copydoc LayoutBase::DoRegisterChildProperties()
+   */
+  virtual void DoRegisterChildProperties( const std::type_info& containerType ) override;
+
+  virtual void OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec ) override;
+
+  virtual void OnLayout( bool changed, int l, int t, int r, int b, bool animate ) override;
 
 private:
   HboxLayout( const HboxLayout& other ) = delete;

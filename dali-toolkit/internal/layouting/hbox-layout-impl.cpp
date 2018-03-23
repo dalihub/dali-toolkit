@@ -19,9 +19,10 @@
 
 //EXTERNAL HEADERS
 //INTERNAL HEADERS
-#include <dali-toolkit/devel-api/layouting/child-layout-data.h>
-#include <dali-toolkit/internal/layouting/margin-layout-data-impl.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/extents.h>
+#include <dali-toolkit/devel-api/layouting/layout-base.h>
+
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
@@ -34,7 +35,7 @@ namespace Toolkit
 namespace Internal
 {
 
-HboxLayoutPtr HboxLayout::New( IntrusivePtr<RefObject> owner)
+HboxLayoutPtr HboxLayout::New( Handle& owner)
 {
   HboxLayoutPtr layout( new HboxLayout() );
   layout->Initialize( owner );
@@ -55,6 +56,28 @@ HboxLayout::HboxLayout()
 
 HboxLayout::~HboxLayout()
 {
+}
+
+  /**
+   * @copydoc LayoutBase::DoRegisterChildProperties()
+   */
+void HboxLayout::DoRegisterChildProperties( const std::type_info& containerType )
+{
+  // Must chain up
+  LayoutGroup::DoRegisterChildProperties( containerType );
+
+  auto typeInfo = Dali::TypeRegistry::Get().GetTypeInfo( containerType );
+  if( typeInfo )
+  {
+    Property::IndexContainer indices;
+    typeInfo.GetChildPropertyIndices( indices );
+
+    if( std::find( indices.Begin(), indices.End(), Toolkit::HboxLayout::ChildProperty::WEIGHT ) ==
+        indices.End() )
+    {
+      ChildPropertyRegistration( typeInfo.GetName(), "weight", Toolkit::HboxLayout::ChildProperty::WEIGHT, Property::FLOAT );
+    }
+  }
 }
 
 void HboxLayout::SetMode( Dali::Toolkit::HboxView::Mode mode )
@@ -80,8 +103,8 @@ LayoutSize HboxLayout::GetCellPadding()
 void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
 {
 #if defined(DEBUG_ENABLED)
-  CustomActorImpl* customActor = dynamic_cast<CustomActorImpl*>( GetOwner().Get() );
-  Actor actor = (customActor != nullptr) ? customActor->Self() : nullptr;
+  auto actor = Actor::DownCast(GetOwner());
+
   std::ostringstream oss;
   oss << "HBoxLayout::OnMeasure  ";
   if( actor )
@@ -107,12 +130,13 @@ void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
     auto childLayout = GetChild( i );
     if( childLayout )
     {
-      ChildLayoutDataPtr childLayoutData = childLayout->GetLayoutData();
-      MarginLayoutDataPtr marginLayoutData( static_cast<MarginLayoutData*>(childLayoutData.Get()) );
+      auto childOwner = childLayout->GetOwner();
+      auto widthMeasureSpec = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
+      auto heightMeasureSpec = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
 
       MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, heightMeasureSpec, 0 );
       auto childWidth = childLayout->GetMeasuredWidth();
-      auto childMargin = marginLayoutData->GetMargin();
+      auto childMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
       auto length = childWidth + childMargin.start + childMargin.end;
 
       if( isExactly )
@@ -126,7 +150,7 @@ void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
       }
 
       bool matchHeightLocally = false;
-      if( heightMode != MeasureSpec::EXACTLY && marginLayoutData->GetHeight() == Toolkit::ChildLayoutData::MATCH_PARENT )
+      if( heightMode != MeasureSpec::EXACTLY && heightMeasureSpec == Toolkit::ChildLayoutData::MATCH_PARENT )
       {
         // Will have to re-measure at least this child when we know exact height.
         matchHeight = true;
@@ -140,7 +164,7 @@ void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
                       |  childLayout->GetMeasuredHeightAndState().GetState() >> 1 );
 
       maxHeight = std::max( maxHeight, childHeight );
-      allFillParent = ( allFillParent && childLayoutData->GetHeight() == Toolkit::ChildLayoutData::MATCH_PARENT );
+      allFillParent = ( allFillParent && heightMeasureSpec == Toolkit::ChildLayoutData::MATCH_PARENT );
       alternativeMaxHeight = std::max( alternativeMaxHeight, matchHeightLocally ? marginHeight : childHeight );
     }
   }
@@ -182,18 +206,20 @@ void HboxLayout::ForceUniformHeight( int count, MeasureSpec widthMeasureSpec )
     LayoutBasePtr childLayout = GetChild(i);
     if( childLayout != nullptr )
     {
-      ChildLayoutDataPtr childLayoutData = childLayout->GetLayoutData();
-      MarginLayoutDataPtr marginLayoutData( static_cast<MarginLayoutData*>(childLayoutData.Get()) );
+      auto childOwner = childLayout->GetOwner();
+      auto widthMeasureSpec = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
+      auto heightMeasureSpec = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
 
-      if( marginLayoutData->GetHeight() == Toolkit::ChildLayoutData::MATCH_PARENT )
+      if( heightMeasureSpec == Toolkit::ChildLayoutData::MATCH_PARENT )
       {
         // Temporarily force children to reuse their old measured width
-        int oldWidth = marginLayoutData->GetWidth();
-        marginLayoutData->SetWidth( childLayout->GetMeasuredWidth() );
+        int oldWidth = widthMeasureSpec;
+        childOwner.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, childLayout->GetMeasuredWidth() );
 
         // Remeasure with new dimensions
         MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, uniformMeasureSpec, 0);
-        marginLayoutData->SetWidth(oldWidth);
+
+        childOwner.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, oldWidth );
       }
     }
   }
@@ -234,27 +260,16 @@ void HboxLayout::OnLayout( bool changed, int left, int top, int right, int botto
       uint16_t childWidth = childLayout->GetMeasuredWidth();
       uint16_t childHeight = childLayout->GetMeasuredHeight();
 
-      ChildLayoutDataPtr childLayoutData = childLayout->GetLayoutData();
-      MarginLayoutDataPtr marginLayoutData( static_cast<MarginLayoutData*>(childLayoutData.Get()) );
+      auto childOwner = childLayout->GetOwner();
+      auto childMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
 
-      const Extents& childMargin = marginLayoutData->GetMargin();
-
-      childTop = padding.top + ((childSpace - childHeight) / 2)
-        + childMargin.top - childMargin.bottom;
+      childTop = padding.top + ((childSpace - childHeight) / 2) + childMargin.top - childMargin.bottom;
 
       childLeft += childMargin.start;
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight, false );
       childLeft += childWidth + childMargin.end;
     }
   }
-}
-
-ChildLayoutDataPtr HboxLayout::GenerateDefaultLayoutData()
-{
-  ChildLayoutDataPtr layoutData = MarginLayoutData::New( Toolkit::ChildLayoutData::WRAP_CONTENT,
-                                                         Toolkit::ChildLayoutData::WRAP_CONTENT,
-                                                         0u, 0u, 0u, 0u );
-  return layoutData;
 }
 
 } // namespace Internal
