@@ -252,7 +252,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
                           ImageDimensions size,
                           FittingMode::Type fittingMode,
                           Dali::SamplingMode::Type samplingMode )
-: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
   mImage(),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
