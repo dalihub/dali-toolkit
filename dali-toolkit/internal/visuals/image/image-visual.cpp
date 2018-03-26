@@ -410,7 +410,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
   {
     case Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING:
     {
-      bool sync;
+      bool sync = false;
       if( value.Get( sync ) )
       {
         if( sync )
@@ -431,7 +431,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
     case Toolkit::ImageVisual::Property::DESIRED_WIDTH:
     {
-      float desiredWidth;
+      float desiredWidth = 0.0f;
       if( value.Get( desiredWidth ) )
       {
         mDesiredSize.SetWidth( desiredWidth );
@@ -445,7 +445,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
     case Toolkit::ImageVisual::Property::DESIRED_HEIGHT:
     {
-      float desiredHeight;
+      float desiredHeight = 0.0f;
       if( value.Get( desiredHeight ) )
       {
         mDesiredSize.SetHeight( desiredHeight );
@@ -459,7 +459,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
     case Toolkit::ImageVisual::Property::FITTING_MODE:
     {
-      int fittingMode;
+      int fittingMode = 0;
       Scripting::GetEnumerationProperty( value, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, fittingMode );
       mFittingMode = Dali::FittingMode::Type( fittingMode );
       break;
@@ -467,7 +467,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
     case Toolkit::ImageVisual::Property::SAMPLING_MODE:
     {
-      int samplingMode;
+      int samplingMode = 0;
       Scripting::GetEnumerationProperty( value, SAMPLING_MODE_TABLE, SAMPLING_MODE_TABLE_COUNT, samplingMode );
       mSamplingMode = Dali::SamplingMode::Type( samplingMode );
       break;
@@ -481,7 +481,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
     case Toolkit::ImageVisual::Property::WRAP_MODE_U:
     {
-      int wrapMode;
+      int wrapMode = 0;
       Scripting::GetEnumerationProperty( value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode );
       mWrapModeU = Dali::WrapMode::Type( wrapMode );
       break;
@@ -489,7 +489,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
     case Toolkit::ImageVisual::Property::WRAP_MODE_V:
     {
-      int wrapMode;
+      int wrapMode = 0;
       Scripting::GetEnumerationProperty( value, WRAP_MODE_TABLE, WRAP_MODE_TABLE_COUNT, wrapMode );
       mWrapModeV = Dali::WrapMode::Type( wrapMode );
       break;
@@ -503,7 +503,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
     case Toolkit::ImageVisual::Property::ALPHA_MASK_URL:
     {
-      std::string alphaUrl;
+      std::string alphaUrl = "";
       if( value.Get( alphaUrl ) )
       {
         AllocateMaskData();
@@ -517,7 +517,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
     case Toolkit::ImageVisual::Property::MASK_CONTENT_SCALE:
     {
-      float scale;
+      float scale = 1.0f;
       if( value.Get( scale ) )
       {
         AllocateMaskData();
@@ -539,7 +539,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
     case Toolkit::ImageVisual::Property::RELEASE_POLICY:
     {
-      int releasePolicy;
+      int releasePolicy = 0;
       Scripting::GetEnumerationProperty( value, RELEASE_POLICY_TABLE, RELEASE_POLICY_TABLE_COUNT, releasePolicy );
       mReleasePolicy = Toolkit::ImageVisual::ReleasePolicy::Type( releasePolicy );
       break;
@@ -547,7 +547,7 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
 
     case Toolkit::ImageVisual::Property::LOAD_POLICY:
     {
-      int loadPolicy;
+      int loadPolicy = 0;
       Scripting::GetEnumerationProperty( value, LOAD_POLICY_TABLE, LOAD_POLICY_TABLE_COUNT, loadPolicy );
       mLoadPolicy = Toolkit::ImageVisual::LoadPolicy::Type( loadPolicy );
       break;
