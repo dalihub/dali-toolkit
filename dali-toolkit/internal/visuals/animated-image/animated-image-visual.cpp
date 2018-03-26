@@ -154,7 +154,7 @@ AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCach
 void AnimatedImageVisual::InitializeGif( const VisualUrl& imageUrl )
 {
   mImageUrl = imageUrl;
-  mGifLoading = GifLoading::New( imageUrl.GetUrl() );
+  mGifLoading = GifLoading::New( imageUrl.GetUrl(), imageUrl.IsLocalResource() );
   mFrameCount = mGifLoading->GetImageCount();
   mGifLoading->LoadFrameDelays( mFrameDelayContainer );
 }
