@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -378,6 +378,16 @@ void VisualModel::SetOutlineWidth( unsigned int width )
   mOutlineWidth = width;
 }
 
+void VisualModel::SetBackgroundColor( const Vector4& color )
+{
+  mBackgroundColor = color;
+}
+
+void VisualModel::SetBackgroundEnabled( bool enabled )
+{
+  mBackgroundEnabled = enabled;
+}
+
 const Vector4& VisualModel::GetTextColor() const
 {
   return mTextColor;
@@ -423,6 +433,16 @@ unsigned int VisualModel::GetOutlineWidth() const
   return mOutlineWidth;
 }
 
+const Vector4& VisualModel::GetBackgroundColor() const
+{
+  return mBackgroundColor;
+}
+
+bool VisualModel::IsBackgroundEnabled() const
+{
+  return mBackgroundEnabled;
+}
+
 Length VisualModel::GetNumberOfUnderlineRuns() const
 {
   return mUnderlineRuns.Count();
@@ -449,6 +469,7 @@ VisualModel::VisualModel()
   mShadowColor( Color::BLACK ),
   mUnderlineColor( Color::BLACK ),
   mOutlineColor( Color::WHITE ),
+  mBackgroundColor( Color::CYAN ),
   mControlSize(),
   mShadowOffset(),
   mUnderlineHeight( 0.0f ),
@@ -458,7 +479,8 @@ VisualModel::VisualModel()
   mLayoutSize(),
   mCachedLineIndex( 0u ),
   mUnderlineEnabled( false ),
-  mUnderlineColorSet( false )
+  mUnderlineColorSet( false ),
+  mBackgroundEnabled( false )
 {
 }
 

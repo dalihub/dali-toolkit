@@ -69,11 +69,10 @@ void main()\n
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
 \n
 void main()\n
 {\n
-  gl_FragColor = uColor * vec4( mixColor, opacity );\n
+  gl_FragColor = uColor * vec4( mixColor, 1.0 );\n
 }\n
 );
 

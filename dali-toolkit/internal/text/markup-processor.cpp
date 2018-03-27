@@ -153,6 +153,11 @@ void Initialize( FontDescriptionRun& fontRun )
  */
 void ParseAttributes( Tag& tag )
 {
+  if( tag.buffer == NULL )
+  {
+    return;
+  }
+
   tag.attributes.Resize( MAX_NUM_OF_ATTRIBUTES );
 
   // Find first the tag name.

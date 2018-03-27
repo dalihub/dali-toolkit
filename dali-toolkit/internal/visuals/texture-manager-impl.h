@@ -136,6 +136,18 @@ public:
   };
   using MaskingDataPointer = std::unique_ptr<MaskingData>;
 
+
+  /**
+   * Class to provide lifecycle event on destruction of texture manager.
+   */
+  struct LifecycleObserver
+  {
+    /**
+     * Called shortly before the texture manager is destroyed.
+     */
+    virtual void TextureManagerDestroyed() = 0;
+  };
+
   /**
    * Constructor.
    */
@@ -144,8 +156,7 @@ public:
   /**
    * Destructor.
    */
-  ~TextureManager() = default;
-
+  ~TextureManager();
 
   // TextureManager Main API:
 
@@ -296,9 +307,11 @@ public:
   void Remove( const TextureManager::TextureId textureId );
 
   /**
-   * Get the visualUrl associated with the texture id
+   * @brief Get the visualUrl associated with the texture id.
+   * @param[in] textureId The texture Id to get
+   * @return The visual Url associated with the texture id.
    */
-  const VisualUrl& GetVisualUrl( TextureId textureId );
+  VisualUrl GetVisualUrl( TextureId textureId );
 
   /**
    * @brief Get the current state of a texture
@@ -328,6 +341,19 @@ public:
    * @return handle to the texture
    */
   TextureSet RemoveExternalTexture( const std::string& url );
+
+  /**
+   * Add an observer to the object.
+   * @param[in] observer The observer to add.
+   */
+  void AddObserver( TextureManager::LifecycleObserver& observer );
+
+  /**
+   * Remove an observer from the object
+   * @pre The observer has already been added.
+   * @param[in] observer The observer to remove.
+   */
+  void RemoveObserver( TextureManager::LifecycleObserver& observer );
 
 private:
 
@@ -710,6 +736,7 @@ private:  // Member Variables:
   RoundRobinContainerView< AsyncLoadingHelper > mAsyncLocalLoaders;    ///< The Asynchronous image loaders used to provide all local async loads
   RoundRobinContainerView< AsyncLoadingHelper > mAsyncRemoteLoaders;   ///< The Asynchronous image loaders used to provide all remote async loads
   std::vector< ExternalTextureInfo >            mExternalTextures;     ///< Externally provided textures
+  Dali::Vector<LifecycleObserver*>              mLifecycleObservers;   ///< Lifecycle observers of texture manager
   TextureId                                     mCurrentTextureId;     ///< The current value used for the unique Texture Id generation
 };
 

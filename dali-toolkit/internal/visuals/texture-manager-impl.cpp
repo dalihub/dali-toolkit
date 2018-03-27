@@ -120,6 +120,14 @@ TextureManager::TextureManager()
 {
 }
 
+TextureManager::~TextureManager()
+{
+  for( auto iter = mLifecycleObservers.Begin(), endIter = mLifecycleObservers.End(); iter != endIter; ++iter)
+  {
+    (*iter)->TextureManagerDestroyed();
+  }
+}
+
 TextureSet TextureManager::LoadTexture(
     const VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode,
     Dali::SamplingMode::Type samplingMode, const MaskingDataPointer& maskInfo,
@@ -466,13 +474,20 @@ void TextureManager::Remove( const TextureManager::TextureId textureId )
   }
 }
 
-const VisualUrl& TextureManager::GetVisualUrl( TextureId textureId )
+VisualUrl TextureManager::GetVisualUrl( TextureId textureId )
 {
+  VisualUrl visualUrl("");
   int cacheIndex = GetCacheIndexFromId( textureId );
-  DALI_ASSERT_DEBUG( cacheIndex != INVALID_CACHE_INDEX && "TextureId out of range");
 
-  TextureInfo& cachedTextureInfo( mTextureInfoContainer[ cacheIndex ] );
-  return cachedTextureInfo.url;
+  if( cacheIndex != INVALID_CACHE_INDEX )
+  {
+    DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::GetVisualUrl. Using cached texture id=%d, textureId=%d\n",
+                   cacheIndex, textureId );
+
+    TextureInfo& cachedTextureInfo( mTextureInfoContainer[ cacheIndex ] );
+    visualUrl = cachedTextureInfo.url;
+  }
+  return visualUrl;
 }
 
 TextureManager::LoadState TextureManager::GetTextureState( TextureId textureId )
@@ -573,6 +588,31 @@ TextureSet TextureManager::RemoveExternalTexture( const std::string& url )
   }
   return TextureSet();
 }
+
+
+void TextureManager::AddObserver( TextureManager::LifecycleObserver& observer )
+{
+  // make sure an observer doesn't observe the same object twice
+  // otherwise it will get multiple calls to ObjectDestroyed()
+  DALI_ASSERT_DEBUG( mLifecycleObservers.End() == std::find( mLifecycleObservers.Begin(), mLifecycleObservers.End(), &observer));
+  mLifecycleObservers.PushBack( &observer );
+}
+
+void TextureManager::RemoveObserver( TextureManager::LifecycleObserver& observer)
+{
+  // Find the observer...
+  auto endIter =  mLifecycleObservers.End();
+  for( auto iter = mLifecycleObservers.Begin(); iter != endIter; ++iter)
+  {
+    if( (*iter) == &observer)
+    {
+      mLifecycleObservers.Erase( iter );
+      break;
+    }
+  }
+  DALI_ASSERT_DEBUG(endIter != mLifecycleObservers.End());
+}
+
 
 bool TextureManager::LoadTexture( TextureInfo& textureInfo )
 {
@@ -730,8 +770,11 @@ void TextureManager::ApplyMask(
   float contentScale, bool cropToMask )
 {
   int maskCacheIndex = GetCacheIndexFromId( maskTextureId );
-  Devel::PixelBuffer maskPixelBuffer = mTextureInfoContainer[maskCacheIndex].pixelBuffer;
-  pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
+  if( maskCacheIndex != INVALID_CACHE_INDEX )
+  {
+    Devel::PixelBuffer maskPixelBuffer = mTextureInfoContainer[maskCacheIndex].pixelBuffer;
+    pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
+  }
 }
 
 

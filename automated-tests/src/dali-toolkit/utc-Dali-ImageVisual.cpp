@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -760,18 +760,17 @@ int UtcDaliImageVisualAnimateMixColor(void)
   application.SendNotification();
   application.Render(0); // Ensure animation starts
   application.Render(2000u); // Halfway point
-  Vector4 testColor(1.0f, 0.0f, 0.5f, 0.75f );
+  Vector3 testColor( 1.0f, 0.0f, 0.5f );
 
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Vector4(0.5f, 0.5f, 0.5f, 1.0f )), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(testColor)), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", testColor.a), true, TEST_LOCATION );
+  // uColor.a should be actor's alpha * mixColor.a.
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>( "uColor", Vector4( 0.5f, 0.5f, 0.5f, 0.75f ) ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>( "mixColor", testColor ), true, TEST_LOCATION );
 
   application.Render(2000u); // Halfway point between blue and white
 
   DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::WHITE, TEST_LOCATION );
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>("uColor", Color::WHITE ), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>("mixColor", Vector3(TARGET_MIX_COLOR)), true, TEST_LOCATION );
-  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", TARGET_MIX_COLOR.a), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>( "uColor", Vector4( 1.0f, 1.0f, 1.0f, 0.5f ) ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>( "mixColor", Vector3( TARGET_MIX_COLOR ) ), true, TEST_LOCATION );
 
   TestMixColor( visual, Visual::Property::MIX_COLOR, TARGET_MIX_COLOR );
 
@@ -808,11 +807,6 @@ int UtcDaliImageVisualAnimateOpacity(void)
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = actor.GetRendererAt(0);
-  tet_infoline("Test that the renderer has the opacity property");
-  Property::Index index = DevelHandle::GetPropertyIndex( renderer, Visual::Property::OPACITY );
-  DALI_TEST_CHECK( index != Property::INVALID_INDEX );
-
-
   Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
   DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
 
@@ -838,12 +832,15 @@ int UtcDaliImageVisualAnimateOpacity(void)
     application.Render(2000u); // Halfway point through animation
     application.SendNotification(); // Handle any signals
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", 0.75f), true, TEST_LOCATION );
+    Vector4 color;
+    DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
+    DALI_TEST_EQUALS( color.a, 0.75f, TEST_LOCATION );
 
     application.Render(2001u); // end
     application.SendNotification(); // ensure animation finished signal is sent
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", 1.0f), true, TEST_LOCATION );
+    DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
+    DALI_TEST_EQUALS( color.a, 1.0f, TEST_LOCATION );
 
     blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
     DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
@@ -875,12 +872,15 @@ int UtcDaliImageVisualAnimateOpacity(void)
     application.Render(2000u); // Halfway point
     application.SendNotification();
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", 0.55f), true, TEST_LOCATION );
+    Vector4 color;
+    DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
+    DALI_TEST_EQUALS( color.a, 0.55f, TEST_LOCATION );
 
     application.Render(2016u); // end
     application.SendNotification();
 
-    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<float>("opacity", 0.1f), true, TEST_LOCATION );
+    DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
+    DALI_TEST_EQUALS( color.a, 0.1f, TEST_LOCATION );
 
     blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
     DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );

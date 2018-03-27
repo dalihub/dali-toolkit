@@ -74,12 +74,16 @@ RollingGifImageCache::RollingGifImageCache(
 
 RollingGifImageCache::~RollingGifImageCache()
 {
-  while( !mQueue.IsEmpty() )
+  if( mTextureManagerAlive )
   {
-    ImageFrame imageFrame = mQueue.PopFront();
-    Dali::Toolkit::TextureManager::RemoveTexture( mImageUrls[ imageFrame.mFrameNumber ].mUrl );
+    while( !mQueue.IsEmpty() )
+    {
+      ImageFrame imageFrame = mQueue.PopFront();
+      Dali::Toolkit::TextureManager::RemoveTexture( mImageUrls[ imageFrame.mFrameNumber ].mUrl );
+    }
   }
 }
+
 
 TextureSet RollingGifImageCache::FirstFrame()
 {

@@ -28,7 +28,7 @@ namespace Toolkit
 namespace Internal
 {
 
-class ImageCache
+class ImageCache : public TextureManager::LifecycleObserver
 {
 public:
   /**
@@ -85,6 +85,12 @@ public:
    */
   virtual TextureSet NextFrame() = 0;
 
+private:
+  /**
+   * Called before the texture manager is destroyed.
+   */
+  virtual void TextureManagerDestroyed() override final;
+
 protected:
   TextureManager&        mTextureManager;
   FrameReadyObserver&    mObserver;
@@ -92,6 +98,7 @@ protected:
   unsigned int           mUrlIndex;
   bool                   mWaitingForReadyFrame:1;
   bool                   mRequestingLoad:1;
+  bool                   mTextureManagerAlive:1;
 };
 
 } //namespace Internal

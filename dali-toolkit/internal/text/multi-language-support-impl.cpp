@@ -101,11 +101,11 @@ MultilanguageSupport::MultilanguageSupport()
 {
   // Initializes the default font cache to zero (invalid font).
   // Reserves space to cache the default fonts and access them with the script as an index.
-  mDefaultFontPerScriptCache.Resize( TextAbstraction::UNKNOWN, NULL );
+  mDefaultFontPerScriptCache.Resize( TextAbstraction::UNKNOWN + 1, NULL );
 
   // Initializes the valid fonts cache to NULL (no valid fonts).
   // Reserves space to cache the valid fonts and access them with the script as an index.
-  mValidFontsPerScriptCache.Resize( TextAbstraction::UNKNOWN, NULL );
+  mValidFontsPerScriptCache.Resize( TextAbstraction::UNKNOWN + 1, NULL );
 }
 
 MultilanguageSupport::~MultilanguageSupport()
@@ -254,10 +254,6 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
         currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
 
         // Store the script run.
-        if( TextAbstraction::UNKNOWN == currentScriptRun.script )
-        {
-          currentScriptRun.script = TextAbstraction::LATIN;
-        }
         scripts.Insert( scripts.Begin() + scriptIndex, currentScriptRun );
         ++scriptIndex;
 
@@ -320,7 +316,6 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
       else if( ( TextAbstraction::UNKNOWN == currentScriptRun.script ) &&
                ( TextAbstraction::EMOJI == script ) )
       {
-        currentScriptRun.script = TextAbstraction::LATIN;
         currentScriptRun.characterRun.numberOfCharacters += numberOfAllScriptCharacters;
         numberOfAllScriptCharacters = 0u;
       }
@@ -357,12 +352,6 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
 
   if( 0u != currentScriptRun.characterRun.numberOfCharacters )
   {
-    if( TextAbstraction::UNKNOWN == currentScriptRun.script )
-    {
-      // There are only white spaces in the last script. Set the latin script.
-      currentScriptRun.script = TextAbstraction::LATIN;
-    }
-
     // Store the last run.
     scripts.Insert( scripts.Begin() + scriptIndex, currentScriptRun );
     ++scriptIndex;
@@ -490,10 +479,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                      description.path.c_str() );
     }
 #endif
-    if( script == TextAbstraction::UNKNOWN )
-    {
-      script = TextAbstraction::LATIN;
-    }
 
     // Validate whether the current character is supported by the given font.
     bool isValidFont = false;
@@ -670,18 +655,21 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
                 fontId = fontClient.FindDefaultFont( UTF32_A, currentFontPointSize );
               }
 
-              // Cache the font.
-              if( NULL == defaultFontsPerScript )
+              if ( script != TextAbstraction::UNKNOWN )
               {
-                defaultFontsPerScript = *( defaultFontPerScriptCacheBuffer + script );
-
+                // Cache the font if it is not an unknown script
                 if( NULL == defaultFontsPerScript )
                 {
-                  defaultFontsPerScript = new DefaultFonts();
-                  *( defaultFontPerScriptCacheBuffer + script ) = defaultFontsPerScript;
+                  defaultFontsPerScript = *( defaultFontPerScriptCacheBuffer + script );
+
+                  if( NULL == defaultFontsPerScript )
+                  {
+                    defaultFontsPerScript = new DefaultFonts();
+                    *( defaultFontPerScriptCacheBuffer + script ) = defaultFontsPerScript;
+                  }
                 }
+                defaultFontsPerScript->Cache( currentFontDescription, fontId );
               }
-              defaultFontsPerScript->Cache( currentFontDescription, fontId );
             }
           } // !isValidFont (3)
         } // !isValidFont (2)

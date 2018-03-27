@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "looping", BOOLEAN, LOOPING )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "muted", BOOLEAN, MUTED )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "volume", MAP, VOLUME )
 DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "underlay", BOOLEAN, UNDERLAY )
+DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "playPosition", INTEGER, PLAY_POSITION )
+DALI_PROPERTY_REGISTRATION( Toolkit, VideoView, "displayMode", INTEGER, DISPLAY_MODE )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, VideoView, "finished", FINISHED_SIGNAL )
 
@@ -98,11 +100,10 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = vec4(mixColor, opacity)*uColor;\n
+    gl_FragColor = vec4(mixColor, 1.0)*uColor;\n
   }\n
 );
 
@@ -451,6 +452,24 @@ void VideoView::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::VideoView::Property::PLAY_POSITION:
+      {
+        int pos;
+        if( value.Get( pos ) )
+        {
+          impl.SetPlayPosition( pos );
+        }
+        break;
+      }
+      case Toolkit::VideoView::Property::DISPLAY_MODE:
+      {
+        int mode;
+        if( value.Get( mode ) )
+        {
+          impl.SetDisplayMode( mode );
+        }
+        break;
+      }
     }
   }
 }
@@ -502,6 +521,16 @@ Property::Value VideoView::GetProperty( BaseObject* object, Property::Index prop
       case Toolkit::VideoView::Property::UNDERLAY:
       {
         value = impl.IsUnderlay();
+        break;
+      }
+      case Toolkit::VideoView::Property::PLAY_POSITION:
+      {
+        value = impl.GetPlayPosition();
+        break;
+      }
+      case Toolkit::VideoView::Property::DISPLAY_MODE:
+      {
+        value = impl.GetDisplayMode();
         break;
       }
     }
@@ -722,6 +751,40 @@ void VideoView::SetUnderlay( bool set )
 bool VideoView::IsUnderlay()
 {
   return mIsUnderlay;
+}
+
+void VideoView::SetSWCodec( bool on )
+{
+  // If setting SW or HW type is failed , video-view shows video by default codec type.
+  // The default codec type is selected by platform.
+  if( on )
+  {
+    mVideoPlayer.SetCodecType( Dali::VideoPlayerPlugin::CodecType::SW );
+  }
+  else
+  {
+    mVideoPlayer.SetCodecType( Dali::VideoPlayerPlugin::CodecType::HW );
+  }
+}
+
+int VideoView::GetPlayPosition()
+{
+  return mVideoPlayer.GetPlayPosition();
+}
+
+void VideoView::SetPlayPosition( int pos )
+{
+  mVideoPlayer.SetPlayPosition( pos );
+}
+
+void VideoView::SetDisplayMode( int mode )
+{
+  mVideoPlayer.SetDisplayMode( static_cast< Dali::VideoPlayerPlugin::DisplayMode::Type >( mode ) );
+}
+
+int VideoView::GetDisplayMode() const
+{
+  return static_cast< int >( mVideoPlayer.GetDisplayMode() );
 }
 
 } // namespace Internal

@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
@@ -291,7 +292,6 @@ void Visual::Base::SetOffStage( Actor& actor )
   {
     DoSetOffStage( actor );
     mImpl->mMixColorIndex = Property::INVALID_INDEX;
-    mImpl->mOpacityIndex = Property::INVALID_INDEX;
     mImpl->mFlags &= ~Impl::IS_ON_STAGE;
   }
 }
@@ -393,14 +393,7 @@ void Visual::Base::RegisterMixColor()
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
 
-  if( mImpl->mOpacityIndex == Property::INVALID_INDEX )
-  {
-    mImpl->mOpacityIndex = DevelHandle::RegisterProperty(
-      mImpl->mRenderer,
-      Toolkit::Visual::Property::OPACITY,
-      OPACITY,
-      mImpl->mMixColor.a );
-  }
+  mImpl->mRenderer.SetProperty( DevelRenderer::Property::OPACITY, mImpl->mMixColor.a );
 
   float preMultipliedAlpha = 0.0f;
   if( IsPreMultipliedAlphaEnabled() )
@@ -417,7 +410,7 @@ void Visual::Base::SetMixColor( const Vector4& color )
   if( mImpl->mRenderer )
   {
     mImpl->mRenderer.SetProperty( mImpl->mMixColorIndex, Vector3(color) );
-    mImpl->mRenderer.SetProperty( mImpl->mOpacityIndex, color.a );
+    mImpl->mRenderer.SetProperty( DevelRenderer::Property::OPACITY, color.a );
     if( color.a < 1.f )
     {
       mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
@@ -600,27 +593,22 @@ void Visual::Base::AnimateOpacityProperty(
   Dali::Animation& transition,
   Internal::TransitionData::Animator& animator )
 {
-  Property::Index index = mImpl->mOpacityIndex;
-
   bool isOpaque = mImpl->mMixColor.a >= 1.0f;
 
-  if( index != Property::INVALID_INDEX )
+  float initialOpacity;
+  if( animator.initialValue.Get( initialOpacity ) )
   {
-    float initialOpacity;
-    if( animator.initialValue.Get( initialOpacity ) )
-    {
-      isOpaque = (initialOpacity >= 1.0f);
-    }
-
-    float targetOpacity;
-    if( animator.targetValue.Get( targetOpacity ) )
-    {
-      mImpl->mMixColor.a = targetOpacity;
-    }
-
-    SetupTransition( transition, animator, index, animator.initialValue, animator.targetValue );
-    SetupBlendMode( transition, isOpaque, animator.animate );
+    isOpaque = (initialOpacity >= 1.0f);
   }
+
+  float targetOpacity;
+  if( animator.targetValue.Get( targetOpacity ) )
+  {
+    mImpl->mMixColor.a = targetOpacity;
+  }
+
+  SetupTransition( transition, animator, DevelRenderer::Property::OPACITY, animator.initialValue, animator.targetValue );
+  SetupBlendMode( transition, isOpaque, animator.animate );
 }
 
 void Visual::Base::AnimateRendererProperty(
@@ -699,7 +687,7 @@ void Visual::Base::AnimateMixColorProperty(
     SetupTransition( transition, animator, index, initialMixColor, targetMixColor );
     if( animateOpacity )
     {
-      SetupTransition( transition, animator, mImpl->mOpacityIndex, initialOpacity, targetOpacity );
+      SetupTransition( transition, animator, DevelRenderer::Property::OPACITY, initialOpacity, targetOpacity );
       SetupBlendMode( transition, isOpaque, animator.animate );
     }
   }
