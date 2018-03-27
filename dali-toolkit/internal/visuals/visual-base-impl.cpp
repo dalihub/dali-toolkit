@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,15 @@
 // EXTERNAL HEADER
 #include <dali/public-api/common/dali-common.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/internal/helpers/property-helper.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -37,7 +40,8 @@ Debug::Filter* gVisualBaseLogFilter = Debug::Filter::New( Debug::NoLogging, fals
 #endif
 
 const char * const PRE_MULTIPLIED_ALPHA_PROPERTY( "preMultipliedAlpha" );
-}
+
+} // namespace
 
 namespace Dali
 {
@@ -48,8 +52,18 @@ namespace Toolkit
 namespace Internal
 {
 
-Visual::Base::Base( VisualFactoryCache& factoryCache )
-: mImpl( new Impl() ),
+namespace
+{
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( FITTING_MODE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Visual::FittingMode, FIT_KEEP_ASPECT_RATIO  )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Visual::FittingMode, FILL  )
+DALI_ENUM_TO_STRING_TABLE_END( FITTING_MODE )
+
+} // namespace
+
+Visual::Base::Base( VisualFactoryCache& factoryCache, FittingMode fittingMode )
+: mImpl( new Impl(fittingMode) ),
   mFactoryCache( factoryCache )
 {
 }
@@ -101,6 +115,10 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
       else if( matchKey == OPACITY )
       {
         matchKey = Property::Key( Toolkit::Visual::Property::OPACITY );
+      }
+      else if( matchKey == FITTING_MODE )
+      {
+        matchKey = Property::Key( Toolkit::DevelVisual::Property::FITTING_MODE );
       }
     }
 
@@ -161,6 +179,12 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
           mImpl->mMixColor.a = opacity;
           SetMixColor( mImpl->mMixColor );
         }
+        break;
+      }
+      case Toolkit::DevelVisual::Property::FITTING_MODE:
+      {
+        Scripting::GetEnumerationProperty< Visual::FittingMode >(
+          value, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT, mImpl->mFittingMode );
         break;
       }
     }
@@ -292,6 +316,10 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   // which is ok, because they have a different key value range.
   map.Insert( Toolkit::Visual::Property::MIX_COLOR, mImpl->mMixColor ); // vec4
   map.Insert( Toolkit::Visual::Property::OPACITY, mImpl->mMixColor.a );
+
+  auto fittingModeString = Scripting::GetLinearEnumerationName< FittingMode >(
+    mImpl->mFittingMode, FITTING_MODE_TABLE, FITTING_MODE_TABLE_COUNT );
+  map.Insert( Toolkit::DevelVisual::Property::FITTING_MODE, fittingModeString );
 }
 
 void Visual::Base::CreateInstancePropertyMap( Property::Map& map ) const
@@ -446,6 +474,11 @@ bool Visual::Base::IsResourceReady() const
 Toolkit::Visual::ResourceStatus Visual::Base::GetResourceStatus() const
 {
   return mImpl->mResourceStatus;
+}
+
+Visual::FittingMode Visual::Base::GetFittingMode() const
+{
+  return mImpl->mFittingMode;
 }
 
 Renderer Visual::Base::GetRenderer()

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_STRING_CONSTANTS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,9 @@ extern const char * const PREMULTIPLIED_ALPHA;
 // Mix color
 extern const char * const MIX_COLOR;
 extern const char * const OPACITY;
+
+// Fitting mode
+extern const char * const FITTING_MODE;
 
 // Color visual
 extern const char * const RENDER_IF_TRANSPARENT_NAME;
