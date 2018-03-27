@@ -296,9 +296,11 @@ public:
   void Remove( const TextureManager::TextureId textureId );
 
   /**
-   * Get the visualUrl associated with the texture id
+   * @brief Get the visualUrl associated with the texture id.
+   * @param[in] textureId The texture Id to get
+   * @return The visual Url associated with the texture id.
    */
-  const VisualUrl& GetVisualUrl( TextureId textureId );
+  VisualUrl GetVisualUrl( TextureId textureId );
 
   /**
    * @brief Get the current state of a texture

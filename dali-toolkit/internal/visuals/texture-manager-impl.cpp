@@ -467,13 +467,20 @@ void TextureManager::Remove( const TextureManager::TextureId textureId )
   }
 }
 
-const VisualUrl& TextureManager::GetVisualUrl( TextureId textureId )
+VisualUrl TextureManager::GetVisualUrl( TextureId textureId )
 {
+  VisualUrl visualUrl("");
   int cacheIndex = GetCacheIndexFromId( textureId );
-  DALI_ASSERT_DEBUG( cacheIndex != INVALID_CACHE_INDEX && "TextureId out of range");
 
-  TextureInfo& cachedTextureInfo( mTextureInfoContainer[ cacheIndex ] );
-  return cachedTextureInfo.url;
+  if( cacheIndex != INVALID_CACHE_INDEX )
+  {
+    DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::GetVisualUrl. Using cached texture id=%d, textureId=%d\n",
+                   cacheIndex, textureId );
+
+    TextureInfo& cachedTextureInfo( mTextureInfoContainer[ cacheIndex ] );
+    visualUrl = cachedTextureInfo.url;
+  }
+  return visualUrl;
 }
 
 TextureManager::LoadState TextureManager::GetTextureState( TextureId textureId )
@@ -772,8 +779,11 @@ void TextureManager::ApplyMask(
   float contentScale, bool cropToMask )
 {
   int maskCacheIndex = GetCacheIndexFromId( maskTextureId );
-  Devel::PixelBuffer maskPixelBuffer = mTextureInfoContainer[maskCacheIndex].pixelBuffer;
-  pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
+  if( maskCacheIndex != INVALID_CACHE_INDEX )
+  {
+    Devel::PixelBuffer maskPixelBuffer = mTextureInfoContainer[maskCacheIndex].pixelBuffer;
+    pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
+  }
 }
 
 void TextureManager::UploadTexture( Devel::PixelBuffer& pixelBuffer, TextureInfo& textureInfo )
