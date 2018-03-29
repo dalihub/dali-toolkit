@@ -106,6 +106,7 @@ EventData::EventData( DecoratorPtr decorator )
   mAllTextSelected( false ),
   mUpdateInputStyle( false ),
   mPasswordInput( false ),
+  mCheckScrollAmount( false ),
   mIsPlaceholderPixelSize( false ),
   mIsPlaceholderElideEnabled( false ),
   mPlaceholderEllipsisFlag( false ),
