@@ -77,8 +77,16 @@ public:
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,  ///< @SINCE_1_0.0
   };
 
+  /**
+   * @brief Enumeration for the instance of properties belonging to the VideoView class.
+   * @SINCE_1_1.38
+   */
   struct Property
   {
+    /**
+     * @brief Enumeration for the instance of properties belonging to the VideoView class.
+     * @SINCE_1_1.38
+     */
     enum
     {
       /**
@@ -138,6 +146,10 @@ public:
    */
   struct DisplayMode
   {
+    /**
+     * @brief The values of this enum determine how the video should be display mode to the view.
+     * @SINCE_1_3_15
+     */
     enum Type
     {
       /**
