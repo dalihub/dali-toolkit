@@ -157,7 +157,10 @@ class RulerExtension;
 class DALI_IMPORT_API Ruler : public RefObject
 {
 public:
-  /// @brief The type of the ruler
+  /**
+   * @brief Enumeration for the type of the ruler.
+   * @SINCE_1_0.0
+   */
   enum RulerType {
     Fixed,  ///< A fixed ruler @SINCE_1_0.0
     Free    ///< A free ruler @SINCE_1_0.0
