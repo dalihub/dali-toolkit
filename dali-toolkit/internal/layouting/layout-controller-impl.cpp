@@ -77,11 +77,11 @@ void LayoutController::Process()
 
     // If window size has changed, expect stage to have already been updated
     Stage stage = Stage::GetCurrent();
-    uint32_t stageWidth  = stage.GetSize().width;
-    uint32_t stageHeight = stage.GetSize().height;
+    auto stageWidth  = stage.GetSize().width;
+    auto stageHeight = stage.GetSize().height;
 
-    MeasureSpec widthSpec = MeasureSpec::MakeMeasureSpec( stageWidth, MeasureSpec::EXACTLY );
-    MeasureSpec heightSpec = MeasureSpec::MakeMeasureSpec( stageHeight, MeasureSpec::EXACTLY );
+    auto widthSpec = MeasureSpec( stageWidth, MeasureSpec::Mode::EXACTLY );
+    auto heightSpec = MeasureSpec( stageHeight, MeasureSpec::Mode::EXACTLY );
 
     // Test how to perform a measure on each control.
     MeasureHierarchy( stage.GetRootLayer(), widthSpec, heightSpec );

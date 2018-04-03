@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_LAYOUTING_MEASURED_SIZE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  */
 
 #include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/devel-api/layouting/layout-length.h>
 
 namespace Dali
 {
@@ -25,45 +26,32 @@ namespace Toolkit
 {
 
 /**
- * Class that encodes a measurement into a 16 bit value, using the top
- * bit to signify if the measured size is too small.
+ * Class that encodes a measurement and a measure state, which is set if the measured size is too small.
  */
 class DALI_IMPORT_API MeasuredSize
 {
 public:
-  /**
-   * Mask for masking out the states of the measured size
-   */
-  static const uint16_t MEASURED_SIZE_MASK = 0x7FFF;
 
-  /**
-   * Mask for masking out the states of the measured size
-   */
-  static const uint16_t MEASURED_STATE_MASK = 0x8000;
-
-  /**
-   * Bit shift to move the state to the lowest bits
-   */
-  static const uint16_t MEASURED_STATE_BIT_SHIFT = 15;
-
-  /**
-   * Bit indicating if the measured size is too small
-   */
-  static const uint16_t MEASURED_SIZE_TOO_SMALL = 0x8000;
-
+  enum State
+  {
+    MEASURED_SIZE_OK,
+    MEASURED_SIZE_TOO_SMALL
+  };
 
   MeasuredSize()
-  : mMeasuredSize( 0 )
+  : mMeasuredSize( 0u )
   {
   }
 
-  MeasuredSize( uint16_t measuredSize )
-  : mMeasuredSize( measuredSize )
+  MeasuredSize( LayoutLength measuredSize )
+  : mMeasuredSize( measuredSize ),
+    mState ( MeasuredSize::State::MEASURED_SIZE_OK )
   {
   }
 
-  MeasuredSize( uint16_t measuredSize, uint16_t measuredState )
-  : mMeasuredSize( measuredSize | measuredState )
+  MeasuredSize( LayoutLength measuredSize, MeasuredSize::State state )
+  : mMeasuredSize( measuredSize ),
+    mState( state )
   {
   }
 
@@ -72,12 +60,14 @@ public:
   MeasuredSize& operator=( const MeasuredSize& rhs )
   {
     this->mMeasuredSize = rhs.mMeasuredSize;
+    this->mState = rhs.mState;
     return *this;
   }
 
-  MeasuredSize& operator=( uint16_t rhs )
+  MeasuredSize& operator=( LayoutLength::IntType rhs )
   {
     this->mMeasuredSize = rhs;
+    this->mState = State::MEASURED_SIZE_OK;
     return *this;
   }
 
@@ -91,28 +81,33 @@ public:
     return mMeasuredSize != value.mMeasuredSize;
   }
 
-  inline operator uint16_t()
+  inline operator LayoutLength::IntType()
+  {
+    return mMeasuredSize.mValue;
+  }
+
+  inline void SetState( MeasuredSize::State state )
+  {
+    mState = state;
+  }
+
+  inline MeasuredSize::State GetState()
+  {
+    return mState;
+  }
+
+  inline void SetSize( LayoutLength size )
+  {
+    mMeasuredSize = size;
+  }
+  inline LayoutLength GetSize()
   {
     return mMeasuredSize;
   }
 
-  inline void SetState( uint16_t state )
-  {
-    mMeasuredSize |= ( state & MEASURED_STATE_MASK );
-  }
-
-  inline uint16_t GetState()
-  {
-    return ( mMeasuredSize & MEASURED_STATE_MASK );
-  }
-
-  inline uint16_t GetSize()
-  {
-    return ( mMeasuredSize & MEASURED_SIZE_MASK );
-  }
-
 private:
-  uint16_t mMeasuredSize;
+  LayoutLength mMeasuredSize;
+  State mState;
 };
 
 

@@ -23,11 +23,11 @@ namespace Dali
 namespace Toolkit
 {
 
+// used in property system - must be integer values.
 namespace ChildLayoutData
 {
-
-static const uint16_t MATCH_PARENT = uint16_t(-1); ///< Constant which indicates child size should match parent size
-static const uint16_t WRAP_CONTENT = uint16_t(-2); ///< Constant which indicates parent should take the smallest size possible to wrap it's children with their desired size
+static const int MATCH_PARENT = -1; ///< Constant which indicates child size should match parent size
+static const int WRAP_CONTENT = -2; ///< Constant which indicates parent should take the smallest size possible to wrap it's children with their desired size
 
 } // namespace ChildLayoutData
 
