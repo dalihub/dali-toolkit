@@ -22,11 +22,11 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/actors/actor-enumerations.h>
-#include <dali/public-api/math/uint-16-pair.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
 #include <dali-toolkit/devel-api/layouting/layout-base.h>
 #include <dali-toolkit/devel-api/layouting/layout-parent-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
+#include <dali-toolkit/devel-api/layouting/layout-size.h>
 #include <dali-toolkit/devel-api/layouting/measure-spec.h>
 #include <dali-toolkit/devel-api/layouting/measured-size.h>
 
@@ -112,7 +112,7 @@ public:
    * @param[in] b Bottom position, relative to parent
    * @param[in] animate True if the layout should be animated
    */
-  void Layout( int l, int t, int r, int b, bool animate );
+  void Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b, bool animate );
 
   /**
    * Utility to return a default size. Uses the supplied size if the
@@ -123,7 +123,7 @@ public:
    * @param measureSpec Constraints imposed by the parent
    * @return The size this view should be.
    */
-  static uint16_t GetDefaultSize( uint16_t size, MeasureSpec measureSpec );
+  static LayoutLength GetDefaultSize( LayoutLength size, MeasureSpec measureSpec );
 
   /**
    * Get the layout object that contains this LayoutBase.
@@ -142,7 +142,7 @@ public:
    *
    * Use {@link Dali::Actor::GetTargetSize()} to see how wide a control is after layout
    */
-  uint16_t GetMeasuredWidth();
+  LayoutLength GetMeasuredWidth();
 
   /**
    * Get the measured height (without any measurement flags). This
@@ -150,7 +150,7 @@ public:
    *
    * Use {@link Dali::Actor::GetTargetSize()} to see how high a control is after layout
    */
-  uint16_t GetMeasuredHeight();
+  LayoutLength GetMeasuredHeight();
 
   /**
    * Get the measured width and state This method should be used only
@@ -168,7 +168,6 @@ public:
    */
   MeasuredSize GetMeasuredHeightAndState();
 
-
   /**
    * Returns the suggested minimum width that the view should use. This
    * returns the maximum of the view's minimum width
@@ -179,7 +178,7 @@ public:
    *
    * @return The suggested minimum width of the view.
    */
-  uint16_t GetSuggestedMinimumWidth();
+  LayoutLength GetSuggestedMinimumWidth();
 
   /**
    * Returns the suggested minimum height that the view should use. This
@@ -191,7 +190,7 @@ public:
    *
    * @return The suggested minimum height of the view.
    */
-  uint16_t GetSuggestedMinimumHeight();
+  LayoutLength GetSuggestedMinimumHeight();
 
   /**
    * Sets the minimum width of the view. It is not guaranteed the view will
@@ -202,7 +201,7 @@ public:
    *
    * @see #GetMinimumWidth()
    */
-  void SetMinimumWidth( uint16_t minWidth );
+  void SetMinimumWidth( LayoutLength minWidth );
 
   /**
    * Sets the minimum height of the view. It is not guaranteed the view will
@@ -213,25 +212,25 @@ public:
    *
    * @see #GetMinimumHeight()
    */
-  void SetMinimumHeight( uint16_t minHeight );
+  void SetMinimumHeight( LayoutLength minHeight );
 
   /**
    * Returns the minimum width of the view.
    *
    * @return the minimum width the view will try to be, in pixels
    *
-   * @see #SetMinimumWidth(uint16_t)
+   * @see #SetMinimumWidth(LayoutLength)
    */
-  uint16_t GetMinimumWidth();
+  LayoutLength GetMinimumWidth();
 
   /**
    * Returns the minimum height of the view.
    *
    * @return the minimum height the view will try to be, in pixels
    *
-   * @see #SetMinimumHeight(uint16_t)
+   * @see #SetMinimumHeight(LayoutLength)
    */
-  uint16_t GetMinimumHeight();
+  LayoutLength GetMinimumHeight();
 
 
 protected:
@@ -296,7 +295,7 @@ protected:
    * @param[in] bottom Bottom position, relative to parent
    * @param[in] animate Whether the layout is about to animate into place
    */
-  virtual void OnLayout( bool changed, int left, int top, int right, int bottom, bool animate );
+  virtual void OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom, bool animate );
 
 
   /**
@@ -309,14 +308,14 @@ protected:
    */
   void SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight );
 
-  static MeasuredSize ResolveSizeAndState( uint16_t size, MeasureSpec measureSpec, uint16_t childMeasuredState );
+  static MeasuredSize ResolveSizeAndState( LayoutLength size, MeasureSpec measureSpec, MeasuredSize::State childMeasuredState );
 
-  bool SetFrame( int left, int top, int right, int bottom );
+  bool SetFrame( LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom );
 
-  virtual void OnSizeChanged( Uint16Pair newSize, Uint16Pair oldSize );
+  virtual void OnSizeChanged( LayoutSize newSize, LayoutSize oldSize );
 
 private:
-  void SizeChange( Uint16Pair newSize, Uint16Pair oldSize );
+  void SizeChange( LayoutSize newSize, LayoutSize oldSize );
 
 public:
   class Impl; // Class declaration is public so we can add devel API's in the future

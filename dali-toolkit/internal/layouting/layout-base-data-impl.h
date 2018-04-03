@@ -19,6 +19,7 @@
 
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
+#include <dali-toolkit/devel-api/layouting/layout-size.h>
 
 namespace Dali
 {
@@ -42,16 +43,18 @@ public:
 
   MeasureSpec mOldWidthMeasureSpec;
   MeasureSpec mOldHeightMeasureSpec;
-  Uint16Pair mMinimumSize;
-  Uint16Pair mMeasuredSize;
+  LayoutSize mMinimumSize;
+
+  MeasuredSize mMeasuredWidth;
+  MeasuredSize mMeasuredHeight;
 
   Extents mMargin; ///< Distances in pixels from the edges of this view to this view's parent.
   Extents mPadding; ///< Distances in pixels from the edges of this view to this view's content.
 
-  uint16_t mLeft;
-  uint16_t mRight;
-  uint16_t mTop;
-  uint16_t mBottom;
+  LayoutLength mLeft;
+  LayoutLength mRight;
+  LayoutLength mTop;
+  LayoutLength mBottom;
 
   /**
    * This view is visible.
