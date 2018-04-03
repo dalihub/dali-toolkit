@@ -34,6 +34,161 @@ namespace Toolkit
 namespace Internal
 {
 
+class JsonWriter
+{
+public:
+  JsonWriter( Property::Value& value )
+  : mValue(value)
+  {
+  }
+
+  std::string ToString()
+  {
+    std::ostringstream stream;
+    ToStream( stream );
+    return stream.str();
+  }
+
+  void ToStream( std::ostream& stream )
+  {
+    switch( mValue.GetType() )
+    {
+      case Dali::Property::BOOLEAN:
+      {
+        auto value = mValue.Get<bool>();
+        stream << ((value)?"true":"false");
+        break;
+      }
+      case Dali::Property::FLOAT:
+      {
+        stream << mValue.Get<float>();
+        break;
+      }
+      case Dali::Property::INTEGER:
+      {
+        stream << mValue.Get<int>();
+        break;
+      }
+      case Dali::Property::VECTOR2:
+      {
+        auto vector = mValue.Get<Vector2>();
+        stream << "[" << vector.x << ", " << vector.y << "]";
+        break;
+      }
+      case Dali::Property::VECTOR3:
+      {
+        auto vector = mValue.Get<Vector3>();
+        stream << "[" << vector.x << ", " << vector.y << ", " << vector.z << "]";
+        break;
+      }
+      case Dali::Property::VECTOR4:
+      {
+        auto vector = mValue.Get<Vector4>();
+        stream << "[" << vector.x << ", " << vector.y << ", " << vector.z << ", " << vector.w << "]";
+        break;
+      }
+      case Dali::Property::MATRIX3:
+      {
+        auto matrix = mValue.Get<Matrix3>();
+        stream << "[";
+        for( int i=0; i<9; ++i )
+        {
+          if( i>0)
+            stream << ",";
+          stream << matrix.AsFloat()[i];
+        }
+        stream << "]";
+        break;
+      }
+      case Dali::Property::MATRIX:
+      {
+        auto matrix = mValue.Get<Matrix>();
+        stream << "[";
+        for( int i=0; i<16; ++i )
+        {
+          if( i>0)
+            stream << ",";
+          stream << matrix.AsFloat()[i];
+        }
+        stream << "]";
+        break;
+      }
+      case Dali::Property::RECTANGLE:
+      {
+        auto vector = mValue.Get<Rect<int> >();
+        stream << "[" << vector.x << ", " << vector.y << ", " << vector.width << ", " << vector.height << "]";
+        break;
+      }
+      case Dali::Property::ROTATION:
+      {
+        auto angleAxis = mValue.Get<AngleAxis>();
+        stream << "[ [ " << angleAxis.axis.x << ", " << angleAxis.axis.y << ", " << angleAxis.axis.z << "], "
+               << angleAxis.angle.radian << "]";
+        break;
+      }
+      case Dali::Property::STRING:
+      {
+        stream << '"' << mValue.Get<std::string>() << '"';
+        break;
+      }
+      case Dali::Property::ARRAY:
+      {
+        auto array = mValue.GetArray();
+        stream << "[ ";
+        if( array )
+        {
+          for( Property::Array::SizeType i=0; i<array->Size(); ++i)
+          {
+            if( i>0)
+              stream << ", ";
+            auto outValue = JsonWriter( array->GetElementAt(i) );
+            stream << outValue.ToString();
+          }
+        }
+        stream << "]";
+        break;
+      }
+      case Dali::Property::MAP:
+      {
+        auto map = mValue.GetMap();
+        stream << "{ ";
+        if( map )
+        {
+          for( Property::Map::SizeType i=0; i<map->Count(); ++i)
+          {
+            if( i>0)
+              stream << ", ";
+            auto key = map->GetKeyAt( i );
+            auto outValue = JsonWriter( map->GetValue(i) );
+            stream << '\"' << key << "\":";
+            stream << outValue.ToString();
+          }
+        }
+        stream << "}";
+        break;
+      }
+      case Dali::Property::EXTENTS:
+      {
+        stream << mValue.Get<Extents>();
+        break;
+      }
+      case Dali::Property::NONE:
+      {
+        stream << "undefined type";
+        break;
+      }
+    }
+  }
+
+  Property::Value& mValue;
+};
+
+static std::ostream& operator<<( std::ostream& o, JsonWriter& value )
+{
+  value.ToStream(o);
+  return o;
+}
+
 std::ostream& operator<<( std::ostream& o, Visual::Base& visual )
 {
   Property::Map map;
@@ -48,7 +203,7 @@ std::ostream& operator<<( std::ostream& o, const RegisteredVisual& registeredVis
   o << "{\n" << "\"index\":" << registeredVisual.index << ",\n";
   o << "\"enabled\":" << (registeredVisual.enabled?"true":"false") << ",\n";
   o << "\"pending\":" << (registeredVisual.pending?"true":"false") << ",\n";
-  o << "\"visual\":" << registeredVisual << "\n}\n";
+  o << "\"visual\":" << registeredVisual.visual << "\n}\n";
   return o;
 }
 
@@ -65,7 +220,7 @@ std::ostream& operator<<( std::ostream& o, const RegisteredVisualContainer& visu
     }
     first = false;
 
-    o<<elem<<"\n";
+    o<<*elem<<"\n";
   }
   o<<"]\n";
   return o;
@@ -73,10 +228,13 @@ std::ostream& operator<<( std::ostream& o, const RegisteredVisualContainer& visu
 
 std::ostream& DumpProperty( std::ostream& o, Property::Index index, Handle handle )
 {
+  auto propertyValue = handle.GetProperty( index );
+  auto jsonPropertyValue = JsonWriter(propertyValue);
+
   o << "{\n";
   o << "\"index\":" << index << ",\n";
-  o << "\"name\":" << handle.GetPropertyName( index ) << ",\n";
-  o << "\"value\":" << handle.GetProperty( index ) << "\n";
+  o << "\"name\":\"" << handle.GetPropertyName( index ) << "\",\n";
+  o << "\"value\":" << jsonPropertyValue << "\n";
   o << "}";
   return o;
 }
@@ -122,7 +280,7 @@ std::ostream& DumpProperties( std::ostream& o, Handle handle )
 
   o << "\"Properties\":[\n" ;
   DumpPropertiesWithPredicate( o, handle, indices, propertiesP );
-  o << std::endl << "]," << std::endl;
+  o << std::endl << "]" << std::endl;
 
   return o;
 }
@@ -140,7 +298,6 @@ std::string DumpControl( const Internal::Control& control )
   }
   oss << "\"id\":\"" << control.Self().GetId() << "\",\n";
   oss << "\"registeredVisuals\":\n" << controlData.mVisuals << ",\n";
-  oss << ",\n";
   oss << "\"removeVisuals\":\n" << controlData.mRemoveVisuals << ",\n";
   oss << "\"rendererCount\":" << control.Self().GetRendererCount() << ",\n";
   oss << "\"properties\":\n{\n";

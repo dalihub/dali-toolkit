@@ -82,7 +82,7 @@ public:
    *        current dimension
    * @return a MeasureSpec for the child
    */
-  static MeasureSpec GetChildMeasureSpec( MeasureSpec measureSpec, int padding, uint16_t childDimension );
+  static MeasureSpec GetChildMeasureSpec( MeasureSpec measureSpec, LayoutLength padding, LayoutLength childDimension );
 
   /**
    * Check if the layout has already been requested
@@ -154,9 +154,9 @@ protected:
    */
   virtual void MeasureChildWithMargins( LayoutBasePtr child,
                                         MeasureSpec parentWidthMeasureSpec,
-                                        uint16_t widthUsed,
+                                        LayoutLength widthUsed,
                                         MeasureSpec parentHeightMeasureSpec,
-                                        uint16_t heightUsed );
+                                        LayoutLength heightUsed );
 public:
   class Impl;
 

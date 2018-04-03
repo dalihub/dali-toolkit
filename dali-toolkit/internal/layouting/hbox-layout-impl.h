@@ -56,7 +56,7 @@ protected:
 
   virtual void OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec ) override;
 
-  virtual void OnLayout( bool changed, int l, int t, int r, int b, bool animate ) override;
+  virtual void OnLayout( bool changed, LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b, bool animate ) override;
 
 private:
   HboxLayout( const HboxLayout& other ) = delete;
@@ -67,7 +67,7 @@ private:
 private:
   Dali::Toolkit::HboxView::Mode mMode;
   LayoutSize mCellPadding;
-  unsigned int mTotalLength;
+  LayoutLength mTotalLength;
 };
 
 } // namespace Internal

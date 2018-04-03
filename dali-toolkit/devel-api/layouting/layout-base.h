@@ -20,7 +20,6 @@
 #include <cstdint>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/actors/actor-enumerations.h>
-#include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
@@ -37,8 +36,6 @@ class LayoutBase;
 }
 
 using LayoutId = unsigned int;
-using LayoutLength = uint16_t;
-using LayoutSize = Uint16Pair;
 
 
 /**

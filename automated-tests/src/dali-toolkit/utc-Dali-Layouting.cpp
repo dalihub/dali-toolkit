@@ -60,13 +60,13 @@ void DumpControlHierarchy( std::ostream& o, Actor actor )
   o << "{\n";
   if( control )
   {
-    o << Toolkit::Internal::DumpControl( Toolkit::Internal::GetImplementation( control ) );
+    o << "\"Control\":" << Toolkit::Internal::DumpControl( Toolkit::Internal::GetImplementation( control ) );
   }
   else
   {
-    o << DumpActor( actor );
+    o << "\"Actor\":" << DumpActor( actor );
   }
-  o << "\"children\":{\n";
+  o << ",\n\"children\":[\n";
   bool first=true;
   for( auto count=actor.GetChildCount(), i=0u; i<count; ++i )
   {
@@ -78,7 +78,7 @@ void DumpControlHierarchy( std::ostream& o, Actor actor )
     o << "\n";
     DumpControlHierarchy( o, actor.GetChildAt( i ) );
   }
-  o << "}\n";
+  o << "]}\n";
 }
 
 Control CreateLeafControl( int width, int height )
@@ -295,6 +295,10 @@ int UtcDaliLayouting_HboxLayout03(void)
 
   stage.Add( hbox3 );
 
+  //std::ostringstream oss;
+  //DumpControlHierarchy( oss, Stage::GetCurrent().GetRootLayer() );
+  //printf("Control hierarchy: \n%s\n", oss.str().c_str() );
+
   // Ensure layouting happens
   application.SendNotification();
   application.Render();
@@ -340,13 +344,17 @@ int UtcDaliLayouting_HboxLayout03(void)
 int UtcDaliLayouting_HboxLayout04(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliLayouting_HboxLayout03 Test nested hboxes with MATCH_PARENT");
+  tet_infoline(" UtcDaliLayouting_HboxLayout04 Test nested hboxes with explicit WRAP_CONTENT");
 
   Stage stage = Stage::GetCurrent();
   auto hbox1 = HboxView::New();
   auto hbox2 = HboxView::New();
   hbox1.SetName( "HBox1"); // Default spec is to wrap content
   hbox2.SetName( "HBox2");
+  hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
 
   std::vector< Control > controls;
   controls.push_back( CreateLeafControl( 80, 40 ) );
@@ -383,6 +391,7 @@ int UtcDaliLayouting_HboxLayout04(void)
 
   std::ostringstream oss;
   DumpControlHierarchy( oss, Stage::GetCurrent().GetRootLayer() );
+  printf("Control hierarchy: \n%s\n", oss.str().c_str() );
 
   // Ensure layouting happens
   application.SendNotification();

@@ -19,6 +19,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
+#include <dali-toolkit/devel-api/layouting/layout-size.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
 namespace Dali
