@@ -98,8 +98,8 @@ void LayoutBase::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
     ( heightMeasureSpec != mImpl->mOldHeightMeasureSpec );
 
   const bool isSpecExactly =
-    ( widthMeasureSpec.GetMode() == MeasureSpec::EXACTLY ) &&
-    ( heightMeasureSpec.GetMode() == MeasureSpec::EXACTLY );
+    ( widthMeasureSpec.GetMode() == MeasureSpec::Mode::EXACTLY ) &&
+    ( heightMeasureSpec.GetMode() == MeasureSpec::Mode::EXACTLY );
 
   const bool matchesSpecSize =
     ( GetMeasuredWidth() == widthMeasureSpec.GetSize() ) &&
@@ -122,9 +122,6 @@ void LayoutBase::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
     }
     else
     {
-      //long value = mMeasureCache.valueAt(cacheIndex);
-      // Casting a long to int drops the high 32 bits, no mask needed
-      //setMeasuredDimensionRaw((int) (value >> 32), (int) value);
       mImpl->SetPrivateFlag( Impl::PFLAG_MEASURE_NEEDED_BEFORE_LAYOUT );
     }
 
@@ -140,7 +137,7 @@ void LayoutBase::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
   //mMeasureCache.put(key, ((long) mMeasuredWidth) << 32 | (long) mMeasuredHeight & 0xffffffffL); // suppress sign extension
 }
 
-void LayoutBase::Layout( int l, int t, int r, int b, bool animate )
+void LayoutBase::Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b, bool animate )
 {
   if( mImpl->GetPrivateFlag( Impl::PFLAG_MEASURE_NEEDED_BEFORE_LAYOUT ) )
   {
@@ -167,43 +164,43 @@ void LayoutBase::Layout( int l, int t, int r, int b, bool animate )
   mImpl->SetPrivateFlag( Impl::PFLAG_IS_LAID_OUT );
 }
 
-uint16_t LayoutBase::GetMinimumWidth()
+LayoutLength LayoutBase::GetMinimumWidth()
 {
   return mImpl->mMinimumSize.GetWidth();
 }
 
-uint16_t LayoutBase::GetMinimumHeight()
+LayoutLength LayoutBase::GetMinimumHeight()
 {
   return mImpl->mMinimumSize.GetHeight();
 }
 
-void LayoutBase::SetMinimumWidth( uint16_t minimumWidth )
+void LayoutBase::SetMinimumWidth( LayoutLength minimumWidth )
 {
   mImpl->mMinimumSize.SetWidth( minimumWidth );
   RequestLayout();
 }
 
-void LayoutBase::SetMinimumHeight( uint16_t minimumHeight )
+void LayoutBase::SetMinimumHeight( LayoutLength minimumHeight )
 {
   mImpl->mMinimumSize.SetHeight( minimumHeight );
   RequestLayout();
 }
 
-uint16_t LayoutBase::GetDefaultSize( uint16_t size, MeasureSpec measureSpec )
+LayoutLength LayoutBase::GetDefaultSize( LayoutLength size, MeasureSpec measureSpec )
 {
-  uint16_t result = size;
-  uint32_t specMode = measureSpec.GetMode();
-  uint32_t specSize = measureSpec.GetSize();
+  LayoutLength result = size;
+  auto specMode = measureSpec.GetMode();
+  auto specSize = measureSpec.GetSize();
 
   switch (specMode)
   {
-    case MeasureSpec::UNSPECIFIED:
+    case MeasureSpec::Mode::UNSPECIFIED:
     {
       result = size;
       break;
     }
-    case MeasureSpec::AT_MOST:
-    case MeasureSpec::EXACTLY:
+    case MeasureSpec::Mode::AT_MOST:
+    case MeasureSpec::Mode::EXACTLY:
     {
       result = specSize;
       break;
@@ -218,7 +215,7 @@ void LayoutBase::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
                          GetDefaultSize( GetSuggestedMinimumHeight(), heightMeasureSpec ) );
 }
 
-void LayoutBase::OnLayout( bool changed, int left, int top, int right, int bottom, bool animate )
+void LayoutBase::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom, bool animate )
 {
 }
 
@@ -238,57 +235,58 @@ void LayoutBase::RequestLayout()
 void LayoutBase::SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight )
 {
   mImpl->SetPrivateFlag( Impl::PFLAG_MEASURED_DIMENSION_SET );
-  mImpl->mMeasuredSize = Uint16Pair( measuredWidth, measuredHeight );
+  mImpl->mMeasuredWidth = measuredWidth;
+  mImpl->mMeasuredHeight = measuredHeight;
 }
 
-uint16_t LayoutBase::GetMeasuredWidth()
+LayoutLength LayoutBase::GetMeasuredWidth()
 {
   // Get the size portion of the measured width
-  return MeasuredSize( mImpl->mMeasuredSize.GetWidth() ).GetSize();
+  return  mImpl->mMeasuredWidth.GetSize();
 }
 
-uint16_t LayoutBase::GetMeasuredHeight()
+LayoutLength LayoutBase::GetMeasuredHeight()
 {
-  return MeasuredSize( mImpl->mMeasuredSize.GetHeight() ).GetSize();
+  return  mImpl->mMeasuredHeight.GetSize();
 }
 
 MeasuredSize LayoutBase::GetMeasuredWidthAndState()
 {
-  return MeasuredSize( mImpl->mMeasuredSize.GetWidth() );
+  return mImpl->mMeasuredWidth;
 }
 
 MeasuredSize LayoutBase::GetMeasuredHeightAndState()
 {
-  return MeasuredSize( mImpl->mMeasuredSize.GetHeight() );
+  return mImpl->mMeasuredHeight;
 }
 
-uint16_t LayoutBase::GetSuggestedMinimumWidth()
+LayoutLength LayoutBase::GetSuggestedMinimumWidth()
 {
   auto owner = GetOwner();
   auto actor = Actor::DownCast(owner);
   auto naturalSize = actor ? actor.GetNaturalSize() : Vector3::ZERO;
 
-  return std::max( mImpl->mMinimumSize.GetWidth(), uint16_t( naturalSize.width ) );
+  return std::max( mImpl->mMinimumSize.GetWidth(), LayoutLength::IntType( naturalSize.width ) );
 }
 
-uint16_t LayoutBase::GetSuggestedMinimumHeight()
+LayoutLength LayoutBase::GetSuggestedMinimumHeight()
 {
   auto owner = GetOwner();
   auto actor = Actor::DownCast(owner);
   auto naturalSize = actor ? actor.GetNaturalSize() : Vector3::ZERO;
 
-  return std::max( mImpl->mMinimumSize.GetHeight(), uint16_t(naturalSize.height) );
+  return std::max( mImpl->mMinimumSize.GetHeight(), LayoutLength::IntType(naturalSize.height) );
 }
 
-MeasuredSize LayoutBase::ResolveSizeAndState( uint16_t size, MeasureSpec measureSpec, uint16_t childMeasuredState )
+MeasuredSize LayoutBase::ResolveSizeAndState( LayoutLength size, MeasureSpec measureSpec, MeasuredSize::State childMeasuredState )
 {
-  uint32_t specMode = measureSpec.GetMode();
-  uint32_t specSize = measureSpec.GetSize();
+  auto specMode = measureSpec.GetMode();
+  LayoutLength specSize = measureSpec.GetSize();
   MeasuredSize result;
 
   switch( specMode )
   {
-    case MeasureSpec::AT_MOST:
+    case MeasureSpec::Mode::AT_MOST:
     {
       if (specSize < size)
       {
@@ -296,21 +294,21 @@ MeasuredSize LayoutBase::ResolveSizeAndState( uint16_t size, MeasureSpec measure
       }
       else
       {
-        result = size;
+        result.SetSize( size );
       }
       break;
     }
 
-    case MeasureSpec::EXACTLY:
+    case MeasureSpec::Mode::EXACTLY:
     {
-      result = specSize;
+      result.SetSize( specSize );
       break;
     }
 
-    case MeasureSpec::UNSPECIFIED:
+    case MeasureSpec::Mode::UNSPECIFIED:
     default:
     {
-      result = size;
+      result.SetSize( size );
       break;
     }
   }
@@ -320,20 +318,20 @@ MeasuredSize LayoutBase::ResolveSizeAndState( uint16_t size, MeasureSpec measure
 }
 
 
-bool LayoutBase::SetFrame( int left, int top, int right, int bottom )
+bool LayoutBase::SetFrame( LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
 {
   bool changed = false;
 
-  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutBase::SetFrame(%d, %d, %d, %d)\n", left, top, right, bottom );
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutBase::SetFrame(%d, %d, %d, %d)\n", left.mValue, top.mValue, right.mValue, bottom.mValue );
 
   if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom )
   {
     changed = true;
 
-    int oldWidth = mImpl->mRight - mImpl->mLeft;
-    int oldHeight = mImpl->mBottom - mImpl->mTop;
-    int newWidth = right - left;
-    int newHeight = bottom - top;
+    auto oldWidth = mImpl->mRight - mImpl->mLeft;
+    auto oldHeight = mImpl->mBottom - mImpl->mTop;
+    auto newWidth = right - left;
+    auto newHeight = bottom - top;
     bool sizeChanged = (newWidth != oldWidth) || (newHeight != oldHeight);
 
     mImpl->mLeft = left;
@@ -349,13 +347,13 @@ bool LayoutBase::SetFrame( int left, int top, int right, int bottom )
     auto actor = Actor::DownCast(owner);
     if( actor )
     {
-      actor.SetPosition( Vector3( left, top, 0.0f ) );
+      actor.SetPosition( Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
       actor.SetSize( Vector3( right-left, bottom-top, 0.0f ) );
     }
 
     if( sizeChanged )
     {
-      SizeChange( Uint16Pair( newWidth, newHeight ), Uint16Pair( oldWidth, oldHeight ) );
+      SizeChange( LayoutSize( newWidth, newHeight ), LayoutSize( oldWidth, oldHeight ) );
     }
 
     //mImpl->mBackgroundSizeChanged = true;
@@ -364,13 +362,13 @@ bool LayoutBase::SetFrame( int left, int top, int right, int bottom )
   return changed;
 }
 
-void LayoutBase::SizeChange( Uint16Pair newSize, Uint16Pair oldSize)
+void LayoutBase::SizeChange( LayoutSize newSize, LayoutSize oldSize)
 {
   OnSizeChanged( newSize, oldSize );
 }
 
 
-void LayoutBase::OnSizeChanged( Uint16Pair newSize, Uint16Pair oldSize )
+void LayoutBase::OnSizeChanged( LayoutSize newSize, LayoutSize oldSize )
 {
 }
 
