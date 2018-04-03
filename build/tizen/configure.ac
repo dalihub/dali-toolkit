@@ -97,6 +97,10 @@ if test "x$enable_debug" = "xyes"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDEBUG_ENABLED"
 fi
 
+if test "x$enable_trace" = "xyes"; then
+  DALI_ADAPTOR_CFLAGS="$DALI_ADAPTOR_CFLAGS -DTRACE_ENABLED"
+fi
+
 if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
 fi
@@ -253,6 +257,7 @@ Configuration
 -------------
   Prefix:                           $prefix
   Debug Build:                      $enable_debug
+  Trace Build:                      $enable_trace
   JavaScript support (V8 required)  $build_javascript_plugin
   CSharp support                    $build_csharp_plugin
   Profile:                          $dali_profile
