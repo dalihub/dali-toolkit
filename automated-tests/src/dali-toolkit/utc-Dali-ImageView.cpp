@@ -1708,3 +1708,29 @@ int UtcDaliImageViewPaddingProperty02(void)
 
   END_TEST;
 }
+
+int UtcDaliImageViewUsingAtlasAndGetNaturalSize(void)
+{
+  ToolkitTestApplication application;
+
+  // Check ImageView with background and main image, to ensure both visuals are marked as loaded
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imageMap[ Toolkit::ImageVisual::Property::URL ] = gImage_34_RGBA;
+  imageMap[ Toolkit::ImageVisual::Property::ATLASING ] = true;
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Vector3 naturalSize = imageView.GetNaturalSize();
+
+  DALI_TEST_EQUALS( naturalSize.width, 34.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( naturalSize.height, 34.0f, TEST_LOCATION );
+
+  END_TEST;
+}
+
