@@ -89,6 +89,10 @@
  *    <td>ImageView is a control displaying an image.</td>
  * </tr>
  * <tr>
+ *    <td style="padding-left:1em">@ref dali_toolkit_controls_model3d_view</td>
+ *    <td>Model3dView is a control for displaying 3d geometry.</td>
+ * </tr>
+ * <tr>
  *    <td style="padding-left:1em">@ref dali_toolkit_controls_scroll_bar</td>
  *    <td>ScrollBar is a component that can be linked to the scrollable objects.</td>
  * </tr>
@@ -171,6 +175,9 @@
 
  *     @defgroup dali_toolkit_controls_image_view Image View
  *     @brief ImageView is a control displaying an image.
+
+ *     @defgroup dali_toolkit_controls_model3d_view Model3dView
+ *     @brief Model3dView is a control for displaying 3d geometry.
 
  *     @defgroup dali_toolkit_controls_scroll_bar Scroll Bar
  *     @brief ScrollBar is a component that can be linked to the scrollable objects.

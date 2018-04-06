@@ -31,6 +31,12 @@ namespace Internal DALI_INTERNAL
 {
 class Model3dView;
 }
+
+/**
+ * @addtogroup dali_toolkit_controls_model3d_view
+ * @{
+ */
+
 /**
  * @brief Model3dView is a control for displaying 3d geometry.
  *
@@ -80,11 +86,15 @@ public:
     };
   };
 
+  /**
+   * @brief Enumeration for the type of illumination.
+   * @SINCE_1_1.4
+   */
   enum IlluminationType
   {
-    DIFFUSE,
-    DIFFUSE_WITH_TEXTURE,
-    DIFFUSE_WITH_NORMAL_MAP
+    DIFFUSE,                 ///< diffuse @SINCE_1_1.4
+    DIFFUSE_WITH_TEXTURE,    ///< diffuse with texture @SINCE_1_1.4
+    DIFFUSE_WITH_NORMAL_MAP  ///< diffuse with normal map @SINCE_1_1.4
   };
 
   /**
@@ -173,6 +183,9 @@ public: // Not intended for application developers
 
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

@@ -27,7 +27,10 @@ namespace Toolkit
 namespace Text
 {
 
-// The type of text renderer required
+/**
+ * @brief Enumeration for the type of text renderer required.
+ * @SINCE_1_0.0
+ */
 enum RenderingType
 {
   RENDERING_SHARED_ATLAS, ///< A bitmap-based solution where renderers can share a texture atlas @SINCE_1_0.0

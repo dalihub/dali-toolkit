@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    1.3.18
+Version:    1.3.19
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -165,6 +165,9 @@ DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
 %if 0%{?enable_debug}
            --enable-debug \
 %endif
+%if 0%{?enable_trace}
+      --enable-trace \
+%endif
            --enable-i18n=yes \
            --enable-rename-so=no
 
@@ -193,6 +196,9 @@ DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
            --enable-cxx03-abi=yes \
 %if 0%{?enable_debug}
            --enable-debug \
+%endif
+%if 0%{?enable_trace}
+      --enable-trace \
 %endif
            --enable-i18n=yes \
            --enable-rename-so=no
