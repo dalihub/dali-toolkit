@@ -67,11 +67,13 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN_CREATE( Toolkit::VisualFactory, Dali::BaseHandle, Create, true )
 DALI_TYPE_REGISTRATION_END()
+const char * const  BROKEN_IMAGE_URL( DALI_IMAGE_DIR "broken.png" ); ///< URL For the broken image
 
 } // namespace
 
 VisualFactory::VisualFactory( bool debugEnabled )
 : mFactoryCache(),
+  mSlotDelegate(this),
   mDebugEnabled( debugEnabled ),
   mPreMultiplyOnLoad( true )
 {
@@ -79,6 +81,22 @@ VisualFactory::VisualFactory( bool debugEnabled )
 
 VisualFactory::~VisualFactory()
 {
+}
+
+void VisualFactory::OnStyleChangedSignal( Toolkit::StyleManager styleManager, StyleChange::Type type)
+{
+  if( type == StyleChange::THEME_CHANGE )
+  {
+    std::string brokenImageUrl(BROKEN_IMAGE_URL);
+
+    Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
+    config["brokenImageUrl"].Get( brokenImageUrl );
+
+    if( mFactoryCache )
+    {
+      mFactoryCache->SetBrokenImageUrl(brokenImageUrl);
+    }
+  }
 }
 
 Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& propertyMap )
@@ -342,6 +360,17 @@ Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
   if( !mFactoryCache )
   {
     mFactoryCache = std::unique_ptr<VisualFactoryCache>( new VisualFactoryCache( mPreMultiplyOnLoad ) );
+
+    std::string brokenImageUrl(BROKEN_IMAGE_URL);
+    Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
+    if( styleManager )
+    {
+      Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
+      config["brokenImageUrl"].Get( brokenImageUrl );
+      styleManager.StyleChangedSignal().Connect( mSlotDelegate, &VisualFactory::OnStyleChangedSignal );
+    }
+
+    mFactoryCache->SetBrokenImageUrl(brokenImageUrl);
   }
   return *mFactoryCache;
 }

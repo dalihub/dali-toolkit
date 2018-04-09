@@ -24,6 +24,8 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 
 namespace Dali
 {
@@ -49,6 +51,14 @@ public:
    * @param[in] debugEnabled If true, use debug renderer to replace all the concrete renderer.
    */
   VisualFactory( bool debugEnabled );
+
+  /**
+   * @brief StyleChanged callback
+   *
+   * @param[in] styleManager Handle for style manager.
+   * @param[in] type Style change type.
+   */
+  void OnStyleChangedSignal( Toolkit::StyleManager styleManager, StyleChange::Type type );
 
   /**
    * @copydoc Toolkit::VisualFactory::CreateVisual( const Property::Map& )
@@ -99,6 +109,7 @@ private:
 
 private:
   std::unique_ptr<VisualFactoryCache> mFactoryCache;
+  SlotDelegate< VisualFactory >       mSlotDelegate;
   bool                                mDebugEnabled:1;
   bool                                mPreMultiplyOnLoad:1; ///< Local store for this flag
 };
