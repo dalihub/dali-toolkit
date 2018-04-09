@@ -135,9 +135,6 @@ void LayoutController::PerformLayout( Actor root, int left, int top, int right, 
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
     LayoutBasePtr layout = controlDataImpl.GetLayout();
 
-    // This is the first control. Give it the stage size
-    control.SetSize( Vector3(right, bottom, 0.0f) );
-
     if( layout )
     {
       layout->Layout( left, top, right, bottom, false ); // @todo why pass animate flag down? - should be per layout.
