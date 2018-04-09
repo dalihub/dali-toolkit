@@ -1243,7 +1243,11 @@ void Builder::RecordStyle( StylePtr           style,
           }
           else
           {
-            style->visuals.Add(visual.first, *property.GetMap());
+            Property::Map* map = property.GetMap();
+            if( map )
+            {
+              style->visuals.Add( visual.first, *map );
+            }
           }
         }
       }
