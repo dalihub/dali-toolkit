@@ -55,15 +55,25 @@ protected:
 
 protected:
   /**
+   * @copydoc CustomActorImpl::OnChildAdd()
+   */
+  virtual void OnChildAdd( Actor& child ) override;
+
+  /**
    * @copydoc Toolkit::Control::OnInitialize()
    */
   virtual void OnInitialize();
 
 private:
+  void AddChildImpl( Actor& child );
+
   HboxView( const HboxView& other ) = delete;
   HboxView& operator=( const HboxView& other ) = delete;
 
   Toolkit::HboxLayout GetLayout();
+
+private:
+  bool mAddingChild;
 };
 
 } // namespace Internal
