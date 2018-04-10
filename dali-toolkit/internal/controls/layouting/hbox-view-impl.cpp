@@ -55,34 +55,12 @@ Dali::Toolkit::HboxView HboxView::New()
 void HboxView::AddChild( Actor child )
 {
   child.Unparent();
+
+  mAddingChild=true;
   Self().Add( child );
+  mAddingChild=false;
 
-  LayoutBasePtr childLayout;
-  Toolkit::Control control = Toolkit::Control::DownCast( child );
-  if( control )
-  {
-    Internal::Control& childControlImpl = GetImplementation( control );
-    Internal::Control::Impl& childControlDataImpl = Internal::Control::Impl::Get( childControlImpl );
-    childLayout = childControlDataImpl.GetLayout();
-
-    if( ! childLayout )
-    {
-      childLayout = LayoutBase::New( control );
-      auto desiredSize = control.GetNaturalSize();
-
-      // HBoxLayout will apply default layout data for this object
-      child.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, desiredSize.width );
-      child.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, desiredSize.height );
-      child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Extents() );
-
-      childControlDataImpl.SetLayout( *childLayout.Get() );
-    }
-  }
-
-  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( *this );
-  auto layout = controlDataImpl.GetLayout();
-  auto layoutGroup = static_cast<LayoutGroup*>(layout.Get());
-  layoutGroup->Add( *childLayout.Get() );
+  AddChildImpl( child );
 }
 
 Actor HboxView::GetChildAt( Dali::Toolkit::HboxView::CellPosition position )
@@ -123,6 +101,14 @@ void HboxView::SetCellHeight( Dali::Toolkit::HboxView::CellPosition cellPosition
 {
 }
 
+void HboxView::OnChildAdd( Actor& child )
+{
+  if( ! mAddingChild )
+  {
+    AddChildImpl( child );
+  }
+}
+
 void HboxView::OnInitialize()
 {
   auto publicControl = Self();
@@ -133,8 +119,40 @@ void HboxView::OnInitialize()
   layout->RegisterChildProperties( typeid(Dali::Toolkit::HboxView) ); // @todo Must make this work with C# derived types (Dictionary?)
 }
 
+void HboxView::AddChildImpl( Actor& child )
+{
+  LayoutBasePtr childLayout;
+  Toolkit::Control control = Toolkit::Control::DownCast( child );
+
+  if( control ) // Can only support adding Controls, not Actors to layout
+  {
+    Internal::Control& childControlImpl = GetImplementation( control );
+    Internal::Control::Impl& childControlDataImpl = Internal::Control::Impl::Get( childControlImpl );
+    childLayout = childControlDataImpl.GetLayout();
+
+    if( ! childLayout )
+    {
+      childLayout = LayoutBase::New( control );
+      auto desiredSize = control.GetNaturalSize();
+
+      // HBoxLayout will apply default layout data for this object
+      child.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, desiredSize.width );
+      child.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, desiredSize.height );
+      child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Extents() );
+
+      childControlDataImpl.SetLayout( *childLayout.Get() );
+    }
+
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( *this );
+    auto layout = controlDataImpl.GetLayout();
+    auto layoutGroup = static_cast<LayoutGroup*>(layout.Get());
+    layoutGroup->Add( *childLayout.Get() );
+  }
+}
+
 HboxView::HboxView()
-: Control(ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT | DISABLE_SIZE_NEGOTIATION))
+: Control(ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT | DISABLE_SIZE_NEGOTIATION)),
+  mAddingChild(false)
 {
 }
 
