@@ -49,6 +49,12 @@ LayoutBase::LayoutBase( Internal::LayoutBase* layoutBase )
 {
 }
 
+LayoutBase::LayoutBase( const Internal::LayoutBase& layoutBase )
+: BaseHandle()
+{
+}
+
+
 Handle LayoutBase::GetOwner()
 {
   return GetImplementation( *this ).GetOwner();

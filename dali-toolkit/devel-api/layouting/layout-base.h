@@ -103,6 +103,9 @@ public:
   Handle GetOwner();
 
 public:
+
+  LayoutBase( const Internal::LayoutBase& layoutBase );
+
   explicit DALI_INTERNAL LayoutBase( Internal::LayoutBase* layoutBase );
 };
 

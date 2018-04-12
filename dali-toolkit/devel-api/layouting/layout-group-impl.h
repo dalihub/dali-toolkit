@@ -52,7 +52,9 @@ protected:
 
 public:
   LayoutGroup( const LayoutGroup& copy ) = delete;
-  LayoutGroup& operator=( const LayoutGroup& rhs ) = delete;
+  LayoutGroup& operator=( const LayoutGroup& rhs ); // once wrapped up should use = delete;
+
+  static Dali::Toolkit::LayoutGroup New( LayoutGroupPtr layoutGroup );
 
   Toolkit::LayoutGroup::LayoutId Add( LayoutBase& layoutData );
   void Remove( Toolkit::LayoutGroup::LayoutId childId );

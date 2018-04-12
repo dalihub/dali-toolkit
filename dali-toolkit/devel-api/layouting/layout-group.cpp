@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,11 @@ LayoutBase LayoutGroup::GetChild( LayoutGroup::LayoutId childId )
 MeasureSpec LayoutGroup::GetChildMeasureSpec( MeasureSpec measureSpec, int padding, Dali::Dimension::Type dimension )
 {
   return GetImplementation( *this ).GetChildMeasureSpec( measureSpec, padding, dimension );
+}
+
+LayoutGroup::LayoutGroup(Internal::LayoutGroup& layoutGroup)
+: LayoutBase(layoutGroup)
+{
 }
 
 LayoutGroup::LayoutGroup( Internal::LayoutGroup* layoutGroup )

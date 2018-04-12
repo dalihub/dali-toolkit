@@ -42,6 +42,22 @@ LayoutGroup::~LayoutGroup()
 {
 }
 
+LayoutGroup& LayoutGroup::operator=( const LayoutGroup& handle )
+{
+  if( &handle != this )
+  {
+    LayoutGroup::operator=( handle );
+  }
+  return *this;
+}
+
+Dali::Toolkit::LayoutGroup LayoutGroup::New( LayoutGroupPtr layoutGroup )
+{
+  Dali::Toolkit::LayoutGroup handle( *layoutGroup );
+
+  return handle;
+}
+
 void LayoutGroup::DoRegisterChildProperties( const std::type_info& containerType )
 {
   // Chain up to parent class
