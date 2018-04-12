@@ -156,7 +156,6 @@ public:
   template <typename T>
     LayoutBase GetChild( T childId ) = delete;
 
-
 public:
   /// @cond internal
   /**
@@ -164,7 +163,7 @@ public:
    *
    * @param[in] actor A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL LayoutGroup( Internal::LayoutGroup* layoutGroup );
+  explicit LayoutGroup( Internal::LayoutGroup* layoutGroup );
   /// @endcond
 };
 
