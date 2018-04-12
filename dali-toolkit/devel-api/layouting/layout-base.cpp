@@ -54,6 +54,16 @@ Handle LayoutBase::GetOwner()
   return GetImplementation( *this ).GetOwner();
 }
 
+void LayoutBase::SetAnimateLayout( bool animateLayout )
+{
+  GetImplementation( *this ).SetAnimateLayout( animateLayout );
+}
+
+bool LayoutBase::GetAnimateLayout()
+{
+  return GetImplementation( *this ).GetAnimateLayout();
+}
+
 } // namespace Toolkit
 
 } // namespace Dali

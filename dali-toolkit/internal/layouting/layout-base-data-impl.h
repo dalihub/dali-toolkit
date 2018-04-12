@@ -95,6 +95,8 @@ public:
   int mViewFlags;
   int mPrivateFlags;
 
+  bool mAnimated;
+
   inline void ClearPrivateFlag( int flag )
   {
     mPrivateFlags &= ~flag;
@@ -111,6 +113,7 @@ public:
   }
 
   static bool sUseZeroUnspecifiedMeasureSpec;
+
 };
 
 } // namespace Internal
