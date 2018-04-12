@@ -280,7 +280,7 @@ Toolkit::LayoutBase GetLayout( Control control );
  * @param[in] control The internal Control to set the layout on
  * @param[in] layout Pointer to the layout
  */
-void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout );
+DALI_IMPORT_API void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout );
 
 /**
  * @brief Set the layout on a control.
@@ -288,7 +288,7 @@ void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout );
  * @param[in] control The Control to set the layout on
  * @param[in] layout Pointer to the layout
  */
-void SetLayout( Control control, Toolkit::LayoutBase layout );
+DALI_IMPORT_API void SetLayout( Control control, Toolkit::LayoutBase layout );
 
 } // namespace DevelControl
 
