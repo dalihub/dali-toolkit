@@ -233,10 +233,12 @@ void HboxLayout::ForceUniformHeight( int count, MeasureSpec widthMeasureSpec )
   }
 }
 
-void HboxLayout::OnLayout(
-  bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom, bool animate )
+void HboxLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
 {
-  bool isLayoutRtl = false;//IsLayoutRtl();
+  auto owner = GetOwner();
+  auto actor = Actor::DownCast(owner);
+  bool isLayoutRtl = actor ? actor.GetProperty<bool>( Actor::Property::LAYOUT_DIRECTION ) : false;
+
   Extents padding = GetPadding();
 
   LayoutLength childTop( 0 );
@@ -250,9 +252,9 @@ void HboxLayout::OnLayout(
 
   auto count = GetChildCount();
 
-
   int start = 0;
   int dir = 1;
+
   //In case of RTL, start drawing from the last child.
   if (isLayoutRtl) {
     start = count - 1;
@@ -274,7 +276,7 @@ void HboxLayout::OnLayout(
       childTop = LayoutLength(padding.top) + ((childSpace - childHeight) / 2) + childMargin.top - childMargin.bottom;
 
       childLeft += childMargin.start;
-      childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight, false );
+      childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
       childLeft += childWidth + childMargin.end;
     }
   }
