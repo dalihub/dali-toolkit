@@ -56,7 +56,7 @@ protected:
 
   virtual void OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec ) override;
 
-  virtual void OnLayout( bool changed, LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b, bool animate ) override;
+  virtual void OnLayout( bool changed, LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b ) override;
 
 private:
   HboxLayout( const HboxLayout& other ) = delete;

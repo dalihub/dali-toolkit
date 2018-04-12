@@ -62,6 +62,20 @@ public:
   Handle GetOwner() const;
 
   /**
+   * @brief Set whether this layout should be animated or not
+   *
+   * @param[in] animateLayout True if the layout should be animated when applied
+   */
+  void SetAnimateLayout( bool animateLayout );
+
+  /**
+   * @brief Get whether this layout should be animated or not
+   *
+   * @return True if the layout should be animated when applied
+   */
+  bool GetAnimateLayout();
+
+  /**
    * Register child properties of layout
    * @param[in] containerType The type of the containing view (owner)
    */
@@ -75,17 +89,12 @@ public:
 
 
   /**
-   * <p>
    * This is called to find out how big a view should be. The parent
    * supplies constraint information in the width and height parameters.
-   * </p>
    *
-   * <p>
    * The actual measurement work of a view is performed in
    * {@link #OnMeasure(MeasureSpec, MeasureSpec)}, called by this method. Therefore, only
    * {@link #OnMeasure(MeasureSpec, MeasureSpec)} can and must be overridden by subclasses.
-   * </p>
-   *
    *
    * @param widthMeasureSpec Horizontal space requirements as imposed by the parent
    * @param heightMeasureSpec Vertical space requirements as imposed by the parent
@@ -95,24 +104,23 @@ public:
   void Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec );
 
   /**
-   * Assign a size and position to a view and all of its descendants
+   * @brief Assign a size and position to a view and all of its descendants
    *
-   * <p>This is the second phase of the layout mechanism.  (The first
-   * is measuring). In this phase, each parent calls layout on all of
-   * its children to position them.  This is typically done using the
-   * child measurements that were stored in the measure pass.</p>
+   * This is the second phase of the layout mechanism.  (The first is
+   * measuring). In this phase, each parent calls layout on all of its
+   * children to position them.  This is typically done using the
+   * child measurements that were stored in the measure pass.
    *
-   * <p>Derived classes should not override this method.  Derived
-   * classes with children should override onLayout. In that method,
-   * they should call layout on each of their children.</p>
+   * Derived classes should not override this method.  Derived classes
+   * with children should override OnLayout. In that method, they
+   * should call Layout on each of their children.
    *
    * @param[in] l Left position, relative to parent
    * @param[in] t Top position, relative to parent
    * @param[in] r Right position, relative to parent
    * @param[in] b Bottom position, relative to parent
-   * @param[in] animate True if the layout should be animated
    */
-  void Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b, bool animate );
+  void Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b );
 
   /**
    * Utility to return a default size. Uses the supplied size if the
@@ -172,7 +180,7 @@ public:
    * Returns the suggested minimum width that the view should use. This
    * returns the maximum of the view's minimum width
    * and the background's minimum width
-   * <p>
+   *
    * When being used in {@link #OnMeasure()}, the caller should still
    * ensure the returned width is within the requirements of the parent.
    *
@@ -184,7 +192,7 @@ public:
    * Returns the suggested minimum height that the view should use. This
    * returns the maximum of the view's minimum height
    * and the background's minimum height
-   * <p>
+   *
    * When being used in {@link #OnMeasure()}, the caller should still
    * ensure the returned height is within the requirements of the parent.
    *
@@ -235,38 +243,30 @@ public:
 
 protected:
   /**
-   * <p>
    * Measure the view and its content to determine the measured width and the
    * measured height. This method is invoked by {@link #Measure(MeasureSpec, MeasureSpec)} and
    * should be overridden by subclasses to provide accurate and efficient
    * measurement of their contents.
-   * </p>
    *
-   * <p>
    * <strong>CONTRACT:</strong> When overriding this method, you
    * <em>must</em> call {@link #SetMeasuredDimensions(MeasuredSize,MeasuredSize)} to store the
    * measured width and height of this view. Failure to do so will trigger an
    * <code>IllegalStateException</code>, thrown by
    * {@link #Measure(MeasureSpec,MeasureSpec)}. Calling the superclass'
    * {@link #OnMeasure(MeasureSpec,MeasureSpec)} is a valid use.
-   * </p>
    *
-   * <p>
    * The base class implementation of measure defaults to the background size,
    * unless a larger size is allowed by the MeasureSpec. Subclasses should
    * override {@link #OnMeasure(MeasureSpec,MeasureSpec)} to provide better measurements of
    * their content.
-   * </p>
    *
-   * <p>
    * If this method is overridden, it is the subclass's responsibility to make
    * sure the measured height and width are at least the view's minimum height
    * and width ({@link #GetSuggestedMinimumHeight()} and
    * {@link #GetSuggestedMinimumWidth()}).
-   * </p>
    *
    * @param[in] widthMeasureSpec horizontal space requirements as imposed by the parent.
-       *                         The requirements are encoded with
+   *                             The requirements are encoded with
    *                             {@link MeasureSpec}.
    * @param[in] heightMeasureSpec vertical space requirements as imposed by the parent.
    *                              The requirements are encoded with
@@ -286,22 +286,21 @@ protected:
    * position to each of its children.
    *
    * Derived classes with children should override this method and
-   * call layout on each of their children.
+   * call Layout() on each of their children.
    *
    * @param[in] changed This is a new size or position for this view
    * @param[in] left Left position, relative to parent
    * @param[in] top Top position, relative to parent
    * @param[in] right Right position, relative to parent
    * @param[in] bottom Bottom position, relative to parent
-   * @param[in] animate Whether the layout is about to animate into place
    */
-  virtual void OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom, bool animate );
+  virtual void OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom );
 
 
   /**
-   * <p>This method must be called by {@link #OnMeasure(MeasureSpec,MeasureSpec)} to store the
+   * This method must be called by {@link #OnMeasure(MeasureSpec,MeasureSpec)} to store the
    * measured width and measured height. Failing to do so will trigger an
-   * exception at measurement time.</p>
+   * exception at measurement time.
    *
    * @param[in] measuredWidth The measured width of this view. This may have a state of {@link MeasuredSize::MEASURED_SIZE_TOO_SMALL}
    * @param[in] measuredHeight The measured height of this view. This may have a state of {@link MeasuredSize::MEASURED_SIZE_TOO_SMALL}

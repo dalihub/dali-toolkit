@@ -99,6 +99,20 @@ public:
    */
   Handle GetOwner();
 
+  /**
+   * @brief Set whether this layout should be animated or not
+   *
+   * @param[in] animateLayout True if the layout should be animated when applied
+   */
+  void SetAnimateLayout( bool animateLayout );
+
+  /**
+   * @brief Get whether this layout should be animated or not
+   *
+   * @return True if the layout should be animated when applied
+   */
+  bool GetAnimateLayout();
+
 public:
   explicit DALI_INTERNAL LayoutBase( Internal::LayoutBase* layoutBase );
 };

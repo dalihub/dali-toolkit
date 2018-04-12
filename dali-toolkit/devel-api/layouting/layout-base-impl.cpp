@@ -15,6 +15,8 @@
  */
 
 #include <dali/integration-api/debug.h>
+
+#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
@@ -28,6 +30,8 @@ namespace
 {
 const char* WIDTH_SPECIFICATION_NAME( "widthSpecification" );
 const char* HEIGHT_SPECIFICATION_NAME( "heightSpecification" );
+
+const float DEFAULT_TRANSITION_DURATION( 0.5f );
 }
 
 namespace Dali
@@ -57,6 +61,16 @@ void LayoutBase::Initialize( Handle& owner )
 Handle LayoutBase::GetOwner() const
 {
   return Handle::DownCast(BaseHandle(mImpl->mOwner));
+}
+
+void LayoutBase::SetAnimateLayout( bool animateLayout )
+{
+  mImpl->mAnimated = animateLayout;
+}
+
+bool LayoutBase::GetAnimateLayout()
+{
+  return mImpl->mAnimated;
 }
 
 void LayoutBase::RegisterChildProperties( const std::type_info& containerType )
@@ -137,7 +151,7 @@ void LayoutBase::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
   //mMeasureCache.put(key, ((long) mMeasuredWidth) << 32 | (long) mMeasuredHeight & 0xffffffffL); // suppress sign extension
 }
 
-void LayoutBase::Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b, bool animate )
+void LayoutBase::Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b )
 {
   if( mImpl->GetPrivateFlag( Impl::PFLAG_MEASURE_NEEDED_BEFORE_LAYOUT ) )
   {
@@ -155,7 +169,7 @@ void LayoutBase::Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutL
 
   if( changed || mImpl->GetPrivateFlag( Impl::PFLAG_LAYOUT_REQUIRED ) )
   {
-    OnLayout( changed, l, t, r, b, animate );
+    OnLayout( changed, l, t, r, b );
     mImpl->ClearPrivateFlag( Impl::PFLAG_LAYOUT_REQUIRED );
 
     // @todo Inform observers
@@ -215,10 +229,9 @@ void LayoutBase::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
                          GetDefaultSize( GetSuggestedMinimumHeight(), heightMeasureSpec ) );
 }
 
-void LayoutBase::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom, bool animate )
+void LayoutBase::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
 {
 }
-
 
 LayoutParent* LayoutBase::GetParent()
 {
@@ -347,8 +360,21 @@ bool LayoutBase::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
     auto actor = Actor::DownCast(owner);
     if( actor )
     {
-      actor.SetPosition( Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
-      actor.SetSize( Vector3( right-left, bottom-top, 0.0f ) );
+      if( mImpl->mAnimated )
+      {
+        auto animation = Animation::New( 0.5f );
+        animation.AnimateTo( Property( actor, Actor::Property::POSITION ),
+                             Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
+        animation.AnimateTo( Property( actor, Actor::Property::SIZE ),
+                             Vector3( right-left, bottom-top, 0.0f ) );
+        animation.Play();
+      }
+      else
+      {
+        // @todo Collate into list of Property & Property::Value pairs.
+        actor.SetPosition( Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
+        actor.SetSize( Vector3( right-left, bottom-top, 0.0f ) );
+      }
     }
 
     if( sizeChanged )

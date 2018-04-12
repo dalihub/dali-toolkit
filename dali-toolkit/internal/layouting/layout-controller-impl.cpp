@@ -137,7 +137,7 @@ void LayoutController::PerformLayout( Actor root, int left, int top, int right, 
 
     if( layout )
     {
-      layout->Layout( left, top, right, bottom, false ); // @todo why pass animate flag down? - should be per layout.
+      layout->Layout( left, top, right, bottom );
     }
   }
   else
