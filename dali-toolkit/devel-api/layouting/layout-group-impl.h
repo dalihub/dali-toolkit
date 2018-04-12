@@ -182,14 +182,6 @@ protected:
   virtual void DoRegisterChildProperties( const std::string& containerType );
 
   /**
-   * Callback when a child property is set on any given child
-   * @param[in] handle The handle to the child
-   * @param[in] index The index of the property that has been set
-   * @param[in] value The new value of the property
-   */
-  void OnSetChildProperties( Handle& handle, Property::Index index, Property::Value value );
-
-  /**
    * Create default child property values suitable for this layout group or derived layouter
    */
   virtual void GenerateDefaultChildPropertyValues( Handle child );
@@ -213,7 +205,7 @@ protected:
    * @param parentWidthMeasureSpec The width requirements for this view
    * @param parentHeightMeasureSpec The height requirements for this view
    */
-  void MeasureChild( LayoutBasePtr child, MeasureSpec parentWidthMeasureSpec, MeasureSpec parentHeightMeasureSpec );
+  virtual void MeasureChild( LayoutBasePtr child, MeasureSpec parentWidthMeasureSpec, MeasureSpec parentHeightMeasureSpec );
 
   /**
    * Ask one of the children of this view to measure itself, taking into
@@ -266,6 +258,14 @@ private:
    * Callback when an owner property is set. Triggers a relayout if it's a child property
    */
   void OnOwnerPropertySet( Handle& handle, Property::Index index, Property::Value value );
+
+  /**
+   * Callback when a child property is set on any given child
+   * @param[in] handle The handle to the child
+   * @param[in] index The index of the property that has been set
+   * @param[in] value The new value of the property
+   */
+  void OnSetChildProperties( Handle& handle, Property::Index index, Property::Value value );
 
 public:
   class Impl; // Class declaration is public so we can add devel API's in the future
