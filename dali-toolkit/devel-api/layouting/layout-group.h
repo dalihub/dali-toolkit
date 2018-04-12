@@ -88,7 +88,7 @@ public:
   MeasureSpec GetChildMeasureSpec( MeasureSpec measureSpec, int padding, Dali::Dimension::Type dimension ) const;
 
 public:
-  explicit DALI_INTERNAL LayoutGroup( Internal::LayoutGroup* layoutGroup );
+  explicit LayoutGroup( Internal::LayoutGroup* layoutGroup );
 };
 
 
