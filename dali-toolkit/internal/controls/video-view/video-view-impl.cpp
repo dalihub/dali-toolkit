@@ -99,12 +99,10 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 );
 
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = vec4(mixColor, 1.0)*uColor;\n
+    gl_FragColor = vec4(0.0);\n
   }\n
 );
 
@@ -620,12 +618,7 @@ void VideoView::SetWindowSurfaceTarget()
     Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
     Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
     mOverlayRenderer = Renderer::New( geometry, shader );
-
-    mOverlayRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-    mOverlayRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_RGB, BlendFactor::ONE );
-    mOverlayRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_RGB, BlendFactor::ZERO );
-    mOverlayRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_SRC_ALPHA, BlendFactor::ONE );
-    mOverlayRenderer.SetProperty( Renderer::Property::BLEND_FACTOR_DEST_ALPHA, BlendFactor::ZERO );
+    mOverlayRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::OFF );
   }
 
   if( mIsPlay )
