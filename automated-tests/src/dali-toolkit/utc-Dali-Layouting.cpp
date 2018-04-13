@@ -21,7 +21,8 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
-#include <dali-toolkit/devel-api/controls/layouting/hbox-view.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/devel-api/layouting/hbox-layout.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl-debug.h>
 
 using namespace Dali;
@@ -111,7 +112,9 @@ int UtcDaliLayouting_HboxLayout01(void)
   tet_infoline(" UtcDaliLayouting_HboxLayout01");
 
   Stage stage = Stage::GetCurrent();
-  auto hbox = HboxView::New();
+  auto hbox = Control::New();
+  auto hboxLayout = HboxLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
 
   std::vector< Control > controls;
@@ -122,7 +125,7 @@ int UtcDaliLayouting_HboxLayout01(void)
 
   for( auto&& iter : controls )
   {
-    hbox.AddChild( iter );
+    hbox.Add( iter );
   }
   hbox.SetParentOrigin( ParentOrigin::CENTER );
   hbox.SetAnchorPoint( AnchorPoint::CENTER );
@@ -156,8 +159,15 @@ int UtcDaliLayouting_HboxLayout02(void)
   tet_infoline(" UtcDaliLayouting_HboxLayout02 Test nested hboxes with default spec of WRAP_CONTENT");
 
   Stage stage = Stage::GetCurrent();
-  auto hbox1 = HboxView::New();
-  auto hbox2 = HboxView::New();
+
+  auto hbox1 = Control::New();
+  auto hboxLayout1 = HboxLayout::New();
+  DevelControl::SetLayout( hbox1, hboxLayout1 );
+
+  auto hbox2 = Control::New();
+  auto hboxLayout2 = HboxLayout::New();
+  DevelControl::SetLayout( hbox2, hboxLayout2 );
+
   hbox1.SetName( "HBox1");
   hbox2.SetName( "HBox2");
 
@@ -177,11 +187,11 @@ int UtcDaliLayouting_HboxLayout02(void)
   {
     if( counter < 4 )
     {
-      hbox1.AddChild( iter );
+      hbox1.Add( iter );
     }
     else
     {
-      hbox2.AddChild( iter );
+      hbox2.Add( iter );
     }
     ++counter;
   }
@@ -190,11 +200,14 @@ int UtcDaliLayouting_HboxLayout02(void)
   hbox2.SetParentOrigin( ParentOrigin::CENTER );
   hbox2.SetAnchorPoint( AnchorPoint::CENTER );
 
-  auto hbox3 = HboxView::New();
+  auto hbox3 = Control::New();
+  auto hboxLayout3 = HboxLayout::New();
+  DevelControl::SetLayout( hbox3, hboxLayout3 );
+
   hbox3.SetParentOrigin( ParentOrigin::CENTER );
   hbox3.SetName( "HBox3");
-  hbox3.AddChild( hbox1 );
-  hbox3.AddChild( hbox2 );
+  hbox3.Add( hbox1 );
+  hbox3.Add( hbox2 );
 
   stage.Add( hbox3 );
 
@@ -246,8 +259,15 @@ int UtcDaliLayouting_HboxLayout03(void)
   tet_infoline(" UtcDaliLayouting_HboxLayout03 Test nested hboxes with MATCH_PARENT");
 
   Stage stage = Stage::GetCurrent();
-  auto hbox1 = HboxView::New();
-  auto hbox2 = HboxView::New();
+
+  auto hbox1 = Control::New();
+  auto hboxLayout1 = HboxLayout::New();
+  DevelControl::SetLayout( hbox1, hboxLayout1 );
+
+  auto hbox2 = Control::New();
+  auto hboxLayout2 = HboxLayout::New();
+  DevelControl::SetLayout( hbox2, hboxLayout2 );
+
   hbox1.SetName( "HBox1");
   hbox2.SetName( "HBox2");
   hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
@@ -274,11 +294,11 @@ int UtcDaliLayouting_HboxLayout03(void)
   {
     if( counter < 4 )
     {
-      hbox1.AddChild( iter );
+      hbox1.Add( iter );
     }
     else
     {
-      hbox2.AddChild( iter );
+      hbox2.Add( iter );
     }
     ++counter;
   }
@@ -287,11 +307,14 @@ int UtcDaliLayouting_HboxLayout03(void)
   hbox2.SetParentOrigin( ParentOrigin::CENTER );
   hbox2.SetAnchorPoint( AnchorPoint::CENTER );
 
-  auto hbox3 = HboxView::New();
+  auto hbox3 = Control::New();
+  auto hboxLayout3 = HboxLayout::New();
+  DevelControl::SetLayout( hbox3, hboxLayout3);
+
   hbox3.SetParentOrigin( ParentOrigin::CENTER );
   hbox3.SetName( "HBox3");
-  hbox3.AddChild( hbox1 );
-  hbox3.AddChild( hbox2 );
+  hbox3.Add( hbox1 );
+  hbox3.Add( hbox2 );
 
   stage.Add( hbox3 );
 
@@ -347,8 +370,15 @@ int UtcDaliLayouting_HboxLayout04(void)
   tet_infoline(" UtcDaliLayouting_HboxLayout04 Test nested hboxes with explicit WRAP_CONTENT");
 
   Stage stage = Stage::GetCurrent();
-  auto hbox1 = HboxView::New();
-  auto hbox2 = HboxView::New();
+
+  auto hbox1 = Control::New();
+  auto hboxLayout1 = HboxLayout::New();
+  DevelControl::SetLayout( hbox1, hboxLayout1 );
+
+  auto hbox2 = Control::New();
+  auto hboxLayout2 = HboxLayout::New();
+  DevelControl::SetLayout( hbox2, hboxLayout2 );
+
   hbox1.SetName( "HBox1"); // Default spec is to wrap content
   hbox2.SetName( "HBox2");
   hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
@@ -372,21 +402,24 @@ int UtcDaliLayouting_HboxLayout04(void)
   {
     if( counter < 4 )
     {
-      hbox1.AddChild( iter );
+      hbox1.Add( iter );
     }
     else
     {
-      hbox2.AddChild( iter );
+      hbox2.Add( iter );
     }
     ++counter;
   }
 
 
-  auto hbox3 = HboxView::New();
+  auto hbox3 = Control::New();
+  auto hboxLayout3 = HboxLayout::New();
+  DevelControl::SetLayout( hbox3, hboxLayout3 );
+
   hbox3.SetParentOrigin( ParentOrigin::CENTER );
   hbox3.SetName( "HBox3");
-  hbox3.AddChild( hbox1 );
-  hbox3.AddChild( hbox2 );
+  hbox3.Add( hbox1 );
+  hbox3.Add( hbox2 );
   stage.Add( hbox3 );
 
   std::ostringstream oss;

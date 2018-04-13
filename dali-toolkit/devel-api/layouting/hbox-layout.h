@@ -19,8 +19,8 @@
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali-toolkit/devel-api/controls/layouting/hbox-view.h>
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
+#include <dali-toolkit/devel-api/layouting/layout-size.h>
 
 namespace Dali
 {
@@ -51,14 +51,11 @@ public:
   };
 
   HboxLayout();
-  static HboxLayout New( Handle& owner);
+  static HboxLayout New();
   static HboxLayout DownCast( BaseHandle handle );
   HboxLayout( const HboxLayout& other );
   HboxLayout& operator=( const HboxLayout& other );
   ~HboxLayout()=default;
-
-  void SetMode( HboxView::Mode mode );
-  HboxView::Mode GetMode();
 
   void SetCellPadding( LayoutSize size );
   LayoutSize GetCellPadding();

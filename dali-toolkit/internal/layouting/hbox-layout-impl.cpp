@@ -21,7 +21,11 @@
 //INTERNAL HEADERS
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/extents.h>
+#include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/layouting/layout-base.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 
 #if defined(DEBUG_ENABLED)
@@ -35,10 +39,10 @@ namespace Toolkit
 namespace Internal
 {
 
-HboxLayoutPtr HboxLayout::New( Handle& owner)
+HboxLayoutPtr HboxLayout::New()
 {
   HboxLayoutPtr layout( new HboxLayout() );
-  layout->Initialize( owner );
+  //layout->Initialize( owner );
 
   auto layoutController = Toolkit::LayoutController::Get();
   layoutController.RegisterLayout( Toolkit::HboxLayout(layout.Get()) );
@@ -48,9 +52,9 @@ HboxLayoutPtr HboxLayout::New( Handle& owner)
 
 HboxLayout::HboxLayout()
 : LayoutGroup(),
-  mMode( Toolkit::HboxView::FIXED ),
   mCellPadding( 20, 20 ),
-  mTotalLength( 0 )
+  mTotalLength( 0 ),
+  mSlotDelegate( this )
 {
 }
 
@@ -58,10 +62,18 @@ HboxLayout::~HboxLayout()
 {
 }
 
-  /**
-   * @copydoc LayoutBase::DoRegisterChildProperties()
-   */
-void HboxLayout::DoRegisterChildProperties( const std::type_info& containerType )
+void HboxLayout::DoInitialize()
+{
+  auto control = Toolkit::Control::DownCast( GetOwner() );
+  if( control )
+  {
+    DevelActor::ChildAddedSignal( control ).Connect( mSlotDelegate, &HboxLayout::ChildAddedToOwner );
+    DevelActor::ChildRemovedSignal( control ).Connect( mSlotDelegate, &HboxLayout::ChildRemovedFromOwner );
+    DevelHandle::PropertySetSignal( control ).Connect( mSlotDelegate, &HboxLayout::OnOwnerPropertySet );
+  }
+}
+
+void HboxLayout::DoRegisterChildProperties( const std::string& containerType )
 {
   // Must chain up
   LayoutGroup::DoRegisterChildProperties( containerType );
@@ -80,24 +92,66 @@ void HboxLayout::DoRegisterChildProperties( const std::type_info& containerType 
   }
 }
 
-void HboxLayout::SetMode( Dali::Toolkit::HboxView::Mode mode )
-{
-  mMode = mode;
-}
-
 void HboxLayout::SetCellPadding( LayoutSize size )
 {
   mCellPadding = size;
 }
 
-Dali::Toolkit::HboxView::Mode HboxLayout::GetMode()
-{
-  return mMode;
-}
-
 LayoutSize HboxLayout::GetCellPadding()
 {
   return mCellPadding;
+}
+
+void HboxLayout::ChildAddedToOwner( Actor child )
+{
+  LayoutBasePtr childLayout;
+  Toolkit::Control control = Toolkit::Control::DownCast( child );
+
+  if( control ) // Can only support adding Controls, not Actors to layout
+  {
+    Internal::Control& childControlImpl = GetImplementation( control );
+    Internal::Control::Impl& childControlDataImpl = Internal::Control::Impl::Get( childControlImpl );
+    childLayout = childControlDataImpl.GetLayout();
+
+    if( ! childLayout )
+    {
+      // If the child doesn't already have a layout, then create a LayoutBase for it. (@todo:Why?)
+      childLayout = LayoutBase::New( control );
+      auto desiredSize = control.GetNaturalSize();
+      childControlDataImpl.SetLayout( *childLayout.Get() );
+
+      // HBoxLayout will apply default layout data for this object
+      child.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, desiredSize.width );
+      child.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, desiredSize.height );
+      child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Extents() );
+    }
+
+    Add( *childLayout.Get() );
+  }
+}
+
+void HboxLayout::ChildRemovedFromOwner( Actor child )
+{
+  Toolkit::Control control = Toolkit::Control::DownCast( child );
+  if( control )
+  {
+    Internal::Control& childControlImpl = GetImplementation( control );
+    Internal::Control::Impl& childControlDataImpl = Internal::Control::Impl::Get( childControlImpl );
+    auto childLayout = childControlDataImpl.GetLayout();
+    if( childLayout )
+    {
+      Remove( *childLayout.Get() );
+    }
+  }
+}
+
+void HboxLayout::OnOwnerPropertySet( Handle& handle, Property::Index index, Property::Value value )
+{
+  auto actor = Actor::DownCast( handle );
+  if( actor && index == Actor::Property::LAYOUT_DIRECTION )
+  {
+    RequestLayout();
+  }
 }
 
 void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )

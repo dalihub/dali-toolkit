@@ -42,7 +42,7 @@ LayoutGroup::~LayoutGroup()
 {
 }
 
-void LayoutGroup::DoRegisterChildProperties( const std::type_info& containerType )
+void LayoutGroup::DoRegisterChildProperties( const std::string& containerType )
 {
   // Chain up to parent class
   LayoutBase::DoRegisterChildProperties( containerType );

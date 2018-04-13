@@ -1407,15 +1407,17 @@ Extents Control::Impl::GetPadding() const
   return mControlImpl.mImpl->mPadding;
 }
 
-Toolkit::Internal::LayoutBasePtr Control::Impl::GetLayout()
+Toolkit::Internal::LayoutBasePtr Control::Impl::GetLayout() const
 {
   return mLayout;
 }
 
 void Control::Impl::SetLayout( Toolkit::Internal::LayoutBase& layout )
 {
-
   mLayout = &layout;
+  auto controlHandle = Toolkit::Control::DownCast( mControlImpl.Self() );
+  mLayout->Initialize( controlHandle );
+  mLayout->RegisterChildProperties( controlHandle.GetTypeName() );
 }
 
 } // namespace Internal

@@ -30,9 +30,9 @@ HboxLayout::HboxLayout()
 {
 }
 
-HboxLayout HboxLayout::New( Handle& owner )
+HboxLayout HboxLayout::New()
 {
-  Internal::HboxLayoutPtr internal = Internal::HboxLayout::New( owner );
+  Internal::HboxLayoutPtr internal = Internal::HboxLayout::New();
   return HboxLayout( internal.Get() );
 }
 
@@ -53,16 +53,6 @@ HboxLayout& HboxLayout::operator=( const HboxLayout& other )
     LayoutGroup::operator=( other );
   }
   return *this;
-}
-
-void HboxLayout::SetMode( Toolkit::HboxView::Mode mode )
-{
-  GetImplementation(*this).SetMode( mode );
-}
-
-Toolkit::HboxView::Mode HboxLayout::GetMode()
-{
-  return GetImplementation(*this).GetMode();
 }
 
 void HboxLayout::SetCellPadding( LayoutSize size )

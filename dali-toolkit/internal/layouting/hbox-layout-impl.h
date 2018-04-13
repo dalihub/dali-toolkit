@@ -18,10 +18,8 @@
  */
 
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
-#include <dali-toolkit/devel-api/controls/layouting/hbox-view.h>
 #include <dali/public-api/object/base-object.h>
-
+#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 #include <dali-toolkit/devel-api/layouting/hbox-layout.h>
 
 namespace Dali
@@ -37,11 +35,9 @@ using HboxLayoutPtr = IntrusivePtr<HboxLayout>;
 class HboxLayout : public LayoutGroup
 {
 public:
-  static HboxLayoutPtr New( Handle& owner );
+  static HboxLayoutPtr New();
 
 public:
-  void SetMode( Dali::Toolkit::HboxView::Mode mode );
-  Dali::Toolkit::HboxView::Mode GetMode();
   void SetCellPadding( LayoutSize size );
   LayoutSize GetCellPadding();
 
@@ -50,9 +46,14 @@ protected:
   virtual ~HboxLayout();
 
   /**
+   * @copydoc LayoutBase::DoInitialize
+   */
+  virtual void DoInitialize() override;
+
+  /**
    * @copydoc LayoutBase::DoRegisterChildProperties()
    */
-  virtual void DoRegisterChildProperties( const std::type_info& containerType ) override;
+  virtual void DoRegisterChildProperties( const std::string& containerType ) override;
 
   virtual void OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec ) override;
 
@@ -63,11 +64,14 @@ private:
   HboxLayout& operator=( const HboxLayout& other ) = delete;
 
   void ForceUniformHeight( int count, MeasureSpec widthMeasureSpec );
+  void ChildAddedToOwner( Actor child );
+  void ChildRemovedFromOwner( Actor child );
+  void OnOwnerPropertySet( Handle& handle, Property::Index index, Property::Value value );
 
 private:
-  Dali::Toolkit::HboxView::Mode mMode;
   LayoutSize mCellPadding;
   LayoutLength mTotalLength;
+  SlotDelegate<HboxLayout> mSlotDelegate; // Automatically disconnects from attached signals on object death
 };
 
 } // namespace Internal

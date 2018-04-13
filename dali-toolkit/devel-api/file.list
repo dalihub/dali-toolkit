@@ -11,7 +11,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/bubble-effect/bubble-emitter.cpp \
   $(devel_api_src_dir)/controls/buttons/toggle-button.cpp \
   $(devel_api_src_dir)/controls/effects-view/effects-view.cpp \
-  $(devel_api_src_dir)/controls/layouting/hbox-view.cpp \
   $(devel_api_src_dir)/controls/magnifier/magnifier.cpp \
   $(devel_api_src_dir)/controls/navigation-view/navigation-view.cpp \
   $(devel_api_src_dir)/controls/page-turn-view/page-turn-landscape-view.cpp \
@@ -75,9 +74,6 @@ devel_api_builder_header_files = \
 
 devel_api_effects_view_header_files = \
   $(devel_api_src_dir)/controls/effects-view/effects-view.h
-
-devel_api_layouting_controls_header_files = \
-  $(devel_api_src_dir)/controls/layouting/hbox-view.h
 
 devel_api_layouting_header_files = \
   $(devel_api_src_dir)/layouting/child-layout-data.h \

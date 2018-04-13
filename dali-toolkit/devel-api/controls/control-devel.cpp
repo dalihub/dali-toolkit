@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,13 @@ void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Proper
   controlDataImpl.DoAction( visualIndex, actionId, attributes );
 }
 
+Toolkit::LayoutBase GetLayout( Control control )
+{
+  const Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
+  return Toolkit::LayoutBase( controlDataImpl.GetLayout().Get() );
+}
+
 Toolkit::LayoutBase GetLayout( Internal::Control& control )
 {
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
@@ -114,6 +121,13 @@ Toolkit::LayoutBase GetLayout( Internal::Control& control )
 void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout )
 {
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.SetLayout( GetImplementation( layout ) );
+}
+
+void SetLayout( Control control, Toolkit::LayoutBase layout )
+{
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
   controlDataImpl.SetLayout( GetImplementation( layout ) );
 }
 
