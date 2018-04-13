@@ -101,7 +101,7 @@ protected:
   /**
    * @copydoc LayoutBase::DoRegisterChildProperties()
    */
-  virtual void DoRegisterChildProperties( const std::type_info& containerType ) override;
+  virtual void DoRegisterChildProperties( const std::string& containerType ) override;
 
   /**
    * Callback when a child property is set on any given child

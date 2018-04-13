@@ -49,13 +49,17 @@ LayoutBase::LayoutBase()
 LayoutBasePtr LayoutBase::New( Handle& owner )
 {
   LayoutBasePtr layoutPtr = new LayoutBase();
-  layoutPtr->Initialize( owner );
   return layoutPtr;
 }
 
 void LayoutBase::Initialize( Handle& owner )
 {
   mImpl->mOwner = &(owner.GetBaseObject());
+  DoInitialize();
+}
+
+void LayoutBase::DoInitialize()
+{
 }
 
 Handle LayoutBase::GetOwner() const
@@ -73,7 +77,7 @@ bool LayoutBase::GetAnimateLayout()
   return mImpl->mAnimated;
 }
 
-void LayoutBase::RegisterChildProperties( const std::type_info& containerType )
+void LayoutBase::RegisterChildProperties( const std::string& containerType )
 {
   // Call on derived types
   auto typeInfo = TypeRegistry::Get().GetTypeInfo( containerType );
@@ -83,7 +87,7 @@ void LayoutBase::RegisterChildProperties( const std::type_info& containerType )
   }
 }
 
-void LayoutBase::DoRegisterChildProperties( const std::type_info& containerType )
+void LayoutBase::DoRegisterChildProperties( const std::string& containerType )
 {
   auto typeInfo = TypeRegistry::Get().GetTypeInfo( containerType );
   if( typeInfo )

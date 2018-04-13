@@ -263,16 +263,32 @@ DALI_IMPORT_API void DoAction( Control& control, Dali::Property::Index visualInd
 /*
  * @brief Get the layout associated with this control, if any.
  *
- * @return A pointer to the layout, or NULL.
+ * @return A handle to the layout, or empty.
  */
 Toolkit::LayoutBase GetLayout( Internal::Control& control );
 
+/*
+ * @brief Get the layout associated with a control, if any.
+ *
+ * @return A handle to the layout, or empty.
+ */
+Toolkit::LayoutBase GetLayout( Control control );
+
 /**
  * @brief Set the layout on this control.
- * @param[in] control The Control to set the layout on
+ *
+ * @param[in] control The internal Control to set the layout on
  * @param[in] layout Pointer to the layout
  */
 void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout );
+
+/**
+ * @brief Set the layout on a control.
+ *
+ * @param[in] control The Control to set the layout on
+ * @param[in] layout Pointer to the layout
+ */
+void SetLayout( Control control, Toolkit::LayoutBase layout );
 
 } // namespace DevelControl
 

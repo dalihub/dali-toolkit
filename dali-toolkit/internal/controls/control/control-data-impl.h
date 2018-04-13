@@ -316,7 +316,7 @@ public:
    *
    * @return A pointer to the layout, or NULL.
    */
-  Toolkit::Internal::LayoutBasePtr GetLayout();
+  Toolkit::Internal::LayoutBasePtr GetLayout() const;
 
   /**
    * @brief Set the layout on this control.

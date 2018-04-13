@@ -57,7 +57,12 @@ public:
   LayoutBase(const LayoutBase& copy)=delete;
   LayoutBase& operator=(const LayoutBase& rhs)=delete;
 
-  virtual void Initialize( Handle& handle );
+  void Initialize( Handle& handle );
+
+  /**
+   * @brief Initialization method for deriving classes to override
+   */
+  virtual void DoInitialize();
 
   Handle GetOwner() const;
 
@@ -77,15 +82,18 @@ public:
 
   /**
    * Register child properties of layout
+   *
    * @param[in] containerType The type of the containing view (owner)
    */
-  void RegisterChildProperties( const std::type_info& containerType );
+  void RegisterChildProperties( const std::string& containerType );
 
   /**
    * Ensure derived types register their child properties
-   * Must chain up to parent.
+   *
+   * @param[in] containerType The type name of the container
+   * @note Deriving types MUST chain up for all child properties to be registered.
    */
-  virtual void DoRegisterChildProperties( const std::type_info& containerType );
+  virtual void DoRegisterChildProperties( const std::string& containerType );
 
 
   /**
