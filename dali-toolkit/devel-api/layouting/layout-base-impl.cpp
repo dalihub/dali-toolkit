@@ -42,7 +42,8 @@ namespace Internal
 {
 
 LayoutBase::LayoutBase()
-: mImpl( new Impl(*this) )
+: mImpl( new Impl(*this) ),
+  mSlotDelegate( this )
 {
 }
 
@@ -371,6 +372,7 @@ bool LayoutBase::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
                              Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
         animation.AnimateTo( Property( actor, Actor::Property::SIZE ),
                              Vector3( right-left, bottom-top, 0.0f ) );
+        animation.FinishedSignal().Connect( mSlotDelegate, &LayoutBase::OnLayoutAnimationFinished );
         animation.Play();
       }
       else
@@ -390,6 +392,16 @@ bool LayoutBase::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
     //mImpl->mDefaultFocusHighlightSizeChanged = true;
   }
   return changed;
+}
+
+void LayoutBase::OnLayoutAnimationFinished( Animation& animation )
+{
+  auto owner = GetOwner();
+  auto actor = Actor::DownCast(owner);
+  if( actor )
+  {
+    actor.SetSize( Vector3( mImpl->mRight-mImpl->mLeft, mImpl->mBottom-mImpl->mTop, 0.0f ) );
+  }
 }
 
 void LayoutBase::SizeChange( LayoutSize newSize, LayoutSize oldSize)

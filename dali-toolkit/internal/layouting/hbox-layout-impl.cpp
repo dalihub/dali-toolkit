@@ -117,6 +117,8 @@ void HboxLayout::ChildAddedToOwner( Actor child )
     {
       // If the child doesn't already have a layout, then create a LayoutBase for it. (@todo:Why?)
       childLayout = LayoutBase::New( control );
+      childLayout->SetAnimateLayout( GetAnimateLayout() );
+
       auto desiredSize = control.GetNaturalSize();
       childControlDataImpl.SetLayout( *childLayout.Get() );
 

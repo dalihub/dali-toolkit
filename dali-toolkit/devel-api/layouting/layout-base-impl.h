@@ -323,12 +323,14 @@ protected:
 
 private:
   void SizeChange( LayoutSize newSize, LayoutSize oldSize );
+  void OnLayoutAnimationFinished( Animation& animation );
 
 public:
   class Impl; // Class declaration is public so we can add devel API's in the future
 
 private:
   std::unique_ptr<Impl> mImpl; ///< Implementation class holds all the data
+  SlotDelegate<LayoutBase> mSlotDelegate;
 };
 
 } //namespace Internal
