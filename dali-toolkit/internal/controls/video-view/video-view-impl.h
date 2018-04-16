@@ -25,9 +25,11 @@
 #include <dali/integration-api/adaptors/trigger-event-factory.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/property-conditions.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 
@@ -283,26 +285,49 @@ private: // From Control
 
 private:
 
-  // Undefined
+  /**
+   * @brief Construct a new VideoView.
+   */
   VideoView( const VideoView& videoView );
 
+  // Undefined assignment operator.
   VideoView& operator=( const VideoView& videoView );
 
+  /**
+   * @brief SetWindowSurfaceTarget for underlay video playback.
+   */
   void SetWindowSurfaceTarget();
 
+  /**
+   * @brief SetNativeImageTarget for native image video playback.
+   */
   void SetNativeImageTarget();
+
+  /**
+   * @brief CreateShader for native image target
+   */
+  Dali::Shader CreateShader();
+
+  /**
+   * @brief Checks whether the property has a string value.
+   * @param Property value
+   * @param String output
+   * @return true if the output was found
+   */
+  bool GetStringFromProperty( const Dali::Property::Value& value, std::string& output );
 
 private:
 
   Dali::VideoPlayer mVideoPlayer;
   Dali::ImageDimensions mVideoSize;
-  Toolkit::Visual::Base mVisual;
   Dali::Property::Map mPropertyMap;
-  Dali::NativeImage mNativeImage; ///< Native image handle for video rendering by texture streaming
+  Dali::Property::Map mEffectPropertyMap;
+  Dali::Texture mNativeTexture;
   Dali::Toolkit::VideoView::VideoViewSignalType mFinishedSignal;
   std::string mUrl;
   Dali::DisplayArea mDisplayArea;
-  Dali::Renderer mRenderer;
+  Dali::Renderer mOverlayRenderer;
+  Dali::Renderer mTextureRenderer;
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;
   Dali::PropertyNotification mScaleUpdateNotification;
