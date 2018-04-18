@@ -79,6 +79,10 @@ public:
     height=value.mValue;
   }
 
+  bool operator==( const LayoutSize& rhs )
+  {
+    return x==rhs.x && y==rhs.y;
+  }
 
   union
   {
@@ -93,6 +97,17 @@ public:
   };
 };
 
+/**
+ * @brief Prints a LayoutSize
+ *
+ * @param[in] o The output stream operator
+ * @param[in] layoutSize the layout size to print
+ * @return The output stream operator
+ */
+inline std::ostream& operator<< (std::ostream& o, const LayoutSize& layoutSize)
+{
+  return o << "[" << layoutSize.x << ", " << layoutSize.y << "]";
+}
 
 } // namespace Toolkit
 

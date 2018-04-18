@@ -23,6 +23,7 @@
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/layouting/hbox-layout.h>
+#include <dali-toolkit/devel-api/layouting/vbox-layout.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl-debug.h>
 
 using namespace Dali;
@@ -114,6 +115,7 @@ int UtcDaliLayouting_HboxLayout01(void)
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
   auto hboxLayout = HboxLayout::New();
+  hboxLayout.SetCellPadding( LayoutSize( 10, 0 ) );
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
 
@@ -138,9 +140,9 @@ int UtcDaliLayouting_HboxLayout01(void)
   // hbox centers elements vertically, it fills test harness stage, which is 480x800.
   // hbox left justifies elements
   DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 100.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 180.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 50.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 120.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 210.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
@@ -275,9 +277,6 @@ int UtcDaliLayouting_HboxLayout03(void)
   hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
   hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
 
-  // hbox1.SetLayoutData( MarginLayoutData::New( ChildLayoutData::MATCH_PARENT, , 0,0,0,0 ));
-  // hbox2.SetLayoutData( MarginLayoutData::New( ChildLayoutData::MATCH_PARENT, ChildLayoutData::MATCH_PARENT, 0,0,0,0 ));
-
   std::vector< Control > controls;
   controls.push_back( CreateLeafControl( 20, 40 ) );
   controls.push_back( CreateLeafControl( 30, 50 ) );
@@ -411,7 +410,7 @@ int UtcDaliLayouting_HboxLayout04(void)
     ++counter;
   }
 
-
+  controls[6].SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
   auto hbox3 = Control::New();
   auto hboxLayout3 = HboxLayout::New();
   DevelControl::SetLayout( hbox3, hboxLayout3 );
@@ -443,12 +442,12 @@ int UtcDaliLayouting_HboxLayout04(void)
 
   DALI_TEST_EQUALS( controls[4].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3(  0.0f, 15.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[5].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 80.0f, 10.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[6].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 160.0f,  5.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[6].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 160.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[7].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 240.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   DALI_TEST_EQUALS( controls[4].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[5].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 50.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[6].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[6].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 70.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[7].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 70.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   DALI_TEST_EQUALS( hbox1.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 320.0f, 70.0f, 0.0f ), 0.0001f, TEST_LOCATION );
@@ -460,6 +459,198 @@ int UtcDaliLayouting_HboxLayout04(void)
   // Test hbox3 matches parent (root layer)
   DALI_TEST_EQUALS( hbox3.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( hbox3.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliLayouting_VboxLayout01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_VboxLayout01");
+
+  Stage stage = Stage::GetCurrent();
+  auto vbox = Control::New();
+  auto vboxLayout = VboxLayout::New();
+  DevelControl::SetLayout( vbox, vboxLayout );
+  vbox.SetName( "Vbox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 60 ) );
+  controls.push_back( CreateLeafControl( 80, 80 ) );
+  controls.push_back( CreateLeafControl( 100, 100 ) );
+
+  for( auto&& iter : controls )
+  {
+    vbox.Add( iter );
+  }
+  vbox.SetParentOrigin( ParentOrigin::CENTER );
+  vbox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( vbox );
+
+  controls[2].SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  // Check it.
+  DALI_TEST_EQUALS( controls[2].GetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ), Property::Value( ChildLayoutData::MATCH_PARENT ), TEST_LOCATION );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // vbox centers elements horizontally, it fills test harness stage, which is 480x800.
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 220.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 210.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 190.0f, 180.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 80.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_VboxLayout02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_VboxLayout01");
+
+  Stage stage = Stage::GetCurrent();
+
+  // @todo Can't set specification properties on root control. Really need to make LayoutController a root
+  // LayoutGroup for this to happen automatically.
+  //
+  // For this test, add an hbox instead
+  auto hbox = Control::New();
+  auto hboxLayout = HboxLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "Hbox");
+  stage.Add( hbox );
+
+  auto vbox = Control::New();
+  auto vboxLayout = VboxLayout::New();
+  DevelControl::SetLayout( vbox, vboxLayout );
+  vbox.SetName( "Vbox");
+  hbox.Add( vbox );
+
+  vbox.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  vbox.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 60 ) );
+  controls.push_back( CreateLeafControl( 80, 80 ) );
+  controls.push_back( CreateLeafControl( 100, 100 ) );
+
+  for( auto&& iter : controls )
+  {
+    vbox.Add( iter );
+  }
+  vbox.SetParentOrigin( ParentOrigin::CENTER );
+  vbox.SetAnchorPoint( AnchorPoint::CENTER );
+
+  controls[2].SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  // Check it.
+  DALI_TEST_EQUALS( controls[2].GetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ), Property::Value( ChildLayoutData::MATCH_PARENT ), TEST_LOCATION );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>(Actor::Property::POSITION), Vector3(0,0,0),TEST_LOCATION);
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>(Actor::Property::SIZE), Vector3(480,800,0),TEST_LOCATION);
+
+  // vbox centers elements horizontally, it should wrap it's content horizontally, i.e. it should take the width of the largest element (100)
+  DALI_TEST_EQUALS( vbox.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( vbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // 3rd control is set to match parent - this should also be 100 wide
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 30.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 20.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 180.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 80.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliLayouting_VboxLayout03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_VboxLayout03 test with cell padding set");
+
+  Stage stage = Stage::GetCurrent();
+
+  // @todo Can't set specification properties on root control. Really need to make LayoutController a root
+  // LayoutGroup for this to happen automatically.
+  //
+  // For this test, add an hbox instead
+  auto hbox = Control::New();
+  auto hboxLayout = HboxLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "Hbox");
+  stage.Add( hbox );
+
+  auto vbox = Control::New();
+  auto vboxLayout = VboxLayout::New();
+  vboxLayout.SetCellPadding( LayoutSize( 0, 10 ) );
+
+  DALI_TEST_EQUALS( vboxLayout.GetCellPadding(), LayoutSize( 0, 10 ), TEST_LOCATION );
+
+  DevelControl::SetLayout( vbox, vboxLayout );
+  vbox.SetName( "Vbox");
+  hbox.Add( vbox );
+
+  vbox.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  vbox.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 60 ) );
+  controls.push_back( CreateLeafControl( 80, 80 ) );
+  controls.push_back( CreateLeafControl( 100, 100 ) );
+
+  for( auto&& iter : controls )
+  {
+    vbox.Add( iter );
+  }
+  vbox.SetParentOrigin( ParentOrigin::CENTER );
+  vbox.SetAnchorPoint( AnchorPoint::CENTER );
+
+  controls[2].SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  // Check it.
+  DALI_TEST_EQUALS( controls[2].GetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ), Property::Value( ChildLayoutData::MATCH_PARENT ), TEST_LOCATION );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>(Actor::Property::POSITION), Vector3(0,0,0),TEST_LOCATION);
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>(Actor::Property::SIZE), Vector3(480,800,0),TEST_LOCATION);
+
+  // vbox centers elements horizontally, it should wrap it's content horizontally, i.e. it should take the width of the largest element (100)
+  DALI_TEST_EQUALS( vbox.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( vbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // 3rd control is set to match parent - this should also be 100 wide
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 30.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 20.0f, 50.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 120.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 210.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 80.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }

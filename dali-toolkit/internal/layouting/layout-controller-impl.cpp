@@ -25,6 +25,10 @@
 
 using namespace Dali;
 
+#if defined(DEBUG_ENABLED)
+static Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
+#endif
+
 namespace Dali
 {
 namespace Toolkit
@@ -53,6 +57,7 @@ void LayoutController::RegisterLayout( LayoutGroup& layout )
 
 void LayoutController::RequestLayout( LayoutBase& layoutBase )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutController::RequestLayout\n" );
   mLayoutRequested = true;
 
   // Go up the tree and mark all parents to relayout

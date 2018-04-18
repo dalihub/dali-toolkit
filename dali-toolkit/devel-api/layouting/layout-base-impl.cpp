@@ -53,10 +53,12 @@ LayoutBasePtr LayoutBase::New( Handle& owner )
   return layoutPtr;
 }
 
-void LayoutBase::Initialize( Handle& owner )
+void LayoutBase::Initialize( Handle& owner, const std::string& containerType )
 {
   mImpl->mOwner = &(owner.GetBaseObject());
+  RegisterChildProperties( containerType );
   DoInitialize();
+  RequestLayout();
 }
 
 void LayoutBase::DoInitialize()
@@ -66,6 +68,15 @@ void LayoutBase::DoInitialize()
 Handle LayoutBase::GetOwner() const
 {
   return Handle::DownCast(BaseHandle(mImpl->mOwner));
+}
+
+void LayoutBase::Unparent()
+{
+  // Enable derived types to first remove children
+  DoUnparent();
+
+  // Last, clear owner
+  mImpl->mOwner = NULL;
 }
 
 void LayoutBase::SetAnimateLayout( bool animateLayout )
@@ -164,21 +175,14 @@ void LayoutBase::Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutL
     mImpl->ClearPrivateFlag( Impl::PFLAG_MEASURE_NEEDED_BEFORE_LAYOUT );
   }
 
-  // keep old margins for observers
-  //int oldL = mImpl->mLeft;
-  //int oldT = mImpl->mTop;
-  //int oldB = mImpl->mBottom;
-  //int oldR = mImpl->mRight;
-
   bool changed = SetFrame( l, t, r, b );
 
   if( changed || mImpl->GetPrivateFlag( Impl::PFLAG_LAYOUT_REQUIRED ) )
   {
     OnLayout( changed, l, t, r, b );
     mImpl->ClearPrivateFlag( Impl::PFLAG_LAYOUT_REQUIRED );
-
-    // @todo Inform observers
   }
+
   mImpl->ClearPrivateFlag( Impl::PFLAG_FORCE_LAYOUT );
   mImpl->SetPrivateFlag( Impl::PFLAG_IS_LAID_OUT );
 }
@@ -387,9 +391,6 @@ bool LayoutBase::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
     {
       SizeChange( LayoutSize( newWidth, newHeight ), LayoutSize( oldWidth, oldHeight ) );
     }
-
-    //mImpl->mBackgroundSizeChanged = true;
-    //mImpl->mDefaultFocusHighlightSizeChanged = true;
   }
   return changed;
 }

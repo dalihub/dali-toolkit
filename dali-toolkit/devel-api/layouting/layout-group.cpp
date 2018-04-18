@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@ LayoutGroup::LayoutGroup()
 {
 }
 
-LayoutGroup::LayoutGroup(const LayoutGroup& copy)
+LayoutGroup::LayoutGroup( const LayoutGroup& copy )
 : LayoutBase( copy )
 {
 }
 
-LayoutGroup& LayoutGroup::operator=(const LayoutGroup& rhs)
+LayoutGroup& LayoutGroup::operator=( const LayoutGroup& rhs )
 {
   LayoutBase::operator=(rhs);
   return *this;
@@ -48,13 +48,29 @@ void LayoutGroup::Remove( LayoutGroup::LayoutId childId )
   GetImplementation( *this ).Remove( childId );
 }
 
-LayoutBase LayoutGroup::GetChild( LayoutGroup::LayoutId childId )
+void LayoutGroup::Remove( LayoutBase& child )
+{
+  GetImplementation( *this ).Remove( GetImplementation(child) );
+}
+
+LayoutBase LayoutGroup::GetChild( LayoutGroup::LayoutId childId ) const
 {
   Internal::LayoutBasePtr child = GetImplementation( *this ).GetChild( childId );
   return LayoutBase( child.Get() );
 }
 
-MeasureSpec LayoutGroup::GetChildMeasureSpec( MeasureSpec measureSpec, int padding, Dali::Dimension::Type dimension )
+LayoutBase LayoutGroup::GetChildAt( unsigned int childId ) const
+{
+  Internal::LayoutBasePtr child = GetImplementation( *this ).GetChildAt( childId );
+  return LayoutBase( child.Get() );
+}
+
+unsigned int LayoutGroup::GetChildCount() const
+{
+  return GetImplementation( *this ).GetChildCount();
+}
+
+MeasureSpec LayoutGroup::GetChildMeasureSpec( MeasureSpec measureSpec, int padding, Dali::Dimension::Type dimension ) const
 {
   return GetImplementation( *this ).GetChildMeasureSpec( measureSpec, padding, dimension );
 }

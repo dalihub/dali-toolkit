@@ -36,15 +36,30 @@ class LayoutGroup;
 using LayoutGroupPtr = IntrusivePtr<LayoutGroup>;
 
 /**
- * LayoutGroup is an abstract class that provides child layout management and
- * basic measuring and layouting.
+ * LayoutGroup is an abstract class that provides child layout management and basic measuring and layouting.
  *
- * Implementing classes should ensure that they initialize the object with
- * the handle of the control that owns the layout.
+ * Deriving classes should override LayoutBase::DoInitialize, LayoutBase::DoRegisterChildProperties,
+ * LayoutGroup::OnChildAdd and LayoutGroup::OnChildRemove, taking care to chain up inside these implementations
+ * to the parent class's implementation. OnChildAdd should be used to write default child property values to
+ * the given child's owner.
+ *
+ * Deriving classes should also override OnMeasure and OnLayout as follows:
+ *
+ * OnMeasure should measure each child using LayoutGroup::MeasureChildWithMargins or LayoutGroup::MeasureChild.
+ * We recommend calling LayoutBase::ResolveSizeAndState() to resolve measure specs.
+ * If some children don't fit, then they can be measured again with different MeasureSpecs as required.
+ *
+ * After measurement, must also call SetMeasuredDimensions to set own requested size.
+ *
+ * OnLayout should use it's own layout parameters and the measured children's size to determine the children's
+ * position and size; it should then call Layout() on the child layout to layout the child and it's hierarchy.
  */
 class DALI_IMPORT_API LayoutGroup : public LayoutBase, public LayoutParent, public ConnectionTracker
 {
 public:
+  /**
+   * Constructor. Returns an initialized object
+   */
   LayoutGroup();
 
 protected:
@@ -54,14 +69,88 @@ public:
   LayoutGroup( const LayoutGroup& copy ) = delete;
   LayoutGroup& operator=( const LayoutGroup& rhs ) = delete;
 
-  Toolkit::LayoutGroup::LayoutId Add( LayoutBase& layoutData );
-  void Remove( Toolkit::LayoutGroup::LayoutId childId );
-  void Remove( LayoutBase& child );
-
-  LayoutBasePtr GetChild( Toolkit::LayoutGroup::LayoutId childId );
-  unsigned int GetChildCount();
+  /**
+   * @brief Initialization method for deriving classes to override
+   * @note Deriving types MUST chain up for all child properties to be registered.
+   */
+  virtual void DoInitialize() override;
 
   /**
+   * @brief Add a layout child to this group.
+   *
+   * @param[in] layoutChild The child to add
+   * @return The layout id of this child.
+   */
+  Toolkit::LayoutGroup::LayoutId Add( LayoutBase& layoutChild );
+
+  /**
+   * @brief Remove a layout child from this group.
+   * @param[in] childId The layout child id
+   */
+  void Remove( Toolkit::LayoutGroup::LayoutId childId );
+
+  /**
+   * @brief Remove a layout child from this group
+   * @param[in] child The layout child
+   */
+  void Remove( LayoutBase& child );
+
+  /**
+   * @brief Remove all layout children.
+   *
+   * @note This will not unparent owner's children
+   */
+  void RemoveAll();
+
+  /**
+   * @brief Remove all children from this layout
+   */
+  virtual void DoUnparent() override final;
+
+  /**
+   * @brief Get the number of children contained by this layout group
+   *
+   * @return the number of children
+   */
+  unsigned int GetChildCount() const;
+
+  /**
+   * Get the child layout at the given index
+   */
+  LayoutBasePtr GetChildAt( unsigned int childIndex ) const;
+
+  /**
+   * Get the child layout id of the given child
+   */
+  Toolkit::LayoutGroup::LayoutId GetChildId( LayoutBase& child ) const;
+
+  /**
+   * @brief Get the layout child with the given layout id.
+   * @note child id's start at 1, and follow the insertion order
+   * @param[in] childId the layout id of the child within this group
+   * @return A pointer to the child layout
+   */
+  LayoutBasePtr GetChild( Toolkit::LayoutGroup::LayoutId childId ) const;
+
+  template <typename T>
+    LayoutBasePtr GetChild( T childId ) = delete; // Prevent implicit casting of int/uint to LayoutId
+
+  /**
+   * Callback when child is added to container.
+   * Derived classes can use this to set their own child properties on the child layout's owner.
+   * If they do override it, they must chain up.
+   */
+  virtual void OnChildAdd( LayoutBase& child );
+
+  /**
+   * Callback when child is removed from container.
+   * Derived classes using this method must chain up.
+   */
+  virtual void OnChildRemove( LayoutBase& child );
+
+  /**
+   * @brief Calculate the right measure spec for this child.
+   *
    * Does the hard part of MeasureChildren: figuring out the MeasureSpec to
    * pass to a particular child. This method figures out the right MeasureSpec
    * for one dimension (height or width) of one child view.
@@ -85,16 +174,21 @@ public:
   static MeasureSpec GetChildMeasureSpec( MeasureSpec measureSpec, LayoutLength padding, LayoutLength childDimension );
 
   /**
-   * Check if the layout has already been requested
+   * @brief Check if the layout has already been requested
+   * @return true if a layout has been requested
    */
-  bool IsLayoutRequested();
+  bool IsLayoutRequested() const;
 
   /**
    * Get the padding information
+   * @return The padding information
    */
-  Extents GetPadding();
+  Extents GetPadding() const;
 
 public: // Implementation of LayoutParent
+  /**
+   * @copydoc LayoutParent::GetParent()
+   */
   virtual LayoutParent* GetParent();
 
 protected:
@@ -112,15 +206,14 @@ protected:
   void OnSetChildProperties( Handle& handle, Property::Index index, Property::Value value );
 
   /**
-   * Create default layout data suitable for this layout group or derived layouter
+   * Create default child property values suitable for this layout group or derived layouter
    */
-  virtual void GenerateDefaultChildProperties( Handle child );
+  virtual void GenerateDefaultChildPropertyValues( Handle child );
 
   /**
    * Ask all of the children of this view to measure themselves, taking into
    * account both the MeasureSpec requirements for this view and its padding.
-   * We skip children that are in the GONE state The heavy lifting is done in
-   * getChildMeasureSpec.
+   * The heavy lifting is done in GetChildMeasureSpec.
    *
    * @param widthMeasureSpec The width requirements for this view
    * @param heightMeasureSpec The height requirements for this view
@@ -130,7 +223,7 @@ protected:
   /**
    * Ask one of the children of this view to measure itself, taking into
    * account both the MeasureSpec requirements for this view and its padding.
-   * The heavy lifting is done in getChildMeasureSpec.
+   * The heavy lifting is done in GetChildMeasureSpec.
    *
    * @param child The child to measure
    * @param parentWidthMeasureSpec The width requirements for this view
@@ -142,7 +235,7 @@ protected:
    * Ask one of the children of this view to measure itself, taking into
    * account both the MeasureSpec requirements for this view and its padding
    * and margins. The child must have MarginLayoutParams The heavy lifting is
-   * done in getChildMeasureSpec.
+   * done in GetChildMeasureSpec.
    *
    * @param child The child to measure
    * @param parentWidthMeasureSpec The width requirements for this view
@@ -157,11 +250,29 @@ protected:
                                         LayoutLength widthUsed,
                                         MeasureSpec parentHeightMeasureSpec,
                                         LayoutLength heightUsed );
-public:
-  class Impl;
 
 private:
-  std::unique_ptr<Impl> mImpl;
+  /**
+   * Callback when child is added to owner
+   */
+  void ChildAddedToOwner( Actor child );
+
+  /**
+   * Callback when child is removed from owner
+   */
+  void ChildRemovedFromOwner( Actor child );
+
+  /**
+   * Callback when an owner property is set. Triggers a relayout if it's a child property
+   */
+  void OnOwnerPropertySet( Handle& handle, Property::Index index, Property::Value value );
+
+public:
+  class Impl; // Class declaration is public so we can add devel API's in the future
+
+private:
+  std::unique_ptr<Impl> mImpl; // The implementation data for this class.
+  SlotDelegate<LayoutGroup> mSlotDelegate; ///< Slot delegate allows this class to connect safely to signals
 };
 
 }//namespace Internal

@@ -1414,10 +1414,15 @@ Toolkit::Internal::LayoutBasePtr Control::Impl::GetLayout() const
 
 void Control::Impl::SetLayout( Toolkit::Internal::LayoutBase& layout )
 {
+  if( mLayout )
+  {
+    mLayout->Unparent();
+    mLayout.Reset();
+  }
   mLayout = &layout;
+
   auto controlHandle = Toolkit::Control::DownCast( mControlImpl.Self() );
-  mLayout->Initialize( controlHandle );
-  mLayout->RegisterChildProperties( controlHandle.GetTypeName() );
+  mLayout->Initialize( controlHandle, controlHandle.GetTypeName() ); // LayoutGroup takes ownership of existing children
 }
 
 } // namespace Internal

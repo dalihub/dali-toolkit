@@ -16,9 +16,12 @@
 
 // CLASS HEADER
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 #include <dali-toolkit/internal/layouting/layout-group-data-impl.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 
 namespace
@@ -34,12 +37,31 @@ namespace Internal
 {
 
 LayoutGroup::LayoutGroup()
-: mImpl( new Impl( *this ) )
+: mImpl( new Impl( *this ) ),
+  mSlotDelegate( this )
 {
 }
 
 LayoutGroup::~LayoutGroup()
 {
+}
+
+void LayoutGroup::DoInitialize()
+{
+  auto control = Toolkit::Control::DownCast( GetOwner() );
+
+  if( control )
+  {
+    // Take ownership of existing children
+    for( unsigned int childIndex = 0 ; childIndex < control.GetChildCount(); ++childIndex )
+    {
+      ChildAddedToOwner( control.GetChildAt( childIndex ) );
+    }
+
+    DevelActor::ChildAddedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildAddedToOwner );
+    DevelActor::ChildRemovedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildRemovedFromOwner );
+    DevelHandle::PropertySetSignal( control ).Connect( mSlotDelegate, &LayoutGroup::OnOwnerPropertySet );
+  }
 }
 
 void LayoutGroup::DoRegisterChildProperties( const std::string& containerType )
@@ -56,12 +78,64 @@ void LayoutGroup::DoRegisterChildProperties( const std::string& containerType )
     if( std::find( indices.Begin(), indices.End(), Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION ) ==
         indices.End() )
     {
-
       ChildPropertyRegistration( typeInfo.GetName(), MARGIN_SPECIFICATION_NAME, Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Property::EXTENTS );
     }
   }
 }
 
+void LayoutGroup::ChildAddedToOwner( Actor child )
+{
+  LayoutBasePtr childLayout;
+  Toolkit::Control control = Toolkit::Control::DownCast( child );
+
+  if( control ) // Can only support adding Controls, not Actors to layout
+  {
+    Internal::Control& childControlImpl = GetImplementation( control );
+    Internal::Control::Impl& childControlDataImpl = Internal::Control::Impl::Get( childControlImpl );
+    childLayout = childControlDataImpl.GetLayout();
+
+    if( ! childLayout )
+    {
+      // If the child doesn't already have a layout, then create a LayoutBase for it.
+      childLayout = LayoutBase::New( control );
+      childLayout->SetAnimateLayout( GetAnimateLayout() ); // @todo this essentially forces animation inheritance. Bad?
+
+      auto desiredSize = control.GetNaturalSize();
+      childControlDataImpl.SetLayout( *childLayout.Get() );
+
+      // HBoxLayout will apply default layout data for this object
+      child.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, desiredSize.width );
+      child.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, desiredSize.height );
+      child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Extents() );
+    }
+
+    Add( *childLayout.Get() );
+  }
+}
+
+void LayoutGroup::ChildRemovedFromOwner( Actor child )
+{
+  Toolkit::Control control = Toolkit::Control::DownCast( child );
+  if( control )
+  {
+    Internal::Control& childControlImpl = GetImplementation( control );
+    Internal::Control::Impl& childControlDataImpl = Internal::Control::Impl::Get( childControlImpl );
+    auto childLayout = childControlDataImpl.GetLayout();
+    if( childLayout )
+    {
+      Remove( *childLayout.Get() );
+    }
+  }
+}
+
+void LayoutGroup::OnOwnerPropertySet( Handle& handle, Property::Index index, Property::Value value )
+{
+  auto actor = Actor::DownCast( handle );
+  if( actor && index == Actor::Property::LAYOUT_DIRECTION )
+  {
+    RequestLayout();
+  }
+}
 
 Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutBase& child )
 {
@@ -82,16 +156,22 @@ Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutBase& child )
 
   auto owner = child.GetOwner();
 
-  // If there are no LayoutBase child properties, add them
+  // If the owner does not have any LayoutBase child properties, add them
   if( ! DevelHandle::DoesCustomPropertyExist( owner, Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ) )
   {
-    GenerateDefaultChildProperties( owner );
+    // Set default properties for LayoutGroup and LayoutBase.
+    // Deriving classes can override OnChildAdd() to add their own default properties
+    GenerateDefaultChildPropertyValues( owner );
   }
+
+  // Inform deriving classes that this child has been added
+  OnChildAdd( *childLayout.child.Get() );
 
   // Now listen to future changes to the child properties.
   DevelHandle::PropertySetSignal(owner).Connect( this, &LayoutGroup::OnSetChildProperties );
 
   RequestLayout();
+
   return childLayout.layoutId;
 }
 
@@ -101,6 +181,7 @@ void LayoutGroup::Remove( Toolkit::LayoutGroup::LayoutId childId )
   {
     if( iter->layoutId == childId )
     {
+      OnChildRemove( *iter->child.Get() );
       mImpl->mChildren.erase(iter);
       break;
     }
@@ -114,6 +195,7 @@ void LayoutGroup::Remove( LayoutBase& child )
   {
     if( iter->child.Get() == &child )
     {
+      OnChildRemove( *iter->child.Get() );
       mImpl->mChildren.erase(iter);
       break;
     }
@@ -121,7 +203,32 @@ void LayoutGroup::Remove( LayoutBase& child )
   RequestLayout();
 }
 
-LayoutBasePtr LayoutGroup::GetChild( Toolkit::LayoutGroup::LayoutId childId )
+void LayoutGroup::RemoveAll()
+{
+  for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; ++iter )
+  {
+    OnChildRemove( *iter->child.Get() );
+    iter = mImpl->mChildren.erase(iter);
+  }
+}
+
+void LayoutGroup::DoUnparent()
+{
+  RemoveAll();
+}
+
+unsigned int LayoutGroup::GetChildCount() const
+{
+  return mImpl->mChildren.size();
+}
+
+LayoutBasePtr LayoutGroup::GetChildAt( unsigned int index ) const
+{
+  DALI_ASSERT_ALWAYS( index < mImpl->mChildren.size() );
+  return mImpl->mChildren[ index ].child;
+}
+
+LayoutBasePtr LayoutGroup::GetChild( Toolkit::LayoutGroup::LayoutId childId ) const
 {
   for( auto&& childLayout : mImpl->mChildren )
   {
@@ -133,9 +240,24 @@ LayoutBasePtr LayoutGroup::GetChild( Toolkit::LayoutGroup::LayoutId childId )
   return NULL;
 }
 
-unsigned int LayoutGroup::GetChildCount()
+Toolkit::LayoutGroup::LayoutId LayoutGroup::GetChildId( LayoutBase& child ) const
 {
-  return mImpl->mChildren.size();
+  for( auto&& childLayout : mImpl->mChildren )
+  {
+    if( childLayout.child.Get() == &child )
+    {
+      return childLayout.layoutId;
+    }
+  }
+  return Toolkit::LayoutGroup::UNKNOWN_ID;
+}
+
+void LayoutGroup::OnChildAdd( LayoutBase& child )
+{
+}
+
+void LayoutGroup::OnChildRemove( LayoutBase& child )
+{
 }
 
 LayoutParent* LayoutGroup::GetParent()
@@ -152,7 +274,7 @@ void LayoutGroup::OnSetChildProperties( Handle& handle, Property::Index index, P
   }
 }
 
-void LayoutGroup::GenerateDefaultChildProperties( Handle child )
+void LayoutGroup::GenerateDefaultChildPropertyValues( Handle child )
 {
   child.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION,
                      Toolkit::ChildLayoutData::WRAP_CONTENT );
@@ -313,12 +435,12 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
   return MeasureSpec( resultSize, resultMode );
 }
 
-bool LayoutGroup::IsLayoutRequested()
+bool LayoutGroup::IsLayoutRequested() const
 {
   return mImpl->GetPrivateFlag( Impl::PFLAG_FORCE_LAYOUT );
 }
 
-Extents LayoutGroup::GetPadding()
+Extents LayoutGroup::GetPadding() const
 {
   return mImpl->mPadding;
 }

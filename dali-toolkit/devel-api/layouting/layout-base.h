@@ -39,8 +39,8 @@ using LayoutId = unsigned int;
 
 
 /**
- * Base class for layouts. Implements layouting for a given control. Used by both
- * layout containers and layout children ( that aren't layout containers ).
+ * Base class for layouts. It is used to layout a control (or visual).
+ * It can be laid out by a LayoutGroup.
  */
 class DALI_IMPORT_API LayoutBase : public BaseHandle
 {

@@ -167,6 +167,13 @@ public:
   IntType mValue;
 };
 
+/**
+ * @brief Prints a LayoutLength
+ *
+ * @param[in] o The output stream operator
+ * @param[in] layoutLength the layout length to print
+ * @return The output stream operator
+ */
 inline std::ostream& operator<<( std::ostream& o, const LayoutLength& layoutLength )
 {
   return o<<layoutLength.mValue;

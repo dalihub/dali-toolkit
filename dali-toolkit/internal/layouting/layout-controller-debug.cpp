@@ -70,7 +70,7 @@ void LayoutDebugMeasureStateRecurseActor( Actor root, int depth )
       {
         for( unsigned int i=0; i<layoutGroup->GetChildCount(); ++i )
         {
-          auto layoutChild = layoutGroup->GetChild( i );
+          auto layoutChild = layoutGroup->GetChildAt( i );
           LayoutDebugMeasureStateRecurseLayout( layoutChild, depth+1 );
         }
       }
@@ -116,7 +116,7 @@ void LayoutDebugMeasureStateRecurseLayout( LayoutBasePtr layout, int depth )
   {
     for( unsigned int i=0; i<layoutGroup->GetChildCount(); ++i )
     {
-      auto layoutChild = layoutGroup->GetChild( i );
+      auto layoutChild = layoutGroup->GetChildAt( i );
       LayoutDebugMeasureStateRecurseLayout( layoutChild, depth+1 );
     }
   }

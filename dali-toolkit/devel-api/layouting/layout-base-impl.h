@@ -57,14 +57,28 @@ public:
   LayoutBase(const LayoutBase& copy)=delete;
   LayoutBase& operator=(const LayoutBase& rhs)=delete;
 
-  void Initialize( Handle& handle );
+  void Initialize( Handle& owner, const std::string& containerType );
 
   /**
    * @brief Initialization method for deriving classes to override
+   * @note Deriving types MUST chain up for all child properties to be registered.
    */
   virtual void DoInitialize();
 
+  /**
+   * Get a handle to the owner of this layout
+   */
   Handle GetOwner() const;
+
+  /**
+   * Unparent this layout from it's owner, and remove any layout children in derived types
+   */
+  void Unparent();
+
+  /**
+   * Allow deriving classes to remove layout children when unparented
+   */
+  virtual void DoUnparent(){};
 
   /**
    * @brief Set whether this layout should be animated or not
@@ -81,16 +95,19 @@ public:
   bool GetAnimateLayout();
 
   /**
-   * Register child properties of layout
+   * Register child properties of layout with owner type.
+   *
+   * The Actor hierarchy uses these registered properties in the type
+   * system to ensure child custom properties are properly initialized.
    *
    * @param[in] containerType The type of the containing view (owner)
    */
   void RegisterChildProperties( const std::string& containerType );
 
   /**
-   * Ensure derived types register their child properties
+   * Ensure derived types register their child properties with the owner
    *
-   * @param[in] containerType The type name of the container
+   * @param[in] containerType The type name of the owner container
    * @note Deriving types MUST chain up for all child properties to be registered.
    */
   virtual void DoRegisterChildProperties( const std::string& containerType );
@@ -307,30 +324,57 @@ protected:
 
   /**
    * This method must be called by {@link #OnMeasure(MeasureSpec,MeasureSpec)} to store the
-   * measured width and measured height. Failing to do so will trigger an
-   * exception at measurement time.
+   * measured width and measured height. Failing to do so will trigger an exception at measurement time.
    *
    * @param[in] measuredWidth The measured width of this view. This may have a state of {@link MeasuredSize::MEASURED_SIZE_TOO_SMALL}
    * @param[in] measuredHeight The measured height of this view. This may have a state of {@link MeasuredSize::MEASURED_SIZE_TOO_SMALL}
    */
   void SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight );
 
+  /**
+   * @brief
+   */
   static MeasuredSize ResolveSizeAndState( LayoutLength size, MeasureSpec measureSpec, MeasuredSize::State childMeasuredState );
 
+  /**
+   * @brief Sets the frame (the size and position) of the layout onto it's owner
+   *
+   * @todo Consider instead, collating properties into LayoutCollector in order to set/animate them all in one block.
+   * @param[in] left The horizontal position of the left edge of this frame within the parent layout
+   * @param[in] top The vertical position of the top edge of this frame within the parent layout
+   * @param[in] right The horizontal position of the right edge of this frame within the parent layout
+   * @param[in] bottom The vertical position of the bottom edge of this frame within the parent layout
+   */
   bool SetFrame( LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom );
 
+  /**
+   * Virtual method to inform derived classes when the layout size changed
+   * @param[in] newSize The new size of the layout
+   * @param[in] oldSize The old size of the layout
+   */
   virtual void OnSizeChanged( LayoutSize newSize, LayoutSize oldSize );
 
 private:
+  /**
+   * @brief Called to change the size of the layout.
+   * @param[in] newSize The new size of the layout
+   * @param[in] oldSize The old size of the layout
+   */
   void SizeChange( LayoutSize newSize, LayoutSize oldSize );
+
+  /**
+   * Triggered when a layout animation finished
+   * @param[in] animation  A handle to the layout animation
+   */
   void OnLayoutAnimationFinished( Animation& animation );
 
 public:
   class Impl; // Class declaration is public so we can add devel API's in the future
 
+
 private:
   std::unique_ptr<Impl> mImpl; ///< Implementation class holds all the data
-  SlotDelegate<LayoutBase> mSlotDelegate;
+  SlotDelegate<LayoutBase> mSlotDelegate; ///< Slot delegate allows this class to connect safely to signals
 };
 
 } //namespace Internal

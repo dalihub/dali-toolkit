@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_LAYOUTING_HBOX_LAYOUT_H
-#define DALI_TOOLKIT_LAYOUTING_HBOX_LAYOUT_H
+#ifndef DALI_TOOLKIT_LAYOUTING_VBOX_LAYOUT_H
+#define DALI_TOOLKIT_LAYOUTING_VBOX_LAYOUT_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -21,7 +21,6 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
 #include <dali-toolkit/devel-api/layouting/layout-size.h>
-#include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
 
 namespace Dali
 {
@@ -30,10 +29,10 @@ namespace Toolkit
 
 namespace Internal DALI_INTERNAL
 {
-class HboxLayout;
+class VboxLayout;
 }
 
-class DALI_IMPORT_API HboxLayout : public LayoutGroup
+class DALI_IMPORT_API VboxLayout : public LayoutGroup
 {
 public:
 
@@ -43,29 +42,20 @@ public:
     CHILD_PROPERTY_END_INDEX   = CHILD_PROPERTY_START_INDEX+1000
   };
 
-  struct Property
-  {
-    // @todo When we can have event-only properties for BaseObject, this will be useful.
-    enum
-    {
-      CELL_PADDING = PROPERTY_REGISTRATION_START_INDEX + 2000
-    };
-  };
-
   struct ChildProperty
   {
     enum
     {
-      WEIGHT = CHILD_PROPERTY_START_INDEX
+      WEIGHT = CHILD_PROPERTY_START_INDEX,
     };
   };
 
-  HboxLayout();
-  static HboxLayout New();
-  static HboxLayout DownCast( BaseHandle handle );
-  HboxLayout( const HboxLayout& other );
-  HboxLayout& operator=( const HboxLayout& other );
-  ~HboxLayout()=default;
+  VboxLayout();
+  static VboxLayout New();
+  static VboxLayout DownCast( BaseHandle handle );
+  VboxLayout( const VboxLayout& other );
+  VboxLayout& operator=( const VboxLayout& other );
+  ~VboxLayout()=default;
 
   void SetCellPadding( LayoutSize size );
   LayoutSize GetCellPadding();
@@ -73,11 +63,11 @@ public:
 public: // Not intended for application developers
 
   /// @cond internal
-  explicit DALI_INTERNAL HboxLayout( Internal::HboxLayout* body );
+  explicit DALI_INTERNAL VboxLayout( Internal::VboxLayout* body );
   /// @endcond
 };
 
 } // namespace Toolkit
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_LAYOUTING_HBOX_LAYOUT_H
+#endif // DALI_TOOLKIT_LAYOUTING_VBOX_LAYOUT_H

@@ -34,15 +34,25 @@ class LayoutGroup;
 
 
 /**
- * A layout that has children. Implements LayoutBase.
- * CONSIDER HOW TO WRITE CUSTOM LAYOUTERS.
- * (Handle and body are both public; body contains no data apart from an extensible Impl ptr)
- * Do we really need a specific handle type?
+ * A layout that has layout children. Implements LayoutBase.
+ * It can both layout it's children, and be laid out by a parent container.
+ *
+ * A layout group automatically handles adding a Control container's children to itself,
+ * both on startup and on child add/remove. If this functionality is not desired, this needs
+ * splitting into two classes; one that manages just the layout part, and the other which
+ * handles Actor hierarchy. (@todo Consider doing this anyway...)
+ *
+ * This handle class allows the application to set up layout properties for the layout group;
+ * it doesn't access measure/layout directly.
+ *
+ * To write a new layout, inherit from both LayoutGroup handle and Internal::LayoutGroup body.
+ *
  */
 class DALI_IMPORT_API LayoutGroup : public LayoutBase
 {
 public:
   using LayoutId = unsigned int;
+  static const unsigned int UNKNOWN_ID = 0;
 
   enum PropertyRange
   {
@@ -67,16 +77,22 @@ public:
 
   LayoutId Add( LayoutBase& layoutData );
   void Remove( LayoutId childId );
-  LayoutBase GetChild( LayoutId childId );
+  void Remove( LayoutBase& layoutData );
+  LayoutBase GetChildAt( unsigned int index ) const;
+  unsigned int GetChildCount() const ;
 
-  MeasureSpec GetChildMeasureSpec( MeasureSpec measureSpec, int padding, Dali::Dimension::Type dimension );
+  LayoutBase GetChild( LayoutId childId ) const ;
+  template <typename T>
+    LayoutBase GetChild( T childId ) = delete; // Prevent implicit casting
+
+  MeasureSpec GetChildMeasureSpec( MeasureSpec measureSpec, int padding, Dali::Dimension::Type dimension ) const;
 
 public:
   explicit DALI_INTERNAL LayoutGroup( Internal::LayoutGroup* layoutGroup );
 };
 
 
-}//namespace Toolkit
-}//namespace Dali
+} // namespace Toolkit
+} // namespace Dali
 
 #endif // DALI_TOOLKIT_LAYOUTING_LAYOUT_GROUP_H
