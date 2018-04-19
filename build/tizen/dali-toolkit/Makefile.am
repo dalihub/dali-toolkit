@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017 Samsung Electronics Co., Ltd.
+# Copyright (c) 2018 Samsung Electronics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -144,6 +144,8 @@ develapishadowviewdir =         $(develapicontrolsdir)/shadow-view
 develapisuperblurviewdir =      $(develapicontrolsdir)/super-blur-view
 develapifocusmanagerdir =       $(develapidir)/focus-manager
 develapiimageloaderdir =        $(develapidir)/image-loader
+develapilayoutingdir =          $(develapidir)/layouting
+develapilayoutingcontrolsdir =  $(develapidir)/controls/layouting
 develapiscriptingdir =          $(develapidir)/scripting
 develapishadereffectsdir =      $(develapidir)/shader-effects
 develapistylingdir =            $(develapidir)/styling
@@ -166,6 +168,8 @@ develapieffectsview_HEADERS =       $(devel_api_effects_view_header_files)
 develapifocusmanager_HEADERS =      $(devel_api_focus_manager_header_files)
 develapigaussianblurview_HEADERS =  $(devel_api_gaussian_blur_view_header_files)
 develapiimageloader_HEADERS =       $(devel_api_image_loader_header_files)
+develapilayoutingcontrols_HEADERS = $(devel_api_layouting_controls_header_files)
+develapilayouting_HEADERS =         $(devel_api_layouting_header_files)
 develapimagnifier_HEADERS =         $(devel_api_magnifier_header_files)
 develapinavigationview_HEADERS =    $(devel_api_navigation_view_header_files)
 develapipageturnview_HEADERS =      $(devel_api_page_turn_view_header_files)

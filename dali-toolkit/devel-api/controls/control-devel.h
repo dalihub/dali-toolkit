@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
+#include <dali-toolkit/devel-api/layouting/layout-base.h>
 
 namespace Dali
 {
@@ -216,6 +217,23 @@ DALI_TOOLKIT_API void EnableVisual( Internal::Control& control, Dali::Property::
  */
 DALI_TOOLKIT_API bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index index );
 
+
+/**
+ * @brief Add a transition effect on the control to the given animation
+ *
+ * Only generates an animator if the properties described in the transition
+ * data are staged (e.g. the visual is Enabled and the control is on stage).
+ * Otherwise the target values are stored, and will get set onto the properties
+ * when the visual is next staged.
+ *
+ * @param[in] control The control
+ * @param[in] animation The Animation to add valid transitions to
+ * @param[in] transitionData The transition data describing the effect to create
+ */
+DALI_TOOLKIT_API void AddTransitions( Internal::Control& control,
+                                      Dali::Animation animation,
+                                      const Toolkit::TransitionData& transitionData );
+
 /**
  * @brief Create a transition effect on the control.
  *
@@ -229,7 +247,8 @@ DALI_TOOLKIT_API bool IsVisualEnabled( const Internal::Control& control, Dali::P
  * @return A handle to an animation defined with the given effect, or an empty
  * handle if no properties match.
  */
-DALI_TOOLKIT_API Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& transitionData );
+DALI_TOOLKIT_API Dali::Animation CreateTransition( Internal::Control& control,
+                                                   const Toolkit::TransitionData& transitionData );
 
 /**
  * @brief Perform an action on a visual registered to this control.
@@ -250,6 +269,36 @@ DALI_TOOLKIT_API void DoAction( Control& control, Dali::Property::Index visualIn
  * @param[in] inputMethodContext The input method context.
  */
 DALI_TOOLKIT_API void SetInputMethodContext( Internal::Control& control, InputMethodContext& inputMethodContext );
+
+/*
+ * @brief Get the layout associated with this control, if any.
+ *
+ * @return A handle to the layout, or empty.
+ */
+DALI_TOOLKIT_API Toolkit::LayoutBase GetLayout( Internal::Control& control );
+
+/*
+ * @brief Get the layout associated with a control, if any.
+ *
+ * @return A handle to the layout, or empty.
+ */
+DALI_TOOLKIT_API Toolkit::LayoutBase GetLayout( Control control );
+
+/**
+ * @brief Set the layout on this control.
+ *
+ * @param[in] control The internal Control to set the layout on
+ * @param[in] layout Pointer to the layout
+ */
+DALI_TOOLKIT_API void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout );
+
+/**
+ * @brief Set the layout on a control.
+ *
+ * @param[in] control The Control to set the layout on
+ * @param[in] layout Pointer to the layout
+ */
+DALI_TOOLKIT_API void SetLayout( Control control, Toolkit::LayoutBase layout );
 
 } // namespace DevelControl
 
