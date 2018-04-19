@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -666,7 +666,7 @@ void FlexContainer::ComputeLayout()
       }
 
       Toolkit::FlexContainer::Alignment alignSelf( Toolkit::FlexContainer::ALIGN_AUTO );
-      if( childActor.GetPropertyType( Toolkit::FlexContainer::FlexContainer::ChildProperty::ALIGN_SELF ) != Property::NONE )
+      if( childActor.GetPropertyType( Toolkit::FlexContainer::ChildProperty::ALIGN_SELF ) != Property::NONE )
       {
         Property::Value alignSelfPropertyValue = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::ALIGN_SELF );
         if( alignSelfPropertyValue.GetType() == Property::INTEGER )
