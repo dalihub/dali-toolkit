@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "2d07a76d_2db78b0d",
+        "filename": "dali-toolkit/devel-api/controls/control-devel.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-20T18:43:04Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "83b012c0_c1f6e6d5",
+      "range": {
+        "startLine": 222,
+        "startChar": 21,
+        "endLine": 222,
+        "endChar": 29
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e157c4a3_c6046e05",
         "filename": "dali-toolkit/devel-api/layouting/child-layout-data.h",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2018-04-20T17:03:15Z",
       "side": 1,
       "message": "Question, Why are negative values used here?",
+      "range": {
+        "startLine": 29,
+        "startChar": 32,
+        "endLine": 29,
+        "endChar": 34
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da84b5c3_ccb4ca54",
+        "filename": "dali-toolkit/devel-api/layouting/child-layout-data.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-20T18:43:04Z",
+      "side": 1,
+      "message": "Because where this constant is used, positive values indicate exact size.",
+      "parentUuid": "e157c4a3_c6046e05",
       "range": {
         "startLine": 29,
         "startChar": 32,
@@ -134,6 +182,30 @@
     },
     {
       "key": {
+        "uuid": "6c68d761_02e5f934",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-20T18:43:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04eb8196_2f4600d5",
+      "range": {
+        "startLine": 54,
+        "startChar": 3,
+        "endLine": 54,
+        "endChar": 5
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a9611b6c_0ad9f070",
         "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
         "patchSetId": 1
@@ -180,6 +252,54 @@
     },
     {
       "key": {
+        "uuid": "5113ef1d_00651200",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-20T18:43:04Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a9611b6c_0ad9f070",
+      "range": {
+        "startLine": 60,
+        "startChar": 7,
+        "endLine": 60,
+        "endChar": 17
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8c014e19_534ccb72",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-20T18:43:04Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a4cad844_9aeb3002",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 69
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e5ce1227_2468253b",
         "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
         "patchSetId": 1
@@ -191,6 +311,30 @@
       "writtenOn": "2018-04-20T17:03:15Z",
       "side": 1,
       "message": "[in]  or  [in][out] missing",
+      "range": {
+        "startLine": 124,
+        "startChar": 5,
+        "endLine": 124,
+        "endChar": 12
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8d627fe_00163f3c",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-20T18:43:04Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "e5ce1227_2468253b",
       "range": {
         "startLine": 124,
         "startChar": 5,
@@ -226,6 +370,30 @@
     },
     {
       "key": {
+        "uuid": "ba729c39_f9c5d770",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-20T18:43:04Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c515aad0_ce470e0b",
+      "range": {
+        "startLine": 139,
+        "startChar": 5,
+        "endLine": 139,
+        "endChar": 52
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7067394_f0939924",
         "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
         "patchSetId": 1
@@ -237,6 +405,30 @@
       "writtenOn": "2018-04-20T17:03:15Z",
       "side": 1,
       "message": "don\u0027t think it\u0027s a good precedence to start using single letter parameters",
+      "range": {
+        "startLine": 148,
+        "startChar": 28,
+        "endLine": 148,
+        "endChar": 78
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c556b408_aa03fe0f",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-20T18:43:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7067394_f0939924",
       "range": {
         "startLine": 148,
         "startChar": 28,
@@ -272,6 +464,30 @@
     },
     {
       "key": {
+        "uuid": "89c4deb0_4386796a",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-20T18:43:04Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "ad9e8ea9_df0f7ed3",
+      "range": {
+        "startLine": 176,
+        "startChar": 57,
+        "endLine": 176,
+        "endChar": 61
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6c1638b2_504d2768",
         "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
         "patchSetId": 1
@@ -289,6 +505,24 @@
     },
     {
       "key": {
+        "uuid": "2d8b330e_7076a382",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-20T18:43:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c1638b2_504d2768",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "97c5eb83_2af0d0b5",
         "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
         "patchSetId": 1
@@ -300,6 +534,30 @@
       "writtenOn": "2018-04-20T17:03:15Z",
       "side": 1,
       "message": "Can you explain this function and comment when you have a minute",
+      "range": {
+        "startLine": 342,
+        "startChar": 0,
+        "endLine": 342,
+        "endChar": 117
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fcd6644_4dfa2a41",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-20T18:43:04Z",
+      "side": 1,
+      "message": "The clue\u0027s in the brief description. It does what it says on the tin.",
+      "parentUuid": "97c5eb83_2af0d0b5",
       "range": {
         "startLine": 342,
         "startChar": 0,
