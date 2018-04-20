@@ -195,14 +195,20 @@ DOXYGEN_ROOT_DIR=../../..
 AC_SUBST(DOXYGEN_DOCS_DIR)
 AC_SUBST(DOXYGEN_ROOT_DIR)
 
+if test "x$enable_cxx03_abi" = "xyes"; then
+PKG_CHECK_MODULES(DALI, dali-core-cxx03)
+PKG_CHECK_MODULES(DALIDAPTOR, dali-adaptor-cxx03)
+else
+PKG_CHECK_MODULES(DALICORE, dali-core)
+PKG_CHECK_MODULES(DALIADAPTOR, dali-adaptor)
+fi
+
 # Enable csharp plugin
 build_csharp_plugin=no
 build_ruby_flag=no
 if test x$enable_csharp = xyes; then
   [build_csharp_plugin=yes]
   AC_MSG_NOTICE(Building DALi csharp plugin ...)
-
-  PKG_CHECK_MODULES(DALIADAPTOR, dali-adaptor)
   AC_PATH_PROG([SWIG], [swig])
 
   # if gbs enable, then only use swig, without ruby or mcs
@@ -223,12 +229,6 @@ if test x$enable_csharp = xyes; then
   DALITOOLKIT_LIBS="-L${prefix}/lib -ldali-toolkit -ldali-core"
   AC_SUBST(DALITOOLKIT_CFLAGS)
   AC_SUBST(DALITOOLKIT_LIBS)
-fi
-
-if test "x$enable_cxx03_abi" = "xyes"; then
-PKG_CHECK_MODULES(DALICORE, dali-core-cxx03)
-else
-PKG_CHECK_MODULES(DALICORE, dali-core)
 fi
 
 #set a variable for the makefile to force compile the csharp plugin
