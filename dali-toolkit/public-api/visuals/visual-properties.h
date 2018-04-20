@@ -73,7 +73,7 @@ enum
 {
   /**
    * @brief The index for the visual type.
-   * @details Name "visualType", type [Type](@ref Dali::Toolkit::Visual::Type) (Property::INTEGER) or Property::STRING.
+   * @details Name "visualType", type [Type](Dali::Toolkit::Visual::Type) (Property::INTEGER) or Property::STRING.
    * @SINCE_1_1.45
    * @note Mandatory.
    * @see Type
