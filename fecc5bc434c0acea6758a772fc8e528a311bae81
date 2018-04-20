@@ -1,0 +1,622 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "83b012c0_c1f6e6d5",
+        "filename": "dali-toolkit/devel-api/controls/control-devel.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "Does the user of the public API care about \"animator\"?",
+      "range": {
+        "startLine": 222,
+        "startChar": 21,
+        "endLine": 222,
+        "endChar": 29
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e157c4a3_c6046e05",
+        "filename": "dali-toolkit/devel-api/layouting/child-layout-data.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "Question, Why are negative values used here?",
+      "range": {
+        "startLine": 29,
+        "startChar": 32,
+        "endLine": 29,
+        "endChar": 34
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5b464971_17695259",
+        "filename": "dali-toolkit/devel-api/layouting/hbox-layout.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "no need for this",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 18
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c64545f4_03927b71",
+        "filename": "dali-toolkit/devel-api/layouting/hbox-layout.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "Add a @brief here with a description of what this class does",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c73c84bc_f74cfc37",
+        "filename": "dali-toolkit/devel-api/layouting/hbox-layout.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "Needs doxygen",
+      "range": {
+        "startLine": 63,
+        "startChar": 2,
+        "endLine": 71,
+        "endChar": 30
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "04eb8196_2f4600d5",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "@return missing",
+      "range": {
+        "startLine": 54,
+        "startChar": 3,
+        "endLine": 54,
+        "endChar": 5
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a9611b6c_0ad9f070",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "Does this need to be public? for chaining?",
+      "range": {
+        "startLine": 60,
+        "startChar": 7,
+        "endLine": 60,
+        "endChar": 17
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a4cad844_9aeb3002",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "doxygen for Consistency",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 69
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5ce1227_2468253b",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "[in]  or  [in][out] missing",
+      "range": {
+        "startLine": 124,
+        "startChar": 5,
+        "endLine": 124,
+        "endChar": 12
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c515aad0_ce470e0b",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "add \"final\" if this non virtual can be overridden?",
+      "range": {
+        "startLine": 139,
+        "startChar": 5,
+        "endLine": 139,
+        "endChar": 52
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7067394_f0939924",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "don\u0027t think it\u0027s a good precedence to start using single letter parameters",
+      "range": {
+        "startLine": 148,
+        "startChar": 28,
+        "endLine": 148,
+        "endChar": 78
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ad9e8ea9_df0f7ed3",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "Just how wide or it\u0027s  size.  Instead adding Actor::GetTargetSize().width ??",
+      "range": {
+        "startLine": 176,
+        "startChar": 57,
+        "endLine": 176,
+        "endChar": 61
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6c1638b2_504d2768",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "incomplete",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97c5eb83_2af0d0b5",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "Can you explain this function and comment when you have a minute",
+      "range": {
+        "startLine": 342,
+        "startChar": 0,
+        "endLine": 342,
+        "endChar": 117
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e731e970_9626d9a2",
+        "filename": "dali-toolkit/devel-api/layouting/layout-controller.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "@param[in]",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "711016d3_6346b3fe",
+        "filename": "dali-toolkit/devel-api/layouting/layout-controller.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "@param[in]",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89cd413e_49d1a1d0",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "missing doxygen comments",
+      "range": {
+        "startLine": 54,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 113
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b5e8352_a55639c6",
+        "filename": "dali-toolkit/devel-api/layouting/layout-length.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "@brief missing",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c9666e1a_ebfea610",
+        "filename": "dali-toolkit/devel-api/layouting/layout-parent-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "@brief missing",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4081e0ce_8067a38c",
+        "filename": "dali-toolkit/devel-api/layouting/layout-size.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "doxygen missing",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fbf839e_a96a6a96",
+        "filename": "dali-toolkit/devel-api/layouting/measure-spec.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "doxygen missing",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97abe4ed_3b93b16b",
+        "filename": "dali-toolkit/devel-api/layouting/measured-size.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "doxygen missing",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d94aa986_d4557ee0",
+        "filename": "dali-toolkit/devel-api/layouting/vbox-layout.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "can remove this",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 18
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cbe1f4c2_58d22a61",
+        "filename": "dali-toolkit/devel-api/layouting/vbox-layout.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "doxygen missing",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "72db2dbf_1818915c",
+        "filename": "dali-toolkit/internal/controls/control/control-data-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "@brief missing",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "93be7ab8_31777247",
+        "filename": "dali-toolkit/internal/layouting/hbox-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "whitespace",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 3
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4e87011e_7ec26bd0",
+        "filename": "dali-toolkit/internal/layouting/layout-base-data-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "can we remove this?",
+      "range": {
+        "startLine": 86,
+        "startChar": 0,
+        "endLine": 86,
+        "endChar": 69
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "08cec745_d431823b",
+        "filename": "dali-toolkit/internal/layouting/layout-base-data-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "Do we need the PFLAG prefix? Doesn\u0027t help understanding",
+      "range": {
+        "startLine": 88,
+        "startChar": 19,
+        "endLine": 88,
+        "endChar": 47
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1bc6ead1_aa8a7ffd",
+        "filename": "dali-toolkit/internal/layouting/layout-controller-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "can we remove this for now if not needed?",
+      "range": {
+        "startLine": 54,
+        "startChar": 47,
+        "endLine": 54,
+        "endChar": 56
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3e41766c_4f18fb96",
+        "filename": "dali-toolkit/internal/layouting/layout-group-data-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-20T17:03:15Z",
+      "side": 1,
+      "message": "doxygen",
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
