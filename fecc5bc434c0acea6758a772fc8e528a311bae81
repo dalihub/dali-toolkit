@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "0b59289f_be4d5e6e",
+        "filename": "dali-toolkit/devel-api/controls/control-devel.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-23T11:12:31Z",
+      "side": 1,
+      "message": "Didn\u0027t find any references to \"animator\" outside of json.",
+      "parentUuid": "2d07a76d_2db78b0d",
+      "range": {
+        "startLine": 222,
+        "startChar": 21,
+        "endLine": 222,
+        "endChar": 29
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e157c4a3_c6046e05",
         "filename": "dali-toolkit/devel-api/layouting/child-layout-data.h",
         "patchSetId": 1
@@ -84,6 +108,30 @@
       "side": 1,
       "message": "Because where this constant is used, positive values indicate exact size.",
       "parentUuid": "e157c4a3_c6046e05",
+      "range": {
+        "startLine": 29,
+        "startChar": 32,
+        "endLine": 29,
+        "endChar": 34
+      },
+      "revId": "fecc5bc434c0acea6758a772fc8e528a311bae81",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c1ed368d_e9b73ffe",
+        "filename": "dali-toolkit/devel-api/layouting/child-layout-data.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-23T11:12:31Z",
+      "side": 1,
+      "message": "SSo should there be a constant FIXED_SIZE \u003d 0?",
+      "parentUuid": "da84b5c3_ccb4ca54",
       "range": {
         "startLine": 29,
         "startChar": 32,
