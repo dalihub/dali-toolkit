@@ -83,7 +83,6 @@ Debug::Filter* gTextureManagerLogFilter = Debug::Filter::New( Debug::NoLogging, 
 
 const uint32_t      DEFAULT_ATLAS_SIZE( 1024u );                     ///< This size can fit 8 by 8 images of average size 128 * 128
 const Vector4       FULL_ATLAS_RECT( 0.0f, 0.0f, 1.0f, 1.0f );       ///< UV Rectangle that covers the full Texture
-const char * const  BROKEN_IMAGE_URL( DALI_IMAGE_DIR "broken.png" ); ///< URL For the broken image placeholder
 const int           INVALID_INDEX( -1 );                             ///< Invalid index used to represent a non-existant TextureInfo struct
 const int           INVALID_CACHE_INDEX( -1 ); ///< Invalid Cache index
 
@@ -116,6 +115,7 @@ TextureManager::MaskingData::MaskingData()
 TextureManager::TextureManager()
 : mAsyncLocalLoaders( GetNumberOfLocalLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
   mAsyncRemoteLoaders( GetNumberOfRemoteLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
+  mBrokenImageUrl(""),
   mCurrentTextureId( 0 )
 {
 }
@@ -176,7 +176,7 @@ TextureSet TextureManager::LoadTexture(
     {
       // use broken image
       textureSet = TextureSet::New();
-      Devel::PixelBuffer pixelBuffer = LoadImageFromFile( BROKEN_IMAGE_URL );
+      Devel::PixelBuffer pixelBuffer = LoadImageFromFile( mBrokenImageUrl );
       if( pixelBuffer )
       {
         PreMultiply( pixelBuffer, preMultiplyOnLoad );
@@ -1063,6 +1063,11 @@ void TextureManager::AsyncLoadingHelper::AsyncLoadComplete(uint32_t           id
                                                            Devel::PixelBuffer pixelBuffer)
 {
   mTextureManager.AsyncLoadComplete(mLoadingInfoContainer, id, pixelBuffer);
+}
+
+void TextureManager::SetBrokenImageUrl(const std::string& brokenImageUrl)
+{
+  mBrokenImageUrl = brokenImageUrl;
 }
 
 } // namespace Internal

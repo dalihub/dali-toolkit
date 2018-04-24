@@ -317,7 +317,7 @@ public:
        * @note VARIATION key can be changed depending on PANEL_LAYOUT.
        * For example, when PANEL_LAYOUT key is InputMethod::PanelLayout::NORMAL,
        * then VARIATION would be among NORMAL, WITH_FILENAME, and WITH_PERSON_NAME in Dali::InputMethod::NormalLayout.
-       * For more information, see @ref Dali::InputMethod::Category.
+       * For more information, see Dali::InputMethod::Category.
        *
        * Example Usage:
        * @code

@@ -355,6 +355,12 @@ public:
    */
   void RemoveObserver( TextureManager::LifecycleObserver& observer );
 
+  /**
+   * @brief Set an image to be used when a visual has failed to correctly render
+   * @param[in] brokenImageUrl The broken image url.
+   */
+  void SetBrokenImageUrl(const std::string& brokenImageUrl);
+
 private:
 
   /**
@@ -737,6 +743,7 @@ private:  // Member Variables:
   RoundRobinContainerView< AsyncLoadingHelper > mAsyncRemoteLoaders;   ///< The Asynchronous image loaders used to provide all remote async loads
   std::vector< ExternalTextureInfo >            mExternalTextures;     ///< Externally provided textures
   Dali::Vector<LifecycleObserver*>              mLifecycleObservers;   ///< Lifecycle observers of texture manager
+  std::string                                   mBrokenImageUrl;       ///< Broken image url
   TextureId                                     mCurrentTextureId;     ///< The current value used for the unique Texture Id generation
 };
 

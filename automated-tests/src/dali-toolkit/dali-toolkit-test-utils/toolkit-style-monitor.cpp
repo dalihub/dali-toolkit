@@ -27,7 +27,13 @@
 namespace
 {
 const char* DEFAULT_THEME=
-  "{\"styles\":{\n"
+  "{\n"
+  "  \"config\":\n"
+  "  {\n"
+  "    \"brokenImageUrl\":\"{DALI_IMAGE_DIR}broken.png\"\n"
+  "  },\n"
+  "  \"styles\":\n"
+  "  {\n"
   "  \"textlabel\":\n"
   "    {\n"
   "      \"fontStyle\":{\"weight\":\"normal\"},\n"

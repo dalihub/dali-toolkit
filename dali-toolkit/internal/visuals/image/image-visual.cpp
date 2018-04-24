@@ -623,7 +623,7 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
       }
       else
       {
-        Image brokenImage = VisualFactoryCache::GetBrokenVisualImage();
+        Image brokenImage = mFactoryCache.GetBrokenVisualImage();
 
         naturalSize.x = brokenImage.GetWidth();
         naturalSize.y = brokenImage.GetWidth();
@@ -1097,7 +1097,7 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
       }
       else
       {
-        Image brokenImage = VisualFactoryCache::GetBrokenVisualImage();
+        Image brokenImage = mFactoryCache.GetBrokenVisualImage();
 
         textureSet = TextureSet::New();
         mImpl->mRenderer.SetTextures( textureSet );

@@ -161,7 +161,7 @@ public:
    * @brief Returns an image to be used when a visual has failed to correctly render
    * @return The broken image handle.
    */
-  static Image GetBrokenVisualImage();
+  Image GetBrokenVisualImage();
 
   /**
    * @copydoc Toolkit::VisualFactory::SetPreMultiplyOnLoad()
@@ -172,6 +172,12 @@ public:
    * @copydoc Toolkit::VisualFactory::GetPreMultiplyOnLoad()
    */
   bool GetPreMultiplyOnLoad();
+
+  /**
+   * @brief Set an image to be used when a visual has failed to correctly render
+   * @param[in] brokenImageUrl The broken image url.
+   */
+  void SetBrokenImageUrl(const std::string& brokenImageUrl);
 
 public:
   /**
@@ -225,6 +231,7 @@ private:
   TextureManager       mTextureManager;
   NPatchLoader         mNPatchLoader;
   SvgRasterizeThread*  mSvgRasterizeThread;
+  std::string          mBrokenImageUrl;
   bool                 mPreMultiplyOnLoad;
 };
 

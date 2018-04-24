@@ -238,6 +238,12 @@ int UtcDaliStyleManagerApplyTheme(void)
 
   styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
 
+  // To ensure we make VisualFactory
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::TEXT );
+  Visual::Base textVisual = factory.CreateVisual( propertyMap );
+
   // Render and notify
   application.SendNotification();
   application.Render();
@@ -1306,8 +1312,13 @@ int UtcDaliStyleManagerConfigSectionTest(void)
 
   const char* defaultTheme =
     "{\n"
+    "  \"constants\":\n"
+    "  {\n"
+    "    \"TEST\":\"broken\"\n"
+    "  },\n"
     "  \"config\":\n"
     "  {\n"
+    "    \"brokenImageUrl\":\"{TEST}|{TEST}|{TEST|TEST.png\",\n"
     "    \"alwaysShowFocus\":false,\n"
     "    \"clearFocusOnEscape\":false\n"
     "  },\n"
@@ -1327,6 +1338,8 @@ int UtcDaliStyleManagerConfigSectionTest(void)
   DALI_TEST_CHECK( !alwaysShowFocus );
   bool clearFocusOnEscape = config["clearFocusOnEscape"].Get<bool>();
   DALI_TEST_CHECK( !clearFocusOnEscape );
+  std::string brokenImageUrl = config["brokenImageUrl"].Get<std::string>();
+  DALI_TEST_CHECK( brokenImageUrl.compare( "broken|broken|{TEST|TEST.png" ) == 0 );
 
   // For coverage
   Toolkit::TextEditor editor = Toolkit::TextEditor::New();
