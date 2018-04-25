@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "5e1f2fbb_a3df3be5",
+        "filename": "dali-toolkit/devel-api/layouting/child-layout-data.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T17:05:07Z",
+      "side": 1,
+      "message": "Won\u0027t this create these variables in EVERY SINGLE source file that uses it???",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 157
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a2a25c85_92503834",
         "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
         "patchSetId": 2
