@@ -242,6 +242,86 @@
     },
     {
       "key": {
+        "uuid": "88a7e81c_c0a1979a",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T17:15:23Z",
+      "side": 1,
+      "message": "virtual?",
+      "range": {
+        "startLine": 66,
+        "startChar": 2,
+        "endLine": 66,
+        "endChar": 17
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d7138a42_01da1cbe",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T17:15:23Z",
+      "side": 1,
+      "message": "Again, could be part of mImpl",
+      "range": {
+        "startLine": 286,
+        "startChar": 2,
+        "endLine": 286,
+        "endChar": 108
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "216b4940_93d6b4ef",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T17:15:23Z",
+      "side": 1,
+      "message": "default",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3bf3d845_545f32c2",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T17:15:23Z",
+      "side": 1,
+      "message": "default",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b722ece1_388099f6",
         "filename": "dali-toolkit/internal/controls/control/control-data-impl.cpp",
         "patchSetId": 2
