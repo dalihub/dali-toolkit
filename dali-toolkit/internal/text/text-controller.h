@@ -550,6 +550,14 @@ public: // Update.
    */
   void UpdateAfterFontChange( const std::string& newDefaultFont );
 
+  void RetrieveSelection( std::string& selectedText );
+
+  void SetSelection( int start, int end );
+
+  void CopyStringToClipboard( std::string& source );
+
+  void SendSelectionToClipboard( bool deleteAfterSending );
+
 public: // Default style & Input style
 
   /**

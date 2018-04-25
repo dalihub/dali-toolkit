@@ -513,9 +513,9 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
         if( impl.mController )
         {
 
-          // The line spacing isn't supported by the TextEditor. Since it's supported
-          // by the TextLabel for now it must be ignored. The property is being shadowed
-          // locally so its value isn't affected.
+          // The line spacing isn't supported by the TextEditor. Since it's
+          // supported by the TextEditor for now it must be ignored. The
+          // property is being shadowed locally so its value isn't affected.
           const float lineSpacing = value.Get<float>();
           impl.mLineSpacing = lineSpacing;
           // set it to 0.0 due to missing implementation
@@ -1149,6 +1149,8 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
 
   return value;
 }
+
+Text::ControllerPtr TextEditor::getController() { return mController; }
 
 bool TextEditor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
@@ -1834,6 +1836,10 @@ TextEditor::TextEditor()
   mScrollBarEnabled( false ),
   mScrollStarted( false )
 {
+  SetAccessibilityConstructor( []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::Text ) );
+  } );
 }
 
 TextEditor::~TextEditor()
@@ -1845,6 +1851,97 @@ TextEditor::~TextEditor()
     // Removes the callback from the callback manager in case the text-editor is destroyed before the callback is executed.
     Adaptor::Get().RemoveIdle( mIdleCallback );
   }
+}
+
+std::string TextEditor::AccessibleImpl::GetName()
+{
+  auto slf = Toolkit::TextEditor::DownCast( self );
+  return slf.GetProperty( Toolkit::TextEditor::Property::TEXT )
+      .Get< std::string >();
+}
+
+std::string TextEditor::AccessibleImpl::GetText( size_t startOffset,
+                                                 size_t endOffset )
+{
+  if( endOffset <= startOffset )
+    return {};
+
+  auto slf = Toolkit::TextEditor::DownCast( self );
+  auto txt =
+      slf.GetProperty( Toolkit::TextEditor::Property::TEXT ).Get< std::string >();
+
+  if( txt.size() > startOffset || txt.size() > endOffset )
+    return {};
+
+  return txt.substr( startOffset, endOffset - startOffset );
+}
+
+size_t TextEditor::AccessibleImpl::GetCharacterCount()
+{
+  auto slf = Toolkit::TextEditor::DownCast( self );
+  auto txt =
+      slf.GetProperty( Toolkit::TextEditor::Property::TEXT ).Get< std::string >();
+
+  return txt.size();
+}
+
+Dali::Accessibility::Range TextEditor::AccessibleImpl::GetTextAtOffset(
+    size_t offset, Dali::Accessibility::TextBoundary boundary )
+{
+  return {};
+}
+
+Dali::Accessibility::Range
+TextEditor::AccessibleImpl::GetSelection( size_t selectionNum )
+{
+  // Since DALi supports only one selection indexes higher than 0 are ignored
+  if( selectionNum > 0 )
+    return {};
+
+  auto slf = Toolkit::TextEditor::DownCast( self );
+  std::string ret;
+  Dali::Toolkit::GetImpl( slf ).getController()->RetrieveSelection( ret );
+
+  return Dali::Accessibility::Range( 0, ret.size(), ret );
+}
+
+bool TextEditor::AccessibleImpl::RemoveSelection( size_t selectionNum )
+{
+  // Since DALi supports only one selection indexes higher than 0 are ignored
+  if( selectionNum > 0 )
+    return false;
+
+  auto slf = Toolkit::TextEditor::DownCast( self );
+  std::string ret;
+  Dali::Toolkit::GetImpl( slf ).getController()->SetSelection( 0, 0 );
+  return true;
+}
+
+bool TextEditor::AccessibleImpl::SetSelection( size_t selectionNum,
+                                               size_t startOffset,
+                                               size_t endOffset )
+{
+  // Since DALi supports only one selection indexes higher than 0 are ignored
+  if( selectionNum > 0 )
+    return false;
+
+  auto slf = Toolkit::TextEditor::DownCast( self );
+  std::string ret;
+  Dali::Toolkit::GetImpl( slf ).getController()->SetSelection( startOffset,
+                                                               endOffset );
+  return true;
+}
+
+bool TextEditor::AccessibleImpl::CopyText( size_t startPosition,
+                                           size_t endPosition )
+{
+  return {};
+}
+
+bool TextEditor::AccessibleImpl::CutText( size_t startPosition,
+                                          size_t endPosition )
+{
+  return {};
 }
 
 } // namespace Internal

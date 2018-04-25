@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+#include <dali/public-api/adaptor-framework/accessibility.h>
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
@@ -191,6 +192,8 @@ private: // From Control
    */
   virtual void AddDecoration( Actor& actor, bool needsClipping );
 
+  Text::ControllerPtr getController();
+
 private: // Implementation
 
   /**
@@ -306,6 +309,26 @@ private: // Data
   bool mScrollAnimationEnabled:1;
   bool mScrollBarEnabled:1;
   bool mScrollStarted:1;
+
+  struct AccessibleImpl : public Control::AccessibleImpl,
+                          public virtual Dali::Accessibility::Text,
+                          public virtual Dali::Accessibility::EditableText
+  {
+    using Control::AccessibleImpl::AccessibleImpl;
+
+    std::string GetName() override;
+    std::string GetText( size_t startOffset, size_t endOffset ) override;
+    size_t GetCharacterCount() override;
+    Dali::Accessibility::Range
+    GetTextAtOffset( size_t offset,
+                     Dali::Accessibility::TextBoundary boundary ) override;
+    Dali::Accessibility::Range GetSelection( size_t selectionNum ) override;
+    bool RemoveSelection( size_t selectionNum ) override;
+    bool SetSelection( size_t selectionNum, size_t startOffset,
+                       size_t endOffset ) override;
+    bool CopyText( size_t startPosition, size_t endPosition ) override;
+    bool CutText( size_t startPosition, size_t endPosition ) override;
+  };
 };
 
 } // namespace Internal

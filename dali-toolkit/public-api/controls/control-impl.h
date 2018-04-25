@@ -19,6 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/style-change.h>
 #include <dali/public-api/events/long-press-gesture.h>
 #include <dali/public-api/events/pan-gesture.h>
@@ -29,6 +31,10 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+
+#include <functional>
+#include <memory>
+#include <string>
 
 namespace Dali
 {
@@ -690,7 +696,55 @@ public:
 private:
   Impl* mImpl;
   /// @endcond
+public:
+  void SetAccessibilityConstructor(std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Dali::Actor)> constructor);
+  static Dali::Accessibility::Accessible *GetAccessibilityObject(Dali::Actor actor);
+  Toolkit::Control::AccessibilityActivateSignalType &AccessibilityActivateSignal();
+  void AccessibilitySetAttribute( const std::string& key, const std::string value );
+  std::string AccessibilityGetAttribute( const std::string& key );
+  void AccessibilityEraseAttribute( std::string& key );
 
+  struct AccessibleImpl : public virtual Dali::Accessibility::Accessible, public virtual Dali::Accessibility::Component, public virtual Dali::Accessibility::Collection,
+            public virtual Dali::Accessibility::Action {
+    Dali::Actor self;
+    Dali::Accessibility::Role role;
+    bool modal = false, root = false;
+
+    AccessibleImpl( Dali::Actor self, Dali::Accessibility::Role role,
+                    bool modal = false )
+        : self( self ), role( role ), modal( modal ) {}
+
+    std::string GetName() override;
+    std::string GetDescription() override;
+    Dali::Accessibility::Accessible* GetParent() override;
+    size_t GetChildCount() override;
+    Dali::Accessibility::Accessible* GetChildAtIndex( size_t index ) override;
+    size_t GetIndexInParent() override;
+    Dali::Accessibility::Role GetRole() override;
+    Dali::Accessibility::States GetStates() override;
+    Dali::Accessibility::Attributes GetAttributes() override;
+    Dali::Accessibility::Rectangle
+    GetExtents( Dali::Accessibility::CoordType ctype ) override;
+    Dali::Accessibility::ComponentLayer GetLayer() override;
+    int GetMdiZOrder() override;
+    bool GrabFocus() override;
+    double GetAlpha() override;
+    bool SetExtents( Dali::Accessibility::Rectangle rect,
+                     Dali::Accessibility::CoordType ctype ) override;
+    bool GrabHighlight() override;
+    bool ClearHighlight() override;
+    int GetHighlightIndex() override;
+
+    std::string GetActionName( size_t index ) override;
+    std::string GetLocalizedActionName( size_t index ) override;
+    std::string GetActionDescription( size_t index ) override;
+    size_t GetActionCount() override;
+    std::string GetActionKeyBinding( size_t index ) override;
+    bool DoAction( size_t index ) override;
+
+    virtual Dali::Accessibility::States CalculateStates();
+    virtual bool CalculateIsVisible() const;
+  };
 };
 
 /**

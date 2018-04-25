@@ -26,6 +26,11 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/common/stage.h>
+#include <dali-toolkit/public-api/controls/control.h>
+#include <dali/public-api/object/object-registry.h>
+#include <dali/devel-api/adaptor-framework/accessibility.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <cstring>
 #include <limits>
 
@@ -175,13 +180,20 @@ static bool DoAction( BaseObject* object, const std::string& actionName, const P
 {
   bool ret = false;
 
-  if( object && ( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_ACTIVATED ) ) )
+  if( object &&
+      ( 0 == strcmp( actionName.c_str(), ACTION_ACCESSIBILITY_ACTIVATED ) ||
+        actionName == "activate" ) )
   {
     Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
     if( control )
     {
       // if cast succeeds there is an implementation so no need to check
-      ret = Internal::GetImplementation( control ).OnAccessibilityActivated();
+      if (!Internal::GetImplementation( control ).AccessibilityActivateSignal().Empty()) {
+        Internal::GetImplementation( control ).AccessibilityActivateSignal().Emit();
+        ret = true;
+      }
+      else
+        ret = Internal::GetImplementation( control ).OnAccessibilityActivated();
     }
   }
 
@@ -271,7 +283,9 @@ SignalConnectorType registerSignal5( typeRegistration, SIGNAL_PANNED, &DoConnect
 SignalConnectorType registerSignal6( typeRegistration, SIGNAL_PINCHED, &DoConnectSignal );
 SignalConnectorType registerSignal7( typeRegistration, SIGNAL_LONG_PRESSED, &DoConnectSignal );
 
-TypeAction registerAction( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED, &DoAction );
+TypeAction registerAction( typeRegistration, "activate", &DoAction );
+TypeAction registerAction2( typeRegistration, ACTION_ACCESSIBILITY_ACTIVATED,
+                            &DoAction );
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -311,6 +325,7 @@ const PropertyRegistration Control::Impl::PROPERTY_11( typeRegistration, "leftFo
 const PropertyRegistration Control::Impl::PROPERTY_12( typeRegistration, "rightFocusableActorId", Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID,Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_13( typeRegistration, "upFocusableActorId",    Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,   Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_14( typeRegistration, "downFocusableActorId",  Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_15( typeRegistration, "accessibilityAttributes", Toolkit::Control::Property::ACCESSIBILITY_ATTRIBUTES, Property::MAP, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 
 Control::Impl::Impl( Control& controlImpl )
@@ -338,7 +353,10 @@ Control::Impl::Impl( Control& controlImpl )
   mIsKeyboardNavigationSupported( false ),
   mIsKeyboardFocusGroup( false )
 {
-
+  Dali::Accessibility::Accessible::RegisterControlAccessibilityGetter(
+      []( Dali::Actor actor ) -> Dali::Accessibility::Accessible* {
+        return Control::GetAccessibilityObject( actor );
+      } );
 }
 
 Control::Impl::~Impl()
@@ -792,6 +810,16 @@ void Control::Impl::DoAction( Dali::Property::Index visualIndex, Dali::Property:
   }
 }
 
+void Control::Impl::AccessibilitySetAttribute( const std::string& key,
+                                               const std::string value )
+{
+  Property::Value* val = mAccessibilityAttributes.Find( key );
+  if( val )
+    mAccessibilityAttributes[key] = Property::Value( value );
+  else
+    mAccessibilityAttributes.Insert( key, value );
+}
+
 void Control::Impl::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::Control control = Toolkit::Control::DownCast( BaseHandle( object ) );
@@ -982,8 +1010,24 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
         break;
       }
 
+      case Toolkit::Control::Property::ACCESSIBILITY_ATTRIBUTES:
+      {
+        value.Get( controlImpl.mImpl->mAccessibilityAttributes );
+        break;
+      }
     }
   }
+}
+
+std::string Control::Impl::AccessibilityGetAttribute( const std::string& key )
+{
+  std::string value;
+  auto place = mAccessibilityAttributes.Find( key );
+  if( !place )
+    return "";
+  if( !place->Get( value ) )
+    return "";
+  return value;
 }
 
 Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index index )
@@ -1101,12 +1145,24 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
         value = map;
         break;
       }
+
+      case Toolkit::Control::Property::ACCESSIBILITY_ATTRIBUTES:
+      {
+        value = controlImpl.mImpl->mAccessibilityAttributes;
+        break;
+      }
     }
   }
 
   return value;
 }
 
+void Control::Impl::AccessibilityEraseAttribute( std::string& key )
+{
+  Property::Value* val = mAccessibilityAttributes.Find( key );
+  if( val )
+    mAccessibilityAttributes[key] = Property::Value();
+}
 
 void  Control::Impl::CopyInstancedProperties( RegisteredVisualContainer& visuals, Dictionary<Property::Map>& instancedProperties )
 {

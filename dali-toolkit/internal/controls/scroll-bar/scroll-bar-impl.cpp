@@ -204,6 +204,10 @@ ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
   mIsPanning(false),
   mIndicatorFirstShow(true)
 {
+  SetAccessibilityConstructor( []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::ScrollBar ) );
+  } );
 }
 
 ScrollBar::~ScrollBar()
@@ -856,6 +860,39 @@ Toolkit::ScrollBar ScrollBar::New(Toolkit::ScrollBar::Direction direction)
 
   return handle;
 }
+
+double ScrollBar::AccessibleImpl::GetMinimum()
+{
+  auto p = Toolkit::ScrollBar::DownCast( self );
+  return p.GetProperty( GetImpl( p ).mPropertyMinScrollPosition ).Get< float >();
+}
+
+double ScrollBar::AccessibleImpl::GetCurrent()
+{
+  auto p = Toolkit::ScrollBar::DownCast( self );
+  if( GetImpl( p ).mPropertyScrollPosition == Property::INVALID_INDEX )
+    throw Dali::Accessibility::AccessibleError(
+        "Scroll position is INVALID_INDEX" );
+  return p.GetProperty( GetImpl( p ).mPropertyScrollPosition ).Get< float >();
+}
+
+double ScrollBar::AccessibleImpl::GetMaximum()
+{
+  auto p = Toolkit::ScrollBar::DownCast( self );
+  return p.GetProperty( GetImpl( p ).mPropertyMaxScrollPosition ).Get< float >();
+}
+
+bool ScrollBar::AccessibleImpl::SetCurrent( double current )
+{
+  if( current < GetMinimum() || current > GetMaximum() )
+    return false;
+  auto p = Toolkit::ScrollBar::DownCast( self );
+  p.SetProperty( GetImpl( p ).mPropertyScrollPosition,
+                 static_cast< float >( current ) );
+  return true;
+}
+
+double ScrollBar::AccessibleImpl::GetMinimumIncrement() { return 0.001; }
 
 } // namespace Internal
 

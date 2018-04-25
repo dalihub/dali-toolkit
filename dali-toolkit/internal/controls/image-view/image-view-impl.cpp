@@ -66,6 +66,10 @@ using namespace Dali;
 ImageView::ImageView()
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) )
 {
+  SetAccessibilityConstructor( []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::Image ) );
+  } );
 }
 
 ImageView::~ImageView()

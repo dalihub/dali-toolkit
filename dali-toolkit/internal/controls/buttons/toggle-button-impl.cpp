@@ -98,6 +98,10 @@ ToggleButton::ToggleButton()
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::Constructor\n" );
   SetTogglableButton( false );
+  SetAccessibilityConstructor( []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::ToggleButton ) );
+  } );
 }
 
 ToggleButton::~ToggleButton()

@@ -25,9 +25,13 @@
 #include <typeinfo>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-info.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/public-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/actors/actor-devel.h>
+#include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/align-enumerations.h>
@@ -44,6 +48,7 @@
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 namespace Dali
 {
@@ -485,6 +490,13 @@ Control::Control( ControlBehaviour behaviourFlags )
   mImpl(new Impl(*this))
 {
   mImpl->mFlags = behaviourFlags;
+  SetAccessibilityConstructor(
+      []( Dali::Actor actor )
+          -> std::unique_ptr< Dali::Accessibility::Accessible > {
+        return std::unique_ptr< Dali::Accessibility::Accessible >(
+            new AccessibleImpl( actor,
+                                Dali::Accessibility::Role::RedundantObject ) );
+      } );
 }
 
 Control::~Control()
@@ -519,6 +531,11 @@ void Control::Initialize()
   {
     SetKeyboardNavigationSupport( true );
   }
+
+  Dali::TypeInfo type;
+  Self().GetTypeInfo( type );
+  auto type_name = type.GetName();
+  AccessibilitySetAttribute( "t", type_name );
 }
 
 void Control::OnInitialize()
@@ -800,6 +817,275 @@ const Control& GetImplementation( const Dali::Toolkit::Control& handle )
   // downcast to control
   const Control& impl = dynamic_cast< const Internal::Control& >( customInterface );
   return impl;
+}
+
+Toolkit::Control::AccessibilityActivateSignalType &Control::AccessibilityActivateSignal()
+{
+  return mImpl->mAccessibilityActivateSignal;
+}
+
+Dali::Accessibility::Accessible *Control::GetAccessibilityObject(Dali::Actor actor)
+{
+  if( actor )
+  {
+    auto q = Dali::Toolkit::Control::DownCast( actor );
+    if( q )
+    {
+      auto q2 = static_cast< Internal::Control* >( &q.GetImplementation() );
+      if( !q2->mImpl->accessibilityObject )
+        q2->mImpl->accessibilityObject =
+            q2->mImpl->accessibilityConstructor( actor );
+      return q2->mImpl->accessibilityObject.get();
+    }
+  }
+  return nullptr;
+}
+
+void Control::SetAccessibilityConstructor(
+    std::function< std::unique_ptr< Dali::Accessibility::Accessible >( Dali::Actor ) >
+        constructor )
+{
+  mImpl->accessibilityConstructor = constructor;
+}
+
+std::string Control::AccessibleImpl::GetName() { return self.GetName(); }
+std::string Control::AccessibleImpl::GetDescription() { return ""; }
+Dali::Accessibility::Accessible* Control::AccessibleImpl::GetParent()
+{
+  return Dali::Accessibility::Accessible::Get( self.GetParent() );
+}
+size_t Control::AccessibleImpl::GetChildCount() { return self.GetChildCount(); }
+Dali::Accessibility::Accessible*
+Control::AccessibleImpl::GetChildAtIndex( size_t index )
+{
+  return Dali::Accessibility::Accessible::Get(
+      self.GetChildAt( static_cast< unsigned int >( index ) ) );
+}
+size_t Control::AccessibleImpl::GetIndexInParent()
+{
+  auto s = self;
+  auto parent = s.GetParent();
+  if( !parent )
+    throw Dali::Accessibility::AccessibleError(
+        "can't call GetIndexInParent on object '" + GetAddress().ToString() +
+        "' without parent" );
+  auto count = parent.GetChildCount();
+  for( auto i = 0u; i < count; ++i )
+  {
+    auto c = parent.GetChildAt( i );
+    if( c == s )
+      return i;
+  }
+  throw Dali::Accessibility::AccessibleError(
+      "object '" + GetAddress().ToString() + "' isn't child of it's parent" );
+}
+
+Dali::Accessibility::Role Control::AccessibleImpl::GetRole() { return role; }
+
+void Control::AccessibilitySetAttribute( const std::string& key,
+                                         const std::string value )
+{
+  return mImpl->AccessibilitySetAttribute( key, value );
+}
+
+std::string Control::AccessibilityGetAttribute( const std::string& key )
+{
+  return mImpl->AccessibilityGetAttribute( key );
+}
+
+void Control::AccessibilityEraseAttribute( std::string& key )
+{
+  return mImpl->AccessibilityEraseAttribute( key );
+}
+
+bool Control::AccessibleImpl::CalculateIsVisible() const
+{
+  auto parent = self.GetParent();
+  if( parent )
+  {
+    auto p = Accessible::Get( parent );
+    auto p2 = dynamic_cast< AccessibleImpl* >( p );
+    if( p2 && !p2->CalculateIsVisible() )
+      return false;
+  }
+  auto stage = Stage::GetCurrent();
+  if( stage && self.OnStage() )
+  {
+    auto position =
+        self.GetProperty( Dali::DevelActor::Property::SCREEN_POSITION )
+            .Get< Vector2 >();
+    auto size = stage.GetSize();
+    if( position.x >= 0 && position.x < size.x )
+      return true;
+  }
+  return false;
+}
+
+Dali::Accessibility::States Control::AccessibleImpl::CalculateStates()
+{
+  Dali::Accessibility::States s;
+  s[Dali::Accessibility::State::Highlightable] = true;
+  s[Dali::Accessibility::State::Enabled] = true;
+  s[Dali::Accessibility::State::Sensitive] = true;
+  if( self.IsVisible() )
+    s[Dali::Accessibility::State::Showing] = true;
+  if( modal )
+  {
+    s[Dali::Accessibility::State::Modal] = true;
+  }
+  s[Dali::Accessibility::State::Visible] = CalculateIsVisible();
+  auto am = Toolkit::AccessibilityManager::Get();
+  if( self == am.GetCurrentFocusActor() )
+    s[Dali::Accessibility::State::Highlighted] = true;
+  return s;
+}
+
+Dali::Accessibility::States Control::AccessibleImpl::GetStates()
+{
+  return CalculateStates();
+}
+
+Dali::Accessibility::Attributes Control::AccessibleImpl::GetAttributes()
+{
+  std::unordered_map< std::string, std::string > attribute_map;
+  auto q = Dali::Toolkit::Control::DownCast( self );
+  auto w =
+      q.GetProperty( Dali::Toolkit::Control::Property::ACCESSIBILITY_ATTRIBUTES );
+  auto z = w.GetMap();
+
+  if( z )
+  {
+    auto map_size = z->Count();
+
+    for( unsigned int i = 0; i < map_size; i++ )
+    {
+      auto map_key = z->GetKeyAt( i );
+      if( map_key.type == Property::Key::STRING )
+      {
+        std::string map_value;
+        if( z->GetValue( i ).Get( map_value ) )
+        {
+          attribute_map.emplace( std::move( map_key.stringKey ),
+                                 std::move( map_value ) );
+        }
+      }
+    }
+  }
+
+  return attribute_map;
+}
+
+Dali::Accessibility::ComponentLayer Control::AccessibleImpl::GetLayer()
+{
+  return Dali::Accessibility::ComponentLayer::Window;
+}
+
+Dali::Accessibility::Rectangle
+Control::AccessibleImpl::GetExtents( Dali::Accessibility::CoordType ctype )
+{
+  Vector2 screenPosition =
+      self.GetProperty( Dali::DevelActor::Property::SCREEN_POSITION )
+          .Get< Vector2 >();
+  Vector3 size = self.GetCurrentSize() * self.GetCurrentWorldScale();
+  bool positionUsesAnchorPoint =
+      self.GetProperty( Dali::DevelActor::Property::POSITION_USES_ANCHOR_POINT )
+          .Get< bool >();
+  Vector3 anchorPointOffSet =
+      size * ( positionUsesAnchorPoint ? self.GetCurrentAnchorPoint()
+                                       : AnchorPoint::TOP_LEFT );
+  Vector2 position = Vector2( screenPosition.x - anchorPointOffSet.x,
+                              screenPosition.y - anchorPointOffSet.y );
+
+  return {Dali::Accessibility::Point( (int)position.x, (int)position.y ),
+          Dali::Accessibility::Size( (int)size.x, (int)size.y )};
+}
+
+int Control::AccessibleImpl::GetMdiZOrder() { return 0; }
+bool Control::AccessibleImpl::GrabFocus() { return false; }
+double Control::AccessibleImpl::GetAlpha() { return 0; }
+bool Control::AccessibleImpl::SetExtents( Dali::Accessibility::Rectangle rect,
+                                          Dali::Accessibility::CoordType ctype )
+{
+  return false;
+}
+bool Control::AccessibleImpl::GrabHighlight()
+{
+  auto am = Toolkit::AccessibilityManager::Get();
+  auto old = am.GetCurrentFocusActor();
+  if( old != self )
+  {
+    if( old )
+    {
+      auto c = dynamic_cast< Dali::Accessibility::Component* >(
+          GetAccessibilityObject( old ) );
+      if( c )
+        c->ClearHighlight();
+    }
+    return am.SetCurrentFocusActor( self );
+  }
+  return false;
+}
+bool Control::AccessibleImpl::ClearHighlight()
+{
+  auto am = Toolkit::AccessibilityManager::Get();
+  if( am.GetCurrentFocusActor() == self )
+  {
+    am.ClearFocus();
+    return true;
+  }
+  return false;
+}
+int Control::AccessibleImpl::GetHighlightIndex() { return 0; }
+
+std::string Control::AccessibleImpl::GetActionName( size_t index )
+{
+  if( index >= GetActionCount() )
+    throw Dali::Accessibility::AccessibleError(
+        "index " + std::to_string( index ) + " is too large for action count " +
+        std::to_string( GetActionCount() ) );
+   Dali::TypeInfo type;
+  self.GetTypeInfo( type );
+  if( !type )
+    throw Dali::Accessibility::AccessibleError(
+        "GetActionName failed for object '" + GetAddress().ToString() +
+        "' due to the lack of TypeInfo." );
+  return type.GetActionName( index );
+}
+std::string Control::AccessibleImpl::GetLocalizedActionName( size_t index )
+{
+  // TODO: add localization
+  return GetActionName( index );
+}
+std::string Control::AccessibleImpl::GetActionDescription( size_t index )
+{
+  if( index >= GetActionCount() )
+    throw Dali::Accessibility::AccessibleError(
+        "index " + std::to_string( index ) + " is too large for action count " +
+        std::to_string( GetActionCount() ) );
+   return "";
+}
+size_t Control::AccessibleImpl::GetActionCount()
+{
+   Dali::TypeInfo type;
+  self.GetTypeInfo( type );
+  if( !type )
+    throw Dali::Accessibility::AccessibleError(
+        "GetActionCount failed for object '" + GetAddress().ToString() +
+        "' due to the lack of TypeInfo." );
+   return type.GetActionCount();
+}
+std::string Control::AccessibleImpl::GetActionKeyBinding( size_t index )
+{
+  if( index >= GetActionCount() )
+    throw Dali::Accessibility::AccessibleError(
+        "index " + std::to_string( index ) + " is too large for action count " +
+        std::to_string( GetActionCount() ) );
+   return "";
+}
+bool Control::AccessibleImpl::DoAction( size_t index )
+{
+  std::string actionName = GetActionName( index );
+  return self.DoAction( actionName, {} );
 }
 
 } // namespace Internal

@@ -101,6 +101,10 @@ PushButton::PushButton()
 : Button(),
   mIconAlignment( RIGHT )
 {
+  SetAccessibilityConstructor( []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::PushButton ) );
+  } );
 }
 
 PushButton::~PushButton()

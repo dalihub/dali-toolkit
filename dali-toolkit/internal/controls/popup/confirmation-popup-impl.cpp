@@ -99,6 +99,10 @@ ConfirmationPopup::ConfirmationPopup()
   mControlSignals.reserve( MAXIMUM_NUMBER_OF_CONTROLS );
   mControlSignalNames[ Toolkit::ConfirmationPopup::CONTROL_OK ] = DEFAULT_CONNECT_SIGNAL_NAME;
   mControlSignalNames[ Toolkit::ConfirmationPopup::CONTROL_CANCEL ] = DEFAULT_CONNECT_SIGNAL_NAME;
+  SetAccessibilityConstructor( []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::Dialog, true ) );
+  } );
 }
 
 ConfirmationPopup::~ConfirmationPopup()
