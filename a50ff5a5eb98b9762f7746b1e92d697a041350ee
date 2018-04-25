@@ -399,6 +399,40 @@
       "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a7e2b67_e6be2f7c",
+        "filename": "dali-toolkit/internal/layouting/hbox-layout-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T18:07:39Z",
+      "side": 1,
+      "message": "final?",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb75e2c3_53a299ec",
+        "filename": "dali-toolkit/internal/visuals/texture-manager-impl.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T18:07:39Z",
+      "side": 1,
+      "message": "Separate change directly to devel/master",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
