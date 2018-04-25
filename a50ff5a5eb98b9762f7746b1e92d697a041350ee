@@ -1,0 +1,221 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a2a25c85_92503834",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T16:53:55Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be protected?",
+      "range": {
+        "startLine": 97,
+        "startChar": 2,
+        "endLine": 97,
+        "endChar": 30
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c35cc114_6349e95a",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T16:53:55Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be protected?",
+      "range": {
+        "startLine": 128,
+        "startChar": 2,
+        "endLine": 128,
+        "endChar": 77
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3e0b782c_9f50c3c7",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T16:53:55Z",
+      "side": 1,
+      "message": "Not obvious why this needs to be virtual.  Please add a note explaining why this should (or could) be overridden.",
+      "range": {
+        "startLine": 179,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 36
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d4743eea_2cdc1bc9",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T16:53:55Z",
+      "side": 1,
+      "message": "All the getters below can be const.",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "81fe8f65_3cd22720",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T16:53:55Z",
+      "side": 1,
+      "message": "Could be part of the Impl.",
+      "range": {
+        "startLine": 420,
+        "startChar": 2,
+        "endLine": 420,
+        "endChar": 107
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f3382355_36028719",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T16:53:55Z",
+      "side": 1,
+      "message": "Documentation",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6f04925_8077ce45",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T16:53:55Z",
+      "side": 1,
+      "message": "\u003ddefault?",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64e77634_49a68621",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T16:53:55Z",
+      "side": 1,
+      "message": "\u003ddefault?",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "890f19fe_b175ade2",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T16:53:55Z",
+      "side": 1,
+      "message": "const",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e24b668b_e5765c32",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T16:53:55Z",
+      "side": 1,
+      "message": "const",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8e047d7e_83d388c7",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-04-25T16:53:55Z",
+      "side": 1,
+      "message": "IsLayoutAnimated",
+      "range": {
+        "startLine": 114,
+        "startChar": 7,
+        "endLine": 114,
+        "endChar": 23
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
