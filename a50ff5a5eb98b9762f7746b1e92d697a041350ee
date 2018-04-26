@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "6f659e14_49613419",
+        "filename": "dali-toolkit/devel-api/controls/control-devel.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-04-26T18:52:41Z",
+      "side": 1,
+      "message": "DALI_IMPORT_API needed",
+      "range": {
+        "startLine": 268,
+        "startChar": 0,
+        "endLine": 291,
+        "endChar": 62
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5e1f2fbb_a3df3be5",
         "filename": "dali-toolkit/devel-api/layouting/child-layout-data.h",
         "patchSetId": 2
