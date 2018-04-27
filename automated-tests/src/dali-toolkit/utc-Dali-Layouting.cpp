@@ -64,6 +64,16 @@ Control CreateLeafControl( int width, int height )
   return control;
 }
 
+Vector3 GetSizeWithPadding( Control control )
+{
+  auto controlSize = control.GetProperty<Vector3>( Actor::Property::SIZE );
+  Extents controlPadding = control.GetProperty<Extents>( Dali::Toolkit::Control::Property::PADDING );
+  controlSize.width += controlPadding.start + controlPadding.end;
+  controlSize.height += controlPadding.top + controlPadding.bottom;
+
+  return controlSize;
+}
+
 int UtcDaliLayouting_HboxLayout01(void)
 {
   ToolkitTestApplication application;
@@ -108,9 +118,6 @@ int UtcDaliLayouting_HboxLayout01(void)
 
   END_TEST;
 }
-
-
-
 
 int UtcDaliLayouting_HboxLayout02(void)
 {
@@ -317,9 +324,6 @@ int UtcDaliLayouting_HboxLayout03(void)
   END_TEST;
 }
 
-
-
-
 int UtcDaliLayouting_HboxLayout04(void)
 {
   ToolkitTestApplication application;
@@ -416,6 +420,299 @@ int UtcDaliLayouting_HboxLayout04(void)
   // Test hbox3 matches parent (root layer)
   DALI_TEST_EQUALS( hbox3.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( hbox3.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+// Padding tests
+
+int UtcDaliLayouting_HboxLayout_Padding01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayouting_HboxLayout_Padding01 - Adding Padding to a single child");
+
+  Stage stage = Stage::GetCurrent();
+  auto hbox = Control::New();
+  auto hboxLayout = HboxLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 40 ) );
+  controls.push_back( CreateLeafControl( 80, 40 ) );
+  controls.push_back( CreateLeafControl( 100, 40 ) );
+
+  const Extents CONTROL_PADDING = Extents(5, 10, 20, 2 );
+  tet_printf( "\nAdding Padding to control at index %u \n", 1 );
+  controls[1].SetProperty(Toolkit::Control::Property::PADDING, CONTROL_PADDING );
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800.
+  // hbox left justifies elements
+  tet_infoline("Test Child Actor Position");
+  float xPositionOfControlBeingTested = 0.0f;
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            380.0f,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+  xPositionOfControlBeingTested += 40.0f;
+
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            380.0f - ( ( CONTROL_PADDING.top + CONTROL_PADDING.bottom) * 0.5f ),                                                                                            0.0f ),
+                                                                                            0.0001f, TEST_LOCATION );
+
+  xPositionOfControlBeingTested += 60.0f + CONTROL_PADDING.start + CONTROL_PADDING.end;
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  xPositionOfControlBeingTested += 80.0f;
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  tet_infoline("Test Child Actor Size");
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f + CONTROL_PADDING.start + CONTROL_PADDING.end,
+                                                                                        40.0f + CONTROL_PADDING.top + CONTROL_PADDING.bottom , 0.0f ),
+                                                                                        0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_HboxLayout_Padding02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayouting_HboxLayout_Padding02 - Adding Padding to a all children");
+
+  Stage stage = Stage::GetCurrent();
+  auto hbox = Control::New();
+  auto hboxLayout = HboxLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 40 ) );
+  controls.push_back( CreateLeafControl( 80, 40 ) );
+  controls.push_back( CreateLeafControl( 100, 40 ) );
+
+  const Extents CONTROL_PADDING = Extents(5, 10, 20, 2 );
+
+  for( auto&& iter : controls )
+  {
+    iter.SetProperty(Toolkit::Control::Property::PADDING, CONTROL_PADDING );
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800.
+  // hbox left justifies elements
+  tet_infoline("Test Child Actor Position");
+  float xPositionOfControlBeingTested = 0.0f;
+  float yPositionOfControlBeingTested = ( 800.0f * 0.5) - ( 0.5 * ( 40.0f + CONTROL_PADDING.top + CONTROL_PADDING.bottom ) );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            yPositionOfControlBeingTested,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+  xPositionOfControlBeingTested += 40.0f + CONTROL_PADDING.start + CONTROL_PADDING.end;
+
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            yPositionOfControlBeingTested,
+                                                                                            0.0f ),
+                                                                                            0.0001f, TEST_LOCATION );
+
+  xPositionOfControlBeingTested += 60.0f + CONTROL_PADDING.start + CONTROL_PADDING.end;
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            yPositionOfControlBeingTested,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  xPositionOfControlBeingTested += 80.0f + CONTROL_PADDING.start + CONTROL_PADDING.end;
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            yPositionOfControlBeingTested,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  tet_infoline("Test Child Actor Size");
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f + CONTROL_PADDING.start + CONTROL_PADDING.end,
+                                                                                        40.0f + CONTROL_PADDING.top + CONTROL_PADDING.bottom,
+                                                                                        0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f + CONTROL_PADDING.start + CONTROL_PADDING.end,
+                                                                                        40.0f + CONTROL_PADDING.top + CONTROL_PADDING.bottom,
+                                                                                        0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f + CONTROL_PADDING.start + CONTROL_PADDING.end ,
+                                                                                        40.0f + CONTROL_PADDING.top + CONTROL_PADDING.bottom,
+                                                                                        0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f + CONTROL_PADDING.start + CONTROL_PADDING.end,
+                                                                                        40.0f + CONTROL_PADDING.top + CONTROL_PADDING.bottom,
+                                                                                        0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliLayouting_HboxLayout_Padding03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayouting_HboxLayout_Padding03 - Adding Changing padding on a single child");
+
+  Stage stage = Stage::GetCurrent();
+  auto hbox = Control::New();
+  auto hboxLayout = HboxLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+
+  const Extents CONTROL_PADDING = Extents(5, 10, 20, 2 );
+  tet_printf( "\nAdding Padding to control at index 1 \n" );
+  controls[1].SetProperty(Toolkit::Control::Property::PADDING, CONTROL_PADDING );
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800.
+  // hbox left justifies elements
+  tet_infoline("Test Child Actor Position");
+  float xPositionOfControlBeingTested = 0.0f;
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            380.0f,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+  xPositionOfControlBeingTested += 40.0f;
+
+  DALI_TEST_EQUALS( controls[ 1 ].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            380.0f - ( ( CONTROL_PADDING.top + CONTROL_PADDING.bottom) * 0.5f ),                                                                                            0.0f ),
+                                                                                            0.0001f, TEST_LOCATION );
+
+  xPositionOfControlBeingTested += 40.0f + CONTROL_PADDING.start + CONTROL_PADDING.end;
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  const Extents NEW_CONTROL_PADDING = Extents(10, 10, 20, 2 );
+  tet_printf( "\nChanging Padding to control at index 1 \n" );
+  controls[1].SetProperty(Toolkit::Control::Property::PADDING, NEW_CONTROL_PADDING );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  xPositionOfControlBeingTested = 0.0f; // reset
+
+  tet_infoline("Test Child Actor Position");
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            380.0f,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+  xPositionOfControlBeingTested += 40.0f;
+
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            380.0f - ( ( NEW_CONTROL_PADDING.top + NEW_CONTROL_PADDING.bottom) * 0.5f ),                                                                                            0.0f ),
+                                                                                            0.0001f, TEST_LOCATION );
+
+  xPositionOfControlBeingTested += 40.0f + NEW_CONTROL_PADDING.start + NEW_CONTROL_PADDING.end;
+  tet_printf( "\nIf x position %u then change has not been processed \n", 40 + 40 + CONTROL_PADDING.start + CONTROL_PADDING.end );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  tet_infoline("Test Child Actor Size");
+  DALI_TEST_EQUALS( GetSizeWithPadding( controls[0] ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( GetSizeWithPadding( controls[1] ), Vector3( 40.0f + NEW_CONTROL_PADDING.start + NEW_CONTROL_PADDING.end,
+                                                                                        40.0f + NEW_CONTROL_PADDING.top + NEW_CONTROL_PADDING.bottom , 0.0f ),
+                                                                                        0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( GetSizeWithPadding( controls[2] ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+// Margin Tests
+
+int UtcDaliLayouting_HboxLayout_Margin01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayouting_HboxLayout_Margin01 - Adding a margin to a single child");
+
+  Stage stage = Stage::GetCurrent();
+  auto hbox = Control::New();
+  auto hboxLayout = HboxLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 40 ) );
+  controls.push_back( CreateLeafControl( 80, 40 ) );
+  controls.push_back( CreateLeafControl( 100, 40 ) );
+
+  const Extents CONTROL_MARGIN = Extents(5, 10, 20, 0 );
+  tet_printf( "\nAdding Margin to control at index 1 \n" );
+  controls[1].SetProperty(Toolkit::Control::Property::MARGIN, CONTROL_MARGIN );
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800.
+  // hbox left justifies elements
+  tet_infoline("Test Child Actor Position");
+  auto xPositionOfControlBeingTested = 0.0f;
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            380.0f,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+  xPositionOfControlBeingTested += 40.0f + CONTROL_MARGIN.start;
+
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            380.0f + CONTROL_MARGIN.top, 0.0f ),
+                                                                                            0.0001f, TEST_LOCATION );
+
+  xPositionOfControlBeingTested += 60.0f + CONTROL_MARGIN.end;
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  xPositionOfControlBeingTested += 80.0f;
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  tet_infoline("Test Child Actor Size is the same after Margin added");
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f , 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }
