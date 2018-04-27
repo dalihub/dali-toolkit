@@ -289,7 +289,7 @@ public:
   LayoutLength GetMinimumHeight() const;
 
   /**
-   * Get the padding information
+   * Get the padding information for the given target.
    * @return The padding information
    */
   Extents GetPadding() const;
