@@ -171,7 +171,8 @@ void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
     }
   }
 
-  Extents padding = GetPadding();
+  auto owner = GetOwner();
+  Extents padding = GetPadding( owner );
   mTotalLength += padding.start + padding.end;
   auto widthSize = mTotalLength;
   widthSize = std::max( widthSize, GetSuggestedMinimumWidth() );
@@ -232,7 +233,7 @@ void HboxLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
   auto actor = Actor::DownCast(owner);
   bool isLayoutRtl = actor ? actor.GetProperty<bool>( Actor::Property::LAYOUT_DIRECTION ) : false;
 
-  Extents padding = GetPadding();
+  Extents padding = GetPadding( owner );
 
   LayoutLength childTop( 0 );
   LayoutLength childLeft( padding.start );
