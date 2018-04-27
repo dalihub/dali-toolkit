@@ -28,6 +28,7 @@ namespace Dali
 namespace Toolkit
 {
 namespace Internal
+
 {
 
 class LayoutGroup::Impl
@@ -48,6 +49,7 @@ public:
 
 
 } // namespace Internal
+
 } // namespace Toolkit
 } // namespace Dali
 
