@@ -44,6 +44,7 @@
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 
 using namespace Dali::Toolkit::Text;
 
@@ -586,7 +587,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         Toolkit::Control control = Toolkit::KeyInputFocusManager::Get().GetCurrentFocusControl();
         if (control == textField)
         {
-          impl.mImfManager.ApplyOptions( impl.mInputMethodOptions );
+          impl.mInputMethodContext.ApplyOptions( impl.mInputMethodOptions );
         }
         break;
       }
@@ -1205,6 +1206,11 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
   return value;
 }
 
+InputMethodContext TextField::GetInputMethodContext()
+{
+  return mInputMethodContext;
+}
+
 bool TextField::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::BaseHandle handle( object );
@@ -1261,10 +1267,12 @@ void TextField::OnInitialize()
   mDecorator = Text::Decorator::New( *mController,
                                      *mController );
 
+  mInputMethodContext = InputMethodContext::New();
+
   mController->GetLayoutEngine().SetLayout( Layout::Engine::SINGLE_LINE_BOX );
 
   // Enables the text input.
-  mController->EnableTextInput( mDecorator );
+  mController->EnableTextInput( mDecorator, mInputMethodContext );
 
   // Enables the horizontal scrolling after the text input has been enabled.
   mController->SetHorizontalScrollEnabled( true );
@@ -1281,8 +1289,6 @@ void TextField::OnInitialize()
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
-
-  mImfManager = ImfManager::Get();
 
   self.TouchSignal().Connect( this, &TextField::OnTouched );
 
@@ -1303,6 +1309,8 @@ void TextField::OnInitialize()
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
   self.OnStageSignal().Connect( this, &TextField::OnStageConnect );
+
+  DevelControl::SetInputMethodContext( *this, mInputMethodContext );
 
   if( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP == mExceedPolicy )
   {
@@ -1499,25 +1507,26 @@ void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
 void TextField::OnKeyInputFocusGained()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnKeyInputFocusGained %p\n", mController.Get() );
+  if ( mInputMethodContext )
+  {
+    mInputMethodContext.ApplyOptions( mInputMethodOptions );
 
-  mImfManager.ApplyOptions( mInputMethodOptions );
+    mInputMethodContext.StatusChangedSignal().Connect( this, &TextField::KeyboardStatusChanged );
 
-  mImfManager.StatusChangedSignal().Connect( this, &TextField::KeyboardStatusChanged );
+    mInputMethodContext.EventReceivedSignal().Connect( this, &TextField::OnInputMethodContextEvent );
 
-  mImfManager.EventReceivedSignal().Connect( this, &TextField::OnImfEvent );
+    // Notify that the text editing start.
+    mInputMethodContext.Activate();
 
-  // Notify that the text editing start.
-  mImfManager.Activate();
+    // When window gain lost focus, the inputMethodContext is deactivated. Thus when window gain focus again, the inputMethodContext must be activated.
+    mInputMethodContext.SetRestoreAfterFocusLost( true );
+  }
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
 
-  // When window gain lost focus, the imf manager is deactivated. Thus when window gain focus again, the imf manager must be activated.
-  mImfManager.SetRestoreAfterFocusLost( true );
-
-   ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
-
-   if ( notifier )
-   {
-      notifier.ContentSelectedSignal().Connect( this, &TextField::OnClipboardTextSelected );
-   }
+  if ( notifier )
+  {
+    notifier.ContentSelectedSignal().Connect( this, &TextField::OnClipboardTextSelected );
+  }
 
   mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
 
@@ -1527,16 +1536,17 @@ void TextField::OnKeyInputFocusGained()
 void TextField::OnKeyInputFocusLost()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField:OnKeyInputFocusLost %p\n", mController.Get() );
+  if ( mInputMethodContext )
+  {
+    mInputMethodContext.StatusChangedSignal().Disconnect( this, &TextField::KeyboardStatusChanged );
+    // The text editing is finished. Therefore the inputMethodContext don't have restore activation.
+    mInputMethodContext.SetRestoreAfterFocusLost( false );
 
-  mImfManager.StatusChangedSignal().Disconnect( this, &TextField::KeyboardStatusChanged );
-  // The text editing is finished. Therefore the imf manager don't have restore activation.
-  mImfManager.SetRestoreAfterFocusLost( false );
+    // Notify that the text editing finish.
+    mInputMethodContext.Deactivate();
 
-  // Notify that the text editing finish.
-  mImfManager.Deactivate();
-
-  mImfManager.EventReceivedSignal().Disconnect( this, &TextField::OnImfEvent );
-
+    mInputMethodContext.EventReceivedSignal().Disconnect( this, &TextField::OnInputMethodContextEvent );
+  }
   ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
 
   if ( notifier )
@@ -1552,9 +1562,10 @@ void TextField::OnKeyInputFocusLost()
 void TextField::OnTap( const TapGesture& gesture )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnTap %p\n", mController.Get() );
-
-  mImfManager.Activate();
-
+  if ( mInputMethodContext )
+  {
+    mInputMethodContext.Activate();
+  }
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
   Extents padding;
   padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
@@ -1570,8 +1581,10 @@ void TextField::OnPan( const PanGesture& gesture )
 
 void TextField::OnLongPress( const LongPressGesture& gesture )
 {
-  mImfManager.Activate();
-
+  if ( mInputMethodContext )
+  {
+    mInputMethodContext.Activate();
+  }
   Extents padding;
   padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
   mController->LongPressEvent( gesture.state, gesture.localPoint.x - padding.start, gesture.localPoint.y - padding.top );
@@ -1699,10 +1712,10 @@ void TextField::OnStageConnect( Dali::Actor actor )
   }
 }
 
-ImfManager::ImfCallbackData TextField::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
+InputMethodContext::CallbackData TextField::OnInputMethodContextEvent( Dali::InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnImfEvent %p eventName %d\n", mController.Get(), imfEvent.eventName );
-  return mController->OnImfEvent( imfManager, imfEvent );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextField::OnInputMethodContextEvent %p eventName %d\n", mController.Get(), inputMethodContextEvent.eventName );
+  return mController->OnInputMethodContextEvent( inputMethodContext, inputMethodContextEvent );
 }
 
 void TextField::GetHandleImagePropertyValue(  Property::Value& value, Text::HandleType handleType, Text::HandleImageType handleImageType )

@@ -338,7 +338,6 @@ Control::Impl::Impl( Control& controlImpl )
   mIsKeyboardNavigationSupported( false ),
   mIsKeyboardFocusGroup( false )
 {
-
 }
 
 Control::Impl::~Impl()
@@ -1390,6 +1389,22 @@ void Control::Impl::SetPadding( Extents padding )
 Extents Control::Impl::GetPadding() const
 {
   return mControlImpl.mImpl->mPadding;
+}
+
+void Control::Impl::SetInputMethodContext( InputMethodContext& inputMethodContext )
+{
+  mInputMethodContext = inputMethodContext;
+}
+
+bool Control::Impl::FilterKeyEvent( const KeyEvent& event )
+{
+  bool consumed ( false );
+
+  if ( mInputMethodContext )
+  {
+    consumed = mInputMethodContext.FilterEventKey( event );
+  }
+  return consumed;
 }
 
 } // namespace Internal

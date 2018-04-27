@@ -17,6 +17,8 @@
  * limitations under the License.
  *
  */
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/input-method-context.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -240,6 +242,14 @@ DALI_IMPORT_API Dali::Animation CreateTransition( Internal::Control& control, co
  * @param[in] attributes Optional attributes for the action.
  */
 DALI_IMPORT_API void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes );
+
+/**
+ * @brief Set input method context.
+ *
+ * @param[in] control The control.
+ * @param[in] inputMethodContext The input method context.
+ */
+DALI_IMPORT_API void SetInputMethodContext( Internal::Control& control, InputMethodContext& inputMethodContext );
 
 } // namespace DevelControl
 

@@ -17,6 +17,8 @@
  * limitations under the License.
  *
  */
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/input-method-context.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-field.h>
@@ -101,6 +103,14 @@ namespace Property
       ENABLE_GRAB_HANDLE = ELLIPSIS + 2
   };
 } // namespace Property
+
+/**
+ * @brief Return the input method context of TextField.
+ *
+ * @param[in] textField The instance of TextField.
+ * @return InputMethodContext instance.
+ */
+DALI_IMPORT_API InputMethodContext GetInputMethodContext( TextField textField );
 
 } // namespace DevelText
 

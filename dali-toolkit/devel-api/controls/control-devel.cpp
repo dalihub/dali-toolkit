@@ -96,6 +96,11 @@ void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Proper
   controlDataImpl.DoAction( visualIndex, actionId, attributes );
 }
 
+void SetInputMethodContext( Internal::Control& control, InputMethodContext& inputMethodContext )
+{
+  Internal::Control::Impl::Get( control ).SetInputMethodContext( inputMethodContext );
+}
+
 } // namespace DevelControl
 
 } // namespace Toolkit

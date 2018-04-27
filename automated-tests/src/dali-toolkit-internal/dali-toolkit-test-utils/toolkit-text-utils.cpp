@@ -357,8 +357,9 @@ void ConfigureTextLabel( ControllerPtr controller )
   // Set cursor's width to zero.
   controller->GetLayoutEngine().SetCursorWidth( 0 );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Disables the text input.
-  controller->EnableTextInput( NULL );
+  controller->EnableTextInput( NULL, inputMethodContext );
 
   // Disables the vertical scrolling.
   controller->SetVerticalScrollEnabled( false );
@@ -382,8 +383,9 @@ void ConfigureTextField( ControllerPtr controller )
   // Set the text layout as multi-line.
   controller->GetLayoutEngine().SetLayout( Layout::Engine::SINGLE_LINE_BOX );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   // Enables the vertical scrolling after the text input has been enabled.
   controller->SetVerticalScrollEnabled( false );
@@ -410,8 +412,9 @@ void ConfigureTextEditor( ControllerPtr controller )
   // Set the text layout as multi-line.
   controller->GetLayoutEngine().SetLayout( Layout::Engine::MULTI_LINE_BOX );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   // Enables the vertical scrolling after the text input has been enabled.
   controller->SetVerticalScrollEnabled( true );

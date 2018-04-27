@@ -28,6 +28,7 @@
 {
   "config":
   {
+    "brokenImageUrl":"{DALI_IMAGE_DIR}broken.png",
     "alwaysShowFocus":false,
     "clearFocusOnEscape":true
   },

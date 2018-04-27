@@ -22,7 +22,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-environment-variable.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-feedback-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-file-loader.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-imf-manager.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-context.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-native-image-source.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-orientation.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
