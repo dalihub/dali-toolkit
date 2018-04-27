@@ -212,13 +212,13 @@ Vector3 ImageView::GetNaturalSize()
   if( mVisual )
   {
     Vector2 rendererNaturalSize;
+    Extents padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
     mVisual.GetNaturalSize( rendererNaturalSize );
-
-    Extents padding;
-    padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
-
+ 
     rendererNaturalSize.width += ( padding.start + padding.end );
     rendererNaturalSize.height += ( padding.top + padding.bottom );
+
     return Vector3( rendererNaturalSize );
   }
 
