@@ -209,7 +209,7 @@ void LayoutGroup::MeasureChild( LayoutBasePtr child,
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
   auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
 
-  auto padding = GetPadding();
+  auto padding = child->GetPadding();
 
   const MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
                                                                  padding.start + padding.end,
@@ -229,7 +229,7 @@ void LayoutGroup::MeasureChildWithMargins( LayoutBasePtr child,
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
   auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
   auto desiredMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
-  auto padding = GetPadding();
+  auto padding = child->GetPadding();
 
   MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
                                                            padding.start + padding.end +
@@ -438,7 +438,6 @@ void LayoutGroup::OnOwnerPropertySet( Handle& handle, Property::Index index, Pro
     RequestLayout();
   }
 }
-
 
 } // namespace Internal
 } // namespace Toolkit
