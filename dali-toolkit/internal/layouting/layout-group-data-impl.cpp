@@ -26,7 +26,6 @@ namespace Internal
 
 LayoutGroup::Impl::Impl( LayoutGroup& layoutGroup )
 : LayoutBase::Impl( layoutGroup ),
-  mPadding(),
   mChildren(),
   mNextLayoutId(1)
 {

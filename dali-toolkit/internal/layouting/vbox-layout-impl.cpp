@@ -173,8 +173,8 @@ void VboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
       alternativeMaxWidth = std::max( alternativeMaxWidth, matchWidthLocally ? marginWidth : childWidth );
     }
   }
-
-  Extents padding = GetPadding();
+  auto owner = GetOwner();
+  Extents padding = GetPadding( owner );
   mTotalLength += padding.top + padding.bottom;
   auto heightSize = mTotalLength;
   heightSize = std::max( heightSize, GetSuggestedMinimumHeight() );
@@ -232,7 +232,7 @@ void VboxLayout::ForceUniformWidth( int count, MeasureSpec heightMeasureSpec )
 void VboxLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
 {
   auto owner = GetOwner();
-  Extents padding = GetPadding();
+  Extents padding = GetPadding( owner );
 
   LayoutLength childTop( 0 );
   LayoutLength childLeft( padding.start );

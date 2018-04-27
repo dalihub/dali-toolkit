@@ -302,7 +302,7 @@ void LayoutGroup::MeasureChild( LayoutBasePtr child,
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
   auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
 
-  auto padding = GetPadding();
+  auto padding = GetPadding( childOwner );
 
   const MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
                                                                  padding.start + padding.end,
@@ -322,14 +322,16 @@ void LayoutGroup::MeasureChildWithMargins( LayoutBasePtr child,
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
   auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
   auto desiredMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
+  auto owner = GetOwner();
+  auto padding = GetPadding( owner );
 
   MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
-                                                           mImpl->mPadding.start + mImpl->mPadding.end +
+                                                           padding.start + padding.end +
                                                            desiredMargin.start + desiredMargin.end +
                                                            widthUsed, desiredWidth );
 
   MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( parentHeightMeasureSpec,
-                                                            mImpl->mPadding.top + mImpl->mPadding.bottom +
+                                                            padding.top + padding.bottom +
                                                             desiredMargin.top + desiredMargin.end +
                                                             heightUsed, desiredHeight );
 
@@ -440,9 +442,10 @@ bool LayoutGroup::IsLayoutRequested() const
   return mImpl->GetPrivateFlag( Impl::PFLAG_FORCE_LAYOUT );
 }
 
-Extents LayoutGroup::GetPadding() const
+Extents LayoutGroup::GetPadding( BaseHandle handle ) const
 {
-  return mImpl->mPadding;
+  Toolkit::Control control = Toolkit::Control::DownCast( handle );
+  return control.GetProperty<Extents>( Toolkit::Control::Property::PADDING );
 }
 
 } // namespace Internal

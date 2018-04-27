@@ -180,10 +180,11 @@ public:
   bool IsLayoutRequested() const;
 
   /**
-   * Get the padding information
+   * Get the padding information for the given target.
+   * @param[in] handle target to retreive padding from.
    * @return The padding information
    */
-  Extents GetPadding() const;
+  Extents GetPadding( BaseHandle handle ) const;
 
 public: // Implementation of LayoutParent
   /**

@@ -28,6 +28,7 @@ namespace Dali
 namespace Toolkit
 {
 namespace Internal
+
 {
 
 class LayoutGroup::Impl : public Internal::LayoutBase::Impl
@@ -42,13 +43,13 @@ public:
     Toolkit::LayoutGroup::LayoutId layoutId;
   };
 
-  Extents mPadding;
   std::vector<ChildLayout> mChildren;
   Toolkit::LayoutGroup::LayoutId mNextLayoutId;
 };
 
 
 } // namespace Internal
+
 } // namespace Toolkit
 } // namespace Dali
 
