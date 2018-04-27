@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -439,8 +439,11 @@ bool GetCharactersDirectionTest( const GetCharactersDirectionData& data )
   // 2) Clear the direction info data.
   Vector<CharacterDirection>& directions = logicalModel->mCharacterDirections;
 
-  directions.Erase( directions.Begin() + data.startIndex,
-                    directions.Begin() + data.startIndex + data.numberOfCharacters );
+  if( directions.Count() >= data.startIndex + data.numberOfCharacters )
+  {
+    directions.Erase( directions.Begin() + data.startIndex,
+                      directions.Begin() + data.startIndex + data.numberOfCharacters );
+  }
 
   // 3) Call GetCharactersDirection() function.
 
