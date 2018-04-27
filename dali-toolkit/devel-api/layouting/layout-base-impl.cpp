@@ -203,9 +203,10 @@ void LayoutBase::SetMinimumHeight( LayoutLength minimumHeight )
   RequestLayout();
 }
 
-Extents LayoutBase::GetPadding() const
+Extents LayoutBase::GetPadding( BaseHandle handle ) const
 {
-  return mImpl->mPadding;
+  Toolkit::Control control = Toolkit::Control::DownCast( handle );
+  return control.GetProperty<Extents>( Toolkit::Control::Property::PADDING );
 }
 
 LayoutLength LayoutBase::GetDefaultSize( LayoutLength size, MeasureSpec measureSpec )
