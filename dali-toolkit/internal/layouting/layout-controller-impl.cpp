@@ -51,7 +51,7 @@ void LayoutController::Initialize()
 
 void LayoutController::RequestLayout( LayoutBase& layoutBase )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutController::RequestLayout\n" );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::RequestLayout\n" );
   mLayoutRequested = true;
 
   // Go up the tree and mark all parents to relayout
@@ -105,7 +105,9 @@ void LayoutController::MeasureHierarchy( Actor root, MeasureSpec widthSpec, Meas
   Toolkit::Control control = Toolkit::Control::DownCast( root );
   if( control )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::Measuring leaf\n" );
     Internal::Control& controlImpl = GetImplementation( control );
+
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
     LayoutBasePtr layout = controlDataImpl.GetLayout();
 
@@ -116,6 +118,7 @@ void LayoutController::MeasureHierarchy( Actor root, MeasureSpec widthSpec, Meas
   }
   else
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::Measuring (%u) children\n", root.GetChildCount() );
     // Depth first descent through actor children
     for( unsigned int i = 0, count = root.GetChildCount(); i < count; ++i )
     {
@@ -130,17 +133,20 @@ void LayoutController::PerformLayout( Actor root, int left, int top, int right, 
   Toolkit::Control control = Toolkit::Control::DownCast( root );
   if( control )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayout on leaf\n" );
     Internal::Control& controlImpl = GetImplementation( control );
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
     LayoutBasePtr layout = controlDataImpl.GetLayout();
 
     if( layout )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayout on layout\n" );
       layout->Layout( left, top, right, bottom );
     }
   }
   else
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayout (%u) children\n", root.GetChildCount() );
     // Depth first descent through actor children
     for( unsigned int i = 0, count = root.GetChildCount(); i < count; ++i )
     {
