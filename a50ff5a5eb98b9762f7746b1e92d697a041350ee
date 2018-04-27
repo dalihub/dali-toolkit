@@ -25,6 +25,53 @@
     },
     {
       "key": {
+        "uuid": "4bf57783_75af32ab",
+        "filename": "dali-toolkit/devel-api/controls/control-devel.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f659e14_49613419",
+      "range": {
+        "startLine": 268,
+        "startChar": 0,
+        "endLine": 291,
+        "endChar": 62
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6ae6ef25_10b875ae",
+        "filename": "dali-toolkit/devel-api/controls/control-devel.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Add DALI_IMPORT_API",
+      "range": {
+        "startLine": 268,
+        "startChar": 0,
+        "endLine": 291,
+        "endChar": 62
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5e1f2fbb_a3df3be5",
         "filename": "dali-toolkit/devel-api/layouting/child-layout-data.h",
         "patchSetId": 2
@@ -36,6 +83,30 @@
       "writtenOn": "2018-04-25T17:05:07Z",
       "side": 1,
       "message": "Won\u0027t this create these variables in EVERY SINGLE source file that uses it???",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 157
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d1795fe0_96c166b2",
+        "filename": "dali-toolkit/devel-api/layouting/child-layout-data.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "The static keyword should ensure it only gets defined once, not in every translation unit.",
+      "parentUuid": "5e1f2fbb_a3df3be5",
       "range": {
         "startLine": 29,
         "startChar": 0,
@@ -71,6 +142,30 @@
     },
     {
       "key": {
+        "uuid": "390bbfdd_6bcd9fc2",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2a25c85_92503834",
+      "range": {
+        "startLine": 97,
+        "startChar": 2,
+        "endLine": 97,
+        "endChar": 30
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c35cc114_6349e95a",
         "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
         "patchSetId": 2
@@ -82,6 +177,30 @@
       "writtenOn": "2018-04-25T16:53:55Z",
       "side": 1,
       "message": "Shouldn\u0027t this be protected?",
+      "range": {
+        "startLine": 128,
+        "startChar": 2,
+        "endLine": 128,
+        "endChar": 77
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ed5205b_18bbca21",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c35cc114_6349e95a",
       "range": {
         "startLine": 128,
         "startChar": 2,
@@ -117,6 +236,30 @@
     },
     {
       "key": {
+        "uuid": "4ed0f210_f53413c6",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "This should actually inherit from LayoutParent.",
+      "parentUuid": "3e0b782c_9f50c3c7",
+      "range": {
+        "startLine": 179,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 36
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d4743eea_2cdc1bc9",
         "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
         "patchSetId": 2
@@ -134,6 +277,24 @@
     },
     {
       "key": {
+        "uuid": "99596852_a8eec021",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4743eea_2cdc1bc9",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "81fe8f65_3cd22720",
         "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
         "patchSetId": 2
@@ -145,6 +306,30 @@
       "writtenOn": "2018-04-25T16:53:55Z",
       "side": 1,
       "message": "Could be part of the Impl.",
+      "range": {
+        "startLine": 420,
+        "startChar": 2,
+        "endLine": 420,
+        "endChar": 107
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31a12220_0da07af9",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "SlotDelegate is not copyable. We can\u0027t therefore copy construct the Impl in the LayoutBase member list.",
+      "parentUuid": "81fe8f65_3cd22720",
       "range": {
         "startLine": 420,
         "startChar": 2,
@@ -225,6 +410,24 @@
     },
     {
       "key": {
+        "uuid": "9acafdfc_040c148c",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "890f19fe_b175ade2",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e24b668b_e5765c32",
         "filename": "dali-toolkit/devel-api/layouting/layout-base.h",
         "patchSetId": 2
@@ -259,6 +462,48 @@
         "endLine": 114,
         "endChar": 23
       },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "90bcbc42_27cddd62",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e047d7e_83d388c7",
+      "range": {
+        "startLine": 114,
+        "startChar": 7,
+        "endLine": 114,
+        "endChar": 23
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "715f665e_35b1e5ad",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e24b668b_e5765c32",
       "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
@@ -328,6 +573,24 @@
     },
     {
       "key": {
+        "uuid": "2f045400_26071017",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "216b4940_93d6b4ef",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3bf3d845_545f32c2",
         "filename": "dali-toolkit/devel-api/layouting/layout-group.h",
         "patchSetId": 2
@@ -339,6 +602,24 @@
       "writtenOn": "2018-04-25T17:15:23Z",
       "side": 1,
       "message": "default",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8a3691d0_fa050ec3",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3bf3d845_545f32c2",
       "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
@@ -368,6 +649,30 @@
     },
     {
       "key": {
+        "uuid": "6806b704_ea8b5481",
+        "filename": "dali-toolkit/devel-api/layouting/layout-length.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Apparently I like typing.",
+      "parentUuid": "7a82e6a2_32f9e760",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 3
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a6b9d0b8_4f55c13c",
         "filename": "dali-toolkit/internal/controls/control/control-data-impl-debug.h",
         "patchSetId": 2
@@ -379,6 +684,24 @@
       "writtenOn": "2018-04-25T17:21:36Z",
       "side": 1,
       "message": "Could be in a separate patch in devel/master",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "906bcf8f_90828bb7",
+        "filename": "dali-toolkit/internal/controls/control/control-data-impl-debug.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "a6b9d0b8_4f55c13c",
       "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
@@ -408,6 +731,30 @@
     },
     {
       "key": {
+        "uuid": "93946b2c_f024be2d",
+        "filename": "dali-toolkit/internal/controls/control/control-data-impl.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 1424,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Yes. This doesn\u0027t allocate any new resource. I read the documentation and the implementation. Apparently they both agree that a new internal actor resource is allocated. I don\u0027t want that here.",
+      "parentUuid": "b722ece1_388099f6",
+      "range": {
+        "startLine": 1424,
+        "startChar": 23,
+        "endLine": 1424,
+        "endChar": 73
+      },
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adc4a52_3114a968",
         "filename": "dali-toolkit/internal/controls/flex-container/flex-container-impl.cpp",
         "patchSetId": 2
@@ -419,6 +766,24 @@
       "writtenOn": "2018-04-25T17:21:36Z",
       "side": 1,
       "message": "Separate patch in devel/master?",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "494d8c70_c6fbb732",
+        "filename": "dali-toolkit/internal/controls/flex-container/flex-container-impl.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 669,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "A better question is why did this start failing to compile for me?",
+      "parentUuid": "9adc4a52_3114a968",
       "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
@@ -453,6 +818,24 @@
       "writtenOn": "2018-04-25T18:07:39Z",
       "side": 1,
       "message": "Separate change directly to devel/master",
+      "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f77b9cf5_bdeb25af",
+        "filename": "dali-toolkit/internal/visuals/texture-manager-impl.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-04-27T14:11:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb75e2c3_53a299ec",
       "revId": "a50ff5a5eb98b9762f7746b1e92d697a041350ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
