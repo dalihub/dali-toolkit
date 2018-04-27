@@ -41,7 +41,7 @@ LayoutBase::Impl::Impl()
   mBottom( 0 ),
   mViewFlags( 0 ),
   mPrivateFlags( 0 ),
-  mAnimated(false)
+  mAnimated( false )
 {
 }
 
