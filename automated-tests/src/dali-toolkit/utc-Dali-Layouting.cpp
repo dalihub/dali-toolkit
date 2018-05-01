@@ -109,9 +109,6 @@ int UtcDaliLayouting_HboxLayout01(void)
   END_TEST;
 }
 
-
-
-
 int UtcDaliLayouting_HboxLayout02(void)
 {
   ToolkitTestApplication application;
@@ -643,6 +640,73 @@ int UtcDaliLayouting_HboxLayout_Padding03(void)
                                                                                         0.0001f, TEST_LOCATION );
 
   DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+// Margin Tests
+
+int UtcDaliLayouting_HboxLayout_Margin01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayouting_HboxLayout_Margin01 - Adding a margin to a single child");
+
+  Stage stage = Stage::GetCurrent();
+  auto hbox = Control::New();
+  auto hboxLayout = HboxLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 40 ) );
+  controls.push_back( CreateLeafControl( 80, 40 ) );
+  controls.push_back( CreateLeafControl( 100, 40 ) );
+
+  const Extents CONTROL_MARGIN = Extents(5, 10, 20, 2 );
+  tet_printf( "\nAdding Padding to control at index 1 \n" );
+  controls[1].SetProperty(Toolkit::Control::Property::MARGIN, CONTROL_MARGIN );
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800.
+  // hbox left justifies elements
+  tet_infoline("Test Child Actor Position");
+  float xPositionOfControlBeingTested = 0.0f;
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            380.0f,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+  xPositionOfControlBeingTested += 40.0f;
+
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,
+                                                                                            380.0f - ( ( CONTROL_MARGIN.top + CONTROL_MARGIN.bottom) * 0.5f ),                                                                                            0.0f ),
+                                                                                            0.0001f, TEST_LOCATION );
+
+  xPositionOfControlBeingTested += 60.0f + CONTROL_MARGIN.start + CONTROL_MARGIN.end;
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  xPositionOfControlBeingTested += 80.0f;
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( xPositionOfControlBeingTested,380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  tet_infoline("Test Child Actor Size");
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f + CONTROL_MARGIN.start + CONTROL_MARGIN.end,
+                                                                                        40.0f + CONTROL_MARGIN.top + CONTROL_MARGIN.bottom , 0.0f ),
+                                                                                        0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }
