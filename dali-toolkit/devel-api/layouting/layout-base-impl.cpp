@@ -216,6 +216,19 @@ Extents LayoutBase::GetPadding() const
   }
 }
 
+Extents LayoutBase::GetMargin() const
+{
+  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  if ( control )
+  {
+    return control.GetProperty<Extents>( Toolkit::Control::Property::MARGIN );
+  }
+  else
+  {
+    return Extents();
+  }
+}
+
 LayoutLength LayoutBase::GetDefaultSize( LayoutLength size, MeasureSpec measureSpec )
 {
   LayoutLength result = size;
