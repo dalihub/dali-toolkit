@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5e4f96c8_684dc281",
+        "filename": "automated-tests/src/dali-toolkit/utc-Dali-Layouting.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-01T19:13:03Z",
+      "side": 1,
+      "message": "Don\u0027t use floats. Extent is based on uint16_t",
+      "range": {
+        "startLine": 440,
+        "startChar": 42,
+        "endLine": 440,
+        "endChar": 67
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6accecd8_bb825c0b",
+        "filename": "automated-tests/src/dali-toolkit/utc-Dali-Layouting.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 609,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-01T19:13:03Z",
+      "side": 1,
+      "message": "If you must use constants for indices, use them consistently",
+      "range": {
+        "startLine": 609,
+        "startChar": 29,
+        "endLine": 609,
+        "endChar": 30
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "da5fde8e_02887a15",
+        "filename": "automated-tests/src/dali-toolkit/utc-Dali-Layouting.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 637,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-01T19:13:03Z",
+      "side": 1,
+      "message": "Stop using floats!",
+      "range": {
+        "startLine": 637,
+        "startChar": 31,
+        "endLine": 637,
+        "endChar": 33
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8094e136_29f55722",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-01T19:13:03Z",
+      "side": 1,
+      "message": "Why do you pass a handle in? Can\u0027t you use the mOwner?",
+      "range": {
+        "startLine": 206,
+        "startChar": 32,
+        "endLine": 206,
+        "endChar": 49
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d131bb64_b1577f73",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-01T19:13:03Z",
+      "side": 1,
+      "message": "Should test the control downcast is non-null before running methods on it.",
+      "range": {
+        "startLine": 209,
+        "startChar": 9,
+        "endLine": 209,
+        "endChar": 16
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b3d30aa_a89700b2",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-01T19:13:03Z",
+      "side": 1,
+      "message": "Surely you can use owner rather than passing another handle in?",
+      "range": {
+        "startLine": 296,
+        "startChar": 22,
+        "endLine": 296,
+        "endChar": 39
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4398a98f_3e89ee79",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-01T19:13:03Z",
+      "side": 1,
+      "message": "should write as child-\u003eGetPadding(); Is this change of meaning right? (Need to check if Android also uses CSS Box model for meaning of padding and margin)",
+      "range": {
+        "startLine": 212,
+        "startChar": 17,
+        "endLine": 212,
+        "endChar": 42
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b170921b_1eb94b48",
+        "filename": "dali-toolkit/internal/layouting/hbox-layout-impl.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-01T19:13:03Z",
+      "side": 1,
+      "message": "Don\u0027t need to get owner - can do this inside LayoutBase.",
+      "range": {
+        "startLine": 175,
+        "startChar": 32,
+        "endLine": 175,
+        "endChar": 37
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
