@@ -130,7 +130,7 @@ void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
 
       MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, heightMeasureSpec, 0 );
       auto childWidth = childLayout->GetMeasuredWidth();
-      auto childMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
+      auto childMargin = childLayout->GetMargin();
       auto length = childWidth + LayoutLength::IntType(childMargin.start + childMargin.end);
 
       auto cellPadding = i<GetChildCount()-1 ? mCellPadding.width: 0;
@@ -265,8 +265,7 @@ void HboxLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
       auto childWidth = childLayout->GetMeasuredWidth();
       auto childHeight = childLayout->GetMeasuredHeight();
 
-      auto childOwner = childLayout->GetOwner();
-      auto childMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
+      auto childMargin = childLayout->GetMargin();
 
       childTop = LayoutLength(padding.top) + ((childSpace - childHeight) / 2) + childMargin.top - childMargin.bottom;
 
