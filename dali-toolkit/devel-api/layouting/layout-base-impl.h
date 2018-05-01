@@ -294,6 +294,12 @@ public:
    */
   Extents GetPadding() const;
 
+  /**
+   * Get the margin information for the given target.
+   * @return The margin information
+   */
+  Extents GetMargin() const;
+
 protected:
   /**
    * @brief Allow directly deriving classes to remove layout children when unparented
@@ -306,7 +312,6 @@ protected:
    * @param[in] containerType The type name of the owner container
    */
   virtual void OnRegisterChildProperties( const std::string& containerType );
-
 
   /**
    * @brief Measure the layout and its content to determine the measured width and the

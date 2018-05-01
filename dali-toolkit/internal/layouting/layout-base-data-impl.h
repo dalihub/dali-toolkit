@@ -46,8 +46,6 @@ public:
   MeasuredSize mMeasuredWidth;
   MeasuredSize mMeasuredHeight;
 
-  Extents mMargin; ///< Distances in pixels from the edges of this view to this view's parent.
-
   LayoutLength mLeft;
   LayoutLength mRight;
   LayoutLength mTop;
