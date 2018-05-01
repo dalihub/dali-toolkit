@@ -15,10 +15,15 @@
  */
 
 // CLASS HEADER
+#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
+
+// EXTERNAL INCLUDES
+#include <iostream>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
-#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/layouting/layout-group-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
@@ -228,17 +233,21 @@ void LayoutGroup::MeasureChildWithMargins( LayoutBasePtr child,
   auto childOwner = child->GetOwner();
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
   auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
-  auto desiredMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
+  auto margin = GetMargin( childOwner );
+
+  std::cout << "margin:" << margin.start << std::endl;
   auto padding = GetPadding( childOwner );
+
+  
 
   MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
                                                            padding.start + padding.end +
-                                                           desiredMargin.start + desiredMargin.end +
+                                                           margin.start + margin.end +
                                                            widthUsed, desiredWidth );
 
   MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( parentHeightMeasureSpec,
                                                             padding.top + padding.bottom +
-                                                            desiredMargin.top + desiredMargin.end +
+                                                            margin.top + margin.end +
                                                             heightUsed, desiredHeight );
 
   child->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
@@ -405,7 +414,7 @@ void LayoutGroup::ChildAddedToOwner( Actor child )
       auto desiredSize = control.GetNaturalSize();
       childControlDataImpl.SetLayout( *childLayout.Get() );
 
-      // HBoxLayout will apply default layout data for this object
+      // Default layout data for this object
       child.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, LayoutLength::IntType( desiredSize.width ) );
       child.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, LayoutLength::IntType( desiredSize.height ) );
       child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Extents() );

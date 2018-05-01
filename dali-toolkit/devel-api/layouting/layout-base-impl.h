@@ -295,6 +295,13 @@ public:
    */
   Extents GetPadding( BaseHandle handle ) const;
 
+  /**
+   * Get the margin information for the given target.
+   * @param[in] handle target to retreive margins from.
+   * @return The margin information
+   */
+  Extents GetMargin( BaseHandle handle ) const;
+
 protected:
   /**
    * @brief Allow directly deriving classes to remove layout children when unparented

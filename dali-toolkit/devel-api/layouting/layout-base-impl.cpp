@@ -209,6 +209,12 @@ Extents LayoutBase::GetPadding( BaseHandle handle ) const
   return control.GetProperty<Extents>( Toolkit::Control::Property::PADDING );
 }
 
+Extents LayoutBase::GetMargin( BaseHandle handle ) const
+{
+  Toolkit::Control control = Toolkit::Control::DownCast( handle );
+  return control.GetProperty<Extents>( Toolkit::Control::Property::MARGIN );
+}
+
 LayoutLength LayoutBase::GetDefaultSize( LayoutLength size, MeasureSpec measureSpec )
 {
   LayoutLength result = size;
