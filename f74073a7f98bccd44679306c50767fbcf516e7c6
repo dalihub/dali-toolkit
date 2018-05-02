@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "13e41a83_37ab7dac",
+        "filename": "automated-tests/src/dali-toolkit/utc-Dali-Layouting.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T13:20:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e4f96c8_684dc281",
+      "range": {
+        "startLine": 440,
+        "startChar": 42,
+        "endLine": 440,
+        "endChar": 67
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6accecd8_bb825c0b",
         "filename": "automated-tests/src/dali-toolkit/utc-Dali-Layouting.cpp",
         "patchSetId": 4
@@ -36,6 +60,30 @@
       "writtenOn": "2018-05-01T19:13:03Z",
       "side": 1,
       "message": "If you must use constants for indices, use them consistently",
+      "range": {
+        "startLine": 609,
+        "startChar": 29,
+        "endLine": 609,
+        "endChar": 30
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6a44d76c_3e4a3f65",
+        "filename": "automated-tests/src/dali-toolkit/utc-Dali-Layouting.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 609,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T13:20:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6accecd8_bb825c0b",
       "range": {
         "startLine": 609,
         "startChar": 29,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "d5d99385_767fa652",
+        "filename": "automated-tests/src/dali-toolkit/utc-Dali-Layouting.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 637,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T13:20:59Z",
+      "side": 1,
+      "message": "done, although still inconsistent having unsigned Extents added to Size ( float).",
+      "parentUuid": "da5fde8e_02887a15",
+      "range": {
+        "startLine": 637,
+        "startChar": 31,
+        "endLine": 637,
+        "endChar": 33
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8094e136_29f55722",
         "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.cpp",
         "patchSetId": 4
@@ -82,6 +154,30 @@
       "writtenOn": "2018-05-01T19:13:03Z",
       "side": 1,
       "message": "Why do you pass a handle in? Can\u0027t you use the mOwner?",
+      "range": {
+        "startLine": 206,
+        "startChar": 32,
+        "endLine": 206,
+        "endChar": 49
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "069e4661_ed4e4b17",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T13:20:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8094e136_29f55722",
       "range": {
         "startLine": 206,
         "startChar": 32,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "e75a07eb_f67afe22",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T13:20:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d131bb64_b1577f73",
+      "range": {
+        "startLine": 209,
+        "startChar": 9,
+        "endLine": 209,
+        "endChar": 16
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2b3d30aa_a89700b2",
         "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
         "patchSetId": 4
@@ -128,6 +248,30 @@
       "writtenOn": "2018-05-01T19:13:03Z",
       "side": 1,
       "message": "Surely you can use owner rather than passing another handle in?",
+      "range": {
+        "startLine": 296,
+        "startChar": 22,
+        "endLine": 296,
+        "endChar": 39
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4537ad53_081d85e3",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T13:20:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b3d30aa_a89700b2",
       "range": {
         "startLine": 296,
         "startChar": 22,
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "53909504_42f25472",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T13:20:59Z",
+      "side": 1,
+      "message": "Android does use padding and margin in the same way the Box Model works.  Padding adds space around the View\u0027s content whilst Margin adds space around the View.",
+      "parentUuid": "4398a98f_3e89ee79",
+      "range": {
+        "startLine": 212,
+        "startChar": 17,
+        "endLine": 212,
+        "endChar": 42
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b170921b_1eb94b48",
         "filename": "dali-toolkit/internal/layouting/hbox-layout-impl.cpp",
         "patchSetId": 4
@@ -174,6 +342,30 @@
       "writtenOn": "2018-05-01T19:13:03Z",
       "side": 1,
       "message": "Don\u0027t need to get owner - can do this inside LayoutBase.",
+      "range": {
+        "startLine": 175,
+        "startChar": 32,
+        "endLine": 175,
+        "endChar": 37
+      },
+      "revId": "f74073a7f98bccd44679306c50767fbcf516e7c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "931ba8ba_d1daa850",
+        "filename": "dali-toolkit/internal/layouting/hbox-layout-impl.cpp",
+        "patchSetId": 4
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T13:20:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b170921b_1eb94b48",
       "range": {
         "startLine": 175,
         "startChar": 32,
