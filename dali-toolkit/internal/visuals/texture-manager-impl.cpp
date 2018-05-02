@@ -115,6 +115,8 @@ TextureManager::MaskingData::MaskingData()
 TextureManager::TextureManager()
 : mAsyncLocalLoaders( GetNumberOfLocalLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
   mAsyncRemoteLoaders( GetNumberOfRemoteLoaderThreads(), [&]() { return AsyncLoadingHelper(*this); } ),
+  mExternalTextures(),
+  mLifecycleObservers(),
   mBrokenImageUrl(""),
   mCurrentTextureId( 0 )
 {
@@ -129,13 +131,13 @@ TextureManager::~TextureManager()
 }
 
 TextureSet TextureManager::LoadTexture(
-    const VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode,
-    Dali::SamplingMode::Type samplingMode, const MaskingDataPointer& maskInfo,
-    bool synchronousLoading, TextureManager::TextureId& textureId, Vector4& textureRect,
-    bool& atlasingStatus, bool& loadingStatus, Dali::WrapMode::Type wrapModeU,
-    Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
-    AtlasUploadObserver* atlasObserver, ImageAtlasManagerPtr imageAtlasManager, bool orientationCorrection,
-    TextureManager::ReloadPolicy reloadPolicy, TextureManager::MultiplyOnLoad& preMultiplyOnLoad )
+  const VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode,
+  Dali::SamplingMode::Type samplingMode, const MaskingDataPointer& maskInfo,
+  bool synchronousLoading, TextureManager::TextureId& textureId, Vector4& textureRect,
+  bool& atlasingStatus, bool& loadingStatus, Dali::WrapMode::Type wrapModeU,
+  Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
+  AtlasUploadObserver* atlasObserver, ImageAtlasManagerPtr imageAtlasManager, bool orientationCorrection,
+  TextureManager::ReloadPolicy reloadPolicy, TextureManager::MultiplyOnLoad& preMultiplyOnLoad )
 {
   TextureSet textureSet;
 

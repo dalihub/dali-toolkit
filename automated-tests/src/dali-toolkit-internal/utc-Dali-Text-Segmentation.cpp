@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,9 +56,10 @@ bool LineBreakInfoTest( const BreakInfoData& data )
   Vector<Character> utf32;
   utf32.Resize( data.text.size() );
 
-  const uint32_t numberOfCharacters = Utf8ToUtf32( reinterpret_cast<const uint8_t* const>( data.text.c_str() ),
-                                                   data.text.size(),
-                                                   &utf32[0u] );
+  const uint32_t numberOfCharacters = ( data.text.size() == 0 ) ? 0 :
+    Utf8ToUtf32( reinterpret_cast<const uint8_t* const>( data.text.c_str() ),
+                 data.text.size(),
+                 &utf32[0u] );
 
   utf32.Resize( numberOfCharacters );
 
@@ -113,9 +114,10 @@ bool WordBreakInfoTest( const BreakInfoData& data )
   Vector<Character> utf32;
   utf32.Resize( data.text.size() );
 
-  const uint32_t numberOfCharacters = Utf8ToUtf32( reinterpret_cast<const uint8_t* const>( data.text.c_str() ),
-                                                   data.text.size(),
-                                                   &utf32[0u] );
+  const uint32_t numberOfCharacters = ( data.text.size() == 0 ) ? 0 :
+    Utf8ToUtf32( reinterpret_cast<const uint8_t* const>( data.text.c_str() ),
+                 data.text.size(),
+                 &utf32[0u] );
 
   utf32.Resize( numberOfCharacters );
 

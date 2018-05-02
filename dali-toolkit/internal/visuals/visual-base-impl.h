@@ -89,7 +89,7 @@ public:
   /**
    * @copydoc Toolkit::Visual::Base::GetName
    */
-  const std::string& GetName();
+  const std::string& GetName() const;
 
   /**
    * @copydoc Toolkit::Visual::Base::SetSize
