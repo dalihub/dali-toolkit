@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "105bc09c_26f9c205",
+        "filename": "dali-toolkit/devel-api/layouting/layout-base-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T16:16:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "416c25d8_5e245abe",
+      "range": {
+        "startLine": 303,
+        "startChar": 21,
+        "endLine": 303,
+        "endChar": 38
+      },
+      "revId": "a9d92e72ef878c81046d5d255840466a8e17e1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "06ef2dff_d8f4a3de",
         "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2018-05-01T19:20:24Z",
       "side": 1,
       "message": "Use dali debug, or remove.",
+      "range": {
+        "startLine": 21,
+        "startChar": 1,
+        "endLine": 21,
+        "endChar": 19
+      },
+      "revId": "a9d92e72ef878c81046d5d255840466a8e17e1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8d1c54cd_753678a8",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T16:16:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06ef2dff_d8f4a3de",
       "range": {
         "startLine": 21,
         "startChar": 1,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "9776dfa2_63b13f2f",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T16:16:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ff38863_17779962",
+      "range": {
+        "startLine": 195,
+        "startChar": 2,
+        "endLine": 195,
+        "endChar": 92
+      },
+      "revId": "a9d92e72ef878c81046d5d255840466a8e17e1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a008e93b_810f1c8c",
         "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
         "patchSetId": 1
@@ -82,6 +154,30 @@
       "writtenOn": "2018-05-01T19:20:24Z",
       "side": 1,
       "message": "child-\u003eGetMargin()",
+      "range": {
+        "startLine": 236,
+        "startChar": 16,
+        "endLine": 236,
+        "endChar": 40
+      },
+      "revId": "a9d92e72ef878c81046d5d255840466a8e17e1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e40e163f_7c9cc944",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T16:16:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a008e93b_810f1c8c",
       "range": {
         "startLine": 236,
         "startChar": 16,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "13b4be8b_ac20eb39",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T16:16:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5e61872_9aa97c4b",
+      "range": {
+        "startLine": 238,
+        "startChar": 2,
+        "endLine": 238,
+        "endChar": 54
+      },
+      "revId": "a9d92e72ef878c81046d5d255840466a8e17e1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f9a51336_938cb097",
         "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
         "patchSetId": 1
@@ -128,6 +248,30 @@
       "writtenOn": "2018-05-01T19:20:24Z",
       "side": 1,
       "message": "Remove",
+      "range": {
+        "startLine": 377,
+        "startChar": 0,
+        "endLine": 387,
+        "endChar": 3
+      },
+      "revId": "a9d92e72ef878c81046d5d255840466a8e17e1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "595c53cc_e4e84f11",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 387,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T16:16:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9a51336_938cb097",
       "range": {
         "startLine": 377,
         "startChar": 0,
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "ad09fa89_3bc46225",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T16:16:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "16a21e19_9a9e8890",
+      "range": {
+        "startLine": 420,
+        "startChar": 6,
+        "endLine": 420,
+        "endChar": 95
+      },
+      "revId": "a9d92e72ef878c81046d5d255840466a8e17e1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ae0751cb_e5669230",
         "filename": "dali-toolkit/internal/layouting/hbox-layout-impl.cpp",
         "patchSetId": 1
@@ -186,6 +354,30 @@
     },
     {
       "key": {
+        "uuid": "ca59371b_d473fb96",
+        "filename": "dali-toolkit/internal/layouting/hbox-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T16:16:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae0751cb_e5669230",
+      "range": {
+        "startLine": 133,
+        "startChar": 25,
+        "endLine": 133,
+        "endChar": 49
+      },
+      "revId": "a9d92e72ef878c81046d5d255840466a8e17e1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d096ecbf_c44c69ba",
         "filename": "dali-toolkit/internal/layouting/hbox-layout-impl.cpp",
         "patchSetId": 1
@@ -197,6 +389,30 @@
       "writtenOn": "2018-05-01T19:20:24Z",
       "side": 1,
       "message": "childLayout-\u003eGetMargin()",
+      "range": {
+        "startLine": 270,
+        "startChar": 25,
+        "endLine": 270,
+        "endChar": 49
+      },
+      "revId": "a9d92e72ef878c81046d5d255840466a8e17e1ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3832589f_1011c284",
+        "filename": "dali-toolkit/internal/layouting/hbox-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-02T16:16:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d096ecbf_c44c69ba",
       "range": {
         "startLine": 270,
         "startChar": 25,
