@@ -97,8 +97,6 @@ public:
    */
   Toolkit::TextField::InputStyleChangedSignalType& InputStyleChangedSignal();
 
-  Text::ControllerPtr getController();
-
 private: // From Control
 
   /**
@@ -283,27 +281,6 @@ private: // Data
   int mRenderingBackend;
   int mExceedPolicy;
   bool mHasBeenStaged:1;
-
-protected:
-  struct AccessibleImpl : public Control::AccessibleImpl,
-                          public virtual Dali::Accessibility::Text,
-                          public virtual Dali::Accessibility::EditableText
-  {
-    using Control::AccessibleImpl::AccessibleImpl;
-
-    std::string GetName() override;
-    std::string GetText( size_t startOffset, size_t endOffset ) override;
-    size_t GetCharacterCount() override;
-    Dali::Accessibility::Range
-    GetTextAtOffset( size_t offset,
-                     Dali::Accessibility::TextBoundary boundary ) override;
-    Dali::Accessibility::Range GetSelection( size_t selectionNum ) override;
-    bool RemoveSelection( size_t selectionNum ) override;
-    bool SetSelection( size_t selectionNum, size_t startOffset,
-                       size_t endOffset ) override;
-    bool CopyText( size_t startPosition, size_t endPosition ) override;
-    bool CutText( size_t startPosition, size_t endPosition ) override;
-  };
 };
 
 } // namespace Internal

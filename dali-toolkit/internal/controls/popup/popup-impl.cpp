@@ -263,10 +263,6 @@ Popup::Popup()
   mTailRightImage( DEFAULT_TAIL_RIGHT_IMAGE_PATH )
 {
   SetKeyboardNavigationSupport( true );
-  SetAccessibilityConstructor( []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::Dialog, true ) );
-  } );
 }
 
 void Popup::OnInitialize()

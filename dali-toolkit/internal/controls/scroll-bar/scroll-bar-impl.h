@@ -319,18 +319,6 @@ private:
 
   bool mIsPanning                 : 1;                               ///< Whether the scroll bar is being panned.
   bool mIndicatorFirstShow        : 1;                               ///< True if the indicator has never been shown
-
-protected:
-  struct AccessibleImpl : public Control::AccessibleImpl,
-                          public virtual Dali::Accessibility::Value
-  {
-    using Control::AccessibleImpl::AccessibleImpl;
-    double GetMinimum() override;
-    double GetCurrent() override;
-    double GetMaximum() override;
-    bool SetCurrent( double ) override;
-    double GetMinimumIncrement() override;
-  };
 };
 
 } // namespace Internal

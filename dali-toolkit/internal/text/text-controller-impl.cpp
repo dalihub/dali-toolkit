@@ -1935,13 +1935,6 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
   }
 }
 
-void Controller::Impl::SetSelection( int start, int end )
-{
-  mEventData->mLeftSelectionPosition = start;
-  mEventData->mRightSelectionPosition = end;
-  mEventData->mUpdateCursorPosition = true;
-}
-
 void Controller::Impl::ShowClipboard()
 {
   if( mClipboard )

@@ -544,9 +544,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       impl.RequestTextRelayout();
     }
   }
-}
 
-Text::ControllerPtr TextLabel::getController() { return mController; }
+
+
+
+}
 
 Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index index )
 {
@@ -1083,92 +1085,10 @@ TextLabel::TextLabel()
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mTextUpdateNeeded( false )
 {
-  SetAccessibilityConstructor( []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::Label ) );
-  } );
 }
 
 TextLabel::~TextLabel()
 {
-}
-
-std::string TextLabel::AccessibleImpl::GetName()
-{
-  auto slf = Toolkit::TextLabel::DownCast( self );
-  return slf.GetProperty( Toolkit::TextLabel::Property::TEXT ).Get< std::string >();
-}
-
-std::string TextLabel::AccessibleImpl::GetText( size_t startOffset,
-                                                size_t endOffset )
-{
-  if( endOffset <= startOffset )
-    return {};
-
-  auto slf = Toolkit::TextLabel::DownCast( self );
-  auto txt =
-      slf.GetProperty( Toolkit::TextLabel::Property::TEXT ).Get< std::string >();
-
-  if( txt.size() > startOffset || txt.size() > endOffset )
-    return {};
-
-  return txt.substr( startOffset, endOffset - startOffset );
-}
-
-size_t TextLabel::AccessibleImpl::GetCharacterCount()
-{
-  auto slf = Toolkit::TextLabel::DownCast( self );
-  auto txt =
-      slf.GetProperty( Toolkit::TextLabel::Property::TEXT ).Get< std::string >();
-
-  return txt.size();
-}
-
-Dali::Accessibility::Range TextLabel::AccessibleImpl::GetTextAtOffset(
-    size_t offset, Dali::Accessibility::TextBoundary boundary )
-{
-  return {};
-}
-
-Dali::Accessibility::Range
-TextLabel::AccessibleImpl::GetSelection( size_t selectionNum )
-{
-  // Since DALi supports only one selection indexes higher than 0 are ignored
-  if( selectionNum > 0 )
-    return {};
-
-  auto slf = Toolkit::TextLabel::DownCast( self );
-  std::string ret;
-  Dali::Toolkit::GetImpl( slf ).getController()->RetrieveSelection( ret );
-
-  return Dali::Accessibility::Range( 0, ret.size(), ret );
-}
-
-bool TextLabel::AccessibleImpl::RemoveSelection( size_t selectionNum )
-{
-  // Since DALi supports only one selection indexes higher than 0 are ignored
-  if( selectionNum > 0 )
-    return false;
-
-  auto slf = Toolkit::TextLabel::DownCast( self );
-  std::string ret;
-  Dali::Toolkit::GetImpl( slf ).getController()->SetSelection( 0, 0 );
-  return true;
-}
-
-bool TextLabel::AccessibleImpl::SetSelection( size_t selectionNum,
-                                              size_t startOffset,
-                                              size_t endOffset )
-{
-  // Since DALi supports only one selection indexes higher than 0 are ignored
-  if( selectionNum > 0 )
-    return false;
-
-  auto slf = Toolkit::TextLabel::DownCast( self );
-  std::string ret;
-  Dali::Toolkit::GetImpl( slf ).getController()->SetSelection( startOffset,
-                                                               endOffset );
-  return true;
 }
 
 } // namespace Internal

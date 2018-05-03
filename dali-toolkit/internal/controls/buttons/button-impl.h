@@ -685,14 +685,6 @@ private:
   Image            mSetButtonImage;             ///< Store set image if deprecated SetButtonImage used.
   Image            mSetSelectedImage;           ///< Store set image if deprecated SetSelectedImage used.
 
-protected:
-  struct AccessibleImpl : public Control::AccessibleImpl
-  {
-    using Control::AccessibleImpl::AccessibleImpl;
-
-    Dali::Accessibility::States CalculateStates() override;
-    std::string GetName() override;
-  };
 };
 
 } // namespace Internal

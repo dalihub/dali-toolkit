@@ -67,10 +67,6 @@ Dali::Toolkit::RadioButton RadioButton::New()
 RadioButton::RadioButton()
 {
   SetTogglableButton(true);
-  SetAccessibilityConstructor( []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::RadioButton ) );
-  } );
 }
 
 RadioButton::~RadioButton()

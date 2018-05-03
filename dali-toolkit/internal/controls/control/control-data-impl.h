@@ -32,9 +32,6 @@
 #include <dali-toolkit/internal/builder/style.h>
 #include <dali-toolkit/internal/builder/dictionary.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali/devel-api/common/owner-container.h>
-#include <dali/integration-api/debug.h>
-#include <memory>
 
 namespace Dali
 {
@@ -303,11 +300,6 @@ public:
    */
   Extents GetPadding() const;
 
-  void AccessibilitySetAttribute( const std::string& key,
-                                  const std::string value );
-  std::string AccessibilityGetAttribute( const std::string& key );
-  void AccessibilityEraseAttribute( std::string& key );
-
 private:
 
   /**
@@ -352,7 +344,6 @@ public:
   Control& mControlImpl;
   DevelControl::State mState;
   std::string mSubStateName;
-  Property::Map mAccessibilityAttributes;
 
   int mLeftFocusableActorId;       ///< Actor ID of Left focusable control.
   int mRightFocusableActorId;      ///< Actor ID of Right focusable control.
@@ -369,7 +360,6 @@ public:
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
   Toolkit::Control::ResourceReadySignalType mResourceReadySignal;
-  Toolkit::Control::AccessibilityActivateSignalType mAccessibilityActivateSignal;
 
   // Gesture Detection
   PinchGestureDetector mPinchGestureDetector;
@@ -401,11 +391,6 @@ public:
   static const PropertyRegistration PROPERTY_12;
   static const PropertyRegistration PROPERTY_13;
   static const PropertyRegistration PROPERTY_14;
-  static const PropertyRegistration PROPERTY_15;
-
-  std::function< std::unique_ptr< Dali::Accessibility::Accessible >( Actor ) >
-      accessibilityConstructor;
-  std::unique_ptr< Dali::Accessibility::Accessible > accessibilityObject;
 };
 
 

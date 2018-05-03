@@ -170,12 +170,6 @@ Control::ResourceReadySignalType&  Control::ResourceReadySignal()
   return controlImpl.mResourceReadySignal;
 }
 
-Control::AccessibilityActivateSignalType& Control::AccessibilityActivateSignal()
-{
-  return Internal::GetImplementation(*this).AccessibilityActivateSignal();
-}
-
-
 Control::Control(Internal::Control& implementation)
 : CustomActor(implementation)
 {
@@ -185,23 +179,6 @@ Control::Control(Dali::Internal::CustomActor* internal)
 : CustomActor(internal)
 {
   VerifyCustomActorPointer<Internal::Control>(internal);
-}
-
-void Control::AccessibilitySetAttribute( const std::string& key,
-                                         const std::string value )
-{
-  return Internal::GetImplementation( *this ).AccessibilitySetAttribute( key,
-                                                                         value );
-}
-
-std::string Control::AccessibilityGetAttribute( const std::string& key )
-{
-  return Internal::GetImplementation( *this ).AccessibilityGetAttribute( key );
-}
-
-void Control::AccessibilityEraseAttribute( std::string& key )
-{
-  return Internal::GetImplementation( *this ).AccessibilityEraseAttribute( key );
 }
 
 } // namespace Toolkit

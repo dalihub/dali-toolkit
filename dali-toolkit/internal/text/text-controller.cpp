@@ -661,26 +661,6 @@ void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
   }
 }
 
-void Controller::RetrieveSelection( std::string& selectedText )
-{
-  mImpl->RetrieveSelection( selectedText, false );
-}
-
-void Controller::SetSelection( int start, int end )
-{
-  mImpl->SetSelection( start, end );
-}
-
-void Controller::CopyStringToClipboard( std::string& source )
-{
-  mImpl->CopyStringToClipboard( source );
-}
-
-void Controller::SendSelectionToClipboard( bool deleteAfterSending )
-{
-  mImpl->SendSelectionToClipboard( deleteAfterSending );
-}
-
 // public : Default style & Input style
 
 void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )

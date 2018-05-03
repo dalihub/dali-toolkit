@@ -113,10 +113,7 @@ enum
    * @details Name "downFocusableActorId", type Property::INTEGER.
    *
    */
-  DOWN_FOCUSABLE_ACTOR_ID = PADDING + 7,
-
-  ACCESSIBILITY_ATTRIBUTES = PADDING + 8
-
+  DOWN_FOCUSABLE_ACTOR_ID = PADDING + 7
 };
 
 } // namespace Property

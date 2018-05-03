@@ -1431,8 +1431,6 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
   }
 }
 
-Text::ControllerPtr TextField::getController() { return mController; }
-
 void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
 {
   Actor renderableActor;
@@ -1797,10 +1795,6 @@ TextField::TextField()
   mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP ),
   mHasBeenStaged( false )
 {
-  SetAccessibilityConstructor( []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::Text ) );
-  } );
 }
 
 TextField::~TextField()
@@ -1811,115 +1805,6 @@ TextField::~TextField()
   {
     Adaptor::Get().RemoveIdle( mIdleCallback );
   }
-}
-
-std::string TextField::AccessibleImpl::GetName()
-{
-  auto slf = Toolkit::TextField::DownCast( self );
-  return slf.GetProperty( Toolkit::TextField::Property::TEXT ).Get< std::string >();
-}
-
-std::string TextField::AccessibleImpl::GetText( size_t startOffset,
-                                                size_t endOffset )
-{
-  if( endOffset <= startOffset )
-    return {};
-
-  auto slf = Toolkit::TextField::DownCast( self );
-  auto txt =
-      slf.GetProperty( Toolkit::TextField::Property::TEXT ).Get< std::string >();
-
-  if( txt.size() > startOffset || txt.size() > endOffset )
-    return {};
-
-  return txt.substr( startOffset, endOffset - startOffset );
-}
-
-size_t TextField::AccessibleImpl::GetCharacterCount()
-{
-  auto slf = Toolkit::TextField::DownCast( self );
-  auto txt =
-      slf.GetProperty( Toolkit::TextField::Property::TEXT ).Get< std::string >();
-
-  return txt.size();
-}
-
-Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
-    size_t offset, Dali::Accessibility::TextBoundary boundary )
-{
-  return {};
-}
-
-Dali::Accessibility::Range
-TextField::AccessibleImpl::GetSelection( size_t selectionNum )
-{
-  // Since DALi supports only one selection indexes higher than 0 are ignored
-  if( selectionNum > 0 )
-    return {};
-
-  auto slf = Toolkit::TextField::DownCast( self );
-  std::string ret;
-  Dali::Toolkit::GetImpl( slf ).getController()->RetrieveSelection( ret );
-
-  return Dali::Accessibility::Range( 0, ret.size(), ret );
-}
-
-bool TextField::AccessibleImpl::RemoveSelection( size_t selectionNum )
-{
-  // Since DALi supports only one selection indexes higher than 0 are ignored
-  if( selectionNum > 0 )
-    return false;
-
-  auto slf = Toolkit::TextField::DownCast( self );
-  std::string ret;
-  Dali::Toolkit::GetImpl( slf ).getController()->SetSelection( 0, 0 );
-  return true;
-}
-
-bool TextField::AccessibleImpl::SetSelection( size_t selectionNum,
-                                              size_t startOffset,
-                                              size_t endOffset )
-{
-  // Since DALi supports only one selection indexes higher than 0 are ignored
-  if( selectionNum > 0 )
-    return false;
-
-  auto slf = Toolkit::TextField::DownCast( self );
-  std::string ret;
-  Dali::Toolkit::GetImpl( slf ).getController()->SetSelection( startOffset,
-                                                               endOffset );
-  return true;
-}
-
-bool TextField::AccessibleImpl::CopyText( size_t startPosition,
-                                          size_t endPosition )
-{
-  if( endPosition <= startPosition )
-    return false;
-
-  auto t = GetText( startPosition, endPosition );
-  auto slf = Toolkit::TextField::DownCast( self );
-  std::string ret;
-  Dali::Toolkit::GetImpl( slf ).getController()->CopyStringToClipboard( t );
-
-  return true;
-}
-
-bool TextField::AccessibleImpl::CutText( size_t startPosition,
-                                         size_t endPosition )
-{
-  if( endPosition <= startPosition )
-    return false;
-
-  auto txt = GetText( startPosition, endPosition );
-  auto slf = Toolkit::TextField::DownCast( self );
-  std::string ret;
-  Dali::Toolkit::GetImpl( slf ).getController()->CopyStringToClipboard( txt );
-
-  slf.SetProperty( Toolkit::TextField::Property::TEXT,
-                   txt.substr( startPosition, endPosition - startPosition ) );
-
-  return true;
 }
 
 } // namespace Internal

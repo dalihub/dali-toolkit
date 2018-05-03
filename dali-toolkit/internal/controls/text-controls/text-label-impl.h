@@ -73,8 +73,6 @@ public:
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
 
-  Text::ControllerPtr getController();
-
 private: // From Control
 
   /**
@@ -153,24 +151,6 @@ private: // Data
 
   int mRenderingBackend;
   bool mTextUpdateNeeded:1;
-
-protected:
-  struct AccessibleImpl : public Control::AccessibleImpl,
-                          public virtual Dali::Accessibility::Text
-  {
-    using Control::AccessibleImpl::AccessibleImpl;
-
-    std::string GetName() override;
-    std::string GetText( size_t startOffset, size_t endOffset ) override;
-    size_t GetCharacterCount() override;
-    Dali::Accessibility::Range
-    GetTextAtOffset( size_t offset,
-                     Dali::Accessibility::TextBoundary boundary ) override;
-    Dali::Accessibility::Range GetSelection( size_t selectionNum ) override;
-    bool RemoveSelection( size_t selectionNum ) override;
-    bool SetSelection( size_t selectionNum, size_t startOffset,
-                       size_t endOffset ) override;
-  };
 };
 
 } // namespace Internal

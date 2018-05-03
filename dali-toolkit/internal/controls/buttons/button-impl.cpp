@@ -1652,23 +1652,6 @@ Actor Button::GetSelectedImage() const
   return imageView;
 }
 
-std::string Button::AccessibleImpl::GetName()
-{
-  auto slf = Toolkit::Button::DownCast( self );
-  return slf.GetLabelText();
-}
-
-Dali::Accessibility::States Button::AccessibleImpl::CalculateStates()
-{
-  auto tmp = Control::AccessibleImpl::CalculateStates();
-  tmp[Dali::Accessibility::State::Selectable] = true;
-  auto slf = Toolkit::Button::DownCast( self );
-  tmp[Dali::Accessibility::State::Enabled] = !slf.IsDisabled();
-  if( slf.IsSelected() )
-    tmp[Dali::Accessibility::State::Checked] = true;
-  return tmp;
-}
-
 } // namespace Internal
 
 } // namespace Toolkit

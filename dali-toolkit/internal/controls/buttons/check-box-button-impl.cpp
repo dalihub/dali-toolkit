@@ -75,10 +75,6 @@ CheckBoxButton::CheckBoxButton()
 : Button()
 {
   SetTogglableButton( true );
-  SetAccessibilityConstructor( []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new AccessibleImpl( actor, Dali::Accessibility::Role::CheckBox ) );
-  } );
 }
 
 CheckBoxButton::~CheckBoxButton()

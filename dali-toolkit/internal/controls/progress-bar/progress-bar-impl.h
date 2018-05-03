@@ -256,18 +256,6 @@ private:
   float mProgressValue;                                               ///< Current value of ProgressBar
   float mSecondaryProgressValue;                                      ///< Current loading value of ProgressBar
   bool mIndeterminate;                                                ///< Whether the progress state is determined or not
-
-protected:
-  struct AccessibleImpl : public Control::AccessibleImpl,
-                          public virtual Dali::Accessibility::Value
-  {
-    using Control::AccessibleImpl::AccessibleImpl;
-    double GetMinimum() override;
-    double GetCurrent() override;
-    double GetMaximum() override;
-    bool SetCurrent( double ) override;
-    double GetMinimumIncrement() override;
-  };
 };
 
 } // namespace Internal

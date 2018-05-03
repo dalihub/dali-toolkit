@@ -755,18 +755,6 @@ private:
   bool mShowPopup   : 1,      ///< Show the popup or not
        mShowValue   : 1,      ///< Whether to display the value number or not on the handle
        mSnapToMarks : 1;      ///< Turn on or off snapping to marks
-
-protected:
-  struct AccessibleImpl : public Control::AccessibleImpl,
-                          public virtual Dali::Accessibility::Value
-  {
-    using Control::AccessibleImpl::AccessibleImpl;
-    double GetMinimum() override;
-    double GetCurrent() override;
-    double GetMaximum() override;
-    bool SetCurrent( double ) override;
-    double GetMinimumIncrement() override;
-  };
 };
 
 } // namespace Internal

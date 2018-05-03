@@ -614,8 +614,6 @@ struct Controller::Impl
    */
   void RetrieveSelection( std::string& selectedText, bool deleteAfterRetrieval );
 
-  void SetSelection( int start, int end );
-
   void ShowClipboard();
 
   void HideClipboard();

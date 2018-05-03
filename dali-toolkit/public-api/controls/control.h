@@ -154,11 +154,6 @@ public:
       MARGIN,
 
       /**
-       * @ TODO
-       */
-      ACCESSIBILITY_ATTRIBUTES,
-
-      /**
        * @brief The inner space of the control.
        * @details Name "padding", type Property::EXTENTS.
        * @SINCE_1_2.62
@@ -198,8 +193,6 @@ public:
 
   /// @brief ResourceReady signal type. @SINCE_1_2.60
   typedef Signal<void ( Control ) > ResourceReadySignalType;
-
-  typedef Signal< void ( ) > AccessibilityActivateSignalType;
 
 public: // Creation & Destruction
 
@@ -497,8 +490,6 @@ public:
    */
   ResourceReadySignalType& ResourceReadySignal();
 
-  Toolkit::Control::AccessibilityActivateSignalType &AccessibilityActivateSignal();
-
 public: // Intended for control developers
 
   /**
@@ -572,10 +563,6 @@ public: // Templates for Deriving Classes
     }
   }
 
-  void AccessibilitySetAttribute( const std::string& key,
-                                  const std::string value );
-  std::string AccessibilityGetAttribute( const std::string& key );
-  void AccessibilityEraseAttribute( std::string& key );
 };
 
 /**
