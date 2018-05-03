@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8d51efdc_5adf3fc2",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-03T12:48:08Z",
+      "side": 1,
+      "message": "Daves comment - Should not be child padding",
+      "revId": "31e46a22b03b24408cccd07f068df0de1189e779",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97f72c5f_d7717dc6",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-03T12:48:08Z",
+      "side": 1,
+      "message": "Daves comment - Should not be child padding",
+      "range": {
+        "startLine": 232,
+        "startChar": 17,
+        "endLine": 232,
+        "endChar": 22
+      },
+      "revId": "31e46a22b03b24408cccd07f068df0de1189e779",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
