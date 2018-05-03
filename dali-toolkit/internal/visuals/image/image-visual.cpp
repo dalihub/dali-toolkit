@@ -28,6 +28,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/rendering/shader-devel.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL HEADERS
@@ -41,6 +42,8 @@
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
+
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -668,9 +671,13 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
     }
     else
     {
-      shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
-                             mImpl->mCustomShader->mFragmentShader.empty() ? FRAGMENT_SHADER_NO_ATLAS : mImpl->mCustomShader->mFragmentShader,
-                             mImpl->mCustomShader->mHints );
+      //shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
+      //                       mImpl->mCustomShader->mFragmentShader.empty() ? FRAGMENT_SHADER_NO_ATLAS : mImpl->mCustomShader->mFragmentShader,
+      //                       mImpl->mCustomShader->mHints );
+      shader = DevelShader::New<uint32_t>(
+        GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_SHADER_VERT"),
+        GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG" ),
+                                  DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
       if( mImpl->mCustomShader->mVertexShader.empty() )
       {
         shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
@@ -1000,7 +1007,12 @@ Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlas
     shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_NO_ATLAS );
+      shader = DevelShader::New<uint32_t>(
+        GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_SHADER_VERT" ),
+        GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG" ),
+        DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
+
+      //shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_NO_ATLAS );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER, shader );
     }
