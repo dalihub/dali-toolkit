@@ -105,17 +105,22 @@ void LayoutController::MeasureHierarchy( Actor root, MeasureSpec widthSpec, Meas
   Toolkit::Control control = Toolkit::Control::DownCast( root );
   if( control )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutController::Measuring leaf(%s)\n", control.GetName() );
+    std::cout << "LayoutController Control::" << control.GetName() << std::endl;
     Internal::Control& controlImpl = GetImplementation( control );
+
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
     LayoutBasePtr layout = controlDataImpl.GetLayout();
 
     if( layout )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutController::Measuring leaf layout->Measure\n" );
       layout->Measure( widthSpec, heightSpec );
     }
   }
   else
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutController::Measuring (%u) children\n", root.GetChildCount() );
     // Depth first descent through actor children
     for( unsigned int i = 0, count = root.GetChildCount(); i < count; ++i )
     {
@@ -130,17 +135,20 @@ void LayoutController::PerformLayout( Actor root, int left, int top, int right, 
   Toolkit::Control control = Toolkit::Control::DownCast( root );
   if( control )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayout on leaf(%s)\n", control.GetName() );
     Internal::Control& controlImpl = GetImplementation( control );
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
     LayoutBasePtr layout = controlDataImpl.GetLayout();
 
     if( layout )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayout layout(%s)\n", control.GetName() );
       layout->Layout( left, top, right, bottom );
     }
   }
   else
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayout (%u) children\n", root.GetChildCount() );
     // Depth first descent through actor children
     for( unsigned int i = 0, count = root.GetChildCount(); i < count; ++i )
     {

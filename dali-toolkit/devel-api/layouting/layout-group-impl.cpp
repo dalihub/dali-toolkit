@@ -21,11 +21,16 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/layouting/layout-group-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+
+#if defined(DEBUG_ENABLED)
+    Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
+#endif
 
 namespace Dali
 {
@@ -255,7 +260,7 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
 
   auto size = std::max( LayoutLength(0), specSize - padding );
 
-  MeasureSpec::IntType resultSize = 0;
+  MeasureSpec::IntType resultSize = 0;  check if all is okay here
   MeasureSpec::Mode resultMode = MeasureSpec::Mode::UNSPECIFIED;
 
   switch( specMode )
@@ -376,6 +381,7 @@ void LayoutGroup::ChildAddedToOwner( Actor child )
 {
   LayoutBasePtr childLayout;
   Toolkit::Control control = Toolkit::Control::DownCast( child );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutGroup::ChildAddedToOwner(%s)\n", control.GetName().c_str() );
 
   if( control ) // Can only support adding Controls, not Actors to layout
   {
