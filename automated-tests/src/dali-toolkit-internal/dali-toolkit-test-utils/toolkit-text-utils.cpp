@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,7 +109,8 @@ void CreateTextModel( const std::string& text,
   Vector<Character>& utf32Characters = logicalModel->mText;
   utf32Characters.Resize( text.size() );
 
-  const uint32_t numberOfCharacters = Utf8ToUtf32( reinterpret_cast<const uint8_t* const>( text.c_str() ),
+  const uint32_t numberOfCharacters = ( text.size() == 0) ? 0 :
+    Utf8ToUtf32( reinterpret_cast<const uint8_t* const>( text.c_str() ),
                                                    text.size(),
                                                    &utf32Characters[0u] );
   utf32Characters.Resize( numberOfCharacters );

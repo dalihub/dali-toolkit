@@ -214,7 +214,7 @@ void Visual::Base::SetName( const std::string& name )
   mImpl->mName = name;
 }
 
-const std::string& Visual::Base::GetName()
+const std::string& Visual::Base::GetName() const
 {
   return mImpl->mName;
 }

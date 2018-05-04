@@ -23,6 +23,14 @@ $ sudo locale-gen en
 $ sudo locale-gen ar
 $ sudo update-locale
 
+Installing fonts required by tests
+----------------------------------
+
+The test suite requires certain fonts in the repository to be installed:
+
+$ mkdir -p ~/.fonts
+$ cp -r resources/fonts/* ~/.fonts/
+$ fc-cache
 
 Quickstart
 ----------

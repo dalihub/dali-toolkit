@@ -38,6 +38,8 @@ class TestRenderSurface : public RenderSurface
 public:
   virtual PositionSize GetPositionSize() const { PositionSize size; return size; }
 
+  virtual void GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVertical ) { dpiHorizontal = dpiVertical = 96; }
+
   virtual void InitializeEgl( EglInterface& egl ) {}
 
   virtual void CreateEglSurface( EglInterface& egl ) {}
