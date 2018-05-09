@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-#include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
 #include <dali-toolkit/devel-api/layouting/layout-size.h>
 
@@ -30,7 +30,7 @@ namespace Internal
 class LayoutParent;
 
 
-class LayoutBase::Impl
+class LayoutItem::Impl
 {
 public:
   Impl();

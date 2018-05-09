@@ -63,27 +63,27 @@ protected:
   virtual ~VboxLayout();
 
   /**
-   * @copydoc LayoutBase::DoInitialize
+   * @copydoc LayoutItem::DoInitialize
    */
   virtual void DoInitialize() override;
 
   /**
-   * @copydoc LayoutBase::DoRegisterChildProperties()
+   * @copydoc LayoutItem::DoRegisterChildProperties()
    */
   virtual void DoRegisterChildProperties( const std::string& containerType ) override;
 
   /**
-   * @copydoc LayoutBase::OnChildAdd
+   * @copydoc LayoutItem::OnChildAdd
    */
-  virtual void OnChildAdd( LayoutBase& child ) override;
+  virtual void OnChildAdd( LayoutItem& child ) override;
 
   /**
-   * @copydoc LayoutBase::OnMeasure
+   * @copydoc LayoutItem::OnMeasure
    */
   virtual void OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec ) override;
 
   /**
-   * @copydoc LayoutBase::OnLayout
+   * @copydoc LayoutItem::OnLayout
    */
   virtual void OnLayout( bool changed, LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b ) override;
 

@@ -1422,12 +1422,12 @@ bool Control::Impl::FilterKeyEvent( const KeyEvent& event )
   return consumed;
 }
 
-Toolkit::Internal::LayoutBasePtr Control::Impl::GetLayout() const
+Toolkit::Internal::LayoutItemPtr Control::Impl::GetLayout() const
 {
   return mLayout;
 }
 
-void Control::Impl::SetLayout( Toolkit::Internal::LayoutBase& layout )
+void Control::Impl::SetLayout( Toolkit::Internal::LayoutItem& layout )
 {
   if( mLayout )
   {

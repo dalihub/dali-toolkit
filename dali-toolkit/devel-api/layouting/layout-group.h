@@ -19,7 +19,7 @@
 #include <memory>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/actors/actor-enumerations.h>
-#include <dali-toolkit/devel-api/layouting/layout-base.h>
+#include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/devel-api/layouting/measure-spec.h>
 
 namespace Dali
@@ -34,7 +34,7 @@ class LayoutGroup;
 
 
 /**
- * A layout that has layout children. Implements LayoutBase.
+ * A layout that has layout children. Implements LayoutItem.
  * It can both layout it's children, and be laid out by a parent container.
  *
  * A layout group automatically handles adding a Control container's children to itself,
@@ -48,7 +48,7 @@ class LayoutGroup;
  * To write a new layout, inherit from both LayoutGroup handle and Internal::LayoutGroup body.
  *
  */
-class DALI_IMPORT_API LayoutGroup : public LayoutBase
+class DALI_IMPORT_API LayoutGroup : public LayoutItem
 {
 public:
   using LayoutId = unsigned int;
@@ -112,7 +112,7 @@ public:
    * @param[in] childLayout The layout to add.
    * @return an Id of the child.
    */
-  LayoutId Add( LayoutBase& childLayout );
+  LayoutId Add( LayoutItem& childLayout );
 
   /**
    * @brief Add a child layout to the layout group
@@ -126,14 +126,14 @@ public:
    *
    * @param[in] childLayout The layout to remove.
    */
-  void Remove( LayoutBase& childLayout );
+  void Remove( LayoutItem& childLayout );
 
   /**
    * @brief Get the child at the given index.
    *
    * @param[in] index The index of the child.
    */
-  LayoutBase GetChildAt( unsigned int index ) const;
+  LayoutItem GetChildAt( unsigned int index ) const;
 
   /**
    * @brief Get the count of the children of the layout
@@ -148,13 +148,13 @@ public:
    * @param[in] childId The id of the child to get
    * @return A handle to the child layout, or empty if not found
    */
-  LayoutBase GetChild( LayoutId childId ) const ;
+  LayoutItem GetChild( LayoutId childId ) const ;
 
   /**
    * Delete template method to remove implicit casting to integer types.
    */
   template <typename T>
-    LayoutBase GetChild( T childId ) = delete;
+    LayoutItem GetChild( T childId ) = delete;
 
 public:
   /// @cond internal

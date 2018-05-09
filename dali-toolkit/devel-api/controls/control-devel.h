@@ -23,7 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
-#include <dali-toolkit/devel-api/layouting/layout-base.h>
+#include <dali-toolkit/devel-api/layouting/layout-item.h>
 
 namespace Dali
 {
@@ -275,14 +275,14 @@ DALI_TOOLKIT_API void SetInputMethodContext( Internal::Control& control, InputMe
  *
  * @return A handle to the layout, or empty.
  */
-DALI_TOOLKIT_API Toolkit::LayoutBase GetLayout( Internal::Control& control );
+DALI_TOOLKIT_API Toolkit::LayoutItem GetLayout( Internal::Control& control );
 
 /*
  * @brief Get the layout associated with a control, if any.
  *
  * @return A handle to the layout, or empty.
  */
-DALI_TOOLKIT_API Toolkit::LayoutBase GetLayout( Control control );
+DALI_TOOLKIT_API Toolkit::LayoutItem GetLayout( Control control );
 
 /**
  * @brief Set the layout on this control.
@@ -290,7 +290,7 @@ DALI_TOOLKIT_API Toolkit::LayoutBase GetLayout( Control control );
  * @param[in] control The internal Control to set the layout on
  * @param[in] layout Pointer to the layout
  */
-DALI_TOOLKIT_API void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout );
+DALI_TOOLKIT_API void SetLayout( Internal::Control& control, Toolkit::LayoutItem layout );
 
 /**
  * @brief Set the layout on a control.
@@ -298,7 +298,7 @@ DALI_TOOLKIT_API void SetLayout( Internal::Control& control, Toolkit::LayoutBase
  * @param[in] control The Control to set the layout on
  * @param[in] layout Pointer to the layout
  */
-DALI_TOOLKIT_API void SetLayout( Control control, Toolkit::LayoutBase layout );
+DALI_TOOLKIT_API void SetLayout( Control control, Toolkit::LayoutItem layout );
 
 } // namespace DevelControl
 

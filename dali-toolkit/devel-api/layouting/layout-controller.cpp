@@ -66,7 +66,7 @@ LayoutController LayoutController::Get()
   return layoutController;
 }
 
-void LayoutController::RequestLayout( LayoutBase layout )
+void LayoutController::RequestLayout( LayoutItem layout )
 {
   GetImpl(*this).RequestLayout( GetImplementation( layout ) );
 }
