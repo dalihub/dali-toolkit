@@ -14,41 +14,41 @@
  * limitations under the License.
  */
 
-#include <dali-toolkit/devel-api/layouting/layout-base.h>
-#include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-item.h>
+#include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
 
-LayoutBase::LayoutBase()
+LayoutItem::LayoutItem()
 : BaseHandle()
 {
 }
 
-LayoutBase LayoutBase::New( Handle& handle )
+LayoutItem LayoutItem::New( Handle& handle )
 {
-  Internal::LayoutBasePtr layout = Internal::LayoutBase::New( handle );
-  return LayoutBase( layout.Get() );
+  Internal::LayoutItemPtr layout = Internal::LayoutItem::New( handle );
+  return LayoutItem( layout.Get() );
 }
 
-LayoutBase::LayoutBase( Internal::LayoutBase* layoutBase )
-: BaseHandle( layoutBase )
+LayoutItem::LayoutItem( Internal::LayoutItem* LayoutItem )
+: BaseHandle( LayoutItem )
 {
 }
 
-Handle LayoutBase::GetOwner() const
+Handle LayoutItem::GetOwner() const
 {
   return GetImplementation( *this ).GetOwner();
 }
 
-void LayoutBase::SetAnimateLayout( bool animateLayout )
+void LayoutItem::SetAnimateLayout( bool animateLayout )
 {
   GetImplementation( *this ).SetAnimateLayout( animateLayout );
 }
 
-bool LayoutBase::IsLayoutAnimated() const
+bool LayoutItem::IsLayoutAnimated() const
 {
   return GetImplementation( *this ).IsLayoutAnimated();
 }

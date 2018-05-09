@@ -22,7 +22,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/actors/actor.h>
-#include <dali-toolkit/devel-api/layouting/layout-base.h>
+#include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
@@ -75,7 +75,7 @@ void HboxLayout::DoRegisterChildProperties( const std::string& containerType )
   }
 }
 
-void HboxLayout::OnChildAdd( LayoutBase& child )
+void HboxLayout::OnChildAdd( LayoutItem& child )
 {
   auto owner = child.GetOwner();
   owner.SetProperty( Toolkit::HboxLayout::ChildProperty::WEIGHT, 1.0f );
@@ -126,7 +126,7 @@ void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
     if( childLayout )
     {
       auto childOwner = childLayout->GetOwner();
-      auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
+      auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
 
       MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, heightMeasureSpec, 0 );
       auto childWidth = childLayout->GetMeasuredWidth();
@@ -204,23 +204,23 @@ void HboxLayout::ForceUniformHeight( int count, MeasureSpec widthMeasureSpec )
   auto uniformMeasureSpec = MeasureSpec( GetMeasuredHeight(), MeasureSpec::Mode::EXACTLY );
   for (int i = 0; i < count; ++i)
   {
-    LayoutBasePtr childLayout = GetChildAt(i);
+    LayoutItemPtr childLayout = GetChildAt(i);
     if( childLayout != nullptr )
     {
       auto childOwner = childLayout->GetOwner();
-      auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
-      auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
+      auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
+      auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
 
       if( desiredHeight == Toolkit::ChildLayoutData::MATCH_PARENT )
       {
         // Temporarily force children to reuse their old measured width
         int oldWidth = desiredWidth;
-        childOwner.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, childLayout->GetMeasuredWidth().mValue );
+        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, childLayout->GetMeasuredWidth().mValue );
 
         // Remeasure with new dimensions
         MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, uniformMeasureSpec, 0);
 
-        childOwner.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, oldWidth );
+        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, oldWidth );
       }
     }
   }
@@ -259,7 +259,7 @@ void HboxLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
   for( unsigned int i = 0; i < count; i++)
   {
     int childIndex = start + dir * i;
-    LayoutBasePtr childLayout = GetChildAt( childIndex );
+    LayoutItemPtr childLayout = GetChildAt( childIndex );
     if( childLayout != nullptr )
     {
       auto childWidth = childLayout->GetMeasuredWidth();

@@ -49,13 +49,13 @@ void LayoutController::Initialize()
 {
 }
 
-void LayoutController::RequestLayout( LayoutBase& layoutBase )
+void LayoutController::RequestLayout( LayoutItem& LayoutItem )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutController::RequestLayout\n" );
   mLayoutRequested = true;
 
   // Go up the tree and mark all parents to relayout
-  LayoutParent* layoutParent = layoutBase.GetParent();
+  LayoutParent* layoutParent = LayoutItem.GetParent();
   if( layoutParent )
   {
     LayoutGroup& layoutGroup = static_cast< LayoutGroup& >( *layoutParent );
@@ -107,7 +107,7 @@ void LayoutController::MeasureHierarchy( Actor root, MeasureSpec widthSpec, Meas
   {
     Internal::Control& controlImpl = GetImplementation( control );
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
-    LayoutBasePtr layout = controlDataImpl.GetLayout();
+    LayoutItemPtr layout = controlDataImpl.GetLayout();
 
     if( layout )
     {
@@ -132,7 +132,7 @@ void LayoutController::PerformLayout( Actor root, int left, int top, int right, 
   {
     Internal::Control& controlImpl = GetImplementation( control );
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
-    LayoutBasePtr layout = controlDataImpl.GetLayout();
+    LayoutItemPtr layout = controlDataImpl.GetLayout();
 
     if( layout )
     {

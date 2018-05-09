@@ -23,11 +23,11 @@ namespace Toolkit
 {
 
 LayoutGroup::LayoutGroup()
-: LayoutBase()
+: LayoutItem()
 {
 }
 
-LayoutGroup::LayoutId LayoutGroup::Add( LayoutBase& child )
+LayoutGroup::LayoutId LayoutGroup::Add( LayoutItem& child )
 {
   return GetImplementation( *this ).Add( GetImplementation(child) );
 }
@@ -37,21 +37,21 @@ void LayoutGroup::Remove( LayoutGroup::LayoutId childId )
   GetImplementation( *this ).Remove( childId );
 }
 
-void LayoutGroup::Remove( LayoutBase& child )
+void LayoutGroup::Remove( LayoutItem& child )
 {
   GetImplementation( *this ).Remove( GetImplementation(child) );
 }
 
-LayoutBase LayoutGroup::GetChild( LayoutGroup::LayoutId childId ) const
+LayoutItem LayoutGroup::GetChild( LayoutGroup::LayoutId childId ) const
 {
-  Internal::LayoutBasePtr child = GetImplementation( *this ).GetChild( childId );
-  return LayoutBase( child.Get() );
+  Internal::LayoutItemPtr child = GetImplementation( *this ).GetChild( childId );
+  return LayoutItem( child.Get() );
 }
 
-LayoutBase LayoutGroup::GetChildAt( unsigned int childId ) const
+LayoutItem LayoutGroup::GetChildAt( unsigned int childId ) const
 {
-  Internal::LayoutBasePtr child = GetImplementation( *this ).GetChildAt( childId );
-  return LayoutBase( child.Get() );
+  Internal::LayoutItemPtr child = GetImplementation( *this ).GetChildAt( childId );
+  return LayoutItem( child.Get() );
 }
 
 unsigned int LayoutGroup::GetChildCount() const
@@ -60,7 +60,7 @@ unsigned int LayoutGroup::GetChildCount() const
 }
 
 LayoutGroup::LayoutGroup( Internal::LayoutGroup* layoutGroup )
-: LayoutBase( layoutGroup )
+: LayoutItem( layoutGroup )
 {
 }
 

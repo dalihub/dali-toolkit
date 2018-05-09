@@ -24,10 +24,10 @@ namespace Toolkit
 namespace Internal
 {
 
-bool LayoutBase::Impl::sUseZeroUnspecifiedMeasureSpec = false;
+bool LayoutItem::Impl::sUseZeroUnspecifiedMeasureSpec = false;
 
 
-LayoutBase::Impl::Impl()
+LayoutItem::Impl::Impl()
 : mOwner( nullptr ),
   mLayoutParent( nullptr ),
   mOldWidthMeasureSpec( 0u ),

@@ -27,7 +27,7 @@
 #include <dali-toolkit/internal/visuals/visual-resource-observer.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 #include <dali-toolkit/internal/builder/style.h>
@@ -329,13 +329,13 @@ public:
    *
    * @return A pointer to the layout, or NULL.
    */
-  Toolkit::Internal::LayoutBasePtr GetLayout() const;
+  Toolkit::Internal::LayoutItemPtr GetLayout() const;
 
   /**
    * @brief Set the layout on this control.
    * @param[in] layout Pointer to the layout
    */
-  void SetLayout( Toolkit::Internal::LayoutBase& layout );
+  void SetLayout( Toolkit::Internal::LayoutItem& layout );
 
 private:
 
@@ -383,7 +383,7 @@ public:
   std::string mSubStateName;
 
   // Layout
-  Toolkit::Internal::LayoutBasePtr mLayout;
+  Toolkit::Internal::LayoutItemPtr mLayout;
 
   int mLeftFocusableActorId;       ///< Actor ID of Left focusable control.
   int mRightFocusableActorId;      ///< Actor ID of Right focusable control.

@@ -21,7 +21,7 @@
 #include <dali/integration-api/core.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
-#include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 
 namespace Dali
@@ -56,7 +56,7 @@ public:
   /**
    * This marks the given layout and all its parents as dirty.
    */
-  void RequestLayout( LayoutBase& layout );
+  void RequestLayout( LayoutItem& layout );
 
   /**
    * Measures next level of layouts in the actor hierarchy.
