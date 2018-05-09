@@ -110,26 +110,26 @@ void SetInputMethodContext( Internal::Control& control, InputMethodContext& inpu
   Internal::Control::Impl::Get( control ).SetInputMethodContext( inputMethodContext );
 }
 
-Toolkit::LayoutBase GetLayout( Control control )
+Toolkit::LayoutItem GetLayout( Control control )
 {
   const Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
   const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
-  return Toolkit::LayoutBase( controlDataImpl.GetLayout().Get() );
+  return Toolkit::LayoutItem( controlDataImpl.GetLayout().Get() );
 }
 
-Toolkit::LayoutBase GetLayout( Internal::Control& control )
+Toolkit::LayoutItem GetLayout( Internal::Control& control )
 {
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
-  return Toolkit::LayoutBase( controlDataImpl.GetLayout().Get() );
+  return Toolkit::LayoutItem( controlDataImpl.GetLayout().Get() );
 }
 
-void SetLayout( Internal::Control& control, Toolkit::LayoutBase layout )
+void SetLayout( Internal::Control& control, Toolkit::LayoutItem layout )
 {
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
   controlDataImpl.SetLayout( GetImplementation( layout ) );
 }
 
-void SetLayout( Control control, Toolkit::LayoutBase layout )
+void SetLayout( Control control, Toolkit::LayoutItem layout )
 {
   Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );

@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_BASE_H
-#define DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_BASE_H
+#ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_ITEM_H
+#define DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_ITEM_H
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
@@ -23,7 +23,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
-#include <dali-toolkit/devel-api/layouting/layout-base.h>
+#include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/devel-api/layouting/layout-parent-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
 #include <dali-toolkit/devel-api/layouting/layout-size.h>
@@ -37,27 +37,27 @@ namespace Toolkit
 namespace Internal
 {
 
-class LayoutBase;
-using LayoutBasePtr = IntrusivePtr<LayoutBase>;
+class LayoutItem;
+using LayoutItemPtr = IntrusivePtr<LayoutItem>;
 
 
 /**
  * Base class for layouts.
  */
-class DALI_IMPORT_API LayoutBase : public BaseObject,
+class DALI_IMPORT_API LayoutItem : public BaseObject,
                                    public LayoutParent
 {
 public:
   /**
    * Constructor.
    */
-  LayoutBase();
+  LayoutItem();
 
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  ~LayoutBase() = default;
+  virtual ~LayoutItem();
 
 public:
 
@@ -65,19 +65,19 @@ public:
    * @brief Construct
    *
    * @param[in] owner The owner (container view / child view / visual ) of this layout
-   * @return a new LayoutBase object
+   * @return a new LayoutItem object
    */
-  static LayoutBasePtr New( Handle& owner );
+  static LayoutItemPtr New( Handle& owner );
 
   /**
    * @brief Remove the default copy constructor
    */
-  LayoutBase(const LayoutBase& copy)=delete;
+  LayoutItem(const LayoutItem& copy)=delete;
 
   /**
    * @brief Remove the default assignment operator
    */
-  LayoutBase& operator=(const LayoutBase& rhs)=delete;
+  LayoutItem& operator=(const LayoutItem& rhs)=delete;
 
   /**
    * @brief Initialize the layout with it's owner and owner's type name
@@ -436,26 +436,26 @@ public:
 
 private:
   std::unique_ptr<Impl> mImpl; ///< Implementation class holds all the data
-  SlotDelegate<LayoutBase> mSlotDelegate;
+  SlotDelegate<LayoutItem> mSlotDelegate;
 };
 
 } //namespace Internal
 
-inline Internal::LayoutBase& GetImplementation( Dali::Toolkit::LayoutBase& handle )
+inline Internal::LayoutItem& GetImplementation( Dali::Toolkit::LayoutItem& handle )
 {
-  DALI_ASSERT_ALWAYS( handle && "LayoutBase handle is empty" );
+  DALI_ASSERT_ALWAYS( handle && "LayoutItem handle is empty" );
   BaseObject& object = handle.GetBaseObject();
-  return static_cast< Internal::LayoutBase& >( object );
+  return static_cast< Internal::LayoutItem& >( object );
 }
 
-inline const Internal::LayoutBase& GetImplementation( const Dali::Toolkit::LayoutBase& handle )
+inline const Internal::LayoutItem& GetImplementation( const Dali::Toolkit::LayoutItem& handle )
 {
-  DALI_ASSERT_ALWAYS( handle && "LayoutBase handle is empty" );
+  DALI_ASSERT_ALWAYS( handle && "LayoutItem handle is empty" );
   const BaseObject& object = handle.GetBaseObject();
-  return static_cast< const Internal::LayoutBase& >( object );
+  return static_cast< const Internal::LayoutItem& >( object );
 }
 
 } //namespace Toolkit
 } //namespace Dali
 
-#endif // DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_BASE_H
+#endif // DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_ITEM_H

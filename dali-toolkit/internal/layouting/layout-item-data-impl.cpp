@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <dali-toolkit/internal/layouting/layout-base-data-impl.h>
+#include <dali-toolkit/internal/layouting/layout-item-data-impl.h>
 #include <dali-toolkit/devel-api/layouting/measured-size.h>
 
 namespace Dali
@@ -24,10 +24,10 @@ namespace Toolkit
 namespace Internal
 {
 
-bool LayoutBase::Impl::sUseZeroUnspecifiedMeasureSpec = false;
+bool LayoutItem::Impl::sUseZeroUnspecifiedMeasureSpec = false;
 
 
-LayoutBase::Impl::Impl()
+LayoutItem::Impl::Impl()
 : mOwner( nullptr ),
   mLayoutParent( nullptr ),
   mOldWidthMeasureSpec( 0u ),

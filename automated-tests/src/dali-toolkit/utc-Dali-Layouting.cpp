@@ -229,10 +229,10 @@ int UtcDaliLayouting_HboxLayout03(void)
 
   hbox1.SetName( "HBox1");
   hbox2.SetName( "HBox2");
-  hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
-  hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
-  hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
-  hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox1.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox1.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox2.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox2.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
 
   std::vector< Control > controls;
   controls.push_back( CreateLeafControl( 20, 40 ) );
@@ -337,10 +337,10 @@ int UtcDaliLayouting_HboxLayout04(void)
 
   hbox1.SetName( "HBox1"); // Default spec is to wrap content
   hbox2.SetName( "HBox2");
-  hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
-  hbox1.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
-  hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
-  hbox2.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox1.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox1.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox2.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox2.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
 
   std::vector< Control > controls;
   controls.push_back( CreateLeafControl( 80, 40 ) );
@@ -367,7 +367,7 @@ int UtcDaliLayouting_HboxLayout04(void)
     ++counter;
   }
 
-  controls[6].SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  controls[6].SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
   auto hbox3 = Control::New();
   auto hboxLayout3 = HboxLayout::New();
   DevelControl::SetLayout( hbox3, hboxLayout3 );
@@ -446,10 +446,10 @@ int UtcDaliLayouting_VboxLayout01(void)
   vbox.SetAnchorPoint( AnchorPoint::CENTER );
   stage.Add( vbox );
 
-  controls[2].SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  controls[2].SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
 
   // Check it.
-  DALI_TEST_EQUALS( controls[2].GetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ), Property::Value( ChildLayoutData::MATCH_PARENT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION ), Property::Value( ChildLayoutData::MATCH_PARENT ), TEST_LOCATION );
 
   // Ensure layouting happens
   application.SendNotification();
@@ -492,8 +492,8 @@ int UtcDaliLayouting_VboxLayout02(void)
   vbox.SetName( "Vbox");
   hbox.Add( vbox );
 
-  vbox.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
-  vbox.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  vbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  vbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
 
   std::vector< Control > controls;
   controls.push_back( CreateLeafControl( 40, 40 ) );
@@ -508,10 +508,10 @@ int UtcDaliLayouting_VboxLayout02(void)
   vbox.SetParentOrigin( ParentOrigin::CENTER );
   vbox.SetAnchorPoint( AnchorPoint::CENTER );
 
-  controls[2].SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  controls[2].SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
 
   // Check it.
-  DALI_TEST_EQUALS( controls[2].GetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ), Property::Value( ChildLayoutData::MATCH_PARENT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION ), Property::Value( ChildLayoutData::MATCH_PARENT ), TEST_LOCATION );
 
   // Ensure layouting happens
   application.SendNotification();
@@ -566,8 +566,8 @@ int UtcDaliLayouting_VboxLayout03(void)
   vbox.SetName( "Vbox");
   hbox.Add( vbox );
 
-  vbox.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
-  vbox.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  vbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  vbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
 
   std::vector< Control > controls;
   controls.push_back( CreateLeafControl( 40, 40 ) );
@@ -582,10 +582,10 @@ int UtcDaliLayouting_VboxLayout03(void)
   vbox.SetParentOrigin( ParentOrigin::CENTER );
   vbox.SetAnchorPoint( AnchorPoint::CENTER );
 
-  controls[2].SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  controls[2].SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
 
   // Check it.
-  DALI_TEST_EQUALS( controls[2].GetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ), Property::Value( ChildLayoutData::MATCH_PARENT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION ), Property::Value( ChildLayoutData::MATCH_PARENT ), TEST_LOCATION );
 
   // Ensure layouting happens
   application.SendNotification();

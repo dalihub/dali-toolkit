@@ -19,7 +19,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/devel-api/layouting/layout-base.h>
+#include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
 
 namespace Dali
@@ -65,7 +65,7 @@ public:
    * @brief Request for a particular layout (wrapping a control or a visual) to be measured and laid out.
    * @param[in] layout The layout to measure & relayout.
    */
-  void RequestLayout( LayoutBase layout );
+  void RequestLayout( LayoutItem layout );
 
 public:
   /// @cond internal
