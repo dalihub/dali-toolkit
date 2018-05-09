@@ -23,7 +23,7 @@
 #include <dali/public-api/common/extents.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
-#include <dali-toolkit/devel-api/layouting/layout-base.h>
+#include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
@@ -76,7 +76,7 @@ void VboxLayout::DoRegisterChildProperties( const std::string& containerType )
   }
 }
 
-void VboxLayout::OnChildAdd( LayoutBase& child )
+void VboxLayout::OnChildAdd( LayoutItem& child )
 {
   auto owner = child.GetOwner();
   owner.SetProperty( Toolkit::VboxLayout::ChildProperty::WEIGHT, 1.0f );
@@ -128,7 +128,7 @@ void VboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
     if( childLayout )
     {
       auto childOwner = childLayout->GetOwner();
-      auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
+      auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
 
       MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, heightMeasureSpec, 0 );
       auto childHeight = childLayout->GetMeasuredHeight();
@@ -199,23 +199,23 @@ void VboxLayout::ForceUniformWidth( int count, MeasureSpec heightMeasureSpec )
   auto uniformMeasureSpec = MeasureSpec( GetMeasuredWidth(), MeasureSpec::Mode::EXACTLY );
   for (int i = 0; i < count; ++i)
   {
-    LayoutBasePtr childLayout = GetChildAt(i);
+    LayoutItemPtr childLayout = GetChildAt(i);
     if( childLayout != nullptr )
     {
       auto childOwner = childLayout->GetOwner();
-      auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
-      auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
+      auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
+      auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
 
       if( desiredWidth == Toolkit::ChildLayoutData::MATCH_PARENT )
       {
         // Temporarily force children to reuse their old measured height
         int oldHeight = desiredHeight;
-        childOwner.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, childLayout->GetMeasuredHeight().mValue );
+        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, childLayout->GetMeasuredHeight().mValue );
 
         // Remeasure with new dimensions
         MeasureChildWithMargins( childLayout, uniformMeasureSpec, 0, heightMeasureSpec, 0 );
 
-        childOwner.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, oldHeight );
+        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, oldHeight );
       }
     }
   }
@@ -238,7 +238,7 @@ void VboxLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
 
   for( unsigned int childIndex = 0; childIndex < count; childIndex++)
   {
-    LayoutBasePtr childLayout = GetChildAt( childIndex );
+    LayoutItemPtr childLayout = GetChildAt( childIndex );
     if( childLayout != nullptr )
     {
       auto childWidth = childLayout->GetMeasuredWidth();

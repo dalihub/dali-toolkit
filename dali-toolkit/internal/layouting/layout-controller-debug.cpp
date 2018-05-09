@@ -30,7 +30,7 @@ namespace Internal
 Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Verbose, false, "LOG_LAYOUT_TREE" );
 
 
-void GetLayoutMeasureStateString( std::ostringstream& oss, LayoutBasePtr layout )
+void GetLayoutMeasureStateString( std::ostringstream& oss, LayoutItemPtr layout )
 {
   if( layout )
   {
@@ -43,7 +43,7 @@ void GetLayoutMeasureStateString( std::ostringstream& oss, LayoutBasePtr layout 
   }
 }
 
-void LayoutDebugMeasureStateRecurseLayout( LayoutBasePtr layout, int depth );
+void LayoutDebugMeasureStateRecurseLayout( LayoutItemPtr layout, int depth );
 
 void LayoutDebugMeasureStateRecurseActor( Actor root, int depth )
 {
@@ -57,7 +57,7 @@ void LayoutDebugMeasureStateRecurseActor( Actor root, int depth )
   {
     Internal::Control& controlImpl = GetImplementation( control );
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
-    LayoutBasePtr layout = controlDataImpl.GetLayout();
+    LayoutItemPtr layout = controlDataImpl.GetLayout();
 
     if( layout != nullptr )
     {
@@ -92,7 +92,7 @@ void LayoutDebugMeasureStateRecurseActor( Actor root, int depth )
   }
 }
 
-void LayoutDebugMeasureStateRecurseLayout( LayoutBasePtr layout, int depth )
+void LayoutDebugMeasureStateRecurseLayout( LayoutItemPtr layout, int depth )
 {
   std::ostringstream oss;
   for(int i=0;i<depth;++i) { oss << "  "; }; // indent
@@ -147,13 +147,13 @@ void LayoutDebugAfterLayoutRecurse( Actor root, int depth )
   {
     Internal::Control& controlImpl = GetImplementation( control );
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
-    LayoutBasePtr layout = controlDataImpl.GetLayout();
+    LayoutItemPtr layout = controlDataImpl.GetLayout();
 
     if( layout )
     {
       auto childOwner = layout->GetOwner();
-      auto widthMeasureSpec = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
-      auto heightMeasureSpec = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
+      auto widthMeasureSpec = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
+      auto heightMeasureSpec = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
 
       oss << "LayoutData:" << "( " << widthMeasureSpec << ", " << heightMeasureSpec << ") ";
 

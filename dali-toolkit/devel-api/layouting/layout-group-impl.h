@@ -23,7 +23,7 @@
 #include <dali/public-api/signals/connection-tracker.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
-#include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 
 namespace Dali
 {
@@ -38,7 +38,7 @@ using LayoutGroupPtr = IntrusivePtr<LayoutGroup>;
 /**
  * LayoutGroup is an abstract class that provides child layout management and basic measuring and layouting.
  *
- * Deriving classes should override LayoutBase::DoInitialize for second stage initialization,
+ * Deriving classes should override LayoutItem::DoInitialize for second stage initialization,
  * LayoutGroup::DoRegisterChildProperties to register child property types with the owner,
  * LayoutGroup::OnChildAdd to apply default child property values to the child.
  * Deriving classes may override LayoutGroup::OnChildRemove.
@@ -46,7 +46,7 @@ using LayoutGroupPtr = IntrusivePtr<LayoutGroup>;
  * Deriving classes must also override OnMeasure and OnLayout as follows:
  *
  * OnMeasure should measure each child using LayoutGroup::MeasureChildWithMargins or LayoutGroup::MeasureChild.
- * We recommend calling LayoutBase::ResolveSizeAndState() to resolve measure specs.
+ * We recommend calling LayoutItem::ResolveSizeAndState() to resolve measure specs.
  * If some children don't fit, then they can be measured again with different MeasureSpecs as required.
  *
  * After measurement, the derived class must also call SetMeasuredDimensions to set it's own requested size.
@@ -54,7 +54,7 @@ using LayoutGroupPtr = IntrusivePtr<LayoutGroup>;
  * OnLayout should use it's own layout parameters and the measured children's size to determine the children's
  * position and size; it should then call Layout() on the child layout to layout the child and it's hierarchy.
  */
-class DALI_IMPORT_API LayoutGroup : public LayoutBase,
+class DALI_IMPORT_API LayoutGroup : public LayoutItem,
                                     public ConnectionTracker
 {
 public:
@@ -79,7 +79,7 @@ public:
    * @param[in] layoutChild The child to add
    * @return The layout id of this child.
    */
-  Toolkit::LayoutGroup::LayoutId Add( LayoutBase& layoutChild );
+  Toolkit::LayoutGroup::LayoutId Add( LayoutItem& layoutChild );
 
   /**
    * @brief Remove a layout child from this group.
@@ -91,7 +91,7 @@ public:
    * @brief Remove a layout child from this group
    * @param[in] child The layout child
    */
-  void Remove( LayoutBase& child );
+  void Remove( LayoutItem& child );
 
   /**
    * @brief Remove all layout children.
@@ -111,12 +111,12 @@ public:
   /**
    * Get the child layout at the given index
    */
-  LayoutBasePtr GetChildAt( unsigned int childIndex ) const;
+  LayoutItemPtr GetChildAt( unsigned int childIndex ) const;
 
   /**
    * Get the child layout id of the given child
    */
-  Toolkit::LayoutGroup::LayoutId GetChildId( LayoutBase& child ) const;
+  Toolkit::LayoutGroup::LayoutId GetChildId( LayoutItem& child ) const;
 
   /**
    * @brief Get the layout child with the given layout id.
@@ -124,21 +124,21 @@ public:
    * @param[in] childId the layout id of the child within this group
    * @return A pointer to the child layout
    */
-  LayoutBasePtr GetChild( Toolkit::LayoutGroup::LayoutId childId ) const;
+  LayoutItemPtr GetChild( Toolkit::LayoutGroup::LayoutId childId ) const;
 
   template <typename T>
-    LayoutBasePtr GetChild( T childId ) = delete; // Prevent implicit casting of int/uint to LayoutId
+    LayoutItemPtr GetChild( T childId ) = delete; // Prevent implicit casting of int/uint to LayoutId
 
   /**
    * Callback when child is added to container.
    * Derived classes can use this to set their own child properties on the child layout's owner.
    */
-  virtual void OnChildAdd( LayoutBase& child );
+  virtual void OnChildAdd( LayoutItem& child );
 
   /**
    * Callback when child is removed from container.
    */
-  virtual void OnChildRemove( LayoutBase& child );
+  virtual void OnChildRemove( LayoutItem& child );
 
   /**
    * @brief Calculate the right measure spec for this child.
@@ -205,7 +205,7 @@ protected:
    * @param parentWidthMeasureSpec The width requirements for this view
    * @param parentHeightMeasureSpec The height requirements for this view
    */
-  virtual void MeasureChild( LayoutBasePtr child, MeasureSpec parentWidthMeasureSpec, MeasureSpec parentHeightMeasureSpec );
+  virtual void MeasureChild( LayoutItemPtr child, MeasureSpec parentWidthMeasureSpec, MeasureSpec parentHeightMeasureSpec );
 
   /**
    * Ask one of the children of this view to measure itself, taking into
@@ -221,7 +221,7 @@ protected:
    * @param heightUsed Extra space that has been used up by the parent
    *        vertically (possibly by other children of the parent)
    */
-  virtual void MeasureChildWithMargins( LayoutBasePtr child,
+  virtual void MeasureChildWithMargins( LayoutItemPtr child,
                                         MeasureSpec parentWidthMeasureSpec,
                                         LayoutLength widthUsed,
                                         MeasureSpec parentHeightMeasureSpec,
@@ -235,12 +235,12 @@ private:
   void OnInitialize() override final;
 
   /**
-   * @copydoc LayoutBase::OnRegisterChildProperties()
+   * @copydoc LayoutItem::OnRegisterChildProperties()
    */
   void OnRegisterChildProperties( const std::string& containerType ) override final;
 
   /**
-   * @copydoc LayoutBase::OnUnparent
+   * @copydoc LayoutItem::OnUnparent
    */
   void OnUnparent() override final;
 

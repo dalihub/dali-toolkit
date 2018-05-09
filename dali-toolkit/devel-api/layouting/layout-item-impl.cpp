@@ -19,8 +19,8 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali-toolkit/public-api/controls/control.h>
-#include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
-#include <dali-toolkit/internal/layouting/layout-base-data-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
+#include <dali-toolkit/internal/layouting/layout-item-data-impl.h>
 
 #if defined(DEBUG_ENABLED)
     Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::Verbose, false, "LOG_LAYOUT" );
@@ -41,19 +41,19 @@ namespace Toolkit
 namespace Internal
 {
 
-LayoutBase::LayoutBase()
-: mImpl( new LayoutBase::Impl() ),
+LayoutItem::LayoutItem()
+: mImpl( new LayoutItem::Impl() ),
   mSlotDelegate( this )
 {
 }
 
-LayoutBasePtr LayoutBase::New( Handle& owner )
+LayoutItemPtr LayoutItem::New( Handle& owner )
 {
-  LayoutBasePtr layoutPtr = new LayoutBase();
+  LayoutItemPtr layoutPtr = new LayoutItem();
   return layoutPtr;
 }
 
-void LayoutBase::Initialize( Handle& owner, const std::string& containerType )
+void LayoutItem::Initialize( Handle& owner, const std::string& containerType )
 {
   mImpl->mOwner = &(owner.GetBaseObject());
   RegisterChildProperties( containerType );
@@ -61,12 +61,12 @@ void LayoutBase::Initialize( Handle& owner, const std::string& containerType )
   RequestLayout();
 }
 
-Handle LayoutBase::GetOwner() const
+Handle LayoutItem::GetOwner() const
 {
   return Handle::DownCast(BaseHandle(mImpl->mOwner));
 }
 
-void LayoutBase::Unparent()
+void LayoutItem::Unparent()
 {
   // Enable directly derived types to first remove children
   OnUnparent();
@@ -75,17 +75,17 @@ void LayoutBase::Unparent()
   mImpl->mOwner = NULL;
 }
 
-void LayoutBase::SetAnimateLayout( bool animateLayout )
+void LayoutItem::SetAnimateLayout( bool animateLayout )
 {
   mImpl->mAnimated = animateLayout;
 }
 
-bool LayoutBase::IsLayoutAnimated() const
+bool LayoutItem::IsLayoutAnimated() const
 {
   return mImpl->mAnimated;
 }
 
-void LayoutBase::RegisterChildProperties( const std::string& containerType )
+void LayoutItem::RegisterChildProperties( const std::string& containerType )
 {
   // Call on derived types
   auto typeInfo = TypeRegistry::Get().GetTypeInfo( containerType );
@@ -94,26 +94,26 @@ void LayoutBase::RegisterChildProperties( const std::string& containerType )
     Property::IndexContainer indices;
     typeInfo.GetChildPropertyIndices( indices );
 
-    if( std::find( indices.Begin(), indices.End(), Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ) ==
+    if( std::find( indices.Begin(), indices.End(), Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION ) ==
         indices.End() )
     {
       ChildPropertyRegistration( typeInfo.GetName(), WIDTH_SPECIFICATION_NAME,
-                                 Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, Property::INTEGER );
+                                 Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, Property::INTEGER );
 
       ChildPropertyRegistration( typeInfo.GetName(), HEIGHT_SPECIFICATION_NAME,
-                                 Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, Property::INTEGER );
+                                 Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, Property::INTEGER );
     }
 
     OnRegisterChildProperties( containerType );
   }
 }
 
-void LayoutBase::OnRegisterChildProperties( const std::string& containerType )
+void LayoutItem::OnRegisterChildProperties( const std::string& containerType )
 {
 }
 
 
-void LayoutBase::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
+void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
 {
   const bool forceLayout = mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
 
@@ -161,7 +161,7 @@ void LayoutBase::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
   //mMeasureCache.put(key, ((long) mMeasuredWidth) << 32 | (long) mMeasuredHeight & 0xffffffffL); // suppress sign extension
 }
 
-void LayoutBase::Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b )
+void LayoutItem::Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b )
 {
   if( mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT ) )
   {
@@ -181,34 +181,34 @@ void LayoutBase::Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutL
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_IS_LAID_OUT );
 }
 
-LayoutLength LayoutBase::GetMinimumWidth() const
+LayoutLength LayoutItem::GetMinimumWidth() const
 {
   return mImpl->mMinimumSize.GetWidth();
 }
 
-LayoutLength LayoutBase::GetMinimumHeight() const
+LayoutLength LayoutItem::GetMinimumHeight() const
 {
   return mImpl->mMinimumSize.GetHeight();
 }
 
-void LayoutBase::SetMinimumWidth( LayoutLength minimumWidth )
+void LayoutItem::SetMinimumWidth( LayoutLength minimumWidth )
 {
   mImpl->mMinimumSize.SetWidth( minimumWidth );
   RequestLayout();
 }
 
-void LayoutBase::SetMinimumHeight( LayoutLength minimumHeight )
+void LayoutItem::SetMinimumHeight( LayoutLength minimumHeight )
 {
   mImpl->mMinimumSize.SetHeight( minimumHeight );
   RequestLayout();
 }
 
-Extents LayoutBase::GetPadding() const
+Extents LayoutItem::GetPadding() const
 {
   return mImpl->mPadding;
 }
 
-LayoutLength LayoutBase::GetDefaultSize( LayoutLength size, MeasureSpec measureSpec )
+LayoutLength LayoutItem::GetDefaultSize( LayoutLength size, MeasureSpec measureSpec )
 {
   LayoutLength result = size;
   auto specMode = measureSpec.GetMode();
@@ -231,63 +231,63 @@ LayoutLength LayoutBase::GetDefaultSize( LayoutLength size, MeasureSpec measureS
   return result;
 }
 
-void LayoutBase::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec)
+void LayoutItem::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec)
 {
   SetMeasuredDimensions( GetDefaultSize( GetSuggestedMinimumWidth(), widthMeasureSpec ),
                          GetDefaultSize( GetSuggestedMinimumHeight(), heightMeasureSpec ) );
 }
 
-void LayoutBase::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
+void LayoutItem::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
 {
 }
 
-LayoutParent* LayoutBase::GetParent()
+LayoutParent* LayoutItem::GetParent()
 {
   return mImpl->mLayoutParent;
 }
 
-void LayoutBase::RequestLayout()
+void LayoutItem::RequestLayout()
 {
   // @todo Enforce failure if called in Measure/Layout passes.
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
   Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
-  layoutController.RequestLayout( Toolkit::LayoutBase(this) );
+  layoutController.RequestLayout( Toolkit::LayoutItem(this) );
 }
 
-bool LayoutBase::IsLayoutRequested() const
+bool LayoutItem::IsLayoutRequested() const
 {
   return mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
 }
 
-void LayoutBase::SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight )
+void LayoutItem::SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight )
 {
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET );
   mImpl->mMeasuredWidth = measuredWidth;
   mImpl->mMeasuredHeight = measuredHeight;
 }
 
-LayoutLength LayoutBase::GetMeasuredWidth() const
+LayoutLength LayoutItem::GetMeasuredWidth() const
 {
   // Get the size portion of the measured width
   return  mImpl->mMeasuredWidth.GetSize();
 }
 
-LayoutLength LayoutBase::GetMeasuredHeight() const
+LayoutLength LayoutItem::GetMeasuredHeight() const
 {
   return  mImpl->mMeasuredHeight.GetSize();
 }
 
-MeasuredSize LayoutBase::GetMeasuredWidthAndState() const
+MeasuredSize LayoutItem::GetMeasuredWidthAndState() const
 {
   return mImpl->mMeasuredWidth;
 }
 
-MeasuredSize LayoutBase::GetMeasuredHeightAndState() const
+MeasuredSize LayoutItem::GetMeasuredHeightAndState() const
 {
   return mImpl->mMeasuredHeight;
 }
 
-LayoutLength LayoutBase::GetSuggestedMinimumWidth() const
+LayoutLength LayoutItem::GetSuggestedMinimumWidth() const
 {
   auto owner = GetOwner();
   auto actor = Actor::DownCast(owner);
@@ -296,7 +296,7 @@ LayoutLength LayoutBase::GetSuggestedMinimumWidth() const
   return std::max( mImpl->mMinimumSize.GetWidth(), LayoutLength::IntType( naturalSize.width ) );
 }
 
-LayoutLength LayoutBase::GetSuggestedMinimumHeight() const
+LayoutLength LayoutItem::GetSuggestedMinimumHeight() const
 {
   auto owner = GetOwner();
   auto actor = Actor::DownCast(owner);
@@ -305,7 +305,7 @@ LayoutLength LayoutBase::GetSuggestedMinimumHeight() const
   return std::max( mImpl->mMinimumSize.GetHeight(), LayoutLength::IntType(naturalSize.height) );
 }
 
-MeasuredSize LayoutBase::ResolveSizeAndState( LayoutLength size, MeasureSpec measureSpec, MeasuredSize::State childMeasuredState )
+MeasuredSize LayoutItem::ResolveSizeAndState( LayoutLength size, MeasureSpec measureSpec, MeasuredSize::State childMeasuredState )
 {
   auto specMode = measureSpec.GetMode();
   LayoutLength specSize = measureSpec.GetSize();
@@ -345,11 +345,11 @@ MeasuredSize LayoutBase::ResolveSizeAndState( LayoutLength size, MeasureSpec mea
 }
 
 
-bool LayoutBase::SetFrame( LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
+bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
 {
   bool changed = false;
 
-  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutBase::SetFrame(%d, %d, %d, %d)\n", left.mValue, top.mValue, right.mValue, bottom.mValue );
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame(%d, %d, %d, %d)\n", left.mValue, top.mValue, right.mValue, bottom.mValue );
 
   if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom )
   {
@@ -381,7 +381,7 @@ bool LayoutBase::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
                              Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
         animation.AnimateTo( Property( actor, Actor::Property::SIZE ),
                              Vector3( right-left, bottom-top, 0.0f ) );
-        animation.FinishedSignal().Connect( mSlotDelegate, &LayoutBase::OnLayoutAnimationFinished );
+        animation.FinishedSignal().Connect( mSlotDelegate, &LayoutItem::OnLayoutAnimationFinished );
         animation.Play();
       }
       else
@@ -400,7 +400,7 @@ bool LayoutBase::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
   return changed;
 }
 
-void LayoutBase::OnLayoutAnimationFinished( Animation& animation )
+void LayoutItem::OnLayoutAnimationFinished( Animation& animation )
 {
   auto owner = GetOwner();
   auto actor = Actor::DownCast(owner);
@@ -410,17 +410,17 @@ void LayoutBase::OnLayoutAnimationFinished( Animation& animation )
   }
 }
 
-void LayoutBase::SizeChange( LayoutSize newSize, LayoutSize oldSize)
+void LayoutItem::SizeChange( LayoutSize newSize, LayoutSize oldSize)
 {
   OnSizeChanged( newSize, oldSize );
 }
 
 
-void LayoutBase::OnSizeChanged( LayoutSize newSize, LayoutSize oldSize )
+void LayoutItem::OnSizeChanged( LayoutSize newSize, LayoutSize oldSize )
 {
 }
 
-void LayoutBase::OnInitialize()
+void LayoutItem::OnInitialize()
 {
 }
 

@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_LAYOUTING_LAYOUT_BASE_H
-#define DALI_TOOLKIT_LAYOUTING_LAYOUT_BASE_H
+#ifndef DALI_TOOLKIT_LAYOUTING_LAYOUT_ITEM_H
+#define DALI_TOOLKIT_LAYOUTING_LAYOUT_ITEM_H
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
@@ -32,7 +32,7 @@ namespace Toolkit
 
 namespace Internal
 {
-class LayoutBase;
+class LayoutItem;
 }
 
 using LayoutId = unsigned int;
@@ -42,7 +42,7 @@ using LayoutId = unsigned int;
  * Base class for layouts. It is used to layout a control (or visual).
  * It can be laid out by a LayoutGroup.
  */
-class DALI_IMPORT_API LayoutBase : public BaseHandle
+class DALI_IMPORT_API LayoutItem : public BaseHandle
 {
 public:
 
@@ -63,35 +63,35 @@ public:
   };
 
   /**
-   * @brief Default constructor which provides an uninitialized Dali::LayoutBase.
+   * @brief Default constructor which provides an uninitialized Dali::LayoutItem.
    */
-  LayoutBase();
+  LayoutItem();
 
   /**
    * @brief Default destructor
    */
-  ~LayoutBase()=default;
+  ~LayoutItem()=default;
 
   /**
-   * @brief Create an initialized LayoutBase
+   * @brief Create an initialized LayoutItem
    *
    * @param[in] handle A handle to the object that this layout for, e.g. a Control or a Visual::Base
    * @warning This is an interim function, and will be deleted when all controls have layouts
    * @todo Ensure that this warning is implemented
    */
-  static LayoutBase New( Handle& handle );
+  static LayoutItem New( Handle& handle );
 
   /**
    * @brief Copy constructor
-   * @param[in] copy The LayoutBase to copy.
+   * @param[in] copy The LayoutItem to copy.
    */
-  LayoutBase(const LayoutBase& copy) = default;
+  LayoutItem(const LayoutItem& copy) = default;
 
   /**
    * @brief Assignment operator
-   * @param[in] rhs The LayoutBase to copy
+   * @param[in] rhs The LayoutItem to copy
    */
-  LayoutBase& operator=( const LayoutBase& rhs ) = default;
+  LayoutItem& operator=( const LayoutItem& rhs ) = default;
 
   /**
    * @brief Get a handle to the control or visual this layout represents.
@@ -117,11 +117,11 @@ public:
 public:
   /// @cond internal
   /**
-   * @brief This constructor is used by LayoutBase::New() methods.
+   * @brief This constructor is used by LayoutItem::New() methods.
    *
    * @param[in] actor A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL LayoutBase( Internal::LayoutBase* layoutBase );
+  explicit DALI_INTERNAL LayoutItem( Internal::LayoutItem* LayoutItem );
   /// @endcond
 };
 
@@ -129,4 +129,4 @@ public:
 }//namespace Toolkit
 }//namespace Dali
 
-#endif // DALI_TOOLKIT_LAYOUTING_LAYOUT_BASE_H
+#endif // DALI_TOOLKIT_LAYOUTING_LAYOUT_ITEM_H

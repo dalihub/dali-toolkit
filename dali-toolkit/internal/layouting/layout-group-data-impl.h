@@ -19,8 +19,8 @@
 
 #include <vector>
 
-#include <dali-toolkit/devel-api/layouting/layout-base-impl.h>
-#include <dali-toolkit/internal/layouting/layout-base-data-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
+#include <dali-toolkit/internal/layouting/layout-item-data-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 
 namespace Dali
@@ -38,7 +38,7 @@ public:
 public:
   struct ChildLayout
   {
-    LayoutBasePtr child;
+    LayoutItemPtr child;
     Toolkit::LayoutGroup::LayoutId layoutId;
   };
 

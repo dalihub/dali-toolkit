@@ -46,7 +46,7 @@ LayoutGroup::~LayoutGroup()
 {
 }
 
-Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutBase& child )
+Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutItem& child )
 {
   LayoutParent* oldParent = child.GetParent();
   if( oldParent )
@@ -65,10 +65,10 @@ Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutBase& child )
 
   auto owner = child.GetOwner();
 
-  // If the owner does not have any LayoutBase child properties, add them
-  if( ! DevelHandle::DoesCustomPropertyExist( owner, Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION ) )
+  // If the owner does not have any LayoutItem child properties, add them
+  if( ! DevelHandle::DoesCustomPropertyExist( owner, Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION ) )
   {
-    // Set default properties for LayoutGroup and LayoutBase.
+    // Set default properties for LayoutGroup and LayoutItem.
     // Deriving classes can override OnChildAdd() to add their own default properties
     GenerateDefaultChildPropertyValues( owner );
   }
@@ -98,7 +98,7 @@ void LayoutGroup::Remove( Toolkit::LayoutGroup::LayoutId childId )
   RequestLayout();
 }
 
-void LayoutGroup::Remove( LayoutBase& child )
+void LayoutGroup::Remove( LayoutItem& child )
 {
   for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; ++iter )
   {
@@ -126,13 +126,13 @@ unsigned int LayoutGroup::GetChildCount() const
   return mImpl->mChildren.size();
 }
 
-LayoutBasePtr LayoutGroup::GetChildAt( unsigned int index ) const
+LayoutItemPtr LayoutGroup::GetChildAt( unsigned int index ) const
 {
   DALI_ASSERT_ALWAYS( index < mImpl->mChildren.size() );
   return mImpl->mChildren[ index ].child;
 }
 
-LayoutBasePtr LayoutGroup::GetChild( Toolkit::LayoutGroup::LayoutId childId ) const
+LayoutItemPtr LayoutGroup::GetChild( Toolkit::LayoutGroup::LayoutId childId ) const
 {
   for( auto&& childLayout : mImpl->mChildren )
   {
@@ -144,7 +144,7 @@ LayoutBasePtr LayoutGroup::GetChild( Toolkit::LayoutGroup::LayoutId childId ) co
   return NULL;
 }
 
-Toolkit::LayoutGroup::LayoutId LayoutGroup::GetChildId( LayoutBase& child ) const
+Toolkit::LayoutGroup::LayoutId LayoutGroup::GetChildId( LayoutItem& child ) const
 {
   for( auto&& childLayout : mImpl->mChildren )
   {
@@ -156,11 +156,11 @@ Toolkit::LayoutGroup::LayoutId LayoutGroup::GetChildId( LayoutBase& child ) cons
   return Toolkit::LayoutGroup::UNKNOWN_ID;
 }
 
-void LayoutGroup::OnChildAdd( LayoutBase& child )
+void LayoutGroup::OnChildAdd( LayoutItem& child )
 {
 }
 
-void LayoutGroup::OnChildRemove( LayoutBase& child )
+void LayoutGroup::OnChildRemove( LayoutItem& child )
 {
 }
 
@@ -183,9 +183,9 @@ void LayoutGroup::OnSetChildProperties( Handle& handle, Property::Index index, P
 
 void LayoutGroup::GenerateDefaultChildPropertyValues( Handle child )
 {
-  child.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION,
+  child.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION,
                      Toolkit::ChildLayoutData::WRAP_CONTENT );
-  child.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION,
+  child.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,
                      Toolkit::ChildLayoutData::WRAP_CONTENT );
   child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Extents() );
 }
@@ -201,13 +201,13 @@ void LayoutGroup::MeasureChildren( MeasureSpec widthMeasureSpec, MeasureSpec hei
   }
 }
 
-void LayoutGroup::MeasureChild( LayoutBasePtr child,
+void LayoutGroup::MeasureChild( LayoutItemPtr child,
                                 MeasureSpec parentWidthMeasureSpec,
                                 MeasureSpec parentHeightMeasureSpec )
 {
   auto childOwner = child->GetOwner();
-  auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
-  auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
+  auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
+  auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
 
   auto padding = GetPadding();
 
@@ -221,13 +221,13 @@ void LayoutGroup::MeasureChild( LayoutBasePtr child,
   child->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
 }
 
-void LayoutGroup::MeasureChildWithMargins( LayoutBasePtr child,
+void LayoutGroup::MeasureChildWithMargins( LayoutItemPtr child,
                                            MeasureSpec parentWidthMeasureSpec, LayoutLength widthUsed,
                                            MeasureSpec parentHeightMeasureSpec, LayoutLength heightUsed)
 {
   auto childOwner = child->GetOwner();
-  auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION );
-  auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION );
+  auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
+  auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
   auto desiredMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
   auto padding = GetPadding();
 
@@ -319,14 +319,14 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
       if (childDimension == Toolkit::ChildLayoutData::MATCH_PARENT)
       {
         // Child wants to be our size... find out how big it should be
-        resultSize = LayoutBase::Impl::sUseZeroUnspecifiedMeasureSpec ? LayoutLength(0) : size;
+        resultSize = LayoutItem::Impl::sUseZeroUnspecifiedMeasureSpec ? LayoutLength(0) : size;
         resultMode = MeasureSpec::Mode::UNSPECIFIED;
       }
       else if (childDimension == Toolkit::ChildLayoutData::WRAP_CONTENT)
       {
         // Child wants to determine its own size.... find out how big
         // it should be
-        resultSize = LayoutBase::Impl::sUseZeroUnspecifiedMeasureSpec ? LayoutLength(0) : size;
+        resultSize = LayoutItem::Impl::sUseZeroUnspecifiedMeasureSpec ? LayoutLength(0) : size;
         resultMode = MeasureSpec::Mode::UNSPECIFIED;
       }
       else
@@ -387,7 +387,7 @@ void LayoutGroup::OnUnparent()
 
 void LayoutGroup::ChildAddedToOwner( Actor child )
 {
-  LayoutBasePtr childLayout;
+  LayoutItemPtr childLayout;
   Toolkit::Control control = Toolkit::Control::DownCast( child );
 
   if( control ) // Can only support adding Controls, not Actors to layout
@@ -398,16 +398,16 @@ void LayoutGroup::ChildAddedToOwner( Actor child )
 
     if( ! childLayout )
     {
-      // If the child doesn't already have a layout, then create a LayoutBase for it.
-      childLayout = LayoutBase::New( control );
+      // If the child doesn't already have a layout, then create a LayoutItem for it.
+      childLayout = LayoutItem::New( control );
       childLayout->SetAnimateLayout( IsLayoutAnimated() ); // @todo this essentially forces animation inheritance. Bad?
 
       auto desiredSize = control.GetNaturalSize();
       childControlDataImpl.SetLayout( *childLayout.Get() );
 
       // HBoxLayout will apply default layout data for this object
-      child.SetProperty( Toolkit::LayoutBase::ChildProperty::WIDTH_SPECIFICATION, LayoutLength::IntType( desiredSize.width ) );
-      child.SetProperty( Toolkit::LayoutBase::ChildProperty::HEIGHT_SPECIFICATION, LayoutLength::IntType( desiredSize.height ) );
+      child.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, LayoutLength::IntType( desiredSize.width ) );
+      child.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, LayoutLength::IntType( desiredSize.height ) );
       child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Extents() );
     }
 
