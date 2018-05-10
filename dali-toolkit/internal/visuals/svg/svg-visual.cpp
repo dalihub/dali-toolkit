@@ -150,6 +150,9 @@ void SvgVisual::DoSetOffStage( Actor& actor )
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
+
+  // Reset the visual size to zero so that when adding the actor back to stage the SVG rasterization is forced
+  mVisualSize = Vector2::ZERO;
 }
 
 void SvgVisual::GetNaturalSize( Vector2& naturalSize )

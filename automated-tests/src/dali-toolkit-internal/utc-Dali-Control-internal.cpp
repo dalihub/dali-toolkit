@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@
 #include <dummy-visual.h>
 #include <../dali-toolkit/dali-toolkit-test-utils/dummy-control.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/internal/controls/control/control-debug.h>
+
 
 using namespace Dali;
 using namespace Toolkit;
@@ -64,6 +66,28 @@ int UtcDaliControlActionOnVisual(void)
 
   application.SendNotification();
   DALI_TEST_EQUALS( dummyVisualPtr->GetActionCounter() , 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlDebugHierarchy(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Create a control hierarchy, and test that the debug produces output" );
+
+  auto tableView = Toolkit::TableView::New(1, 2);
+  tableView.AddChild( ImageView::New( TEST_RESOURCE_DIR "/gallery-small-1.jpg" ), TableView::CellPosition( 1, 1 ) );
+  tableView.AddChild( TextLabel::New("Stuff"), TableView::CellPosition( 1, 2 ) );
+
+  Stage::GetCurrent().Add( tableView );
+
+  Property::Value v(Matrix3::IDENTITY);
+  tableView.RegisterProperty( "SomeMatrix3", v);
+
+  std::ostringstream oss;
+  Dali::Toolkit::Internal::DumpControlHierarchy( oss, Stage::GetCurrent().GetRootLayer() );
+  DALI_TEST_CHECK( oss.str().length() != 0 );
+  tet_printf("Control hierarchy: \n%s\n", oss.str().c_str() );
 
   END_TEST;
 }

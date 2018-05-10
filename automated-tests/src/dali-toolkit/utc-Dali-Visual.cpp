@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <toolkit-event-thread-callback.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -396,7 +397,7 @@ int UtcDaliVisualSize(void)
 int UtcDaliVisualSetOnOffStage(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualSetDepthIndex" );
+  tet_infoline( "UtcDaliVisualSetOnOffStage" );
 
   VisualFactory factory = VisualFactory::Get();
   Property::Map propertyMap;
@@ -419,6 +420,64 @@ int UtcDaliVisualSetOnOffStage(void)
   application.SendNotification();
   application.Render(0);
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+
+  Stage::GetCurrent().Remove( actor );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+int UtcDaliVisualSetOnOffStage2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualSetOnOffStage2" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::SVG );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_SVG_FILE_NAME );
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  actor.SetSize(200.f, 200.f);
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  // First on/off
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  Renderer renderer = actor.GetRendererAt( 0 );
+  auto textures = renderer.GetTextures();
+  DALI_TEST_CHECK( textures.GetTextureCount() != 0u );
+
+  Stage::GetCurrent().Remove( actor );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  // Second on/off
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  renderer = actor.GetRendererAt( 0 );
+  textures = renderer.GetTextures();
+  DALI_TEST_CHECK( textures.GetTextureCount() != 0u );
 
   Stage::GetCurrent().Remove( actor );
 

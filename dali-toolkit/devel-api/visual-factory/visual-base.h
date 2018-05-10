@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_VISUAL_BASE_H
 #define DALI_TOOLKIT_VISUAL_BASE_H
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ public:
    * Used by the styling system to animate properties
    * @return The name of the visual
    */
-  const std::string& GetName();
+  const std::string& GetName() const;
 
   /**
    * @brief Sets the transform and the control size

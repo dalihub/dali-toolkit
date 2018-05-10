@@ -39,7 +39,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-environment-variable.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-imf-manager.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-context.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-orientation.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-style-monitor.cpp
@@ -72,7 +72,7 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali-toolkit
 )
 
-ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
+ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED )
 ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 
 ADD_DEFINITIONS(-DTEST_RESOURCE_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../resources\" )

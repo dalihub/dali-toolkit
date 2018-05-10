@@ -17,6 +17,8 @@
  * limitations under the License.
  *
  */
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/input-method-context.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
@@ -112,6 +114,14 @@ namespace Property
   };
 
 } // namespace Property
+
+/**
+ * @brief Return the input method context of TextEditor.
+ *
+ * @param[in] textEditor The instance of TextEditor.
+ * @return InputMethodContext instance.
+ */
+DALI_IMPORT_API InputMethodContext GetInputMethodContext( TextEditor textEditor );
 
 } // namespace DevelTextEditor
 

@@ -67,9 +67,9 @@ namespace Toolkit
 namespace Text
 {
 
-EventData::EventData( DecoratorPtr decorator )
+EventData::EventData( DecoratorPtr decorator, InputMethodContext& inputMethodContext )
 : mDecorator( decorator ),
-  mImfManager(),
+  mInputMethodContext( inputMethodContext ),
   mPlaceholderFont( NULL ),
   mPlaceholderTextActive(),
   mPlaceholderTextInactive(),
@@ -112,7 +112,6 @@ EventData::EventData( DecoratorPtr decorator )
   mPlaceholderEllipsisFlag( false ),
   mShiftSelectionFlag( true )
 {
-  mImfManager = ImfManager::Get();
 }
 
 EventData::~EventData()
@@ -180,7 +179,7 @@ bool Controller::Impl::ProcessInputEvents()
   if( mEventData->mUpdateCursorPosition ||
       mEventData->mUpdateHighlightBox )
   {
-    NotifyImfManager();
+    NotifyInputMethodContext();
   }
 
   // The cursor must also be repositioned after inserts into the model
@@ -329,9 +328,9 @@ bool Controller::Impl::ProcessInputEvents()
   return decoratorUpdated;
 }
 
-void Controller::Impl::NotifyImfManager()
+void Controller::Impl::NotifyInputMethodContext()
 {
-  if( mEventData && mEventData->mImfManager )
+  if( mEventData && mEventData->mInputMethodContext )
   {
     CharacterIndex cursorPosition = GetLogicalCursorPosition();
 
@@ -347,17 +346,17 @@ void Controller::Impl::NotifyImfManager()
       cursorPosition -= numberOfWhiteSpaces;
     }
 
-    mEventData->mImfManager.SetCursorPosition( cursorPosition );
-    mEventData->mImfManager.NotifyCursorPosition();
+    mEventData->mInputMethodContext.SetCursorPosition( cursorPosition );
+    mEventData->mInputMethodContext.NotifyCursorPosition();
   }
 }
 
-void Controller::Impl::NotifyImfMultiLineStatus()
+void Controller::Impl::NotifyInputMethodContextMultiLineStatus()
 {
-  if ( mEventData )
+  if ( mEventData && mEventData->mInputMethodContext )
   {
     Text::Layout::Engine::Type layout = mLayoutEngine.GetLayout();
-    mEventData->mImfManager.NotifyTextInputMultiLine( layout == Text::Layout::Engine::MULTI_LINE_BOX );
+    mEventData->mInputMethodContext.NotifyTextInputMultiLine( layout == Text::Layout::Engine::MULTI_LINE_BOX );
   }
 }
 
@@ -1320,11 +1319,11 @@ void Controller::Impl::OnCursorKeyEvent( const Event& event )
 
     if ( selecting )
     {
-      // Notify the cursor position to the imf manager.
-      if( mEventData->mImfManager )
+      // Notify the cursor position to the InputMethodContext.
+      if( mEventData->mInputMethodContext )
       {
-        mEventData->mImfManager.SetCursorPosition( mEventData->mPrimaryCursorPosition );
-        mEventData->mImfManager.NotifyCursorPosition();
+        mEventData->mInputMethodContext.SetCursorPosition( mEventData->mPrimaryCursorPosition );
+        mEventData->mInputMethodContext.NotifyCursorPosition();
       }
 
       ChangeState( EventData::SELECTING );
@@ -1396,11 +1395,11 @@ void Controller::Impl::OnTapEvent( const Event& event )
       mEventData->mScrollAfterUpdatePosition = true;
       mEventData->mUpdateInputStyle = true;
 
-      // Notify the cursor position to the imf manager.
-      if( mEventData->mImfManager )
+      // Notify the cursor position to the InputMethodContext.
+      if( mEventData->mInputMethodContext )
       {
-        mEventData->mImfManager.SetCursorPosition( mEventData->mPrimaryCursorPosition );
-        mEventData->mImfManager.NotifyCursorPosition();
+        mEventData->mInputMethodContext.SetCursorPosition( mEventData->mPrimaryCursorPosition );
+        mEventData->mInputMethodContext.NotifyCursorPosition();
       }
     }
     else if( 2u == tapCount )
@@ -2418,8 +2417,8 @@ void Controller::Impl::RepositionSelectionHandles( float visualX, float visualY,
     mEventData->mUpdateRightSelectionPosition = true;
     mEventData->mUpdateHighlightBox = true;
 
-    // It may happen an IMF commit event arrives before the selection event
-    // if the IMF manager is in pre-edit state. The commit event will set the
+    // It may happen an InputMethodContext commit event arrives before the selection event
+    // if the InputMethodContext is in pre-edit state. The commit event will set the
     // mEventData->mUpdateCursorPosition flag to true. If it's not set back
     // to false, the highlight box won't be updated.
     mEventData->mUpdateCursorPosition = false;

@@ -20,6 +20,8 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/popup/popup.cpp \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.cpp \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
+  $(devel_api_src_dir)/controls/text-controls/text-editor-devel.cpp \
+  $(devel_api_src_dir)/controls/text-controls/text-field-devel.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-popup.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-selection-toolbar.cpp \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.cpp \

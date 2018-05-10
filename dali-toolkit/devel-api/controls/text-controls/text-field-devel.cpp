@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEST_SUITE_UTILS_H__
-#define __DALI_TOOLKIT_TEST_SUITE_UTILS_H__
+#ifndef DALI_TOOLKIT_TEXT_FIELD_DEVEL_H
+#define DALI_TOOLKIT_TEXT_FIELD_DEVEL_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,27 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
+#include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 
-#include <dali-test-suite-utils.h>
-#include "toolkit-test-application.h"
-#include "toolkit-application.h"
-#include "toolkit-input-method-context.h"
-#include "toolkit-clipboard-event-notifier.h"
+namespace Dali
+{
 
-#endif // __DALI_TOOLKIT_TEST_SUITE_UTILS_H__
+namespace Toolkit
+{
+
+namespace DevelTextField
+{
+
+InputMethodContext GetInputMethodContext( TextField textField )
+{
+  return GetImpl( textField ).GetInputMethodContext();
+}
+
+} // namespace DevelText
+
+} // namespace Toolkit
+
+} // namespace Dali
+
+#endif // DALI_TOOLKIT_TEXT_FIELD_DEVEL_H
