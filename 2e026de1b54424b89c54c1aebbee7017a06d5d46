@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c4bf396_d7933b3d",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-10T10:52:30Z",
+      "side": 1,
+      "message": "This should only remove padding for controls that have added it, i.e. ImageView and Text controls.",
+      "range": {
+        "startLine": 40,
+        "startChar": 32,
+        "endLine": 40,
+        "endChar": 55
+      },
+      "revId": "2e026de1b54424b89c54c1aebbee7017a06d5d46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9ae42855_1ed370f6",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-10T10:52:30Z",
+      "side": 1,
+      "message": "Using DALI_LOG_TRACE_METHOD( gLogFilter ) would give more useful results - you\u0027ll see the call tree with indent.",
+      "range": {
+        "startLine": 227,
+        "startChar": 2,
+        "endLine": 227,
+        "endChar": 16
+      },
+      "revId": "2e026de1b54424b89c54c1aebbee7017a06d5d46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "41da4a91_0bca3f50",
+        "filename": "dali-toolkit/internal/layouting/layout-controller-impl.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-05-10T10:52:30Z",
+      "side": 1,
+      "message": "Did you change all the log levels to the same level? multiple levels are useful :D",
+      "range": {
+        "startLine": 54,
+        "startChar": 36,
+        "endLine": 54,
+        "endChar": 43
+      },
+      "revId": "2e026de1b54424b89c54c1aebbee7017a06d5d46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
