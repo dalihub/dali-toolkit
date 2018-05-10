@@ -890,6 +890,95 @@ int UtcDaliImageVisualAnimateOpacity(void)
   END_TEST;
 }
 
+
+
+int UtcDaliImageVisualAnimateOpacity02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Animate image visual opacity" );
+
+  application.GetPlatform().SetClosestImageSize( Vector2(100, 100) );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert(Visual::Property::TYPE,  Visual::IMAGE);
+  propertyMap.Insert(ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+  propertyMap.Insert("opacity", 0.5f);
+  propertyMap.Insert(ImageVisual::Property::SYNCHRONOUS_LOADING, true);
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+
+  DummyControl actor = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  actor.SetSize(2000, 2000);
+  actor.SetParentOrigin(ParentOrigin::CENTER);
+  actor.SetColor(Color::BLACK);
+
+  tet_infoline( "Test that the opacity doesn't animate when actor not staged" );
+
+  Property::Array array;
+
+  Property::Map map;
+  map["target"] = "testVisual";
+  map["property"] = "opacity";
+  map["initialValue"] = 0.0f;
+  map["targetValue"] = 1.0f;
+  map["animator"] = Property::Map()
+    .Add("alphaFunction", "LINEAR")
+    .Add("timePeriod", Property::Map()
+         .Add("delay", 0.0f)
+         .Add("duration", 4.0f));
+
+  Property::Map map2;
+  map2["target"] = "testVisual";
+  map2["property"] = "size";
+  map2["targetValue"] = Vector2(1.0f, 1.0f);
+
+  array.Add( map ).Add(map2);
+
+  Dali::Toolkit::TransitionData transition = TransitionData::New( array );
+  Animation animation = dummyImpl.CreateTransition( transition );
+
+  Stage::GetCurrent().Add(actor);
+  application.SendNotification();
+  application.Render(0);     // Ensure animation starts
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = actor.GetRendererAt(0);
+  Property::Value blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+  DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
+
+  animation = dummyImpl.CreateTransition( transition );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(0);     // Ensure animation starts
+  application.Render(2000u); // Halfway point through animation
+  application.SendNotification(); // Handle any signals
+
+  blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+  DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::ON, TEST_LOCATION );
+
+  Vector4 color;
+  DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
+  DALI_TEST_EQUALS( color.a, 0.5f, TEST_LOCATION );
+
+  application.Render(2001u); // end
+  application.SendNotification(); // ensure animation finished signal is sent
+
+  DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue< Vector4 >( "uColor", color ) );
+  DALI_TEST_EQUALS( color.a, 1.0f, TEST_LOCATION );
+
+  blendModeValue = renderer.GetProperty( Renderer::Property::BLEND_MODE );
+  DALI_TEST_EQUALS( blendModeValue.Get<int>(), (int)BlendMode::AUTO, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+
 int UtcDaliImageVisualAnimatePixelArea(void)
 {
   ToolkitTestApplication application;
