@@ -194,7 +194,11 @@ void VideoView::SetPropertyMap( Property::Map map )
 
     if( shaderValue )
     {
-      mEffectPropertyMap = *( shaderValue->GetMap() );
+      Property::Map* shaderMap = shaderValue->GetMap();
+      if( shaderMap )
+      {
+        mEffectPropertyMap = *shaderMap;
+      }
     }
   }
 
