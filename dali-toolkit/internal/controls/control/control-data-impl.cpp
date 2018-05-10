@@ -736,6 +736,7 @@ Dali::Animation Control::Impl::CreateTransition( const Toolkit::TransitionData& 
                        visual.GetName().c_str(), typeInfo?typeInfo.GetName().c_str():"Unknown" );
 #endif
         Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+
         visualImpl.AnimateProperty( transition, *animator );
       }
       else
