@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "b05ee07e_4d0955ce",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-10T15:11:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c4bf396_d7933b3d",
+      "range": {
+        "startLine": 40,
+        "startChar": 32,
+        "endLine": 40,
+        "endChar": 55
+      },
+      "revId": "2e026de1b54424b89c54c1aebbee7017a06d5d46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9ae42855_1ed370f6",
         "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
         "patchSetId": 6
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "88d1965b_0424935c",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-10T15:11:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ae42855_1ed370f6",
+      "range": {
+        "startLine": 227,
+        "startChar": 2,
+        "endLine": 227,
+        "endChar": 16
+      },
+      "revId": "2e026de1b54424b89c54c1aebbee7017a06d5d46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "41da4a91_0bca3f50",
         "filename": "dali-toolkit/internal/layouting/layout-controller-impl.cpp",
         "patchSetId": 6
@@ -59,6 +107,30 @@
       "writtenOn": "2018-05-10T10:52:30Z",
       "side": 1,
       "message": "Did you change all the log levels to the same level? multiple levels are useful :D",
+      "range": {
+        "startLine": 54,
+        "startChar": 36,
+        "endLine": 54,
+        "endChar": 43
+      },
+      "revId": "2e026de1b54424b89c54c1aebbee7017a06d5d46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a6e67d94_a0bd6f6f",
+        "filename": "dali-toolkit/internal/layouting/layout-controller-impl.cpp",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-10T15:11:06Z",
+      "side": 1,
+      "message": "Got carried away, this shouldn\u0027t have been changed.",
+      "parentUuid": "41da4a91_0bca3f50",
       "range": {
         "startLine": 54,
         "startChar": 36,
