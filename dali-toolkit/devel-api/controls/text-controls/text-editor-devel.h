@@ -121,7 +121,7 @@ namespace Property
  * @param[in] textEditor The instance of TextEditor.
  * @return InputMethodContext instance.
  */
-DALI_IMPORT_API InputMethodContext GetInputMethodContext( TextEditor textEditor );
+DALI_TOOLKIT_API InputMethodContext GetInputMethodContext( TextEditor textEditor );
 
 } // namespace DevelTextEditor
 

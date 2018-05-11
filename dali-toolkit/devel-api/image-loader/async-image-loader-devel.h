@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_IMAGE_LOADER_ASYNC_IMAGE_LOADER_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ typedef Signal< void ( uint32_t, Devel::PixelBuffer ) > PixelBufferLoadedSignalT
  * Connect to this signal if you want to load a PixelBuffer instead of a PixelData.
  * @note Connecting to this signal prevents the emission of the ImageLoadedSignal.
  */
-DALI_IMPORT_API PixelBufferLoadedSignalType&  PixelBufferLoadedSignal( AsyncImageLoader asyncImageLoader );
+DALI_TOOLKIT_API PixelBufferLoadedSignalType&  PixelBufferLoadedSignal( AsyncImageLoader asyncImageLoader );
 
 }
 } // Toolkit

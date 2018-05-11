@@ -110,7 +110,7 @@ namespace Property
  * @param[in] textField The instance of TextField.
  * @return InputMethodContext instance.
  */
-DALI_IMPORT_API InputMethodContext GetInputMethodContext( TextField textField );
+DALI_TOOLKIT_API InputMethodContext GetInputMethodContext( TextField textField );
 
 } // namespace DevelText
 

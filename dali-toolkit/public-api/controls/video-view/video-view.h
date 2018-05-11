@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_VIDEO_VIEW_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ namespace Internal DALI_INTERNAL
  * @SINCE_1_1.38
  *
  */
-class DALI_IMPORT_API VideoView: public Control
+class DALI_TOOLKIT_API VideoView: public Control
 {
 public:
 

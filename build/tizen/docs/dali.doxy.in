@@ -2147,7 +2147,7 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             = DALI_IMPORT_API \
+PREDEFINED             = DALI_TOOLKIT_API \
                          DALI_INTERNAL \
                          __attribute__ \
                          ((visibility \

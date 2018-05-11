@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>

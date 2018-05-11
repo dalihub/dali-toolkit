@@ -19,7 +19,7 @@
 #include "visual-base-impl.h"
 
 // EXTERNAL HEADER
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/rendering/renderer-devel.h>

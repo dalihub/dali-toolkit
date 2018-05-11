@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,7 +132,7 @@ enum
  * @note If the depth-index is not set on the visual, then it is set to be above the currently registered visuals.
  * @note If replacing a visual, then the depth-index of the visual being replaced is used for the visual.
  */
-DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual );
+DALI_TOOLKIT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual );
 
 /**
  * @brief Register a visual by Property Index with a depth index.
@@ -148,7 +148,7 @@ DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property:
  * @see Visual::Base::GetDepthIndex()
  * @see Visual::Base::SetDepthIndex()
  */
-DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, int depthIndex );
+DALI_TOOLKIT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, int depthIndex );
 
 /**
  * @brief Register a visual by Property Index with the option of enabling/disabling it.
@@ -163,7 +163,7 @@ DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property:
  *
  * @see EnableVisual()
  */
-DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
+DALI_TOOLKIT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled );
 
 /**
  * @brief Register a visual by Property Index with a depth index with the option of enabling/disabling it.
@@ -178,7 +178,7 @@ DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property:
  * @see Visual::Base::GetDepthIndex()
  * @see Visual::Base::SetDepthIndex()
  */
-DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex );
+DALI_TOOLKIT_API void RegisterVisual( Internal::Control& control, Dali::Property::Index index, Toolkit::Visual::Base& visual, bool enabled, int depthIndex );
 
 /**
  * @brief Erase the entry matching the given index from the list of registered visuals
@@ -186,7 +186,7 @@ DALI_IMPORT_API void RegisterVisual( Internal::Control& control, Dali::Property:
  * @param[in] control The control
  * @param[in] index The Property index of the visual, used to reference visual
  */
-DALI_IMPORT_API void UnregisterVisual( Internal::Control& control, Dali::Property::Index index );
+DALI_TOOLKIT_API void UnregisterVisual( Internal::Control& control, Dali::Property::Index index );
 
 /**
  * @brief Retrieve the visual associated with the given property index.
@@ -196,7 +196,7 @@ DALI_IMPORT_API void UnregisterVisual( Internal::Control& control, Dali::Propert
  * @return The registered visual if exist, otherwise empty handle.
  * @note For managing object life-cycle, do not store the returned visual as a member which increments its reference count.
  */
-DALI_IMPORT_API Toolkit::Visual::Base GetVisual( const Internal::Control& control, Dali::Property::Index index );
+DALI_TOOLKIT_API Toolkit::Visual::Base GetVisual( const Internal::Control& control, Dali::Property::Index index );
 
 /**
  * @brief Sets the given visual to be displayed or not when parent staged.
@@ -205,7 +205,7 @@ DALI_IMPORT_API Toolkit::Visual::Base GetVisual( const Internal::Control& contro
  * @param[in] index The Property index of the visual
  * @param[in] enable flag to set enabled or disabled.
  */
-DALI_IMPORT_API void EnableVisual( Internal::Control& control, Dali::Property::Index index, bool enable );
+DALI_TOOLKIT_API void EnableVisual( Internal::Control& control, Dali::Property::Index index, bool enable );
 
 /**
  * @brief Queries if the given visual is to be displayed when parent staged.
@@ -214,7 +214,7 @@ DALI_IMPORT_API void EnableVisual( Internal::Control& control, Dali::Property::I
  * @param[in] index The Property index of the visual
  * @return bool whether visual is enabled or not
  */
-DALI_IMPORT_API bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index index );
+DALI_TOOLKIT_API bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index index );
 
 /**
  * @brief Create a transition effect on the control.
@@ -229,7 +229,7 @@ DALI_IMPORT_API bool IsVisualEnabled( const Internal::Control& control, Dali::Pr
  * @return A handle to an animation defined with the given effect, or an empty
  * handle if no properties match.
  */
-DALI_IMPORT_API Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& transitionData );
+DALI_TOOLKIT_API Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& transitionData );
 
 /**
  * @brief Perform an action on a visual registered to this control.
@@ -241,7 +241,7 @@ DALI_IMPORT_API Dali::Animation CreateTransition( Internal::Control& control, co
  * @param[in] actionId The action to perform.  See Visual to find supported actions.
  * @param[in] attributes Optional attributes for the action.
  */
-DALI_IMPORT_API void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes );
+DALI_TOOLKIT_API void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes );
 
 /**
  * @brief Set input method context.
@@ -249,7 +249,7 @@ DALI_IMPORT_API void DoAction( Control& control, Dali::Property::Index visualInd
  * @param[in] control The control.
  * @param[in] inputMethodContext The input method context.
  */
-DALI_IMPORT_API void SetInputMethodContext( Internal::Control& control, InputMethodContext& inputMethodContext );
+DALI_TOOLKIT_API void SetInputMethodContext( Internal::Control& control, InputMethodContext& inputMethodContext );
 
 } // namespace DevelControl
 

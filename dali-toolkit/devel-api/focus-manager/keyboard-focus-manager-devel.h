@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_KEYBOARD_FOCUS_MANAGER_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ public:
  * @param[in] interface The user's implementation of CustomAlgorithmInterface
  * @see DevelKeyboardFocusManager::CustomAlgorithmInterface
  */
-DALI_IMPORT_API void SetCustomAlgorithm(KeyboardFocusManager keyboardFocusManager, CustomAlgorithmInterface& interface);
+DALI_TOOLKIT_API void SetCustomAlgorithm(KeyboardFocusManager keyboardFocusManager, CustomAlgorithmInterface& interface);
 
 } // namespace DevelKeyboardFocusManager
 
