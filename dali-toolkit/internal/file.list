@@ -11,6 +11,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/style.cpp \
    $(toolkit_src_dir)/builder/tree-node-manipulator.cpp \
    $(toolkit_src_dir)/builder/replacement.cpp \
+   $(toolkit_src_dir)/layouting/grid-impl.cpp \
    $(toolkit_src_dir)/layouting/hbox-layout-impl.cpp \
    $(toolkit_src_dir)/layouting/vbox-layout-impl.cpp \
    $(toolkit_src_dir)/layouting/layout-item-data-impl.cpp \
