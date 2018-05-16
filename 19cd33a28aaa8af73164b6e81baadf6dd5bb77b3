@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "eb15bd23_e7e37cad",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-16T15:22:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44558e49_2319844f",
+      "range": {
+        "startLine": 223,
+        "startChar": 14,
+        "endLine": 223,
+        "endChar": 27
+      },
+      "revId": "19cd33a28aaa8af73164b6e81baadf6dd5bb77b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "46e3114d_1eb2e498",
         "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
         "patchSetId": 10
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "f2d8c7ac_71a2e513",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-16T15:22:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46e3114d_1eb2e498",
+      "range": {
+        "startLine": 314,
+        "startChar": 5,
+        "endLine": 314,
+        "endChar": 18
+      },
+      "revId": "19cd33a28aaa8af73164b6e81baadf6dd5bb77b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "07ec4ebc_d1278640",
         "filename": "dali-toolkit/devel-api/layouting/layout-item-impl.cpp",
         "patchSetId": 10
@@ -59,6 +107,30 @@
       "writtenOn": "2018-05-16T14:34:20Z",
       "side": 1,
       "message": "why logging just width?",
+      "range": {
+        "startLine": 299,
+        "startChar": 82,
+        "endLine": 299,
+        "endChar": 83
+      },
+      "revId": "19cd33a28aaa8af73164b6e81baadf6dd5bb77b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8af5638d_f0bfbc9e",
+        "filename": "dali-toolkit/devel-api/layouting/layout-item-impl.cpp",
+        "patchSetId": 10
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-16T15:22:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07ec4ebc_d1278640",
       "range": {
         "startLine": 299,
         "startChar": 82,
