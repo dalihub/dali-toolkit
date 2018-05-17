@@ -22,6 +22,30 @@
       "revId": "b496b2b09088a2f728c3e6c8aa02e4f075e60501",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f2bd0438_432fc735",
+        "filename": "dali-toolkit/devel-api/layouting/layout-group-impl.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-17T11:31:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1442cc82_87eac367",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 6
+      },
+      "revId": "b496b2b09088a2f728c3e6c8aa02e4f075e60501",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
