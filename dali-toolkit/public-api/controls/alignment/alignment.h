@@ -2,7 +2,7 @@
 #define __DALI_ALIGNMENT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class Alignment;
  * All actors added to an alignment are going to be set with the same anchor point and parent origin. And if the scaling property is set to a value
  * different than ScaleNone, constraints as well.
  */
-class DALI_IMPORT_API Alignment : public Control
+class DALI_TOOLKIT_API Alignment : public Control
 {
 public:
   /**

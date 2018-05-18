@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_CUBE_TRANSITION_CROSS_EFFECT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace Internal DALI_INTERNAL
  * SubClass of CubeTransitionEffect
  * Rotate the neighboring cubes in perpendicular directions to transition from one image to another
  */
-class DALI_IMPORT_API CubeTransitionCrossEffect : public CubeTransitionEffect
+class DALI_TOOLKIT_API CubeTransitionCrossEffect : public CubeTransitionEffect
 {
 
 public:

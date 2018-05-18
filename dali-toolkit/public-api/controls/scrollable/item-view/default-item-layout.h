@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_DEFAULT_ITEM_LAYOUT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ enum Type
  * @param[in] type The type of layout required
  * @return An ItemLayoutPtr to the newly created layout
  */
-DALI_IMPORT_API ItemLayoutPtr New( Type type );
+DALI_TOOLKIT_API ItemLayoutPtr New( Type type );
 
 } // namespace DefaultItemLayout
 

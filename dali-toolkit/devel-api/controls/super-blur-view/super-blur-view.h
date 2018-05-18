@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SUPER_BLUR_VIEW_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ class SuperBlurView;
  *  blurAnimation.AnimateTo( Property( blurView, blurView.GetBlurStrengthPropertyIndex() ), ... );\n
  *  blurAnimation.Play();\n
  */
-class DALI_IMPORT_API SuperBlurView : public Control
+class DALI_TOOLKIT_API SuperBlurView : public Control
 {
 public:
 

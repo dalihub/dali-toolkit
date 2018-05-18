@@ -18,7 +18,7 @@
 #include "toolkit-timer.h"
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/signals/dali-signal.h>
 

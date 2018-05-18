@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SCROLL_VIEW_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ enum DirectionBias
  * @brief Used for specifying minimum/maximum extents of a ruler.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API RulerDomain
+class DALI_TOOLKIT_API RulerDomain
 {
 public:
 
@@ -154,7 +154,7 @@ class RulerExtension;
  * where their snap points are and their domain.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Ruler : public RefObject
+class DALI_TOOLKIT_API Ruler : public RefObject
 {
 public:
   /**
@@ -372,7 +372,7 @@ typedef IntrusivePtr<Ruler> RulerPtr; ///< Pointer to Dali::Toolkit::Ruler objec
  * @brief Concrete implementation of Ruler that has no snapping and has one single page.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API DefaultRuler : public Ruler
+class DALI_TOOLKIT_API DefaultRuler : public Ruler
 {
 public:
   /**
@@ -406,7 +406,7 @@ public:
  * @brief Concrete implementation of Ruler that has fixed snapping.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API FixedRuler : public Ruler
+class DALI_TOOLKIT_API FixedRuler : public Ruler
 {
 public:
   /**
@@ -454,7 +454,7 @@ class ScrollView;
  * | snap-started      | @ref SnapStartedSignal()   |
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API ScrollView : public Scrollable
+class DALI_TOOLKIT_API ScrollView : public Scrollable
 {
 
 public:

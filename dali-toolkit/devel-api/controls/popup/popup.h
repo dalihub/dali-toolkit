@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_POPUP_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ class Popup;
  * | hiding            | @ref HidingSignal()          |
  * | hidden            | @ref HiddenSignal()          |
  */
-class DALI_IMPORT_API Popup : public Control
+class DALI_TOOLKIT_API Popup : public Control
 {
 
 public:

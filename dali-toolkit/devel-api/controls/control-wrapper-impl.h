@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_CONTROL_WRAPPER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ typedef IntrusivePtr< ControlWrapper > ControlWrapperPtr;
 /**
  * @copydoc Toolkit::ControlWrapper
  */
-class DALI_IMPORT_API ControlWrapper : public Control
+class DALI_TOOLKIT_API ControlWrapper : public Control
 {
 public:
 

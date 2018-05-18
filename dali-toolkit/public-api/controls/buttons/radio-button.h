@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_RADIO_BUTTON_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ class RadioButton;
  * @endcode
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API RadioButton: public Button
+class DALI_TOOLKIT_API RadioButton: public Button
 {
  public:
   /**

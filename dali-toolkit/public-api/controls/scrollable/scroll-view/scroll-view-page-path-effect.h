@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SCROLL_VIEW_PAGE_PATH_EFFECT_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/scrollable/scroll-view/scroll-view-effect.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -62,7 +65,7 @@ class ScrollViewPagePathEffect;
  * not implemented.
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API ScrollViewPagePathEffect : public ScrollViewEffect
+class DALI_TOOLKIT_API ScrollViewPagePathEffect : public ScrollViewEffect
 {
 
 public:

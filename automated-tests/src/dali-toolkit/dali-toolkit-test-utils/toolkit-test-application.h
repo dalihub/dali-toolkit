@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEST_APPLICATION_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/adaptors/adaptor.h>
 #include <toolkit-adaptor-impl.h>
+#include <toolkit-singleton-service.h>
 
 namespace Dali
 {
@@ -41,6 +42,8 @@ public:
   : TestApplication( false, surfaceWidth, surfaceHeight, horizontalDpi, verticalDpi )
   {
     Initialize();
+    auto singletonService = SingletonService::Get();
+    Test::SetApplication( singletonService, *this );
 
     // set the DPI value for font rendering
     Dali::TextAbstraction::FontClient fontClient = Dali::TextAbstraction::FontClient::Get();

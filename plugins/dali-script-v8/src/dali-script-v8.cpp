@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@
 #include <utils/v8-utils.h>
 
 // The plugin factories
-extern "C" DALI_EXPORT_API Dali::Toolkit::ScriptPlugin* CreateScriptPlugin(void)
+extern "C" DALI_TOOLKIT_API Dali::Toolkit::ScriptPlugin* CreateScriptPlugin(void)
 {
   return new Dali::V8Plugin::DaliScriptV8;
 }
 
-extern "C" DALI_EXPORT_API void DestroyScriptPlugin(Dali::Toolkit::ScriptPlugin* plugin)
+extern "C" DALI_TOOLKIT_API void DestroyScriptPlugin(Dali::Toolkit::ScriptPlugin* plugin)
 {
   delete plugin;
 }

@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_FIELD_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class TextField;
  * | maxLengthReached     | @ref MaxLengthReachedSignal()  | @SINCE_1_0.0       |
  * | inputStyleChanged    | @ref InputStyleChangedSignal() | @SINCE_1_2_2       |
  */
-class DALI_IMPORT_API TextField : public Control
+class DALI_TOOLKIT_API TextField : public Control
 {
 public:
 

@@ -2,7 +2,7 @@
 #define __DALI_SCRIPT_TREE_NODE_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <utility> // pair
 #include <iterator>
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -42,7 +42,7 @@ class TreeNodeManipulator;
  * TreeNode does not own its string data which is held by a container eg JsonParser
  * Modification operations should be done through a container.
  */
-class DALI_IMPORT_API TreeNode
+class DALI_TOOLKIT_API TreeNode
 {
 public:
   /*

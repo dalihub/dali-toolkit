@@ -24,10 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/flex-container/flex-container.h>
-extern "C"
-{
-#include <dali-toolkit/third-party/facebook-flexbox/layout.h>
-}
+#include <dali-toolkit/third-party/yoga/Yoga.h>
 
 namespace Dali
 {
@@ -52,7 +49,7 @@ public:
   struct FlexItemNode
   {
     WeakHandle< Dali::Actor > actor;      ///< Actor handle of the flex item
-    css_node_t* node;                     ///< The style properties and layout information
+    YGNodeRef node;                     ///< The style properties and layout information
   };
 
   typedef std::vector< FlexItemNode > FlexItemNodeContainer;
