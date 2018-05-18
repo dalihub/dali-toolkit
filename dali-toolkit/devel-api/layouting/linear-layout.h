@@ -37,7 +37,7 @@ class LinearLayout;
  * This class implements a linear box layout, automatically handling
  * right to left or left to right direction change.
  */
-class DALI_IMPORT_API LinearLayout : public LayoutGroup
+class DALI_TOOLKIT_API LinearLayout : public LayoutGroup
 {
 public:
 

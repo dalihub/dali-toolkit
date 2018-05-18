@@ -54,8 +54,8 @@ using LayoutGroupPtr = IntrusivePtr<LayoutGroup>;
  * OnLayout should use it's own layout parameters and the measured children's size to determine the children's
  * position and size; it should then call Layout() on the child layout to layout the child and it's hierarchy.
  */
-class DALI_IMPORT_API LayoutGroup : public LayoutItem,
-                                    public ConnectionTracker
+class DALI_TOOLKIT_API LayoutGroup : public LayoutItem,
+                                     public ConnectionTracker
 {
 public:
   /**
