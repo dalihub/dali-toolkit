@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TRANSITION_DATA_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,9 @@
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -67,7 +70,7 @@ class TransitionData;
  * ]
  *
  */
-class DALI_IMPORT_API TransitionData : public BaseHandle
+class DALI_TOOLKIT_API TransitionData : public BaseHandle
 {
 public:
   /**

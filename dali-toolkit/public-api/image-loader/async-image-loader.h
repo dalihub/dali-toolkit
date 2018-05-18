@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ASYNC_IMAGE_LOADER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/signals/dali-signal.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -87,7 +90,7 @@ class AsyncImageLoader;
  *
  * @endcode
  */
-class DALI_IMPORT_API AsyncImageLoader : public BaseHandle
+class DALI_TOOLKIT_API AsyncImageLoader : public BaseHandle
 {
 public:
 

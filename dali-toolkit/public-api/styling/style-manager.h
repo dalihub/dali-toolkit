@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_STYLE_MANAGER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ class StyleManager;
  * | styleChanged            | @ref StyleChangedSignal()        |
  * @SINCE_1_1.32
  */
-class DALI_IMPORT_API StyleManager : public BaseHandle
+class DALI_TOOLKIT_API StyleManager : public BaseHandle
 {
 public:
 

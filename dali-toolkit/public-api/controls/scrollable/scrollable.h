@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SCROLLABLE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class Scrollable;
  * | scrollUpdated    | @ref ScrollUpdatedSignal()   |
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Scrollable : public Control
+class DALI_TOOLKIT_API Scrollable : public Control
 {
 public:
 

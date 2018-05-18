@@ -19,7 +19,7 @@
 #include "visual-base-impl.h"
 
 // EXTERNAL HEADER
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
@@ -699,17 +699,20 @@ void Visual::Base::SetupBlendMode( Animation& transition, bool isInitialOpaque, 
   // turned off after the animation ends if the final value is opaque
   if( ! isInitialOpaque || mImpl->mMixColor.a < 1.0f )
   {
-    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-
-    if( animating == true && mImpl->mMixColor.a >= 1.0f )
+    if( mImpl->mRenderer )
     {
-      // When it becomes opaque, set the blend mode back to automatically
-      if( ! mImpl->mBlendSlotDelegate )
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+
+      if( animating == true && mImpl->mMixColor.a >= 1.0f )
       {
-        mImpl->mBlendSlotDelegate = new SlotDelegate<Visual::Base>(this);
+        // When it becomes opaque, set the blend mode back to automatically
+        if( ! mImpl->mBlendSlotDelegate )
+        {
+          mImpl->mBlendSlotDelegate = new SlotDelegate<Visual::Base>(this);
+        }
+        transition.FinishedSignal().Connect( *(mImpl->mBlendSlotDelegate),
+                                             &Visual::Base::OnMixColorFinished );
       }
-      transition.FinishedSignal().Connect( *(mImpl->mBlendSlotDelegate),
-                                           &Visual::Base::OnMixColorFinished );
     }
   }
 }

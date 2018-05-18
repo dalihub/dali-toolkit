@@ -217,6 +217,9 @@ public:
    * If the visual isn't staged (i.e. it doesn't have a renderer),
    * then this will not add an animation.
    *
+   * If the animator is valid and the transition handle is empty - it will
+   * be created.
+   *
    * @param[in] transition The animation to create or attach to
    * @param[in] animator The animation parameters of the property.
    */

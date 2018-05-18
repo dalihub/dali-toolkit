@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_CONTROL_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/custom-actor.h>
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/events/long-press-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/events/pinch-gesture-detector.h>
@@ -72,7 +72,7 @@ class Control;
  * |------------------------|----------------------------------------------------|
  * | accessibilityActivated | %OnAccessibilityActivated()                        |
  */
-class DALI_IMPORT_API Control : public CustomActor
+class DALI_TOOLKIT_API Control : public CustomActor
 {
 public:
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CUBE_TRANSITION_EFFECT_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/rendering/texture.h>
@@ -81,7 +82,7 @@ class CubeTransitionEffect;
  * |---------------------|----------------------------------|
  * | transitionCompleted | @ref TransitionCompletedSignal() |
  */
-class DALI_IMPORT_API CubeTransitionEffect : public Control
+class DALI_TOOLKIT_API CubeTransitionEffect : public Control
 {
 public:
 
