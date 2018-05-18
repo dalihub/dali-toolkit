@@ -1,5 +1,8 @@
+#ifndef DALI_TOOLKIT_TEXT_EDITOR_DEVEL_H
+#define DALI_TOOLKIT_TEXT_EDITOR_DEVEL_H
+
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2017 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,3 +41,5 @@ InputMethodContext GetInputMethodContext( TextEditor textEditor )
 } // namespace Toolkit
 
 } // namespace Dali
+
+#endif // DALI_TOOLKIT_TEXT_EDITOR_DEVEL_H
