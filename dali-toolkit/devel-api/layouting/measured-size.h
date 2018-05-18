@@ -19,6 +19,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali-toolkit/devel-api/layouting/layout-length.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -28,7 +29,7 @@ namespace Toolkit
 /**
  * Class that encodes a measurement and a measure state, which is set if the measured size is too small.
  */
-class DALI_IMPORT_API MeasuredSize
+class DALI_TOOLKIT_API MeasuredSize
 {
 public:
 

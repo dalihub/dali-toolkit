@@ -36,7 +36,7 @@ class VboxLayout;
  * This class implements a vertical box layout, automatically handling
  * right to left or left to right direction change.
  */
-class DALI_IMPORT_API VboxLayout : public LayoutGroup
+class DALI_TOOLKIT_API VboxLayout : public LayoutGroup
 {
 public:
 
