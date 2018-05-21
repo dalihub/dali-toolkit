@@ -40,7 +40,8 @@ public:
   };
 
   MeasuredSize()
-  : mMeasuredSize( 0u )
+  : mMeasuredSize( 0u ),
+    mState ( MeasuredSize::State::MEASURED_SIZE_OK )
   {
   }
 
