@@ -25,7 +25,7 @@ SUBDIRS +=plugins/csharp
 endif
 
 # perform documentation last, so it doesn't prevent code from building if there's an error
-SUBDIRS += docs
+#SUBDIRS += docs
 
 pkgconfigdir = $(libdir)/pkgconfig
 

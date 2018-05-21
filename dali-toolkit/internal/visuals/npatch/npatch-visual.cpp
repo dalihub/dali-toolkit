@@ -34,6 +34,9 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 
+#include <dali/devel-api/rendering/shader-devel.h>
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
+
 namespace Dali
 {
 
@@ -86,7 +89,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     gl_Position = vertexPosition;\n
   }\n
 );
-
+#if 0
 const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
     attribute mediump vec2 aPosition;\n
     varying mediump vec2 vTexCoord;\n
@@ -126,6 +129,7 @@ const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
       gl_Position = vertexPosition;\n
     }\n
 );
+#endif
 
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
@@ -416,7 +420,11 @@ Shader NPatchVisual::CreateShader()
       shader = mFactoryCache.GetShader( VisualFactoryCache::NINE_PATCH_SHADER );
       if( DALI_UNLIKELY( !shader ) )
       {
-        shader = Shader::New( VERTEX_SHADER_3X3, FRAGMENT_SHADER );
+        //shader = Shader::New( VERTEX_SHADER_3X3, FRAGMENT_SHADER );
+        shader = DevelShader::New<uint32_t>(
+          GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_3X3_SHADER_VERT" ),
+          GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_SHADER_FRAG" ),
+          DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
         mFactoryCache.SaveShader( VisualFactoryCache::NINE_PATCH_SHADER, shader );
       }
     }
@@ -445,13 +453,21 @@ Shader NPatchVisual::CreateShader()
     if( ( xStretchCount == 1 && yStretchCount == 1 ) ||
         ( xStretchCount == 0 && yStretchCount == 0 ) )
     {
-      const char* vertexShader = VERTEX_SHADER_3X3;
+      //const char* vertexShader = VERTEX_SHADER_3X3;
 
-      if( !mImpl->mCustomShader->mVertexShader.empty() )
-      {
-        vertexShader = mImpl->mCustomShader->mVertexShader.c_str();
-      }
-      shader = Shader::New( vertexShader, fragmentShader, hints );
+
+
+      //if( !mImpl->mCustomShader->mVertexShader.empty() )
+      //{
+      //  vertexShader = mImpl->mCustomShader->mVertexShader.c_str();
+      //}
+      //shader = Shader::New( vertexShader, fragmentShader, hints );
+
+      shader = DevelShader::New<uint32_t>(
+        GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_3X3_SHADER_VERT" ),
+        GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_SHADER_FRAG" ),
+        DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
+
     }
     else if( xStretchCount > 0 || yStretchCount > 0)
     {

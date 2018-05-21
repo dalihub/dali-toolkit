@@ -21,10 +21,13 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/rendering/shader-devel.h>
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
+
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -41,7 +44,7 @@ namespace Internal
 
 namespace
 {
-
+#if 0
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform mediump mat4 uMvpMatrix;\n
@@ -78,6 +81,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
     gl_FragColor = vec4(mixColor, opacity)*uColor;\n
   }\n
 );
+#endif
 }
 
 ColorVisualPtr ColorVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
@@ -162,7 +166,14 @@ void ColorVisual::InitializeRenderer()
   Shader shader = mFactoryCache.GetShader( VisualFactoryCache::COLOR_SHADER );
   if( !shader )
   {
-    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    //shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+
+    shader = DevelShader::New(
+      GraphicsGetBuiltinShaderId( SHADER_COLOR_VISUAL_SHADER_VERT ),
+      GraphicsGetBuiltinShaderId( SHADER_COLOR_VISUAL_SHADER_FRAG ),
+      DevelShader::ShaderLanguage::SPIRV_1_0,
+      Property::Map()
+    );
     mFactoryCache.SaveShader( VisualFactoryCache::COLOR_SHADER, shader );
   }
 

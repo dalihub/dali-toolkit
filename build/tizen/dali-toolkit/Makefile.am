@@ -50,8 +50,8 @@ daliimage_DATA = ${dali_toolkit_image_files}
 dalisounddir = ${dataReadOnlyDir}/toolkit/sounds/
 dalisound_DATA = ${dali_toolkit_sound_files}
 
-package_doxy_dir = ../../../doc
-include ../../../doc/file.list
+#package_doxy_dir = ../../../doc
+#include ../../../doc/file.list
 
 LIBDALI_TOOLKIT_LA_SOURCES = \
                      $(toolkit_src_files) \
@@ -232,5 +232,5 @@ publicapislider_HEADERS =               $(public_api_slider_header_files)
 publicapivisuals_HEADERS =              $(public_api_visuals_header_files)
 
 # package doxygen file (contains doxygen grouping information)
-packagedoxydir = $(topleveldir)/doc
-packagedoxy_HEADERS = $(package_doxy_files)
+#packagedoxydir = $(topleveldir)/doc
+#packagedoxy_HEADERS = $(package_doxy_files)
