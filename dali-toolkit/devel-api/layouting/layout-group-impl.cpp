@@ -226,7 +226,7 @@ void LayoutGroup::MeasureChild( LayoutItemPtr child,
 #if defined( DEBUG_ENABLED )
   if ( control )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::MeasureChildWithMargins naturalSizewidth(%f)\n",  control.GetNaturalSize().width );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::MeasureChild naturalSizewidth(%f)\n",  control.GetNaturalSize().width );
   }
 #endif
 
