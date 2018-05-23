@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_LAYOUT_H
-#define DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_LAYOUT_H
+#ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_IMPL_H
+#define DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_IMPL_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -17,10 +17,14 @@
  * limitations under the License.
  */
 
+// EXTERNAL_HEADERS
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
+
+// INTERNAL_HEADERS
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 #include <dali-toolkit/devel-api/layouting/grid.h>
+#include <dali-toolkit/internal/layouting/grid-axis.h>
 
 namespace Dali
 {
@@ -37,14 +41,20 @@ class Grid final : public LayoutGroup
 public:
   static GridPtr New();
 
-public:
+  void SetNumberOfRows( unsigned int rows );
+
+  void SetNumberOfColumns( unsigned int columns );
+
+  int GetNumberOfColumns();
+
   void SetCellPadding( LayoutSize size );
   LayoutSize GetCellPadding();
 
 protected:
+
   Grid();
 
-  virtual ~Grid();
+  ~Grid();
 
   /**
    * @copydoc LayoutItem::DoInitialize
@@ -75,9 +85,22 @@ private:
   Grid( const Grid& other ) = delete;
   Grid& operator=( const Grid& other ) = delete;
 
-  void ForceUniformHeight( int count, MeasureSpec widthMeasureSpec );
+  /**
+   * @brief
+   * For the given availableSpace, calculate or retreive the number of required columns.
+   * @param[in] availableSpace the space available for a child in each column.
+   * @param[out] numberOfColumns the updated number of columns required
+   */
+  void DetermineNumberOfColumns( int availableSpace, int numberOfColumns );
+
+  void CalculateLocations( int numberOfColumns, unsigned int columnWidth, unsigned int rowHeight, unsigned int numberOfCells );
+
+  Dali::Vector<int> GetLocations( unsigned int axis );
 
 private:
+
+  GridAxisPtr mLocations;
+
   LayoutSize mCellPadding;
   LayoutLength mTotalLength;
 
@@ -85,7 +108,11 @@ private:
   const int AUTO_FIT = -1;
   const int STRETCH_COLUMN_WIDTH = 2;
 
-  int mNumColumns = AUTO_FIT;
+  const unsigned int DEFAULT_COLUMN_COUNT = 2;
+  const unsigned int DEFAULT_ROW_COUNT = 3;
+
+  int mNumColumns;
+  int mNumRows;
 
   int mHorizontalSpacing = 0;
   int mVerticalSpacing = 0;
@@ -94,6 +121,7 @@ private:
   int mColumnWidth;
   int mRequestedColumnWidth;
   int mRequestedNumColumns;
+  int mRequestedNumRows;
 };
 
 } // namespace Internal
@@ -115,4 +143,4 @@ inline const Internal::Grid& GetImplementation( const Dali::Toolkit::Grid& handl
 } // namespace Toolkit
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_LAYOUT_H
+#endif // DALI_TOOLKIT_INTERNAL_LAYOUTINGInner
