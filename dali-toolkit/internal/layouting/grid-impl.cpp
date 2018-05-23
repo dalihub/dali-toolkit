@@ -27,11 +27,17 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-length.h>
-
+#include <dali-toolkit/internal/layouting/grid-axis.h>
 
 #if defined(DEBUG_ENABLED)
 static Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
 #endif
+
+namespace
+{
+  const unsigned int HORIZONTAL = 0;
+  const unsigned int VERTICAL = 1;
+}
 
 namespace Dali
 {
@@ -48,13 +54,33 @@ GridPtr Grid::New()
 
 Grid::Grid()
 : LayoutGroup(),
+  mLocations(),
   mCellPadding( 0, 0 ),
-  mTotalLength( 0 )
+  mTotalLength( 0 ),
+  mNumColumns( AUTO_FIT ),
+  mNumRows( AUTO_FIT )
 {
 }
 
 Grid::~Grid()
 {
+}
+
+void Grid::SetNumberOfRows( unsigned int rows )
+{
+  // Store value and invalidate structure.
+  mNumRows = rows;
+}
+
+void Grid::SetNumberOfColumns( unsigned int columns )
+{
+  // Store value and invalidate structure.
+  mNumColumns = columns;
+}
+
+int Grid::GetNumberOfColumns()
+{
+  return mNumColumns;
 }
 
 void Grid::DoInitialize()
@@ -93,6 +119,25 @@ LayoutSize Grid::GetCellPadding()
   return mCellPadding;
 }
 
+// todo remove the availableSpace if not needed due to explict column numbers.
+void Grid::DetermineNumberOfColumns( int availableSpace, int numberOfColumns )
+{
+  if ( mNumColumns == AUTO_FIT )
+  {
+    // not supported, would determine numbers of colums by dividing available space
+    // by the requested column width.
+    mNumColumns = 1;
+  }
+  else
+  {
+    // Columns numbers can be automatically determined or set.
+    if ( mNumColumns <= 0 )
+    {
+      mNumColumns = 1; // Columns not set so force value
+    }
+  }
+}
+
 void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
 {
 #if defined(DEBUG_ENABLED)
@@ -108,16 +153,18 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
   DALI_LOG_INFO( gLogFilter, Debug::Concise, oss.str().c_str() );
 #endif
 
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Grid::OnMeasure widthSize(%d) \n", widthMeasureSpec.GetSize());
-
-  auto widthMode = widthMeasureSpec.GetMode();
-  auto heightMode = heightMeasureSpec.GetMode();
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "HboxLayout::OnMeasure size(%d,%d) \n", widthMeasureSpec.GetSize(),
+                                                                                     heightMeasureSpec.GetSize() );
+  auto gridWidthMode = widthMeasureSpec.GetMode();
+  auto gridHeightMode = heightMeasureSpec.GetMode();
   LayoutLength widthSize = widthMeasureSpec.GetSize();
   LayoutLength heightSize = heightMeasureSpec.GetSize();
 
-  auto padding = Extents(); // todo , should be the padding of this control or just the column padding. Column most likely.
+  // todo , Column padding not Grid layout padding
+  // Will column padding be suported?  Extra data will need to be stored and properties provided.
+  auto padding = Extents();
 
-  if( widthMode == MeasureSpec::Mode::UNSPECIFIED )
+  if( gridWidthMode == MeasureSpec::Mode::UNSPECIFIED )
   {
     if( mColumnWidth > 0 ) //explict value assigned
     {
@@ -129,14 +176,9 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
     }
   }
 
-  // used to determine colums
-  //int childWidth = widthSize - padding.start - padding.end;
-
-//  bool isExactly = (widthMode == MeasureSpec::Mode::EXACTLY);
-//  bool matchHeight = false;
-//  bool allFillParent = true;
-//  LayoutLength maxHeight = 0;
-//  LayoutLength alternativeMaxHeight = 0;
+  int availableChildWidth = widthSize - padding.start - padding.end;
+  
+  DetermineNumberOfColumns( availableChildWidth, mNumColumns );
 
   struct
   {
@@ -144,39 +186,39 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
     MeasuredSize::State heightState;
   } childState = { MeasuredSize::State::MEASURED_SIZE_OK, MeasuredSize::State::MEASURED_SIZE_OK };
 
-  // measure children, and determine if further resolution is required
-  auto count = GetChildCount();
-  for( auto i=0u; i<count; ++i )
+  // measure first child and use it's dimensions for layout measurement
+  auto childCount = GetChildCount();
+
+  mLocations->CalculateLocations( mNumColumns, widthSize, heightSize, childCount );
+
+  if( childCount > 0 )
   {
-    auto childLayoutItem = GetChildAt( i );
+    auto childLayoutItem = GetChildAt( 0 );
     if( childLayoutItem )
     {
       auto childOwner = childLayoutItem->GetOwner();
-      //auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
 
       MeasureChild( childLayoutItem, widthMeasureSpec, heightMeasureSpec );
       auto childHeight = childLayoutItem->GetMeasuredHeight();
-      //auto childMargin = Extents(0,0,0,0);//childLayoutItem->GetMargin();
+      //auto childMargin = childLayoutItem->GetMargin();
 
-     // childState = combineMeasuredStates(childState, child.getMeasuredState());
-
-      if ( heightMode == MeasureSpec::Mode::UNSPECIFIED)
+      if ( gridHeightMode == MeasureSpec::Mode::UNSPECIFIED )
       {
-         heightSize = padding.top + padding.bottom + childHeight /*+ getVerticalFadingEdgeLength() * 2*/;
+         heightSize = padding.top + padding.bottom + childHeight;
       }
 
-      if (heightMode == MeasureSpec::Mode::AT_MOST)
+      if ( gridHeightMode == MeasureSpec::Mode::AT_MOST )
       {
           int ourSize =  padding.top + padding.bottom;
 
-          for( auto i = 0u; i < count; i += mNumColumns)
+          for( auto i = 0u; i < childCount; i += mNumColumns )
           {
-            ourSize += childHeight;
-            if(i + mNumColumns < count )
+            mTotalLength += childHeight;
+            if( i + mNumColumns < childCount )
             {
               ourSize += mVerticalSpacing;
             }
-            if (ourSize >= heightSize)
+            if( ourSize >= heightSize )
             {
               ourSize = heightSize;
               break;
@@ -184,15 +226,14 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
           }
           heightSize = ourSize;
       }
-///
 
-      if(widthMode == MeasureSpec::Mode::AT_MOST && mRequestedNumColumns != AUTO_FIT)
+      if( gridWidthMode == MeasureSpec::Mode::AT_MOST && mRequestedNumColumns != AUTO_FIT )
       {
-          int ourSize = (mRequestedNumColumns*mColumnWidth)
-                        + ((mRequestedNumColumns-1)*mHorizontalSpacing)
+          int ourSize = ( mRequestedNumColumns*mColumnWidth )
+                        + ( ( mRequestedNumColumns-1 )*mHorizontalSpacing )
                         + padding.start + padding.end;
 
-          if( ourSize > widthSize /*|| didNotInitiallyFit */)
+          if( ourSize > widthSize )
           {
             // widthSize |= MeasuredSize::State::MEASURED_SIZE_TOO_SMALL;  OR
             //   MeasuredSize widthSizeAndState = ResolveSizeAndState( widthSize, widthMeasureSpec, MeasuredSize::State::MEASURED_SIZE_OK);
@@ -203,62 +244,22 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
       SetMeasuredDimensions( ResolveSizeAndState( widthSize, widthMeasureSpec, childState.widthState ),
                              ResolveSizeAndState( heightSize, heightMeasureSpec, childState.heightState ) );
 
-    }
-  } // Iterating through children
+    } // Child is LayoutItem
+  } // Child exists
 
-  Extents layoutPadding = GetPadding();
-  mTotalLength += layoutPadding.start + layoutPadding.end;
+  Extents gridLayoutPadding = GetPadding();
+  mTotalLength += gridLayoutPadding.start + gridLayoutPadding.end;
   widthSize = std::max( mTotalLength, GetSuggestedMinimumWidth() );
-  MeasuredSize widthSizeAndState = ResolveSizeAndState( widthSize, widthMeasureSpec, MeasuredSize::State::MEASURED_SIZE_OK);
+  MeasuredSize widthSizeAndState = ResolveSizeAndState( widthSize, widthMeasureSpec, MeasuredSize::State::MEASURED_SIZE_OK );
   widthSize = widthSizeAndState.GetSize();
 
-  //if( !allFillParent && heightMode != MeasureSpec::Mode::EXACTLY )
-  {
-    //heightSize = alternativeMaxHeight;
-  }
-
-  heightSize += layoutPadding.top + layoutPadding.bottom;
+  heightSize += gridLayoutPadding.top + gridLayoutPadding.bottom;
   //heightSize = std::max( maxHeight, GetSuggestedMinimumHeight() );
 
   widthSizeAndState.SetState( childState.widthState );
 
   SetMeasuredDimensions( widthSizeAndState,
                          ResolveSizeAndState( heightSize, heightMeasureSpec, childState.heightState ) );
-
-  //if( matchHeight )
-  //{
-   // ForceUniformHeight( GetChildCount(), widthMeasureSpec );
- // }
-}
-
-void Grid::ForceUniformHeight( int count, MeasureSpec widthMeasureSpec )
-{
-  // Pretend that the linear layout has an exact size. This is the measured height of
-  // ourselves. The measured height should be the max height of the children, changed
-  // to accommodate the heightMeasureSpec from the parent
-  auto uniformMeasureSpec = MeasureSpec( GetMeasuredHeight(), MeasureSpec::Mode::EXACTLY );
-  for (int i = 0; i < count; ++i)
-  {
-    LayoutItemPtr childLayout = GetChildAt(i);
-    if( childLayout != nullptr )
-    {
-      auto childOwner = childLayout->GetOwner();
-      auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
-      auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
-
-      if( desiredHeight == Toolkit::ChildLayoutData::MATCH_PARENT )
-      {
-        // Temporarily force children to reuse their old measured width
-        int oldWidth = desiredWidth;
-        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, childLayout->GetMeasuredWidth().mValue );
-
-        // Remeasure with new dimensions
-        MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, uniformMeasureSpec, 0);
-
-        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, oldWidth );
-      }
-    }
-  }
 }
 
 void Grid::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
@@ -290,7 +291,7 @@ void Grid::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLe
     if( childLayout != nullptr )
     {
       // Get column and row spec
-  
+
 
       // Get start and end position of child x1,x2
       auto x1 = 0;
@@ -314,15 +315,82 @@ void Grid::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLe
       cellWidth -= sumMarginsX;
       cellHeight -= sumMarginsY;
 
-      // Get szie in of child in the cell
+      // Get size  of child in the cell
       //int width = hAlign.getSizeInCell(c, childWidth, cellWidth - sumMarginsX);
       //int height = vAlign.getSizeInCell(c, childHeight, cellHeight - sumMarginsY);
 
-      auto childTop = LayoutLength(padding.top) + childMargin.top;
-      auto childLeft = childMargin.start;
+      int childTop = LayoutLength(padding.top) + childMargin.top;
+      int childLeft = childMargin.start;
 
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
     }
+  }
+}
+
+class Grid::Locations
+{
+public:
+
+  void CalculateLocations( int numberOfColumns, unsigned int columnWidth, unsigned int rowHeight, unsigned int numberOfCells );
+
+  Dali::Vector<int> GetLocations( unsigned int axis );
+
+private:
+
+  Dali::Vector<int> mHorizontalLocations;
+  Dali::Vector<int> mVerticalLocations;
+
+};
+
+void LocationsDeleter::operator()(Locations *p)
+{
+  delete p;
+}
+
+void Grid::CalculateLocations( int numberOfColumns, unsigned int columnWidth, unsigned int rowHeight, unsigned int numberOfCells )
+{
+
+}
+
+Dali::Vector<int> Grid::GetLocations( unsigned int axis )
+{
+
+}
+
+void Grid::Locations::CalculateLocations( int numberOfColumns, unsigned int columnWidth, unsigned int rowHeight, unsigned int numberOfCells )
+{
+  mHorizontalLocations.Clear();
+  mVerticalLocations.Clear();
+
+  for( auto i = 0u; i < numberOfCells; i++ )
+  {
+    int xPos = ( i % numberOfColumns ) * columnWidth;
+    mHorizontalLocations.PushBack( xPos );
+    int yPos = ( i / numberOfColumns ) * rowHeight;
+    mVerticalLocations.PushBack( yPos );
+  }
+
+#if defined(DEBUG_ENABLED)
+
+  std::ostringstream oss;
+  for( auto i = 0u; i < numberOfCells; i++ )
+  {
+    oss << "Locations::CalculateLocations  ";
+    oss << "horizontalPosition:" << mHorizontalLocations[i] << " verticalPosition:" << mVerticalLocations[i] << std::endl;
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, oss.str().c_str() );
+  }
+#endif
+}
+
+Dali::Vector<int> Grid::Locations::GetLocations( unsigned int axis )
+{
+  if( HORIZONTAL == axis )
+  {
+    return mHorizontalLocations;
+  }
+  else
+  {
+    return mVerticalLocations;
   }
 }
 

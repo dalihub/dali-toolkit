@@ -119,6 +119,18 @@ public:
    */
   LayoutSize GetCellPadding();
 
+  /**
+   * @brief Set the number of columns in the Grid.
+   * @param[in] columns number of columns,
+   */
+  void SetNumberOfColumns( int columns );
+
+  /**
+   *  @brief Get the number of columns in the grid.
+   *  @return the number of columns.
+   */
+  int GetNumberOfColumns();
+
 public: // Not intended for application developers
 
   /// @cond internal
