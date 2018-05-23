@@ -27,6 +27,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-length.h>
+#include <dali-toolkit/internal/layouting/grid-axis.h>
 
 
 #if defined(DEBUG_ENABLED)
@@ -49,13 +50,99 @@ GridPtr Grid::New()
 Grid::Grid()
 : LayoutGroup(),
   mCellPadding( 0, 0 ),
-  mTotalLength( 0 )
+  mTotalLength( 0 ),
+  mNumColumns( AUTO_FIT ),
+  mNumRows( AUTO_FIT )
 {
 }
 
 Grid::~Grid()
 {
 }
+
+void Grid::SetRowCount( unsigned int rows )
+{
+  // Store value and invalidate structure.
+  mNumRows = rows;
+}
+
+void Grid::SetColumnCount( unsigned int columns )
+{
+  // Store value and invalidate structure.
+  mNumColumns = columns;
+}
+
+// void Grid::ValidateLayoutParams()
+// {
+//   const GridAxis axis = mHorizontal ? mHorizontalAxis : mVerticalAxis;
+//   const int count = ( axis.definedCount != GridAxis::UNDEFINED ) ? axis.definedCount : 0;
+
+//   int major = 0;
+//   int minor = 0;
+//   Dali::Vector<unsigned int>  maxSizes;
+
+//   auto childCount = GetChildCount();
+
+//   for( int i = 0; i < childCount; i++ )
+//   {
+//     LayoutParams lp = (LayoutParams) getChildAt(i).getLayoutParams();
+
+//     const Spec majorSpec = horizontal ? lp.rowSpec : lp.columnSpec;
+//     const Interval majorRange = majorSpec.span;
+//     const boolean majorWasDefined = majorSpec.startDefined;
+//     const int majorSpan = majorRange.size();
+//     if (majorWasDefined)
+//     {
+//       major = majorRange.min;
+//     }
+
+//     const Spec minorSpec = horizontal ? lp.columnSpec : lp.rowSpec;
+//     const Interval minorRange = minorSpec.span;
+//     const boolean minorWasDefined = minorSpec.startDefined;
+//     const int minorSpan = clip(minorRange, minorWasDefined, count);
+
+//     if( minorWasDefined )
+//     {
+//       minor = minorRange.min;
+//     }
+
+//     if (count != 0)
+//     {
+//         // Find suitable row/col values when at least one is undefined.
+//         if (!majorWasDefined || !minorWasDefined) {
+//             while (!fits(maxSizes, major, minor, minor + minorSpan))
+//             {
+//               if (minorWasDefined)
+//               {
+//                 major++;
+//               }
+//               else
+//               {
+//                 if (minor + minorSpan <= count)
+//                 {
+//                   minor++;
+//                 }
+//                 else
+//                 {
+//                   minor = 0;
+//                   major++;
+//                 }
+//               }
+//             }
+//         }
+//         procrusteanFill(maxSizes, minor, minor + minorSpan, major + majorSpan);
+//     }
+
+//     if (horizontal)
+//     {
+//         setCellGroup(lp, major, majorSpan, minor, minorSpan);
+//     } else {
+//         setCellGroup(lp, minor, minorSpan, major, majorSpan);
+//     }
+
+//     minor = minor + minorSpan;
+//   }
+// }
 
 void Grid::DoInitialize()
 {
@@ -93,6 +180,25 @@ LayoutSize Grid::GetCellPadding()
   return mCellPadding;
 }
 
+// todo remove the availableSpace if not needed due to explict column numbers.
+void Grid::DetermineNumberOfColumns( int availableSpace, int numberOfColumns )
+{
+  if ( mNumColumns == AUTO_FIT )
+  {
+    // not supported, would determine numbers of colums by dividing available space
+    // by the requested column width.
+    mNumColumns = 1;
+  }
+  else
+  {
+    // Columns numbers can be automatically determined or set.
+    if ( mNumColumns <= 0 )
+    {
+      mNumColumns = 1; // Columns not set so force value
+    }
+  }
+}
+
 void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
 {
 #if defined(DEBUG_ENABLED)
@@ -110,14 +216,16 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
 
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Grid::OnMeasure widthSize(%d) \n", widthMeasureSpec.GetSize());
 
-  auto widthMode = widthMeasureSpec.GetMode();
-  auto heightMode = heightMeasureSpec.GetMode();
+  auto gridWidthMode = widthMeasureSpec.GetMode();
+  auto gridHeightMode = heightMeasureSpec.GetMode();
   LayoutLength widthSize = widthMeasureSpec.GetSize();
   LayoutLength heightSize = heightMeasureSpec.GetSize();
 
-  auto padding = Extents(); // todo , should be the padding of this control or just the column padding. Column most likely.
+  // todo , Column padding not Grid layout padding
+  // Will column padding be suported?  Extra data will need to be stored and properties provided.
+  auto padding = Extents();
 
-  if( widthMode == MeasureSpec::Mode::UNSPECIFIED )
+  if( gridWidthMode == MeasureSpec::Mode::UNSPECIFIED )
   {
     if( mColumnWidth > 0 ) //explict value assigned
     {
@@ -129,10 +237,10 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
     }
   }
 
-  // used to determine colums
-  //int childWidth = widthSize - padding.start - padding.end;
+  int availableChildWidth = widthSize - padding.start - padding.end;
+  DetermineNumberOfColumns( availableChildWidth, mNumColumns );
 
-//  bool isExactly = (widthMode == MeasureSpec::Mode::EXACTLY);
+//  bool isExactly = (gridWidthMode == MeasureSpec::Mode::EXACTLY);
 //  bool matchHeight = false;
 //  bool allFillParent = true;
 //  LayoutLength maxHeight = 0;
@@ -144,11 +252,11 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
     MeasuredSize::State heightState;
   } childState = { MeasuredSize::State::MEASURED_SIZE_OK, MeasuredSize::State::MEASURED_SIZE_OK };
 
-  // measure children, and determine if further resolution is required
-  auto count = GetChildCount();
-  for( auto i=0u; i<count; ++i )
+  // measure first child and use it's dimensions for layout measurement
+  auto childCount = GetChildCount();
+  if( childCount > 0 )
   {
-    auto childLayoutItem = GetChildAt( i );
+    auto childLayoutItem = GetChildAt( 0 );
     if( childLayoutItem )
     {
       auto childOwner = childLayoutItem->GetOwner();
@@ -160,23 +268,23 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
 
      // childState = combineMeasuredStates(childState, child.getMeasuredState());
 
-      if ( heightMode == MeasureSpec::Mode::UNSPECIFIED)
+      if ( gridHeightMode == MeasureSpec::Mode::UNSPECIFIED )
       {
-         heightSize = padding.top + padding.bottom + childHeight /*+ getVerticalFadingEdgeLength() * 2*/;
+         heightSize = padding.top + padding.bottom + childHeight;
       }
 
-      if (heightMode == MeasureSpec::Mode::AT_MOST)
+      if ( gridHeightMode == MeasureSpec::Mode::AT_MOST )
       {
           int ourSize =  padding.top + padding.bottom;
 
-          for( auto i = 0u; i < count; i += mNumColumns)
+          for( auto i = 0u; i < childCount; i += mNumColumns )
           {
-            ourSize += childHeight;
-            if(i + mNumColumns < count )
+            mTotalLength += childHeight;
+            if( i + mNumColumns < childCount )
             {
               ourSize += mVerticalSpacing;
             }
-            if (ourSize >= heightSize)
+            if( ourSize >= heightSize )
             {
               ourSize = heightSize;
               break;
@@ -184,15 +292,14 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
           }
           heightSize = ourSize;
       }
-///
 
-      if(widthMode == MeasureSpec::Mode::AT_MOST && mRequestedNumColumns != AUTO_FIT)
+      if( gridWidthMode == MeasureSpec::Mode::AT_MOST && mRequestedNumColumns != AUTO_FIT )
       {
-          int ourSize = (mRequestedNumColumns*mColumnWidth)
-                        + ((mRequestedNumColumns-1)*mHorizontalSpacing)
+          int ourSize = ( mRequestedNumColumns*mColumnWidth )
+                        + ( ( mRequestedNumColumns-1 )*mHorizontalSpacing )
                         + padding.start + padding.end;
 
-          if( ourSize > widthSize /*|| didNotInitiallyFit */)
+          if( ourSize > widthSize )
           {
             // widthSize |= MeasuredSize::State::MEASURED_SIZE_TOO_SMALL;  OR
             //   MeasuredSize widthSizeAndState = ResolveSizeAndState( widthSize, widthMeasureSpec, MeasuredSize::State::MEASURED_SIZE_OK);
@@ -203,21 +310,21 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
       SetMeasuredDimensions( ResolveSizeAndState( widthSize, widthMeasureSpec, childState.widthState ),
                              ResolveSizeAndState( heightSize, heightMeasureSpec, childState.heightState ) );
 
-    }
-  } // Iterating through children
+    } // Child is LayoutItem
+  } // Child exists
 
-  Extents layoutPadding = GetPadding();
-  mTotalLength += layoutPadding.start + layoutPadding.end;
+  Extents gridLayoutPadding = GetPadding();
+  mTotalLength += gridLayoutPadding.start + gridLayoutPadding.end;
   widthSize = std::max( mTotalLength, GetSuggestedMinimumWidth() );
-  MeasuredSize widthSizeAndState = ResolveSizeAndState( widthSize, widthMeasureSpec, MeasuredSize::State::MEASURED_SIZE_OK);
+  MeasuredSize widthSizeAndState = ResolveSizeAndState( widthSize, widthMeasureSpec, MeasuredSize::State::MEASURED_SIZE_OK );
   widthSize = widthSizeAndState.GetSize();
 
-  //if( !allFillParent && heightMode != MeasureSpec::Mode::EXACTLY )
+  //if( !allFillParent && gridHeightMode != MeasureSpec::Mode::EXACTLY )
   {
     //heightSize = alternativeMaxHeight;
   }
 
-  heightSize += layoutPadding.top + layoutPadding.bottom;
+  heightSize += gridLayoutPadding.top + gridLayoutPadding.bottom;
   //heightSize = std::max( maxHeight, GetSuggestedMinimumHeight() );
 
   widthSizeAndState.SetState( childState.widthState );
@@ -290,7 +397,7 @@ void Grid::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLe
     if( childLayout != nullptr )
     {
       // Get column and row spec
-  
+
 
       // Get start and end position of child x1,x2
       auto x1 = 0;
@@ -314,17 +421,22 @@ void Grid::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLe
       cellWidth -= sumMarginsX;
       cellHeight -= sumMarginsY;
 
-      // Get szie in of child in the cell
+      // Get size  of child in the cell
       //int width = hAlign.getSizeInCell(c, childWidth, cellWidth - sumMarginsX);
       //int height = vAlign.getSizeInCell(c, childHeight, cellHeight - sumMarginsY);
 
-      auto childTop = LayoutLength(padding.top) + childMargin.top;
-      auto childLeft = childMargin.start;
+      int childTop = LayoutLength(padding.top) + childMargin.top;
+      int childLeft = childMargin.start;
 
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
     }
   }
 }
+
+class Grid::Locations
+{
+
+};
 
 } // namespace Internal
 } // namespace Toolkit
