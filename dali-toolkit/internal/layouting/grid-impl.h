@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_LAYOUT_H
-#define DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_LAYOUT_H
+#ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_IMPL_H
+#define DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_IMPL_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -115,4 +115,4 @@ inline const Internal::Grid& GetImplementation( const Dali::Toolkit::Grid& handl
 } // namespace Toolkit
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_LAYOUT_H
+#endif // DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_IMPL_H
