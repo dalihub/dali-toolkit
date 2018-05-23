@@ -60,8 +60,11 @@ public:
 
   MeasuredSize& operator=( const MeasuredSize& rhs )
   {
-    this->mMeasuredSize = rhs.mMeasuredSize;
-    this->mState = rhs.mState;
+    if( this != &rhs )
+    {
+      this->mMeasuredSize = rhs.mMeasuredSize;
+      this->mState = rhs.mState;
+    }
     return *this;
   }
 
