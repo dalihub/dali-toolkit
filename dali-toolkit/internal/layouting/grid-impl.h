@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_LAYOUT_H
-#define DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_LAYOUT_H
+#ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_IMPL_H
+#define DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_IMPL_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -36,6 +36,12 @@ class Grid final : public LayoutGroup
 {
 public:
   static GridPtr New();
+
+  void SetRowCount( unsigned int rows );
+
+  void SetColumnCount( unsigned int columns );
+
+  void ValidateLayoutParams();
 
 public:
   void SetCellPadding( LayoutSize size );
@@ -85,7 +91,11 @@ private:
   const int AUTO_FIT = -1;
   const int STRETCH_COLUMN_WIDTH = 2;
 
-  int mNumColumns = AUTO_FIT;
+  const unsigned int DEFAULT_COLUMN_COUNT = 2;
+  const unsigned int DEFAULT_ROW_COUNT = 3;
+
+  int mNumColumns;
+  int mNumRows;
 
   int mHorizontalSpacing = 0;
   int mVerticalSpacing = 0;
@@ -94,6 +104,7 @@ private:
   int mColumnWidth;
   int mRequestedColumnWidth;
   int mRequestedNumColumns;
+  int mRequestedNumRows;
 };
 
 } // namespace Internal
@@ -115,4 +126,4 @@ inline const Internal::Grid& GetImplementation( const Dali::Toolkit::Grid& handl
 } // namespace Toolkit
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_LAYOUT_H
+#endif // DALI_TOOLKIT_INTERNAL_LAYOUTING_GRID_IMPL_H

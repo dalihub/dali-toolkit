@@ -49,12 +49,98 @@ GridPtr Grid::New()
 Grid::Grid()
 : LayoutGroup(),
   mCellPadding( 0, 0 ),
-  mTotalLength( 0 )
+  mTotalLength( 0 ),
+  mNumColumns( AUTO_FIT ),
+  mNumRows( AUTO_FIT )
 {
 }
 
 Grid::~Grid()
 {
+}
+
+void Grid::SetRowCount( unsigned int rows )
+{
+  // Store value and invalidate structure.
+  mNumRows = rows;
+}
+
+void Grid::SetColumnCount( unsigned int columns )
+{
+  // Store value and invalidate structure.
+  mNumColumns = columns;
+}
+
+void Grid::ValidateLayoutParams()
+{
+  const GridAxis axis = mHorizontal ? mHorizontalAxis : mVerticalAxis;
+  const int count = ( axis.definedCount != UNDEFINED ) ? axis.definedCount : 0;
+
+  int major = 0;
+  int minor = 0;
+  Dali::Vector<unsigned int>  maxSizes;
+
+  auto childCount = GetChildCount();
+
+  for( int i = 0, i < childCount; i++ )
+  {
+    LayoutParams lp = (LayoutParams) getChildAt(i).getLayoutParams();
+
+    const Spec majorSpec = horizontal ? lp.rowSpec : lp.columnSpec;
+    const Interval majorRange = majorSpec.span;
+    const boolean majorWasDefined = majorSpec.startDefined;
+    const int majorSpan = majorRange.size();
+    if (majorWasDefined)
+    {
+      major = majorRange.min;
+    }
+
+    const Spec minorSpec = horizontal ? lp.columnSpec : lp.rowSpec;
+    const Interval minorRange = minorSpec.span;
+    const boolean minorWasDefined = minorSpec.startDefined;
+    const int minorSpan = clip(minorRange, minorWasDefined, count);
+
+    if( minorWasDefined )
+    {
+      minor = minorRange.min;
+    }
+
+    if (count != 0)
+    {
+        // Find suitable row/col values when at least one is undefined.
+        if (!majorWasDefined || !minorWasDefined) {
+            while (!fits(maxSizes, major, minor, minor + minorSpan))
+            {
+              if (minorWasDefined)
+              {
+                major++;
+              }
+              else
+              {
+                if (minor + minorSpan <= count)
+                {
+                  minor++;
+                }
+                else
+                {
+                  minor = 0;
+                  major++;
+                }
+              }
+            }
+        }
+        procrusteanFill(maxSizes, minor, minor + minorSpan, major + majorSpan);
+    }
+
+    if (horizontal)
+    {
+        setCellGroup(lp, major, majorSpan, minor, minorSpan);
+    } else {
+        setCellGroup(lp, minor, minorSpan, major, majorSpan);
+    }
+
+    minor = minor + minorSpan;
+  }
 }
 
 void Grid::DoInitialize()
@@ -290,7 +376,7 @@ void Grid::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLe
     if( childLayout != nullptr )
     {
       // Get column and row spec
-  
+
 
       // Get start and end position of child x1,x2
       auto x1 = 0;
