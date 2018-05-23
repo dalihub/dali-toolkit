@@ -65,6 +65,16 @@ LayoutSize Grid::GetCellPadding()
   return GetImplementation(*this).GetCellPadding();
 }
 
+void Grid::SetNumberOfColumns( int columns )
+{
+  GetImplementation(*this).SetNumberOfColumns( columns );
+}
+
+int Grid::GetNumberOfColumns()
+{
+  return GetImplementation(*this).GetNumberOfColumns();
+}
+
 Grid::Grid( Dali::Toolkit::Internal::Grid* object )
 : LayoutGroup( object )
 {
