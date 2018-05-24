@@ -99,7 +99,7 @@ bool YGStyle::operator==(const YGStyle& style) {
   return areNonFloatValuesEqual;
 }
 
-bool YGStyle::operator!=(YGStyle style) {
+bool YGStyle::operator!=(const YGStyle& style) {
   return !(*this == style);
 }
 

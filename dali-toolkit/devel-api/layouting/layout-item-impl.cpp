@@ -141,19 +141,9 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
   {
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET );
 
-    //resolveRtlPropertiesIfNeeded();
-
-    int cacheIndex = -1;  // = forceLayout ? -1 : mMeasureCache.indexOfKey(key);
-    if( cacheIndex < 0 ) //|| sIgnoreMeasureCache )
-    {
-      // measure ourselves, this should set the measured dimension flag back
-      OnMeasure( widthMeasureSpec, heightMeasureSpec );
-      mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT );
-    }
-    else
-    {
-      mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT );
-    }
+    // measure ourselves, this should set the measured dimension flag back
+    OnMeasure( widthMeasureSpec, heightMeasureSpec );
+    mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT );
 
     // flag not set, setMeasuredDimension() was not invoked, we raise an exception to warn the developer
     DALI_ASSERT_ALWAYS( mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET ) &&
@@ -163,8 +153,6 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
 
   mImpl->mOldWidthMeasureSpec = widthMeasureSpec;
   mImpl->mOldHeightMeasureSpec = heightMeasureSpec;
-
-  //mMeasureCache.put(key, ((long) mMeasuredWidth) << 32 | (long) mMeasuredHeight & 0xffffffffL); // suppress sign extension
 }
 
 void LayoutItem::Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b )
