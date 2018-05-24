@@ -24,6 +24,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/layouting/hbox-layout.h>
 #include <dali-toolkit/devel-api/layouting/vbox-layout.h>
+#include <dali-toolkit/devel-api/layouting/flex-layout.h>
 //#include <dali-toolkit/internal/controls/control/control-data-impl-debug.h>
 
 using namespace Dali;
@@ -894,6 +895,119 @@ int UtcDaliLayouting_VboxLayout03(void)
   DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 80.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+// To see the test go to
+// https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjIsImFsaWduQ29udGVudCI6MSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiZmxleFdyYXAiOjEsImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjQwIiwiaGVpZ2h0IjoiNDAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIxMCJ9LCJwb3NpdGlvbiI6eyJ0b3AiOm51bGwsInJpZ2h0IjpudWxsLCJib3R0b20iOm51bGwsImxlZnQiOm51bGx9fSx7IndpZHRoIjoiNjAiLCJoZWlnaHQiOiI2MCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsIm1hcmdpbiI6eyJyaWdodCI6IjEwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19LHsid2lkdGgiOjEwMCwiaGVpZ2h0IjoxMDAsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsIm1hcmdpbiI6eyJyaWdodCI6IjEwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19XX0=
+int UtcDaliLayouting_FlexLayout01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_FlexLayout01");
+
+  Stage stage = Stage::GetCurrent();
+  auto flexBox = Control::New();
+  auto flexLayout = FlexLayout::New();
+  flexLayout.SetFlexDirection( Dali::Toolkit::FlexLayout::ROW );
+  flexLayout.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_CENTER );
+  DevelControl::SetLayout( flexBox, flexLayout );
+  flexBox.SetName( "Flexbox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 60 ) );
+  controls.push_back( CreateLeafControl( 80, 80 ) );
+  controls.push_back( CreateLeafControl( 100, 100 ) );
+
+  const Extents CONTROL_MARGIN = Extents( 0, 10, 0, 0 );
+  for( auto&& iter : controls )
+  {
+    iter.SetProperty(Toolkit::Control::Property::MARGIN, CONTROL_MARGIN );
+    flexBox.Add( iter );
+  }
+  flexBox.SetParentOrigin( ParentOrigin::CENTER );
+  flexBox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( flexBox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // flexbox centers elements vertically, it fills test harness stage, which is 480x800.
+  // left aligned elements with right margin 10
+
+  DALI_TEST_EQUALS( flexBox.GetProperty<Vector3>(Actor::Property::POSITION), Vector3(0,0,0),TEST_LOCATION);
+  DALI_TEST_EQUALS( flexBox.GetProperty<Vector3>(Actor::Property::SIZE), Vector3(480,800,0),TEST_LOCATION);
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 50.0f, 370.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 120.0f, 360.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 210.0f, 350.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 80.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_FlexLayout02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_FlexLayout02");
+
+  Stage stage = Stage::GetCurrent();
+  auto flexBox = Control::New();
+  auto flexLayout = FlexLayout::New();
+  flexLayout.SetFlexDirection( Dali::Toolkit::FlexLayout::ROW );
+  flexLayout.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_CENTER );
+
+  DevelControl::SetLayout( flexBox, flexLayout );
+  flexBox.SetName( "Flexbox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 60 ) );
+  controls.push_back( CreateLeafControl( 80, 80 ) );
+  controls.push_back( CreateLeafControl( 100, 100 ) );
+
+  const Extents CONTROL_MARGIN = Extents( 0, 10, 0, 0 );
+  for( auto&& iter : controls )
+  {
+    iter.SetProperty( Toolkit::Control::Property::MARGIN, CONTROL_MARGIN );
+    flexBox.Add( iter );
+  }
+
+  controls[1].SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  controls[1].SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  flexBox.SetParentOrigin( ParentOrigin::CENTER );
+  flexBox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( flexBox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // flexbox centers elements vertically, it fills test harness stage, which is 480x800.
+  DALI_TEST_EQUALS( flexBox.GetProperty<Vector3>(Actor::Property::POSITION), Vector3( 0, 0, 0 ),TEST_LOCATION);
+  DALI_TEST_EQUALS( flexBox.GetProperty<Vector3>(Actor::Property::SIZE), Vector3( 480, 800, 0 ),TEST_LOCATION);
+
+  DALI_TEST_EQUALS( controls[1].GetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION ), Property::Value( ChildLayoutData::WRAP_CONTENT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION ), Property::Value( ChildLayoutData::MATCH_PARENT ), TEST_LOCATION );
+
+  // left aligned elements with right margin 10
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 50.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 120.0f, 360.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 210.0f, 350.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 80.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
