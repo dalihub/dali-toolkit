@@ -24,6 +24,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/layouting/hbox-layout.h>
 #include <dali-toolkit/devel-api/layouting/vbox-layout.h>
+#include <dali-toolkit/devel-api/layouting/flex-layout.h>
 //#include <dali-toolkit/internal/controls/control/control-data-impl-debug.h>
 
 using namespace Dali;
@@ -895,6 +896,438 @@ int UtcDaliLayouting_VboxLayout03(void)
   DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 80.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_FlexLayout01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_FlexLayout01");
+
+  Stage stage = Stage::GetCurrent();
+  auto flexBox = Control::New();
+  auto flexLayout = FlexLayout::New();
+  flexLayout.SetFlexDirection( Dali::Toolkit::FlexLayout::ROW );
+  flexLayout.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_CENTER );
+  DevelControl::SetLayout( flexBox, flexLayout );
+  flexBox.SetName( "Flexbox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 60 ) );
+  controls.push_back( CreateLeafControl( 80, 80 ) );
+  controls.push_back( CreateLeafControl( 100, 100 ) );
+
+  const Extents CONTROL_MARGIN = Extents( 0, 10, 0, 0 );
+  for( auto&& iter : controls )
+  {
+    iter.SetProperty(Toolkit::Control::Property::MARGIN, CONTROL_MARGIN );
+    flexBox.Add( iter );
+  }
+  flexBox.SetParentOrigin( ParentOrigin::CENTER );
+  flexBox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( flexBox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // flexbox centers elements vertically, it fills test harness stage, which is 480x800.
+  // left aligned elements with right margin 10
+  // To see goto https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjIsImFsaWduQ29udGVudCI6MSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiZmxleFdyYXAiOjEsImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjQwIiwiaGVpZ2h0IjoiNDAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIxMCJ9LCJwb3NpdGlvbiI6eyJ0b3AiOm51bGwsInJpZ2h0IjpudWxsLCJib3R0b20iOm51bGwsImxlZnQiOm51bGx9fSx7IndpZHRoIjoiNjAiLCJoZWlnaHQiOiI2MCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsIm1hcmdpbiI6eyJyaWdodCI6IjEwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19LHsid2lkdGgiOjEwMCwiaGVpZ2h0IjoxMDAsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsIm1hcmdpbiI6eyJyaWdodCI6IjEwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19XX0=
+  DALI_TEST_EQUALS( flexBox.GetProperty<Vector3>(Actor::Property::POSITION), Vector3(0,0,0),TEST_LOCATION);
+  DALI_TEST_EQUALS( flexBox.GetProperty<Vector3>(Actor::Property::SIZE), Vector3(480,800,0),TEST_LOCATION);
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 50.0f, 370.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 120.0f, 360.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 210.0f, 350.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 80.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_FlexLayout02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_FlexLayout02");
+
+  Stage stage = Stage::GetCurrent();
+  auto flexBox = Control::New();
+  auto flexLayout = FlexLayout::New();
+  flexLayout.SetFlexDirection( Dali::Toolkit::FlexLayout::ROW );
+  flexLayout.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_CENTER );
+
+  DevelControl::SetLayout( flexBox, flexLayout );
+  flexBox.SetName( "Flexbox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 60 ) );
+  controls.push_back( CreateLeafControl( 80, 80 ) );
+  controls.push_back( CreateLeafControl( 100, 100 ) );
+
+  const Extents CONTROL_MARGIN = Extents( 0, 10, 0, 0 );
+  for( auto&& iter : controls )
+  {
+    iter.SetProperty( Toolkit::Control::Property::MARGIN, CONTROL_MARGIN );
+    flexBox.Add( iter );
+  }
+
+  controls[1].SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  controls[1].SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  flexBox.SetParentOrigin( ParentOrigin::CENTER );
+  flexBox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( flexBox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // flexbox centers elements vertically, it fills test harness stage, which is 480x800.
+  DALI_TEST_EQUALS( flexBox.GetProperty<Vector3>(Actor::Property::POSITION), Vector3( 0, 0, 0 ),TEST_LOCATION);
+  DALI_TEST_EQUALS( flexBox.GetProperty<Vector3>(Actor::Property::SIZE), Vector3( 480, 800, 0 ),TEST_LOCATION);
+
+  DALI_TEST_EQUALS( controls[1].GetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION ), Property::Value( ChildLayoutData::WRAP_CONTENT ), TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION ), Property::Value( ChildLayoutData::MATCH_PARENT ), TEST_LOCATION );
+
+  // left aligned elements with right margin 10
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 50.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 120.0f, 360.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 210.0f, 350.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 80.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_FlexLayout03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_FlexLayout03 Test nested flex boxes");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto flexbox1 = Control::New();
+  auto flexLayout1 = FlexLayout::New();
+  DevelControl::SetLayout( flexbox1, flexLayout1 );
+  flexbox1.SetName( "Flexbox1");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 20, 20 ) );
+  controls.push_back( CreateLeafControl( 30, 30 ) );
+  flexbox1.Add( controls[0] );
+  flexbox1.Add( controls[1] );
+  flexbox1.SetParentOrigin( ParentOrigin::CENTER );
+  flexbox1.SetAnchorPoint( AnchorPoint::CENTER );
+
+  flexLayout1.SetFlexDirection( Dali::Toolkit::FlexLayout::ROW );
+  flexLayout1.SetFlexWrap(Dali::Toolkit::FlexLayout::NO_WRAP);
+  flexLayout1.SetFlexAlignment( Dali::Toolkit::FlexLayout::ALIGN_FLEX_START );
+  flexLayout1.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_FLEX_START );
+  flexLayout1.SetFlexJustification( Dali::Toolkit::FlexLayout::JUSTIFY_FLEX_START );
+
+  auto flexbox2 = Control::New();
+  auto flexLayout2 = FlexLayout::New();
+  DevelControl::SetLayout( flexbox2, flexLayout2 );
+  flexbox2.SetName( "Flexbox2");
+
+  controls.push_back( CreateLeafControl( 25, 25 ) );
+  controls.push_back( CreateLeafControl( 35, 35 ) );
+  flexbox2.Add( controls[2] );
+  flexbox2.Add( controls[3] );
+  flexbox2.SetParentOrigin( ParentOrigin::CENTER );
+  flexbox2.SetAnchorPoint( AnchorPoint::CENTER );
+
+  flexLayout2.SetFlexDirection( Dali::Toolkit::FlexLayout::COLUMN );
+  flexLayout2.SetFlexWrap(Dali::Toolkit::FlexLayout::NO_WRAP);
+  flexLayout2.SetFlexAlignment( Dali::Toolkit::FlexLayout::ALIGN_FLEX_START );
+  flexLayout2.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_FLEX_START );
+  flexLayout2.SetFlexJustification( Dali::Toolkit::FlexLayout::JUSTIFY_FLEX_START );
+
+  auto flexbox3 = Control::New();
+  auto flexLayout3 = FlexLayout::New();
+  DevelControl::SetLayout( flexbox3, flexLayout3 );
+  flexbox3.SetParentOrigin( ParentOrigin::CENTER );
+  flexbox3.SetName( "Flexbox3");
+  flexbox3.Add( flexbox1 );
+  flexbox3.Add( flexbox2 );
+  stage.Add( flexbox3 );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 20.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 30.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 55.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 20.0f, 20.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 30.0f, 30.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 25.0f, 25.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 35.0f, 35.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Test flexbox1,2 are sized to wrap their content
+  DALI_TEST_EQUALS( flexbox1.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 50.0f, 30.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( flexbox2.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 35.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( flexbox1.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( flexbox2.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 30.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Test flexbox3 matches parent (root layer)
+  DALI_TEST_EQUALS( flexbox3.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( flexbox3.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_FlexLayout04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_FlexLayout04");
+
+  Stage stage = Stage::GetCurrent();
+  auto flexBox = Control::New();
+  auto flexLayout = FlexLayout::New();
+  flexLayout.SetFlexAlignment( Dali::Toolkit::FlexLayout::ALIGN_FLEX_START );
+  flexLayout.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_FLEX_START );
+  flexLayout.SetFlexWrap(Dali::Toolkit::FlexLayout::NO_WRAP);
+  flexLayout.SetFlexJustification( Dali::Toolkit::FlexLayout::JUSTIFY_FLEX_START );
+  flexLayout.SetFlexDirection( Dali::Toolkit::FlexLayout::COLUMN );
+  DevelControl::SetLayout( flexBox, flexLayout );
+  flexBox.SetName( "Flexbox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 60 ) );
+  for( auto&& iter : controls )
+  {
+    flexBox.Add( iter );
+  }
+  flexBox.SetParentOrigin( ParentOrigin::CENTER );
+  flexBox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( flexBox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsImFsaWduQ29udGVudCI6MSwiZmxleERpcmVjdGlvbiI6MCwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiZmxleFdyYXAiOjEsImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjQwIiwiaGVpZ2h0IjoiNDAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19LHsid2lkdGgiOiI2MCIsImhlaWdodCI6IjYwIiwibWluV2lkdGgiOm51bGwsIm1pbkhlaWdodCI6bnVsbCwibWF4V2lkdGgiOm51bGwsIm1heEhlaWdodCI6bnVsbCwibWFyZ2luIjp7InJpZ2h0IjoiMTAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX1dfQ==
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Ensure layouting happens
+  flexLayout.SetFlexDirection( Dali::Toolkit::FlexLayout::COLUMN_REVERSE );
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsImFsaWduQ29udGVudCI6MSwiZmxleERpcmVjdGlvbiI6MSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiZmxleFdyYXAiOjEsImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjQwIiwiaGVpZ2h0IjoiNDAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19LHsid2lkdGgiOiI2MCIsImhlaWdodCI6IjYwIiwibWluV2lkdGgiOm51bGwsIm1pbkhlaWdodCI6bnVsbCwibWF4V2lkdGgiOm51bGwsIm1heEhlaWdodCI6bnVsbCwibWFyZ2luIjp7InJpZ2h0IjoiMTAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX1dfQ==
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 760.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 700.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Ensure layouting happens
+  flexLayout.SetFlexDirection( Dali::Toolkit::FlexLayout::ROW );
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsImFsaWduQ29udGVudCI6MSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiZmxleFdyYXAiOjEsImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjQwIiwiaGVpZ2h0IjoiNDAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19LHsid2lkdGgiOiI2MCIsImhlaWdodCI6IjYwIiwibWluV2lkdGgiOm51bGwsIm1pbkhlaWdodCI6bnVsbCwibWF4V2lkdGgiOm51bGwsIm1heEhlaWdodCI6bnVsbCwibWFyZ2luIjp7InJpZ2h0IjoiMTAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX1dfQ==
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Ensure layouting happens
+  flexLayout.SetFlexDirection( Dali::Toolkit::FlexLayout::ROW_REVERSE );
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsImFsaWduQ29udGVudCI6MSwiZmxleERpcmVjdGlvbiI6MywicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiZmxleFdyYXAiOjEsImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjQwIiwiaGVpZ2h0IjoiNDAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19LHsid2lkdGgiOiI2MCIsImhlaWdodCI6IjYwIiwibWluV2lkdGgiOm51bGwsIm1pbkhlaWdodCI6bnVsbCwibWF4V2lkdGgiOm51bGwsIm1heEhlaWdodCI6bnVsbCwibWFyZ2luIjp7InJpZ2h0IjoiMTAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX1dfQ==
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 440.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 380.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Ensure layouting happens
+  flexLayout.SetFlexDirection( Dali::Toolkit::FlexLayout::ROW );
+  flexLayout.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_CENTER );
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjIsImFsaWduQ29udGVudCI6MSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiY2hpbGRyZW4iOlt7IndpZHRoIjoiNDAiLCJoZWlnaHQiOiI0MCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX0seyJ3aWR0aCI6IjYwIiwiaGVpZ2h0IjoiNjAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIxMCJ9LCJwb3NpdGlvbiI6eyJ0b3AiOm51bGwsInJpZ2h0IjpudWxsLCJib3R0b20iOm51bGwsImxlZnQiOm51bGx9fV19
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 370.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Ensure layouting happens
+  flexLayout.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_FLEX_END );
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjMsImFsaWduQ29udGVudCI6MSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiY2hpbGRyZW4iOlt7IndpZHRoIjoiNDAiLCJoZWlnaHQiOiI0MCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX0seyJ3aWR0aCI6IjYwIiwiaGVpZ2h0IjoiNjAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIxMCJ9LCJwb3NpdGlvbiI6eyJ0b3AiOm51bGwsInJpZ2h0IjpudWxsLCJib3R0b20iOm51bGwsImxlZnQiOm51bGx9fV19
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 760.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 740.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Ensure layouting happens
+  flexLayout.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_STRETCH );
+  application.SendNotification();
+  application.Render();
+/* TODO: fix
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduQ29udGVudCI6MSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiY2hpbGRyZW4iOlt7IndpZHRoIjoiNDAiLCJoZWlnaHQiOiI0MCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX0seyJ3aWR0aCI6IjYwIiwiaGVpZ2h0IjoiNjAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIxMCJ9LCJwb3NpdGlvbiI6eyJ0b3AiOm51bGwsInJpZ2h0IjpudWxsLCJib3R0b20iOm51bGwsImxlZnQiOm51bGx9fV19
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+*/
+
+  flexLayout.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_FLEX_START );
+  flexLayout.SetFlexJustification( Dali::Toolkit::FlexLayout::JUSTIFY_FLEX_START );
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsImFsaWduQ29udGVudCI6MSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiY2hpbGRyZW4iOlt7IndpZHRoIjoiNDAiLCJoZWlnaHQiOiI0MCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX0seyJ3aWR0aCI6IjYwIiwiaGVpZ2h0IjoiNjAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIxMCJ9LCJwb3NpdGlvbiI6eyJ0b3AiOm51bGwsInJpZ2h0IjpudWxsLCJib3R0b20iOm51bGwsImxlZnQiOm51bGx9fV19
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  flexLayout.SetFlexJustification( Dali::Toolkit::FlexLayout::JUSTIFY_CENTER );
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImp1c3RpZnlDb250ZW50IjoxLCJhbGlnbkl0ZW1zIjoxLCJhbGlnbkNvbnRlbnQiOjEsInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH0sImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjQwIiwiaGVpZ2h0IjoiNDAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19LHsid2lkdGgiOiI2MCIsImhlaWdodCI6IjYwIiwibWluV2lkdGgiOm51bGwsIm1pbkhlaWdodCI6bnVsbCwibWF4V2lkdGgiOm51bGwsIm1heEhlaWdodCI6bnVsbCwibWFyZ2luIjp7InJpZ2h0IjoiMTAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX1dfQ==
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 190.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 230.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  flexLayout.SetFlexJustification( Dali::Toolkit::FlexLayout::JUSTIFY_FLEX_END );
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImp1c3RpZnlDb250ZW50IjoyLCJhbGlnbkl0ZW1zIjoxLCJhbGlnbkNvbnRlbnQiOjEsInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH0sImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjQwIiwiaGVpZ2h0IjoiNDAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJtYXJnaW4iOnsicmlnaHQiOiIwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19LHsid2lkdGgiOiI2MCIsImhlaWdodCI6IjYwIiwibWluV2lkdGgiOm51bGwsIm1pbkhlaWdodCI6bnVsbCwibWF4V2lkdGgiOm51bGwsIm1heEhlaWdodCI6bnVsbCwibWFyZ2luIjp7InJpZ2h0IjoiMTAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX1dfQ==  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 190.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 380.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 420.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  flexLayout.SetFlexJustification( Dali::Toolkit::FlexLayout::JUSTIFY_SPACE_BETWEEN );
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImp1c3RpZnlDb250ZW50IjozLCJhbGlnbkl0ZW1zIjoxLCJhbGlnbkNvbnRlbnQiOjEsInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH0sImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjQwIiwiaGVpZ2h0IjoiNDAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJhbGlnbkl0ZW1zIjoxLCJtYXJnaW4iOnsicmlnaHQiOiIwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19LHsid2lkdGgiOiI2MCIsImhlaWdodCI6IjYwIiwibWluV2lkdGgiOm51bGwsIm1pbkhlaWdodCI6bnVsbCwibWF4V2lkdGgiOm51bGwsIm1heEhlaWdodCI6bnVsbCwiYWxpZ25JdGVtcyI6MSwibWFyZ2luIjp7InJpZ2h0IjoiMCJ9LCJwb3NpdGlvbiI6eyJ0b3AiOm51bGwsInJpZ2h0IjpudWxsLCJib3R0b20iOm51bGwsImxlZnQiOm51bGx9fV19  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 420.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  flexLayout.SetFlexJustification( Dali::Toolkit::FlexLayout::JUSTIFY_SPACE_AROUND );
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImp1c3RpZnlDb250ZW50Ijo0LCJhbGlnbkl0ZW1zIjoxLCJhbGlnbkNvbnRlbnQiOjEsInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH0sImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjQwIiwiaGVpZ2h0IjoiNDAiLCJtaW5XaWR0aCI6bnVsbCwibWluSGVpZ2h0IjpudWxsLCJtYXhXaWR0aCI6bnVsbCwibWF4SGVpZ2h0IjpudWxsLCJhbGlnbkl0ZW1zIjoxLCJtYXJnaW4iOnsicmlnaHQiOiIwIn0sInBvc2l0aW9uIjp7InRvcCI6bnVsbCwicmlnaHQiOm51bGwsImJvdHRvbSI6bnVsbCwibGVmdCI6bnVsbH19LHsid2lkdGgiOiI2MCIsImhlaWdodCI6IjYwIiwibWluV2lkdGgiOm51bGwsIm1pbkhlaWdodCI6bnVsbCwibWF4V2lkdGgiOm51bGwsIm1heEhlaWdodCI6bnVsbCwiYWxpZ25JdGVtcyI6MSwibWFyZ2luIjp7InJpZ2h0IjoiMCJ9LCJwb3NpdGlvbiI6eyJ0b3AiOm51bGwsInJpZ2h0IjpudWxsLCJib3R0b20iOm51bGwsImxlZnQiOm51bGx9fV19  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 95.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 325.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_FlexLayout05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_FlexLayout05");
+
+  Stage stage = Stage::GetCurrent();
+  auto flexBox = Control::New();
+  auto flexLayout = FlexLayout::New();
+  flexLayout.SetFlexAlignment( Dali::Toolkit::FlexLayout::ALIGN_FLEX_START );
+  flexLayout.SetFlexItemsAlignment( Dali::Toolkit::FlexLayout::ALIGN_FLEX_START );
+  flexLayout.SetFlexWrap(Dali::Toolkit::FlexLayout::NO_WRAP);
+  flexLayout.SetFlexJustification( Dali::Toolkit::FlexLayout::JUSTIFY_FLEX_START );
+  flexLayout.SetFlexDirection( Dali::Toolkit::FlexLayout::ROW );
+  DevelControl::SetLayout( flexBox, flexLayout );
+  flexBox.SetName( "Flexbox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 200, 200 ) );
+  controls.push_back( CreateLeafControl( 400, 400 ) );
+  for( auto&& iter : controls )
+  {
+    flexBox.Add( iter );
+  }
+  flexBox.SetParentOrigin( ParentOrigin::CENTER );
+  flexBox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( flexBox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // Shrink is off
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 200.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 200.0f, 200.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 400.0f, 400.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  flexLayout.SetFlexWrap(Dali::Toolkit::FlexLayout::WRAP);
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsImFsaWduQ29udGVudCI6MSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiZmxleFdyYXAiOjEsImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjIwMCIsImhlaWdodCI6IjIwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX0seyJ3aWR0aCI6IjQwMCIsImhlaWdodCI6IjQwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX1dfQ==
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 200.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 200.0f, 200.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 400.0f, 400.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  flexLayout.SetFlexAlignment(Dali::Toolkit::FlexLayout::ALIGN_CENTER);
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsImFsaWduQ29udGVudCI6MiwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiZmxleFdyYXAiOjEsImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjIwMCIsImhlaWdodCI6IjIwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX0seyJ3aWR0aCI6IjQwMCIsImhlaWdodCI6IjQwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX1dfQ==
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 300.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 200.0f, 200.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 400.0f, 400.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  flexLayout.SetFlexAlignment(Dali::Toolkit::FlexLayout::ALIGN_FLEX_END);
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsImFsaWduQ29udGVudCI6MiwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiZmxleFdyYXAiOjEsImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjIwMCIsImhlaWdodCI6IjIwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX0seyJ3aWR0aCI6IjQwMCIsImhlaWdodCI6IjQwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX1dfQ==
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 200.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 400.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 200.0f, 200.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 400.0f, 400.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  flexLayout.SetFlexAlignment(Dali::Toolkit::FlexLayout::ALIGN_STRETCH);
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // To see the test go to https://yogalayout.com/playground/#eyJ3aWR0aCI6IjQ4MCIsImhlaWdodCI6IjgwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsImFsaWduQ29udGVudCI6MiwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfSwiZmxleFdyYXAiOjEsImNoaWxkcmVuIjpbeyJ3aWR0aCI6IjIwMCIsImhlaWdodCI6IjIwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX0seyJ3aWR0aCI6IjQwMCIsImhlaWdodCI6IjQwMCIsIm1pbldpZHRoIjpudWxsLCJtaW5IZWlnaHQiOm51bGwsIm1heFdpZHRoIjpudWxsLCJtYXhIZWlnaHQiOm51bGwsImFsaWduSXRlbXMiOjEsIm1hcmdpbiI6eyJyaWdodCI6IjAifSwicG9zaXRpb24iOnsidG9wIjpudWxsLCJyaWdodCI6bnVsbCwiYm90dG9tIjpudWxsLCJsZWZ0IjpudWxsfX1dfQ==
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 300.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 200.0f, 200.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 400.0f, 400.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }
