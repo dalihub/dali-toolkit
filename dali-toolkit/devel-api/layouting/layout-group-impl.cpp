@@ -187,7 +187,9 @@ void LayoutGroup::OnSetChildProperties( Handle& handle, Property::Index index, P
   if ( ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) &&
          ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) )
        ||
-       ( index == Toolkit::Control::Property::MARGIN || index == Toolkit::Control::Property::PADDING ) )
+       ( index == Toolkit::Control::Property::MARGIN || index == Toolkit::Control::Property::PADDING )
+       ||
+       ( index == Actor::Property::LAYOUT_DIRECTION || index == Actor::Property::INHERIT_LAYOUT_DIRECTION ) )
   {
     // If any child properties are set, must perform relayout
     RequestLayout();
