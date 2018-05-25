@@ -42,4 +42,6 @@ extern "C"
 std::vector<uint32_t> GraphicsGetBuiltinShader( const std::string& tag );
 }
 
+#define GraphicsGetBuiltinShaderId( x ) GraphicsGetBuiltinShader( #x )
+
 #endif // GRAPHICS_BUILTIN_SHADER_EXTERN_GEN_H

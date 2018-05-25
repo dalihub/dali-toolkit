@@ -32,6 +32,10 @@
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
+// @todo: using generated file in the dali-core!!!!
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
+#include <dali/devel-api/rendering/shader-devel.h>
+
 namespace Dali
 {
 
@@ -588,7 +592,13 @@ void MeshVisual::InitializeRenderer()
 void MeshVisual::SupplyEmptyGeometry()
 {
   mGeometry = Geometry::New();
-  mShader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER );
+  mShader = DevelShader::New(
+    GraphicsGetBuiltinShader( "SHADER_MESH_VISUAL_SIMPLE_SHADER_VERT" ),
+    GraphicsGetBuiltinShader( "SHADER_MESH_VISUAL_SIMPLE_SHADER_FRAG" ),
+    DevelShader::ShaderLanguage::SPIRV_1_0,
+    Property::Map()
+  );
+
   mImpl->mRenderer = Renderer::New( mGeometry, mShader );
 
   DALI_LOG_ERROR( "Initialisation error in mesh visual.\n" );
@@ -613,14 +623,35 @@ void MeshVisual::CreateShader()
   if( mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_DETAILED_SPECULAR_LIGHTING )
   {
     mShader = Shader::New( NORMAL_MAP_VERTEX_SHADER, NORMAL_MAP_FRAGMENT_SHADER );
+    mShader = DevelShader::New(
+      GraphicsGetBuiltinShader( "SHADER_MESH_VISUAL_NORMAL_MAP_SHADER_VERT" ),
+      GraphicsGetBuiltinShader( "SHADER_MESH_VISUAL_NORMAL_MAP_SHADER_FRAG" ),
+      DevelShader::ShaderLanguage::SPIRV_1_0,
+      Property::Map()
+    );
+
   }
   else if( mShadingMode == Toolkit::MeshVisual::ShadingMode::TEXTURED_WITH_SPECULAR_LIGHTING )
   {
     mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    mShader = DevelShader::New(
+      GraphicsGetBuiltinShader( "SHADER_MESH_VISUAL_SHADER_VERT" ),
+      GraphicsGetBuiltinShader( "SHADER_MESH_VISUAL_SHADER_FRAG" ),
+      DevelShader::ShaderLanguage::SPIRV_1_0,
+      Property::Map()
+    );
+
   }
   else //Textureless
   {
     mShader = Shader::New( SIMPLE_VERTEX_SHADER, SIMPLE_FRAGMENT_SHADER );
+    mShader = DevelShader::New(
+      GraphicsGetBuiltinShader( "SHADER_MESH_VISUAL_SIMPLE_SHADER_VERT" ),
+      GraphicsGetBuiltinShader( "SHADER_MESH_VISUAL_SIMPLE_SHADER_FRAG" ),
+      DevelShader::ShaderLanguage::SPIRV_1_0,
+      Property::Map()
+    );
+
   }
 
   UpdateShaderUniforms();

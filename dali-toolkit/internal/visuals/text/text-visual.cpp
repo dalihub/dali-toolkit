@@ -126,7 +126,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
     gl_FragColor = uTextColorAnimatable * textTexture * uColor * visualMixColor();
   }\n
 );
-#endif
+
 const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
@@ -177,6 +177,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
     gl_FragColor = ( uTextColorAnimatable * textTexture + styleTexture * ( 1.0 - textTexture ) ) * uColor * visualMixColor();\n
   }\n
 );
+#endif
 
 const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
@@ -811,8 +812,15 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_MULTI_COLOR_TEXT );
+
+      shader = DevelShader::New(
+        GraphicsGetBuiltinShader( "SHADER_TEXT_VISUAL_SHADER_VERT" ),
+        GraphicsGetBuiltinShader( "SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_SHADER_FRAG" ),
+        DevelShader::ShaderLanguage::SPIRV_1_0,
+        Property::Map()
+      );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT, shader );
     }
   }
@@ -849,7 +857,13 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE );
+      shader = DevelShader::New(
+        GraphicsGetBuiltinShader( "SHADER_TEXT_VISUAL_SHADER_VERT" ),
+        GraphicsGetBuiltinShader( "SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_SHADER_FRAG" ),
+        DevelShader::ShaderLanguage::SPIRV_1_0,
+        Property::Map()
+      );
+
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE, shader );
     }
