@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "521d8dbd_76ef6c08",
+        "filename": "dali-toolkit/devel-api/layouting/fbox-layout.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-29T13:52:08Z",
+      "side": 1,
+      "message": "Should use Flex not just F.\nSo FlexLayout would be a better name.  Can drop the \"box\".",
+      "range": {
+        "startLine": 38,
+        "startChar": 22,
+        "endLine": 38,
+        "endChar": 32
+      },
+      "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aaec85a5_0f35c6e3",
+        "filename": "dali-toolkit/internal/layouting/fbox-layout-impl.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-29T13:52:08Z",
+      "side": 1,
+      "message": "these are EXTERNAL_HEADERS (to the library)",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 47
+      },
+      "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "73ffa193_70d091c4",
+        "filename": "dali-toolkit/internal/layouting/fbox-layout-impl.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-29T13:52:08Z",
+      "side": 1,
+      "message": "So this OnMeasure is not from LayoutItem but Yoga?\nThinking if it can be renamed to avoid confusion?",
+      "range": {
+        "startLine": 125,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 28
+      },
+      "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f305a2f_ccef48db",
+        "filename": "dali-toolkit/internal/layouting/fbox-layout-impl.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-29T13:52:08Z",
+      "side": 1,
+      "message": "Are the calculated valves used here cached for when need in OnLayout if the sizes are the same.  Maybe something to optimize later if possible?",
+      "range": {
+        "startLine": 224,
+        "startChar": 2,
+        "endLine": 224,
+        "endChar": 23
+      },
+      "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16ff0de7_bbcfa857",
+        "filename": "dali-toolkit/internal/layouting/fbox-layout-impl.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-29T13:52:08Z",
+      "side": 1,
+      "message": "use spaces for tabs",
+      "range": {
+        "startLine": 226,
+        "startChar": 0,
+        "endLine": 226,
+        "endChar": 2
+      },
+      "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7adbeeea_ae0df20d",
+        "filename": "dali-toolkit/internal/layouting/fbox-layout-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-05-29T13:52:08Z",
+      "side": 1,
+      "message": "Can use \n/**\n * @copydoc Fbox::SetFlexDirection\n */",
+      "range": {
+        "startLine": 42,
+        "startChar": 2,
+        "endLine": 47,
+        "endChar": 52
+      },
+      "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
