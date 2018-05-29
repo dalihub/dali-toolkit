@@ -234,23 +234,6 @@ DALI_TOOLKIT_API void AddTransitions( Internal::Control& control,
                                       Dali::Animation animation,
                                       const Toolkit::TransitionData& transitionData );
 
-
-/**
- * @brief Add a transition effect on the control to the given animation
- *
- * Only generates an animator if the properties described in the transition
- * data are staged (e.g. the visual is Enabled and the control is on stage).
- * Otherwise the target values are stored, and will get set onto the properties
- * when the visual is next staged.
- *
- * @param[in] control The control
- * @param[in] animation The Animation to add valid transitions to
- * @param[in] transitionData The transition data describing the effect to create
- */
-DALI_IMPORT_API void AddTransitions( Internal::Control& control,
-                                     Dali::Animation animation,
-                                     const Toolkit::TransitionData& transitionData );
-
 /**
  * @brief Create a transition effect on the control.
  *
