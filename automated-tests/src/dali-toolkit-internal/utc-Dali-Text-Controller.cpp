@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
+#include <dali-toolkit/internal/text/text-controller-impl.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -145,9 +146,9 @@ int UtcDaliTextControllerEnableCursorBlinking(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
                                                        *controller );
-
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   // Enables the cursor blink.
   controller->SetEnableCursorBlink( true );
@@ -172,7 +173,7 @@ int UtcDaliTextControllerImfEvent(void)
   ControllerPtr controller = Controller::New();
 
   std::string text;
-  ImfManager::ImfEventData imfEvent;
+  InputMethodContext::EventData imfEvent;
 
   DALI_TEST_CHECK( controller );
 
@@ -181,34 +182,39 @@ int UtcDaliTextControllerImfEvent(void)
   Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
                                                        *controller );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
-  // Creates an ImfManager.
-  ImfManager imfManager = ImfManager::Get();
+  // Set the placeholder text.
+  controller->SetPlaceholderText( Controller::PLACEHOLDER_TYPE_INACTIVE, "Hello Dali" );
+
+  // For coverage.
+  imfEvent = InputMethodContext::EventData( InputMethodContext::GET_SURROUNDING, "", 0, 0 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   // Send VOID event.
-  imfEvent = ImfManager::ImfEventData( ImfManager::VOID, "", 0, 0 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  imfEvent = InputMethodContext::EventData( InputMethodContext::VOID, "", 0, 0 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   controller->GetText( text );
   DALI_TEST_CHECK( text.empty() );
 
-  imfEvent = ImfManager::ImfEventData( ImfManager::COMMIT, "Hello ", 0, 6 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  imfEvent = InputMethodContext::EventData( InputMethodContext::COMMIT, "Hello ", 0, 6 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
   controller->GetNaturalSize();
 
   // Check 'Delete All' key which means the input panel send a big range
-  imfEvent = ImfManager::ImfEventData( ImfManager::DELETESURROUNDING, "", -100, 100 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  imfEvent = InputMethodContext::EventData( InputMethodContext::DELETE_SURROUNDING, "", -100, 100 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
   controller->GetNaturalSize();
 
   controller->GetText( text );
   DALI_TEST_EQUALS( "", text, TEST_LOCATION );
 
   // Send COMMIT event.
-  imfEvent = ImfManager::ImfEventData( ImfManager::COMMIT, "Hello ", 0, 6 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  imfEvent = InputMethodContext::EventData( InputMethodContext::COMMIT, "Hello ", 0, 6 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   // Force to update the model.
   controller->GetNaturalSize();
@@ -216,9 +222,9 @@ int UtcDaliTextControllerImfEvent(void)
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello ", text, TEST_LOCATION );
 
-  // Send PREEDIT event
-  imfEvent = ImfManager::ImfEventData( ImfManager::PREEDIT, "w", 6, 1 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  // Send PRE_EDIT event
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   // Force to update the model.
   controller->GetNaturalSize();
@@ -226,9 +232,9 @@ int UtcDaliTextControllerImfEvent(void)
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello w", text, TEST_LOCATION );
 
-  // Send DELETESURROUNDING event
-  imfEvent = ImfManager::ImfEventData( ImfManager::DELETESURROUNDING, "", -1, 1 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  // Send DELETE_SURROUNDING event
+  imfEvent = InputMethodContext::EventData( InputMethodContext::DELETE_SURROUNDING, "", -1, 1 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   // Force to update the model.
   controller->GetNaturalSize();
@@ -236,9 +242,9 @@ int UtcDaliTextControllerImfEvent(void)
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello ", text, TEST_LOCATION );
 
-  // Send PREEDIT event
-  imfEvent = ImfManager::ImfEventData( ImfManager::PREEDIT, "wo", 6, 2 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  // Send PRE_EDIT event
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "wo", 6, 2 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   // Force to update the model.
   controller->GetNaturalSize();
@@ -246,16 +252,16 @@ int UtcDaliTextControllerImfEvent(void)
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello wo", text, TEST_LOCATION );
 
-  // Send GETSURROUNDING event
-  imfEvent = ImfManager::ImfEventData( ImfManager::GETSURROUNDING, "", 0, 0 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  // Send GET_SURROUNDING event
+  imfEvent = InputMethodContext::EventData( InputMethodContext::GET_SURROUNDING, "", 0, 0 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello wo", text, TEST_LOCATION );
 
-  // Send PRIVATECOMMAND event
-  imfEvent = ImfManager::ImfEventData( ImfManager::PRIVATECOMMAND, "", 0, 0 );
-  controller->OnImfEvent( imfManager, imfEvent );
+  // Send PRIVATE_COMMAND event
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRIVATE_COMMAND, "", 0, 0 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello wo", text, TEST_LOCATION );
@@ -283,8 +289,9 @@ int UtcDaliTextControllerTextPopupButtonTouched(void)
   Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
                                                        *controller );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   // Creates the text's popup.
   TextSelectionPopupCallbackInterface& callbackInterface = *controller;
@@ -471,8 +478,9 @@ int UtcDaliTextControllerSetGetCheckProperty(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator = Text::Decorator::New( *controller, *controller );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   DALI_TEST_CHECK( !controller->IsInputModePassword() );
 
@@ -515,8 +523,9 @@ int UtcDaliTextControllerSetGetTapLongPressAction(void)
   // Creates a decorator.
   Text::DecoratorPtr decorator = Text::Decorator::New( *controller, *controller );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   DALI_TEST_EQUALS( Controller::NoTextTap::NO_ACTION, controller->GetNoTextDoubleTapAction(), TEST_LOCATION );
   controller->SetNoTextDoubleTapAction( Controller::NoTextTap::HIGHLIGHT );
@@ -525,6 +534,160 @@ int UtcDaliTextControllerSetGetTapLongPressAction(void)
   DALI_TEST_EQUALS( Controller::NoTextTap::SHOW_SELECTION_POPUP, controller->GetNoTextLongPressAction(), TEST_LOCATION ); // The default is SHOW_SELECTION_POPUP
   controller->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
   DALI_TEST_EQUALS( Controller::NoTextTap::HIGHLIGHT, controller->GetNoTextLongPressAction(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTextControllerSetGetLineSpacingProperty(void)
+{
+  tet_infoline(" UtcDaliTextControllerSetGetLineSpacingProperty");
+  ToolkitTestApplication application;
+
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+
+  // single line text
+  const std::string textSingle("A Quick Brown Fox Jumps Over The Lazy Dog");
+
+  // multi-line text
+  const std::string textMulti("A Quick Brown\nFox Jumps Over\nThe Lazy Dog");
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  // single line, line spacing = 0px
+  {
+    const float EXPECTED_SPACING = 0.0f;
+    const Vector2 EXPECTED_LAYOUT_SIZE( 326.0f, 19.0f);
+    const Vector3 EXPECTED_NATURAL_SIZE( 326.0f, 20.0f, 0.0f );
+
+    controller->SetText(textSingle);
+    controller->Relayout(size);
+    controller->SetMultiLineEnabled( false );
+
+    Vector3 naturalSize  = controller->GetNaturalSize();
+    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
+    float lineSpacing0 = controller->GetDefaultLineSpacing();
+
+    DALI_TEST_EQUALS( EXPECTED_SPACING, lineSpacing0, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION );
+  }
+
+  // single line, line spacing = 20px
+  {
+    const float EXPECTED_SPACING = 20.0f;
+    const Vector2 EXPECTED_LAYOUT_SIZE( 326.0f, 19.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 326.0f, 40.0f, 0.0f );
+
+    controller->SetText(textSingle);
+    controller->Relayout(size);
+    controller->SetDefaultLineSpacing( 20 );
+    controller->SetMultiLineEnabled( false );
+
+    Vector3 naturalSize  = controller->GetNaturalSize();
+    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
+    float lineSpacing0 = controller->GetDefaultLineSpacing();
+
+    DALI_TEST_EQUALS( EXPECTED_SPACING, lineSpacing0, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION );
+  }
+
+  // multi-line, line spacing = 0px
+  {
+    const float EXPECTED_SPACING = 0.0f;
+    const Vector2 EXPECTED_LAYOUT_SIZE( 318.0f, 39.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 58.0f, 0.0f );
+
+    controller->SetText(textMulti);
+    controller->Relayout(size);
+    controller->SetMultiLineEnabled( true );
+    controller->SetDefaultLineSpacing( 0 );
+
+    Vector3 naturalSize  = controller->GetNaturalSize();
+    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
+    float lineSpacing0 = controller->GetDefaultLineSpacing();
+
+    DALI_TEST_EQUALS( EXPECTED_SPACING, lineSpacing0, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION );
+  }
+
+  // multi-line, line spacing = 20px
+  {
+    const float EXPECTED_SPACING = 20.0f;
+    const Vector2 EXPECTED_LAYOUT_SIZE( 115.0f, 57.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 118.0f, 0.0f );
+
+    controller->SetText(textMulti);
+    controller->Relayout(size);
+    controller->SetMultiLineEnabled( true );
+    controller->SetDefaultLineSpacing( 20 );
+
+    Vector3 naturalSize  = controller->GetNaturalSize();
+    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
+    float lineSpacing0 = controller->GetDefaultLineSpacing();
+
+    DALI_TEST_EQUALS( EXPECTED_SPACING, lineSpacing0, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION );
+  }
+
+  // multi-line, line spacing = 30px
+  {
+    const float EXPECTED_SPACING = 30.0f;
+    const Vector2 EXPECTED_LAYOUT_SIZE( 115.0f, 117.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 148.0f, 0.0f );
+
+    controller->SetText(textMulti);
+    controller->Relayout(size);
+    controller->SetMultiLineEnabled( true );
+    controller->SetDefaultLineSpacing( 30 );
+
+    Vector3 naturalSize  = controller->GetNaturalSize();
+    Vector2 layoutSize   = controller->GetTextModel()->GetLayoutSize();
+    float lineSpacing0 = controller->GetDefaultLineSpacing();
+
+    DALI_TEST_EQUALS( EXPECTED_SPACING, lineSpacing0, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_LAYOUT_SIZE, layoutSize, TEST_LOCATION );
+    DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, naturalSize, TEST_LOCATION );
+  }
+
+
+  END_TEST;
+
+}
+
+int UtcDaliTextControllerCheckBufferIndices(void)
+{
+  tet_infoline(" UtcDaliTextControllerCheckBufferIndices");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  // Set the text
+  const std::string text("A Quick Brown Fox Jumps Over The Lazy Dog");
+  controller->SetText(text);
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  // Tweak some parameters to make the indices to access the text buffer invalid
+  mImpl.mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl.mModel->mLogicalModel->mText.Count() * 10u;
+  mImpl.mTextUpdateInfo.mNumberOfCharactersToRemove = 0u;
+  mImpl.mTextUpdateInfo.mPreviousNumberOfCharacters = 0u;
+  mImpl.mOperationsPending = Controller::ALL_OPERATIONS;
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  tet_result(TET_PASS);
 
   END_TEST;
 }

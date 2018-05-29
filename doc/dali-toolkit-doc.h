@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_DOC_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,11 @@
  * </tr>
  * <tr>
  *    <td style="padding-left:1em">@ref dali_toolkit_controls_image_view</td>
- *    <td>ImageView is a control displying an image.</td>
+ *    <td>ImageView is a control displaying an image.</td>
+ * </tr>
+ * <tr>
+ *    <td style="padding-left:1em">@ref dali_toolkit_controls_model3d_view</td>
+ *    <td>Model3dView is a control for displaying 3d geometry.</td>
  * </tr>
  * <tr>
  *    <td style="padding-left:1em">@ref dali_toolkit_controls_scroll_bar</td>
@@ -170,7 +174,10 @@
  *     @brief GaussianBlurView provides a render process that blurs an image.
 
  *     @defgroup dali_toolkit_controls_image_view Image View
- *     @brief ImageView is a control displying an image.
+ *     @brief ImageView is a control displaying an image.
+
+ *     @defgroup dali_toolkit_controls_model3d_view Model3dView
+ *     @brief Model3dView is a control for displaying 3d geometry.
 
  *     @defgroup dali_toolkit_controls_scroll_bar Scroll Bar
  *     @brief ScrollBar is a component that can be linked to the scrollable objects.

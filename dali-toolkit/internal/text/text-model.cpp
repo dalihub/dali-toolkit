@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,11 @@ HorizontalAlignment::Type Model::GetHorizontalAlignment() const
 VerticalAlignment::Type Model::GetVerticalAlignment() const
 {
   return mVerticalAlignment;
+}
+
+DevelText::VerticalLineAlignment::Type Model::GetVerticalLineAlignment() const
+{
+  return mVerticalLineAlignment;
 }
 
 bool Model::IsTextElideEnabled() const
@@ -162,6 +167,16 @@ float Model::GetOutlineWidth() const
   return mVisualModel->GetOutlineWidth();
 }
 
+const Vector4& Model::GetBackgroundColor() const
+{
+  return mVisualModel->GetBackgroundColor();
+}
+
+bool Model::IsBackgroundEnabled() const
+{
+  return mVisualModel->IsBackgroundEnabled();
+}
+
 Model::Model()
 : mLogicalModel(),
   mVisualModel(),
@@ -169,6 +184,7 @@ Model::Model()
   mScrollPositionLast(),
   mHorizontalAlignment( Text::HorizontalAlignment::BEGIN ),
   mVerticalAlignment( Text::VerticalAlignment::TOP ),
+  mVerticalLineAlignment( DevelText::VerticalLineAlignment::TOP ),
   mLineWrapMode( Text::LineWrap::WORD ),
   mAlignmentOffset( 0.0f ),
   mElideEnabled( false )

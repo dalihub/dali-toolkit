@@ -2,7 +2,7 @@
 #define __DALI_TEST_APPLICATION_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,12 @@
 #include "test-render-controller.h"
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/resource-policies.h>
+#include <dali/integration-api/trace.h>
 
 namespace Dali
 {
 
-class DALI_IMPORT_API TestApplication : public ConnectionTracker
+class DALI_CORE_API TestApplication : public ConnectionTracker
 {
 public:
 
@@ -66,6 +67,7 @@ public:
   void Initialize();
   virtual ~TestApplication();
   static void LogMessage( Dali::Integration::Log::DebugPriority level, std::string& message );
+  static void LogContext( bool start, const char* tag );
   Dali::Integration::Core& GetCore();
   TestPlatformAbstraction& GetPlatform();
   TestRenderController& GetRenderController();

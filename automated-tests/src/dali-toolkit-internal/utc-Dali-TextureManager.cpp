@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ public:
   {
   }
 
-  void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect )
+  virtual void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet,
+                               bool useAtlasing, const Vector4& atlasRect, bool preMultiplied ) override
   {
     mLoaded = loadSuccess;
     mObserverCalled = true;
@@ -53,7 +54,7 @@ int UtcTextureManagerRequestLoad(void)
 
   TestObserver observer;
   std::string filename("image.png");
-
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
   TextureManager::TextureId textureId = textureManager.RequestLoad(
     filename,
     ImageDimensions(),
@@ -61,9 +62,11 @@ int UtcTextureManagerRequestLoad(void)
     SamplingMode::BOX_THEN_LINEAR,
     TextureManager::NO_ATLAS,
     &observer,
-    true );
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
 
-  const VisualUrl& url = textureManager.GetVisualUrl( textureId );
+  VisualUrl url = textureManager.GetVisualUrl( textureId );
 
   DALI_TEST_EQUALS( url.GetUrl().compare( filename ), 0, TEST_LOCATION );
 

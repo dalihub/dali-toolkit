@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -583,13 +583,13 @@ int UtcDaliTextViewModelElideText02(void)
   Size textSize00( 100.f, 100.f );
 
   Size textSize01( 80.f, 100.f );
-  float positions01[] = { 0.f, 10.f, 16.f, 26.f, 35.f, 38.f, 46.f, 56.f };
+  float positions01[] = { 0.f, 9.f, 17.f, 27.f, 35.f, 37.f, 46.f, 56.f };
 
   Size textSize02( 80.f, 100.f );
   float positions02[] = { 72.f, 63.f, 54.f, 50.f, 43.f, 38.f, 30.f, 11.f };
 
   Size textSize03( 80.f, 100.f );
-  float positions03[] = { 77.f, 76.f, 71.f, 62.f, 60.f, 52.f, 47.f, 42.f, 39.f, 35.f, 32.f, 13.f };
+  float positions03[] = { 77.f, 76.f, 71.f, 62.f, 59.f, 52.f, 47.f, 42.f, 39.f, 35.f, 32.f, 13.f };
 
   Size textSize04( 80.f, 10.f );
   float positions04[] = { 2.f };

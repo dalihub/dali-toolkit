@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_VIEW_INTERFACE_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,6 +172,21 @@ public:
   virtual void GetUnderlineRuns( GlyphRun* underlineRuns,
                                  UnderlineRunIndex index,
                                  Length numberOfRuns ) const = 0;
+
+  /**
+   * @brief Retrieve the outline color.
+   *
+   * @return The outline color.
+   */
+  virtual const Vector4& GetOutlineColor() const = 0;
+
+  /**
+   * @brief Retrieves the width of an outline
+   *
+   * @return The width of the outline.
+   */
+  virtual unsigned int GetOutlineWidth() const = 0;
+
 };
 
 } // namespace Text

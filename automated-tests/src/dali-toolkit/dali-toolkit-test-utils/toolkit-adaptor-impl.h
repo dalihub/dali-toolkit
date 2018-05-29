@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_ADAPTOR_IMPL_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/devel-api/adaptor-framework/render-surface.h>
+#include <dali/integration-api/adaptors/render-surface.h>
 
 namespace Dali
 {
@@ -37,6 +37,8 @@ class TestRenderSurface : public RenderSurface
 {
 public:
   virtual PositionSize GetPositionSize() const { PositionSize size; return size; }
+
+  virtual void GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVertical ) { dpiHorizontal = dpiVertical = 96; }
 
   virtual void InitializeEgl( EglInterface& egl ) {}
 
@@ -62,7 +64,7 @@ public:
 
   virtual void SetThreadSynchronization( ThreadSynchronizationInterface& threadSynchronization ) {}
 
-  virtual RenderSurface::Type GetSurfaceType() { return RenderSurface::ECORE_RENDER_SURFACE; }
+  virtual RenderSurface::Type GetSurfaceType() { return RenderSurface::WINDOW_RENDER_SURFACE; }
 };
 
 namespace Internal

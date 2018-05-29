@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_MANAGER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -635,14 +635,14 @@ private:
 
   /**
    * Perform the accessibility action to move the focus to the first item on the top
-   * and read from the top item continously (by three fingers single tap).
+   * and read from the top item continuously (by three fingers single tap).
    * @return whether the accessibility action is performed or not.
    */
   virtual bool AccessibilityActionReadFromTop();
 
   /**
    * Perform the accessibility action to move the focus to and read from the next item
-   * continously (by three fingers double tap).
+   * continuously (by three fingers double tap).
    * @return whether the accessibility action is performed or not.
    */
   virtual bool AccessibilityActionReadFromNext();

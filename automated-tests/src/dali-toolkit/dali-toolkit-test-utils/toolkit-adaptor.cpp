@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include <dali/public-api/object/base-object.h>
 
 #include <toolkit-adaptor-impl.h>
+#include <dali/integration-api/debug.h>
+#include <test-application.h>
 
 namespace Dali
 {
@@ -208,6 +210,34 @@ void Adaptor::SetViewMode( ViewMode mode )
 
 void Adaptor::SetStereoBase(  float stereoBase )
 {
+}
+
+
+class LogFactory : public LogFactoryInterface
+{
+public:
+  virtual void InstallLogFunction() const
+  {
+    Dali::Integration::Log::LogFunction logFunction(&TestApplication::LogMessage);
+    Dali::Integration::Log::InstallLogFunction(logFunction);
+  }
+
+  LogFactory()
+  {
+  }
+  virtual ~LogFactory()
+  {
+  }
+};
+
+LogFactory* gLogFactory = NULL;
+const LogFactoryInterface& Adaptor::GetLogFactory()
+{
+  if( gLogFactory == NULL )
+  {
+    gLogFactory = new LogFactory;
+  }
+  return *gLogFactory;
 }
 
 Adaptor::Adaptor()

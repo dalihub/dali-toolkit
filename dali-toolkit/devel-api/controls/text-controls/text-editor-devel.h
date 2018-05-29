@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_EDITOR_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
  * limitations under the License.
  *
  */
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/input-method-context.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-editor.h>
@@ -96,9 +98,30 @@ namespace Property
        * @details Name "placeholderTextColor", type Property::VECTOR4.
        */
       PLACEHOLDER_TEXT_COLOR,
+
+      /**
+       * @brief Enables Text selection using Shift key.
+       * @details Name "enableShiftSelection", type Property::BOOLEAN.
+       */
+      ENABLE_SHIFT_SELECTION,
+
+      /**
+       * @brief Enables the grab handles for text selection.
+       * @details Name "enableGrabHandle", type Property::BOOLEAN.
+       * @note The default value is true, which means the grab handles are enabled by default.
+       */
+      ENABLE_GRAB_HANDLE
   };
 
 } // namespace Property
+
+/**
+ * @brief Return the input method context of TextEditor.
+ *
+ * @param[in] textEditor The instance of TextEditor.
+ * @return InputMethodContext instance.
+ */
+DALI_TOOLKIT_API InputMethodContext GetInputMethodContext( TextEditor textEditor );
 
 } // namespace DevelTextEditor
 

@@ -2,7 +2,7 @@
 #define __DALI_V8PLUGIN_DALI_WRAP_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <v8.h>
-#include <dali/public-api/common/dali-common.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <garbage-collector/garbage-collector.h>
 
 #include <module-loader/module-loader.h>

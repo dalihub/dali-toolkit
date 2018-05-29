@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MODEL_INTERFACE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/text/line-run.h>
 #include <dali-toolkit/internal/text/script-run.h>
 #include <dali-toolkit/internal/text/text-definitions.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 namespace Dali
 {
@@ -82,6 +83,13 @@ public:
    * @return The vertical alignment.
    */
   virtual VerticalAlignment::Type GetVerticalAlignment() const = 0;
+
+  /**
+   * @brief Retrieves the text's vertical line alignment.
+   *
+   * @return The vertical line alignment.
+   */
+  virtual DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const = 0;
 
   /**
    * @brief Whether the text elide property is enabled.
@@ -231,6 +239,20 @@ public:
    * @return The width of the outline.
    */
   virtual float GetOutlineWidth() const = 0;
+
+  /**
+   * @brief Retrieves the background color.
+   *
+   * @return The background color.
+   */
+  virtual const Vector4& GetBackgroundColor() const = 0;
+
+  /**
+   * @brief Returns whether background is enabled or not.
+   *
+   * @return The background state.
+   */
+  virtual bool IsBackgroundEnabled() const = 0;
 
 };
 

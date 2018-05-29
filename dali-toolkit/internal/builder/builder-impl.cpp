@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,10 +179,10 @@ void Builder::LoadFromString( std::string const& data, Dali::Toolkit::Builder::U
   }
   else
   {
-    // load configuration map
-    LoadConfiguration( *parser.GetRoot(), mConfigurationMap );
     // load constant map (allows the user to override the constants in the json after loading)
     LoadConstants( *parser.GetRoot(), mReplacementMap );
+    // load configuration map
+    LoadConfiguration( *parser.GetRoot(), mConfigurationMap );
     // merge includes
     if( OptionalChild includes = IsChild(*parser.GetRoot(), KEYNAME_INCLUDES) )
     {
@@ -797,6 +797,61 @@ void Builder::LoadConfiguration( const TreeNode& root, Property::Map& intoMap )
       if( (*iter).second.GetName() )
       {
         DeterminePropertyFromNode( (*iter).second, property, replacer );
+
+        // If config is string, find constant and replace it to original value.
+        if( (*iter).second.GetType() == TreeNode::STRING )
+        {
+          std::string stringConfigValue;
+          if( property.Get( stringConfigValue ) )
+          {
+            std::size_t pos = 0;
+
+            while( pos < stringConfigValue.size() )
+            {
+              // If we can't find "{","}" pair in stringConfigValue, will out loop.
+              std::size_t leftPos = stringConfigValue.find( "{", pos );
+              if( leftPos != std::string::npos )
+              {
+                std::size_t rightPos = stringConfigValue.find( "}", pos+1 );
+
+                if( rightPos != std::string::npos )
+                {
+                  // If we find "{","}" pair but can't find matched constant
+                  // try to find other "{","}" pair after current left position.
+                  pos = leftPos+1;
+
+                  for( unsigned int i = 0; i < mReplacementMap.Count() ; i++ )
+                  {
+                    std::string constant = mReplacementMap.GetKey(i);
+
+                    // Compare string which is between "{" and "}" with constant string
+                    // If they are same, change string in stringConfigValue to mapped constant value.
+                    if ( stringConfigValue.compare( leftPos+1, rightPos-leftPos-1,constant) == 0 )
+                    {
+                      std::string replaceString;
+                      mReplacementMap.GetValue(i).Get( replaceString );
+
+                      stringConfigValue.replace( leftPos, rightPos-leftPos+1, replaceString );
+                      pos = leftPos + replaceString.size();
+                      break;
+                    }
+                  }
+                }
+                else
+                {
+                  // If we cannot find constant in const value, will out loop.
+                  pos = stringConfigValue.size();
+                }
+              }
+              else
+              {
+                // If we cannot find constant in const value, will out loop.
+                pos = stringConfigValue.size();
+              }
+            }
+            property = Property::Value( stringConfigValue );
+          }
+        }
         intoMap[ (*iter).second.GetName() ] = property;
       }
     }
@@ -1243,7 +1298,11 @@ void Builder::RecordStyle( StylePtr           style,
           }
           else
           {
-            style->visuals.Add(visual.first, *property.GetMap());
+            Property::Map* map = property.GetMap();
+            if( map )
+            {
+              style->visuals.Add( visual.first, *map );
+            }
           }
         }
       }

@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_VIDEO_VIEW_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ namespace Internal DALI_INTERNAL
  * @SINCE_1_1.38
  *
  */
-class DALI_IMPORT_API VideoView: public Control
+class DALI_TOOLKIT_API VideoView: public Control
 {
 public:
 
@@ -77,13 +77,23 @@ public:
     PROPERTY_START_INDEX = Control::CONTROL_PROPERTY_END_INDEX + 1,  ///< @SINCE_1_0.0
   };
 
+  /**
+   * @brief Enumeration for the instance of properties belonging to the VideoView class.
+   * @SINCE_1_1.38
+   */
   struct Property
   {
+    /**
+     * @brief Enumeration for the instance of properties belonging to the VideoView class.
+     * @SINCE_1_1.38
+     */
     enum
     {
       /**
        * @brief name "video", video file url as string type or Property::Map.
        * @SINCE_1_1.38
+       * @REMARK_INTERNET
+       * @REMARK_STORAGE
        */
       VIDEO = PROPERTY_START_INDEX,
 
@@ -113,7 +123,65 @@ public:
        * @SINCE_1_2.62
        * @REMARK_RAWVIDEO
        */
-      UNDERLAY
+      UNDERLAY,
+
+     /**
+       * @brief The play position (millisecond) of the video.
+       * @details Name "playPosition", type Property::INTEGER
+       * @SINCE_1_3_9
+       */
+      PLAY_POSITION,
+
+      /**
+        * @brief The display mode of the video.
+        * @SINCE_1_3_15
+        */
+      DISPLAY_MODE
+    };
+  };
+
+  /**
+   * @brief The values of this enum determine how the video should be display mode to the view
+   * @SINCE_1_3_15
+   */
+  struct DisplayMode
+  {
+    /**
+     * @brief The values of this enum determine how the video should be display mode to the view.
+     * @SINCE_1_3_15
+     */
+    enum Type
+    {
+      /**
+       * @brief Letter box
+       * @SINCE_1_3_15
+       */
+      LETTER_BOX = 0,
+      /**
+       * @brief Origin size
+       * @SINCE_1_3_15
+       */
+      ORIGIN_SIZE,
+      /**
+       * @brief Full-screen
+       * @SINCE_1_3_15
+       */
+      FULL_SCREEN,
+      /**
+       * @brief Cropped full-screen
+       * @SINCE_1_3_15
+       */
+      CROPPED_FULL,
+      /**
+       * @brief  Origin size (if surface size is larger than video size(width/height)) or Letter box (if video size(width/height) is larger than surface size)
+       * @SINCE_1_3_15
+       */
+      ORIGIN_OR_LETTER,
+      /**
+       * @brief  Region of Interest
+       * @SINCE_1_3_15
+       */
+      DST_ROI
     };
   };
 
@@ -124,7 +192,6 @@ public:
    * @SINCE_1_1.38
    * @return A handle to a newly allocated Dali ImageView
    *
-   * @note VideoView will not display anything
    */
   static VideoView New();
 
@@ -141,6 +208,31 @@ public:
   static VideoView New( const std::string& url );
 
   /**
+   * @brief Creates an initialized VideoView.
+   * @SINCE_1_3_9
+   * @param[in] swCodec Video rendering by H/W codec if false
+   * @return A handle to a newly allocated Dali ImageView
+   *
+   * @note If platform or target does not support sw codec, video-view shows an error message and video by default codec type
+   */
+  static VideoView New( bool swCodec );
+
+  /**
+   * @brief Creates an initialized VideoView.
+   * If the string is empty, VideoView will not display anything.
+   *
+   * @SINCE_1_3_9
+   * @REMARK_INTERNET
+   * @REMARK_STORAGE
+   * @param[in] url The url of the video resource to display
+   * @param[in] swCodec Video rendering by H/W codec if false
+   * @return A handle to a newly allocated Dali VideoView
+   *
+   * @note If platform or target does not support sw codec, video-view shows an error message and video by default codec type
+   */
+  static VideoView New( const std::string& url, bool swCodec );
+
+  /**
    * @brief Creates an uninitialized VideoView.
    * @SINCE_1_1.38
    */
@@ -154,7 +246,7 @@ public:
    */
   ~VideoView();
 
-  /*
+  /**
    * @brief Copy constructor.
    *
    * @SINCE_1_1.38

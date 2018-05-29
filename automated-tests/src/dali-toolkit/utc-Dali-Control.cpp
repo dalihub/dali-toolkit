@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
+
+
 #include <toolkit-event-thread-callback.h>
 
 #include "dummy-control.h"
@@ -71,6 +74,18 @@ static void TestKeyInputFocusCallback( Control control )
 
 const char* TEST_LARGE_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/tbcol.png";
 const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+
+Vector4 GetControlBackgroundColor( Control& control )
+{
+  Property::Value propValue = control.GetProperty( Control::Property::BACKGROUND );
+  Property::Map* resultMap = propValue.GetMap();
+  DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR ) );
+
+  Vector4 color;
+  resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get( color );
+
+  return color;
+}
 
 } // namespace
 
@@ -455,6 +470,80 @@ int UtcDaliControlBackgroundColor(void)
   END_TEST;
 }
 
+int UtcDaliControlBackgroundColorRendererCount(void)
+{
+  tet_infoline( "Test ensures we only create renderers when non-transparent color is requested or if we our clipping-mode is set to CLIP_CHILDREN" );
+
+  ToolkitTestApplication application;
+  Control control = Control::New();
+  Stage::GetCurrent().Add( control );
+
+  tet_infoline( "Set transparent, no renderers should be created" );
+  control.SetBackgroundColor( Color::TRANSPARENT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+
+  tet_infoline( "Set transparent alpha with positive RGB values, no renderers should be created, but returned color should reflect what we set" );
+  const Vector4 alphaZero( 1.0f, 0.5f, 0.25f, 0.0f );
+  control.SetBackgroundColor( alphaZero );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), alphaZero, TEST_LOCATION );
+
+  tet_infoline( "Set semi transparent alpha with positive RGB values, 1 renderer should be created, but returned color should reflect what we set" );
+  const Vector4 semiTransparent( 1.0f, 0.75f, 0.5f, 0.5f );
+  control.SetBackgroundColor( semiTransparent );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), semiTransparent, TEST_LOCATION );
+
+  tet_infoline( "Set transparent, ensure no renderers are created" );
+  control.SetBackgroundColor( Color::TRANSPARENT );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
+
+  tet_infoline( "Set control to clip its children, a renderer should be created which will be transparent" );
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
+
+  tet_infoline( "Set a color, only 1 renderer should exist" );
+  control.SetBackgroundColor( Color::RED );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::RED, TEST_LOCATION );
+
+  tet_infoline( "Clear the background, no renderers" );
+  control.ClearBackground();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+
+  tet_infoline( "Set control to clip its children again, a renderer should be created which will be transparent" );
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
+
+  tet_infoline( "Disable clipping, no renderers" );
+  control.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( control.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( GetControlBackgroundColor( control ), Color::TRANSPARENT, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliControlBackgroundImage(void)
 {
   ToolkitTestApplication application;
@@ -831,11 +920,12 @@ int UtcDaliControlResourcesReady(void)
 
   DummyControl actor = DummyControl::New();
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, smallVisual );
 
   actor.SetSize( 200.f, 200.f );
 
-  Toolkit::Visual::ResourceStatus resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL);
+  Toolkit::Visual::ResourceStatus resourceStatus = actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL);
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
   DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::PREPARING), TEST_LOCATION );
@@ -849,7 +939,7 @@ int UtcDaliControlResourcesReady(void)
   application.SendNotification();
   application.Render();
 
-  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL);
+  resourceStatus = actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL);
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
   DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::READY), TEST_LOCATION );
@@ -862,12 +952,12 @@ int UtcDaliControlResourcesReady(void)
 
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL2, largeVisual, false );
 
-  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL2);
+  resourceStatus = actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL2);
   DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::PREPARING), TEST_LOCATION );
 
   application.SendNotification();
 
-  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL2);
+  resourceStatus = actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL2);
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
   DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::PREPARING), TEST_LOCATION );
@@ -878,7 +968,7 @@ int UtcDaliControlResourcesReady(void)
 
   application.SendNotification();
 
-  resourceStatus = DevelControl::GetVisualResourceStatus(dummyImpl, DummyControl::Property::TEST_VISUAL2);
+  resourceStatus = actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL2);
   DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::READY), TEST_LOCATION );
 
   END_TEST;
@@ -922,14 +1012,126 @@ int UtcDaliControlPaddingProperty(void)
   Control control = Control::New();
   control.SetBackgroundColor( Color::BLUE );
 
-  control.SetProperty( Control::Property::PADDING, Extents( 10, 10, 10, 10 ) );
+  control.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
 
   Stage::GetCurrent().Add( control );
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( control.GetProperty<Extents>( Control::Property::PADDING ), Extents( 10, 10, 10, 10 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetProperty<Extents>( Control::Property::PADDING ), Extents( 15, 10, 5, 10 ), TEST_LOCATION );
+
+  Control child = Control::New();
+  control.Add(child);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( child.GetProperty<Vector3>( Dali::Actor::Property::POSITION ), Vector3( 15, 5, 0 ), TEST_LOCATION );
+
+  control.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION,  Dali::LayoutDirection::RIGHT_TO_LEFT);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( child.GetProperty<Vector3>( Dali::Actor::Property::POSITION ), Vector3( 10, 5, 0 ), TEST_LOCATION );
+
+  control.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION,  Dali::LayoutDirection::LEFT_TO_RIGHT);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( child.GetProperty<Vector3>( Dali::Actor::Property::POSITION ), Vector3( 15, 5, 0 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlDoAction(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "DoAction on a visual registered with a control" );
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable( true );
+
+  //Created AnimatedImageVisual
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base imageVisual = factory.CreateVisual( TEST_IMAGE_FILE_NAME, ImageDimensions() );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  dummyControl.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add( dummyControl );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
+
+  Property::Map attributes;
+  DevelControl::DoAction( dummyControl,  DummyControl::Property::TEST_VISUAL, DevelImageVisual::Action::RELOAD, attributes );
+
+  tet_infoline( "Perform RELOAD action. should reload Image and generate a texture" );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliControlDoActionWhenNotStage(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "DoAction on a visual registered with a control but not staged" );
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable( true );
+
+  //Created AnimatedImageVisual
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base imageVisual = factory.CreateVisual( TEST_IMAGE_FILE_NAME, ImageDimensions() );
+
+  DummyControl dummyControl = DummyControl::New(true);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual );
+  dummyControl.SetSize(200.f, 200.f);
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+  textureTrace.Reset();
+
+  Property::Map attributes;
+  DevelControl::DoAction( dummyControl,  DummyControl::Property::TEST_VISUAL, DevelImageVisual::Action::RELOAD, attributes );
+
+  tet_infoline( "Perform RELOAD action. should reload Image and generate a texture" );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );
+  textureTrace.Reset();
+
+  tet_infoline( "Adding control to stage will in turn add the visual to the stage" );
+
+  Stage::GetCurrent().Add( dummyControl );
+  application.SendNotification();
+  application.Render();
+  tet_infoline( "No change in textures could occurs as already loaded and cached texture will be used" );
+
+  DALI_TEST_EQUALS( textureTrace.CountMethod("DeleteTextures"), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION );
+  textureTrace.Reset();
 
   END_TEST;
 }

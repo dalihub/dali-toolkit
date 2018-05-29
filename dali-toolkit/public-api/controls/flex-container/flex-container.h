@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_FLEX_CONTAINER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ class FlexContainer;
  * @SINCE_1_1.35
  */
 
-class DALI_IMPORT_API FlexContainer : public Control
+class DALI_TOOLKIT_API FlexContainer : public Control
 {
 public:
 
@@ -220,7 +220,7 @@ public:
     {
       // Event side child properties
       FLEX = CHILD_PROPERTY_START_INDEX,        ///< name "flex",               The proportion of the free space in the container the flex item will receive. If all items in the container set this property, their sizes will be proportional to the specified flex factor,  type FLOAT @SINCE_1_1.35
-      ALIGN_SELF,                               ///< name "alignSelf",          The alignment of the flex item along the cross axis, which, if set, overides the default alignment for all items in the container,                          @see FlexContainer::Alignment,     type INTEGER @SINCE_1_1.35
+      ALIGN_SELF,                               ///< name "alignSelf",          The alignment of the flex item along the cross axis, which, if set, overrides the default alignment for all items in the container,                         @see FlexContainer::Alignment,     type INTEGER @SINCE_1_1.35
       FLEX_MARGIN                               ///< name "flexMargin",         The space around the flex item,                                                                                                                                                                type VECTOR4 @SINCE_1_1.35
     };
   };

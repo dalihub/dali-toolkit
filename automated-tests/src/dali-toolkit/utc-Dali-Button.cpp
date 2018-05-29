@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,12 +46,19 @@ void utc_dali_toolkit_button_cleanup(void)
 namespace
 {
 static bool gIsCalledButtonCallback = false;
+static bool gIsCalledChildButtonCallback = false;
 
 const int RENDER_FRAME_INTERVAL = 16;
 
 static bool ButtonCallback( Button button )
 {
   gIsCalledButtonCallback = true;
+  return false;
+}
+
+static bool ChildButtonCallback( Button button )
+{
+  gIsCalledChildButtonCallback = true;
   return false;
 }
 
@@ -958,5 +965,180 @@ int UtcDaliButtonSetSelectedP(void)
   button.SetSelected( false );
 
   DALI_TEST_CHECK( !button.IsSelected() );
+  END_TEST;
+}
+
+int UtcDaliButtonEventConsumption(void)
+{
+  /**
+   *  [ Parent ]
+   *  [ Child  ]
+   *
+   *  Child parented and positioned under parent.
+   *  Touch up and down performed on child.
+   *  Should only trigger signal on child.
+   */
+
+  ToolkitTestApplication application;
+
+  Button parentButton = PushButton::New();
+  parentButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  parentButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  parentButton.SetSize( 20, 20 );
+  Stage::GetCurrent().Add( parentButton );
+
+  Button childButton = PushButton::New();
+  childButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  childButton.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
+  childButton.SetSize( 20, 20 );
+  parentButton.Add( childButton );
+
+  // Reset signal flags
+  gIsCalledChildButtonCallback = false;
+  gIsCalledButtonCallback = false;
+
+  parentButton.ClickedSignal().Connect( &ButtonCallback );
+  childButton.ClickedSignal().Connect( &ChildButtonCallback );
+
+  // Peform a button click at coordinates (10,30) which is the child.
+  Dali::Integration::TouchEvent event;
+  event = Dali::Integration::TouchEvent();
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10, 30 ) );
+  event.AddPoint( point );
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::TouchEvent();
+  point.SetState( PointState::UP );
+  point.SetScreenPosition( Vector2( 10, 30 ) );
+  event.AddPoint( point );
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gIsCalledChildButtonCallback, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( ! gIsCalledButtonCallback, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliButtonRelease(void)
+{
+  /**
+   * Down event followed by interrupted event should signal Release.
+   */
+
+  ToolkitTestApplication application;
+
+  Button parentButton = PushButton::New();
+  parentButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  parentButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  parentButton.SetSize( 20, 20 );
+  Stage::GetCurrent().Add( parentButton );
+  parentButton.ReleasedSignal().Connect( &ButtonCallback );
+
+  // Reset signal flags
+  gIsCalledButtonCallback = false;
+
+  // Peform a button down and then button interrupted at coordinates (10,10).
+  Dali::Integration::TouchEvent event;
+  event = Dali::Integration::TouchEvent();
+  Dali::Integration::Point point;
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10, 10 ) );
+  event.AddPoint( point );
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent( event );
+
+  event = Dali::Integration::TouchEvent();
+  point.SetState( PointState::INTERRUPTED );
+  event.AddPoint( point );
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( gIsCalledButtonCallback, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliButtonMultiTouch(void)
+{
+  /**
+   * Down event followed by a multi touch point event should signal Release.
+   */
+
+  ToolkitTestApplication application;
+
+  Button button = PushButton::New();
+  button.SetProperty( Button::Property::TOGGLABLE, true);
+
+  button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  button.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  button.SetSize( 20, 20 );
+  Stage::GetCurrent().Add( button );
+  button.ReleasedSignal().Connect( &ButtonCallback );
+
+  // Reset signal flags
+  gIsCalledButtonCallback = false;
+
+  // Peform a button down and then button interrupted at coordinates (10,10).
+  Dali::Integration::TouchEvent downEvent;
+  downEvent = Dali::Integration::TouchEvent();
+  Dali::Integration::Point point;
+
+  // Add Press button
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 15, 15 ) );
+  downEvent.AddPoint( point );
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent( downEvent );
+
+  // Release button
+  Dali::Integration::TouchEvent upEvent;
+  upEvent = Dali::Integration::TouchEvent();
+  point.SetState( PointState::UP );
+  point.SetScreenPosition( Vector2( 15, 15 ) );
+  upEvent.AddPoint( point );
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent( upEvent );
+
+  tet_infoline("Button should now be selected\n");
+  bool isSelected = button.GetProperty<bool>( Button::Property::SELECTED ) ;
+  DALI_TEST_EQUALS( isSelected, true, TEST_LOCATION );
+
+  // Add first point
+  Dali::Integration::TouchEvent multiEvent;
+  multiEvent = Dali::Integration::TouchEvent();
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 10, 10 ) );
+  multiEvent.AddPoint( point );
+
+  // Add second point
+  point.SetState( PointState::DOWN );
+  point.SetScreenPosition( Vector2( 15, 15 ) );
+  multiEvent.AddPoint( point );
+
+  tet_infoline("Before a multi touch event\n");
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+  application.ProcessEvent( multiEvent );
+
+  DALI_TEST_EQUALS( gIsCalledButtonCallback, true, TEST_LOCATION );
+
   END_TEST;
 }

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace Toolkit
 namespace Internal
 {
 
-class ImageCache : public TextureUploadObserver
+class ImageCache : public TextureManager::LifecycleObserver
 {
 public:
   /**
@@ -67,7 +67,6 @@ public:
    * batch and cache sizes. The cache is as large as the number of urls.
    */
   ImageCache( TextureManager&                 textureManager,
-              UrlList&                        urlList,
               ImageCache::FrameReadyObserver& observer,
               unsigned int                    batchSize );
 
@@ -86,14 +85,20 @@ public:
    */
   virtual TextureSet NextFrame() = 0;
 
+private:
+  /**
+   * Called before the texture manager is destroyed.
+   */
+  virtual void TextureManagerDestroyed() override final;
+
 protected:
   TextureManager&        mTextureManager;
   FrameReadyObserver&    mObserver;
-  std::vector<UrlStore>& mImageUrls;
   unsigned int           mBatchSize;
   unsigned int           mUrlIndex;
   bool                   mWaitingForReadyFrame:1;
   bool                   mRequestingLoad:1;
+  bool                   mTextureManagerAlive:1;
 };
 
 } //namespace Internal

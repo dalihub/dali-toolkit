@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& 
 }
 
 SvgVisual::SvgVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
   mAtlasRect( FULL_TEXTURE_RECT ),
   mImageUrl( ),
   mParsedImage( NULL ),
@@ -150,6 +150,9 @@ void SvgVisual::DoSetOffStage( Actor& actor )
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
   mPlacementActor.Reset();
+
+  // Reset the visual size to zero so that when adding the actor back to stage the SVG rasterization is forced
+  mVisualSize = Vector2::ZERO;
 }
 
 void SvgVisual::GetNaturalSize( Vector2& naturalSize )

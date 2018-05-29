@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
+
 namespace
 {
 const char * const BROKEN_VISUAL_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
@@ -40,8 +41,10 @@ namespace Toolkit
 namespace Internal
 {
 
-VisualFactoryCache::VisualFactoryCache()
-: mSvgRasterizeThread( NULL )
+VisualFactoryCache::VisualFactoryCache( bool preMultiplyOnLoad )
+: mSvgRasterizeThread( NULL ),
+  mBrokenImageUrl(""),
+  mPreMultiplyOnLoad( preMultiplyOnLoad )
 {
 }
 
@@ -106,7 +109,7 @@ ImageAtlasManagerPtr VisualFactoryCache::GetAtlasManager()
   if( !mAtlasManager )
   {
     mAtlasManager = new ImageAtlasManager();
-    mAtlasManager->SetBrokenImage( BROKEN_VISUAL_IMAGE_URL );
+    mAtlasManager->SetBrokenImage( mBrokenImageUrl );
   }
 
   return mAtlasManager;
@@ -211,7 +214,30 @@ Geometry VisualFactoryCache::CreateGridGeometry( Uint16Pair gridSize )
 
 Image VisualFactoryCache::GetBrokenVisualImage()
 {
-  return ResourceImage::New( BROKEN_VISUAL_IMAGE_URL );
+  return ResourceImage::New( mBrokenImageUrl );
+}
+
+void VisualFactoryCache::SetPreMultiplyOnLoad( bool preMultiply )
+{
+  mPreMultiplyOnLoad = preMultiply;
+}
+
+bool VisualFactoryCache::GetPreMultiplyOnLoad()
+{
+  return mPreMultiplyOnLoad;
+}
+
+void VisualFactoryCache::SetBrokenImageUrl(const std::string& brokenImageUrl)
+{
+  mBrokenImageUrl = brokenImageUrl;
+
+  if( !mAtlasManager )
+  {
+    mAtlasManager = new ImageAtlasManager();
+  }
+
+  mAtlasManager->SetBrokenImage( mBrokenImageUrl );
+  mTextureManager.SetBrokenImageUrl( mBrokenImageUrl );
 }
 
 } // namespace Internal

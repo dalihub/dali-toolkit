@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_EDITOR_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class TextEditor;
  * | inputStyleChanged    | @ref InputStyleChangedSignal() | @SINCE_1_2_2       |
  *
  */
-class DALI_IMPORT_API TextEditor : public Control
+class DALI_TOOLKIT_API TextEditor : public Control
 {
 public:
 
@@ -301,9 +301,7 @@ public:
       INPUT_LINE_SPACING,
 
       /**
-       * @brief The default underline parameters.
-       * @details Name "underline", type Property::MAP.
-       * @SINCE_1_2.13
+       * @copydoc Dali::Toolkit::TextLabel::Property::UNDERLINE
        */
       UNDERLINE,
 
@@ -315,9 +313,7 @@ public:
       INPUT_UNDERLINE,
 
       /**
-       * @brief The default shadow parameters.
-       * @details Name "shadow", type Property::MAP.
-       * @SINCE_1_2.13
+       * @copydoc Dali::Toolkit::TextLabel::Property::SHADOW
        */
       SHADOW,
 
@@ -343,9 +339,7 @@ public:
       INPUT_EMBOSS,
 
       /**
-       * @brief The default outline parameters.
-       * @details Name "outline", type Property::MAP.
-       * @SINCE_1_2.13
+       * @copydoc Dali::Toolkit::TextLabel::Property::OUTLINE
        */
       OUTLINE,
 

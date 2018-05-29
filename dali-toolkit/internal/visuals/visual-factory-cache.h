@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_CACHE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ typedef IntrusivePtr<ImageAtlasManager> ImageAtlasManagerPtr;
 /**
  * Caches shaders and geometries. Owned by VisualFactory.
  */
-class VisualFactoryCache : public RefObject
+class VisualFactoryCache
 {
 public:
 
@@ -67,6 +67,7 @@ public:
     IMAGE_SHADER_ATLAS_DEFAULT_WRAP,
     IMAGE_SHADER_ATLAS_CUSTOM_WRAP,
     NINE_PATCH_SHADER,
+    NINE_PATCH_MASK_SHADER,
     SVG_SHADER,
     TEXT_SHADER_MULTI_COLOR_TEXT,
     TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE,
@@ -74,6 +75,18 @@ public:
     TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE,
     TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI,
     TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI,
+    ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_REFLECT,
+    ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_REPEAT,
+    ANIMATED_GRADIENT_SHADER_LINEAR_BOUNDING_CLAMP,
+    ANIMATED_GRADIENT_SHADER_LINEAR_USER_REFLECT,
+    ANIMATED_GRADIENT_SHADER_LINEAR_USER_REPEAT,
+    ANIMATED_GRADIENT_SHADER_LINEAR_USER_CLAMP,
+    ANIMATED_GRADIENT_SHADER_RADIAL_BOUNDING_REFLECT,
+    ANIMATED_GRADIENT_SHADER_RADIAL_BOUNDING_REPEAT,
+    ANIMATED_GRADIENT_SHADER_RADIAL_BOUNDING_CLAMP,
+    ANIMATED_GRADIENT_SHADER_RADIAL_USER_REFLECT,
+    ANIMATED_GRADIENT_SHADER_RADIAL_USER_REPEAT,
+    ANIMATED_GRADIENT_SHADER_RADIAL_USER_CLAMP,
     WIREFRAME_SHADER,
     SHADER_TYPE_MAX = WIREFRAME_SHADER
   };
@@ -95,8 +108,15 @@ public:
 
   /**
    * @brief Constructor
+   *
+   * @param[in] preMultiplyOnLoad True if image visuals should pre-multiply alpha on image load.
    */
-  VisualFactoryCache();
+  VisualFactoryCache( bool preMultiplyOnLoad );
+
+  /**
+   * @brief Destructor
+   */
+  ~VisualFactoryCache();
 
   /**
    * Request geometry of the given type.
@@ -141,7 +161,23 @@ public:
    * @brief Returns an image to be used when a visual has failed to correctly render
    * @return The broken image handle.
    */
-  static Image GetBrokenVisualImage();
+  Image GetBrokenVisualImage();
+
+  /**
+   * @copydoc Toolkit::VisualFactory::SetPreMultiplyOnLoad()
+   */
+  void SetPreMultiplyOnLoad( bool preMultiply );
+
+  /**
+   * @copydoc Toolkit::VisualFactory::GetPreMultiplyOnLoad()
+   */
+  bool GetPreMultiplyOnLoad();
+
+  /**
+   * @brief Set an image to be used when a visual has failed to correctly render
+   * @param[in] brokenImageUrl The broken image url.
+   */
+  void SetBrokenImageUrl(const std::string& brokenImageUrl);
 
 public:
   /**
@@ -178,11 +214,6 @@ private: // for svg rasterization thread
 protected:
 
   /**
-   * A reference counted object may only be deleted by calling Unreference()
-   */
-  virtual ~VisualFactoryCache();
-
-  /**
    * Undefined copy constructor.
    */
   VisualFactoryCache(const VisualFactoryCache&);
@@ -200,6 +231,8 @@ private:
   TextureManager       mTextureManager;
   NPatchLoader         mNPatchLoader;
   SvgRasterizeThread*  mSvgRasterizeThread;
+  std::string          mBrokenImageUrl;
+  bool                 mPreMultiplyOnLoad;
 };
 
 } // namespace Internal

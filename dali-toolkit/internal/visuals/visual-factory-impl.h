@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_IMPL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/public-api/styling/style-manager.h>
+#include <dali-toolkit/devel-api/styling/style-manager-devel.h>
 
 namespace Dali
 {
@@ -35,7 +37,6 @@ namespace Internal
 {
 
 class VisualFactoryCache;
-typedef IntrusivePtr<VisualFactoryCache> VisualFactoryCachePtr;
 
 /**
  * @copydoc Toolkit::VisualFactory
@@ -52,19 +53,37 @@ public:
   VisualFactory( bool debugEnabled );
 
   /**
-   * @copydoc Toolkit::RenderFactory::CreateVisual( const Property::Map& )
+   * @brief StyleChanged callback
+   *
+   * @param[in] styleManager Handle for style manager.
+   * @param[in] type Style change type.
+   */
+  void OnStyleChangedSignal( Toolkit::StyleManager styleManager, StyleChange::Type type );
+
+  /**
+   * @copydoc Toolkit::VisualFactory::CreateVisual( const Property::Map& )
    */
   Toolkit::Visual::Base CreateVisual( const Property::Map& propertyMap );
 
   /**
-   * @copydoc Toolkit::RenderFactory::CreateVisual( const Image& )
+   * @copydoc Toolkit::VisualFactory::CreateVisual( const Image& )
    */
   Toolkit::Visual::Base CreateVisual( const Image& image );
 
   /**
-   * @copydoc Toolkit::RenderFactory::CreateVisual( const std::string&, ImageDimensions )
+   * @copydoc Toolkit::VisualFactory::CreateVisual( const std::string&, ImageDimensions )
    */
   Toolkit::Visual::Base CreateVisual( const std::string& image, ImageDimensions size );
+
+  /**
+   * @copydoc Toolkit::VisualFactory::SetPreMultiplyOnLoad()
+   */
+  void SetPreMultiplyOnLoad( bool preMultiply );
+
+  /**
+   * @copydoc Toolkit::VisualFactory::GetPreMultiplyOnLoad()
+   */
+  bool GetPreMultiplyOnLoad() const;
 
   /**
    * @return the reference to texture manager
@@ -79,21 +98,20 @@ protected:
   virtual ~VisualFactory();
 
 private:
-
   /**
-   * Undefined copy constructor.
+   * Get the factory cache, creating it if necessary.
    */
-  VisualFactory(const VisualFactory&);
+  Internal::VisualFactoryCache& GetFactoryCache();
 
-  /**
-   * Undefined assignment operator.
-   */
-  VisualFactory& operator=(const VisualFactory& rhs);
+  VisualFactory(const VisualFactory&) = delete;
+
+  VisualFactory& operator=(const VisualFactory& rhs) = delete;
 
 private:
-
-  VisualFactoryCachePtr   mFactoryCache;
-  bool                    mDebugEnabled;
+  std::unique_ptr<VisualFactoryCache> mFactoryCache;
+  SlotDelegate< VisualFactory >       mSlotDelegate;
+  bool                                mDebugEnabled:1;
+  bool                                mPreMultiplyOnLoad:1; ///< Local store for this flag
 };
 
 /**

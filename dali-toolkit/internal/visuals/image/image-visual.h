@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 namespace Dali
 {
@@ -177,6 +178,11 @@ public:  // from Visual
    */
   virtual void DoCreateInstancePropertyMap( Property::Map& map ) const;
 
+  /**
+   * @copydoc Visual::Base::OnDoAction
+   */
+  virtual void OnDoAction( const Dali::Property::Index actionName, const Dali::Property::Value& attributes ) override;
+
 protected:
 
   /**
@@ -222,12 +228,12 @@ protected:
   /**
    * @copydoc Visual::Base::DoSetOffStage
    */
-  virtual void DoSetOffStage( Actor& actor );
+  virtual void DoSetOffStage( Actor& actor ) ;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
    */
-  virtual void OnSetTransform();
+  virtual void OnSetTransform() ;
 
   /**
    * @copydoc Visual::Base::IsResourceReady
@@ -250,7 +256,7 @@ public:
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  virtual void UploadCompleted();
+  virtual void UploadCompleted() override;
 
   /**
    * @copydoc TextureUploadObserver::UploadCompleted
@@ -258,7 +264,8 @@ public:
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  virtual void UploadComplete( bool success, int32_t textureId, TextureSet textureSet, bool usingAtlas, const Vector4& atlasRectangle );
+  virtual void UploadComplete( bool success, int32_t textureId, TextureSet textureSet,
+                               bool usingAtlas, const Vector4& atlasRectangle, bool preMultiplied ) override;
 
 private:
 
@@ -280,8 +287,15 @@ private:
    * @param[out] atlasRect if atlasing is used this the texture area of the image in the atlas.
    * @param[out] textures resulting texture set from the image loading.
    * @param[in] orientationCorrection flag determines if orientation correction should be performed
+   * @param[in] forceReload flag determines if the texture should be reloaded from its source or use the cached texture.
    */
-  void LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection );
+  void LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection, TextureManager::ReloadPolicy forceReload );
+
+  /**
+   * @brief Checks if atlasing should be attempted
+   * @return bool returns true if atlasing can be attempted.
+   */
+  bool AttemptAtlasing();
 
   /**
    * @brief Initializes the Dali::Renderer from the image url
@@ -357,8 +371,8 @@ private:
   Dali::SamplingMode::Type mSamplingMode:4;
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
-  DevelImageVisual::LoadPolicy::Type mLoadPolicy;
-  DevelImageVisual::ReleasePolicy::Type mReleasePolicy;
+  Dali::Toolkit::ImageVisual::LoadPolicy::Type mLoadPolicy;
+  Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
   Vector4 mAtlasRect;
   bool mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
   bool mLoading;  ///< True if the texture is still loading.

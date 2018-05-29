@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_PAGE_TURN_LANDSCAPE_VIEW_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class PageTurnLandscapeView;
  * @brief PageTurnLandscapeView provides a page turn view in landscape mode
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API PageTurnLandscapeView : public PageTurnView
+class DALI_TOOLKIT_API PageTurnLandscapeView : public PageTurnView
 {
 public:
   /**

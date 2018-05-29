@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,6 +194,7 @@ ScrollBar::ScrollBar(Toolkit::ScrollBar::Direction direction)
   mIndicatorHideDuration(DEFAULT_INDICATOR_HIDE_DURATION),
   mTransientIndicatorDuration(DEFAULT_INDICATOR_TRANSIENT_DURATION),
   mScrollStart(0.0f),
+  mGestureDisplacement( Vector3::ZERO ),
   mCurrentScrollPosition(0.0f),
   mIndicatorHeightPolicy(Toolkit::ScrollBar::Variable),
   mIndicatorFixedHeight(DEFAULT_INDICATOR_FIXED_HEIGHT),

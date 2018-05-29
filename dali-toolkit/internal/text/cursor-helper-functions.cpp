@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -467,6 +467,13 @@ CharacterIndex GetClosestCursorIndex( VisualModelPtr visualModel,
 void GetCursorPosition( GetCursorPositionParameters& parameters,
                         CursorInfo& cursorInfo )
 {
+  const LineRun* const modelLines = parameters.visualModel->mLines.Begin();
+  if( NULL == modelLines )
+  {
+    // Nothing to do.
+    return;
+  }
+
   // Whether the logical cursor position is at the end of the whole text.
   const bool isLastPosition = parameters.logicalModel->mText.Count() == parameters.logical;
 
@@ -475,8 +482,6 @@ void GetCursorPosition( GetCursorPositionParameters& parameters,
 
   // Whether the cursor is in the last position and the last position is a new paragraph character.
   const bool isLastNewParagraph = parameters.isMultiline && isLastPosition && TextAbstraction::IsNewParagraph( *( parameters.logicalModel->mText.Begin() + characterOfLine ) );
-
-  const LineRun* const modelLines = parameters.visualModel->mLines.Begin();
 
   const LineIndex lineIndex = parameters.visualModel->GetLineOfCharacter( characterOfLine );
   const LineRun& line = *( modelLines + lineIndex );
@@ -664,7 +669,6 @@ void GetCursorPosition( GetCursorPositionParameters& parameters,
 
     // Set the primary cursor's height.
     cursorInfo.primaryCursorHeight = cursorInfo.isSecondaryCursor ? 0.5f * glyphMetrics.fontHeight : glyphMetrics.fontHeight;
-
 
     cursorInfo.glyphOffset = line.ascender - glyphMetrics.ascender;
     // Set the primary cursor's position.

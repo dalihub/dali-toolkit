@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_VIEW_MODEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/internal/text/text-model-interface.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 namespace Dali
 {
@@ -81,6 +82,11 @@ public:
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
   virtual Text::VerticalAlignment::Type GetVerticalAlignment() const;
+
+  /**
+ * @copydoc ModelInterface::GetVerticalLineAlignment()
+ */
+  virtual DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const;
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()
@@ -187,7 +193,17 @@ public:
    */
   virtual float GetOutlineWidth() const;
 
- /**
+  /**
+   * @copydoc ModelInterface::GetBackgroundColor()
+   */
+  virtual const Vector4& GetBackgroundColor() const;
+
+  /**
+   * @copydoc ModelInterface::IsBackgroundEnabled()
+   */
+  virtual bool IsBackgroundEnabled() const;
+
+/**
    * @brief Does the text elide.
    *
    * It stores a copy of the visible glyphs and removes as many glyphs as needed

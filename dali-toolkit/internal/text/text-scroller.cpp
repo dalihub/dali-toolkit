@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,15 +66,12 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
     mediump vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy );\n
     mediump vec2 visualSize = mix( uSize.xy * size, size, offsetSizeMode.zw );\n
     \n
-    mediump float delta = floor ( uDelta ) + 0.5;\n
-    vTexCoord.x = ( delta + uHorizontalAlign * ( uTextureSize.x - visualSize.x - uGap ) + floor( aPosition.x * visualSize.x ) + 0.5 - uGap * 0.5 ) / uTextureSize.x + 0.5;\n
+    vTexCoord.x = ( uDelta + uHorizontalAlign * ( uTextureSize.x - visualSize.x - uGap ) + floor( aPosition.x * visualSize.x ) + 0.5 - uGap * 0.5 ) / uTextureSize.x + 0.5;\n
     vTexCoord.y = ( uVerticalAlign * ( uTextureSize.y - visualSize.y ) + floor( aPosition.y * visualSize.y ) + 0.5 ) / ( uTextureSize.y ) + 0.5;\n
     \n
     mediump vec4 vertexPosition = vec4( floor( ( aPosition + anchorPoint ) * visualSize + ( visualOffset + origin ) * uSize.xy ), 0.0, 1.0 );\n
-    mediump vec4 nonAlignedVertex = uViewMatrix * uModelMatrix * vertexPosition;\n
-    mediump vec4 pixelAlignedVertex = vec4 ( floor( nonAlignedVertex.xyz ), 1.0 );\n
     \n
-    gl_Position = uProjection * pixelAlignedVertex;\n
+    gl_Position = uProjection * uViewMatrix * uModelMatrix * vertexPosition;\n
   }\n
 );
 
@@ -83,13 +80,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform lowp float preMultipliedAlpha;\n
-  \n
-  lowp vec4 visualMixColor()\n
-  {\n
-    return vec4( mixColor * mix( 1.0, opacity, preMultipliedAlpha ), opacity );\n
-  }\n
   \n
   void main()\n
   {\n
@@ -97,9 +88,8 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
       discard;\n
     \n
     mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
-    textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
     \n
-    gl_FragColor = textTexture * uColor * visualMixColor();
+    gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );
   }\n
 );
 
@@ -298,8 +288,20 @@ void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, T
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters wrapGap[%f]\n", wrapGap );
 
-  const float horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[ horizontalAlignment ][ direction ];
+  float horizontalAlign;
+
+  if( textureSize.x > controlSize.x )
+  {
+    // if Text is elided, scroll should start at the begin of text.
+    horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[HorizontalAlignment::BEGIN][ direction ];
+  }
+  else
+  {
+    horizontalAlign = HORIZONTAL_ALIGNMENT_TABLE[ horizontalAlignment ][ direction ];
+  }
+
   const float verticalAlign = VERTICAL_ALIGNMENT_TABLE[ verticalAlignment ];
+
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters horizontalAlign[%f], verticalAlign[%f]\n", horizontalAlign, verticalAlign );
 
   scrollingTextActor.RegisterProperty( "uTextureSize", textureSize );

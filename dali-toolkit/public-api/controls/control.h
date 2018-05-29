@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_CONTROL_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,16 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/custom-actor.h>
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/events/long-press-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/events/pinch-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/images/image.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 
 namespace Dali
 {
@@ -69,7 +72,7 @@ class Control;
  * |------------------------|----------------------------------------------------|
  * | accessibilityActivated | %OnAccessibilityActivated()                        |
  */
-class DALI_IMPORT_API Control : public CustomActor
+class DALI_TOOLKIT_API Control : public CustomActor
 {
 public:
 
@@ -395,6 +398,15 @@ public:
    */
   bool IsResourceReady() const;
 
+  /**
+   * @brief Get the loading state of the visual resource.
+   *
+   * @SINCE_1_3_5
+   * @param[in] index The Property index of the visual
+   * @return Return the loading status (PREPARING, READY and FAILED) of visual resource
+   */
+  Visual::ResourceStatus GetVisualResourceStatus( const Dali::Property::Index index );
+
   // Signals
 
   /**
@@ -450,12 +462,30 @@ public:
    *
    * Most resources are only loaded when the control is placed on stage.
    *
+   * If resources are shared between ImageViews, they are cached.
+   * In this case, the ResourceReady signal may be sent before there is an object to connect to.
+   * To protect against this, IsResourceReady() can be checked first.
+   *
+   * @code
+   *    auto newControl = Control::New();
+   *    newControl.SetResource( resourceUrl );
+   *    if ( newControl.IsResourceReady() )
+   *    {
+   *       // do something
+   *    }
+   *    else
+   *    {
+   *      newControl.ResourceReadySignal.Connect( .... )
+   *    }
+   * @endcode
+   *
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName( Control control );
    * @endcode
    *
    * @SINCE_1_2.60
+   * @return The signal to connect to
    * @note A RelayoutRequest is queued by Control before this signal is emitted
    */
   ResourceReadySignalType& ResourceReadySignal();

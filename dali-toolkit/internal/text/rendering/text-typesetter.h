@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_TYPESETTER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 namespace Dali
 {
@@ -102,13 +103,14 @@ public:
    * - Combines different image buffers to create the pixel data used to generate the final image
    *
    * @param[in] size The renderer size.
+   * @param[in] textDirection The direction of the text.
    * @param[in] behaviour The behaviour of how to render the text (i.e. whether to render the text only or the styles only or both).
    * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment (i.e. always render as if HORIZONTAL_ALIGN_BEGIN).
    * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
    *
    * @return A pixel data with the text rendered.
    */
-  PixelData Render( const Vector2& size, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888 );
+  PixelData Render( const Vector2& size, Toolkit::DevelText::TextDirection::Type textDirection, RenderBehaviour behaviour = RENDER_TEXT_AND_STYLES, bool ignoreHorizontalAlignment = false, Pixel::Format pixelFormat = Pixel::RGBA8888 );
 
 private:
   /**
@@ -137,13 +139,14 @@ private:
    * @param[in] style The style of the text.
    * @param[in] ignoreHorizontalAlignment Whether to ignore the horizontal alignment, not ignored by default.
    * @param[in] pixelFormat The format of the pixel in the image that the text is rendered as (i.e. either Pixel::BGRA8888 or Pixel::L8).
+   * @param[in] horizontalOffset The horizontal offset to be added to the glyph's position.
    * @param[in] verticalOffset The vertical offset to be added to the glyph's position.
    * @param[in] fromGlyphIndex The index of the first glyph within the text to be drawn
    * @param[in] toGlyphIndex The index of the last glyph within the text to be drawn
    *
    * @return An image buffer with the text.
    */
-  Devel::PixelBuffer CreateImageBuffer( const unsigned int bufferWidth, const unsigned int bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int verticalOffset, TextAbstraction::GlyphIndex fromGlyphIndex, TextAbstraction::GlyphIndex toGlyphIndex );
+  Devel::PixelBuffer CreateImageBuffer( const unsigned int bufferWidth, const unsigned int bufferHeight, Typesetter::Style style, bool ignoreHorizontalAlignment, Pixel::Format pixelFormat, int horizontalOffset, int verticalOffset, TextAbstraction::GlyphIndex fromGlyphIndex, TextAbstraction::GlyphIndex toGlyphIndex );
 
   /**
    * @brief Combine the two RGBA image buffers together.

@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_HELPER_FUNCTIONS_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,14 @@ float StringToFloat( const char* const floatStr );
  * @param[out] floatStr The string.
  */
 void FloatToString( float value, std::string& floatStr );
+
+/**
+ * @brief Converts an unsigned int into a string.
+ *
+ * @param[in] value The unsigned int value.
+ * @param[out] uIntStr The string.
+ */
+void UintToString( unsigned int value, std::string& uIntStr );
 
 /**
  * @brief Converts an ARGB color packed in 4 byte unsigned int into a Vector4 color used in Dali.

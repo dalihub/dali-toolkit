@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TOOL_BAR_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class ToolBar;
  * is not forbidden, it adds controls on the left group with a size of 10% of the total tool bar size.
  * Dali::Actor::Remove() method does nothing.
  */
-class DALI_IMPORT_API ToolBar : public Control
+class DALI_TOOLKIT_API ToolBar : public Control
 {
 public:
   static const Toolkit::Alignment::Padding DEFAULT_PADDING; ///< Default padding space between controls. By default all values are set to 0.

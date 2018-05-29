@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_TEXTURE_MANAGER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/rendering/texture-set.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -41,7 +44,7 @@ namespace TextureManager
  * @param[in] texture the Texture to add
  * @return the Url string representing this texture
  */
-DALI_IMPORT_API std::string AddTexture( Texture& texture );
+DALI_TOOLKIT_API std::string AddTexture( Texture& texture );
 
 /**
  * @brief Add a TextureSet to texture manager
@@ -51,7 +54,7 @@ DALI_IMPORT_API std::string AddTexture( Texture& texture );
  * @param[in] textureSet the TextureSet to add
  * @return the Url string representing this texture
  */
-DALI_IMPORT_API std::string AddTexture( TextureSet& textureSet );
+DALI_TOOLKIT_API std::string AddTexture( TextureSet& textureSet );
 
 /**
  * @brief Removes a TextureSet from toolkit
@@ -59,9 +62,9 @@ DALI_IMPORT_API std::string AddTexture( TextureSet& textureSet );
  * @param[in] textureUrl to remove
  * @return the handle to the TextureSet or empty handle in case TextureSet is not found
  */
-DALI_IMPORT_API TextureSet RemoveTexture( const std::string& textureUrl );
+DALI_TOOLKIT_API TextureSet RemoveTexture( const std::string& textureUrl );
 
-}
+} // TextureManager
 
 } // Toolkit
 

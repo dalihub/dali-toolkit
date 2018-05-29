@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_MODEL3D_VIEW_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,12 @@ namespace Internal DALI_INTERNAL
 {
 class Model3dView;
 }
+
+/**
+ * @addtogroup dali_toolkit_controls_model3d_view
+ * @{
+ */
+
 /**
  * @brief Model3dView is a control for displaying 3d geometry.
  *
@@ -39,7 +45,7 @@ class Model3dView;
  *
  * @SINCE_1_1.4
  */
-class DALI_IMPORT_API Model3dView : public Control
+class DALI_TOOLKIT_API Model3dView : public Control
 {
 public:
 
@@ -80,11 +86,15 @@ public:
     };
   };
 
+  /**
+   * @brief Enumeration for the type of illumination.
+   * @SINCE_1_1.4
+   */
   enum IlluminationType
   {
-    DIFFUSE,
-    DIFFUSE_WITH_TEXTURE,
-    DIFFUSE_WITH_NORMAL_MAP
+    DIFFUSE,                 ///< diffuse @SINCE_1_1.4
+    DIFFUSE_WITH_TEXTURE,    ///< diffuse with texture @SINCE_1_1.4
+    DIFFUSE_WITH_NORMAL_MAP  ///< diffuse with normal map @SINCE_1_1.4
   };
 
   /**
@@ -173,6 +183,9 @@ public: // Not intended for application developers
 
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

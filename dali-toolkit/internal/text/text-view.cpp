@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -400,6 +400,24 @@ void View::GetUnderlineRuns( GlyphRun* underlineRuns,
                                            index,
                                            numberOfRuns );
   }
+}
+
+const Vector4& View::GetOutlineColor() const
+{
+  if( mImpl->mVisualModel )
+  {
+    return mImpl->mVisualModel->GetOutlineColor();
+  }
+  return Vector4::ZERO;
+}
+
+unsigned int View::GetOutlineWidth() const
+{
+  if( mImpl->mVisualModel )
+  {
+    return mImpl->mVisualModel->GetOutlineWidth();
+  }
+  return 0u;
 }
 
 } // namespace Text

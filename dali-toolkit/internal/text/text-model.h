@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MODEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,11 @@ public:
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
   virtual VerticalAlignment::Type GetVerticalAlignment() const;
+
+  /**
+   * @copydoc ModelInterface::GetVerticalLineAlignment()
+   */
+  virtual DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const override;
 
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()
@@ -188,6 +193,16 @@ public:
    */
   virtual float GetOutlineWidth() const;
 
+  /**
+   * @copydoc ModelInterface::GetBackgroundColor()
+   */
+  virtual const Vector4& GetBackgroundColor() const;
+
+  /**
+   * @copydoc ModelInterface::IsBackgroundEnabled()
+   */
+  virtual bool IsBackgroundEnabled() const;
+
 private: // Private contructors & copy operator.
 
   /**
@@ -215,13 +230,14 @@ public:
    * 0,0 means that the top-left corner of the layout matches the top-left corner of the UI control.
    * Typically this will have a negative value with scrolling occurs.
    */
-  Vector2                            mScrollPosition;      ///< The text is offset by this position when scrolling.
-  Vector2                            mScrollPositionLast;  ///< The last offset value of mScrollPosition
-  HorizontalAlignment::Type          mHorizontalAlignment; ///< The layout's horizontal alignment.
-  VerticalAlignment::Type            mVerticalAlignment;   ///< The layout's vertical alignment.
-  Text::LineWrap::Mode               mLineWrapMode;        ///< The text wrap mode
-  float                              mAlignmentOffset;     ///< The alignment offset.
-  bool                               mElideEnabled:1;      ///< Whether the text's elide is enabled.
+  Vector2                                   mScrollPosition;        ///< The text is offset by this position when scrolling.
+  Vector2                                   mScrollPositionLast;    ///< The last offset value of mScrollPosition
+  HorizontalAlignment::Type                 mHorizontalAlignment;   ///< The layout's horizontal alignment.
+  VerticalAlignment::Type                   mVerticalAlignment;     ///< The layout's vertical alignment.
+  DevelText::VerticalLineAlignment::Type    mVerticalLineAlignment; ///< The layout's vertical line alignment.
+  Text::LineWrap::Mode                      mLineWrapMode;          ///< The text wrap mode
+  float                                     mAlignmentOffset;       ///< The alignment offset.
+  bool                                      mElideEnabled:1;        ///< Whether the text's elide is enabled.
 };
 
 } // namespace Text

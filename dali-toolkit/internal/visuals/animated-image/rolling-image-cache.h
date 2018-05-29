@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ROLLING_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace Internal
  * Class to manage a rolling cache of images, where the cache size
  * is smaller than the total number of images.
  */
-class RollingImageCache : public ImageCache
+class RollingImageCache : public ImageCache, public TextureUploadObserver
 {
 public:
   /**
@@ -111,7 +111,8 @@ protected:
     int32_t        textureId,
     TextureSet     textureSet,
     bool           useAtlasing,
-    const Vector4& atlasRect );
+    const Vector4& atlasRect,
+    bool           preMultiplied ) override;
 
 private:
   /**
@@ -119,10 +120,11 @@ private:
    */
   struct ImageFrame
   {
-    unsigned int mUrlIndex;
-    bool mReady;
+    unsigned int mUrlIndex = 0u;
+    bool mReady = false;
   };
 
+  std::vector<UrlStore>& mImageUrls;
   CircularQueue<ImageFrame> mQueue;
 };
 

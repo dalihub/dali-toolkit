@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_FIXED_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace Toolkit
 namespace Internal
 {
 
-class FixedImageCache : public ImageCache
+class FixedImageCache : public ImageCache, public TextureUploadObserver
 {
 public:
   /**
@@ -95,9 +95,11 @@ protected:
     int32_t        textureId,
     TextureSet     textureSet,
     bool           useAtlasing,
-    const Vector4& atlasRect );
+    const Vector4& atlasRect,
+    bool           premultiplied) override;
 
-protected:
+private:
+  std::vector<UrlStore>& mImageUrls;
   std::vector<bool> mReadyFlags;
   unsigned int      mFront;
 };

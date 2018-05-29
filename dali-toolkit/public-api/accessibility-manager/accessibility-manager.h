@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_ACCESSIBILITY_MANAGER_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -55,7 +58,7 @@ class AccessibilityManager;
  * | focusedActorActivated | @ref FocusedActorActivatedSignal() |
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API AccessibilityManager : public BaseHandle
+class DALI_TOOLKIT_API AccessibilityManager : public BaseHandle
 {
 public:
 
@@ -722,7 +725,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to focus and read from the
-   * first item on the top continously (by three fingers single tap).
+   * first item on the top continuously (by three fingers single tap).
    *
    * A callback of the following type may be connected:
    * @code
@@ -735,7 +738,7 @@ public:
 
   /**
    * @brief This is emitted when accessibility action is received to move the focus to and
-   * read from the next item continously (by three fingers double tap).
+   * read from the next item continuously (by three fingers double tap).
    *
    * A callback of the following type may be connected:
    * @code

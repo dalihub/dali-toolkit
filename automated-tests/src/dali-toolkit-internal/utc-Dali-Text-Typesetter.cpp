@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/text/rendering/text-typesetter.h>
 #include <dali-toolkit/internal/text/rendering/view-model.h>
 #include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -108,7 +109,7 @@ int UtcDaliTextRenderingControllerRender(void)
   DALI_TEST_CHECK( renderingController );
 
   // Renders the text and creates the final bitmap.
-  PixelData bitmap = renderingController->Render( relayoutSize );
+  PixelData bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
   DALI_TEST_CHECK( bitmap );
 
   DALI_TEST_EQUALS( 120u, bitmap.GetWidth(), TEST_LOCATION );
@@ -120,7 +121,7 @@ int UtcDaliTextRenderingControllerRender(void)
   controller->Relayout( relayoutSize );
 
   // Renders the text and creates the final bitmap.
-  bitmap = renderingController->Render( relayoutSize );
+  bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
   DALI_TEST_CHECK( bitmap );
 
   DALI_TEST_EQUALS( 120u, bitmap.GetWidth(), TEST_LOCATION );
@@ -131,12 +132,66 @@ int UtcDaliTextRenderingControllerRender(void)
   controller->Relayout( relayoutSize );
 
   // Renders the text and creates the final bitmap.
-  bitmap = renderingController->Render( relayoutSize );
+  bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
   DALI_TEST_CHECK( bitmap );
 
   DALI_TEST_EQUALS( 120u, bitmap.GetWidth(), TEST_LOCATION );
   DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
   DALI_TEST_EQUALS( Pixel::RGBA8888, bitmap.GetPixelFormat(), TEST_LOCATION );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextTypesetterVerticalLineAlignment(void)
+{
+  tet_infoline(" UtcDaliTextTypesetter");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  // Configures the text controller similarly to the text-label.
+  ConfigureTextLabel( controller );
+
+  // Sets the text.
+  controller->SetMarkupProcessorEnabled( true );
+  controller->SetText( "<font family='TizenSansRegular'>Hello world</font>" );
+
+  // Creates the text's model and relais-out the text.
+  const Size relayoutSize( 120.f, 60.f );
+  controller->Relayout( relayoutSize );
+
+  // Tests the rendering controller has been created.
+  TypesetterPtr renderingController = Typesetter::New( controller->GetTextModel() );
+  DALI_TEST_CHECK( renderingController );
+
+  {
+    controller->SetVerticalLineAlignment( Dali::Toolkit::DevelText::VerticalLineAlignment::TOP );
+    controller->Relayout( relayoutSize );
+
+    // Renders the text and creates the final bitmap.
+    auto bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
+    DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
+  }
+
+  {
+    controller->SetVerticalLineAlignment( Dali::Toolkit::DevelText::VerticalLineAlignment::MIDDLE );
+    controller->Relayout( relayoutSize );
+
+    // Renders the text and creates the final bitmap.
+    auto bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
+    DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
+  }
+
+  {
+    controller->SetVerticalLineAlignment( Dali::Toolkit::DevelText::VerticalLineAlignment::BOTTOM );
+    controller->Relayout( relayoutSize );
+
+    // Renders the text and creates the final bitmap.
+    auto bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
+    DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
+  }
 
   tet_result(TET_PASS);
   END_TEST;

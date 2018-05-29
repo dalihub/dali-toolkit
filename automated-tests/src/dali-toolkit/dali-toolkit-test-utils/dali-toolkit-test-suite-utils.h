@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEST_SUITE_UTILS_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include <dali-test-suite-utils.h>
 #include "toolkit-test-application.h"
 #include "toolkit-application.h"
-#include "toolkit-imf-manager.h"
+#include "toolkit-input-method-context.h"
 #include "toolkit-clipboard-event-notifier.h"
 
 #endif // __DALI_TOOLKIT_TEST_SUITE_UTILS_H__

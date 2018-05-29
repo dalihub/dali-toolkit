@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -750,15 +750,15 @@ void TableView::OnLayoutNegotiated( float size, Dimension::Type dimension )
 
     // update every column position in ColumnData array
     float cumulatedWidth = 0.0f;
-    for( unsigned int column = 0, columnCount = mCellData.GetColumns(); column < columnCount; ++column )
+    for( auto&& element : mColumnData )
     {
-      if( mColumnData[ column ].sizePolicy == Toolkit::TableView::FILL ||  mColumnData[ column ].sizePolicy == Toolkit::TableView::RELATIVE)
+      if( element.sizePolicy == Toolkit::TableView::FILL || element.sizePolicy == Toolkit::TableView::RELATIVE )
       {
-        mColumnData[ column ].size = mColumnData[ column ].fillRatio * remainingSize;
+        element.size = element.fillRatio * remainingSize;
       }
 
-      cumulatedWidth += mColumnData[ column ].size;
-      mColumnData[column].position = cumulatedWidth;
+      cumulatedWidth += element.size;
+      element.position = cumulatedWidth;
     }
 
     mColumnDirty = false;
@@ -803,6 +803,18 @@ void TableView::OnSizeSet( const Vector3& size )
 void TableView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   // Go through the layout data
+  float totalWidth = 0.0;
+
+  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( Self().GetProperty(Dali::Actor::Property::LAYOUT_DIRECTION).Get<int>() );
+
+  if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
+  {
+    for (auto&& element : mColumnData)
+    {
+      totalWidth += element.size;
+    }
+  }
+
   for( unsigned int row = 0, rowCount = mCellData.GetRows(); row < rowCount; ++row )
   {
     for( unsigned int column = 0, columnCount = mCellData.GetColumns(); column < columnCount; ++column )
@@ -826,8 +838,19 @@ void TableView::OnRelayout( const Vector2& size, RelayoutContainer& container )
         Padding padding;
         actor.GetPadding( padding );
 
-        float left = column > 0 ? mColumnData[column-1].position : 0.f;
-        float right = mColumnData[column+position.columnSpan-1].position;
+        float left = (column > 0) ? mColumnData[column - 1].position : 0.f;
+        float right;
+
+        if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
+        {
+          right = totalWidth - left;
+          left = right - mColumnData[column].size;
+        }
+        else
+        {
+          right = left + mColumnData[column].size;
+        }
+
         float top = row > 0 ? mRowData[row-1].position : 0.f;
         float bottom = mRowData[row+position.rowSpan-1].position;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 //INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/color-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
 
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -74,11 +75,10 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = vec4(mixColor, opacity)*uColor;\n
+    gl_FragColor = vec4(mixColor, 1.0)*uColor;\n
   }\n
 );
 #endif
@@ -92,7 +92,8 @@ ColorVisualPtr ColorVisual::New( VisualFactoryCache& factoryCache, const Propert
 }
 
 ColorVisual::ColorVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache )
+: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+  mRenderIfTransparent( false )
 {
 }
 
@@ -126,13 +127,27 @@ void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
       DALI_LOG_ERROR("ColorVisual: mixColor property has incorrect type\n");
     }
   }
+
+  Property::Value* renderIfTransparentValue = propertyMap.Find( Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT, RENDER_IF_TRANSPARENT_NAME );
+  if( renderIfTransparentValue )
+  {
+    if( ! renderIfTransparentValue->Get( mRenderIfTransparent ) )
+    {
+      DALI_LOG_ERROR( "ColorVisual: renderIfTransparent property has incorrect type: %d\n", renderIfTransparentValue->GetType() );
+    }
+  }
 }
 
 void ColorVisual::DoSetOnStage( Actor& actor )
 {
   InitializeRenderer();
 
-  actor.AddRenderer( mImpl->mRenderer );
+  // Only add the renderer if it's not fully transparent
+  // We cannot avoid creating a renderer as it's used in the base class
+  if( mRenderIfTransparent || mImpl->mMixColor.a > 0.0f )
+  {
+    actor.AddRenderer( mImpl->mRenderer );
+  }
 
   // Color Visual generated and ready to display
   ResourceReady( Toolkit::Visual::ResourceStatus::READY );
@@ -143,6 +158,7 @@ void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Clear();
   map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR );
   map.Insert( Toolkit::ColorVisual::Property::MIX_COLOR, mImpl->mMixColor );
+  map.Insert( Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT, mRenderIfTransparent );
 }
 
 void ColorVisual::DoCreateInstancePropertyMap( Property::Map& map ) const

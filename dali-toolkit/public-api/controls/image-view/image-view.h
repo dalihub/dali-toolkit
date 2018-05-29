@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_IMAGE_VIEW_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,10 +44,36 @@ class ImageView;
  *
  * An instance of ImageView can be created using a URL or an Image instance.
  *
+ * Some resources can be loaded before the ImageView is staged ( already cached ), in these cases if the connection to
+ * ResouceReadySignal is done after the resource is set then signal will be missed.
+ *
+ * To protect against this, IsResourceReady() can be checked before connecting to ResourceReadySignal,
+ * or the signal connection can be done before setting the resource.
+ *
+ * @code
+ *    auto myImageView = ImageView::New( resourceUrl );
+ *    if ( myImageView.IsResourceReady() )
+ *    {
+ *       // do something
+ *    }
+ *    else
+ *    {
+ *      myImageView.ResourceReadySignal.Connect( .... )
+ *    }
+ * @endcode
+ *
+ * OR Connect to signal before setting resource
+ *
+ * @code
+ *    auto myImageView = ImageView::New();
+ *    myImageView.ResourceReadySignal.Connect( .... )
+ *    myImageView.SetProperty( ImageView::Property::IMAGE, resourceUrl );
+ * @endcode
+ *
  * @SINCE_1_0.0
  *
  */
-class DALI_IMPORT_API ImageView : public Control
+class DALI_TOOLKIT_API ImageView : public Control
 {
 public:
 

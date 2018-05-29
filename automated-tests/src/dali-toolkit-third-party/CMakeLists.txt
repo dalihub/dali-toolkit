@@ -18,7 +18,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-environment-variable.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-imf-manager.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-context.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-orientation.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-style-monitor.cpp
@@ -40,7 +40,6 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-render-controller.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-trace-call-stack.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-native-image.cpp
-   facebook-flexbox/layout-test-utils.c
 )
 
 
@@ -49,6 +48,10 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
     dali-adaptor
     dali-toolkit
 )
+
+# Locate GTest
+cmake_minimum_required(VERSION 2.6)
+find_package(GTest REQUIRED)
 
 #ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
 # ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
@@ -65,14 +68,17 @@ ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 
 INCLUDE_DIRECTORIES(
     ../../../
+    ../../../dali-toolkit/third-party
     ${${CAPI_LIB}_INCLUDE_DIRS}
     ../dali-toolkit/dali-toolkit-test-utils
+    ${GTEST_INCLUDE_DIRS}
 )
 
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
     -lpthread --coverage
+    ${GTEST_LIBRARIES}
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

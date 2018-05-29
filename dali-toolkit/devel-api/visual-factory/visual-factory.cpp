@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,6 +107,16 @@ Visual::Base VisualFactory::CreateVisual( const Image& image )
 Visual::Base VisualFactory::CreateVisual( const std::string& url, ImageDimensions size )
 {
   return GetImplementation( *this ).CreateVisual( url, size );
+}
+
+void VisualFactory::SetPreMultiplyOnLoad( bool preMultiply )
+{
+  GetImplementation( *this ).SetPreMultiplyOnLoad( preMultiply );
+}
+
+bool VisualFactory::GetPreMultiplyOnLoad() const
+{
+  return GetImplementation( *this ).GetPreMultiplyOnLoad();
 }
 
 } // namespace Toolkit

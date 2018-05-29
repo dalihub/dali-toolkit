@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@
 #include <dali-toolkit/internal/visuals/transition-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/devel-api/direction-enums.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 namespace Dali
 {
@@ -46,6 +48,8 @@ namespace Visual
 {
 
 class ResourceObserver;
+
+using FittingMode = DevelVisual::FittingMode;
 
 /**
  * Base class for all Control rendering logic. A control may have multiple visuals.
@@ -85,12 +89,20 @@ public:
   /**
    * @copydoc Toolkit::Visual::Base::GetName
    */
-  const std::string& GetName();
+  const std::string& GetName() const;
 
   /**
    * @copydoc Toolkit::Visual::Base::SetSize
    */
   void SetTransformAndSize( const Property::Map& transform, Size controlSize );
+
+  /**
+   * @brief Performs an action on the visual with the given action name and attributes.
+   *
+   * @param[in] actionName The name of the action to perform this API only takes an Index
+   * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
+   */
+  void DoAction( const Dali::Property::Index actionName, const Dali::Property::Value attributes );
 
   /**
    * @copydoc Toolkit::Visual::Base::GetHeightForWidth
@@ -205,6 +217,9 @@ public:
    * If the visual isn't staged (i.e. it doesn't have a renderer),
    * then this will not add an animation.
    *
+   * If the animator is valid and the transition handle is empty - it will
+   * be created.
+   *
    * @param[in] transition The animation to create or attach to
    * @param[in] animator The animation parameters of the property.
    */
@@ -240,14 +255,19 @@ public:
    */
   Toolkit::Visual::ResourceStatus GetResourceStatus() const;
 
-protected:
+  /**
+   * @brief Get the fitting mode for the visual
+   */
+  FittingMode GetFittingMode() const;
+
+ protected:
 
   /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    */
-  Base( VisualFactoryCache& factoryCache );
+  Base( VisualFactoryCache& factoryCache, FittingMode fittingMode );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -292,7 +312,7 @@ protected:
    *
    * @param[in] actor The actor applying this visual.
    */
-  virtual void DoSetOnStage( Actor& actor )=0;
+  virtual void DoSetOnStage( Actor& actor ) = 0;
 
   /**
    * @brief Called by SetOffStage() allowing sub classes to respond to the SetOffStage event
@@ -300,6 +320,14 @@ protected:
    * @param[in] actor The actor applying this visual.
    */
   virtual void DoSetOffStage( Actor& actor );
+
+  /**
+   * @brief Called by DoAction() allowing sub classes to do the given action.
+   *
+   * @param[in] actionId The action to perform
+   * @param[in] attributes The list of attributes for the action. ( optional for this data structure to have content )
+   */
+  virtual void OnDoAction( const Property::Index actionId, const Property::Value& attributes );
 
 protected:
 

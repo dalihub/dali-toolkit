@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,6 +155,12 @@ Animation DummyControlImpl::CreateTransition( const Toolkit::TransitionData& tra
   return DevelControl::CreateTransition( *this, transition );
 }
 
+void DummyControlImpl::DoAction( Dali::Property::Index index, Dali::Property::Index action, const Dali::Property::Value attributes )
+{
+  DummyControl control( *this );
+  DevelControl::DoAction(  control, index, action, attributes);
+}
+
 void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value )
 {
   Toolkit::DummyControl control = Toolkit::DummyControl::DownCast( Dali::BaseHandle( object ) );
@@ -185,6 +191,7 @@ Property::Value DummyControlImpl::GetProperty( BaseObject* object, Dali::Propert
   Dali::Property::Value value;
   return value;
 }
+
 
 Toolkit::DummyControl Impl::DummyControl::New()
 {
@@ -293,6 +300,23 @@ void Impl::DummyControl::SetRelayoutCallback( RelayoutCallbackFunc callback  )
 {
   mRelayoutCallback = callback;
 }
+
+Vector3 Impl::DummyControl::GetNaturalSize()
+{
+  Vector2 currentSize;
+
+  for( auto elem : mRegisteredVisualIndices )
+  {
+    Vector2 naturalSize;
+    Visual::Base visual = GetVisual(elem);
+    visual.GetNaturalSize( naturalSize );
+    currentSize.width = std::max( naturalSize.width, currentSize.width );
+    currentSize.height = std::max( naturalSize.height, currentSize.height );
+  }
+
+  return Vector3( currentSize );
+}
+
 
 
 DummyControl DummyControl::New( bool override )

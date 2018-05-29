@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/integration-api/adaptors/adaptor.h>
 
 namespace Dali
 {
@@ -56,7 +57,8 @@ void LoadingTask::Load()
 
 
 ImageLoadThread::ImageLoadThread( EventThreadCallback* trigger )
-: mTrigger( trigger )
+: mTrigger( trigger ),
+  mLogFactory( Dali::Adaptor::Get().GetLogFactory() )
 {
 }
 
@@ -72,6 +74,8 @@ ImageLoadThread::~ImageLoadThread()
 
 void ImageLoadThread::Run()
 {
+  mLogFactory.InstallLogFunction();
+
   while( LoadingTask* task = NextTaskToProcess() )
   {
     task->Load();

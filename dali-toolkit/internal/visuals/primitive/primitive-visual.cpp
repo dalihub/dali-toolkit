@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,12 +46,13 @@ namespace
 // shapes
 DALI_ENUM_TO_STRING_TABLE_BEGIN( SHAPE_TYPE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, SPHERE )
-DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CONICAL_FRUSTRUM )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CONICAL_FRUSTRUM ) // deprecated
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CONE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CYLINDER )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CUBE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, OCTAHEDRON )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, BEVELLED_CUBE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CONICAL_FRUSTUM )
 DALI_ENUM_TO_STRING_TABLE_END( SHAPE_TYPE )
 
 //Property names
@@ -70,8 +71,8 @@ const char * const LIGHT_POSITION_UNIFORM_NAME( "lightPosition" );
 //Primitive property defaults
 const int     DEFAULT_SLICES =              128; ///< For spheres and conics
 const int     DEFAULT_STACKS =              128; ///< For spheres and conics
-const float   DEFAULT_SCALE_TOP_RADIUS =    1.0; ///< For conical frustrums
-const float   DEFAULT_SCALE_BOTTOM_RADIUS = 1.5; ///< For cones and conical frustrums
+const float   DEFAULT_SCALE_TOP_RADIUS =    1.0; ///< For conical frustums
+const float   DEFAULT_SCALE_BOTTOM_RADIUS = 1.5; ///< For cones and conical frustums
 const float   DEFAULT_SCALE_HEIGHT =        3.0; ///< For all conics
 const float   DEFAULT_SCALE_RADIUS =        1.0; ///< For cylinders
 const float   DEFAULT_BEVEL_PERCENTAGE =    0.0; ///< For bevelled cubes
@@ -90,11 +91,12 @@ const float MAX_SMOOTHNESS =       1.0; ///< Maximum bevel smoothness for bevell
 //Specific shape labels.
 const char * const SPHERE_LABEL( "SPHERE" );
 const char * const CONE_LABEL( "CONE" );
-const char * const CONICAL_FRUSTRUM_LABEL( "CONICAL_FRUSTRUM" );
+const char * const CONICAL_FRUSTRUM_LABEL( "CONICAL_FRUSTRUM" ); // deprecated
 const char * const CYLINDER_LABEL( "CYLINDER" );
 const char * const CUBE_LABEL( "CUBE" );
 const char * const OCTAHEDRON_LABEL( "OCTAHEDRON" );
 const char * const BEVELLED_CUBE_LABEL( "BEVELLED_CUBE" );
+const char * const CONICAL_FRUSTUM_LABEL( "CONICAL_FRUSTUM" );
 
 //Shader properties
 const char * const OBJECT_MATRIX_UNIFORM_NAME( "uObjectMatrix" );
@@ -167,10 +169,9 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying   mediump vec3  vIllumination;\n
   uniform   lowp    vec4  uColor;\n
   uniform   lowp    vec3  mixColor;\n
-  uniform   lowp    float opacity;\n
   void main()\n
   {\n
-      vec4 baseColor = vec4(mixColor, opacity) * uColor;\n
+      vec4 baseColor = vec4(mixColor, 1.0) * uColor;\n
     gl_FragColor = vec4( vIllumination.rgb * baseColor.rgb, baseColor.a );\n
   }\n
 );
@@ -185,7 +186,7 @@ PrimitiveVisualPtr PrimitiveVisual::New( VisualFactoryCache& factoryCache, const
 }
 
 PrimitiveVisual::PrimitiveVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache ),
+: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
   mScaleDimensions( Vector3::ONE ),
   mScaleTopRadius( DEFAULT_SCALE_TOP_RADIUS ),
   mScaleBottomRadius( DEFAULT_SCALE_BOTTOM_RADIUS ),
@@ -515,7 +516,7 @@ void PrimitiveVisual::CreateGeometry()
       CreateConic( vertices, indices, 0, mScaleBottomRadius, mScaleHeight, mSlices );
       break;
     }
-    case Toolkit::PrimitiveVisual::Shape::CONICAL_FRUSTRUM:
+    case Toolkit::PrimitiveVisual::Shape::CONICAL_FRUSTRUM: // deprecated
     {
       CreateConic( vertices, indices, mScaleTopRadius, mScaleBottomRadius, mScaleHeight, mSlices );
       break;
@@ -541,6 +542,11 @@ void PrimitiveVisual::CreateGeometry()
     case Toolkit::PrimitiveVisual::Shape::BEVELLED_CUBE:
     {
       CreateBevelledCube( vertices, indices, mScaleDimensions, mBevelPercentage, mBevelSmoothness );
+      break;
+    }
+    case Toolkit::PrimitiveVisual::Shape::CONICAL_FRUSTUM:
+    {
+      CreateConic( vertices, indices, mScaleTopRadius, mScaleBottomRadius, mScaleHeight, mSlices );
       break;
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -264,18 +264,21 @@ void VisualModel::GetLinesOfGlyphRange( LineRun* lines,
 
 LineIndex VisualModel::GetLineOfCharacter( CharacterIndex characterIndex )
 {
-  // 1) Check first in the cached line.
+  // 1) Check line is empty or not.
+  if( mLines.Empty() )
+  {
+    return 0u;
+  }
 
+  // 2) Check in the cached line.
   const LineRun& lineRun = *( mLines.Begin() + mCachedLineIndex );
-
   if( ( lineRun.characterRun.characterIndex <= characterIndex ) &&
       ( characterIndex < lineRun.characterRun.characterIndex + lineRun.characterRun.numberOfCharacters ) )
   {
     return mCachedLineIndex;
   }
 
-  // 2) Is not in the cached line. Check in the other lines.
-
+  // 3) Is not in the cached line. Check in the other lines.
   LineIndex index = characterIndex < lineRun.characterRun.characterIndex ? 0u : mCachedLineIndex + 1u;
 
   for( Vector<LineRun>::ConstIterator it = mLines.Begin() + index,
@@ -370,9 +373,19 @@ void VisualModel::SetUnderlineHeight( float height )
   mUnderlineHeight = height;
 }
 
-void VisualModel::SetOutlineWidth( float width )
+void VisualModel::SetOutlineWidth( unsigned int width )
 {
   mOutlineWidth = width;
+}
+
+void VisualModel::SetBackgroundColor( const Vector4& color )
+{
+  mBackgroundColor = color;
+}
+
+void VisualModel::SetBackgroundEnabled( bool enabled )
+{
+  mBackgroundEnabled = enabled;
 }
 
 const Vector4& VisualModel::GetTextColor() const
@@ -415,9 +428,19 @@ float VisualModel::GetUnderlineHeight() const
   return mUnderlineHeight;
 }
 
-float VisualModel::GetOutlineWidth() const
+unsigned int VisualModel::GetOutlineWidth() const
 {
   return mOutlineWidth;
+}
+
+const Vector4& VisualModel::GetBackgroundColor() const
+{
+  return mBackgroundColor;
+}
+
+bool VisualModel::IsBackgroundEnabled() const
+{
+  return mBackgroundEnabled;
 }
 
 Length VisualModel::GetNumberOfUnderlineRuns() const
@@ -446,16 +469,18 @@ VisualModel::VisualModel()
   mShadowColor( Color::BLACK ),
   mUnderlineColor( Color::BLACK ),
   mOutlineColor( Color::WHITE ),
+  mBackgroundColor( Color::CYAN ),
   mControlSize(),
   mShadowOffset(),
   mUnderlineHeight( 0.0f ),
-  mOutlineWidth( 0.0f ),
+  mOutlineWidth( 0u ),
   mShadowBlurRadius( 0.0f ),
   mNaturalSize(),
   mLayoutSize(),
   mCachedLineIndex( 0u ),
   mUnderlineEnabled( false ),
-  mUnderlineColorSet( false )
+  mUnderlineColorSet( false ),
+  mBackgroundEnabled( false )
 {
 }
 

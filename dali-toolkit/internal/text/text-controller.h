@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/imf-manager.h>
+#include <dali/devel-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/events/gesture.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/text/text-enumerations.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+#include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali-toolkit/internal/text/decorator/text-decorator.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/hidden-text.h>
@@ -86,7 +88,7 @@ public: // Enumerated types.
   };
 
   /**
-   * @brief Used to distinguish between regular key events and IMF events
+   * @brief Used to distinguish between regular key events and InputMethodContext events
    */
   enum InsertType
   {
@@ -177,8 +179,9 @@ public: // Configure the text controller.
    *
    * @note Selectable or editable controls should call this once after Controller::New().
    * @param[in] decorator Used to create cursor, selection handle decorations etc.
+   * @param[in] inputMethodContext Used to manager ime.
    */
-  void EnableTextInput( DecoratorPtr decorator );
+  void EnableTextInput( DecoratorPtr decorator, InputMethodContext& inputMethodContext );
 
   /**
    * @brief Used to switch between bitmap & vector based glyphs
@@ -390,6 +393,32 @@ public: // Configure the text controller.
    * @return True if the text selection is enabled
    */
   bool IsSelectionEnabled() const;
+
+  /**
+   * @brief Enable or disable the text selection using Shift key.
+   * @param enabled Whether to enable the text selection using Shift key
+   */
+  void SetShiftSelectionEnabled( bool enabled );
+
+  /**
+   * @brief Whether the text selection using Shift key is enabled or not.
+   * @return True if the text selection using Shift key is enabled
+   */
+  bool IsShiftSelectionEnabled() const;
+
+  /**
+   * @brief Enable or disable the grab handles for text selection.
+   *
+   * @param[in] enabled Whether to enable the grab handles
+   */
+  void SetGrabHandleEnabled( bool enabled );
+
+  /**
+   * @brief Returns whether the grab handles are enabled.
+   *
+   * @return True if the grab handles are enabled
+   */
+  bool IsGrabHandleEnabled() const;
 
   /**
    * @brief Sets input type to password
@@ -832,14 +861,42 @@ public: // Default style & Input style
    *
    * @param[in] width The width in pixels of the outline, 0 indicates no outline
    */
-  void SetOutlineWidth( float width );
+  void SetOutlineWidth( unsigned int width );
 
   /**
    * @brief Retrieves the width of an outline
    *
    * @return The width of the outline.
    */
-  float GetOutlineWidth() const;
+  unsigned int GetOutlineWidth() const;
+
+  /**
+   * @brief Set the background color.
+   *
+   * @param[in] color color of background.
+   */
+  void SetBackgroundColor( const Vector4& color );
+
+  /**
+   * @brief Retrieve the background color.
+   *
+   * @return The background color.
+   */
+  const Vector4& GetBackgroundColor() const;
+
+  /**
+   * @brief Set the background enabled flag.
+   *
+   * @param[in] enabled The background enabled flag.
+   */
+  void SetBackgroundEnabled( bool enabled );
+
+  /**
+   * @brief Returns whether to enable text background or not.
+   *
+   * @return Whether text background is enabled.
+   */
+  bool IsBackgroundEnabled() const;
 
   /**
    * @brief Sets the emboss's properties string.
@@ -877,8 +934,10 @@ public: // Default style & Input style
    * @brief Sets the default line spacing.
    *
    * @param[in] lineSpacing The line spacing.
+   *
+   * @return True if lineSpacing has been updated, false otherwise
    */
-  void SetDefaultLineSpacing( float lineSpacing );
+  bool SetDefaultLineSpacing( float lineSpacing );
 
   /**
    * @brief Retrieves the default line spacing.
@@ -1154,6 +1213,24 @@ public: // Queries & retrieves.
    */
   void GetPlaceholderProperty( Property::Map& map );
 
+  /**
+   * @brief Checks text direction.
+   * @return The text direction.
+   */
+  Toolkit::DevelText::TextDirection::Type GetTextDirection();
+
+  /**
+   * @brief Retrieves vertical line alignment
+   * @return The vertical line alignment
+   */
+  Toolkit::DevelText::VerticalLineAlignment::Type GetVerticalLineAlignment() const;
+
+  /**
+   * @brief Sets vertical line alignment
+   * @param[in] alignment The vertical line alignment for the text
+   */
+  void SetVerticalLineAlignment( Toolkit::DevelText::VerticalLineAlignment::Type alignment );
+
 public: // Relayout.
 
   /**
@@ -1202,7 +1279,7 @@ public: // Text-input Event Queuing.
    * @brief Called by editable UI controls when key events are received.
    *
    * @param[in] event The key event.
-   * @param[in] type Used to distinguish between regular key events and IMF events.
+   * @param[in] type Used to distinguish between regular key events and InputMethodContext events.
    */
   bool KeyEvent( const Dali::KeyEvent& event );
 
@@ -1232,13 +1309,13 @@ public: // Text-input Event Queuing.
   void LongPressEvent( Gesture::State state, float x, float y );
 
   /**
-   * @brief Event received from IMF manager
+   * @brief Event received from input method context
    *
-   * @param[in] imfManager The IMF manager.
-   * @param[in] imfEvent The event received.
+   * @param[in] inputMethodContext The input method context.
+   * @param[in] inputMethodContextEvent The event received.
    * @return A data struture indicating if update is needed, cursor position and current text.
    */
-  ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
+  InputMethodContext::CallbackData OnInputMethodContextEvent( InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent );
 
   /**
    * @brief Event from Clipboard notifying an Item has been selected for pasting
@@ -1289,7 +1366,7 @@ private: // Update.
    * @brief Called by editable UI controls when key events are received.
    *
    * @param[in] text The text to insert.
-   * @param[in] type Used to distinguish between regular key events and IMF events.
+   * @param[in] type Used to distinguish between regular key events and InputMethodContext events.
    */
   void InsertText( const std::string& text, InsertType type );
 
@@ -1377,11 +1454,12 @@ private: // Events.
   void SelectEvent( float x, float y, bool selectAll );
 
   /**
-   * @brief Helper to KeyEvent() to handle the backspace case.
+   * @brief Helper to KeyEvent() to handle the backspace or delete key case.
    *
+   * @param[in] keyCode The keycode for the key pressed
    * @return True if a character was deleted.
    */
-  bool BackspaceKeyEvent();
+  bool DeleteEvent( int keyCode );
 
 private: // Helpers.
 
@@ -1448,9 +1526,12 @@ protected: // Destructor.
    */
   virtual ~Controller();
 
+public:
+
+  struct Impl; ///< Made public for testing purposes
+
 private:
 
-  struct Impl;
   Impl* mImpl;
 };
 

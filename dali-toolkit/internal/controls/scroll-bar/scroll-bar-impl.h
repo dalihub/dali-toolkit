@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_SCROLL_BAR_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -316,7 +316,6 @@ private:
 
   Constraint mIndicatorPositionConstraint;
   Constraint mIndicatorSizeConstraint;
-  Constraint mScrollPositionInCurrentAxisConstraint;
 
   bool mIsPanning                 : 1;                               ///< Whether the scroll bar is being panned.
   bool mIndicatorFirstShow        : 1;                               ///< True if the indicator has never been shown

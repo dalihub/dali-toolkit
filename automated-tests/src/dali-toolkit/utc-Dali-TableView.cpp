@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,6 +188,23 @@ int UtcDaliTableViewMetricsFit(void)
   DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
   DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
   DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
+
+  tableView.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION,  Dali::LayoutDirection::RIGHT_TO_LEFT );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(90.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(80.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(90.0f, 10.0f, 0.0f), TEST_LOCATION );
+
+  tableView.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION,  Dali::LayoutDirection::LEFT_TO_RIGHT );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
+
   END_TEST;
 }
 

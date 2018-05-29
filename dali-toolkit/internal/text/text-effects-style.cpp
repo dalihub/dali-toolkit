@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,26 +125,45 @@ bool ParseUnderlineProperties( const Property::Map& underlinePropertiesMap,
     if( ENABLE_KEY == valueGet.first.stringKey )
     {
       /// Enable key.
-      const std::string enableStr = valueGet.second.Get<std::string>();
-      enabled = Text::TokenComparison( TRUE_TOKEN, enableStr.c_str(), enableStr.size() );
+      if( valueGet.second.GetType() == Dali::Property::STRING )
+      {
+        const std::string enableStr = valueGet.second.Get<std::string>();
+        enabled = Text::TokenComparison( TRUE_TOKEN, enableStr.c_str(), enableStr.size() );
+      }
+      else
+      {
+        enabled = valueGet.second.Get<bool>();
+      }
     }
     else if( COLOR_KEY == valueGet.first.stringKey )
     {
       /// Color key.
       colorDefined = true;
 
-      const std::string colorStr = valueGet.second.Get<std::string>();
-
-      Text::ColorStringToVector4( colorStr.c_str(), colorStr.size(), color );
+      if( valueGet.second.GetType() == Dali::Property::STRING )
+      {
+        const std::string colorStr = valueGet.second.Get<std::string>();
+        Text::ColorStringToVector4( colorStr.c_str(), colorStr.size(), color );
+      }
+      else
+      {
+        color = valueGet.second.Get<Vector4>();
+      }
     }
     else if( HEIGHT_KEY == valueGet.first.stringKey )
     {
       /// Height key.
       heightDefined = true;
 
-      const std::string heightStr = valueGet.second.Get<std::string>();
-
-      height = StringToFloat( heightStr.c_str() );
+      if( valueGet.second.GetType() == Dali::Property::STRING )
+      {
+        const std::string heightStr = valueGet.second.Get<std::string>();
+        height = StringToFloat( heightStr.c_str() );
+      }
+      else
+      {
+        height = valueGet.second.Get<float>();
+      }
     }
   }
 
@@ -155,7 +174,7 @@ bool ParseOutlineProperties( const Property::Map& underlinePropertiesMap,
                                bool& colorDefined,
                                Vector4& color,
                                bool& widthDefined,
-                               float& width )
+                               unsigned int& width )
 {
   const unsigned int numberOfItems = underlinePropertiesMap.Count();
 
@@ -174,7 +193,35 @@ bool ParseOutlineProperties( const Property::Map& underlinePropertiesMap,
     {
       /// Width key.
       widthDefined = true;
-      width = valueGet.second.Get<float>();
+      width = static_cast<unsigned int>( valueGet.second.Get<float>() );
+    }
+  }
+
+  return 0u == numberOfItems;
+}
+
+bool ParseBackgroundProperties( const Property::Map& backgroundProperties,
+                                bool& enabled,
+                                bool& colorDefined,
+                                Vector4& color )
+{
+  const unsigned int numberOfItems = backgroundProperties.Count();
+
+  // Parses and applies the style.
+  for( unsigned int index = 0u; index < numberOfItems; ++index )
+  {
+    const KeyValuePair& valueGet = backgroundProperties.GetKeyValue( index );
+
+    if( ENABLE_KEY == valueGet.first.stringKey )
+    {
+      /// Enable key.
+      enabled = valueGet.second.Get<bool>();
+    }
+    else if( COLOR_KEY == valueGet.first.stringKey )
+    {
+      /// Color key.
+      colorDefined = true;
+      color = valueGet.second.Get<Vector4>();
     }
   }
 
@@ -218,7 +265,7 @@ bool SetUnderlineProperties( ControllerPtr controller, const Property::Value& va
                                               heightDefined,
                                               height );
 
-            controller->UnderlineSetByString( !empty);
+            controller->UnderlineSetByString( !empty );
           }
         }
         else
@@ -546,7 +593,7 @@ bool SetOutlineProperties( ControllerPtr controller, const Property::Value& valu
         bool colorDefined = false;
         Vector4 color;
         bool widthDefined = false;
-        float width = 0.f;
+        unsigned int width = 0u;
 
         bool empty = true;
 
@@ -581,7 +628,7 @@ bool SetOutlineProperties( ControllerPtr controller, const Property::Value& valu
             update = true;
           }
 
-          if( widthDefined && ( fabsf( controller->GetOutlineWidth() - width ) > Math::MACHINE_EPSILON_1000 ) )
+          if( widthDefined && ( controller->GetOutlineWidth() != width ) )
           {
             controller->SetOutlineWidth( width );
             update = true;
@@ -590,9 +637,9 @@ bool SetOutlineProperties( ControllerPtr controller, const Property::Value& valu
         else
         {
           // Disable outline
-          if( fabsf( controller->GetOutlineWidth() ) > Math::MACHINE_EPSILON_1000 )
+          if( 0u != controller->GetOutlineWidth() )
           {
-            controller->SetOutlineWidth( 0.0f );
+            controller->SetOutlineWidth( 0u );
             update = true;
           }
         }
@@ -627,17 +674,11 @@ void GetOutlineProperties( ControllerPtr controller, Property::Value& value, Eff
         else
         {
           const Vector4& color = controller->GetOutlineColor();
-          const float width = controller->GetOutlineWidth();
+          const unsigned int width = controller->GetOutlineWidth();
 
           Property::Map map;
-
-          std::string colorStr;
-          Vector4ToColorString( color, colorStr );
-          map.Insert( COLOR_KEY, colorStr );
-
-          std::string widthStr;
-          FloatToString( width, widthStr );
-          map.Insert( WIDTH_KEY, widthStr );
+          map.Insert( COLOR_KEY, color );
+          map.Insert( WIDTH_KEY, static_cast<int>( width ) );
 
           value = map;
 
@@ -652,6 +693,98 @@ void GetOutlineProperties( ControllerPtr controller, Property::Value& value, Eff
     }
   }
 }
+
+bool SetBackgroundProperties( ControllerPtr controller, const Property::Value& value, EffectStyle::Type type )
+{
+  bool update = false;
+
+  if( controller )
+  {
+    switch( type )
+    {
+      case EffectStyle::DEFAULT:
+      {
+        const Property::Map& propertiesMap = value.Get<Property::Map>();
+
+        bool enabled = false;
+        bool colorDefined = false;
+        Vector4 color;
+
+        bool empty = true;
+
+        if ( !propertiesMap.Empty() )
+        {
+           empty = ParseBackgroundProperties( propertiesMap,
+                                              enabled,
+                                              colorDefined,
+                                              color );
+        }
+
+        if( !empty )
+        {
+          if( enabled != controller->IsBackgroundEnabled() )
+          {
+            controller->SetBackgroundEnabled( enabled );
+            update = true;
+          }
+
+          if( colorDefined && ( controller->GetBackgroundColor() != color ) )
+          {
+            controller->SetBackgroundColor( color );
+            update = true;
+          }
+        }
+        else
+        {
+          // Disable background.
+          if( controller->IsBackgroundEnabled() )
+          {
+            controller->SetBackgroundEnabled( false );
+            update = true;
+          }
+        }
+        break;
+      }
+      case EffectStyle::INPUT:
+      {
+        // Text background is not supported while inputting yet
+        break;
+      }
+    } // switch
+  } // if( controller )
+
+  return update;
+}
+
+void GetBackgroundProperties( ControllerPtr controller, Property::Value& value, EffectStyle::Type type )
+{
+  if( controller )
+  {
+    switch( type )
+    {
+      case EffectStyle::DEFAULT:
+      {
+        const bool enabled = controller->IsBackgroundEnabled();
+        const Vector4& color = controller->GetBackgroundColor();
+
+        Property::Map map;
+        map.Insert( ENABLE_KEY, enabled );
+        map.Insert( COLOR_KEY, color );
+
+        value = map;
+
+        break;
+
+      }
+      case EffectStyle::INPUT:
+      {
+        // Text background is not supported while inputting yet
+        break;
+      }
+    }
+  }
+}
+
 
 } // namespace Text
 

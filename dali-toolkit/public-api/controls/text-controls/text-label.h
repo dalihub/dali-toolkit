@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_TEXT_LABEL_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ class TextLabel;
  *
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API TextLabel : public Control
+class DALI_TOOLKIT_API TextLabel : public Control
 {
 public:
 
@@ -254,6 +254,15 @@ public:
       /**
        * @brief The default underline parameters.
        * @details Name "underline", type Property::MAP.
+       *
+       * The underline map contains the following keys:
+       *
+       * | %Property Name       | Type     | Required | Description                                                                                                        |
+       * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
+       * | enable               | BOOLEAN  | No       | True to enable the underline or false to disable (the default value is false)                                      |
+       * | color                | VECTOR4  | No       | The color of the underline (the default value is Color::BLACK)                                                     |
+       * | height               | FLOAT    | No       | The height of the underline (the default value is 0)                                                               |
+       *
        * @SINCE_1_2.13
        */
       UNDERLINE,
@@ -261,6 +270,15 @@ public:
       /**
        * @brief The default shadow parameters.
        * @details Name "shadow", type Property::MAP.
+       *
+       * The shadow map contains the following keys:
+       *
+       * | %Property Name       | Type     | Required | Description                                                                                                        |
+       * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
+       * | color                | VECTOR4  | No       | The color of the shadow (the default value is Color::BLACK)                                                        |
+       * | offset               | VECTOR2  | No       | The offset from the text to draw the shadow in the X and Y axes (the default value is 0 which means no shadow)     |
+       * | blurRadius           | FLOAT    | No       | The radius of blur to be applied to the shadow (the default value is 0 which means no blur)                        |
+       *
        * @SINCE_1_2.13
        */
       SHADOW,
@@ -275,6 +293,14 @@ public:
       /**
        * @brief The default outline parameters.
        * @details Name "outline", type Property::MAP.
+       *
+       * The outline map contains the following keys:
+       *
+       * | %Property Name       | Type     | Required | Description                                                                                                        |
+       * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
+       * | color                | VECTOR4  | No       | The color of the outline (the default value is Color::WHITE)                                                       |
+       * | width                | INTEGER  | No       | The width of the outline (the default value is 0 which means no outline)                                           |
+       *
        * @SINCE_1_2.13
        */
       OUTLINE,
@@ -311,7 +337,7 @@ public:
        */
       AUTO_SCROLL_STOP_MODE,
 
-      /*
+      /**
        * @brief The line count of text.
        * @details name "lineCount", type Property::INTEGER.
        * @SINCE_1_2.60

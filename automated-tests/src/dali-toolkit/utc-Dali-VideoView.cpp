@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,9 +48,10 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   }\n
 );
 
+const char* fragmentShaderPrefix( "#extension GL_OES_EGL_image_external:require\n" );
 const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
+  uniform samplerExternalOES sTexture;\n
   uniform lowp vec4 uColor;\n
   \n
   void main()\n
@@ -347,6 +348,12 @@ int UtcDaliVideoViewCustomShaderForCoverage(void)
   VideoView videoView = VideoView::New();
   DALI_TEST_CHECK( videoView );
 
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+
+  videoView.SetProperty( Toolkit::VideoView::Property::UNDERLAY, false );
+  bool isUnderlay = videoView.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( !isUnderlay );
+
   Stage::GetCurrent().Add( videoView );
   videoView.SetProperty( VideoView::Property::VIDEO, "testvideo" );
 
@@ -409,6 +416,7 @@ int UtcDaliVideoViewMethodsForCoverage2(void)
 int UtcDaliVideoViewPropertyUnderlay(void)
 {
   ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewPropertyUnderlay");
   ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
 
   VideoView view = VideoView::New();
@@ -450,6 +458,138 @@ int UtcDaliVideoViewPropertyUnderlay(void)
   DALI_TEST_CHECK( !isUnderlay );
 
   view.Stop();
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewPropertyPlayPosition(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewPropertyPlayPosition");
+
+  VideoView view = VideoView::New();
+  DALI_TEST_CHECK( view );
+
+  Stage::GetCurrent().Add( view );
+  view.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  int playPos = view.GetProperty( Toolkit::VideoView::Property::PLAY_POSITION ).Get< int >();
+  DALI_TEST_CHECK( playPos == 0 );
+
+  view.SetProperty( Toolkit::VideoView::Property::PLAY_POSITION, 10 );
+  playPos = view.GetProperty( Toolkit::VideoView::Property::PLAY_POSITION ).Get< int >();
+  // Actually setting play position will be async
+  // Actual platform result may be different.
+  DALI_TEST_CHECK( playPos == 10 );
+
+  END_TEST;
+}
+
+// For coverage.
+int UtcDaliVideoViewNew2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewNew2");
+
+  VideoView view = VideoView::New( true );
+  DALI_TEST_CHECK( view );
+
+  Stage::GetCurrent().Add( view );
+  view.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  VideoView view2 = VideoView::New( "", false );
+  DALI_TEST_CHECK( view2 );
+
+  Stage::GetCurrent().Add( view2 );
+  view2.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliVideoViewPropertyDisplayMode(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliVideoViewPropertyDisplayMode");
+
+  VideoView view = VideoView::New();
+  DALI_TEST_CHECK( view );
+
+  Stage::GetCurrent().Add( view );
+  view.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  view.SetProperty( Toolkit::VideoView::Property::DISPLAY_MODE, Toolkit::VideoView::DisplayMode::DST_ROI );
+  int displayMode = view.GetProperty( Toolkit::VideoView::Property::DISPLAY_MODE ).Get< int >();
+  DALI_TEST_CHECK( displayMode == Toolkit::VideoView::DisplayMode::DST_ROI );
+
+  END_TEST;
+}
+
+
+int UtcDaliVideoViewCustomShader(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "VideoView with custom shader" );
+
+  VideoView view = VideoView::New();
+  DALI_TEST_CHECK( view );
+
+  ToolkitApplication::DECODED_IMAGES_SUPPORTED = true;
+
+  view.SetProperty( Toolkit::VideoView::Property::UNDERLAY, false );
+  bool isUnderlay = view.GetProperty( Toolkit::VideoView::Property::UNDERLAY ).Get< bool >();
+  DALI_TEST_CHECK( !isUnderlay );
+
+  Stage::GetCurrent().Add( view );
+  view.SetProperty( VideoView::Property::VIDEO, "testvideo" );
+
+  /* insert custom shader */
+  Property::Map customShader;
+  std::string fragmentShaderString;
+  fragmentShaderString.reserve( strlen( fragmentShaderPrefix ) + strlen( FRAGMENT_SHADER ) );
+  fragmentShaderString.append( fragmentShaderPrefix );
+  fragmentShaderString.append( FRAGMENT_SHADER );
+  customShader.Insert( "vertexShader", VERTEX_SHADER );
+  customShader.Insert( "fragmentShader", fragmentShaderString );
+
+  Property::Map map;
+  map.Insert( "shader", customShader );
+
+  view.SetProperty( VideoView::Property::VIDEO, map );
+
+  /* do render for check custom shader */
+  Stage::GetCurrent().Add( view );
+  view.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  /* get renderer */
+  DALI_TEST_CHECK( view.GetRendererCount() == 1u );
+  Renderer renderer = view.GetRendererAt( 0 );
+  Shader shader = renderer.GetShader();
+  DALI_TEST_CHECK( shader );
+
+  Property::Value value = shader.GetProperty(Shader::Property::PROGRAM);
+  Property::Map* shaderMap = value.GetMap();
+  DALI_TEST_CHECK( shaderMap );
+
+  Property::Value* fragment = shaderMap->Find( "fragment" ); // fragment key name from shader-impl.cpp
+  DALI_TEST_EQUALS( fragmentShaderString, fragment->Get<std::string>(), TEST_LOCATION );
+
+  Property::Value* vertex = shaderMap->Find( "vertex" ); // vertex key name from shader-impl.cpp
+  DALI_TEST_EQUALS( VERTEX_SHADER, vertex->Get<std::string>(), TEST_LOCATION );
 
   END_TEST;
 }

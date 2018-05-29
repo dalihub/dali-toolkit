@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,18 +39,19 @@ namespace
 
 #define FLEX_CONTAINER_TAG "DALI Toolkit::FlexContainer "
 #define FC_LOG(fmt, args...) Debug::LogMessage(Debug::DebugInfo, FLEX_CONTAINER_TAG fmt, ## args)
-//#define FLEX_CONTAINER_DEBUG 1
+// #define FLEX_CONTAINER_DEBUG 1
 
 #if defined(FLEX_CONTAINER_DEBUG)
-void PrintNode( Toolkit::Internal::FlexContainer::FlexItemNodeContainer itemNodes )
+void PrintNodes( Toolkit::Internal::FlexContainer::FlexItemNodeContainer itemNodes )
 {
   // Print the style property and layout of all the children
   for( unsigned int i = 0; i < itemNodes.size(); ++i )
   {
     FC_LOG( "Item %d style: \n", i );
-    print_css_node( itemNodes[i].node, (css_print_options_t)( CSS_PRINT_STYLE | CSS_PRINT_CHILDREN ) );
+    YGNodePrint( itemNodes[i].node, (YGPrintOptions)( YGPrintOptionsStyle | YGPrintOptionsChildren ) );
+    FC_LOG( "\n" );
     FC_LOG( "Item %d layout: \n", i );
-    print_css_node( itemNodes[i].node, (css_print_options_t)( CSS_PRINT_LAYOUT | CSS_PRINT_CHILDREN ) );
+    YGNodePrint( itemNodes[i].node, (YGPrintOptions)( YGPrintOptionsLayout | YGPrintOptionsChildren ) );
     FC_LOG( "\n" );
   }
 }
@@ -156,27 +157,6 @@ const Scripting::StringEnum ALIGN_CONTENT_STRING_TABLE[] =
 };
 const unsigned int ALIGN_CONTENT_STRING_TABLE_COUNT = sizeof( ALIGN_CONTENT_STRING_TABLE ) / sizeof( ALIGN_CONTENT_STRING_TABLE[0] );
 
-/**
- * The function used by the layout algorithm to be get the style properties
- * and layout information of the child at the given index.
- */
-css_node_t* GetChildNodeAtIndex( void *childrenNodes, int i )
-{
-  FlexContainer::FlexItemNodeContainer childrenNodeContainer = *( static_cast<FlexContainer::FlexItemNodeContainer*>( childrenNodes ) );
-  return childrenNodeContainer[i].node;
-}
-
-/**
- * The function used by the layout algorithm to check whether the node is dirty
- * for relayout.
- */
-bool IsNodeDirty( void *itemNodes )
-{
-  // We only calculate the layout when the child is added or removed, or when
-  // style properties are changed. So should always return true here.
-  return true;
-}
-
 } // Unnamed namespace
 
 Toolkit::FlexContainer FlexContainer::New()
@@ -196,22 +176,52 @@ Toolkit::FlexContainer FlexContainer::New()
 
 FlexContainer::~FlexContainer()
 {
-  free_css_node( mRootNode.node );
+  YGNodeFree( mRootNode.node );
 
   for( unsigned int i = 0; i < mChildrenNodes.size(); i++ )
   {
-    free_css_node( mChildrenNodes[i].node );
+    YGNodeFree( mChildrenNodes[i].node );
   }
 
   mChildrenNodes.clear();
 }
 
-void FlexContainer::SetContentDirection( Toolkit::FlexContainer::ContentDirection contentDirection )
+void FlexContainer::SetContentDirection( Toolkit::FlexContainer::ContentDirection contentDirection)
 {
   if( mContentDirection != contentDirection )
   {
-    mContentDirection = contentDirection;
-    mRootNode.node->style.direction = static_cast<css_direction_t>( mContentDirection );
+    Dali::CustomActor ownerActor(GetOwner());
+
+    if( Toolkit::FlexContainer::INHERIT != contentDirection )
+    {
+      mContentDirection = contentDirection;
+
+      ownerActor.SetProperty( Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION, false );
+
+      if( Toolkit::FlexContainer::LTR == contentDirection )
+      {
+        ownerActor.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::LEFT_TO_RIGHT);
+      }
+      else
+      {
+        ownerActor.SetProperty(Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT);
+      }
+    }
+    else
+    {
+      ownerActor.SetProperty( Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION, true );
+
+      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( ownerActor.GetParent().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+
+      if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
+      {
+        mContentDirection = Toolkit::FlexContainer::RTL;
+      }
+      else
+      {
+        mContentDirection = Toolkit::FlexContainer::LTR;
+      }
+    }
 
     RelayoutRequest();
   }
@@ -227,7 +237,7 @@ void FlexContainer::SetFlexDirection( Toolkit::FlexContainer::FlexDirection flex
   if( mFlexDirection != flexDirection )
   {
     mFlexDirection = flexDirection;
-    mRootNode.node->style.flex_direction = static_cast<css_flex_direction_t>( mFlexDirection );
+    YGNodeStyleSetFlexDirection( mRootNode.node, static_cast<YGFlexDirection>( flexDirection ) );
 
     RelayoutRequest();
   }
@@ -243,7 +253,7 @@ void FlexContainer::SetFlexWrap( Toolkit::FlexContainer::WrapType flexWrap )
   if( mFlexWrap != flexWrap )
   {
     mFlexWrap = flexWrap;
-    mRootNode.node->style.flex_wrap = static_cast<css_wrap_type_t>( mFlexWrap );
+    YGNodeStyleSetFlexWrap( mRootNode.node, static_cast<YGWrap>( flexWrap ) );
 
     RelayoutRequest();
   }
@@ -259,7 +269,7 @@ void FlexContainer::SetJustifyContent( Toolkit::FlexContainer::Justification jus
   if( mJustifyContent != justifyContent )
   {
     mJustifyContent = justifyContent;
-    mRootNode.node->style.justify_content = static_cast<css_justify_t>( mJustifyContent );
+    YGNodeStyleSetJustifyContent( mRootNode.node, static_cast<YGJustify>( justifyContent ) );
 
     RelayoutRequest();
   }
@@ -275,7 +285,7 @@ void FlexContainer::SetAlignItems( Toolkit::FlexContainer::Alignment alignItems 
   if( mAlignItems != alignItems )
   {
     mAlignItems = alignItems;
-    mRootNode.node->style.align_items = static_cast<css_align_t>( mAlignItems );
+    YGNodeStyleSetAlignItems( mRootNode.node, static_cast<YGAlign>( alignItems ) );
 
     RelayoutRequest();
   }
@@ -291,7 +301,7 @@ void FlexContainer::SetAlignContent( Toolkit::FlexContainer::Alignment alignCont
   if( mAlignContent != alignContent )
   {
     mAlignContent = alignContent;
-    mRootNode.node->style.align_content = static_cast<css_align_t>( mAlignContent );
+    YGNodeStyleSetAlignContent( mRootNode.node, static_cast<YGAlign>( alignContent ) );
 
     RelayoutRequest();
   }
@@ -469,10 +479,10 @@ void FlexContainer::OnChildAdd( Actor& child )
   // Create a new node for the child.
   FlexItemNode childNode;
   childNode.actor = child;
-  childNode.node = new_css_node();
-  childNode.node->get_child = GetChildNodeAtIndex;
-  childNode.node->is_dirty = IsNodeDirty;
-  mChildrenNodes.push_back(childNode);
+  childNode.node = YGNodeNew();
+
+  mChildrenNodes.push_back( childNode );
+  YGNodeInsertChild( mRootNode.node, childNode.node, mChildrenNodes.size() - 1 );
 
   Control::OnChildAdd( child );
 }
@@ -483,7 +493,9 @@ void FlexContainer::OnChildRemove( Actor& child )
   {
     if( mChildrenNodes[i].actor.GetHandle() == child )
     {
-      free_css_node( mChildrenNodes[i].node );
+      YGNodeRemoveChild( mRootNode.node, mChildrenNodes[i].node );
+      YGNodeFree( mChildrenNodes[i].node );
+
       mChildrenNodes.erase( mChildrenNodes.begin() + i );
 
       // Relayout the container only if instances were found
@@ -514,17 +526,20 @@ void FlexContainer::OnRelayout( const Vector2& size, RelayoutContainer& containe
 
       if( negotiatedWidth > 0 )
       {
-        mChildrenNodes[i].node->style.dimensions[CSS_WIDTH] = negotiatedWidth;
+        YGNodeStyleSetWidth( mChildrenNodes[i].node, negotiatedWidth );
       }
       if( negotiatedHeight > 0 )
       {
-        mChildrenNodes[i].node->style.dimensions[CSS_HEIGHT] = negotiatedHeight;
+        YGNodeStyleSetHeight( mChildrenNodes[i].node, negotiatedHeight );
       }
     }
   }
 
   // Relayout the container
   RelayoutChildren();
+#if defined(FLEX_CONTAINER_DEBUG)
+  PrintNodes( mChildrenNodes );
+#endif
 
   for( unsigned int i = 0; i < mChildrenNodes.size(); i++ )
   {
@@ -544,8 +559,7 @@ void FlexContainer::OnRelayout( const Vector2& size, RelayoutContainer& containe
           child.SetResizePolicy( ResizePolicy::USE_ASSIGNED_SIZE, Dimension::HEIGHT );
         }
       }
-
-      container.Add( child, Vector2(mChildrenNodes[i].node->layout.dimensions[CSS_WIDTH], mChildrenNodes[i].node->layout.dimensions[CSS_HEIGHT] ) );
+      container.Add( child, Vector2(YGNodeLayoutGetWidth(mChildrenNodes[i].node), YGNodeLayoutGetHeight(mChildrenNodes[i].node) ) );
     }
   }
 }
@@ -560,9 +574,8 @@ void FlexContainer::OnSizeSet( const Vector3& size )
   if( mRootNode.node )
   {
     Actor self = Self();
-
-    mRootNode.node->style.dimensions[CSS_WIDTH] = size.x;
-    mRootNode.node->style.dimensions[CSS_HEIGHT] = size.y;
+    YGNodeStyleSetWidth( mRootNode.node, size.x );
+    YGNodeStyleSetHeight( mRootNode.node, size.y );
 
     RelayoutRequest();
   }
@@ -570,37 +583,45 @@ void FlexContainer::OnSizeSet( const Vector3& size )
   Control::OnSizeSet( size );
 }
 
+void FlexContainer::OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type )
+{
+  Toolkit::FlexContainer flexContainer = Toolkit::FlexContainer::DownCast(actor);
+  Toolkit::FlexContainer::ContentDirection direction;
+
+  if( type == Dali::LayoutDirection::RIGHT_TO_LEFT )
+  {
+    direction = Toolkit::FlexContainer::RTL;
+  }
+  else
+  {
+    direction = Toolkit::FlexContainer::LTR;
+  }
+
+  Toolkit::Internal::FlexContainer &flexContainerImpl = GetImpl( flexContainer );
+
+  if( flexContainerImpl.mContentDirection != direction )
+  {
+    Dali::CustomActor ownerActor(flexContainerImpl.GetOwner());
+    flexContainerImpl.mContentDirection = direction;
+
+    flexContainerImpl.RelayoutRequest();
+  }
+}
+
 void FlexContainer::ComputeLayout()
 {
   if( mRootNode.node )
   {
-    mRootNode.node->children_count = mChildrenNodes.size();
-
-    // Intialize the layout.
-    mRootNode.node->layout.position[CSS_LEFT] = 0;
-    mRootNode.node->layout.position[CSS_TOP] = 0;
-    mRootNode.node->layout.position[CSS_BOTTOM] = 0;
-    mRootNode.node->layout.position[CSS_RIGHT] = 0;
-    mRootNode.node->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-    mRootNode.node->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
-
     for( unsigned int i = 0; i < mChildrenNodes.size(); i++ )
     {
-      css_node_t* childNode = mChildrenNodes[i].node;
+      YGNodeRef childNode = mChildrenNodes[i].node;
       Actor childActor = mChildrenNodes[i].actor.GetHandle();
 
-      childNode->layout.position[CSS_LEFT] = 0;
-      childNode->layout.position[CSS_TOP] = 0;
-      childNode->layout.position[CSS_BOTTOM] = 0;
-      childNode->layout.position[CSS_RIGHT] = 0;
-      childNode->layout.dimensions[CSS_WIDTH] = CSS_UNDEFINED;
-      childNode->layout.dimensions[CSS_HEIGHT] = CSS_UNDEFINED;
-
       // Intialize the style of the child.
-      childNode->style.minDimensions[CSS_WIDTH] = childActor.GetMinimumSize().x;
-      childNode->style.minDimensions[CSS_HEIGHT] = childActor.GetMinimumSize().y;
-      childNode->style.maxDimensions[CSS_WIDTH] = childActor.GetMaximumSize().x;
-      childNode->style.maxDimensions[CSS_HEIGHT] = childActor.GetMaximumSize().y;
+      YGNodeStyleSetMinWidth( childNode, childActor.GetMinimumSize().x );
+      YGNodeStyleSetMinHeight( childNode, childActor.GetMinimumSize().y );
+      YGNodeStyleSetMaxWidth( childNode, childActor.GetMaximumSize().x );
+      YGNodeStyleSetMaxHeight( childNode, childActor.GetMaximumSize().y );
 
       // Check child properties on the child for how to layout it.
       // These properties should be dynamically registered to the child which
@@ -608,11 +629,11 @@ void FlexContainer::ComputeLayout()
 
       if( childActor.GetPropertyType( Toolkit::FlexContainer::ChildProperty::FLEX ) != Property::NONE )
       {
-        childNode->style.flex = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::FLEX ).Get<float>();
+        YGNodeStyleSetFlex( childNode, childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::FLEX ).Get<float>() );
       }
 
       Toolkit::FlexContainer::Alignment alignSelf( Toolkit::FlexContainer::ALIGN_AUTO );
-      if( childActor.GetPropertyType( Toolkit::FlexContainer::FlexContainer::ChildProperty::ALIGN_SELF ) != Property::NONE )
+      if( childActor.GetPropertyType( Toolkit::FlexContainer::ChildProperty::ALIGN_SELF ) != Property::NONE )
       {
         Property::Value alignSelfPropertyValue = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::ALIGN_SELF );
         if( alignSelfPropertyValue.GetType() == Property::INTEGER )
@@ -627,21 +648,49 @@ void FlexContainer::ComputeLayout()
                                                                           ALIGN_SELF_STRING_TABLE_COUNT,
                                                                           alignSelf );
         }
+        YGNodeStyleSetAlignSelf( childNode, static_cast<YGAlign>(alignSelf) );
       }
-      childNode->style.align_self = static_cast<css_align_t>(alignSelf);
 
       if( childActor.GetPropertyType( Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN ) != Property::NONE )
       {
         Vector4 flexMargin = childActor.GetProperty( Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN ).Get<Vector4>();
-        childNode->style.margin[CSS_LEFT] = flexMargin.x;
-        childNode->style.margin[CSS_TOP] = flexMargin.y;
-        childNode->style.margin[CSS_RIGHT] = flexMargin.z;
-        childNode->style.margin[CSS_BOTTOM] = flexMargin.w;
+        YGNodeStyleSetMargin( childNode, YGEdgeLeft, flexMargin.x );
+        YGNodeStyleSetMargin( childNode, YGEdgeTop, flexMargin.y );
+        YGNodeStyleSetMargin( childNode, YGEdgeRight, flexMargin.z );
+        YGNodeStyleSetMargin( childNode, YGEdgeBottom, flexMargin.w );
       }
     }
 
     // Calculate the layout
-    layoutNode( mRootNode.node, Self().GetMaximumSize().x, Self().GetMaximumSize().y, mRootNode.node->style.direction );
+    YGDirection nodeLayoutDirection = YGDirectionInherit;
+    switch( mContentDirection )
+    {
+    case Dali::Toolkit::FlexContainer::LTR:
+    {
+      nodeLayoutDirection = YGDirectionLTR;
+      break;
+    }
+
+    case Dali::Toolkit::FlexContainer::RTL:
+    {
+      nodeLayoutDirection = YGDirectionRTL;
+      break;
+    }
+
+    case Dali::Toolkit::FlexContainer::INHERIT:
+    {
+      nodeLayoutDirection = YGDirectionInherit;
+      break;
+    }
+    }
+
+#if defined(FLEX_CONTAINER_DEBUG)
+    YGNodePrint( mRootNode.node, (YGPrintOptions)( YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren ) );
+#endif
+    YGNodeCalculateLayout( mRootNode.node, Self().GetMaximumSize().x, Self().GetMaximumSize().y, nodeLayoutDirection );
+#if defined(FLEX_CONTAINER_DEBUG)
+    YGNodePrint( mRootNode.node, (YGPrintOptions)( YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren ) );
+#endif
   }
 }
 
@@ -655,8 +704,8 @@ void FlexContainer::RelayoutChildren()
     Dali::Actor child = mChildrenNodes[i].actor.GetHandle();
     if( child )
     {
-      child.SetX( mChildrenNodes[i].node->layout.position[CSS_LEFT] );
-      child.SetY( mChildrenNodes[i].node->layout.position[CSS_TOP] );
+      child.SetX( YGNodeLayoutGetLeft( mChildrenNodes[i].node ) );
+      child.SetY( YGNodeLayoutGetTop( mChildrenNodes[i].node ) );
     }
   }
 }
@@ -779,21 +828,18 @@ void FlexContainer::OnInitialize()
 {
   // Initialize the node for the flex container itself
   Dali::Actor self = Self();
+  self.LayoutDirectionChangedSignal().Connect( this, &FlexContainer::OnLayoutDirectionChanged );
+
   mRootNode.actor = self;
-  mRootNode.node = new_css_node();
-  mRootNode.node->context = &mChildrenNodes;
+  mRootNode.node = YGNodeNew();
+  YGNodeSetContext( mRootNode.node, &mChildrenNodes );
 
   // Set default style
-  mRootNode.node->style.direction = static_cast<css_direction_t>( mContentDirection );
-  mRootNode.node->style.flex_direction = static_cast<css_flex_direction_t>( mFlexDirection );
-  mRootNode.node->style.flex_wrap = static_cast<css_wrap_type_t>( mFlexWrap );
-  mRootNode.node->style.justify_content = static_cast<css_justify_t>( mJustifyContent );
-  mRootNode.node->style.align_items = static_cast<css_align_t>( mAlignItems );
-  mRootNode.node->style.align_content = static_cast<css_align_t>( mAlignContent );
-
-  // Set callbacks.
-  mRootNode.node->get_child = GetChildNodeAtIndex;
-  mRootNode.node->is_dirty = IsNodeDirty;
+  YGNodeStyleSetFlexDirection( mRootNode.node, static_cast<YGFlexDirection>( mFlexDirection ) );
+  YGNodeStyleSetFlexWrap( mRootNode.node, static_cast<YGWrap>( mFlexWrap ) );
+  YGNodeStyleSetJustifyContent( mRootNode.node, static_cast<YGJustify>( mJustifyContent ) );
+  YGNodeStyleSetAlignItems( mRootNode.node, static_cast<YGAlign>( mAlignItems ) );
+  YGNodeStyleSetAlignContent( mRootNode.node, static_cast<YGAlign>( mAlignContent ) );
 
   // Make self as keyboard focusable and focus group
   self.SetKeyboardFocusable( true );

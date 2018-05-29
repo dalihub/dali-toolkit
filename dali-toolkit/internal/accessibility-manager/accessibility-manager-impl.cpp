@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,9 @@ bool IsActorFocusableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType 
 
 AccessibilityManager::AccessibilityManager()
 : mCurrentFocusActor(FocusIDPair(0, 0)),
+  mCurrentGesturedActor(),
   mFocusIndicatorActor(),
+  mPreviousPosition( 0.0f, 0.0f ),
   mRecursiveFocusMoveCounter(0),
   mIsWrapped(false),
   mIsFocusWithinGroup(false),

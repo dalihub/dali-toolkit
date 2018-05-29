@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_INTERNAL_FLEX_CONTAINER_H__
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/flex-container/flex-container.h>
-extern "C"
-{
-#include <dali-toolkit/third-party/facebook-flexbox/layout.h>
-}
+#include <dali-toolkit/third-party/yoga/Yoga.h>
 
 namespace Dali
 {
@@ -52,7 +49,7 @@ public:
   struct FlexItemNode
   {
     WeakHandle< Dali::Actor > actor;      ///< Actor handle of the flex item
-    css_node_t* node;                     ///< The style properties and layout information
+    YGNodeRef node;                     ///< The style properties and layout information
   };
 
   typedef std::vector< FlexItemNode > FlexItemNodeContainer;
@@ -204,6 +201,13 @@ private: // From Control
    * @copydoc CustomActorImpl::OnSizeSet( const Vector3& size )
    */
   virtual void OnSizeSet( const Vector3& size );
+
+  /**
+  * @copydoc OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type )
+  * @param[in] actor The actor whose layoutDirection is changed.
+  * @param[in] type  The layoutDirection.
+  */
+  void OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type );
 
 private: // Implementation
 

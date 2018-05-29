@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,10 +79,10 @@ std::size_t NPatchLoader::Load( const std::string& url, const Rect< int >& borde
     data->textureSet = mCache[ cachedIndex ]->textureSet;
 
     NinePatchImage::StretchRanges stretchRangesX;
-    stretchRangesX.PushBack( Uint16Pair( border.left, data->croppedWidth - border.right ) );
+    stretchRangesX.PushBack( Uint16Pair( border.left, ( (data->croppedWidth >= static_cast< unsigned int >( border.right )) ? data->croppedWidth - border.right : 0 ) ) );
 
     NinePatchImage::StretchRanges stretchRangesY;
-    stretchRangesY.PushBack( Uint16Pair( border.top, data->croppedHeight - border.bottom ) );
+    stretchRangesY.PushBack( Uint16Pair( border.top, ( (data->croppedHeight >= static_cast< unsigned int >( border.bottom )) ? data->croppedHeight - border.bottom : 0 ) ) );
 
     data->stretchPixelsX = stretchRangesX;
     data->stretchPixelsY = stretchRangesY;
@@ -137,10 +137,10 @@ std::size_t NPatchLoader::Load( const std::string& url, const Rect< int >& borde
       data->textureSet.SetTexture( 0u, texture );
 
       NinePatchImage::StretchRanges stretchRangesX;
-      stretchRangesX.PushBack( Uint16Pair( border.left, data->croppedWidth - border.right ) );
+      stretchRangesX.PushBack( Uint16Pair( border.left, ( (data->croppedWidth >= static_cast< unsigned int >( border.right )) ? data->croppedWidth - border.right : 0 ) ) );
 
       NinePatchImage::StretchRanges stretchRangesY;
-      stretchRangesY.PushBack( Uint16Pair( border.top, data->croppedHeight - border.bottom ) );
+      stretchRangesY.PushBack( Uint16Pair( border.top, ( (data->croppedHeight >= static_cast< unsigned int >( border.bottom )) ? data->croppedHeight - border.bottom : 0 ) ) );
 
       data->stretchPixelsX = stretchRangesX;
       data->stretchPixelsY = stretchRangesY;

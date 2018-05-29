@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_BASE_DATA_IMPL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-resource-observer.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 namespace Dali
 {
@@ -43,8 +45,9 @@ struct Base::Impl
 {
   /**
    * Constructor
+   * @param [in] fittingMode that the derived class prefers
    */
-  Impl();
+  Impl(FittingMode fittingMode);
 
   /**
    * Destructor
@@ -123,7 +126,7 @@ struct Base::Impl
   Size            mControlSize;
   int             mDepthIndex;
   Property::Index mMixColorIndex;
-  Property::Index mOpacityIndex;
+  FittingMode     mFittingMode;  //< How the contents should fit the view
   int             mFlags;
   Toolkit::Visual::ResourceStatus  mResourceStatus;
 };

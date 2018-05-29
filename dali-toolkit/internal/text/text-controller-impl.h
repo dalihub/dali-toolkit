@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@ struct Event
     int mInt;
     unsigned int mUint;
     float mFloat;
+    bool mBool;
   };
 
   Event( Type eventType )
@@ -96,7 +97,7 @@ struct EventData
     TEXT_PANNING
   };
 
-  EventData( DecoratorPtr decorator );
+  EventData( DecoratorPtr decorator, InputMethodContext& inputMethodContext );
 
   ~EventData();
 
@@ -106,7 +107,7 @@ struct EventData
   }
 
   DecoratorPtr       mDecorator;               ///< Pointer to the decorator.
-  ImfManager         mImfManager;              ///< The Input Method Framework Manager.
+  InputMethodContext mInputMethodContext;      ///< The Input Method Framework Manager.
   FontDefaults*      mPlaceholderFont;         ///< The placeholder default font.
   std::string        mPlaceholderTextActive;   ///< The text to display when the TextField is empty with key-input focus.
   std::string        mPlaceholderTextInactive; ///< The text to display when the TextField is empty and inactive.
@@ -161,6 +162,7 @@ struct EventData
   bool mIsPlaceholderPixelSize          : 1;   ///< True if the placeholder font size is set as pixel size.
   bool mIsPlaceholderElideEnabled       : 1;   ///< True if the placeholder text's elide is enabled.
   bool mPlaceholderEllipsisFlag         : 1;   ///< True if the text controller sets the placeholder ellipsis.
+  bool mShiftSelectionFlag              : 1;   ///< True if the text selection using Shift key is enabled.
 };
 
 struct ModifyEvent
@@ -321,7 +323,8 @@ struct Controller::Impl
     mMarkupProcessorEnabled( false ),
     mClipboardHideEnabled( true ),
     mIsAutoScrollEnabled( false ),
-    mAutoScrollDirectionRTL( false ),
+    mUpdateTextDirection( true ),
+    mIsTextDirectionRTL( false ),
     mUnderlineSetByString( false ),
     mShadowSetByString( false ),
     mOutlineSetByString( false ),
@@ -452,14 +455,14 @@ struct Controller::Impl
     }
   }
 
-  void ResetImfManager()
+  void ResetInputMethodContext()
   {
     if( mEventData )
     {
       // Reset incase we are in a pre-edit state.
-      if( mEventData->mImfManager )
+      if( mEventData->mInputMethodContext )
       {
-        mEventData->mImfManager.Reset(); // Will trigger a message ( commit, get surrounding )
+        mEventData->mInputMethodContext.Reset(); // Will trigger a message ( commit, get surrounding )
       }
 
       ClearPreEditFlag();
@@ -467,14 +470,14 @@ struct Controller::Impl
   }
 
   /**
-   * @brief Helper to notify IMF manager with surrounding text & cursor changes.
+   * @brief Helper to notify InputMethodContext with surrounding text & cursor changes.
    */
-  void NotifyImfManager();
+  void NotifyInputMethodContext();
 
   /**
-   * @brief Helper to notify IMF manager with multi line status.
+   * @brief Helper to notify InputMethodContext with multi line status.
    */
-  void NotifyImfMultiLineStatus();
+  void NotifyInputMethodContextMultiLineStatus();
 
   /**
    * @brief Retrieve the current cursor position.
@@ -709,6 +712,18 @@ struct Controller::Impl
    */
   void ScrollTextToMatchCursor( const CursorInfo& cursorInfo );
 
+public:
+
+  /**
+   * @brief Gets implementation from the controller handle.
+   * @param controller The text controller
+   * @return The implementation of the Controller
+   */
+  static Impl& GetImplementation( Text::Controller& controller )
+  {
+    return *controller.mImpl;
+  }
+
 private:
   // Declared private and left undefined to avoid copies.
   Impl( const Impl& );
@@ -742,7 +757,8 @@ public:
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
   bool mClipboardHideEnabled:1;            ///< Whether the ClipboardHide function work or not
   bool mIsAutoScrollEnabled:1;             ///< Whether auto text scrolling is enabled.
-  CharacterDirection mAutoScrollDirectionRTL:1;  ///< Direction of auto scrolling, true if rtl
+  bool mUpdateTextDirection:1;             ///< Whether the text direction needs to be updated.
+  CharacterDirection mIsTextDirectionRTL:1;  ///< Whether the text direction is right to left or not
 
   bool mUnderlineSetByString:1;            ///< Set when underline is set by string (legacy) instead of map
   bool mShadowSetByString:1;               ///< Set when shadow is set by string (legacy) instead of map

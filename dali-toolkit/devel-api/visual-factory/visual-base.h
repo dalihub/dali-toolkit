@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_VISUAL_BASE_H
 #define DALI_TOOLKIT_VISUAL_BASE_H
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/actors/actor.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
+
 namespace Dali
 {
 
@@ -37,13 +40,6 @@ class Base;
 
 namespace Visual
 {
-
-enum class ResourceStatus
-{
-  PREPARING,
-  READY,
-  FAILED
-};
 
 /**
  * @brief A Visual provides a renderer for drawing a control component. A control may have multiple visuals.
@@ -84,7 +80,7 @@ enum class ResourceStatus
  * Absolute means that the component describes world units (equivalent to pixels)
  *
  */
-class DALI_IMPORT_API Base : public BaseHandle
+class DALI_TOOLKIT_API Base : public BaseHandle
 {
 public:
 
@@ -129,7 +125,7 @@ public:
    * Used by the styling system to animate properties
    * @return The name of the visual
    */
-  const std::string& GetName();
+  const std::string& GetName() const;
 
   /**
    * @brief Sets the transform and the control size

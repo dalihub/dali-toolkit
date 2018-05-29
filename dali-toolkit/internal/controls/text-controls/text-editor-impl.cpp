@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@
 #include <dali-toolkit/internal/text/text-font-style.h>
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
+#include <dali-toolkit/devel-api/controls/control-devel.h>
 
 using namespace Dali::Toolkit::Text;
 
@@ -135,6 +136,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholder",                 
 DALI_PROPERTY_REGISTRATION( Toolkit, TextEditor, "lineWrapMode",                         INTEGER,   LINE_WRAP_MODE                       )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderText",                STRING,    PLACEHOLDER_TEXT                     )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "placeholderTextColor",           VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableShiftSelection",           BOOLEAN,   ENABLE_SHIFT_SELECTION               )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextEditor, "enableGrabHandle",               BOOLEAN,   ENABLE_GRAB_HANDLE                   )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextEditor, "inputStyleChanged",  SIGNAL_INPUT_STYLE_CHANGED )
@@ -510,8 +513,14 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
       {
         if( impl.mController )
         {
+
+          // The line spacing isn't supported by the TextEditor. Since it's supported
+          // by the TextLabel for now it must be ignored. The property is being shadowed
+          // locally so its value isn't affected.
           const float lineSpacing = value.Get<float>();
-          impl.mController->SetDefaultLineSpacing( lineSpacing );
+          impl.mLineSpacing = lineSpacing;
+          // set it to 0.0 due to missing implementation
+          impl.mController->SetDefaultLineSpacing( 0.0f );
           impl.mRenderer.Reset();
         }
         break;
@@ -708,9 +717,31 @@ void TextEditor::SetProperty( BaseObject* object, Property::Index index, const P
           Text::LineWrap::Mode lineWrapMode( static_cast< Text::LineWrap::Mode >( -1 ) ); // Set to invalid value to ensure a valid mode does get set
           if( GetLineWrapModeEnumeration( value, lineWrapMode ) )
           {
-            DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel %p LineWrap::MODE %d\n", impl.mController.Get(), lineWrapMode );
+            DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p LineWrap::MODE %d\n", impl.mController.Get(), lineWrapMode );
             impl.mController->SetLineWrapMode( lineWrapMode );
           }
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ENABLE_SHIFT_SELECTION:
+      {
+        if( impl.mController )
+        {
+          const bool shiftSelection = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_SHIFT_SELECTION %d\n", impl.mController.Get(), shiftSelection );
+
+          impl.mController->SetShiftSelectionEnabled( shiftSelection );
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ENABLE_GRAB_HANDLE:
+      {
+        if( impl.mController )
+        {
+          const bool grabHandleEnabled = value.Get<bool>();
+          DALI_LOG_INFO( gLogFilter, Debug::General, "TextEditor %p ENABLE_GRAB_HANDLE %d\n", impl.mController.Get(), grabHandleEnabled );
+
+          impl.mController->SetGrabHandleEnabled( grabHandleEnabled );
         }
         break;
       }
@@ -961,7 +992,9 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
       {
         if( impl.mController )
         {
-          value = impl.mController->GetDefaultLineSpacing();
+          // LINE_SPACING isn't implemented for the TextEditor. Returning
+          // only shadowed value, not the real one.
+          value = impl.mLineSpacing;
         }
         break;
       }
@@ -1094,11 +1127,33 @@ Property::Value TextEditor::GetProperty( BaseObject* object, Property::Index ind
         {
           value = impl.mController->GetLineWrapMode();
         }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ENABLE_SHIFT_SELECTION:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsShiftSelectionEnabled();
+        }
+        break;
+      }
+      case Toolkit::DevelTextEditor::Property::ENABLE_GRAB_HANDLE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsGrabHandleEnabled();
+        }
+        break;
       }
     } //switch
   }
 
   return value;
+}
+
+InputMethodContext TextEditor::GetInputMethodContext()
+{
+  return mInputMethodContext;
 }
 
 bool TextEditor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -1149,10 +1204,12 @@ void TextEditor::OnInitialize()
   mDecorator = Text::Decorator::New( *mController,
                                      *mController );
 
+  mInputMethodContext = InputMethodContext::New();
+
   mController->GetLayoutEngine().SetLayout( Layout::Engine::MULTI_LINE_BOX );
 
   // Enables the text input.
-  mController->EnableTextInput( mDecorator );
+  mController->EnableTextInput( mDecorator, mInputMethodContext );
 
   // Enables the vertical scrolling after the text input has been enabled.
   mController->SetVerticalScrollEnabled( true );
@@ -1172,8 +1229,6 @@ void TextEditor::OnInitialize()
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
-
-  mImfManager = ImfManager::Get();
 
   self.TouchSignal().Connect( this, &TextEditor::OnTouched );
 
@@ -1197,6 +1252,8 @@ void TextEditor::OnInitialize()
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
   self.OnStageSignal().Connect( this, &TextEditor::OnStageConnect );
+
+  DevelControl::SetInputMethodContext( *this, mInputMethodContext );
 
   // Creates an extra control to be used as stencil buffer.
   mStencil = Control::New();
@@ -1385,23 +1442,24 @@ void TextEditor::RenderText( Text::Controller::UpdateTextType updateTextType )
 void TextEditor::OnKeyInputFocusGained()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnKeyInputFocusGained %p\n", mController.Get() );
+  if ( mInputMethodContext )
+  {
+    mInputMethodContext.StatusChangedSignal().Connect( this, &TextEditor::KeyboardStatusChanged );
 
-  mImfManager.StatusChangedSignal().Connect( this, &TextEditor::KeyboardStatusChanged );
+    mInputMethodContext.EventReceivedSignal().Connect( this, &TextEditor::OnInputMethodContextEvent );
 
-  mImfManager.EventReceivedSignal().Connect( this, &TextEditor::OnImfEvent );
+    // Notify that the text editing start.
+    mInputMethodContext.Activate();
 
-  // Notify that the text editing start.
-  mImfManager.Activate();
+    // When window gain lost focus, the InputMethodContext is deactivated. Thus when window gain focus again, the InputMethodContext must be activated.
+    mInputMethodContext.SetRestoreAfterFocusLost( true );
+  }
+  ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
 
-  // When window gain lost focus, the imf manager is deactivated. Thus when window gain focus again, the imf manager must be activated.
-  mImfManager.SetRestoreAfterFocusLost( true );
-
-   ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
-
-   if ( notifier )
-   {
-      notifier.ContentSelectedSignal().Connect( this, &TextEditor::OnClipboardTextSelected );
-   }
+  if ( notifier )
+  {
+    notifier.ContentSelectedSignal().Connect( this, &TextEditor::OnClipboardTextSelected );
+  }
 
   mController->KeyboardFocusGainEvent(); // Called in the case of no virtual keyboard to trigger this event
 
@@ -1411,17 +1469,18 @@ void TextEditor::OnKeyInputFocusGained()
 void TextEditor::OnKeyInputFocusLost()
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor:OnKeyInputFocusLost %p\n", mController.Get() );
+  if ( mInputMethodContext )
+  {
+    mInputMethodContext.StatusChangedSignal().Disconnect( this, &TextEditor::KeyboardStatusChanged );
 
-  mImfManager.StatusChangedSignal().Disconnect( this, &TextEditor::KeyboardStatusChanged );
+    // The text editing is finished. Therefore the InputMethodContext don't have restore activation.
+    mInputMethodContext.SetRestoreAfterFocusLost( false );
 
-  // The text editing is finished. Therefore the imf manager don't have restore activation.
-  mImfManager.SetRestoreAfterFocusLost( false );
+    // Notify that the text editing finish.
+    mInputMethodContext.Deactivate();
 
-  // Notify that the text editing finish.
-  mImfManager.Deactivate();
-
-  mImfManager.EventReceivedSignal().Disconnect( this, &TextEditor::OnImfEvent );
-
+    mInputMethodContext.EventReceivedSignal().Disconnect( this, &TextEditor::OnInputMethodContextEvent );
+  }
   ClipboardEventNotifier notifier( ClipboardEventNotifier::Get() );
 
   if ( notifier )
@@ -1437,9 +1496,10 @@ void TextEditor::OnKeyInputFocusLost()
 void TextEditor::OnTap( const TapGesture& gesture )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnTap %p\n", mController.Get() );
-
-  mImfManager.Activate();
-
+  if ( mInputMethodContext )
+  {
+    mInputMethodContext.Activate();
+  }
   // Deliver the tap before the focus event to controller; this allows us to detect when focus is gained due to tap-gestures
   Extents padding;
   padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
@@ -1455,8 +1515,10 @@ void TextEditor::OnPan( const PanGesture& gesture )
 
 void TextEditor::OnLongPress( const LongPressGesture& gesture )
 {
-  mImfManager.Activate();
-
+  if ( mInputMethodContext )
+  {
+    mInputMethodContext.Activate();
+  }
   Extents padding;
   padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
   mController->LongPressEvent( gesture.state, gesture.localPoint.x - padding.start, gesture.localPoint.y - padding.top );
@@ -1678,10 +1740,10 @@ void TextEditor::OnStageConnect( Dali::Actor actor )
   }
 }
 
-ImfManager::ImfCallbackData TextEditor::OnImfEvent( Dali::ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent )
+InputMethodContext::CallbackData TextEditor::OnInputMethodContextEvent( Dali::InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnImfEvent %p eventName %d\n", mController.Get(), imfEvent.eventName );
-  return mController->OnImfEvent( imfManager, imfEvent );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextEditor::OnInputMethodContextEvent %p eventName %d\n", mController.Get(), inputMethodContextEvent.eventName );
+  return mController->OnInputMethodContextEvent( inputMethodContext, inputMethodContextEvent );
 }
 
 void TextEditor::GetHandleImagePropertyValue(  Property::Value& value, Text::HandleType handleType, Text::HandleImageType handleImageType )
@@ -1778,6 +1840,7 @@ TextEditor::TextEditor()
   mIdleCallback( NULL ),
   mAlignmentOffset( 0.f ),
   mScrollAnimationDuration( 0.f ),
+  mLineSpacing( 0.f ),
   mRenderingBackend( DEFAULT_RENDERING_BACKEND ),
   mHasBeenStaged( false ),
   mScrollAnimationEnabled( false ),

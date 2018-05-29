@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_FIELD_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+#include <dali/devel-api/adaptor-framework/input-method-context.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -38,7 +39,6 @@ namespace Toolkit
 
 namespace Internal
 {
-
 /**
  * @brief A control which renders a short text string.
  */
@@ -70,6 +70,11 @@ public:
    * @return The current value of the property.
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
+
+  /**
+   * @copydoc Dali::Toollkit::TextField::GetInputMethodContext()
+   */
+  InputMethodContext GetInputMethodContext();
 
   /**
    * Connects a callback function with the object's signals.
@@ -191,9 +196,9 @@ private: // From Control
 private: // Implementation
 
   /**
-   * @copydoc Dali::Toolkit::Text::Controller::(ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent)
+   * @copydoc Dali::Toolkit::Text::Controller::(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
    */
-  ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
+  InputMethodContext::CallbackData OnInputMethodContextEvent( InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent );
 
   /**
    * @brief Callback when Clipboard signals an item should be pasted
@@ -265,7 +270,7 @@ private: // Data
   Toolkit::TextField::MaxLengthReachedSignalType mMaxLengthReachedSignal;
   Toolkit::TextField::InputStyleChangedSignalType mInputStyleChangedSignal;
 
-  ImfManager         mImfManager;
+  InputMethodContext mInputMethodContext;
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;

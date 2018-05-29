@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXTURE_UPLOAD_OBSERVER_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
@@ -61,8 +61,10 @@ public:
    * @param[in] textureSet  The TextureSet containing the Texture
    * @param[in] useAtlasing True if atlasing was used (note: this may be different to what was requested)
    * @param[in] atlasRect   If using atlasing, this is the rectangle within the atlas to use.
+   * @param[in] preMultiplied True if the image had pre-multiplied alpha applied
    */
-  virtual void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect ) = 0;
+  virtual void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing,
+                               const Vector4& atlasRect, bool preMultiplied ) = 0;
 
   /**
    * @brief Returns the destruction signal.

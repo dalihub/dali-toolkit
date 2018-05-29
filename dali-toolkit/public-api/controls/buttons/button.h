@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_BUTTON_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ class Button;
  * | buttonClick      | Doesn't have attributes | Simulates a button click. See @ref DoAction() |
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API Button : public Control
+class DALI_TOOLKIT_API Button : public Control
 {
 public:
 

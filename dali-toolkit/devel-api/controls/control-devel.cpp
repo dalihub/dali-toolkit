@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,18 +83,58 @@ bool IsVisualEnabled( const Internal::Control& control, Dali::Property::Index in
   return controlDataImpl.IsVisualEnabled( index );
 }
 
-Toolkit::Visual::ResourceStatus GetVisualResourceStatus( const Internal::Control& control, Dali::Property::Index index )
-{
-  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
-  return controlDataImpl.GetVisualResourceStatus( index );
-}
-
 Dali::Animation CreateTransition( Internal::Control& control, const Toolkit::TransitionData& handle )
 {
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
   return controlDataImpl.CreateTransition( handle );
 }
 
+
+void AddTransitions( Internal::Control& control,
+                     Dali::Animation animation,
+                     const Toolkit::TransitionData& transitionData )
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.AddTransitions( animation, transitionData );
+}
+
+void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes )
+{
+  Internal::Control& controlInternal = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlInternal );
+  controlDataImpl.DoAction( visualIndex, actionId, attributes );
+}
+
+void SetInputMethodContext( Internal::Control& control, InputMethodContext& inputMethodContext )
+{
+  Internal::Control::Impl::Get( control ).SetInputMethodContext( inputMethodContext );
+}
+
+Toolkit::LayoutItem GetLayout( Control control )
+{
+  const Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
+  return Toolkit::LayoutItem( controlDataImpl.GetLayout().Get() );
+}
+
+Toolkit::LayoutItem GetLayout( Internal::Control& control )
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  return Toolkit::LayoutItem( controlDataImpl.GetLayout().Get() );
+}
+
+void SetLayout( Internal::Control& control, Toolkit::LayoutItem layout )
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  controlDataImpl.SetLayout( GetImplementation( layout ) );
+}
+
+void SetLayout( Control control, Toolkit::LayoutItem layout )
+{
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
+  controlDataImpl.SetLayout( GetImplementation( layout ) );
+}
 
 } // namespace DevelControl
 

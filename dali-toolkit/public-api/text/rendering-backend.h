@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_RENDERING_BACKEND_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,10 @@ namespace Toolkit
 namespace Text
 {
 
-// The type of text renderer required
+/**
+ * @brief Enumeration for the type of text renderer required.
+ * @SINCE_1_0.0
+ */
 enum RenderingType
 {
   RENDERING_SHARED_ATLAS, ///< A bitmap-based solution where renderers can share a texture atlas @SINCE_1_0.0

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,8 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 
+#include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+
 using namespace Dali::Toolkit::Text;
 
 namespace Dali
@@ -58,6 +60,19 @@ namespace Internal
 namespace
 {
   const unsigned int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
+
+  /**
+   * @brief How the text visual should be aligned vertically inside the control.
+   *
+   * 0.0f aligns the text to the top, 0.5f aligns the text to the center, 1.0f aligns the text to the bottom.
+   * The alignment depends on the alignment value of the text label (Use Text::VerticalAlignment enumerations).
+   */
+  const float VERTICAL_ALIGNMENT_TABLE[ Text::VerticalAlignment::BOTTOM + 1 ] =
+  {
+    0.0f,  // VerticalAlignment::TOP
+    0.5f,  // VerticalAlignment::CENTER
+    1.0f   // VerticalAlignment::BOTTOM
+  };
 }
 
 namespace
@@ -113,6 +128,9 @@ DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "autoScrollLoopDelay",
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "autoScrollStopMode",        STRING,  AUTO_SCROLL_STOP_MODE      )
 DALI_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "lineCount",                 INTEGER, LINE_COUNT                 )
 DALI_PROPERTY_REGISTRATION( Toolkit,           TextLabel, "lineWrapMode",              INTEGER, LINE_WRAP_MODE             )
+DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "textDirection",       INTEGER, TEXT_DIRECTION             )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "verticalLineAlignment",     INTEGER, VERTICAL_LINE_ALIGNMENT    )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textBackground",            MAP,     BACKGROUND                 )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -407,8 +425,12 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         if( impl.mController )
         {
           const float lineSpacing = value.Get<float>();
-          impl.mController->SetDefaultLineSpacing( lineSpacing );
-          impl.mTextUpdateNeeded = true;
+
+          // Don't trigger anything if the line spacing didn't change
+          if( impl.mController->SetDefaultLineSpacing( lineSpacing ) )
+          {
+            impl.mTextUpdateNeeded = true;
+          }
         }
         break;
       }
@@ -486,8 +508,46 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT:
+      {
+        if( impl.mController && impl.mController->GetTextModel() )
+        {
+          DevelText::VerticalLineAlignment::Type alignment = static_cast<DevelText::VerticalLineAlignment::Type>( value.Get<int>() );
+
+          impl.mController->SetVerticalLineAlignment( alignment );
+
+          // Property doesn't affect the layout, only Visual must be updated
+          TextVisual::EnableRendererUpdate( impl.mVisual );
+
+          // No need to trigger full re-layout. Instead call UpdateRenderer() directly
+          TextVisual::UpdateRenderer( impl.mVisual );
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::BACKGROUND:
+      {
+        const bool update = SetBackgroundProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mTextUpdateNeeded = true;
+        }
+        break;
+      }
+    }
+
+    // Request relayout when text update is needed. It's necessary to call it
+    // as changing the property not via UI interaction brings no effect if only
+    // the mTextUpdateNeeded is changed.
+    if( impl.mTextUpdateNeeded )
+    {
+      // need to request relayout as size of text may have changed
+      impl.RequestTextRelayout();
     }
   }
+
+
+
+
 }
 
 Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index index )
@@ -750,6 +810,27 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::TEXT_DIRECTION:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetTextDirection();
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetVerticalLineAlignment();
+        }
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::BACKGROUND:
+      {
+        GetBackgroundProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        break;
+      }
     }
   }
 
@@ -887,10 +968,29 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
       std::swap( padding.start, padding.end );
     }
 
+    // Calculate the size of the visual that can fit the text
+    Size layoutSize = mController->GetTextModel()->GetLayoutSize();
+    layoutSize.x = contentSize.x;
+
+    const Vector2& shadowOffset = mController->GetTextModel()->GetShadowOffset();
+    if ( shadowOffset.y > Math::MACHINE_EPSILON_1 )
+    {
+      layoutSize.y += shadowOffset.y;
+    }
+
+    float outlineWidth = mController->GetTextModel()->GetOutlineWidth();
+    layoutSize.y += outlineWidth * 2.0f;
+    layoutSize.y = std::min( layoutSize.y, contentSize.y );
+
+    // Calculate the offset for vertical alignment only, as the layout engine will do the horizontal alignment.
+    Vector2 alignmentOffset;
+    alignmentOffset.x = 0.0f;
+    alignmentOffset.y = ( contentSize.y - layoutSize.y ) * VERTICAL_ALIGNMENT_TABLE[mController->GetVerticalAlignment()];
+
     Property::Map visualTransform;
-    visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, contentSize )
+    visualTransform.Add( Toolkit::Visual::Transform::Property::SIZE, layoutSize )
                    .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                   .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( padding.start, padding.top ) )
+                   .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( padding.start, padding.top ) + alignmentOffset )
                    .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
                    .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
                    .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
@@ -950,7 +1050,7 @@ void TextLabel::SetUpAutoScrolling()
 
   Text::TypesetterPtr typesetter = Text::Typesetter::New( mController->GetTextModel() );
 
-  PixelData data = typesetter->Render( verifiedSize, Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888 ); // ignore the horizontal alignment
+  PixelData data = typesetter->Render( verifiedSize, mController->GetTextDirection(), Text::Typesetter::RENDER_TEXT_AND_STYLES, true, Pixel::RGBA8888 ); // ignore the horizontal alignment
   Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
                                   data.GetPixelFormat(),
                                   data.GetWidth(),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,18 @@
 #include "visual-base-impl.h"
 
 // EXTERNAL HEADER
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/scripting/enum-helper.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
 
 //INTERNAL HEARDER
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/primitive-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/internal/helpers/property-helper.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -37,7 +41,8 @@ Debug::Filter* gVisualBaseLogFilter = Debug::Filter::New( Debug::NoLogging, fals
 #endif
 
 const char * const PRE_MULTIPLIED_ALPHA_PROPERTY( "preMultipliedAlpha" );
-}
+
+} // namespace
 
 namespace Dali
 {
@@ -48,8 +53,18 @@ namespace Toolkit
 namespace Internal
 {
 
-Visual::Base::Base( VisualFactoryCache& factoryCache )
-: mImpl( new Impl() ),
+namespace
+{
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( VISUAL_FITTING_MODE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Visual::FittingMode, FIT_KEEP_ASPECT_RATIO  )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Visual::FittingMode, FILL  )
+DALI_ENUM_TO_STRING_TABLE_END( VISUAL_FITTING_MODE )
+
+} // namespace
+
+Visual::Base::Base( VisualFactoryCache& factoryCache, FittingMode fittingMode )
+: mImpl( new Impl(fittingMode) ),
   mFactoryCache( factoryCache )
 {
 }
@@ -101,6 +116,10 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
       else if( matchKey == OPACITY )
       {
         matchKey = Property::Key( Toolkit::Visual::Property::OPACITY );
+      }
+      else if( matchKey == VISUAL_FITTING_MODE )
+      {
+        matchKey = Property::Key( Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE );
       }
     }
 
@@ -163,6 +182,12 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
         }
         break;
       }
+      case Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE:
+      {
+        Scripting::GetEnumerationProperty< Visual::FittingMode >(
+          value, VISUAL_FITTING_MODE_TABLE, VISUAL_FITTING_MODE_TABLE_COUNT, mImpl->mFittingMode );
+        break;
+      }
     }
   }
 
@@ -189,7 +214,7 @@ void Visual::Base::SetName( const std::string& name )
   mImpl->mName = name;
 }
 
-const std::string& Visual::Base::GetName()
+const std::string& Visual::Base::GetName() const
 {
   return mImpl->mName;
 }
@@ -221,6 +246,11 @@ float Visual::Base::GetWidthForHeight( float height )
 void Visual::Base::GetNaturalSize( Vector2& naturalSize )
 {
   naturalSize = Vector2::ZERO;
+}
+
+void Visual::Base::DoAction( const Property::Index actionId, const Property::Value attributes )
+{
+  OnDoAction( actionId, attributes );
 }
 
 void Visual::Base::SetDepthIndex( int index )
@@ -262,7 +292,6 @@ void Visual::Base::SetOffStage( Actor& actor )
   {
     DoSetOffStage( actor );
     mImpl->mMixColorIndex = Property::INVALID_INDEX;
-    mImpl->mOpacityIndex = Property::INVALID_INDEX;
     mImpl->mFlags &= ~Impl::IS_ON_STAGE;
   }
 }
@@ -287,6 +316,10 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   // which is ok, because they have a different key value range.
   map.Insert( Toolkit::Visual::Property::MIX_COLOR, mImpl->mMixColor ); // vec4
   map.Insert( Toolkit::Visual::Property::OPACITY, mImpl->mMixColor.a );
+
+  auto fittingModeString = Scripting::GetLinearEnumerationName< FittingMode >(
+    mImpl->mFittingMode, VISUAL_FITTING_MODE_TABLE, VISUAL_FITTING_MODE_TABLE_COUNT );
+  map.Insert( Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE, fittingModeString );
 }
 
 void Visual::Base::CreateInstancePropertyMap( Property::Map& map ) const
@@ -337,6 +370,11 @@ bool Visual::Base::IsOnStage() const
   return mImpl->mFlags & Impl::IS_ON_STAGE;
 }
 
+void Visual::Base::OnDoAction( const Property::Index actionId, const Property::Value& attributes )
+{
+  // May be overriden by derived class
+}
+
 void Visual::Base::RegisterMixColor()
 {
   // Only register if not already registered.
@@ -355,14 +393,7 @@ void Visual::Base::RegisterMixColor()
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
 
-  if( mImpl->mOpacityIndex == Property::INVALID_INDEX )
-  {
-    mImpl->mOpacityIndex = DevelHandle::RegisterProperty(
-      mImpl->mRenderer,
-      Toolkit::Visual::Property::OPACITY,
-      OPACITY,
-      mImpl->mMixColor.a );
-  }
+  mImpl->mRenderer.SetProperty( DevelRenderer::Property::OPACITY, mImpl->mMixColor.a );
 
   float preMultipliedAlpha = 0.0f;
   if( IsPreMultipliedAlphaEnabled() )
@@ -379,7 +410,7 @@ void Visual::Base::SetMixColor( const Vector4& color )
   if( mImpl->mRenderer )
   {
     mImpl->mRenderer.SetProperty( mImpl->mMixColorIndex, Vector3(color) );
-    mImpl->mRenderer.SetProperty( mImpl->mOpacityIndex, color.a );
+    mImpl->mRenderer.SetProperty( DevelRenderer::Property::OPACITY, color.a );
     if( color.a < 1.f )
     {
       mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
@@ -436,6 +467,11 @@ bool Visual::Base::IsResourceReady() const
 Toolkit::Visual::ResourceStatus Visual::Base::GetResourceStatus() const
 {
   return mImpl->mResourceStatus;
+}
+
+Visual::FittingMode Visual::Base::GetFittingMode() const
+{
+  return mImpl->mFittingMode;
 }
 
 Renderer Visual::Base::GetRenderer()
@@ -557,27 +593,22 @@ void Visual::Base::AnimateOpacityProperty(
   Dali::Animation& transition,
   Internal::TransitionData::Animator& animator )
 {
-  Property::Index index = mImpl->mOpacityIndex;
-
   bool isOpaque = mImpl->mMixColor.a >= 1.0f;
 
-  if( index != Property::INVALID_INDEX )
+  float initialOpacity;
+  if( animator.initialValue.Get( initialOpacity ) )
   {
-    float initialOpacity;
-    if( animator.initialValue.Get( initialOpacity ) )
-    {
-      isOpaque = (initialOpacity >= 1.0f);
-    }
-
-    float targetOpacity;
-    if( animator.targetValue.Get( targetOpacity ) )
-    {
-      mImpl->mMixColor.a = targetOpacity;
-    }
-
-    SetupTransition( transition, animator, index, animator.initialValue, animator.targetValue );
-    SetupBlendMode( transition, isOpaque, animator.animate );
+    isOpaque = (initialOpacity >= 1.0f);
   }
+
+  float targetOpacity;
+  if( animator.targetValue.Get( targetOpacity ) )
+  {
+    mImpl->mMixColor.a = targetOpacity;
+  }
+
+  SetupTransition( transition, animator, DevelRenderer::Property::OPACITY, animator.initialValue, animator.targetValue );
+  SetupBlendMode( transition, isOpaque, animator.animate );
 }
 
 void Visual::Base::AnimateRendererProperty(
@@ -656,7 +687,7 @@ void Visual::Base::AnimateMixColorProperty(
     SetupTransition( transition, animator, index, initialMixColor, targetMixColor );
     if( animateOpacity )
     {
-      SetupTransition( transition, animator, mImpl->mOpacityIndex, initialOpacity, targetOpacity );
+      SetupTransition( transition, animator, DevelRenderer::Property::OPACITY, initialOpacity, targetOpacity );
       SetupBlendMode( transition, isOpaque, animator.animate );
     }
   }
@@ -668,17 +699,20 @@ void Visual::Base::SetupBlendMode( Animation& transition, bool isInitialOpaque, 
   // turned off after the animation ends if the final value is opaque
   if( ! isInitialOpaque || mImpl->mMixColor.a < 1.0f )
   {
-    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-
-    if( animating == true && mImpl->mMixColor.a >= 1.0f )
+    if( mImpl->mRenderer )
     {
-      // When it becomes opaque, set the blend mode back to automatically
-      if( ! mImpl->mBlendSlotDelegate )
+      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+
+      if( animating == true && mImpl->mMixColor.a >= 1.0f )
       {
-        mImpl->mBlendSlotDelegate = new SlotDelegate<Visual::Base>(this);
+        // When it becomes opaque, set the blend mode back to automatically
+        if( ! mImpl->mBlendSlotDelegate )
+        {
+          mImpl->mBlendSlotDelegate = new SlotDelegate<Visual::Base>(this);
+        }
+        transition.FinishedSignal().Connect( *(mImpl->mBlendSlotDelegate),
+                                             &Visual::Base::OnMixColorFinished );
       }
-      transition.FinishedSignal().Connect( *(mImpl->mBlendSlotDelegate),
-                                           &Visual::Base::OnMixColorFinished );
     }
   }
 }

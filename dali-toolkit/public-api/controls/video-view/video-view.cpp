@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,21 @@ VideoView VideoView::New( const std::string& url )
 {
   VideoView videoView = Internal::VideoView::New();
   Dali::Toolkit::GetImpl( videoView ).SetUrl( url );
+  return videoView;
+}
+
+VideoView VideoView::New( bool swCodec )
+{
+  VideoView videoView = Internal::VideoView::New();
+  Dali::Toolkit::GetImpl( videoView ).SetSWCodec( swCodec );
+  return videoView;
+}
+
+VideoView VideoView::New( const std::string& url, bool swCodec )
+{
+  VideoView videoView = Internal::VideoView::New();
+  Dali::Toolkit::GetImpl( videoView ).SetUrl( url );
+  Dali::Toolkit::GetImpl( videoView ).SetSWCodec( swCodec );
   return videoView;
 }
 

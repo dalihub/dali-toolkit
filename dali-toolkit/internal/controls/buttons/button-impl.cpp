@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -689,50 +689,53 @@ bool Button::OnAccessibilityActivated()
 bool Button::OnTouch( Actor actor, const TouchData& touch )
 {
 
-  // Only events are processed when the button is not disabled and the touch event has only
-  // one touch point.
+  // Only events are processed when the button is not disabled
+  auto result( false );
 
-  if( !IsDisabled() && ( 1 == touch.GetPointCount() ) )
+  if( !IsDisabled() )
   {
-    switch( touch.GetState( 0 ) )
+    if ( 1 == touch.GetPointCount() )
     {
-      case PointState::DOWN:
+      switch( touch.GetState( 0 ) )
       {
-        ButtonDown();
-        break;
-      }
-      case PointState::UP:
-      {
-        ButtonUp();
-        break;
-      }
-      case PointState::INTERRUPTED:
-      {
-        OnTouchPointInterrupted();
-        break;
-      }
-      case PointState::LEAVE:
-      {
-        OnTouchPointLeave();
-        break;
-      }
-      case PointState::MOTION:
-      case PointState::STATIONARY: // FALLTHROUGH
-      {
-        // Nothing to do
-        break;
+        case PointState::DOWN:
+        {
+          ButtonDown();
+          break;
+        }
+        case PointState::UP:
+        {
+          ButtonUp();
+          break;
+        }
+        case PointState::INTERRUPTED:
+        {
+          OnTouchPointInterrupted();
+          break;
+        }
+        case PointState::LEAVE:
+        {
+          OnTouchPointLeave();
+          break;
+        }
+        case PointState::MOTION:
+        case PointState::STATIONARY: // FALLTHROUGH
+        {
+          // Nothing to do
+          break;
+        }
       }
     }
-  }
-  else if( 1 < touch.GetPointCount() )
-  {
-    OnTouchPointLeave(); // Notification for derived classes.
+    else if( 1 < touch.GetPointCount() )
+    {
+      OnTouchPointLeave(); // Notification for derived classes.
 
-    // Sets the button state to the default
-    mButtonPressedState = UNPRESSED;
+      // Sets the button state to the default
+      mButtonPressedState = UNPRESSED;
+    }
+    result = true;
   }
-
-  return false;
+  return result;
 }
 
 bool Button::OnKeyboardEnter()

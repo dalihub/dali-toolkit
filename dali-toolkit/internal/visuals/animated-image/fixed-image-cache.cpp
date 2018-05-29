@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 // CLASS HEADER
 #include <dali-toolkit/internal/visuals/animated-image/fixed-image-cache.h>
 
+// INTERNAL HEADERS
+#include <dali-toolkit/internal/visuals/image-atlas-manager.h> // For ImageAtlasManagerPtr
+
 namespace Dali
 {
 namespace Toolkit
@@ -32,7 +35,8 @@ const bool ENABLE_ORIENTATION_CORRECTION( true );
 FixedImageCache::FixedImageCache(
   TextureManager& textureManager, UrlList& urlList, ImageCache::FrameReadyObserver& observer,
   unsigned int batchSize )
-: ImageCache( textureManager, urlList, observer, batchSize ),
+: ImageCache( textureManager, observer, batchSize ),
+  mImageUrls( urlList ),
   mFront(0u)
 {
   mReadyFlags.reserve( mImageUrls.size() );
@@ -41,9 +45,12 @@ FixedImageCache::FixedImageCache(
 
 FixedImageCache::~FixedImageCache()
 {
-  for( std::size_t i = 0; i < mImageUrls.size() ; ++i )
+  if( mTextureManagerAlive )
   {
-    mTextureManager.Remove( mImageUrls[i].mTextureId );
+    for( std::size_t i = 0; i < mImageUrls.size() ; ++i )
+    {
+      mTextureManager.Remove( mImageUrls[i].mTextureId );
+    }
   }
 }
 
@@ -102,10 +109,28 @@ void FixedImageCache::LoadBatch()
     // need to account for this inside the UploadComplete method using mRequestingLoad.
     mRequestingLoad = true;
 
-    mImageUrls[ mUrlIndex ].mTextureId =
-      mTextureManager.RequestLoad( url, ImageDimensions(), FittingMode::SCALE_TO_FILL,
-                                   SamplingMode::BOX_THEN_LINEAR, TextureManager::NO_ATLAS,
-                                   this, ENABLE_ORIENTATION_CORRECTION );
+    bool synchronousLoading = false;
+    bool atlasingStatus = false;
+    bool loadingStatus = false;
+    TextureManager::MaskingDataPointer maskInfo = nullptr;
+    AtlasUploadObserver* atlasObserver = nullptr;
+    ImageAtlasManagerPtr imageAtlasManager = nullptr;
+    Vector4 textureRect;
+    auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
+    mTextureManager.LoadTexture(
+      url, ImageDimensions(), FittingMode::SCALE_TO_FILL,
+      SamplingMode::BOX_THEN_LINEAR, maskInfo,
+      synchronousLoading, mImageUrls[ mUrlIndex ].mTextureId, textureRect,
+      atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT,
+      Dali::WrapMode::Type::DEFAULT, this,
+      atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED,
+      preMultiply );
+
+    if( loadingStatus == false )  // not loading, means it's already ready.
+    {
+      SetImageFrameReady( mImageUrls[ mUrlIndex ].mTextureId );
+    }
     mRequestingLoad = false;
     ++mUrlIndex;
   }
@@ -144,7 +169,8 @@ void FixedImageCache::UploadComplete(
   int32_t        textureId,
   TextureSet     textureSet,
   bool           useAtlasing,
-  const Vector4& atlasRect )
+  const Vector4& atlasRect,
+  bool           preMultiplied)
 {
   bool frontFrameReady = IsFrontReady();
 

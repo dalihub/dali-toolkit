@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ class VisualFactory;
  * | visualType               | INTEGER or STRING |
  * | shader                   | MAP               |
  */
-class DALI_IMPORT_API VisualFactory : public BaseHandle
+class DALI_TOOLKIT_API VisualFactory : public BaseHandle
 {
 public:
 
@@ -116,6 +116,25 @@ public:
    * @return The pointer pointing to the visual
    */
   Visual::Base CreateVisual( const std::string& url, ImageDimensions size );
+
+  /**
+   * @brief Enable or disable premultiplying alpha in images and image visuals.
+   *
+   * The default is to enable pre-multiplication on load.
+   *
+   * Applications that have assets with pre-multiplied alpha already applied should turn this option off.
+   *
+   * @param[in] preMultiply True if loaded images for image visuals should have alpha multiplied into the color
+   * channels.
+   */
+  void SetPreMultiplyOnLoad( bool preMultiply );
+
+  /**
+   * @brief Get the setting for automatically pre-multiplying image visual images on load.
+   *
+   * @return True if loaded images have pre-multiplied alpha applied on load, false otherwise.
+   */
+  bool GetPreMultiplyOnLoad() const;
 
 private:
 

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_EDITOR_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
+#include <dali/devel-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
@@ -41,7 +42,6 @@ namespace Toolkit
 
 namespace Internal
 {
-
 /**
  * @brief A control which renders a long text string with styles.
  */
@@ -73,6 +73,11 @@ public:
    * @return The current value of the property.
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index index );
+
+  /**
+   * @copydoc Dali::Toollkit::TextEditor::GetInputMethodContext()
+   */
+  InputMethodContext GetInputMethodContext();
 
   /**
    * Connects a callback function with the object's signals.
@@ -194,9 +199,9 @@ private: // From Control
 private: // Implementation
 
   /**
-   * @copydoc Dali::Toolkit::Text::Controller::(ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent)
+   * @copydoc Dali::Toolkit::Text::Controller::(InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent)
    */
-  ImfManager::ImfCallbackData OnImfEvent( ImfManager& imfManager, const ImfManager::ImfEventData& imfEvent );
+  InputMethodContext::CallbackData OnInputMethodContextEvent( InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent );
 
   /**
    * @brief Callback when Clipboard signals an item should be pasted
@@ -283,7 +288,7 @@ private: // Data
   Toolkit::TextEditor::InputStyleChangedSignalType mInputStyleChangedSignal;
   Toolkit::TextEditor::ScrollStateChangedSignalType mScrollStateChangedSignal;
 
-  ImfManager          mImfManager;
+  InputMethodContext mInputMethodContext;
   Text::ControllerPtr mController;
   Text::RendererPtr mRenderer;
   Text::DecoratorPtr mDecorator;
@@ -300,6 +305,7 @@ private: // Data
 
   float mAlignmentOffset;
   float mScrollAnimationDuration;
+  float mLineSpacing;
   int mRenderingBackend;
   bool mHasBeenStaged:1;
   bool mScrollAnimationEnabled:1;

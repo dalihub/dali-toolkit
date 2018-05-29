@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,6 +237,12 @@ int UtcDaliStyleManagerApplyTheme(void)
   StyleManager styleManager = StyleManager::Get();
 
   styleManager.StyleChangedSignal().Connect(&styleChangedSignalHandler, &StyleChangedSignalChecker::OnStyleChanged);
+
+  // To ensure we make VisualFactory
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::TEXT );
+  Visual::Base textVisual = factory.CreateVisual( propertyMap );
 
   // Render and notify
   application.SendNotification();
@@ -1306,8 +1312,13 @@ int UtcDaliStyleManagerConfigSectionTest(void)
 
   const char* defaultTheme =
     "{\n"
+    "  \"constants\":\n"
+    "  {\n"
+    "    \"TEST\":\"broken\"\n"
+    "  },\n"
     "  \"config\":\n"
     "  {\n"
+    "    \"brokenImageUrl\":\"{TEST}|{TEST}|{TEST|TEST.png\",\n"
     "    \"alwaysShowFocus\":false,\n"
     "    \"clearFocusOnEscape\":false\n"
     "  },\n"
@@ -1327,6 +1338,8 @@ int UtcDaliStyleManagerConfigSectionTest(void)
   DALI_TEST_CHECK( !alwaysShowFocus );
   bool clearFocusOnEscape = config["clearFocusOnEscape"].Get<bool>();
   DALI_TEST_CHECK( !clearFocusOnEscape );
+  std::string brokenImageUrl = config["brokenImageUrl"].Get<std::string>();
+  DALI_TEST_CHECK( brokenImageUrl.compare( "broken|broken|{TEST|TEST.png" ) == 0 );
 
   // For coverage
   Toolkit::TextEditor editor = Toolkit::TextEditor::New();
@@ -1335,7 +1348,7 @@ int UtcDaliStyleManagerConfigSectionTest(void)
 
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( editor );
 
-  application.ProcessEvent( Integration::KeyEvent( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( Integration::KeyEvent( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 

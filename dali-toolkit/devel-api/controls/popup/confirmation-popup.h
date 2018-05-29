@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_CONFIRMATION_POPUP_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ class ConfirmationPopup;
  * | controlSignalOk     | controlOk                | connectSignalOkSelected                  |
  * | controlSignalCancel | controlCancel            | connectSignalCancelSelected              |
  */
-class DALI_IMPORT_API ConfirmationPopup : public Popup
+class DALI_TOOLKIT_API ConfirmationPopup : public Popup
 {
 public:
 

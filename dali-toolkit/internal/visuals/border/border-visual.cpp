@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,11 +83,10 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec4 borderColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = vec4(mixColor, opacity)*borderColor*uColor;\n
+    gl_FragColor = vec4(mixColor, 1.0)*borderColor*uColor;\n
   }\n
 );
 
@@ -111,13 +110,12 @@ const char* FRAGMENT_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec4 borderColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float opacity;\n
   uniform mediump float borderSize;\n
   varying mediump float vAlpha;\n
   \n
   void main()\n
   {\n
-    gl_FragColor = vec4(mixColor, opacity)*borderColor*uColor;\n
+    gl_FragColor = vec4(mixColor, 1.0)*borderColor*uColor;\n
     gl_FragColor.a *= smoothstep(0.0, 1.5, vAlpha)*smoothstep( borderSize+1.5, borderSize, vAlpha );\n
   }\n
 );
@@ -131,7 +129,7 @@ BorderVisualPtr BorderVisual::New( VisualFactoryCache& factoryCache, const Prope
 }
 
 BorderVisual::BorderVisual( VisualFactoryCache& factoryCache )
-: Visual::Base( factoryCache ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
   mBorderColor( Color::TRANSPARENT ),
   mBorderSize( 0.f ),
   mBorderColorIndex( Property::INVALID_INDEX ),

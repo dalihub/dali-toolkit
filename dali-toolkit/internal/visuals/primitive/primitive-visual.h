@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_PRIMITIVE_VISUAL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,11 +79,11 @@ typedef IntrusivePtr< PrimitiveVisual > PrimitiveVisualPtr;
  * | %Property Name    | Type        | Shapes Affected                          |
  * |-------------------|-------------|------------------------------------------|
  * | shapeColor        | VECTOR4     | all                                      |
- * | slices            | INTEGER     | sphere, cone, conical frustrum, cylinder |
+ * | slices            | INTEGER     | sphere, cone, conical frustum, cylinder  |
  * | stacks            | INTEGER     | sphere                                   |
- * | scaleTopRadius    | FLOAT       | conical frustrum                         |
- * | scaleBottomRadius | FLOAT       | cone, conical frustrum                   |
- * | scaleHeight       | FLOAT       | cone, conical frustrum, cylinder         |
+ * | scaleTopRadius    | FLOAT       | conical frustum                          |
+ * | scaleBottomRadius | FLOAT       | cone, conical frustum                    |
+ * | scaleHeight       | FLOAT       | cone, conical frustum, cylinder          |
  * | scaleRadius       | FLOAT       | cylinder                                 |
  * | scaleDimensions   | VECTOR3     | cube, octahedron, bevelled cube          |
  * | bevelPercentage   | FLOAT       | bevelled cube                            |

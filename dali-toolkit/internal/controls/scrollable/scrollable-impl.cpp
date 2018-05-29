@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,9 @@ Scrollable::Scrollable()
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
   mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),
   mScrollToAlphaFunction( AlphaFunction::EASE_OUT ),
+  mScrollStartedSignal(),
+  mScrollUpdatedSignal(),
+  mScrollCompletedSignal(),
   mOvershootEnabled(true)
 {
 }
@@ -96,6 +99,9 @@ Scrollable::Scrollable( ControlBehaviour behaviourFlags )
   mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
   mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),
   mScrollToAlphaFunction( AlphaFunction::EASE_OUT ),
+  mScrollStartedSignal(),
+  mScrollUpdatedSignal(),
+  mScrollCompletedSignal(),
   mOvershootEnabled(true)
 {
 }

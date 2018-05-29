@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,7 +109,8 @@ void CreateTextModel( const std::string& text,
   Vector<Character>& utf32Characters = logicalModel->mText;
   utf32Characters.Resize( text.size() );
 
-  const uint32_t numberOfCharacters = Utf8ToUtf32( reinterpret_cast<const uint8_t* const>( text.c_str() ),
+  const uint32_t numberOfCharacters = ( text.size() == 0) ? 0 :
+    Utf8ToUtf32( reinterpret_cast<const uint8_t* const>( text.c_str() ),
                                                    text.size(),
                                                    &utf32Characters[0u] );
   utf32Characters.Resize( numberOfCharacters );
@@ -269,7 +270,7 @@ void CreateTextModel( const std::string& text,
   // Set the layout parameters.
   const Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   const Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
-
+  float outlineWidth = visualModel->GetOutlineWidth();
   Layout::Parameters layoutParameters( textArea,
                                        utf32Characters.Begin(),
                                        lineBreakInfo.Begin(),
@@ -282,7 +283,8 @@ void CreateTextModel( const std::string& text,
                                        glyphsPerCharacter.Begin(),
                                        numberOfGlyphs,
                                        Text::HorizontalAlignment::BEGIN,
-                                       Text::LineWrap::WORD );
+                                       Text::LineWrap::WORD,
+                                       outlineWidth );
 
   Vector<LineRun>& lines = visualModel->mLines;
 
@@ -356,8 +358,9 @@ void ConfigureTextLabel( ControllerPtr controller )
   // Set cursor's width to zero.
   controller->GetLayoutEngine().SetCursorWidth( 0 );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Disables the text input.
-  controller->EnableTextInput( NULL );
+  controller->EnableTextInput( NULL, inputMethodContext );
 
   // Disables the vertical scrolling.
   controller->SetVerticalScrollEnabled( false );
@@ -381,8 +384,9 @@ void ConfigureTextField( ControllerPtr controller )
   // Set the text layout as multi-line.
   controller->GetLayoutEngine().SetLayout( Layout::Engine::SINGLE_LINE_BOX );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   // Enables the vertical scrolling after the text input has been enabled.
   controller->SetVerticalScrollEnabled( false );
@@ -409,8 +413,9 @@ void ConfigureTextEditor( ControllerPtr controller )
   // Set the text layout as multi-line.
   controller->GetLayoutEngine().SetLayout( Layout::Engine::MULTI_LINE_BOX );
 
+  InputMethodContext inputMethodContext = InputMethodContext::New();
   // Enables the text input.
-  controller->EnableTextInput( decorator );
+  controller->EnableTextInput( decorator, inputMethodContext );
 
   // Enables the vertical scrolling after the text input has been enabled.
   controller->SetVerticalScrollEnabled( true );

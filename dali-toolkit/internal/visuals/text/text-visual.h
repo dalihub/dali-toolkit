@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_VISUAL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,15 @@ public:
     GetVisualObject( visual ).mRendererUpdateNeeded = true;
   };
 
+  /**
+   * @brief Instantly updates the renderer
+   * @param[in] visual The text visual.
+   */
+  static void UpdateRenderer( Toolkit::Visual::Base visual )
+  {
+    GetVisualObject( visual ).UpdateRenderer();
+  };
+
 public: // from Visual::Base
 
   /**
@@ -196,19 +205,19 @@ private:
    * Get the texture of the text for rendering.
    * @param[in] size The texture size.
    * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
-   * @param[in] containsEmoji Whether the text contains emoji.
+   * @param[in] containsColorGlyph Whether the text contains color glyph.
    * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
    */
-  TextureSet GetTextTexture( const Vector2& size, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled );
+  TextureSet GetTextTexture( const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled );
 
   /**
    * Get the text rendering shader.
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
-   * @param[in] containsEmoji Whether the text contains emoji.
+   * @param[in] containsColorGlyph Whether the text contains color glyph.
    * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
    */
-  Shader GetTextShader( VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsEmoji, bool styleEnabled );
+  Shader GetTextShader( VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled );
 
   /**
    * @brief Retrieve the text's controller.

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_N_PATCH_VISUAL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,8 @@ typedef IntrusivePtr< NPatchVisual > NPatchVisualPtr;
  * | url                      | STRING           |
  * | borderOnly               | BOOLEAN          |
  * | border                   | RECTANGLE        |
- *
+ * | auxiliaryImage           | STRING           |
+ * | auxiliaryImageAlpha      | FLOAT            |
  */
 class NPatchVisual: public Visual::Base
 {
@@ -144,6 +145,11 @@ protected:
 private:
 
   /**
+   * Loads the NPatch image and the Auxiliary image if needed
+   */
+  void LoadImages();
+
+  /**
    * @brief Creates a geometry for this renderer's grid size
    *
    * @return Returns the created geometry for this renderer's grid size
@@ -202,11 +208,14 @@ private:
 
 private:
 
-  NPatchLoader& mLoader;      ///< reference to N patch loader for fast access
-  VisualUrl mImageUrl;        ///< The url to the N patch to load
-  std::size_t mId;            ///< id of the N patch (from loader/cache)
-  bool mBorderOnly;           ///< if only border is desired
-  Rect< int > mBorder;        ///< The size of the border
+  NPatchLoader&      mLoader;               ///< reference to N patch loader for fast access
+  VisualUrl          mImageUrl;             ///< The url to the N patch to load
+  VisualUrl          mAuxiliaryUrl;         ///< An auxiliary image that can be displayed on top of the N-Patch
+  std::size_t        mId;                   ///< id of the N patch (from loader/cache)
+  Devel::PixelBuffer mAuxiliaryPixelBuffer; ///< pixel buffer of the auxiliary mask image
+  bool               mBorderOnly;           ///< if only border is desired
+  Rect<int>          mBorder;               ///< The size of the border
+  float              mAuxiliaryImageAlpha;  ///< The alpha value for the auxiliary image only
 };
 
 } // namespace Internal

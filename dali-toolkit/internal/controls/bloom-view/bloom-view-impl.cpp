@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -358,6 +358,7 @@ void BloomView::AllocateResources()
     mGaussianBlurView.SetSize(mTargetSize);
     GetImpl(mGaussianBlurView).AllocateResources();
 
+    mGaussianBlurView.SetVisible( true );
 
     //////////////////////////////////////////////////////
     // Create render targets
@@ -458,9 +459,18 @@ void BloomView::Deactivate()
   // stop render tasks processing
   // Note: render target resources are automatically freed since we set the Image::Unused flag
   RemoveRenderTasks();
+
   mRenderTargetForRenderingChildren.Reset();
   mBloomExtractTarget.Reset();
   mOutputRenderTarget.Reset();
+
+  // Reset children
+  mBloomExtractImageView.SetImage( "" );
+  mTargetImageView.SetImage( "" );
+  mCompositeImageView.SetImage( "" );
+
+  mGaussianBlurView.SetVisible( false );
+
   mActivated = false;
 }
 

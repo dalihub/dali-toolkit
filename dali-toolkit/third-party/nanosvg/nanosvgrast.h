@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-14 Mikko Mononen memon@inside.org
+ * Copyright (c) 2018-14 Mikko Mononen memon@inside.org
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -10,7 +10,7 @@
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- * claim that you wrote the original software. If you use this software
+ * claim that you wrote the original software. If you use this softwarue
  * in a product, an acknowledgment in the product documentation would be
  * appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
@@ -30,15 +30,15 @@
 typedef struct NSVGrasterizer NSVGrasterizer;
 
 /* Example Usage:
-	// Load SVG
-	struct SNVGImage* image = nsvgParseFromFile("test.svg.");
+  // Load SVG
+  struct SNVGImage* image = nsvgParseFromFile("test.svg.");
 
-	// Create rasterizer (can be used to render multiple images).
-	struct NSVGrasterizer* rast = nsvgCreateRasterizer();
-	// Allocate memory for image
-	unsigned char* img = malloc(w*h*4);
-	// Rasterize
-	nsvgRasterize(rast, image, 0,0,1, img, w, h, w*4);
+  // Create rasterizer (can be used to render multiple images).
+  struct NSVGrasterizer* rast = nsvgCreateRasterizer();
+  // Allocate memory for image
+  unsigned char* img = malloc(w*h*4);
+  // Rasterize
+  nsvgRasterize(rast, image, 0,0,1, img, w, h, w*4);
 */
 
 // Allocated rasterizer context.
@@ -54,8 +54,8 @@ NSVGrasterizer* nsvgCreateRasterizer();
 //   h - height of the image to render
 //   stride - number of bytes per scaleline in the destination buffer
 void nsvgRasterize(NSVGrasterizer* r,
-				   NSVGimage* image, float tx, float ty, float scale,
-				   unsigned char* dst, int w, int h, int stride);
+                   NSVGimage* image, float tx, float ty, float scale,
+                   unsigned char* dst, int w, int h, int stride);
 
 // Deletes rasterizer context.
 void nsvgDeleteRasterizer(NSVGrasterizer*);

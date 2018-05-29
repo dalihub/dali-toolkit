@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -491,6 +492,69 @@ int UtcDaliToolkitFlexContainerMoveFocus(void)
   DALI_TEST_EQUALS(manager.GetCurrentFocusActor(), actor1, TEST_LOCATION);
   DALI_TEST_EQUALS(focusChangedCallback.mSignalVerified, true, TEST_LOCATION);
   DALI_TEST_EQUALS(focusChangedCallback.mCurrentFocusedActor, actor1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliToolkitFlexContainerRTLSupportP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitFlexContainerRTLSupportP");
+  FlexContainer flexContainer = FlexContainer::New();
+  DALI_TEST_CHECK( flexContainer );
+
+  Actor actor0 = Actor::New();
+
+  Stage::GetCurrent().Add( actor0 );
+  actor0.Add( flexContainer );
+
+  // Create two actors and add them to the container
+  Actor actor1 = Actor::New();
+  Actor actor2 = Actor::New();
+  DALI_TEST_CHECK( actor1 );
+  DALI_TEST_CHECK( actor2 );
+
+  flexContainer.Add(actor1);
+  flexContainer.Add(actor2);
+
+  // Check flex direction property.
+  flexContainer.SetProperty( FlexContainer::Property::FLEX_DIRECTION, "row" );
+  DALI_TEST_EQUALS( (FlexContainer::FlexDirection)flexContainer.GetProperty<int>( FlexContainer::Property::FLEX_DIRECTION ), FlexContainer::ROW, TEST_LOCATION );
+
+  // Check content direction property.
+  DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::INHERIT, TEST_LOCATION );
+
+  actor0.SetProperty( Dali::DevelActor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT );
+  DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::RTL, TEST_LOCATION );
+
+  actor0.SetProperty( Dali::DevelActor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::LEFT_TO_RIGHT );
+  DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::LTR, TEST_LOCATION );
+
+  flexContainer.SetProperty( FlexContainer::Property::CONTENT_DIRECTION, "RTL" );
+  DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::RTL, TEST_LOCATION );
+
+  flexContainer.SetProperty( FlexContainer::Property::CONTENT_DIRECTION, "LTR" );
+  DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::LTR, TEST_LOCATION );
+
+  actor0.SetProperty( Dali::DevelActor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::RIGHT_TO_LEFT );
+  DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::LTR, TEST_LOCATION );
+
+  flexContainer.SetProperty( FlexContainer::Property::CONTENT_DIRECTION, "inherit" );
+  DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::RTL, TEST_LOCATION );
+
+  actor0.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION, Dali::LayoutDirection::LEFT_TO_RIGHT );
+  DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::LTR, TEST_LOCATION );
+
+  flexContainer.SetProperty( FlexContainer::Property::CONTENT_DIRECTION, "inherit" );
+  DALI_TEST_EQUALS( (FlexContainer::ContentDirection)flexContainer.GetProperty<int>( FlexContainer::Property::CONTENT_DIRECTION ), FlexContainer::LTR, TEST_LOCATION );
+
+  flexContainer.SetProperty( FlexContainer::Property::CONTENT_DIRECTION, "LTR" );
+  application.SendNotification();
+  application.Render();
+
+  flexContainer.SetProperty( FlexContainer::Property::CONTENT_DIRECTION, "RTL" );
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
