@@ -412,6 +412,8 @@ void LayoutGroup::OnInitialize()
 {
   auto control = Toolkit::Control::DownCast( GetOwner() );
 
+  DoInitialize();
+
   if( control )
   {
     // Take ownership of existing children
