@@ -26,10 +26,12 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
-
+namespace
+{
 #if defined(DEBUG_ENABLED)
 static Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
 #endif
+}
 
 namespace Dali
 {
@@ -106,6 +108,8 @@ void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
   DALI_LOG_INFO( gLogFilter, Debug::Concise, oss.str().c_str() );
 #endif
 
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "HboxLayout::OnMeasure widthSize(%d) \n", widthMeasureSpec.GetSize());
+
   auto widthMode = widthMeasureSpec.GetMode();
   auto heightMode = heightMeasureSpec.GetMode();
   bool isExactly = (widthMode == MeasureSpec::Mode::EXACTLY);
@@ -128,9 +132,12 @@ void HboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
       auto childOwner = childLayout->GetOwner();
       auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
 
-      MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, heightMeasureSpec, 0 );
+      MeasureChild( childLayout, widthMeasureSpec, heightMeasureSpec );
       auto childWidth = childLayout->GetMeasuredWidth();
-      auto childMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
+      auto childMargin = childLayout->GetMargin();
+
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "HboxLayout::OnMeasure childWidth(%d)\n", MeasureSpec::IntType( childWidth ) );
+
       auto length = childWidth + LayoutLength::IntType(childMargin.start + childMargin.end);
 
       auto cellPadding = i<GetChildCount()-1 ? mCellPadding.width: 0;
@@ -265,8 +272,7 @@ void HboxLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
       auto childWidth = childLayout->GetMeasuredWidth();
       auto childHeight = childLayout->GetMeasuredHeight();
 
-      auto childOwner = childLayout->GetOwner();
-      auto childMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
+      auto childMargin = childLayout->GetMargin();
 
       childTop = LayoutLength(padding.top) + ((childSpace - childHeight) / 2) + childMargin.top - childMargin.bottom;
 
