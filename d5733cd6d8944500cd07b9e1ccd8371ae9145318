@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "391eba98_f8cf7a64",
+        "filename": "dali-toolkit/devel-api/layouting/fbox-layout.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-05-29T14:10:24Z",
+      "side": 1,
+      "message": "Yes, sounds better I will change.\nWill be HBox and VBox renamed as well I guess?",
+      "parentUuid": "521d8dbd_76ef6c08",
+      "range": {
+        "startLine": 38,
+        "startChar": 22,
+        "endLine": 38,
+        "endChar": 32
+      },
+      "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "aaec85a5_0f35c6e3",
         "filename": "dali-toolkit/internal/layouting/fbox-layout-impl.cpp",
         "patchSetId": 2
@@ -45,6 +69,30 @@
       "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5da84e4d_1a78e427",
+        "filename": "dali-toolkit/internal/layouting/fbox-layout-impl.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-05-29T14:10:24Z",
+      "side": 1,
+      "message": "I see, will fix.",
+      "parentUuid": "aaec85a5_0f35c6e3",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 47
+      },
+      "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "8bc60229_9376cc41",
+        "filename": "dali-toolkit/internal/layouting/fbox-layout-impl.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-05-29T14:10:24Z",
+      "side": 1,
+      "message": "Yes. Could be something like OnChildMeasure.",
+      "parentUuid": "73ffa193_70d091c4",
+      "range": {
+        "startLine": 125,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 28
+      },
+      "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9f305a2f_ccef48db",
         "filename": "dali-toolkit/internal/layouting/fbox-layout-impl.cpp",
         "patchSetId": 2
@@ -91,6 +163,30 @@
       "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b43d8d44_2edfd9a8",
+        "filename": "dali-toolkit/internal/layouting/fbox-layout-impl.cpp",
+        "patchSetId": 2
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-05-29T14:10:24Z",
+      "side": 1,
+      "message": "They are cached inside Yoga. So second run of YGNodeCalculateLayout with the same parameters should hit the yoga internal cache. I will double check later.",
+      "parentUuid": "9f305a2f_ccef48db",
+      "range": {
+        "startLine": 224,
+        "startChar": 2,
+        "endLine": 224,
+        "endChar": 23
+      },
+      "revId": "d5733cd6d8944500cd07b9e1ccd8371ae9145318",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
     },
     {
       "key": {
