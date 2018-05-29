@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_SLIDER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class Slider;
  * | slidingFinished   | @ref SlidingFinishedSignal()  |
  * @SINCE_1_1.39
  */
-class DALI_IMPORT_API Slider : public Control
+class DALI_TOOLKIT_API Slider : public Control
 {
 public:
 

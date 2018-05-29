@@ -289,16 +289,10 @@ public:
   LayoutLength GetMinimumHeight() const;
 
   /**
-   * Get the padding information.
+   * Get the padding information
    * @return The padding information
    */
   Extents GetPadding() const;
-
-  /**
-   * Get the margin information.
-   * @return The margin information
-   */
-  Extents GetMargin() const;
 
 protected:
   /**
@@ -312,6 +306,7 @@ protected:
    * @param[in] containerType The type name of the owner container
    */
   virtual void OnRegisterChildProperties( const std::string& containerType );
+
 
   /**
    * @brief Measure the layout and its content to determine the measured width and the

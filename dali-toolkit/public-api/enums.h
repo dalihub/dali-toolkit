@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_ENUMS_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -61,7 +61,7 @@ enum Type
  * @param[in] orientation The orientation
  * @return true if the orientation is vertical
  */
-DALI_IMPORT_API bool IsVertical(ControlOrientation::Type orientation);
+DALI_TOOLKIT_API bool IsVertical(ControlOrientation::Type orientation);
 
 /**
  * @brief Queries whether an orientation is horizontal.
@@ -70,7 +70,7 @@ DALI_IMPORT_API bool IsVertical(ControlOrientation::Type orientation);
  * @param[in] orientation The orientation
  * @return true if the orientation is horizontal
  */
-DALI_IMPORT_API bool IsHorizontal(ControlOrientation::Type orientation);
+DALI_TOOLKIT_API bool IsHorizontal(ControlOrientation::Type orientation);
 
 /**
  * @}

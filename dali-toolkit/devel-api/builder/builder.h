@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_UIBUILDER_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@
 #include <dali/public-api/animation/linear-constrainer.h>
 #include <dali/devel-api/animation/path-constrainer.h>
 #include <dali/public-api/images/frame-buffer-image.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -118,7 +121,7 @@ class Builder;
  *
  */
 
-class DALI_IMPORT_API Builder : public BaseHandle
+class DALI_TOOLKIT_API Builder : public BaseHandle
  {
  public:
    /**

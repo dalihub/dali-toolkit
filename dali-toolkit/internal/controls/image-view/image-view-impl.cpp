@@ -286,7 +286,8 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
       // scale to fit the padded area
       auto finalSize =
-             naturalSize * std::min((paddedSize.width / naturalSize.width), (paddedSize.height / naturalSize.height));
+             naturalSize * std::min( ( naturalSize.width  ? ( paddedSize.width  / naturalSize.width  ) : 0 ),
+                                     ( naturalSize.height ? ( paddedSize.height / naturalSize.height ) : 0 ) );
 
       // calculate final offset within the padded area
       auto finalOffset = Vector2(padding.start, padding.top) + (paddedSize - finalSize) * .5f;

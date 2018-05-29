@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_PAGE_FACTORY_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/rendering/texture.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
+
 namespace Dali
 {
 
@@ -33,7 +36,7 @@ namespace Toolkit
  *
  * @SINCE_1_1.4
  */
-class DALI_IMPORT_API PageFactory
+class DALI_TOOLKIT_API PageFactory
 {
 public:
 

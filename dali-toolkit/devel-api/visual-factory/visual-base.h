@@ -21,6 +21,9 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/actors/actor.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
+
 namespace Dali
 {
 
@@ -77,7 +80,7 @@ namespace Visual
  * Absolute means that the component describes world units (equivalent to pixels)
  *
  */
-class DALI_IMPORT_API Base : public BaseHandle
+class DALI_TOOLKIT_API Base : public BaseHandle
 {
 public:
 

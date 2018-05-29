@@ -19,7 +19,7 @@
 #include "control-data-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
@@ -335,6 +335,8 @@ Control::Impl::Impl( Control& controlImpl )
   mPanGestureDetector(),
   mTapGestureDetector(),
   mLongPressGestureDetector(),
+  mTooltip( NULL ),
+  mInputMethodContext(),
   mFlags( Control::ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIsKeyboardNavigationSupported( false ),
   mIsKeyboardFocusGroup( false )

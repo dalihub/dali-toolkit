@@ -17,7 +17,7 @@
 
 #include <toolkit-singleton-service.h>
 
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/signals/dali-signal.h>

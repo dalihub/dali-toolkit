@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_EVENT_THREAD_CALLBACK_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@
 #define __DALI_EVENT_THREAD_CALLBACK_H_
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/signals/callback.h>
 
 namespace Dali
 {
 
-class DALI_IMPORT_API EventThreadCallback
+class DALI_TOOLKIT_API EventThreadCallback
 {
 public:
 

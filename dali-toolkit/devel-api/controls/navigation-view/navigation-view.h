@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NAVIGATION_VIEW_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ class NavigationView;
  * When pop is called on the NavigationView, the current tree of Actors are removed and the previous set added back.
  * If pop is called on the last set of Actors then they remain, nothing is popped.
  */
-class DALI_IMPORT_API NavigationView : public Control
+class DALI_TOOLKIT_API NavigationView : public Control
 {
 
 public:

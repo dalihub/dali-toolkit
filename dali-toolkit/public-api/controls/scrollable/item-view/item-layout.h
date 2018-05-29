@@ -2,7 +2,7 @@
 #define __DALI_TOOLKIT_ITEM_LAYOUT_H__
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,7 +138,7 @@ struct ItemRange
  * Whilst scrolling, the layout provides a range of items that are within a layout-area (3D bounding volume).
  * @SINCE_1_0.0
  */
-class DALI_IMPORT_API ItemLayout : public RefObject
+class DALI_TOOLKIT_API ItemLayout : public RefObject
 {
 public:
 
@@ -148,7 +148,7 @@ public:
    * @brief Virtual destructor.
    * @SINCE_1_0.0
    */
-  DALI_IMPORT_API virtual ~ItemLayout();
+  virtual ~ItemLayout();
 
   /**
    * @brief Set the orientation of the layout.
@@ -156,7 +156,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] orientation The orientation of the layout.
    */
-  DALI_IMPORT_API void SetOrientation(ControlOrientation::Type orientation);
+  void SetOrientation(ControlOrientation::Type orientation);
 
   /**
    * @brief Query the orientation of the layout.
@@ -164,7 +164,7 @@ public:
    * @SINCE_1_0.0
    * @return the orientation of the layout.
    */
-  DALI_IMPORT_API ControlOrientation::Type GetOrientation() const;
+  ControlOrientation::Type GetOrientation() const;
 
   /**
    * @brief Apply the layout Properties.
@@ -192,7 +192,7 @@ public:
    * @note layout-position is not provided as a parameter, since applying size constraints is not recommended.
    * Animating to target-sizes is preferable, since this allows controls to perform layouting without constraints.
    */
-  DALI_IMPORT_API void GetItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const;
+  void GetItemSize( unsigned int itemId, const Vector3& layoutSize, Vector3& itemSize ) const;
 
   /**
    * @brief Overrides the default size for the layout.
@@ -200,7 +200,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] itemSize The size of each item.
    */
-  DALI_IMPORT_API void SetItemSize( const Vector3& itemSize );
+  void SetItemSize( const Vector3& itemSize );
 
   /**
    * @brief Query the minimum valid layout position; this is a negative value.
@@ -261,7 +261,7 @@ public:
    * @param[in] layoutSize the current size of the item view instance
    * @return The layout position
    */
-  DALI_IMPORT_API virtual float GetClosestOnScreenLayoutPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize);
+  virtual float GetClosestOnScreenLayoutPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize);
 
   /**
    * @brief Query the number of items that should be reserved, for scrolling purposes.
@@ -340,7 +340,7 @@ public:
    * @param[in] loopEnabled Whether the KeyboardFocusManager is set to wrap around between first and last item
    * @return The next item ID.
    */
-  DALI_IMPORT_API virtual int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled);
+  virtual int GetNextFocusItemID(int itemID, int maxItems, Dali::Toolkit::Control::KeyboardFocus::Direction direction, bool loopEnabled);
 
   /**
    * @brief Query the flick speed factor of the layout while swipping.
@@ -355,7 +355,7 @@ public:
    * @SINCE_1_0.0
    * @return The scroll speed factor of the layout.
    */
-  DALI_IMPORT_API virtual float GetFlickSpeedFactor() const;
+  virtual float GetFlickSpeedFactor() const;
 
   /**
    * @brief Applies constraints defined by the layout to an actor.
@@ -365,7 +365,7 @@ public:
    * @param[in] layoutSize The current size of the item view instance.
    * @param[in] itemViewActor The item view instance which requests the application of constraints.
    */
-  DALI_IMPORT_API virtual void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor ) = 0;
+  virtual void ApplyConstraints( Actor& actor, const int itemId, const Vector3& layoutSize, const Actor& itemViewActor ) = 0;
 
   /**
    * @brief Gets the position of a given item
@@ -376,7 +376,7 @@ public:
    * @param[in] layoutSize The current size of the item view instance
    * @return The item position (x,y,z)
    */
-  DALI_IMPORT_API virtual Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const = 0;
+  virtual Vector3 GetItemPosition(int itemID, float currentLayoutPosition, const Vector3& layoutSize) const = 0;
 
   /**
    * @brief Retrieve the extension for this layout.
@@ -395,7 +395,7 @@ protected:
    * @brief Create a new ItemLayout; Only derived versions are instantiatable.
    * @SINCE_1_0.0
    */
-  DALI_IMPORT_API ItemLayout();
+  ItemLayout();
 
 private:
 

@@ -2,7 +2,7 @@
 #define __DALI_SCRIPT_PLUGIN_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <string>
 
 namespace Dali
@@ -34,7 +34,7 @@ namespace Toolkit
  * CreateScriptPlugin()  // returns a pointer to a ScriptPlugin object
  * DestroyScriptPlugin() // destroys the plugin
  */
-class DALI_IMPORT_API ScriptPlugin
+class DALI_TOOLKIT_API ScriptPlugin
 {
 public:
 
