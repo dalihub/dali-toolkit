@@ -474,6 +474,11 @@ Visual::FittingMode Visual::Base::GetFittingMode() const
   return mImpl->mFittingMode;
 }
 
+Visual::Base& Visual::Base::GetVisualObject()
+{
+  return *this;
+}
+
 Renderer Visual::Base::GetRenderer()
 {
   return mImpl->mRenderer;
