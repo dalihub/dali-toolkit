@@ -19,12 +19,17 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <test-native-image.h>
+#include <toolkit-event-thread-callback.h>
+
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/layouting/hbox-layout.h>
 #include <dali-toolkit/devel-api/layouting/vbox-layout.h>
-//#include <dali-toolkit/internal/controls/control/control-data-impl-debug.h>
+
+#include "dummy-control.h"
+
 
 using namespace Dali;
 using namespace Toolkit;
@@ -39,6 +44,10 @@ void utc_dali_toolkit_layouting_cleanup(void)
   test_return_value = TET_PASS;
 }
 
+namespace
+{
+
+const char* TEST_IMAGE_1 = TEST_RESOURCE_DIR "/test-image-600.jpg";
 
 Control CreateLeafControl( int width, int height )
 {
@@ -62,6 +71,15 @@ Control CreateLeafControl( int width, int height )
   map[ ImageVisual::Property::DESIRED_HEIGHT ] = (float) height;
   control.SetProperty( Control::Property::BACKGROUND, map );
   return control;
+}
+
+Vector3 gNaturalSize;
+
+// void OnSizeChange( Size size )
+// {
+//   gNaturalSize = size; // Size Relayout is using
+// }
+
 }
 
 int UtcDaliLayouting_HboxLayout01(void)
@@ -895,6 +913,49 @@ int UtcDaliLayouting_VboxLayout03(void)
   DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 80.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_ImageViewLoading(void)
+{
+  tet_infoline("UtcDaliLayouting_ImageViewLoading Load an Image that exceeds the size of the it's parent container");
+
+  ToolkitTestApplication application;
+
+  // Check ImageView with background and main image, to ensure both visuals are marked as loaded
+  ImageView imageView = ImageView::New();
+
+  Property::Map imageMap;
+
+  imageMap[ ImageVisual::Property::URL ] = TEST_IMAGE_1;
+
+  imageView.SetProperty( ImageView::Property::IMAGE, imageMap );
+
+  imageView.SetName( "ImageView");
+
+  auto hbox = Control::New();
+  auto hboxLayout = HboxLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "Hbox");
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  Stage::GetCurrent().Add( hbox );
+
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  hbox.Add( imageView );
+
+  application.SendNotification();
+  application.Render();
+
+  // loading started, this waits for the loader thread for max 30 seconds
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  tet_infoline("Checking retreived Size does not exceed that of the stage ( 480, 800 ");
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 600.0f, 0.0001f ), TEST_LOCATION );
 
   END_TEST;
 }
