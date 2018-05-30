@@ -312,6 +312,9 @@ void ImageView::OnResourceReady( Toolkit::Control control )
 {
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
   mVisual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
+
+  // Trigger a size negotiation request that may be needed when unregistering a visual.
+  RelayoutRequest();
 }
 
 ///////////////////////////////////////////////////////////
