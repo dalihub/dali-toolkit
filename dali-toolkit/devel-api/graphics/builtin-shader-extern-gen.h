@@ -26,6 +26,7 @@ extern std::vector<uint32_t> SHADER_MESH_VISUAL_SIMPLE_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_MESH_VISUAL_SIMPLE_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_NPATCH_VISUAL_3X3_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_NPATCH_VISUAL_SHADER_FRAG;
+extern std::vector<uint32_t> SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_NPATCH_VISUAL_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_WITH_STYLE_SHADER_FRAG;

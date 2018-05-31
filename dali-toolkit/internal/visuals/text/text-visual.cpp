@@ -882,8 +882,6 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     if( !shader )
     {
       //shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI );
-
-
       shader = DevelShader::New(
         GraphicsGetBuiltinShader( "SHADER_TEXT_VISUAL_SHADER_VERT" ),
         GraphicsGetBuiltinShader( "SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_EMOJI_SHADER_FRAG" ),

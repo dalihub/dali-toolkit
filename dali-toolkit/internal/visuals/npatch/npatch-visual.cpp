@@ -480,8 +480,10 @@ Shader NPatchVisual::CreateShader()
   NinePatchImage::StretchRanges::SizeType xStretchCount = 0;
   NinePatchImage::StretchRanges::SizeType yStretchCount = 0;
 
-  auto fragmentShader = mAuxiliaryPixelBuffer ? FRAGMENT_MASK_SHADER
-                                              : FRAGMENT_SHADER;
+  auto fragmentShader = mAuxiliaryPixelBuffer ? FRAGMENT_MASK_SHADER : FRAGMENT_SHADER;
+  auto fragmentShaderTag = mAuxiliaryPixelBuffer ? "SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG"
+                                                 : "SHADER_NPATCH_VISUAL_SHADER_FRAG";
+
   auto shaderType = mAuxiliaryPixelBuffer ? VisualFactoryCache::NINE_PATCH_MASK_SHADER
                                           : VisualFactoryCache::NINE_PATCH_SHADER;
 
@@ -500,14 +502,12 @@ Shader NPatchVisual::CreateShader()
       shader = mFactoryCache.GetShader( shaderType );
       if( DALI_UNLIKELY( !shader ) )
       {
-        //shader = Shader::New( VERTEX_SHADER_3X3, fragment_shader );
-		//@todo Need new shader for FRAGMENT_MASK_SHADER
         shader = DevelShader::New<uint32_t>(
           GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_3X3_SHADER_VERT" ),
-          GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_SHADER_FRAG" ),
+          GraphicsGetBuiltinShader( fragmentShaderTag ),
           DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
 
-		// Only cache vanilla 9 patch shaders  
+        // Only cache vanilla 9 patch shaders
         mFactoryCache.SaveShader( shaderType, shader );
       }
     }
@@ -536,8 +536,6 @@ Shader NPatchVisual::CreateShader()
         ( xStretchCount == 0 && yStretchCount == 0 ) )
     {
       //const char* vertexShader = VERTEX_SHADER_3X3;
-
-
 
       //if( !mImpl->mCustomShader->mVertexShader.empty() )
       //{
