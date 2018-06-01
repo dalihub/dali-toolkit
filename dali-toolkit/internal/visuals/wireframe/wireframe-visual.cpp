@@ -240,6 +240,16 @@ void WireframeVisual::OnSetTransform()
   }
 }
 
+Visual::Base& WireframeVisual::GetVisualObject()
+{
+  if( mActualVisual )
+  {
+    return *mActualVisual.Get();
+  }
+
+  return *this;
+}
+
 } // namespace Internal
 
 } // namespace Toolkit
