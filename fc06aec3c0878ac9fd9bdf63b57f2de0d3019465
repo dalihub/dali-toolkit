@@ -94,6 +94,30 @@
     },
     {
       "key": {
+        "uuid": "8a0c3563_90936489",
+        "filename": "dali-toolkit/devel-api/layouting/flex-layout.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-05T14:29:54Z",
+      "side": 1,
+      "message": "Can\u0027t be Properties set due to Properties not yet being supported in LayoutItem",
+      "parentUuid": "ced13298_62287a36",
+      "range": {
+        "startLine": 152,
+        "startChar": 2,
+        "endLine": 215,
+        "endChar": 36
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d9609aab_d7bc03c7",
         "filename": "dali-toolkit/internal/layouting/flex-layout-impl.cpp",
         "patchSetId": 11
