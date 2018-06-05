@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "879accd3_213466c9",
+        "filename": "dali-toolkit/internal/layouting/flex-layout-impl.cpp",
+        "patchSetId": 12
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-05T18:50:50Z",
+      "side": 1,
+      "message": "convention is to use braces {}",
+      "range": {
+        "startLine": 222,
+        "startChar": 4,
+        "endLine": 222,
+        "endChar": 69
+      },
+      "revId": "ba81910731916d4a7d8389917bacc86ea4e96e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8883206e_fd4380f3",
+        "filename": "dali-toolkit/internal/layouting/flex-layout-impl.cpp",
+        "patchSetId": 12
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-05T18:50:50Z",
+      "side": 1,
+      "message": "{ }",
+      "range": {
+        "startLine": 224,
+        "startChar": 0,
+        "endLine": 224,
+        "endChar": 1
+      },
+      "revId": "ba81910731916d4a7d8389917bacc86ea4e96e3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
