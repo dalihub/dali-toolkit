@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "513dca94_40928858",
+        "filename": "automated-tests/src/dali-toolkit/utc-Dali-Layouting.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 936,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-05T15:15:37Z",
+      "side": 1,
+      "message": "The Base64 string contains the whole test case.",
+      "parentUuid": "a2e861ed_ba4ffa6c",
+      "range": {
+        "startLine": 936,
+        "startChar": 17,
+        "endLine": 936,
+        "endChar": 1480
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "601a4877_63c93b53",
         "filename": "dali-toolkit/devel-api/layouting/flex-layout.cpp",
         "patchSetId": 11
@@ -36,6 +60,30 @@
       "writtenOn": "2018-06-05T14:24:38Z",
       "side": 1,
       "message": "full path - dali-toolkit/internal/layouting",
+      "range": {
+        "startLine": 22,
+        "startChar": 10,
+        "endLine": 22,
+        "endChar": 34
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d47c92d8_f03d54b0",
+        "filename": "dali-toolkit/devel-api/layouting/flex-layout.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-05T15:15:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "601a4877_63c93b53",
       "range": {
         "startLine": 22,
         "startChar": 10,
@@ -68,6 +116,30 @@
       "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8835549c_ebdd2e1c",
+        "filename": "dali-toolkit/devel-api/layouting/flex-layout.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-05T15:15:37Z",
+      "side": 1,
+      "message": "The description copy pasted from flex container for the same. I woudn\u0027t change it for now .",
+      "parentUuid": "9ab53ae2_3ac59017",
+      "range": {
+        "startLine": 101,
+        "startChar": 121,
+        "endLine": 101,
+        "endChar": 131
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
     },
     {
       "key": {
@@ -106,6 +178,30 @@
       "side": 1,
       "message": "Can\u0027t be Properties set due to Properties not yet being supported in LayoutItem",
       "parentUuid": "ced13298_62287a36",
+      "range": {
+        "startLine": 152,
+        "startChar": 2,
+        "endLine": 215,
+        "endChar": 36
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "af885bba_2227d2ec",
+        "filename": "dali-toolkit/devel-api/layouting/flex-layout.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-05T15:15:37Z",
+      "side": 1,
+      "message": "Can\u0027t be properties for now.",
+      "parentUuid": "8a0c3563_90936489",
       "range": {
         "startLine": 152,
         "startChar": 2,
@@ -164,6 +260,30 @@
     },
     {
       "key": {
+        "uuid": "1b05ce94_45047e12",
+        "filename": "dali-toolkit/internal/layouting/flex-layout-impl.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-05T15:15:37Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "3ce4b7da_c73aca68",
+      "range": {
+        "startLine": 298,
+        "startChar": 11,
+        "endLine": 298,
+        "endChar": 17
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ca874c37_707dac6b",
         "filename": "dali-toolkit/internal/layouting/flex-layout-impl.h",
         "patchSetId": 11
@@ -175,6 +295,30 @@
       "writtenOn": "2018-06-05T14:24:38Z",
       "side": 1,
       "message": "EXTERNAL_HEADERS",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 47
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6229dfc5_dcd1cd52",
+        "filename": "dali-toolkit/internal/layouting/flex-layout-impl.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-05T15:15:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca874c37_707dac6b",
       "range": {
         "startLine": 20,
         "startChar": 0,
@@ -210,6 +354,30 @@
     },
     {
       "key": {
+        "uuid": "38a1f800_a11d25c5",
+        "filename": "dali-toolkit/internal/layouting/flex-layout-impl.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-05T15:15:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5273520_0b4ffea2",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 47
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8c9e0f05_5524415f",
         "filename": "dali-toolkit/internal/layouting/flex-layout-impl.h",
         "patchSetId": 11
@@ -221,6 +389,30 @@
       "writtenOn": "2018-06-05T14:24:38Z",
       "side": 1,
       "message": "full path?",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 50
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d92d9f2a_2282e615",
+        "filename": "dali-toolkit/internal/layouting/flex-layout-impl.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-05T15:15:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c9e0f05_5524415f",
       "range": {
         "startLine": 24,
         "startChar": 0,
