@@ -27,6 +27,10 @@
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
 
+// @todo: using generated file in the dali-core!!!!
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
+#include <dali/devel-api/rendering/shader-devel.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/gradient-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
@@ -98,6 +102,7 @@ VisualFactoryCache::ShaderType GetShaderType( GradientVisual::Type type, Toolkit
   return VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX;
 }
 
+#if 0
 const char* VERTEX_SHADER[] =
 {
 // vertex shader for gradient units as OBJECT_BOUNDING_BOX
@@ -105,7 +110,7 @@ const char* VERTEX_SHADER[] =
   attribute mediump vec2 aPosition;\n
   uniform mediump mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
-  uniform mediump mat3 uAlignmentMatrix;\n
+  uniform mediump mat3 uAli3gnmentMatrix;\n
   varying mediump vec2 vTexCoord;\n
   \n
 
@@ -194,6 +199,8 @@ DALI_COMPOSE_SHADER(
   }\n
 )
 };
+
+#endif
 
 Dali::WrapMode::Type GetWrapMode( Toolkit::GradientVisual::SpreadMethod::Type spread )
 {
@@ -336,9 +343,26 @@ void GradientVisual::InitializeRenderer()
   Toolkit::GradientVisual::Units::Type gradientUnits = mGradient->GetGradientUnits();
   VisualFactoryCache::ShaderType shaderType = GetShaderType( mGradientType, gradientUnits );
   Shader shader = mFactoryCache.GetShader( shaderType );
+
+  const char* VERTEX_SHADER_STR[] = {
+    "SHADER_GRADIENT_VISUAL_SHADER_0_VERT",
+    "SHADER_GRADIENT_VISUAL_SHADER_1_VERT",
+  };
+
+  const char* FRAGMENT_SHADER_STR[] = {
+    "SHADER_GRADIENT_VISUAL_SHADER_0_FRAG",
+    "SHADER_GRADIENT_VISUAL_SHADER_1_FRAG",
+  };
+
   if( !shader )
   {
-    shader = Shader::New( VERTEX_SHADER[gradientUnits], FRAGMENT_SHADER[ mGradientType ] );
+    shader = DevelShader::New(
+      GraphicsGetBuiltinShader( VERTEX_SHADER_STR[gradientUnits] ),
+      GraphicsGetBuiltinShader( FRAGMENT_SHADER_STR[mGradientType] ),
+      DevelShader::ShaderLanguage::SPIRV_1_0,
+      Property::Map()
+    );
+
     mFactoryCache.SaveShader( shaderType, shader );
   }
 
