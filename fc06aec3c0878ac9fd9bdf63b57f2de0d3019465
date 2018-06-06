@@ -119,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "e14fb350_a64d4a9b",
+        "filename": "dali-toolkit/devel-api/layouting/flex-layout.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-06T08:47:54Z",
+      "side": 1,
+      "message": "Yes, thought about it, will do.",
+      "parentUuid": "d85ecae5_dabfd9ae",
+      "range": {
+        "startLine": 44,
+        "startChar": 71,
+        "endLine": 44,
+        "endChar": 77
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9ab53ae2_3ac59017",
         "filename": "dali-toolkit/devel-api/layouting/flex-layout.h",
         "patchSetId": 11
@@ -260,6 +284,30 @@
     },
     {
       "key": {
+        "uuid": "850b8b36_178ad3a2",
+        "filename": "dali-toolkit/internal/layouting/flex-layout-impl.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-06T08:47:54Z",
+      "side": 1,
+      "message": "Should functions declaration be in alphabetic order as well?",
+      "parentUuid": "085cb765_2b5bcd25",
+      "range": {
+        "startLine": 148,
+        "startChar": 7,
+        "endLine": 148,
+        "endChar": 17
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3446a40a_568f1263",
         "filename": "dali-toolkit/internal/layouting/flex-layout-impl.cpp",
         "patchSetId": 11
@@ -271,6 +319,30 @@
       "writtenOn": "2018-06-05T17:29:07Z",
       "side": 1,
       "message": "Should avoid doing this again if the specs haven\u0027t changed",
+      "range": {
+        "startLine": 212,
+        "startChar": 15,
+        "endLine": 212,
+        "endChar": 22
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "102d2ddc_d65fe7dc",
+        "filename": "dali-toolkit/internal/layouting/flex-layout-impl.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-06T08:47:54Z",
+      "side": 1,
+      "message": "Will update",
+      "parentUuid": "3446a40a_568f1263",
       "range": {
         "startLine": 212,
         "startChar": 15,
@@ -318,6 +390,30 @@
       "side": 1,
       "message": "Actor\u0027s min/max size isn\u0027t currently used by LayoutItem - It probably should be. LayoutItem currently has a MinimumWidth and MinimumHeight in it\u0027s implementation, but these aren\u0027t in the public API for no good reason.",
       "parentUuid": "d9609aab_d7bc03c7",
+      "range": {
+        "startLine": 284,
+        "startChar": 11,
+        "endLine": 284,
+        "endChar": 15
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4d76667_11460cec",
+        "filename": "dali-toolkit/internal/layouting/flex-layout-impl.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-06T08:47:54Z",
+      "side": 1,
+      "message": "So ideally LayoutItem should have Minimum(Width|Height) and Maximum(Width|Height) as public API but for now we can stick to using Actor properties?\nWe could add (Set|Get)Maximum(Width|Height) and make the APIs public.",
+      "parentUuid": "7cceade8_a46c171b",
       "range": {
         "startLine": 284,
         "startChar": 11,
