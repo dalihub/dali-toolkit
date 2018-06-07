@@ -21,9 +21,11 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/rendering/shader-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/text-scroller-interface.h>
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -39,7 +41,7 @@ namespace
 #endif
 
 const int MINIMUM_SCROLL_SPEED = 1; // Speed should be set by Property system.
-
+#if 0
 const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying highp vec2 vTexCoord;\n
@@ -92,6 +94,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
     gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );
   }\n
 );
+#endif
 
 /**
  * @brief How the text should be aligned horizontally when scrolling the text.
@@ -282,7 +285,11 @@ void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, T
   mTextureSet = mRenderer.GetTextures();
 
   // Set the shader and texture for scrolling
-  Shader shader = Shader::New( VERTEX_SHADER_SCROLL, FRAGMENT_SHADER, Shader::Hint::NONE );
+  Shader shader = DevelShader::New<uint32_t>(
+    GraphicsGetBuiltinShaderId( SHADER_TEXT_SCROLLER_SHADER_VERT ),
+    GraphicsGetBuiltinShaderId( SHADER_TEXT_SCROLLER_SHADER_FRAG ),
+    DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
+
   mRenderer.SetShader( shader );
   mRenderer.SetTextures( textureSet );
 

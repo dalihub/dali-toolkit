@@ -47,7 +47,8 @@ devel_api_src_files = \
   $(devel_api_src_dir)/visual-factory/transition-data.cpp \
   $(devel_api_src_dir)/visual-factory/visual-factory.cpp \
   $(devel_api_src_dir)/visual-factory/visual-base.cpp \
-  $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp
+  $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp \
+  $(devel_api_src_dir)/graphics/generated/builtin-shader-gen.cpp
 
 # Add devel header files here
 

@@ -25,11 +25,13 @@
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/devel-api/rendering/shader-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -108,6 +110,7 @@ const char * const POSITION( "aPosition");
 const char * const NORMAL( "aNormal" );
 const char * const INDICES( "aIndices" );
 
+#if 0
 //A simple shader that applies diffuse lighting to a mono-coloured object.
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute highp   vec3 aPosition;\n
@@ -175,7 +178,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
     gl_FragColor = vec4( vIllumination.rgb * baseColor.rgb, baseColor.a );\n
   }\n
 );
-
+#endif
 } // unnamed namespace
 
 PrimitiveVisualPtr PrimitiveVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
@@ -494,8 +497,12 @@ void PrimitiveVisual::UpdateShaderUniforms()
 
 void PrimitiveVisual::CreateShader()
 {
-  mShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-  UpdateShaderUniforms();
+  mShader = DevelShader::New<uint32_t>(
+    GraphicsGetBuiltinShaderId( SHADER_PRIMITIVE_VISUAL_SHADER_VERT ),
+    GraphicsGetBuiltinShaderId( SHADER_PRIMITIVE_VISUAL_SHADER_FRAG ),
+    DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map().Add("tag", 500) );
+
+    UpdateShaderUniforms();
 }
 
 void PrimitiveVisual::CreateGeometry()
