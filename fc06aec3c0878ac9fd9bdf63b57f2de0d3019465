@@ -143,6 +143,30 @@
     },
     {
       "key": {
+        "uuid": "c8c11128_0bfe13aa",
+        "filename": "dali-toolkit/devel-api/layouting/flex-layout.h",
+        "patchSetId": 11
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-07T08:51:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e14fb350_a64d4a9b",
+      "range": {
+        "startLine": 44,
+        "startChar": 71,
+        "endLine": 44,
+        "endChar": 77
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ab53ae2_3ac59017",
         "filename": "dali-toolkit/devel-api/layouting/flex-layout.h",
         "patchSetId": 11
@@ -308,6 +332,30 @@
     },
     {
       "key": {
+        "uuid": "a19d909f_898f8bd9",
+        "filename": "dali-toolkit/internal/layouting/flex-layout-impl.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-07T08:51:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "850b8b36_178ad3a2",
+      "range": {
+        "startLine": 148,
+        "startChar": 7,
+        "endLine": 148,
+        "endChar": 17
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3446a40a_568f1263",
         "filename": "dali-toolkit/internal/layouting/flex-layout-impl.cpp",
         "patchSetId": 11
@@ -352,6 +400,30 @@
       "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "edb6b1f7_0c597192",
+        "filename": "dali-toolkit/internal/layouting/flex-layout-impl.cpp",
+        "patchSetId": 11
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1014323
+      },
+      "writtenOn": "2018-06-07T08:51:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "102d2ddc_d65fe7dc",
+      "range": {
+        "startLine": 212,
+        "startChar": 15,
+        "endLine": 212,
+        "endChar": 22
+      },
+      "revId": "fc06aec3c0878ac9fd9bdf63b57f2de0d3019465",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     },
     {
       "key": {
