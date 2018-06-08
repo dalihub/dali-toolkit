@@ -21,9 +21,8 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/layouting/hbox-layout.h>
-#include <dali-toolkit/devel-api/layouting/vbox-layout.h>
 #include <dali-toolkit/devel-api/layouting/absolute-layout.h>
+#include <dali-toolkit/devel-api/layouting/linear-layout.h>
 
 #include <layout-utils.h>
 
@@ -47,7 +46,7 @@ int UtcDaliLayouting_HboxLayout01(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   hboxLayout.SetCellPadding( LayoutSize( 10, 0 ) );
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
@@ -83,7 +82,7 @@ int UtcDaliLayouting_HboxLayout01(void)
   DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   // Change a layout
-  auto newHBoxLayout = HboxLayout::New();
+  auto newHBoxLayout = LinearLayout::New();
   newHBoxLayout.SetCellPadding( LayoutSize( 10, 0 ) );
   DevelControl::SetLayout( hbox, newHBoxLayout );
 
@@ -106,11 +105,11 @@ int UtcDaliLayouting_HboxLayout02(void)
   Stage stage = Stage::GetCurrent();
 
   auto hbox1 = Control::New();
-  auto hboxLayout1 = HboxLayout::New();
+  auto hboxLayout1 = LinearLayout::New();
   DevelControl::SetLayout( hbox1, hboxLayout1 );
 
   auto hbox2 = Control::New();
-  auto hboxLayout2 = HboxLayout::New();
+  auto hboxLayout2 = LinearLayout::New();
   DevelControl::SetLayout( hbox2, hboxLayout2 );
 
   hbox1.SetName( "HBox1");
@@ -146,7 +145,7 @@ int UtcDaliLayouting_HboxLayout02(void)
   hbox2.SetAnchorPoint( AnchorPoint::CENTER );
 
   auto hbox3 = Control::New();
-  auto hboxLayout3 = HboxLayout::New();
+  auto hboxLayout3 = LinearLayout::New();
   DevelControl::SetLayout( hbox3, hboxLayout3 );
 
   hbox3.SetParentOrigin( ParentOrigin::CENTER );
@@ -206,11 +205,11 @@ int UtcDaliLayouting_HboxLayout03(void)
   Stage stage = Stage::GetCurrent();
 
   auto hbox1 = Control::New();
-  auto hboxLayout1 = HboxLayout::New();
+  auto hboxLayout1 = LinearLayout::New();
   DevelControl::SetLayout( hbox1, hboxLayout1 );
 
   auto hbox2 = Control::New();
-  auto hboxLayout2 = HboxLayout::New();
+  auto hboxLayout2 = LinearLayout::New();
   DevelControl::SetLayout( hbox2, hboxLayout2 );
 
   hbox1.SetName( "HBox1");
@@ -250,7 +249,7 @@ int UtcDaliLayouting_HboxLayout03(void)
   hbox2.SetAnchorPoint( AnchorPoint::CENTER );
 
   auto hbox3 = Control::New();
-  auto hboxLayout3 = HboxLayout::New();
+  auto hboxLayout3 = LinearLayout::New();
   DevelControl::SetLayout( hbox3, hboxLayout3);
 
   hbox3.SetParentOrigin( ParentOrigin::CENTER );
@@ -311,11 +310,11 @@ int UtcDaliLayouting_HboxLayout04(void)
   Stage stage = Stage::GetCurrent();
 
   auto hbox1 = Control::New();
-  auto hboxLayout1 = HboxLayout::New();
+  auto hboxLayout1 = LinearLayout::New();
   DevelControl::SetLayout( hbox1, hboxLayout1 );
 
   auto hbox2 = Control::New();
-  auto hboxLayout2 = HboxLayout::New();
+  auto hboxLayout2 = LinearLayout::New();
   DevelControl::SetLayout( hbox2, hboxLayout2 );
 
   hbox1.SetName( "HBox1"); // Default spec is to wrap content
@@ -352,7 +351,7 @@ int UtcDaliLayouting_HboxLayout04(void)
 
   controls[6].SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
   auto hbox3 = Control::New();
-  auto hboxLayout3 = HboxLayout::New();
+  auto hboxLayout3 = LinearLayout::New();
   DevelControl::SetLayout( hbox3, hboxLayout3 );
 
   hbox3.SetParentOrigin( ParentOrigin::CENTER );
@@ -410,7 +409,7 @@ int UtcDaliLayouting_HboxLayout05(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   hboxLayout.SetCellPadding( LayoutSize( 10, 0 ) );
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
@@ -460,7 +459,7 @@ int UtcDaliLayouting_HboxLayout_Padding01(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
 
@@ -525,7 +524,7 @@ int UtcDaliLayouting_HboxLayout_Padding02(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
 
@@ -604,7 +603,7 @@ int UtcDaliLayouting_HboxLayout_Padding03(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
 
@@ -690,7 +689,7 @@ int UtcDaliLayouting_HboxLayout_Margin01(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
 
@@ -752,7 +751,8 @@ int UtcDaliLayouting_VboxLayout01(void)
 
   Stage stage = Stage::GetCurrent();
   auto vbox = Control::New();
-  auto vboxLayout = VboxLayout::New();
+  auto vboxLayout = LinearLayout::New();
+  vboxLayout.SetOrientation( LinearLayout::Orientation::VERTICAL );
   DevelControl::SetLayout( vbox, vboxLayout );
   vbox.SetName( "Vbox");
 
@@ -811,7 +811,8 @@ int UtcDaliLayouting_VboxLayout02(void)
   stage.Add( rootControl );
 
   auto vbox = Control::New();
-  auto vboxLayout = VboxLayout::New();
+  auto vboxLayout = LinearLayout::New();
+  vboxLayout.SetOrientation( LinearLayout::Orientation::VERTICAL );
   DevelControl::SetLayout( vbox, vboxLayout );
   vbox.SetName( "Vbox");
   rootControl.Add( vbox );
@@ -875,14 +876,15 @@ int UtcDaliLayouting_VboxLayout03(void)
   //
   // For this test, add an hbox instead
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "Hbox");
   stage.Add( hbox );
 
   auto vbox = Control::New();
-  auto vboxLayout = VboxLayout::New();
+  auto vboxLayout = LinearLayout::New();
   vboxLayout.SetCellPadding( LayoutSize( 0, 10 ) );
+  vboxLayout.SetOrientation( LinearLayout::Orientation::VERTICAL );
 
   DALI_TEST_EQUALS( vboxLayout.GetCellPadding(), LayoutSize( 0, 10 ), TEST_LOCATION );
 
