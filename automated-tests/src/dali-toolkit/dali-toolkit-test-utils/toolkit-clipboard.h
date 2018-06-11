@@ -24,7 +24,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali DALI_CORE_API
+namespace Dali DALI_IMPORT_API
 {
 
 namespace Internal DALI_INTERNAL
