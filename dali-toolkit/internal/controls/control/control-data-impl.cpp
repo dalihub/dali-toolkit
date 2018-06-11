@@ -335,6 +335,8 @@ Control::Impl::Impl( Control& controlImpl )
   mPanGestureDetector(),
   mTapGestureDetector(),
   mLongPressGestureDetector(),
+  mTooltip( NULL ),
+  mInputMethodContext(),
   mFlags( Control::ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIsKeyboardNavigationSupported( false ),
   mIsKeyboardFocusGroup( false )

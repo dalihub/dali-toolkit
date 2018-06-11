@@ -260,6 +260,13 @@ public:
    */
   FittingMode GetFittingMode() const;
 
+  /**
+   * @brief Get the actual Visual Object.
+   * @return The actual visual object
+   * @note Should be overridden by deriving controls if they are acting as a proxy to other visual objects.
+   */
+  virtual Base& GetVisualObject();
+
  protected:
 
   /**

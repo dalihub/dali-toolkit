@@ -19,6 +19,7 @@
 #include <memory>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/actors/actor-enumerations.h>
+#include <dali-toolkit/devel-api/toolkit-property-index-ranges.h>
 #include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/devel-api/layouting/measure-spec.h>
 
@@ -54,17 +55,11 @@ public:
   using LayoutId = unsigned int;
   static const unsigned int UNKNOWN_ID = 0;
 
-  enum PropertyRange
-  {
-    CHILD_PROPERTY_START_INDEX = CHILD_PROPERTY_REGISTRATION_START_INDEX+100,
-    CHILD_PROPERTY_END_INDEX   = CHILD_PROPERTY_START_INDEX+1000
-  };
-
   struct ChildProperty
   {
     enum
     {
-      MARGIN_SPECIFICATION = CHILD_PROPERTY_START_INDEX,
+      MARGIN_SPECIFICATION = LAYOUT_GROUP_CHILD_PROPERTY_START_INDEX,
     };
   };
 

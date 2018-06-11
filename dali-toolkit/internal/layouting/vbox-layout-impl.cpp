@@ -17,7 +17,6 @@
 //CLASS HEADER
 #include <dali-toolkit/internal/layouting/vbox-layout-impl.h>
 
-//EXTERNAL HEADERS
 //INTERNAL HEADERS
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/extents.h>
@@ -27,10 +26,12 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
-
+namespace
+{
 #if defined(DEBUG_ENABLED)
 static Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
 #endif
+}
 
 namespace Dali
 {
@@ -165,7 +166,6 @@ void VboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
       alternativeMaxWidth = std::max( alternativeMaxWidth, matchWidthLocally ? marginWidth : childWidth );
     }
   }
-
   Extents padding = GetPadding();
   mTotalLength += padding.top + padding.bottom;
   auto heightSize = mTotalLength;
@@ -223,7 +223,6 @@ void VboxLayout::ForceUniformWidth( int count, MeasureSpec heightMeasureSpec )
 
 void VboxLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
 {
-  auto owner = GetOwner();
   Extents padding = GetPadding();
 
   LayoutLength childTop( 0 );

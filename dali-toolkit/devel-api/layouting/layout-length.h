@@ -46,7 +46,10 @@ public:
 
   LayoutLength& operator=(const LayoutLength& rhs)
   {
-    mValue = rhs.mValue;
+    if( this != &rhs )
+    {
+      mValue = rhs.mValue;
+    }
     return *this;
   }
 

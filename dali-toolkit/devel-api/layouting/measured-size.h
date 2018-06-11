@@ -39,7 +39,8 @@ public:
   };
 
   MeasuredSize()
-  : mMeasuredSize( 0u )
+  : mMeasuredSize( 0u ),
+    mState ( MeasuredSize::State::MEASURED_SIZE_OK )
   {
   }
 
@@ -59,8 +60,11 @@ public:
 
   MeasuredSize& operator=( const MeasuredSize& rhs )
   {
-    this->mMeasuredSize = rhs.mMeasuredSize;
-    this->mState = rhs.mState;
+    if( this != &rhs )
+    {
+      this->mMeasuredSize = rhs.mMeasuredSize;
+      this->mState = rhs.mState;
+    }
     return *this;
   }
 
