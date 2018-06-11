@@ -38,6 +38,6 @@ struct YGStyle {
   // Yoga specific properties, not compatible with flexbox specification
   bool operator==(const YGStyle& style);
 
-  bool operator!=(const YGStyle& style);
+  bool operator!=(YGStyle style);
   ~YGStyle();
 };
