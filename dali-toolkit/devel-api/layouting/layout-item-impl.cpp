@@ -140,7 +140,7 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
 
   const bool needsLayout = specChanged && ( !isSpecExactly || !matchesSpecSize );
 
-  if( forceLayout || needsLayout)
+  if( forceLayout || needsLayout )
   {
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET );
 
@@ -246,6 +246,18 @@ LayoutLength LayoutItem::GetDefaultSize( LayoutLength size, MeasureSpec measureS
       break;
     }
     case MeasureSpec::Mode::AT_MOST:
+    {
+      LayoutLength tmp = specSize;
+      if( size < tmp )
+      {
+        result = size;
+      }
+      else
+      {
+        result = specSize;
+      }
+      break;
+    }
     case MeasureSpec::Mode::EXACTLY:
     {
       result = specSize;
@@ -272,6 +284,11 @@ LayoutParent* LayoutItem::GetParent()
 
 void LayoutItem::RequestLayout()
 {
+  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  if ( control )
+  {
+    DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::RequestLayout %s\n", control.GetName().c_str());
+  }
   // @todo Enforce failure if called in Measure/Layout passes.
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
   Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
@@ -281,6 +298,11 @@ void LayoutItem::RequestLayout()
 bool LayoutItem::IsLayoutRequested() const
 {
   return mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
+}
+
+void LayoutItem::SetLayoutRequested()
+{
+  return mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
 }
 
 void LayoutItem::SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight )
