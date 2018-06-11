@@ -44,8 +44,8 @@ using LayoutItemPtr = IntrusivePtr<LayoutItem>;
 /**
  * Base class for layouts.
  */
-class DALI_TOOLKIT_API LayoutItem : public BaseObject,
-                                    public LayoutParent
+class DALI_IMPORT_API LayoutItem : public BaseObject,
+                                   public LayoutParent
 {
 public:
   /**
