@@ -24,8 +24,6 @@
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/shader.h>
 
-#include <dali/public-api/math/random.h>
-
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/bubble-effect/bubble-effect.h>
 #include <dali-toolkit/internal/controls/bubble-effect/bubble-renderer.h>
@@ -48,6 +46,18 @@ struct Vertex
   Dali::Vector2 position;
   Dali::Vector2 textureCoord;
 };
+
+/**
+ * Return a random value between the given interval.
+ * @param[in] f0 The low bound
+ * @param[in] f1 The up bound
+ * @param[in] seed The seed to genergate random number
+ * @return A random value between the given interval
+ */
+float RandomRange(float f0, float f1, unsigned int& seed)
+{
+  return f0 + (rand_r( &seed ) & 0xfff) * (f1-f0) * (1.0f/4095.0f);
+}
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
@@ -151,6 +161,7 @@ BubbleEmitter::BubbleEmitter( const Vector2& movementArea,
   mDensity( 5 ),
   mTotalNumOfBubble( maximumNumberOfBubble ),
   mCurrentBubble( 0 ),
+  mRandomSeed( 0 ),
   mRenderTaskRunning(false)
 {
   // Calculate how many shaders are required
@@ -170,6 +181,8 @@ BubbleEmitter::BubbleEmitter( const Vector2& movementArea,
     mNumBubblePerRenderer = mTotalNumOfBubble;
     mNumRenderer = 1;
   }
+
+  mRandomSeed = time( NULL );
 }
 
 BubbleEmitter::~BubbleEmitter()
@@ -354,7 +367,7 @@ Geometry BubbleEmitter::CreateGeometry( unsigned int numOfPatch )
 
   for(unsigned int i = 0; i < numOfPatch; i++)
   {
-    float halfSize = Random::Range( mBubbleSizeRange.x, mBubbleSizeRange.y ) * 0.5f;
+    float halfSize = RandomRange(mBubbleSizeRange.x, mBubbleSizeRange.y, mRandomSeed) * 0.5f;
 
     float index = static_cast<float>( i );
     vertexData.PushBack( Vertex( index, Vector2(-halfSize,-halfSize),Vector2(0.f,0.f) ) );
@@ -392,7 +405,7 @@ void BubbleEmitter::SetBubbleParameter( BubbleRenderer& bubbleRenderer, unsigned
 
   int halfRange = displacement.x / 2;
   // for the y coordinate, always negative, so bubbles always go upwards
-  Vector2 randomVec( rand() % static_cast<int>( displacement.x ) - halfRange, -rand() % static_cast<int>( displacement.y ) );
+  Vector2 randomVec( rand_r( &mRandomSeed ) % static_cast<int>(displacement.x) - halfRange, -rand_r( &mRandomSeed ) % static_cast<int>(displacement.y) );
   dir.Normalize();
   randomVec.x -= dir.x*halfRange;
   randomVec.y *= 1.0f - fabsf(dir.x)*0.33f;
