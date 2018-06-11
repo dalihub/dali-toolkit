@@ -52,7 +52,8 @@ devel_api_src_files = \
 # Add devel header files here
 
 devel_api_header_files = \
-  $(devel_api_src_dir)/direction-enums.h
+  $(devel_api_src_dir)/direction-enums.h \
+  $(devel_api_src_dir)/toolkit-property-index-ranges.h
 
 devel_api_controls_header_files = \
   $(devel_api_src_dir)/controls/control-depth-index-ranges.h \

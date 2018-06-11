@@ -62,8 +62,11 @@ public:
 
   MeasureSpec& operator=( const MeasureSpec& rhs )
   {
-    this->mSize = rhs.mSize;
-    this->mMode = rhs.mMode;
+    if( this != &rhs )
+    {
+      this->mSize = rhs.mSize;
+      this->mMode = rhs.mMode;
+    }
     return *this;
   }
 
