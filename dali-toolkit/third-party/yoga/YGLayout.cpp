@@ -30,7 +30,7 @@ YGLayout::YGLayout()
       didUseLegacyFlag(false),
       doesLegacyStretchFlagAffectsLayout(false) {}
 
-bool YGLayout::operator==(const YGLayout& layout) const {
+bool YGLayout::operator==(YGLayout layout) const {
   bool isEqual = YGFloatArrayEqual(position, layout.position) &&
       YGFloatArrayEqual(dimensions, layout.dimensions) &&
       YGFloatArrayEqual(margin, layout.margin) &&
@@ -60,6 +60,6 @@ bool YGLayout::operator==(const YGLayout& layout) const {
   return isEqual;
 }
 
-bool YGLayout::operator!=(const YGLayout& layout) const {
+bool YGLayout::operator!=(YGLayout layout) const {
   return !(*this == layout);
 }

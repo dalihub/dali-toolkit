@@ -49,7 +49,7 @@ struct YGNode {
       YGMeasureFunc measure,
       YGBaselineFunc baseline,
       YGDirtiedFunc dirtied,
-      const YGStyle& style,
+      YGStyle style,
       const YGLayout& layout,
       uint32_t lineIndex,
       YGNodeRef owner,
