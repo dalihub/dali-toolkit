@@ -22,6 +22,7 @@
 #include <dali-toolkit/devel-api/toolkit-property-index-ranges.h>
 #include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/devel-api/layouting/measure-spec.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -49,7 +50,7 @@ class LayoutGroup;
  * To write a new layout, inherit from both LayoutGroup handle and Internal::LayoutGroup body.
  *
  */
-class DALI_IMPORT_API LayoutGroup : public LayoutItem
+class DALI_TOOLKIT_API LayoutGroup : public LayoutItem
 {
 public:
   using LayoutId = unsigned int;
