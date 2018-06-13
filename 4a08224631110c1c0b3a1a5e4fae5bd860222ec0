@@ -1,0 +1,320 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7bb9ed4c_cadbc2ed",
+        "filename": "dali-toolkit/devel-api/layouting/absolute-layout.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Add new layout property index",
+      "range": {
+        "startLine": 46,
+        "startChar": 33,
+        "endLine": 46,
+        "endChar": 73
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9b8d4135_60a43a7a",
+        "filename": "dali-toolkit/devel-api/layouting/absolute-layout.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "These make no sense for this layout",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 4
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "849c8014_83255134",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 3
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ce5200ba_940fb237",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 82,
+        "startChar": 2,
+        "endLine": 84,
+        "endChar": 1
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c3e3bcc0_cf70b6bb",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "DALI_LOG_STREAM will be a thing.",
+      "range": {
+        "startLine": 91,
+        "startChar": 2,
+        "endLine": 98,
+        "endChar": 65
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3fe75315_75e26be9",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Remove",
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "de576116_64f6bb24",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 150,
+        "endChar": 7
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7c735bd8_d0b85925",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Calculate maxWidth as well",
+      "range": {
+        "startLine": 163,
+        "startChar": 6,
+        "endLine": 163,
+        "endChar": 53
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "533aa11f_6500acf4",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 164,
+        "startChar": 6,
+        "endLine": 165,
+        "endChar": 75
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2cdba25c_8308bf10",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 180,
+        "endChar": 3
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "582b06ff_979d2f20",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 191,
+        "startChar": 2,
+        "endLine": 194,
+        "endChar": 3
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "27a7354a_0a179c9e",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 197,
+        "startChar": 0,
+        "endLine": 225,
+        "endChar": 1
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "823603c5_15c370f9",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 41,
+        "startChar": 1,
+        "endLine": 42,
+        "endChar": 30
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "30539365_b3ac4998",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007394
+      },
+      "writtenOn": "2018-06-13T16:19:54Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 77,
+        "startChar": 1,
+        "endLine": 77,
+        "endChar": 69
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    }
+  ]
+}
