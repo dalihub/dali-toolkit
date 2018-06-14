@@ -26,7 +26,7 @@ namespace
 {
 
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::Verbose, false, "LOG_LAYOUT" );
+Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_LAYOUT" );
 #endif
 
 const char* WIDTH_SPECIFICATION_NAME( "widthSpecification" );
@@ -139,6 +139,8 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
     ( GetMeasuredHeight() == heightMeasureSpec.GetSize() );
 
   const bool needsLayout = specChanged && ( !isSpecExactly || !matchesSpecSize );
+
+  DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::Measure("<<widthMeasureSpec<<", "<<heightMeasureSpec<<") Owner:"<<Actor::DownCast(GetOwner()).GetName() <<"  forceLayout="<<forceLayout<<", specChanged="<<specChanged<<", isSpecExactly="<<isSpecExactly<<", matchesSpecSize="<<matchesSpecSize<<", needsLayout="<<needsLayout <<std::endl <<(forceLayout||needsLayout?"  Remeasuring":"  NoChange"));
 
   if( forceLayout || needsLayout )
   {

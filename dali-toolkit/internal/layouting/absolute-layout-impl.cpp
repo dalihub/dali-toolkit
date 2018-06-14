@@ -28,7 +28,7 @@
 namespace
 {
 #if defined(DEBUG_ENABLED)
-static Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
+static Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_LAYOUT" );
 #endif
 }
 

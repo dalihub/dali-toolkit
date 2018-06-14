@@ -30,7 +30,7 @@
 #include <dali-toolkit/third-party/yoga/YGNode.h>
 
 #if defined(DEBUG_ENABLED)
-static Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
+static Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_LAYOUT" );
 #endif
 
 namespace Dali
@@ -191,7 +191,7 @@ void FlexLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
   oss << "FlexLayout::OnMeasure  ";
   if( actor )
   {
-  	oss << "Actor Id:" << actor.GetId() << " Name:" << actor.GetName() << " Layout direction:" << actor.GetProperty( Actor::Property::LAYOUT_DIRECTION ).Get<int>() << " ";
+    oss << "Actor Id:" << actor.GetId() << " Name:" << actor.GetName() << " Layout direction:" << actor.GetProperty( Actor::Property::LAYOUT_DIRECTION ).Get<int>() << " ";
   }
   oss << "widthMeasureSpec:" << widthMeasureSpec << " heightMeasureSpec:" << heightMeasureSpec << std::endl;
   DALI_LOG_INFO( gLogFilter, Debug::Concise, oss.str().c_str() );
