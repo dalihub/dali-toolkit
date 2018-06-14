@@ -113,16 +113,6 @@ public:
   bool IsLayoutAnimated() const;
 
   /**
-   * @brief Register child properties of layout with owner type.
-   *
-   * The Actor hierarchy uses these registered properties in the type
-   * system to ensure child custom properties are properly initialized.
-   *
-   * @param[in] containerType The type of the containing view (owner)
-   */
-  void RegisterChildProperties( const std::string& containerType );
-
-  /**
    * @brief  This is called to find out how big a layout should be.
    *
    * The parent supplies constraint information in the width and height parameters.
@@ -439,6 +429,16 @@ private:
    * @param[in] animation  A handle to the layout animation
    */
   void OnLayoutAnimationFinished( Animation& animation );
+
+  /**
+   * @brief Register child properties of layout with owner type.
+   *
+   * The Actor hierarchy uses these registered properties in the type
+   * system to ensure child custom properties are properly initialized.
+   *
+   * @param[in] containerType The type of the containing view (owner)
+   */
+  void RegisterChildProperties( const std::string& containerType );
 
 public:
   class Impl; // Class declaration is public so we can add devel API's in the future

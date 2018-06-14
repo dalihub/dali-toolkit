@@ -121,7 +121,7 @@ public:
    *
    * @param[in] actor A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL LayoutItem( Internal::LayoutItem* LayoutItem );
+  explicit LayoutItem( Internal::LayoutItem* LayoutItem );
   /// @endcond
 };
 
