@@ -133,7 +133,8 @@ void VboxLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
 
       MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, heightMeasureSpec, 0 );
       auto childHeight = childLayout->GetMeasuredHeight();
-      auto childMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
+      auto childMargin = childLayout->GetMargin();
+
       auto length = childHeight + LayoutLength::IntType(childMargin.top + childMargin.bottom );
 
       auto cellPadding = i<GetChildCount()-1 ? mCellPadding.height : 0;
@@ -244,7 +245,7 @@ void VboxLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
       auto childHeight = childLayout->GetMeasuredHeight();
 
       auto childOwner = childLayout->GetOwner();
-      auto childMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
+      auto childMargin = childLayout->GetMargin();
 
       childTop += childMargin.top;
       childLeft = ( childSpace - childWidth ) / 2 + childMargin.start - childMargin.end;

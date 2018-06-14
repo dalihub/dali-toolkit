@@ -59,7 +59,6 @@ public:
   {
     enum
     {
-      MARGIN_SPECIFICATION = LAYOUT_GROUP_CHILD_PROPERTY_START_INDEX,
     };
   };
 
