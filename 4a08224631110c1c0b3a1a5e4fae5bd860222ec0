@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "90eab503_d299a7e7",
+        "filename": "dali-toolkit/devel-api/layouting/absolute-layout.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7bb9ed4c_cadbc2ed",
+      "range": {
+        "startLine": 46,
+        "startChar": 33,
+        "endLine": 46,
+        "endChar": 73
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9b8d4135_60a43a7a",
         "filename": "dali-toolkit/devel-api/layouting/absolute-layout.h",
         "patchSetId": 1
@@ -45,6 +69,30 @@
       "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "811e756b_4f085a49",
+        "filename": "dali-toolkit/devel-api/layouting/absolute-layout.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b8d4135_60a43a7a",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 4
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "83ce0b87_4e74007f",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "849c8014_83255134",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 77,
+        "endChar": 3
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ce5200ba_940fb237",
         "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
         "patchSetId": 1
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "8afe7c82_aa2e2ad8",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "ce5200ba_940fb237",
+      "range": {
+        "startLine": 82,
+        "startChar": 2,
+        "endLine": 84,
+        "endChar": 1
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3e3bcc0_cf70b6bb",
         "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
         "patchSetId": 1
@@ -105,6 +201,30 @@
       "writtenOn": "2018-06-13T16:19:54Z",
       "side": 1,
       "message": "DALI_LOG_STREAM will be a thing.",
+      "range": {
+        "startLine": 91,
+        "startChar": 2,
+        "endLine": 98,
+        "endChar": 65
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "401ffb70_d8c2fff1",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Can update the layouts once implemented",
+      "parentUuid": "c3e3bcc0_cf70b6bb",
       "range": {
         "startLine": 91,
         "startChar": 2,
@@ -134,6 +254,24 @@
     },
     {
       "key": {
+        "uuid": "dae15571_d187a0a3",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3fe75315_75e26be9",
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "de576116_64f6bb24",
         "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
         "patchSetId": 1
@@ -157,6 +295,30 @@
     },
     {
       "key": {
+        "uuid": "1afc291d_366b4c32",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "de576116_64f6bb24",
+      "range": {
+        "startLine": 144,
+        "startChar": 0,
+        "endLine": 150,
+        "endChar": 7
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7c735bd8_d0b85925",
         "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
         "patchSetId": 1
@@ -168,6 +330,30 @@
       "writtenOn": "2018-06-13T16:19:54Z",
       "side": 1,
       "message": "Calculate maxWidth as well",
+      "range": {
+        "startLine": 163,
+        "startChar": 6,
+        "endLine": 163,
+        "endChar": 53
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "550095d4_66312277",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "In the latest patch I removed this as the max height is determined from the children already (mTotalHeight)",
+      "parentUuid": "7c735bd8_d0b85925",
       "range": {
         "startLine": 163,
         "startChar": 6,
@@ -203,6 +389,30 @@
     },
     {
       "key": {
+        "uuid": "fffd717a_211b8f37",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "533aa11f_6500acf4",
+      "range": {
+        "startLine": 164,
+        "startChar": 6,
+        "endLine": 165,
+        "endChar": 75
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2cdba25c_8308bf10",
         "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
         "patchSetId": 1
@@ -223,6 +433,30 @@
       "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c93f9398_e1c24861",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2cdba25c_8308bf10",
+      "range": {
+        "startLine": 176,
+        "startChar": 0,
+        "endLine": 180,
+        "endChar": 3
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     },
     {
       "key": {
@@ -249,6 +483,30 @@
     },
     {
       "key": {
+        "uuid": "f64c260d_b0663a2e",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "582b06ff_979d2f20",
+      "range": {
+        "startLine": 191,
+        "startChar": 2,
+        "endLine": 194,
+        "endChar": 3
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "27a7354a_0a179c9e",
         "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
         "patchSetId": 1
@@ -269,6 +527,30 @@
       "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "711568df_4f6c06ed",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "27a7354a_0a179c9e",
+      "range": {
+        "startLine": 197,
+        "startChar": 0,
+        "endLine": 225,
+        "endChar": 1
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     },
     {
       "key": {
@@ -295,6 +577,30 @@
     },
     {
       "key": {
+        "uuid": "e29588d9_25c10721",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "823603c5_15c370f9",
+      "range": {
+        "startLine": 41,
+        "startChar": 1,
+        "endLine": 42,
+        "endChar": 30
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "30539365_b3ac4998",
         "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.h",
         "patchSetId": 1
@@ -315,6 +621,30 @@
       "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "251a27ac_6633fb6f",
+        "filename": "dali-toolkit/internal/layouting/absolute-layout-impl.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1011527
+      },
+      "writtenOn": "2018-06-14T09:08:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "30539365_b3ac4998",
+      "range": {
+        "startLine": 77,
+        "startChar": 1,
+        "endLine": 77,
+        "endChar": 69
+      },
+      "revId": "4a08224631110c1c0b3a1a5e4fae5bd860222ec0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
     }
   ]
 }
