@@ -406,6 +406,7 @@ void LayoutGroup::OnInitialize()
 
     DevelActor::ChildAddedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildAddedToOwner );
     DevelActor::ChildRemovedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildRemovedFromOwner );
+    DevelActor::ChildOrderChangedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildOrderChanged );
     DevelHandle::PropertySetSignal( control ).Connect( mSlotDelegate, &LayoutGroup::OnOwnerPropertySet );
 
     if( control.GetParent() )
@@ -497,6 +498,16 @@ void LayoutGroup::ChildRemovedFromOwner( Actor child )
     {
       Remove( *childLayout.Get() );
     }
+  }
+}
+
+void LayoutGroup::ChildOrderChanged()
+{
+  RequestLayout();
+  // Force Children to be relaid out:
+  for( auto&& child : mImpl->mChildren )
+  {
+    child.child->SetLayoutRequested();
   }
 }
 

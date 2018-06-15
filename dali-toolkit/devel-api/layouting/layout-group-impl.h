@@ -255,6 +255,11 @@ private:
   void ChildRemovedFromOwner( Actor child );
 
   /**
+   * Callback when child order is changed
+   */
+  void ChildOrderChanged();
+
+  /**
    * Callback when an owner property is set. Triggers a relayout if it's a child property
    */
   void OnOwnerPropertySet( Handle& handle, Property::Index index, Property::Value value );
