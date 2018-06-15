@@ -7,6 +7,7 @@ SET(CAPI_LIB "dali-toolkit")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
+  utc-Dali-AbsoluteLayout.cpp
   utc-Dali-Alignment.cpp
   utc-Dali-AnimatedImageVisual.cpp
   utc-Dali-BloomView.cpp

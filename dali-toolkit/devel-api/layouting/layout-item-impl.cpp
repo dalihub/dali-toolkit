@@ -145,6 +145,11 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET );
 
     // measure ourselves, this should set the measured dimension flag back
+#if defined(DEBUG_ENABLED)
+    std::ostringstream o;
+    o<<widthMeasureSpec<<","<<heightMeasureSpec;
+    DALI_LOG_INFO( gLayoutFilter, Debug::Concise, "Calling %s OnMeasure( %s )\n", Actor::DownCast(GetOwner()).GetName().c_str(), o.str().c_str());
+#endif
     OnMeasure( widthMeasureSpec, heightMeasureSpec );
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT );
 

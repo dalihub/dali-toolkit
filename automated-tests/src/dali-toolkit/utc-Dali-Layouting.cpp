@@ -23,6 +23,7 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/layouting/hbox-layout.h>
 #include <dali-toolkit/devel-api/layouting/vbox-layout.h>
+#include <dali-toolkit/devel-api/layouting/absolute-layout.h>
 
 #include <layout-utils.h>
 
@@ -803,17 +804,17 @@ int UtcDaliLayouting_VboxLayout02(void)
   // LayoutGroup for this to happen automatically.
   //
   // For this test, add an hbox instead
-  auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
-  DevelControl::SetLayout( hbox, hboxLayout );
-  hbox.SetName( "Hbox");
-  stage.Add( hbox );
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout");
+  stage.Add( rootControl );
 
   auto vbox = Control::New();
   auto vboxLayout = VboxLayout::New();
   DevelControl::SetLayout( vbox, vboxLayout );
   vbox.SetName( "Vbox");
-  hbox.Add( vbox );
+  rootControl.Add( vbox );
 
   vbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
   vbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
@@ -840,8 +841,8 @@ int UtcDaliLayouting_VboxLayout02(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>(Actor::Property::POSITION), Vector3(0,0,0),TEST_LOCATION);
-  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>(Actor::Property::SIZE), Vector3(480,800,0),TEST_LOCATION);
+  DALI_TEST_EQUALS( rootControl.GetProperty<Vector3>(Actor::Property::POSITION), Vector3(0,0,0),TEST_LOCATION);
+  DALI_TEST_EQUALS( rootControl.GetProperty<Vector3>(Actor::Property::SIZE), Vector3(480,800,0),TEST_LOCATION);
 
   // vbox centers elements horizontally, it should wrap it's content horizontally, i.e. it should take the width of the largest element (100)
   DALI_TEST_EQUALS( vbox.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
