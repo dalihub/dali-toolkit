@@ -36,7 +36,7 @@ class LayoutController;
  * @brief Controls the process of layouting the control tree. It provides methods to enable
  * controls to re-layout and internal systems to separately measure and layout controls.
  */
-class DALI_TOOLKIT_API LayoutController : public BaseHandle
+class DALI_IMPORT_API LayoutController : public BaseHandle
 {
 public:
   /**
