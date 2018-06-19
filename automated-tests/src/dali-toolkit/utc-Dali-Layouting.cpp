@@ -18,13 +18,13 @@
 #include <iostream>
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
-
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+#include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/layouting/hbox-layout.h>
 #include <dali-toolkit/devel-api/layouting/vbox-layout.h>
-
-#include <layout-utils.h>
+//#include <dali-toolkit/internal/controls/control/control-data-impl-debug.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -37,6 +37,31 @@ void utc_dali_toolkit_layouting_startup(void)
 void utc_dali_toolkit_layouting_cleanup(void)
 {
   test_return_value = TET_PASS;
+}
+
+
+Control CreateLeafControl( int width, int height )
+{
+  auto control = Control::New();
+  control.SetName( "Leaf" );
+
+  auto pixelBuffer = Devel::PixelBuffer::New( 1, 1, Pixel::RGB888 );
+  unsigned char* pixels = pixelBuffer.GetBuffer();
+  pixels[0] = 0xff;
+  pixels[1] = 0x00;
+  pixels[2] = 0x00;
+  auto texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGB888, 1, 1 );
+  auto pixelData = Devel::PixelBuffer::Convert( pixelBuffer );
+  texture.Upload( pixelData );
+  std::string url = TextureManager::AddTexture( texture );
+
+  Property::Map map;
+  map[ Visual::Property::TYPE ] = Visual::IMAGE;
+  map[ ImageVisual::Property::URL ] = url;
+  map[ ImageVisual::Property::DESIRED_WIDTH ] = (float) width;
+  map[ ImageVisual::Property::DESIRED_HEIGHT ] = (float) height;
+  control.SetProperty( Control::Property::BACKGROUND, map );
+  return control;
 }
 
 int UtcDaliLayouting_HboxLayout01(void)

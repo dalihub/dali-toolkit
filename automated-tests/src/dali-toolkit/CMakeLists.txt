@@ -7,6 +7,7 @@ SET(CAPI_LIB "dali-toolkit")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
+  utc-Dali-Layouting.cpp
   utc-Dali-Alignment.cpp
   utc-Dali-AnimatedImageVisual.cpp
   utc-Dali-BloomView.cpp
@@ -17,13 +18,11 @@ SET(TC_SOURCES
   utc-Dali-CubeTransitionEffect.cpp
   utc-Dali-EffectsView.cpp
   utc-Dali-FlexContainer.cpp
-  utc-Dali-FlexLayout.cpp
   utc-Dali-GaussianBlurView.cpp
   utc-Dali-ImageView.cpp
   utc-Dali-ImageVisual.cpp
   utc-Dali-JsonParser.cpp
   utc-Dali-KeyInputFocusManager.cpp
-  utc-Dali-Layouting.cpp
   utc-Dali-PageTurnView.cpp
   utc-Dali-Script.cpp
   utc-Dali-ScrollBar.cpp
@@ -91,7 +90,6 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/toolkit-web-view-lite.cpp
   dali-toolkit-test-utils/dali-test-suite-utils.cpp
   dali-toolkit-test-utils/dummy-control.cpp
-  dali-toolkit-test-utils/layout-utils.cpp
   dali-toolkit-test-utils/mesh-builder.cpp
   dali-toolkit-test-utils/test-actor-utils.cpp
   dali-toolkit-test-utils/test-animation-data.cpp
