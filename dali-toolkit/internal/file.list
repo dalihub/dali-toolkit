@@ -100,6 +100,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/controls/tool-bar/tool-bar-impl.cpp \
    $(toolkit_src_dir)/controls/tooltip/tooltip.cpp \
    $(toolkit_src_dir)/controls/video-view/video-view-impl.cpp \
+   $(toolkit_src_dir)/controls/web-view-lite/web-view-lite-impl.cpp \
    $(toolkit_src_dir)/accessibility-manager/accessibility-manager-impl.cpp \
    \
    $(toolkit_src_dir)/feedback/feedback-style.cpp \
