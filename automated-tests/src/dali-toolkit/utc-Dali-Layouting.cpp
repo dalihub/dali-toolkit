@@ -389,54 +389,6 @@ int UtcDaliLayouting_HboxLayout04(void)
   END_TEST;
 }
 
-int UtcDaliLayouting_HboxLayout05(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliLayouting_HboxLayout05 - Set children size explicitly via width & height specification");
-
-  Stage stage = Stage::GetCurrent();
-  auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
-  hboxLayout.SetCellPadding( LayoutSize( 10, 0 ) );
-  DevelControl::SetLayout( hbox, hboxLayout );
-  hbox.SetName( "HBox");
-
-  std::vector< Control > controls;
-  controls.push_back( CreateLeafControl( 40, 40 ) );
-  controls.push_back( CreateLeafControl( 60, 40 ) );
-  controls.push_back( CreateLeafControl( 80, 40 ) );
-  controls.push_back( CreateLeafControl( 100, 40 ) );
-
-  for( auto&& iter : controls )
-  {
-    hbox.Add( iter );
-    iter.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, 100 );
-    iter.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, 50 );
-  }
-
-  hbox.SetParentOrigin( ParentOrigin::CENTER );
-  hbox.SetAnchorPoint( AnchorPoint::CENTER );
-  stage.Add( hbox );
-
-  // Ensure layouting happens
-  application.SendNotification();
-  application.Render();
-
-  // hbox centers elements vertically, it fills test harness stage, which is 480x800.
-  // hbox left justifies elements
-  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 375.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 110.0f, 375.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 220.0f, 375.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 330.0f, 375.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 50.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 50.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 50.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 50.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-
-  END_TEST;
-}
-
 // Padding tests
 
 int UtcDaliLayouting_HboxLayout_Padding01(void)

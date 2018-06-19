@@ -286,8 +286,6 @@ YGSize FlexLayout::OnChildMeasure( YGNodeRef node,
                               YGMeasureMode widthMode,
                               float innerHeight,
                               YGMeasureMode heightMode ) {
-  // TODO: this function should try to get use of LayoutGroup::GetChildMeasureSpec
-  // or LayoutGroup::MeasureChild somehow since it is fixed now
   LayoutItem* childLayout = static_cast<LayoutItem*>(node->getContext());
   auto childOwner = childLayout->GetOwner();
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
@@ -350,20 +348,8 @@ YGSize FlexLayout::OnChildMeasure( YGNodeRef node,
   }
 
   // Measure for Yoga
-  MeasureSpec::Mode ygWidthMode = static_cast<MeasureSpec::Mode>(widthMode);
-  if( measureWidthMode == MeasureSpec::Mode::EXACTLY )
-  {
-    ygWidthMode = MeasureSpec::Mode::EXACTLY;
-  }
-
-  MeasureSpec::Mode ygHeightMode = static_cast<MeasureSpec::Mode>(heightMode);
-  if( measureHeightMode == MeasureSpec::Mode::EXACTLY )
-  {
-    ygHeightMode = MeasureSpec::Mode::EXACTLY;
-  }
-
-  MeasureSpec ygWidthMeasureSpec = MeasureSpec( desiredWidth, ygWidthMode );
-  MeasureSpec ygHeightMeasureSpec = MeasureSpec( desiredHeight, ygHeightMode );
+  MeasureSpec ygWidthMeasureSpec = MeasureSpec( desiredWidth, static_cast<MeasureSpec::Mode>(widthMode) );
+  MeasureSpec ygHeightMeasureSpec = MeasureSpec( desiredHeight, static_cast<MeasureSpec::Mode>(heightMode) );
 #if defined(DEBUG_ENABLED)
   auto actor = Actor::DownCast(childOwner);
   std::ostringstream oss;

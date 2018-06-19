@@ -187,11 +187,6 @@ public:
   bool IsLayoutRequested() const;
 
   /**
-   * @brief Set layout requested flag (mark the layout dirty).
-   */
-  void SetLayoutRequested();
-
-  /**
    * @brief Get the measured width (without any measurement flags).
    *
    * This method should be used only during measurement and layout calculations.
