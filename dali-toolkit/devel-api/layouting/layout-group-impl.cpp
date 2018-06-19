@@ -122,7 +122,7 @@ void LayoutGroup::Remove( LayoutItem& child )
 
 void LayoutGroup::RemoveAll()
 {
-  for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; )
+  for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; ++iter )
   {
     OnChildRemove( *iter->child.Get() );
     iter = mImpl->mChildren.erase(iter);
