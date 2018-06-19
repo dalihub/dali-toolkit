@@ -27,7 +27,7 @@ namespace Internal
 {
 
 #if defined( DEBUG_ENABLED )
-Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Verbose, false, "LOG_LAYOUT_TREE" );
+Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_LAYOUT_TREE" );
 
 
 void GetLayoutMeasureStateString( std::ostringstream& oss, LayoutItemPtr layout )
