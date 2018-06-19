@@ -1391,6 +1391,9 @@ void Control::Impl::OnStageDisconnection()
 void Control::Impl::SetMargin( Extents margin )
 {
   mControlImpl.mImpl->mMargin = margin;
+
+  // Trigger a size negotiation request that may be needed when setting a margin.
+  mControlImpl.RelayoutRequest();
 }
 
 Extents Control::Impl::GetMargin() const
@@ -1401,6 +1404,9 @@ Extents Control::Impl::GetMargin() const
 void Control::Impl::SetPadding( Extents padding )
 {
   mControlImpl.mImpl->mPadding = padding;
+
+  // Trigger a size negotiation request that may be needed when setting a padding.
+  mControlImpl.RelayoutRequest();
 }
 
 Extents Control::Impl::GetPadding() const

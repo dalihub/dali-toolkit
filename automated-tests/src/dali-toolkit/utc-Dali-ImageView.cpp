@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 #include <test-native-image.h>
 #include <sstream>
@@ -1616,6 +1617,94 @@ int UtcDaliImageViewResourceReadySignalWithReusedImage02(void)
   Stage::GetCurrent().Add( imageViewWithExistingImage );
 
   DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewPaddingProperty(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+  Property::Map imagePropertyMap;
+  imagePropertyMap[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imagePropertyMap[ Toolkit::ImageVisual::Property::URL ] = TEST_RESOURCE_DIR "/gallery-small-1.jpg" ;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_WIDTH ] = 128;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 128;
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE , imagePropertyMap );
+  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
+  Stage::GetCurrent().Add( imageView );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Extents>( Control::Property::PADDING ), Extents( 15, 10, 5, 10 ), TEST_LOCATION );
+
+  ImageView childImage = ImageView::New();
+  childImage.SetBackgroundColor( Color::BLACK );
+  childImage.SetSize( 10.f, 10.f );
+  imageView.Add( childImage );
+
+  application.SendNotification();
+  application.Render();
+
+  // Child ImageView should be positioned dependinig on Parent ImageView's Padding value
+  DALI_TEST_EQUALS( childImage.GetProperty<Vector3>( Dali::Actor::Property::POSITION ), Vector3( 15, 5, 0 ), TEST_LOCATION );
+
+  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( imageView );
+  Toolkit::Visual::Base imageVisual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+  Property::Map resultMap;
+  imageVisual.CreatePropertyMap( resultMap );
+
+  Property::Value* transformValue = resultMap.Find( Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( transformValue );
+  Property::Map* retMap = transformValue->GetMap();
+  DALI_TEST_CHECK( retMap );
+
+  // Image Visual should be positioned depending on ImageView's padding
+  DALI_TEST_EQUALS( retMap->Find( Visual::Transform::Property::OFFSET )->Get< Vector2 >(), Vector2( 15, 5 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewPaddingProperty02(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+  Property::Map imagePropertyMap;
+  imagePropertyMap[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imagePropertyMap[ Toolkit::ImageVisual::Property::URL ] = TEST_RESOURCE_DIR "/Kid1.svg" ;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_WIDTH ] = 128;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 128;
+  imagePropertyMap[ DevelVisual::Property::VISUAL_FITTING_MODE ] = Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE , imagePropertyMap );
+  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
+  Stage::GetCurrent().Add( imageView );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Extents>( Control::Property::PADDING ), Extents( 15, 10, 5, 10 ), TEST_LOCATION );
+
+  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( imageView );
+  Toolkit::Visual::Base imageVisual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+  Property::Map resultMap;
+  imageVisual.CreatePropertyMap( resultMap );
+
+  Property::Value* transformValue = resultMap.Find( Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( transformValue );
+  Property::Map* retMap = transformValue->GetMap();
+  DALI_TEST_CHECK( retMap );
+
+  // Image Visual should be positioned depending on ImageView's padding
+  DALI_TEST_EQUALS( retMap->Find( Visual::Transform::Property::OFFSET )->Get< Vector2 >(), Vector2( 15, 5 ), TEST_LOCATION );
 
   END_TEST;
 }
