@@ -35,7 +35,7 @@ namespace Toolkit
 namespace Internal
 {
 extern Animation CreateAnimation( const TreeNode& child, Dali::Toolkit::Internal::Builder* const builder  );
-extern void DeterminePropertyFromNode( const TreeNode& node, Property::Value& value );
+extern bool DeterminePropertyFromNode( const TreeNode& node, Property::Value& value );
 }
 }
 }
