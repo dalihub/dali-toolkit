@@ -17,6 +17,8 @@
  * limitations under the License.
  */
 
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
+
 namespace Dali
 {
 namespace Toolkit
@@ -30,7 +32,7 @@ namespace Internal
  * Needed to prevent circular inheritance - most LayoutBases have a parent,
  * but parenting is provided by LayoutGroup, which is a sub-class of LayoutBase.
  */
-class DALI_IMPORT_API LayoutParent
+class DALI_TOOLKIT_API LayoutParent
 {
 public:
   /**

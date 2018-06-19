@@ -24,6 +24,7 @@
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
 #include <dali-toolkit/devel-api/layouting/measure-spec.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -42,7 +43,7 @@ using LayoutId = unsigned int;
  * Base class for layouts. It is used to layout a control (or visual).
  * It can be laid out by a LayoutGroup.
  */
-class DALI_IMPORT_API LayoutItem : public BaseHandle
+class DALI_TOOLKIT_API LayoutItem : public BaseHandle
 {
 public:
 
