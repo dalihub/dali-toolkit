@@ -184,7 +184,7 @@ void LayoutGroup::DoRegisterChildProperties( const std::string& containerType )
 
 void LayoutGroup::OnSetChildProperties( Handle& handle, Property::Index index, Property::Value value )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnSetChildProperties\n");
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnSetChildProperties property(%s)\n", handle.GetPropertyName(index).c_str());
 
   if ( ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) &&
          ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) )
@@ -192,12 +192,11 @@ void LayoutGroup::OnSetChildProperties( Handle& handle, Property::Index index, P
        ( index == Toolkit::Control::Property::MARGIN || index == Toolkit::Control::Property::PADDING ) )
   {
     // If any child properties are set, must perform relayout
-    RequestLayout();
     for( auto&& child : mImpl->mChildren )
     {
       if( child.child->GetOwner() == handle )
       {
-        child.child->SetLayoutRequested();
+        child.child->RequestLayout();
         break;
       }
     }
