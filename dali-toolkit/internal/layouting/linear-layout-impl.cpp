@@ -144,6 +144,9 @@ void LinearLayout::MeasureHorizontal( MeasureSpec widthMeasureSpec, MeasureSpec 
     MeasuredSize::State heightState;
   } childState = { MeasuredSize::State::MEASURED_SIZE_OK, MeasuredSize::State::MEASURED_SIZE_OK };
 
+  // Reset total length
+  mTotalLength = 0;
+
   // measure children, and determine if further resolution is required
   for( unsigned int i=0; i<GetChildCount(); ++i )
   {
@@ -317,6 +320,9 @@ void LinearLayout::MeasureVertical( MeasureSpec widthMeasureSpec, MeasureSpec he
     MeasuredSize::State widthState;
     MeasuredSize::State heightState;
   } childState = { MeasuredSize::State::MEASURED_SIZE_OK, MeasuredSize::State::MEASURED_SIZE_OK };
+
+  // Reset total length
+  mTotalLength = 0;
 
   // measure children, and determine if further resolution is required
   for( unsigned int i=0; i<GetChildCount(); ++i )
