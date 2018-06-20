@@ -71,6 +71,8 @@ Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutItem& child )
   childLayout.child = &child;
   mImpl->mChildren.emplace_back( childLayout );
 
+  child.SetParent( this );
+
   auto owner = child.GetOwner();
 
   // If the owner does not have any LayoutItem child properties, add them
@@ -406,6 +408,20 @@ void LayoutGroup::OnInitialize()
     DevelActor::ChildAddedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildAddedToOwner );
     DevelActor::ChildRemovedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildRemovedFromOwner );
     DevelHandle::PropertySetSignal( control ).Connect( mSlotDelegate, &LayoutGroup::OnOwnerPropertySet );
+
+    if( control.GetParent() )
+    {
+      auto parent = Toolkit::Control::DownCast( control.GetParent() );
+      if( parent )
+      {
+        auto parentLayout = Toolkit::LayoutGroup::DownCast( DevelControl::GetLayout( parent ) );
+        if( parentLayout )
+        {
+          Internal::LayoutGroup& parentLayoutImpl = GetImplementation( parentLayout );
+          parentLayoutImpl.Add( *this );
+        }
+      }
+    }
   }
 }
 
@@ -416,7 +432,19 @@ void LayoutGroup::OnRegisterChildProperties( const std::string& containerType )
 
 void LayoutGroup::OnUnparent()
 {
+  // Remove children
   RemoveAll();
+
+  // Remove myself from parent
+  LayoutParent* parent = GetParent();
+  if( parent )
+  {
+    LayoutGroupPtr parentGroup( dynamic_cast< LayoutGroup* >( parent ) );
+    if( parentGroup )
+    {
+      parentGroup->Remove( *this );
+    }
+  }
 }
 
 void LayoutGroup::ChildAddedToOwner( Actor child )

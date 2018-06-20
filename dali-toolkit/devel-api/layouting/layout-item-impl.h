@@ -168,6 +168,11 @@ public:
   static LayoutLength GetDefaultSize( LayoutLength size, MeasureSpec measureSpec );
 
   /**
+   * @copydoc LayoutParent::SetParent
+   */
+  virtual void SetParent( LayoutParent* parent ) override;
+
+  /**
    * @copydoc LayoutParent::GetParent
    */
   virtual LayoutParent* GetParent() override;

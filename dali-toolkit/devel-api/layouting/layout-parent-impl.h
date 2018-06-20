@@ -34,6 +34,11 @@ class DALI_IMPORT_API LayoutParent
 {
 public:
   /**
+   * Set the parent of this layout.
+   */
+  virtual void SetParent( LayoutParent* parent ) = 0;
+
+  /**
    * Get the parent of this layout.
    */
   virtual LayoutParent* GetParent() = 0;

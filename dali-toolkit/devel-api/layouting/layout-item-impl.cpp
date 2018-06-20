@@ -284,6 +284,11 @@ void LayoutItem::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
 {
 }
 
+void LayoutItem::SetParent( LayoutParent* parent )
+{
+  mImpl->mLayoutParent = parent;
+}
+
 LayoutParent* LayoutItem::GetParent()
 {
   return mImpl->mLayoutParent;
