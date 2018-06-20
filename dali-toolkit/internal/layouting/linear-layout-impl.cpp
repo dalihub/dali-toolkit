@@ -279,12 +279,12 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
   int start = 0;
   int dir = 1;
 
-  // In case of RTL, start drawing from the last child.
-  // @todo re-work to draw the first child from the right edge, and move leftwards.
-  // (Should have an alignment also)
+  // In case of RTL, start drawing from the last child and apply right alignment.
+  // @TODO Should we have also support Actor HorizontalAlignment|VerticalAlignment in general for LinearLayout?
   if( isLayoutRtl ) {
     start = count - 1;
     dir = -1;
+    childLeft = padding.start + right - left - mTotalLength;
   }
 
   for( unsigned int i = 0; i < count; i++)
