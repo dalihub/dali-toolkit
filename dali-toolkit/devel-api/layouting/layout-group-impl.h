@@ -267,6 +267,11 @@ private:
    */
   void OnSetChildProperties( Handle& handle, Property::Index index, Property::Value value );
 
+  /**
+   * @brief Called when a layer animation state is changed.
+   */
+  void OnAnimationStateChanged( bool animateLayout ) override final;
+
 public:
   class Impl; // Class declaration is public so we can add devel API's in the future
 

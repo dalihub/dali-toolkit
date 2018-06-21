@@ -85,6 +85,8 @@ void LayoutItem::Unparent()
 void LayoutItem::SetAnimateLayout( bool animateLayout )
 {
   mImpl->mAnimated = animateLayout;
+
+  OnAnimationStateChanged( animateLayout );
 }
 
 bool LayoutItem::IsLayoutAnimated() const

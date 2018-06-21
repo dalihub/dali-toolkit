@@ -419,6 +419,11 @@ protected:
    */
   virtual void OnInitialize();
 
+  /**
+   * @brief Called when a layer animation state is changed.
+   */
+  virtual void OnAnimationStateChanged( bool animateLayout ) {}
+
 private:
   /**
    * @brief Called to change the size of the layout.

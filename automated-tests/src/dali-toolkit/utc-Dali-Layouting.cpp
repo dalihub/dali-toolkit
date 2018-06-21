@@ -593,6 +593,52 @@ int UtcDaliLayouting_HboxLayout07(void)
   END_TEST;
 }
 
+int UtcDaliLayouting_HboxLayout08(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_HboxLayout08 - Test layout animation");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  absoluteLayout.SetAnimateLayout( true );
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  Control control1 = CreateLeafControl( 40, 40 );
+  rootControl.Add( control1 );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hboxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox" );
+
+  Control control2 = CreateLeafControl( 40, 40 );
+  hbox.Add( control2 );
+
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  rootControl.Add( hbox );
+
+  DALI_TEST_EQUALS( absoluteLayout.IsLayoutAnimated(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::GetLayout( control1 ).IsLayoutAnimated(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hboxLayout.IsLayoutAnimated(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::GetLayout( control2 ).IsLayoutAnimated(), false, TEST_LOCATION );
+
+  hboxLayout.SetAnimateLayout( true );
+  absoluteLayout.SetAnimateLayout( false );
+
+  DALI_TEST_EQUALS( absoluteLayout.IsLayoutAnimated(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::GetLayout( control1 ).IsLayoutAnimated(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( hboxLayout.IsLayoutAnimated(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::GetLayout( control2 ).IsLayoutAnimated(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
 // Padding tests
 
 int UtcDaliLayouting_HboxLayout_Padding01(void)
