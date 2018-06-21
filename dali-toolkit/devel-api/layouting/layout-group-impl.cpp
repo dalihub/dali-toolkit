@@ -763,8 +763,8 @@ void LayoutGroup::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMea
         auto childMargin = childLayout->GetMargin();
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure child width[%d] height(%d)\n", childWidth.mValue, childHeight.mValue );
 
-        layoutWidth = std::max( layoutWidth, childWidth + childMargin.start + childMargin.end );
-        layoutHeight = std::max( layoutHeight, childHeight + childMargin.top + childMargin.bottom );
+        layoutWidth = std::max( layoutWidth, childWidth + LayoutLength( childMargin.start ) + LayoutLength( childMargin.end ) );
+        layoutHeight = std::max( layoutHeight, childHeight + LayoutLength( childMargin.top ) + LayoutLength( childMargin.bottom ) );
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure calculated child width[%d] calculated height(%d)\n", layoutWidth.mValue, layoutHeight.mValue );
       }
       else
