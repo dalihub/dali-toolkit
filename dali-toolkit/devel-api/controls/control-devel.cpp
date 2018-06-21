@@ -133,7 +133,14 @@ void SetLayout( Control control, Toolkit::LayoutItem layout )
 {
   Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
-  controlDataImpl.SetLayout( GetImplementation( layout ) );
+  if( layout )
+  {
+    controlDataImpl.SetLayout( GetImplementation( layout ) );
+  }
+  else
+  {
+    controlDataImpl.RemoveLayout();
+  }
 }
 
 } // namespace DevelControl

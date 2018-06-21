@@ -1447,3 +1447,58 @@ int UtcDaliLayouting_HboxLayout_TargetSize(void)
 
   END_TEST;
 }
+
+
+int UtcDaliLayouting_RemoveLayout01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_RemoveLayout");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hboxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox" );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 40 ) );
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  rootControl.Add( hbox );
+
+  tet_infoline("Layout as normal");
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Set an empty layout on hbox container");
+  LinearLayout emptyLayout;
+  DevelControl::SetLayout( hbox, emptyLayout );
+
+  tet_infoline("Run another layout");
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Check leaf controls haven't moved");
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
