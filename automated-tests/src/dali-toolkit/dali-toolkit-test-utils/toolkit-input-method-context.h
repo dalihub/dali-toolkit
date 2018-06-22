@@ -25,7 +25,7 @@
 #include <dali/devel-api/adaptor-framework/input-method-options.h>
 #include <dali/public-api/events/key-event.h>
 
-namespace Dali DALI_CORE_API
+namespace Dali DALI_IMPORT_API
 {
 
 namespace Internal DALI_INTERNAL

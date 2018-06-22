@@ -478,12 +478,12 @@ private:
     TextureManager::TextureHash hash; ///< The hash used to cache this Texture
     float scaleFactor;             ///< The scale factor to apply to the Texture when masking
     int16_t referenceCount;        ///< The reference count of clients using this Texture
-    LoadState loadState:4;         ///< The load state showing the load progress of the Texture
+    LoadState loadState:3;         ///< The load state showing the load progress of the Texture
     FittingMode::Type fittingMode:2; ///< The requested FittingMode
     Dali::SamplingMode::Type samplingMode:3; ///< The requested SamplingMode
-    StorageType storageType:2;     ///< CPU storage / GPU upload;
+    StorageType storageType:1;     ///< CPU storage / GPU upload;
     bool loadSynchronously:1;      ///< True if synchronous loading was requested
-    UseAtlas useAtlas:2;           ///< USE_ATLAS if an atlas was requested.
+    UseAtlas useAtlas:1;           ///< USE_ATLAS if an atlas was requested.
                                    ///< This is updated to false if atlas is not used
     bool cropToMask:1;             ///< true if the image should be cropped to the mask size.
     bool orientationCorrection:1;  ///< true if the image should be rotated to match exif orientation data
