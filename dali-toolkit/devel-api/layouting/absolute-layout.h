@@ -39,7 +39,7 @@ class AbsoluteLayout;
  * Positions are from the top left of the layout and can be set using the
  * Actor::Property::POSITION and alike.
  */
-class DALI_IMPORT_API AbsoluteLayout : public LayoutGroup
+class DALI_TOOLKIT_API AbsoluteLayout : public LayoutGroup
 {
 public:
 

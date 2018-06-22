@@ -27,6 +27,11 @@ LayoutGroup::LayoutGroup()
 {
 }
 
+LayoutGroup LayoutGroup::DownCast( BaseHandle handle )
+{
+  return LayoutGroup( dynamic_cast< Dali::Toolkit::Internal::LayoutGroup* >( handle.GetObjectPtr() ) );
+}
+
 LayoutGroup::LayoutId LayoutGroup::Add( LayoutItem& child )
 {
   return GetImplementation( *this ).Add( GetImplementation(child) );

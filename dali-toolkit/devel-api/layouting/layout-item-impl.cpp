@@ -85,6 +85,8 @@ void LayoutItem::Unparent()
 void LayoutItem::SetAnimateLayout( bool animateLayout )
 {
   mImpl->mAnimated = animateLayout;
+
+  OnAnimationStateChanged( animateLayout );
 }
 
 bool LayoutItem::IsLayoutAnimated() const
@@ -282,6 +284,11 @@ void LayoutItem::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
 
 void LayoutItem::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
 {
+}
+
+void LayoutItem::SetParent( LayoutParent* parent )
+{
+  mImpl->mLayoutParent = parent;
 }
 
 LayoutParent* LayoutItem::GetParent()

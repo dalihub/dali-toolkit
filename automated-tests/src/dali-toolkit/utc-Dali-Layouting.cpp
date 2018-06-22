@@ -21,9 +21,10 @@
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/layouting/hbox-layout.h>
-#include <dali-toolkit/devel-api/layouting/vbox-layout.h>
 #include <dali-toolkit/devel-api/layouting/absolute-layout.h>
+#include <dali-toolkit/devel-api/layouting/linear-layout.h>
+
+#include <../custom-layout.h>
 
 #include <layout-utils.h>
 
@@ -47,7 +48,7 @@ int UtcDaliLayouting_HboxLayout01(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   hboxLayout.SetCellPadding( LayoutSize( 10, 0 ) );
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
@@ -83,7 +84,7 @@ int UtcDaliLayouting_HboxLayout01(void)
   DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   // Change a layout
-  auto newHBoxLayout = HboxLayout::New();
+  auto newHBoxLayout = LinearLayout::New();
   newHBoxLayout.SetCellPadding( LayoutSize( 10, 0 ) );
   DevelControl::SetLayout( hbox, newHBoxLayout );
 
@@ -106,11 +107,11 @@ int UtcDaliLayouting_HboxLayout02(void)
   Stage stage = Stage::GetCurrent();
 
   auto hbox1 = Control::New();
-  auto hboxLayout1 = HboxLayout::New();
+  auto hboxLayout1 = LinearLayout::New();
   DevelControl::SetLayout( hbox1, hboxLayout1 );
 
   auto hbox2 = Control::New();
-  auto hboxLayout2 = HboxLayout::New();
+  auto hboxLayout2 = LinearLayout::New();
   DevelControl::SetLayout( hbox2, hboxLayout2 );
 
   hbox1.SetName( "HBox1");
@@ -146,7 +147,7 @@ int UtcDaliLayouting_HboxLayout02(void)
   hbox2.SetAnchorPoint( AnchorPoint::CENTER );
 
   auto hbox3 = Control::New();
-  auto hboxLayout3 = HboxLayout::New();
+  auto hboxLayout3 = LinearLayout::New();
   DevelControl::SetLayout( hbox3, hboxLayout3 );
 
   hbox3.SetParentOrigin( ParentOrigin::CENTER );
@@ -206,11 +207,11 @@ int UtcDaliLayouting_HboxLayout03(void)
   Stage stage = Stage::GetCurrent();
 
   auto hbox1 = Control::New();
-  auto hboxLayout1 = HboxLayout::New();
+  auto hboxLayout1 = LinearLayout::New();
   DevelControl::SetLayout( hbox1, hboxLayout1 );
 
   auto hbox2 = Control::New();
-  auto hboxLayout2 = HboxLayout::New();
+  auto hboxLayout2 = LinearLayout::New();
   DevelControl::SetLayout( hbox2, hboxLayout2 );
 
   hbox1.SetName( "HBox1");
@@ -250,7 +251,7 @@ int UtcDaliLayouting_HboxLayout03(void)
   hbox2.SetAnchorPoint( AnchorPoint::CENTER );
 
   auto hbox3 = Control::New();
-  auto hboxLayout3 = HboxLayout::New();
+  auto hboxLayout3 = LinearLayout::New();
   DevelControl::SetLayout( hbox3, hboxLayout3);
 
   hbox3.SetParentOrigin( ParentOrigin::CENTER );
@@ -311,11 +312,11 @@ int UtcDaliLayouting_HboxLayout04(void)
   Stage stage = Stage::GetCurrent();
 
   auto hbox1 = Control::New();
-  auto hboxLayout1 = HboxLayout::New();
+  auto hboxLayout1 = LinearLayout::New();
   DevelControl::SetLayout( hbox1, hboxLayout1 );
 
   auto hbox2 = Control::New();
-  auto hboxLayout2 = HboxLayout::New();
+  auto hboxLayout2 = LinearLayout::New();
   DevelControl::SetLayout( hbox2, hboxLayout2 );
 
   hbox1.SetName( "HBox1"); // Default spec is to wrap content
@@ -352,7 +353,7 @@ int UtcDaliLayouting_HboxLayout04(void)
 
   controls[6].SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
   auto hbox3 = Control::New();
-  auto hboxLayout3 = HboxLayout::New();
+  auto hboxLayout3 = LinearLayout::New();
   DevelControl::SetLayout( hbox3, hboxLayout3 );
 
   hbox3.SetParentOrigin( ParentOrigin::CENTER );
@@ -410,7 +411,7 @@ int UtcDaliLayouting_HboxLayout05(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   hboxLayout.SetCellPadding( LayoutSize( 10, 0 ) );
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
@@ -451,6 +452,195 @@ int UtcDaliLayouting_HboxLayout05(void)
   END_TEST;
 }
 
+int UtcDaliLayouting_HboxLayout06(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_HboxLayout06 - Test nested layouts");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hboxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox" );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 40 ) );
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  rootControl.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800.
+  // hbox left justifies elements
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Change a layout
+  auto newHBoxLayout = LinearLayout::New();
+  newHBoxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
+  DevelControl::SetLayout( hbox, newHBoxLayout );
+
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Change size specification
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Use WRAP_CONTENT again
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliLayouting_HboxLayout07(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_HboxLayout07 - Set LTR/RTL direction");
+
+  Stage stage = Stage::GetCurrent();
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hboxLayout.SetCellPadding( LayoutSize( 10, 0 ) );
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 40 ) );
+  controls.push_back( CreateLeafControl( 80, 40 ) );
+  controls.push_back( CreateLeafControl( 100, 40 ) );
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( hbox );
+
+  hbox.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::LEFT_TO_RIGHT );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800 from left to right.
+  // hbox left justifies elements
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 50.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 120.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 210.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  hbox.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 470.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 400.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 310.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 200.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_HboxLayout08(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_HboxLayout08 - Test layout animation");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  absoluteLayout.SetAnimateLayout( true );
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  Control control1 = CreateLeafControl( 40, 40 );
+  rootControl.Add( control1 );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hboxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox" );
+
+  Control control2 = CreateLeafControl( 40, 40 );
+  hbox.Add( control2 );
+
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  rootControl.Add( hbox );
+
+  DALI_TEST_EQUALS( absoluteLayout.IsLayoutAnimated(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::GetLayout( control1 ).IsLayoutAnimated(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( hboxLayout.IsLayoutAnimated(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::GetLayout( control2 ).IsLayoutAnimated(), false, TEST_LOCATION );
+
+  hboxLayout.SetAnimateLayout( true );
+  absoluteLayout.SetAnimateLayout( false );
+
+  DALI_TEST_EQUALS( absoluteLayout.IsLayoutAnimated(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::GetLayout( control1 ).IsLayoutAnimated(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( hboxLayout.IsLayoutAnimated(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::GetLayout( control2 ).IsLayoutAnimated(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
 // Padding tests
 
 int UtcDaliLayouting_HboxLayout_Padding01(void)
@@ -460,7 +650,7 @@ int UtcDaliLayouting_HboxLayout_Padding01(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
 
@@ -525,7 +715,7 @@ int UtcDaliLayouting_HboxLayout_Padding02(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
 
@@ -604,7 +794,7 @@ int UtcDaliLayouting_HboxLayout_Padding03(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
 
@@ -690,7 +880,7 @@ int UtcDaliLayouting_HboxLayout_Margin01(void)
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
 
@@ -752,7 +942,8 @@ int UtcDaliLayouting_VboxLayout01(void)
 
   Stage stage = Stage::GetCurrent();
   auto vbox = Control::New();
-  auto vboxLayout = VboxLayout::New();
+  auto vboxLayout = LinearLayout::New();
+  vboxLayout.SetOrientation( LinearLayout::Orientation::VERTICAL );
   DevelControl::SetLayout( vbox, vboxLayout );
   vbox.SetName( "Vbox");
 
@@ -811,7 +1002,8 @@ int UtcDaliLayouting_VboxLayout02(void)
   stage.Add( rootControl );
 
   auto vbox = Control::New();
-  auto vboxLayout = VboxLayout::New();
+  auto vboxLayout = LinearLayout::New();
+  vboxLayout.SetOrientation( LinearLayout::Orientation::VERTICAL );
   DevelControl::SetLayout( vbox, vboxLayout );
   vbox.SetName( "Vbox");
   rootControl.Add( vbox );
@@ -875,14 +1067,15 @@ int UtcDaliLayouting_VboxLayout03(void)
   //
   // For this test, add an hbox instead
   auto hbox = Control::New();
-  auto hboxLayout = HboxLayout::New();
+  auto hboxLayout = LinearLayout::New();
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "Hbox");
   stage.Add( hbox );
 
   auto vbox = Control::New();
-  auto vboxLayout = VboxLayout::New();
+  auto vboxLayout = LinearLayout::New();
   vboxLayout.SetCellPadding( LayoutSize( 0, 10 ) );
+  vboxLayout.SetOrientation( LinearLayout::Orientation::VERTICAL );
 
   DALI_TEST_EQUALS( vboxLayout.GetCellPadding(), LayoutSize( 0, 10 ), TEST_LOCATION );
 
@@ -932,6 +1125,70 @@ int UtcDaliLayouting_VboxLayout03(void)
   DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 80.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+
+int UtcDaliLayouting_RelayoutOnChildOrderChanged(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_RelayoutOnChildOrderChanged");
+  tet_infoline(" Test that if the sibling order changes, the container is re-laid out automatically");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto hbox = Control::New();
+  auto hboxLayout = Test::CustomLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 40 ) );
+  controls.push_back( CreateLeafControl( 80, 40 ) );
+  controls.push_back( CreateLeafControl( 100, 40 ) );
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800.
+  // hbox left justifies elements
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 100.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 180.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  controls[0].RaiseToTop(); // 0->3; 1, 2, 3, 0
+  controls[2].Lower();      // 2->1; 2, 1, 3, 0
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 80.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 140.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 240.0f, 380.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }
