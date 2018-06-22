@@ -22,7 +22,6 @@
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
 #include <dali-toolkit/devel-api/layouting/layout-size.h>
 #include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
-#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -40,7 +39,7 @@ class AbsoluteLayout;
  * Positions are from the top left of the layout and can be set using the
  * Actor::Property::POSITION and alike.
  */
-class DALI_TOOLKIT_API AbsoluteLayout : public LayoutGroup
+class DALI_IMPORT_API AbsoluteLayout : public LayoutGroup
 {
 public:
 

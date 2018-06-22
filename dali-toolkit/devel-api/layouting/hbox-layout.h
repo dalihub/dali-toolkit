@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_LAYOUTING_LINEAR_LAYOUT_H
-#define DALI_TOOLKIT_LAYOUTING_LINEAR_LAYOUT_H
+#ifndef DALI_TOOLKIT_LAYOUTING_HBOX_LAYOUT_H
+#define DALI_TOOLKIT_LAYOUTING_HBOX_LAYOUT_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -31,14 +31,14 @@ namespace Toolkit
 
 namespace Internal DALI_INTERNAL
 {
-class LinearLayout;
+class HboxLayout;
 }
 
 /**
- * This class implements a linear box layout, automatically handling
+ * This class implements a horizontal box layout, automatically handling
  * right to left or left to right direction change.
  */
-class DALI_TOOLKIT_API LinearLayout : public LayoutGroup
+class DALI_TOOLKIT_API HboxLayout : public LayoutGroup
 {
 public:
 
@@ -48,55 +48,63 @@ public:
     CHILD_PROPERTY_END_INDEX   = LINEAR_LAYOUT_CHILD_PROPERTY_END_INDEX
   };
 
-  /**
-   * @brief Enumeration for the direction in which the content is laid out
-   */
-  enum class Orientation
+  struct Property
   {
-    HORIZONTAL,                 ///< Horizontal (row)
-    VERTICAL                    ///< Vertical (column)
+    // @todo When we can have event-only properties for BaseObject, this will be useful.
+    enum
+    {
+      CELL_PADDING = PROPERTY_REGISTRATION_START_INDEX + 2000
+    };
+  };
+
+  struct ChildProperty
+  {
+    enum
+    {
+      WEIGHT = CHILD_PROPERTY_START_INDEX
+    };
   };
 
   /**
-   * @brief Creates an uninitialized LinearLayout handle.
+   * @brief Creates an uninitialized HboxLayout handle.
    *
-   * Initialize it using LinearLayout::New().
+   * Initialize it using HboxLayout::New().
    * Calling member functions with an uninitialized handle is not allowed.
    */
-  LinearLayout();
+  HboxLayout();
 
   /**
-   * @brief Creates a LinearLayout object.
+   * @brief Creates a HboxLayout object.
    */
-  static LinearLayout New();
+  static HboxLayout New();
 
   /**
-   * @brief Downcasts a handle to a LinearLayout handle.
+   * @brief Downcasts a handle to a HboxLayout handle.
    *
-   * If handle points to a LinearLayout, the downcast produces a valid handle.
+   * If handle points to a HboxLayout, the downcast produces a valid handle.
    * If not, the returned handle is left uninitialized.
 
    * @param[in] handle to an object
-   * @return Handle to a LinearLayout or an uninitialized handle
+   * @return Handle to a HboxLayout or an uninitialized handle
    */
-  static LinearLayout DownCast( BaseHandle handle );
+  static HboxLayout DownCast( BaseHandle handle );
 
   /**
    * @brief Copy constructor
    */
-  LinearLayout( const LinearLayout& other );
+  HboxLayout( const HboxLayout& other );
 
   /**
    * @brief Assigment operator
    */
-  LinearLayout& operator=( const LinearLayout& other );
+  HboxLayout& operator=( const HboxLayout& other );
 
   /**
    * @brief Default destructor.
    *
    * This is non-virtual, since derived Handle types must not contain data or virtual methods
    */
-  ~LinearLayout()=default;
+  ~HboxLayout()=default;
 
   /**
    * @brief Set the padding between cells in the layout
@@ -112,33 +120,19 @@ public:
    */
   LayoutSize GetCellPadding();
 
-  /**
-   * @brief Set the orientation in the layout
-   *
-   * @param[in] orientation The orientation.
-   */
-  void SetOrientation( Orientation orientation );
-
-  /**
-   * @brief Get the orientation in the layout
-   *
-   * @return The orientation.
-   */
-  Orientation GetOrientation();
-
 public: // Not intended for application developers
 
   /// @cond internal
   /**
-   * @brief This constructor is used by LinearLayout::New() methods.
+   * @brief This constructor is used by HboxLayout::New() methods.
    *
    * @param[in] actor A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL LinearLayout( Internal::LinearLayout* body );
+  explicit DALI_INTERNAL HboxLayout( Internal::HboxLayout* body );
   /// @endcond
 };
 
 } // namespace Toolkit
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_LAYOUTING_LINEAR_LAYOUT_H
+#endif // DALI_TOOLKIT_LAYOUTING_HBOX_LAYOUT_H
