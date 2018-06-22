@@ -19,7 +19,6 @@
 
 #include <dali/public-api/common/dali-common.h>
 #include <dali-toolkit/devel-api/layouting/layout-length.h>
-#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 #include <sstream>
 
@@ -33,7 +32,7 @@ namespace Toolkit
  * how to be measured. For instance, it may measure a child with an exact width and an unspecified
  * height in order to determine height for width.
  */
-class DALI_TOOLKIT_API MeasureSpec
+class DALI_IMPORT_API MeasureSpec
 {
 public:
   using IntType = LayoutLength::IntType;

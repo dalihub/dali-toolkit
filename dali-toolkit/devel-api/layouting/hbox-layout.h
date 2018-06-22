@@ -22,7 +22,6 @@
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
 #include <dali-toolkit/devel-api/layouting/layout-size.h>
 #include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
-#include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
 {
@@ -38,7 +37,7 @@ class HboxLayout;
  * This class implements a horizontal box layout, automatically handling
  * right to left or left to right direction change.
  */
-class DALI_TOOLKIT_API HboxLayout : public LayoutGroup
+class DALI_IMPORT_API HboxLayout : public LayoutGroup
 {
 public:
 
