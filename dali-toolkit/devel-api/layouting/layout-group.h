@@ -49,7 +49,7 @@ class LayoutGroup;
  * To write a new layout, inherit from both LayoutGroup handle and Internal::LayoutGroup body.
  *
  */
-class DALI_IMPORT_API LayoutGroup : public LayoutItem
+class DALI_TOOLKIT_API LayoutGroup : public LayoutItem
 {
 public:
   using LayoutId = unsigned int;
@@ -59,7 +59,6 @@ public:
   {
     enum
     {
-      MARGIN_SPECIFICATION = LAYOUT_GROUP_CHILD_PROPERTY_START_INDEX,
     };
   };
 

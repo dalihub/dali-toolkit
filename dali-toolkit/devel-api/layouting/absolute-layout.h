@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_LAYOUTING_VBOX_LAYOUT_H
-#define DALI_TOOLKIT_LAYOUTING_VBOX_LAYOUT_H
+#ifndef DALI_TOOLKIT_LAYOUTING_ABSOLUTE_LAYOUT_H
+#define DALI_TOOLKIT_LAYOUTING_ABSOLUTE_LAYOUT_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -21,6 +21,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
 #include <dali-toolkit/devel-api/layouting/layout-size.h>
+#include <dali-toolkit/public-api/toolkit-property-index-ranges.h>
 
 namespace Dali
 {
@@ -29,99 +30,80 @@ namespace Toolkit
 
 namespace Internal DALI_INTERNAL
 {
-class VboxLayout;
+class AbsoluteLayout;
 }
 
 /**
- * This class implements a vertical box layout, automatically handling
- * right to left or left to right direction change.
+ * This class implements a absolute layout, allowing explict positioning of
+ * children.
+ * Positions are from the top left of the layout and can be set using the
+ * Actor::Property::POSITION and alike.
  */
-class DALI_TOOLKIT_API VboxLayout : public LayoutGroup
+class DALI_TOOLKIT_API AbsoluteLayout : public LayoutGroup
 {
 public:
 
   enum PropertyRange
   {
-    CHILD_PROPERTY_START_INDEX = LINEAR_LAYOUT_CHILD_PROPERTY_START_INDEX,
-    CHILD_PROPERTY_END_INDEX   = LINEAR_LAYOUT_CHILD_PROPERTY_END_INDEX
-  };
-
-  struct ChildProperty
-  {
-    enum
-    {
-      WEIGHT = CHILD_PROPERTY_START_INDEX,
-    };
+    CHILD_PROPERTY_START_INDEX = ABSOLUTE_LAYOUT_CHILD_PROPERTY_START_INDEX,
+    CHILD_PROPERTY_END_INDEX   = ABSOLUTE_LAYOUT_CHILD_PROPERTY_END_INDEX
   };
 
   /**
-   * @brief Creates an uninitialized VboxLayout handle.
+   * @brief Creates an uninitialized AbsoluteLayout handle.
    *
-   * Initialize it using VboxLayout::New().
+   * Initialize it using AbsoluteLayout::New().
    * Calling member functions with an uninitialized handle is not allowed.
    */
-  VboxLayout();
+  AbsoluteLayout();
 
   /**
-   * @brief Creates a VboxLayout object.
+   * @brief Creates a AbsoluteLayout object.
    */
-  static VboxLayout New();
+  static AbsoluteLayout New();
 
   /**
-   * @brief Downcasts a handle to a VboxLayout handle.
+   * @brief Downcasts a handle to a AbsoluteLayout handle.
    *
-   * If handle points to a VboxLayout, the downcast produces a valid handle.
+   * If handle points to a AbsoluteLayout, the downcast produces a valid handle.
    * If not, the returned handle is left uninitialized.
 
    * @param[in] handle to an object
-   * @return Handle to a VboxLayout or an uninitialized handle
+   * @return Handle to a AbsoluteLayout or an uninitialized handle
    */
-  static VboxLayout DownCast( BaseHandle handle );
+  static AbsoluteLayout DownCast( BaseHandle handle );
 
   /**
    * @brief Copy constructor
    */
-  VboxLayout( const VboxLayout& other );
+  AbsoluteLayout( const AbsoluteLayout& other );
 
   /**
    * @brief Assigment operator
    */
-  VboxLayout& operator=( const VboxLayout& other );
+  AbsoluteLayout& operator=( const AbsoluteLayout& other );
 
   /**
    * @brief Default destructor.
    *
    * This is non-virtual, since derived Handle types must not contain data or virtual methods
    */
-  ~VboxLayout()=default;
+  ~AbsoluteLayout()=default;
 
-  /**
-   * @brief Set the padding between cells in the layout
-   *
-   * @param[in] size The padding between cells.
-   */
-  void SetCellPadding( LayoutSize size );
-
-  /**
-   * @brief Get the padding between cells in the layout
-   *
-   * @return The padding between cells.
-   */
-  LayoutSize GetCellPadding();
 
 public: // Not intended for application developers
 
   /// @cond internal
   /**
-   * @brief This constructor is used by VboxLayout::New() methods.
+   * @brief This constructor is used by AbsoluteLayout::New() methods.
    *
    * @param[in] actor A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL VboxLayout( Internal::VboxLayout* body );
+  explicit DALI_INTERNAL AbsoluteLayout( Internal::AbsoluteLayout* body );
   /// @endcond
 };
 
 } // namespace Toolkit
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_LAYOUTING_VBOX_LAYOUT_H
+#endif // DALI_TOOLKIT_LAYOUTING_ABSOLUTE_LAYOUT_H

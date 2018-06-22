@@ -54,8 +54,8 @@ using LayoutGroupPtr = IntrusivePtr<LayoutGroup>;
  * OnLayout should use it's own layout parameters and the measured children's size to determine the children's
  * position and size; it should then call Layout() on the child layout to layout the child and it's hierarchy.
  */
-class DALI_IMPORT_API LayoutGroup : public LayoutItem,
-                                    public ConnectionTracker
+class DALI_TOOLKIT_API LayoutGroup : public LayoutItem,
+                                     public ConnectionTracker
 {
 public:
   /**
@@ -266,6 +266,11 @@ private:
    * @param[in] value The new value of the property
    */
   void OnSetChildProperties( Handle& handle, Property::Index index, Property::Value value );
+
+  /**
+   * @brief Called when a layer animation state is changed.
+   */
+  void OnAnimationStateChanged( bool animateLayout ) override final;
 
 public:
   class Impl; // Class declaration is public so we can add devel API's in the future
