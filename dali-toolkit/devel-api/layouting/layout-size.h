@@ -87,6 +87,11 @@ public:
     return x==rhs.x && y==rhs.y;
   }
 
+  bool operator!=( const LayoutSize& rhs )
+  {
+    return !( *this==rhs );
+  }
+
   union
   {
     LayoutLength::IntType x;
