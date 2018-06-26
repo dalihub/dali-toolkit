@@ -286,84 +286,33 @@ YGSize FlexLayout::OnChildMeasure( YGNodeRef node,
                               YGMeasureMode widthMode,
                               float innerHeight,
                               YGMeasureMode heightMode ) {
-  // TODO: this function should try to get use of LayoutGroup::GetChildMeasureSpec
-  // or LayoutGroup::MeasureChild somehow since it is fixed now
   LayoutItem* childLayout = static_cast<LayoutItem*>(node->getContext());
   auto childOwner = childLayout->GetOwner();
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
   auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
-
-  MeasureSpec::Mode measureWidthMode = MeasureSpec::Mode::AT_MOST;
-  MeasureSpec::Mode measureHeightMode = MeasureSpec::Mode::AT_MOST;
-  if( desiredWidth == Toolkit::ChildLayoutData::MATCH_PARENT )
+  auto parentWidthMeasureSpec = MeasureSpec( 0 );
+  if ( innerWidth != YGUndefined )
   {
-    if( innerWidth != YGUndefined)
-    {
-      desiredWidth = innerWidth;
-    }
-    measureWidthMode = MeasureSpec::Mode::EXACTLY;
+    parentWidthMeasureSpec = MeasureSpec( innerWidth, static_cast<MeasureSpec::Mode>(widthMode) );
+  }
+  auto parentHeightMeasureSpec = MeasureSpec( 0 );
+  if ( innerHeight != YGUndefined )
+  {
+    parentHeightMeasureSpec = MeasureSpec( innerHeight, static_cast<MeasureSpec::Mode>(heightMode) );
+  }
+  auto childWidthMeasureSpec = LayoutGroup::GetChildMeasureSpec( parentWidthMeasureSpec, 0, desiredWidth);
+  auto childHeightMeasureSpec = LayoutGroup::GetChildMeasureSpec( parentHeightMeasureSpec, 0, desiredHeight);
+
+  // Force to fill parent if a child wants to match parent even if GetChildMeasureSpec sets otherwise
+  if( desiredWidth == Toolkit::ChildLayoutData::MATCH_PARENT && innerWidth != YGUndefined )
+  {
+    childWidthMeasureSpec = MeasureSpec( innerWidth, MeasureSpec::Mode::EXACTLY );
+  }
+  if( desiredHeight == Toolkit::ChildLayoutData::MATCH_PARENT && innerHeight != YGUndefined )
+  {
+    childHeightMeasureSpec = MeasureSpec( innerHeight, MeasureSpec::Mode::EXACTLY );
   }
 
-  if( desiredHeight == Toolkit::ChildLayoutData::MATCH_PARENT )
-  {
-    if( innerHeight != YGUndefined)
-    {
-      desiredHeight = innerHeight;
-    }
-    measureHeightMode = MeasureSpec::Mode::EXACTLY;
-  }
-
-  if( desiredWidth == Toolkit::ChildLayoutData::WRAP_CONTENT )
-  {
-    measureWidthMode = MeasureSpec::Mode::UNSPECIFIED;
-  }
-
-  if( desiredHeight == Toolkit::ChildLayoutData::WRAP_CONTENT )
-  {
-    measureHeightMode = MeasureSpec::Mode::UNSPECIFIED;
-  }
-
-  MeasureSpec widthMeasureSpec = MeasureSpec( desiredWidth, measureWidthMode );
-  MeasureSpec heightMeasureSpec = MeasureSpec( desiredHeight, measureHeightMode );
-  if( measureWidthMode == MeasureSpec::Mode::UNSPECIFIED ||
-      measureHeightMode == MeasureSpec::Mode::UNSPECIFIED )
-  {
-    // A measure just to get the size if the wrapped content
-    childLayout->Measure( widthMeasureSpec, heightMeasureSpec );
-    desiredWidth = childLayout->GetMeasuredWidth();
-    desiredHeight = childLayout->GetMeasuredHeight();
-    // Remove padding here since the second measure will add it back
-    Extents padding = childLayout->GetPadding();
-    desiredWidth = desiredWidth - padding.end - padding.start;
-    desiredHeight = desiredHeight - padding.bottom - padding.top;
-  }
-
-  // Safety check to avoid going out of boundary
-  if( (innerWidth != YGUndefined && innerWidth != 0) && innerWidth < desiredWidth )
-  {
-    desiredWidth = innerWidth;
-  }
-
-  if( (innerHeight != YGUndefined && innerHeight != 0) && innerHeight < desiredHeight )
-  {
-    desiredHeight = innerHeight;
-  }
-
-  // Measure for Yoga
-  MeasureSpec::Mode ygWidthMode = static_cast<MeasureSpec::Mode>(widthMode);
-  if( measureWidthMode == MeasureSpec::Mode::EXACTLY )
-  {
-    ygWidthMode = MeasureSpec::Mode::EXACTLY;
-  }
-
-  MeasureSpec::Mode ygHeightMode = static_cast<MeasureSpec::Mode>(heightMode);
-  if( measureHeightMode == MeasureSpec::Mode::EXACTLY )
-  {
-    ygHeightMode = MeasureSpec::Mode::EXACTLY;
-  }
-
-  MeasureSpec ygWidthMeasureSpec = MeasureSpec( desiredWidth, ygWidthMode );
-  MeasureSpec ygHeightMeasureSpec = MeasureSpec( desiredHeight, ygHeightMode );
 #if defined(DEBUG_ENABLED)
   auto actor = Actor::DownCast(childOwner);
   std::ostringstream oss;
@@ -372,30 +321,23 @@ YGSize FlexLayout::OnChildMeasure( YGNodeRef node,
   {
     oss << "Actor Id:" << actor.GetId() << " Name:" << actor.GetName() << " ";
   }
-  oss << "innerWidth:" << ((innerWidth == YGUndefined) ? "YGUndefined " : "") << innerWidth <<
-         " innerHeight:" << ((innerHeight == YGUndefined) ? "YGUndefined " : "") << innerHeight <<
+  oss << "innerWidth:" << ( ( innerWidth == YGUndefined ) ? "YGUndefined " : "" ) << innerWidth <<
+         " innerHeight:" << ( ( innerHeight == YGUndefined ) ? "YGUndefined " : "" ) << innerHeight <<
          " desiredWidth:" << desiredWidth << " desiredHeight:" << desiredHeight <<
-         " widthMeasureSpec:" << widthMeasureSpec << " heightMeasureSpec:" << heightMeasureSpec <<
-         " ygWidthMeasureSpec:" << ygWidthMeasureSpec << " ygHeightMeasureSpec:" << ygHeightMeasureSpec << std::endl;
+         " childWidthMeasureSpec:" << childWidthMeasureSpec << " childHeightMeasureSpec:" << childHeightMeasureSpec << std::endl;
   DALI_LOG_INFO( gLogFilter, Debug::Concise, oss.str().c_str() );
 #endif
 
-  if( measureWidthMode == MeasureSpec::Mode::UNSPECIFIED ||
-      measureHeightMode == MeasureSpec::Mode::UNSPECIFIED )
-  {
-    if( ygWidthMeasureSpec == widthMeasureSpec && ygHeightMeasureSpec == heightMeasureSpec )
-    {
-      return YGSize{
-        .width = childLayout->GetMeasuredWidth(),
-        .height = childLayout->GetMeasuredHeight(),
-      };
-    }
-  }
+  childLayout->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
 
-  childLayout->Measure( ygWidthMeasureSpec, ygHeightMeasureSpec );
+  // Remove padding here since Yoga doesn't consider it as a part of the node size
+  Extents padding = childLayout->GetPadding();
+  auto measuredWidth = childLayout->GetMeasuredWidth() - padding.end - padding.start;
+  auto measuredHeight = childLayout->GetMeasuredHeight() - padding.bottom - padding.top;
+
   return YGSize{
-    .width = childLayout->GetMeasuredWidth(),
-    .height = childLayout->GetMeasuredHeight(),
+    .width = measuredWidth,
+    .height = measuredHeight,
   };
 }
 
