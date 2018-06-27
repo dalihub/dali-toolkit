@@ -20,11 +20,8 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <dali/public-api/rendering/texture-set.h>
+#include <dali/public-api/math/uint-16-pair.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/devel-api/images/nine-patch-image.h>
-
-// INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/image-loader/image-atlas.h>
 
 namespace Dali
 {
@@ -34,6 +31,13 @@ namespace Toolkit
 
 namespace Internal
 {
+
+namespace NPatchBuffer
+{
+
+void GetRedOffsetAndMask( Dali::Pixel::Format pixelFormat, int& byteOffset, int& bitMask );
+
+} // namespace NPatchBuffer
 
 /**
  * The manager for loading Npatch textures.
@@ -48,6 +52,8 @@ class NPatchLoader
 {
 public:
 
+  typedef Dali::Vector< Uint16Pair > StretchRanges;
+
   enum
   {
     UNINITIALIZED_ID = 0 ///< uninitialised id, use to initialize ids
@@ -57,8 +63,8 @@ public:
   {
     std::string url;                              ///< Url of the N-Patch
     TextureSet textureSet;                        ///< Texture containing the cropped image
-    NinePatchImage::StretchRanges stretchPixelsX; ///< X stretch pixels
-    NinePatchImage::StretchRanges stretchPixelsY; ///< Y stretch pixels
+    StretchRanges stretchPixelsX;                 ///< X stretch pixels
+    StretchRanges stretchPixelsY;                 ///< Y stretch pixels
     std::size_t hash;                             ///< Hash code for the Url
     uint32_t croppedWidth;                        ///< Width of the cropped middle part of N-patch
     uint32_t croppedHeight;                       ///< Height of the cropped middle part of N-patch
@@ -82,9 +88,11 @@ public:
    *
    * @param [in] url to retrieve
    * @param [in] border The border size of the image
+   * @param [in,out] preMultiplyOnLoad True if the image color should be multiplied by it's alpha. Set to false if the
+   *                                   image has no alpha channel
    * @return id of the texture.
    */
-  std::size_t Load( const std::string& url, const Rect< int >& border );
+  std::size_t Load( const std::string& url, const Rect< int >& border, bool& preMultiplyOnLoad );
 
   /**
    * @brief Retrieve N patch data matching to an id

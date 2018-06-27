@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_INTERNAL_LAYOUTING_HBOX_LAYOUT_H
-#define DALI_TOOLKIT_INTERNAL_LAYOUTING_HBOX_LAYOUT_H
+#ifndef DALI_TOOLKIT_INTERNAL_ABSOLUTE_LAYOUT_H
+#define DALI_TOOLKIT_INTERNAL_ABSOLUTE_LAYOUT_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -20,7 +20,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
-#include <dali-toolkit/devel-api/layouting/hbox-layout.h>
+#include <dali-toolkit/devel-api/layouting/absolute-layout.h>
 
 namespace Dali
 {
@@ -29,36 +29,25 @@ namespace Toolkit
 namespace Internal
 {
 
-class HboxLayout;
-using HboxLayoutPtr = IntrusivePtr<HboxLayout>;
+class AbsoluteLayout;
+using AbsoluteLayoutPtr = IntrusivePtr<AbsoluteLayout>;
 
-class HboxLayout final : public LayoutGroup
+class AbsoluteLayout final : public LayoutGroup
 {
 public:
-  static HboxLayoutPtr New();
-
-public:
-  void SetCellPadding( LayoutSize size );
-  LayoutSize GetCellPadding();
+  static AbsoluteLayoutPtr New();
 
 protected:
-  HboxLayout();
-  virtual ~HboxLayout();
 
   /**
-   * @copydoc LayoutItem::DoInitialize
+   * Constructor
    */
-  virtual void DoInitialize() override;
+  AbsoluteLayout();
 
   /**
-   * @copydoc LayoutItem::DoRegisterChildProperties()
+   * Destructor
    */
-  virtual void DoRegisterChildProperties( const std::string& containerType ) override;
-
-  /**
-   * @copydoc LayoutItem::OnChildAdd
-   */
-  virtual void OnChildAdd( LayoutItem& child ) override;
+  virtual ~AbsoluteLayout();
 
   /**
    * @copydoc LayoutItem::OnMeasure
@@ -71,33 +60,30 @@ protected:
   virtual void OnLayout( bool changed, LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b ) override;
 
 private:
-  HboxLayout( const HboxLayout& other ) = delete;
-  HboxLayout& operator=( const HboxLayout& other ) = delete;
+  AbsoluteLayout( const AbsoluteLayout& other ) = delete;
+  AbsoluteLayout& operator=( const AbsoluteLayout& other ) = delete;
 
   void ForceUniformHeight( int count, MeasureSpec widthMeasureSpec );
 
-private:
-  LayoutSize mCellPadding;
-  LayoutLength mTotalLength;
 };
 
 } // namespace Internal
 
-inline Internal::HboxLayout& GetImplementation( Dali::Toolkit::HboxLayout& handle )
+inline Internal::AbsoluteLayout& GetImplementation( Dali::Toolkit::AbsoluteLayout& handle )
 {
-  DALI_ASSERT_ALWAYS( handle && "HboxLayout handle is empty" );
+  DALI_ASSERT_ALWAYS( handle && "AbsoluteLayout handle is empty" );
   BaseObject& object = handle.GetBaseObject();
-  return static_cast<Internal::HboxLayout&>( object );
+  return static_cast<Internal::AbsoluteLayout&>( object );
 }
 
-inline const Internal::HboxLayout& GetImplementation( const Dali::Toolkit::HboxLayout& handle )
+inline const Internal::AbsoluteLayout& GetImplementation( const Dali::Toolkit::AbsoluteLayout& handle )
 {
-  DALI_ASSERT_ALWAYS( handle && "HboxLayout handle is empty" );
+  DALI_ASSERT_ALWAYS( handle && "AbsoluteLayout handle is empty" );
   const BaseObject& object = handle.GetBaseObject();
-  return static_cast<const Internal::HboxLayout&>( object );
+  return static_cast<const Internal::AbsoluteLayout&>( object );
 }
 
 } // namespace Toolkit
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_INTERNAL_LAYOUTING_HBOX_LAYOUT_H
+#endif // DALI_TOOLKIT_INTERNAL_ABSOLUTE_LAYOUT_H

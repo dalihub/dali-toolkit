@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
+#include <dali-toolkit/internal/visuals/visual-base-impl.h>
+#include <dali-toolkit/internal/visuals/text/text-visual.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 
@@ -236,5 +238,102 @@ int UtcDaliDebugRenderingGetVisual2(void)
   TestDebugVisual( nPatchVisual, Visual::N_PATCH, Vector2::ZERO );
 
   EnvironmentVariable::SetTestingEnvironmentVariable(false);
+  END_TEST;
+}
+
+int UtcDaliDebugRenderingGetVisualObject01(void)
+{
+  EnvironmentVariable::SetTestingEnvironmentVariable( true );
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  tet_infoline( "Create a TextVisual when debugging is enabled, thus creating a proxy Wireframe Visual" );
+
+  Dali::Property::Map map;
+  map[ Toolkit::Visual::Property::TYPE ] = Visual::TEXT;
+  map[ TextVisual::Property::TEXT ] = "Hello";
+
+  Visual::Base textVisual = factory.CreateVisual( map);
+  DALI_TEST_CHECK( textVisual );
+
+  tet_infoline( "Check that GetVisualObject returns the actual TextVisual" );
+  Toolkit::Internal::Visual::Base& visualImpl = GetImplementation( textVisual ).GetVisualObject();
+  DALI_TEST_CHECK( dynamic_cast< Toolkit::Internal::TextVisual* >( &visualImpl ) );
+
+  tet_infoline( "Compare the returned TextVisual with the visual implementation, should differ" );
+  DALI_TEST_CHECK( textVisual.GetObjectPtr() != &visualImpl );
+
+  END_TEST;
+}
+
+int UtcDaliDebugRenderingGetVisualObject02(void)
+{
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  tet_infoline( "Create a TextVisual without debugging enabled, thus no proxy Wireframe Visual" );
+
+  Dali::Property::Map map;
+  map[ Toolkit::Visual::Property::TYPE ] = Visual::TEXT;
+  map[ TextVisual::Property::TEXT ] = "Hello";
+
+  Visual::Base textVisual = factory.CreateVisual( map);
+  DALI_TEST_CHECK( textVisual );
+
+  tet_infoline( "Check that GetVisualObject returns the actual TextVisual" );
+  Toolkit::Internal::Visual::Base& visualImpl = GetImplementation( textVisual ).GetVisualObject();
+  DALI_TEST_CHECK( dynamic_cast< Toolkit::Internal::TextVisual* >( &visualImpl ) );
+
+  tet_infoline( "Compare the returned TextVisual with the visual implementation, should be the same" );
+  DALI_TEST_CHECK( textVisual.GetObjectPtr() == &visualImpl );
+
+  END_TEST;
+}
+
+int UtcDaliDebugRenderingGetVisualObject03(void)
+{
+  ToolkitTestApplication application;
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  tet_infoline( "Create a WireframeVisual without debugging enabled, thus no proxy Wireframe Visual either" );
+
+  Dali::Property::Map map;
+  map[ Toolkit::Visual::Property::TYPE ] = Visual::WIREFRAME;
+
+  Visual::Base textVisual = factory.CreateVisual( map);
+  DALI_TEST_CHECK( textVisual );
+
+  tet_infoline( "Check that GetVisualObject returns the WireframeVisual" );
+  Toolkit::Internal::Visual::Base& visualImpl = GetImplementation( textVisual ).GetVisualObject();
+  DALI_TEST_CHECK( dynamic_cast< Toolkit::Internal::WireframeVisual* >( &visualImpl ) );
+
+  tet_infoline( "Compare the returned Visual with the visual implementation, should be the same" );
+  DALI_TEST_CHECK( textVisual.GetObjectPtr() == &visualImpl );
+
+  END_TEST;
+}
+
+int UtcDaliDebugRenderingRenderText(void)
+{
+  EnvironmentVariable::SetTestingEnvironmentVariable( true );
+  ToolkitTestApplication application;
+  tet_infoline( "Ensure we can render text when in debug mode" );
+
+  try
+  {
+    Toolkit::TextLabel label = TextLabel::New( "Hello" );
+    Stage::GetCurrent().Add( label );
+    DALI_TEST_CHECK( true );
+  } catch( ... )
+  {
+    DALI_TEST_CHECK( false );
+  }
+
   END_TEST;
 }

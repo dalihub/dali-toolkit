@@ -1387,7 +1387,7 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
       {
         // @note: The callback manager takes the ownership of the callback object.
         mIdleCallback = MakeCallback( this, &TextEditor::OnIdleSignal );
-        adaptor.AddIdle( mIdleCallback );
+        adaptor.AddIdle( mIdleCallback, false );
       }
     }
   }

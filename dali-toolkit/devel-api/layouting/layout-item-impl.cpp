@@ -22,12 +22,13 @@
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 #include <dali-toolkit/internal/layouting/layout-item-data-impl.h>
 
-#if defined(DEBUG_ENABLED)
-    Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::Verbose, false, "LOG_LAYOUT" );
-#endif
-
 namespace
 {
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_LAYOUT" );
+#endif
+
 const char* WIDTH_SPECIFICATION_NAME( "widthSpecification" );
 const char* HEIGHT_SPECIFICATION_NAME( "heightSpecification" );
 
@@ -84,6 +85,8 @@ void LayoutItem::Unparent()
 void LayoutItem::SetAnimateLayout( bool animateLayout )
 {
   mImpl->mAnimated = animateLayout;
+
+  OnAnimationStateChanged( animateLayout );
 }
 
 bool LayoutItem::IsLayoutAnimated() const
@@ -121,6 +124,8 @@ void LayoutItem::OnRegisterChildProperties( const std::string& containerType )
 
 void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
 {
+  DALI_LOG_TRACE_METHOD( gLayoutFilter );
+
   const bool forceLayout = mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
 
   const bool specChanged =
@@ -137,11 +142,18 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
 
   const bool needsLayout = specChanged && ( !isSpecExactly || !matchesSpecSize );
 
-  if( forceLayout || needsLayout)
+  DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::Measure("<<widthMeasureSpec<<", "<<heightMeasureSpec<<") Owner:"<<Actor::DownCast(GetOwner()).GetName() <<"  forceLayout="<<forceLayout<<", specChanged="<<specChanged<<", isSpecExactly="<<isSpecExactly<<", matchesSpecSize="<<matchesSpecSize<<", needsLayout="<<needsLayout <<std::endl <<(forceLayout||needsLayout?"  Remeasuring":"  NoChange"));
+
+  if( forceLayout || needsLayout )
   {
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET );
 
     // measure ourselves, this should set the measured dimension flag back
+#if defined(DEBUG_ENABLED)
+    std::ostringstream o;
+    o<<widthMeasureSpec<<","<<heightMeasureSpec;
+    DALI_LOG_INFO( gLayoutFilter, Debug::Concise, "Calling %s OnMeasure( %s )\n", Actor::DownCast(GetOwner()).GetName().c_str(), o.str().c_str());
+#endif
     OnMeasure( widthMeasureSpec, heightMeasureSpec );
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT );
 
@@ -199,7 +211,34 @@ void LayoutItem::SetMinimumHeight( LayoutLength minimumHeight )
 
 Extents LayoutItem::GetPadding() const
 {
-  return mImpl->mPadding;
+  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  if( control )
+  {
+    Extents padding = control.GetProperty<Extents>( Toolkit::Control::Property::PADDING );
+
+    DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutBase::Padding for %s : (%d,%d,%d,%d) \n",
+                   control.GetName().c_str(),
+                   padding.start, padding.end, padding.top, padding.bottom
+                 );
+    return padding;
+  }
+  else
+  {
+    return Extents();
+  }
+}
+
+Extents LayoutItem::GetMargin() const
+{
+  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  if ( control )
+  {
+    return control.GetProperty<Extents>( Toolkit::Control::Property::MARGIN );
+  }
+  else
+  {
+    return Extents();
+  }
 }
 
 LayoutLength LayoutItem::GetDefaultSize( LayoutLength size, MeasureSpec measureSpec )
@@ -216,6 +255,18 @@ LayoutLength LayoutItem::GetDefaultSize( LayoutLength size, MeasureSpec measureS
       break;
     }
     case MeasureSpec::Mode::AT_MOST:
+    {
+      LayoutLength tmp = specSize;
+      if( size < tmp )
+      {
+        result = size;
+      }
+      else
+      {
+        result = specSize;
+      }
+      break;
+    }
     case MeasureSpec::Mode::EXACTLY:
     {
       result = specSize;
@@ -235,6 +286,11 @@ void LayoutItem::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
 {
 }
 
+void LayoutItem::SetParent( LayoutParent* parent )
+{
+  mImpl->mLayoutParent = parent;
+}
+
 LayoutParent* LayoutItem::GetParent()
 {
   return mImpl->mLayoutParent;
@@ -242,6 +298,11 @@ LayoutParent* LayoutItem::GetParent()
 
 void LayoutItem::RequestLayout()
 {
+  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  if ( control )
+  {
+    DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::RequestLayout %s\n", control.GetName().c_str());
+  }
   // @todo Enforce failure if called in Measure/Layout passes.
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
   Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
@@ -253,8 +314,18 @@ bool LayoutItem::IsLayoutRequested() const
   return mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
 }
 
+void LayoutItem::SetLayoutRequested()
+{
+  return mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
+}
+
 void LayoutItem::SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight )
 {
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutBase::SetMeasuredDimensions width(%d) height(%d) \n",
+                                                 MeasureSpec::IntType( measuredWidth.GetSize() ),
+                                                 MeasureSpec::IntType( measuredHeight.GetSize() )
+               );
+
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET );
   mImpl->mMeasuredWidth = measuredWidth;
   mImpl->mMeasuredHeight = measuredHeight;

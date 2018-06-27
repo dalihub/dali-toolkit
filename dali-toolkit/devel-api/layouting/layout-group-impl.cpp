@@ -15,18 +15,24 @@
  */
 
 // CLASS HEADER
+#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
+
+// EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
-#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
+#include <dali/integration-api/debug.h>
+
+// INTERNAL INCLUDES
 #include <dali-toolkit/internal/layouting/layout-group-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
-
 namespace
 {
-const char* MARGIN_SPECIFICATION_NAME( "marginSpec" );
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_LAYOUT" );
+#endif
 }
 
 namespace Dali
@@ -64,6 +70,8 @@ Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutItem& child )
   childLayout.layoutId = mImpl->mNextLayoutId++;
   childLayout.child = &child;
   mImpl->mChildren.emplace_back( childLayout );
+
+  child.SetParent( this );
 
   auto owner = child.GetOwner();
 
@@ -116,7 +124,7 @@ void LayoutGroup::Remove( LayoutItem& child )
 
 void LayoutGroup::RemoveAll()
 {
-  for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; ++iter )
+  for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; )
   {
     OnChildRemove( *iter->child.Get() );
     iter = mImpl->mChildren.erase(iter);
@@ -176,10 +184,22 @@ void LayoutGroup::DoRegisterChildProperties( const std::string& containerType )
 
 void LayoutGroup::OnSetChildProperties( Handle& handle, Property::Index index, Property::Value value )
 {
-  if ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) )
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnSetChildProperties property(%s)\n", handle.GetPropertyName(index).c_str());
+
+  if ( ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) &&
+         ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) )
+       ||
+       ( index == Toolkit::Control::Property::MARGIN || index == Toolkit::Control::Property::PADDING ) )
   {
     // If any child properties are set, must perform relayout
-    RequestLayout();
+    for( auto&& child : mImpl->mChildren )
+    {
+      if( child.child->GetOwner() == handle )
+      {
+        child.child->RequestLayout();
+        break;
+      }
+    }
   }
 }
 
@@ -189,7 +209,6 @@ void LayoutGroup::GenerateDefaultChildPropertyValues( Handle child )
                      Toolkit::ChildLayoutData::WRAP_CONTENT );
   child.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,
                      Toolkit::ChildLayoutData::WRAP_CONTENT );
-  child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Extents() );
 }
 
 void LayoutGroup::MeasureChildren( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec)
@@ -207,11 +226,25 @@ void LayoutGroup::MeasureChild( LayoutItemPtr child,
                                 MeasureSpec parentWidthMeasureSpec,
                                 MeasureSpec parentHeightMeasureSpec )
 {
+  DALI_LOG_TRACE_METHOD( gLogFilter );
+
   auto childOwner = child->GetOwner();
+
+  auto control = Toolkit::Control::DownCast( childOwner );
+
+#if defined( DEBUG_ENABLED )
+  if ( control )
+  {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::MeasureChild natural size(%f, %f)\n",  control.GetNaturalSize().width, control.GetNaturalSize().height );
+  }
+#endif
+
+  // Get last stored width and height specifications for the child
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
   auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::MeasureChild desiredWidth(%d) desiredHeight(%d)\n", desiredWidth, desiredHeight );
 
-  auto padding = GetPadding();
+  auto padding = GetPadding(); // Padding of this layout's owner, not of the child being measured.
 
   const MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
                                                                  padding.start + padding.end,
@@ -230,17 +263,19 @@ void LayoutGroup::MeasureChildWithMargins( LayoutItemPtr child,
   auto childOwner = child->GetOwner();
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
   auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
-  auto desiredMargin = childOwner.GetProperty<Extents>( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION );
-  auto padding = GetPadding();
+
+  auto padding = GetPadding(); // Padding of this layout's owner, not of the child being measured.
+
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::MeasureChildWithMargins desiredWidth(%d)\n",  desiredWidth );
 
   MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
                                                            padding.start + padding.end +
-                                                           desiredMargin.start + desiredMargin.end +
                                                            widthUsed, desiredWidth );
+
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::MeasureChildWithMargins desiredHeight(%d)\n",  desiredHeight );
 
   MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( parentHeightMeasureSpec,
                                                             padding.top + padding.bottom +
-                                                            desiredMargin.top + desiredMargin.end +
                                                             heightUsed, desiredHeight );
 
   child->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
@@ -255,7 +290,7 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
   auto specMode = measureSpec.GetMode();
   LayoutLength specSize = measureSpec.GetSize();
 
-  auto size = std::max( LayoutLength(0), specSize - padding );
+  auto size = std::max( LayoutLength(0), specSize - padding ); // reduce available size by the owners padding
 
   MeasureSpec::IntType resultSize = 0;
   MeasureSpec::Mode resultMode = MeasureSpec::Mode::UNSPECIFIED;
@@ -265,15 +300,19 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
     // Parent has imposed an exact size on us
     case MeasureSpec::Mode::EXACTLY:
     {
-
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::GetChildMeasureSpec MeasureSpec::Mode::EXACTLY\n");
       if (childDimension == Toolkit::ChildLayoutData::MATCH_PARENT)
       {
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::GetChildMeasureSpec childDimension MATCH_PARENT\n");
+
         // Child wants to be our size. So be it.
         resultSize = size;
         resultMode = MeasureSpec::Mode::EXACTLY;
       }
       else if (childDimension == Toolkit::ChildLayoutData::WRAP_CONTENT)
       {
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::GetChildMeasureSpec childDimension WRAP_CONTENT\n");
+
         // Child wants to determine its own size. It can't be
         // bigger than us.
         resultSize = size;
@@ -281,6 +320,7 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
       }
       else
       {
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::GetChildMeasureSpec childDimension UNSPECIFIED\n");
         resultSize = childDimension;
         resultMode = MeasureSpec::Mode::EXACTLY;
       }
@@ -291,6 +331,7 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
       // Parent has imposed a maximum size on us
     case MeasureSpec::Mode::AT_MOST:
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::GetChildMeasureSpec MeasureSpec::Mode::AT_MOST\n");
       if (childDimension == Toolkit::ChildLayoutData::MATCH_PARENT)
       {
         // Child wants to be our size, but our size is not fixed.
@@ -308,7 +349,7 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
       else
       {
         // Child wants a specific size... so be it
-        resultSize = childDimension;
+        resultSize = childDimension + padding;
         resultMode = MeasureSpec::Mode::EXACTLY;
       }
 
@@ -318,6 +359,8 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
       // Parent asked to see how big we want to be
     case MeasureSpec::Mode::UNSPECIFIED:
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::GetChildMeasureSpec MeasureSpec::Mode::UNSPECIFIED\n");
+
       if (childDimension == Toolkit::ChildLayoutData::MATCH_PARENT)
       {
         // Child wants to be our size... find out how big it should be
@@ -334,12 +377,15 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
       else
       {
         // Child wants a specific size... let him have it
-        resultSize = childDimension;
+        resultSize = childDimension + padding;
         resultMode = MeasureSpec::Mode::EXACTLY;
       }
       break;
     }
   }
+
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::GetChildMeasureSpec resultSize(%u)\n", resultSize );
+
 
   //noinspection ResourceType
   return MeasureSpec( resultSize, resultMode );
@@ -361,36 +407,50 @@ void LayoutGroup::OnInitialize()
     DevelActor::ChildAddedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildAddedToOwner );
     DevelActor::ChildRemovedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildRemovedFromOwner );
     DevelHandle::PropertySetSignal( control ).Connect( mSlotDelegate, &LayoutGroup::OnOwnerPropertySet );
+
+    if( control.GetParent() )
+    {
+      auto parent = Toolkit::Control::DownCast( control.GetParent() );
+      if( parent )
+      {
+        auto parentLayout = Toolkit::LayoutGroup::DownCast( DevelControl::GetLayout( parent ) );
+        if( parentLayout )
+        {
+          Internal::LayoutGroup& parentLayoutImpl = GetImplementation( parentLayout );
+          parentLayoutImpl.Add( *this );
+        }
+      }
+    }
   }
 }
 
 void LayoutGroup::OnRegisterChildProperties( const std::string& containerType )
 {
-  auto typeInfo = TypeRegistry::Get().GetTypeInfo( containerType );
-  if( typeInfo )
-  {
-    Property::IndexContainer indices;
-    typeInfo.GetChildPropertyIndices( indices );
-
-    if( std::find( indices.Begin(), indices.End(), Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION ) ==
-        indices.End() )
-    {
-      ChildPropertyRegistration( typeInfo.GetName(), MARGIN_SPECIFICATION_NAME, Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Property::EXTENTS );
-    }
-  }
-
   DoRegisterChildProperties( containerType );
 }
 
 void LayoutGroup::OnUnparent()
 {
+  // Remove children
   RemoveAll();
+
+  // Remove myself from parent
+  LayoutParent* parent = GetParent();
+  if( parent )
+  {
+    LayoutGroupPtr parentGroup( dynamic_cast< LayoutGroup* >( parent ) );
+    if( parentGroup )
+    {
+      parentGroup->Remove( *this );
+    }
+  }
 }
 
 void LayoutGroup::ChildAddedToOwner( Actor child )
 {
   LayoutItemPtr childLayout;
   Toolkit::Control control = Toolkit::Control::DownCast( child );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner(%s)\n", control.GetName().c_str() );
 
   if( control ) // Can only support adding Controls, not Actors to layout
   {
@@ -403,14 +463,22 @@ void LayoutGroup::ChildAddedToOwner( Actor child )
       // If the child doesn't already have a layout, then create a LayoutItem for it.
       childLayout = LayoutItem::New( control );
       childLayout->SetAnimateLayout( IsLayoutAnimated() ); // @todo this essentially forces animation inheritance. Bad?
-
+#if defined(DEBUG_ENABLED)
       auto desiredSize = control.GetNaturalSize();
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner desiredSize(%f,%f) (naturalSize)\n", desiredSize.width, desiredSize.height );
+#endif
       childControlDataImpl.SetLayout( *childLayout.Get() );
 
-      // HBoxLayout will apply default layout data for this object
-      child.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, LayoutLength::IntType( desiredSize.width ) );
-      child.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, LayoutLength::IntType( desiredSize.height ) );
-      child.SetProperty( Toolkit::LayoutGroup::ChildProperty::MARGIN_SPECIFICATION, Extents() );
+      // Default layout data will be generated by Add().
+    }
+    else
+    {
+      LayoutGroupPtr layoutGroup( dynamic_cast< LayoutGroup* >( childLayout.Get() ) );
+      if( !layoutGroup )
+      {
+        // Set only in case of leaf children
+        childLayout->SetAnimateLayout( IsLayoutAnimated() );
+      }
     }
 
     Add( *childLayout.Get() );
@@ -434,13 +502,33 @@ void LayoutGroup::ChildRemovedFromOwner( Actor child )
 
 void LayoutGroup::OnOwnerPropertySet( Handle& handle, Property::Index index, Property::Value value )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutGroup::OnOwnerPropertySet\n");
   auto actor = Actor::DownCast( handle );
-  if( actor && index == Actor::Property::LAYOUT_DIRECTION )
+  if( actor &&
+      (
+        index == Actor::Property::LAYOUT_DIRECTION  ||
+        index == Toolkit::Control::Property::PADDING  ||
+        index == Toolkit::Control::Property::MARGIN
+      )
+    )
   {
     RequestLayout();
   }
 }
 
+void LayoutGroup::OnAnimationStateChanged( bool animateLayout )
+{
+  // Change children's animation state
+  for( auto&& child : mImpl->mChildren )
+  {
+    LayoutGroupPtr parentGroup( dynamic_cast< LayoutGroup* >( child.child.Get() ) );
+    if( !parentGroup )
+    {
+      // Change state only in case of leaf children
+      child.child->SetAnimateLayout( animateLayout );
+    }
+  }
+}
 
 } // namespace Internal
 } // namespace Toolkit

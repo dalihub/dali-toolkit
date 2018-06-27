@@ -97,7 +97,7 @@ void Adaptor::Stop()
 {
 }
 
-bool Adaptor::AddIdle( CallbackBase* callback )
+bool Adaptor::AddIdle( CallbackBase* callback, bool hasReturnValue )
 {
   const bool isAvailable = IsAvailable();
 

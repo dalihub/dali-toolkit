@@ -19,10 +19,11 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-timer.h>
 #include <toolkit-event-thread-callback.h>
-#include <dali/devel-api/images/nine-patch-image.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/internal/visuals/npatch-loader.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -30,15 +31,17 @@ using namespace Dali::Toolkit;
 
 namespace
 {
-typedef NinePatchImage::StretchRanges StretchRanges;
+typedef Toolkit::Internal::NPatchLoader::StretchRanges StretchRanges;
 
-const char* TEST_NPATCH_FILE_NAME =  TEST_RESOURCE_DIR  "/demo-tile-texture-focused.9.png";
+const char* TEST_9_PATCH_FILE_NAME =  TEST_RESOURCE_DIR  "/demo-tile-texture-focused.9.png";
+const char* TEST_NPATCH_FILE_NAME =  TEST_RESOURCE_DIR  "/heartsframe.9.png";
 const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/svg1.svg";
 const char* TEST_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube.obj";
 const char* TEST_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal.mtl";
 const char* TEST_SIMPLE_OBJ_FILE_NAME = TEST_RESOURCE_DIR "/Cube-Points-Only.obj";
 const char* TEST_SIMPLE_MTL_FILE_NAME = TEST_RESOURCE_DIR "/ToyRobot-Metal-Simple.mtl";
 const char* TEST_AUX_IMAGE = TEST_RESOURCE_DIR "/folder_appicon_empty_bg.png";
+const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/gallery-small-1.jpg";
 
 // resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
 const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
@@ -60,155 +63,12 @@ Property::Map DefaultTransform()
   return transformMap;
 }
 
-Integration::Bitmap* CreateBitmap( unsigned int imageWidth, unsigned int imageHeight, unsigned int initialColor, Pixel::Format pixelFormat )
-{
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_RETAIN );
-  Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight );
-  unsigned int bytesPerPixel = GetBytesPerPixel( pixelFormat );
-
-  memset( pixbuffer, initialColor, imageHeight * imageWidth * bytesPerPixel );
-
-  return bitmap;
-}
-
-void InitialiseRegionsToZeroAlpha( Integration::Bitmap* image, unsigned int imageWidth, unsigned int imageHeight, Pixel::Format pixelFormat )
-{
-  PixelBuffer* pixbuffer = image->GetBuffer();
-  unsigned int bytesPerPixel = GetBytesPerPixel( pixelFormat );
-
-  for( unsigned int row = 0; row < imageWidth; ++row )
-  {
-    unsigned int pixelOffset = row * bytesPerPixel;
-    pixbuffer[ pixelOffset + 3 ] = 0x00;
-    pixelOffset += ( imageHeight - 1 ) * imageWidth * bytesPerPixel;
-    pixbuffer[ pixelOffset + 3 ] = 0x00;
-  }
-
-  for ( unsigned int column = 0; column < imageHeight; ++column )
-  {
-    unsigned int pixelOffset = column * imageWidth * bytesPerPixel;
-    pixbuffer[ pixelOffset + 3 ] = 0x00;
-    pixelOffset += ( imageWidth -1 ) * bytesPerPixel;
-    pixbuffer[ pixelOffset + 3 ] = 0x00;
-  }
-}
-
-void AddStretchRegionsToImage( Integration::Bitmap* image, unsigned int imageWidth, unsigned int imageHeight, const StretchRanges& stretchRangesX, const StretchRanges& stretchRangesY, Pixel::Format pixelFormat )
-{
-  PixelBuffer* pixbuffer = image->GetBuffer();
-  unsigned int bytesPerPixel = GetBytesPerPixel( pixelFormat );
-
-  for(StretchRanges::ConstIterator it = stretchRangesX.Begin(); it != stretchRangesX.End(); ++it)
-  {
-    const Uint16Pair& range = *it;
-    //since the stretch range is in the cropped image space, we need to offset by 1 to get it to the uncropped image space
-    for( unsigned int column = range.GetX() + 1u; column < range.GetY() + 1u; ++column )
-    {
-      unsigned int pixelOffset = column * bytesPerPixel;
-      pixbuffer[ pixelOffset ] = 0x00;
-      pixbuffer[ pixelOffset + 1 ] = 0x00;
-      pixbuffer[ pixelOffset + 2 ] = 0x00;
-      pixbuffer[ pixelOffset + 3 ] = 0xFF;
-    }
-  }
-
-
-  for(StretchRanges::ConstIterator it = stretchRangesY.Begin(); it != stretchRangesY.End(); ++it)
-  {
-    const Uint16Pair& range = *it;
-    //since the stretch range is in the cropped image space, we need to offset by 1 to get it to the uncropped image space
-    for( unsigned int row = range.GetX() + 1u; row < range.GetY() + 1u; ++row )
-    {
-      unsigned int pixelOffset = row * imageWidth * bytesPerPixel;
-      pixbuffer[ pixelOffset ] = 0x00;
-      pixbuffer[ pixelOffset + 1 ] = 0x00;
-      pixbuffer[ pixelOffset + 2 ] = 0x00;
-      pixbuffer[ pixelOffset + 3 ] = 0xFF;
-    }
-  }
-}
-
-void AddChildRegionsToImage( Integration::Bitmap* image, unsigned int imageWidth, unsigned int imageHeight, const Vector4& requiredChildRegion, Pixel::Format pixelFormat )
-{
-  PixelBuffer* pixbuffer = image->GetBuffer();
-  unsigned int bytesPerPixel = GetBytesPerPixel( pixelFormat );
-
-  Integration::Bitmap::PackedPixelsProfile* srcProfile = image->GetPackedPixelsProfile();
-  unsigned int bufferStride = srcProfile->GetBufferStride();
-
-  // Add bottom child region
-  for( unsigned int column = requiredChildRegion.x; column < imageWidth - requiredChildRegion.z; ++column )
-  {
-    unsigned int pixelOffset = column * bytesPerPixel;
-    pixelOffset += ( imageHeight - 1 ) * bufferStride;
-    pixbuffer[ pixelOffset ] = 0x00;
-    pixbuffer[ pixelOffset + 1 ] = 0x00;
-    pixbuffer[ pixelOffset + 2 ] = 0x00;
-    pixbuffer[ pixelOffset + 3 ] = 0xFF;
-  }
-
-  // Add right child region
-  for ( unsigned int row = requiredChildRegion.y; row < imageHeight - requiredChildRegion.w; ++row )
-  {
-    unsigned int pixelOffset = row * bufferStride + ( imageWidth - 1 ) * bytesPerPixel;
-    pixbuffer[ pixelOffset ] = 0x00;
-    pixbuffer[ pixelOffset + 1 ] = 0x00;
-    pixbuffer[ pixelOffset + 2 ] = 0x00;
-    pixbuffer[ pixelOffset + 3 ] = 0xFF;
-  }
-}
-
-Integration::ResourcePointer CustomizeNinePatch( TestApplication& application,
-                                                 unsigned int ninePatchImageWidth,
-                                                 unsigned int ninePatchImageHeight,
-                                                 const StretchRanges& stretchRangesX,
-                                                 const StretchRanges& stretchRangesY,
-                                                 bool addChildRegion = false,
-                                                 Vector4 requiredChildRegion = Vector4::ZERO )
-{
-  TestPlatformAbstraction& platform = application.GetPlatform();
-
-  Pixel::Format pixelFormat = Pixel::RGBA8888;
-
-  tet_infoline("Create Bitmap");
-  platform.SetClosestImageSize(Vector2( ninePatchImageWidth, ninePatchImageHeight));
-  Integration::Bitmap* bitmap = CreateBitmap( ninePatchImageWidth, ninePatchImageHeight, 0xFF, pixelFormat );
-
-  tet_infoline("Clear border regions");
-  InitialiseRegionsToZeroAlpha( bitmap, ninePatchImageWidth, ninePatchImageHeight, pixelFormat );
-
-  tet_infoline("Add Stretch regions to Bitmap");
-  AddStretchRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY, pixelFormat );
-
-  if( addChildRegion )
-  {
-    tet_infoline("Add Child regions to Bitmap");
-    AddChildRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, requiredChildRegion, pixelFormat );
-  }
-
-  tet_infoline("Getting resource");
-  Integration::ResourcePointer resourcePtr(bitmap);
-  //platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
-  platform.SetSynchronouslyLoadedResource( resourcePtr);
-
-  return resourcePtr;
-}
-
 void TestVisualRender( ToolkitTestApplication& application,
                        DummyControl& actor,
-                       Visual::Base& visual,
-                       std::size_t expectedSamplers = 0,
-                       ImageDimensions imageDimensions = ImageDimensions(),
-                       Integration::ResourcePointer resourcePtr = Integration::ResourcePointer())
+                       Visual::Base& visual )
 {
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-
-  if( resourcePtr )
-  {
-    // set the image size, for test case, this needs to be set before loading started
-    application.GetPlatform().SetClosestImageSize(  Vector2(imageDimensions.GetWidth(), imageDimensions.GetHeight()) );
-  }
 
   actor.SetSize( 200.f, 200.f );
   DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
@@ -221,13 +81,7 @@ void TestVisualRender( ToolkitTestApplication& application,
   application.Render();
   application.SendNotification();
 
-  if( resourcePtr )
-  {
-    DALI_TEST_EQUALS( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceSynchronouslyFunc ), true, TEST_LOCATION);
-  }
-
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
-
 }
 
 } // namespace
@@ -500,7 +354,7 @@ int UtcDaliVisualFactoryGetLinearGradientVisual(void)
 
   // A lookup texture is generated and pass to shader as sampler
   DummyControl actor = DummyControl::New(true);
-  TestVisualRender( application, actor, visual, 1u);
+  TestVisualRender( application, actor, visual );
 
   END_TEST;
 }
@@ -537,7 +391,7 @@ int UtcDaliVisualFactoryGetRadialGradientVisual(void)
 
   // A lookup texture is generated and pass to shader as sampler
   DummyControl actor = DummyControl::New(true);
-  TestVisualRender( application, actor, visual, 1u );
+  TestVisualRender( application, actor, visual );
 
   Matrix3 alignMatrix( radius, 0.f, 0.f, 0.f, radius, 0.f, center.x, center.y, 1.f );
   alignMatrix.Invert();
@@ -577,17 +431,13 @@ int UtcDaliVisualFactoryDefaultOffsetsGradientVisual(void)
 
   // A lookup texture is generated and pass to shader as sampler
   DummyControl actor = DummyControl::New(true);
-  TestVisualRender( application, actor, visual, 1u );
+  TestVisualRender( application, actor, visual );
 
   Stage::GetCurrent().Remove( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
 }
-
-
-
-
 
 int UtcDaliVisualFactoryGetNPatchVisual1(void)
 {
@@ -597,33 +447,29 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
-  const unsigned int ninePatchImageHeight = 18;
-  const unsigned int ninePatchImageWidth = 28;
-  StretchRanges stretchRangesX;
-  stretchRangesX.PushBack( Uint16Pair( 2, 3 ) );
-  StretchRanges stretchRangesY;
-  stretchRangesY.PushBack( Uint16Pair( 4, 5 ) );
-  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
+  // Get actual size of test image
+  ImageDimensions imageSize = Dali::GetClosestImageSize( TEST_9_PATCH_FILE_NAME );
 
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
-  propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_9_PATCH_FILE_NAME );
   {
     tet_infoline( "whole grid" );
     Visual::Base visual = factory.CreateVisual( propertyMap );
     DALI_TEST_CHECK( visual );
-
 
     TestGlAbstraction& gl = application.GetGlAbstraction();
     TraceCallStack& textureTrace = gl.GetTextureTrace();
     textureTrace.Enable(true);
 
     DummyControl actor = DummyControl::New(true);
-    TestVisualRender( application, actor, visual, 1u,
-                      ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
-                      ninePatchResource );
+    TestVisualRender( application, actor, visual );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
   }
 
   propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
@@ -637,11 +483,13 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
     textureTrace.Enable(true);
 
     DummyControl actor = DummyControl::New(true);
-    TestVisualRender( application, actor, visual, 1u,
-                      ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
-                      ninePatchResource );
+    TestVisualRender( application, actor, visual );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
   }
 
   END_TEST;
@@ -654,6 +502,9 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
+
+  // Get actual size of test image
+  ImageDimensions imageSize = Dali::GetClosestImageSize( gImage_34_RGBA );
 
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
@@ -669,9 +520,13 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
     textureTrace.Enable(true);
 
     DummyControl actor = DummyControl::New(true);
-    TestVisualRender( application, actor, visual, 1u );
+    TestVisualRender( application, actor, visual );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth(), imageSize.GetHeight() ), TEST_LOCATION );
   }
 
   propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
@@ -685,9 +540,13 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
     textureTrace.Enable(true);
 
     DummyControl actor = DummyControl::New(true);
-    TestVisualRender( application, actor, visual, 1u );
+    TestVisualRender( application, actor, visual );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth(), imageSize.GetHeight() ), TEST_LOCATION );
   }
 
   propertyMap.Clear();
@@ -704,9 +563,13 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
     textureTrace.Enable(true);
 
     DummyControl actor = DummyControl::New(true);
-    TestVisualRender( application, actor, visual, 1u );
+    TestVisualRender( application, actor, visual );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth(), imageSize.GetHeight() ), TEST_LOCATION );
   }
 
   END_TEST;
@@ -720,22 +583,12 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
-  const unsigned int ninePatchImageWidth = 18;
-  const unsigned int ninePatchImageHeight = 28;
-  StretchRanges stretchRangesX;
-  stretchRangesX.PushBack( Uint16Pair( 2, 3 ) );
-  stretchRangesX.PushBack( Uint16Pair( 5, 7 ) );
-  stretchRangesX.PushBack( Uint16Pair( 12, 15 ) );
-  StretchRanges stretchRangesY;
-  stretchRangesY.PushBack( Uint16Pair( 4, 5 ) );
-  stretchRangesY.PushBack( Uint16Pair( 8, 12 ) );
-  stretchRangesY.PushBack( Uint16Pair( 15, 16 ) );
-  stretchRangesY.PushBack( Uint16Pair( 25, 27 ) );
-  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
+  // Get actual size of test image
+  ImageDimensions imageSize = Dali::GetClosestImageSize( TEST_NPATCH_FILE_NAME );
 
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
-  propertyMap.Insert( ImageVisual::Property::URL,  TEST_NPATCH_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_NPATCH_FILE_NAME );
   {
     Visual::Base visual = factory.CreateVisual( propertyMap );
     DALI_TEST_CHECK( visual );
@@ -745,14 +598,16 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
     textureTrace.Enable(true);
 
     DummyControl actor = DummyControl::New(true);
-    TestVisualRender( application, actor, visual, 1u,
-                      ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
-                      ninePatchResource );
+    TestVisualRender( application, actor, visual );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
     Stage::GetCurrent().Remove( actor );
     DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
   }
 
   propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
@@ -765,12 +620,13 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
     TraceCallStack& textureTrace = gl.GetTextureTrace();
     textureTrace.Enable(true);
     DummyControl actor = DummyControl::New(true);
-    TestVisualRender( application, actor, visual, 1u,
-                      ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
-                      ninePatchResource );
-
+    TestVisualRender( application, actor, visual );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
 
     Stage::GetCurrent().Remove( actor );
     DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
@@ -782,20 +638,15 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
 int UtcDaliVisualFactoryGetNPatchVisual4(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual3: Request 9-patch visual with an image url" );
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual4: Request 9-patch visual with an image url" );
+
+  // Get actual size of test image
+  ImageDimensions imageSize = Dali::GetClosestImageSize( TEST_9_PATCH_FILE_NAME );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
 
-  const unsigned int ninePatchImageHeight = 18;
-  const unsigned int ninePatchImageWidth = 28;
-  StretchRanges stretchRangesX;
-  stretchRangesX.PushBack( Uint16Pair( 2, 3 ) );
-  StretchRanges stretchRangesY;
-  stretchRangesY.PushBack( Uint16Pair( 4, 5 ) );
-  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application, ninePatchImageWidth, ninePatchImageHeight, stretchRangesX, stretchRangesY );
-
-  Visual::Base visual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
+  Visual::Base visual = factory.CreateVisual( TEST_9_PATCH_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( visual );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -803,19 +654,27 @@ int UtcDaliVisualFactoryGetNPatchVisual4(void)
   textureTrace.Enable(true);
 
   DummyControl actor = DummyControl::New(true);
-  TestVisualRender( application, actor, visual, 1u,
-                    ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
-                    ninePatchResource );
+  TestVisualRender( application, actor, visual );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
+  Vector2 naturalSize( 0.0f, 0.0f );
+  visual.GetNaturalSize( naturalSize );
+  DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
 
-  ResourceImage image = ResourceImage::New(TEST_NPATCH_FILE_NAME);
+  textureTrace.Reset();
+
+  ResourceImage image = ResourceImage::New( TEST_9_PATCH_FILE_NAME );
   Visual::Base nPatchVisual = factory.CreateVisual( image );
-  Vector2 controlSize( 20.f, 30.f ), naturalSize(0,0);
-  nPatchVisual.SetTransformAndSize(DefaultTransform(), controlSize );
+
+  DummyControl actor1 = DummyControl::New(true);
+  TestVisualRender( application, actor1, nPatchVisual );
+
+  DALI_TEST_EQUALS( textureTrace.CountMethod("BindTexture"), 0, TEST_LOCATION );  // The same texture should be used with the first visual.
+
+  naturalSize = Vector2( 0.0f, 0.0f );
   nPatchVisual.GetNaturalSize( naturalSize );
-  DALI_TEST_EQUALS( naturalSize, Vector2( ninePatchImageWidth-2, ninePatchImageHeight-2 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -823,27 +682,13 @@ int UtcDaliVisualFactoryGetNPatchVisual4(void)
 int UtcDaliVisualFactoryGetNPatchVisual5(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual4: Request n-patch visual with an image url" );
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual5: Request n-patch visual with an image url" );
+
+  // Get actual size of test image
+  ImageDimensions imageSize = Dali::GetClosestImageSize( TEST_NPATCH_FILE_NAME );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
-
-  const unsigned int ninePatchImageHeight = 18;
-  const unsigned int ninePatchImageWidth = 28;
-  StretchRanges stretchRangesX;
-  stretchRangesX.PushBack( Uint16Pair( 2, 3 ) );
-  stretchRangesX.PushBack( Uint16Pair( 5, 7 ) );
-  stretchRangesX.PushBack( Uint16Pair( 12, 15 ) );
-  StretchRanges stretchRangesY;
-  stretchRangesY.PushBack( Uint16Pair( 4, 5 ) );
-  stretchRangesY.PushBack( Uint16Pair( 8, 12 ) );
-  stretchRangesY.PushBack( Uint16Pair( 15, 16 ) );
-  stretchRangesY.PushBack( Uint16Pair( 25, 27 ) );
-  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application,
-                                                                       ninePatchImageWidth,
-                                                                       ninePatchImageHeight,
-                                                                       stretchRangesX,
-                                                                       stretchRangesY );
 
   Visual::Base visual = factory.CreateVisual( TEST_NPATCH_FILE_NAME, ImageDimensions() );
   DALI_TEST_CHECK( visual );
@@ -853,15 +698,83 @@ int UtcDaliVisualFactoryGetNPatchVisual5(void)
   textureTrace.Enable(true);
 
   DummyControl actor = DummyControl::New(true);
-  TestVisualRender( application, actor, visual, 1u,
-                    ImageDimensions(ninePatchImageWidth, ninePatchImageHeight),
-                    ninePatchResource );
+  TestVisualRender( application, actor, visual );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+  Vector2 naturalSize( 0.0f, 0.0f );
+  visual.GetNaturalSize( naturalSize );
+  DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
 
   END_TEST;
 }
 
+int UtcDaliVisualFactoryGetNPatchVisual6(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual6: Request n-patch visual with a general image" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  {
+    // Get actual size of test image
+    ImageDimensions imageSize = Dali::GetClosestImageSize( gImage_34_RGBA );
+
+    Property::Map propertyMap;
+    propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
+    propertyMap.Insert( ImageVisual::Property::URL, gImage_34_RGBA );
+
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+    TestVisualRender( application, actor, visual );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
+
+    Stage::GetCurrent().Remove( actor );
+    DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  }
+
+  {
+    // Get actual size of test image
+    ImageDimensions imageSize = Dali::GetClosestImageSize( TEST_IMAGE_FILE_NAME );
+
+    Property::Map propertyMap;
+    propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
+    propertyMap.Insert( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME );
+
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+    TestVisualRender( application, actor, visual );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
+
+    Stage::GetCurrent().Remove( actor );
+    DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  }
+
+  END_TEST;
+}
 
 int UtcDaliNPatchVisualAuxiliaryImage(void)
 {
@@ -883,21 +796,9 @@ int UtcDaliNPatchVisualAuxiliaryImage(void)
   properties[Visual::Property::TYPE] = Visual::IMAGE;
   properties[Visual::Property::MIX_COLOR] = Color::BLUE;
   properties[Visual::Property::SHADER]=shader;
-  properties[ImageVisual::Property::URL] = TEST_NPATCH_FILE_NAME;
+  properties[ImageVisual::Property::URL] = TEST_9_PATCH_FILE_NAME;
   properties[DevelImageVisual::Property::AUXILIARY_IMAGE] = TEST_AUX_IMAGE;
   properties[DevelImageVisual::Property::AUXILIARY_IMAGE_ALPHA] = 0.9f;
-
-  const unsigned int ninePatchImageWidth =  256;
-  const unsigned int ninePatchImageHeight = 256;
-  StretchRanges stretchRangesX;
-  stretchRangesX.PushBack( Uint16Pair( 10, 246 ) );
-  StretchRanges stretchRangesY;
-  stretchRangesY.PushBack( Uint16Pair( 15, 241 ) );
-  Integration::ResourcePointer ninePatchResource = CustomizeNinePatch( application,
-                                                                       ninePatchImageWidth,
-                                                                       ninePatchImageHeight,
-                                                                       stretchRangesX,
-                                                                       stretchRangesY );
 
   Visual::Base visual = factory.CreateVisual( properties );
 
@@ -916,7 +817,6 @@ int UtcDaliNPatchVisualAuxiliaryImage(void)
   auto textures = renderer.GetTextures();
   DALI_TEST_EQUALS( textures.GetTextureCount(), 2, TEST_LOCATION );
 
-
   END_TEST;
 }
 
@@ -934,18 +834,12 @@ int UtcDaliVisualFactoryGetNPatchVisualN1(void)
   Visual::Base visual = factory.CreateVisual( "ERROR.9.jpg", ImageDimensions() );
   DALI_TEST_CHECK( visual );
 
-  //The testkit still has to load a bitmap for the broken renderer image
-  Integration::Bitmap* bitmap = Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 100, 100, 100, 100 );
-
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
 
   DummyControl actor = DummyControl::New(true);
-  TestVisualRender( application, actor, visual, 1u,
-                    ImageDimensions(),
-                    Integration::ResourcePointer(bitmap) );
+  TestVisualRender( application, actor, visual );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
@@ -969,10 +863,6 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
-  //The testkit still has to load a bitmap for the broken renderer image
-  Integration::Bitmap* bitmap = Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::OWNED_DISCARD);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 100, 100, 100, 100 );
-
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
@@ -980,9 +870,7 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
   drawTrace.Enable(true);
 
   DummyControl actor = DummyControl::New(true);
-  TestVisualRender( application, actor, visual, 1u,
-                    ImageDimensions(),
-                    Integration::ResourcePointer(bitmap) );
+  TestVisualRender( application, actor, visual );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 

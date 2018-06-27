@@ -1,3 +1,6 @@
+#ifndef __DALI_TOOLKIT_LAYOUT_UTILS_H__
+#define __DALI_TOOLKIT_LAYOUT_UTILS_H__
+
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
@@ -12,39 +15,28 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
-#include <dali-toolkit/internal/layouting/layout-item-data-impl.h>
-#include <dali-toolkit/devel-api/layouting/measured-size.h>
+#include <dali-toolkit/dali-toolkit.h>
 
 namespace Dali
 {
+
 namespace Toolkit
 {
-namespace Internal
-{
 
-bool LayoutItem::Impl::sUseZeroUnspecifiedMeasureSpec = false;
+/**
+ * @brief Creates an empty leaf control filled with red color for layout tests
+ *
+ * @param[in] width The width of the control.
+ * @param[in] height The height of the control.
+ * @param[out] Control The control.
+ */
+Control CreateLeafControl( int width, int height );
 
-
-LayoutItem::Impl::Impl()
-: mOwner( nullptr ),
-  mLayoutParent( nullptr ),
-  mOldWidthMeasureSpec( 0u ),
-  mOldHeightMeasureSpec( 0u ),
-  mMinimumSize(),
-  mMeasuredWidth(0u),
-  mMeasuredHeight(0u),
-  mLeft( 0 ),
-  mRight( 0 ),
-  mTop( 0 ),
-  mBottom( 0 ),
-  mViewFlags( 0 ),
-  mPrivateFlags( 0 ),
-  mAnimated( false )
-{
-}
-
-} // namespace Internal
 } // namespace Toolkit
+
 } // namespace Dali
+
+#endif // __DALI_TOOLKIT_LAYOUT_UTILS_H__

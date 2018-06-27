@@ -25,9 +25,14 @@
 
 using namespace Dali;
 
+namespace
+{
+
 #if defined(DEBUG_ENABLED)
-static Debug::Filter* gLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_LAYOUT" );
+static Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_LAYOUT" );
 #endif
+
+}
 
 namespace Dali
 {
@@ -105,7 +110,9 @@ void LayoutController::MeasureHierarchy( Actor root, MeasureSpec widthSpec, Meas
   Toolkit::Control control = Toolkit::Control::DownCast( root );
   if( control )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::Measuring leaf\n" );
     Internal::Control& controlImpl = GetImplementation( control );
+
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
     LayoutItemPtr layout = controlDataImpl.GetLayout();
 
@@ -116,6 +123,7 @@ void LayoutController::MeasureHierarchy( Actor root, MeasureSpec widthSpec, Meas
   }
   else
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::Measuring (%u) children\n", root.GetChildCount() );
     // Depth first descent through actor children
     for( unsigned int i = 0, count = root.GetChildCount(); i < count; ++i )
     {
@@ -130,17 +138,20 @@ void LayoutController::PerformLayout( Actor root, int left, int top, int right, 
   Toolkit::Control control = Toolkit::Control::DownCast( root );
   if( control )
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayout on leaf\n" );
     Internal::Control& controlImpl = GetImplementation( control );
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
     LayoutItemPtr layout = controlDataImpl.GetLayout();
 
     if( layout )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayout on layout\n" );
       layout->Layout( left, top, right, bottom );
     }
   }
   else
   {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayout (%u) children\n", root.GetChildCount() );
     // Depth first descent through actor children
     for( unsigned int i = 0, count = root.GetChildCount(); i < count; ++i )
     {

@@ -15,38 +15,37 @@
  */
 
 //CLASS HEADER
-#include <dali-toolkit/devel-api/layouting/hbox-layout.h>
+#include <dali-toolkit/devel-api/layouting/absolute-layout.h>
 
-//EXTERNAL HEADERS
 //INTERNAL HEADERS
-#include <dali-toolkit/internal/layouting/hbox-layout-impl.h>
+#include <dali-toolkit/internal/layouting/absolute-layout-impl.h>
 
 namespace Dali
 {
 namespace Toolkit
 {
 
-HboxLayout::HboxLayout()
+AbsoluteLayout::AbsoluteLayout()
 {
 }
 
-HboxLayout HboxLayout::New()
+AbsoluteLayout AbsoluteLayout::New()
 {
-  Internal::HboxLayoutPtr internal = Internal::HboxLayout::New();
-  return HboxLayout( internal.Get() );
+  Internal::AbsoluteLayoutPtr internal = Internal::AbsoluteLayout::New();
+  return AbsoluteLayout( internal.Get() );
 }
 
-HboxLayout HboxLayout::DownCast( BaseHandle handle )
+AbsoluteLayout AbsoluteLayout::DownCast( BaseHandle handle )
 {
-  return HboxLayout( dynamic_cast< Dali::Toolkit::Internal::HboxLayout*>( handle.GetObjectPtr() ) );
+  return AbsoluteLayout( dynamic_cast< Dali::Toolkit::Internal::AbsoluteLayout*>( handle.GetObjectPtr() ) );
 }
 
-HboxLayout::HboxLayout( const HboxLayout& other )
+AbsoluteLayout::AbsoluteLayout( const AbsoluteLayout& other )
 : LayoutGroup( other )
 {
 }
 
-HboxLayout& HboxLayout::operator=( const HboxLayout& other )
+AbsoluteLayout& AbsoluteLayout::operator=( const AbsoluteLayout& other )
 {
   if( &other != this )
   {
@@ -55,17 +54,7 @@ HboxLayout& HboxLayout::operator=( const HboxLayout& other )
   return *this;
 }
 
-void HboxLayout::SetCellPadding( LayoutSize size )
-{
-  GetImplementation(*this).SetCellPadding( size );
-}
-
-LayoutSize HboxLayout::GetCellPadding()
-{
-  return GetImplementation(*this).GetCellPadding();
-}
-
-HboxLayout::HboxLayout( Dali::Toolkit::Internal::HboxLayout* object )
+AbsoluteLayout::AbsoluteLayout( Dali::Toolkit::Internal::AbsoluteLayout* object )
 : LayoutGroup( object )
 {
 }

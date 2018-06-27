@@ -220,13 +220,13 @@ private:
   Shader GetTextShader( VisualFactoryCache& factoryCache, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled );
 
   /**
-   * @brief Retrieve the text's controller.
-   * @param[in] visual The text visual.
-   * @return The text controller
+   * @brief Retrieve the TextVisual object.
+   * @param[in] visual A handle to the TextVisual
+   * @return The TextVisual object
    */
   static TextVisual& GetVisualObject( Toolkit::Visual::Base visual )
   {
-    return static_cast<TextVisual&>( visual.GetBaseObject() );
+    return static_cast< TextVisual& >( Toolkit::GetImplementation( visual ).GetVisualObject() );
   };
 
 private:
