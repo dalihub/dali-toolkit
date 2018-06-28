@@ -1192,3 +1192,37 @@ int UtcDaliLayouting_RelayoutOnChildOrderChanged(void)
 
   END_TEST;
 }
+
+int UtcDaliLayouting_HboxLayout_TargetSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_HboxLayout07 - Set target size on leaf");
+
+  Stage stage = Stage::GetCurrent();
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  for( auto&& iter : controls )
+  {
+    iter.SetSize( 100, 100 );
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800 from left to right.
+  // hbox left justifies elements
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 350.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
