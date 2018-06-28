@@ -227,12 +227,12 @@ void FlexLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
     YGNodeStyleSetMaxWidth( mRoot, width );
   }
 
-  if (heightMeasureSpec.GetMode() == MeasureSpec::Mode::EXACTLY)
+  if ( heightMeasureSpec.GetMode() == MeasureSpec::Mode::EXACTLY )
   {
     height = heightMeasureSpec.GetSize();
     YGNodeStyleSetHeight( mRoot, height );
   }
-  else if (widthMeasureSpec.GetMode() == MeasureSpec::Mode::AT_MOST)
+  else if ( heightMeasureSpec.GetMode() == MeasureSpec::Mode::AT_MOST )
   {
     height = heightMeasureSpec.GetSize();
     YGNodeStyleSetMaxHeight( mRoot, height );
@@ -306,7 +306,7 @@ YGSize FlexLayout::OnChildMeasure( YGNodeRef node,
 
   if( desiredHeight == Toolkit::ChildLayoutData::MATCH_PARENT )
   {
-    if( innerWidth != YGUndefined)
+    if( innerHeight != YGUndefined)
     {
       desiredHeight = innerHeight;
     }
