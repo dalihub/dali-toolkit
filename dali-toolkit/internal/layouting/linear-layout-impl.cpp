@@ -61,7 +61,11 @@ LinearLayout::~LinearLayout()
 
 void LinearLayout::SetCellPadding( LayoutSize size )
 {
-  mCellPadding = size;
+  if ( mCellPadding != size )
+  {
+    mCellPadding = size;
+    RequestLayout();
+  }
 }
 
 LayoutSize LinearLayout::GetCellPadding()
@@ -71,7 +75,11 @@ LayoutSize LinearLayout::GetCellPadding()
 
 void LinearLayout::SetOrientation( Dali::Toolkit::LinearLayout::Orientation orientation )
 {
-  mOrientation = orientation;
+  if ( mOrientation != orientation )
+  {
+    mOrientation = orientation;
+    RequestLayout();
+  }
 }
 
 Dali::Toolkit::LinearLayout::Orientation LinearLayout::GetOrientation()
