@@ -23,6 +23,8 @@
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/layouting/absolute-layout.h>
 #include <dali-toolkit/devel-api/layouting/linear-layout.h>
+#include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 
 #include <../custom-layout.h>
 
@@ -1448,7 +1450,6 @@ int UtcDaliLayouting_HboxLayout_TargetSize(void)
   END_TEST;
 }
 
-
 int UtcDaliLayouting_RemoveLayout01(void)
 {
   ToolkitTestApplication application;
@@ -1499,6 +1500,141 @@ int UtcDaliLayouting_RemoveLayout01(void)
 
   DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_LayoutChildren01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_LayoutChildren01");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  rootControl.Add( hbox );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 1, TEST_LOCATION );
+
+  tet_infoline("Test removal by setting empty layout to child container" );
+  DevelControl::SetLayout( hbox, LayoutItem{} );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 0, TEST_LOCATION );
+
+  auto& hboxImpl = GetImplementation( hboxLayout );
+  Handle empty;
+  DALI_TEST_EQUALS( hboxLayout.GetOwner(), empty, TEST_LOCATION );
+  DALI_TEST_EQUALS( (void*)hboxImpl.GetParent(), (void*)nullptr, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_LayoutChildren02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_LayoutChildren02");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  rootControl.Add( hbox );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 1, TEST_LOCATION );
+
+  tet_infoline("Test removal by removing child actor from parent container" );
+  hbox.Unparent();
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 0, TEST_LOCATION );
+
+  auto& hboxImpl = GetImplementation( hboxLayout );
+  tet_infoline("Test child actor still has hbox layout " );
+  DALI_TEST_EQUALS( (bool)hboxLayout.GetOwner(), true, TEST_LOCATION );
+
+  tet_infoline("Test hbox layout has no parent " );
+  DALI_TEST_EQUALS( (void*)hboxImpl.GetParent(), (void*)nullptr, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_LayoutChildren03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_LayoutChildren02");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  rootControl.Add( hbox );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 1, TEST_LOCATION );
+
+  tet_infoline("Test removal by removing child layout from parent layout" );
+  absoluteLayout.Remove( hboxLayout );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 0, TEST_LOCATION );
+
+  auto& hboxImpl = GetImplementation( hboxLayout );
+
+  tet_infoline("Check child actor has orphaned layout (Moving child keeps old layout)");
+  DALI_TEST_EQUALS( hboxLayout.GetOwner(), hbox, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::GetLayout(hbox), hboxLayout, TEST_LOCATION );
+
+  tet_infoline("Check orphaned layout has no parent");
+  DALI_TEST_EQUALS( (void*)hboxImpl.GetParent(), (void*)nullptr, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliLayouting_LayoutChildren04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_LayoutChildren03");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  tet_infoline("Test unparenting by adding child with no layout to parent (should auto-generate LayoutItem) ");
+  auto hboxLayout = LinearLayout::New();
+  rootControl.Add( hbox );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 1, TEST_LOCATION );
+
+  tet_infoline("Then setting a layout on the child container");
+  DevelControl::SetLayout( hbox, hboxLayout );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 1, TEST_LOCATION );
+
+  auto& hboxImpl = GetImplementation( hboxLayout );
+  auto& absImpl = GetImplementation( absoluteLayout );
+  DALI_TEST_EQUALS( hboxLayout.GetOwner(), Handle(hbox), TEST_LOCATION );
+  DALI_TEST_EQUALS( hboxImpl.GetParent(), (Dali::Toolkit::Internal::LayoutParent*)&absImpl, TEST_LOCATION );
 
   END_TEST;
 }

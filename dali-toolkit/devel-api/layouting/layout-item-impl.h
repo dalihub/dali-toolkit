@@ -24,7 +24,7 @@
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
 #include <dali-toolkit/devel-api/layouting/layout-item.h>
-#include <dali-toolkit/devel-api/layouting/layout-parent-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-child-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
 #include <dali-toolkit/devel-api/layouting/layout-size.h>
 #include <dali-toolkit/devel-api/layouting/measure-spec.h>
@@ -45,7 +45,7 @@ using LayoutItemPtr = IntrusivePtr<LayoutItem>;
  * Base class for layouts.
  */
 class DALI_TOOLKIT_API LayoutItem : public BaseObject,
-                                    public LayoutParent
+                                    public LayoutChild
 {
 public:
   /**
@@ -94,7 +94,8 @@ public:
   Handle GetOwner() const;
 
   /**
-   * @brief Unparent this layout from it's owner, and remove any layout children in derived types
+   * @brief Unparent this layout from it's parent, remove it from it's owner
+   * and remove any layout children in derived types.
    */
   void Unparent();
 
@@ -158,14 +159,14 @@ public:
   static LayoutLength GetDefaultSize( LayoutLength size, MeasureSpec measureSpec );
 
   /**
-   * @copydoc LayoutParent::SetParent
+   * @copydoc LayoutChild::SetParent
    */
-  virtual void SetParent( LayoutParent* parent ) override;
+  void SetParent( LayoutParent* parent ) override;
 
   /**
-   * @copydoc LayoutParent::GetParent
+   * @copydoc LayoutChild::GetParent
    */
-  virtual LayoutParent* GetParent() override;
+  LayoutParent* GetParent() override;
 
   /**
    * @brief Request that this layout is re-laid out.

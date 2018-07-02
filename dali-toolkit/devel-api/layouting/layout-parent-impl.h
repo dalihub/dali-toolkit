@@ -25,31 +25,39 @@ namespace Toolkit
 {
 namespace Internal
 {
+class LayoutItem;
 
 /**
- * Interface that allows a layout to determine its layout parent.
- *
- * Needed to prevent circular inheritance - most LayoutBases have a parent,
- * but parenting is provided by LayoutGroup, which is a sub-class of LayoutBase.
+ * Interface that defines a layout Parent. Enables a layout child to access
+ * methods on its parent, e.g. Remove (during unparenting)
  */
 class DALI_TOOLKIT_API LayoutParent
 {
 public:
   /**
-   * Set the parent of this layout.
+   * @brief Add a child to the parent
+   * @param[in] item The item to add to this layout parent
    */
-  virtual void SetParent( LayoutParent* parent ) = 0;
+  virtual Toolkit::LayoutGroup::LayoutId Add( LayoutItem& item ) = 0;
 
   /**
-   * Get the parent of this layout.
+   * @brief Remove a layout child from this group.
+   * @param[in] childId The layout child id
    */
-  virtual LayoutParent* GetParent() = 0;
+  virtual void Remove( Toolkit::LayoutGroup::LayoutId childId ) = 0;
+
+  /**
+   * @brief Remove a child from this parent
+   * @param[in] item The item to remove from this layout parent
+   */
+  virtual void Remove( LayoutItem& item ) = 0;
 
 protected:
   virtual ~LayoutParent()
   {
   }
 };
+
 
 
 } // namespace Internal
