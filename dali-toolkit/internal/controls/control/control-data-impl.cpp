@@ -1442,15 +1442,6 @@ void Control::Impl::SetLayout( Toolkit::Internal::LayoutItem& layout )
   mLayout->Initialize( controlHandle, controlHandle.GetTypeName() ); // LayoutGroup takes ownership of existing children
 }
 
-void Control::Impl::RemoveLayout()
-{
-  if( mLayout )
-  {
-    mLayout->Unparent();
-    mLayout.Reset();
-  }
-}
-
 } // namespace Internal
 
 } // namespace Toolkit
