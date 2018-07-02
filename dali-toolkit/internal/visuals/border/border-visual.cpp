@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/rendering/shader-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>
@@ -29,6 +30,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -49,7 +51,7 @@ const char * const POSITION_ATTRIBUTE_NAME("aPosition");
 const char * const DRIFT_ATTRIBUTE_NAME("aDrift");
 const char * const INDEX_NAME("indices");
 
-
+#if 0
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   attribute mediump vec2 aDrift;\n
@@ -119,6 +121,7 @@ const char* FRAGMENT_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
     gl_FragColor.a *= smoothstep(0.0, 1.5, vAlpha)*smoothstep( borderSize+1.5, borderSize, vAlpha );\n
   }\n
 );
+#endif
 }
 
 BorderVisualPtr BorderVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
@@ -305,7 +308,13 @@ Shader BorderVisual::GetBorderShader()
     shader = mFactoryCache.GetShader( VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER_ANTI_ALIASING, FRAGMENT_SHADER_ANTI_ALIASING );
+      shader = DevelShader::New(
+        GraphicsGetBuiltinShaderId( SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_VERT ),
+        GraphicsGetBuiltinShaderId( SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_FRAG ),
+        DevelShader::ShaderLanguage::SPIRV_1_0,
+        Property::Map()
+      );
+
       mFactoryCache.SaveShader( VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING, shader );
     }
   }
@@ -314,7 +323,13 @@ Shader BorderVisual::GetBorderShader()
     shader = mFactoryCache.GetShader( VisualFactoryCache::BORDER_SHADER );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+      shader = DevelShader::New(
+        GraphicsGetBuiltinShaderId( SHADER_BORDER_VISUAL_SHADER_VERT ),
+        GraphicsGetBuiltinShaderId( SHADER_BORDER_VISUAL_SHADER_FRAG ),
+        DevelShader::ShaderLanguage::SPIRV_1_0,
+        Property::Map()
+      );
+
       mFactoryCache.SaveShader( VisualFactoryCache::BORDER_SHADER, shader );
     }
   }

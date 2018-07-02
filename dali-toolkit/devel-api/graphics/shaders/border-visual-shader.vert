@@ -2,7 +2,7 @@
 
 // in variables
 layout( location = 0 ) in vec2 aPosition;
-layout( location = 0 ) in vec2 aDrift;
+layout( location = 1 ) in vec2 aDrift;
   
 layout( set = 0, binding = 0, std140 )uniform VertexData
 {
