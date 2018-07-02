@@ -451,8 +451,7 @@ void LayoutGroup::ChildAddedToOwner( Actor child )
 {
   LayoutItemPtr childLayout;
   Toolkit::Control control = Toolkit::Control::DownCast( child );
-
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner control(%s)\n", control?control.GetName().c_str():"Invalid" );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner(%s)\n", control.GetName().c_str() );
 
   if( control ) // Can only support adding Controls, not Actors to layout
   {
