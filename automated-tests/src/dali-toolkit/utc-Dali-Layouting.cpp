@@ -1638,3 +1638,44 @@ int UtcDaliLayouting_LayoutChildren04(void)
 
   END_TEST;
 }
+
+int UtcDaliLayouting_SetLayoutOrder(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder - Call SetLayout after adding the control to the root layout");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder - Creating control");
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hbox.SetName( "HBox");
+
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder - Add control to root layout");
+  rootControl.Add( hbox );
+
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder - Set layout to control AFTER control added to root");
+  DevelControl::SetLayout( hbox, hboxLayout );
+
+  // Add a Child control
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 100, 100 ) ); // Single control
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
