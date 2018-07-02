@@ -143,6 +143,16 @@ void SetLayout( Control control, Toolkit::LayoutItem layout )
   }
 }
 
+void RequestLayout( Internal::Control& control )
+{
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
+  Toolkit::Internal::LayoutItemPtr layoutItem = controlDataImpl.GetLayout();
+  if ( layoutItem )
+  {
+    layoutItem->RequestLayout();
+  }
+}
+
 } // namespace DevelControl
 
 } // namespace Toolkit
