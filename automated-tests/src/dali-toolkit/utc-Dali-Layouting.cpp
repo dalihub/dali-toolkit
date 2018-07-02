@@ -790,7 +790,7 @@ int UtcDaliLayouting_HboxLayout_Padding02(void)
 int UtcDaliLayouting_HboxLayout_Padding03(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliLayouting_HboxLayout_Padding03 - Adding Changing padding on a single child");
+  tet_infoline("UtcDaliLayouting_HboxLayout_Padding03 - Changing padding on a single child");
 
   Stage stage = Stage::GetCurrent();
   auto hbox = Control::New();
@@ -868,6 +868,227 @@ int UtcDaliLayouting_HboxLayout_Padding03(void)
 
   DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ) , Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
+  END_TEST;
+}
+
+int UtcDaliLayouting_HboxLayout_Padding04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayouting_HboxLayout_Padding04 - Adding Padding to the hbox");
+
+  // Adding padding to the layout should offset the positioning of the children.
+
+  const Extents LAYOUT_PADDING = Extents(5, 10, 20, 2 );
+  const Size CONTROL_SIZE = Size( 40, 40 );
+
+  Stage stage = Stage::GetCurrent();
+  // Create a root layout, ideally Dali would have a default layout in the root layer.
+  // Without this root layer the LinearLayout (or any other layout) will not
+  // honour WIDTH_SPECIFICATION or HEIGHT_SPECIFICATION settings.
+  // It uses the default stage size and ideally should have a layout added to it.
+  auto rootLayoutControl = Control::New();
+  rootLayoutControl.SetName( "AbsoluteLayout");
+  auto rootLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootLayoutControl, rootLayout );
+  rootLayoutControl.SetAnchorPoint( AnchorPoint::CENTER );
+  rootLayoutControl.SetParentOrigin( ParentOrigin::CENTER );
+  stage.Add( rootLayoutControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hboxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+  hbox.SetProperty(Toolkit::Control::Property::PADDING, LAYOUT_PADDING );
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  rootLayoutControl.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // Extra update needed to Relayout one more time. Catches any position updates, false positive without this seen.
+  application.SendNotification();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800.
+  // hbox left justifies elements
+  tet_infoline("Test Child Actor Position");
+
+  auto controlXPosition=0.0f;
+
+  controlXPosition = LAYOUT_PADDING.start;  // First child positioned at offset defined by the padding
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( LAYOUT_PADDING.start,
+                                                                                            LAYOUT_PADDING.top,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  controlXPosition+=CONTROL_SIZE.width; // Second child positioned is the position of the first child + the first child's width.
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( controlXPosition,
+                                                                                            LAYOUT_PADDING.top,
+                                                                                            0.0f ),
+                                                                                            0.0001f, TEST_LOCATION );
+
+  controlXPosition+=CONTROL_SIZE.width; // Third child positioned adjacent to second
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( controlXPosition,
+                                                                                            LAYOUT_PADDING.top,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  controlXPosition+=CONTROL_SIZE.width; // Forth passed adjacent to the third
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( controlXPosition,
+                                                                                            LAYOUT_PADDING.top,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  auto totalControlsWidth = CONTROL_SIZE.width * controls.size();
+  auto totalControlsHeight = CONTROL_SIZE.height;
+
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( totalControlsWidth + LAYOUT_PADDING.start + LAYOUT_PADDING.end,
+                                                                                 totalControlsHeight + LAYOUT_PADDING.top + LAYOUT_PADDING.bottom,
+                                                                                 0.0f ), 0.0001f, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_HboxLayout_Padding05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayouting_HboxLayout_Padding05 - Changing the hbox Padding");
+
+  // Adding padding to the layout should offset the positioning of the children.
+
+  const Extents LAYOUT_PADDING = Extents(5, 10, 20, 2 );
+  const Size CONTROL_SIZE = Size( 40, 40 );
+
+  Stage stage = Stage::GetCurrent();
+  // Create a root layout, ideally Dali would have a default layout in the root layer.
+  // Without this root layer the LinearLayout (or any other layout) will not
+  // honour WIDTH_SPECIFICATION or HEIGHT_SPECIFICATION settings.
+  // It uses the default stage size and ideally should have a layout added to it.
+  auto rootLayoutControl = Control::New();
+  rootLayoutControl.SetName( "AbsoluteLayout");
+  auto rootLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootLayoutControl, rootLayout );
+  rootLayoutControl.SetAnchorPoint( AnchorPoint::CENTER );
+  rootLayoutControl.SetParentOrigin( ParentOrigin::CENTER );
+  stage.Add( rootLayoutControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hboxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+  hbox.SetProperty(Toolkit::Control::Property::PADDING, LAYOUT_PADDING );
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  rootLayoutControl.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // Extra update needed to Relayout one more time. Catches any position updates, false positive without this seen.
+  application.SendNotification();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800.
+  // hbox left justifies elements
+  tet_infoline("Test Child Actor Position");
+
+  auto controlXPosition=0.0f;
+
+  controlXPosition = LAYOUT_PADDING.start;  // First child positioned at offset defined by the padding
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( LAYOUT_PADDING.start,
+                                                                                            LAYOUT_PADDING.top,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  controlXPosition+=CONTROL_SIZE.width; // Second child positioned is the position of the first child + the first child's width.
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( controlXPosition,
+                                                                                            LAYOUT_PADDING.top,
+                                                                                            0.0f ),
+                                                                                            0.0001f, TEST_LOCATION );
+
+  controlXPosition+=CONTROL_SIZE.width; // Third child positioned adjacent to second
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( controlXPosition,
+                                                                                            LAYOUT_PADDING.top,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  controlXPosition+=CONTROL_SIZE.width; // Forth passed adjacent to the third
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( controlXPosition,
+                                                                                            LAYOUT_PADDING.top,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  auto totalControlsWidth = CONTROL_SIZE.width * controls.size();
+  auto totalControlsHeight = CONTROL_SIZE.height;
+
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( totalControlsWidth + LAYOUT_PADDING.start + LAYOUT_PADDING.end,
+                                                                                 totalControlsHeight + LAYOUT_PADDING.top + LAYOUT_PADDING.bottom,
+                                                                                 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Change layout padding
+  const Extents NEW_LAYOUT_PADDING = Extents(5, 20, 10, 2 );
+  tet_printf( "\nChanging Padding to control at index 1 \n" );
+  hbox.SetProperty(Toolkit::Control::Property::PADDING, NEW_LAYOUT_PADDING );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // Extra update needed to Relayout one more time. Catches any position updates, false positive without this seen.
+  application.SendNotification();
+
+  controlXPosition = NEW_LAYOUT_PADDING.start;  // First child positioned at offset defined by the padding
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( NEW_LAYOUT_PADDING.start,
+                                                                                            NEW_LAYOUT_PADDING.top,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  controlXPosition+=CONTROL_SIZE.width; // Second child positioned is the position of the first child + the first child's width.
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( controlXPosition,
+                                                                                            NEW_LAYOUT_PADDING.top,
+                                                                                            0.0f ),
+                                                                                            0.0001f, TEST_LOCATION );
+
+  controlXPosition+=CONTROL_SIZE.width; // Third child positioned adjacent to second
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( controlXPosition,
+                                                                                            NEW_LAYOUT_PADDING.top,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  controlXPosition+=CONTROL_SIZE.width; // Forth passed adjacent to the third
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( controlXPosition,
+                                                                                            NEW_LAYOUT_PADDING.top,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+  totalControlsWidth = CONTROL_SIZE.width * controls.size();
+  totalControlsHeight = CONTROL_SIZE.height;
+
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( totalControlsWidth + NEW_LAYOUT_PADDING.start + NEW_LAYOUT_PADDING.end,
+                                                                                 totalControlsHeight + NEW_LAYOUT_PADDING.top + NEW_LAYOUT_PADDING.bottom,
+                                                                                 0.0f ), 0.0001f, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1189,6 +1410,40 @@ int UtcDaliLayouting_RelayoutOnChildOrderChanged(void)
   DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 80.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_HboxLayout_TargetSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_HboxLayout07 - Set target size on leaf");
+
+  Stage stage = Stage::GetCurrent();
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  for( auto&& iter : controls )
+  {
+    iter.SetSize( 100, 100 );
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // hbox centers elements vertically, it fills test harness stage, which is 480x800 from left to right.
+  // hbox left justifies elements
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 350.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }

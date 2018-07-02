@@ -414,7 +414,7 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
 {
   bool changed = false;
 
-  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame(%d, %d, %d, %d)\n", left.mValue, top.mValue, right.mValue, bottom.mValue );
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame enter(%d, %d, %d, %d)\n", left.mValue, top.mValue, right.mValue, bottom.mValue );
 
   if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom )
   {
@@ -462,6 +462,9 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
       SizeChange( LayoutSize( newWidth, newHeight ), LayoutSize( oldWidth, oldHeight ) );
     }
   }
+
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame  exit(%d, %d, %d, %d)\n", left.mValue, top.mValue, right.mValue, bottom.mValue );
+
   return changed;
 }
 
