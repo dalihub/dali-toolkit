@@ -17,18 +17,13 @@ Requires(postun): /sbin/ldconfig
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(dali-core)
+BuildRequires:  pkgconfig(dali-adaptor)
 %if !0%{?disable_cxx03_build}
 BuildRequires:  pkgconfig(dali-core-cxx03)
+BuildRequires:  pkgconfig(dali-adaptor-cxx03)
 %endif
 BuildRequires: gettext
 
-# dali-toolkit only need to know the interfaces(APIs) of dali-adaptor(the devel package).
-# It doesn't need to know which adaptor will be used by applications.
-# Applications or dali-addon will decide which one they will use.
-BuildRequires:  dali-adaptor-devel
-%if !0%{?disable_cxx03_build}
-BuildRequires:  dali-adaptor-devel-cxx03
-%endif
 
 #need libtzplatform-config for directory if tizen version is 3.x
 

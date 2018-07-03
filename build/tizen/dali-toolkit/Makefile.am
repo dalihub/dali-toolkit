@@ -77,12 +77,14 @@ LIBDALI_TOOLKIT_LA_CXXFLAGS = -DDALI_COMPILATION \
                       -I../../../ \
                       $(DALI_TOOLKIT_CFLAGS) \
                       $(DALICORE_CFLAGS) \
+                      $(DALIADAPTOR_CFLAGS) \
                       $(DLOG_CFLAGS) \
                       $(FRIBIDI_CFLAGS) \
                       $(HTMLCXX_CFLAGS)
 
 LIBDALI_TOOLKIT_LA_LIBADD = \
                       $(DALICORE_LIBS) \
+                      $(DALIADAPTOR_LIBS) \
                       $(DLOG_LIBS) \
                       $(FRIBIDI_LIBS) \
                       $(HTMLCXX_LIBS)
