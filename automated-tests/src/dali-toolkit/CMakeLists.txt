@@ -66,6 +66,7 @@ SET(TC_SOURCES
   utc-Dali-VisualFactory.cpp
   utc-Dali-ImageAtlas.cpp
   utc-Dali-VideoView.cpp
+  utc-Dali-WebView.cpp
   utc-Dali-AsyncImageLoader.cpp
   utc-Dali-SyncImageLoader.cpp
   utc-Dali-ControlWrapper.cpp
@@ -91,6 +92,7 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/toolkit-tts-player.cpp
   dali-toolkit-test-utils/toolkit-native-image-source.cpp
   dali-toolkit-test-utils/toolkit-video-player.cpp
+  dali-toolkit-test-utils/toolkit-web-engine.cpp
   dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
   dali-toolkit-test-utils/dali-test-suite-utils.cpp
   dali-toolkit-test-utils/dummy-control.cpp
