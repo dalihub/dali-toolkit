@@ -300,6 +300,13 @@ DALI_TOOLKIT_API void SetLayout( Internal::Control& control, Toolkit::LayoutItem
  */
 DALI_TOOLKIT_API void SetLayout( Control control, Toolkit::LayoutItem layout );
 
+/**
+ * @brief Request the control layout.
+ *
+ * @param[in] control The internal Control to request the layout of
+ */
+DALI_TOOLKIT_API void RequestLayout( Internal::Control& control );
+
 } // namespace DevelControl
 
 } // namespace Toolkit

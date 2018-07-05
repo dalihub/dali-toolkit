@@ -18,6 +18,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-event-thread-callback.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -533,7 +534,6 @@ int UtcDaliLayouting_HboxLayout06(void)
   END_TEST;
 }
 
-
 int UtcDaliLayouting_HboxLayout07(void)
 {
   ToolkitTestApplication application;
@@ -613,7 +613,6 @@ int UtcDaliLayouting_HboxLayout08(void)
 
   Control control1 = CreateLeafControl( 40, 40 );
   rootControl.Add( control1 );
-
   auto hbox = Control::New();
   auto hboxLayout = LinearLayout::New();
   hboxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
@@ -639,6 +638,166 @@ int UtcDaliLayouting_HboxLayout08(void)
   DALI_TEST_EQUALS( DevelControl::GetLayout( control1 ).IsLayoutAnimated(), false, TEST_LOCATION );
   DALI_TEST_EQUALS( hboxLayout.IsLayoutAnimated(), true, TEST_LOCATION );
   DALI_TEST_EQUALS( DevelControl::GetLayout( control2 ).IsLayoutAnimated(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+namespace
+{
+const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/broken.png";
+}
+
+int UtcDaliLayouting_HboxLayout_ImageView(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_HboxLayout - Use image view for leaf");
+
+  Stage stage = Stage::GetCurrent();
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox" );
+
+  std::string url = CreateImageURL( Vector4( 0, 255, 0, 255), ImageDimensions( 100, 100 ) );
+  ImageView imageView = CreateImageView( url, ImageDimensions() );
+
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  hbox.Add( imageView );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 350.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  url = CreateImageURL( Vector4( 0, 255, 0, 255), ImageDimensions( 200, 200 ) );
+  imageView.SetImage( url );
+
+  // Ensure layouting happenss
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 300.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 200.0f, 200.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  // Ensure layouting happenss
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 200.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  // Ensure layouting happenss
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 300.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 200.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  Image image = FrameBufferImage::New( 50, 50, Pixel::RGBA8888 );
+  imageView.SetImage( image );
+
+  // Ensure layouting happenss
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 375.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 50.0f, 50.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  Property::Map imagePropertyMap;
+  imagePropertyMap[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imagePropertyMap[ ImageVisual::Property::URL ] = TEST_IMAGE_FILE_NAME;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_WIDTH ] = 150;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 150;
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imagePropertyMap );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  // Ensure layouting happenss
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 325.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 150.0f, 150.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_HboxLayout_TextLabel(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_HboxLayout - Use text label for leaf");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox" );
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+
+  std::vector< Control > controls;
+  TextLabel textLabel = CreateTextLabel( "W" );
+  controls.push_back( textLabel );
+  hbox.Add( textLabel );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 368.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 54.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  textLabel.SetProperty( TextLabel::Property::TEXT, "WWWW" );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 368.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 216.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  textLabel.SetProperty( TextLabel::Property::POINT_SIZE, 10.0f );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 382.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 120.0f, 36.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  controls[0].SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  controls[0].SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 120.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  controls[0].SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  controls[0].SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 382.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 36.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }

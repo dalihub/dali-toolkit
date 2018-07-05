@@ -119,6 +119,8 @@ void ImageView::SetImage( Image image )
     // Trigger a size negotiation request that may be needed when unregistering a visual.
     RelayoutRequest();
   }
+
+  Toolkit::DevelControl::RequestLayout( *this );
 }
 
 void ImageView::SetImage( const Property::Map& map )
@@ -147,6 +149,8 @@ void ImageView::SetImage( const Property::Map& map )
     // Trigger a size negotiation request that may be needed when unregistering a visual.
     RelayoutRequest();
   }
+
+  Toolkit::DevelControl::RequestLayout( *this );
 }
 
 void ImageView::SetImage( const std::string& url, ImageDimensions size )
@@ -175,6 +179,8 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
     // Trigger a size negotiation request that may be needed when unregistering a visual.
     RelayoutRequest();
   }
+
+  Toolkit::DevelControl::RequestLayout( *this );
 }
 
 Image ImageView::GetImage() const
