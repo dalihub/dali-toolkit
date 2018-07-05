@@ -129,46 +129,6 @@ void CreateClippingRenderer( Control& controlImpl )
   }
 }
 
-/**
- * @brief Sets Control::Property::BACKGROUND visual
- * @param[in] controlImpl The control implementation
- * @param[in] visual The control background visual
- * @param[in] size The current size
- */
-void SetBackgroundVisual( Control::Impl& controlImpl, Toolkit::Visual::Base& visual, const Vector2& size )
-{
-  Property::Map transformMap = Property::Map();
-
-  Vector2 newSize( 0.f, 0.f );
-  newSize.width = size.width + ( controlImpl.mPadding.start + controlImpl.mPadding.end );
-  newSize.height = size.height + ( controlImpl.mPadding.top + controlImpl.mPadding.bottom );
-
-  if( ( controlImpl.mMargin.start != 0 ) ||
-      ( controlImpl.mMargin.end != 0 ) ||
-      ( controlImpl.mMargin.top != 0 ) ||
-      ( controlImpl.mMargin.bottom != 0 ) )
-  {
-    transformMap.Add( Toolkit::Visual::Transform::Property::SIZE, newSize )
-                .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( controlImpl.mMargin.start, controlImpl.mMargin.top ) )
-                .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
-                .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
-  }
-  else if( ( controlImpl.mPadding.start != 0 ) ||
-           ( controlImpl.mPadding.end != 0 ) ||
-           ( controlImpl.mPadding.top != 0 ) ||
-           ( controlImpl.mPadding.bottom != 0 ) )
-  {
-    transformMap.Add( Toolkit::Visual::Transform::Property::SIZE, newSize )
-                .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
-                .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN );
-  }
-
-  visual.SetTransformAndSize( transformMap, newSize ); // Send an empty map as we do not want to modify the visual's set transform
-}
-
 } // unnamed namespace
 
 
@@ -659,8 +619,7 @@ void Control::OnSizeSet(const Vector3& targetSize)
   if( visual )
   {
     Vector2 size( targetSize );
-    SetBackgroundVisual( *mImpl, visual, size );
-
+    visual.SetTransformAndSize( Property::Map(), size ); // Send an empty map as we do not want to modify the visual's set transform
   }
 }
 
@@ -739,7 +698,7 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
   Toolkit::Visual::Base visual = mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
   if( visual )
   {
-    SetBackgroundVisual( *mImpl, visual, size );
+    visual.SetTransformAndSize( Property::Map(), size ); // Send an empty map as we do not want to modify the visual's set transform
   }
 }
 
