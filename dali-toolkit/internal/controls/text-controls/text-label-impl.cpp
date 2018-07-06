@@ -1008,6 +1008,7 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
 void TextLabel::RequestTextRelayout()
 {
   RelayoutRequest();
+  Toolkit::DevelControl::RequestLayout( *this );
 }
 
 void TextLabel::SetUpAutoScrolling()

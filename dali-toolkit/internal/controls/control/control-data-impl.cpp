@@ -1391,6 +1391,9 @@ void Control::Impl::OnStageDisconnection()
 void Control::Impl::SetMargin( Extents margin )
 {
   mControlImpl.mImpl->mMargin = margin;
+
+  // Trigger a size negotiation request that may be needed when setting a margin.
+  mControlImpl.RelayoutRequest();
 }
 
 Extents Control::Impl::GetMargin() const
@@ -1401,6 +1404,9 @@ Extents Control::Impl::GetMargin() const
 void Control::Impl::SetPadding( Extents padding )
 {
   mControlImpl.mImpl->mPadding = padding;
+
+  // Trigger a size negotiation request that may be needed when setting a padding.
+  mControlImpl.RelayoutRequest();
 }
 
 Extents Control::Impl::GetPadding() const
@@ -1440,6 +1446,15 @@ void Control::Impl::SetLayout( Toolkit::Internal::LayoutItem& layout )
 
   auto controlHandle = Toolkit::Control::DownCast( mControlImpl.Self() ); // Get a handle of this control implementation without copying internals.
   mLayout->Initialize( controlHandle, controlHandle.GetTypeName() ); // LayoutGroup takes ownership of existing children
+}
+
+void Control::Impl::RemoveLayout()
+{
+  if( mLayout )
+  {
+    mLayout->Unparent();
+    mLayout.Reset();
+  }
 }
 
 } // namespace Internal

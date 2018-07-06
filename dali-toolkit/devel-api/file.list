@@ -85,15 +85,16 @@ devel_api_layouting_header_files = \
   $(devel_api_src_dir)/layouting/child-layout-data.h \
   $(devel_api_src_dir)/layouting/flex-layout.h \
   $(devel_api_src_dir)/layouting/linear-layout.h \
-  $(devel_api_src_dir)/layouting/layout-item.h \
-  $(devel_api_src_dir)/layouting/layout-item-impl.h \
+  $(devel_api_src_dir)/layouting/layout-child-impl.h \
   $(devel_api_src_dir)/layouting/layout-controller.h \
   $(devel_api_src_dir)/layouting/layout-group.h \
   $(devel_api_src_dir)/layouting/layout-group-impl.h \
+  $(devel_api_src_dir)/layouting/layout-item.h \
+  $(devel_api_src_dir)/layouting/layout-item-impl.h \
   $(devel_api_src_dir)/layouting/layout-length.h \
+  $(devel_api_src_dir)/layouting/layout-parent-impl.h \
   $(devel_api_src_dir)/layouting/layout-size.h \
   $(devel_api_src_dir)/layouting/measured-size.h \
-  $(devel_api_src_dir)/layouting/layout-parent-impl.h \
   $(devel_api_src_dir)/layouting/measure-spec.h
 
 devel_api_magnifier_header_files = \

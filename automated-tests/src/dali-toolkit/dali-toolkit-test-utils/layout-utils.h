@@ -27,6 +27,15 @@ namespace Toolkit
 {
 
 /**
+ * @brief Creates an empty image buffer filled with the color for layout tests
+ *
+ * @param[in] color The color of the image buffer.
+ * @param[in] size The size of the image buffer.
+ * @param[out] string The url.
+ */
+std::string CreateImageURL( Vector4 color, ImageDimensions size );
+
+/**
  * @brief Creates an empty leaf control filled with red color for layout tests
  *
  * @param[in] width The width of the control.
@@ -34,6 +43,23 @@ namespace Toolkit
  * @param[out] Control The control.
  */
 Control CreateLeafControl( int width, int height );
+
+/**
+ * @brief Creates a text label for layout tests
+ *
+ * @param[in] text The text of the label.
+ * @param[out] TextLabel The text label.
+ */
+TextLabel CreateTextLabel( const char* text );
+
+/**
+ * @brief Creates an image view for layout tests
+ *
+ * @param[in] url The image url.
+ * @param[in] size The size of the image view.
+ * @param[out] ImageView The image view.
+ */
+ImageView CreateImageView( std::string& url, ImageDimensions size );
 
 } // namespace Toolkit
 

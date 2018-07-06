@@ -20,6 +20,7 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 #include <dali-toolkit/internal/layouting/layout-item-data-impl.h>
 
 namespace
@@ -77,6 +78,16 @@ void LayoutItem::Unparent()
 {
   // Enable directly derived types to first remove children
   OnUnparent();
+
+  // Remove myself from parent
+  LayoutParent* parent = GetParent();
+  if( parent )
+  {
+    parent->Remove( *this );
+  }
+
+  // Remove parent reference
+  SetParent(nullptr);
 
   // Last, clear owner
   mImpl->mOwner = NULL;
@@ -414,7 +425,7 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
 {
   bool changed = false;
 
-  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame(%d, %d, %d, %d)\n", left.mValue, top.mValue, right.mValue, bottom.mValue );
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame enter(%d, %d, %d, %d)\n", left.mValue, top.mValue, right.mValue, bottom.mValue );
 
   if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom )
   {
@@ -462,6 +473,9 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
       SizeChange( LayoutSize( newWidth, newHeight ), LayoutSize( oldWidth, oldHeight ) );
     }
   }
+
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame  exit(%d, %d, %d, %d)\n", left.mValue, top.mValue, right.mValue, bottom.mValue );
+
   return changed;
 }
 
