@@ -38,18 +38,8 @@
 #    define DALI_TOOLKIT_API __attribute__ ((visibility ("default")))
 #  endif
 #else
-#ifdef WIN32
-#ifdef BUILDING_DALI_TOOLKIT
-/** Visibility attribute to hide declarations */
-#  define DALI_TOOLKIT_API __declspec(dllexport)
-#else
-/** Visibility attribute to hide declarations */
-#  define DALI_TOOLKIT_API __declspec(dllimport)
-#endif
-#else
 /** Visibility attribute to show declarations */
 #  define DALI_TOOLKIT_API
-#endif
 #endif
 
 #endif // DALI_TOOLKIT_COMMON_H
