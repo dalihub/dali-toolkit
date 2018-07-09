@@ -806,3 +806,48 @@ int UtcDaliLayouting_FlexLayout_NestedFlexboxWithSpec(void)
 
   END_TEST;
 }
+
+int UtcDaliLayouting_FlexLayout_WithTextLabel(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_FlexLayout_WithTextLabel ");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto flexbox1 = Control::New();
+  auto flexLayout1 = FlexLayout::New();
+  DevelControl::SetLayout( flexbox1, flexLayout1 );
+  flexbox1.SetName( "Flexbox1");
+  flexbox1.SetParentOrigin( ParentOrigin::CENTER );
+  flexbox1.SetAnchorPoint( AnchorPoint::CENTER );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateTextLabel( "W" ) );
+  flexbox1.Add( controls[0] );
+  stage.Add( flexbox1 );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 54.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Test flexbox2 is sized to wrap its content
+  DALI_TEST_EQUALS( flexbox1.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( flexbox1.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  TextLabel::DownCast( controls[0] ).SetProperty( TextLabel::Property::TEXT, "WWWW" );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 216.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( flexbox1.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( flexbox1.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}

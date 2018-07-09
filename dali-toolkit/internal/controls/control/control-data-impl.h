@@ -337,6 +337,14 @@ public:
    */
   void SetLayout( Toolkit::Internal::LayoutItem& layout );
 
+  /**
+   * @brief Remove the layout from this control
+   *
+   * @note This does not remove any children from this control, nor does it strip
+   * layouts from them but it does remove them from the layout hierarchy.
+   */
+  void RemoveLayout();
+
 private:
 
   /**

@@ -18,11 +18,14 @@
 #include <iostream>
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
+#include <toolkit-event-thread-callback.h>
 
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/layouting/absolute-layout.h>
 #include <dali-toolkit/devel-api/layouting/linear-layout.h>
+#include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 
 #include <../custom-layout.h>
 
@@ -531,7 +534,6 @@ int UtcDaliLayouting_HboxLayout06(void)
   END_TEST;
 }
 
-
 int UtcDaliLayouting_HboxLayout07(void)
 {
   ToolkitTestApplication application;
@@ -611,7 +613,6 @@ int UtcDaliLayouting_HboxLayout08(void)
 
   Control control1 = CreateLeafControl( 40, 40 );
   rootControl.Add( control1 );
-
   auto hbox = Control::New();
   auto hboxLayout = LinearLayout::New();
   hboxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
@@ -637,6 +638,166 @@ int UtcDaliLayouting_HboxLayout08(void)
   DALI_TEST_EQUALS( DevelControl::GetLayout( control1 ).IsLayoutAnimated(), false, TEST_LOCATION );
   DALI_TEST_EQUALS( hboxLayout.IsLayoutAnimated(), true, TEST_LOCATION );
   DALI_TEST_EQUALS( DevelControl::GetLayout( control2 ).IsLayoutAnimated(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+namespace
+{
+const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/broken.png";
+}
+
+int UtcDaliLayouting_HboxLayout_ImageView(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_HboxLayout - Use image view for leaf");
+
+  Stage stage = Stage::GetCurrent();
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox" );
+
+  std::string url = CreateImageURL( Vector4( 0, 255, 0, 255), ImageDimensions( 100, 100 ) );
+  ImageView imageView = CreateImageView( url, ImageDimensions() );
+
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  hbox.Add( imageView );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 350.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  url = CreateImageURL( Vector4( 0, 255, 0, 255), ImageDimensions( 200, 200 ) );
+  imageView.SetImage( url );
+
+  // Ensure layouting happenss
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 300.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 200.0f, 200.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  // Ensure layouting happenss
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 200.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  // Ensure layouting happenss
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 300.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 200.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  imageView.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  Image image = FrameBufferImage::New( 50, 50, Pixel::RGBA8888 );
+  imageView.SetImage( image );
+
+  // Ensure layouting happenss
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 375.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 50.0f, 50.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  Property::Map imagePropertyMap;
+  imagePropertyMap[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imagePropertyMap[ ImageVisual::Property::URL ] = TEST_IMAGE_FILE_NAME;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_WIDTH ] = 150;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 150;
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imagePropertyMap );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  // Ensure layouting happenss
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 325.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 150.0f, 150.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_HboxLayout_TextLabel(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_HboxLayout - Use text label for leaf");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox" );
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+
+  std::vector< Control > controls;
+  TextLabel textLabel = CreateTextLabel( "W" );
+  controls.push_back( textLabel );
+  hbox.Add( textLabel );
+  stage.Add( hbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 368.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 54.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  textLabel.SetProperty( TextLabel::Property::TEXT, "WWWW" );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 368.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 216.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  textLabel.SetProperty( TextLabel::Property::POINT_SIZE, 10.0f );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 382.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 120.0f, 36.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  controls[0].SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  controls[0].SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 120.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  controls[0].SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  controls[0].SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 382.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 36.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1443,6 +1604,236 @@ int UtcDaliLayouting_HboxLayout_TargetSize(void)
   // hbox centers elements vertically, it fills test harness stage, which is 480x800 from left to right.
   // hbox left justifies elements
   DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 350.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_RemoveLayout01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_RemoveLayout");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hboxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox" );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 40 ) );
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+  hbox.SetParentOrigin( ParentOrigin::CENTER );
+  hbox.SetAnchorPoint( AnchorPoint::CENTER );
+  rootControl.Add( hbox );
+
+  tet_infoline("Layout as normal");
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Set an empty layout on hbox container");
+  LinearLayout emptyLayout;
+  DevelControl::SetLayout( hbox, emptyLayout );
+
+  tet_infoline("Run another layout");
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Check leaf controls haven't moved");
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_LayoutChildren01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_LayoutChildren01");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  rootControl.Add( hbox );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 1, TEST_LOCATION );
+
+  tet_infoline("Test removal by setting empty layout to child container" );
+  DevelControl::SetLayout( hbox, LayoutItem{} );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 0, TEST_LOCATION );
+
+  auto& hboxImpl = GetImplementation( hboxLayout );
+  Handle empty;
+  DALI_TEST_EQUALS( hboxLayout.GetOwner(), empty, TEST_LOCATION );
+  DALI_TEST_EQUALS( (void*)hboxImpl.GetParent(), (void*)nullptr, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_LayoutChildren02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_LayoutChildren02");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  rootControl.Add( hbox );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 1, TEST_LOCATION );
+
+  tet_infoline("Test removal by removing child actor from parent container" );
+  hbox.Unparent();
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 0, TEST_LOCATION );
+
+  auto& hboxImpl = GetImplementation( hboxLayout );
+  tet_infoline("Test child actor still has hbox layout " );
+  DALI_TEST_EQUALS( (bool)hboxLayout.GetOwner(), true, TEST_LOCATION );
+
+  tet_infoline("Test hbox layout has no parent " );
+  DALI_TEST_EQUALS( (void*)hboxImpl.GetParent(), (void*)nullptr, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_LayoutChildren03(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_LayoutChildren02");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  rootControl.Add( hbox );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 1, TEST_LOCATION );
+
+  tet_infoline("Test removal by removing child layout from parent layout" );
+  absoluteLayout.Remove( hboxLayout );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 0, TEST_LOCATION );
+
+  auto& hboxImpl = GetImplementation( hboxLayout );
+
+  tet_infoline("Check child actor has orphaned layout (Moving child keeps old layout)");
+  DALI_TEST_EQUALS( hboxLayout.GetOwner(), hbox, TEST_LOCATION );
+  DALI_TEST_EQUALS( DevelControl::GetLayout(hbox), hboxLayout, TEST_LOCATION );
+
+  tet_infoline("Check orphaned layout has no parent");
+  DALI_TEST_EQUALS( (void*)hboxImpl.GetParent(), (void*)nullptr, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliLayouting_LayoutChildren04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_LayoutChildren03");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  tet_infoline("Test unparenting by adding child with no layout to parent (should auto-generate LayoutItem) ");
+  auto hboxLayout = LinearLayout::New();
+  rootControl.Add( hbox );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 1, TEST_LOCATION );
+
+  tet_infoline("Then setting a layout on the child container");
+  DevelControl::SetLayout( hbox, hboxLayout );
+
+  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 1, TEST_LOCATION );
+
+  auto& hboxImpl = GetImplementation( hboxLayout );
+  auto& absImpl = GetImplementation( absoluteLayout );
+  DALI_TEST_EQUALS( hboxLayout.GetOwner(), Handle(hbox), TEST_LOCATION );
+  DALI_TEST_EQUALS( hboxImpl.GetParent(), (Dali::Toolkit::Internal::LayoutParent*)&absImpl, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_SetLayoutOrder(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder - Call SetLayout after adding the control to the root layout");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder - Creating control");
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hbox.SetName( "HBox");
+
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder - Add control to root layout");
+  rootControl.Add( hbox );
+
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder - Set layout to control AFTER control added to root");
+  DevelControl::SetLayout( hbox, hboxLayout );
+
+  // Add a Child control
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 100, 100 ) ); // Single control
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
   DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;

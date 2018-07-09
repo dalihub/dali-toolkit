@@ -100,7 +100,7 @@ void LayoutGroup::Remove( Toolkit::LayoutGroup::LayoutId childId )
   {
     if( iter->layoutId == childId )
     {
-      OnChildRemove( *iter->child.Get() );
+      RemoveChild( *iter->child.Get() );
       mImpl->mChildren.erase(iter);
       break;
     }
@@ -114,7 +114,7 @@ void LayoutGroup::Remove( LayoutItem& child )
   {
     if( iter->child.Get() == &child )
     {
-      OnChildRemove( *iter->child.Get() );
+      RemoveChild( *iter->child.Get() );
       mImpl->mChildren.erase(iter);
       break;
     }
@@ -126,7 +126,7 @@ void LayoutGroup::RemoveAll()
 {
   for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; )
   {
-    OnChildRemove( *iter->child.Get() );
+    RemoveChild( *iter->child.Get() );
     iter = mImpl->mChildren.erase(iter);
   }
 }
@@ -434,17 +434,12 @@ void LayoutGroup::OnUnparent()
 {
   // Remove children
   RemoveAll();
+}
 
-  // Remove myself from parent
-  LayoutParent* parent = GetParent();
-  if( parent )
-  {
-    LayoutGroupPtr parentGroup( dynamic_cast< LayoutGroup* >( parent ) );
-    if( parentGroup )
-    {
-      parentGroup->Remove( *this );
-    }
-  }
+void LayoutGroup::RemoveChild( LayoutItem& item )
+{
+  item.SetParent( nullptr );
+  OnChildRemove( item );
 }
 
 void LayoutGroup::ChildAddedToOwner( Actor child )
