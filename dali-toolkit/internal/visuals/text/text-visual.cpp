@@ -69,7 +69,7 @@ const char * const OUTLINE_PROPERTY( "outline" );
 const char * const BACKGROUND_PROPERTY( "textBackground" );
 
 const Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
-
+#if 0
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform mediump mat4 uMvpMatrix;\n
@@ -106,7 +106,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     gl_Position = vertexPosition;\n
   }\n
 );
-#if 0
+
 const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
@@ -158,7 +158,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
     gl_FragColor = ( uTextColorAnimatable * textTexture + styleTexture * ( 1.0 - uTextColorAnimatable.a * textTexture ) ) * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
-#endif
+
 
 const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
@@ -178,7 +178,7 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
     gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
-/*
+
 const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
@@ -203,7 +203,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
     gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
-*/
+
 const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOSE_SHADER(
   varying mediump vec2 vTexCoord;\n
   uniform sampler2D sTexture;\n
@@ -231,6 +231,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOS
     gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, 1.0 );\n
   }\n
 );
+#endif
 
 /**
  * Return Property index for the given string key
@@ -838,7 +839,12 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE );
+      shader = DevelShader::New(
+        GraphicsGetBuiltinShaderId( SHADER_TEXT_VISUAL_SHADER_VERT ),
+        GraphicsGetBuiltinShaderId( SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_WITH_STYLE_SHADER_FRAG ),
+        DevelShader::ShaderLanguage::SPIRV_1_0,
+        Property::Map()
+      );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE, shader );
     }
@@ -848,7 +854,6 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT );
     if( !shader )
     {
-      //shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT );
       shader = DevelShader::New(
         GraphicsGetBuiltinShader( "SHADER_TEXT_VISUAL_SHADER_VERT" ),
         GraphicsGetBuiltinShader( "SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_SHADER_FRAG" ),
@@ -881,7 +886,6 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI );
     if( !shader )
     {
-      //shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI );
       shader = DevelShader::New(
         GraphicsGetBuiltinShader( "SHADER_TEXT_VISUAL_SHADER_VERT" ),
         GraphicsGetBuiltinShader( "SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_EMOJI_SHADER_FRAG" ),
@@ -897,7 +901,12 @@ Shader TextVisual::GetTextShader( VisualFactoryCache& factoryCache, bool hasMult
     shader = factoryCache.GetShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI );
+      shader = DevelShader::New(
+        GraphicsGetBuiltinShaderId( SHADER_TEXT_VISUAL_SHADER_VERT ),
+        GraphicsGetBuiltinShaderId( SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI_SHADER_FRAG ),
+        DevelShader::ShaderLanguage::SPIRV_1_0,
+        Property::Map()
+      );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
       factoryCache.SaveShader( VisualFactoryCache::TEXT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI, shader );
     }
