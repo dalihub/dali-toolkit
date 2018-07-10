@@ -324,6 +324,7 @@ void ImageView::OnResourceReady( Toolkit::Control control )
 {
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
   mVisual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
+  Toolkit::DevelControl::RequestLayout( *this );
 }
 
 ///////////////////////////////////////////////////////////
