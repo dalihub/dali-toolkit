@@ -109,7 +109,6 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uTextColorAnimatable;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float preMultipliedAlpha;\n
   \n
   void main()\n
   {\n
@@ -125,12 +124,10 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT = DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float preMultipliedAlpha;\n
   \n
   void main()\n
   {\n
     mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
-    textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );
   }\n
@@ -143,7 +140,6 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uTextColorAnimatable;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float preMultipliedAlpha;\n
   \n
   void main()\n
   {\n
@@ -161,13 +157,11 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   uniform sampler2D sStyle;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float preMultipliedAlpha;\n
   \n
   void main()\n
   {\n
     mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
     mediump vec4 styleTexture = texture2D( sStyle, vTexCoord );\n
-    textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     // Draw the text as overlay above the style
     gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, 1.0 );\n
@@ -181,7 +175,6 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uTextColorAnimatable;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float preMultipliedAlpha;\n
   \n
   void main()\n
   {\n
@@ -192,7 +185,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
     // Markup text with multiple text colors are not animated (but can be supported later on if required).
     // Emoji color are not animated.
     mediump float vstep = step( 0.0001, textTexture.a );\n
-    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture ) * mix( 1.0, textTexture.a, preMultipliedAlpha );\n
+    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture );\n
 
     // Draw the text as overlay above the style
     gl_FragColor = textTexture * uColor * vec4( mixColor, 1.0 );\n
@@ -208,7 +201,6 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOS
   uniform lowp vec4 uTextColorAnimatable;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float preMultipliedAlpha;\n
   \n
   void main()\n
   {\n
@@ -220,7 +212,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOS
     // Markup text with multiple text colors are not animated (but can be supported later on if required).
     // Emoji color are not animated.
     mediump float vstep = step( 0.0001, textTexture.a );\n
-    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) ) * mix( 1.0, textTexture.a, preMultipliedAlpha );\n
+    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) );\n
 
     // Draw the text as overlay above the style
     gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4( mixColor, 1.0 );\n
@@ -308,7 +300,11 @@ void TextColorConstraint( Vector4& current, const PropertyInputContainer& inputs
 
 void OpacityConstraint( float& current, const PropertyInputContainer& inputs )
 {
-  current = inputs[0]->GetVector4().a;
+  // Make zero if the alpha value of text color is zero to skip rendering text
+  if( EqualsZero( inputs[0]->GetVector4().a ) )
+  {
+    current = 0.0f;
+  }
 }
 
 } // unnamed namespace
@@ -466,6 +462,7 @@ void TextVisual::DoSetOnStage( Actor& actor )
       colorConstraint.AddSource( Source( actor, mAnimatableTextColorPropertyIndex ) );
       colorConstraint.Apply();
 
+      // Make zero if the alpha value of text color is zero to skip rendering text
       Constraint opacityConstraint = Constraint::New< float >( mImpl->mRenderer, Dali::DevelRenderer::Property::OPACITY, OpacityConstraint );
       opacityConstraint.AddSource( Source( actor, mAnimatableTextColorPropertyIndex ) );
       opacityConstraint.Apply();
