@@ -139,7 +139,6 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT = DALI_COMPOSE_SHADER(
   void main()\n
   {\n
     mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
-    textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     gl_FragColor = textTexture * uColor * visualMixColor();
   }\n
@@ -188,7 +187,6 @@ const char* FRAGMENT_SHADER_MULTI_COLOR_TEXT_WITH_STYLE = DALI_COMPOSE_SHADER(
   {\n
     mediump vec4 textTexture = texture2D( sTexture, vTexCoord );\n
     mediump vec4 styleTexture = texture2D( sStyle, vTexCoord );\n
-    textTexture.rgb *= mix( 1.0, textTexture.a, preMultipliedAlpha );\n
 
     // Draw the text as overlay above the style
     gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * visualMixColor();\n
@@ -219,7 +217,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_EMOJI = DALI_COMPOSE_SHADER(
     // Markup text with multiple text colors are not animated (but can be supported later on if required).
     // Emoji color are not animated.
     mediump float vstep = step( 0.0001, textTexture.a );\n
-    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture ) * mix( 1.0, textTexture.a, preMultipliedAlpha );\n
+    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture );\n
 
     // Draw the text as overlay above the style
     gl_FragColor = textTexture * uColor * visualMixColor();\n
@@ -253,7 +251,7 @@ const char* FRAGMENT_SHADER_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI = DALI_COMPOS
     // Markup text with multiple text colors are not animated (but can be supported later on if required).
     // Emoji color are not animated.
     mediump float vstep = step( 0.0001, textTexture.a );\n
-    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) ) * mix( 1.0, textTexture.a, preMultipliedAlpha );\n
+    textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) );\n
 
     // Draw the text as overlay above the style
     gl_FragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * visualMixColor();\n
