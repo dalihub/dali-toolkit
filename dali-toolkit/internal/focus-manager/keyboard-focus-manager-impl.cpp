@@ -123,6 +123,7 @@ KeyboardFocusManager::KeyboardFocusManager()
   mFocusGroupLoopEnabled( false ),
   mIsWaitingKeyboardFocusChangeCommit( false ),
   mClearFocusOnTouch( true ),
+  mEnableFocusIndicator( true ),
   mFocusHistory(),
   mSlotDelegate( this ),
   mCustomAlgorithmInterface(NULL)
@@ -178,7 +179,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
   // Check whether the actor is in the stage and is keyboard focusable.
   if( actor && actor.IsKeyboardFocusable() && actor.OnStage() )
   {
-    if( mIsFocusIndicatorEnabled )
+    if( mIsFocusIndicatorEnabled && mEnableFocusIndicator )
     {
       actor.Add( GetFocusIndicatorActor() );
     }
@@ -836,8 +837,11 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     Actor actor = GetCurrentFocusActor();
     if( actor )
     {
-      // Make sure the focused actor is highlighted
-      actor.Add( GetFocusIndicatorActor() );
+      if( mEnableFocusIndicator )
+      {
+        // Make sure the focused actor is highlighted
+        actor.Add( GetFocusIndicatorActor() );
+      }
     }
     else
     {
@@ -921,6 +925,21 @@ bool KeyboardFocusManager::DoConnectSignal( BaseObject* object, ConnectionTracke
 void KeyboardFocusManager::SetCustomAlgorithm(CustomAlgorithmInterface& interface)
 {
   mCustomAlgorithmInterface = &interface;
+}
+
+void KeyboardFocusManager::EnableFocusIndicator(bool enable)
+{
+  if( !enable && mFocusIndicatorActor )
+  {
+    mFocusIndicatorActor.Unparent();
+  }
+
+  mEnableFocusIndicator = enable;
+}
+
+bool KeyboardFocusManager::IsFocusIndicatorEnabled() const
+{
+  return mEnableFocusIndicator;
 }
 
 } // namespace Internal

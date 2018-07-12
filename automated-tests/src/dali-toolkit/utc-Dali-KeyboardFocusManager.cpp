@@ -1425,3 +1425,39 @@ int UtcDaliKeyboardFocusManagerFocusedActorUnstaged(void)
 
   END_TEST;
 }
+
+int UtcDaliKeyboardFocusManagerEnableFocusIndicator(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Ensure we cannot set an actor to be focused if it is not staged and that we do not retrieve an actor if it has been unstaged" );
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK( ! manager.GetCurrentFocusActor() );
+
+  Actor actor = Actor::New();
+  actor.SetKeyboardFocusable( true );
+  Stage::GetCurrent().Add( actor );
+  manager.SetCurrentFocusActor( actor );
+
+  // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
+  // It makes mIsFocusIndicatorEnabled true and add focus indicator to focused actor.
+  Integration::KeyEvent rightEvent( "Right", "", 0, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  application.ProcessEvent(rightEvent);
+
+  Actor indicatorActor = manager.GetFocusIndicatorActor();
+
+  tet_infoline( "Indicator is added to focused actor" );
+  DALI_TEST_CHECK( actor == indicatorActor.GetParent() );
+
+  Dali::Toolkit::DevelKeyboardFocusManager::EnableFocusIndicator(manager, false);
+  DALI_TEST_CHECK( !Dali::Toolkit::DevelKeyboardFocusManager::IsFocusIndicatorEnabled(manager) );
+
+  tet_infoline( "Indicator is removed from focused actor because mUseFocusIndicator is false" );
+  DALI_TEST_CHECK( !indicatorActor.GetParent() );
+
+  END_TEST;
+}
+
+
+
