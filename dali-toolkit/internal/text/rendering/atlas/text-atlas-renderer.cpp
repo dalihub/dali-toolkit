@@ -24,6 +24,7 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraints.h>
+#include <dali/devel-api/rendering/shader-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
@@ -31,6 +32,7 @@
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-mesh-factory.h>
 #include <dali-toolkit/internal/text/text-view.h>
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -43,7 +45,7 @@ namespace
 #endif
 
 #define MAKE_SHADER(A)#A
-
+#if 0
 const char* VERTEX_SHADER = MAKE_SHADER(
 attribute mediump vec2    aPosition;
 attribute mediump vec2    aTexCoord;
@@ -87,7 +89,7 @@ void main()
   gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * textColorAnimatable;
 }
 );
-
+#endif
 const float ZERO( 0.0f );
 const float HALF( 0.5f );
 const float ONE( 1.0f );
@@ -678,7 +680,11 @@ struct AtlasRenderer::Impl
       // The glyph is an emoji and is not a shadow.
       if( !mShaderRgba )
       {
-        mShaderRgba = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_RGBA );
+        mShaderRgba = DevelShader::New( GraphicsGetBuiltinShaderId( SHADER_TEXT_ATLAS_SHADER_VERT ),
+                                        GraphicsGetBuiltinShaderId( SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG ),
+                                        DevelShader::ShaderLanguage::SPIRV_1_0,
+                                        Dali::Property::Map()
+        );
       }
       shader = mShaderRgba;
     }
@@ -687,7 +693,11 @@ struct AtlasRenderer::Impl
       // The glyph is text or a shadow.
       if( !mShaderL8 )
       {
-        mShaderL8 = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_L8 );
+        mShaderL8 = DevelShader::New( GraphicsGetBuiltinShaderId( SHADER_TEXT_ATLAS_SHADER_VERT ),
+                                      GraphicsGetBuiltinShaderId( SHADER_TEXT_ATLAS_L8_SHADER_FRAG ),
+                                      DevelShader::ShaderLanguage::SPIRV_1_0,
+                                      Dali::Property::Map()
+        );
       }
       shader = mShaderL8;
     }

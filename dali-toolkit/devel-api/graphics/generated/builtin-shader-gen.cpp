@@ -33,6 +33,9 @@
 #include "npatch-visual-shader-vert.h"
 #include "primitive-visual-shader-frag.h"
 #include "primitive-visual-shader-vert.h"
+#include "text-atlas-l8-shader-frag.h"
+#include "text-atlas-rgba-shader-frag.h"
+#include "text-atlas-shader-vert.h"
 #include "text-scroller-shader-frag.h"
 #include "text-scroller-shader-vert.h"
 #include "text-visual-multi-color-text-shader-frag.h"
@@ -75,6 +78,9 @@ static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
   { "SHADER_NPATCH_VISUAL_SHADER_VERT", SHADER_NPATCH_VISUAL_SHADER_VERT },
   { "SHADER_PRIMITIVE_VISUAL_SHADER_FRAG", SHADER_PRIMITIVE_VISUAL_SHADER_FRAG },
   { "SHADER_PRIMITIVE_VISUAL_SHADER_VERT", SHADER_PRIMITIVE_VISUAL_SHADER_VERT },
+  { "SHADER_TEXT_ATLAS_L8_SHADER_FRAG", SHADER_TEXT_ATLAS_L8_SHADER_FRAG },
+  { "SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG", SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG },
+  { "SHADER_TEXT_ATLAS_SHADER_VERT", SHADER_TEXT_ATLAS_SHADER_VERT },
   { "SHADER_TEXT_SCROLLER_SHADER_FRAG", SHADER_TEXT_SCROLLER_SHADER_FRAG },
   { "SHADER_TEXT_SCROLLER_SHADER_VERT", SHADER_TEXT_SCROLLER_SHADER_VERT },
   { "SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_SHADER_FRAG", SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_SHADER_FRAG },
