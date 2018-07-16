@@ -17,9 +17,9 @@
  */
 
 #include <memory>
-#include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali-toolkit/devel-api/toolkit-property-index-ranges.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/devel-api/layouting/measure-spec.h>
 
