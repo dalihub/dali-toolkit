@@ -84,7 +84,7 @@ typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
  *
  * where imageFittingMode should be one of the following fitting modes:
  *   "SHRINK_TO_FIT"
- *   "SCALE_TO_FIT"
+ *   "SCALE_TO_FILL"
  *   "FIT_WIDTH"
  *   "FIT_HEIGHT"
  *   "DEFAULT"
