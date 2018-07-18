@@ -305,6 +305,10 @@ void OpacityConstraint( float& current, const PropertyInputContainer& inputs )
   {
     current = 0.0f;
   }
+  else
+  {
+    current = 1.0f;
+  }
 }
 
 } // unnamed namespace

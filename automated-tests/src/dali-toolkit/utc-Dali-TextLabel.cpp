@@ -1158,6 +1158,15 @@ int UtcDaliToolkitTextLabelColorComponents(void)
 
   DALI_TEST_EQUALS( drawTrace.FindMethod( "DrawArrays" ), false, TEST_LOCATION ); // Rendering should be skipped
 
+  label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::RED );
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( drawTrace.FindMethod( "DrawArrays" ), true, TEST_LOCATION ); // Should be rendered again
+
   END_TEST;
 }
 
