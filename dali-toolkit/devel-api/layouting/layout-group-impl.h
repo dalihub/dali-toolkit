@@ -23,6 +23,7 @@
 #include <dali/public-api/signals/connection-tracker.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
+#include <dali-toolkit/devel-api/layouting/layout-parent-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 
 namespace Dali
@@ -55,6 +56,7 @@ using LayoutGroupPtr = IntrusivePtr<LayoutGroup>;
  * position and size; it should then call Layout() on the child layout to layout the child and it's hierarchy.
  */
 class DALI_TOOLKIT_API LayoutGroup : public LayoutItem,
+                                     public LayoutParent,
                                      public ConnectionTracker
 {
 public:
@@ -79,19 +81,19 @@ public:
    * @param[in] layoutChild The child to add
    * @return The layout id of this child.
    */
-  Toolkit::LayoutGroup::LayoutId Add( LayoutItem& layoutChild );
+  Toolkit::LayoutGroup::LayoutId Add( LayoutItem& layoutChild ) override;
 
   /**
    * @brief Remove a layout child from this group.
    * @param[in] childId The layout child id
    */
-  void Remove( Toolkit::LayoutGroup::LayoutId childId );
+  void Remove( Toolkit::LayoutGroup::LayoutId childId ) override;
 
   /**
    * @brief Remove a layout child from this group
    * @param[in] child The layout child
    */
-  void Remove( LayoutItem& child );
+  void Remove( LayoutItem& child ) override;
 
   /**
    * @brief Remove all layout children.
@@ -245,6 +247,11 @@ private:
   void OnUnparent() override final;
 
   /**
+   * Method to remove a child from this group
+   */
+  void RemoveChild( LayoutItem& item );
+
+  /**
    * Callback when child is added to owner
    */
   void ChildAddedToOwner( Actor child );
@@ -253,6 +260,11 @@ private:
    * Callback when child is removed from owner
    */
   void ChildRemovedFromOwner( Actor child );
+
+  /**
+   * Callback when child order is changed
+   */
+  void ChildOrderChanged();
 
   /**
    * Callback when an owner property is set. Triggers a relayout if it's a child property

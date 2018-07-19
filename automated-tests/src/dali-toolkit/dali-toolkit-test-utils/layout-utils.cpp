@@ -33,20 +33,24 @@ namespace Dali
 namespace Toolkit
 {
 
+std::string CreateImageURL( Vector4 color, ImageDimensions size )
+{
+  auto pixelBuffer = Devel::PixelBuffer::New( size.GetWidth(), size.GetHeight(), Pixel::RGB888 );
+  unsigned char* pixels = pixelBuffer.GetBuffer();
+  pixels[0] = static_cast<unsigned char>( color.r );
+  pixels[1] = static_cast<unsigned char>( color.g );
+  pixels[2] = static_cast<unsigned char>( color.b );
+  auto texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGB888, size.GetWidth(), size.GetHeight() );
+  auto pixelData = Devel::PixelBuffer::Convert( pixelBuffer );
+  texture.Upload( pixelData );
+  return TextureManager::AddTexture( texture );
+}
+
 Control CreateLeafControl( int width, int height )
 {
   auto control = Control::New();
   control.SetName( "Leaf" );
-
-  auto pixelBuffer = Devel::PixelBuffer::New( 1, 1, Pixel::RGB888 );
-  unsigned char* pixels = pixelBuffer.GetBuffer();
-  pixels[0] = 0xff;
-  pixels[1] = 0x00;
-  pixels[2] = 0x00;
-  auto texture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGB888, 1, 1 );
-  auto pixelData = Devel::PixelBuffer::Convert( pixelBuffer );
-  texture.Upload( pixelData );
-  std::string url = TextureManager::AddTexture( texture );
+  std::string url = CreateImageURL( Vector4( 255, 0, 0, 255 ), ImageDimensions( 1, 1 ) );
 
   Property::Map map;
   map[ Visual::Property::TYPE ] = Visual::IMAGE;
@@ -55,6 +59,24 @@ Control CreateLeafControl( int width, int height )
   map[ ImageVisual::Property::DESIRED_HEIGHT ] = (float) height;
   control.SetProperty( Control::Property::BACKGROUND, map );
   return control;
+}
+
+TextLabel CreateTextLabel( const char* text )
+{
+  TextLabel textLabel = TextLabel::New(text);
+  textLabel.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
+  textLabel.SetProperty( TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
+  textLabel.SetName( "TextLabel" );
+  textLabel.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  return textLabel;
+}
+
+ImageView CreateImageView( std::string& url, ImageDimensions size )
+{
+  ImageView imageView = ImageView::New( url, size );
+  imageView.SetName( "ImageView" );
+  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  return imageView;
 }
 
 } // namespace Toolkit
