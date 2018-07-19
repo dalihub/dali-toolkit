@@ -196,11 +196,11 @@ AC_SUBST(DOXYGEN_DOCS_DIR)
 AC_SUBST(DOXYGEN_ROOT_DIR)
 
 if test "x$enable_cxx03_abi" = "xyes"; then
-PKG_CHECK_MODULES(DALI, dali-core-cxx03)
-PKG_CHECK_MODULES(DALIDAPTOR, dali-adaptor-cxx03)
+PKG_CHECK_MODULES(DALI, dali-core-vk-cxx03)
+PKG_CHECK_MODULES(DALIDAPTOR, dali-adaptor-vk-cxx03)
 else
-PKG_CHECK_MODULES(DALICORE, dali-core)
-PKG_CHECK_MODULES(DALIADAPTOR, dali-adaptor)
+PKG_CHECK_MODULES(DALICORE, dali-core-vk)
+PKG_CHECK_MODULES(DALIADAPTOR, dali-adaptor-vk)
 fi
 
 # Enable csharp plugin
@@ -226,7 +226,7 @@ if test x$enable_csharp = xyes; then
 
   # Set varaibles for dali-toolkit
   DALITOOLKIT_CFLAGS="-I${prefix}/include -I${prefix}/include/dali-toolkit"
-  DALITOOLKIT_LIBS="-L${prefix}/lib -ldali-toolkit -ldali-core"
+  DALITOOLKIT_LIBS="-L${prefix}/lib -ldali-toolkit-vk -ldali-core-vk"
   AC_SUBST(DALITOOLKIT_CFLAGS)
   AC_SUBST(DALITOOLKIT_LIBS)
 fi
@@ -247,7 +247,7 @@ AC_CONFIG_FILES([
 ])
 
 if test "x$enable_cxx03_abi" = "xno"; then
-AC_CONFIG_FILES([dali-toolkit.pc])
+AC_CONFIG_FILES([dali-toolkit-vk.pc])
 fi
 
 AC_OUTPUT

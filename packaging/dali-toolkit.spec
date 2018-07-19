@@ -1,4 +1,4 @@
-Name:       dali-toolkit
+Name:       dali-toolkit-vk
 Summary:    Dali 3D engine Toolkit
 Version:    1.3.33
 Release:    1
@@ -16,11 +16,11 @@ Requires(postun): /sbin/ldconfig
 
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
-BuildRequires:  pkgconfig(dali-core)
-BuildRequires:  pkgconfig(dali-adaptor)
+BuildRequires:  pkgconfig(dali-core-vk)
+BuildRequires:  pkgconfig(dali-adaptor-vk)
 %if !0%{?disable_cxx03_build}
-BuildRequires:  pkgconfig(dali-core-cxx03)
-BuildRequires:  pkgconfig(dali-adaptor-cxx03)
+BuildRequires:  pkgconfig(dali-core-vk-cxx03)
+BuildRequires:  pkgconfig(dali-adaptor-vk-cxx03)
 %endif
 BuildRequires: gettext
 
@@ -129,7 +129,7 @@ Application development package for Dali 3D engine toolkit - headers and package
 
 # PO
 {
-cd %{_builddir}/dali-toolkit-%{version}/dali-toolkit/po
+cd %{_builddir}/dali-toolkit-vk-%{version}/dali-toolkit/po
 for language in *.po
 do
   language=${language%.po}
@@ -151,7 +151,7 @@ LDFLAGS+=" --coverage "
 %endif
 
 libtoolize --force
-cd %{_builddir}/dali-toolkit-%{version}/build/tizen
+cd %{_builddir}/dali-toolkit-vk-%{version}/build/tizen
 autoreconf --install
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
@@ -173,15 +173,15 @@ pushd %{_builddir}/%{name}-%{version}/build/tizen
 popd
 
 pushd %{buildroot}%{_libdir}
-for FILE in libdali-toolkit-cxx11.so*; do mv "$FILE" "%{_builddir}/%{name}-%{version}/build/tizen/$FILE"; done
-mv pkgconfig/dali-toolkit.pc %{_builddir}/%{name}-%{version}/build/tizen/dali-toolkit.pc
+for FILE in libdali-toolkit-vk-cxx11.so*; do mv "$FILE" "%{_builddir}/%{name}-%{version}/build/tizen/$FILE"; done
+mv pkgconfig/dali-toolkit-vk.pc %{_builddir}/%{name}-%{version}/build/tizen/dali-toolkit-vk.pc
 popd
 
 %if !0%{?disable_cxx03_build}
 make clean
 
 libtoolize --force
-cd %{_builddir}/dali-toolkit-%{version}/build/tizen
+cd %{_builddir}/dali-toolkit-vk-%{version}/build/tizen
 autoreconf --install
 
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
@@ -209,12 +209,12 @@ rm -rf %{buildroot}
 pushd %{_builddir}/%{name}-%{version}/build/tizen
 %make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 
-for FILE in libdali-toolkit-cxx11.so*; do mv "$FILE" "%{buildroot}%{_libdir}/$FILE"; done
-mv dali-toolkit.pc %{buildroot}%{_libdir}/pkgconfig/dali-toolkit.pc
+for FILE in libdali-toolkit-vk-cxx11.so*; do mv "$FILE" "%{buildroot}%{_libdir}/$FILE"; done
+mv dali-toolkit-vk.pc %{buildroot}%{_libdir}/pkgconfig/dali-toolkit-vk.pc
 
 # PO
 {
-cd %{_builddir}/dali-toolkit-%{version}/dali-toolkit/po
+cd %{_builddir}/dali-toolkit-vk-%{version}/dali-toolkit/po
 for language in *.mo
 do
   language=${language%.mo}
@@ -228,12 +228,12 @@ popd
 #rename
 #############################
 pushd  %{buildroot}%{_libdir}
-rm -rf libdali-toolkit.so
-rm -rf libdali-toolkit-cxx11.so
+rm -rf libdali-toolkit-vk.so
+rm -rf libdali-toolkit-vk-cxx11.so
 %if !0%{?disable_cxx03_build}
-ln -s libdali-toolkit.so.0.0.* libdali-toolkit-cxx03.so
+ln -s libdali-toolkit-vk.so.0.0.* libdali-toolkit-vk-cxx03.so
 %endif
-ln -s libdali-toolkit-cxx11.so.0.0.* libdali-toolkit.so
+ln -s libdali-toolkit-vk-cxx11.so.0.0.* libdali-toolkit-vk.so
 popd
 
 # Remove default style and style images which are for Linux build
@@ -421,8 +421,8 @@ esac
 %manifest dali-toolkit.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/libdali-toolkit-cxx11.so.*
-%{_libdir}/libdali-toolkit.so
+%{_libdir}/libdali-toolkit-vk-cxx11.so.*
+%{_libdir}/libdali-toolkit-vk.so
 %license LICENSE
 
 %if !0%{?disable_cxx03_build}
@@ -433,15 +433,15 @@ esac
 %manifest dali-toolkit.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/libdali-toolkit.so.*
-%{_libdir}/libdali-toolkit-cxx03.so
+%{_libdir}/libdali-toolkit-vk.so.*
+%{_libdir}/libdali-toolkit-vk-cxx03.so
 %license LICENSE
 %endif
 
 %files devel
 %defattr(-,root,root,-)
 %{dev_include_path}/dali-toolkit/*
-%{_libdir}/pkgconfig/dali-toolkit.pc
+%{_libdir}/pkgconfig/dali-toolkit-vk.pc
 
 %files resources_360x360
 %manifest dali-toolkit-resources.manifest
