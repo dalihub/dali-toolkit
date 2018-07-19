@@ -65,7 +65,7 @@ dalistyle_DATA = ${dali_toolkit_style_files}
 dalistyleimagesdir = ${dataReadOnlyDir}/toolkit/styles/images/
 dalistyleimages_DATA = ${dali_toolkit_style_images}
 
-libdali_toolkit_la_DEPENDENCIES =
+libdali_toolkit_vk_la_DEPENDENCIES =
 
 LIBDALI_TOOLKIT_LA_CXXFLAGS = -DDALI_COMPILATION \
                       -DDALI_IMAGE_DIR="\"${daliimagedir}\"" \
@@ -93,34 +93,34 @@ LIBDALI_TOOLKIT_LA_LIBADD = \
 # The library
 if ENABLE_CXX03_ABI
 
-lib_LTLIBRARIES = libdali-toolkit.la
-libdali_toolkit_la_SOURCES = $(LIBDALI_TOOLKIT_LA_SOURCES)
-libdali_toolkit_la_LIBADD = $(LIBDALI_TOOLKIT_LA_LIBADD)
-libdali_toolkit_la_CXXFLAGS = $(LIBDALI_TOOLKIT_LA_CXXFLAGS)
-libdali_toolkit_la_CFLAGS = $(LIBDALI_TOOLKTI_LA_CFLAGS)
+lib_LTLIBRARIES = libdali-toolkit-vk.la
+libdali_toolkit_vk_la_SOURCES = $(LIBDALI_TOOLKIT_LA_SOURCES)
+libdali_toolkit_vk_la_LIBADD = $(LIBDALI_TOOLKIT_LA_LIBADD)
+libdali_toolkit_vk_la_CXXFLAGS = $(LIBDALI_TOOLKIT_LA_CXXFLAGS)
+libdali_toolkit_vk_la_CFLAGS = $(LIBDALI_TOOLKTI_LA_CFLAGS)
 
 if ENABLE_RENAME_SO
 #rename
 install: install-am
-	rm -rf $(libdir)/libdali-toolkit.so
-	rm -rf $(libdir)/libdali-toolkit-cxx03.so
-	ln -s $(libdir)/libdali-toolkit.so.0.0.* $(libdir)/libdali-toolkit-cxx03.so
+	rm -rf $(libdir)/libdali-toolkit-vk.so
+	rm -rf $(libdir)/libdali-toolkit-vk-cxx03.so
+	ln -s $(libdir)/libdali-toolkit-vk.so.0.0.* $(libdir)/libdali-toolkit-vk-cxx03.so
 endif
 
 else
 
-lib_LTLIBRARIES = libdali-toolkit-cxx11.la
-libdali_toolkit_cxx11_la_SOURCES = $(LIBDALI_TOOLKIT_LA_SOURCES)
-libdali_toolkit_cxx11_la_LIBADD = $(LIBDALI_TOOLKIT_LA_LIBADD)
-libdali_toolkit_cxx11_la_CXXFLAGS = $(LIBDALI_TOOLKIT_LA_CXXFLAGS)
-libdali_toolkit_cxx11_la_CFLAGS = $(LIBDALI_TOOLKTI_LA_CFLAGS)
+lib_LTLIBRARIES = libdali-toolkit-vk-cxx11.la
+libdali_toolkit_vk_cxx11_la_SOURCES = $(LIBDALI_TOOLKIT_LA_SOURCES)
+libdali_toolkit_vk_cxx11_la_LIBADD = $(LIBDALI_TOOLKIT_LA_LIBADD)
+libdali_toolkit_vk_cxx11_la_CXXFLAGS = $(LIBDALI_TOOLKIT_LA_CXXFLAGS)
+libdali_toolkit_vk_cxx11_la_CFLAGS = $(LIBDALI_TOOLKTI_LA_CFLAGS)
 
 if ENABLE_RENAME_SO
 #rename
 install: install-am
-	rm -rf $(libdir)/libdali-toolkit-cxx11.so
-	rm -rf $(libdir)/libdali-toolkit.so
-	ln -s $(libdir)/libdali-toolkit-cxx11.so.0.0.* $(libdir)/libdali-toolkit.so
+	rm -rf $(libdir)/libdali-toolkit-vk-cxx11.so
+	rm -rf $(libdir)/libdali-toolkit-vk.so
+	ln -s $(libdir)/libdali-toolkit-vk-cxx11.so.0.0.* $(libdir)/libdali-toolkit-vk.so
 endif
 
 endif
