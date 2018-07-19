@@ -57,6 +57,22 @@ public:
   };
 
   /**
+   * @brief Enumeration for the alignment of the linear layout items.
+   */
+  struct Alignment
+  {
+    enum Type
+    {
+      BEGIN                     = 0x1,  ///< At the left/right edge of the container (maps to LTR/RTL direction for horizontal orientation)
+      END                       = 0x2,  ///< At the right/left edge of the container (maps to LTR/RTL direction for horizontal orientation)
+      CENTER_HORIZONTAL         = 0x4,  ///< At the horizontal center of the container
+      TOP                       = 0x8,  ///< At the top edge of the container
+      BOTTOM                    = 0x10, ///< At the bottom edge of the container
+      CENTER_VERTICAL           = 0x20  ///< At the vertical center of the container
+    };
+  };
+
+  /**
    * @brief Creates an uninitialized LinearLayout handle.
    *
    * Initialize it using LinearLayout::New().
@@ -109,7 +125,7 @@ public:
    *
    * @return The padding between cells.
    */
-  LayoutSize GetCellPadding();
+  LayoutSize GetCellPadding() const;
 
   /**
    * @brief Set the orientation in the layout
@@ -123,7 +139,21 @@ public:
    *
    * @return The orientation.
    */
-  Orientation GetOrientation();
+  Orientation GetOrientation() const;
+
+  /**
+   * @brief Set the alignment in the layout
+   *
+   * @param[in] alignment The alignment.
+   */
+  void SetAlignment( unsigned int alignment );
+
+  /**
+   * @brief Get the alignment in the layout
+   *
+   * @return The alignment.
+   */
+  unsigned int GetAlignment() const;
 
 public: // Not intended for application developers
 
