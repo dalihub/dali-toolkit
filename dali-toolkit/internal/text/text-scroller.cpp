@@ -80,7 +80,6 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
   uniform sampler2D sTexture;\n
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
-  uniform lowp float preMultipliedAlpha;\n
   \n
   void main()\n
   {\n
