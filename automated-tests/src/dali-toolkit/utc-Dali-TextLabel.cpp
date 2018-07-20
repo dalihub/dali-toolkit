@@ -1135,6 +1135,38 @@ int UtcDaliToolkitTextLabelColorComponents(void)
   DALI_TEST_EQUALS( label.GetProperty< Vector4 >( TextLabel::Property::TEXT_COLOR ), Vector4( 0.0f, 0.0f, 1.0f, 0.6f ), TEST_LOCATION );
   DALI_TEST_EQUALS( label.GetProperty< Vector4 >( TextLabel::Property::UNUSED_PROPERTY_TEXT_COLOR ), Vector4( 0.0f, 0.0f, 1.0f, 0.6f ), TEST_LOCATION );
 
+  // Test a transparent text - Rendering should be skipped.
+  label.SetProperty( TextLabel::Property::TEXT, "Hello world Hello world" );
+  label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::BLUE );
+
+  Stage::GetCurrent().Add( label );
+
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable( true );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( drawTrace.FindMethod( "DrawArrays" ), true, TEST_LOCATION );  // Should be rendered
+
+  label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::TRANSPARENT );
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( drawTrace.FindMethod( "DrawArrays" ), false, TEST_LOCATION ); // Rendering should be skipped
+
+  label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::RED );
+
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( drawTrace.FindMethod( "DrawArrays" ), true, TEST_LOCATION ); // Should be rendered again
+
   END_TEST;
 }
 

@@ -168,7 +168,14 @@ void Controller::SetGlyphType( TextAbstraction::GlyphType glyphType )
 
 void Controller::SetMarkupProcessorEnabled( bool enable )
 {
-  mImpl->mMarkupProcessorEnabled = enable;
+  if( enable != mImpl->mMarkupProcessorEnabled )
+  {
+    //If Text was already set, call the SetText again for enabling or disabling markup
+    mImpl->mMarkupProcessorEnabled = enable;
+    std::string text;
+    GetText( text );
+    SetText( text );
+  }
 }
 
 bool Controller::IsMarkupProcessorEnabled() const
