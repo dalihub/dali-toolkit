@@ -26,7 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/internal/helpers/property-helper.h>
+#include <dali-toolkit/devel-api/builder/base64-encoding.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
 namespace Dali
@@ -144,26 +144,26 @@ Internal::Visual::Base::Impl::CustomShader::CustomShader( const Property::Map& m
 
 void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap( const Property::Map& shaderMap )
 {
-  mVertexShader.clear();
-  mFragmentShader.clear();
+  mVertexShaderData.clear();
+  mFragmentShaderData.clear();
   mGridSize = ImageDimensions( 1, 1 );
   mHints = Shader::Hint::NONE;
 
   Property::Value* vertexShaderValue = shaderMap.Find( Toolkit::Visual::Shader::Property::VERTEX_SHADER, CUSTOM_VERTEX_SHADER );
   if( vertexShaderValue )
   {
-    if( ! GetStringFromProperty( *vertexShaderValue, mVertexShader ) )
+    if( ! DecodeBase64PropertyData( *vertexShaderValue, mVertexShaderData ) )
     {
-      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string\n", CUSTOM_VERTEX_SHADER );
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a data block\n", CUSTOM_VERTEX_SHADER );
     }
   }
 
   Property::Value* fragmentShaderValue = shaderMap.Find( Toolkit::Visual::Shader::Property::FRAGMENT_SHADER, CUSTOM_FRAGMENT_SHADER );
   if( fragmentShaderValue )
   {
-    if( ! GetStringFromProperty( *fragmentShaderValue, mFragmentShader ) )
+    if( ! DecodeBase64PropertyData( *fragmentShaderValue, mFragmentShaderData ) )
     {
-      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a string\n", CUSTOM_FRAGMENT_SHADER );
+      DALI_LOG_ERROR( "'%s' parameter does not correctly specify a data block\n", CUSTOM_FRAGMENT_SHADER );
     }
   }
 
@@ -207,16 +207,20 @@ void Internal::Visual::Base::Impl::CustomShader::SetPropertyMap( const Property:
 
 void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap( Property::Map& map ) const
 {
-  if( !mVertexShader.empty() || !mFragmentShader.empty() )
+  if( !mVertexShaderData.empty() || !mFragmentShaderData.empty() )
   {
     Property::Map customShader;
-    if( !mVertexShader.empty() )
+    if( !mVertexShaderData.empty() )
     {
-      customShader.Insert( Toolkit::Visual::Shader::Property::VERTEX_SHADER, mVertexShader );
+      Property::Value value;
+      EncodeBase64PropertyData( value, mVertexShaderData );
+      customShader.Insert( Toolkit::Visual::Shader::Property::VERTEX_SHADER, value );
     }
-    if( !mFragmentShader.empty() )
+    if( !mFragmentShaderData.empty() )
     {
-      customShader.Insert( Toolkit::Visual::Shader::Property::FRAGMENT_SHADER, mFragmentShader );
+      Property::Value value;
+      EncodeBase64PropertyData( value, mFragmentShaderData );
+      customShader.Insert( Toolkit::Visual::Shader::Property::FRAGMENT_SHADER, value );
     }
 
     if( mGridSize.GetWidth() != 1 )
