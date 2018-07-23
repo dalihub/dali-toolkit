@@ -68,8 +68,8 @@ struct Base::Impl
     void SetPropertyMap( const Property::Map& map );
     void CreatePropertyMap( Property::Map& map ) const;
 
-    std::string mVertexShader;
-    std::string mFragmentShader;
+    std::vector<uint32_t> mVertexShaderData;
+    std::vector<uint32_t> mFragmentShaderData;
     Dali::ImageDimensions mGridSize;
     Dali::Shader::Hint::Value mHints; //(bitfield) values from enum Shader::Hint
   };

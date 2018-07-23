@@ -56,128 +56,6 @@ const char * const BORDER( "border" );
 const char * const AUXILIARY_IMAGE_NAME( "auxiliaryImage" );
 const char * const AUXILIARY_IMAGE_ALPHA_NAME( "auxiliaryImageAlpha" );
 
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  varying mediump vec2 vTexCoord;\n
-  varying mediump vec2 vMaskTexCoord;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
-  uniform mediump vec2 uNinePatchFactorsX[ FACTOR_SIZE_X ];\n
-  uniform mediump vec2 uNinePatchFactorsY[ FACTOR_SIZE_Y ];\n
-  \n
-
-  // Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
-
-  void main()\n
-  {\n
-    mediump vec2 fixedFactor  = vec2( uNinePatchFactorsX[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uNinePatchFactorsY[ int( ( aPosition.y + 1.0 ) * 0.5 ) ].x );\n
-    mediump vec2 stretch      = vec2( uNinePatchFactorsX[ int( ( aPosition.x       ) * 0.5 ) ].y, uNinePatchFactorsY[ int( ( aPosition.y       ) * 0.5 ) ].y );\n
-    \n
-    mediump vec2 fixedTotal   = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].x, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].x );\n
-    mediump vec2 stretchTotal = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].y, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].y );\n
-    \n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    \n
-    mediump vec4 gridPosition = vec4( fixedFactor + ( visualSize.xy - fixedTotal ) * stretch / stretchTotal, 0.0, 1.0 );\n
-    mediump vec4 vertexPosition = gridPosition;\n
-    vertexPosition.xy -= visualSize.xy * vec2( 0.5, 0.5 );\n
-    vertexPosition.xy += anchorPoint*visualSize + (visualOffset + origin)*uSize.xy;\n
-    vertexPosition = uMvpMatrix * vertexPosition;\n
-    \n
-    vTexCoord = ( fixedFactor + stretch ) / ( fixedTotal + stretchTotal );\n
-    vMaskTexCoord = gridPosition.xy / visualSize;\n
-    \n
-    gl_Position = vertexPosition;\n
-  }\n
-);
-#if 0
-const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
-    attribute mediump vec2 aPosition;\n
-    varying mediump vec2 vTexCoord;\n
-    varying mediump vec2 vMaskTexCoord;\n
-    uniform mediump mat4 uModelMatrix;\n
-    uniform mediump mat4 uMvpMatrix;\n
-    uniform mediump vec3 uSize;\n
-    uniform mediump vec2 uFixed[ 3 ];\n
-    uniform mediump vec2 uStretchTotal;\n
-    \n
-    //Visual size and offset
-    uniform mediump vec2 offset;\n
-    uniform mediump vec2 size;\n
-    uniform mediump vec4 offsetSizeMode;\n
-    uniform mediump vec2 origin;\n
-    uniform mediump vec2 anchorPoint;\n
-    \n
-    void main()\n
-    {\n
-      vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-      vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-      \n
-      mediump vec2 size         = visualSize.xy;\n
-      \n
-      mediump vec2 fixedFactor  = vec2( uFixed[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uFixed[ int( ( aPosition.y  + 1.0 ) * 0.5 ) ].y );\n
-      mediump vec2 stretch      = floor( aPosition * 0.5 );\n
-      mediump vec2 fixedTotal   = uFixed[ 2 ];\n
-      \n
-      mediump vec4 gridPosition = vec4( fixedFactor + ( size - fixedTotal ) * stretch, 0.0, 1.0 );\n
-      mediump vec4 vertexPosition = gridPosition;\n
-      vertexPosition.xy -= size * vec2( 0.5, 0.5 );\n
-      vertexPosition.xy += anchorPoint*size + (visualOffset + origin)*uSize.xy;\n
-      \n
-      vertexPosition = uMvpMatrix * vertexPosition;\n
-      \n
-      vTexCoord = ( fixedFactor + stretch * uStretchTotal ) / ( fixedTotal + uStretchTotal );\n
-      \n
-      vMaskTexCoord = gridPosition.xy / size;\n
-      gl_Position = vertexPosition;\n
-    }\n
-);
-#endif
-
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  uniform lowp float preMultipliedAlpha;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * vec4( mixColor, 1.0 );\n
-  }\n
-);
-
-const char* FRAGMENT_MASK_SHADER = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  varying mediump vec2 vMaskTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform sampler2D sMask;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  uniform lowp float preMultipliedAlpha;\n
-  uniform mediump float auxiliaryImageAlpha;\n
-  \n
-  void main()\n
-  {\n
-      // Where mask image is transparent, all of background image must show through.
-      // where mask image is opaque, only mask should be shown
-      // where mask is translucent, less of background should be shown.
-      // auxiliaryImageAlpha controls how much of mask is visible
-
-      mediump vec4 color = texture2D( sTexture, vTexCoord );\n
-      mediump vec4 mask  = texture2D( sMask, vMaskTexCoord );\n
-
-      mediump vec3 mixedColor = color.rgb * mix( 1.0-mask.a, 1.0, 1.0-auxiliaryImageAlpha)
-                                + mask.rgb*mask.a * auxiliaryImageAlpha;\n
-      gl_FragColor = vec4(mixedColor,1.0) * uColor * vec4( mixColor, 1.0 );\n
-  }\n
-);
 
 /**
  * @brief Creates the geometry formed from the vertices and indices
@@ -484,10 +362,9 @@ Shader NPatchVisual::CreateShader()
   const NPatchLoader::Data* data;
   // 0 is either no data (load failed?) or no stretch regions on image
   // for both cases we use the default shader
-  NPatchLoader::StretchRanges::SizeType xStretchCount = 0;
-  NPatchLoader::StretchRanges::SizeType yStretchCount = 0;
+  int xStretchCount = 0;
+  int yStretchCount = 0;
 
-  auto fragmentShader = mAuxiliaryPixelBuffer ? FRAGMENT_MASK_SHADER : FRAGMENT_SHADER;
   auto fragmentShaderTag = mAuxiliaryPixelBuffer ? "SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG"
                                                  : "SHADER_NPATCH_VISUAL_SHADER_FRAG";
 
@@ -520,50 +397,49 @@ Shader NPatchVisual::CreateShader()
     }
     else if( xStretchCount > 0 || yStretchCount > 0)
     {
-      std::stringstream vertexShader;
-      vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
-                   << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
-                   << VERTEX_SHADER;
+      Property::Map specializationConstants;
+      specializationConstants["FACTOR_SIZE_X"] = xStretchCount+2;
+      specializationConstants["FACTOR_SIZE_Y"] = yStretchCount+2;
 
-      shader = Shader::New( vertexShader.str(), fragmentShader );
+      shader = DevelShader::New<uint32_t>( GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_3X3_SHADER_VERT" ),
+                                           GraphicsGetBuiltinShader( fragmentShaderTag ),
+                                           DevelShader::ShaderLanguage::SPIRV_1_0, specializationConstants );
     }
   }
   else
   {
-    Dali::Shader::Hint::Value hints = Dali::Shader::Hint::NONE;
+    auto vertexShader = GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_3X3_SHADER_VERT" );
+    auto fragmentShader = GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_SHADER_FRAG" );
 
-    if( !mImpl->mCustomShader->mFragmentShader.empty() )
+    if( !mImpl->mCustomShader->mFragmentShaderData.empty() )
     {
-      fragmentShader = mImpl->mCustomShader->mFragmentShader.c_str();
+      fragmentShader = mImpl->mCustomShader->mFragmentShaderData;
     }
-    hints = mImpl->mCustomShader->mHints;
 
     /* Apply Custom Vertex Shader only if image is 9-patch */
     if( ( xStretchCount == 1 && yStretchCount == 1 ) ||
         ( xStretchCount == 0 && yStretchCount == 0 ) )
     {
-      //const char* vertexShader = VERTEX_SHADER_3X3;
+      if( !mImpl->mCustomShader->mVertexShaderData.empty() )
+      {
+        vertexShader = mImpl->mCustomShader->mVertexShaderData;
+      }
 
-      //if( !mImpl->mCustomShader->mVertexShader.empty() )
-      //{
-      //  vertexShader = mImpl->mCustomShader->mVertexShader.c_str();
-      //}
-      //shader = Shader::New( vertexShader, fragmentShader, hints );
-
-      shader = DevelShader::New<uint32_t>(
-        GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_3X3_SHADER_VERT" ),
-        GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_SHADER_FRAG" ),
-        DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
+      shader = DevelShader::New<uint32_t>( vertexShader, fragmentShader,
+                                           DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
 
     }
     else if( xStretchCount > 0 || yStretchCount > 0)
     {
-      std::stringstream vertexShader;
-      vertexShader << "#define FACTOR_SIZE_X " << xStretchCount + 2 << "\n"
-                   << "#define FACTOR_SIZE_Y " << yStretchCount + 2 << "\n"
-                   << VERTEX_SHADER;
+      auto vertexShader = GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_NxM_SHADER_VERT" );
+      auto fragmentShader = GraphicsGetBuiltinShader( "SHADER_NPATCH_VISUAL_SHADER_FRAG" );
+      Property::Map specializationConstants;
+      specializationConstants["FACTOR_SIZE_X"] = xStretchCount+2;
+      specializationConstants["FACTOR_SIZE_Y"] = yStretchCount+2;
 
-      shader = Shader::New( vertexShader.str(), fragmentShader, hints );
+      shader = DevelShader::New<uint32_t>( vertexShader, fragmentShader,
+                                           DevelShader::ShaderLanguage::SPIRV_1_0,
+                                           specializationConstants );
     }
   }
 
