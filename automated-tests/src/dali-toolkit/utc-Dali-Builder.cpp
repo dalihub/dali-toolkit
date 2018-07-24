@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,19 @@
  */
 
 #include <iostream>
-#include <stdlib.h>
+#include <iterator>
+#include <vector>
+#include <algorithm>
+#include <cstdlib>
+
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/devel-api/builder/builder.h>
+#include <dali-toolkit/devel-api/builder/base64-encoding.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <test-button.h>
 #include <test-animation-data.h>
+
 
 #define STRINGIFY(A)#A
 
@@ -1848,6 +1854,259 @@ int UtcDaliBuilderConfigurationP(void)
   bool value = pValue->Get<bool>();
 
   DALI_TEST_CHECK( value );
+
+  END_TEST;
+}
+
+
+int UtcDaliBase64EncodingP(void)
+{
+  std::vector<uint32_t> data = { 0, 1, 2, 3, 4, 5, std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max()  };
+
+  Property::Value value;
+  EncodeBase64PropertyData( value, data );
+
+  std::cout << "Max uint32_t:" << std::numeric_limits<uint32_t>::max() << std::endl;
+  std::cout << "Input data:  ";
+  std::ostream_iterator<uint32_t> out_it (std::cout,", ");
+  std::copy ( data.begin(), data.end(), out_it );
+  std::cout << std::endl;
+
+  std::string output;
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, "AAAAAAEAAAACAAAAAwAAAAQAAAAFAAAAAAAAAP////8", TEST_LOCATION );
+
+  std::cout << "Output data:  " << output << std::endl;
+
+  END_TEST;
+}
+
+int UtcDaliBase64EncodingN(void)
+{
+  tet_infoline( "Test encoding an empty vector returns empty string" );
+  std::vector<uint32_t> data;
+
+  Property::Value value;
+  EncodeBase64PropertyData( value, data );
+
+  std::string output;
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output.empty(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+template <typename T>
+int b64l(std::vector<T>&data)
+{
+  auto lengthInBytes = 4*data.size();
+  return ceil( lengthInBytes * 1.33333f );
+}
+
+int UtcDaliBase64EncodingP02(void)
+{
+  tet_infoline( "Test encoding vectors of lengths m .. m+4 encode and decode back to the same length vectors" );
+
+  std::vector<uint32_t> testData;
+  for(int i=0; i<8; ++i ) // 8 chosen to stay within single string output
+  {
+    testData.push_back(i);
+  }
+  Property::Value value;
+  EncodeBase64PropertyData( value, testData );
+
+  std::string output;
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output.empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS( output.length(), b64l(testData), TEST_LOCATION );
+
+  std::vector<uint32_t> outData;
+  DecodeBase64PropertyData( value, outData );
+  DALI_TEST_EQUALS( testData.size(), outData.size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( std::equal( testData.begin(), testData.end(), outData.begin()), true, TEST_LOCATION );
+
+  // n+1
+  testData.push_back( 12345 );
+  EncodeBase64PropertyData( value, testData );
+
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output.empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS( output.length(), b64l(testData), TEST_LOCATION );
+
+  outData.clear();
+  DecodeBase64PropertyData( value, outData );
+  DALI_TEST_EQUALS( testData.size(), outData.size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( std::equal( testData.begin(), testData.end(), outData.begin()), true, TEST_LOCATION );
+
+  // n+2
+  testData.push_back( 67890 );
+  EncodeBase64PropertyData( value, testData );
+
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output.empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS( output.length(), b64l(testData), TEST_LOCATION );
+
+  outData.clear();
+  DecodeBase64PropertyData( value, outData );
+  DALI_TEST_EQUALS( testData.size(), outData.size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( std::equal( testData.begin(), testData.end(), outData.begin()), true, TEST_LOCATION );
+
+  // n+3
+  testData.push_back( -1 );
+  EncodeBase64PropertyData( value, testData );
+
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output.empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS( output.length(), b64l(testData), TEST_LOCATION );
+
+  outData.clear();
+  DecodeBase64PropertyData( value, outData );
+  DALI_TEST_EQUALS( testData.size(), outData.size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( std::equal( testData.begin(), testData.end(), outData.begin()), true, TEST_LOCATION );
+
+
+  END_TEST;
+}
+
+
+int UtcDaliBase64EncodingP03(void)
+{
+  tet_infoline( "Test encoding a vector of length 12 has output within single string" );
+
+  std::vector<uint32_t> testData;
+  for(int i=0; i<12; ++i )
+  {
+    testData.push_back(i);
+  }
+  Property::Value value;
+  EncodeBase64PropertyData( value, testData );
+
+  std::string output;
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output.empty(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS( output.length(), b64l(testData), TEST_LOCATION );
+
+  std::vector<uint32_t> outData;
+  DecodeBase64PropertyData( value, outData );
+  DALI_TEST_EQUALS( testData.size(), outData.size(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliBase64EncodingP04(void)
+{
+  tet_infoline( "Test encoding a vector of length 13 has output split over 2 strings" );
+
+  std::vector<uint32_t> testData;
+  for(int i=0; i<13; ++i )
+  {
+    testData.push_back(i);
+  }
+  Property::Value value;
+  EncodeBase64PropertyData( value, testData );
+
+  auto array = value.GetArray();
+  DALI_TEST_CHECK( array );
+
+  DALI_TEST_EQUALS( array->Count(), 2, TEST_LOCATION );
+
+  std::vector<uint32_t> outData;
+  DecodeBase64PropertyData( value, outData );
+  DALI_TEST_EQUALS( testData.size(), outData.size(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliBase64EncodingP05(void)
+{
+  tet_infoline( "Test encoding a vector of length 24 has output split over 2 strings" );
+
+  std::vector<uint32_t> testData;
+  for(int i=0; i<24; ++i )
+  {
+    testData.push_back(i);
+  }
+  Property::Value value;
+  EncodeBase64PropertyData( value, testData );
+
+  auto array = value.GetArray();
+  DALI_TEST_CHECK( array );
+
+  DALI_TEST_EQUALS( array->Count(), 2, TEST_LOCATION );
+
+  std::vector<uint32_t> outData;
+  DecodeBase64PropertyData( value, outData );
+  DALI_TEST_EQUALS( testData.size(), outData.size(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliBase64EncodingP06(void)
+{
+  tet_infoline( "Test encoding a vector of arbitrary length decodes OK." );
+
+  std::vector<uint32_t> testData;
+  for(int i=0; i<97; ++i )
+  {
+    testData.push_back(i);
+  }
+  Property::Value value;
+  EncodeBase64PropertyData( value, testData );
+
+  auto array = value.GetArray();
+  DALI_TEST_CHECK( array );
+
+  std::vector<uint32_t> outData;
+  DecodeBase64PropertyData( value, outData );
+  DALI_TEST_EQUALS( testData.size(), outData.size(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliBase64DecodingN01(void)
+{
+  tet_infoline( "Test decoding empty string results in empty data" );
+
+  Property::Value value("");
+  std::vector<uint32_t> outputData;
+  DecodeBase64PropertyData( value, outputData);
+  DALI_TEST_EQUALS( outputData.size(), 0, TEST_LOCATION );
+  END_TEST;
+}
+
+
+int UtcDaliBase64DecodingN02(void)
+{
+  tet_infoline( "Test decoding array with non-string values results in empty data" );
+
+  Property::Array array;
+  array.Resize(2);
+  array[0] = "Stuff, things";
+  array[1] = 1;
+  Property::Value value(array);
+
+  std::vector<uint32_t> outputData;
+  DecodeBase64PropertyData( value, outputData);
+  DALI_TEST_EQUALS( outputData.size(), 0, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliBase64DecodingP01(void)
+{
+  tet_infoline( "Test decoding string of known data gives expected result");
+
+  std::string testInput("//////7+/v4DAgEA");
+  std::vector<uint32_t> expectedResults = { 0xffffffff, 0xfefefefe, 0x00010203 };
+
+  std::vector<uint32_t> outputData;
+  DecodeBase64PropertyData(Property::Value(testInput), outputData);
+
+  DALI_TEST_EQUALS( std::equal( expectedResults.begin(), expectedResults.end(), outputData.begin() ), true,
+                    TEST_LOCATION );
 
   END_TEST;
 }
