@@ -1521,6 +1521,95 @@ int UtcDaliLayouting_VboxLayout03(void)
   END_TEST;
 }
 
+int UtcDaliLayouting_VboxLayout_Padding(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayouting_VboxLayout_Padding - Adding Padding to the vbox");
+
+  // Adding padding to the layout should offset the positioning of the children.
+
+  const Extents LAYOUT_PADDING = Extents(5, 10, 20, 2 );
+  const Size CONTROL_SIZE = Size( 40, 40 );
+
+  Stage stage = Stage::GetCurrent();
+  // Create a root layout, ideally Dali would have a default layout in the root layer.
+  // Without this root layer the LinearLayout (or any other layout) will not
+  // honour WIDTH_SPECIFICATION or HEIGHT_SPECIFICATION settings.
+  // It uses the default stage size and ideally should have a layout added to it.
+  auto rootLayoutControl = Control::New();
+  rootLayoutControl.SetName( "AbsoluteLayout");
+  auto rootLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootLayoutControl, rootLayout );
+  rootLayoutControl.SetAnchorPoint( AnchorPoint::CENTER );
+  rootLayoutControl.SetParentOrigin( ParentOrigin::CENTER );
+  stage.Add( rootLayoutControl );
+
+  auto vbox = Control::New();
+  auto vboxLayout = LinearLayout::New();
+  vboxLayout.SetOrientation( LinearLayout::Orientation::VERTICAL );
+  DevelControl::SetLayout( vbox, vboxLayout );
+  vbox.SetName( "VBox");
+  vbox.SetProperty( Toolkit::Control::Property::PADDING, LAYOUT_PADDING );
+  vbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  vbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+
+  for( auto&& iter : controls )
+  {
+    vbox.Add( iter );
+  }
+
+  vbox.SetParentOrigin( ParentOrigin::CENTER );
+  vbox.SetAnchorPoint( AnchorPoint::CENTER );
+  rootLayoutControl.Add( vbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // Extra update needed to Relayout one more time. Catches any position updates, false positive without this seen.
+  application.SendNotification();
+
+  // vbox centers elements horizontally, it fills test harness stage, which is 480x800.
+  tet_infoline("Test Child Actor Position");
+
+  auto controlYPosition = 0.0f;
+
+  controlYPosition = LAYOUT_PADDING.top;  // First child positioned at offset defined by the padding
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( LAYOUT_PADDING.start,
+                                                                                            LAYOUT_PADDING.top,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  controlYPosition += CONTROL_SIZE.height; // Second child positioned is the position of the first child + the first child's height.
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( LAYOUT_PADDING.start,
+                                                                                            controlYPosition,
+                                                                                            0.0f ),
+                                                                                            0.0001f, TEST_LOCATION );
+
+  controlYPosition += CONTROL_SIZE.height; // Third child positioned adjacent to second
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( LAYOUT_PADDING.start,
+                                                                                            controlYPosition,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  controlYPosition += CONTROL_SIZE.height; // Forth passed adjacent to the third
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( LAYOUT_PADDING.start,
+                                                                                            controlYPosition,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  auto totalControlsWidth = CONTROL_SIZE.width;
+  auto totalControlsHeight = CONTROL_SIZE.height * controls.size();
+
+  DALI_TEST_EQUALS( vbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( totalControlsWidth + LAYOUT_PADDING.start + LAYOUT_PADDING.end,
+                                                                                 totalControlsHeight + LAYOUT_PADDING.top + LAYOUT_PADDING.bottom,
+                                                                                 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
 
 
 int UtcDaliLayouting_RelayoutOnChildOrderChanged(void)

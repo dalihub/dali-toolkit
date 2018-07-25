@@ -273,7 +273,7 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
 
   Extents padding = GetPadding();
 
-  LayoutLength childTop( 0 );
+  LayoutLength childTop( padding.top );
   LayoutLength childLeft( padding.start );
 
   // Where bottom of child should go
@@ -433,7 +433,7 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
 {
   Extents padding = GetPadding();
 
-  LayoutLength childTop( 0 );
+  LayoutLength childTop( padding.top );
   LayoutLength childLeft( padding.start );
 
   // Where bottom of child should go
@@ -453,7 +453,7 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
       auto childMargin = childLayout->GetMargin();
 
       childTop += childMargin.top;
-      childLeft = ( childSpace - childWidth ) / 2 + childMargin.start - childMargin.end;
+      childLeft = LayoutLength( padding.start ) + ( childSpace - childWidth ) / 2 + childMargin.start - childMargin.end;
 
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
       childTop += childHeight + childMargin.bottom + mCellPadding.height;
