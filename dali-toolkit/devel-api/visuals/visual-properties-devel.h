@@ -84,6 +84,38 @@ enum FittingMode
   FILL,                   ///< The visual should be stretched to fill, not preserving aspect ratio
 };
 
+
+
+namespace Shader
+{
+
+namespace Property
+{
+
+enum
+{
+  VERTEX_SHADER = Dali::Toolkit::Visual::Shader::Property::VERTEX_SHADER,
+  FRAGMENT_SHADER = Dali::Toolkit::Visual::Shader::Property::FRAGMENT_SHADER,
+  SUBDIVIDE_GRID_X = Dali::Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X,
+  SUBDIVIDE_GRID_Y = Dali::Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y,
+  HINTS = Dali::Toolkit::Visual::Shader::Property::HINTS,
+
+  /**
+   * @brief The specialization constants for the custom shader
+   *
+   * @details Name "specializationConstants", type Property::MAP
+   * @note Key value pairs are used to write specialization constants for the shader:
+   * Keys are checked against shader reflection, values must be valid types
+   * for the shader.
+   */
+  SPECIALIZATION_CONSTANTS = HINTS + 1,
+};
+
+} // namespace Property
+
+} // namespace Shader
+
+
 } // namespace DevelVisual
 
 } // namespace Toolkit

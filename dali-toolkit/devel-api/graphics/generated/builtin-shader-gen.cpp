@@ -5,6 +5,7 @@
 
 #include "basic-shader-frag.h"
 #include "basic-shader-vert.h"
+#include "blur-two-pass-shader-frag.h"
 #include "border-visual-anti-aliasing-shader-frag.h"
 #include "border-visual-anti-aliasing-shader-vert.h"
 #include "border-visual-shader-frag.h"
@@ -33,6 +34,8 @@
 #include "npatch-visual-shader-vert.h"
 #include "primitive-visual-shader-frag.h"
 #include "primitive-visual-shader-vert.h"
+#include "shadow-view-render-shader-frag.h"
+#include "shadow-view-render-shader-vert.h"
 #include "text-atlas-l8-shader-frag.h"
 #include "text-atlas-rgba-shader-frag.h"
 #include "text-atlas-shader-vert.h"
@@ -52,6 +55,7 @@
 static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
   { "SHADER_BASIC_SHADER_FRAG", SHADER_BASIC_SHADER_FRAG },
   { "SHADER_BASIC_SHADER_VERT", SHADER_BASIC_SHADER_VERT },
+  { "SHADER_BLUR_TWO_PASS_SHADER_FRAG", SHADER_BLUR_TWO_PASS_SHADER_FRAG },
   { "SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_FRAG", SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_FRAG },
   { "SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_VERT", SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_VERT },
   { "SHADER_BORDER_VISUAL_SHADER_FRAG", SHADER_BORDER_VISUAL_SHADER_FRAG },
@@ -80,6 +84,8 @@ static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
   { "SHADER_NPATCH_VISUAL_SHADER_VERT", SHADER_NPATCH_VISUAL_SHADER_VERT },
   { "SHADER_PRIMITIVE_VISUAL_SHADER_FRAG", SHADER_PRIMITIVE_VISUAL_SHADER_FRAG },
   { "SHADER_PRIMITIVE_VISUAL_SHADER_VERT", SHADER_PRIMITIVE_VISUAL_SHADER_VERT },
+  { "SHADER_SHADOW_VIEW_RENDER_SHADER_FRAG", SHADER_SHADOW_VIEW_RENDER_SHADER_FRAG },
+  { "SHADER_SHADOW_VIEW_RENDER_SHADER_VERT", SHADER_SHADOW_VIEW_RENDER_SHADER_VERT },
   { "SHADER_TEXT_ATLAS_L8_SHADER_FRAG", SHADER_TEXT_ATLAS_L8_SHADER_FRAG },
   { "SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG", SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG },
   { "SHADER_TEXT_ATLAS_SHADER_VERT", SHADER_TEXT_ATLAS_SHADER_VERT },

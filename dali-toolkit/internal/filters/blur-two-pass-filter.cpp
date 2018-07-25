@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,16 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/property-array.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/builder/base64-encoding.h>
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 namespace Dali
 {
@@ -59,23 +63,6 @@ const float DEFAULT_KERNEL4[] = { 2.0f/16.0f, 1.5f/16.0f, 1.5f/16.0f, 1.5f/16.0f
                                   1.0f/16.0f, 1.0f/16.0f, 1.0f/16.0f, 0.5f/16.0f,
                                   0.5f/16.0f, 0.5f/16.0f, 0.5f/16.0f };
 
-const char* BLUR_TWO_PASS_FRAGMENT_SOURCE =
-{
- "precision highp float;\n"
- "varying mediump vec2 vTexCoord;\n"
- "uniform sampler2D sTexture;\n"
- "uniform vec2 uSampleOffsets[NUM_SAMPLES];\n"
- "uniform float uSampleWeights[NUM_SAMPLES];\n"
- "void main()\n"
- "{\n"
- "  vec4 color = vec4(0.0);\n"
- "  for( int i = 0; i < NUM_SAMPLES; ++i )\n"
- "  {\n"
- "    color += texture2D( sTexture, vTexCoord + uSampleOffsets[i] ) * uSampleWeights[i];\n"
- "  }\n"
- "  gl_FragColor = color;\n"
- "}\n"
-};
 
 std::string GetOffsetUniformName( int index )
 {
@@ -90,20 +77,6 @@ std::string GetWeightUniformName( int index )
   oss << "uSampleWeights[" << index << "]";
   return oss.str();
 }
-
-const char* BLEND_TWO_IMAGES_FRAGMENT_SOURCE =
-{
- "precision highp float;\n"
- "uniform float uBlurStrength;\n "
- "uniform sampler2D sTexture;\n"
- "uniform sampler2D sEffect;\n"
- "varying mediump vec2 vTexCoord;\n"
- "void main()\n"
- "{\n"
- "  gl_FragColor = texture2D( sTexture, vTexCoord ) * uBlurStrength"
- "               + texture2D( sEffect, vTexCoord )*(1.0-uBlurStrength); \n"
- "}\n"
-};
 
 const char* const BLUR_STRENGTH_UNIFORM_NAME( "uBlurStrength"  );
 const char* const EFFECT_IMAGE_NAME( "sEffect" );
@@ -165,19 +138,29 @@ void BlurTwoPassFilter::Enable()
   }
 
   // Set up blur-two-pass custom shader
-  std::ostringstream fragmentSource;
-  fragmentSource << "#define NUM_SAMPLES " << kernelSize << "\n";
-  fragmentSource << BLUR_TWO_PASS_FRAGMENT_SOURCE;
+  Property::Value twoPassFragData;
+  const auto& twoPassFragShader = GraphicsGetBuiltinShader( "BLUR_TWO_PASS_SHADER_FRAG" );
+  EncodeBase64PropertyData( twoPassFragData, twoPassFragShader );
+
+  Property::Value twoImageFragData;
+  auto twoImageFragShader = GraphicsGetBuiltinShader( "BLUR_TWO_IMAGES_SHADER_FRAG" );
+  EncodeBase64PropertyData( twoImageFragData, twoImageFragShader );
 
   Property::Map customShader;
-  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentSource.str();
+  Property::Map specializationConstants;
+  specializationConstants["NUM_SAMPLES"] = kernelSize;
+
+  customShader[ Toolkit::DevelVisual::Shader::Property::SPECIALIZATION_CONSTANTS ] = specializationConstants;
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = twoPassFragData;
+
   Property::Map visualMap;
-  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
+  visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
   mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
   mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
   // Set up blend-two-image custom shader
-  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = BLEND_TWO_IMAGES_FRAGMENT_SOURCE;
+  customShader.Clear();
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = twoImageFragData;
   visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
   mActorForBlending.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
