@@ -122,6 +122,104 @@ void LayoutGroup::Remove( LayoutItem& child )
   RequestLayout();
 }
 
+Toolkit::LayoutGroup::LayoutId LayoutGroup::Insert( LayoutItem& target, LayoutItem& child )
+{
+  LayoutParent* oldParent = child.GetParent();
+  if( oldParent )
+  {
+    LayoutGroupPtr parentGroup( dynamic_cast< LayoutGroup* >( oldParent ) );
+    if( parentGroup )
+    {
+      parentGroup->Remove( child );
+    }
+  }
+
+  // Find target position
+  std::vector< Impl::ChildLayout >::iterator position;
+  for( auto iter = mImpl->mChildren.begin(); iter != mImpl->mChildren.end(); ++iter )
+  {
+    if( iter->child.Get() == &target )
+    {
+      position = iter;
+      break;
+    }
+  }
+
+  Impl::ChildLayout childLayout;
+  childLayout.layoutId = mImpl->mNextLayoutId++;
+  childLayout.child = &child;
+  mImpl->mChildren.insert( position, childLayout );
+
+  child.SetParent( this );
+
+  auto owner = child.GetOwner();
+
+  // Inform deriving classes that this child has been added
+  OnChildAdd( *childLayout.child.Get() );
+
+  // Now listen to future changes to the child properties.
+  DevelHandle::PropertySetSignal(owner).Connect( this, &LayoutGroup::OnSetChildProperties );
+
+  RequestLayout();
+
+  return childLayout.layoutId;
+}
+
+Toolkit::LayoutGroup::LayoutId LayoutGroup::Move( LayoutItem& target, LayoutItem& child )
+{
+  // Remove child from the previous position
+  for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; ++iter )
+  {
+    if( iter->child.Get() == &child )
+    {
+      mImpl->mChildren.erase( iter );
+      break;
+    }
+  }
+
+  // Find target position
+  std::vector< Impl::ChildLayout >::iterator position;
+  for( auto iter = mImpl->mChildren.begin(); iter != mImpl->mChildren.end(); ++iter )
+  {
+    if( iter->child.Get() == &target )
+    {
+      position = iter;
+      break;
+    }
+  }
+
+  Impl::ChildLayout childLayout;
+  childLayout.layoutId = mImpl->mNextLayoutId++;
+  childLayout.child = &child;
+  mImpl->mChildren.insert( position, childLayout );
+
+  RequestLayout();
+
+  return childLayout.layoutId;
+}
+
+Toolkit::LayoutGroup::LayoutId LayoutGroup::MoveBack( LayoutItem& child )
+{
+  // Remove child from the previous position
+  for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; ++iter )
+  {
+    if( iter->child.Get() == &child )
+    {
+      mImpl->mChildren.erase( iter );
+      break;
+    }
+  }
+
+  Impl::ChildLayout childLayout;
+  childLayout.layoutId = mImpl->mNextLayoutId++;
+  childLayout.child = &child;
+  mImpl->mChildren.emplace_back( childLayout );
+
+  RequestLayout();
+
+  return childLayout.layoutId;
+}
+
 void LayoutGroup::RemoveAll()
 {
   for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; )
@@ -418,7 +516,30 @@ void LayoutGroup::OnInitialize()
         if( parentLayout )
         {
           Internal::LayoutGroup& parentLayoutImpl = GetImplementation( parentLayout );
-          parentLayoutImpl.Add( *this );
+
+          unsigned int count = parent.GetChildCount();
+          unsigned int index = static_cast< unsigned int >( control.GetProperty< int >( DevelActor::Property::SIBLING_ORDER ) );
+
+          // Find insertion position
+          while( ++index < count )
+          {
+            auto sibling = Toolkit::Control::DownCast( parent.GetChildAt( index ) );
+            if( sibling )
+            {
+              auto siblingLayout = DevelControl::GetLayout( sibling );
+              if( siblingLayout )
+              {
+                Internal::LayoutItem& siblingLayoutImpl = GetImplementation( siblingLayout );
+                parentLayoutImpl.Insert( siblingLayoutImpl, *this );
+                break;
+              }
+            }
+          }
+
+          if( index >= count )
+          {
+            parentLayoutImpl.Add( *this );
+          }
         }
       }
     }
@@ -509,13 +630,39 @@ void LayoutGroup::ChildRemovedFromOwner( Actor child )
   }
 }
 
-void LayoutGroup::ChildOrderChanged()
+void LayoutGroup::ChildOrderChanged( Actor child )
 {
-  RequestLayout();
-  // Force Children to be relaid out:
-  for( auto&& child : mImpl->mChildren )
+  Toolkit::Control childControl = Toolkit::Control::DownCast( child );
+  if( childControl )
   {
-    child.child->SetLayoutRequested();
+    Internal::Control& childControlImpl = GetImplementation( childControl );
+    Internal::Control::Impl& childControlDataImpl = Internal::Control::Impl::Get( childControlImpl );
+
+    auto childLayout = childControlDataImpl.GetLayout();
+    if( childLayout )
+    {
+      Toolkit::Control control = Toolkit::Control::DownCast( GetOwner() );
+      unsigned int count = control.GetChildCount();
+      unsigned int index = static_cast< unsigned int >( childControl.GetProperty< int >( DevelActor::Property::SIBLING_ORDER ) );
+
+      // Find insertion position
+      while( ++index < count )
+      {
+        auto sibling = Toolkit::Control::DownCast( control.GetChildAt( index ) );
+        if( sibling )
+        {
+          auto siblingLayout = DevelControl::GetLayout( sibling );
+          if( siblingLayout )
+          {
+            Internal::LayoutItem& siblingLayoutImpl = GetImplementation( siblingLayout );
+            Move( siblingLayoutImpl, *childLayout );
+            return;
+          }
+        }
+      }
+
+      MoveBack( *childLayout );
+    }
   }
 }
 

@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/layouting/linear-layout.h>
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 #include <../custom-layout.h>
 
@@ -33,6 +34,15 @@
 
 using namespace Dali;
 using namespace Toolkit;
+
+void TestLayoutItemOrder( std::vector< Control >& controls, LayoutGroup& layoutGroup )
+{
+  for( auto&& iter : controls )
+  {
+    unsigned int siblingOrder = static_cast< unsigned int>( iter.GetProperty< int >( DevelActor::Property::SIBLING_ORDER ) );
+    DALI_TEST_EQUALS( layoutGroup.GetChildAt( siblingOrder ), DevelControl::GetLayout( iter ), TEST_LOCATION );
+  }
+}
 
 void utc_dali_toolkit_layouting_startup(void)
 {
@@ -1692,6 +1702,9 @@ int UtcDaliLayouting_LayoutChildren01(void)
   DALI_TEST_EQUALS( hboxLayout.GetOwner(), empty, TEST_LOCATION );
   DALI_TEST_EQUALS( (void*)hboxImpl.GetParent(), (void*)nullptr, TEST_LOCATION );
 
+  // For coverage
+  hboxImpl.SetLayoutRequested();
+
   END_TEST;
 }
 
@@ -1798,10 +1811,10 @@ int UtcDaliLayouting_LayoutChildren04(void)
   END_TEST;
 }
 
-int UtcDaliLayouting_SetLayoutOrder(void)
+int UtcDaliLayouting_SetLayoutOrder01(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliLayouting_SetLayoutOrder - Call SetLayout after adding the control to the root layout");
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder01 - Call SetLayout after adding the control to the root layout");
 
   Stage stage = Stage::GetCurrent();
 
@@ -1835,6 +1848,94 @@ int UtcDaliLayouting_SetLayoutOrder(void)
   application.Render();
 
   DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_SetLayoutOrder02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder02 - Test the layout item order and the control order");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hbox.SetName( "HBox");
+
+  rootControl.Add( hbox );
+
+  DevelControl::SetLayout( hbox, hboxLayout );
+
+  // Add child controls
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 100, 100 ) );  // 0
+  controls.push_back( CreateLeafControl( 100, 100 ) );  // 1
+  controls.push_back( CreateLeafControl( 100, 100 ) );  // 2
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("RaiseToTop");
+
+  controls[0].RaiseToTop(); // 1 2 0
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("LowerToBottom");
+
+  controls[2].LowerToBottom();  // 2 1 0
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("Remove / Add");
+
+  hbox.Remove( controls[2] );  // 1 0
+  hbox.Add( controls[2] );     // 1 0 2
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("SetLayout");
+
+  auto vboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( controls[0], vboxLayout );
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("Raise");
+
+  controls[0].Raise();  // 1 2 0
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("Lower");
+
+  controls[2].Lower();   // 2 1 0
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("SetLayout again");
+
+  auto vboxLayout1 = LinearLayout::New();
+  DevelControl::SetLayout( controls[2], vboxLayout1 );
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  DevelControl::SetLayout( controls[2], vboxLayout );
 
   END_TEST;
 }
