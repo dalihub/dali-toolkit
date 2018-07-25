@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/stage.h>
+#include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -31,6 +32,9 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/builder/base64-encoding.h>
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/controls/shadow-view/shadow-view-impl.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 
@@ -85,38 +89,6 @@ const char* const SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME = "uLightCameraV
 const char* const SHADER_SHADOW_COLOR_PROPERTY_NAME = "uShadowColor";
 const char* const BLUR_STRENGTH_PROPERTY_NAME = "BlurStrengthProperty";
 const char* const SHADOW_COLOR_PROPERTY_NAME = "ShadowColorProperty";
-
-const char* const RENDER_SHADOW_VERTEX_SOURCE =
-
-  " attribute mediump vec2 aPosition;\n"
-  " uniform mediump mat4 uMvpMatrix;\n"
-  " uniform mediump mat4 uModelMatrix;\n"
-  " uniform vec3 uSize;\n"
-  " varying vec2 vTexCoord;\n"
-
-  " uniform mediump mat4 uLightCameraProjectionMatrix;\n"
-  " uniform mediump mat4 uLightCameraViewMatrix;\n"
-  "\n"
-  "void main()\n"
-  "{\n"
-    "  mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n"
-    "  vertexPosition.xyz *= uSize;\n"
-    "  gl_Position = uMvpMatrix * vertexPosition;\n"
-    "  vec4 textureCoords = uLightCameraProjectionMatrix * uLightCameraViewMatrix * uModelMatrix  * vertexPosition;\n"
-    "  vTexCoord = 0.5 + 0.5 * (textureCoords.xy/textureCoords.w);\n"
-  "}\n";
-
-const char* const RENDER_SHADOW_FRAGMENT_SOURCE =
-  "varying mediump vec2 vTexCoord;\n"
-  "uniform lowp vec4 uShadowColor;\n"
-  "uniform sampler2D sTexture;\n"
-
-  "void main()\n"
-  "{\n"
-  "  lowp float alpha;\n"
-  "  alpha = texture2D(sTexture, vec2(vTexCoord.x, vTexCoord.y)).a;\n"
-  "  gl_FragColor = vec4(uShadowColor.rgb, uShadowColor.a * alpha);\n"
-  "}\n";
 
 } // namespace
 
@@ -244,8 +216,13 @@ void ShadowView::OnInitialize()
 
 
   Property::Map customShader;
-  customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = RENDER_SHADOW_VERTEX_SOURCE;
-  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = RENDER_SHADOW_FRAGMENT_SOURCE;
+  Property::Value renderShadowVertexData;
+  Property::Value renderShadowFragmentData;
+  EncodeBase64PropertyData( renderShadowVertexData, GraphicsGetBuiltinShader( "SHADOW_VIEW_RENDER_SHADER_VERT" ));
+  EncodeBase64PropertyData( renderShadowFragmentData, GraphicsGetBuiltinShader( "SHADOW_VIEW_RENDER_SHADER_FRAG" ));
+
+  customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = renderShadowVertexData;
+  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = renderShadowFragmentData;
 
   customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X ] = 20;
   customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y ] = 20;
