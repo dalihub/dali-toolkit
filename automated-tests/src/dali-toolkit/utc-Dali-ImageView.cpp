@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1734,3 +1734,44 @@ int UtcDaliImageViewUsingAtlasAndGetNaturalSize(void)
   END_TEST;
 }
 
+int UtcDaliImageViewFillMode(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Create an ImageVisual without padding and set the fill-mode to fill" );
+  tet_infoline( "  There should be no need to change the transform, our size-policy should be relative and size shoudl be [1,1]");
+
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  imageMap.Add( Toolkit::ImageVisual::Property::URL, gImage_600_RGB );
+  imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, DevelVisual::FittingMode::FILL );
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  // If there's
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2::ONE, TEST_LOCATION ); // Relative size so will take up 100%
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get< int >() == Toolkit::Visual::Transform::Policy::RELATIVE );
+
+  END_TEST;
+}
