@@ -29,10 +29,12 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/rendering/shader-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
 {
@@ -84,27 +86,6 @@ const char* const CUSTOM_VERTEX_SHADER( "vertexShader" );
 const char* const CUSTOM_FRAGMENT_SHADER( "fragmentShader" );
 const char* const DEFAULT_SAMPLER_TYPE_NAME( "sampler2D" );
 const char* const CUSTOM_SAMPLER_TYPE_NAME( "samplerExternalOES" );
-
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
-    vertexPosition.xyz *= uSize;\n
-    gl_Position = uMvpMatrix * vertexPosition;\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = vec4(0.0);\n
-  }\n
-);
 
 const char* VERTEX_SHADER_TEXTURE = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
@@ -620,7 +601,9 @@ void VideoView::SetWindowSurfaceTarget()
   {
     // For underlay rendering mode, video display area have to be transparent.
     Geometry geometry = VisualFactoryCache::CreateQuadGeometry();
-    Shader shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    Shader shader = DevelShader::New<uint32_t>( GraphicsGetBuiltinShaderId( SHADER_VIDEO_VIEW_UNDERLAY_VERT ),
+                                                GraphicsGetBuiltinShaderId( SHADER_VIDEO_VIEW_UNDERLAY_FRAG ),
+                                                DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
     mOverlayRenderer = Renderer::New( geometry, shader );
     mOverlayRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::OFF );
   }

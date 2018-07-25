@@ -59,6 +59,8 @@
 #include "text-visual-single-color-text-with-emoji-shader-frag.h"
 #include "text-visual-single-color-text-with-style-and-emoji-shader-frag.h"
 #include "text-visual-single-color-text-with-style-shader-frag.h"
+#include "video-view-underlay-frag.h"
+#include "video-view-underlay-vert.h"
 #include "wireframe-visual-shader-frag.h"
 #include "wireframe-visual-shader-vert.h"
 static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
@@ -118,6 +120,8 @@ static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
   { "SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_EMOJI_SHADER_FRAG", SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_EMOJI_SHADER_FRAG },
   { "SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI_SHADER_FRAG", SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI_SHADER_FRAG },
   { "SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_SHADER_FRAG", SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_SHADER_FRAG },
+  { "SHADER_VIDEO_VIEW_UNDERLAY_FRAG", SHADER_VIDEO_VIEW_UNDERLAY_FRAG },
+  { "SHADER_VIDEO_VIEW_UNDERLAY_VERT", SHADER_VIDEO_VIEW_UNDERLAY_VERT },
   { "SHADER_WIREFRAME_VISUAL_SHADER_FRAG", SHADER_WIREFRAME_VISUAL_SHADER_FRAG },
   { "SHADER_WIREFRAME_VISUAL_SHADER_VERT", SHADER_WIREFRAME_VISUAL_SHADER_VERT },
 };

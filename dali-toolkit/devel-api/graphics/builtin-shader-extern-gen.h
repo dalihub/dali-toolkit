@@ -48,6 +48,8 @@ extern std::vector<uint32_t> SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_EMOJI_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_AND_EMOJI_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_TEXT_VISUAL_SINGLE_COLOR_TEXT_WITH_STYLE_SHADER_FRAG;
+extern std::vector<uint32_t> SHADER_VIDEO_VIEW_UNDERLAY_FRAG;
+extern std::vector<uint32_t> SHADER_VIDEO_VIEW_UNDERLAY_VERT;
 extern std::vector<uint32_t> SHADER_WIREFRAME_VISUAL_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_WIREFRAME_VISUAL_SHADER_VERT;
 extern "C" std::vector<uint32_t> GraphicsGetBuiltinShader( const std::string& tag );
