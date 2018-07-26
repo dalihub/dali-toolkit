@@ -55,6 +55,8 @@ struct GlyphInfoData
   float yBearing;    ///< The distance from the baseline to the topmost border of the glyph
   float advance;     ///< The distance to move the cursor for this glyph
   float scaleFactor; ///< The scaling applied (fixed-size fonts only)
+  bool softwareItalic; ///< Whether glyph needs software support to draw italic style
+  bool softwareBold;   ///< Whether glyph needs software support to draw bold style
 };
 
 bool IsEqualGlyph ( const GlyphInfoData& glyphData, const GlyphInfo& glyph )
@@ -91,6 +93,14 @@ bool IsEqualGlyph ( const GlyphInfoData& glyphData, const GlyphInfo& glyph )
   {
     return false;
   }
+  if( glyphData.softwareItalic != glyph.softwareItalic )
+  {
+    return false;
+  }
+  if( glyphData.softwareBold != glyph.softwareBold )
+  {
+    return false;
+  }
 
   return true;
 }
@@ -107,6 +117,7 @@ struct ShapeInfoData
   Length*         charactersPerGlyph;                 ///< The characters per glyph.
   uint32_t        expectedNumberOfNewParagraphGlyphs; ///< The expected number of glyphs.
   GlyphIndex*     newParagraphGlyphs;                 ///< Indices to the new paragraphs glyphs.
+  Vector<FontDescriptionRun> fontDescriptions;        ///< Fonts which is used for text.
 };
 
 bool ShapeInfoTest( const ShapeInfoData& data )
@@ -122,7 +133,7 @@ bool ShapeInfoTest( const ShapeInfoData& data )
   const LayoutOptions options;
   CreateTextModel( data.text,
                    textArea,
-                   fontDescriptions,
+                   data.fontDescriptions,
                    options,
                    layoutSize,
                    logicalModel,
@@ -519,6 +530,154 @@ int UtcDaliTextShape(void)
     },
   };
   const unsigned int numberOfTests = 7u;
+
+  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  {
+    ToolkitTestApplication application;
+    if( !ShapeInfoTest( data[index] ) )
+    {
+      tet_result(TET_FAIL);
+    }
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextSoftwareStyling(void)
+{
+  tet_infoline(" UtcDaliTextSoftwareStyling");
+
+  struct GlyphInfoData glyphs01[] =
+  {
+    { 2u, 14750u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
+    { 2u, 9802u, 0.f, 0.f, 0.f, 0.f,  16.f, 0.f, true, true },
+    { 2u, 12811u, 0.f, 0.f, 0.f, 0.f,  16.f, 0.f, true, true },
+  };
+  struct GlyphInfoData glyphs02[] =
+  {
+    { 2u, 14750u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, false, false },
+    { 2u, 9802u, 0.f, 0.f, 0.f, 0.f,  16.f, 0.f, false, true },
+    { 2u, 12811u, 0.f, 0.f, 0.f, 0.f,  16.f, 0.f, true, false },
+  };
+
+  CharacterIndex characterIndices[] = { 0u, 1u, 2u };
+  Length charactersPerGlyph[] = { 1u, 1u, 1u };
+
+  Vector<FontDescriptionRun> fontDescriptions01;
+  Vector<FontDescriptionRun> fontDescriptions02;
+
+  FontDescriptionRun fontDescriptionRun01 =
+  {
+    {
+      0u,
+      3u
+    },
+    NULL,
+    0u,
+    TextAbstraction::FontWeight::BOLD,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::ITALIC,
+    TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+    false,
+    true,
+    false,
+    true,
+    false
+  };
+  fontDescriptions01.PushBack(fontDescriptionRun01);
+
+  FontDescriptionRun fontDescriptionRun02 =
+  {
+    {
+      0u,
+      1u
+    },
+    NULL,
+    0u,
+    TextAbstraction::FontWeight::NONE,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::NONE,
+    TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+    false,
+    false,
+    false,
+    false,
+    false
+  };
+  FontDescriptionRun fontDescriptionRun03 =
+  {
+    {
+      1u,
+      1u
+    },
+    NULL,
+    0u,
+    TextAbstraction::FontWeight::BOLD,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::NONE,
+    TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+    false,
+    true,
+    false,
+    false,
+    false
+  };
+  FontDescriptionRun fontDescriptionRun04 =
+  {
+    {
+      2u,
+      1u
+    },
+    NULL,
+    0u,
+    TextAbstraction::FontWeight::NONE,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::ITALIC,
+    TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+    false,
+    false,
+    false,
+    true,
+    false
+  };
+
+  fontDescriptions02.PushBack(fontDescriptionRun02);
+  fontDescriptions02.PushBack(fontDescriptionRun03);
+  fontDescriptions02.PushBack(fontDescriptionRun04);
+
+
+  struct ShapeInfoData data[] =
+  {
+    {
+      "Chiness script. Characters have same font description",
+      "未取得",
+      0u,
+      3u,
+      3u,
+      glyphs01,
+      characterIndices,
+      charactersPerGlyph,
+      0u,
+      NULL,
+      fontDescriptions01
+    },
+    {
+      "Chiness script. Each character has different font description.",
+      "未取得",
+      0u,
+      3u,
+      3u,
+      glyphs02,
+      characterIndices,
+      charactersPerGlyph,
+      0u,
+      NULL,
+      fontDescriptions02
+    }
+  };
+
+  const unsigned int numberOfTests = 2u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
