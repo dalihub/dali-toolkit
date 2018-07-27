@@ -374,6 +374,7 @@ private:
   Dali::Toolkit::ImageVisual::LoadPolicy::Type mLoadPolicy;
   Dali::Toolkit::ImageVisual::ReleasePolicy::Type mReleasePolicy;
   Vector4 mAtlasRect;
+  Dali::ImageDimensions mAtlasRectSize;
   bool mAttemptAtlasing; ///< If true will attempt atlasing, otherwise create unique texture
   bool mLoading;  ///< True if the texture is still loading.
   bool mOrientationCorrection; ///< true if the image will have it's orientation corrected.

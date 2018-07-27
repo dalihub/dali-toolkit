@@ -175,7 +175,10 @@ public:
    * @param[in] maskInfo              Mask info structure
    * @param[in] synchronousLoading    true if the URL should be loaded synchronously
    * @param[out] textureId,           The textureId of the URL
-   * @param[out] textureRect          The rectangle within the texture atlas that this URL occupies
+   * @param[out] textureRect          The rectangle within the texture atlas that this URL occupies,
+   *                                  this is the rectangle in normalized coordinates.
+   * @param[out] textureRectSize      The rectangle within the texture atlas that this URL occupies,
+   *                                  this is the same rectangle in pixels.
    * @param[in,out] atlasingStatus    Set to USE_ATLAS to attempt atlasing. If atlasing fails, the image will still
    *                                  be loaded, and marked successful, but this will be set to false.
    *                                  If atlasing succeeds, this will be set to true.
@@ -203,6 +206,7 @@ public:
                           bool                         synchronousLoading,
                           TextureManager::TextureId&   textureId,
                           Vector4&                     textureRect,
+                          Dali::ImageDimensions&       textureRectSize,
                           bool&                        atlasingStatus,
                           bool&                        loadingStatus,
                           Dali::WrapMode::Type         wrapModeU,
