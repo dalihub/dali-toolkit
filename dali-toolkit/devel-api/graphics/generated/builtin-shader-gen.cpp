@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 
+#include "alpha-discard-effect-frag.h"
 #include "basic-shader-frag.h"
 #include "basic-shader-vert.h"
 #include "blur-two-pass-shader-frag.h"
@@ -12,11 +13,15 @@
 #include "border-visual-shader-vert.h"
 #include "color-visual-shader-frag.h"
 #include "color-visual-shader-vert.h"
+#include "dissolve-effect-frag.h"
+#include "dissove-effect-vert.h"
+#include "distance-field-effect-shader-frag.h"
 #include "experimental-shader-vert.h"
 #include "gradient-visual-shader-0-frag.h"
 #include "gradient-visual-shader-0-vert.h"
 #include "gradient-visual-shader-1-frag.h"
 #include "gradient-visual-shader-1-vert.h"
+#include "image-region-effect-vert.h"
 #include "image-visual-atlas-clamp-shader-frag.h"
 #include "image-visual-atlas-various-wrap-shader-frag.h"
 #include "image-visual-no-atlas-shader-frag.h"
@@ -28,6 +33,10 @@
 #include "mesh-visual-shader-vert.h"
 #include "mesh-visual-simple-shader-frag.h"
 #include "mesh-visual-simple-shader-vert.h"
+#include "motion-blur-effect-frag.h"
+#include "motion-blur-effect-vert.h"
+#include "motion-stretch-effect-frag.h"
+#include "motion-stretch-effect-vert.h"
 #include "npatch-visual-3x3-shader-vert.h"
 #include "npatch-visual-mask-shader-frag.h"
 #include "npatch-visual-shader-frag.h"
@@ -53,6 +62,7 @@
 #include "wireframe-visual-shader-frag.h"
 #include "wireframe-visual-shader-vert.h"
 static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
+  { "SHADER_ALPHA_DISCARD_EFFECT_FRAG", SHADER_ALPHA_DISCARD_EFFECT_FRAG },
   { "SHADER_BASIC_SHADER_FRAG", SHADER_BASIC_SHADER_FRAG },
   { "SHADER_BASIC_SHADER_VERT", SHADER_BASIC_SHADER_VERT },
   { "SHADER_BLUR_TWO_PASS_SHADER_FRAG", SHADER_BLUR_TWO_PASS_SHADER_FRAG },
@@ -62,11 +72,15 @@ static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
   { "SHADER_BORDER_VISUAL_SHADER_VERT", SHADER_BORDER_VISUAL_SHADER_VERT },
   { "SHADER_COLOR_VISUAL_SHADER_FRAG", SHADER_COLOR_VISUAL_SHADER_FRAG },
   { "SHADER_COLOR_VISUAL_SHADER_VERT", SHADER_COLOR_VISUAL_SHADER_VERT },
+  { "SHADER_DISSOLVE_EFFECT_FRAG", SHADER_DISSOLVE_EFFECT_FRAG },
+  { "SHADER_DISSOVE_EFFECT_VERT", SHADER_DISSOVE_EFFECT_VERT },
+  { "SHADER_DISTANCE_FIELD_EFFECT_SHADER_FRAG", SHADER_DISTANCE_FIELD_EFFECT_SHADER_FRAG },
   { "SHADER_EXPERIMENTAL_SHADER_VERT", SHADER_EXPERIMENTAL_SHADER_VERT },
   { "SHADER_GRADIENT_VISUAL_SHADER_0_FRAG", SHADER_GRADIENT_VISUAL_SHADER_0_FRAG },
   { "SHADER_GRADIENT_VISUAL_SHADER_0_VERT", SHADER_GRADIENT_VISUAL_SHADER_0_VERT },
   { "SHADER_GRADIENT_VISUAL_SHADER_1_FRAG", SHADER_GRADIENT_VISUAL_SHADER_1_FRAG },
   { "SHADER_GRADIENT_VISUAL_SHADER_1_VERT", SHADER_GRADIENT_VISUAL_SHADER_1_VERT },
+  { "SHADER_IMAGE_REGION_EFFECT_VERT", SHADER_IMAGE_REGION_EFFECT_VERT },
   { "SHADER_IMAGE_VISUAL_ATLAS_CLAMP_SHADER_FRAG", SHADER_IMAGE_VISUAL_ATLAS_CLAMP_SHADER_FRAG },
   { "SHADER_IMAGE_VISUAL_ATLAS_VARIOUS_WRAP_SHADER_FRAG", SHADER_IMAGE_VISUAL_ATLAS_VARIOUS_WRAP_SHADER_FRAG },
   { "SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG", SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG },
@@ -78,6 +92,10 @@ static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
   { "SHADER_MESH_VISUAL_SHADER_VERT", SHADER_MESH_VISUAL_SHADER_VERT },
   { "SHADER_MESH_VISUAL_SIMPLE_SHADER_FRAG", SHADER_MESH_VISUAL_SIMPLE_SHADER_FRAG },
   { "SHADER_MESH_VISUAL_SIMPLE_SHADER_VERT", SHADER_MESH_VISUAL_SIMPLE_SHADER_VERT },
+  { "SHADER_MOTION_BLUR_EFFECT_FRAG", SHADER_MOTION_BLUR_EFFECT_FRAG },
+  { "SHADER_MOTION_BLUR_EFFECT_VERT", SHADER_MOTION_BLUR_EFFECT_VERT },
+  { "SHADER_MOTION_STRETCH_EFFECT_FRAG", SHADER_MOTION_STRETCH_EFFECT_FRAG },
+  { "SHADER_MOTION_STRETCH_EFFECT_VERT", SHADER_MOTION_STRETCH_EFFECT_VERT },
   { "SHADER_NPATCH_VISUAL_3X3_SHADER_VERT", SHADER_NPATCH_VISUAL_3X3_SHADER_VERT },
   { "SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG", SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG },
   { "SHADER_NPATCH_VISUAL_SHADER_FRAG", SHADER_NPATCH_VISUAL_SHADER_FRAG },
