@@ -268,6 +268,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mLoadPolicy( Toolkit::ImageVisual::LoadPolicy::ATTACHED ),
   mReleasePolicy( Toolkit::ImageVisual::ReleasePolicy::DETACHED ),
   mAtlasRect( 0.0f, 0.0f, 0.0f, 0.0f ),
+  mAtlasRectSize( 0, 0 ),
   mAttemptAtlasing( false ),
   mLoading( false ),
   mOrientationCorrection( true )
@@ -588,8 +589,14 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
   }
   else if( mImpl->mRenderer ) // Check if we have a loaded image
   {
-    auto textureSet = mImpl->mRenderer.GetTextures();
+    if( mImpl->mFlags & Impl::IS_ATLASING_APPLIED )
+    {
+      naturalSize.x = mAtlasRectSize.GetWidth();
+      naturalSize.y = mAtlasRectSize.GetHeight();
+      return;
+    }
 
+    auto textureSet = mImpl->mRenderer.GetTextures();
     if( textureSet )
     {
       auto texture = textureSet.GetTexture(0);
@@ -768,7 +775,7 @@ void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& t
 
   textures = textureManager.LoadTexture( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode,
                                          mMaskingData, IsSynchronousResourceLoading(), mTextureId,
-                                         atlasRect, atlasing, mLoading, mWrapModeU,
+                                         atlasRect, mAtlasRectSize, atlasing, mLoading, mWrapModeU,
                                          mWrapModeV, textureObserver, atlasUploadObserver, atlasManager,
                                          mOrientationCorrection, forceReload, preMultiplyOnLoad);
 
