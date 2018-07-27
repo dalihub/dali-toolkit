@@ -29,11 +29,13 @@
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
+#include <dali/devel-api/rendering/shader-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/controls/image-view/image-view-impl.h>
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
 
 #ifdef DEBUG_ENABLED
 #define DECORATOR_DEBUG
@@ -44,6 +46,7 @@
 
 namespace
 {
+#if 0
 const char* VERTEX_SHADER = MAKE_SHADER(
 attribute mediump vec2    aPosition;
 uniform   mediump mat4    uMvpMatrix;
@@ -63,6 +66,7 @@ void main()
   gl_FragColor = uColor;
 }
 );
+#endif
 }
 
 namespace Dali
@@ -269,7 +273,11 @@ struct Decorator::Impl : public ConnectionTracker
     mIsHighlightBoxActive( false )
   {
     mQuadVertexFormat[ "aPosition" ] = Property::VECTOR2;
-    mHighlightShader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+    mHighlightShader = DevelShader::New(
+      GraphicsGetBuiltinShaderId( SHADER_TEXT_DECORATOR_SHADER_VERT ),
+      GraphicsGetBuiltinShaderId( SHADER_TEXT_DECORATOR_SHADER_FRAG ),
+      DevelShader::ShaderLanguage::SPIRV_1_0,
+      Dali::Property::Map() );
     SetupGestures();
   }
 

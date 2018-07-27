@@ -36,6 +36,8 @@
 #include "text-atlas-l8-shader-frag.h"
 #include "text-atlas-rgba-shader-frag.h"
 #include "text-atlas-shader-vert.h"
+#include "text-decorator-shader-frag.h"
+#include "text-decorator-shader-vert.h"
 #include "text-scroller-shader-frag.h"
 #include "text-scroller-shader-vert.h"
 #include "text-visual-multi-color-text-shader-frag.h"
@@ -81,6 +83,8 @@ static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
   { "SHADER_TEXT_ATLAS_L8_SHADER_FRAG", SHADER_TEXT_ATLAS_L8_SHADER_FRAG },
   { "SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG", SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG },
   { "SHADER_TEXT_ATLAS_SHADER_VERT", SHADER_TEXT_ATLAS_SHADER_VERT },
+  { "SHADER_TEXT_DECORATOR_SHADER_FRAG", SHADER_TEXT_DECORATOR_SHADER_FRAG },
+  { "SHADER_TEXT_DECORATOR_SHADER_VERT", SHADER_TEXT_DECORATOR_SHADER_VERT },
   { "SHADER_TEXT_SCROLLER_SHADER_FRAG", SHADER_TEXT_SCROLLER_SHADER_FRAG },
   { "SHADER_TEXT_SCROLLER_SHADER_VERT", SHADER_TEXT_SCROLLER_SHADER_VERT },
   { "SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_SHADER_FRAG", SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_SHADER_FRAG },

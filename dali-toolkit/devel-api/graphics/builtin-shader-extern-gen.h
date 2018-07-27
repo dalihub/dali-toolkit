@@ -37,6 +37,8 @@ extern std::vector<uint32_t> SHADER_PRIMITIVE_VISUAL_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_TEXT_ATLAS_L8_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_TEXT_ATLAS_SHADER_VERT;
+extern std::vector<uint32_t> SHADER_TEXT_DECORATOR_SHADER_FRAG;
+extern std::vector<uint32_t> SHADER_TEXT_DECORATOR_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_TEXT_SCROLLER_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_TEXT_SCROLLER_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_TEXT_VISUAL_MULTI_COLOR_TEXT_SHADER_FRAG;
