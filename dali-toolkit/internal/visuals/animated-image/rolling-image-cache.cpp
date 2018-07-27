@@ -151,12 +151,13 @@ void RollingImageCache::LoadBatch()
     AtlasUploadObserver* atlasObserver = nullptr;
     ImageAtlasManagerPtr imageAtlasManager = nullptr;
     Vector4 textureRect;
+    Dali::ImageDimensions textureRectSize;
     auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
     mTextureManager.LoadTexture(
       url, ImageDimensions(), FittingMode::SCALE_TO_FILL,
       SamplingMode::BOX_THEN_LINEAR, maskInfo,
-      synchronousLoading, mImageUrls[ imageFrame.mUrlIndex ].mTextureId, textureRect,
+      synchronousLoading, mImageUrls[ imageFrame.mUrlIndex ].mTextureId, textureRect, textureRectSize,
       atlasingStatus, loadingStatus, Dali::WrapMode::Type::DEFAULT,
       Dali::WrapMode::Type::DEFAULT, this,
       atlasObserver, imageAtlasManager, ENABLE_ORIENTATION_CORRECTION, TextureManager::ReloadPolicy::CACHED,
