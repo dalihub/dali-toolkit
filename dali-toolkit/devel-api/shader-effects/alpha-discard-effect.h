@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_ALPHA_DISCARD_EFFECT_H__
-#define __DALI_TOOLKIT_ALPHA_DISCARD_EFFECT_H__
+#ifndef DALI_TOOLKIT_ALPHA_DISCARD_EFFECT_H
+#define DALI_TOOLKIT_ALPHA_DISCARD_EFFECT_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,34 +44,10 @@ namespace Toolkit
  *
  * @return A property map of the required shaders.
  */
-inline Property::Map CreateAlphaDiscardEffect()
-{
-  const char* ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE =
-      "varying mediump vec2 vTexCoord;                                \n"
-      "                                                               \n"
-      "uniform sampler2D sTexture;                                    \n"
-      "uniform lowp vec4 uColor;                                      \n"
-      "void main()                                                    \n"
-      "{                                                              \n"
-      "  mediump vec4 color = texture2D( sTexture, vTexCoord );       \n"
-      "  if(color.a <= 0.0001)                                        \n"
-      "  {                                                            \n"
-      "    discard;                                                   \n"
-      "  }                                                            \n"
-      "  gl_FragColor = color * uColor;                               \n"
-      "}                                                              \n";
-
-  Property::Map map;
-
-  Property::Map customShader;
-  customShader[ Visual::Shader::Property::FRAGMENT_SHADER ] = ALPHA_DISCARD_FRAGMENT_SHADER_SOURCE;
-
-  map[ Toolkit::Visual::Property::SHADER ] = customShader;
-  return map;
-}
+Property::Map CreateAlphaDiscardEffect();
 
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_ALPHA_DISCARD_EFFECT_H__
+#endif // DALI_TOOLKIT_ALPHA_DISCARD_EFFECT_H
