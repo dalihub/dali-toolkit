@@ -49,7 +49,7 @@ ImageAtlasManager::~ImageAtlasManager()
 
 TextureSet ImageAtlasManager::Add( Vector4& textureRect,
                                  const std::string& url,
-                                 ImageDimensions size,
+                                 ImageDimensions& size,
                                  FittingMode::Type fittingMode,
                                  bool orientationCorrection,
                                  AtlasUploadObserver* atlasUploadObserver )
@@ -68,6 +68,7 @@ TextureSet ImageAtlasManager::Add( Vector4& textureRect,
   {
     return TextureSet();
   }
+  size = dimensions;
 
   unsigned int i = 0;
   for( AtlasContainer::iterator iter = mAtlasList.begin(); iter != mAtlasList.end(); ++iter)

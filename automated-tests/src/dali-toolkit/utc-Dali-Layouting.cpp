@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/layouting/linear-layout.h>
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 #include <../custom-layout.h>
 
@@ -33,6 +34,15 @@
 
 using namespace Dali;
 using namespace Toolkit;
+
+void TestLayoutItemOrder( std::vector< Control >& controls, LayoutGroup& layoutGroup )
+{
+  for( auto&& iter : controls )
+  {
+    unsigned int siblingOrder = static_cast< unsigned int>( iter.GetProperty< int >( DevelActor::Property::SIBLING_ORDER ) );
+    DALI_TEST_EQUALS( layoutGroup.GetChildAt( siblingOrder ), DevelControl::GetLayout( iter ), TEST_LOCATION );
+  }
+}
 
 void utc_dali_toolkit_layouting_startup(void)
 {
@@ -1511,6 +1521,95 @@ int UtcDaliLayouting_VboxLayout03(void)
   END_TEST;
 }
 
+int UtcDaliLayouting_VboxLayout_Padding(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayouting_VboxLayout_Padding - Adding Padding to the vbox");
+
+  // Adding padding to the layout should offset the positioning of the children.
+
+  const Extents LAYOUT_PADDING = Extents(5, 10, 20, 2 );
+  const Size CONTROL_SIZE = Size( 40, 40 );
+
+  Stage stage = Stage::GetCurrent();
+  // Create a root layout, ideally Dali would have a default layout in the root layer.
+  // Without this root layer the LinearLayout (or any other layout) will not
+  // honour WIDTH_SPECIFICATION or HEIGHT_SPECIFICATION settings.
+  // It uses the default stage size and ideally should have a layout added to it.
+  auto rootLayoutControl = Control::New();
+  rootLayoutControl.SetName( "AbsoluteLayout");
+  auto rootLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootLayoutControl, rootLayout );
+  rootLayoutControl.SetAnchorPoint( AnchorPoint::CENTER );
+  rootLayoutControl.SetParentOrigin( ParentOrigin::CENTER );
+  stage.Add( rootLayoutControl );
+
+  auto vbox = Control::New();
+  auto vboxLayout = LinearLayout::New();
+  vboxLayout.SetOrientation( LinearLayout::Orientation::VERTICAL );
+  DevelControl::SetLayout( vbox, vboxLayout );
+  vbox.SetName( "VBox");
+  vbox.SetProperty( Toolkit::Control::Property::PADDING, LAYOUT_PADDING );
+  vbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  vbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+  controls.push_back( CreateLeafControl( CONTROL_SIZE.width, CONTROL_SIZE.height ) );
+
+  for( auto&& iter : controls )
+  {
+    vbox.Add( iter );
+  }
+
+  vbox.SetParentOrigin( ParentOrigin::CENTER );
+  vbox.SetAnchorPoint( AnchorPoint::CENTER );
+  rootLayoutControl.Add( vbox );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  // Extra update needed to Relayout one more time. Catches any position updates, false positive without this seen.
+  application.SendNotification();
+
+  // vbox centers elements horizontally, it fills test harness stage, which is 480x800.
+  tet_infoline("Test Child Actor Position");
+
+  auto controlYPosition = 0.0f;
+
+  controlYPosition = LAYOUT_PADDING.top;  // First child positioned at offset defined by the padding
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( LAYOUT_PADDING.start,
+                                                                                            LAYOUT_PADDING.top,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  controlYPosition += CONTROL_SIZE.height; // Second child positioned is the position of the first child + the first child's height.
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( LAYOUT_PADDING.start,
+                                                                                            controlYPosition,
+                                                                                            0.0f ),
+                                                                                            0.0001f, TEST_LOCATION );
+
+  controlYPosition += CONTROL_SIZE.height; // Third child positioned adjacent to second
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( LAYOUT_PADDING.start,
+                                                                                            controlYPosition,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  controlYPosition += CONTROL_SIZE.height; // Forth passed adjacent to the third
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( LAYOUT_PADDING.start,
+                                                                                            controlYPosition,
+                                                                                            0.0f ), 0.0001f, TEST_LOCATION );
+
+  auto totalControlsWidth = CONTROL_SIZE.width;
+  auto totalControlsHeight = CONTROL_SIZE.height * controls.size();
+
+  DALI_TEST_EQUALS( vbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( totalControlsWidth + LAYOUT_PADDING.start + LAYOUT_PADDING.end,
+                                                                                 totalControlsHeight + LAYOUT_PADDING.top + LAYOUT_PADDING.bottom,
+                                                                                 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
 
 
 int UtcDaliLayouting_RelayoutOnChildOrderChanged(void)
@@ -1692,6 +1791,9 @@ int UtcDaliLayouting_LayoutChildren01(void)
   DALI_TEST_EQUALS( hboxLayout.GetOwner(), empty, TEST_LOCATION );
   DALI_TEST_EQUALS( (void*)hboxImpl.GetParent(), (void*)nullptr, TEST_LOCATION );
 
+  // For coverage
+  hboxImpl.SetLayoutRequested();
+
   END_TEST;
 }
 
@@ -1798,10 +1900,10 @@ int UtcDaliLayouting_LayoutChildren04(void)
   END_TEST;
 }
 
-int UtcDaliLayouting_SetLayoutOrder(void)
+int UtcDaliLayouting_SetLayoutOrder01(void)
 {
   ToolkitTestApplication application;
-  tet_infoline(" UtcDaliLayouting_SetLayoutOrder - Call SetLayout after adding the control to the root layout");
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder01 - Call SetLayout after adding the control to the root layout");
 
   Stage stage = Stage::GetCurrent();
 
@@ -1835,6 +1937,94 @@ int UtcDaliLayouting_SetLayoutOrder(void)
   application.Render();
 
   DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_SetLayoutOrder02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_SetLayoutOrder02 - Test the layout item order and the control order");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hbox.SetName( "HBox");
+
+  rootControl.Add( hbox );
+
+  DevelControl::SetLayout( hbox, hboxLayout );
+
+  // Add child controls
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 100, 100 ) );  // 0
+  controls.push_back( CreateLeafControl( 100, 100 ) );  // 1
+  controls.push_back( CreateLeafControl( 100, 100 ) );  // 2
+
+  for( auto&& iter : controls )
+  {
+    hbox.Add( iter );
+  }
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("RaiseToTop");
+
+  controls[0].RaiseToTop(); // 1 2 0
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("LowerToBottom");
+
+  controls[2].LowerToBottom();  // 2 1 0
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("Remove / Add");
+
+  hbox.Remove( controls[2] );  // 1 0
+  hbox.Add( controls[2] );     // 1 0 2
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("SetLayout");
+
+  auto vboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( controls[0], vboxLayout );
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("Raise");
+
+  controls[0].Raise();  // 1 2 0
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("Lower");
+
+  controls[2].Lower();   // 2 1 0
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("SetLayout again");
+
+  auto vboxLayout1 = LinearLayout::New();
+  DevelControl::SetLayout( controls[2], vboxLayout1 );
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  DevelControl::SetLayout( controls[2], vboxLayout );
 
   END_TEST;
 }

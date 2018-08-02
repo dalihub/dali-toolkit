@@ -134,8 +134,8 @@ TextureSet TextureManager::LoadTexture(
   const VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode,
   Dali::SamplingMode::Type samplingMode, const MaskingDataPointer& maskInfo,
   bool synchronousLoading, TextureManager::TextureId& textureId, Vector4& textureRect,
-  bool& atlasingStatus, bool& loadingStatus, Dali::WrapMode::Type wrapModeU,
-  Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
+  Dali::ImageDimensions& textureRectSize, bool& atlasingStatus, bool& loadingStatus,
+  Dali::WrapMode::Type wrapModeU, Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
   AtlasUploadObserver* atlasObserver, ImageAtlasManagerPtr imageAtlasManager, bool orientationCorrection,
   TextureManager::ReloadPolicy reloadPolicy, TextureManager::MultiplyOnLoad& preMultiplyOnLoad )
 {
@@ -205,6 +205,11 @@ TextureSet TextureManager::LoadTexture(
         textureSet = TextureSet::New();
         textureSet.SetTexture( 0u, texture );
       }
+      else
+      {
+        textureRectSize.SetWidth(data.GetWidth());
+        textureRectSize.SetHeight(data.GetHeight());
+      }
     }
   }
   else
@@ -212,7 +217,7 @@ TextureSet TextureManager::LoadTexture(
     loadingStatus = true;
     if( atlasingStatus )
     {
-      textureSet = imageAtlasManager->Add( textureRect, url.GetUrl(), desiredSize, fittingMode, true, atlasObserver );
+      textureSet = imageAtlasManager->Add( textureRect, url.GetUrl(), desiredSize, fittingMode, true, atlasObserver);
     }
     if( !textureSet ) // big image, no atlasing or atlasing failed
     {
@@ -244,6 +249,10 @@ TextureSet TextureManager::LoadTexture(
         // UploadComplete has already been called - keep the same texture set
         textureSet = GetTextureSet( textureId );
       }
+    }
+    else
+    {
+      textureRectSize = desiredSize;
     }
   }
 

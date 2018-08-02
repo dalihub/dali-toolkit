@@ -64,7 +64,7 @@ public:
    *
    * @param [out] textureRect The texture area of the resource image in the atlas.
    * @param [in] url The URL of the resource image file to use.
-   * @param [in] size The width and height to fit the loaded image to.
+   * @param [in, out] size The width and height to fit the loaded image to.
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * @param [in] atlasUploadObserver The object to observe the uploading state inside ImageAtlas.
@@ -72,7 +72,7 @@ public:
    */
   TextureSet Add( Vector4& textureRect,
                   const std::string& url,
-                  ImageDimensions size = ImageDimensions(),
+                  ImageDimensions& size,
                   FittingMode::Type fittingMode = FittingMode::DEFAULT,
                   bool orientationCorrection = true,
                   AtlasUploadObserver* atlasUploadObserver = NULL );
