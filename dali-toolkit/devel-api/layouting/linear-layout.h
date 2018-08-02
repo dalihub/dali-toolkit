@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 
-#include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali-toolkit/devel-api/layouting/layout-group.h>
 #include <dali-toolkit/devel-api/layouting/layout-size.h>
 #include <dali-toolkit/public-api/toolkit-property-index-ranges.h>

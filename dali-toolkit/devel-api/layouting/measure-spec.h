@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali-toolkit/devel-api/layouting/layout-length.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
