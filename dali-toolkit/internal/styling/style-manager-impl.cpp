@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,10 @@ const char* PACKAGE_PATH_KEY = "PACKAGE_PATH";
 const char* APPLICATION_RESOURCE_PATH_KEY = "APPLICATION_RESOURCE_PATH";
 
 const char* DEFAULT_PACKAGE_PATH = DALI_DATA_READ_ONLY_DIR "/toolkit/";
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_STYLE");
+#endif
 
 } // namespace
 
@@ -227,42 +231,52 @@ Toolkit::StyleManager::StyleChangedSignalType& StyleManager::ControlStyleChangeS
 void StyleManager::SetTheme( const std::string& themeFile )
 {
   bool themeLoaded = false;
+  bool loading = false;
 
-  if( mThemeFile.compare(DEFAULT_THEME) == 0 && mThemeBuilder )
+  // If we haven't loaded a theme, or the stored theme file is empty, or
+  // the previously loaded theme is different to the requested theme,
+  // first reset the builder and load the default theme.
+  if( ! mThemeBuilder || mThemeFile.empty() || mThemeFile.compare( themeFile ) != 0 )
   {
-    // We have already loaded the default theme into mThemeBuilder
-  }
-  else
-  {
-    // Reload the default theme
+    loading = true;
     mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
-    themeLoaded = LoadJSON( mThemeBuilder, DEFAULT_THEME );
+    themeLoaded = LoadJSON( mThemeBuilder, DEFAULT_THEME ); // Sets themeLoaded to true if theme exists
   }
 
   if( themeFile.compare(DEFAULT_THEME) != 0 )
   {
     // The theme is different to the default: Merge it
-    themeLoaded = LoadJSON( mThemeBuilder, themeFile );
+    loading = true;
+    themeLoaded |= LoadJSON( mThemeBuilder, themeFile );
+  }
+
+  if( loading )
+  {
     mThemeFile = themeFile;
-  }
 
-  if( themeLoaded )
-  {
-    if(mFeedbackStyle)
+    if( themeLoaded )
     {
-      mFeedbackStyle->StyleChanged( mThemeFile, StyleChange::THEME_CHANGE );
-    }
+      // We've successfully loaded the theme file
+      if(mFeedbackStyle)
+      {
+        mFeedbackStyle->StyleChanged( mThemeFile, StyleChange::THEME_CHANGE );
+      }
 
-    EmitStyleChangeSignals(StyleChange::THEME_CHANGE);
-  }
-  else
-  {
-    mThemeBuilder.Reset();
+      EmitStyleChangeSignals(StyleChange::THEME_CHANGE);
+    }
+    else
+    {
+      // We tried to load a theme, but it failed. Ensure the builder is reset
+      mThemeBuilder.Reset();
+      mThemeFile.clear();
+    }
   }
 }
 
 const Property::Map StyleManager::GetConfigurations()
 {
+  DALI_LOG_STREAM( gLogFilter, Debug::Concise, "GetConfigurations()\n On entry, mThemeBuilder: " << (bool(mThemeBuilder)?"Created":"Empty") << "  mThemeFile: " << mThemeFile);
+
   Property::Map result;
   if( mThemeBuilder )
   {
@@ -270,6 +284,8 @@ const Property::Map StyleManager::GetConfigurations()
   }
   else
   {
+    DALI_LOG_STREAM( gLogFilter, Debug::Concise, "GetConfigurations()  Loading default theme" );
+
     bool themeLoaded = false;
 
     mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
@@ -282,7 +298,11 @@ const Property::Map StyleManager::GetConfigurations()
     {
       result = mThemeBuilder.GetConfigurations();
     }
+    DALI_LOG_STREAM( gLogFilter, Debug::Concise, "  themeLoaded" << (themeLoaded?"success":"failure") );
   }
+
+  DALI_LOG_STREAM( gLogFilter, Debug::Concise, "GetConfigurations()\n On exit, result Count: " << (result.Count() != 0) );
+  DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "          result: " << result );
 
   return result;
 }
