@@ -327,7 +327,7 @@ bool LayoutItem::IsLayoutRequested() const
 
 void LayoutItem::SetLayoutRequested()
 {
-  return mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
+  mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
 }
 
 void LayoutItem::SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight )
