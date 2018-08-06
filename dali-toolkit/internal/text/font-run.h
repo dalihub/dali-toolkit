@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/text-abstraction/font-list.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-run.h>
 
@@ -35,8 +38,10 @@ namespace Text
  */
 struct FontRun
 {
-  CharacterRun characterRun; ///< The initial character index and the number of characters of the run.
-  FontId       fontId;       ///< Font id of the run.
+  CharacterRun characterRun;      ///< The initial character index and the number of characters of the run.
+  FontId       fontId;            ///< Font id of the run.
+  bool         softwareItalic:1;    ///< Whether font needs software support to draw italic style
+  bool         softwareBold:1;      ///< Whether font needs software support to draw bold style
 };
 
 } // namespace Text

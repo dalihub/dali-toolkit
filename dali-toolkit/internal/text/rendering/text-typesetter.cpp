@@ -672,6 +672,8 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
       {
         fontClient.CreateBitmap( glyphInfo->fontId,
                                  glyphInfo->index,
+                                 glyphInfo->softwareItalic,
+                                 glyphInfo->softwareBold,
                                  glyphData.glyphBitmap,
                                  outlineWidth );
       }
