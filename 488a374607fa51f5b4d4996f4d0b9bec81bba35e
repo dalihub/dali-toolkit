@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "244c8816_51caa014",
+        "filename": "dali-toolkit/internal/visuals/visual-base-data-impl.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007416
+      },
+      "writtenOn": "2018-08-08T11:16:26Z",
+      "side": 1,
+      "message": "Can we use Dali::Vector here?",
+      "revId": "488a374607fa51f5b4d4996f4d0b9bec81bba35e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735",
+      "unresolved": false
+    }
+  ]
+}
