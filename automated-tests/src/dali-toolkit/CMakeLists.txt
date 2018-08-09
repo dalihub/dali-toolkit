@@ -20,6 +20,7 @@ SET(TC_SOURCES
   utc-Dali-FlexContainer.cpp
   utc-Dali-FlexLayout.cpp
   utc-Dali-GaussianBlurView.cpp
+  utc-Dali-GridLayout.cpp
   utc-Dali-ImageView.cpp
   utc-Dali-ImageVisual.cpp
   utc-Dali-JsonParser.cpp

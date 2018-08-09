@@ -14,6 +14,8 @@ toolkit_src_files = \
    $(toolkit_src_dir)/layouting/flex-layout-impl.cpp \
    $(toolkit_src_dir)/layouting/absolute-layout-impl.cpp \
    $(toolkit_src_dir)/layouting/linear-layout-impl.cpp \
+   $(toolkit_src_dir)/layouting/grid-locations.cpp \
+   $(toolkit_src_dir)/layouting/grid-impl.cpp \
    $(toolkit_src_dir)/layouting/layout-item-data-impl.cpp \
    $(toolkit_src_dir)/layouting/layout-group-data-impl.cpp \
    $(toolkit_src_dir)/layouting/layout-controller-debug.cpp \
