@@ -35,6 +35,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/layouting/flex-layout.cpp \
   $(devel_api_src_dir)/layouting/absolute-layout.cpp \
   $(devel_api_src_dir)/layouting/linear-layout.cpp \
+  $(devel_api_src_dir)/layouting/grid.cpp \
   $(devel_api_src_dir)/layouting/layout-item.cpp \
   $(devel_api_src_dir)/layouting/layout-item-impl.cpp \
   $(devel_api_src_dir)/layouting/layout-controller.cpp \
@@ -93,6 +94,7 @@ devel_api_layouting_header_files = \
   $(devel_api_src_dir)/layouting/absolute-layout.h \
   $(devel_api_src_dir)/layouting/child-layout-data.h \
   $(devel_api_src_dir)/layouting/flex-layout.h \
+  $(devel_api_src_dir)/layouting/grid.h \
   $(devel_api_src_dir)/layouting/linear-layout.h \
   $(devel_api_src_dir)/layouting/layout-child-impl.h \
   $(devel_api_src_dir)/layouting/layout-controller.h \

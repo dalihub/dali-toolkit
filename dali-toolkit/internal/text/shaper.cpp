@@ -137,6 +137,8 @@ void ShapeText( const Vector<Character>& text,
 
     currentFontId = fontRun.fontId;
     currentScript = scriptRun.script;
+    bool softwareItalic = fontRun.softwareItalic;
+    bool softwareBold = fontRun.softwareBold;
 
     // Get the min index to the last character of both runs.
     CharacterIndex currentIndex = min( fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters,
@@ -170,7 +172,12 @@ void ShapeText( const Vector<Character>& text,
     // Retrieve the glyphs and the glyph to character conversion map.
     Vector<GlyphInfo> tmpGlyphs;
     Vector<CharacterIndex> tmpGlyphToCharacterMap;
-    tmpGlyphs.Resize( numberOfGlyphs );
+
+    GlyphInfo glyphInfo;
+    glyphInfo.softwareItalic = softwareItalic;
+    glyphInfo.softwareBold = softwareBold;
+
+    tmpGlyphs.Resize( numberOfGlyphs, glyphInfo );
     tmpGlyphToCharacterMap.Resize( numberOfGlyphs );
     shaping.GetGlyphs( tmpGlyphs.Begin(),
                        tmpGlyphToCharacterMap.Begin() );

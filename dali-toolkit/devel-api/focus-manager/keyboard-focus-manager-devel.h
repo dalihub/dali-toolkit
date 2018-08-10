@@ -71,6 +71,22 @@ public:
  */
 DALI_TOOLKIT_API void SetCustomAlgorithm(KeyboardFocusManager keyboardFocusManager, CustomAlgorithmInterface& interface);
 
+/**
+ * @brief Decide using focus indicator or not
+ *
+ * @param[in] keyboardFocusManager The instance of KeyboardFocusManager
+ * @param[in] enable Whether using focus indicator or not
+ */
+DALI_TOOLKIT_API void EnableFocusIndicator(KeyboardFocusManager keyboardFocusManager, bool enable);
+
+/**
+ * @brief Check focus indicator is enabled or not
+ *
+ * @param[in] keyboardFocusManager The instance of KeyboardFocusManager
+ * @return True when focus indicator is enabled
+ */
+DALI_TOOLKIT_API bool IsFocusIndicatorEnabled(KeyboardFocusManager keyboardFocusManager);
+
 } // namespace DevelKeyboardFocusManager
 
 } // namespace Toolkit

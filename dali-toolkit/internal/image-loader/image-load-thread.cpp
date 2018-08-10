@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/adaptors/adaptor.h>
+#include <dali/devel-api/adaptor-framework/thread-settings.h>
 
 namespace Dali
 {
@@ -74,6 +75,7 @@ ImageLoadThread::~ImageLoadThread()
 
 void ImageLoadThread::Run()
 {
+  SetThreadName( "ImageLoadThread" );
   mLogFactory.InstallLogFunction();
 
   while( LoadingTask* task = NextTaskToProcess() )

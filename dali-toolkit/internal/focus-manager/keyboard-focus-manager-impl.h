@@ -120,6 +120,16 @@ public:
    */
   void SetCustomAlgorithm(CustomAlgorithmInterface& interface);
 
+  /**
+   * @copydoc Toolkit::DevelKeyboardFocusManager::UseFocusIndicator
+   */
+  void EnableFocusIndicator(bool enable);
+
+  /**
+   * @copydoc Toolkit::DevelKeyboardFocusManager::UseFocusIndicator
+   */
+  bool IsFocusIndicatorEnabled() const;
+
 public:
 
   /**
@@ -266,6 +276,8 @@ private:
   bool mIsWaitingKeyboardFocusChangeCommit:1; /// A flag to indicate PreFocusChangeSignal emitted but the proposed focus actor is not commited by the application yet.
 
   bool mClearFocusOnTouch:1; ///< Whether clear focus on touch.
+
+  bool mEnableFocusIndicator;  ///< Whether use focus indicator
 
   FocusStack mFocusHistory; ///< Stack to contain pre-focused actor's BaseObject*
 

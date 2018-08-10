@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/third-party/nanosvg/nanosvgrast.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
+#include <dali/devel-api/adaptor-framework/thread-settings.h>
 
 namespace Dali
 {
@@ -221,6 +222,7 @@ void SvgRasterizeThread::AddCompletedTask( RasterizingTaskPtr task )
 
 void SvgRasterizeThread::Run()
 {
+  SetThreadName( "SVGThread" );
   while( RasterizingTaskPtr task = NextTaskToProcess() )
   {
     task->Rasterize( mRasterizer );
