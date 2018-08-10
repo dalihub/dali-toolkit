@@ -440,12 +440,18 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   FontId previousFontId = 0u;
   bool isPreviousEmojiScript = false;
 
+  // Description of fallback font which is selected at current iteration.
+  TextAbstraction::FontDescription selectedFontDescription;
+
   CharacterIndex lastCharacter = startIndex + numberOfCharacters;
   for( Length index = startIndex; index < lastCharacter; ++index )
   {
     // Get the current character.
     const Character character = *( textBuffer + index );
+    bool needSoftwareBoldening = false;
+    bool needSoftwareItalic = false;
 
+    // new description for current character
     TextAbstraction::FontDescription currentFontDescription;
     TextAbstraction::PointSize26Dot6 currentFontPointSize = defaultFontPointSize;
     bool isDefaultFont = true;
@@ -689,9 +695,22 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     }
 #endif
 
+    if( fontId != currentFontRun.fontId )
+    {
+      fontClient.GetDescription(fontId,selectedFontDescription);
+    }
+
+    // Developer sets bold to character but selected font cannot support it
+    needSoftwareBoldening = ( currentFontDescription.weight >= TextAbstraction::FontWeight::BOLD ) && ( selectedFontDescription.weight < TextAbstraction::FontWeight::BOLD );
+
+    // Developer sets italic to character but selected font cannot support it
+    needSoftwareItalic = ( currentFontDescription.slant == TextAbstraction::FontSlant::ITALIC ) && ( selectedFontDescription.slant < TextAbstraction::FontSlant::ITALIC );
+
     // The font is now validated.
     if( ( fontId != currentFontRun.fontId ) ||
-        isNewParagraphCharacter )
+        isNewParagraphCharacter ||
+        // If font id is same as previous but style is diffrent, initialize new one
+        ( ( fontId == currentFontRun.fontId ) && ( ( needSoftwareBoldening != currentFontRun.softwareBold ) || ( needSoftwareItalic != currentFontRun.softwareItalic ) ) ) )
     {
       // Current run needs to be stored and a new one initialized.
 
@@ -706,6 +725,8 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       currentFontRun.characterRun.characterIndex = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
       currentFontRun.characterRun.numberOfCharacters = 0u;
       currentFontRun.fontId = fontId;
+      currentFontRun.softwareItalic = needSoftwareItalic;
+      currentFontRun.softwareBold = needSoftwareBoldening;
     }
 
     // Add one more character to the run.

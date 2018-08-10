@@ -257,6 +257,8 @@ struct AtlasRenderer::Impl
 
         mFontClient.CreateBitmap( glyph.fontId,
                                   glyph.index,
+                                  glyph.softwareItalic,
+                                  glyph.softwareBold,
                                   glyphBufferData,
                                   outline );
 
