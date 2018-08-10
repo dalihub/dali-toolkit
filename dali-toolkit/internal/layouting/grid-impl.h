@@ -107,12 +107,8 @@ private:
   int mNumColumns;
   int mNumRows;
 
-  int mHorizontalSpacing = 0;
-  int mVerticalSpacing = 0;
-  int mRequestedHorizontalSpacing;
   int mRequestedColumnWidth;
   int mRequestedNumColumns;
-  int mRequestedNumRows;
 };
 
 } // namespace Internal
