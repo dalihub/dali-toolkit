@@ -33,6 +33,16 @@ void SetCustomAlgorithm(KeyboardFocusManager keyboardFocusManager, CustomAlgorit
   GetImpl(keyboardFocusManager).SetCustomAlgorithm(interface);
 }
 
+void EnableFocusIndicator(KeyboardFocusManager keyboardFocusManager, bool enable)
+{
+  GetImpl(keyboardFocusManager).EnableFocusIndicator(enable);
+}
+
+bool IsFocusIndicatorEnabled(KeyboardFocusManager keyboardFocusManager)
+{
+  return GetImpl(keyboardFocusManager).IsFocusIndicatorEnabled();
+}
+
 } // namespace DevelKeyboardFocusManager
 
 } // namespace Toolkit
