@@ -258,7 +258,7 @@ private:
 
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
-  DevelAnimatedImageVisual::Action::Type mActionStatus:2;
+  DevelAnimatedImageVisual::Action::Type mActionStatus:3;
   bool mStartFirstFrame:1;
 };
 
