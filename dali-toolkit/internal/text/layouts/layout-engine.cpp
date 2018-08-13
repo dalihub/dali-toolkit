@@ -397,11 +397,19 @@ struct Engine::Impl
         tmpLineLayout.wsLengthEndOfLine = 0.f;
       }
 
+      // If calculation is end but wsLengthEndOfLine is exist, it means end of text is space.
+      // Merge remained length.
+      if ( !parameters.ignoreSpaceAfterText && glyphIndex == lastGlyphOfParagraphPlusOne-1 && tmpLineLayout.wsLengthEndOfLine > 0 )
+      {
+        tmpLineLayout.length += tmpLineLayout.wsLengthEndOfLine;
+        tmpLineLayout.wsLengthEndOfLine = 0u;
+      }
+
       // Save the current extra width to compare with the next one
       mPreviousCharacterExtraWidth = tmpExtraWidth;
 
       // Check if the accumulated length fits in the width of the box.
-      if( ( completelyFill || isMultiline ) && !isWhiteSpace &&
+      if( ( completelyFill || isMultiline )  && !(parameters.ignoreSpaceAfterText && isWhiteSpace) &&
           ( tmpExtraBearing + lineLayout.length + lineLayout.wsLengthEndOfLine + tmpLineLayout.length + tmpExtraWidth > parameters.boundingBox.width ) )
       {
         // Current word does not fit in the box's width.

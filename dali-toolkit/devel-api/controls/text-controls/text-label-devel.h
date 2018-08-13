@@ -94,6 +94,13 @@ namespace Property
      * | color                | VECTOR4  | No       | The color of the background (the default value is Color::CYAN)                                                     |
      */
     BACKGROUND,
+
+    /**
+     * @brief Ignore spaces after text.
+     * @details Name "ignoreSpacesAfterText", type (Property::BOLEAN), Read/Write
+     * @note The default value is true
+     */
+    IGNORE_SPACES_AFTER_TEXT,
   };
 
 } // namespace Property
