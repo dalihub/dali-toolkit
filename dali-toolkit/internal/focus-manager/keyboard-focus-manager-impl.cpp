@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -672,12 +672,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
           // Show focus indicator
           mIsFocusIndicatorEnabled = 1;
         }
-        else
-        {
-          // Move the focus towards left
-          MoveFocus(Toolkit::Control::KeyboardFocus::LEFT);
-        }
 
+        // Move the focus towards left
+        MoveFocus(Toolkit::Control::KeyboardFocus::LEFT);
         isFocusStartableKey = true;
       }
       else
@@ -695,11 +692,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
           // Show focus indicator
           mIsFocusIndicatorEnabled = 1;
         }
-        else
-        {
-          // Move the focus towards right
-          MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT);
-        }
+
+        // Move the focus towards right
+        MoveFocus(Toolkit::Control::KeyboardFocus::RIGHT);
       }
       else
       {
@@ -716,12 +711,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         // Show focus indicator
         mIsFocusIndicatorEnabled = 1;
       }
-      else
-      {
-        // Move the focus towards up
-        MoveFocus(Toolkit::Control::KeyboardFocus::UP);
-      }
 
+      // Move the focus towards up
+      MoveFocus(Toolkit::Control::KeyboardFocus::UP);
       isFocusStartableKey = true;
     }
     else if (keyName == "Down" && !isAccessibilityEnabled)
@@ -731,12 +723,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         // Show focus indicator
         mIsFocusIndicatorEnabled = 1;
       }
-      else
-      {
-        // Move the focus towards down
-        MoveFocus(Toolkit::Control::KeyboardFocus::DOWN);
-      }
 
+      // Move the focus towards down
+      MoveFocus(Toolkit::Control::KeyboardFocus::DOWN);
       isFocusStartableKey = true;
     }
     else if (keyName == "Prior" && !isAccessibilityEnabled)
@@ -746,12 +735,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         // Show focus indicator
         mIsFocusIndicatorEnabled = 1;
       }
-      else
-      {
-        // Move the focus towards the previous page
-        MoveFocus(Toolkit::Control::KeyboardFocus::PAGE_UP);
-      }
 
+      // Move the focus towards the previous page
+      MoveFocus(Toolkit::Control::KeyboardFocus::PAGE_UP);
       isFocusStartableKey = true;
     }
     else if (keyName == "Next" && !isAccessibilityEnabled)
@@ -761,12 +747,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
         // Show focus indicator
         mIsFocusIndicatorEnabled = 1;
       }
-      else
-      {
-        // Move the focus towards the next page
-        MoveFocus(Toolkit::Control::KeyboardFocus::PAGE_DOWN);
-      }
 
+      // Move the focus towards the next page
+      MoveFocus(Toolkit::Control::KeyboardFocus::PAGE_DOWN);
       isFocusStartableKey = true;
     }
     else if (keyName == "Tab" && !isAccessibilityEnabled)
