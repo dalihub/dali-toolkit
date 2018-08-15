@@ -1,7 +1,7 @@
 #version 430
 
 
-layout(location=0) in vec2 vTexCoord;
+layout(location=0) in mediump vec2 vTexCoord;
 
 layout (constant_id = 0) const int NUM_SAMPLES = 16;
 

@@ -1,13 +1,15 @@
 #version 430
 
-layout(location=0) in vec2 vTexCoord;
-layout(location=1) in vec3 vIllumination;
-layout(location=2) in float vSpecular;
+precision mediump float;
+
+layout(location=0) in mediump vec2 vTexCoord;
+layout(location=1) in mediump vec3 vIllumination;
+layout(location=2) in mediump float vSpecular;
 
 layout( set = 0, binding = 1, std140 ) uniform FragData
 {
-    vec4 uColor;
-    vec3 mixColor;
+    lowp vec4 uColor;
+    lowp vec3 mixColor;
 };
 
 layout( set = 0, binding = 2 ) uniform sampler2D sDiffuse;

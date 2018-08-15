@@ -1,8 +1,8 @@
 #version 430
 
-layout(location=0) in vec2 aPosition;
-layout(location=0) out vec2 vTexCoord;
-layout(location=1) out vec2 vMaskTexCoord;
+layout(location=0) in mediump vec2 aPosition;
+layout(location=0) out mediump vec2 vTexCoord;
+layout(location=1) out mediump vec2 vMaskTexCoord;
 
 // using specialization constants
 layout(constant_id = 0) const int FACTOR_SIZE_X = 4;
@@ -10,32 +10,32 @@ layout(constant_id = 1) const int FACTOR_SIZE_Y = 4;
 
 layout(set=0, binding=0, std140) uniform VertData
 {
-    mat4 uMvpMatrix;
-    vec3 uSize;
-    vec2 uNinePatchFactorsX[ FACTOR_SIZE_X ];
-    vec2 uNinePatchFactorsY[ FACTOR_SIZE_Y ];
+    mediump mat4 uMvpMatrix;
+    mediump vec3 uSize;
+    mediump vec2 uNinePatchFactorsX[ FACTOR_SIZE_X ];
+    mediump vec2 uNinePatchFactorsY[ FACTOR_SIZE_Y ];
 
     //Visual size and offset
-    vec2 offset;
-    vec2 size;
-    vec4 offsetSizeMode;
-    vec2 origin;
-    vec2 anchorPoint;
+    mediump vec2 offset;
+    mediump vec2 size;
+    mediump vec4 offsetSizeMode;
+    mediump vec2 origin;
+    mediump vec2 anchorPoint;
 };
 
 void main()
 {
-  vec2 fixedFactor  = vec2( uNinePatchFactorsX[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uNinePatchFactorsY[ int( ( aPosition.y + 1.0 ) * 0.5 ) ].x );
-  vec2 stretch      = vec2( uNinePatchFactorsX[ int( ( aPosition.x       ) * 0.5 ) ].y, uNinePatchFactorsY[ int( ( aPosition.y       ) * 0.5 ) ].y );
+  mediump vec2 fixedFactor  = vec2( uNinePatchFactorsX[ int( ( aPosition.x + 1.0 ) * 0.5 ) ].x, uNinePatchFactorsY[ int( ( aPosition.y + 1.0 ) * 0.5 ) ].x );
+  mediump vec2 stretch      = vec2( uNinePatchFactorsX[ int( ( aPosition.x       ) * 0.5 ) ].y, uNinePatchFactorsY[ int( ( aPosition.y       ) * 0.5 ) ].y );
 
-  vec2 fixedTotal   = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].x, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].x );
-  vec2 stretchTotal = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].y, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].y );
+  mediump vec2 fixedTotal   = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].x, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].x );
+  mediump vec2 stretchTotal = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].y, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].y );
 
-  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );
-  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);
+  mediump vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );
+  mediump vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);
 
-  vec4 gridPosition = vec4( fixedFactor + ( visualSize.xy - fixedTotal ) * stretch / stretchTotal, 0.0, 1.0 );
-  vec4 vertexPosition = gridPosition;
+  mediump vec4 gridPosition = vec4( fixedFactor + ( visualSize.xy - fixedTotal ) * stretch / stretchTotal, 0.0, 1.0 );
+  mediump vec4 vertexPosition = gridPosition;
   vertexPosition.xy -= visualSize.xy * vec2( 0.5, 0.5 );
   vertexPosition.xy += anchorPoint*visualSize + (visualOffset + origin)*uSize.xy;
   vertexPosition = uMvpMatrix * vertexPosition;

@@ -1,26 +1,26 @@
 #version 430
 
-layout( location = 0 ) in vec2 aPosition;
+layout( location = 0 ) in mediump vec2 aPosition;
 
 layout( set = 0, binding = 0, std140 ) uniform vertData
 {
-    mat4 uModelMatrix;  // 0
-    mat4 uViewMatrix;   // 64
-    mat4 uProjection;   // 128
-    vec3 uSize;         // 192
-    vec4 pixelArea;     // 204
-    float uPixelAligned; // 220
+    mediump mat4 uModelMatrix;  // 0
+    mediump mat4 uViewMatrix;   // 64
+    mediump mat4 uProjection;   // 128
+    mediump vec3 uSize;         // 192
+    mediump vec4 pixelArea;     // 204
+    lowp float uPixelAligned; // 220
 
     //Visual size and offset
-    vec2 offset; // 224
-    vec2 size; // 232
-    vec4 offsetSizeMode; // 240
-    vec2 origin; // 256
-    vec2 anchorPoint; // 264
+    mediump vec2 offset; // 224
+    mediump vec2 size; // 232
+    mediump vec4 offsetSizeMode; // 240
+    mediump vec2 origin; // 256
+    mediump vec2 anchorPoint; // 264
     // 272
 };
 
-layout( location = 0 ) out vec2 vTexCoord;
+layout( location = 0 ) out mediump vec2 vTexCoord;
 
 vec4 ComputeVertexPosition()
 {
@@ -31,7 +31,7 @@ vec4 ComputeVertexPosition()
 
 void main()
 {
-    vec4 vertexPosition = uViewMatrix * uModelMatrix * ComputeVertexPosition();
+    mediump vec4 vertexPosition = uViewMatrix * uModelMatrix * ComputeVertexPosition();
     vec4 alignedVertexPosition = vertexPosition;
     alignedVertexPosition.xy = floor ( vertexPosition.xy ); // Pixel alignment
     vertexPosition = uProjection * mix( vertexPosition, alignedVertexPosition, uPixelAligned );

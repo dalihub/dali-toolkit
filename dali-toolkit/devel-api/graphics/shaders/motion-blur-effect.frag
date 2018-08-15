@@ -1,5 +1,7 @@
 #version 430
 
+precision mediump float;
+
 layout( location = 0 ) in vec2 vModelSpaceCenterToPos;
 layout( location = 1 ) in vec2 vScreenSpaceVelocityVector;
 layout( location = 2 ) in float vSpeed;

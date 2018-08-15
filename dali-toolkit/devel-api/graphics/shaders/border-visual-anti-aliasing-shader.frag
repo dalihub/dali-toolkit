@@ -1,13 +1,13 @@
 #version 430
 
-layout( location = 0 ) in float vAlpha;
+layout( location = 0 ) in mediump float vAlpha;
 
 layout( set = 0, binding = 1, std140 ) uniform FragData
 {
-  vec4 uColor;
-  vec4 borderColor;
-  vec3 mixColor;
-  float borderSize;
+  lowp vec4 uColor;
+  lowp vec4 borderColor;
+  lowp vec3 mixColor;
+  mediump float borderSize;
 };
 
 layout( location = 0 ) out vec4 fragColor;

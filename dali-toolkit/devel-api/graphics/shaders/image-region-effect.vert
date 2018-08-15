@@ -1,21 +1,21 @@
 #version 430
 
-layout( location = 0 ) in vec2 aPosition;
+layout( location = 0 ) in mediump vec2 aPosition;
 
 layout( set = 0, binding = 0, std140 ) uniform vertData
 {
- mat4 uMvpMatrix;
+ mediump mat4 uMvpMatrix;
  vec3 uSize;
  vec4 uTextureRect;
- vec2 uTopLeft;
- vec2 uBottomRight;
+ mediump vec2 uTopLeft;
+ mediump vec2 uBottomRight;
 };
 
 layout( location = 0 ) out vec2 vTexCoord;
 
 void main()
 {
-  vec4 position = vec4(aPosition, 0.0, 1.0);
+  mediump vec4 position = vec4(aPosition, 0.0, 1.0);
   position.xyz *= uSize;
   gl_Position = uMvpMatrix * position;
 

@@ -2,9 +2,9 @@
 
 layout( set = 0, binding = 1, std140 ) uniform FragData
 {
-  vec4 uColor;
-  vec4 borderColor;
-  vec3 mixColor;
+  lowp vec4 uColor;
+  lowp vec4 borderColor;
+  lowp vec3 mixColor;
 };
 
 layout( location = 0 ) out vec4 fragColor;

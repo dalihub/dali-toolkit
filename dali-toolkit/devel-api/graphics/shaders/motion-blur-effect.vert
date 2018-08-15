@@ -1,5 +1,7 @@
 #version 430
 
+precision mediump float;
+
 layout( location = 0 ) in vec2 aPosition;
 
 layout( set = 0, binding = 0, std140 ) uniform vertData

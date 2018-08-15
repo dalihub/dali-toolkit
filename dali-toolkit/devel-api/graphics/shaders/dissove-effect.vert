@@ -1,13 +1,13 @@
 #version 430
 
-layout( location = 0 ) in vec2 aPosition;
+layout( location = 0 ) in mediump vec2 aPosition;
 
 layout( location = 0 ) out float vPercentage;
-layout( location = 1 ) out vec2 vTexCoord;
+layout( location = 1 ) out mediump vec2 vTexCoord;
 
 layout( set = 0, binding = 0, std140 ) uniform vertData
 {
-   mat4 uMvpMatrix;
+   mediump mat4 uMvpMatrix;
    vec3 uSize;
    vec4 uTextureRect;
 
@@ -20,7 +20,7 @@ layout( set = 0, binding = 0, std140 ) uniform vertData
 
 void main()
 {
-  vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
+  mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);
   vertexPosition.xyz *= uSize;
   vertexPosition = uMvpMatrix * vertexPosition;
   gl_Position = vertexPosition;

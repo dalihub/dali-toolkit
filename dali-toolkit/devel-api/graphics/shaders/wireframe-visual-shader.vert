@@ -1,19 +1,19 @@
 #version 430
 
 // in variables
-layout( location = 0 ) in vec2 aPosition;
+layout( location = 0 ) in mediump vec2 aPosition;
 
 layout( set = 0, binding = 0, std140 ) uniform VertexData
 {
-  mat4 uMvpMatrix;
-  vec3 uSize;
+  mediump mat4 uMvpMatrix;
+  mediump vec3 uSize;
 
   // Visual size and offset
-  vec2 offset;
-  vec2 size;
-  vec4 offsetSizeMode;
-  vec2 origin;
-  vec2 anchorPoint;
+  mediump vec2 offset;
+  mediump vec2 size;
+  mediump vec4 offsetSizeMode;
+  mediump vec2 origin;
+  mediump vec2 anchorPoint;
 };
 
 vec4 ComputeVertexPosition()

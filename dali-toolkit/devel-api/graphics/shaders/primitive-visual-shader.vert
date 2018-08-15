@@ -2,26 +2,26 @@
 
 layout(location=0) in   vec3 aPosition;
 layout(location=1) in   vec3 aNormal;
-layout(location=0) out   vec3 vIllumination;
+layout(location=0) out  mediump vec3 vIllumination;
 
 layout(set = 0, binding = 0, std140) uniform VertData
 {
-    vec3 uSize;
-    vec3 uObjectDimensions;
-    mat4 uMvpMatrix;
-    mat4 uModelView;
-    mat4 uViewMatrix;
-    mat3 uNormalMatrix;
-    mat4 uObjectMatrix;
-    vec3 lightPosition;
-    vec2 uStageOffset;
+    mediump vec3 uSize;
+    mediump vec3 uObjectDimensions;
+    mediump mat4 uMvpMatrix;
+    mediump mat4 uModelView;
+    mediump mat4 uViewMatrix;
+    mediump mat3 uNormalMatrix;
+    mediump mat4 uObjectMatrix;
+    mediump vec3 lightPosition;
+    mediump vec2 uStageOffset;
 
     //Visual size and offset
-    vec2 offset;
-    vec2 size;
-    vec4 offsetSizeMode;
-    vec2 origin;
-    vec2 anchorPoint;
+    mediump vec2 offset;
+    mediump vec2 size;
+    mediump vec4 offsetSizeMode;
+    mediump vec2 origin;
+    mediump vec2 anchorPoint;
 };
 
 vec4 ComputeVertexPosition()

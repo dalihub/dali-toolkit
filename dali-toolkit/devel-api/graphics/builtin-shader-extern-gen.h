@@ -4,19 +4,25 @@
 #include <vector>
 #include <string>
 
+extern std::vector<uint32_t> SHADER_ALPHA_DISCARD_EFFECT_FRAG;
 extern std::vector<uint32_t> SHADER_BASIC_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_BASIC_SHADER_VERT;
+extern std::vector<uint32_t> SHADER_BLUR_TWO_PASS_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_BORDER_VISUAL_ANTI_ALIASING_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_BORDER_VISUAL_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_BORDER_VISUAL_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_COLOR_VISUAL_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_COLOR_VISUAL_SHADER_VERT;
+extern std::vector<uint32_t> SHADER_DISSOLVE_EFFECT_FRAG;
+extern std::vector<uint32_t> SHADER_DISSOVE_EFFECT_VERT;
+extern std::vector<uint32_t> SHADER_DISTANCE_FIELD_EFFECT_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_EXPERIMENTAL_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_GRADIENT_VISUAL_SHADER_0_FRAG;
 extern std::vector<uint32_t> SHADER_GRADIENT_VISUAL_SHADER_0_VERT;
 extern std::vector<uint32_t> SHADER_GRADIENT_VISUAL_SHADER_1_FRAG;
 extern std::vector<uint32_t> SHADER_GRADIENT_VISUAL_SHADER_1_VERT;
+extern std::vector<uint32_t> SHADER_IMAGE_REGION_EFFECT_VERT;
 extern std::vector<uint32_t> SHADER_IMAGE_VISUAL_ATLAS_CLAMP_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_IMAGE_VISUAL_ATLAS_VARIOUS_WRAP_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG;
@@ -28,12 +34,18 @@ extern std::vector<uint32_t> SHADER_MESH_VISUAL_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_MESH_VISUAL_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_MESH_VISUAL_SIMPLE_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_MESH_VISUAL_SIMPLE_SHADER_VERT;
+extern std::vector<uint32_t> SHADER_MOTION_BLUR_EFFECT_FRAG;
+extern std::vector<uint32_t> SHADER_MOTION_BLUR_EFFECT_VERT;
+extern std::vector<uint32_t> SHADER_MOTION_STRETCH_EFFECT_FRAG;
+extern std::vector<uint32_t> SHADER_MOTION_STRETCH_EFFECT_VERT;
 extern std::vector<uint32_t> SHADER_NPATCH_VISUAL_3X3_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_NPATCH_VISUAL_MASK_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_NPATCH_VISUAL_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_NPATCH_VISUAL_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_PRIMITIVE_VISUAL_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_PRIMITIVE_VISUAL_SHADER_VERT;
+extern std::vector<uint32_t> SHADER_SHADOW_VIEW_RENDER_SHADER_FRAG;
+extern std::vector<uint32_t> SHADER_SHADOW_VIEW_RENDER_SHADER_VERT;
 extern std::vector<uint32_t> SHADER_TEXT_ATLAS_L8_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_TEXT_ATLAS_RGBA_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_TEXT_ATLAS_SHADER_VERT;

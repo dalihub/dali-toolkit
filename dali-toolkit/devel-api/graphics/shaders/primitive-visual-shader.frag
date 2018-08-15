@@ -1,10 +1,11 @@
 #version 430
-layout(location=0) in   vec3  vIllumination;
+
+layout(location=0) in   mediump vec3  vIllumination;
 
 layout( set = 0, binding = 1, std140 ) uniform FragData
 {
-   vec4  uColor;
-   vec3  mixColor;
+   lowp vec4  uColor;
+   lowp vec3  mixColor;
 };
 
 layout( location = 0 ) out vec4 fragColor;
