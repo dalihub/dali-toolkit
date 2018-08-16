@@ -17,6 +17,7 @@
 #include "dissove-effect-vert.h"
 #include "distance-field-effect-shader-frag.h"
 #include "experimental-shader-vert.h"
+#include "gaussian-blur-shader-frag.h"
 #include "gradient-visual-shader-0-frag.h"
 #include "gradient-visual-shader-0-vert.h"
 #include "gradient-visual-shader-1-frag.h"
@@ -78,6 +79,7 @@ static std::map<std::string, std::vector<uint32_t>> gGraphicsBuiltinShader = {
   { "SHADER_DISSOVE_EFFECT_VERT", SHADER_DISSOVE_EFFECT_VERT },
   { "SHADER_DISTANCE_FIELD_EFFECT_SHADER_FRAG", SHADER_DISTANCE_FIELD_EFFECT_SHADER_FRAG },
   { "SHADER_EXPERIMENTAL_SHADER_VERT", SHADER_EXPERIMENTAL_SHADER_VERT },
+  { "SHADER_GAUSSIAN_BLUR_SHADER_FRAG", SHADER_GAUSSIAN_BLUR_SHADER_FRAG },
   { "SHADER_GRADIENT_VISUAL_SHADER_0_FRAG", SHADER_GRADIENT_VISUAL_SHADER_0_FRAG },
   { "SHADER_GRADIENT_VISUAL_SHADER_0_VERT", SHADER_GRADIENT_VISUAL_SHADER_0_VERT },
   { "SHADER_GRADIENT_VISUAL_SHADER_1_FRAG", SHADER_GRADIENT_VISUAL_SHADER_1_FRAG },
