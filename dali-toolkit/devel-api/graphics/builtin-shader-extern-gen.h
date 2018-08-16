@@ -18,6 +18,7 @@ extern std::vector<uint32_t> SHADER_DISSOLVE_EFFECT_FRAG;
 extern std::vector<uint32_t> SHADER_DISSOVE_EFFECT_VERT;
 extern std::vector<uint32_t> SHADER_DISTANCE_FIELD_EFFECT_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_EXPERIMENTAL_SHADER_VERT;
+extern std::vector<uint32_t> SHADER_GAUSSIAN_BLUR_SHADER_FRAG;
 extern std::vector<uint32_t> SHADER_GRADIENT_VISUAL_SHADER_0_FRAG;
 extern std::vector<uint32_t> SHADER_GRADIENT_VISUAL_SHADER_0_VERT;
 extern std::vector<uint32_t> SHADER_GRADIENT_VISUAL_SHADER_1_FRAG;
