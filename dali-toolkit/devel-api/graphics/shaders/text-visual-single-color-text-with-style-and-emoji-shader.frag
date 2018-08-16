@@ -8,6 +8,7 @@ layout( set = 0, binding = 1, std140 ) uniform FragData
   lowp vec4 uTextColorAnimatable;
   lowp vec4 uColor;
   lowp vec3 mixColor;
+  lowp float preMultipliedAlpha;
 };
 
 layout( set = 0, binding = 2 ) uniform sampler2D sTexture;
@@ -26,7 +27,7 @@ void main()
   // Markup text with multiple text colors are not animated (but can be supported later on if required).
   // Emoji color are not animated.
   mediump float vstep = step( 0.0001, textTexture.a );
-  textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) );
+  textTexture.rgb = mix( textTexture.rgb, uTextColorAnimatable.rgb, vstep * maskTexture * ( 1.0 - uHasMultipleTextColors ) ) * mix( 1.0, textTexture.a, preMultipliedAlpha );
 
   // Draw the text as overlay above the style
   fragColor = ( textTexture + styleTexture * ( 1.0 - textTexture.a ) ) * uColor * vec4(mixColor,1.0);
