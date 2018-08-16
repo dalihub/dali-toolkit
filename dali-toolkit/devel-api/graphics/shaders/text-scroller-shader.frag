@@ -4,8 +4,9 @@ layout(location=0) in vec2 vTexCoord;
 
 layout( set = 0, binding = 1, std140 ) uniform FragData
 {
-    lowp vec4 uColor;
-    lowp vec3 mixColor;
+    vec4 uColor;
+    vec3 mixColor;
+    float preMultipliedAlpha;
 };
 
 layout( set = 0, binding = 2 ) uniform sampler2D sTexture;
@@ -17,7 +18,7 @@ void main()
     if ( vTexCoord.y > 1.0 )
       discard;
 
-    mediump vec4 textTexture = texture( sTexture, vTexCoord );
+    vec4 textTexture = texture( sTexture, vTexCoord );
 
     fragColor = textTexture * uColor * vec4( mixColor, 1.0 );
 }
