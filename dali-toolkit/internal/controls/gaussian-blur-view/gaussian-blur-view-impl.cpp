@@ -28,6 +28,8 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/integration-api/debug.h>
+#include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
+#include <dali-toolkit/devel-api/builder/base64-encoding.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
@@ -95,24 +97,6 @@ const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_WIDTH_SCALE = 0.5f;
 const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE = 0.5f;
 
 const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
-
-const char* const GAUSSIAN_BLUR_FRAGMENT_SOURCE =
-    "varying mediump vec2 vTexCoord;\n"
-    "uniform sampler2D sTexture;\n"
-    "uniform lowp vec4 uColor;\n"
-    "uniform mediump vec2 uSampleOffsets[NUM_SAMPLES];\n"
-    "uniform mediump float uSampleWeights[NUM_SAMPLES];\n"
-
-    "void main()\n"
-    "{\n"
-    "   mediump vec4 col = texture2D(sTexture, vTexCoord + uSampleOffsets[0]) * uSampleWeights[0];\n"
-    "   for (int i=1; i<NUM_SAMPLES; ++i)\n"
-    "   {\n"
-    "     col += texture2D(sTexture, vTexCoord + uSampleOffsets[i]) * uSampleWeights[i];\n"
-    "   }\n"
-    "   gl_FragColor = col;\n"
-    "}\n";
-
 } // namespace
 
 
@@ -259,11 +243,11 @@ void GaussianBlurView::OnInitialize()
   //////////////////////////////////////////////////////
   // Create shaders
 
-  std::ostringstream horizFragmentShaderStringStream;
-  horizFragmentShaderStringStream << "#define NUM_SAMPLES " << mNumSamples << "\n";
-  horizFragmentShaderStringStream << GAUSSIAN_BLUR_FRAGMENT_SOURCE;
+  //TODO: add setting custom value to NUM_SAMPLES
   Property::Map source;
-  source[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = horizFragmentShaderStringStream.str();
+  Property::Value value;
+  Toolkit::EncodeBase64PropertyData( value, GraphicsGetBuiltinShaderId( SHADER_GAUSSIAN_BLUR_SHADER_FRAG ));
+  source[Toolkit::Visual::Shader::Property::FRAGMENT_SHADER] = value;
   mCustomShader[ Toolkit::Visual::Property::SHADER ] = source;
 
   //////////////////////////////////////////////////////
