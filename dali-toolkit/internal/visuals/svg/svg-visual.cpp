@@ -30,12 +30,11 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/third-party/nanosvg/nanosvg.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
-#include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
-
+#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 
 namespace
 {
@@ -56,25 +55,26 @@ namespace Toolkit
 namespace Internal
 {
 
-SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties )
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties )
 {
-  SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache, shaderFactory ) );
   svgVisual->ParseFromUrl( imageUrl );
   svgVisual->SetProperties( properties );
 
   return svgVisual;
 }
 
-SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl )
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl )
 {
-  SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache, shaderFactory ) );
   svgVisual->ParseFromUrl( imageUrl );
 
   return svgVisual;
 }
 
-SvgVisual::SvgVisual( VisualFactoryCache& factoryCache )
+SvgVisual::SvgVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory )
 : Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+  mImageVisualShaderFactory( shaderFactory ),
   mAtlasRect( FULL_TEXTURE_RECT ),
   mImageUrl( ),
   mParsedImage( NULL ),
@@ -125,7 +125,20 @@ void SvgVisual::DoSetProperty( Property::Index index, const Property::Value& val
 
 void SvgVisual::DoSetOnStage( Actor& actor )
 {
-  Shader shader = ImageVisual::GetImageShader( mFactoryCache, mAttemptAtlasing, true );
+  Shader shader;
+  if( !mImpl->mCustomShader )
+  {
+    shader = mImageVisualShaderFactory.GetShader( mFactoryCache, mAttemptAtlasing, true );
+  }
+  else
+  {
+    shader = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource() : mImpl->mCustomShader->mVertexShader,
+                          mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource() : mImpl->mCustomShader->mFragmentShader,
+                          mImpl->mCustomShader->mHints );
+
+    shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
+  }
+
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
   TextureSet textureSet = TextureSet::New();
   mImpl->mRenderer = Renderer::New( geometry, shader );
@@ -219,7 +232,7 @@ void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
 
     TextureSet textureSet;
 
-    if( mAttemptAtlasing )
+    if( mAttemptAtlasing && !mImpl->mCustomShader )
     {
       Vector4 atlasRect;
       textureSet = mFactoryCache.GetAtlasManager()->Add(atlasRect, rasterizedPixelData );
