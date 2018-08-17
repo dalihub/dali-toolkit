@@ -30,12 +30,13 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/animated-image/fixed-image-cache.h>
 #include <dali-toolkit/internal/visuals/animated-image/rolling-image-cache.h>
 #include <dali-toolkit/internal/visuals/animated-image/rolling-gif-image-cache.h>
-#include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/devel-api/image-loader/image-atlas.h>
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 
 namespace Dali
 {
@@ -100,9 +101,9 @@ Debug::Filter* gAnimImgLogFilter = Debug::Filter::New(Debug::NoLogging, false, "
  *  Time
  */
 
-AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties )
+AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties )
 {
-  AnimatedImageVisualPtr visual( new AnimatedImageVisual( factoryCache ) );
+  AnimatedImageVisualPtr visual( new AnimatedImageVisual( factoryCache, shaderFactory ) );
   visual->InitializeGif( imageUrl );
   visual->SetProperties( properties );
 
@@ -114,9 +115,9 @@ AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCach
   return visual;
 }
 
-AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, const Property::Array& imageUrls, const Property::Map& properties )
+AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Property::Array& imageUrls, const Property::Map& properties )
 {
-  AnimatedImageVisualPtr visual( new AnimatedImageVisual( factoryCache ) );
+  AnimatedImageVisualPtr visual( new AnimatedImageVisual( factoryCache, shaderFactory ) );
   visual->mImageUrls = new ImageCache::UrlList();
   visual->mImageUrls->reserve( imageUrls.Count() );
 
@@ -138,9 +139,9 @@ AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCach
   return visual;
 }
 
-AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl )
+AnimatedImageVisualPtr AnimatedImageVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl )
 {
-  AnimatedImageVisualPtr visual( new AnimatedImageVisual( factoryCache ) );
+  AnimatedImageVisualPtr visual( new AnimatedImageVisual( factoryCache, shaderFactory ) );
   visual->InitializeGif( imageUrl );
 
   if( visual->mFrameCount > 0 )
@@ -159,10 +160,11 @@ void AnimatedImageVisual::InitializeGif( const VisualUrl& imageUrl )
   mGifLoading->LoadFrameDelays( mFrameDelayContainer );
 }
 
-AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache )
+AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory )
 : Visual::Base( factoryCache ),
   mFrameDelayTimer(),
   mPlacementActor(),
+  mImageVisualShaderFactory( shaderFactory ),
   mPixelArea( FULL_TEXTURE_RECT ),
   mImageUrl(),
   mGifLoading( nullptr ),
@@ -442,7 +444,7 @@ void AnimatedImageVisual::CreateRenderer()
 {
   bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
   bool atlasing = false;
-  Shader shader = ImageVisual::GetImageShader( mFactoryCache, atlasing, defaultWrapMode );
+  Shader shader = mImageVisualShaderFactory.GetShader( mFactoryCache, atlasing, defaultWrapMode );
 
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 

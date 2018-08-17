@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,11 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/third-party/nanosvg/nanosvg.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
-#include <dali-toolkit/internal/visuals/image/image-visual.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
-
+#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 
 namespace
 {
@@ -56,25 +55,26 @@ namespace Toolkit
 namespace Internal
 {
 
-SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties )
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties )
 {
-  SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache, shaderFactory ) );
   svgVisual->ParseFromUrl( imageUrl );
   svgVisual->SetProperties( properties );
 
   return svgVisual;
 }
 
-SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl )
+SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl )
 {
-  SvgVisualPtr svgVisual( new SvgVisual( factoryCache ) );
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache, shaderFactory ) );
   svgVisual->ParseFromUrl( imageUrl );
 
   return svgVisual;
 }
 
-SvgVisual::SvgVisual( VisualFactoryCache& factoryCache )
+SvgVisual::SvgVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory )
 : Visual::Base( factoryCache ),
+  mImageVisualShaderFactory( shaderFactory ),
   mAtlasRect( FULL_TEXTURE_RECT ),
   mImageUrl( ),
   mParsedImage( NULL ),
@@ -128,13 +128,13 @@ void SvgVisual::DoSetOnStage( Actor& actor )
   Shader shader;
   if( !mImpl->mCustomShader )
   {
-    shader = ImageVisual::GetImageShader( mFactoryCache, mAttemptAtlasing, true );
+    shader = mImageVisualShaderFactory.GetShader( mFactoryCache, mAttemptAtlasing, true );
   }
   else
   {
-    shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? ImageVisual::GetStandardVertexShader() : mImpl->mCustomShader->mVertexShader,
-                           mImpl->mCustomShader->mFragmentShader.empty() ? ImageVisual::GetStandardFrgamentShader() : mImpl->mCustomShader->mFragmentShader,
-                           mImpl->mCustomShader->mHints );
+    shader = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource() : mImpl->mCustomShader->mVertexShader,
+                          mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource() : mImpl->mCustomShader->mFragmentShader,
+                          mImpl->mCustomShader->mHints );
 
     shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
   }

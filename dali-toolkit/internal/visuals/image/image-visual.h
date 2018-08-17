@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ namespace Toolkit
 namespace Internal
 {
 
+class ImageVisualShaderFactory;
 class ImageVisual;
 typedef IntrusivePtr< ImageVisual > ImageVisualPtr;
 
@@ -121,6 +122,7 @@ public:
    * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL of the image resource to use
    * @param[in] properties A Property::Map containing settings for this visual
    * @param[in] size The width and height to fit the loaded image to.
@@ -129,6 +131,7 @@ public:
    * @return A smart-pointer to the newly allocated visual.
    */
   static ImageVisualPtr New( VisualFactoryCache& factoryCache,
+                             ImageVisualShaderFactory& shaderFactory,
                              const VisualUrl& imageUrl,
                              const Property::Map& properties,
                              ImageDimensions size = ImageDimensions(),
@@ -141,6 +144,7 @@ public:
    * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL of the image resource to use
    * @param[in] size The width and height to fit the loaded image to.
    * @param[in] fittingMode The FittingMode of the resource to load
@@ -148,6 +152,7 @@ public:
    * @return A smart-pointer to the newly allocated visual.
    */
   static ImageVisualPtr New( VisualFactoryCache& factoryCache,
+                             ImageVisualShaderFactory& shaderFactory,
                              const VisualUrl& imageUrl,
                              ImageDimensions size = ImageDimensions(),
                              FittingMode::Type fittingMode = FittingMode::DEFAULT,
@@ -157,9 +162,10 @@ public:
    * @brief Create a new image visual with an Image type.
    *
    * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] image The image to use
    */
-  static ImageVisualPtr New( VisualFactoryCache& factoryCache, const Image& image );
+  static ImageVisualPtr New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image );
 
 public:  // from Visual
 
@@ -191,12 +197,14 @@ protected:
    * The visual will load the Image asynchronously when the associated actor is put on stage, and destroy the image when it is off stage
    *
    * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL of the image resource to use
    * @param[in] size The width and height to fit the loaded image to.
    * @param[in] fittingMode The FittingMode of the resource to load
    * @param[in] samplingMode The SamplingMode of the resource to load
    */
   ImageVisual( VisualFactoryCache& factoryCache,
+               ImageVisualShaderFactory& shaderFactory,
                const VisualUrl& imageUrl,
                ImageDimensions size,
                FittingMode::Type fittingMode,
@@ -206,9 +214,10 @@ protected:
    * @brief Constructor with an Image type.
    *
    * @param[in] factoryCache The VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] image The image to use
    */
-  ImageVisual( VisualFactoryCache& factoryCache, const Image& image );
+  ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -241,24 +250,6 @@ protected:
   virtual bool IsResourceReady() const;
 
 public:
-
-  /**
-   * Get the standard image rendering shader.
-   * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
-   * @param[in] atlasing Whether texture atlasing is applied.
-   * @param[in] defaultTextureWrapping Whether the default texture wrap mode is applied.
-   */
-  static Shader GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping );
-
-  /**
-   * Get the standard vertex shader code.
-   */
-  static const char* GetStandardVertexShader();
-
-  /**
-   * Get the standard fragment shader code.
-   */
-  static const char* GetStandardFrgamentShader();
 
   /**
    * @copydoc AtlasUploadObserver::UploadCompleted
@@ -376,6 +367,8 @@ private:
   Dali::ImageDimensions mDesiredSize;
   TextureManager::TextureId mTextureId;
   TextureSet mTextures;
+
+  ImageVisualShaderFactory& mImageVisualShaderFactory;
 
   Dali::FittingMode::Type mFittingMode:3;
   Dali::SamplingMode::Type mSamplingMode:4;
