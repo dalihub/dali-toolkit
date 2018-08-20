@@ -689,10 +689,7 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   //Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 
-  if( IsPreMultipliedAlphaEnabled() )
-  {
-    EnablePreMultipliedAlpha( true );
-  }
+  EnablePreMultipliedAlpha( IsPreMultipliedAlphaEnabled() );
 }
 
 void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
@@ -779,9 +776,9 @@ void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& t
                                          mWrapModeV, textureObserver, atlasUploadObserver, atlasManager,
                                          mOrientationCorrection, forceReload, preMultiplyOnLoad);
 
-  if( textures && preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD)
+  if( textures )
   {
-    EnablePreMultipliedAlpha( true );
+    EnablePreMultipliedAlpha( preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD );
   }
 
   if( atlasing ) // Flag needs to be set before creating renderer
@@ -1087,10 +1084,8 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
       {
         mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, mAtlasRect );
       }
-      else if( preMultiplied )
-      {
-        EnablePreMultipliedAlpha( true );
-      }
+
+      EnablePreMultipliedAlpha( preMultiplied );
 
       actor.AddRenderer( mImpl->mRenderer );
       // reset the weak handle so that the renderer only get added to actor once

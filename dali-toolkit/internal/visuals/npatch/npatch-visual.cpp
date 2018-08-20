@@ -295,10 +295,7 @@ void NPatchVisual::LoadImages()
 
     mId = mLoader.Load( mImageUrl.GetUrl(), mBorder, preMultiplyOnLoad );
 
-    if( preMultiplyOnLoad )
-    {
-      EnablePreMultipliedAlpha( true );
-    }
+    EnablePreMultipliedAlpha( preMultiplyOnLoad );
   }
 
   if( ! mAuxiliaryPixelBuffer && mAuxiliaryUrl.IsValid() && mAuxiliaryUrl.IsLocalResource() )
