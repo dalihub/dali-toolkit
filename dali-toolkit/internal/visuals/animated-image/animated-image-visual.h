@@ -41,6 +41,7 @@ namespace Toolkit
 namespace Internal
 {
 
+class ImageVisualShaderFactory;
 class AnimatedImageVisual;
 typedef IntrusivePtr< AnimatedImageVisual > AnimatedImageVisualPtr;
 
@@ -90,29 +91,32 @@ public:
    * @brief Create the animated image Visual using the image URL.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to gif resource to use
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static AnimatedImageVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties );
+  static AnimatedImageVisualPtr New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties );
 
   /**
    * @brief Create the animated image Visual using image URLs.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrls A Property::Array containing the URLs to the image resources
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static AnimatedImageVisualPtr New( VisualFactoryCache& factoryCache, const Property::Array& imageUrls, const Property::Map& properties );
+  static AnimatedImageVisualPtr New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Property::Array& imageUrls, const Property::Map& properties );
 
   /**
    * @brief Create the animated image visual using the image URL.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to animated image resource to use
    */
-  static AnimatedImageVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl );
+  static AnimatedImageVisualPtr New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl );
 
 public:  // from Visual
 
@@ -142,8 +146,9 @@ protected:
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    */
-  AnimatedImageVisual( VisualFactoryCache& factoryCache );
+  AnimatedImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -234,6 +239,7 @@ private:
 
   Timer mFrameDelayTimer;
   WeakHandle<Actor> mPlacementActor;
+  ImageVisualShaderFactory& mImageVisualShaderFactory;
 
   // Variables for GIF player
   Dali::Vector<uint32_t> mFrameDelayContainer;
