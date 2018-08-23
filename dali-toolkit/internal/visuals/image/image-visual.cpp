@@ -42,6 +42,7 @@
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
+#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 
 namespace Dali
 {
@@ -112,97 +113,6 @@ const char* DEFAULT_SAMPLER_TYPENAME = "sampler2D";
 const float PIXEL_ALIGN_ON = 1.0f;
 const float PIXEL_ALIGN_OFF = 0.0f;
 
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform mediump mat4 uModelMatrix;\n
-  uniform mediump mat4 uViewMatrix;\n
-  uniform mediump mat4 uProjection;\n
-  uniform mediump vec3 uSize;\n
-  uniform mediump vec4 pixelArea;
-  varying mediump vec2 vTexCoord;\n
-  uniform lowp float uPixelAligned;\n
-  \n
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
-\n
-  vec4 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-  }\n
-\n
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = uViewMatrix * uModelMatrix * ComputeVertexPosition();\n
-    vec4 alignedVertexPosition = vertexPosition;\n
-    alignedVertexPosition.xy = floor ( vertexPosition.xy );\n // Pixel alignment
-    vertexPosition = uProjection * mix( vertexPosition, alignedVertexPosition, uPixelAligned );\n
-    vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
-    gl_Position = vertexPosition;\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER_NO_ATLAS = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  uniform lowp float preMultipliedAlpha;\n
-  \n
-  void main()\n
-  {\n
-      gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * vec4( mixColor, 1.0 );\n
-  }\n
-);
-
-const char* FRAGMENT_SHADER_ATLAS_CLAMP = DALI_COMPOSE_SHADER(
-    varying mediump vec2 vTexCoord;\n
-    uniform sampler2D sTexture;\n
-    uniform mediump vec4 uAtlasRect;\n
-    uniform lowp vec4 uColor;\n
-    uniform lowp vec3 mixColor;\n
-    uniform lowp float preMultipliedAlpha;\n
-    \n
-    void main()\n
-    {\n
-        mediump vec2 texCoord = clamp( mix( uAtlasRect.xy, uAtlasRect.zw, vTexCoord ), uAtlasRect.xy, uAtlasRect.zw );\n
-        gl_FragColor = texture2D( sTexture, texCoord ) * uColor * vec4( mixColor, 1.0 );\n
-     }\n
-);
-
-const char* FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP = DALI_COMPOSE_SHADER(
-    varying mediump vec2 vTexCoord;\n
-    uniform sampler2D sTexture;\n
-    uniform mediump vec4 uAtlasRect;\n
-    // WrapMode -- 0: CLAMP; 1: REPEAT; 2: REFLECT;
-    uniform lowp vec2 wrapMode;\n
-    uniform lowp vec4 uColor;\n
-    uniform lowp vec3 mixColor;\n
-    uniform lowp float preMultipliedAlpha;\n
-    \n
-    mediump float wrapCoordinate( mediump vec2 range, mediump float coordinate, lowp float wrap )\n
-    {\n
-      mediump float coord;\n
-      if( wrap > 1.5 )\n // REFLECT
-        coord = 1.0-abs(fract(coordinate*0.5)*2.0 - 1.0);\n
-      else \n// warp == 0 or 1
-        coord = mix(coordinate, fract( coordinate ), wrap);\n
-      return clamp( mix(range.x, range.y, coord), range.x, range.y );
-    }\n
-    \n
-    void main()\n
-    {\n
-        mediump vec2 texCoord = vec2( wrapCoordinate( uAtlasRect.xz, vTexCoord.x, wrapMode.x ),
-                                      wrapCoordinate( uAtlasRect.yw, vTexCoord.y, wrapMode.y ) );\n
-        gl_FragColor = texture2D( sTexture, texCoord ) * uColor * vec4( mixColor, 1.0 );\n
-    }\n
-);
-
 Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridSize )
 {
   Geometry geometry;
@@ -222,32 +132,35 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
 } // unnamed namespace
 
 ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
+                                 ImageVisualShaderFactory& shaderFactory,
                                  const VisualUrl& imageUrl,
                                  const Property::Map& properties,
                                  ImageDimensions size,
                                  FittingMode::Type fittingMode,
                                  Dali::SamplingMode::Type samplingMode )
 {
-  ImageVisualPtr imageVisualPtr( new ImageVisual( factoryCache, imageUrl, size, fittingMode, samplingMode ) );
+  ImageVisualPtr imageVisualPtr( new ImageVisual( factoryCache, shaderFactory, imageUrl, size, fittingMode, samplingMode ) );
   imageVisualPtr->SetProperties( properties );
   return imageVisualPtr;
 }
 
 ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
+                                 ImageVisualShaderFactory& shaderFactory,
                                  const VisualUrl& imageUrl,
                                  ImageDimensions size,
                                  FittingMode::Type fittingMode,
                                  Dali::SamplingMode::Type samplingMode )
 {
-  return new ImageVisual( factoryCache, imageUrl, size, fittingMode, samplingMode );
+  return new ImageVisual( factoryCache, shaderFactory, imageUrl, size, fittingMode, samplingMode );
 }
 
-ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache, const Image& image )
+ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image )
 {
-  return new ImageVisual( factoryCache, image );
+  return new ImageVisual( factoryCache, shaderFactory, image );
 }
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
+                          ImageVisualShaderFactory& shaderFactory,
                           const VisualUrl& imageUrl,
                           ImageDimensions size,
                           FittingMode::Type fittingMode,
@@ -261,6 +174,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mDesiredSize( size ),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
   mTextures(),
+  mImageVisualShaderFactory( shaderFactory ),
   mFittingMode( fittingMode ),
   mSamplingMode( samplingMode ),
   mWrapModeU( WrapMode::DEFAULT ),
@@ -275,7 +189,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
 {
 }
 
-ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
+ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image )
 : Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
   mImage( image ),
   mPixelArea( FULL_TEXTURE_RECT ),
@@ -285,6 +199,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mDesiredSize(),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
   mTextures(),
+  mImageVisualShaderFactory( shaderFactory ),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
@@ -651,7 +566,7 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   {
     geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
 
-    shader = GetImageShader( mFactoryCache,
+    shader = mImageVisualShaderFactory.GetShader( mFactoryCache,
                              mImpl->mFlags & Impl::IS_ATLASING_APPLIED,
                              mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE );
   }
@@ -660,13 +575,15 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
     geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
     if( mImpl->mCustomShader->mVertexShader.empty() && mImpl->mCustomShader->mFragmentShader.empty() )
     {
-      shader = GetImageShader( mFactoryCache, false, true );
+      // Use custom hints
+      shader = Shader::New( mImageVisualShaderFactory.GetVertexShaderSource(), mImageVisualShaderFactory.GetFragmentShaderSource(), mImpl->mCustomShader->mHints );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
     }
     else
     {
-      shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
-                             mImpl->mCustomShader->mFragmentShader.empty() ? FRAGMENT_SHADER_NO_ATLAS : mImpl->mCustomShader->mFragmentShader,
-                             mImpl->mCustomShader->mHints );
+      shader = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource() : mImpl->mCustomShader->mVertexShader,
+                            mImpl->mCustomShader->mFragmentShader.empty() ? mImageVisualShaderFactory.GetFragmentShaderSource() : mImpl->mCustomShader->mFragmentShader,
+                            mImpl->mCustomShader->mHints );
       if( mImpl->mCustomShader->mVertexShader.empty() )
       {
         shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
@@ -713,7 +630,7 @@ void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
   }
   else
   {
-    fragmentShader += FRAGMENT_SHADER_NO_ATLAS;
+    fragmentShader += mImageVisualShaderFactory.GetFragmentShaderSource();
   }
 
   if( customSamplerTypename )
@@ -725,13 +642,13 @@ void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
   {
     geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
 
-    shader  = Shader::New( VERTEX_SHADER, fragmentShader );
+    shader  = Shader::New( mImageVisualShaderFactory.GetVertexShaderSource(), fragmentShader );
     shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
   }
   else
   {
     geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
-    shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? VERTEX_SHADER : mImpl->mCustomShader->mVertexShader,
+    shader  = Shader::New( mImpl->mCustomShader->mVertexShader.empty() ? mImageVisualShaderFactory.GetVertexShaderSource() : mImpl->mCustomShader->mVertexShader,
                            fragmentShader,
                            mImpl->mCustomShader->mHints );
     if( mImpl->mCustomShader->mVertexShader.empty() )
@@ -996,46 +913,6 @@ bool ImageVisual::IsResourceReady() const
 {
   return ( mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY ||
            mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED );
-}
-
-Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping )
-{
-  Shader shader;
-  if( atlasing )
-  {
-    if( defaultTextureWrapping )
-    {
-      shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP );
-      if( !shader )
-      {
-        shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_CLAMP );
-        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-        factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
-      }
-    }
-    else
-    {
-      shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP );
-      if( !shader )
-      {
-        shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ATLAS_VARIOUS_WRAP );
-        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-        factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP, shader );
-      }
-    }
-  }
-  else
-  {
-    shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER );
-    if( !shader )
-    {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_NO_ATLAS );
-      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-      factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER, shader );
-    }
-  }
-
-  return shader;
 }
 
 void ImageVisual::ApplyImageToSampler( const Image& image )

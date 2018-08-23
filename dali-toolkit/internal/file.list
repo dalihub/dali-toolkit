@@ -44,6 +44,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/visuals/transition-data-impl.cpp \
    $(toolkit_src_dir)/visuals/texture-manager-impl.cpp \
    $(toolkit_src_dir)/visuals/texture-upload-observer.cpp \
+   $(toolkit_src_dir)/visuals/image-visual-shader-factory.cpp \
    $(toolkit_src_dir)/visuals/visual-base-data-impl.cpp \
    $(toolkit_src_dir)/visuals/visual-base-impl.cpp \
    $(toolkit_src_dir)/visuals/visual-factory-cache.cpp \
