@@ -72,6 +72,14 @@ public:
     };
   };
 
+  struct ChildProperty
+  {
+    enum
+    {
+      WEIGHT = CHILD_PROPERTY_START_INDEX, ///< name "weight", The proportion of the free space in the container the linear item will receive after all other non weighted items measured and all items specification width & height added. Type FLOAT
+    };
+  };
+
   /**
    * @brief Creates an uninitialized LinearLayout handle.
    *

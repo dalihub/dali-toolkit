@@ -95,6 +95,16 @@ protected:
   virtual ~LinearLayout();
 
   /**
+   * @copydoc LayoutItem::DoRegisterChildProperties()
+   */
+  virtual void DoRegisterChildProperties( const std::string& containerType ) override;
+
+  /**
+    * @copydoc LayoutItem::OnChildAdd
+    */
+  virtual void OnChildAdd( LayoutItem& child ) override;
+
+  /**
    * @copydoc LayoutItem::OnMeasure
    */
   virtual void OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec ) override;
