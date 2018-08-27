@@ -45,6 +45,7 @@
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
+#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 
 namespace Dali
 {
@@ -73,6 +74,7 @@ const char * const  BROKEN_IMAGE_URL( DALI_IMAGE_DIR "broken.png" ); ///< URL Fo
 
 VisualFactory::VisualFactory( bool debugEnabled )
 : mFactoryCache(),
+  mImageVisualShaderFactory(),
   mSlotDelegate(this),
   mDebugEnabled( debugEnabled ),
   mPreMultiplyOnLoad( true )
@@ -151,17 +153,17 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
               }
               case VisualUrl::SVG:
               {
-                visualPtr = SvgVisual::New( GetFactoryCache(), visualUrl, propertyMap );
+                visualPtr = SvgVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap );
                 break;
               }
               case VisualUrl::GIF:
               {
-                visualPtr = AnimatedImageVisual::New( GetFactoryCache(), visualUrl, propertyMap );
+                visualPtr = AnimatedImageVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap );
                 break;
               }
               case VisualUrl::REGULAR_IMAGE:
               {
-                visualPtr = ImageVisual::New( GetFactoryCache(), visualUrl, propertyMap );
+                visualPtr = ImageVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap );
                 break;
               }
             }
@@ -172,7 +174,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
           Property::Array* array = imageURLValue->GetArray();
           if( array )
           {
-            visualPtr = AnimatedImageVisual::New( GetFactoryCache(), *array, propertyMap );
+            visualPtr = AnimatedImageVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), *array, propertyMap );
           }
         }
       }
@@ -220,7 +222,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       std::string imageUrl;
       if( imageURLValue && imageURLValue->Get( imageUrl ) )
       {
-        visualPtr = SvgVisual::New( GetFactoryCache(), imageUrl, propertyMap );
+        visualPtr = SvgVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap );
       }
       break;
     }
@@ -233,14 +235,14 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       {
         if( imageURLValue->Get( imageUrl ) )
         {
-          visualPtr = AnimatedImageVisual::New( GetFactoryCache(), imageUrl, propertyMap );
+          visualPtr = AnimatedImageVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), imageUrl, propertyMap );
         }
         else
         {
           Property::Array* array = imageURLValue->GetArray();
           if( array )
           {
-            visualPtr = AnimatedImageVisual::New( GetFactoryCache(), *array, propertyMap );
+            visualPtr = AnimatedImageVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), *array, propertyMap );
           }
         }
       }
@@ -281,7 +283,7 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Image& image )
     }
     else
     {
-      visualPtr = ImageVisual::New(GetFactoryCache(), image );
+      visualPtr = ImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), image );
     }
   }
 
@@ -311,17 +313,17 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
       }
       case VisualUrl::SVG:
       {
-        visualPtr = SvgVisual::New( GetFactoryCache(), visualUrl );
+        visualPtr = SvgVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl );
         break;
       }
       case VisualUrl::GIF:
       {
-        visualPtr = AnimatedImageVisual::New( GetFactoryCache(), visualUrl );
+        visualPtr = AnimatedImageVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl );
         break;
       }
       case VisualUrl::REGULAR_IMAGE:
       {
-        visualPtr = ImageVisual::New(GetFactoryCache(), visualUrl, size );
+        visualPtr = ImageVisual::New(GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, size );
         break;
       }
     }
@@ -373,6 +375,15 @@ Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
     mFactoryCache->SetBrokenImageUrl(brokenImageUrl);
   }
   return *mFactoryCache;
+}
+
+ImageVisualShaderFactory& VisualFactory::GetImageVisualShaderFactory()
+{
+  if( !mImageVisualShaderFactory )
+  {
+    mImageVisualShaderFactory = std::unique_ptr< ImageVisualShaderFactory >( new ImageVisualShaderFactory() );
+  }
+  return *mImageVisualShaderFactory;
 }
 
 } // namespace Internal

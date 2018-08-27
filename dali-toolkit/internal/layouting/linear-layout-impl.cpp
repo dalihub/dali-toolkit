@@ -41,6 +41,9 @@ namespace Toolkit
 namespace Internal
 {
 
+const int HORIZONTAL_ALIGNMENT_MASK  = ( Dali::Toolkit::LinearLayout::Alignment::BEGIN | Dali::Toolkit::LinearLayout::Alignment::CENTER_HORIZONTAL | Dali::Toolkit::LinearLayout::Alignment::END );
+const int VERTICAL_ALIGNMENT_MASK = ( Dali::Toolkit::LinearLayout::Alignment::TOP | Dali::Toolkit::LinearLayout::Alignment::CENTER_VERTICAL | Dali::Toolkit::LinearLayout::Alignment::BOTTOM );
+
 LinearLayoutPtr LinearLayout::New()
 {
   LinearLayoutPtr layout( new LinearLayout() );
@@ -51,6 +54,7 @@ LinearLayout::LinearLayout()
 : LayoutGroup(),
   mCellPadding( 0, 0 ),
   mOrientation( Dali::Toolkit::LinearLayout::Orientation::HORIZONTAL ),
+  mAlignment( Dali::Toolkit::LinearLayout::Alignment::BEGIN | Dali::Toolkit::LinearLayout::Alignment::CENTER_VERTICAL ),
   mTotalLength( 0 )
 {
 }
@@ -68,7 +72,7 @@ void LinearLayout::SetCellPadding( LayoutSize size )
   }
 }
 
-LayoutSize LinearLayout::GetCellPadding()
+LayoutSize LinearLayout::GetCellPadding() const
 {
   return mCellPadding;
 }
@@ -82,9 +86,23 @@ void LinearLayout::SetOrientation( Dali::Toolkit::LinearLayout::Orientation orie
   }
 }
 
-Dali::Toolkit::LinearLayout::Orientation LinearLayout::GetOrientation()
+Dali::Toolkit::LinearLayout::Orientation LinearLayout::GetOrientation() const
 {
   return mOrientation;
+}
+
+void LinearLayout::SetAlignment( unsigned int alignment )
+{
+  if ( mAlignment != alignment )
+  {
+    mAlignment = alignment;
+    RequestLayout();
+  }
+}
+
+unsigned int LinearLayout::GetAlignment() const
+{
+  return mAlignment;
 }
 
 void LinearLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
@@ -284,15 +302,48 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
 
   auto count = GetChildCount();
 
+  switch ( mAlignment & HORIZONTAL_ALIGNMENT_MASK )
+  {
+    case Dali::Toolkit::LinearLayout::Alignment::BEGIN:
+    default:
+    {
+      // mTotalLength contains the padding already
+      // In case of RTL map BEGIN alignment to the right edge
+      if ( isLayoutRtl ) {
+        childLeft = LayoutLength( padding.start ) + right - left - mTotalLength;
+      }
+      else {
+        childLeft = LayoutLength( padding.start );
+      }
+      break;
+    }
+    case Dali::Toolkit::LinearLayout::Alignment::END:
+    {
+      // mTotalLength contains the padding already
+      // In case of RTL map END alignment to the left edge
+      if ( isLayoutRtl ) {
+        childLeft = LayoutLength( padding.start );
+      }
+      else {
+        childLeft = LayoutLength( padding.start ) + right - left - mTotalLength;
+      }
+      break;
+    }
+    case Dali::Toolkit::LinearLayout::Alignment::CENTER_HORIZONTAL:
+    {
+      // mTotalLength contains the padding already
+      childLeft = LayoutLength( padding.start ) + ( right - left - mTotalLength ) / 2;
+      break;
+    }
+  }
+
   int start = 0;
   int dir = 1;
 
-  // In case of RTL, start drawing from the last child and apply right alignment.
-  // @TODO Should we have also support Actor HorizontalAlignment|VerticalAlignment in general for LinearLayout?
+  // In case of RTL, start drawing from the last child.
   if( isLayoutRtl ) {
     start = count - 1;
     dir = -1;
-    childLeft = padding.start + right - left - mTotalLength;
   }
 
   for( unsigned int i = 0; i < count; i++)
@@ -305,8 +356,25 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
       auto childHeight = childLayout->GetMeasuredHeight();
       auto childMargin = childLayout->GetMargin();
 
-      childTop = LayoutLength(padding.top) + ((childSpace - childHeight) / 2) + childMargin.top - childMargin.bottom;
-
+      switch ( mAlignment & VERTICAL_ALIGNMENT_MASK )
+      {
+        case Dali::Toolkit::LinearLayout::Alignment::TOP:
+        {
+          childTop = LayoutLength( padding.top ) + childMargin.top;
+          break;
+        }
+        case Dali::Toolkit::LinearLayout::Alignment::BOTTOM:
+        {
+          childTop = height - padding.bottom - childHeight - childMargin.bottom;
+          break;
+        }
+        case Dali::Toolkit::LinearLayout::Alignment::CENTER_VERTICAL:
+        default:
+        {
+          childTop = LayoutLength( padding.top ) + ( ( childSpace - childHeight ) / 2 ) + childMargin.top - childMargin.bottom;
+          break;
+        }
+      }
       childLeft += childMargin.start;
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
       childLeft += childWidth + childMargin.end + mCellPadding.width;
@@ -436,12 +504,35 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
   LayoutLength childTop( padding.top );
   LayoutLength childLeft( padding.start );
 
-  // Where bottom of child should go
+  // Where end of child should go
   auto width = right - left;
 
   // Space available for child
   auto childSpace = width - padding.start - padding.end;
   auto count = GetChildCount();
+
+  switch ( mAlignment & VERTICAL_ALIGNMENT_MASK )
+  {
+    case Dali::Toolkit::LinearLayout::Alignment::TOP:
+    {
+      // mTotalLength contains the padding already
+      childTop = LayoutLength( padding.top );
+      break;
+    }
+    case Dali::Toolkit::LinearLayout::Alignment::BOTTOM:
+    {
+      // mTotalLength contains the padding already
+      childTop = LayoutLength( padding.top ) + bottom - top - mTotalLength;
+      break;
+    }
+    case Dali::Toolkit::LinearLayout::Alignment::CENTER_VERTICAL:
+    default:
+    {
+      // mTotalLength contains the padding already
+      childTop = LayoutLength( padding.top ) + ( bottom - top - mTotalLength ) / 2;
+      break;
+    }
+  }
 
   for( unsigned int childIndex = 0; childIndex < count; childIndex++)
   {
@@ -453,8 +544,25 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
       auto childMargin = childLayout->GetMargin();
 
       childTop += childMargin.top;
-      childLeft = LayoutLength( padding.start ) + ( childSpace - childWidth ) / 2 + childMargin.start - childMargin.end;
-
+      switch ( mAlignment & HORIZONTAL_ALIGNMENT_MASK )
+      {
+        case Dali::Toolkit::LinearLayout::Alignment::BEGIN:
+        default:
+        {
+          childLeft = LayoutLength( padding.start ) + childMargin.start;
+          break;
+        }
+        case Dali::Toolkit::LinearLayout::Alignment::END:
+        {
+          childLeft = width - padding.end - childWidth - childMargin.end;
+          break;
+        }
+        case Dali::Toolkit::LinearLayout::Alignment::CENTER_HORIZONTAL:
+        {
+          childLeft = LayoutLength( padding.start ) + ( childSpace - childWidth ) / 2 + childMargin.start - childMargin.end;
+          break;
+        }
+      }
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
       childTop += childHeight + childMargin.bottom + mCellPadding.height;
     }
