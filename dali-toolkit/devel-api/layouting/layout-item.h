@@ -18,7 +18,7 @@
 
 #include <memory>
 #include <cstdint>
-#include <dali-toolkit/public-api/dali-toolkit-common.h>
+#include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
