@@ -80,7 +80,8 @@ bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
@@ -162,7 +163,8 @@ bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;

@@ -109,7 +109,8 @@ bool LayoutTextTest( const LayoutTextData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   // 2) Clear the layout.
   Vector<LineRun>& lines = visualModel->mLines;
@@ -370,7 +371,8 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   // 2) Call the ReLayoutRightToLeftLines() method.
   Layout::Engine engine;
@@ -482,7 +484,8 @@ bool AlignTest( const AlignData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   // Call the Align method.
   Layout::Engine engine;
