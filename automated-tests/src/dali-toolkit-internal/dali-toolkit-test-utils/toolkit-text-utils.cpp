@@ -306,7 +306,8 @@ void CreateTextModel( const std::string& text,
                                        numberOfGlyphs,
                                        Text::HorizontalAlignment::BEGIN,
                                        Text::LineWrap::WORD,
-                                       outlineWidth );
+                                       outlineWidth,
+                                       true );
 
   Vector<LineRun>& lines = visualModel->mLines;
 

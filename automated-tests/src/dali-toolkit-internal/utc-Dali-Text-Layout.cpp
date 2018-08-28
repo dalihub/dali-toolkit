@@ -173,7 +173,8 @@ bool LayoutTextTest( const LayoutTextData& data )
                                        totalNumberOfGlyphs,
                                        Text::HorizontalAlignment::BEGIN,
                                        Text::LineWrap::WORD,
-                                       outlineWidth );
+                                       outlineWidth,
+                                       true );
 
   layoutParameters.isLastNewParagraph = isLastNewParagraph;
 
@@ -392,7 +393,8 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                                        visualModel->mGlyphs.Count(),
                                        Text::HorizontalAlignment::BEGIN,
                                        Text::LineWrap::WORD,
-                                       outlineWidth );
+                                       outlineWidth,
+                                       true );
 
   layoutParameters.numberOfBidirectionalInfoRuns = logicalModel->mBidirectionalLineInfo.Count();
   layoutParameters.lineBidirectionalInfoRunsBuffer = logicalModel->mBidirectionalLineInfo.Begin();
