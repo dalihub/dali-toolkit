@@ -59,6 +59,7 @@ struct LayoutOptions
  * @param[out] logicalModel Pointer to a logical text model instance.
  * @param[out] visualModel Pointer to a visual text model instance.
  * @param[out] metrics Pointer to a wrapper around FontClient used to get metrics.
+ * @param[in] markupProcessorEnabled Enable markup processor to use markup text.
  */
 void CreateTextModel( const std::string& text,
                       const Size& textArea,
@@ -67,7 +68,8 @@ void CreateTextModel( const std::string& text,
                       Size& layoutSize,
                       LogicalModelPtr& logicalModel,
                       VisualModelPtr& visualModel,
-                      MetricsPtr& metrics );
+                      MetricsPtr& metrics,
+                      bool markupProcessorEnabled );
 
 /**
  * @brief Configures the text @p controller similarly to the one configured by the text-label.

@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
 #include <dali-toolkit/internal/text/text-controller-impl.h>
+#include <dali-toolkit/internal/text/markup-processor.h>
 
 namespace Dali
 {
@@ -100,31 +101,52 @@ void CreateTextModel( const std::string& text,
                       Size& layoutSize,
                       LogicalModelPtr& logicalModel,
                       VisualModelPtr& visualModel,
-                      MetricsPtr& metrics )
+                      MetricsPtr& metrics,
+                      bool markupProcessorEnabled )
 {
   logicalModel = LogicalModel::New();
   visualModel = VisualModel::New();
 
+  MarkupProcessData markupProcessData( logicalModel->mColorRuns,
+                                       logicalModel->mFontDescriptionRuns );
+
+  Length textSize = 0u;
+  const uint8_t* utf8 = NULL;
+  if( markupProcessorEnabled )
+  {
+    ProcessMarkupString( text, markupProcessData );
+    textSize = markupProcessData.markupProcessedText.size();
+
+    // This is a bit horrible but std::string returns a (signed) char*
+    utf8 = reinterpret_cast<const uint8_t*>( markupProcessData.markupProcessedText.c_str() );
+  }
+  else
+  {
+    textSize = text.size();
+
+    // This is a bit horrible but std::string returns a (signed) char*
+    utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+  }
+
   // 1) Convert to utf32
   Vector<Character>& utf32Characters = logicalModel->mText;
-  utf32Characters.Resize( text.size() );
+  utf32Characters.Resize( textSize );
 
-  const uint32_t numberOfCharacters = ( text.size() == 0) ? 0 :
-    Utf8ToUtf32( reinterpret_cast<const uint8_t* const>( text.c_str() ),
-                                                   text.size(),
-                                                   &utf32Characters[0u] );
-  utf32Characters.Resize( numberOfCharacters );
+  // Transform a text array encoded in utf8 into an array encoded in utf32.
+  // It returns the actual number of characters.
+  Length characterCount = Utf8ToUtf32( utf8, textSize, utf32Characters.Begin() );
+  utf32Characters.Resize( characterCount );
 
   // 2) Set the break and paragraph info.
   Vector<LineBreakInfo>& lineBreakInfo = logicalModel->mLineBreakInfo;
-  lineBreakInfo.Resize( numberOfCharacters );
+  lineBreakInfo.Resize( characterCount );
 
   SetLineBreakInfo( utf32Characters,
                     0u,
-                    numberOfCharacters,
+                    characterCount,
                     lineBreakInfo );
 
-  if( 0u == numberOfCharacters )
+  if( 0u == characterCount )
   {
     // Nothing else to do if the number of characters is zero.
     return;
@@ -132,11 +154,11 @@ void CreateTextModel( const std::string& text,
 
   // Retrieves the word break info. The word break info is used to layout the text (where to wrap the text in lines).
   Vector<WordBreakInfo>& wordBreakInfo = logicalModel->mWordBreakInfo;
-  wordBreakInfo.Resize( numberOfCharacters );
+  wordBreakInfo.Resize( characterCount );
 
   SetWordBreakInfo( utf32Characters,
                     0u,
-                    numberOfCharacters,
+                    characterCount,
                     wordBreakInfo );
 
   // 3) Set the script info.
@@ -145,7 +167,7 @@ void CreateTextModel( const std::string& text,
   Vector<ScriptRun>& scripts = logicalModel->mScriptRuns;
   multilanguageSupport.SetScripts( utf32Characters,
                                    0u,
-                                   numberOfCharacters,
+                                   characterCount,
                                    scripts );
 
   // 4) Set the font info
@@ -167,7 +189,7 @@ void CreateTextModel( const std::string& text,
                                       fontDescription,
                                       TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
                                       0u,
-                                      numberOfCharacters,
+                                      characterCount,
                                       validFonts );
 
   // 5) Set the bidirectional info per paragraph.
@@ -182,12 +204,12 @@ void CreateTextModel( const std::string& text,
                         scripts,
                         lineBreakInfo,
                         0u,
-                        numberOfCharacters,
+                        characterCount,
                         bidirectionalInfo );
 
   // Create the paragraph info.
   logicalModel->CreateParagraphInfo( 0u,
-                                     numberOfCharacters );
+                                     characterCount );
 
   // 6) Set character directions.
   Vector<CharacterDirection>& characterDirections = logicalModel->mCharacterDirections;
@@ -195,9 +217,9 @@ void CreateTextModel( const std::string& text,
   {
     // Only set the character directions if there is right to left characters.
     GetCharactersDirection( bidirectionalInfo,
-                            numberOfCharacters,
+                            characterCount,
                             0u,
-                            numberOfCharacters,
+                            characterCount,
                             characterDirections );
 
 
@@ -206,7 +228,7 @@ void CreateTextModel( const std::string& text,
                                     characterDirections,
                                     bidirectionalInfo,
                                     0u,
-                                    numberOfCharacters,
+                                    characterCount,
                                     mirroredUtf32Characters );
   }
   else
@@ -230,15 +252,15 @@ void CreateTextModel( const std::string& text,
              validFonts,
              0u,
              0u,
-             numberOfCharacters,
+             characterCount,
              glyphs,
              glyphsToCharactersMap,
              charactersPerGlyph,
              newParagraphGlyphs );
 
   // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-  visualModel->CreateGlyphsPerCharacterTable( 0u, 0u, numberOfCharacters );
-  visualModel->CreateCharacterToGlyphTable( 0u, 0u, numberOfCharacters );
+  visualModel->CreateGlyphsPerCharacterTable( 0u, 0u, characterCount );
+  visualModel->CreateCharacterToGlyphTable( 0u, 0u, characterCount );
 
   const Length numberOfGlyphs = glyphs.Count();
 
@@ -291,7 +313,7 @@ void CreateTextModel( const std::string& text,
   Vector<Vector2>& glyphPositions = visualModel->mGlyphPositions;
   glyphPositions.Resize( numberOfGlyphs );
 
-  layoutParameters.isLastNewParagraph = TextAbstraction::IsNewParagraph( *( utf32Characters.Begin() + ( numberOfCharacters - 1u ) ) );
+  layoutParameters.isLastNewParagraph = TextAbstraction::IsNewParagraph( *( utf32Characters.Begin() + ( characterCount - 1u ) ) );
 
   // The initial glyph and the number of glyphs to layout.
   layoutParameters.startGlyphIndex = 0u;
@@ -317,7 +339,7 @@ void CreateTextModel( const std::string& text,
     bidirectionalLineInfo.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
     ReorderLines( bidirectionalInfo,
                   0u,
-                  numberOfCharacters,
+                  characterCount,
                   lines,
                   bidirectionalLineInfo );
 
@@ -330,7 +352,7 @@ void CreateTextModel( const std::string& text,
       // Re-layout the text. Reorder those lines with right to left characters.
       layoutEngine.ReLayoutRightToLeftLines( layoutParameters,
                                              0u,
-                                             numberOfCharacters,
+                                             characterCount,
                                              glyphPositions );
     }
   }
@@ -340,7 +362,7 @@ void CreateTextModel( const std::string& text,
     float alignmentOffset = 0.f;
     layoutEngine.Align( textArea,
                         0u,
-                        numberOfCharacters,
+                        characterCount,
                         Text::HorizontalAlignment::BEGIN,
                         lines,
                         alignmentOffset );
