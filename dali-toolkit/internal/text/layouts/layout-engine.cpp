@@ -281,9 +281,6 @@ struct Engine::Impl
       // Get the line break info for the current character.
       const LineBreakInfo lineBreakInfo = hasCharacters ? *( parameters.lineBreakInfoBuffer + characterLastIndex ) : TextAbstraction::LINE_NO_BREAK;
 
-      // Get the word break info for the current character.
-      const WordBreakInfo wordBreakInfo = *( parameters.wordBreakInfoBuffer + characterLastIndex );
-
       // Increase the number of characters.
       tmpLineLayout.numberOfCharacters += charactersPerGlyph;
 
@@ -458,7 +455,7 @@ struct Engine::Impl
       }
 
       if( isMultiline &&
-          ( TextAbstraction::WORD_BREAK == wordBreakInfo ) )
+          ( TextAbstraction::LINE_ALLOW_BREAK == lineBreakInfo ) )
       {
         oneWordLaidOut = isWordLaidOut;
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  One word laid-out\n" );
