@@ -43,4 +43,20 @@ void CustomLayout::RequestLayout()
 {
   GetImplementation( *this ).RequestLayout();
 }
+
+void CustomLayout::SetCustomBehaviourFlag( int flag )
+{
+  GetImplementation(*this).SetCustomBehaviourFlag( flag );
+}
+
+bool CustomLayout::GetCustomBehaviourFlags( int flagToCheck )
+{
+  return GetImplementation(*this).GetCustomBehaviourFlags( flagToCheck );
+}
+
+void CustomLayout::ClearPrivateFlag( int flag )
+{
+  return GetImplementation(*this).ClearPrivateFlag( flag );
+}
+
 } // namespace Test
