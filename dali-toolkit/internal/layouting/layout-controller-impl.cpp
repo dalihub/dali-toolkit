@@ -110,7 +110,7 @@ void LayoutController::MeasureHierarchy( Actor root, MeasureSpec widthSpec, Meas
   Toolkit::Control control = Toolkit::Control::DownCast( root );
   if( control )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::Measuring control\n" );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::Measuring leaf\n" );
     Internal::Control& controlImpl = GetImplementation( control );
 
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
@@ -138,7 +138,7 @@ void LayoutController::PerformLayout( Actor root, int left, int top, int right, 
   Toolkit::Control control = Toolkit::Control::DownCast( root );
   if( control )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayout on control[%s]\n", control.GetName().c_str() );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayout on leaf\n" );
     Internal::Control& controlImpl = GetImplementation( control );
     Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
     LayoutItemPtr layout = controlDataImpl.GetLayout();

@@ -48,12 +48,6 @@ LayoutGroup::LayoutGroup()
 {
 }
 
-LayoutGroupPtr LayoutGroup::New( Handle& owner )
-{
-  LayoutGroupPtr layoutPtr = new LayoutGroup();
-  return layoutPtr;
-}
-
 LayoutGroup::~LayoutGroup()
 {
   // An object with a unique_ptr to an opaque structure must define it's destructor in the translation unit
@@ -339,8 +333,7 @@ void LayoutGroup::MeasureChild( LayoutItemPtr child,
 #if defined( DEBUG_ENABLED )
   if ( control )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::MeasureChild(%s) natural size(%f, %f)\n",
-                   control.GetName().c_str(), control.GetNaturalSize().width, control.GetNaturalSize().height );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::MeasureChild natural size(%f, %f)\n",  control.GetNaturalSize().width, control.GetNaturalSize().height );
   }
 #endif
 
@@ -575,10 +568,7 @@ void LayoutGroup::ChildAddedToOwner( Actor child )
   LayoutItemPtr childLayout;
   Toolkit::Control control = Toolkit::Control::DownCast( child );
 
-#if defined(DEBUG_ENABLED)
-  auto parent = Toolkit::Control::DownCast( GetOwner() );
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner control(%s) owner(%s)\n", control?control.GetName().c_str():"Invalid", parent?parent.GetName().c_str():"Invalid" );
-#endif
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner control(%s)\n", control?control.GetName().c_str():"Invalid" );
 
   if( control ) // Can only support adding Controls, not Actors to layout
   {
@@ -589,7 +579,7 @@ void LayoutGroup::ChildAddedToOwner( Actor child )
     if( ! childLayout )
     {
       // If the child doesn't already have a layout, then create a LayoutItem for it.
-      childLayout = LayoutGroup::New( control );
+      childLayout = LayoutItem::New( control );
       childLayout->SetAnimateLayout( IsLayoutAnimated() ); // @todo this essentially forces animation inheritance. Bad?
 #if defined(DEBUG_ENABLED)
       auto desiredSize = control.GetNaturalSize();
@@ -698,153 +688,13 @@ void LayoutGroup::OnAnimationStateChanged( bool animateLayout )
   for( auto&& child : mImpl->mChildren )
   {
     LayoutGroupPtr parentGroup( dynamic_cast< LayoutGroup* >( child.child.Get() ) );
-    if( parentGroup && ( 0 == parentGroup->GetChildCount() ) ) // A leaf LayoutGroup will have no children.
+    if( !parentGroup )
     {
       // Change state only in case of leaf children
       child.child->SetAnimateLayout( animateLayout );
     }
   }
 }
-
-void LayoutGroup::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
-{
-  DALI_LOG_STREAM( gLogFilter, Debug::Verbose,
-                  "LayoutGroup::OnMeasure Actor Id:" <<  Actor::DownCast(GetOwner()).GetId() <<
-                  " Owner:" <<  Actor::DownCast(GetOwner()).GetName() <<
-                  " MeasureSpecs( width:"<<widthMeasureSpec<<", height:"<<heightMeasureSpec );
-
-  auto childCount = GetChildCount();
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure child count(%u)\n", childCount);
-
-  auto widthMode = widthMeasureSpec.GetMode();
-  auto heightMode = heightMeasureSpec.GetMode();
-  LayoutLength widthSpecSize = widthMeasureSpec.GetSize();
-  LayoutLength heightSpecSize = heightMeasureSpec.GetSize();
-
-  bool exactWidth ( false );
-  bool exactHeight ( false );
-
-  // Default Layouting behaviour if not overridden
-  // EXACT, width and height as provided.
-  // MATCH_PARENT, width and hewidthSpecSizeight that of parent
-
-  // WRAP_CONTENT, take width of widest child and height size of longest child (within given limit)
-  // UNSPECIFIED, take width of widest child and height size of longest child.
-
-  LayoutLength layoutWidth( 0 );
-  LayoutLength layoutHeight( 0 );
-
-  // If LayoutGroup has children then measure children to get max dimensions
-  if ( childCount > 0 )
-  {
-    for( unsigned int i=0; i<childCount; ++i )
-    {
-      auto childLayout = GetChildAt( i );
-      if( childLayout )
-      {
-        auto childOwner = childLayout->GetOwner();
-
-        // Get size of child
-        MeasureChild( childLayout, widthMeasureSpec, heightMeasureSpec );
-        auto childWidth = childLayout->GetMeasuredWidth();
-        auto childHeight = childLayout->GetMeasuredHeight();
-        auto childMargin = childLayout->GetMargin();
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure child width[%d] height(%d)\n", childWidth.mValue, childHeight.mValue );
-
-        layoutWidth = std::max( layoutWidth, childWidth + childMargin.start + childMargin.end );
-        layoutHeight = std::max( layoutHeight, childHeight + childMargin.top + childMargin.bottom );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure calculated child width[%d] calculated height(%d)\n", layoutWidth.mValue, layoutHeight.mValue );
-      }
-    }
-
-    Extents padding = GetPadding();
-    layoutWidth += padding.start + padding.end;
-    layoutHeight += padding.top + padding.bottom;
-  }
-  else
-  {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure Getting default size as a leaf\n" );
-    // LayoutGroup does not contain any children so must be a leaf
-    layoutWidth = GetDefaultSize( GetSuggestedMinimumWidth(), widthMeasureSpec );
-    layoutHeight = GetDefaultSize( GetSuggestedMinimumHeight(), heightMeasureSpec );
-  }
-
-  // Can't exceed specified width
-  if( widthMode == MeasureSpec::Mode::EXACTLY )
-  {
-    exactWidth = true;
-  }
-  else if ( widthMode == MeasureSpec::Mode::AT_MOST )
-  {
-    layoutWidth = std::min( layoutWidth, widthSpecSize );
-  }
-
-  // Can't exceed specified height
-  if( heightMode == MeasureSpec::Mode::EXACTLY )
-  {
-    exactHeight = true;
-  }
-  else if ( heightMode == MeasureSpec::Mode::AT_MOST )
-  {
-    layoutHeight = std::min( layoutHeight, heightSpecSize );
-  }
-
-  layoutWidth = std::max( layoutWidth, GetSuggestedMinimumWidth() );
-  layoutHeight = std::max( layoutHeight, GetSuggestedMinimumHeight() );
-
-  if( exactWidth )
-  {
-    layoutWidth = widthSpecSize;
-  }
-
-  if( exactHeight )
-  {
-    layoutHeight = heightSpecSize;
-  }
-
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure Measured size(%d,%d) for : %s \n", layoutWidth.mValue, layoutHeight.mValue, Actor::DownCast(GetOwner()).GetName().c_str() );
-  SetMeasuredDimensions( MeasuredSize( layoutWidth ), MeasuredSize( layoutHeight ) );
-}
-
-void LayoutGroup::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
-{
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnLayout\n");
-
-  auto count = GetChildCount();
-
-  for( unsigned int childIndex = 0; childIndex < count; childIndex++)
-  {
-    LayoutItemPtr childLayout = GetChildAt( childIndex );
-    if( childLayout != nullptr )
-    {
-
-      auto childOwner = childLayout->GetOwner();
-      auto childWidth = childLayout->GetMeasuredWidth();
-      auto childHeight = childLayout->GetMeasuredHeight();
-      auto childMargin = childLayout->GetMargin();
-      auto control = Toolkit::Control::DownCast( childOwner );
-      Extents padding = GetPadding();
-
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnLayout child width[%d] height(%d)\n", childWidth.mValue, childHeight.mValue );
-
-      auto childPosition = control.GetProperty< Vector3 >( Actor::Property::POSITION );
-      auto anchorPoint = control.GetProperty< Vector3 >( Actor::Property::ANCHOR_POINT );
-
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnLayout child[%s] position(%f,%f)\n", control.GetName().c_str(), childPosition.x, childPosition.y );
-
-      // Margin and Padding only supported when child anchor point is TOP_LEFT.
-      int paddingAndMarginOffsetX = ( AnchorPoint::TOP_LEFT == anchorPoint ) ? ( padding.top + childMargin.top ) : 0;
-      int paddingAndMarginOffsetY = ( AnchorPoint::TOP_LEFT == anchorPoint ) ? ( padding.start + childMargin.start ) : 0;
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnLayout paddingMargin offset(%d,%d)\n", paddingAndMarginOffsetX, paddingAndMarginOffsetY );
-
-      LayoutLength childLeft = childPosition.x + paddingAndMarginOffsetX;
-      LayoutLength childTop = childPosition.y + paddingAndMarginOffsetY;
-
-      childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
-    }
-  }
-}
-
 
 } // namespace Internal
 } // namespace Toolkit
