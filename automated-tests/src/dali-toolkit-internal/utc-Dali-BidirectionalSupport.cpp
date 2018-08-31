@@ -101,11 +101,12 @@ struct GetMirroredTextData
 
 struct GetCharactersDirectionData
 {
-  std::string  description;         ///< Description of the test.
-  std::string  text;                ///< Input text.
-  unsigned int startIndex;          ///< The index from where the model is updated.
-  unsigned int numberOfCharacters;  ///< The number of characters.
-  bool*        directions;          ///< The expected directions.
+  std::string  description;            ///< Description of the test.
+  std::string  text;                   ///< Input text.
+  unsigned int startIndex;             ///< The index from where the model is updated.
+  unsigned int numberOfCharacters;     ///< The number of characters.
+  bool*        directions;             ///< The expected directions.
+  bool         markupProcessorEnabled; ///< Enable markup processor to use markup text.
 };
 
 bool SetBidirectionalInfoTest( const SetBidirectionalInfoData& data )
@@ -127,7 +128,8 @@ bool SetBidirectionalInfoTest( const SetBidirectionalInfoData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   // 2) Clear the bidirectional paragraph info data.
   Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = logicalModel->mBidirectionalParagraphInfo;
@@ -233,7 +235,8 @@ bool ReorderLinesTest( const ReorderLinesData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   // 2) Clear the bidirectional line info data.
   uint32_t startRemoveIndex = logicalModel->mBidirectionalLineInfo.Count();
@@ -358,7 +361,8 @@ bool GetMirroredTextTest( const GetMirroredTextData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   // 2) Call the GetMirroredText() function for the whole text
   Vector<Character> mirroredText;
@@ -432,7 +436,8 @@ bool GetCharactersDirectionTest( const GetCharactersDirectionData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   data.markupProcessorEnabled );
 
   Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = logicalModel->mBidirectionalParagraphInfo;
 
@@ -930,6 +935,11 @@ int UtcDaliGetCharactersDirection(void)
     true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
     true,  true,  false, false, false, false, false };
 
+    bool directions06[] = {
+    true,  true,  true,  true,  true,  true,  true,  true,  true, true,
+    false, false, false, false, false, false, false, false, false, false,
+    false, false, false, false, false, false };
+
   struct GetCharactersDirectionData data[] =
   {
     {
@@ -937,28 +947,32 @@ int UtcDaliGetCharactersDirection(void)
       "",
       0u,
       0u,
-      directions01
+      directions01,
+      false
     },
     {
       "Left to right characters only",
       "Hello world\nhello world demo",
       0u,
       28u,
-      directions02
+      directions02,
+      false
     },
     {
       "Right to left characters only",
       "שלום עולם\nשלום עולם",
       0u,
       19u,
-      directions03
+      directions03,
+      false
     },
     {
       "Mix of bidirectional text",
       "Hello world\nhello world שלום עולם\nשלום עולם hello world",
       0u,
       55u,
-      directions04
+      directions04,
+      false
     },
     {
       "Mix of bidirectional text. With more paragraphs.",
@@ -966,7 +980,8 @@ int UtcDaliGetCharactersDirection(void)
       " مرحبا بالعالم שלום עולם hello world hello world\nبالعالم שלום hello world demo עולם\nשלום مرحبا بالعالم עולם hello",
       0u,
       227u,
-      directions05
+      directions05,
+      false
     },
     {
       "Mix of bidirectional text. With more paragraphs. Update first paragraph.",
@@ -974,7 +989,8 @@ int UtcDaliGetCharactersDirection(void)
       " مرحبا بالعالم שלום עולם hello world hello world\nبالعالم שלום hello world demo עולם\nשלום مرحبا بالعالم עולם hello",
       0u,
       17u,
-      directions05
+      directions05,
+      false
     },
     {
       "Mix of bidirectional text. With more paragraphs. Update from character 29",
@@ -982,7 +998,8 @@ int UtcDaliGetCharactersDirection(void)
       " مرحبا بالعالم שלום עולם hello world hello world\nبالعالم שלום hello world demo עולם\nשלום مرحبا بالعالم עולם hello",
       29u,
       134u,
-      directions05
+      directions05,
+      false
     },
     {
       "Mix of bidirectional text. With more paragraphs. Update from character 163",
@@ -990,10 +1007,19 @@ int UtcDaliGetCharactersDirection(void)
       " مرحبا بالعالم שלום עולם hello world hello world\nبالعالم שלום hello world demo עולם\nשלום مرحبا بالعالم עולם hello",
       163u,
       35u,
-      directions05
+      directions05,
+      false
+    },
+    {
+      "Mix of bidirectional text. With brackets and LRM",
+      "שלום עולם &lrm;(hello)[world]&lrm;",
+      0u,
+      26u,
+      directions06,
+      true
     }
   };
-  const unsigned int numberOfTests = 8u;
+  const unsigned int numberOfTests = 9u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {

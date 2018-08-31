@@ -281,9 +281,6 @@ struct Engine::Impl
       // Get the line break info for the current character.
       const LineBreakInfo lineBreakInfo = hasCharacters ? *( parameters.lineBreakInfoBuffer + characterLastIndex ) : TextAbstraction::LINE_NO_BREAK;
 
-      // Get the word break info for the current character.
-      const WordBreakInfo wordBreakInfo = *( parameters.wordBreakInfoBuffer + characterLastIndex );
-
       // Increase the number of characters.
       tmpLineLayout.numberOfCharacters += charactersPerGlyph;
 
@@ -397,11 +394,19 @@ struct Engine::Impl
         tmpLineLayout.wsLengthEndOfLine = 0.f;
       }
 
+      // If calculation is end but wsLengthEndOfLine is exist, it means end of text is space.
+      // Merge remained length.
+      if ( !parameters.ignoreSpaceAfterText && glyphIndex == lastGlyphOfParagraphPlusOne-1 && tmpLineLayout.wsLengthEndOfLine > 0 )
+      {
+        tmpLineLayout.length += tmpLineLayout.wsLengthEndOfLine;
+        tmpLineLayout.wsLengthEndOfLine = 0u;
+      }
+
       // Save the current extra width to compare with the next one
       mPreviousCharacterExtraWidth = tmpExtraWidth;
 
       // Check if the accumulated length fits in the width of the box.
-      if( ( completelyFill || isMultiline ) && !isWhiteSpace &&
+      if( ( completelyFill || isMultiline )  && !(parameters.ignoreSpaceAfterText && isWhiteSpace) &&
           ( tmpExtraBearing + lineLayout.length + lineLayout.wsLengthEndOfLine + tmpLineLayout.length + tmpExtraWidth > parameters.boundingBox.width ) )
       {
         // Current word does not fit in the box's width.
@@ -458,7 +463,7 @@ struct Engine::Impl
       }
 
       if( isMultiline &&
-          ( TextAbstraction::WORD_BREAK == wordBreakInfo ) )
+          ( TextAbstraction::LINE_ALLOW_BREAK == lineBreakInfo ) )
       {
         oneWordLaidOut = isWordLaidOut;
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  One word laid-out\n" );

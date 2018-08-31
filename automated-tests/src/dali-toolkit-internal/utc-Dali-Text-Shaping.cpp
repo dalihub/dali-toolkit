@@ -138,7 +138,8 @@ bool ShapeInfoTest( const ShapeInfoData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   // 2) Clear the model.
 
