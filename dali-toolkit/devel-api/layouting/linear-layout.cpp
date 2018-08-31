@@ -59,7 +59,7 @@ void LinearLayout::SetCellPadding( LayoutSize size )
   GetImplementation(*this).SetCellPadding( size );
 }
 
-LayoutSize LinearLayout::GetCellPadding()
+LayoutSize LinearLayout::GetCellPadding() const
 {
   return GetImplementation(*this).GetCellPadding();
 }
@@ -69,9 +69,19 @@ void LinearLayout::SetOrientation( LinearLayout::Orientation orientation )
   GetImplementation(*this).SetOrientation( orientation );
 }
 
-LinearLayout::Orientation LinearLayout::GetOrientation()
+LinearLayout::Orientation LinearLayout::GetOrientation() const
 {
   return GetImplementation(*this).GetOrientation();
+}
+
+void LinearLayout::SetAlignment( unsigned int alignment )
+{
+  GetImplementation(*this).SetAlignment( alignment );
+}
+
+unsigned int LinearLayout::GetAlignment() const
+{
+  return GetImplementation(*this).GetAlignment();
 }
 
 LinearLayout::LinearLayout( Dali::Toolkit::Internal::LinearLayout* object )

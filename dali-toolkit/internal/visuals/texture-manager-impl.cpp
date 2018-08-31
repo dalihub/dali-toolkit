@@ -932,8 +932,21 @@ TextureManager::TextureHash TextureManager::GenerateHash(
   {
     // We are not including sizing information, but we still need an extra byte for atlasing.
     hashTarget.resize( urlLength + 1u );
+
     // Add the atlasing to the hash input.
-    hashTarget[ urlLength ] = useAtlas;
+    switch( useAtlas )
+    {
+      case UseAtlas::NO_ATLAS:
+      {
+        hashTarget[ urlLength ] = 'f';
+        break;
+      }
+      case UseAtlas::USE_ATLAS:
+      {
+        hashTarget[ urlLength ] = 't';
+        break;
+      }
+    }
   }
 
   if( maskTextureId != INVALID_TEXTURE_ID )

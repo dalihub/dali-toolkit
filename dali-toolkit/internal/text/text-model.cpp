@@ -187,7 +187,8 @@ Model::Model()
   mVerticalLineAlignment( DevelText::VerticalLineAlignment::TOP ),
   mLineWrapMode( Text::LineWrap::WORD ),
   mAlignmentOffset( 0.0f ),
-  mElideEnabled( false )
+  mElideEnabled( false ),
+  mIgnoreSpacesAfterText( true )
 {
   mLogicalModel = LogicalModel::New();
   mVisualModel = VisualModel::New();

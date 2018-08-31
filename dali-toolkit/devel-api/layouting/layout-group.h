@@ -80,6 +80,13 @@ public:
   ~LayoutGroup() = default;
 
   /**
+   * @brief Create an initialized LayoutGroup
+   *
+   * @param[in] handle A handle to the object that this layout for, e.g. a Control or a Visual::Base
+   */
+  static LayoutGroup New( Handle& handle );
+
+  /**
    * @brief Copy constructor
    */
   LayoutGroup(const LayoutGroup& copy) = default;

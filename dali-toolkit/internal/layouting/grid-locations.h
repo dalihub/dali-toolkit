@@ -59,7 +59,6 @@ public:
     int xEnd;
     int yTop;
     int yBottom;
-    int explictlyDefined;
 
     Cell( int x1, int x2, int y1, int y2): xStart(x1), xEnd(x2), yTop(y1), yBottom(y2){};
   };

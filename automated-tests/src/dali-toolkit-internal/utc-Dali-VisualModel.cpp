@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,8 @@ bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
@@ -162,7 +163,8 @@ bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;

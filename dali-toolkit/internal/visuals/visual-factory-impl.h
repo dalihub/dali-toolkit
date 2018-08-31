@@ -37,6 +37,7 @@ namespace Internal
 {
 
 class VisualFactoryCache;
+class ImageVisualShaderFactory;
 
 /**
  * @copydoc Toolkit::VisualFactory
@@ -103,15 +104,21 @@ private:
    */
   Internal::VisualFactoryCache& GetFactoryCache();
 
+  /**
+   * Get the image visual shader factory, creating it if necessary.
+   */
+  ImageVisualShaderFactory& GetImageVisualShaderFactory();
+
   VisualFactory(const VisualFactory&) = delete;
 
   VisualFactory& operator=(const VisualFactory& rhs) = delete;
 
 private:
-  std::unique_ptr<VisualFactoryCache> mFactoryCache;
-  SlotDelegate< VisualFactory >       mSlotDelegate;
-  bool                                mDebugEnabled:1;
-  bool                                mPreMultiplyOnLoad:1; ///< Local store for this flag
+  std::unique_ptr< VisualFactoryCache >       mFactoryCache;
+  std::unique_ptr< ImageVisualShaderFactory > mImageVisualShaderFactory;
+  SlotDelegate< VisualFactory >               mSlotDelegate;
+  bool                                        mDebugEnabled:1;
+  bool                                        mPreMultiplyOnLoad:1; ///< Local store for this flag
 };
 
 /**

@@ -44,6 +44,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
+#include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 #include <dali-toolkit/devel-api/graphics/builtin-shader-extern-gen.h>
 
 namespace Dali
@@ -133,32 +134,35 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
 } // unnamed namespace
 
 ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
+                                 ImageVisualShaderFactory& shaderFactory,
                                  const VisualUrl& imageUrl,
                                  const Property::Map& properties,
                                  ImageDimensions size,
                                  FittingMode::Type fittingMode,
                                  Dali::SamplingMode::Type samplingMode )
 {
-  ImageVisualPtr imageVisualPtr( new ImageVisual( factoryCache, imageUrl, size, fittingMode, samplingMode ) );
+  ImageVisualPtr imageVisualPtr( new ImageVisual( factoryCache, shaderFactory, imageUrl, size, fittingMode, samplingMode ) );
   imageVisualPtr->SetProperties( properties );
   return imageVisualPtr;
 }
 
 ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
+                                 ImageVisualShaderFactory& shaderFactory,
                                  const VisualUrl& imageUrl,
                                  ImageDimensions size,
                                  FittingMode::Type fittingMode,
                                  Dali::SamplingMode::Type samplingMode )
 {
-  return new ImageVisual( factoryCache, imageUrl, size, fittingMode, samplingMode );
+  return new ImageVisual( factoryCache, shaderFactory, imageUrl, size, fittingMode, samplingMode );
 }
 
-ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache, const Image& image )
+ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image )
 {
-  return new ImageVisual( factoryCache, image );
+  return new ImageVisual( factoryCache, shaderFactory, image );
 }
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
+                          ImageVisualShaderFactory& shaderFactory,
                           const VisualUrl& imageUrl,
                           ImageDimensions size,
                           FittingMode::Type fittingMode,
@@ -172,6 +176,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mDesiredSize( size ),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
   mTextures(),
+  mImageVisualShaderFactory( shaderFactory ),
   mFittingMode( fittingMode ),
   mSamplingMode( samplingMode ),
   mWrapModeU( WrapMode::DEFAULT ),
@@ -186,7 +191,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
 {
 }
 
-ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
+ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image )
 : Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
   mImage( image ),
   mPixelArea( FULL_TEXTURE_RECT ),
@@ -196,6 +201,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, const Image& image )
   mDesiredSize(),
   mTextureId( TextureManager::INVALID_TEXTURE_ID ),
   mTextures(),
+  mImageVisualShaderFactory( shaderFactory ),
   mFittingMode( FittingMode::DEFAULT ),
   mSamplingMode( SamplingMode::DEFAULT ),
   mWrapModeU( WrapMode::DEFAULT ),
@@ -562,9 +568,10 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   {
     geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
 
-    shader = GetImageShader( mFactoryCache,
-                             mImpl->mFlags & Impl::IS_ATLASING_APPLIED,
-                             mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE );
+    shader = mImageVisualShaderFactory.GetShader(
+      mFactoryCache,
+      mImpl->mFlags & Impl::IS_ATLASING_APPLIED,
+      mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE );
   }
   else
   {
@@ -573,16 +580,17 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
     if( mImpl->mCustomShader->mVertexShaderData.empty() &&
         mImpl->mCustomShader->mFragmentShaderData.empty() )
     {
-      shader = GetImageShader( mFactoryCache, false, true );
+      shader = mImageVisualShaderFactory.GetShader( mFactoryCache, false, true );
+      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
     }
     else
     {
       std::vector<uint32_t> vertexData = mImpl->mCustomShader->mVertexShaderData.empty()
-        ? GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_SHADER_VERT")
+        ? mImageVisualShaderFactory.GetVertexShaderData()
         : mImpl->mCustomShader->mVertexShaderData;
 
       std::vector<uint32_t> fragmentData = mImpl->mCustomShader->mFragmentShaderData.empty()
-        ? GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG")
+        ? mImageVisualShaderFactory.GetFragmentShaderData()
         : mImpl->mCustomShader->mFragmentShaderData;
 
       shader = DevelShader::New<uint32_t>( vertexData, fragmentData,
@@ -914,56 +922,6 @@ bool ImageVisual::IsResourceReady() const
 {
   return ( mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY ||
            mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED );
-}
-
-Shader ImageVisual::GetImageShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping )
-{
-  Shader shader;
-  if( atlasing )
-  {
-    if( defaultTextureWrapping )
-    {
-      shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP );
-      if( !shader )
-      {
-        shader = DevelShader::New<uint32_t>( GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_SHADER_VERT" ),
-                                             GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_ATLAS_CLAMP_SHADER_FRAG" ),
-                                             DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
-
-        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-        factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_DEFAULT_WRAP, shader );
-      }
-    }
-    else
-    {
-      shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP );
-      if( !shader )
-      {
-        shader = DevelShader::New<uint32_t>( GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_SHADER_VERT" ),
-                                             GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_ATLAS_VARIOUS_WRAP_SHADER_FRAG" ),
-                                             DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
-
-        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-        factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER_ATLAS_CUSTOM_WRAP, shader );
-      }
-    }
-  }
-  else
-  {
-    shader = factoryCache.GetShader( VisualFactoryCache::IMAGE_SHADER );
-    if( !shader )
-    {
-      shader = DevelShader::New<uint32_t>(
-        GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_SHADER_VERT" ),
-        GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG" ),
-        DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
-
-      shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-      factoryCache.SaveShader( VisualFactoryCache::IMAGE_SHADER, shader );
-    }
-  }
-
-  return shader;
 }
 
 void ImageVisual::ApplyImageToSampler( const Image& image )

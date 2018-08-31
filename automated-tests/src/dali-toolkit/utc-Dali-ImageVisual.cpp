@@ -2104,3 +2104,77 @@ int UtcDaliImageVisualOrientationCorrection(void)
 
   END_TEST;
 }
+
+int UtcDaliImageVisualCustomShader(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualCustomShader Test custom shader" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map properties;
+  Property::Map shader;
+  const std::string vertexShader = "Foobar";
+  const std::string fragmentShader = "Foobar";
+  shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+  shader[Visual::Shader::Property::VERTEX_SHADER] = vertexShader;
+
+  properties[Visual::Property::TYPE] = Visual::IMAGE;
+  properties[Visual::Property::SHADER] = shader;
+  properties[ImageVisual::Property::URL] = TEST_IMAGE_FILE_NAME;
+
+  Visual::Base visual = factory.CreateVisual( properties );
+
+  // trigger creation through setting on stage
+  DummyControl dummy = DummyControl::New( true );
+  Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  dummy.SetSize( 200.f, 200.f );
+  dummy.SetParentOrigin( ParentOrigin::CENTER );
+  Stage::GetCurrent().Add( dummy );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  Renderer renderer = dummy.GetRendererAt( 0 );
+  Shader shader2 = renderer.GetShader();
+  Property::Value value = shader2.GetProperty( Shader::Property::PROGRAM );
+  Property::Map* map = value.GetMap();
+  DALI_TEST_CHECK( map );
+
+  Property::Value* fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
+  DALI_TEST_EQUALS( fragmentShader, fragment->Get< std::string >(), TEST_LOCATION );
+
+  Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
+  DALI_TEST_EQUALS( vertexShader, vertex->Get< std::string >(), TEST_LOCATION );
+
+  shader.Clear();
+
+  shader[Visual::Shader::Property::HINTS] = Shader::Hint::OUTPUT_IS_TRANSPARENT;
+  properties[Visual::Property::SHADER] = shader;
+
+  Visual::Base visual1 = factory.CreateVisual( properties );
+
+  // trigger creation through setting on stage
+  DummyControl dummy1 = DummyControl::New( true );
+  Impl::DummyControl& dummyImpl1 = static_cast< Impl::DummyControl& >( dummy1.GetImplementation() );
+  dummyImpl1.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual1 );
+  dummy1.SetSize( 200, 200 );
+  dummy1.SetParentOrigin( ParentOrigin::CENTER );
+  Stage::GetCurrent().Add( dummy1 );
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableEnableDisableCallTrace( true );
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& glEnableStack = glAbstraction.GetEnableDisableTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  END_TEST;
+}

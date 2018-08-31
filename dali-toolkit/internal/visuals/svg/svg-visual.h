@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_SVG_VISUAL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ namespace Toolkit
 namespace Internal
 {
 
+class ImageVisualShaderFactory;
 class SvgVisual;
 typedef IntrusivePtr< SvgVisual > SvgVisualPtr;
 
@@ -61,11 +62,12 @@ public:
    * And rasterize it into BufferImage synchronously when the associated actor is put on stage, and destroy the BufferImage when it is off stage
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to svg resource to use
    * @param[in] properties A Property::Map containing settings for this visual
    * @return A smart-pointer to the newly allocated visual.
    */
-  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl, const Property::Map& properties );
+  static SvgVisualPtr New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties );
 
   /**
    * @brief Create the SVG Visual using the image URL.
@@ -74,10 +76,11 @@ public:
    * And rasterize it into BufferImage synchronously when the associated actor is put on stage, and destroy the BufferImage when it is off stage
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    * @param[in] imageUrl The URL to svg resource to use
    * @return A smart-pointer to the newly allocated visual.
    */
-  static SvgVisualPtr New( VisualFactoryCache& factoryCache, const VisualUrl& imageUrl );
+  static SvgVisualPtr New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl );
 
 public:  // from Visual
 
@@ -102,8 +105,9 @@ protected:
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
+   * @param[in] shaderFactory The ImageVisualShaderFactory object
    */
-  SvgVisual( VisualFactoryCache& factoryCache );
+  SvgVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -170,12 +174,13 @@ private:
   SvgVisual& operator=( const SvgVisual& svgRenderer );
 
 private:
-  Vector4              mAtlasRect;
-  VisualUrl            mImageUrl;
-  NSVGimage*           mParsedImage;
-  WeakHandle<Actor>    mPlacementActor;
-  Vector2              mVisualSize;
-  bool                 mAttemptAtlasing;  ///< If true will attempt atlasing, otherwise create unique texture
+  ImageVisualShaderFactory& mImageVisualShaderFactory;
+  Vector4                   mAtlasRect;
+  VisualUrl                 mImageUrl;
+  NSVGimage*                mParsedImage;
+  WeakHandle<Actor>         mPlacementActor;
+  Vector2                   mVisualSize;
+  bool                      mAttemptAtlasing;  ///< If true will attempt atlasing, otherwise create unique texture
 };
 
 } // namespace Internal

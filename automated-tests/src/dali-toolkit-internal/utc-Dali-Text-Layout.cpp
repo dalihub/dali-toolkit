@@ -109,7 +109,8 @@ bool LayoutTextTest( const LayoutTextData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   // 2) Clear the layout.
   Vector<LineRun>& lines = visualModel->mLines;
@@ -172,7 +173,8 @@ bool LayoutTextTest( const LayoutTextData& data )
                                        totalNumberOfGlyphs,
                                        Text::HorizontalAlignment::BEGIN,
                                        Text::LineWrap::WORD,
-                                       outlineWidth );
+                                       outlineWidth,
+                                       true );
 
   layoutParameters.isLastNewParagraph = isLastNewParagraph;
 
@@ -370,7 +372,8 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   // 2) Call the ReLayoutRightToLeftLines() method.
   Layout::Engine engine;
@@ -390,7 +393,8 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                                        visualModel->mGlyphs.Count(),
                                        Text::HorizontalAlignment::BEGIN,
                                        Text::LineWrap::WORD,
-                                       outlineWidth );
+                                       outlineWidth,
+                                       true );
 
   layoutParameters.numberOfBidirectionalInfoRuns = logicalModel->mBidirectionalLineInfo.Count();
   layoutParameters.lineBidirectionalInfoRunsBuffer = logicalModel->mBidirectionalLineInfo.Begin();
@@ -482,7 +486,8 @@ bool AlignTest( const AlignData& data )
                    layoutSize,
                    logicalModel,
                    visualModel,
-                   metrics );
+                   metrics,
+                   false );
 
   // Call the Align method.
   Layout::Engine engine;

@@ -407,6 +407,16 @@ VerticalAlignment::Type Controller::GetVerticalAlignment() const
   return mImpl->mModel->mVerticalAlignment;
 }
 
+bool Controller::IsIgnoreSpacesAfterText() const
+{
+  return mImpl->mModel->mIgnoreSpacesAfterText;
+}
+
+void Controller::SetIgnoreSpacesAfterText( bool ignore )
+{
+  mImpl->mModel->mIgnoreSpacesAfterText = ignore;
+}
+
 void Controller::SetLineWrapMode( Text::LineWrap::Mode lineWrapMode )
 {
   if( lineWrapMode != mImpl->mModel->mLineWrapMode )
@@ -3532,7 +3542,8 @@ bool Controller::DoRelayout( const Size& size,
                                          totalNumberOfGlyphs,
                                          mImpl->mModel->mHorizontalAlignment,
                                          mImpl->mModel->mLineWrapMode,
-                                         outlineWidth );
+                                         outlineWidth,
+                                         mImpl->mModel->mIgnoreSpacesAfterText );
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mModel->mVisualModel->mGlyphPositions;

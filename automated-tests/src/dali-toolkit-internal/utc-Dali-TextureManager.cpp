@@ -72,3 +72,30 @@ int UtcTextureManagerRequestLoad(void)
 
   END_TEST;
 }
+
+int UtcTextureManagerGenerateHash(void)
+{
+  ToolkitTestApplication application;
+
+  TextureManager textureManager; // Create new texture manager
+
+  TestObserver observer;
+  std::string filename( "image.png" );
+  auto preMultiply = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+  TextureManager::TextureId textureId = textureManager.RequestLoad(
+    filename,
+    ImageDimensions(),
+    FittingMode::SCALE_TO_FILL,
+    SamplingMode::BOX_THEN_LINEAR,
+    TextureManager::USE_ATLAS,
+    &observer,
+    true,
+    TextureManager::ReloadPolicy::CACHED,
+    preMultiply);
+
+  VisualUrl url = textureManager.GetVisualUrl( textureId );
+
+  DALI_TEST_EQUALS( url.GetUrl().compare( filename ), 0, TEST_LOCATION );
+
+  END_TEST;
+}
