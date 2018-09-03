@@ -27,12 +27,6 @@ LayoutGroup::LayoutGroup()
 {
 }
 
-LayoutGroup LayoutGroup::New( Handle& handle )
-{
-  Internal::LayoutGroupPtr layout = Internal::LayoutGroup::New( handle );
-  return LayoutGroup( layout.Get() );
-}
-
 LayoutGroup LayoutGroup::DownCast( BaseHandle handle )
 {
   return LayoutGroup( dynamic_cast< Dali::Toolkit::Internal::LayoutGroup* >( handle.GetObjectPtr() ) );
