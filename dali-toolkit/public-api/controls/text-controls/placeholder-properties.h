@@ -41,7 +41,7 @@ namespace PlaceHolder
 {
 
 /**
- * @brief Placeholder text Propeties used by Text controls to show placeholder
+ * @brief Placeholder text Properties used by Text controls to show placeholder
  * @SINCE_1_2.62
  *
  */

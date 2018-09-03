@@ -50,8 +50,8 @@ Grid::Grid()
 : LayoutGroup(),
   mTotalHeight( 0 ),
   mTotalWidth( 0 ),
-  mNumColumns( AUTO_FIT ),
-  mNumRows( AUTO_FIT ),
+  mNumColumns( 1 ),
+  mNumRows( 1 ),
   mRequestedColumnWidth( 0 ),
   mRequestedNumColumns( AUTO_FIT )
 {

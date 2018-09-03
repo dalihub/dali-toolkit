@@ -173,7 +173,7 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
 #if defined(DEBUG_ENABLED)
     std::ostringstream o;
     o<<widthMeasureSpec<<","<<heightMeasureSpec;
-    DALI_LOG_INFO( gLayoutFilter, Debug::Concise, "Calling %s OnMeasure( %s )\n", Actor::DownCast(GetOwner()).GetName().c_str(), o.str().c_str());
+    DALI_LOG_INFO( gLayoutFilter, Debug::Concise, "LayoutItem::Measure Calling %s OnMeasure( %s )\n", Actor::DownCast(GetOwner()).GetName().c_str(), o.str().c_str());
 #endif
     OnMeasure( widthMeasureSpec, heightMeasureSpec );
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT );
@@ -469,18 +469,22 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
       if( mImpl->mAnimated )
       {
         auto animation = Animation::New( 0.5f );
-        animation.AnimateTo( Property( actor, Actor::Property::POSITION ),
-                             Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
-        animation.AnimateTo( Property( actor, Actor::Property::SIZE ),
-                             Vector3( right-left, bottom-top, 0.0f ) );
+        animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), float( left.mValue ) );
+        animation.AnimateTo( Property( actor, Actor::Property::POSITION_Y ), float( top.mValue ) );
+
+        animation.AnimateTo( Property( actor, Actor::Property::SIZE_WIDTH ), float( newWidth ) );
+        animation.AnimateTo( Property( actor, Actor::Property::SIZE_HEIGHT ), float( newHeight ) );
+
         animation.FinishedSignal().Connect( mSlotDelegate, &LayoutItem::OnLayoutAnimationFinished );
         animation.Play();
       }
       else
       {
         // @todo Collate into list of Property & Property::Value pairs.
-        actor.SetPosition( Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
-        actor.SetSize( Vector3( right-left, bottom-top, 0.0f ) );
+        actor.SetX( float( left.mValue ) );
+        actor.SetY( float( top.mValue ) );
+        actor.SetProperty( Actor::Property::SIZE_WIDTH, float( newWidth ) );
+        actor.SetProperty( Actor::Property::SIZE_HEIGHT, float( newHeight ) );
       }
     }
 

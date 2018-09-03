@@ -1231,6 +1231,18 @@ public: // Queries & retrieves.
    */
   void SetVerticalLineAlignment( Toolkit::DevelText::VerticalLineAlignment::Type alignment );
 
+  /**
+   * @brief Retrieves ignoreSpaceAfterText value from model
+   * @return The value of ignoreSpaceAfterText
+   */
+  bool IsIgnoreSpacesAfterText() const;
+
+  /**
+   * @brief Sets ignoreSpaceAfterText value to model
+   * @param[in] ignore The value of ignoreSpacesAfterText for the text
+   */
+  void SetIgnoreSpacesAfterText( bool ignore );
+
 public: // Relayout.
 
   /**
