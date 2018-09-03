@@ -95,6 +95,16 @@ void LayoutItem::Unparent()
 
 void LayoutItem::SetAnimateLayout( bool animateLayout )
 {
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetAnimateLayout animateLayout(%s)\n", (animateLayout)?"true":"false" );
+
+  auto owner = GetOwner();
+  auto actor = Actor::DownCast(owner);
+
+  if( actor )
+  {
+      DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetAnimateLayout animateLayout(%s) owner(%s)\n", (animateLayout)?"true":"false", actor.GetName().c_str() );
+  }
+
   mImpl->mAnimated = animateLayout;
 
   OnAnimationStateChanged( animateLayout );
@@ -170,7 +180,7 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
 
     // flag not set, setMeasuredDimension() was not invoked, we raise an exception to warn the developer
     DALI_ASSERT_ALWAYS( mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET ) &&
-                        "Layout's OnMeasure() did not set the measured dimension by calling setMeasuredDimension()" );
+                        "Layout's OnMeasure() mension()" );
     mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_LAYOUT_REQUIRED );
   }
 
@@ -180,6 +190,8 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
 
 void LayoutItem::Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b )
 {
+  DALI_LOG_TRACE_METHOD( gLayoutFilter );
+
   if( mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT ) )
   {
     OnMeasure( mImpl->mOldWidthMeasureSpec, mImpl->mOldHeightMeasureSpec );
@@ -227,7 +239,7 @@ Extents LayoutItem::GetPadding() const
   {
     Extents padding = control.GetProperty<Extents>( Toolkit::Control::Property::PADDING );
 
-    DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutBase::Padding for %s : (%d,%d,%d,%d) \n",
+    DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::Padding for %s : (%d,%d,%d,%d) \n",
                    control.GetName().c_str(),
                    padding.start, padding.end, padding.top, padding.bottom
                  );
@@ -289,6 +301,8 @@ LayoutLength LayoutItem::GetDefaultSize( LayoutLength size, MeasureSpec measureS
 
 void LayoutItem::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec)
 {
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::OnMeasure\n");
+
   SetMeasuredDimensions( GetDefaultSize( GetSuggestedMinimumWidth(), widthMeasureSpec ),
                          GetDefaultSize( GetSuggestedMinimumHeight(), heightMeasureSpec ) );
 }
@@ -332,7 +346,7 @@ void LayoutItem::SetLayoutRequested()
 
 void LayoutItem::SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight )
 {
-  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutBase::SetMeasuredDimensions width(%d) height(%d) \n",
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetMeasuredDimensions width(%d) height(%d) \n",
                                                  MeasureSpec::IntType( measuredWidth.GetSize() ),
                                                  MeasureSpec::IntType( measuredHeight.GetSize() )
                );
@@ -450,6 +464,8 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
     auto actor = Actor::DownCast(owner);
     if( actor )
     {
+      DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame owner(%s) (%d, %d, %d, %d)\n",  actor.GetName().c_str(),
+                                    left.mValue, top.mValue, right.mValue, bottom.mValue );
       if( mImpl->mAnimated )
       {
         auto animation = Animation::New( 0.5f );

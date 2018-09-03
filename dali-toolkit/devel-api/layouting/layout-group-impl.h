@@ -65,6 +65,14 @@ public:
    */
   LayoutGroup();
 
+  /**
+   * @brief Construct
+   *
+   * @param[in] owner The owner (container view / child view / visual ) of this layout
+   * @return a new LayoutGroup object
+   */
+  static LayoutGroupPtr New( Handle& owner );
+
 protected:
   /**
    * Virtual destructor may only be called by Unreference()
@@ -248,6 +256,15 @@ protected:
                                         LayoutLength widthUsed,
                                         MeasureSpec parentHeightMeasureSpec,
                                         LayoutLength heightUsed );
+  /**
+   * @copydoc LayoutItem::OnMeasure
+   */
+  virtual void OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec ) override;
+
+  /**
+   * @copydoc LayoutItem::OnLayout
+   */
+  virtual void OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom ) override;
 
 private:
   /**
