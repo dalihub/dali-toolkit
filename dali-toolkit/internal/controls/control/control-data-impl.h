@@ -345,6 +345,16 @@ public:
    */
   void RemoveLayout();
 
+  /**
+   * @copydoc DevelControl::SetLayoutingRequired
+   */
+  void SetLayoutingRequired( bool layoutingRequired );
+
+  /**
+   * @copydoc DevelControl::IsLayoutingRequired()
+   */
+  bool IsLayoutingRequired();
+
 private:
 
   /**
@@ -423,6 +433,7 @@ public:
   ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
+  bool mIsLayoutingRequired :1;            ///< Stores whether the control needs to be Layout
 
   RegisteredVisualContainer mRemoveVisuals;         ///< List of visuals that are being replaced by another visual once ready
 

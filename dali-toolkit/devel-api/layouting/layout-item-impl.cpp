@@ -95,15 +95,11 @@ void LayoutItem::Unparent()
 
 void LayoutItem::SetAnimateLayout( bool animateLayout )
 {
-  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetAnimateLayout animateLayout(%s)\n", (animateLayout)?"true":"false" );
-
   auto owner = GetOwner();
   auto actor = Actor::DownCast(owner);
 
-  if( actor )
-  {
-      DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetAnimateLayout animateLayout(%s) owner(%s)\n", (animateLayout)?"true":"false", actor.GetName().c_str() );
-  }
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetAnimateLayout animateLayout(%s) owner(%s)\n", (animateLayout)?"true":"false",
+                 ( ( Actor::DownCast( owner) ) ? Actor::DownCast(owner).GetName().c_str() : "Invalid Actor" ) );
 
   mImpl->mAnimated = animateLayout;
 
@@ -163,7 +159,7 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
 
   const bool needsLayout = specChanged && ( !isSpecExactly || !matchesSpecSize );
 
-  DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::Measure("<<widthMeasureSpec<<", "<<heightMeasureSpec<<") Owner:"<<Actor::DownCast(GetOwner()).GetName() <<"  forceLayout="<<forceLayout<<", specChanged="<<specChanged<<", isSpecExactly="<<isSpecExactly<<", matchesSpecSize="<<matchesSpecSize<<", needsLayout="<<needsLayout <<std::endl <<(forceLayout||needsLayout?"  Remeasuring":"  NoChange"));
+  DALI_LOG_STREAM( gLayoutFilter, Debug::General, "LayoutItem::Measure("<<widthMeasureSpec<<", "<<heightMeasureSpec<<") Owner:"<<Actor::DownCast(GetOwner()).GetName() <<"  forceLayout="<<forceLayout<<", specChanged="<<specChanged<<", isSpecExactly="<<isSpecExactly<<", matchesSpecSize="<<matchesSpecSize<<", needsLayout="<<needsLayout <<std::endl <<(forceLayout||needsLayout?"  Remeasuring":"  NoChange"));
 
   if( forceLayout || needsLayout )
   {
@@ -173,14 +169,14 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
 #if defined(DEBUG_ENABLED)
     std::ostringstream o;
     o<<widthMeasureSpec<<","<<heightMeasureSpec;
-    DALI_LOG_INFO( gLayoutFilter, Debug::Concise, "LayoutItem::Measure Calling %s OnMeasure( %s )\n", Actor::DownCast(GetOwner()).GetName().c_str(), o.str().c_str());
+    DALI_LOG_INFO( gLayoutFilter, Debug::General, "LayoutItem::Measure Calling %s OnMeasure( %s )\n", Actor::DownCast(GetOwner()).GetName().c_str(), o.str().c_str());
 #endif
     OnMeasure( widthMeasureSpec, heightMeasureSpec );
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT );
 
     // flag not set, setMeasuredDimension() was not invoked, we raise an exception to warn the developer
     DALI_ASSERT_ALWAYS( mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET ) &&
-                        "Layout's OnMeasure() mension()" );
+                        "Layout's OnMeasure() Measured dimension flag not set" );
     mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_LAYOUT_REQUIRED );
   }
 

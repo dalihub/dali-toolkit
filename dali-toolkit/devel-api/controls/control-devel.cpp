@@ -152,6 +152,19 @@ void RequestLayout( Internal::Control& control )
     layoutItem->RequestLayout();
   }
 }
+void SetLayoutingRequired( Control control, bool layoutingRequired )
+{
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
+  controlDataImpl.SetLayoutingRequired( layoutingRequired );
+}
+
+bool IsLayoutingRequired( Control control )
+{
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
+  return controlDataImpl.IsLayoutingRequired();
+}
 
 } // namespace DevelControl
 

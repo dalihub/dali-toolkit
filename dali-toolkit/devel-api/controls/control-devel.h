@@ -307,6 +307,20 @@ DALI_TOOLKIT_API void SetLayout( Control control, Toolkit::LayoutItem layout );
  */
 DALI_TOOLKIT_API void RequestLayout( Internal::Control& control );
 
+/**
+ * @brief Set whether the control should have a layout
+ * @param[in] control The Control to set the behaviour on
+ * @param[in] layoutingRequired true if the control should have a layout
+ */
+DALI_TOOLKIT_API void SetLayoutingRequired( Control control, bool layoutingRequired );
+
+/**
+ * @brief Check if the control has been set to require layouting
+ * @param[in] control The Control to query
+ * @return true if the control needs layouting
+ */
+DALI_TOOLKIT_API bool IsLayoutingRequired( Control control );
+
 } // namespace DevelControl
 
 } // namespace Toolkit
