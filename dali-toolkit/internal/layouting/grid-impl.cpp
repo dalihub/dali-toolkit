@@ -66,7 +66,7 @@ void Grid::SetNumberOfColumns( int columns )
   // Store value and Relayout if changed.
   if( columns != mNumColumns )
   {
-    mNumColumns = columns;
+    mNumColumns = std::max( 1, columns );
     RequestLayout();
   }
 }
@@ -186,11 +186,11 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
     // Grid expands to fit content
 
     // If number of columns AUTO_FIT then set to 1 column.
-
+    mNumColumns = ( mNumColumns > 0 ) ? mNumColumns : 1;
     // Calculate numbers of rows, round down result as later check for remainder.
-    mNumRows = childCount / ( ( mNumColumns ) ? mNumColumns : 1 );
+    mNumRows = childCount / mNumColumns;
     // If number of cells not cleanly dividable by colums, add another row to house remainder cells.
-    mNumRows += ( childCount %  ( ( mNumColumns ) ? mNumColumns : 1 ) ) ? 1 : 0;
+    mNumRows += ( childCount % mNumColumns ) ? 1 : 0;
 
     availableContentHeight = desiredChildHeight * mNumRows;
   }

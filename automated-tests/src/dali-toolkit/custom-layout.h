@@ -38,6 +38,10 @@ class CustomLayout : public Dali::Toolkit::LayoutGroup
 {
 public:
 
+  // Behaviour flags
+  static const int BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_WIDTH                = 0x00000001;  // Child width measured without constraint
+  static const int BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_HEIGHT               = 0x00000002;  // Child height measured without constraint
+
   /**
    * @brief Creates an uninitialized CustomLayout handle.
    *
@@ -90,7 +94,28 @@ public:
    */
   static CustomLayout DownCast( BaseHandle handle );
 
+  /**
+   * Request for a relayout of this layout
+   */
   void RequestLayout();
+
+  /**
+   * Enables setting of flags corresponding to particular behaviour of this layout
+   * @param[in] flag the flag to set
+   */
+  void SetCustomBehaviourFlag( int flag );
+
+  /**
+   * Returns true or false depending on whether flag is set
+   * @return bool returns true if flag set
+   */
+  bool GetCustomBehaviourFlags( int flagToCheck );
+
+  /**
+   * Clears the flag if already set.
+   * @param[in] flag the flag to clear
+   */
+  void ClearPrivateFlag( int flag );
 
 public: // Not intended for application developers
 
