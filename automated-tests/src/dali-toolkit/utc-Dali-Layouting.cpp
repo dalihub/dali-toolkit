@@ -3003,3 +3003,89 @@ int UtcDaliLayouting_LayoutGroupWithChildMargin01(void)
 
   END_TEST;
 }
+
+int UtcDaliLayouting_SetLayout(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_SetLayout - Test reusing layouts");
+
+  Control rootControl;
+  SetupRootLayoutControl( rootControl );
+
+  auto container = Control::New();
+  auto horizontalLayout = LinearLayout::New();
+  horizontalLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
+  DevelControl::SetLayout( container, horizontalLayout );
+  container.SetName( "Container" );
+  rootControl.Add( container );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 40, 40 ) );
+  controls.push_back( CreateLeafControl( 60, 60 ) );
+
+  for( auto&& iter : controls )
+  {
+    container.Add( iter );
+  }
+
+  container.SetParentOrigin( ParentOrigin::CENTER );
+  container.SetAnchorPoint( AnchorPoint::CENTER );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 10.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Change a layout
+  auto verticalLayout = LinearLayout::New();
+  verticalLayout.SetOrientation( LinearLayout::Orientation::VERTICAL );
+  DevelControl::SetLayout( container, verticalLayout );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Second round
+  DevelControl::SetLayout( container, horizontalLayout );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 10.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Change a layout
+  DevelControl::SetLayout( container, verticalLayout );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 60.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
