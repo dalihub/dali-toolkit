@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 
 // INTERNAL INCLUDES
 #include "custom-layout.h"
@@ -57,12 +58,27 @@ public:
   CustomLayout( CustomLayout&& other ) = default;
   CustomLayout& operator=( CustomLayout&& other ) = default;
 
+  /**
+   * @copydoc CustomLayout::SetCustomBehaviourFlag
+   */
+  void SetCustomBehaviourFlag( int flag );
+
+  /**
+   * @copydoc CustomLayout::GetCustomBehaviourFlags
+   */
+  bool GetCustomBehaviourFlags( int flagToCheck );
+
+  /**
+   * @copydoc CustomLayout::ClearPrivateFlag
+   */
+  void ClearPrivateFlag( int flag );
+
 private:
 
   /**
    * @brief Default Constructor
    */
-  CustomLayout() = default;
+  CustomLayout();
 
   /**
    * Virtual Destructor
@@ -82,6 +98,20 @@ private:
    * Overriding this method so that we can layout our children as required.
    */
   virtual void OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom ) override;
+
+  /**
+   * Measure children with parent's measure spec unless BehaviourFlag set to use an unconstrained width or height.
+   * @param[in] childLayout child to measure
+   * @param[in] widthMeasureSpec default layout width measure spec
+   * @param[in] heightMeasureSpec default layout height measure spec
+   * @param[out] resultingWidth resulting width of layout after children are measured
+   * @param[out] resultingHeight resulting height of layout after children are measured
+   */
+  void MeasureChildren( Dali::Toolkit::Internal::LayoutItemPtr childLayout, MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec, int resultingWidth, int resultingHeight );
+
+  private:
+
+  int mBehaviourFlags; // flags to alter behaviour of this custom layout
 
 };
 

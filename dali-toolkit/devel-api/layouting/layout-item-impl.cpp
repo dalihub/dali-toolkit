@@ -314,6 +314,10 @@ void LayoutItem::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
 void LayoutItem::SetParent( LayoutParent* parent )
 {
   mImpl->mLayoutParent = parent;
+  if ( parent == nullptr )
+  {
+    mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME );
+  }
 }
 
 LayoutParent* LayoutItem::GetParent()
@@ -441,7 +445,7 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
 
   DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame enter(%d, %d, %d, %d)\n", left.mValue, top.mValue, right.mValue, bottom.mValue );
 
-  if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom )
+  if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom || !mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME ) )
   {
     changed = true;
 
@@ -456,7 +460,7 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
     mImpl->mRight = right;
     mImpl->mBottom = bottom;
 
-    mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_HAS_BOUNDS );
+    mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME );
 
 
     // Reflect up to parent control
@@ -469,18 +473,22 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
       if( mImpl->mAnimated )
       {
         auto animation = Animation::New( 0.5f );
-        animation.AnimateTo( Property( actor, Actor::Property::POSITION ),
-                             Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
-        animation.AnimateTo( Property( actor, Actor::Property::SIZE ),
-                             Vector3( right-left, bottom-top, 0.0f ) );
+        animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), float( left.mValue ) );
+        animation.AnimateTo( Property( actor, Actor::Property::POSITION_Y ), float( top.mValue ) );
+
+        animation.AnimateTo( Property( actor, Actor::Property::SIZE_WIDTH ), float( newWidth ) );
+        animation.AnimateTo( Property( actor, Actor::Property::SIZE_HEIGHT ), float( newHeight ) );
+
         animation.FinishedSignal().Connect( mSlotDelegate, &LayoutItem::OnLayoutAnimationFinished );
         animation.Play();
       }
       else
       {
         // @todo Collate into list of Property & Property::Value pairs.
-        actor.SetPosition( Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
-        actor.SetSize( Vector3( right-left, bottom-top, 0.0f ) );
+        actor.SetX( float( left.mValue ) );
+        actor.SetY( float( top.mValue ) );
+        actor.SetProperty( Actor::Property::SIZE_WIDTH, float( newWidth ) );
+        actor.SetProperty( Actor::Property::SIZE_HEIGHT, float( newHeight ) );
       }
     }
 

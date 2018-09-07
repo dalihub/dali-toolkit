@@ -78,6 +78,7 @@ int UtcDaliLayouting_AbsoluteLayout01(void)
   Stage stage = Stage::GetCurrent();
   auto absoluteLayout = Control::New();
   auto layout = AbsoluteLayout::New();
+  layout.SetAnimateLayout( true );
   DevelControl::SetLayout( absoluteLayout, layout );
   absoluteLayout.SetName( "AsoluteLayout");
 
