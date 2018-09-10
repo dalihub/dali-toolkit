@@ -21,6 +21,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/devel-api/object/handle-devel.h>
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/layouting/layout-item.h>
@@ -61,6 +62,31 @@ LinearLayout::LinearLayout()
 
 LinearLayout::~LinearLayout()
 {
+}
+
+void LinearLayout::DoRegisterChildProperties( const std::string& containerType )
+{
+  auto typeInfo = Dali::TypeRegistry::Get().GetTypeInfo( containerType );
+  if( typeInfo )
+  {
+    Property::IndexContainer indices;
+    typeInfo.GetChildPropertyIndices( indices );
+
+    if( std::find( indices.Begin(), indices.End(), Toolkit::LinearLayout::ChildProperty::WEIGHT ) ==
+        indices.End() )
+    {
+      ChildPropertyRegistration( typeInfo.GetName(), "weight", Toolkit::LinearLayout::ChildProperty::WEIGHT, Property::FLOAT );
+    }
+  }
+}
+
+void LinearLayout::OnChildAdd( LayoutItem& child )
+{
+  auto owner = child.GetOwner();
+  if( !DevelHandle::DoesCustomPropertyExist( owner, Toolkit::LinearLayout::ChildProperty::WEIGHT ) )
+  {
+    owner.SetProperty( Toolkit::LinearLayout::ChildProperty::WEIGHT, 0.0f );
+  }
 }
 
 void LinearLayout::SetCellPadding( LayoutSize size )
@@ -159,11 +185,14 @@ void LinearLayout::MeasureHorizontal( MeasureSpec widthMeasureSpec, MeasureSpec 
 {
   auto widthMode = widthMeasureSpec.GetMode();
   auto heightMode = heightMeasureSpec.GetMode();
-  bool isExactly = (widthMode == MeasureSpec::Mode::EXACTLY);
+  bool isExactly = ( widthMode == MeasureSpec::Mode::EXACTLY );
   bool matchHeight = false;
   bool allFillParent = true;
   LayoutLength maxHeight = 0;
   LayoutLength alternativeMaxHeight = 0;
+  LayoutLength weightedMaxHeight = 0;
+  float totalWeight = 0;
+  int usedExcessSpace = 0;
   struct
   {
     MeasuredSize::State widthState;
@@ -174,32 +203,64 @@ void LinearLayout::MeasureHorizontal( MeasureSpec widthMeasureSpec, MeasureSpec 
   mTotalLength = 0;
 
   // measure children, and determine if further resolution is required
-  for( unsigned int i=0; i<GetChildCount(); ++i )
+
+  // 1st phase:
+  // We cycle through all children and measure children with weight 0 (non weighted children) according to their specs
+  // to accumulate total used space in mTotalLength based on measured sizes and margins.
+  // Weighted children are not measured at this phase.
+  // Available space for weighted children will be calculated in the phase 2 based on mTotalLength value.
+  for( unsigned int i = 0; i < GetChildCount(); ++i )
   {
     auto childLayout = GetChildAt( i );
     if( childLayout )
     {
       auto childOwner = childLayout->GetOwner();
       auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
-
-      MeasureChild( childLayout, widthMeasureSpec, heightMeasureSpec );
-      auto childWidth = childLayout->GetMeasuredWidth();
+      auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
+      auto childWeight = childOwner.GetProperty<float>( Toolkit::LinearLayout::ChildProperty::WEIGHT );
       auto childMargin = childLayout->GetMargin();
 
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LinearLayout::OnMeasure childWidth(%d)\n", MeasureSpec::IntType( childWidth ) );
+      totalWeight += childWeight;
 
-      auto length = childWidth + LayoutLength::IntType(childMargin.start + childMargin.end);
-
-      auto cellPadding = i<GetChildCount()-1 ? mCellPadding.width: 0;
-
-      if( isExactly )
+      const bool useExcessSpace = desiredWidth == 0 && childWeight > 0;
+      if( isExactly && useExcessSpace )
       {
-        mTotalLength += length;
+        mTotalLength += childMargin.start + childMargin.end;
       }
       else
       {
-        auto totalLength = mTotalLength;
-        mTotalLength = std::max( totalLength, totalLength + length + cellPadding );
+        LayoutLength childWidth = 0;
+        if( useExcessSpace )
+        {
+          // The widthMode is either UNSPECIFIED or AT_MOST, and
+          // this child is only laid out using excess space. Measure
+          // using WRAP_CONTENT so that we can find out the view's
+          // optimal width.
+          auto padding = GetPadding();
+          const MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( widthMeasureSpec, padding.start + padding.end, Toolkit::ChildLayoutData::WRAP_CONTENT );
+          const MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( heightMeasureSpec, padding.top + padding.bottom, desiredHeight );
+          childLayout->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
+          childWidth = childLayout->GetMeasuredWidth();
+          usedExcessSpace += childWidth;
+        }
+        else
+        {
+          MeasureChild( childLayout, widthMeasureSpec, heightMeasureSpec );
+          childWidth = childLayout->GetMeasuredWidth();
+        }
+
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LinearLayout::OnMeasure childWidth(%d)\n", MeasureSpec::IntType( childWidth ) );
+        auto length = childWidth + LayoutLength::IntType( childMargin.start + childMargin.end );
+        auto cellPadding = i < GetChildCount() - 1 ? mCellPadding.width : 0;
+        if( isExactly )
+        {
+          mTotalLength += length;
+        }
+        else
+        {
+          auto totalLength = mTotalLength;
+          mTotalLength = std::max( totalLength, totalLength + length + cellPadding );
+        }
       }
 
       bool matchHeightLocally = false;
@@ -224,7 +285,18 @@ void LinearLayout::MeasureHorizontal( MeasureSpec widthMeasureSpec, MeasureSpec 
 
       maxHeight = std::max( maxHeight, childHeight );
       allFillParent = ( allFillParent && desiredHeight == Toolkit::ChildLayoutData::MATCH_PARENT );
-      alternativeMaxHeight = std::max( alternativeMaxHeight, matchHeightLocally ? marginHeight : childHeight );
+      if( childWeight > 0 )
+      {
+        /*
+         * Heights of weighted Views are bogus if we end up
+         * remeasuring, so keep them separate.
+         */
+        weightedMaxHeight = std::max( weightedMaxHeight, matchHeightLocally ? marginHeight : childHeight );
+      }
+      else
+      {
+        alternativeMaxHeight = std::max( alternativeMaxHeight, matchHeightLocally ? marginHeight : childHeight );
+      }
     }
   }
 
@@ -234,6 +306,88 @@ void LinearLayout::MeasureHorizontal( MeasureSpec widthMeasureSpec, MeasureSpec 
   widthSize = std::max( widthSize, GetSuggestedMinimumWidth() );
   MeasuredSize widthSizeAndState = ResolveSizeAndState( widthSize, widthMeasureSpec, MeasuredSize::State::MEASURED_SIZE_OK);
   widthSize = widthSizeAndState.GetSize();
+
+  // Expand children with weight to take up available space
+  // 2nd phase:
+  // We cycle through weighted children now (children with weight > 0).
+  // The children are measured with exact size equal to their share of the available space based on their weights.
+  // mTotalLength is updated to include weighted children measured sizes.
+  int remainingExcess = widthSize - mTotalLength + usedExcessSpace;
+  if( remainingExcess != 0 && totalWeight > 0 )
+  {
+    float remainingWeightSum = totalWeight;
+    maxHeight = 0;
+    mTotalLength = 0;
+
+    for( unsigned int i = 0; i < GetChildCount(); ++i )
+    {
+      auto childLayout = GetChildAt( i );
+      auto childOwner = childLayout->GetOwner();
+      auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
+      auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
+      auto childWeight = childOwner.GetProperty<float>( Toolkit::LinearLayout::ChildProperty::WEIGHT );
+      auto childMargin = childLayout->GetMargin();
+
+      LayoutLength childWidth = 0;
+      if( childWeight > 0 )
+      {
+        int share = static_cast<int>( childWeight * remainingExcess / remainingWeightSum );
+        remainingExcess -= share;
+        remainingWeightSum -= childWeight;
+
+        // Always lay out weighted elements with intrinsic size regardless of the parent spec.
+        // for consistency between specs.
+        if( desiredWidth == 0 )
+        {
+          // This child needs to be laid out from scratch using
+          // only its share of excess space.
+          childWidth = share;
+        }
+        else
+        {
+          // This child had some intrinsic width to which we
+          // need to add its share of excess space.
+          childWidth = childLayout->GetMeasuredWidth() + share;
+        }
+
+        const MeasureSpec childWidthMeasureSpec = MeasureSpec( childWidth, MeasureSpec::Mode::EXACTLY );
+        const MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( heightMeasureSpec, padding.top + padding.bottom, desiredHeight );
+        childLayout->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
+
+        // Child may now not fit in horizontal dimension.
+        if( childLayout->GetMeasuredWidthAndState().GetState() == MeasuredSize::State::MEASURED_SIZE_TOO_SMALL )
+        {
+          childState.widthState = MeasuredSize::State::MEASURED_SIZE_TOO_SMALL;
+        }
+      }
+
+      auto length = childLayout->GetMeasuredWidth() + LayoutLength::IntType( childMargin.start + childMargin.end );
+      auto cellPadding = i < GetChildCount() - 1 ? mCellPadding.width : 0;
+      if( isExactly )
+      {
+        mTotalLength += length;
+      }
+      else
+      {
+        auto totalLength = mTotalLength;
+        mTotalLength = std::max( totalLength, totalLength + length + cellPadding );
+      }
+
+      bool matchHeightLocally = heightMode != MeasureSpec::Mode::EXACTLY && desiredHeight == Toolkit::ChildLayoutData::MATCH_PARENT;
+      auto marginHeight = LayoutLength( childMargin.top + childMargin.bottom );
+      auto childHeight = childLayout->GetMeasuredHeight() + marginHeight;
+
+      maxHeight = std::max( maxHeight, childHeight );
+      alternativeMaxHeight = std::max( alternativeMaxHeight, matchHeightLocally ? marginHeight : childHeight );
+      allFillParent = (allFillParent && desiredHeight == Toolkit::ChildLayoutData::MATCH_PARENT);
+
+      mTotalLength += padding.start + padding.end;
+    }
+  }
+  else
+  {
+    alternativeMaxHeight = std::max( alternativeMaxHeight, weightedMaxHeight );
+  }
 
   if( !allFillParent && heightMode != MeasureSpec::Mode::EXACTLY )
   {
@@ -385,12 +539,16 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
 void LinearLayout::MeasureVertical( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
 {
   auto widthMode = widthMeasureSpec.GetMode();
+  auto heightMode = heightMeasureSpec.GetMode();
+  bool isExactly = ( heightMode == MeasureSpec::Mode::EXACTLY );
 
   bool matchWidth = false;
   bool allFillParent = true;
   LayoutLength maxWidth = 0;
   LayoutLength alternativeMaxWidth = 0;
-
+  LayoutLength weightedMaxWidth = 0;
+  float totalWeight = 0;
+  int usedExcessSpace = 0;
   struct
   {
     MeasuredSize::State widthState;
@@ -401,22 +559,62 @@ void LinearLayout::MeasureVertical( MeasureSpec widthMeasureSpec, MeasureSpec he
   mTotalLength = 0;
 
   // measure children, and determine if further resolution is required
-  for( unsigned int i=0; i<GetChildCount(); ++i )
+
+  // 1st phase:
+  // We cycle through all children and measure children with weight 0 (non weighted children) according to their specs
+  // to accumulate total used space in mTotalLength based on measured sizes and margins.
+  // Weighted children are not measured at this phase.
+  // Available space for weighted children will be calculated in the phase 2 based on mTotalLength value.
+  for( unsigned int i = 0; i < GetChildCount(); ++i )
   {
     auto childLayout = GetChildAt( i );
     if( childLayout )
     {
       auto childOwner = childLayout->GetOwner();
       auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
-
-      MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, heightMeasureSpec, 0 );
-      auto childHeight = childLayout->GetMeasuredHeight();
+      auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
+      auto childWeight = childOwner.GetProperty<float>( Toolkit::LinearLayout::ChildProperty::WEIGHT );
       auto childMargin = childLayout->GetMargin();
-      auto length = childHeight + LayoutLength::IntType(childMargin.top + childMargin.bottom );
 
-      auto cellPadding = i<GetChildCount()-1 ? mCellPadding.height : 0;
-      auto totalLength = mTotalLength;
-      mTotalLength = std::max( totalLength, totalLength + length + cellPadding);
+      totalWeight += childWeight;
+
+      bool useExcessSpace = desiredHeight == 0 && childWeight > 0;
+
+      if( isExactly && useExcessSpace )
+      {
+        LayoutLength totalLength = mTotalLength;
+        mTotalLength = std::max( totalLength, totalLength + childMargin.top + childMargin.bottom );
+      }
+      else
+      {
+        LayoutLength childHeight = 0;
+        if( useExcessSpace )
+        {
+          // The heightMode is either UNSPECIFIED or AT_MOST, and
+          // this child is only laid out using excess space. Measure
+          // using WRAP_CONTENT so that we can find out the view's
+          // optimal height. We'll restore the original height of 0
+          // after measurement.
+          auto padding = GetPadding();
+          const MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( widthMeasureSpec, padding.start + padding.end, desiredWidth );
+          const MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( heightMeasureSpec, padding.top + padding.bottom, Toolkit::ChildLayoutData::WRAP_CONTENT );
+          childLayout->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
+          childHeight = childLayout->GetMeasuredHeight();
+          usedExcessSpace += childHeight;
+        }
+        else
+        {
+          MeasureChild( childLayout, widthMeasureSpec, heightMeasureSpec );
+          childHeight = childLayout->GetMeasuredHeight();
+        }
+
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LinearLayout::MeasureVertical childHeight(%d)\n", MeasureSpec::IntType( childHeight ) );
+
+        auto length = childHeight + LayoutLength::IntType( childMargin.top + childMargin.bottom );
+        auto cellPadding = i < GetChildCount() - 1 ? mCellPadding.height : 0;
+        auto totalLength = mTotalLength;
+        mTotalLength = std::max( totalLength, totalLength + length + cellPadding );
+      }
 
       bool matchWidthLocally = false;
       if( widthMode != MeasureSpec::Mode::EXACTLY && desiredWidth == Toolkit::ChildLayoutData::MATCH_PARENT )
@@ -441,15 +639,113 @@ void LinearLayout::MeasureVertical( MeasureSpec widthMeasureSpec, MeasureSpec he
 
       maxWidth = std::max( maxWidth, childWidth );
       allFillParent = ( allFillParent && desiredWidth == Toolkit::ChildLayoutData::MATCH_PARENT );
-      alternativeMaxWidth = std::max( alternativeMaxWidth, matchWidthLocally ? marginWidth : childWidth );
+      if( childWeight > 0 )
+      {
+        /*
+         * Widths of weighted Views are bogus if we end up
+         * remeasuring, so keep them separate.
+         */
+        weightedMaxWidth = std::max( weightedMaxWidth, matchWidthLocally ? marginWidth : childWidth );
+      }
+      else
+      {
+        alternativeMaxWidth = std::max( alternativeMaxWidth, matchWidthLocally ? marginWidth : childWidth );
+      }
     }
   }
+
   Extents padding = GetPadding();
   mTotalLength += padding.top + padding.bottom;
   auto heightSize = mTotalLength;
   heightSize = std::max( heightSize, GetSuggestedMinimumHeight() );
   MeasuredSize heightSizeAndState = ResolveSizeAndState( heightSize, heightMeasureSpec, MeasuredSize::State::MEASURED_SIZE_OK);
   heightSize = heightSizeAndState.GetSize();
+
+  // Either expand children with weight to take up available space or
+  // shrink them if they extend beyond our current bounds. If we skipped
+  // measurement on any children, we need to measure them now.
+
+  // 2nd phase:
+  // We cycle through weighted children now (children with weight > 0).
+  // The children are measured with exact size equal to their share of the available space based on their weights.
+  // mTotalLength is updated to include weighted children measured sizes.
+  int remainingExcess = heightSize - mTotalLength + usedExcessSpace;
+  if( remainingExcess != 0 && totalWeight > 0.0f )
+  {
+    float remainingWeightSum = totalWeight;
+
+    mTotalLength = 0;
+
+    for( unsigned int i = 0; i < GetChildCount(); ++i )
+    {
+      auto childLayout = GetChildAt( i );
+      auto childOwner = childLayout->GetOwner();
+      auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
+      auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
+      auto childWeight = childOwner.GetProperty<float>( Toolkit::LinearLayout::ChildProperty::WEIGHT );
+      auto childMargin = childLayout->GetMargin();
+
+      LayoutLength childHeight = 0;
+      if( childWeight > 0 )
+      {
+        int share = static_cast<int>( childWeight * remainingExcess / remainingWeightSum );
+        remainingExcess -= share;
+        remainingWeightSum -= childWeight;
+
+        // Always lay out weighted elements with intrinsic size regardless of the parent spec
+        // for consistency between specs.
+        if( desiredHeight == 0 )
+        {
+          // This child needs to be laid out from scratch using
+          // only its share of excess space.
+          childHeight = share;
+        }
+        else
+        {
+          // This child had some intrinsic width to which we
+          // need to add its share of excess space.
+          childHeight = childLayout->GetMeasuredHeight() + share;
+        }
+
+        const MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( widthMeasureSpec, padding.start + padding.end, desiredWidth );
+        const MeasureSpec childHeightMeasureSpec = MeasureSpec( childHeight, MeasureSpec::Mode::EXACTLY );
+        childLayout->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
+
+        // Child may now not fit in vertical dimension.
+        if( childLayout->GetMeasuredHeightAndState().GetState() == MeasuredSize::State::MEASURED_SIZE_TOO_SMALL )
+        {
+          childState.heightState = MeasuredSize::State::MEASURED_SIZE_TOO_SMALL;
+        }
+      }
+
+      bool matchWidthLocally = false;
+      if( widthMode != MeasureSpec::Mode::EXACTLY && desiredWidth == Toolkit::ChildLayoutData::MATCH_PARENT )
+      {
+        // Will have to re-measure at least this child when we know exact height.
+        matchWidth = true;
+        matchWidthLocally = true;
+      }
+
+      auto marginWidth = LayoutLength( childMargin.start + childMargin.end );
+      auto childWidth = childLayout->GetMeasuredWidth() + marginWidth;
+      maxWidth = std::max( maxWidth, childWidth );
+      allFillParent = allFillParent && desiredWidth == Toolkit::ChildLayoutData::MATCH_PARENT;
+      alternativeMaxWidth = std::max( alternativeMaxWidth, matchWidthLocally ? marginWidth : childWidth );
+
+      childHeight = childLayout->GetMeasuredHeight();
+      auto length = childHeight + LayoutLength::IntType( childMargin.top + childMargin.bottom );
+      auto cellPadding = i < GetChildCount() - 1 ? mCellPadding.height : 0;
+      auto totalLength = mTotalLength;
+      mTotalLength = std::max( totalLength, totalLength + length + cellPadding );
+    }
+
+    // Add in our padding
+    mTotalLength += padding.top + padding.bottom;
+  }
+  else
+  {
+    alternativeMaxWidth = std::max( alternativeMaxWidth, weightedMaxWidth );
+  }
 
   if( !allFillParent && widthMode != MeasureSpec::Mode::EXACTLY )
   {
