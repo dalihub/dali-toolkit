@@ -452,7 +452,7 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
   auto height = bottom - top;
 
   // Space available for child
-  auto childSpace = height - padding.top - padding.bottom;
+  auto childSpace = height - (int)padding.top - (int)padding.bottom;
 
   auto count = GetChildCount();
 
@@ -514,24 +514,25 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
       {
         case Dali::Toolkit::LinearLayout::Alignment::TOP:
         {
-          childTop = LayoutLength( padding.top ) + childMargin.top;
+          childTop = LayoutLength( padding.top ) + (int)childMargin.top;
           break;
         }
         case Dali::Toolkit::LinearLayout::Alignment::BOTTOM:
         {
-          childTop = height - padding.bottom - childHeight - childMargin.bottom;
+          childTop = height - (int)padding.bottom - childHeight - (int)childMargin.bottom;
           break;
         }
         case Dali::Toolkit::LinearLayout::Alignment::CENTER_VERTICAL:
         default:
         {
-          childTop = LayoutLength( padding.top ) + ( ( childSpace - childHeight ) / 2 ) + childMargin.top - childMargin.bottom;
+          childTop = LayoutLength( padding.top ) + (int)( ( childSpace - childHeight ) / 2 ) + (int)childMargin.top - (int)childMargin.bottom;
           break;
         }
       }
+
       childLeft += childMargin.start;
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
-      childLeft += childWidth + childMargin.end + mCellPadding.width;
+      childLeft += childWidth + (int)childMargin.end + mCellPadding.width;
     }
   }
 }
@@ -804,7 +805,7 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
   auto width = right - left;
 
   // Space available for child
-  auto childSpace = width - padding.start - padding.end;
+  auto childSpace = width - (int)padding.start - (int)padding.end;
   auto count = GetChildCount();
 
   switch ( mAlignment & VERTICAL_ALIGNMENT_MASK )
@@ -860,7 +861,7 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
         }
       }
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
-      childTop += childHeight + childMargin.bottom + mCellPadding.height;
+      childTop += childHeight + (int)childMargin.bottom + mCellPadding.height;
     }
   }
 }
