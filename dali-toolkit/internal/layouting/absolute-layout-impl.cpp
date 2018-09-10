@@ -106,7 +106,7 @@ void AbsoluteLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec height
       // Store current width and height needed to contain all children.
       totalWidth = maxPosition.x - minPosition.x;
       totalHeight = maxPosition.y - minPosition.y;
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "AbsoluteLayout::OnMeasure child width(%f) height(%f) \n", (float)totalWidth, (float)totalHeight  );
+      DALI_LOG_INFO( gLogFilter, Debug::Concise, "AbsoluteLayout::OnMeasure child width(%f) height(%f) \n", (float)totalWidth, (float)totalHeight  );
 
       if( childLayout->GetMeasuredWidthAndState().GetState() == MeasuredSize::State::MEASURED_SIZE_TOO_SMALL )
       {
@@ -141,7 +141,6 @@ void AbsoluteLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top
   // Absolute layout positions it's children at their Actor positions.
   // Children could overlap or spill outside the parent, as is the nature of absolute positions.
   auto count = GetChildCount();
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "AbsoluteLayout::OnLayout child count(%d)\n", count  );
 
   for( unsigned int i = 0; i < count; i++)
   {
