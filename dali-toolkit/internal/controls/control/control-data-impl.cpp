@@ -36,6 +36,7 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -339,7 +340,8 @@ Control::Impl::Impl( Control& controlImpl )
   mInputMethodContext(),
   mFlags( Control::ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIsKeyboardNavigationSupported( false ),
-  mIsKeyboardFocusGroup( false )
+  mIsKeyboardFocusGroup( false ),
+  mIsLayoutingRequired( false )
 {
 }
 
@@ -1455,6 +1457,16 @@ void Control::Impl::RemoveLayout()
     mLayout->Unparent();
     mLayout.Reset();
   }
+}
+
+void Control::Impl::SetLayoutingRequired( bool layoutingRequired )
+{
+  mControlImpl.mImpl->mIsLayoutingRequired = layoutingRequired;
+}
+
+bool Control::Impl::IsLayoutingRequired()
+{
+  return mControlImpl.mImpl->mIsLayoutingRequired;
 }
 
 } // namespace Internal

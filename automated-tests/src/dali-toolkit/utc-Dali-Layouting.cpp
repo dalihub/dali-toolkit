@@ -2788,19 +2788,21 @@ int UtcDaliLayouting_LayoutGroup01(void)
   DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, 600 );
   hbox.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  ChildLayoutData::WRAP_CONTENT );
+  DevelControl::SetLayoutingRequired( hbox, true );
   hbox.SetAnchorPoint( AnchorPoint::TOP_LEFT );  // LinearLayout will eventually do this internally.
 
-  tet_infoline("Add a control without SetLayout being called");
+  tet_infoline("Add a control without SetLayout being called but with layout required set true");
 
   auto control = Control::New();
   control.SetName("Control1");
+  DevelControl::SetLayoutingRequired( control, true );
   hbox.Add( control );
   control.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
   control.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  ChildLayoutData::WRAP_CONTENT );
-
   tet_infoline("Add a Textlabel to the control");
   auto textLabel = TextLabel::New("Test text");
   textLabel.SetName("TextLabel");
+
   control.Add( textLabel );
 
   // Ensure layouting happens
@@ -2826,17 +2828,18 @@ int UtcDaliLayouting_LayoutGroup02(void)
   // Create a parent layout
   auto hbox = Control::New();
   auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
   rootControl.Add( hbox );
-  DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, 600 );
   hbox.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  ChildLayoutData::WRAP_CONTENT );
   hbox.SetAnchorPoint( AnchorPoint::TOP_LEFT );  // LinearLayout will eventually do this internally.
 
-  tet_infoline("Add a control without SetLayout being called");
+  tet_infoline("Add a control without SetLayout being called but with layout required set true");
 
   auto control = Control::New();
   control.SetName("Control1");
+  DevelControl::SetLayoutingRequired( control, true );
   hbox.Add( control );
   control.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
   control.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  ChildLayoutData::WRAP_CONTENT );
@@ -2874,7 +2877,7 @@ int UtcDaliLayouting_LayoutGroup02(void)
 int UtcDaliLayouting_LayoutGroup03(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliLayouting_LayoutGroup03 - Test control witha LayoutGroup as a leaf");
+  tet_infoline("UtcDaliLayouting_LayoutGroup03 - Test control with a LayoutGroup as a leaf");
 
   Control rootControl;
   SetupRootLayoutControl( rootControl );
@@ -2882,9 +2885,9 @@ int UtcDaliLayouting_LayoutGroup03(void)
   // Create a parent layout
   auto hbox = Control::New();
   auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetName( "HBox");
   rootControl.Add( hbox );
-  DevelControl::SetLayout( hbox, hboxLayout );
   hbox.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, 600 );
   hbox.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  ChildLayoutData::WRAP_CONTENT );
   hbox.SetAnchorPoint( AnchorPoint::TOP_LEFT );  // LinearLayout will eventually do this internally.
@@ -2904,6 +2907,83 @@ int UtcDaliLayouting_LayoutGroup03(void)
   tet_infoline("Test control is width of it's parent and exact given height");
   DALI_TEST_EQUALS( control.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 600.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( control.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliLayouting_LayoutGroup04(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayouting_LayoutGroup04 - Test control with a LayoutGroup as a leaf and with SetLayotRequired = true");
+
+  Control rootControl;
+  SetupRootLayoutControl( rootControl );
+
+  // Create a parent layout
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+  rootControl.Add( hbox );
+  hbox.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, 600 );
+  hbox.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  ChildLayoutData::WRAP_CONTENT );
+  hbox.SetAnchorPoint( AnchorPoint::TOP_LEFT );  // LinearLayout will eventually do this internally.
+
+  tet_infoline("Add a control without SetLayout being called");
+
+  auto control = Control::New();
+  control.SetName("Control1");
+  DevelControl::SetLayoutingRequired( control, true );
+  hbox.Add( control );
+  control.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  control.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  100 );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Test control is width of it's parent and exact given height");
+  DALI_TEST_EQUALS( control.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 600.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_IsLayoutingRequired(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayouting_IsLayoutingRequired - Test setting the SetLayoutRequired and then check if flag was set");
+
+  Control rootControl;
+  SetupRootLayoutControl( rootControl );
+
+  // Create a parent layout
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "HBox");
+  rootControl.Add( hbox );
+  hbox.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, 600 );
+  hbox.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  ChildLayoutData::WRAP_CONTENT );
+  hbox.SetAnchorPoint( AnchorPoint::TOP_LEFT );  // LinearLayout will eventually do this internally.
+
+  tet_infoline("Add a control without SetLayout being called");
+
+  auto control = Control::New();
+  control.SetName("Control1");
+  DALI_TEST_EQUALS( DevelControl::IsLayoutingRequired( control ), false, TEST_LOCATION );
+  DevelControl::SetLayoutingRequired( control, true );
+  hbox.Add( control );
+  control.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  control.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  100 );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Test control is width of it's parent and exact given height");
+  DALI_TEST_EQUALS( DevelControl::IsLayoutingRequired( control ), true, TEST_LOCATION );
 
   END_TEST;
 }
@@ -2930,6 +3010,7 @@ int UtcDaliLayouting_LayoutGroupWithPadding01(void)
 
   auto control = Control::New();
   control.SetName("Control1");
+  DevelControl::SetLayoutingRequired( control, true );
   hbox.Add( control );
   control.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
   control.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  ChildLayoutData::WRAP_CONTENT );
@@ -2977,6 +3058,7 @@ int UtcDaliLayouting_LayoutGroupWithChildMargin01(void)
 
   auto control = Control::New();
   control.SetName("Control1");
+  DevelControl::SetLayoutingRequired( control, true );
   hbox.Add( control );
   control.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
   control.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  ChildLayoutData::WRAP_CONTENT );

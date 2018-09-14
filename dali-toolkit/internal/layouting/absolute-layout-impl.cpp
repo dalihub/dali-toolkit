@@ -157,6 +157,12 @@ void AbsoluteLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top
       auto childTop = childPosition.y;
       auto childLeft = childPosition.x;
 
+      DALI_LOG_INFO( gLogFilter, Debug::General, "AbsoluteLayout::OnLayout child[%s] position(%f,%f) child width[%d] height(%d)\n",
+                      Toolkit::Control::DownCast( childOwner ).GetName().c_str(),
+                      childPosition.x, childPosition.y,
+                      childWidth.mValue, childHeight.mValue
+                      );
+
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
     }
   }
