@@ -107,7 +107,7 @@ private:
    * @param[out] resultingWidth resulting width of layout after children are measured
    * @param[out] resultingHeight resulting height of layout after children are measured
    */
-  void MeasureChildren( Dali::Toolkit::Internal::LayoutItemPtr childLayout, MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec, int resultingWidth, int resultingHeight );
+  void MeasureChildren( Dali::Toolkit::Internal::LayoutItemPtr childLayout, MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec, LayoutLength resultingWidth, LayoutLength resultingHeight );
 
   private:
 

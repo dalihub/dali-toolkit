@@ -42,6 +42,12 @@ public:
   {
   }
 
+  LayoutSize( LayoutLength anX, LayoutLength aY )
+  : x( anX.mValue ),
+    y( aY.mValue )
+  {
+  }
+
   LayoutSize( const LayoutSize& layoutSize )
   : x( layoutSize.x ),
     y( layoutSize.y )

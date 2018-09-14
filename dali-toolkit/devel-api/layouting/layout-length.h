@@ -34,6 +34,11 @@ class LayoutLength
 public:
   using IntType = int;
 
+  LayoutLength()
+  : mValue( 0 )
+  {
+  }
+
   LayoutLength( IntType value )
   : mValue( value )
   {
@@ -164,12 +169,16 @@ public:
   }
   LayoutLength operator*( float rhs )
   {
-    return LayoutLength(LayoutLength::IntType(float(mValue) * rhs));
+    return LayoutLength(LayoutLength::IntType(AsFloat() * rhs));
   }
 
-  operator float()
+  /**
+   * @brief explicit method to return the value as float
+   * @return the LayoutLength as float
+   */
+  float AsFloat() const
   {
-    return float( mValue );
+    return static_cast<float>( mValue );
   }
 
   IntType mValue;

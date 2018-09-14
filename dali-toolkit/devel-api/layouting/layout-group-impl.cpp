@@ -374,13 +374,13 @@ void LayoutGroup::MeasureChildWithMargins( LayoutItemPtr child,
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::MeasureChildWithMargins desiredWidth(%d)\n",  desiredWidth );
 
   MeasureSpec childWidthMeasureSpec = GetChildMeasureSpec( parentWidthMeasureSpec,
-                                                           padding.start + padding.end +
+                                                           LayoutLength( padding.start + padding.end ) +
                                                            widthUsed, desiredWidth );
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::MeasureChildWithMargins desiredHeight(%d)\n",  desiredHeight );
 
   MeasureSpec childHeightMeasureSpec = GetChildMeasureSpec( parentHeightMeasureSpec,
-                                                            padding.top + padding.bottom +
+                                                            LayoutLength( padding.top + padding.bottom )+
                                                             heightUsed, desiredHeight );
 
   child->Measure( childWidthMeasureSpec, childHeightMeasureSpec );
@@ -395,9 +395,9 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
   auto specMode = measureSpec.GetMode();
   LayoutLength specSize = measureSpec.GetSize();
 
-  auto size = std::max( LayoutLength(0), specSize - padding ); // reduce available size by the owners padding
+  LayoutLength size = std::max( LayoutLength(0), specSize - padding ); // reduce available size by the owners padding
 
-  MeasureSpec::IntType resultSize = 0;
+  LayoutLength resultSize = 0;
   MeasureSpec::Mode resultMode = MeasureSpec::Mode::UNSPECIFIED;
 
   switch( specMode )
@@ -489,8 +489,7 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
     }
   }
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::GetChildMeasureSpec resultSize(%u)\n", resultSize );
-
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::GetChildMeasureSpec resultSize(%u)\n", resultSize.mValue );
 
   //noinspection ResourceType
   return MeasureSpec( resultSize, resultMode );

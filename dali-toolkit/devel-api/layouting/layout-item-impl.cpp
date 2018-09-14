@@ -347,9 +347,7 @@ void LayoutItem::SetLayoutRequested()
 void LayoutItem::SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight )
 {
   DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetMeasuredDimensions width(%d) height(%d) \n",
-                                                 MeasureSpec::IntType( measuredWidth.GetSize() ),
-                                                 MeasureSpec::IntType( measuredHeight.GetSize() )
-               );
+                                                 measuredWidth.GetSize().mValue, measuredHeight.GetSize().mValue );
 
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET );
   mImpl->mMeasuredWidth = measuredWidth;
@@ -445,10 +443,10 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
   {
     changed = true;
 
-    auto oldWidth = mImpl->mRight - mImpl->mLeft;
-    auto oldHeight = mImpl->mBottom - mImpl->mTop;
-    auto newWidth = right - left;
-    auto newHeight = bottom - top;
+    LayoutLength oldWidth = mImpl->mRight - mImpl->mLeft;
+    LayoutLength oldHeight = mImpl->mBottom - mImpl->mTop;
+    LayoutLength newWidth = right - left;
+    LayoutLength newHeight = bottom - top;
     bool sizeChanged = (newWidth != oldWidth) || (newHeight != oldHeight);
 
     mImpl->mLeft = left;
@@ -469,11 +467,11 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
       if( mImpl->mAnimated )
       {
         auto animation = Animation::New( 0.5f );
-        animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), float( left.mValue ) );
-        animation.AnimateTo( Property( actor, Actor::Property::POSITION_Y ), float( top.mValue ) );
+        animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), left.AsFloat() );
+        animation.AnimateTo( Property( actor, Actor::Property::POSITION_Y ), top.AsFloat() );
 
-        animation.AnimateTo( Property( actor, Actor::Property::SIZE_WIDTH ), float( newWidth ) );
-        animation.AnimateTo( Property( actor, Actor::Property::SIZE_HEIGHT ), float( newHeight ) );
+        animation.AnimateTo( Property( actor, Actor::Property::SIZE_WIDTH ), newWidth.AsFloat() );
+        animation.AnimateTo( Property( actor, Actor::Property::SIZE_HEIGHT ), newHeight.AsFloat() );
 
         animation.FinishedSignal().Connect( mSlotDelegate, &LayoutItem::OnLayoutAnimationFinished );
         animation.Play();
@@ -481,10 +479,10 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
       else
       {
         // @todo Collate into list of Property & Property::Value pairs.
-        actor.SetX( float( left.mValue ) );
-        actor.SetY( float( top.mValue ) );
-        actor.SetProperty( Actor::Property::SIZE_WIDTH, float( newWidth ) );
-        actor.SetProperty( Actor::Property::SIZE_HEIGHT, float( newHeight ) );
+        actor.SetX( left.AsFloat() );
+        actor.SetY( top.AsFloat() );
+        actor.SetProperty( Actor::Property::SIZE_WIDTH, newWidth.AsFloat() );
+        actor.SetProperty( Actor::Property::SIZE_HEIGHT, newHeight.AsFloat() );
       }
     }
 
@@ -505,7 +503,7 @@ void LayoutItem::OnLayoutAnimationFinished( Animation& animation )
   auto actor = Actor::DownCast(owner);
   if( actor )
   {
-    actor.SetSize( Vector3( mImpl->mRight-mImpl->mLeft, mImpl->mBottom-mImpl->mTop, 0.0f ) );
+    actor.SetSize( Vector3( mImpl->mRight.AsFloat() - mImpl->mLeft.AsFloat(), mImpl->mBottom.AsFloat() - mImpl->mTop.AsFloat(), 0.0f ) );
   }
 }
 
