@@ -1457,6 +1457,7 @@ void Control::Impl::SetLayout( Toolkit::Internal::LayoutItem& layout )
 
 void Control::Impl::RemoveLayout()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::Impl::RemoveLayout\n");
   if( mLayout )
   {
     mLayout->Unparent();

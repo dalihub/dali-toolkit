@@ -16,6 +16,8 @@
 
 #include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
+#include <dali-toolkit/devel-api/layouting/layout-transition-data.h>
+#include <dali-toolkit/internal/layouting/layout-transition-data-impl.h>
 
 namespace Dali
 {
@@ -51,6 +53,21 @@ void LayoutItem::SetAnimateLayout( bool animateLayout )
 bool LayoutItem::IsLayoutAnimated() const
 {
   return GetImplementation( *this ).IsLayoutAnimated();
+}
+
+void LayoutItem::SetTransitionData( LayoutTransitionData::LayoutTransitionType layoutTransitionType, LayoutTransitionData layoutTransitionData )
+{
+  Toolkit::Internal::LayoutTransitionDataPtr layoutTransitionDataPtr = Toolkit::Internal::LayoutTransitionDataPtr();
+  if ( layoutTransitionData )
+  {
+    layoutTransitionDataPtr = Toolkit::Internal::LayoutTransitionDataPtr( &Toolkit::GetImplementation( layoutTransitionData ) );
+  }
+  GetImplementation( *this ).SetTransitionData( layoutTransitionType, layoutTransitionDataPtr );
+}
+
+LayoutTransitionData LayoutItem::GetTransitionData( LayoutTransitionData::LayoutTransitionType layoutTransitionType ) const
+{
+  return LayoutTransitionData( GetImplementation( *this ).GetTransitionData( layoutTransitionType ).Get() );
 }
 
 } // namespace Toolkit

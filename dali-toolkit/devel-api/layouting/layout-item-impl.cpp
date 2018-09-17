@@ -19,9 +19,13 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali/devel-api/object/handle-devel.h>
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
+#include <dali-toolkit/internal/layouting/layout-transition-data-impl.h>
 #include <dali-toolkit/internal/layouting/layout-item-data-impl.h>
+
+#include <dali/devel-api/scripting/enum-helper.h>
 
 namespace
 {
@@ -33,7 +37,6 @@ Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG
 const char* WIDTH_SPECIFICATION_NAME( "widthSpecification" );
 const char* HEIGHT_SPECIFICATION_NAME( "heightSpecification" );
 
-const float DEFAULT_TRANSITION_DURATION( 0.5f );
 }
 
 namespace Dali
@@ -66,7 +69,6 @@ void LayoutItem::Initialize( Handle& owner, const std::string& containerType )
   mImpl->mOwner = &(owner.GetBaseObject());
   RegisterChildProperties( containerType );
   OnInitialize(); // Ensure direct deriving class gets initialized
-  RequestLayout();
 }
 
 Handle LayoutItem::GetOwner() const
@@ -93,6 +95,35 @@ void LayoutItem::Unparent()
   mImpl->mOwner = NULL;
 }
 
+LayoutTransitionDataPtr LayoutItem::GetDefaultTransition()
+{
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::GetDefaultTransition\n" );
+  if ( !mImpl->mDefaultTransitionData.Get() )
+  {
+    auto owner = GetOwner();
+    auto actor = Actor::DownCast( owner );
+
+    mImpl->mDefaultTransitionData = LayoutTransitionData::New();
+    {
+      Property::Map map;
+      map[ Dali::Toolkit::LayoutTransitionData::AnimatorKey::PROPERTY ] = Actor::Property::POSITION;
+      map[ Dali::Toolkit::LayoutTransitionData::AnimatorKey::TARGET_VALUE ] = Property::Value(); // capture from layout update
+      map[ Dali::Toolkit::LayoutTransitionData::AnimatorKey::ANIMATOR ] = std::string(); // default animator with default duration
+      // Capture calculated position after layout, apply default linear animation
+      mImpl->mDefaultTransitionData->AddPropertyAnimator( actor, map );
+    }
+    {
+      Property::Map map;
+      map[ Dali::Toolkit::LayoutTransitionData::AnimatorKey::PROPERTY ] = Actor::Property::SIZE;
+      map[ Dali::Toolkit::LayoutTransitionData::AnimatorKey::TARGET_VALUE ] = Property::Value(); // capture from layout update
+      map[ Dali::Toolkit::LayoutTransitionData::AnimatorKey::ANIMATOR ] = std::string(); // default animator with default duration
+      // Capture calculated size after layout, apply default linear animation
+      mImpl->mDefaultTransitionData->AddPropertyAnimator( actor, map );
+    }
+  }
+  return mImpl->mDefaultTransitionData;
+}
+
 void LayoutItem::SetAnimateLayout( bool animateLayout )
 {
   auto owner = GetOwner();
@@ -109,6 +140,39 @@ void LayoutItem::SetAnimateLayout( bool animateLayout )
 bool LayoutItem::IsLayoutAnimated() const
 {
   return mImpl->mAnimated;
+}
+
+void LayoutItem::SetTransitionData( int layoutTransitionType, Internal::LayoutTransitionDataPtr layoutTransitionDataPtr )
+{
+  switch ( layoutTransitionType )
+  {
+  case Dali::Toolkit::LayoutTransitionData::ON_CHILD_ADD:
+    mImpl->mOnChildAddTransitionData = layoutTransitionDataPtr;
+    break;
+  case Dali::Toolkit::LayoutTransitionData::ON_CHILD_REMOVE:
+    mImpl->mOnChildRemoveTransitionData = layoutTransitionDataPtr;
+    break;
+  case Dali::Toolkit::LayoutTransitionData::ON_OWNER_SET:
+    mImpl->mOnOwnerSetTransitionData = layoutTransitionDataPtr;
+    break;
+  default:
+    break;
+  }
+}
+
+Internal::LayoutTransitionDataPtr LayoutItem::GetTransitionData( int layoutTransitionType ) const
+{
+  switch ( layoutTransitionType )
+  {
+  case Dali::Toolkit::LayoutTransitionData::ON_CHILD_ADD:
+    return mImpl->mOnChildAddTransitionData.Get();
+  case Dali::Toolkit::LayoutTransitionData::ON_CHILD_REMOVE:
+    return mImpl->mOnChildRemoveTransitionData.Get();
+  case Dali::Toolkit::LayoutTransitionData::ON_OWNER_SET:
+    return mImpl->mOnOwnerSetTransitionData.Get();
+  default:
+    return LayoutTransitionDataPtr();
+  }
 }
 
 void LayoutItem::RegisterChildProperties( const std::string& containerType )
@@ -198,12 +262,21 @@ void LayoutItem::Layout( LayoutLength l, LayoutLength t, LayoutLength r, LayoutL
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT );
   }
 
+  LayoutData& layoutData = *mImpl->sLayoutData;
+  size_t size = layoutData.childrenPropertyAnimators.size();
+
   bool changed = SetFrame( l, t, r, b );
 
   if( changed || mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_LAYOUT_REQUIRED ) )
   {
+
     OnLayout( changed, l, t, r, b );
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_LAYOUT_REQUIRED );
+  }
+
+  if ( size != layoutData.childrenPropertyAnimators.size() )
+  {
+    layoutData.childrenPropertyAnimators.resize( size );
   }
 
   mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
@@ -333,14 +406,29 @@ LayoutParent* LayoutItem::GetParent()
 void LayoutItem::RequestLayout()
 {
   Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
-  if ( control )
+  if( control )
   {
-    DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::RequestLayout %s\n", control.GetName().c_str());
+    DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::RequestLayout control(%s)\n",
+        control.GetName().c_str() );
   }
   // @todo Enforce failure if called in Measure/Layout passes.
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
   Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
-  layoutController.RequestLayout( Toolkit::LayoutItem(this) );
+  layoutController.RequestLayout( Toolkit::LayoutItem( this ) );
+}
+
+void LayoutItem::RequestLayout( Dali::Toolkit::LayoutTransitionData::LayoutTransitionType layoutAnimationType )
+{
+  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  if ( control )
+  {
+    DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::RequestLayout control(%s) layoutTranstionType(%d)\n",
+        control.GetName().c_str(), (int)layoutAnimationType );
+  }
+  // @todo Enforce failure if called in Measure/Layout passes.
+  mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
+  Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
+  layoutController.RequestLayout( Toolkit::LayoutItem(this), layoutAnimationType );
 }
 
 bool LayoutItem::IsLayoutRequested() const
@@ -469,54 +557,63 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
   if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom || mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME ) )
   {
     changed = true;
-
-    LayoutLength oldWidth = mImpl->mRight - mImpl->mLeft;
-    LayoutLength oldHeight = mImpl->mBottom - mImpl->mTop;
-    LayoutLength newWidth = right - left;
-    LayoutLength newHeight = bottom - top;
-    bool sizeChanged = (newWidth != oldWidth) || (newHeight != oldHeight);
-
-    mImpl->mLeft = left;
-    mImpl->mTop = top;
-    mImpl->mRight = right;
-    mImpl->mBottom = bottom;
-
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME );
+  }
 
+  LayoutLength oldWidth = mImpl->mRight - mImpl->mLeft;
+  LayoutLength oldHeight = mImpl->mBottom - mImpl->mTop;
+  LayoutLength newWidth = right - left;
+  LayoutLength newHeight = bottom - top;
+  bool sizeChanged = ( newWidth != oldWidth ) || ( newHeight != oldHeight );
 
-    // Reflect up to parent control
-    auto owner = GetOwner();
-    auto actor = Actor::DownCast(owner);
-    if( actor )
+  mImpl->mLeft = left;
+  mImpl->mTop = top;
+  mImpl->mRight = right;
+  mImpl->mBottom = bottom;
+
+  // Reflect up to parent control
+  auto owner = GetOwner();
+  auto actor = Actor::DownCast( owner );
+  LayoutData& layoutData = *mImpl->sLayoutData;
+  if( actor )
+  {
+    if( mImpl->mAnimated && !layoutData.speculativeLayout )
     {
-      DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame owner(" << left << ", " << top << ", " << right << ", " << bottom << ")\n" );
 
-      if( mImpl->mAnimated )
+      LayoutItem* transitionOwner = layoutData.layoutTransition.layoutItem.Get();
+      LayoutTransitionDataPtr layoutTransitionDataPtr = GetTransitionData( layoutData.layoutTransition.layoutTransitionType );
+
+      // Found transition owner
+      if( transitionOwner == this && layoutTransitionDataPtr.Get() )
       {
-        auto animation = Animation::New( 0.5f );
-        animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), left.AsInteger() );
-        animation.AnimateTo( Property( actor, Actor::Property::POSITION_Y ), top.AsInteger() );
-
-        animation.AnimateTo( Property( actor, Actor::Property::SIZE_WIDTH ), newWidth.AsInteger() );
-        animation.AnimateTo( Property( actor, Actor::Property::SIZE_HEIGHT ), newHeight.AsInteger() );
-
-        animation.FinishedSignal().Connect( mSlotDelegate, &LayoutItem::OnLayoutAnimationFinished );
-        animation.Play();
+        DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame apply transition to (%s), transition type (%d)\n", actor.GetName().c_str(), layoutData.layoutTransition.layoutTransitionType );
+        layoutData.layoutPositionDataArray.push_back( LayoutPositionData( actor, left.AsDecimal(), top.AsDecimal(), right.AsDecimal(), bottom.AsDecimal(), true ) );
+        layoutTransitionDataPtr->ConvertToLayoutDataElements( actor, layoutData );
+        changed = true;
       }
       else
       {
-        // @todo Collate into list of Property & Property::Value pairs.
-        actor.SetX( left.AsInteger() );
-        actor.SetY( top.AsInteger() );
-        actor.SetProperty( Actor::Property::SIZE_WIDTH, newWidth.AsInteger() );
-        actor.SetProperty( Actor::Property::SIZE_HEIGHT, newHeight.AsInteger() );
+        if( changed )
+        {
+          DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame apply default transition to (%s), transition type (%d)\n", actor.GetName().c_str(), layoutData.layoutTransition.layoutTransitionType );
+          layoutData.layoutPositionDataArray.push_back( LayoutPositionData( actor, left.AsDecimal(), top.AsDecimal(), right.AsDecimal(), bottom.AsDecimal(), true ) );
+          GetDefaultTransition()->ConvertToLayoutDataElements( actor, layoutData );
+        }
       }
     }
-
-    if( sizeChanged )
+    else
     {
-      SizeChange( LayoutSize( newWidth, newHeight ), LayoutSize( oldWidth, oldHeight ) );
+      if( changed )
+      {
+        layoutData.layoutPositionDataArray.push_back( LayoutPositionData( actor, left.AsDecimal(), top.AsDecimal(), right.AsDecimal(), bottom.AsDecimal(), false ) );
+      }
     }
+  }
+
+  // TODO: do we need it
+  if( sizeChanged )
+  {
+    SizeChange( LayoutSize( newWidth, newHeight ), LayoutSize( oldWidth, oldHeight ) );
   }
 
   DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame  exit(" << left << ", " << top << ", " << right << ", " << bottom << ")\n" );

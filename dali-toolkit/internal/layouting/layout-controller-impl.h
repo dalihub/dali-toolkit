@@ -16,13 +16,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <list>
 #include <dali/public-api/object/base-object.h>
 #include <dali/integration-api/core.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
+#include <dali-toolkit/internal/layouting/layout-transition-data-impl.h>
 
 namespace Dali
 {
@@ -54,9 +55,9 @@ public:
   void Initialize();
 
   /**
-   * This marks the given layout and all its parents as dirty.
+   * This marks the given layout and all its parents as dirty and triggers a transition if set.
    */
-  void RequestLayout( LayoutItem& layout );
+  void RequestLayout( LayoutItem& layout, int layoutTransitionType );
 
   /**
    * Measures next level of layouts in the actor hierarchy.
@@ -68,6 +69,16 @@ public:
    */
   void PerformLayout( Actor root, int left, int top, int right, int bottom );
 
+  /**
+   * Perform positioning of actors after layout update
+   */
+  void PerformLayoutPositioning( LayoutPositionDataArray& layoutPositionDataArray, bool all ) const;
+
+  /**
+   * Perform animation of actors properties after layout update
+   */
+  void PerformLayoutAnimation( LayoutTransition& layoutTransition, LayoutPositionDataArray& layoutPositionDataArray, LayoutDataArray& layoutDataArray, LayoutAnimatorArray& layoutAnimatorArray );
+
 protected: // Implementation of Processor
 
   /**
@@ -76,7 +87,40 @@ protected: // Implementation of Processor
   virtual void Process();
 
 private:
+  std::list< LayoutTransition > mLayoutTransitions;
+  struct AnimationFinishedFunctor
+  {
+    AnimationFinishedFunctor( LayoutController& layoutController, LayoutTransition& layoutTransition, LayoutPositionDataArray& array )
+    : layoutController( layoutController ),
+      layoutDataPositionArray(),
+      layoutItem( layoutTransition.layoutItem ),
+      layoutTransitionType( layoutTransition.layoutTransitionType )
+    {
+      layoutDataPositionArray.swap( array );
+    }
+
+    void operator()( Animation& animation )
+    {
+      layoutController.PerformLayoutPositioning( layoutDataPositionArray, true );
+      layoutController.mAnimationFinishedFunctors.pop_front();
+      if (layoutTransitionType != -1)
+      {
+        LayoutTransitionDataPtr layoutTransitionDataPtr = layoutItem->GetTransitionData( layoutTransitionType );
+        layoutTransitionDataPtr->EmitSignalFinish( layoutTransitionType );
+      }
+    }
+
+    LayoutController& layoutController;
+    LayoutPositionDataArray layoutDataPositionArray;
+    LayoutItemPtr layoutItem;
+    int layoutTransitionType;
+  };
+
   bool mLayoutRequested;
+  Animation mAnimation;
+  std::list< AnimationFinishedFunctor > mAnimationFinishedFunctors;
+
+  SlotDelegate<LayoutController> mSlotDelegate;
 };
 
 } // namespace Internal

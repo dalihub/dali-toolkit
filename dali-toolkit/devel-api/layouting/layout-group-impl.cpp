@@ -507,7 +507,7 @@ void LayoutGroup::OnInitialize()
     // Take ownership of existing children
     for( unsigned int childIndex = 0 ; childIndex < control.GetChildCount(); ++childIndex )
     {
-      ChildAddedToOwner( control.GetChildAt( childIndex ) );
+      ChildAddedToOwnerImpl( control.GetChildAt( childIndex ) );
     }
 
     DevelActor::ChildAddedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildAddedToOwner );
@@ -551,6 +551,8 @@ void LayoutGroup::OnInitialize()
         }
       }
     }
+
+    RequestLayout( Dali::Toolkit::LayoutTransitionData::LayoutTransitionType::ON_OWNER_SET );
   }
 }
 
@@ -581,6 +583,12 @@ void LayoutGroup::RemoveChild( LayoutItem& item )
 }
 
 void LayoutGroup::ChildAddedToOwner( Actor child )
+{
+  ChildAddedToOwnerImpl( child );
+  RequestLayout( Dali::Toolkit::LayoutTransitionData::LayoutTransitionType::ON_CHILD_ADD );
+}
+
+void LayoutGroup::ChildAddedToOwnerImpl( Actor child )
 {
   LayoutItemPtr childLayout;
   Toolkit::Control control = Toolkit::Control::DownCast( child );
@@ -662,6 +670,7 @@ void LayoutGroup::ChildRemovedFromOwner( Actor child )
     if( childLayout )
     {
       Remove( *childLayout.Get() );
+      RequestLayout( Dali::Toolkit::LayoutTransitionData::LayoutTransitionType::ON_CHILD_REMOVE );
     }
   }
 }

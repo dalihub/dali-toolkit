@@ -20,8 +20,10 @@
 
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/public-api/animation/animation.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
 #include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/devel-api/layouting/layout-child-impl.h>
@@ -37,9 +39,13 @@ namespace Toolkit
 namespace Internal
 {
 
+struct LayoutData;
+
 class LayoutItem;
 using LayoutItemPtr = IntrusivePtr<LayoutItem>;
 
+class LayoutTransitionData;
+using LayoutTransitionDataPtr = IntrusivePtr<LayoutTransitionData>;
 
 /**
  * Base class for layouts.
@@ -114,6 +120,28 @@ public:
   bool IsLayoutAnimated() const;
 
   /**
+   * @brief Get the default transition
+   *
+   * @return The default transition
+   */
+  LayoutTransitionDataPtr GetDefaultTransition();
+
+  /**
+   * @brief Set the layout transition data
+   * @param[in] layoutTransitionType The type of the transition
+   * @param[in] layoutTransitionDataPtr The transition data pointer
+   */
+  void SetTransitionData( int layoutTransitionType, LayoutTransitionDataPtr layoutTransitionDataPtr );
+
+  /**
+   * @brief Get the transition data
+   * @param[in] layoutTransitionType The type of the transition
+   *
+   * @return The transition
+   */
+  LayoutTransitionDataPtr GetTransitionData( int layoutTransitionType ) const;
+
+  /**
    * @brief  This is called to find out how big a layout should be.
    *
    * The parent supplies constraint information in the width and height parameters.
@@ -174,6 +202,14 @@ public:
    * This will make this layout and all it's parent layouts dirty.
    */
   void RequestLayout();
+
+  /**
+   * @brief Request that this layout is re-laid out with particular transition.
+   * @param[in] layoutTranstionType The transition type
+   *
+   * This will make this layout and all it's parent layouts dirty and set the transition queued.
+   */
+  void RequestLayout( Dali::Toolkit::LayoutTransitionData::LayoutTransitionType layoutTranstionType );
 
   /**
    * @brief Predicate to determine if this layout has been requested to re-layout
@@ -408,10 +444,9 @@ protected:
                                            MeasuredSize::State childMeasuredState );
 
   /**
-   * @brief Sets the frame (the size and position) of the layout onto it's owner
+   * @brief Sets the frame (the size and position) of the layout onto it's owner.
+   * Collect all properties to animate after the layout update.
    *
-   * @todo Consider instead, collating properties into LayoutCollector in order to set/animate them all
-   * in one block.
    * @param[in] left The horizontal position of the left edge of this frame within the parent layout
    * @param[in] top The vertical position of the top edge of this frame within the parent layout
    * @param[in] right The horizontal position of the right edge of this frame within the parent layout
@@ -465,7 +500,6 @@ private:
 
 public:
   class Impl; // Class declaration is public so we can add devel API's in the future
-
 
 private:
   std::unique_ptr<Impl> mImpl; ///< Implementation class holds all the data

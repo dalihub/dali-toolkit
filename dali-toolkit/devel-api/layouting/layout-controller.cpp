@@ -68,7 +68,12 @@ LayoutController LayoutController::Get()
 
 void LayoutController::RequestLayout( LayoutItem layout )
 {
-  GetImpl(*this).RequestLayout( GetImplementation( layout ) );
+  GetImpl( *this ).RequestLayout( GetImplementation( layout ), -1 );
+}
+
+void LayoutController::RequestLayout( LayoutItem layout, Dali::Toolkit::LayoutTransitionData::LayoutTransitionType layoutTransitionType  )
+{
+  GetImpl( *this ).RequestLayout( GetImplementation( layout ), layoutTransitionType );
 }
 
 LayoutController::LayoutController( Internal::LayoutController *impl )
