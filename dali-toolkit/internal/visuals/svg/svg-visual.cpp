@@ -143,7 +143,8 @@ void SvgVisual::DoSetOnStage( Actor& actor )
       : mImpl->mCustomShader->mFragmentShaderData;
 
     shader = DevelShader::New<uint32_t>( vertexData, fragmentData,
-                                         DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
+                                         DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map(),
+                                         mImpl->mCustomShader->mHints );
 
 
     shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
