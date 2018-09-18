@@ -20,6 +20,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/layouting/layout-group-data-impl.cpp \
    $(toolkit_src_dir)/layouting/layout-controller-debug.cpp \
    $(toolkit_src_dir)/layouting/layout-controller-impl.cpp \
+   $(toolkit_src_dir)/layouting/size-negotiation-mapper.cpp \
    $(toolkit_src_dir)/visuals/animated-image/animated-image-visual.cpp \
    $(toolkit_src_dir)/visuals/animated-image/image-cache.cpp \
    $(toolkit_src_dir)/visuals/animated-image/fixed-image-cache.cpp \
