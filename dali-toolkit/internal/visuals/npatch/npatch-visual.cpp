@@ -423,7 +423,8 @@ Shader NPatchVisual::CreateShader()
       }
 
       shader = DevelShader::New<uint32_t>( vertexShader, fragmentShader,
-                                           DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
+                                           DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map(),
+                                           mImpl->mCustomShader->mHints );
 
     }
     else if( xStretchCount > 0 || yStretchCount > 0)
@@ -436,7 +437,8 @@ Shader NPatchVisual::CreateShader()
 
       shader = DevelShader::New<uint32_t>( vertexShader, fragmentShader,
                                            DevelShader::ShaderLanguage::SPIRV_1_0,
-                                           specializationConstants );
+                                           specializationConstants,
+                                           mImpl->mCustomShader->mHints );
     }
   }
 

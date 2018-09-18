@@ -577,29 +577,21 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   {
     geometry = CreateGeometry( mFactoryCache, mImpl->mCustomShader->mGridSize );
 
-    if( mImpl->mCustomShader->mVertexShaderData.empty() &&
-        mImpl->mCustomShader->mFragmentShaderData.empty() )
+    std::vector<uint32_t> vertexData = mImpl->mCustomShader->mVertexShaderData.empty()
+      ? mImageVisualShaderFactory.GetVertexShaderData()
+      : mImpl->mCustomShader->mVertexShaderData;
+
+    std::vector<uint32_t> fragmentData = mImpl->mCustomShader->mFragmentShaderData.empty()
+      ? mImageVisualShaderFactory.GetFragmentShaderData()
+      : mImpl->mCustomShader->mFragmentShaderData;
+
+    shader = DevelShader::New<uint32_t>( vertexData, fragmentData,
+                                         DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map(),
+                                         mImpl->mCustomShader->mHints );
+
+    if( mImpl->mCustomShader->mVertexShaderData.empty() )
     {
-      shader = mImageVisualShaderFactory.GetShader( mFactoryCache, false, true );
       shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-    }
-    else
-    {
-      std::vector<uint32_t> vertexData = mImpl->mCustomShader->mVertexShaderData.empty()
-        ? mImageVisualShaderFactory.GetVertexShaderData()
-        : mImpl->mCustomShader->mVertexShaderData;
-
-      std::vector<uint32_t> fragmentData = mImpl->mCustomShader->mFragmentShaderData.empty()
-        ? mImageVisualShaderFactory.GetFragmentShaderData()
-        : mImpl->mCustomShader->mFragmentShaderData;
-
-      shader = DevelShader::New<uint32_t>( vertexData, fragmentData,
-                                           DevelShader::ShaderLanguage::SPIRV_1_0, Property::Map() );
-
-      if( mImpl->mCustomShader->mVertexShaderData.empty() )
-      {
-        shader.RegisterProperty( PIXEL_AREA_UNIFORM_NAME, FULL_TEXTURE_RECT );
-      }
     }
   }
 
