@@ -83,7 +83,8 @@ bool DecodeBase64PropertyData( const Property::Value& value, std::vector<uint32_
     bn::decode_b64( encodedString.begin(), encodedString.end(), std::back_inserter(outputTmpData) );
 
     outputData.clear();
-    outputData.resize( outputTmpData.size() / sizeof(uint32_t) );
+    outputData.resize( 1 + (outputTmpData.size() / sizeof(uint32_t)) ); // Allow for < 4 chararacters
+
     // Treat as a block of data
     memcpy( &outputData[0], &outputTmpData[0], outputTmpData.size() );
 
