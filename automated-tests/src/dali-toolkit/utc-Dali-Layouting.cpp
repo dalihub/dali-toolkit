@@ -70,6 +70,246 @@ void utc_dali_toolkit_layouting_cleanup(void)
   test_return_value = TET_PASS;
 }
 
+int UtcDaliLayouting_LayoutLength_Types(void)
+{
+  tet_infoline("UtcDaliLayouting_LayoutLength Types");
+
+  // testing that operators return correct type
+  // operator+
+  {
+    auto value = LayoutLength( 10 ) + LayoutLength();
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = LayoutLength( 10 ) + 20;
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = 22 + LayoutLength( 10 );
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = LayoutLength( 10 ) + 2.1f;
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = 2.2f + LayoutLength( 10 );
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  // operator-
+  {
+    auto value = LayoutLength() - LayoutLength( 10 );
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = LayoutLength( 10 ) - 99;
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = 20 - LayoutLength( 10 );
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = LayoutLength( 10 ) - 9.9f;
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = 2.0f - LayoutLength( 10 );
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+
+  // operator*
+  {
+    auto value = LayoutLength() * LayoutLength( 10 );
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = LayoutLength( 10 ) * 2;
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = 10 * LayoutLength( 10 );
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = LayoutLength( 10 ) * 2.1f;
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = 1.0f * LayoutLength( 10 );
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  // operator/
+  {
+    auto value = LayoutLength( 10 ) / 2.0f;
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+
+  // combinations
+  {
+    auto value = ( LayoutLength( 10 ) * 2.0f ) / 1.5f;
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+  {
+    auto value = 20 + ( LayoutLength( 10 ) * 2.0f ) / 1.5f;
+    DALI_TEST_EQUALS( typeid(value).name(), typeid(LayoutLength).name(), TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_LayoutLength_Values(void)
+{
+  tet_infoline("UtcDaliLayouting_LayoutLength Values");
+
+  // operator+
+  {
+    LayoutLength value = LayoutLength( 10 ) + LayoutLength();
+    DALI_TEST_EQUALS( value.AsInteger(), 10.0f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = LayoutLength( 10 ) + 20;
+    DALI_TEST_EQUALS( value.AsInteger(), 30.0f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = 22 - LayoutLength( 10 );
+    DALI_TEST_EQUALS( value.AsInteger(), 12.0f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = LayoutLength( 10 ) + 2.1f;
+    DALI_TEST_EQUALS( value.AsDecimal(), 12.1f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsTruncated(), 12.0f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = 2.3f - LayoutLength( 10 );
+    DALI_TEST_EQUALS( value.AsDecimal(), -7.7f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsInteger(), -8.0f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsTruncated(), -7.0f, 0.0001f, TEST_LOCATION );
+  }
+  // operator-
+  {
+    LayoutLength value = LayoutLength() - LayoutLength( 10 );
+    DALI_TEST_EQUALS( value.AsInteger(), -10.0f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = LayoutLength( 10 ) - 99;
+    DALI_TEST_EQUALS( value.AsInteger(), -89.0f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = 20 - LayoutLength( 10 );
+    DALI_TEST_EQUALS( value.AsInteger(), 10.0f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsTruncated(), 10.f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = LayoutLength( 10 ) - 9.9f;
+    DALI_TEST_EQUALS( value.AsInteger(), 0.0f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsDecimal(), 0.1f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsTruncated(), 0.0f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = 10.9f - LayoutLength( 10 );
+    DALI_TEST_EQUALS( value.AsInteger(), 1.0f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsDecimal(), 0.9f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsTruncated(), 0.0f, 0.0001f, TEST_LOCATION );
+  }
+  // operator*
+  {
+    LayoutLength value = LayoutLength() * LayoutLength( 10 );
+    DALI_TEST_EQUALS( value.AsInteger(), 0.0f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = LayoutLength(1) * 10;
+    DALI_TEST_EQUALS( value.AsInteger(), 10.0f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = 11 * LayoutLength( 10 );
+    DALI_TEST_EQUALS( value.AsInteger(), 110.0f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = LayoutLength( 10 ) * 2.12f;
+    DALI_TEST_EQUALS( value.AsDecimal(), 21.2f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsInteger(), 21.0f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsTruncated(), 21.0f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    LayoutLength value = 2.189f * LayoutLength( 10 );
+    DALI_TEST_EQUALS( value.AsDecimal(), 21.89f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsInteger(), 22.0f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsTruncated(), 21.0f, 0.0001f, TEST_LOCATION );
+  }
+  // operator/
+  {
+    LayoutLength value = LayoutLength( 11 ) / 2.0f;
+    DALI_TEST_EQUALS( value.AsDecimal(), 5.5f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsInteger(), 6.0f, 0.0001f, TEST_LOCATION );
+  }
+
+  // combinations
+  {
+    LayoutLength value;
+    value = 20 + ( LayoutLength( 10 ) * 2.0f ) / 1.5f;
+    DALI_TEST_EQUALS( value.AsInteger(), 33.0f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsDecimal(), 33.3333f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    uint16_t padding( 1 );
+    LayoutLength right(35), left(10), mTotalLength(2);
+    LayoutLength value;
+    value = padding + ( right - left - mTotalLength ) / 2.0f;
+    //    = 1 + ( 35 - 10 - 2 ) / 2
+    DALI_TEST_EQUALS( value.AsInteger(), 13.0f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsDecimal(), 12.5f, 0.0001f, TEST_LOCATION );
+  }
+  {
+    uint16_t padding = 1, top = 2, bottom = 3;
+    LayoutLength childSpace( 44 ), childHeight( 23 );
+    LayoutLength value;
+    value = padding + ( ( childSpace - childHeight ) / 2.0f ) + top - bottom;
+    //    = 1       + ( ( 44 - 23                  ) / 2 ) + 2 - 3
+    DALI_TEST_EQUALS( value.AsInteger(), 11.0f, 0.0001f, TEST_LOCATION );
+    DALI_TEST_EQUALS( value.AsDecimal(), 10.5f, 0.0001f, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_LayoutLength_Operators(void)
+{
+  tet_infoline("UtcDaliLayouting_LayoutLength operators");
+
+  {
+    LayoutLength value = 10;
+    DALI_TEST_EQUALS( (int)value.AsInteger(), 10, TEST_LOCATION );
+    value += 1;
+    DALI_TEST_EQUALS( (int)value.AsInteger(), 11, TEST_LOCATION );
+    value -= 12;
+    DALI_TEST_EQUALS( (int)value.AsInteger(), -1, TEST_LOCATION );
+    LayoutLength value2 = value;
+    DALI_TEST_EQUALS( value == value2, true, TEST_LOCATION );
+    value2 = 123;
+    DALI_TEST_EQUALS( value != value2, true, TEST_LOCATION );
+    DALI_TEST_EQUALS( value < value2, true, TEST_LOCATION );
+    DALI_TEST_EQUALS( value <= value2, true, TEST_LOCATION );
+    value = 456;
+    DALI_TEST_EQUALS( value > value2, true, TEST_LOCATION );
+    DALI_TEST_EQUALS( value >= value2, true, TEST_LOCATION );
+  }
+
+  {
+    LayoutLength value( 123 );
+    std::stringstream ss;
+    ss << value;
+    DALI_TEST_EQUALS( ss.str(), "123", TEST_LOCATION );
+  }
+  {
+    LayoutLength value( 0.123f );
+    std::stringstream ss;
+    ss << value;
+    DALI_TEST_EQUALS( ss.str(), "0.123", TEST_LOCATION );
+  }
+  END_TEST;
+}
+
 int UtcDaliLayouting_HboxLayout01(void)
 {
   ToolkitTestApplication application;

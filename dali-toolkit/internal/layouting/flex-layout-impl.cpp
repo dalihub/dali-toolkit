@@ -218,23 +218,23 @@ void FlexLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
 
   if( widthMeasureSpec.GetMode() == MeasureSpec::Mode::EXACTLY )
   {
-    width = widthMeasureSpec.GetSize().AsFloat();
+    width = widthMeasureSpec.GetSize().AsDecimal();
     YGNodeStyleSetWidth( mRoot, width );
   }
   else if( widthMeasureSpec.GetMode() == MeasureSpec::Mode::AT_MOST )
   {
-    width = widthMeasureSpec.GetSize().AsFloat();
+    width = widthMeasureSpec.GetSize().AsDecimal();
     YGNodeStyleSetMaxWidth( mRoot, width );
   }
 
   if ( heightMeasureSpec.GetMode() == MeasureSpec::Mode::EXACTLY )
   {
-    height = heightMeasureSpec.GetSize().AsFloat();
+    height = heightMeasureSpec.GetSize().AsDecimal();
     YGNodeStyleSetHeight( mRoot, height );
   }
   else if ( heightMeasureSpec.GetMode() == MeasureSpec::Mode::AT_MOST )
   {
-    height = heightMeasureSpec.GetSize().AsFloat();
+    height = heightMeasureSpec.GetSize().AsDecimal();
     YGNodeStyleSetMaxHeight( mRoot, height );
   }
 
@@ -263,7 +263,7 @@ void FlexLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
   DALI_LOG_INFO( gLogFilter, Debug::Concise, oss.str().c_str() );
 #endif
 
-  YGNodeCalculateLayout( mRoot, width.AsFloat(), height.AsFloat(), isLayoutRtl ? YGDirectionRTL : YGDirectionLTR );
+  YGNodeCalculateLayout( mRoot, width.AsDecimal(), height.AsDecimal(), isLayoutRtl ? YGDirectionRTL : YGDirectionLTR );
 
   auto count = GetChildCount();
   for( unsigned int childIndex = 0; childIndex < count; childIndex++)
@@ -272,7 +272,7 @@ void FlexLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
     if( childLayout != nullptr )
     {
       YGNodeRef node = YGNodeGetChild(mRoot, childIndex);
-      LayoutLength childLeft = LayoutLength( YGNodeLayoutGetLeft( node ) ) + left;
+      LayoutLength childLeft = LayoutLength( YGNodeLayoutGetLeft( node ) )+ left;
       LayoutLength childTop = LayoutLength( YGNodeLayoutGetTop( node ) ) + top;
       LayoutLength childWidth = LayoutLength( YGNodeLayoutGetWidth( node ) );
       LayoutLength childHeight = LayoutLength( YGNodeLayoutGetHeight( node ) );
@@ -290,7 +290,7 @@ YGSize FlexLayout::OnChildMeasure( YGNodeRef node,
   auto childOwner = childLayout->GetOwner();
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
   auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
-  auto parentWidthMeasureSpec = MeasureSpec( 0 );
+  MeasureSpec parentWidthMeasureSpec( 0 );
   if ( innerWidth != YGUndefined )
   {
     parentWidthMeasureSpec = MeasureSpec( innerWidth, static_cast<MeasureSpec::Mode>(widthMode) );
@@ -336,8 +336,8 @@ YGSize FlexLayout::OnChildMeasure( YGNodeRef node,
   LayoutLength measuredHeight = childLayout->GetMeasuredHeight() - padding.bottom - padding.top;
 
   return YGSize{
-    .width = measuredWidth.AsFloat(),
-    .height = measuredHeight.AsFloat(),
+    .width = measuredWidth.AsDecimal(),
+    .height = measuredHeight.AsDecimal(),
   };
 }
 
