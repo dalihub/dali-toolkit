@@ -417,6 +417,17 @@ void Controller::SetIgnoreSpacesAfterText( bool ignore )
   mImpl->mModel->mIgnoreSpacesAfterText = ignore;
 }
 
+bool Controller::IsMatchSystemLanguageDirection() const
+{
+  return mImpl->mModel->mMatchSystemLanguageDirection;
+}
+
+void Controller::SetMatchSystemLanguageDirection( bool match )
+{
+  mImpl->mModel->mMatchSystemLanguageDirection = match;
+}
+
+
 void Controller::SetLineWrapMode( Text::LineWrap::Mode lineWrapMode )
 {
   if( lineWrapMode != mImpl->mModel->mLineWrapMode )
@@ -2228,12 +2239,13 @@ void Controller::SetVerticalLineAlignment( Toolkit::DevelText::VerticalLineAlign
 
 // public : Relayout.
 
-Controller::UpdateTextType Controller::Relayout( const Size& size )
+Controller::UpdateTextType Controller::Relayout( const Size& size, Dali::LayoutDirection::Type layoutDirection )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", this, size.width, size.height, mImpl->mIsAutoScrollEnabled ?"true":"false"  );
 
   UpdateTextType updateTextType = NONE_UPDATED;
 
+  mImpl->mLayoutDirection = layoutDirection;
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
     if( 0u != mImpl->mModel->mVisualModel->mGlyphPositions.Count() )
@@ -3543,7 +3555,8 @@ bool Controller::DoRelayout( const Size& size,
                                          mImpl->mModel->mHorizontalAlignment,
                                          mImpl->mModel->mLineWrapMode,
                                          outlineWidth,
-                                         mImpl->mModel->mIgnoreSpacesAfterText );
+                                         mImpl->mModel->mIgnoreSpacesAfterText,
+                                         mImpl->mModel->mMatchSystemLanguageDirection );
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mModel->mVisualModel->mGlyphPositions;
@@ -3661,7 +3674,9 @@ bool Controller::DoRelayout( const Size& size,
                                 requestedNumberOfCharacters,
                                 mImpl->mModel->mHorizontalAlignment,
                                 lines,
-                                mImpl->mModel->mAlignmentOffset );
+                                mImpl->mModel->mAlignmentOffset,
+                                mImpl->mLayoutDirection,
+                                mImpl->mModel->mMatchSystemLanguageDirection );
 
     viewUpdated = true;
   }

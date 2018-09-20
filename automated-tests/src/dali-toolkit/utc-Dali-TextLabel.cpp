@@ -1062,6 +1062,22 @@ int UtcDaliToolkitTextlabelEllipsis(void)
     tet_result(TET_FAIL);
   }
 
+
+  label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
+  label.SetProperty( DevelTextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, true );
+  label.SetSize( 400.0f, 10.f );
+
+  try
+  {
+    // Render the text.
+    application.SendNotification();
+    application.Render();
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
+
   END_TEST;
 }
 
