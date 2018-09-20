@@ -67,7 +67,8 @@
       "autoScrollLoopCount":2,
       "autoScrollGap":50,
       "autoScrollSpeed":80,
-      "ignoreSpacesAfterText":false
+      "ignoreSpacesAfterText":false,
+      "matchSystemLanguageDirection":true
     },
 
     "TextLabelFontSize0":

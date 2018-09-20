@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDE
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/vector2.h>
+#include <dali/public-api/actors/actor-enumerations.h>
 
 // INTERNAL INCLUDE
 #include <dali-toolkit/public-api/text/text-enumerations.h>
@@ -140,13 +141,17 @@ public:
    * @param[in] horizontalAlignment The horizontal alignment.
    * @param[in,out] lines The laid-out lines.
    * @param[out] alignmentOffset The alignment offset.
+   * @param[in] layoutDirection The direction of the system language.
+   * @param[in] matchSystemLanguageDirection Whether match align for system language direction or not.
    */
   void Align( const Size& size,
               CharacterIndex startIndex,
               Length numberOfCharacters,
               Text::HorizontalAlignment::Type horizontalAlignment,
               Vector<LineRun>& lines,
-              float& alignmentOffset );
+              float& alignmentOffset,
+              Dali::LayoutDirection::Type layoutDirection,
+              bool matchSystemLanguageDirection );
 
   /**
    * @brief Sets the default line spacing.
