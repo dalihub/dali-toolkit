@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 // CLASS HEADER
 #include "scene-impl.h"
 
@@ -176,6 +177,10 @@ void Scene::UploadTextureFace( Texture& texture, Devel::PixelBuffer pixelBuffer,
   else if( cubeType == ARRAY_HORIZENTAL )
   {
     faceSize = imageWidth / 6;
+  }
+  else
+  {
+    return;
   }
 
   unsigned int xOffset = cubeMap_index_x[cubeType][faceIndex] * faceSize;
