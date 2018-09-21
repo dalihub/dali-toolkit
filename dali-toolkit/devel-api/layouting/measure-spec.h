@@ -36,7 +36,6 @@ namespace Toolkit
 class DALI_TOOLKIT_API MeasureSpec
 {
 public:
-  using IntType = LayoutLength::IntType;
 
   enum class Mode
   {
@@ -48,12 +47,12 @@ public:
   };
 
   MeasureSpec( LayoutLength measureSpec, MeasureSpec::Mode mode )
-  : mSize( measureSpec.mValue ),
+  : mSize( measureSpec ),
     mMode( mode )
   {
   }
 
-  MeasureSpec( IntType measureSpec )
+  MeasureSpec( LayoutLength measureSpec )
   : mSize( measureSpec ),
     mMode( Mode::UNSPECIFIED )
   {
@@ -82,6 +81,16 @@ public:
   }
 
   /**
+   * @brief Set the mode of the measure spec.
+   *
+   * @param mode The mode to set
+   */
+  void SetMode( MeasureSpec::Mode mode )
+  {
+    mMode = mode;
+  }
+
+  /**
    * @brief Get the mode of the measure spec.
    *
    * @return The mode of the measure spec
@@ -92,11 +101,21 @@ public:
   }
 
   /**
+   * @brief Set the size of the measure spec
+   *
+   * @param size the size to set
+   */
+  void SetSize( LayoutLength size )
+  {
+    mSize = size;
+  }
+
+  /**
    * @brief Get the size of the measure spec
    *
    * @return the size of the measure spec
    */
-  IntType GetSize() const
+  LayoutLength GetSize() const
   {
     return mSize;
   }
@@ -121,7 +140,7 @@ public:
       return MeasureSpec( size, MeasureSpec::Mode::UNSPECIFIED );
     }
 
-    if( delta < 0 && measureSpec.mSize < static_cast<IntType>(abs(delta)) )
+    if( delta < 0 && measureSpec.mSize < abs(delta) )
     {
       size = 0;
     }
@@ -132,9 +151,11 @@ public:
     return MeasureSpec( size, mode );
   }
 
-public:
-  IntType  mSize; ///< The specified size
+private:
+
+  LayoutLength  mSize; ///< The specified size
   Mode     mMode; ///< The measure mode
+
 };
 
 inline std::ostream& operator<< (std::ostream& o, const MeasureSpec& measureSpec )
