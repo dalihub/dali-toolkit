@@ -119,7 +119,7 @@ void CustomLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, 
       LayoutLength childWidth = childLayoutImpl.GetMeasuredWidth();
       LayoutLength childHeight = childLayoutImpl.GetMeasuredHeight();
 
-      childTop = middle - (childHeight / 2);
+      childTop = middle - childHeight / 2;
       childLayoutImpl.Layout( currentLeft, childTop, currentLeft + childWidth, childTop + childHeight );
       currentLeft += childWidth;
     }

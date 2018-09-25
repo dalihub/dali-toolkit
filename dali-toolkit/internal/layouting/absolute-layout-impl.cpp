@@ -111,7 +111,7 @@ void AbsoluteLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec height
       // Store current width and height needed to contain all children.
       totalWidth = maxPositionX - minPositionX;
       totalHeight = maxPositionY - minPositionY;
-      DALI_LOG_INFO( gLogFilter, Debug::Concise, "AbsoluteLayout::OnMeasure child width(%f) height(%f) \n", totalWidth.AsFloat(), totalHeight.AsFloat() );
+      DALI_LOG_INFO( gLogFilter, Debug::Concise, "AbsoluteLayout::OnMeasure child width(%f) height(%f) \n", totalWidth.AsDecimal(), totalHeight.AsDecimal() );
 
       if( childLayout->GetMeasuredWidthAndState().GetState() == MeasuredSize::State::MEASURED_SIZE_TOO_SMALL )
       {
@@ -162,11 +162,9 @@ void AbsoluteLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top
       LayoutLength childTop = childPosition.y;
       LayoutLength childLeft = childPosition.x;
 
-      DALI_LOG_INFO( gLogFilter, Debug::General, "AbsoluteLayout::OnLayout child[%s] position(%f,%f) child width[%d] height(%d)\n",
-                      Toolkit::Control::DownCast( childOwner ).GetName().c_str(),
-                      childPosition.x, childPosition.y,
-                      childWidth.mValue, childHeight.mValue
-                      );
+      DALI_LOG_STREAM( gLogFilter, Debug::General,
+                       "AbsoluteLayout::OnLayout child[" << Toolkit::Control::DownCast( childOwner ).GetName().c_str() <<
+                       "] position(" << childPosition << ") child width[" << childWidth << "] height[" << childHeight << "]\n" );
 
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
     }
