@@ -78,8 +78,10 @@ void AbsoluteLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec height
     MeasuredSize::State heightState;
   } childState = { MeasuredSize::State::MEASURED_SIZE_OK, MeasuredSize::State::MEASURED_SIZE_OK };
 
-  auto minPosition = Vector3( Vector3::ZERO );
-  auto maxPosition = Vector3( Vector3::ZERO );
+  LayoutLength minPositionX( 0 );
+  LayoutLength minPositionY( 0 );
+  LayoutLength maxPositionX( 0 );
+  LayoutLength maxPositionY( 0 );
 
   // measure children
   for( unsigned int i=0; i<GetChildCount(); ++i )
@@ -91,22 +93,25 @@ void AbsoluteLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec height
 
       // Get size of child
       MeasureChild( childLayout, widthMeasureSpec, heightMeasureSpec );
-      auto childWidth = childLayout->GetMeasuredWidth();
-      auto childHeight = childLayout->GetMeasuredHeight();
+      LayoutLength childWidth = childLayout->GetMeasuredWidth();
+      LayoutLength childHeight = childLayout->GetMeasuredHeight();
 
       // Determine the width and height needed by the children using their given position and size.
       // Children could overlap so find the left most and right most child.
       auto childPosition = childOwner.GetProperty< Vector3 >( Actor::Property::POSITION );
-      minPosition.x = std::min( minPosition.x, childPosition.x );
-      maxPosition.x = std::max( maxPosition.x, childPosition.x + childWidth );
+      LayoutLength childLeft = childPosition.x;
+      LayoutLength childTop = childPosition.y;
+
+      minPositionX = std::min( minPositionX, childLeft );
+      maxPositionX = std::max( maxPositionX, childLeft + childWidth );
       // Children could overlap so find the highest and lowest child.
-      minPosition.y = std::min( minPosition.y, childPosition.y );
-      maxPosition.y = std::max( maxPosition.y, childPosition.y + childHeight );
+      minPositionY = std::min( minPositionY, childTop );
+      maxPositionY = std::max( maxPositionY, childTop + childHeight );
 
       // Store current width and height needed to contain all children.
-      totalWidth = maxPosition.x - minPosition.x;
-      totalHeight = maxPosition.y - minPosition.y;
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "AbsoluteLayout::OnMeasure child width(%f) height(%f) \n", (float)totalWidth, (float)totalHeight  );
+      totalWidth = maxPositionX - minPositionX;
+      totalHeight = maxPositionY - minPositionY;
+      DALI_LOG_INFO( gLogFilter, Debug::Concise, "AbsoluteLayout::OnMeasure child width(%f) height(%f) \n", totalWidth.AsFloat(), totalHeight.AsFloat() );
 
       if( childLayout->GetMeasuredWidthAndState().GetState() == MeasuredSize::State::MEASURED_SIZE_TOO_SMALL )
       {
@@ -149,13 +154,19 @@ void AbsoluteLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top
     if( childLayout != nullptr )
     {
       auto childOwner = childLayout->GetOwner();
-      auto childWidth = childLayout->GetMeasuredWidth();
-      auto childHeight = childLayout->GetMeasuredHeight();
+      LayoutLength childWidth = childLayout->GetMeasuredWidth();
+      LayoutLength childHeight = childLayout->GetMeasuredHeight();
 
       auto childPosition = childOwner.GetProperty< Vector3 >( Actor::Property::POSITION );
 
-      auto childTop = childPosition.y;
-      auto childLeft = childPosition.x;
+      LayoutLength childTop = childPosition.y;
+      LayoutLength childLeft = childPosition.x;
+
+      DALI_LOG_INFO( gLogFilter, Debug::General, "AbsoluteLayout::OnLayout child[%s] position(%f,%f) child width[%d] height(%d)\n",
+                      Toolkit::Control::DownCast( childOwner ).GetName().c_str(),
+                      childPosition.x, childPosition.y,
+                      childWidth.mValue, childHeight.mValue
+                      );
 
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
     }

@@ -332,6 +332,287 @@ int UtcDaliLayouting_GridLayout04(void)
   END_TEST;
 }
 
+int UtcDaliLayouting_GridLayout05(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_GridLayout05 2 Column, 4 Items UNSPECIFIED width and height SPECIFICATIONS");
+
+  const auto NUMBER_OF_COLUMNS = 2;
+  const auto NUMBER_OF_ITEMS = 4;
+
+  tet_printf( "Testing %d columns with %d items\n", NUMBER_OF_COLUMNS, NUMBER_OF_ITEMS );
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  auto customLayout = Test::CustomLayout::New();
+  tet_printf( "Set Flag so child is measured with an unconstrained measure spec\n");
+  customLayout.SetCustomBehaviourFlag( Test::CustomLayout::BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_WIDTH );
+  customLayout.SetCustomBehaviourFlag( Test::CustomLayout::BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_HEIGHT );
+  auto customHBox = Control::New();
+  customHBox.SetName("CustomHBox");
+  DevelControl::SetLayout( customHBox, customLayout );
+  tet_printf( "Set width of custom layout to be smaller than child Grid wants to be\n");
+  customHBox.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, 150 );
+  customHBox.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, 150 );
+  rootControl.Add( customHBox );
+
+  auto gridContainer = Control::New();
+  auto gridLayout = Grid::New();
+  gridLayout.SetNumberOfColumns( NUMBER_OF_COLUMNS );
+  gridContainer.SetName( "GridLayout");
+  DevelControl::SetLayout( gridContainer, gridLayout );
+  tet_printf( "Grid SPEC set to MATCH_PARENT, this will be ignored if BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_WIDTH or BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_HEIGHT flags are set\n");
+  gridContainer.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  gridContainer.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  std::vector< Control > controls;
+  for( auto i=0; i < NUMBER_OF_ITEMS; i++ )
+  {
+    controls.push_back( CreateLeafControl( 100, 100 ) );
+  }
+
+  for( auto&& iter : controls )
+  {
+    gridContainer.Add( iter );
+  }
+
+  customHBox.Add( gridContainer );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+ // Grid will layout first 2 items on first row then last 2 on second row.
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 100.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Item sizes will not be changed
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_GridLayout06(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_GridLayout06 2 Column, 4 Items UNSPECIFIED width SPECIFICATION");
+
+  const auto NUMBER_OF_COLUMNS = 2;
+  const auto NUMBER_OF_ITEMS = 4;
+
+  tet_printf( "Testing %d columns with %d items\n", NUMBER_OF_COLUMNS, NUMBER_OF_ITEMS );
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  auto customLayout = Test::CustomLayout::New();
+  tet_printf( "Set Flag so child is measured with an unconstrained measure spec\n");
+  customLayout.SetCustomBehaviourFlag( Test::CustomLayout::BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_WIDTH );
+  auto customHBox = Control::New();
+  customHBox.SetName("CustomHBox");
+  DevelControl::SetLayout( customHBox, customLayout );
+  tet_printf( "Set width of custom layout to be smaller than child Grid wants to be\n");
+  customHBox.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, 150 );
+  customHBox.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, 150 );
+  rootControl.Add( customHBox );
+
+  auto gridContainer = Control::New();
+  auto gridLayout = Grid::New();
+  gridLayout.SetNumberOfColumns( NUMBER_OF_COLUMNS );
+  gridContainer.SetName( "GridLayout");
+  DevelControl::SetLayout( gridContainer, gridLayout );
+  tet_printf( "Grid SPEC set to MATCH_PARENT, this will be ignored if BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_WIDTH or BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_HEIGHT flags are set\n");
+  gridContainer.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  gridContainer.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  std::vector< Control > controls;
+  for( auto i=0; i < NUMBER_OF_ITEMS; i++ )
+  {
+    controls.push_back( CreateLeafControl( 100, 100 ) );
+  }
+
+  for( auto&& iter : controls )
+  {
+    gridContainer.Add( iter );
+  }
+
+  customHBox.Add( gridContainer );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+ // Grid will layout first 2 items on first row then last 2 on second row.
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 100.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 75.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 100.0f, 75.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Item sizes will not be changed
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 75.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 75.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 75.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 75.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliLayouting_GridLayout07(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_GridLayout07 2 Column, 4 Items UNSPECIFIED height SPECIFICATION");
+
+  const auto NUMBER_OF_COLUMNS = 2;
+  const auto NUMBER_OF_ITEMS = 4;
+
+  tet_printf( "Testing %d columns with %d items\n", NUMBER_OF_COLUMNS, NUMBER_OF_ITEMS );
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  auto customLayout = Test::CustomLayout::New();
+  tet_printf( "Set Flag so child is measured with an unconstrained measure spec\n");
+  customLayout.SetCustomBehaviourFlag( Test::CustomLayout::BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_HEIGHT );
+  auto customHBox = Control::New();
+  customHBox.SetName("CustomHBox");
+  DevelControl::SetLayout( customHBox, customLayout );
+  tet_printf( "Set width of custom layout to be smaller than child Grid wants to be\n");
+  customHBox.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, 150 );
+  customHBox.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, 150 );
+  rootControl.Add( customHBox );
+
+  auto gridContainer = Control::New();
+  auto gridLayout = Grid::New();
+  gridLayout.SetNumberOfColumns( NUMBER_OF_COLUMNS );
+  gridContainer.SetName( "GridLayout");
+  DevelControl::SetLayout( gridContainer, gridLayout );
+  tet_printf( "Grid SPEC set to MATCH_PARENT, this will be ignored if BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_WIDTH or BEHAVIOUR_FLAG_UNCONSTRAINED_CHILD_HEIGHT flags are set\n");
+  gridContainer.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  gridContainer.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  std::vector< Control > controls;
+  for( auto i=0; i < NUMBER_OF_ITEMS; i++ )
+  {
+    controls.push_back( CreateLeafControl( 100, 100 ) );
+  }
+
+  for( auto&& iter : controls )
+  {
+    gridContainer.Add( iter );
+  }
+
+  customHBox.Add( gridContainer );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+ // Grid will layout first 2 items on first row then last 2 on second row.
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 75.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 75.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Item sizes will not be changed
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 75.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 75.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 75.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 75.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliLayouting_GridLayout08(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_GridLayout08 2 Column, 4 Items Grid with children too wide for parent spec");
+
+  const auto NUMBER_OF_COLUMNS = 2;
+  const auto NUMBER_OF_ITEMS = 4;
+
+  tet_printf( "Testing %d columns with %d items\n", NUMBER_OF_COLUMNS, NUMBER_OF_ITEMS );
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  auto customLayout = Test::CustomLayout::New();
+  auto customHBox = Control::New();
+  customHBox.SetName("CustomHBox");
+  DevelControl::SetLayout( customHBox, customLayout );
+  tet_printf( "Set width of custom layout to be smaller than child Grid wants to be\n");
+  customHBox.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, 150 );
+  customHBox.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, 200 );
+  rootControl.Add( customHBox );
+
+  auto gridContainer = Control::New();
+  auto gridLayout = Grid::New();
+  gridLayout.SetNumberOfColumns( NUMBER_OF_COLUMNS );
+  gridContainer.SetName( "GridLayout");
+  DevelControl::SetLayout( gridContainer, gridLayout );
+  gridContainer.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+  gridContainer.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::MATCH_PARENT );
+
+  std::vector< Control > controls;
+  for( auto i=0; i < NUMBER_OF_ITEMS; i++ )
+  {
+    controls.push_back( CreateLeafControl( 100, 100 ) );
+  }
+
+  for( auto&& iter : controls )
+  {
+    gridContainer.Add( iter );
+  }
+
+  customHBox.Add( gridContainer );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Children width reduced from 100 to 75\n", NUMBER_OF_COLUMNS, NUMBER_OF_ITEMS );
+  // Grid will layout first 2 items on first row then last 2 on second row.
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 75.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 75.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  // Item sizes will be changed
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 75.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 75.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 75.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 75.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
 
 int UtcDaliLayouting_GridLayoutDownCast(void)
 {

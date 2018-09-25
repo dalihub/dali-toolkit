@@ -95,15 +95,11 @@ void LayoutItem::Unparent()
 
 void LayoutItem::SetAnimateLayout( bool animateLayout )
 {
-  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetAnimateLayout animateLayout(%s)\n", (animateLayout)?"true":"false" );
-
   auto owner = GetOwner();
   auto actor = Actor::DownCast(owner);
 
-  if( actor )
-  {
-      DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetAnimateLayout animateLayout(%s) owner(%s)\n", (animateLayout)?"true":"false", actor.GetName().c_str() );
-  }
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetAnimateLayout animateLayout(%s) owner(%s)\n", (animateLayout)?"true":"false",
+                 ( ( Actor::DownCast( owner) ) ? Actor::DownCast(owner).GetName().c_str() : "Invalid Actor" ) );
 
   mImpl->mAnimated = animateLayout;
 
@@ -163,7 +159,7 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
 
   const bool needsLayout = specChanged && ( !isSpecExactly || !matchesSpecSize );
 
-  DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::Measure("<<widthMeasureSpec<<", "<<heightMeasureSpec<<") Owner:"<<Actor::DownCast(GetOwner()).GetName() <<"  forceLayout="<<forceLayout<<", specChanged="<<specChanged<<", isSpecExactly="<<isSpecExactly<<", matchesSpecSize="<<matchesSpecSize<<", needsLayout="<<needsLayout <<std::endl <<(forceLayout||needsLayout?"  Remeasuring":"  NoChange"));
+  DALI_LOG_STREAM( gLayoutFilter, Debug::General, "LayoutItem::Measure("<<widthMeasureSpec<<", "<<heightMeasureSpec<<") Owner:"<<Actor::DownCast(GetOwner()).GetName() <<"  forceLayout="<<forceLayout<<", specChanged="<<specChanged<<", isSpecExactly="<<isSpecExactly<<", matchesSpecSize="<<matchesSpecSize<<", needsLayout="<<needsLayout <<std::endl <<(forceLayout||needsLayout?"  Remeasuring":"  NoChange"));
 
   if( forceLayout || needsLayout )
   {
@@ -173,14 +169,14 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
 #if defined(DEBUG_ENABLED)
     std::ostringstream o;
     o<<widthMeasureSpec<<","<<heightMeasureSpec;
-    DALI_LOG_INFO( gLayoutFilter, Debug::Concise, "LayoutItem::Measure Calling %s OnMeasure( %s )\n", Actor::DownCast(GetOwner()).GetName().c_str(), o.str().c_str());
+    DALI_LOG_INFO( gLayoutFilter, Debug::General, "LayoutItem::Measure Calling %s OnMeasure( %s )\n", Actor::DownCast(GetOwner()).GetName().c_str(), o.str().c_str());
 #endif
     OnMeasure( widthMeasureSpec, heightMeasureSpec );
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT );
 
     // flag not set, setMeasuredDimension() was not invoked, we raise an exception to warn the developer
     DALI_ASSERT_ALWAYS( mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET ) &&
-                        "Layout's OnMeasure() mension()" );
+                        "Layout's OnMeasure() Measured dimension flag not set" );
     mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_LAYOUT_REQUIRED );
   }
 
@@ -314,6 +310,10 @@ void LayoutItem::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
 void LayoutItem::SetParent( LayoutParent* parent )
 {
   mImpl->mLayoutParent = parent;
+  if ( parent == nullptr )
+  {
+    mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME );
+  }
 }
 
 LayoutParent* LayoutItem::GetParent()
@@ -347,9 +347,7 @@ void LayoutItem::SetLayoutRequested()
 void LayoutItem::SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight )
 {
   DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetMeasuredDimensions width(%d) height(%d) \n",
-                                                 MeasureSpec::IntType( measuredWidth.GetSize() ),
-                                                 MeasureSpec::IntType( measuredHeight.GetSize() )
-               );
+                                                 measuredWidth.GetSize().mValue, measuredHeight.GetSize().mValue );
 
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET );
   mImpl->mMeasuredWidth = measuredWidth;
@@ -441,14 +439,14 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
 
   DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame enter(%d, %d, %d, %d)\n", left.mValue, top.mValue, right.mValue, bottom.mValue );
 
-  if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom )
+  if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom || !mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME ) )
   {
     changed = true;
 
-    auto oldWidth = mImpl->mRight - mImpl->mLeft;
-    auto oldHeight = mImpl->mBottom - mImpl->mTop;
-    auto newWidth = right - left;
-    auto newHeight = bottom - top;
+    LayoutLength oldWidth = mImpl->mRight - mImpl->mLeft;
+    LayoutLength oldHeight = mImpl->mBottom - mImpl->mTop;
+    LayoutLength newWidth = right - left;
+    LayoutLength newHeight = bottom - top;
     bool sizeChanged = (newWidth != oldWidth) || (newHeight != oldHeight);
 
     mImpl->mLeft = left;
@@ -456,7 +454,7 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
     mImpl->mRight = right;
     mImpl->mBottom = bottom;
 
-    mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_HAS_BOUNDS );
+    mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME );
 
 
     // Reflect up to parent control
@@ -469,18 +467,22 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
       if( mImpl->mAnimated )
       {
         auto animation = Animation::New( 0.5f );
-        animation.AnimateTo( Property( actor, Actor::Property::POSITION ),
-                             Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
-        animation.AnimateTo( Property( actor, Actor::Property::SIZE ),
-                             Vector3( right-left, bottom-top, 0.0f ) );
+        animation.AnimateTo( Property( actor, Actor::Property::POSITION_X ), left.AsFloat() );
+        animation.AnimateTo( Property( actor, Actor::Property::POSITION_Y ), top.AsFloat() );
+
+        animation.AnimateTo( Property( actor, Actor::Property::SIZE_WIDTH ), newWidth.AsFloat() );
+        animation.AnimateTo( Property( actor, Actor::Property::SIZE_HEIGHT ), newHeight.AsFloat() );
+
         animation.FinishedSignal().Connect( mSlotDelegate, &LayoutItem::OnLayoutAnimationFinished );
         animation.Play();
       }
       else
       {
         // @todo Collate into list of Property & Property::Value pairs.
-        actor.SetPosition( Vector3( float(left.mValue), float(top.mValue), 0.0f ) );
-        actor.SetSize( Vector3( right-left, bottom-top, 0.0f ) );
+        actor.SetX( left.AsFloat() );
+        actor.SetY( top.AsFloat() );
+        actor.SetProperty( Actor::Property::SIZE_WIDTH, newWidth.AsFloat() );
+        actor.SetProperty( Actor::Property::SIZE_HEIGHT, newHeight.AsFloat() );
       }
     }
 
@@ -501,7 +503,7 @@ void LayoutItem::OnLayoutAnimationFinished( Animation& animation )
   auto actor = Actor::DownCast(owner);
   if( actor )
   {
-    actor.SetSize( Vector3( mImpl->mRight-mImpl->mLeft, mImpl->mBottom-mImpl->mTop, 0.0f ) );
+    actor.SetSize( Vector3( mImpl->mRight.AsFloat() - mImpl->mLeft.AsFloat(), mImpl->mBottom.AsFloat() - mImpl->mTop.AsFloat(), 0.0f ) );
   }
 }
 

@@ -59,6 +59,8 @@ void GridLocations::CalculateLocations( int numberOfColumns,
                                         unsigned int columnWidth,
                                         unsigned int rowHeight )
 {
+  DALI_ASSERT_DEBUG( numberOfColumns > 0 && "number of columns should be greater than 0" );
+  numberOfColumns = std::max ( numberOfColumns, 1 );
   mLocations.clear();
 
   // Calculate width and height of columns and rows.

@@ -66,7 +66,7 @@ void Grid::SetNumberOfColumns( int columns )
   // Store value and Relayout if changed.
   if( columns != mNumColumns )
   {
-    mNumColumns = columns;
+    mNumColumns = std::max( 1, columns );
     RequestLayout();
   }
 }
@@ -100,8 +100,8 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
   LayoutLength widthSize = widthMeasureSpec.GetSize();
   LayoutLength heightSize = heightMeasureSpec.GetSize();
 
-  int availableContentWidth(0);
-  int availableContentHeight(0);
+  LayoutLength availableContentWidth( 0 );
+  LayoutLength availableContentHeight( 0 );
 
   LayoutLength desiredChildHeight( 0 );
   LayoutLength desiredChildWidth( 0 );
@@ -149,11 +149,11 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
       mTotalWidth = std::min( mTotalWidth, widthSize );
   }
 
-  availableContentWidth = mTotalWidth - gridLayoutPadding.start - gridLayoutPadding.end;
+  availableContentWidth = mTotalWidth.mValue - gridLayoutPadding.start - gridLayoutPadding.end;
   widthSize = mTotalWidth;
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Grid::OnMeasure availableContentWidth(%d) mTotalWidth(%d) \n",
-                 availableContentWidth,
+                 availableContentWidth.mValue,
                  mTotalWidth.mValue );
   // HEIGHT SPECIFICATIONS
 
@@ -186,20 +186,20 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
     // Grid expands to fit content
 
     // If number of columns AUTO_FIT then set to 1 column.
-
+    mNumColumns = ( mNumColumns > 0 ) ? mNumColumns : 1;
     // Calculate numbers of rows, round down result as later check for remainder.
-    mNumRows = childCount / ( ( mNumColumns ) ? mNumColumns : 1 );
+    mNumRows = childCount / mNumColumns;
     // If number of cells not cleanly dividable by colums, add another row to house remainder cells.
-    mNumRows += ( childCount %  ( ( mNumColumns ) ? mNumColumns : 1 ) ) ? 1 : 0;
+    mNumRows += ( childCount % mNumColumns ) ? 1 : 0;
 
     availableContentHeight = desiredChildHeight * mNumRows;
   }
 
   // If number of columns not defined
-  DetermineNumberOfColumns( availableContentWidth );
+  DetermineNumberOfColumns( availableContentWidth.mValue );
 
   // Locations define the start, end,top and bottom of each cell.
-  mLocations->CalculateLocations( mNumColumns, availableContentWidth, availableContentHeight, childCount, 0, 0 );
+  mLocations->CalculateLocations( mNumColumns, availableContentWidth.mValue, availableContentHeight.mValue, childCount, 0, 0 );
 
 
   SetMeasuredDimensions( ResolveSizeAndState( widthSize, widthMeasureSpec, MeasuredSize::State::MEASURED_SIZE_OK ),
