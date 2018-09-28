@@ -1775,3 +1775,185 @@ int UtcDaliImageViewFillMode(void)
 
   END_TEST;
 }
+
+int UtcDaliImageViewCustomShader(void)
+{
+  ToolkitTestApplication application;
+
+  // Set a custom shader with an image url
+  {
+    Property::Map properties;
+    Property::Map shader;
+    const std::string vertexShader = "Foobar";
+    const std::string fragmentShader = "Foobar";
+    shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+    shader[Visual::Shader::Property::VERTEX_SHADER] = vertexShader;
+
+    properties[Visual::Property::TYPE] = Visual::IMAGE;
+    properties[Visual::Property::SHADER] = shader;
+    properties[ImageVisual::Property::URL] = TEST_IMAGE_FILE_NAME;
+
+    ImageView imageView = ImageView::New();
+    imageView.SetProperty( ImageView::Property::IMAGE, properties );
+
+    Stage::GetCurrent().Add( imageView );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    Renderer renderer = imageView.GetRendererAt( 0 );
+    Shader shader2 = renderer.GetShader();
+    Property::Value value = shader2.GetProperty( Shader::Property::PROGRAM );
+    Property::Map* map = value.GetMap();
+    DALI_TEST_CHECK( map );
+
+    Property::Value* fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
+    DALI_TEST_EQUALS( fragmentShader, fragment->Get< std::string >(), TEST_LOCATION );
+
+    Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
+    DALI_TEST_EQUALS( vertexShader, vertex->Get< std::string >(), TEST_LOCATION );
+  }
+
+  // Set a custom shader after setting an image url
+  {
+    Property::Map properties;
+    Property::Map shader;
+    const std::string vertexShader = "Foobar";
+    const std::string fragmentShader = "Foobar";
+    shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+    shader[Visual::Shader::Property::VERTEX_SHADER] = vertexShader;
+
+    properties[Visual::Property::SHADER] = shader;
+
+    ImageView imageView = ImageView::New( TEST_IMAGE_FILE_NAME );
+    imageView.SetProperty( ImageView::Property::IMAGE, properties );
+
+    Stage::GetCurrent().Add( imageView );
+
+    application.SendNotification();
+    application.Render();
+
+    Renderer renderer = imageView.GetRendererAt( 0 );
+    Shader shader2 = renderer.GetShader();
+    Property::Value value = shader2.GetProperty( Shader::Property::PROGRAM );
+    Property::Map* map = value.GetMap();
+    DALI_TEST_CHECK( map );
+
+    Property::Value* fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
+    DALI_TEST_EQUALS( fragmentShader, fragment->Get< std::string >(), TEST_LOCATION );
+
+    Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
+    DALI_TEST_EQUALS( vertexShader, vertex->Get< std::string >(), TEST_LOCATION );
+  }
+
+  // Set a custom shader before setting an image url
+  {
+    Property::Map properties;
+    Property::Map shader;
+    const std::string vertexShader = "Foobar";
+    const std::string fragmentShader = "Foobar";
+    shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+    shader[Visual::Shader::Property::VERTEX_SHADER] = vertexShader;
+
+    properties[Visual::Property::SHADER] = shader;
+
+    ImageView imageView = ImageView::New();
+    imageView.SetProperty( ImageView::Property::IMAGE, properties );
+    imageView.SetProperty( ImageView::Property::IMAGE, TEST_IMAGE_FILE_NAME );
+
+    Stage::GetCurrent().Add( imageView );
+
+    application.SendNotification();
+    application.Render();
+
+    Renderer renderer = imageView.GetRendererAt( 0 );
+    Shader shader2 = renderer.GetShader();
+    Property::Value value = shader2.GetProperty( Shader::Property::PROGRAM );
+    Property::Map* map = value.GetMap();
+    DALI_TEST_CHECK( map );
+
+    Property::Value* fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
+    DALI_TEST_EQUALS( fragmentShader, fragment->Get< std::string >(), TEST_LOCATION );
+
+    Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
+    DALI_TEST_EQUALS( vertexShader, vertex->Get< std::string >(), TEST_LOCATION );
+  }
+
+  // Set a custom shader after setting a property map
+  {
+    Property::Map properties;
+    Property::Map shader;
+    const std::string vertexShader = "Foobar";
+    const std::string fragmentShader = "Foobar";
+    shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+    shader[Visual::Shader::Property::VERTEX_SHADER] = vertexShader;
+
+    properties[Visual::Property::SHADER] = shader;
+
+    Property::Map properties1;
+    properties1[Visual::Property::TYPE] = Visual::IMAGE;
+    properties1[ImageVisual::Property::URL] = TEST_IMAGE_FILE_NAME;
+
+    ImageView imageView = ImageView::New();
+    imageView.SetProperty( ImageView::Property::IMAGE, properties1 );
+    imageView.SetProperty( ImageView::Property::IMAGE, properties );
+
+    Stage::GetCurrent().Add( imageView );
+
+    application.SendNotification();
+    application.Render();
+
+    Renderer renderer = imageView.GetRendererAt( 0 );
+    Shader shader2 = renderer.GetShader();
+    Property::Value value = shader2.GetProperty( Shader::Property::PROGRAM );
+    Property::Map* map = value.GetMap();
+    DALI_TEST_CHECK( map );
+
+    Property::Value* fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
+    DALI_TEST_EQUALS( fragmentShader, fragment->Get< std::string >(), TEST_LOCATION );
+
+    Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
+    DALI_TEST_EQUALS( vertexShader, vertex->Get< std::string >(), TEST_LOCATION );
+  }
+
+  // Set a custom shader before setting a property map
+  {
+    Property::Map properties;
+    Property::Map shader;
+    const std::string vertexShader = "Foobar";
+    const std::string fragmentShader = "Foobar";
+    shader[Visual::Shader::Property::FRAGMENT_SHADER] = fragmentShader;
+    shader[Visual::Shader::Property::VERTEX_SHADER] = vertexShader;
+
+    properties[Visual::Property::SHADER] = shader;
+
+    Property::Map properties1;
+    properties1[Visual::Property::TYPE] = Visual::IMAGE;
+    properties1[ImageVisual::Property::URL] = TEST_IMAGE_FILE_NAME;
+
+    ImageView imageView = ImageView::New();
+    imageView.SetProperty( ImageView::Property::IMAGE, properties );
+    imageView.SetProperty( ImageView::Property::IMAGE, properties1 );
+
+    Stage::GetCurrent().Add( imageView );
+
+    application.SendNotification();
+    application.Render();
+
+    Renderer renderer = imageView.GetRendererAt( 0 );
+    Shader shader2 = renderer.GetShader();
+    Property::Value value = shader2.GetProperty( Shader::Property::PROGRAM );
+    Property::Map* map = value.GetMap();
+    DALI_TEST_CHECK( map );
+
+    Property::Value* fragment = map->Find( "fragment" ); // fragment key name from shader-impl.cpp
+    DALI_TEST_EQUALS( fragmentShader, fragment->Get< std::string >(), TEST_LOCATION );
+
+    Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
+    DALI_TEST_EQUALS( vertexShader, vertex->Get< std::string >(), TEST_LOCATION );
+  }
+
+  END_TEST;
+}
