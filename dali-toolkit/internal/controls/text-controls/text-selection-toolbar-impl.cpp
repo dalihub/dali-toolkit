@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -208,6 +208,7 @@ void TextSelectionToolbar::SetUpScrollView()
   mScrollView.SetAxisAutoLock( true );
   mScrollView.ScrollStartedSignal().Connect( this, &TextSelectionToolbar::OnScrollStarted );
   mScrollView.ScrollCompletedSignal().Connect( this, &TextSelectionToolbar::OnScrollCompleted );
+  mScrollView.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX ); // In a new layer, so clip to scroll-view's bounding box
 
   mRulerX = new DefaultRuler();  // IntrusivePtr which is unreferenced when ScrollView is destroyed.
 

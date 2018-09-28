@@ -249,8 +249,8 @@ void LinearLayout::MeasureHorizontal( MeasureSpec widthMeasureSpec, MeasureSpec 
           childWidth = childLayout->GetMeasuredWidth();
         }
 
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LinearLayout::OnMeasure childWidth(%d)\n", childWidth.mValue );
-        LayoutLength length = childWidth + LayoutLength::IntType( childMargin.start + childMargin.end );
+        DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LinearLayout::OnMeasure childWidth(" << childWidth << ")\n" );
+        LayoutLength length = childWidth + childMargin.start + childMargin.end;
         LayoutLength cellPadding = i < GetChildCount() - 1 ? mCellPadding.width : 0;
         if( isExactly )
         {
@@ -331,7 +331,7 @@ void LinearLayout::MeasureHorizontal( MeasureSpec widthMeasureSpec, MeasureSpec 
       LayoutLength childWidth = 0;
       if( childWeight > 0 )
       {
-        LayoutLength share = (childWeight * remainingExcess.mValue) / remainingWeightSum;
+        LayoutLength share = ( childWeight * remainingExcess ) / remainingWeightSum;
         remainingExcess -= share;
         remainingWeightSum -= childWeight;
 
@@ -426,12 +426,12 @@ void LinearLayout::ForceUniformHeight( int count, MeasureSpec widthMeasureSpec )
       {
         // Temporarily force children to reuse their old measured width
         LayoutLength oldWidth = desiredWidth;
-        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, childLayout->GetMeasuredWidth().mValue );
+        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, childLayout->GetMeasuredWidth().AsInteger() );
 
         // Remeasure with new dimensions
         MeasureChildWithMargins( childLayout, widthMeasureSpec, 0, uniformMeasureSpec, 0 );
 
-        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, oldWidth.mValue );
+        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, oldWidth.AsInteger() );
       }
     }
   }
@@ -490,7 +490,7 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
     case Dali::Toolkit::LinearLayout::Alignment::CENTER_HORIZONTAL:
     {
       // mTotalLength contains the padding already
-      childLeft = LayoutLength( padding.start ) + ( right - left - mTotalLength ) / 2;
+      childLeft = padding.start + ( right - left - mTotalLength ) / 2.0f;
       break;
     }
   }
@@ -527,10 +527,10 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
           childTop = height - padding.bottom - childHeight - childMargin.bottom;
           break;
         }
-        case Dali::Toolkit::LinearLayout::Alignment::CENTER_VERTICAL:
+        case Dali::Toolkit::LinearLayout::Alignment::CENTER_VERTICAL: // FALLTHROUGH
         default:
         {
-          childTop = LayoutLength( padding.top ) + ( ( childSpace - childHeight ) / 2 ) + childMargin.top - childMargin.bottom;
+          childTop = padding.top + ( ( childSpace - childHeight ) / 2.0f ) + childMargin.top - childMargin.bottom;
           break;
         }
       }
@@ -613,9 +613,9 @@ void LinearLayout::MeasureVertical( MeasureSpec widthMeasureSpec, MeasureSpec he
           childHeight = childLayout->GetMeasuredHeight();
         }
 
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LinearLayout::MeasureVertical childHeight(%d)\n", childHeight.mValue );
+        DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LinearLayout::MeasureVertical childHeight(" << childHeight << ")\n" );
 
-        LayoutLength length = childHeight + LayoutLength::IntType( childMargin.top + childMargin.bottom );
+        LayoutLength length = childHeight + childMargin.top + childMargin.bottom;
         LayoutLength cellPadding = i < GetChildCount() - 1 ? mCellPadding.height : 0;
         LayoutLength totalLength = mTotalLength;
         mTotalLength = std::max( totalLength, totalLength + length + cellPadding );
@@ -693,7 +693,7 @@ void LinearLayout::MeasureVertical( MeasureSpec widthMeasureSpec, MeasureSpec he
       LayoutLength childHeight = 0;
       if( childWeight > 0 )
       {
-        LayoutLength share = (childWeight * remainingExcess.mValue) / remainingWeightSum;
+        LayoutLength share = ( childWeight * remainingExcess ) / remainingWeightSum;
         remainingExcess -= share;
         remainingWeightSum -= childWeight;
 
@@ -738,7 +738,7 @@ void LinearLayout::MeasureVertical( MeasureSpec widthMeasureSpec, MeasureSpec he
       alternativeMaxWidth = std::max( alternativeMaxWidth, matchWidthLocally ? marginWidth : childWidth );
 
       childHeight = childLayout->GetMeasuredHeight();
-      LayoutLength length = childHeight + LayoutLength::IntType( childMargin.top + childMargin.bottom );
+      LayoutLength length = childHeight + childMargin.top + childMargin.bottom;
       LayoutLength cellPadding = i < GetChildCount() - 1 ? mCellPadding.height : 0;
       LayoutLength totalLength = mTotalLength;
       mTotalLength = std::max( totalLength, totalLength + length + cellPadding );
@@ -787,12 +787,12 @@ void LinearLayout::ForceUniformWidth( int count, MeasureSpec heightMeasureSpec )
       {
         // Temporarily force children to reuse their old measured height
         LayoutLength oldHeight = desiredHeight;
-        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, childLayout->GetMeasuredHeight().mValue );
+        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, childLayout->GetMeasuredHeight().AsInteger() );
 
         // Remeasure with new dimensions
         MeasureChildWithMargins( childLayout, uniformMeasureSpec, 0, heightMeasureSpec, 0 );
 
-        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, oldHeight.mValue );
+        childOwner.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, oldHeight.AsInteger() );
       }
     }
   }
@@ -830,7 +830,7 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
     default:
     {
       // mTotalLength contains the padding already
-      childTop = LayoutLength( padding.top ) + ( bottom - top - mTotalLength ) / 2;
+      childTop = padding.top + ( bottom - top - mTotalLength ) / 2.0f;
       break;
     }
   }
@@ -860,7 +860,7 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
         }
         case Dali::Toolkit::LinearLayout::Alignment::CENTER_HORIZONTAL:
         {
-          childLeft = LayoutLength( padding.start ) + ( childSpace - childWidth ) / 2 + childMargin.start - childMargin.end;
+          childLeft = padding.start + ( childSpace - childWidth ) / 2.0f + childMargin.start - childMargin.end;
           break;
         }
       }

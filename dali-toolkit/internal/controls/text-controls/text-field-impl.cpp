@@ -1748,7 +1748,7 @@ void TextField::EnableClipping()
                           Add( ColorVisual::Property::MIX_COLOR, Color::TRANSPARENT ) );
 
     // Enable the clipping property.
-    mStencil.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
+    mStencil.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX );
     mStencil.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
     Self().Add( mStencil );

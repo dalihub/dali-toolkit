@@ -76,14 +76,14 @@ int Grid::GetNumberOfColumns() const
   return mNumColumns;
 }
 
-void Grid::DetermineNumberOfColumns( int availableSpace )
+void Grid::DetermineNumberOfColumns( LayoutLength availableSpace )
 {
   if( mRequestedNumColumns == AUTO_FIT )
   {
     if( availableSpace > 0 )
     {
       // Can only calculate number of columns if a column width has been set
-      mNumColumns = ( mRequestedColumnWidth > 0 ) ? ( availableSpace / mRequestedColumnWidth ) : 1;
+      mNumColumns = ( mRequestedColumnWidth > 0 ) ? ( availableSpace.AsInteger() / mRequestedColumnWidth ) : 1;
     }
   }
 }
@@ -132,7 +132,7 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
       desiredChildWidth += childMargin.start + childMargin.end;
 
       mTotalWidth = desiredChildWidth * mNumColumns;
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Grid::OnMeasure TotalDesiredWidth(%d) \n", mTotalWidth.mValue );
+      DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "Grid::OnMeasure TotalDesiredWidth(" << mTotalWidth << ") \n" );
     } // Child is LayoutItem
   } // Child exists
 
@@ -149,12 +149,10 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
       mTotalWidth = std::min( mTotalWidth, widthSize );
   }
 
-  availableContentWidth = mTotalWidth.mValue - gridLayoutPadding.start - gridLayoutPadding.end;
+  availableContentWidth = mTotalWidth - gridLayoutPadding.start - gridLayoutPadding.end;
   widthSize = mTotalWidth;
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Grid::OnMeasure availableContentWidth(%d) mTotalWidth(%d) \n",
-                 availableContentWidth.mValue,
-                 mTotalWidth.mValue );
+  DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "Grid::OnMeasure availableContentWidth" << availableContentWidth << " mTotalWidth(" << mTotalWidth << ") \n" );
   // HEIGHT SPECIFICATIONS
 
   // heightMode EXACTLY so grid must be the given height
@@ -168,8 +166,7 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
       {
         mTotalHeight += desiredChildHeight;
       }
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Grid::OnMeasure TotalDesiredHeight(%d) \n",
-                      mTotalHeight.mValue );
+      DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "Grid::OnMeasure TotalDesiredHeight(" << mTotalHeight << ") \n" );
 
       // Ensure ourHeight does not exceed specified atmost height
       mTotalHeight = std::min( mTotalHeight, heightSize );
@@ -196,10 +193,10 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
   }
 
   // If number of columns not defined
-  DetermineNumberOfColumns( availableContentWidth.mValue );
+  DetermineNumberOfColumns( availableContentWidth );
 
   // Locations define the start, end,top and bottom of each cell.
-  mLocations->CalculateLocations( mNumColumns, availableContentWidth.mValue, availableContentHeight.mValue, childCount, 0, 0 );
+  mLocations->CalculateLocations( mNumColumns, availableContentWidth.AsInteger(), availableContentHeight.AsInteger(), childCount, 0, 0 );
 
 
   SetMeasuredDimensions( ResolveSizeAndState( widthSize, widthMeasureSpec, MeasuredSize::State::MEASURED_SIZE_OK ),
