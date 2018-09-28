@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -414,10 +414,6 @@ void TextSelectionPopup::OnInitialize()
   Actor self = Self();
   self.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
   self.SetProperty( Actor::Property::COLOR_ALPHA, 0.0f );
-
-  // The Popup Control background is a nine-patch image. We clip against this so the
-  // contents are correctly clipped against the edges of the nine-patch.
-  self.SetProperty( Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN );
 }
 
 void TextSelectionPopup::HideAnimationFinished( Animation& animation )

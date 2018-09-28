@@ -288,7 +288,7 @@ void LayoutGroup::DoRegisterChildProperties( const std::string& containerType )
 
 void LayoutGroup::OnSetChildProperties( Handle& handle, Property::Index index, Property::Value value )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnSetChildProperties property(%s)\n", handle.GetPropertyName(index).c_str());
+  DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LayoutGroup::OnSetChildProperties property(" << handle.GetPropertyName(index) << ")\n" );
 
   if ( ( ( index >= CHILD_PROPERTY_REGISTRATION_START_INDEX ) &&
          ( index <= CHILD_PROPERTY_REGISTRATION_MAX_INDEX ) )
@@ -489,7 +489,7 @@ MeasureSpec LayoutGroup::GetChildMeasureSpec(
     }
   }
 
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::GetChildMeasureSpec resultSize(%u)\n", resultSize.mValue );
+  DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LayoutGroup::GetChildMeasureSpec resultSize(" << resultSize << ")\n" );
 
   //noinspection ResourceType
   return MeasureSpec( resultSize, resultMode );
@@ -601,10 +601,8 @@ void LayoutGroup::ChildAddedToOwner( Actor child )
       }
       childLayout->SetAnimateLayout( IsLayoutAnimated() ); // @todo this essentially forces animation inheritance. Bad?
 
-      DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner control:" <<  control.GetName().c_str() <<
-                       " desiredWidth: " <<  control.GetNaturalSize().width <<
-                       " desiredHeight:"  << control.GetNaturalSize().height
-                       );
+      DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner control:" <<  control.GetName() <<
+                       " desiredWidth: " <<  control.GetNaturalSize().width << " desiredHeight:"  << control.GetNaturalSize().height );
 
       childControlDataImpl.SetLayout( *childLayout.Get() );
 
@@ -757,14 +755,14 @@ void LayoutGroup::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMea
 
         // Get size of child
         MeasureChild( childLayout, widthMeasureSpec, heightMeasureSpec );
-        auto childWidth = childLayout->GetMeasuredWidth();
-        auto childHeight = childLayout->GetMeasuredHeight();
-        auto childMargin = childLayout->GetMargin();
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure child width[%d] height(%d)\n", childWidth.mValue, childHeight.mValue );
+        LayoutLength childWidth = childLayout->GetMeasuredWidth();
+        LayoutLength childHeight = childLayout->GetMeasuredHeight();
+        Extents childMargin = childLayout->GetMargin();
+        DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure child width[" << childWidth << "] height[" << childHeight << "]\n" );
 
         layoutWidth = std::max( layoutWidth, childWidth + childMargin.start + childMargin.end );
         layoutHeight = std::max( layoutHeight, childHeight + childMargin.top + childMargin.bottom );
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure calculated child width[%d] calculated height(%d)\n", layoutWidth.mValue, layoutHeight.mValue );
+        DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure calculated child width[" << layoutWidth << "] height[" << layoutHeight << "]\n" );
       }
       else
       {
@@ -817,7 +815,7 @@ void LayoutGroup::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMea
     layoutHeight = heightSpecSize;
   }
 
-  DALI_LOG_INFO( gLogFilter, Debug::General, "LayoutGroup::OnMeasure Measured size(%d,%d) for : %s \n", layoutWidth.mValue, layoutHeight.mValue, Actor::DownCast(GetOwner()).GetName().c_str() );
+  DALI_LOG_STREAM( gLogFilter, Debug::General, "LayoutGroup::OnMeasure Measured size(" << layoutWidth << "," << layoutHeight << ") for : " << Actor::DownCast(GetOwner()).GetName() << " \n" );
   SetMeasuredDimensions( MeasuredSize( layoutWidth ), MeasuredSize( layoutHeight ) );
 }
 
@@ -834,20 +832,17 @@ void LayoutGroup::OnLayout( bool changed, LayoutLength left, LayoutLength top, L
     {
 
       auto childOwner = childLayout->GetOwner();
-      auto childWidth = childLayout->GetMeasuredWidth();
-      auto childHeight = childLayout->GetMeasuredHeight();
-      auto childMargin = childLayout->GetMargin();
+      LayoutLength childWidth = childLayout->GetMeasuredWidth();
+      LayoutLength childHeight = childLayout->GetMeasuredHeight();
+      Extents childMargin = childLayout->GetMargin();
       auto control = Toolkit::Control::DownCast( childOwner );
       Extents padding = GetPadding();
 
       auto childPosition = control.GetProperty< Vector3 >( Actor::Property::POSITION );
       auto anchorPoint = control.GetProperty< Vector3 >( Actor::Property::ANCHOR_POINT );
 
-      DALI_LOG_INFO( gLogFilter, Debug::General, "LayoutGroup::OnLayout child[%s] position(%f,%f) child width[%d] height(%d)\n",
-                      control.GetName().c_str(),
-                      childPosition.x, childPosition.y,
-                      childWidth.mValue, childHeight.mValue
-                      );
+      DALI_LOG_STREAM( gLogFilter, Debug::General, "LayoutGroup::OnLayout child[" << control.GetName() <<
+                       "] position(" << childPosition << ") child width[" << childWidth << "] height[" << childHeight << "]\n" );
 
       // Margin and Padding only supported when child anchor point is TOP_LEFT.
       int paddingAndMarginOffsetX = ( AnchorPoint::TOP_LEFT == anchorPoint ) ? ( padding.top + childMargin.top ) : 0;

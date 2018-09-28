@@ -40,7 +40,7 @@ public:
   };
 
   MeasuredSize()
-  : mMeasuredSize( 0u ),
+  : mMeasuredSize( 0 ),
     mState ( MeasuredSize::State::MEASURED_SIZE_OK )
   {
   }
@@ -69,7 +69,7 @@ public:
     return *this;
   }
 
-  MeasuredSize& operator=( LayoutLength::IntType rhs )
+  MeasuredSize& operator=( LayoutLength rhs )
   {
     this->mMeasuredSize = rhs;
     this->mState = State::MEASURED_SIZE_OK;
@@ -84,11 +84,6 @@ public:
   inline bool operator!=( MeasuredSize value )
   {
     return mMeasuredSize != value.mMeasuredSize;
-  }
-
-  inline operator LayoutLength::IntType()
-  {
-    return mMeasuredSize.mValue;
   }
 
   inline void SetState( MeasuredSize::State state )
