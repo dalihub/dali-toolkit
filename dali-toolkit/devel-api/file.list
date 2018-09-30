@@ -54,7 +54,8 @@ devel_api_src_files = \
   $(devel_api_src_dir)/visual-factory/transition-data.cpp \
   $(devel_api_src_dir)/visual-factory/visual-factory.cpp \
   $(devel_api_src_dir)/visual-factory/visual-base.cpp \
-  $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp
+  $(devel_api_src_dir)/controls/gaussian-blur-view/gaussian-blur-view.cpp \
+  $(devel_api_src_dir)/drag-drop-detector/drag-and-drop-detector.cpp
 
 # Add devel header files here
 
@@ -197,3 +198,6 @@ devel_api_gaussian_blur_view_header_files = \
 
 devel_api_web_view_header_files = \
   $(devel_api_src_dir)/controls/web-view/web-view.h
+
+devel_api_drag_and_drop_detector_header_files = \
+  $(devel_api_src_dir)/drag-drop-detector/drag-and-drop-detector.h

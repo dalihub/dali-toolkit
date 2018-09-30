@@ -76,6 +76,7 @@ SET(TC_SOURCES
   utc-Dali-AsyncImageLoader.cpp
   utc-Dali-SyncImageLoader.cpp
   utc-Dali-ControlWrapper.cpp
+  utc-Dali-DragAndDropDetector.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
