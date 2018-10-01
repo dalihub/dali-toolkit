@@ -31,12 +31,12 @@ class LayoutSize
 {
 public:
   LayoutSize()
-  : x(0u),
-    y(0u)
+  : x( 0 ),
+    y( 0 )
   {
   }
 
-  LayoutSize( LayoutLength::IntType anX, LayoutLength::IntType aY )
+  LayoutSize( LayoutLength anX, LayoutLength aY )
   : x( anX ),
     y( aY )
   {
@@ -55,31 +55,24 @@ public:
     return *this;
   }
 
-  LayoutLength::IntType GetWidth()
+  void SetWidth( LayoutLength value )
+  {
+    width = value;
+  }
+
+  LayoutLength GetWidth()
   {
     return width;
   }
 
-  LayoutLength::IntType GetHeight()
+  void SetHeight( LayoutLength value )
   {
-    return height;
+    height = value;
   }
 
-  void SetWidth(LayoutLength::IntType value)
+  LayoutLength GetHeight()
   {
-    width=value;
-  }
-  void SetHeight(LayoutLength::IntType value)
-  {
-    height=value;
-  }
-  void SetWidth(LayoutLength value)
-  {
-    width=value.mValue;
-  }
-  void SetHeight(LayoutLength value)
-  {
-    height=value.mValue;
+    return height;
   }
 
   bool operator==( const LayoutSize& rhs )
@@ -94,14 +87,14 @@ public:
 
   union
   {
-    LayoutLength::IntType x;
-    LayoutLength::IntType width;
+    LayoutLength x;
+    LayoutLength width;
   };
 
   union
   {
-    LayoutLength::IntType y;
-    LayoutLength::IntType height;
+    LayoutLength y;
+    LayoutLength height;
   };
 };
 

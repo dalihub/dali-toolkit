@@ -93,7 +93,7 @@ private:
    * For the given availableSpace, calculate or retreive the number of required columns.
    * @param[in] availableSpace the space available for a child in each column.
    */
-  void DetermineNumberOfColumns( int availableSpace );
+  void DetermineNumberOfColumns( LayoutLength availableSpace );
 
 private:
 

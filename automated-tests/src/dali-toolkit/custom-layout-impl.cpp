@@ -41,7 +41,7 @@ CustomLayoutPtr CustomLayout::New()
   return layout;
 }
 
-void CustomLayout::MeasureChildren( Dali::Toolkit::Internal::LayoutItemPtr childLayout, MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec, int resultingWidth, int resultingHeight )
+void CustomLayout::MeasureChildren( Dali::Toolkit::Internal::LayoutItemPtr childLayout, MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec, LayoutLength resultingWidth, LayoutLength resultingHeight )
 {
   // Initially use the measure spec of the child's parent
   auto childWidthMeasureSpec = widthMeasureSpec;
@@ -61,7 +61,7 @@ void CustomLayout::MeasureChildren( Dali::Toolkit::Internal::LayoutItemPtr child
 
   MeasureChild( childLayout, childWidthMeasureSpec, childHeightMeasureSpec );
   resultingWidth += childLayout->GetMeasuredWidth();
-  resultingHeight = std::max( childLayout->GetMeasuredHeight().mValue, resultingHeight );
+  resultingHeight = std::max( childLayout->GetMeasuredHeight(), resultingHeight );
 }
 
 void CustomLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec )
@@ -93,15 +93,15 @@ void CustomLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, 
   LayoutLength childLeft( 0 );
 
   // We want to vertically align the children to the middle
-  auto height = bottom - top;
-  auto middle = height / 2;
+  LayoutLength height = bottom - top;
+  LayoutLength middle = height / 2;
 
   auto owner = GetOwner();
   auto actor = Actor::DownCast(owner);
 
   // Horizontally align the children to the left
   int count = actor.GetChildCount();
-  int currentLeft = 0;
+  LayoutLength currentLeft = 0;
 
   for( int i = 0; i < count; i++)
   {
@@ -116,10 +116,10 @@ void CustomLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, 
     {
       Dali::Toolkit::Internal::LayoutItem& childLayoutImpl = GetImplementation( childLayout );
 
-      auto childWidth = childLayoutImpl.GetMeasuredWidth();
-      auto childHeight = childLayoutImpl.GetMeasuredHeight();
+      LayoutLength childWidth = childLayoutImpl.GetMeasuredWidth();
+      LayoutLength childHeight = childLayoutImpl.GetMeasuredHeight();
 
-      childTop = middle - (childHeight / 2);
+      childTop = middle - childHeight / 2;
       childLayoutImpl.Layout( currentLeft, childTop, currentLeft + childWidth, childTop + childHeight );
       currentLeft += childWidth;
     }

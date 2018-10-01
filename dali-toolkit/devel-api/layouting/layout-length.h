@@ -16,35 +16,72 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// EXTERNAL INCLUDES
 #include <cstdint>
+#include <cmath>
 #include <iostream>
 
 namespace Dali
 {
+
 namespace Toolkit
 {
 
 /**
  * @brief A type that represents a layout length.
  *
- * Currently, this implies pixels, but could be extended to handle device dependant sizes, etc.
+ * Currently, this implies pixels, but could be extended to handle device dependent sizes, etc.
  */
 class LayoutLength
 {
 public:
-  using IntType = int;
 
-  LayoutLength( IntType value )
+  /**
+   * @brief default constructor, initialises to 0
+   */
+  LayoutLength()
+  : mValue( 0 )
+  {
+  }
+
+  /**
+   * @brief constructor
+   *
+   * @param value the value to initialise with
+   */
+  LayoutLength( int value )
   : mValue( value )
   {
   }
 
+  /**
+   * @brief constructor from float
+   *
+   * @param value the value to initialise with
+   */
+  LayoutLength( float value )
+  : mValue( value )
+  {
+  }
+
+  /**
+   * @brief constructor
+   *
+   * @param layoutLength the value to initialise with
+   */
   LayoutLength( const LayoutLength& layoutLength )
   : mValue( layoutLength.mValue )
   {
   }
 
-  LayoutLength& operator=(const LayoutLength& rhs)
+  /**
+   * @brief assignment operator
+   *
+   * @param rhs LayoutLength to assign
+   * @return reference to itself
+   */
+  LayoutLength& operator=( const LayoutLength& rhs )
   {
     if( this != &rhs )
     {
@@ -53,127 +90,219 @@ public:
     return *this;
   }
 
-  bool operator==( const LayoutLength& rhs )
+  /**
+   * @brief assignment operator from int
+   *
+   * @param value the value to assign
+   * @return reference to itself
+   */
+  LayoutLength& operator=( int value )
   {
-    return mValue == rhs.mValue;
+    mValue = value;
+    return *this;
   }
 
-  bool operator==( LayoutLength::IntType rhs )
+  /**
+   * @brief assignment operator from float
+   *
+   * @param value the value to assign
+   * @return reference to itself
+   */
+  LayoutLength& operator=( float value )
   {
-    return mValue == rhs;
+    mValue = value;
+    return *this;
   }
 
-  bool operator!=( const LayoutLength& rhs )
-  {
-    return !operator==(rhs);
-  }
-
-  bool operator<( const LayoutLength& rhs )
-  {
-    return mValue < rhs.mValue;
-  }
-
-  bool operator<( const LayoutLength rhs ) const
-  {
-    return mValue < rhs.mValue;
-  }
-
-  bool operator<=( const LayoutLength& rhs )
-  {
-    return mValue <= rhs.mValue;
-  }
-  bool operator<=( LayoutLength rhs )
-  {
-    return mValue <= rhs.mValue;
-  }
-  bool operator>( const LayoutLength& rhs )
-  {
-    return mValue > rhs.mValue;
-  }
-  bool operator>( LayoutLength rhs )
-  {
-    return mValue > rhs.mValue;
-  }
-  bool operator>=( const LayoutLength& rhs )
-  {
-    return mValue >= rhs.mValue;
-  }
-  bool operator>=( LayoutLength rhs )
-  {
-    return mValue >= rhs.mValue;
-  }
-
-  LayoutLength operator+( const LayoutLength& rhs )
-  {
-    return mValue + rhs.mValue;
-  }
-
-  LayoutLength operator+( LayoutLength::IntType rhs )
-  {
-    return mValue + rhs;
-  }
-
-  LayoutLength operator-( const LayoutLength& rhs )
-  {
-    return mValue - rhs.mValue;
-  }
-  LayoutLength operator-( LayoutLength::IntType rhs )
-  {
-    return mValue - rhs;
-  }
-
-  LayoutLength& operator+=( const LayoutLength& rhs )
+  /**
+   * @brief plus equals operator
+   *
+   * @param rhs to add to this
+   * @return reference to itself
+   */
+  LayoutLength& operator+=( LayoutLength rhs )
   {
     mValue += rhs.mValue;
     return *this;
   }
-  LayoutLength& operator+=( LayoutLength::IntType rhs )
-  {
-    mValue += rhs;
-    return *this;
-  }
 
-  LayoutLength& operator-=( const LayoutLength& rhs )
+  /**
+   * @brief minus equals operator
+   *
+   * @param rhs to subtract from this
+   * @return reference to itself
+   */
+  LayoutLength& operator-=( LayoutLength rhs )
   {
     mValue -= rhs.mValue;
     return *this;
   }
 
-  LayoutLength& operator-=( LayoutLength::IntType rhs )
+  /**
+   * @brief return value as decimal value (full raw value)
+   *
+   * @return the LayoutLength as full decimal value
+   */
+  float AsDecimal() const
   {
-    mValue -= rhs;
-    return *this;
+    return mValue;
   }
 
-  LayoutLength operator/( const LayoutLength& rhs )
+  /**
+   * @brief return value as rounded integer value (whole number)
+   *
+   * @return the LayoutLength rounded to next integer value
+   */
+  float AsInteger() const
   {
-    return mValue / rhs.mValue;
-  }
-  LayoutLength operator/(  LayoutLength::IntType rhs )
-  {
-    return mValue / rhs;
-  }
-
-  LayoutLength operator*( const LayoutLength& rhs )
-  {
-    return mValue * rhs.mValue;
-  }
-  LayoutLength operator*( LayoutLength::IntType rhs )
-  {
-    return mValue * rhs;
-  }
-  LayoutLength operator*( float rhs )
-  {
-    return LayoutLength(LayoutLength::IntType(float(mValue) * rhs));
+    return round( mValue );
   }
 
-  operator float()
+  /**
+   * @brief return value as truncated integral value (whole number)
+   *
+   * @return the LayoutLength rounded to next integral value
+   */
+  float AsTruncated() const
   {
-    return float( mValue );
+    return trunc( mValue );
   }
 
-  IntType mValue;
+private:
+
+  float mValue;
+
 };
+
+/**
+ * @brief equal to operator
+ *
+ * @param lhs value to compare
+ * @param rhs value to compare against
+ * @note Using value instead of reference to allow conversions from int and float
+ * @return true if identical, false otherwise
+ */
+inline bool operator==( LayoutLength lhs, LayoutLength rhs )
+{
+  return lhs.AsDecimal() == rhs.AsDecimal();
+}
+
+/**
+ * @brief not equal to operator
+ *
+ * @param lhs value to compare
+ * @param rhs value to compare against
+ * @note Using value instead of reference to allow conversions from int and float
+ * @return true if value is not identical, false otherwise
+ */
+inline bool operator!=( LayoutLength lhs, LayoutLength rhs )
+{
+  return !operator==( lhs, rhs );
+}
+
+/**
+ * @brief less than operator
+ *
+ * @param lhs value to compare
+ * @param rhs value to compare against
+ * @note Using value instead of reference to allow conversions from int and float
+ * @return true if lhs value is less, false otherwise
+ */
+inline bool operator<( LayoutLength lhs, LayoutLength rhs )
+{
+  return lhs.AsDecimal() < rhs.AsDecimal();
+}
+
+/**
+ * @brief greater than operator
+ *
+ * @param lhs value to compare
+ * @param rhs value to compare against
+ * @note Using value instead of reference to allow conversions from int and float
+ * @return true if lhs value is greater, false otherwise
+ */
+inline bool operator>( LayoutLength lhs, LayoutLength rhs )
+{
+  return rhs < lhs;
+}
+
+/**
+ * @brief less than or equal to operator
+ *
+ * @param lhs value to compare
+ * @param rhs value to compare against
+ * @note Using value instead of reference to allow conversions from int and float
+ * @return true if lhs value is less than or equal to, false otherwise
+ */
+inline bool operator<=( LayoutLength lhs, LayoutLength rhs )
+{
+  return !(lhs > rhs);
+}
+
+/**
+ * @brief greater than or equal to operator
+ *
+ * @param lhs value to compare
+ * @param rhs value to compare against
+ * @note Using value instead of reference to allow conversions from int and float
+ * @return true if lhs value is greater than or equal to, false otherwise
+ */
+inline bool operator>=( LayoutLength lhs, LayoutLength rhs )
+{
+  return !(lhs < rhs);
+}
+
+/**
+ * @brief add two LayoutLengths
+ *
+ * @param lhs The LayoutLength to add
+ * @param rhs The LayoutLength to add
+ * @note Using value instead of reference to allow conversions from int and float
+ * @return the resulting LayoutLength
+ */
+inline LayoutLength operator+( LayoutLength lhs, LayoutLength rhs )
+{
+  return lhs.AsDecimal() + rhs.AsDecimal();
+}
+
+/**
+ * @brief subtract two LayoutLengths
+ *
+ * @param lhs The LayoutLength to subtract from
+ * @param rhs The LayoutLength to subtract
+ * @note Using value instead of reference to allow conversions from int and float
+ * @return the resulting LayoutLength
+ */
+inline LayoutLength operator-( LayoutLength lhs, LayoutLength rhs )
+{
+  return lhs.AsDecimal() - rhs.AsDecimal();
+}
+
+/**
+ * @brief multiply two LayoutLengths
+ *
+ * @param lhs The LayoutLength to multiply
+ * @param rhs The LayoutLength to multiply
+ * @note Using value instead of reference to allow conversions from int and float
+ * @return the resulting LayoutLength
+ */
+inline LayoutLength operator*( LayoutLength lhs, LayoutLength rhs )
+{
+  return lhs.AsDecimal() * rhs.AsDecimal();
+}
+
+/**
+ * @brief divide LayoutLength by a LayoutLength
+ *
+ * @param lhs The LayoutLength to divide
+ * @param rhs The LayoutLength to divide by
+ * @note Using value instead of reference to allow conversions from int and float
+ * @return the resulting value as float
+ */
+inline LayoutLength operator/( LayoutLength lhs, LayoutLength rhs )
+{
+  return lhs.AsDecimal() / rhs.AsDecimal();
+}
 
 /**
  * @brief Prints a LayoutLength
@@ -184,7 +313,7 @@ public:
  */
 inline std::ostream& operator<<( std::ostream& o, const LayoutLength& layoutLength )
 {
-  return o<<layoutLength.mValue;
+  return o << layoutLength.AsDecimal();
 }
 
 } // namespace Toolkit

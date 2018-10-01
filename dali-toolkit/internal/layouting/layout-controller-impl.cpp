@@ -84,8 +84,8 @@ void LayoutController::Process()
     auto stageWidth  = stage.GetSize().width;
     auto stageHeight = stage.GetSize().height;
 
-    auto widthSpec = MeasureSpec( stageWidth, MeasureSpec::Mode::EXACTLY );
-    auto heightSpec = MeasureSpec( stageHeight, MeasureSpec::Mode::EXACTLY );
+    MeasureSpec widthSpec( stageWidth, MeasureSpec::Mode::EXACTLY );
+    MeasureSpec heightSpec( stageHeight, MeasureSpec::Mode::EXACTLY );
 
     // Test how to perform a measure on each control.
     MeasureHierarchy( stage.GetRootLayer(), widthSpec, heightSpec );

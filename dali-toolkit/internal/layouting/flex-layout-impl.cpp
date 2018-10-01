@@ -218,23 +218,23 @@ void FlexLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
 
   if( widthMeasureSpec.GetMode() == MeasureSpec::Mode::EXACTLY )
   {
-    width = widthMeasureSpec.GetSize();
+    width = widthMeasureSpec.GetSize().AsDecimal();
     YGNodeStyleSetWidth( mRoot, width );
   }
   else if( widthMeasureSpec.GetMode() == MeasureSpec::Mode::AT_MOST )
   {
-    width = widthMeasureSpec.GetSize();
+    width = widthMeasureSpec.GetSize().AsDecimal();
     YGNodeStyleSetMaxWidth( mRoot, width );
   }
 
   if ( heightMeasureSpec.GetMode() == MeasureSpec::Mode::EXACTLY )
   {
-    height = heightMeasureSpec.GetSize();
+    height = heightMeasureSpec.GetSize().AsDecimal();
     YGNodeStyleSetHeight( mRoot, height );
   }
   else if ( heightMeasureSpec.GetMode() == MeasureSpec::Mode::AT_MOST )
   {
-    height = heightMeasureSpec.GetSize();
+    height = heightMeasureSpec.GetSize().AsDecimal();
     YGNodeStyleSetMaxHeight( mRoot, height );
   }
 
@@ -249,8 +249,8 @@ void FlexLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
   auto owner = GetOwner();
   auto actor = Actor::DownCast(owner);
   bool isLayoutRtl = actor ? actor.GetProperty( Actor::Property::LAYOUT_DIRECTION ).Get<int>() == LayoutDirection::RIGHT_TO_LEFT: false;
-  auto width = right - left;
-  auto height = bottom - top;
+  LayoutLength width = right - left;
+  LayoutLength height = bottom - top;
 
 #if defined(DEBUG_ENABLED)
   std::ostringstream oss;
@@ -263,7 +263,7 @@ void FlexLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
   DALI_LOG_INFO( gLogFilter, Debug::Concise, oss.str().c_str() );
 #endif
 
-  YGNodeCalculateLayout( mRoot, width, height, isLayoutRtl ? YGDirectionRTL : YGDirectionLTR );
+  YGNodeCalculateLayout( mRoot, width.AsDecimal(), height.AsDecimal(), isLayoutRtl ? YGDirectionRTL : YGDirectionLTR );
 
   auto count = GetChildCount();
   for( unsigned int childIndex = 0; childIndex < count; childIndex++)
@@ -272,10 +272,10 @@ void FlexLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
     if( childLayout != nullptr )
     {
       YGNodeRef node = YGNodeGetChild(mRoot, childIndex);
-      auto childLeft = YGNodeLayoutGetLeft( node ) + left;
-      auto childTop = YGNodeLayoutGetTop( node ) + top;
-      auto childWidth = YGNodeLayoutGetWidth( node );
-      auto childHeight = YGNodeLayoutGetHeight( node );
+      LayoutLength childLeft = LayoutLength( YGNodeLayoutGetLeft( node ) )+ left;
+      LayoutLength childTop = LayoutLength( YGNodeLayoutGetTop( node ) ) + top;
+      LayoutLength childWidth = LayoutLength( YGNodeLayoutGetWidth( node ) );
+      LayoutLength childHeight = LayoutLength( YGNodeLayoutGetHeight( node ) );
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
     }
   }
@@ -290,7 +290,7 @@ YGSize FlexLayout::OnChildMeasure( YGNodeRef node,
   auto childOwner = childLayout->GetOwner();
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
   auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
-  auto parentWidthMeasureSpec = MeasureSpec( 0 );
+  MeasureSpec parentWidthMeasureSpec( 0 );
   if ( innerWidth != YGUndefined )
   {
     parentWidthMeasureSpec = MeasureSpec( innerWidth, static_cast<MeasureSpec::Mode>(widthMode) );
@@ -332,12 +332,12 @@ YGSize FlexLayout::OnChildMeasure( YGNodeRef node,
 
   // Remove padding here since Yoga doesn't consider it as a part of the node size
   Extents padding = childLayout->GetPadding();
-  auto measuredWidth = childLayout->GetMeasuredWidth() - padding.end - padding.start;
-  auto measuredHeight = childLayout->GetMeasuredHeight() - padding.bottom - padding.top;
+  LayoutLength measuredWidth = childLayout->GetMeasuredWidth() - padding.end - padding.start;
+  LayoutLength measuredHeight = childLayout->GetMeasuredHeight() - padding.bottom - padding.top;
 
   return YGSize{
-    .width = measuredWidth,
-    .height = measuredHeight,
+    .width = measuredWidth.AsDecimal(),
+    .height = measuredHeight.AsDecimal(),
   };
 }
 
