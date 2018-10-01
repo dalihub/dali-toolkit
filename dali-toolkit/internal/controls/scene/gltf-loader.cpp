@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 // CLASS HEADER
 #include <dali-toolkit/internal/controls/scene/gltf-loader.h>
 #include <dali-toolkit/internal/controls/scene/gltf-shader.h>
@@ -37,6 +38,14 @@ namespace Toolkit
 
 namespace Internal
 {
+
+namespace
+{
+
+// Maximum path length of linux.
+const unsigned int MAX_PATH_LENGTH = 4096;
+
+}//namespace
 
 GltfLoader::GltfLoader()
   : mNodes( NULL ),
@@ -63,25 +72,22 @@ bool GltfLoader::LoadScene( const std::string& filePath, Internal::Scene& scene 
   }
 
   mRoot = mParser.GetRoot();
-  if( !mRoot )
+  if( mRoot &&
+      LoadAssets() &&
+      CreateScene( scene ) )
   {
-    return false;
+    return true;
   }
-
-  if( !LoadAssets() )
-  {
-    return false;
-  }
-
-  if( !CreateScene( scene ) )
-  {
-    return false;
-  }
-  return true;
+  return false;
 }
 
 bool GltfLoader::ParseGltf( const std::string& filePath )
 {
+  if( filePath.length() > MAX_PATH_LENGTH )
+  {
+    DALI_LOG_ERROR( "File path is too long.\n" );
+    return false;
+  }
   std::ifstream fileStream( filePath.c_str() );
   std::string fileBuffer( ( std::istreambuf_iterator<char>( fileStream ) ),
     ( std::istreambuf_iterator<char>() ) );
@@ -92,10 +98,10 @@ bool GltfLoader::ParseGltf( const std::string& filePath )
 
 bool GltfLoader::LoadAssets()
 {
-  if( LoadBinaryData( mRoot ) &&         // pass a reference
-      LoadTextureArray( mRoot ) &&       // pass a reference
-      LoadMaterialSetArray( mRoot ) &&   // pass a reference
-      LoadMeshArray( mRoot )             // pass a reference
+  if( LoadBinaryData( mRoot ) &&
+      LoadTextureArray( mRoot ) &&
+      LoadMaterialSetArray( mRoot ) &&
+      LoadMeshArray( mRoot )
     )
   {
     return true;
@@ -355,13 +361,17 @@ bool GltfLoader::LoadTextureArray( const TreeNode* root )
 Texture GltfLoader::LoadTexture( const char* imageUrl, bool generateMipmaps )
 {
   Texture texture;
+  if( std::string( imageUrl ).length() > MAX_PATH_LENGTH )
+  {
+    DALI_LOG_ERROR( "Image path is too long.\n" );
+    return texture;
+  }
   Devel::PixelBuffer pixelBuffer = LoadImageFromFile( imageUrl );
   if( pixelBuffer )
   {
     texture = Texture::New( TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(), pixelBuffer.GetWidth(), pixelBuffer.GetHeight() );
     PixelData pixelData = Devel::PixelBuffer::Convert( pixelBuffer );
     texture.Upload( pixelData );
-
     if( generateMipmaps )
     {
       texture.GenerateMipmaps();
@@ -1115,7 +1125,6 @@ Actor GltfLoader::AddNode( Scene& scene, int index )
   if( ( tempNode = node->GetChild( "mesh" ) ) )
   {
     MeshInfo meshInfo = mMeshArray[tempNode->GetInteger()];
-    GLTF::MaterialInfo materialInfo = mMaterialArray[meshInfo.materialsIdx];
     bool isMaterial = ( meshInfo.materialsIdx >= 0 );
 
     TextureSet textureSet;
@@ -1138,6 +1147,7 @@ Actor GltfLoader::AddNode( Scene& scene, int index )
     bool useIBL = ( scene.GetLightType() >= Toolkit::Scene::LightType::IMAGE_BASED_LIGHT );
     if( isMaterial )
     {
+      GLTF::MaterialInfo materialInfo = mMaterialArray[meshInfo.materialsIdx];
       if( SetTextureAndSampler( textureSet, materialInfo.baseColorTexture.index, FRAGMENT_SHADER, DEFINE_BASECOLOR_TEXTURE, addIdx ) )
       {
         shaderTypeIndex += static_cast<int>( ShaderType::BASECOLOR_SHADER );
@@ -1224,6 +1234,7 @@ Actor GltfLoader::AddNode( Scene& scene, int index )
     actor.RegisterProperty( "uIsColor", meshInfo.attribute.COLOR.size() > 0 );
     if( isMaterial )
     {
+      GLTF::MaterialInfo materialInfo = mMaterialArray[meshInfo.materialsIdx];
       actor.RegisterProperty( "uBaseColorFactor", materialInfo.baseColorFactor );
       actor.RegisterProperty( "uMetallicRoughnessFactors", Vector2( materialInfo.metallicFactor, materialInfo.roughnessFactor ) );
 
@@ -1503,14 +1514,22 @@ bool GltfLoader::LoadAnimationSamplers( const TreeNode& animation, AnimationInfo
 template <typename T>
 bool GltfLoader::ReadBinFile( Vector<T> &dataBuffer, std::string url, int offset, int count )
 {
+  if( url.length() > MAX_PATH_LENGTH )
+  {
+    DALI_LOG_ERROR( "Binary file path is too long.\n" );
+    return false;
+  }
   dataBuffer.Resize( count );
   FILE* fp = fopen( url.c_str(), "rb" );
-  if( NULL == fp )
+  if( fp == NULL )
   {
     return false;
   }
-  fseek( fp, offset, SEEK_SET );
-  ssize_t result = fread( &dataBuffer[0], sizeof( T ), count, fp );
+  ssize_t result = -1;
+  if( !fseek( fp, offset, SEEK_SET ) )
+  {
+    result = fread( &dataBuffer[0], sizeof( T ), count, fp );
+  }
   fclose( fp );
 
   return ( result >= 0 );
