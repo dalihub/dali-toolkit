@@ -37,16 +37,16 @@
 #include <dali-toolkit/internal/builder/style.h>
 
 // Warning messages usually displayed
-#define DALI_SCRIPT_WARNING(format, ...) \
-  DALI_LOG_WARNING("Script:" format, ## __VA_ARGS__)
+#define DALI_SCRIPT_WARNING(format, args...) \
+  DALI_LOG_WARNING("Script:" format, ## args)
 
 // Info messages are usually debug build
-#define DALI_SCRIPT_INFO(format, ...) \
-  DALI_LOG_INFO(Dali::Toolkit::Internal::gFilterScript, Debug::General, "Script:" format, ## __VA_ARGS__)
+#define DALI_SCRIPT_INFO(format, args...) \
+  DALI_LOG_INFO(Dali::Toolkit::Internal::gFilterScript, Debug::General, "Script:" format, ## args)
 
 // Info Verbose need to be swiched on in gFilterScript filter constructor (by default set to General)
-#define DALI_SCRIPT_VERBOSE(format, ...) \
-  DALI_LOG_INFO(Dali::Toolkit::Internal::gFilterScript, Debug::Verbose, "Script:" format, ## __VA_ARGS__)
+#define DALI_SCRIPT_VERBOSE(format, args...) \
+  DALI_LOG_INFO(Dali::Toolkit::Internal::gFilterScript, Debug::Verbose, "Script:" format, ## args)
 
 namespace Dali
 {

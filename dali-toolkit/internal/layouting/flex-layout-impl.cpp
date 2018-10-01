@@ -332,8 +332,8 @@ YGSize FlexLayout::OnChildMeasure( YGNodeRef node,
 
   // Remove padding here since Yoga doesn't consider it as a part of the node size
   Extents padding = childLayout->GetPadding();
-  auto measuredWidth = childLayout->GetMeasuredWidth() - LayoutLength( padding.end ) - LayoutLength( padding.start );
-  auto measuredHeight = childLayout->GetMeasuredHeight() - LayoutLength( padding.bottom ) - LayoutLength( padding.top );
+  auto measuredWidth = childLayout->GetMeasuredWidth() - padding.end - padding.start;
+  auto measuredHeight = childLayout->GetMeasuredHeight() - padding.bottom - padding.top;
 
   return YGSize{
     .width = measuredWidth,

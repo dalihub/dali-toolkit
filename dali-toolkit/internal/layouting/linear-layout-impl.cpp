@@ -452,7 +452,7 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
   auto height = bottom - top;
 
   // Space available for child
-  auto childSpace = height - LayoutLength( padding.top ) - LayoutLength( padding.bottom );
+  auto childSpace = height - padding.top - padding.bottom;
 
   auto count = GetChildCount();
 
@@ -514,24 +514,24 @@ void LinearLayout::LayoutHorizontal( LayoutLength left, LayoutLength top, Layout
       {
         case Dali::Toolkit::LinearLayout::Alignment::TOP:
         {
-          childTop = LayoutLength( padding.top ) + LayoutLength( childMargin.top );
+          childTop = LayoutLength( padding.top ) + childMargin.top;
           break;
         }
         case Dali::Toolkit::LinearLayout::Alignment::BOTTOM:
         {
-          childTop = height - LayoutLength( padding.bottom ) - childHeight - LayoutLength( childMargin.bottom );
+          childTop = height - padding.bottom - childHeight - childMargin.bottom;
           break;
         }
         case Dali::Toolkit::LinearLayout::Alignment::CENTER_VERTICAL:
         default:
         {
-          childTop = LayoutLength( padding.top ) + ( ( childSpace - childHeight ) / 2 ) + LayoutLength( childMargin.top ) - LayoutLength( childMargin.bottom );
+          childTop = LayoutLength( padding.top ) + ( ( childSpace - childHeight ) / 2 ) + childMargin.top - childMargin.bottom;
           break;
         }
       }
       childLeft += childMargin.start;
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
-      childLeft += childWidth + LayoutLength( childMargin.end ) + mCellPadding.width;
+      childLeft += childWidth + childMargin.end + mCellPadding.width;
     }
   }
 }
@@ -583,7 +583,7 @@ void LinearLayout::MeasureVertical( MeasureSpec widthMeasureSpec, MeasureSpec he
       if( isExactly && useExcessSpace )
       {
         LayoutLength totalLength = mTotalLength;
-        mTotalLength = std::max( totalLength, totalLength + LayoutLength( childMargin.top ) + LayoutLength( childMargin.bottom ) );
+        mTotalLength = std::max( totalLength, totalLength + childMargin.top + childMargin.bottom );
       }
       else
       {
@@ -804,7 +804,7 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
   auto width = right - left;
 
   // Space available for child
-  auto childSpace = width - LayoutLength( padding.start ) - LayoutLength( padding.end );
+  auto childSpace = width - padding.start - padding.end;
   auto count = GetChildCount();
 
   switch ( mAlignment & VERTICAL_ALIGNMENT_MASK )
@@ -845,22 +845,22 @@ void LinearLayout::LayoutVertical( LayoutLength left, LayoutLength top, LayoutLe
         case Dali::Toolkit::LinearLayout::Alignment::BEGIN:
         default:
         {
-          childLeft = LayoutLength( padding.start ) + LayoutLength( childMargin.start );
+          childLeft = LayoutLength( padding.start ) + childMargin.start;
           break;
         }
         case Dali::Toolkit::LinearLayout::Alignment::END:
         {
-          childLeft = width - LayoutLength( padding.end ) - childWidth - LayoutLength( childMargin.end );
+          childLeft = width - padding.end - childWidth - childMargin.end;
           break;
         }
         case Dali::Toolkit::LinearLayout::Alignment::CENTER_HORIZONTAL:
         {
-          childLeft = LayoutLength( padding.start ) + ( childSpace - childWidth ) / 2 + LayoutLength( childMargin.start ) - LayoutLength( childMargin.end );
+          childLeft = LayoutLength( padding.start ) + ( childSpace - childWidth ) / 2 + childMargin.start - childMargin.end;
           break;
         }
       }
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
-      childTop += childHeight + LayoutLength( childMargin.bottom ) + mCellPadding.height;
+      childTop += childHeight + childMargin.bottom + mCellPadding.height;
     }
   }
 }
