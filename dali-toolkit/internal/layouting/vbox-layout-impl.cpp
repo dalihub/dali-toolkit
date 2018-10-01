@@ -233,7 +233,7 @@ void VboxLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
   auto width = right - left;
 
   // Space available for child
-  auto childSpace = width - padding.start - padding.end;
+  auto childSpace = width - LayoutLength( padding.start ) - LayoutLength( padding.end );
   auto count = GetChildCount();
 
   for( unsigned int childIndex = 0; childIndex < count; childIndex++)
@@ -248,10 +248,10 @@ void VboxLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
       auto childMargin = childLayout->GetMargin();
 
       childTop += childMargin.top;
-      childLeft = ( childSpace - childWidth ) / 2 + childMargin.start - childMargin.end;
+      childLeft = ( childSpace - childWidth ) / 2 + LayoutLength( childMargin.start ) - LayoutLength( childMargin.end );
 
       childLayout->Layout( childLeft, childTop, childLeft + childWidth, childTop + childHeight );
-      childTop += childHeight + childMargin.bottom + mCellPadding.height;
+      childTop += childHeight + LayoutLength( childMargin.bottom ) + mCellPadding.height;
     }
   }
 }
