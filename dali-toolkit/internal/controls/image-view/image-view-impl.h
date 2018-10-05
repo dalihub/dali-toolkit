@@ -166,6 +166,8 @@ private:
   std::string      mUrl;          ///< the url for the image if the image came from a URL, empty otherwise
   Image            mImage;        ///< the Image if the image came from a Image, null otherwise
   Property::Map    mPropertyMap;  ///< the Property::Map if the image came from a Property::Map, empty otherwise
+  Property::Map    mShaderMap;    ///< the Property::Map if the custom shader is set, empty otherwise
+  ImageDimensions  mImageSize;    ///< the image size
 };
 
 } // namespace Internal
