@@ -61,7 +61,11 @@ DALI_TYPE_REGISTRATION_END()
 WebView::WebView( const std::string& locale, const std::string& timezoneId )
 : Control( ControlBehaviour( ACTOR_BEHAVIOUR_DEFAULT | DISABLE_STYLE_CHANGE_SIGNALS ) ),
   mUrl(),
-  mWebViewSize( Stage::GetCurrent().GetSize() )
+  mVisual(),
+  mWebViewSize( Stage::GetCurrent().GetSize() ),
+  mWebEngine(),
+  mPageLoadStartedSignal(),
+  mPageLoadFinishedSignal()
 {
   mWebEngine = Dali::WebEngine::New();
   if ( mWebEngine )
