@@ -26,6 +26,18 @@ class EglInterface;
 class DisplayConnection;
 class ThreadSynchronizationInterface;
 
+namespace Internal
+{
+
+namespace Adaptor
+{
+
+class GraphicsInterface;
+
+} // namespace Adaptor
+
+} // namespace Internal
+
 namespace Integration
 {
 
@@ -40,13 +52,13 @@ public:
 
   virtual void GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVertical ) { dpiHorizontal = dpiVertical = 96; }
 
-  virtual void InitializeEgl( EglInterface& egl ) {}
+  virtual void InitializeGraphics( Dali::Internal::Adaptor::GraphicsInterface& graphics, Dali::DisplayConnection& displayConnection ) {};
 
-  virtual void CreateEglSurface( EglInterface& egl ) {}
+  virtual void CreateSurface() {}
 
-  virtual void DestroyEglSurface( EglInterface& egl ) {}
+  virtual void DestroySurface() {}
 
-  virtual bool ReplaceEGLSurface( EglInterface& egl ) { return false; }
+  virtual bool ReplaceGraphicsSurface() { return false; }
 
   virtual void MoveResize( Dali::PositionSize positionSize ) {}
 
@@ -54,9 +66,9 @@ public:
 
   virtual void StartRender() {}
 
-  virtual bool PreRender( EglInterface& egl, Integration::GlAbstraction& glAbstraction, bool resizingSurface ) { return false; }
+  virtual bool PreRender( bool resizingSurface ) { return false; }
 
-  virtual void PostRender( EglInterface& egl, Integration::GlAbstraction& glAbstraction, DisplayConnection* displayConnection, bool replacingSurface, bool resizingSurface ) {}
+  virtual void PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface ) {}
 
   virtual void StopRender() {}
 
