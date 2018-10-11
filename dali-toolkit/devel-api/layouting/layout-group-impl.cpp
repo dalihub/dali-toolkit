@@ -561,6 +561,15 @@ void LayoutGroup::OnUnparent()
 {
   // Remove children
   RemoveAll();
+
+  auto control = Toolkit::Control::DownCast( GetOwner() );
+  if( control )
+  {
+    DevelActor::ChildAddedSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::ChildAddedToOwner );
+    DevelActor::ChildRemovedSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::ChildRemovedFromOwner );
+    DevelActor::ChildOrderChangedSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::ChildOrderChanged );
+    DevelHandle::PropertySetSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::OnOwnerPropertySet );
+  }
 }
 
 void LayoutGroup::RemoveChild( LayoutItem& item )
