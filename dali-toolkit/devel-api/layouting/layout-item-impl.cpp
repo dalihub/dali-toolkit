@@ -310,10 +310,7 @@ void LayoutItem::OnLayout( bool changed, LayoutLength left, LayoutLength top, La
 void LayoutItem::SetParent( LayoutParent* parent )
 {
   mImpl->mLayoutParent = parent;
-  if ( parent == nullptr )
-  {
-    mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME );
-  }
+  mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME );
 }
 
 LayoutParent* LayoutItem::GetParent()
@@ -438,7 +435,7 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
 
   DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame enter(" << left << ", " << top << ", " << right << ", " << bottom << ")\n" );
 
-  if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom || !mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME ) )
+  if( mImpl->mLeft != left || mImpl->mRight != right || mImpl->mTop != top || mImpl->mBottom != bottom || mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME ) )
   {
     changed = true;
 
@@ -453,7 +450,7 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
     mImpl->mRight = right;
     mImpl->mBottom = bottom;
 
-    mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME );
+    mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME );
 
 
     // Reflect up to parent control
