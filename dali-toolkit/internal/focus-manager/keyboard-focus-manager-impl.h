@@ -269,7 +269,7 @@ private:
 
   Actor mFocusIndicatorActor; ///< The focus indicator actor shared by all the keyboard focusable actors for highlight
 
-  int mIsFocusIndicatorEnabled; ///< Whether indicator should be shown / hidden when getting focus. It could be enabled when keyboard focus feature is enabled and navigation keys or 'Tab' key are pressed.
+  int mIsFocusIndicatorShown; ///< Whether indicator should be shown / hidden when getting focus. It could be enabled when keyboard focus feature is enabled and navigation keys or 'Tab' key are pressed.
 
   bool mFocusGroupLoopEnabled:1; ///< Whether the focus movement is looped within the same focus group
 
@@ -278,6 +278,8 @@ private:
   bool mClearFocusOnTouch:1; ///< Whether clear focus on touch.
 
   bool mEnableFocusIndicator;  ///< Whether use focus indicator
+
+  bool mAlwaysShowIndicator; ///< Whether always show indicator. If true, the indicator would be directly shown when focused.
 
   FocusStack mFocusHistory; ///< Stack to contain pre-focused actor's BaseObject*
 

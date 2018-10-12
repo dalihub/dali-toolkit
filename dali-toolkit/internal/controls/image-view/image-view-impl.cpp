@@ -64,7 +64,8 @@ DALI_TYPE_REGISTRATION_END()
 using namespace Dali;
 
 ImageView::ImageView()
-: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) )
+: Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
+  mImageSize()
 {
 }
 
@@ -109,7 +110,13 @@ void ImageView::SetImage( Image image )
       mVisual = visual;
     }
 
-    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
+    if( !mShaderMap.Empty() )
+    {
+      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+      visualImpl.SetCustomShader( mShaderMap );
+    }
+
+    DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual );
   }
   else
   {
@@ -139,6 +146,12 @@ void ImageView::SetImage( const Property::Map& map )
       mVisual = visual;
     }
 
+    if( !mShaderMap.Empty() )
+    {
+      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+      visualImpl.SetCustomShader( mShaderMap );
+    }
+
     DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual  );
   }
   else
@@ -157,6 +170,7 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
 {
   // Don't bother comparing if we had a visual previously, just drop old visual and create new one
   mUrl = url;
+  mImageSize = size;
   mImage.Reset();
   mPropertyMap.Clear();
 
@@ -167,6 +181,12 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
     if( !mVisual )
     {
       mVisual = visual;
+    }
+
+    if( !mShaderMap.Empty() )
+    {
+      Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
+      visualImpl.SetCustomShader( mShaderMap );
     }
 
     DevelControl::RegisterVisual( *this, Toolkit::ImageView::Property::IMAGE, visual );
@@ -372,18 +392,24 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
               impl.SetImage( *map );
             }
             // the property map contains only the custom shader
-            else if( ( impl.mVisual )&&( map->Count() == 1u )&&( shaderValue ) )
+            else if( ( map->Count() == 1u )&&( shaderValue ) )
             {
               Property::Map* shaderMap = shaderValue->GetMap();
               if( shaderMap )
               {
-                Internal::Visual::Base& visual = Toolkit::GetImplementation( impl.mVisual );
-                visual.SetCustomShader( *shaderMap );
-                if( imageView.OnStage() )
+                impl.mShaderMap = *shaderMap;
+
+                if( !impl.mUrl.empty() )
                 {
-                  // force to create new core renderer to use the newly set shader
-                  visual.SetOffStage( imageView );
-                  visual.SetOnStage( imageView );
+                  impl.SetImage( impl.mUrl, impl.mImageSize );
+                }
+                else if( impl.mImage )
+                {
+                  impl.SetImage( impl.mImage );
+                }
+                else if( !impl.mPropertyMap.Empty() )
+                {
+                  impl.SetImage( impl.mPropertyMap );
                 }
               }
             }

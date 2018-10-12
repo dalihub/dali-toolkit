@@ -329,7 +329,8 @@ struct Controller::Impl
     mShadowSetByString( false ),
     mOutlineSetByString( false ),
     mFontStyleSetByString( false ),
-    mShouldClearFocusOnEscape( true )
+    mShouldClearFocusOnEscape( true ),
+    mLayoutDirection( LayoutDirection::LEFT_TO_RIGHT )
   {
     mModel = Model::New();
 
@@ -765,6 +766,7 @@ public:
   bool mOutlineSetByString:1;              ///< Set when outline is set by string (legacy) instead of map
   bool mFontStyleSetByString:1;            ///< Set when font style is set by string (legacy) instead of map
   bool mShouldClearFocusOnEscape:1;        ///< Whether text control should clear key input focus
+  LayoutDirection::Type mLayoutDirection;  ///< Current system language direction
 };
 
 } // namespace Text
