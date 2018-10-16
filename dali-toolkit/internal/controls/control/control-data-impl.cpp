@@ -68,6 +68,7 @@ namespace
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_CONTROL_VISUALS");
+Debug::Filter* gLogFilterLayout = Debug::Filter::New( Debug::NoLogging, false, "LOG_LAYOUT");
 #endif
 
 
@@ -1439,6 +1440,10 @@ Toolkit::Internal::LayoutItemPtr Control::Impl::GetLayout() const
 
 void Control::Impl::SetLayout( Toolkit::Internal::LayoutItem& layout )
 {
+  DALI_LOG_INFO( gLogFilterLayout, Debug::Verbose, "Control::SetLayout control:%s  existing layout:%s\n",
+                                   mControlImpl.Self().GetName().c_str(),
+                                   mLayout?"true":"false" );
+
   if( mLayout )
   {
     mLayout->Unparent();

@@ -708,6 +708,7 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 
 Vector3 Control::GetNaturalSize()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::GetNaturalSize for %s\n", Self().GetName().c_str() );
   Toolkit::Visual::Base visual = mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
   if( visual )
   {

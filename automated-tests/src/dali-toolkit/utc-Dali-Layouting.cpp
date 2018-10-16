@@ -1663,6 +1663,7 @@ int UtcDaliLayouting_HboxLayout_ImageView(void)
   DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 350.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( imageView.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
+  tet_infoline("UtcDaliLayouting_HboxLayout - Change image (new size)");
   url = CreateImageURL( Vector4( 0, 255, 0, 255), ImageDimensions( 200, 200 ) );
   imageView.SetImage( url );
 

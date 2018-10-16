@@ -26,6 +26,7 @@ SET(TC_SOURCES
   utc-Dali-JsonParser.cpp
   utc-Dali-KeyInputFocusManager.cpp
   utc-Dali-Layouting.cpp
+  utc-Dali-LayoutingResizePolicy.cpp
   utc-Dali-PageTurnView.cpp
   utc-Dali-Scene3dView.cpp
   utc-Dali-Script.cpp

@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/layouting/layout-group-data-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali-toolkit/internal/layouting/size-negotiation-mapper.h>
 
 namespace
 {
@@ -344,6 +345,7 @@ void LayoutGroup::MeasureChild( LayoutItemPtr child,
   }
 #endif
 
+
   // Get last stored width and height specifications for the child
   auto desiredWidth = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
   auto desiredHeight = childOwner.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
@@ -585,7 +587,9 @@ void LayoutGroup::ChildAddedToOwner( Actor child )
 
 #if defined(DEBUG_ENABLED)
   auto parent = Toolkit::Control::DownCast( GetOwner() );
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner control(%s) owner(%s)\n", control?control.GetName().c_str():"Invalid", parent?parent.GetName().c_str():"Invalid" );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner child control(%s) owner control(%s)\n",
+                                              control?control.GetName().c_str():"Invalid",
+                                              parent?parent.GetName().c_str():"Invalid" );
 #endif
 
   if( control ) // Can only support adding Controls, not Actors to layout
@@ -600,18 +604,21 @@ void LayoutGroup::ChildAddedToOwner( Actor child )
       // If control behaviour flag set to Layout then set a LayoutGroup.
       if( DevelControl::IsLayoutingRequired( control ) )
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner Creating default LayoutGroup for control:%s\n", control?control.GetName().c_str():"Invalid" );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner Creating default LayoutGroup for control:%s\n",
+                                                    control?control.GetName().c_str():"Invalid" );
         childLayout = LayoutGroup::New( control );
       }
       else
       {
-        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner Creating default LayoutItem for control:%s\n", control?control.GetName().c_str():"Invalid" );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner Creating default LayoutItem for control:%s\n",
+                                                    control?control.GetName().c_str():"Invalid" );
         childLayout = LayoutItem::New( control );
+        childLayout->SetAnimateLayout( IsLayoutAnimated() ); // forces animation inheritance.
       }
-      childLayout->SetAnimateLayout( IsLayoutAnimated() ); // @todo this essentially forces animation inheritance. Bad?
 
-      DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner control:" <<  control.GetName() <<
-                       " desiredWidth: " <<  control.GetNaturalSize().width << " desiredHeight:"  << control.GetNaturalSize().height );
+      DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner child control:" <<  control.GetName() <<
+                       " desiredWidth: " <<  control.GetNaturalSize().width <<
+                       " desiredHeight:"  << control.GetNaturalSize().height );
 
       childControlDataImpl.SetLayout( *childLayout.Get() );
 
@@ -631,6 +638,7 @@ void LayoutGroup::ChildAddedToOwner( Actor child )
     }
     else
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::ChildAddedToOwner child(%s) already has a Layout\n", control.GetName().c_str() );
       LayoutGroupPtr layoutGroup( dynamic_cast< LayoutGroup* >( childLayout.Get() ) );
       if( !layoutGroup )
       {
@@ -760,14 +768,47 @@ void LayoutGroup::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMea
       auto childLayout = GetChildAt( i );
       if( childLayout )
       {
-        auto childOwner = childLayout->GetOwner();
+        auto childControl = Toolkit::Control::DownCast(childLayout->GetOwner());
+
+        // If child control has children check if a ResizePolicy is set on it.  A LayoutItem could be a legacy container.
+        // A legacy container would need it's ResizePolicy to be applied as a MeasureSpec.
+
+        // Check below will be true for legacy containers and controls with layout required set.
+        // Other layouts will have their own OnMeasure (a checked requirement) hence not execute LayoutGroup::OnMeasure.
+        // Controls which have set layout required will not be legacy controls hence should not have a ResizePolicy set.
+        if( childControl.GetChildCount() > 0 )
+        {
+          // First pass, Static mappings that are not dependant on parent
+          SizeNegotiationMapper::SetLayoutParametersUsingResizePolicy( childControl, childLayout, Dimension::WIDTH );
+          SizeNegotiationMapper::SetLayoutParametersUsingResizePolicy( childControl, childLayout, Dimension::HEIGHT );
+        }
+
+        // Second pass, if any mappings were not possible due to parent size dependancies then calculate an exact desired size for child
+        if( true == childLayout->IsResizePolicyRequired() ) // No need to test child count as this flag would only be set if control had children.
+        {
+          // Get last stored width and height specifications for the child
+          LayoutLength desiredWidth = childControl.GetProperty<float>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
+          LayoutLength desiredHeight = childControl.GetProperty<float>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
+
+          DALI_LOG_INFO( gLogFilter, Debug::General, "LayoutGroup::MeasureChild Initial desired size pre ResizePolicy(%f,%f)\n", desiredWidth.AsInteger(), desiredHeight.AsInteger() );
+
+          childLayout->SetResizePolicyRequired( false ); // clear flag incase in case of changes before next Measure
+          SizeNegotiationMapper::GetSizeofChildForParentDependentResizePolicy( childControl, widthMeasureSpec, heightMeasureSpec, desiredWidth, desiredHeight );
+
+          // Parent dependant ResizePolicies become exact sizes so are now set on the child before it's measured.
+          childControl.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, desiredWidth.AsInteger() );
+          childControl.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, desiredHeight.AsInteger()  );
+
+          DALI_LOG_INFO( gLogFilter, Debug::General, " LayoutGroup::OnMeasure ResizePolicy Required resulting size(%f,%f)\n",  desiredWidth.AsInteger(), desiredHeight.AsInteger() );
+        }
 
         // Get size of child
         MeasureChild( childLayout, widthMeasureSpec, heightMeasureSpec );
         LayoutLength childWidth = childLayout->GetMeasuredWidth();
         LayoutLength childHeight = childLayout->GetMeasuredHeight();
+
         Extents childMargin = childLayout->GetMargin();
-        DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure child width[" << childWidth << "] height[" << childHeight << "]\n" );
+        DALI_LOG_STREAM( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure child " << childControl.GetName().c_str() << " width[" << childWidth << "] height[" << childHeight << "]\n" );
 
         layoutWidth = std::max( layoutWidth, childWidth + childMargin.start + childMargin.end );
         layoutHeight = std::max( layoutHeight, childHeight + childMargin.top + childMargin.bottom );
@@ -775,7 +816,7 @@ void LayoutGroup::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMea
       }
       else
       {
-          DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure Not a layout\n" );
+        DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutGroup::OnMeasure Not a layout\n" );
       }
     }
 
