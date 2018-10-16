@@ -3412,3 +3412,53 @@ int UtcDaliLayouting_SetLayout(void)
 
   END_TEST;
 }
+
+int UtcDaliLayouting_StageAdd(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_StageAdd");
+
+  Stage stage = Stage::GetCurrent();
+
+  AbsoluteLayout absoluteLayout = AbsoluteLayout::New();
+  Control container = Control::New();
+  container.SetName( "Container" );
+  DevelControl::SetLayout( container, absoluteLayout );
+  container.SetAnchorPoint( Dali::AnchorPoint::CENTER );
+  container.SetParentOrigin( Dali::ParentOrigin::CENTER );
+
+  Control child = Control::New();
+  child.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
+  child.SetPosition( 0.0f, 0.0f );
+  child.SetSize( 480.0f, 180.0f );
+  child.SetName( "Child Control" );
+  container.Add( child );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION ); // Not re-laid out
+  DALI_TEST_EQUALS( child.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 180.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  // Add container to stage here
+  // Should call RequestLayout() to measure and layout
+  stage.Add( container );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION ); // Stage Size
+  DALI_TEST_EQUALS( child.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 180.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
