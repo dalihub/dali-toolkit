@@ -1111,6 +1111,9 @@ struct Engine::Impl
     const CharacterIndex lastCharacterPlusOne = startIndex + numberOfCharacters;
 
     alignmentOffset = MAX_FLOAT;
+
+    const bool firstLineDirection = matchSystemLanguageDirection == true ? lines.Begin()->direction : false;
+
     // Traverse all lines and align the glyphs.
     for( Vector<LineRun>::Iterator it = lines.Begin(), endIt = lines.End();
          it != endIt;
@@ -1136,7 +1139,8 @@ struct Engine::Impl
                                     horizontalAlignment,
                                     line,
                                     layoutDirection,
-                                    matchSystemLanguageDirection );
+                                    matchSystemLanguageDirection,
+                                    firstLineDirection );
 
       // Updates the alignment offset.
       alignmentOffset = std::min( alignmentOffset, line.alignmentOffset );
@@ -1147,17 +1151,18 @@ struct Engine::Impl
                                      HorizontalAlignment::Type horizontalAlignment,
                                      LineRun& line,
                                      Dali::LayoutDirection::Type layoutDirection,
-                                     bool matchSystemLanguageDirection )
+                                     bool matchSystemLanguageDirection,
+                                     const bool firstLineDirection )
   {
     line.alignmentOffset = 0.f;
     bool isRTL = RTL == line.direction;
     float lineLength = line.width;
     HorizontalAlignment::Type alignment = horizontalAlignment;
 
-    // match align for system language direction
+    // match align for first line direction and system language direction
     if( matchSystemLanguageDirection )
     {
-      isRTL = layoutDirection == LayoutDirection::RIGHT_TO_LEFT;
+      isRTL = ( ( RTL == firstLineDirection ) && ( layoutDirection == LayoutDirection::RIGHT_TO_LEFT ) );
     }
 
     // Swap the alignment type if the line is right to left.
