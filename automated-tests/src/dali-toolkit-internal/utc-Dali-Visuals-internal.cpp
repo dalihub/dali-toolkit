@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,13 @@
 
 using namespace Dali;
 using namespace Toolkit;
+
+namespace
+{
+
+const char* TEST_VECTOR_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/insta_camera.json";
+
+}
 
 int UtcDaliVisualAction(void)
 {
@@ -102,6 +109,29 @@ int UtcDaliVisualActionNotImplemented(void)
   GetImplementation( visual ).DoAction( Dali::Toolkit::Internal::DummyVisual::TEST_ACTION, attributes );
   application.SendNotification();
   DALI_TEST_EQUALS( dummyVisualPtr->GetActionCounter() , 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualCreateInstancePropertyMap(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatedVectorImageVisualCreateInstancePropertyMap" );
+
+  Property::Map propertyMap;
+  propertyMap.Add( Toolkit::Visual::Property::TYPE,  DevelVisual::ANIMATED_VECTOR_IMAGE )
+             .Add( ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME  );
+
+  // request AnimatedVectorImageVisual with a property map
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  Toolkit::Internal::Visual::Base& visualImpl = GetImplementation( visual );
+
+  Property::Map resultMap;
+  visualImpl.CreateInstancePropertyMap( resultMap );
+
+  // check the property values from the returned map from a visual
+  DALI_TEST_CHECK( resultMap.Empty() );   // Now the map is empty
 
   END_TEST;
 }

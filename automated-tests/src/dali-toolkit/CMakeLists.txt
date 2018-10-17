@@ -9,6 +9,7 @@ SET(CAPI_LIB "dali-toolkit")
 SET(TC_SOURCES
    utc-Dali-Alignment.cpp
    utc-Dali-AnimatedImageVisual.cpp
+   utc-Dali-AnimatedVectorImageVisual.cpp
    utc-Dali-BloomView.cpp
    utc-Dali-BubbleEmitter.cpp
    utc-Dali-Builder.cpp
