@@ -28,8 +28,9 @@ SET(TC_SOURCES
   utc-Dali-KeyInputFocusManager.cpp
   utc-Dali-Layouting.cpp
   utc-Dali-LayoutingAnimation.cpp
-  utc-Dali-LayoutingResizePolicy.cpp
   utc-Dali-LayoutingNesting.cpp
+  utc-Dali-LayoutingResizePolicy.cpp
+  utc-Dali-LayoutingSettingAndRemoval.cpp
   utc-Dali-PageTurnView.cpp
   utc-Dali-Scene3dView.cpp
   utc-Dali-Script.cpp

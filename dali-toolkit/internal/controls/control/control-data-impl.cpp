@@ -36,6 +36,7 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
+#include <dali-toolkit/devel-api/layouting/bin-layout.h>
 #include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -1457,12 +1458,11 @@ void Control::Impl::SetLayout( Toolkit::Internal::LayoutItem& layout )
 
 void Control::Impl::RemoveLayout()
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::Impl::RemoveLayout\n");
-  if( mLayout )
-  {
-    mLayout->Unparent();
-    mLayout.Reset();
-  }
+  DALI_LOG_INFO( gLogFilterLayout, Debug::Verbose, "Control::Impl::RemoveLayout\n");
+
+  Toolkit::BinLayout binLayout = Toolkit::BinLayout::New();
+
+  mControlImpl.mImpl->SetLayout( GetImplementation( binLayout ) ) ;
 }
 
 void Control::Impl::SetLayoutingRequired( bool layoutingRequired )

@@ -2692,99 +2692,10 @@ int UtcDaliLayouting_HboxLayout_TargetSize(void)
   END_TEST;
 }
 
-int UtcDaliLayouting_RemoveLayout01(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliLayouting_RemoveLayout");
-
-  Stage stage = Stage::GetCurrent();
-
-  auto rootControl = Control::New();
-  auto absoluteLayout = AbsoluteLayout::New();
-  DevelControl::SetLayout( rootControl, absoluteLayout );
-  rootControl.SetName( "AbsoluteLayout" );
-  stage.Add( rootControl );
-
-  auto hbox = Control::New();
-  auto hboxLayout = LinearLayout::New();
-  hboxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
-  DevelControl::SetLayout( hbox, hboxLayout );
-  hbox.SetName( "HBox" );
-
-  std::vector< Control > controls;
-  controls.push_back( CreateLeafControl( 40, 40 ) );
-  controls.push_back( CreateLeafControl( 60, 40 ) );
-
-  for( auto&& iter : controls )
-  {
-    hbox.Add( iter );
-  }
-  hbox.SetParentOrigin( ParentOrigin::CENTER );
-  hbox.SetAnchorPoint( AnchorPoint::CENTER );
-  rootControl.Add( hbox );
-
-  tet_infoline("Layout as normal");
-  application.SendNotification();
-  application.Render();
-
-  tet_infoline("Set an empty layout on hbox container");
-  LinearLayout emptyLayout;
-  DevelControl::SetLayout( hbox, emptyLayout );
-
-  tet_infoline("Run another layout");
-  application.SendNotification();
-  application.Render();
-
-  tet_infoline("Check leaf controls haven't moved");
-
-  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 40.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 60.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-
-  END_TEST;
-}
-
 int UtcDaliLayouting_LayoutChildren01(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliLayouting_LayoutChildren01");
-
-  Stage stage = Stage::GetCurrent();
-
-  auto rootControl = Control::New();
-  auto absoluteLayout = AbsoluteLayout::New();
-  DevelControl::SetLayout( rootControl, absoluteLayout );
-  stage.Add( rootControl );
-
-  auto hbox = Control::New();
-  auto hboxLayout = LinearLayout::New();
-  DevelControl::SetLayout( hbox, hboxLayout );
-  rootControl.Add( hbox );
-
-  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 1, TEST_LOCATION );
-
-  tet_infoline("Test removal by setting empty layout to child container" );
-  DevelControl::SetLayout( hbox, LayoutItem{} );
-
-  DALI_TEST_EQUALS( absoluteLayout.GetChildCount(), 0, TEST_LOCATION );
-
-  auto& hboxImpl = GetImplementation( hboxLayout );
-  Handle empty;
-  DALI_TEST_EQUALS( hboxLayout.GetOwner(), empty, TEST_LOCATION );
-  DALI_TEST_EQUALS( (void*)hboxImpl.GetParent(), (void*)nullptr, TEST_LOCATION );
-
-  // For coverage
-  hboxImpl.SetLayoutRequested();
-
-  END_TEST;
-}
-
-int UtcDaliLayouting_LayoutChildren02(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliLayouting_LayoutChildren02");
 
   Stage stage = Stage::GetCurrent();
 
@@ -2815,7 +2726,7 @@ int UtcDaliLayouting_LayoutChildren02(void)
   END_TEST;
 }
 
-int UtcDaliLayouting_LayoutChildren03(void)
+int UtcDaliLayouting_LayoutChildren02(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliLayouting_LayoutChildren02");
@@ -2852,7 +2763,7 @@ int UtcDaliLayouting_LayoutChildren03(void)
 }
 
 
-int UtcDaliLayouting_LayoutChildren04(void)
+int UtcDaliLayouting_LayoutChildren03(void)
 {
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliLayouting_LayoutChildren03");
@@ -2985,33 +2896,50 @@ int UtcDaliLayouting_SetLayoutOrder02(void)
   tet_infoline("SetLayout");
 
   auto vboxLayout = LinearLayout::New();
-  DevelControl::SetLayout( controls[0], vboxLayout );
+  DevelControl::SetLayout( controls[0], vboxLayout ); // 1 2 0(vbox)
 
   TestLayoutItemOrder( controls, hboxLayout );
 
   tet_infoline("Raise");
 
-  controls[0].Raise();  // 1 2 0
+  controls[0].Raise();  // 1 2 0(vbox)
 
   TestLayoutItemOrder( controls, hboxLayout );
 
   tet_infoline("Lower");
 
-  controls[2].Lower();   // 2 1 0
+  controls[2].Lower();   // 2 1 0(vbox)
 
   TestLayoutItemOrder( controls, hboxLayout );
 
   tet_infoline("SetLayout again");
 
   auto vboxLayout1 = LinearLayout::New();
-  DevelControl::SetLayout( controls[2], vboxLayout1 );
+  DevelControl::SetLayout( controls[2], vboxLayout1 );  // 2 1(vbox1) 0(vbox)
 
   TestLayoutItemOrder( controls, hboxLayout );
 
-  DevelControl::SetLayout( controls[2], vboxLayout );
+  tet_infoline("SetLayout with empty handle");
+
+  DevelControl::SetLayout( controls[0], LayoutItem{} );  // 2 1(vbox1) 0
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("SetLayout to another control");
+
+  DevelControl::SetLayout( controls[2], vboxLayout1 );  // 2(vbox1) 1 0
+
+  TestLayoutItemOrder( controls, hboxLayout );
+
+  tet_infoline("SetLayout to change layout");
+
+  DevelControl::SetLayout( controls[2], vboxLayout1 );  // 2(vbox) 1 0
+
+  TestLayoutItemOrder( controls, hboxLayout );
 
   END_TEST;
 }
+
 
 int UtcDaliLayouting_LayoutGroup01(void)
 {
