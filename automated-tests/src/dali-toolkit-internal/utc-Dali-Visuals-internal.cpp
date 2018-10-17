@@ -32,6 +32,13 @@
 using namespace Dali;
 using namespace Toolkit;
 
+namespace
+{
+
+const char* TEST_VECTOR_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/insta_camera.json";
+
+}
+
 int UtcDaliVisualAction(void)
 {
   ToolkitTestApplication application;
@@ -287,6 +294,29 @@ int UtcDaliNPatchBufferGetRedOffsetAndMask(void)
   DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
   Toolkit::Internal::NPatchBuffer::GetRedOffsetAndMask( Pixel::RGB32F, byteOffset, bitMask );
   DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0 );
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualCreateInstancePropertyMap(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatedVectorImageVisualCreateInstancePropertyMap" );
+
+  Property::Map propertyMap;
+  propertyMap.Add( Toolkit::Visual::Property::TYPE,  DevelVisual::ANIMATED_VECTOR_IMAGE )
+             .Add( ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME  );
+
+  // request AnimatedVectorImageVisual with a property map
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  Toolkit::Internal::Visual::Base& visualImpl = GetImplementation( visual );
+
+  Property::Map resultMap;
+  visualImpl.CreateInstancePropertyMap( resultMap );
+
+  // check the property values from the returned map from a visual
+  DALI_TEST_CHECK( resultMap.Empty() );   // Now the map is empty
 
   END_TEST;
 }

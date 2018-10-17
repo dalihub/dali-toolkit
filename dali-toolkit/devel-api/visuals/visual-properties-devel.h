@@ -47,7 +47,8 @@ enum Type
   SVG            = Dali::Toolkit::Visual::SVG,
   ANIMATED_IMAGE = Dali::Toolkit::Visual::ANIMATED_IMAGE,
 
-  ANIMATED_GRADIENT = ANIMATED_IMAGE + 1,  //< Renders an animated gradient.
+  ANIMATED_GRADIENT     = ANIMATED_IMAGE + 1,  ///< Renders an animated gradient.
+  ANIMATED_VECTOR_IMAGE = ANIMATED_IMAGE + 2,  ///< Renders an animated vector image.
 };
 
 /**
