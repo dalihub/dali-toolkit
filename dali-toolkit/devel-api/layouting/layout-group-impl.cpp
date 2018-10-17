@@ -750,10 +750,9 @@ void LayoutGroup::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMea
   bool exactWidth ( false );
   bool exactHeight ( false );
 
-  // Default Layouting behaviour if not overridden
+  // Layouting behaviour
   // EXACT, width and height as provided.
-  // MATCH_PARENT, width and hewidthSpecSizeight that of parent
-
+  // MATCH_PARENT, width and height that of parent
   // WRAP_CONTENT, take width of widest child and height size of longest child (within given limit)
   // UNSPECIFIED, take width of widest child and height size of longest child.
 

@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_INTERNAL_ABSOLUTE_LAYOUT_H
-#define DALI_TOOLKIT_INTERNAL_ABSOLUTE_LAYOUT_H
+#ifndef DALI_TOOLKIT_INTERNAL_BIN_LAYOUT_H
+#define DALI_TOOLKIT_INTERNAL_BIN_LAYOUT_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -20,7 +20,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
-#include <dali-toolkit/devel-api/layouting/absolute-layout.h>
+#include <dali-toolkit/devel-api/layouting/bin-layout.h>
 
 namespace Dali
 {
@@ -29,25 +29,25 @@ namespace Toolkit
 namespace Internal
 {
 
-class AbsoluteLayout;
-using AbsoluteLayoutPtr = IntrusivePtr<AbsoluteLayout>;
+class BinLayout;
+using BinLayoutPtr = IntrusivePtr<BinLayout>;
 
-class AbsoluteLayout final : public LayoutGroup
+class BinLayout final : public LayoutGroup
 {
 public:
-  static AbsoluteLayoutPtr New();
+  static BinLayoutPtr New();
 
 protected:
 
   /**
    * Constructor
    */
-  AbsoluteLayout();
+  BinLayout();
 
   /**
    * Destructor
    */
-  virtual ~AbsoluteLayout();
+  virtual ~BinLayout();
 
   /**
    * @copydoc LayoutItem::OnMeasure
@@ -60,28 +60,28 @@ protected:
   virtual void OnLayout( bool changed, LayoutLength l, LayoutLength t, LayoutLength r, LayoutLength b ) override;
 
 private:
-  AbsoluteLayout( const AbsoluteLayout& other ) = delete;
-  AbsoluteLayout& operator=( const AbsoluteLayout& other ) = delete;
+  BinLayout( const BinLayout& other ) = delete;
+  BinLayout& operator=( const BinLayout& other ) = delete;
 
 };
 
 } // namespace Internal
 
-inline Internal::AbsoluteLayout& GetImplementation( Dali::Toolkit::AbsoluteLayout& handle )
+inline Internal::BinLayout& GetImplementation( Dali::Toolkit::BinLayout& handle )
 {
-  DALI_ASSERT_ALWAYS( handle && "AbsoluteLayout handle is empty" );
+  DALI_ASSERT_ALWAYS( handle && "BinLayout handle is empty" );
   BaseObject& object = handle.GetBaseObject();
-  return static_cast<Internal::AbsoluteLayout&>( object );
+  return static_cast<Internal::BinLayout&>( object );
 }
 
-inline const Internal::AbsoluteLayout& GetImplementation( const Dali::Toolkit::AbsoluteLayout& handle )
+inline const Internal::BinLayout& GetImplementation( const Dali::Toolkit::BinLayout& handle )
 {
-  DALI_ASSERT_ALWAYS( handle && "AbsoluteLayout handle is empty" );
+  DALI_ASSERT_ALWAYS( handle && "BinLayout handle is empty" );
   const BaseObject& object = handle.GetBaseObject();
-  return static_cast<const Internal::AbsoluteLayout&>( object );
+  return static_cast<const Internal::BinLayout&>( object );
 }
 
 } // namespace Toolkit
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_INTERNAL_ABSOLUTE_LAYOUT_H
+#endif // DALI_TOOLKIT_INTERNAL_BIN_LAYOUT_H
