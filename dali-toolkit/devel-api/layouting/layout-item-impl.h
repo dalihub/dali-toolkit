@@ -188,6 +188,18 @@ public:
   void SetLayoutRequested();
 
   /**
+   * @brief Checks if the Resize policy is being used for this LayoutItem
+   * @return true is ResizePolicy is used
+   */
+  bool IsResizePolicyRequired() const;
+
+  /**
+   * @brief Sets if the ResizePolicy is needed or not for this LayoutItem
+   * @param[in] resizeRequired true or false flag
+   */
+  void SetResizePolicyRequired( bool resizeRequired );
+
+  /**
    * @brief Get the measured width (without any measurement flags).
    *
    * This method should be used only during measurement and layout calculations.

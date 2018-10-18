@@ -57,6 +57,7 @@ public:
   static const int PRIVATE_FLAG_IS_LAID_OUT                   = 0x00000008;
   static const int PRIVATE_FLAG_MEASURE_NEEDED_BEFORE_LAYOUT  = 0x00000010; ///< Flag indicating that a call to measure() was skipped and should be done instead when layout() is invoked.
   static const int PRIVATE_FLAG_FORCE_SET_FRAME               = 0x00000020;
+  static const int PRIVATE_FLAG_USE_RESIZE_POLICY             = 0x00000040;
 
   int mViewFlags;
   int mPrivateFlags;

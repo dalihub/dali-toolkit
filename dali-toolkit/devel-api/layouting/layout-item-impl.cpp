@@ -159,7 +159,11 @@ void LayoutItem::Measure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasur
 
   const bool needsLayout = specChanged && ( !isSpecExactly || !matchesSpecSize );
 
-  DALI_LOG_STREAM( gLayoutFilter, Debug::General, "LayoutItem::Measure("<<widthMeasureSpec<<", "<<heightMeasureSpec<<") Owner:"<<Actor::DownCast(GetOwner()).GetName() <<"  forceLayout="<<forceLayout<<", specChanged="<<specChanged<<", isSpecExactly="<<isSpecExactly<<", matchesSpecSize="<<matchesSpecSize<<", needsLayout="<<needsLayout <<std::endl <<(forceLayout||needsLayout?"  Remeasuring":"  NoChange"));
+  DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::Measure("<<widthMeasureSpec<<", "<<heightMeasureSpec<<") Owner:"
+                                                  <<Actor::DownCast(GetOwner()).GetName() <<"  forceLayout="<<forceLayout
+                                                  <<", specChanged="<<specChanged<<", isSpecExactly="<<isSpecExactly
+                                                  <<", matchesSpecSize="<<matchesSpecSize
+                                                  <<", needsLayout="<<needsLayout <<(forceLayout||needsLayout?"  Remeasuring":"  NoChange"));
 
   if( forceLayout || needsLayout )
   {
@@ -266,6 +270,8 @@ LayoutLength LayoutItem::GetDefaultSize( LayoutLength size, MeasureSpec measureS
   auto specMode = measureSpec.GetMode();
   auto specSize = measureSpec.GetSize();
 
+  DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::GetDefaultSize MeasureSpec("<<measureSpec<< ") size:" << size << "\n" );
+
   switch (specMode)
   {
     case MeasureSpec::Mode::UNSPECIFIED:
@@ -275,8 +281,12 @@ LayoutLength LayoutItem::GetDefaultSize( LayoutLength size, MeasureSpec measureS
     }
     case MeasureSpec::Mode::AT_MOST:
     {
+      // Ensure the default size does not exceed the spec size unless the default size is 0.
+      // Another container could provide a default size of 0.
       LayoutLength tmp = specSize;
-      if( size < tmp )
+
+      // Do not set size to 0, use specSize in this case as could be a legacy container
+      if( size < tmp && size > LayoutLength( 0 ) )
       {
         result = size;
       }
@@ -292,6 +302,7 @@ LayoutLength LayoutItem::GetDefaultSize( LayoutLength size, MeasureSpec measureS
       break;
     }
   }
+  DALI_LOG_STREAM( gLayoutFilter, Debug::General, "LayoutItem::GetDefaultSize setting default size:" << result << "\n" );
   return result;
 }
 
@@ -299,6 +310,7 @@ void LayoutItem::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
 {
   DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::OnMeasure\n");
 
+  // GetDefaultSize will limit the MeasureSpec to the suggested minimumWidth and minimumHeight
   SetMeasuredDimensions( GetDefaultSize( GetSuggestedMinimumWidth(), widthMeasureSpec ),
                          GetDefaultSize( GetSuggestedMinimumHeight(), heightMeasureSpec ) );
 }
@@ -341,9 +353,28 @@ void LayoutItem::SetLayoutRequested()
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
 }
 
+bool LayoutItem::IsResizePolicyRequired() const
+{
+  return mImpl->GetPrivateFlag( Impl::PRIVATE_FLAG_USE_RESIZE_POLICY );
+}
+
+void LayoutItem::SetResizePolicyRequired( bool resizePolicyRequired )
+{
+  if( resizePolicyRequired )
+  {
+    mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_USE_RESIZE_POLICY );
+  }
+  else
+  {
+    mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_USE_RESIZE_POLICY );
+  }
+}
+
 void LayoutItem::SetMeasuredDimensions( MeasuredSize measuredWidth, MeasuredSize measuredHeight )
 {
-  DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::SetMeasuredDimensions width(" << measuredWidth.GetSize() << ") height(" << measuredHeight.GetSize() << ") \n" );
+
+  DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::SetMeasuredDimensions width(" << measuredWidth.GetSize() << ") height(" << measuredHeight.GetSize() << ") Control:" <<
+                        ( ( Actor::DownCast( GetOwner()) ) ? Actor::DownCast(GetOwner()).GetName().c_str() : "Invalid Actor" ) << "\n" );
 
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_MEASURED_DIMENSION_SET );
   mImpl->mMeasuredWidth = measuredWidth;
