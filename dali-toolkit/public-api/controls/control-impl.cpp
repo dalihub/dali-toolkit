@@ -573,6 +573,9 @@ void Control::OnStageConnection( int depth )
 
   // The clipping renderer is only created if required.
   CreateClippingRenderer( *this );
+
+  // Request to be laid out when the control is connected to the Stage.
+  Toolkit::DevelControl::RequestLayout( *this );
 }
 
 void Control::OnStageDisconnection()
