@@ -637,7 +637,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
       }
 
       // Retrieves the glyph's color.
-      const ColorIndex colorIndex = *( colorIndexBuffer + glyphIndex );
+      const ColorIndex colorIndex = useDefaultColor ? 0u : *( colorIndexBuffer + glyphIndex );
 
       Vector4 color;
       if ( style == Typesetter::STYLE_SHADOW )
