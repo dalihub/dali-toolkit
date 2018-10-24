@@ -152,8 +152,14 @@ void LayoutItem::SetTransitionData( int layoutTransitionType, Internal::LayoutTr
   case Dali::Toolkit::LayoutTransitionData::ON_CHILD_REMOVE:
     mImpl->mOnChildRemoveTransitionData = layoutTransitionDataPtr;
     break;
+  case Dali::Toolkit::LayoutTransitionData::ON_CHILD_FOCUS:
+    mImpl->mOnChildFocusTransitionData = layoutTransitionDataPtr;
+    break;
   case Dali::Toolkit::LayoutTransitionData::ON_OWNER_SET:
     mImpl->mOnOwnerSetTransitionData = layoutTransitionDataPtr;
+    break;
+  case Dali::Toolkit::LayoutTransitionData::ON_LAYOUT_CHANGE:
+    mImpl->mOnLayoutChangeTransitionData = layoutTransitionDataPtr;
     break;
   default:
     break;
@@ -168,8 +174,12 @@ Internal::LayoutTransitionDataPtr LayoutItem::GetTransitionData( int layoutTrans
     return mImpl->mOnChildAddTransitionData.Get();
   case Dali::Toolkit::LayoutTransitionData::ON_CHILD_REMOVE:
     return mImpl->mOnChildRemoveTransitionData.Get();
+  case Dali::Toolkit::LayoutTransitionData::ON_CHILD_FOCUS:
+    return mImpl->mOnChildFocusTransitionData.Get();
   case Dali::Toolkit::LayoutTransitionData::ON_OWNER_SET:
     return mImpl->mOnOwnerSetTransitionData.Get();
+  case Dali::Toolkit::LayoutTransitionData::ON_LAYOUT_CHANGE:
+    return mImpl->mOnLayoutChangeTransitionData.Get();
   default:
     return LayoutTransitionDataPtr();
   }
@@ -417,7 +427,7 @@ void LayoutItem::RequestLayout()
   layoutController.RequestLayout( Toolkit::LayoutItem( this ) );
 }
 
-void LayoutItem::RequestLayout( Dali::Toolkit::LayoutTransitionData::LayoutTransitionType layoutAnimationType )
+void LayoutItem::RequestLayout( Dali::Toolkit::LayoutTransitionData::Type layoutAnimationType )
 {
   Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
   if ( control )
@@ -429,6 +439,20 @@ void LayoutItem::RequestLayout( Dali::Toolkit::LayoutTransitionData::LayoutTrans
   mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
   Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
   layoutController.RequestLayout( Toolkit::LayoutItem(this), layoutAnimationType );
+}
+
+void LayoutItem::RequestLayout( Dali::Toolkit::LayoutTransitionData::Type layoutAnimationType, Actor gainedChild, Actor lostChild )
+{
+  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  if ( control )
+  {
+    DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::RequestLayout control(%s) layoutTranstionType(%d)\n",
+        control.GetName().c_str(), (int)layoutAnimationType );
+  }
+  // @todo Enforce failure if called in Measure/Layout passes.
+  mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
+  Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
+  layoutController.RequestLayout( Toolkit::LayoutItem(this), layoutAnimationType, gainedChild, lostChild );
 }
 
 bool LayoutItem::IsLayoutRequested() const
@@ -579,7 +603,6 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
   {
     if( mImpl->mAnimated && !layoutData.speculativeLayout )
     {
-
       LayoutItem* transitionOwner = layoutData.layoutTransition.layoutItem.Get();
       LayoutTransitionDataPtr layoutTransitionDataPtr = GetTransitionData( layoutData.layoutTransition.layoutTransitionType );
 
@@ -595,9 +618,25 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
       {
         if( changed )
         {
-          DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame apply default transition to (%s), transition type (%d)\n", actor.GetName().c_str(), layoutData.layoutTransition.layoutTransitionType );
+          layoutTransitionDataPtr = GetTransitionData( Dali::Toolkit::LayoutTransitionData::ON_LAYOUT_CHANGE );
+          if ( layoutTransitionDataPtr )
+          {
+            DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame apply custom default transition to (%s), transition type (%d)\n", actor.GetName().c_str(), Dali::Toolkit::LayoutTransitionData::ON_LAYOUT_CHANGE );
+            layoutData.layoutPositionDataArray.push_back( LayoutPositionData( actor, left.AsDecimal(), top.AsDecimal(), right.AsDecimal(), bottom.AsDecimal(), true ) );
+            layoutTransitionDataPtr->ConvertToLayoutDataElements( actor, layoutData );
+          }
+          else
+          {
+            DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame apply default transition to (%s), transition type (%d)\n", actor.GetName().c_str(), layoutData.layoutTransition.layoutTransitionType );
+            layoutData.layoutPositionDataArray.push_back( LayoutPositionData( actor, left.AsDecimal(), top.AsDecimal(), right.AsDecimal(), bottom.AsDecimal(), true ) );
+            GetDefaultTransition()->ConvertToLayoutDataElements( actor, layoutData );
+          }
+        }
+        else
+        {
+          DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame apply children animators to (%s), transition type (%d)\n", actor.GetName().c_str(), layoutData.layoutTransition.layoutTransitionType );
           layoutData.layoutPositionDataArray.push_back( LayoutPositionData( actor, left.AsDecimal(), top.AsDecimal(), right.AsDecimal(), bottom.AsDecimal(), true ) );
-          GetDefaultTransition()->ConvertToLayoutDataElements( actor, layoutData );
+          LayoutTransitionData::ConvertChildrenAnimatorsToLayoutDataElements( actor, layoutData );
         }
       }
     }

@@ -57,7 +57,7 @@ public:
   /**
    * This marks the given layout and all its parents as dirty and triggers a transition if set.
    */
-  void RequestLayout( LayoutItem& layout, int layoutTransitionType );
+  void RequestLayout( LayoutItem& layout, int layoutTransitionType, Actor gainedChild, Actor lostChild );
 
   /**
    * Measures next level of layouts in the actor hierarchy.
@@ -78,6 +78,11 @@ public:
    * Perform animation of actors properties after layout update
    */
   void PerformLayoutAnimation( LayoutTransition& layoutTransition, LayoutPositionDataArray& layoutPositionDataArray, LayoutDataArray& layoutDataArray, LayoutAnimatorArray& layoutAnimatorArray );
+
+  /**
+   * Focus change callback.
+   */
+  void KeyInputFocusChangedCallback( Control gainingActor, Control lostActor );
 
 protected: // Implementation of Processor
 
@@ -119,6 +124,18 @@ private:
   bool mLayoutRequested;
   Animation mAnimation;
   std::list< AnimationFinishedFunctor > mAnimationFinishedFunctors;
+
+  struct FocusChangedFunctor
+  {
+    FocusChangedFunctor( LayoutController& layoutController )
+    : layoutController( layoutController )
+    {
+    }
+
+    void operator() ( Dali::Toolkit::Control gainingControl, Dali::Toolkit::Control lostActor );
+    LayoutController& layoutController;
+  };
+  FocusChangedFunctor mFocusChangedFunctor;
 
   SlotDelegate<LayoutController> mSlotDelegate;
 };
