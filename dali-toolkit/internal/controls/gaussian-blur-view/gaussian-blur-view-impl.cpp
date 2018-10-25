@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -238,7 +238,9 @@ void GaussianBlurView::OnInitialize()
 {
   // root actor to parent all user added actors, needed to allow us to set that subtree as exclusive for our child render task
   mChildrenRoot.SetParentOrigin(ParentOrigin::CENTER);
+  mChildrenRoot.SetName("GBV::ChildrenRoot");
   mInternalRoot.SetParentOrigin(ParentOrigin::CENTER);
+  mInternalRoot.SetName("GBV::InternalRoot");
 
   //////////////////////////////////////////////////////
   // Create shaders
@@ -255,10 +257,12 @@ void GaussianBlurView::OnInitialize()
 
   // Create an image view for performing a horizontal blur on the texture
   mImageViewHorizBlur = Toolkit::ImageView::New();
+  mImageViewHorizBlur.SetName( "GBV::HorizBlur" );
   mImageViewHorizBlur.SetParentOrigin(ParentOrigin::CENTER);
 
   // Create an image view for performing a vertical blur on the texture
   mImageViewVertBlur = Toolkit::ImageView::New();
+  mImageViewVertBlur.SetName( "GBV::VertBlur" );
   mImageViewVertBlur.SetParentOrigin(ParentOrigin::CENTER);
 
   // Register a property that the user can control to fade the blur in / out via the GaussianBlurView object
@@ -266,9 +270,10 @@ void GaussianBlurView::OnInitialize()
   mBlurStrengthPropertyIndex = self.RegisterProperty(GAUSSIAN_BLUR_VIEW_STRENGTH_PROPERTY_NAME, GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH);
 
   // Create an image view for compositing the blur and the original child actors render
-  if(!mBlurUserImage)
+  if( !mBlurUserImage )
   {
     mImageViewComposite = Toolkit::ImageView::New();
+    mImageViewComposite.SetName( "GBV::Composite" );
     mImageViewComposite.SetParentOrigin(ParentOrigin::CENTER);
     mImageViewComposite.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
 
@@ -278,11 +283,13 @@ void GaussianBlurView::OnInitialize()
 
     // Create an image view for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
     mTargetActor = Toolkit::ImageView::New();
+    mTargetActor.SetName( "GBV::TargetActor" );
     mTargetActor.SetParentOrigin(ParentOrigin::CENTER);
 
     //////////////////////////////////////////////////////
     // Create cameras for the renders corresponding to the view size
     mRenderFullSizeCamera = CameraActor::New();
+    mRenderFullSizeCamera.SetName( "FullSizeCamera");
     mRenderFullSizeCamera.SetInvertYAxis( true );
     mRenderFullSizeCamera.SetParentOrigin(ParentOrigin::CENTER);
 
@@ -298,6 +305,7 @@ void GaussianBlurView::OnInitialize()
   //////////////////////////////////////////////////////
   // Create camera for the renders corresponding to the (potentially downsampled) render targets' size
   mRenderDownsampledCamera = CameraActor::New();
+  mRenderDownsampledCamera.SetName("Downsample Camera");
   mRenderDownsampledCamera.SetInvertYAxis( true );
   mRenderDownsampledCamera.SetParentOrigin(ParentOrigin::CENTER);
 
@@ -434,7 +442,7 @@ void GaussianBlurView::CreateRenderTasks()
     // create render task to render our child actors to offscreen buffer
     mRenderChildrenTask = taskList.CreateTask();
     mRenderChildrenTask.SetSourceActor( mChildrenRoot );
-    mRenderChildrenTask.SetExclusive(true);
+    mRenderChildrenTask.SetExclusive( true );
     mRenderChildrenTask.SetInputEnabled( false );
     mRenderChildrenTask.SetClearEnabled( true );
     mRenderChildrenTask.SetClearColor( mBackgroundColor );
@@ -520,8 +528,9 @@ void GaussianBlurView::ActivateOnce()
 void GaussianBlurView::Deactivate()
 {
   // stop render tasks processing
-  // Note: render target resources are automatically freed since we set the Image::Unused flag
   RemoveRenderTasks();
+  mImageViewHorizBlur.SetImage("");
+  mImageViewVertBlur.SetImage("");
   mRenderTargetForRenderingChildren.Reset();
   mRenderTarget1.Reset();
   mRenderTarget2.Reset();
