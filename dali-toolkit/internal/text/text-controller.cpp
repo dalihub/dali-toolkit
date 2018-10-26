@@ -427,6 +427,11 @@ void Controller::SetMatchSystemLanguageDirection( bool match )
   mImpl->mModel->mMatchSystemLanguageDirection = match;
 }
 
+void Controller::SetLayoutDirection( Dali::LayoutDirection::Type layoutDirection )
+{
+  mImpl->mLayoutDirection = layoutDirection;
+}
+
 
 void Controller::SetLineWrapMode( Text::LineWrap::Mode lineWrapMode )
 {
