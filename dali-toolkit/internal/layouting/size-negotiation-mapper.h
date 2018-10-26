@@ -40,17 +40,19 @@ namespace SizeNegotiationMapper
  * @param[out] control the control to set the layout params on
  * @param[out] layout the layout for the given control
  * @param[in] dimension the dimension or dimensions the resize policy applies to.
+ * @note If Dimension::ALL_DIMENSIONS is provided as the dimension parameter then Dimension::WIDTH is used for
+ *       both height and width mapping.
  */
 void SetLayoutParametersUsingResizePolicy( Toolkit::Control control, Toolkit::Internal::LayoutItemPtr layout, const Dimension::Type dimension );
 
 /**
  * @brief Sets the child layout parameters on the control using the a ResizePolicy that is dependant on it's parent
- * @note This method should be used after a child has been parented and a parent measure spec is available.
  * @param[out] control the control to set the layout params on
  * @param[in] parentWidthSpecification the parent's width measure specification
  * @param[in] parentHeightSpecification the parent's height measure specification
  * @param[out] childWidth the resulting child width
  * @param[out] childHeight the resulting child height
+ * @note This method should be used after a child has been parented and a parent measure spec is available.
  */
 void GetSizeofChildForParentDependentResizePolicy( Toolkit::Control control, const MeasureSpec parentWidthSpecification, const MeasureSpec parentHeightSpecification, LayoutLength& childWidth, LayoutLength& childHeight );
 

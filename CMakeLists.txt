@@ -104,6 +104,7 @@ SET( SOURCES ${SOURCES}
    ${internal_src_dir}/layouting/layout-group-data-impl.cpp
    ${internal_src_dir}/layouting/layout-controller-impl.cpp
    ${internal_src_dir}/layouting/layout-controller-debug.cpp
+   ${internal_src_dir}/layouting/layout-transition-data-impl.cpp
    ${internal_src_dir}/visuals/animated-image/animated-image-visual.cpp
    ${internal_src_dir}/visuals/animated-image/image-cache.cpp
    ${internal_src_dir}/visuals/animated-image/fixed-image-cache.cpp

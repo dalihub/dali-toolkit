@@ -20,6 +20,7 @@
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
 #include <dali-toolkit/devel-api/layouting/layout-size.h>
+#include <dali-toolkit/internal/layouting/layout-transition-data-impl.h>
 
 namespace Dali
 {
@@ -27,8 +28,6 @@ namespace Toolkit
 {
 namespace Internal
 {
-class LayoutParent;
-
 
 class LayoutItem::Impl
 {
@@ -81,6 +80,13 @@ public:
 
   static bool sUseZeroUnspecifiedMeasureSpec;
 
+  LayoutTransitionDataPtr mOnChildAddTransitionData;
+  LayoutTransitionDataPtr mOnChildRemoveTransitionData;
+  LayoutTransitionDataPtr mOnOwnerSetTransitionData;
+  LayoutTransitionDataPtr mDefaultTransitionData;
+
+  // To pass layout data during perform layout
+  static LayoutData* sLayoutData;
 };
 
 } // namespace Internal

@@ -39,9 +39,8 @@ public:
                           size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
                           float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
                           float  verticalDpi   = DEFAULT_VERTICAL_DPI )
-  : TestApplication( false, surfaceWidth, surfaceHeight, horizontalDpi, verticalDpi )
+  : TestApplication( surfaceWidth, surfaceHeight, horizontalDpi, verticalDpi )
   {
-    Initialize();
     auto singletonService = SingletonService::Get();
     Test::SetApplication( singletonService, *this );
 

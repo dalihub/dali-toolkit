@@ -150,17 +150,13 @@ void SizeNegotiationMapper::SetLayoutParametersUsingResizePolicy( Toolkit::Contr
   // matchedLayoutParamHeight should not be used.
   if( matchFound )
   {
-    if( dimension == Dimension::WIDTH )
+    if( dimension & Dimension::WIDTH )
     {
       SetWidthLayoutParams( control, matchedLayoutParamWidth );
     }
-    else if( dimension == Dimension::HEIGHT )
+
+    if( dimension & Dimension::HEIGHT )
     {
-      SetHeightLayoutParams( control, matchedLayoutParamHeight );
-    }
-    else if( Dimension::ALL_DIMENSIONS )
-    {
-      SetWidthLayoutParams( control, matchedLayoutParamWidth );
       SetHeightLayoutParams( control, matchedLayoutParamHeight );
     }
   }

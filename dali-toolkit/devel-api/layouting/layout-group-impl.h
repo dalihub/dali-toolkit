@@ -294,6 +294,11 @@ private:
   void ChildAddedToOwner( Actor child );
 
   /**
+   * Implementation of ChildAddedToOwner
+   */
+  void ChildAddedToOwnerImpl( Actor child );
+
+  /**
    * Callback when child is removed from owner
    */
   void ChildRemovedFromOwner( Actor child );
