@@ -234,3 +234,84 @@ int UtcDaliLayoutingSettingAndRemoval_RemoveLayoutFromHbox(void)
 
   END_TEST;
 }
+
+int UtcDaliLayouting_SetLayoutAlreadyInUse(void)
+{
+  /*
+  1 ControlA (LinearLayoutA)
+  2 Add 3 children
+
+  3 ControlB (LinearLayoutA)
+  4 Add 4 children
+
+  Test number of children in each control/layout
+
+  LinearLayoutA should now have 4 children
+
+  ControlB should have 4 children too
+  ControlA should have 3 children.
+
+  */
+
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_SetLayoutAlreadyInUse - Set layout belonging to controlA to controlB");
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  auto controlA = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  controlA.SetName( "controlA");
+
+  rootControl.Add( controlA );
+
+  DevelControl::SetLayout( controlA, hboxLayout );
+
+  // Add child controls
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 100, 100 ) );  // 0
+  controls.push_back( CreateLeafControl( 100, 100 ) );  // 1
+  controls.push_back( CreateLeafControl( 100, 100 ) );  // 2
+
+  for( auto&& iter : controls )
+  {
+    controlA.Add( iter );
+  }
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("SetLayout to another control");
+
+  auto controlB = Control::New();
+  controlB.SetName( "controlB");
+
+  std::vector< Control > moreControls;
+  moreControls.push_back( CreateLeafControl( 100, 100 ) );  // 0
+  moreControls.push_back( CreateLeafControl( 100, 100 ) );  // 1
+  moreControls.push_back( CreateLeafControl( 100, 100 ) );  // 3
+  moreControls.push_back( CreateLeafControl( 100, 100 ) );  // 4
+
+  for( auto&& iter : moreControls )
+  {
+    controlB.Add( iter );
+  }
+
+  DevelControl::SetLayout( controlB, hboxLayout );  // Set hboxLayout used by ControlA to ControlB
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline("Get number of children in each control's layout");
+  DALI_TEST_EQUALS( ( LayoutGroup::DownCast( DevelControl::GetLayout( controlA ) ) ).GetChildCount(), 3 , TEST_LOCATION );
+  DALI_TEST_EQUALS( ( LayoutGroup::DownCast( DevelControl::GetLayout( controlB ) ) ).GetChildCount(), 4 , TEST_LOCATION );
+
+  END_TEST;
+}
