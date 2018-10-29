@@ -245,7 +245,7 @@ void BloomView::OnInitialize()
   // Note that we use mBloomExtractTarget as the source image and also re-use this as the gaussian blur final render target. This saves the gaussian blur code from creating it
   // render targets etc internally, so we make better use of resources
   // Note, this also internally creates the render tasks used by the Gaussian blur, this must occur after the bloom extraction and before the compositing
-  mGaussianBlurView = Dali::Toolkit::GaussianBlurView::New(mBlurNumSamples, mBlurBellCurveWidth, mPixelFormat, mDownsampleWidthScale, mDownsampleHeightScale, true);
+  mGaussianBlurView = Dali::Toolkit::GaussianBlurView::New( mBlurNumSamples, mBlurBellCurveWidth, mDownsampleWidthScale, mDownsampleHeightScale );
   mGaussianBlurView.SetParentOrigin( ParentOrigin::CENTER );
 
 
@@ -356,7 +356,7 @@ void BloomView::AllocateResources()
     //////////////////////////////////////////////////////
     // Pass size change onto GaussianBlurView, so it matches
     mGaussianBlurView.SetSize(mTargetSize);
-    GetImpl(mGaussianBlurView).AllocateResources();
+    //GetImpl(mGaussianBlurView).AllocateResources();
 
     mGaussianBlurView.SetVisible( true );
 
@@ -383,7 +383,7 @@ void BloomView::AllocateResources()
     mBloomExtractImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
     // set GaussianBlurView to blur our extracted bloom
-    mGaussianBlurView.SetUserImageAndOutputRenderTarget(mBloomExtractTarget, mBlurExtractTarget);
+    //mGaussianBlurView.SetUserImageAndOutputRenderTarget(mBloomExtractTarget, mBlurExtractTarget);
 
     // use the completed blur in the first buffer and composite with the original child actors render
     mCompositeImageView.SetImage( mRenderTargetForRenderingChildren );
@@ -422,7 +422,7 @@ void BloomView::CreateRenderTasks()
   mBloomExtractTask.SetTargetFrameBuffer( mBloomExtractTarget );
 
   // GaussianBlurView tasks must be created here, so they are executed in the correct order with respect to BloomView tasks
-  GetImpl(mGaussianBlurView).CreateRenderTasks();
+  //GetImpl(mGaussianBlurView).CreateRenderTasks();
 
   // Use an image view displaying the children render and composite it with the blurred bloom buffer, targeting the output
   mCompositeTask = taskList.CreateTask();
@@ -441,7 +441,7 @@ void BloomView::RemoveRenderTasks()
   taskList.RemoveTask(mRenderChildrenTask);
   taskList.RemoveTask(mBloomExtractTask);
 
-  GetImpl(mGaussianBlurView).RemoveRenderTasks();
+  //GetImpl(mGaussianBlurView).RemoveRenderTasks();
 
   taskList.RemoveTask(mCompositeTask);
 }
@@ -521,10 +521,10 @@ void BloomView::SetupProperties()
   // bloom strength
 
   // Register a property that the user can control to fade the blur in / out via internal GaussianBlurView object
-  mBlurStrengthPropertyIndex = self.RegisterProperty(BLOOM_BLUR_STRENGTH_PROPERTY_NAME, BLOOM_BLUR_STRENGTH_DEFAULT);
-  Constraint blurStrengthConstraint = Constraint::New<float>( mGaussianBlurView, mGaussianBlurView.GetBlurStrengthPropertyIndex(), EqualToConstraint());
-  blurStrengthConstraint.AddSource( Source(self, mBlurStrengthPropertyIndex) );
-  blurStrengthConstraint.Apply();
+  //mBlurStrengthPropertyIndex = self.RegisterProperty(BLOOM_BLUR_STRENGTH_PROPERTY_NAME, BLOOM_BLUR_STRENGTH_DEFAULT);
+  //Constraint blurStrengthConstraint = Constraint::New<float>( mGaussianBlurView, mGaussianBlurView.GetBlurStrengthPropertyIndex(), EqualToConstraint());
+  //blurStrengthConstraint.AddSource( Source(self, mBlurStrengthPropertyIndex) );
+  //blurStrengthConstraint.Apply();
 
 
   ////////////////////////////////////////////

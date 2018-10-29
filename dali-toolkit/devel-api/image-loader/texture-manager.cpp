@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali/public-api/common/stage.h>
 
 namespace Dali
 {
@@ -45,9 +46,13 @@ std::string AddTexture( TextureSet& textureSet )
 
 TextureSet RemoveTexture( const std::string& textureUrl )
 {
-  auto visualFactory = Toolkit::VisualFactory::Get();
-  auto& textureMgr = GetImplementation( visualFactory ).GetTextureManager();
-  return textureMgr.RemoveExternalTexture( textureUrl );
+  if( Stage::IsInstalled() )
+  {
+    auto visualFactory = Toolkit::VisualFactory::Get();
+    auto& textureMgr = GetImplementation( visualFactory ).GetTextureManager();
+    return textureMgr.RemoveExternalTexture( textureUrl );
+  }
+  return TextureSet();
 }
 
 } // TextureManager
