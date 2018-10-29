@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,13 +56,11 @@ GaussianBlurView GaussianBlurView::New()
   return Internal::GaussianBlurView::New();
 }
 
-GaussianBlurView GaussianBlurView::New( const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
-                                        const float downsampleWidthScale, const float downsampleHeightScale,
-                                        bool blurUserImage)
+GaussianBlurView GaussianBlurView::New(
+  const unsigned int numSamples, const float blurBellCurveWidth,
+  const float downsampleWidthScale, const float downsampleHeightScale )
 {
-  return Internal::GaussianBlurView::New( numSamples, blurBellCurveWidth, renderTargetPixelFormat,
-                                           downsampleWidthScale, downsampleHeightScale,
-                                           blurUserImage);
+  return Internal::GaussianBlurView::New( numSamples, blurBellCurveWidth, downsampleWidthScale, downsampleHeightScale );
 }
 
 GaussianBlurView::GaussianBlurView( Internal::GaussianBlurView& implementation )
@@ -81,24 +79,9 @@ GaussianBlurView GaussianBlurView::DownCast( BaseHandle handle )
   return Control::DownCast<GaussianBlurView, Internal::GaussianBlurView>(handle);
 }
 
-void GaussianBlurView::Add(Actor child)
-{
-  GetImpl(*this).Add(child);
-}
-
-void GaussianBlurView::Remove(Actor child)
-{
-  GetImpl(*this).Remove(child);
-}
-
 void GaussianBlurView::Activate()
 {
   GetImpl(*this).Activate();
-}
-
-void GaussianBlurView::ActivateOnce()
-{
-  GetImpl(*this).ActivateOnce();
 }
 
 void GaussianBlurView::Deactivate()
@@ -106,19 +89,9 @@ void GaussianBlurView::Deactivate()
   GetImpl(*this).Deactivate();
 }
 
-void GaussianBlurView::SetUserImageAndOutputRenderTarget(Image inputImage, FrameBufferImage outputRenderTarget)
+ImageView GaussianBlurView::GetBlurredImageView() const
 {
-  GetImpl(*this).SetUserImageAndOutputRenderTarget(inputImage, outputRenderTarget);
-}
-
-Property::Index GaussianBlurView::GetBlurStrengthPropertyIndex() const
-{
-  return GetImpl(*this).GetBlurStrengthPropertyIndex();
-}
-
-FrameBufferImage GaussianBlurView::GetBlurredRenderTarget() const
-{
-  return GetImpl(*this).GetBlurredRenderTarget();
+  return GetImpl(*this).GetBlurredImageView();
 }
 
 void GaussianBlurView::SetBackgroundColor( const Vector4& color )
@@ -131,9 +104,14 @@ Vector4 GaussianBlurView::GetBackgroundColor() const
   return GetImpl(*this).GetBackgroundColor();
 }
 
-GaussianBlurView::GaussianBlurViewSignal& GaussianBlurView::FinishedSignal()
+void GaussianBlurView::SetBlurBellCurveWidth(float blurBellCurveWidth)
 {
-  return GetImpl(*this).FinishedSignal();
+  GetImpl(*this).SetBlurBellCurveWidth( blurBellCurveWidth );
+}
+
+float GaussianBlurView::GetBlurBellCurveWidth()
+{
+  return GetImpl(*this).GetBlurBellCurveWidth();
 }
 
 } // namespace Toolkit

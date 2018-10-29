@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_GAUSSIAN_BLUR_EFFECT_H__
-#define __DALI_TOOLKIT_INTERNAL_GAUSSIAN_BLUR_EFFECT_H__
+#ifndef DALI_TOOLKIT_INTERNAL_GAUSSIAN_BLUR_VIEW_H
+#define DALI_TOOLKIT_INTERNAL_GAUSSIAN_BLUR_VIEW_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,12 @@
 // EXTERNAL INCLUDES
 #include <sstream>
 #include <cmath>
+#include <string>
+
 #include <dali/public-api/object/property-map.h>
+#include <dali/public-api/rendering/frame-buffer.h>
+#include <dali/public-api/rendering/texture.h>
+#include <dali/public-api/render-tasks/render-task.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -54,9 +59,8 @@ public:
   /**
    * @copydoc Dali::Toolkit::GaussianBlurView::GaussianBlurView
    */
-  GaussianBlurView(const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
-                   const float downsampleWidthScale, const float downsampleHeightScale,
-                   bool blurUserImage);
+  GaussianBlurView( const unsigned int numSamples, const float blurBellCurveWidth,
+                    const float downsampleWidthScale, const float downsampleHeightScale );
 
   /**
    * @copydoc Dali::Toolkit::GaussianBlurView::~GaussianBlurView
@@ -67,21 +71,14 @@ public:
    * @copydoc Dali::Toolkit::GaussianBlurView::New
    */
   static Dali::Toolkit::GaussianBlurView New();
-  static Dali::Toolkit::GaussianBlurView New( const unsigned int numSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,
-                                              const float downsampleWidthScale, const float downsampleHeightScale,
-                                              bool blurUserImage);
 
-  void Add(Actor child);
-  void Remove(Actor child);
+  static Dali::Toolkit::GaussianBlurView New( const unsigned int numSamples, const float blurBellCurveWidth,
+                                              const float downsampleWidthScale, const float downsampleHeightScale );
 
   void Activate();
-  void ActivateOnce();
   void Deactivate();
 
-  void SetUserImageAndOutputRenderTarget(Image inputImage, FrameBufferImage outputRenderTarget);
-
-  Property::Index GetBlurStrengthPropertyIndex() const {return mBlurStrengthPropertyIndex;}
-  FrameBufferImage GetBlurredRenderTarget() const;
+  Toolkit::ImageView GetBlurredImageView() const;
 
   /// @copydoc Dali::Toolkit::GaussianBlurView::SetBackgroundColor(const Vector4&)
   void SetBackgroundColor( const Vector4& color );
@@ -89,12 +86,20 @@ public:
   /// @copydoc Dali::Toolkit::GaussianBlurView::GetBackgroundColor
   Vector4 GetBackgroundColor() const;
 
-  void AllocateResources();
-  void CreateRenderTasks();
-  void RemoveRenderTasks();
-  Dali::Toolkit::GaussianBlurView::GaussianBlurViewSignal& FinishedSignal();
+  void SetBlurBellCurveWidth(float blurBellCurveWidth);
+
+  float GetBlurBellCurveWidth();
 
 private:
+
+  enum class Direction
+  {
+    HORIZONTAL,
+    VERTICAL
+  };
+
+  void AllocateResources();
+  void FreeResources();
 
   virtual void OnInitialize();
   virtual void OnSizeSet(const Vector3& targetSize);
@@ -109,93 +114,68 @@ private:
    */
   virtual void OnChildRemove( Actor& child );
 
-  void SetBlurBellCurveWidth(float blurBellCurveWidth);
-  float CalcGaussianWeight(float x);
-  void SetShaderConstants();
+  CameraActor CreateCamera( float width, float height );
+  Texture CreateTexture( Vector2 size );
+  FrameBuffer CreateFramebuffer( Vector2 targetSize, Texture texture );
+  RenderTask CreateRenderTask( Actor inputActor, CameraActor cameraActor, FrameBuffer framebuffer );
+  Toolkit::ImageView CreateImageView( Vector2 targetSize, Property::Map& customShader,
+                                      Direction blurDirection, const std::string& url );
+
+
+
+  float CalcGaussianWeight( float x );
+  void SetShaderConstants( Actor actor, Vector2 targetSize, Direction direction, uint32_t numSamples );
+
   std::string GetSampleOffsetsPropertyName( unsigned int index ) const;
   std::string GetSampleWeightsPropertyName( unsigned int index ) const;
 
-  void OnRenderTaskFinished(Dali::RenderTask& renderTask);
-
-  /////////////////////////////////////////////////////////////
+private:
   unsigned int mNumSamples;       // number of blur samples in each of horiz/vert directions
   float mBlurBellCurveWidth;      // constant used when calculating the gaussian weights
-  Pixel::Format mPixelFormat;     // pixel format used by render targets
 
-  /////////////////////////////////////////////////////////////
-  // downsampling is used for the separated blur passes to get increased blur with the same number of samples and also to make rendering quicker
-  float mDownsampleWidthScale;
-  float mDownsampleHeightScale;
-  float mDownsampledWidth;
-  float mDownsampledHeight;
+  float mDownsampleWidthScale; ///< the horizontal scale supplied by the user
+  float mDownsampleHeightScale; ///< the vertical scale supplied by the user
+  float mDownsampledWidth; ///< Downsampled size after applying scale to blur view's width
+  float mDownsampledHeight; ///< Downsampled size after applying scale to blur view's height
 
-  /////////////////////////////////////////////////////////////
-  // if this is set to true, we blur a user supplied image rather than rendering and blurring children
-  bool mBlurUserImage:1;
+  Vector4 mBackgroundColor; ///< The clear color for each render task
+  Vector2 mTargetSize; ///< The target size of the scene & blurred image view
+  Vector2 mLastSize; ///< The previous target size on allocation/resize
+
+  Actor mChildrenRoot; ///< Holds added children (scene actors)
+  Actor mInternalRoot; ///< Holds cameras and internal image views
+
+  CameraActor mRenderFullSizeCamera; ///< For rendering scene and final blurred image
+  CameraActor mRenderDownsampledCamera; ///< For rendering horizontal and vertical passes
+
+  FrameBuffer mSceneFramebuffer; ///< Framebuffer is used for rendering the scene and final blurred output
+  FrameBuffer mHorizontalBlurFramebuffer; ///< Framebuffer is used for horizontal pass
+  FrameBuffer mVerticalBlurFramebuffer; ///< Framebuffer is used for vertical pass
+
+  Texture mSceneOutput; ///< Used for both the scene render and the final render
+  Texture mHorizontalOutput;
+  Texture mVerticalOutput;
+  std::string mSceneOutputUrl; ///< Url registered with Texture Manager for mSceneOutput
+  std::string mHorizontalOutputUrl; ///< Url registered with Texture Manager for mHorizontalOutput
+  std::string mVerticalOutputUrl; ///< Url registered with Texture Manager for mVerticalOutput
+
+  Toolkit::ImageView mImageViewScene; ///< Holds output of scene pass, input to horizontal pass
+  Toolkit::ImageView mImageViewHorizontalBlur; ///< Holds output of horizontal pass, input to vertical pass
+  Toolkit::ImageView mImageViewVerticalBlur; ///< Holds output of vertical pass, input to upsample pass
+  Toolkit::ImageView mImageViewFinal; ///< Holds final output
+
+  Property::Map mCustomShader; ///< Custom shader for gaussian blur - used for both horizontal & vertical passes
+
+  RenderTask mRenderSceneTask; ///< Task to render scene into first framebuffer
+  RenderTask mHorizontalBlurTask; ///< Task to render mSceneOutput texture with horizontal blur with downsampling
+  RenderTask mVerticalBlurTask; ///< Task to render mHorizontalOutput texture with vertical blur with downsampling
+  RenderTask mUpsampleTask; ///< Task to render mVerticalOutput texture to full size
 
   /////////////////////////////////////////////////////////////
   // if this is set to true, set the render tasks to refresh once
   bool mRenderOnce:1;
-
-  /////////////////////////////////////////////////////////////
-  // background fill color
-  Vector4 mBackgroundColor;
-
-  /////////////////////////////////////////////////////////////
-  // for checking if we need to reallocate render targets
-  Vector2 mTargetSize;
-  Vector2 mLastSize;
-
-  /////////////////////////////////////////////////////////////
-  // for creating a subtree for all user added child actors, so that we can have them exclusive to the mRenderChildrenTask and our other actors exclusive to our other tasks
-  Actor mChildrenRoot;
-  // for creating a subtree for the internal actors
-  Actor mInternalRoot;
-
-  /////////////////////////////////////////////////////////////
-  // for mapping offscreen renders to render target sizes
-  CameraActor mRenderFullSizeCamera;
-  CameraActor mRenderDownsampledCamera;
-
-  /////////////////////////////////////////////////////////////
-  // for rendering all user added children to offscreen target
-  FrameBufferImage mRenderTargetForRenderingChildren;
-  RenderTask mRenderChildrenTask;
-
-  /////////////////////////////////////////////////////////////
-  // for rendering separated blur passes to offscreen targets
-  FrameBufferImage mRenderTarget1;
-  FrameBufferImage mRenderTarget2;
-
-  Toolkit::ImageView mImageViewHorizBlur;
-  Toolkit::ImageView mImageViewVertBlur;
-
-  Property::Map mCustomShader;
-
-  RenderTask mHorizBlurTask;
-  RenderTask mVertBlurTask;
-
-  /////////////////////////////////////////////////////////////
-  // for compositing blur and children renders to offscreen target
-  Toolkit::ImageView mImageViewComposite;
-  RenderTask mCompositeTask;
-
-  /////////////////////////////////////////////////////////////
-  // for holding blurred result
-  Toolkit::ImageView mTargetActor;
-
-  /////////////////////////////////////////////////////////////
-  // for animating fade in / out of blur, hiding internal implementation but allowing user to set via GaussianBlurView interface
-  Property::Index mBlurStrengthPropertyIndex;
-
-  /////////////////////////////////////////////////////////////
-  // User can specify image to blur and output target, so we can use GaussianBlurView for arbitrary blur processes
-  Image mUserInputImage;
-  FrameBufferImage mUserOutputRenderTarget;
-
-  Dali::Toolkit::GaussianBlurView::GaussianBlurViewSignal mFinishedSignal; ///< Signal emitted when blur has completed.
-
   bool mActivated:1;
+
 private:
 
   // Undefined copy constructor.
@@ -228,4 +208,4 @@ inline const Toolkit::Internal::GaussianBlurView& GetImpl( const Toolkit::Gaussi
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_GAUSSIAN_BLUR_EFFECT_H__
+#endif // DALI_TOOLKIT_INTERNAL_GAUSSIAN_BLUR_VIEW_H

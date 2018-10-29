@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -223,6 +223,7 @@ Image SuperBlurView::GetBlurredImage( unsigned int level )
 void SuperBlurView::BlurImage( unsigned int idx, Image image )
 {
   DALI_ASSERT_ALWAYS( mGaussianBlurView.size()>idx );
+  /*
   mGaussianBlurView[idx] = Toolkit::GaussianBlurView::New( GAUSSIAN_BLUR_DEFAULT_NUM_SAMPLES+GAUSSIAN_BLUR_NUM_SAMPLES_INCREMENTATION*idx,
                                                            GAUSSIAN_BLUR_BELL_CURVE_WIDTH + GAUSSIAN_BLUR_BELL_CURVE_WIDTH_INCREMENTATION*static_cast<float>(idx),
                                                            GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT,
@@ -236,6 +237,7 @@ void SuperBlurView::BlurImage( unsigned int idx, Image image )
   {
     mGaussianBlurView[idx].FinishedSignal().Connect( this, &SuperBlurView::OnBlurViewFinished );
   }
+  */
 }
 
 void SuperBlurView::OnBlurViewFinished( Toolkit::GaussianBlurView blurView )
