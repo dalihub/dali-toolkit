@@ -132,6 +132,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholder",                  
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "ellipsis",                             BOOLEAN,   ELLIPSIS                             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableShiftSelection",           BOOLEAN,   ENABLE_SHIFT_SELECTION               )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableGrabHandle",               BOOLEAN,   ENABLE_GRAB_HANDLE                   )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "matchSystemLanguageDirection",   BOOLEAN,   MATCH_SYSTEM_LANGUAGE_DIRECTION      )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -785,6 +786,14 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
+      {
+        if( impl.mController )
+        {
+          impl.mController->SetMatchSystemLanguageDirection(value.Get< bool >());
+        }
+        break;
+      }
     } // switch
   } // textfield
 }
@@ -1197,6 +1206,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if( impl.mController )
         {
           value = impl.mController->IsGrabHandleEnabled();
+        }
+        break;
+      }
+      case Toolkit::DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->IsMatchSystemLanguageDirection();
         }
         break;
       }
