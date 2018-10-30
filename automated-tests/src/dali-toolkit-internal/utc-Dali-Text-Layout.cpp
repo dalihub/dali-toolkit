@@ -5316,7 +5316,7 @@ int UtcDaliTextAlign10(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { -4.f, 0.f, 0.f, 0.f, 0.f, 0.f };
+  float positions[] = { 0.f, 0.f, 0.f, 0.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -5333,6 +5333,248 @@ int UtcDaliTextAlign10(void)
     6u,
     positions,
     Dali::LayoutDirection::RIGHT_TO_LEFT,
+    true
+  };
+
+  if( !AlignTest( data ) )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextAlign11(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextAlign11");
+
+  // Calculate text alignment.
+
+  const std::string fontLatin( "TizenSans" );
+  const std::string fontHebrew( "TizenSansHebrew" );
+  const std::string fontArabic( "TizenSansArabic" );
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun01;
+  fontDescriptionRun01.characterRun.characterIndex = 0u;
+  fontDescriptionRun01.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun01.familyLength = fontLatin.size();
+  fontDescriptionRun01.familyName = new char[fontDescriptionRun01.familyLength];
+  memcpy( fontDescriptionRun01.familyName, fontLatin.c_str(), fontDescriptionRun01.familyLength );
+  fontDescriptionRun01.familyDefined = true;
+  fontDescriptionRun01.weightDefined = false;
+  fontDescriptionRun01.widthDefined = false;
+  fontDescriptionRun01.slantDefined = false;
+  fontDescriptionRun01.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun02;
+  fontDescriptionRun02.characterRun.characterIndex = 12u;
+  fontDescriptionRun02.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun02.familyLength = fontHebrew.size();
+  fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
+  memcpy( fontDescriptionRun02.familyName, fontHebrew.c_str(), fontDescriptionRun02.familyLength );
+  fontDescriptionRun02.familyDefined = true;
+  fontDescriptionRun02.weightDefined = false;
+  fontDescriptionRun02.widthDefined = false;
+  fontDescriptionRun02.slantDefined = false;
+  fontDescriptionRun02.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun03;
+  fontDescriptionRun03.characterRun.characterIndex = 22u;
+  fontDescriptionRun03.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun03.familyLength = fontArabic.size();
+  fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
+  memcpy( fontDescriptionRun03.familyName, fontArabic.c_str(), fontDescriptionRun03.familyLength );
+  fontDescriptionRun03.familyDefined = true;
+  fontDescriptionRun03.weightDefined = false;
+  fontDescriptionRun03.widthDefined = false;
+  fontDescriptionRun03.slantDefined = false;
+  fontDescriptionRun03.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun04;
+  fontDescriptionRun04.characterRun.characterIndex = 36u;
+  fontDescriptionRun04.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun04.familyLength = fontLatin.size();
+  fontDescriptionRun04.familyName = new char[fontDescriptionRun04.familyLength];
+  memcpy( fontDescriptionRun04.familyName, fontLatin.c_str(), fontDescriptionRun04.familyLength );
+  fontDescriptionRun04.familyDefined = true;
+  fontDescriptionRun04.weightDefined = false;
+  fontDescriptionRun04.widthDefined = false;
+  fontDescriptionRun04.slantDefined = false;
+  fontDescriptionRun04.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun05;
+  fontDescriptionRun05.characterRun.characterIndex = 48u;
+  fontDescriptionRun05.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun05.familyLength = fontLatin.size();
+  fontDescriptionRun05.familyName = new char[fontDescriptionRun05.familyLength];
+  memcpy( fontDescriptionRun05.familyName, fontLatin.c_str(), fontDescriptionRun05.familyLength );
+  fontDescriptionRun05.familyDefined = true;
+  fontDescriptionRun05.weightDefined = false;
+  fontDescriptionRun05.widthDefined = false;
+  fontDescriptionRun05.slantDefined = false;
+  fontDescriptionRun05.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun06;
+  fontDescriptionRun06.characterRun.characterIndex = 60u;
+  fontDescriptionRun06.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun06.familyLength = fontArabic.size();
+  fontDescriptionRun06.familyName = new char[fontDescriptionRun06.familyLength];
+  memcpy( fontDescriptionRun06.familyName, fontArabic.c_str(), fontDescriptionRun06.familyLength );
+  fontDescriptionRun06.familyDefined = true;
+  fontDescriptionRun06.weightDefined = false;
+  fontDescriptionRun06.widthDefined = false;
+  fontDescriptionRun06.slantDefined = false;
+  fontDescriptionRun06.sizeDefined = false;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns;
+  fontDescriptionRuns.PushBack( fontDescriptionRun01 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun02 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun03 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun04 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun05 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun06 );
+
+  float positions[] = { 20.f, 33.f, 2.f, 0.f, 0.f, 0.f };
+
+  Size textArea( 100.f, 300.f );
+  AlignData data =
+  {
+    "End alignment for the last paragraph.",
+    "Hello world שלום עולם\nمرحبا بالعالم Hello world\nHello world مرحبا بالعالم.",
+    textArea,
+    6u,
+    fontDescriptionRuns.Begin(),
+    Text::HorizontalAlignment::END,
+    Text::VerticalAlignment::TOP,
+    0u,
+    26u,
+    6u,
+    positions,
+    Dali::LayoutDirection::LEFT_TO_RIGHT,
+    true
+  };
+
+  if( !AlignTest( data ) )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextAlign12(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextAlign12");
+
+  // Calculate text alignment.
+
+  const std::string fontLatin( "TizenSans" );
+  const std::string fontHebrew( "TizenSansHebrew" );
+  const std::string fontArabic( "TizenSansArabic" );
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun01;
+  fontDescriptionRun01.characterRun.characterIndex = 0u;
+  fontDescriptionRun01.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun01.familyLength = fontLatin.size();
+  fontDescriptionRun01.familyName = new char[fontDescriptionRun01.familyLength];
+  memcpy( fontDescriptionRun01.familyName, fontLatin.c_str(), fontDescriptionRun01.familyLength );
+  fontDescriptionRun01.familyDefined = true;
+  fontDescriptionRun01.weightDefined = false;
+  fontDescriptionRun01.widthDefined = false;
+  fontDescriptionRun01.slantDefined = false;
+  fontDescriptionRun01.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun02;
+  fontDescriptionRun02.characterRun.characterIndex = 12u;
+  fontDescriptionRun02.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun02.familyLength = fontHebrew.size();
+  fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
+  memcpy( fontDescriptionRun02.familyName, fontHebrew.c_str(), fontDescriptionRun02.familyLength );
+  fontDescriptionRun02.familyDefined = true;
+  fontDescriptionRun02.weightDefined = false;
+  fontDescriptionRun02.widthDefined = false;
+  fontDescriptionRun02.slantDefined = false;
+  fontDescriptionRun02.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun03;
+  fontDescriptionRun03.characterRun.characterIndex = 22u;
+  fontDescriptionRun03.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun03.familyLength = fontArabic.size();
+  fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
+  memcpy( fontDescriptionRun03.familyName, fontArabic.c_str(), fontDescriptionRun03.familyLength );
+  fontDescriptionRun03.familyDefined = true;
+  fontDescriptionRun03.weightDefined = false;
+  fontDescriptionRun03.widthDefined = false;
+  fontDescriptionRun03.slantDefined = false;
+  fontDescriptionRun03.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun04;
+  fontDescriptionRun04.characterRun.characterIndex = 36u;
+  fontDescriptionRun04.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun04.familyLength = fontLatin.size();
+  fontDescriptionRun04.familyName = new char[fontDescriptionRun04.familyLength];
+  memcpy( fontDescriptionRun04.familyName, fontLatin.c_str(), fontDescriptionRun04.familyLength );
+  fontDescriptionRun04.familyDefined = true;
+  fontDescriptionRun04.weightDefined = false;
+  fontDescriptionRun04.widthDefined = false;
+  fontDescriptionRun04.slantDefined = false;
+  fontDescriptionRun04.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun05;
+  fontDescriptionRun05.characterRun.characterIndex = 48u;
+  fontDescriptionRun05.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun05.familyLength = fontLatin.size();
+  fontDescriptionRun05.familyName = new char[fontDescriptionRun05.familyLength];
+  memcpy( fontDescriptionRun05.familyName, fontLatin.c_str(), fontDescriptionRun05.familyLength );
+  fontDescriptionRun05.familyDefined = true;
+  fontDescriptionRun05.weightDefined = false;
+  fontDescriptionRun05.widthDefined = false;
+  fontDescriptionRun05.slantDefined = false;
+  fontDescriptionRun05.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun06;
+  fontDescriptionRun06.characterRun.characterIndex = 60u;
+  fontDescriptionRun06.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun06.familyLength = fontArabic.size();
+  fontDescriptionRun06.familyName = new char[fontDescriptionRun06.familyLength];
+  memcpy( fontDescriptionRun06.familyName, fontArabic.c_str(), fontDescriptionRun06.familyLength );
+  fontDescriptionRun06.familyDefined = true;
+  fontDescriptionRun06.weightDefined = false;
+  fontDescriptionRun06.widthDefined = false;
+  fontDescriptionRun06.slantDefined = false;
+  fontDescriptionRun06.sizeDefined = false;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns;
+  fontDescriptionRuns.PushBack( fontDescriptionRun01 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun02 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun03 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun04 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun05 );
+  fontDescriptionRuns.PushBack( fontDescriptionRun06 );
+
+  float positions[] = { 0.f, 0.f, 0.f, 0.f, 0.f, 0.f };
+
+  Size textArea( 100.f, 300.f );
+  AlignData data =
+  {
+    "Begin alignment for the first paragraph.",
+    "Hello world שלום עולם\nمرحبا بالعالم Hello world\nHello world مرحبا بالعالم.",
+    textArea,
+    6u,
+    fontDescriptionRuns.Begin(),
+    Text::HorizontalAlignment::BEGIN,
+    Text::VerticalAlignment::TOP,
+    48u,
+    26u,
+    6u,
+    positions,
+    Dali::LayoutDirection::LEFT_TO_RIGHT,
     true
   };
 
