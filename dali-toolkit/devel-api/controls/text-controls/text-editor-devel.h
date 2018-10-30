@@ -110,7 +110,14 @@ namespace Property
        * @details Name "enableGrabHandle", type Property::BOOLEAN.
        * @note The default value is true, which means the grab handles are enabled by default.
        */
-      ENABLE_GRAB_HANDLE
+      ENABLE_GRAB_HANDLE,
+
+      /**
+       * @brief Modifies the default text alignment to match the direction of the system language.
+       * @details Name "matchSystemLanguageDirection", type (Property::BOOLEAN), Read/Write
+       * @note The default value is false
+       */
+      MATCH_SYSTEM_LANGUAGE_DIRECTION
   };
 
 } // namespace Property
