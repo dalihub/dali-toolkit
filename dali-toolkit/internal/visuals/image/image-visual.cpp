@@ -616,7 +616,7 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
   }
 }
 
-void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
+void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage, TextureSet& textures )
 {
   Geometry geometry;
   Shader shader;
@@ -629,7 +629,7 @@ void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
 
   if( !mImpl->mCustomShader )
   {
-    geometry = CreateGeometry( mFactoryCache, ImageDimensions( 1, 1 ) );
+    geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 
     shader = DevelShader::New<uint32_t>( GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_SHADER_VERT" ),
                                          GraphicsGetBuiltinShader( "SHADER_IMAGE_VISUAL_NO_ATLAS_SHADER_FRAG" ),
@@ -658,10 +658,12 @@ void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
     }
   }
 
+  shader.RegisterProperty( PIXEL_ALIGNED_UNIFORM_NAME, PIXEL_ALIGN_OFF );
   mImpl->mRenderer = Renderer::New( geometry, shader );
 
   //Register transform properties
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+  EnablePreMultipliedAlpha( false );
 }
 
 bool ImageVisual::IsSynchronousResourceLoading() const
@@ -748,30 +750,26 @@ void ImageVisual::InitializeRenderer( const Image& image )
 {
   TextureSet textures = TextureSet::New();
 
-  NativeImage nativeImage = NativeImage::DownCast( image );
-  if( nativeImage )
-  {
-    CreateNativeImageRenderer( nativeImage );
-    DALI_ASSERT_DEBUG( textures );
-    mImpl->mRenderer.SetTextures( textures );
-  }
-  else
-  {
-    // reuse existing code for regular images
-    CreateRenderer( textures ); // Textures will be retreived from Image
-  }
-  ApplyImageToSampler( image );
+  // reuse existing code for regular images
+  ApplyImageToSampler( image, textures );
+  CreateRenderer( textures ); // Textures will be retreived from Image
 }
 
 void ImageVisual::DoSetOnStage( Actor& actor )
 {
   if( mImageUrl.IsValid() )
   {
+    fprintf(stderr, "DoSetOnStage, url\n");
     InitializeRenderer();
   }
   else if( mImage )
   {
+    fprintf(stderr, "DoSetOnStage, image\n");
     InitializeRenderer( mImage );
+  }
+  else
+  {
+    fprintf(stderr, "DoSetOnStage, invalid\n");
   }
 
   if( !mImpl->mRenderer )
@@ -916,11 +914,10 @@ bool ImageVisual::IsResourceReady() const
            mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED );
 }
 
-void ImageVisual::ApplyImageToSampler( const Image& image )
+void ImageVisual::ApplyImageToSampler( const Image& image, TextureSet& textureSet )
 {
   if( image )
   {
-    TextureSet textureSet = mImpl->mRenderer.GetTextures();
     DALI_ASSERT_DEBUG( textureSet ); // texture set should always exist by this time
 
     TextureSetImage( textureSet, 0u, image );
@@ -982,9 +979,8 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
         Image brokenImage = mFactoryCache.GetBrokenVisualImage();
 
         textureSet = TextureSet::New();
+        ApplyImageToSampler( brokenImage, textureSet );
         mImpl->mRenderer.SetTextures( textureSet );
-
-        ApplyImageToSampler( brokenImage );
       }
     }
   }

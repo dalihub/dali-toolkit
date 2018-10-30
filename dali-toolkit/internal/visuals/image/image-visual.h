@@ -279,8 +279,9 @@ private:
    * @brief Applies the image to the texture set used for this renderer
    *
    * @param[in] image The Image to apply to the texture set used for this renderer
+   * @param[in] textures The TextureSet to add the image to. It will be added with a default sampler to the first image
    */
-  void ApplyImageToSampler( const Image& image );
+  void ApplyImageToSampler( const Image& image, TextureSet& textures );
 
   /**
    * @brief Load the texture, will try to atlas unless unable or param set to false.
@@ -320,7 +321,7 @@ private:
    * @brief Creates the Dali::Renderer for NativeImage with custom sampler type and prefix, initializing it
    * @param NativeImageRenderer
    */
-  void CreateNativeImageRenderer( NativeImage& nativeImage );
+  void CreateNativeImageRenderer( NativeImage& nativeImage, TextureSet& textures );
 
   /**
    * @brief Query whether resources requires to be loaded synchronously.
