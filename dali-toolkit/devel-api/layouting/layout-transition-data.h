@@ -50,17 +50,29 @@ public:
   {
     enum Type
     {
-      CONDITION,          ///< A condition triggering the transition animation (the actor is added/removed/focus gained/focus lost)
-      PROPERTY,           ///< A property to animate
-      INITIAL_VALUE,      ///< Initial value of an animated property
-      TARGET_VALUE,       ///< Target value of an animated property
-      ANIMATOR,           ///< Animator for an animated property
-      TYPE,               ///< Type of an animator
-      NAME,               ///< Name of an animator
-      TIME_PERIOD,        ///< Time period of an property animation
-      DURATION,           ///< Duration of an property animation
-      DELAY,              ///< Delay of an property animation
-      ALPHA_FUNCTION,     ///< Alpha function of a property animation
+      CONDITION,            ///< A condition triggering the transition animation (the actor is added/removed/focus gained/focus lost)
+      PROPERTY,             ///< A property to animate
+      INITIAL_VALUE,        ///< Initial value of an animated property
+      TARGET_VALUE,         ///< Target value of an animated property
+      ANIMATOR,             ///< Animator for an animated property
+      TYPE,                 ///< Type of an animator
+      NAME,                 ///< Name of an animator
+      TIME_PERIOD,          ///< Time period of an property animation
+      DURATION,             ///< Duration of an property animation
+      DELAY,                ///< Delay of an property animation
+      ALPHA_FUNCTION,       ///< Alpha function of a property animation
+      AFFECTS_SIBLINGS,     ///< Might change the actor siblings positions etc by updating the actor measured size if the actor size is changed due to the animation. False by default.
+    };
+  };
+
+  struct Animator
+  {
+    enum Type
+    {
+      ANIMATE_TO,           ///< Animate to property target value
+      ANIMATE_BY,           ///< Animate by property target value
+      ANIMATE_BETWEEN,      ///< Animate between property initial and target values
+      ANIMATE_PATH          ///< Animate using the animation path
     };
   };
 

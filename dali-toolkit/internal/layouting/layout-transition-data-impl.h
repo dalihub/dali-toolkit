@@ -68,16 +68,8 @@ const float DEFAULT_TRANSITION_DURATION( 0.5f );
 
 struct LayoutDataAnimator
 {
-   enum class AnimatorType
-   {
-     ANIMATE_TO,
-     ANIMATE_BY,
-     ANIMATE_BETWEEN,
-     ANIMATE_PATH
-   };
-
    LayoutDataAnimator()
-   : animatorType( AnimatorType::ANIMATE_TO ),
+   : animatorType( Toolkit::LayoutTransitionData::Animator::ANIMATE_TO ),
      alphaFunction( AlphaFunction::LINEAR ),
      timePeriod( 0.0f, DEFAULT_TRANSITION_DURATION ),
      interpolation( Animation::Linear )
@@ -85,7 +77,7 @@ struct LayoutDataAnimator
    }
 
    std::string name;
-   AnimatorType animatorType;
+   Toolkit::LayoutTransitionData::Animator::Type animatorType;
    AlphaFunction alphaFunction;
    TimePeriod timePeriod;
 
@@ -101,7 +93,7 @@ using LayoutAnimatorArray = std::vector< LayoutDataAnimator >;
 struct LayoutPositionData
 {
   LayoutPositionData( Handle handle, float left, float top, float right, float bottom, bool animated ) :
-      handle( handle ), left( left ), top( top ), right( right ), bottom( bottom ), animated( animated )
+      handle( handle ), left( left ), top( top ), right( right ), bottom( bottom ), animated( animated ), updateWithCurrentSize(false)
   {
   };
 
@@ -111,6 +103,7 @@ struct LayoutPositionData
   float right;
   float bottom;
   bool animated;
+  bool updateWithCurrentSize;
 };
 
 using LayoutPositionDataArray = std::vector< LayoutPositionData >;
@@ -121,18 +114,29 @@ struct LayoutDataElement
   : propertyIndex( Property::INVALID_KEY ),
     animatorIndex( -1 ),
     positionDataIndex(-1 ),
-    condition( Dali::Toolkit::LayoutTransitionData::Condition::NONE )
+    condition( Dali::Toolkit::LayoutTransitionData::Condition::NONE ),
+    updateMeasuredSize( false )
   {
   };
 
+  bool AdjustMeasuredSize( float& width, float& height, Toolkit::LayoutTransitionData::Animator::Type animatorType );
+  void UpdatePropertyIndex();
+  void UpdateAnimatorIndex( const LayoutAnimatorArray& animators );
+  void UpdatePositionDataIndex( LayoutData& layoutData );
+
   BaseHandle handle;
+  std::string propertyName;
   Property::Index propertyIndex;
   Property::Value initialValue;
   Property::Value targetValue;
+  std::string animatorName;
   int animatorIndex;
   int positionDataIndex;
   int condition;
+  bool updateMeasuredSize;
 };
+
+using LayoutDataArray = std::vector< LayoutDataElement >;
 
 class LayoutTransitionData;
 using LayoutTransitionDataPtr = IntrusivePtr<LayoutTransitionData>;
@@ -160,7 +164,6 @@ public:
     Path path;
     Vector3 forward;
   };
-
   using PropertyAnimatorArray = std::vector< PropertyAnimator >;
 
   static LayoutTransitionDataPtr New();
@@ -173,7 +176,7 @@ public:
    * @param[in] actor The actor
    * @param[in] map The map containing the transition animator keys
    *
-   * This will add the property animator to the list of animators related to this transition
+   * This will parse the property animator map and add the layout data element to the array of layout data elements related to this transition
    */
   void AddPropertyAnimator( Actor actor, Property::Map map );
 
@@ -184,7 +187,7 @@ public:
    * @param[in] keyFrames The key frames used by the property animator
    * @param[in] interpolation The interpolation used by the property animator
    *
-   * This will add the property animator to the list of animators related to this transition
+   * This will parse the property animator map and add the layout data element to the array of layout data elements related to this transition
    */
   void AddPropertyAnimator( Actor actor, Property::Map map, KeyFrames keyFrames, Animation::Interpolation interpolation );
 
@@ -195,27 +198,27 @@ public:
    * @param[in] path The path for the property animator
    * @param[in] forward The forward vector for the property animator
    *
-   * This will add the property animator to the list of animators related to this transition
+   * This will parse the property animator map and add the layout data element to the array of layout data elements related to this transition
    */
   void AddPropertyAnimator( Actor actor, Property::Map map, Path path, Vector3 forward );
 
   /**
-   * @brief Convert the transition property animators to the layout data elements
+   * @brief Collect the transition layout data elements
    * @param[in] actor The actor the transition property animators are applied to
    * @param[in] layoutData The layout data containing layout data elements array for the layout update
    *
-   * This will parse the property animators and add the layout data elements to the layout data elements array
+   * This will copy the transition layout data elements to the layout data elements array
    */
-  void ConvertToLayoutDataElements( Actor, LayoutData& layoutData );
+  void CollectLayoutDataElements( Actor, LayoutData& layoutData );
 
   /**
-   * @brief Convert the transition children property animators to the layout data elements
+   * @brief Collect the transition children layout data elements
    * @param[in] actor The actor the transition property animators are applied to
    * @param[in] layoutData The layout data containing layout data elements array for the layout update
    *
-   * This will parse the children property animators and add the layout data elements to the layout data elements array
+   * This will copy the children transition layout data elements to the layout data elements array
    */
-  static void ConvertChildrenAnimatorsToLayoutDataElements( Actor, LayoutData& layoutData );
+  static void CollectChildrenLayoutDataElements( Actor, LayoutData& layoutData );
 
   /**
    * @copydoc Dali::Toolkit::LayoutTransitionData::FinishedSignal()
@@ -228,6 +231,11 @@ public:
    */
   void EmitSignalFinish( int layoutTransitionType );
 
+  /**
+   * @brief Check if one of the layout data elements has updateMeasuredSize flag set
+   */
+  bool HasUpdateMeasuredSize();
+
 private:
   /**
    * @brief Convert the property animator data to the layout data animator
@@ -235,9 +243,9 @@ private:
    * @param[in] propertyAnimator The property animator
    * @param[in] layoutAnimator The layout animator
    *
-   * This will parse the property animator data and add the layout data element animator
+   * This will parse the property animator map and add the layout data element animator to the layout animators array
    */
-  static bool ConvertToLayoutAnimator( const Property::Map& animatorData, const PropertyAnimator& propertyAnimator, LayoutDataAnimator& layoutAnimator );
+  bool ConvertToLayoutAnimator( const Property::Map& animatorData, const PropertyAnimator& propertyAnimator, LayoutDataAnimator& layoutAnimator );
 
   /**
    * @brief Convert the property animator to the layout data element
@@ -245,11 +253,15 @@ private:
    * @param[in] layoutDataElement The layout data element
    * @param[in] layoutDataElement The layout data
    *
-   * This will parse the children property animators and add the layout data elements to the layout data elements array
+   * This will parse the property animator map and add the layout data element to the layout data elements array
    */
-  static bool ConvertToLayoutDataElement( const PropertyAnimator& propertyAnimator, LayoutDataElement& layoutDataElement, LayoutData& layoutData );
+  bool ConvertToLayoutDataElement( const PropertyAnimator& propertyAnimator, LayoutDataElement& layoutDataElement );
 
-  PropertyAnimatorArray mPropertyAnimators;
+  void UpdateAnimatorsIndices();
+
+  bool mUpdateMeasuredSize;
+  LayoutAnimatorArray mLayoutAnimators;
+  LayoutDataArray mLayoutDataElements;
 
   /**
    * Ref counted object - Only allow construction via New().
@@ -271,23 +283,25 @@ using LayoutDataArray = std::vector< LayoutDataElement >;
 
 struct LayoutData
 {
-  LayoutData( LayoutTransition& layoutTransition, LayoutPositionDataArray& layoutPositionDataArray, LayoutDataArray& layoutDataArray,
-      LayoutAnimatorArray& layoutAnimatorArray, PropertyAnimatorArray& childrenPropertyAnimators )
+  LayoutData( LayoutTransition& layoutTransition, LayoutPositionDataArray& layoutPositionDataArray, LayoutAnimatorArray& layoutAnimatorArray,
+      LayoutDataArray& layoutDataArray, LayoutDataArray& childrenLayoutDataArray )
   : speculativeLayout( false ),
+    updateMeasuredSize( false ),
     layoutTransition( layoutTransition ),
     layoutPositionDataArray( layoutPositionDataArray ),
-    layoutDataArray( layoutDataArray),
     layoutAnimatorArray( layoutAnimatorArray ),
-    childrenPropertyAnimators( childrenPropertyAnimators )
+    layoutDataArray( layoutDataArray),
+    childrenLayoutDataArray( childrenLayoutDataArray )
   {
   };
 
   bool speculativeLayout;
+  bool updateMeasuredSize;
   LayoutTransition& layoutTransition;
   LayoutPositionDataArray& layoutPositionDataArray;
-  LayoutDataArray& layoutDataArray;
   LayoutAnimatorArray& layoutAnimatorArray;
-  PropertyAnimatorArray& childrenPropertyAnimators;
+  LayoutDataArray& layoutDataArray;
+  LayoutDataArray& childrenLayoutDataArray;
 };
 
 } //namespace Internal
