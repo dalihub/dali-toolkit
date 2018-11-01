@@ -963,7 +963,9 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
                           lineBreakInfo,
                           startIndex,
                           requestedNumberOfCharacters,
-                          bidirectionalInfo );
+                          bidirectionalInfo,
+                          mModel->mMatchSystemLanguageDirection,
+                          mLayoutDirection );
 
     if( 0u != bidirectionalInfo.Count() )
     {

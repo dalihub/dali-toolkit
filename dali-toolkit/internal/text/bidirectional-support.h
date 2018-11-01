@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/actors/actor-enumerations.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
@@ -45,13 +46,17 @@ namespace Text
  * @param[in] startIndex The character from where the bidirectional info is set.
  * @param[in] numberOfCharacters The number of characters.
  * @param[out] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
+ * @param[in] matchSystemLanguageDirection Whether match for system language direction or not.
+ * @param[in] layoutDirection The direction of the system language.
  */
 void SetBidirectionalInfo( const Vector<Character>& text,
                            const Vector<ScriptRun>& scripts,
                            const Vector<LineBreakInfo>& lineBreakInfo,
                            CharacterIndex startIndex,
                            Length numberOfCharacters,
-                           Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo );
+                           Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
+                           bool matchSystemLanguageDirection = false,
+                           Dali::LayoutDirection::Type layoutDirection = LayoutDirection::LEFT_TO_RIGHT );
 
 /**
  * Sets the visual to logical map tables.

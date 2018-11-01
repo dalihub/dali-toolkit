@@ -1255,6 +1255,13 @@ public: // Queries & retrieves.
    */
   void SetMatchSystemLanguageDirection( bool match );
 
+  /**
+   * @brief Sets layoutDirection value
+   * @param[in] layoutDirection The value of system language direction
+   */
+  void SetLayoutDirection( Dali::LayoutDirection::Type layoutDirection );
+
+
 public: // Relayout.
 
   /**
