@@ -46,9 +46,7 @@ inline std::string ExpandPath(const std::string &name)
 inline std::string ExePath(void)
 {
   char buf[256];
-  ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
-  len = len > 0 ? len : 0;
-  buf[len] = '\0';
+  readlink("/proc/self/exe", buf, sizeof(buf));
   return std::string(buf);
 }
 
