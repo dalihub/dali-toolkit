@@ -192,7 +192,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
 }
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image )
-: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
   mImage( image ),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
