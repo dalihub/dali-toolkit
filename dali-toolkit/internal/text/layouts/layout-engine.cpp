@@ -1150,7 +1150,8 @@ struct Engine::Impl
                                      bool matchSystemLanguageDirection )
   {
     line.alignmentOffset = 0.f;
-    bool isRTL = RTL == line.direction;
+    bool isLineRTL = RTL == line.direction;
+    bool isRTL = isLineRTL;
     float lineLength = line.width;
     HorizontalAlignment::Type alignment = horizontalAlignment;
 
@@ -1191,7 +1192,7 @@ struct Engine::Impl
       {
         line.alignmentOffset = 0.f;
 
-        if( isRTL )
+        if( isLineRTL )
         {
           // 'Remove' the white spaces at the end of the line (which are at the beginning in visual order)
           line.alignmentOffset -= line.extraLength;
@@ -1202,7 +1203,7 @@ struct Engine::Impl
       {
         line.alignmentOffset = 0.5f * ( boxWidth - lineLength );
 
-        if( isRTL )
+        if( isLineRTL )
         {
           line.alignmentOffset -= line.extraLength;
         }
@@ -1212,7 +1213,7 @@ struct Engine::Impl
       }
       case HorizontalAlignment::END:
       {
-        if( isRTL )
+        if( isLineRTL )
         {
           lineLength += line.extraLength;
         }

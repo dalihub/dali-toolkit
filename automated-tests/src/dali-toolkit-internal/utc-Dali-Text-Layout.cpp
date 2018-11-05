@@ -5316,7 +5316,7 @@ int UtcDaliTextAlign10(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { -4.f, 0.f, 0.f, 0.f, 0.f, 0.f };
+  float positions[] = { 0.f, 0.f, 0.f, 0.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
