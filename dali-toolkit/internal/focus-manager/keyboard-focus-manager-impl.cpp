@@ -119,17 +119,16 @@ KeyboardFocusManager::KeyboardFocusManager()
   mFocusedActorEnterKeySignal(),
   mCurrentFocusActor(),
   mFocusIndicatorActor(),
-  mIsFocusIndicatorShown( -1 ),
+  mIsFocusIndicatorEnabled( -1 ),
   mFocusGroupLoopEnabled( false ),
   mIsWaitingKeyboardFocusChangeCommit( false ),
   mClearFocusOnTouch( true ),
   mEnableFocusIndicator( true ),
-  mAlwaysShowIndicator( true ),
   mFocusHistory(),
   mSlotDelegate( this ),
   mCustomAlgorithmInterface(NULL)
 {
-  // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorShown.
+  // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorEnabled.
   Stage::GetCurrent().KeyEventSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
   Stage::GetCurrent().TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
 }
@@ -144,9 +143,8 @@ void KeyboardFocusManager::GetConfigurationFromStyleManger()
     if( styleManager )
     {
       Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
-      mAlwaysShowIndicator = config["alwaysShowFocus"].Get<bool>();
-      mIsFocusIndicatorShown = static_cast<int>(mAlwaysShowIndicator);
-      mClearFocusOnTouch = mIsFocusIndicatorShown ? false : true;
+      mIsFocusIndicatorEnabled = static_cast<int>(config["alwaysShowFocus"].Get<bool>());
+      mClearFocusOnTouch = mIsFocusIndicatorEnabled ? false : true;
     }
 }
 
@@ -154,7 +152,7 @@ bool KeyboardFocusManager::SetCurrentFocusActor( Actor actor )
 {
   DALI_ASSERT_DEBUG( !mIsWaitingKeyboardFocusChangeCommit && "Calling this function in the PreFocusChangeSignal callback?" );
 
-  if( mIsFocusIndicatorShown == -1 )
+  if( mIsFocusIndicatorEnabled == -1 )
   {
     GetConfigurationFromStyleManger();
   }
@@ -181,7 +179,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
   // Check whether the actor is in the stage and is keyboard focusable.
   if( actor && actor.IsKeyboardFocusable() && actor.OnStage() )
   {
-    if( mIsFocusIndicatorShown && mEnableFocusIndicator )
+    if( mIsFocusIndicatorEnabled && mEnableFocusIndicator )
     {
       actor.Add( GetFocusIndicatorActor() );
     }
@@ -557,7 +555,7 @@ void KeyboardFocusManager::ClearFocus()
   }
 
   mCurrentFocusActor.Reset();
-  mIsFocusIndicatorShown = static_cast<int>(mAlwaysShowIndicator);
+  mIsFocusIndicatorEnabled = 0;
 }
 
 void KeyboardFocusManager::SetFocusGroupLoop(bool enabled)
@@ -657,7 +655,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
   std::string keyName = event.keyPressedName;
 
-  if( mIsFocusIndicatorShown == -1 )
+  if( mIsFocusIndicatorEnabled == -1 )
   {
     GetConfigurationFromStyleManger();
   }
@@ -670,10 +668,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     {
       if(!isAccessibilityEnabled)
       {
-        if(!mIsFocusIndicatorShown)
+        if(!mIsFocusIndicatorEnabled)
         {
           // Show focus indicator
-          mIsFocusIndicatorShown = 1;
+          mIsFocusIndicatorEnabled = 1;
         }
         else
         {
@@ -693,10 +691,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     {
       if(!isAccessibilityEnabled)
       {
-        if(!mIsFocusIndicatorShown)
+        if(!mIsFocusIndicatorEnabled)
         {
           // Show focus indicator
-          mIsFocusIndicatorShown = 1;
+          mIsFocusIndicatorEnabled = 1;
         }
         else
         {
@@ -714,10 +712,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "Up" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -729,10 +727,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "Down" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -744,10 +742,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "Prior" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -759,10 +757,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "Next" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -774,10 +772,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "Tab" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -790,10 +788,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "space" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorEnabled = 1;
       }
 
       isFocusStartableKey = true;
@@ -801,10 +799,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     else if (keyName == "" && !isAccessibilityEnabled)
     {
       // Check the fake key event for evas-plugin case
-      if(!mIsFocusIndicatorShown)
+      if(!mIsFocusIndicatorEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorEnabled = 1;
       }
 
       isFocusStartableKey = true;
@@ -821,10 +819,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
   {
     if (keyName == "Return")
     {
-      if(!mIsFocusIndicatorShown && !isAccessibilityEnabled)
+      if(!mIsFocusIndicatorEnabled && !isAccessibilityEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorEnabled = 1;
       }
       else
       {
@@ -849,7 +847,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
   }
 
-  if(isFocusStartableKey && mIsFocusIndicatorShown && !isAccessibilityEnabled)
+  if(isFocusStartableKey && mIsFocusIndicatorEnabled && !isAccessibilityEnabled)
   {
     Actor actor = GetCurrentFocusActor();
     if( actor )
@@ -871,9 +869,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
 void KeyboardFocusManager::OnTouch(const TouchData& touch)
 {
-  // if mIsFocusIndicatorShown is -1, it means Configuration is not loaded.
+  // if mIsFocusIndicatorEnabled is -1, it means Configuration is not loaded.
   // Try to load configuration.
-  if( mIsFocusIndicatorShown == -1 )
+  if( mIsFocusIndicatorEnabled == -1 )
   {
     GetConfigurationFromStyleManger();
   }

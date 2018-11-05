@@ -1182,68 +1182,10 @@ int UtcDaliKeyboardFocusManagerChangeFocusDirectionByKeyEvents(void)
   DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
   DALI_TEST_CHECK(preFocusChangeCallback.mDirection == Control::KeyboardFocus::RIGHT);
 
-  // Clear the focus again
-  manager.ClearFocus();
-
-  // Send the up event for line coverage, but nothing was focued so focus manager will try the initial focus
-  preFocusChangeCallback.Reset();
-  application.ProcessEvent(upEvent);
-  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
-  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
-  DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == Actor());
-  DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
-
-  // Clear the focus again
-  manager.ClearFocus();
-
-  // Send the down event for line coverage, but nothing was focued so focus manager will try the initial focus
-  preFocusChangeCallback.Reset();
-  application.ProcessEvent(downEvent);
-  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
-  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
-  DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == Actor());
-  DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
-
   END_TEST;
 }
 
-int UtcDaliKeyboardFocusManagerSignalChangedBySpaceKeyEvent(void)
-{
-  ToolkitTestApplication application;
 
-  tet_infoline(" UtcDaliKeyboardFocusManagerSignalChangedBySpaceKeyEvent");
-
-  KeyboardFocusManager manager = KeyboardFocusManager::Get();
-  DALI_TEST_CHECK(manager);
-
-  bool preFocusChangeSignalVerified = false;
-  PreFocusChangeCallback preFocusChangeCallback(preFocusChangeSignalVerified);
-  manager.PreFocusChangeSignal().Connect( &preFocusChangeCallback, &PreFocusChangeCallback::Callback );
-
-  Integration::KeyEvent spaceEvent( "space", "", 0, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
-
-  // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
-  // It makes mIsFocusIndicatorEnabled true
-  application.ProcessEvent(spaceEvent);
-
-  // Send the space event
-  application.ProcessEvent(spaceEvent);
-  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
-  DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == Actor());
-
-  // Clear the focus again
-  manager.ClearFocus();
-
-  // Send the space event again for line coverage
-  preFocusChangeCallback.Reset();
-  application.ProcessEvent(spaceEvent);
-  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == Actor());
-  DALI_TEST_CHECK(preFocusChangeCallback.mSignalVerified);
-  DALI_TEST_CHECK(preFocusChangeCallback.mCurrentFocusedActor == Actor());
-  DALI_TEST_CHECK(preFocusChangeCallback.mProposedActorToFocus == Actor());
-
-  END_TEST;
-}
 
 
 
