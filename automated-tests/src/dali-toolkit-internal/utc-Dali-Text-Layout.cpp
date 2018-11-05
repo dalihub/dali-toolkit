@@ -174,8 +174,7 @@ bool LayoutTextTest( const LayoutTextData& data )
                                        Text::HorizontalAlignment::BEGIN,
                                        Text::LineWrap::WORD,
                                        outlineWidth,
-                                       true,
-                                       false );
+                                       true );
 
   layoutParameters.isLastNewParagraph = isLastNewParagraph;
 
@@ -395,8 +394,7 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                                        Text::HorizontalAlignment::BEGIN,
                                        Text::LineWrap::WORD,
                                        outlineWidth,
-                                       true,
-                                       false );
+                                       true );
 
   layoutParameters.numberOfBidirectionalInfoRuns = logicalModel->mBidirectionalLineInfo.Count();
   layoutParameters.lineBidirectionalInfoRunsBuffer = logicalModel->mBidirectionalLineInfo.Begin();
@@ -449,8 +447,6 @@ struct AlignData
   unsigned int                      numberOfCharacters;
   unsigned int                      numberOfLines;
   float*                            lineOffsets;
-  Dali::LayoutDirection::Type       layoutDirection;
-  bool                              matchSystemLanguageDirection;
 };
 
 bool AlignTest( const AlignData& data )
@@ -503,9 +499,7 @@ bool AlignTest( const AlignData& data )
                 data.numberOfCharacters,
                 data.horizontalAlignment,
                 visualModel->mLines,
-                alignmentOffset,
-                data.layoutDirection,
-                data.matchSystemLanguageDirection );
+                alignmentOffset );
 
   // Compare results.
   if( data.numberOfLines != visualModel->mLines.Count() )
@@ -525,6 +519,7 @@ bool AlignTest( const AlignData& data )
       return false;
     }
   }
+
   return true;
 }
 
@@ -4242,9 +4237,7 @@ int UtcDaliTextAlign01(void)
     0u,
     22u,
     6u,
-    positions,
-    Dali::LayoutDirection::LEFT_TO_RIGHT,
-    false
+    positions
   };
 
   if( !AlignTest( data ) )
@@ -4363,9 +4356,7 @@ int UtcDaliTextAlign02(void)
     22u,
     26u,
     6u,
-    positions,
-    Dali::LayoutDirection::LEFT_TO_RIGHT,
-    false
+    positions
   };
 
   if( !AlignTest( data ) )
@@ -4484,9 +4475,7 @@ int UtcDaliTextAlign03(void)
     48u,
     26u,
     6u,
-    positions,
-    Dali::LayoutDirection::LEFT_TO_RIGHT,
-    false
+    positions
   };
 
   if( !AlignTest( data ) )
@@ -4605,9 +4594,7 @@ int UtcDaliTextAlign04(void)
     0u,
     22u,
     6u,
-    positions,
-    Dali::LayoutDirection::LEFT_TO_RIGHT,
-    false
+    positions
   };
 
   if( !AlignTest( data ) )
@@ -4726,9 +4713,7 @@ int UtcDaliTextAlign05(void)
     22u,
     26u,
     6u,
-    positions,
-    Dali::LayoutDirection::LEFT_TO_RIGHT,
-    false
+    positions
   };
 
   if( !AlignTest( data ) )
@@ -4847,9 +4832,7 @@ int UtcDaliTextAlign06(void)
     48u,
     26u,
     6u,
-    positions,
-    Dali::LayoutDirection::LEFT_TO_RIGHT,
-    false
+    positions
   };
 
   if( !AlignTest( data ) )
@@ -4968,9 +4951,7 @@ int UtcDaliTextAlign07(void)
     0u,
     22u,
     6u,
-    positions,
-    Dali::LayoutDirection::LEFT_TO_RIGHT,
-    false
+    positions
   };
 
   if( !AlignTest( data ) )
@@ -5089,9 +5070,7 @@ int UtcDaliTextAlign08(void)
     22u,
     26u,
     6u,
-    positions,
-    Dali::LayoutDirection::LEFT_TO_RIGHT,
-    false
+    positions
   };
 
   if( !AlignTest( data ) )
@@ -5210,130 +5189,7 @@ int UtcDaliTextAlign09(void)
     48u,
     26u,
     6u,
-    positions,
-    Dali::LayoutDirection::LEFT_TO_RIGHT,
-    false
-  };
-
-  if( !AlignTest( data ) )
-  {
-    tet_result(TET_FAIL);
-  }
-
-  tet_result(TET_PASS);
-  END_TEST;
-}
-
-int UtcDaliTextAlign10(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextAlign10");
-
-  // Calculate text alignment.
-
-  const std::string fontLatin( "TizenSans" );
-  const std::string fontHebrew( "TizenSansHebrew" );
-  const std::string fontArabic( "TizenSansArabic" );
-
-  // Set a known font description
-  FontDescriptionRun fontDescriptionRun01;
-  fontDescriptionRun01.characterRun.characterIndex = 0u;
-  fontDescriptionRun01.characterRun.numberOfCharacters = 12u;
-  fontDescriptionRun01.familyLength = fontLatin.size();
-  fontDescriptionRun01.familyName = new char[fontDescriptionRun01.familyLength];
-  memcpy( fontDescriptionRun01.familyName, fontLatin.c_str(), fontDescriptionRun01.familyLength );
-  fontDescriptionRun01.familyDefined = true;
-  fontDescriptionRun01.weightDefined = false;
-  fontDescriptionRun01.widthDefined = false;
-  fontDescriptionRun01.slantDefined = false;
-  fontDescriptionRun01.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun02;
-  fontDescriptionRun02.characterRun.characterIndex = 12u;
-  fontDescriptionRun02.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun02.familyLength = fontHebrew.size();
-  fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
-  memcpy( fontDescriptionRun02.familyName, fontHebrew.c_str(), fontDescriptionRun02.familyLength );
-  fontDescriptionRun02.familyDefined = true;
-  fontDescriptionRun02.weightDefined = false;
-  fontDescriptionRun02.widthDefined = false;
-  fontDescriptionRun02.slantDefined = false;
-  fontDescriptionRun02.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun03;
-  fontDescriptionRun03.characterRun.characterIndex = 22u;
-  fontDescriptionRun03.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun03.familyLength = fontArabic.size();
-  fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
-  memcpy( fontDescriptionRun03.familyName, fontArabic.c_str(), fontDescriptionRun03.familyLength );
-  fontDescriptionRun03.familyDefined = true;
-  fontDescriptionRun03.weightDefined = false;
-  fontDescriptionRun03.widthDefined = false;
-  fontDescriptionRun03.slantDefined = false;
-  fontDescriptionRun03.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun04;
-  fontDescriptionRun04.characterRun.characterIndex = 36u;
-  fontDescriptionRun04.characterRun.numberOfCharacters = 12u;
-  fontDescriptionRun04.familyLength = fontLatin.size();
-  fontDescriptionRun04.familyName = new char[fontDescriptionRun04.familyLength];
-  memcpy( fontDescriptionRun04.familyName, fontLatin.c_str(), fontDescriptionRun04.familyLength );
-  fontDescriptionRun04.familyDefined = true;
-  fontDescriptionRun04.weightDefined = false;
-  fontDescriptionRun04.widthDefined = false;
-  fontDescriptionRun04.slantDefined = false;
-  fontDescriptionRun04.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun05;
-  fontDescriptionRun05.characterRun.characterIndex = 48u;
-  fontDescriptionRun05.characterRun.numberOfCharacters = 12u;
-  fontDescriptionRun05.familyLength = fontLatin.size();
-  fontDescriptionRun05.familyName = new char[fontDescriptionRun05.familyLength];
-  memcpy( fontDescriptionRun05.familyName, fontLatin.c_str(), fontDescriptionRun05.familyLength );
-  fontDescriptionRun05.familyDefined = true;
-  fontDescriptionRun05.weightDefined = false;
-  fontDescriptionRun05.widthDefined = false;
-  fontDescriptionRun05.slantDefined = false;
-  fontDescriptionRun05.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun06;
-  fontDescriptionRun06.characterRun.characterIndex = 60u;
-  fontDescriptionRun06.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun06.familyLength = fontArabic.size();
-  fontDescriptionRun06.familyName = new char[fontDescriptionRun06.familyLength];
-  memcpy( fontDescriptionRun06.familyName, fontArabic.c_str(), fontDescriptionRun06.familyLength );
-  fontDescriptionRun06.familyDefined = true;
-  fontDescriptionRun06.weightDefined = false;
-  fontDescriptionRun06.widthDefined = false;
-  fontDescriptionRun06.slantDefined = false;
-  fontDescriptionRun06.sizeDefined = false;
-
-  Vector<FontDescriptionRun> fontDescriptionRuns;
-  fontDescriptionRuns.PushBack( fontDescriptionRun01 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun02 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun03 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun04 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun05 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun06 );
-
-  float positions[] = { -4.f, 0.f, 0.f, 0.f, 0.f, 0.f };
-
-  Size textArea( 100.f, 300.f );
-  AlignData data =
-  {
-    "Begin alignment for the first paragraph.",
-    "Hello world שלום עולם\nمرحبا بالعالم Hello world\nHello world مرحبا بالعالم.",
-    textArea,
-    6u,
-    fontDescriptionRuns.Begin(),
-    Text::HorizontalAlignment::END,
-    Text::VerticalAlignment::TOP,
-    0u,
-    22u,
-    6u,
-    positions,
-    Dali::LayoutDirection::RIGHT_TO_LEFT,
-    true
+    positions
   };
 
   if( !AlignTest( data ) )

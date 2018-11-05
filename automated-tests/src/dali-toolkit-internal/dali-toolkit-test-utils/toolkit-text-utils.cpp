@@ -307,8 +307,7 @@ void CreateTextModel( const std::string& text,
                                        Text::HorizontalAlignment::BEGIN,
                                        Text::LineWrap::WORD,
                                        outlineWidth,
-                                       true,
-                                       false );
+                                       true );
 
   Vector<LineRun>& lines = visualModel->mLines;
 
@@ -367,9 +366,7 @@ void CreateTextModel( const std::string& text,
                         characterCount,
                         Text::HorizontalAlignment::BEGIN,
                         lines,
-                        alignmentOffset,
-                        Dali::LayoutDirection::LEFT_TO_RIGHT,
-                        false );
+                        alignmentOffset );
   }
 }
 

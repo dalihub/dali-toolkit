@@ -60,9 +60,6 @@ struct Parameters
    * @param[in] totalNumberOfGlyphs The number of glyphs.
    * @param[in] horizontalAlignment The horizontal alignment.
    * @param[in] lineWrapMode The text wrap mode.
-   * @param[in] outlineWidth The outline width.
-   * @param[in] ignoreSpaceAfterText Whether ignoring spaces after text or not.
-   * @param[in] matchSystemLanguageDirection Whether match align for system language direction or not..
    */
   Parameters( const Vector2& boundingBox,
               const Character* const textBuffer,
@@ -78,8 +75,7 @@ struct Parameters
               Text::HorizontalAlignment::Type horizontalAlignment,
               Text::LineWrap::Mode lineWrapMode,
               float outlineWidth,
-              bool ignoreSpaceAfterText,
-              bool matchSystemLanguageDirection )
+              bool ignoreSpaceAfterText )
   : boundingBox( boundingBox ),
     textBuffer( textBuffer ),
     lineBreakInfoBuffer( lineBreakInfoBuffer ),
@@ -101,8 +97,7 @@ struct Parameters
     lineWrapMode( lineWrapMode ),
     outlineWidth( outlineWidth ),
     isLastNewParagraph( false ),
-    ignoreSpaceAfterText( ignoreSpaceAfterText ),
-    matchSystemLanguageDirection ( matchSystemLanguageDirection )
+    ignoreSpaceAfterText( ignoreSpaceAfterText )
   {}
 
   Vector2                         boundingBox;                     ///< The size of the box containing the text.
@@ -127,7 +122,6 @@ struct Parameters
   float                           outlineWidth;                    ///< The outline width.
   bool                            isLastNewParagraph:1;            ///< Whether the last character is a new paragraph character.
   bool                            ignoreSpaceAfterText:1;          ///< Whether ignoring spaces after text or not. Default is true.
-  bool                            matchSystemLanguageDirection:1;  ///< Whether match align for system language direction or not. Default is false.
 };
 
 } // namespace Layout

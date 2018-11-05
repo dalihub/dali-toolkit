@@ -1351,7 +1351,7 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
     mActiveLayer.SetPosition( padding.start, padding.top );
   }
 
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize, layoutDirection );
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize );
 
   if( ( Text::Controller::NONE_UPDATED != updateTextType ) ||
       !mRenderer )

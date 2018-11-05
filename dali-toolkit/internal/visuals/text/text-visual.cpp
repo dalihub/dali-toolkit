@@ -634,9 +634,7 @@ void TextVisual::UpdateRenderer()
     return;
   }
 
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( control.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
-
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( relayoutSize, layoutDirection );
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( relayoutSize );
 
   if( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType )
    || mRendererUpdateNeeded )

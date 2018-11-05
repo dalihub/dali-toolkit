@@ -101,27 +101,6 @@ namespace Property
      * @note The default value is true
      */
     IGNORE_SPACES_AFTER_TEXT,
-
-    /**
-     * @brief Modifies the default text alignment to match the direction of the system language.
-     * @details Name "matchSystemLanguageDirection", type (Property::BOLEAN), Read/Write
-     * @note The default value is false
-     *
-     * If MATCH_SYSTEM_LANGUAGE_DIRECTION property set true, the default text alignment to match the direction of the system language.
-     *
-     * ex) Current system language direction LTR.
-     *     TextLabel::New("Hello world \n  ﻡﺮﺤﺑﺍ. ");
-     *     TextLabel::Property::HORIZONTAL_ALIGNMENT, "END"
-     *
-     * | TextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION                 |
-     * |-----------------------------------------------------------------------
-     * |        false (default)            |                true              |
-     * |-----------------------------------|----------------------------------|
-     * |                     Hello world   |                  Hello world     |
-     * |   ﻡﺮﺤﺑﺍ.                          |                      ﻡﺮﺤﺑﺍ.      |
-     *
-     */
-    MATCH_SYSTEM_LANGUAGE_DIRECTION,
   };
 
 } // namespace Property

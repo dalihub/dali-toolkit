@@ -239,7 +239,6 @@ public:
   float                                     mAlignmentOffset;         ///< The alignment offset.
   bool                                      mElideEnabled:1;          ///< Whether the text's elide is enabled.
   bool                                      mIgnoreSpacesAfterText:1; ///< Whether ignoring spaces after text or not. Default is true.
-  bool                                      mMatchSystemLanguageDirection:1; ///< Whether match align for system language direction or not. Default is false.
 };
 
 } // namespace Text

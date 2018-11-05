@@ -89,30 +89,6 @@ label.HorizontalAlignment = "BEGIN"; // "CENTER" or "END"
 | ![ ](../assets/img/text-controls/LatinEnd.png) ![ ](LatinEnd.png) | ![ ](../assets/img/text-controls/ArabicEnd.png) ![ ](ArabicEnd.png) |
 
 
-
-The text's alignment can be modified to match the direction of the system language.
-
-If the MATCH_SYSTEM_LANGUAGE_DIRECTION property is set to true then the direction of the text is ignored, instead the text is aligned as the system default language.
-
-~~~{.cpp}
-// C++
-
-label.SetProperty( TextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, true );
-~~~
-
-~~~{.js}
-// JavaScript
-
-label.matchSystemLanguageDirection = true;
-~~~
-
-|  |  |
-|--|--|
-| Current system language direction left-to-right | |
-| END alignment and MATCH_SYSTEM_LANGUAGE_DIRECTION set to TRUE. | END alignment and MATCH_SYSTEM_LANGUAGE_DIRECTION set to FALSE (default). |
-| ![ ](HelloWorld-System-END.png) | ![ ](HelloWorld-Default-END.png) |
-
-
 The examples above assume that the TextLabel size greater than the minimum required.  
 The next section provides details about the other size related options.
 
