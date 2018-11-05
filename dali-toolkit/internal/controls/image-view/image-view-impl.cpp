@@ -410,23 +410,19 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
             // the property map contains only the custom shader
             else if( ( map->Count() == 1u )&&( shaderValue ) )
             {
-              Property::Map* shaderMap = shaderValue->GetMap();
-              if( shaderMap )
-              {
-                impl.mShaderMap = *shaderMap;
+              impl.mShaderMap = *( shaderValue->GetMap() );
 
-                if( !impl.mUrl.empty() )
-                {
-                  impl.SetImage( impl.mUrl, impl.mImageSize );
-                }
-                else if( impl.mImage )
-                {
-                  impl.SetImage( impl.mImage );
-                }
-                else if( !impl.mPropertyMap.Empty() )
-                {
-                  impl.SetImage( impl.mPropertyMap );
-                }
+              if( !impl.mUrl.empty() )
+              {
+                impl.SetImage( impl.mUrl, impl.mImageSize );
+              }
+              else if( impl.mImage )
+              {
+                impl.SetImage( impl.mImage );
+              }
+              else if( !impl.mPropertyMap.Empty() )
+              {
+                impl.SetImage( impl.mPropertyMap );
               }
             }
           }
