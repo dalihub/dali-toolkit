@@ -1226,6 +1226,10 @@ void TextEditor::OnInitialize()
   mController->SetNoTextDoubleTapAction( Controller::NoTextTap::HIGHLIGHT );
   mController->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
 
+  // Sets layoutDirection value
+  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  mController->SetLayoutDirection( layoutDirection );
+
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
@@ -1351,7 +1355,7 @@ void TextEditor::OnRelayout( const Vector2& size, RelayoutContainer& container )
     mActiveLayer.SetPosition( padding.start, padding.top );
   }
 
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize );
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize, layoutDirection );
 
   if( ( Text::Controller::NONE_UPDATED != updateTextType ) ||
       !mRenderer )

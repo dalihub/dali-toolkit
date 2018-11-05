@@ -1243,6 +1243,25 @@ public: // Queries & retrieves.
    */
   void SetIgnoreSpacesAfterText( bool ignore );
 
+  /**
+   * @brief Retrieves matchSystemLanguageDirection value from model
+   * @return The value of matchSystemLanguageDirection
+   */
+  bool IsMatchSystemLanguageDirection() const;
+
+  /**
+   * @brief Sets matchSystemLanguageDirection value to model
+   * @param[in] match The value of matchSystemLanguageDirection for the text
+   */
+  void SetMatchSystemLanguageDirection( bool match );
+
+  /**
+   * @brief Sets layoutDirection value
+   * @param[in] layoutDirection The value of system language direction
+   */
+  void SetLayoutDirection( Dali::LayoutDirection::Type layoutDirection );
+
+
 public: // Relayout.
 
   /**
@@ -1250,10 +1269,11 @@ public: // Relayout.
    *
    * @note UI Controls are expected to minimize calls to this method e.g. call once after size negotiation.
    * @param[in] size A the size of a bounding box to layout text within.
+   * @param[in] layoutDirection The direction of the system language.
    *
    * @return Whether the text model or decorations were updated.
    */
-  UpdateTextType Relayout( const Size& size );
+  UpdateTextType Relayout( const Size& size, Dali::LayoutDirection::Type layoutDirection = Dali::LayoutDirection::LEFT_TO_RIGHT );
 
   /**
    * @brief Request a relayout using the ControlInterface.

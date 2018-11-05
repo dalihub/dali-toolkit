@@ -188,7 +188,8 @@ Model::Model()
   mLineWrapMode( Text::LineWrap::WORD ),
   mAlignmentOffset( 0.0f ),
   mElideEnabled( false ),
-  mIgnoreSpacesAfterText( true )
+  mIgnoreSpacesAfterText( true ),
+  mMatchSystemLanguageDirection( false )
 {
   mLogicalModel = LogicalModel::New();
   mVisualModel = VisualModel::New();

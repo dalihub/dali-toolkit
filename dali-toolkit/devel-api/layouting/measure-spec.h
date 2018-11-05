@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/common/dali-common.h>
 
 // INTERNAL INCLUDES

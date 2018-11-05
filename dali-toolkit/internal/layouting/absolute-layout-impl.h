@@ -63,8 +63,6 @@ private:
   AbsoluteLayout( const AbsoluteLayout& other ) = delete;
   AbsoluteLayout& operator=( const AbsoluteLayout& other ) = delete;
 
-  void ForceUniformHeight( int count, MeasureSpec widthMeasureSpec );
-
 };
 
 } // namespace Internal

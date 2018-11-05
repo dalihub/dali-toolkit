@@ -132,6 +132,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextLabel, "textDirection",
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "verticalLineAlignment",     INTEGER, VERTICAL_LINE_ALIGNMENT    )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textBackground",            MAP,     BACKGROUND                 )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "ignoreSpacesAfterText",     BOOLEAN, IGNORE_SPACES_AFTER_TEXT   )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "matchSystemLanguageDirection", BOOLEAN, MATCH_SYSTEM_LANGUAGE_DIRECTION )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -539,6 +540,11 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         impl.mController->SetIgnoreSpacesAfterText(value.Get< bool >());
         break;
       }
+      case Toolkit::DevelTextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
+      {
+        impl.mController->SetMatchSystemLanguageDirection(value.Get< bool >());
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -842,6 +848,11 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         value = impl.mController->IsIgnoreSpacesAfterText();
         break;
       }
+      case Toolkit::DevelTextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION:
+      {
+        value = impl.mController->IsMatchSystemLanguageDirection();
+        break;
+      }
     }
   }
 
@@ -872,6 +883,10 @@ void TextLabel::OnInitialize()
 
   // Enable the text ellipsis.
   mController->SetTextElideEnabled( true );   // If false then text larger than control will overflow
+
+  // Sets layoutDirection value
+  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  mController->SetLayoutDirection( layoutDirection );
 
   Layout::Engine& engine = mController->GetLayoutEngine();
   engine.SetCursorWidth( 0u ); // Do not layout space for the cursor.
@@ -962,7 +977,10 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
   Vector2 contentSize( size.x - ( padding.start + padding.end ), size.y - ( padding.top + padding.bottom ) );
 
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize );
+  // Support Right-To-Left
+  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( Self().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize, layoutDirection );
 
   if( ( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) )
      || mTextUpdateNeeded )
@@ -973,7 +991,6 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
     TextVisual::EnableRendererUpdate( mVisual );
 
     // Support Right-To-Left of padding
-    Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( Self().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
     if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
     {
       std::swap( padding.start, padding.end );

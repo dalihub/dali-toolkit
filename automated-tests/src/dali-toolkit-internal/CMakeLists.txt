@@ -14,6 +14,7 @@ SET(TC_SOURCES
  utc-Dali-ItemView-internal.cpp
  utc-Dali-LogicalModel.cpp
  utc-Dali-PropertyHelper.cpp
+ utc-Dali-SizeNegotiationMapper.cpp
  utc-Dali-Text-CharacterSetConversion.cpp
  utc-Dali-Text-Controller.cpp
  utc-Dali-Text-Cursor.cpp

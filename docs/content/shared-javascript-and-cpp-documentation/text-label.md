@@ -89,6 +89,41 @@ label.HorizontalAlignment = "BEGIN"; // "CENTER" or "END"
 | ![ ](../assets/img/text-controls/LatinEnd.png) ![ ](LatinEnd.png) | ![ ](../assets/img/text-controls/ArabicEnd.png) ![ ](ArabicEnd.png) |
 
 
+
+The text's alignment and order can be modified to match the direction of the system language.
+
+If the MATCH_SYSTEM_LANGUAGE_DIRECTION property is set to true then the direction of the text is ignored, instead the text is aligned and ordered as the system default language.
+
+~~~{.cpp}
+// C++
+
+label.SetProperty( Toolkit::DevelTextLabel::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, true );
+~~~
+
+~~~{.js}
+// JavaScript
+
+label.matchSystemLanguageDirection = true;
+~~~
+
+|  |  |
+|--|--|
+| Current system language direction left-to-right | |
+| MATCH_SYSTEM_LANGUAGE_DIRECTION set to TRUE. | MATCH_SYSTEM_LANGUAGE_DIRECTION set to FALSE (default). |
+| BEGIN alignment | BEGIN alignment  |
+| ![ ](../assets/img/text-controls/HelloWorld-System-BEGIN.png) ![ ](HelloWorld-System-BEGIN.png) | ![ ](../assets/img/text-controls/HelloWorld-Default-BEGIN.png) ![ ](HelloWorld-Default-BEGIN.png) |
+| CENTER alignment | CENTER alignment  |
+| ![ ](../assets/img/text-controls/HelloWorld-System-CENTER.png) ![ ](HelloWorld-System-CENTER.png) | ![ ](../assets/img/text-controls/HelloWorld-Default-CENTER.png) ![ ](HelloWorld-Default-CENTER.png) |
+| END alignment | END alignment  |
+| ![ ](../assets/img/text-controls/HelloWorld-System-END.png) ![ ](HelloWorld-System-END.png) | ![ ](../assets/img/text-controls/HelloWorld-Default-END.png) ![ ](HelloWorld-Default-END.png) |
+
+
+|  |  |
+|--|--|
+| Current system language direction left-to-right | Current system language direction right-to-left |
+| ![ ](../assets/img/text-controls/LTR_order.png) ![ ](LTR_order.png)  | ![ ](../assets/img/text-controls/RTL_order.png) ![ ](RTL_order.png) |
+
+
 The examples above assume that the TextLabel size greater than the minimum required.  
 The next section provides details about the other size related options.
 

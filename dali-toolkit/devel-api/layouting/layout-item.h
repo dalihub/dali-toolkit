@@ -18,12 +18,15 @@
 
 #include <memory>
 #include <cstdint>
-#include <dali/public-api/common/dali-common.h>
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
 #include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali-toolkit/devel-api/layouting/child-layout-data.h>
 #include <dali-toolkit/devel-api/layouting/measure-spec.h>
+#include <dali-toolkit/devel-api/layouting/layout-transition-data.h>
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
 
 namespace Dali
@@ -37,7 +40,6 @@ class LayoutItem;
 }
 
 using LayoutId = unsigned int;
-
 
 /**
  * Base class for layouts. It is used to layout a control (or visual).
@@ -114,6 +116,23 @@ public:
    * @return True if the layout should be animated when applied
    */
   bool IsLayoutAnimated() const;
+
+  /**
+   * @brief Set the layout transition data
+   *
+   * @param[in] layoutTransitionType The type of the layout transition
+   * @param[in] layoutTransitionData The layout transition data
+   */
+  void SetTransitionData( LayoutTransitionData::LayoutTransitionType layoutTransitionType, LayoutTransitionData layoutTransitionData );
+
+  /**
+   * @brief Get the layout transition data
+   *
+   * @param[in] layoutTransitionType The type of the layout transition
+   *
+   * @return The layout transition data
+   */
+  LayoutTransitionData GetTransitionData( LayoutTransitionData::LayoutTransitionType layoutTransitionType ) const;
 
 public:
   /// @cond internal

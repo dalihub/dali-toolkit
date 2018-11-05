@@ -289,6 +289,11 @@ DALI_TOOLKIT_API Toolkit::LayoutItem GetLayout( Control control );
  *
  * @param[in] control The internal Control to set the layout on
  * @param[in] layout Pointer to the layout
+ * @note Providing an empty layout will remove the current layout and
+ *       replace it with a BinLayout.
+ *       Setting a layout that has already been set will result in the
+ *       original control becoming a BinLayout.  Two Controls can not share
+ *       the same layout.
  */
 DALI_TOOLKIT_API void SetLayout( Internal::Control& control, Toolkit::LayoutItem layout );
 
@@ -297,6 +302,8 @@ DALI_TOOLKIT_API void SetLayout( Internal::Control& control, Toolkit::LayoutItem
  *
  * @param[in] control The Control to set the layout on
  * @param[in] layout Pointer to the layout
+ * @note Providing an empty layout will remove the current layout and
+ *       replace it with a BinLayout.
  */
 DALI_TOOLKIT_API void SetLayout( Control control, Toolkit::LayoutItem layout );
 

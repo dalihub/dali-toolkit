@@ -19,6 +19,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/controls/page-turn-view/page-turn-view.cpp \
   $(devel_api_src_dir)/controls/popup/confirmation-popup.cpp \
   $(devel_api_src_dir)/controls/popup/popup.cpp \
+  $(devel_api_src_dir)/controls/scene3d-view/scene3d-view.cpp \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.cpp \
   $(devel_api_src_dir)/controls/super-blur-view/super-blur-view.cpp \
   $(devel_api_src_dir)/controls/text-controls/text-editor-devel.cpp \
@@ -33,15 +34,17 @@ devel_api_src_files = \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
   $(devel_api_src_dir)/image-loader/image-atlas.cpp \
   $(devel_api_src_dir)/image-loader/texture-manager.cpp \
-  $(devel_api_src_dir)/layouting/flex-layout.cpp \
   $(devel_api_src_dir)/layouting/absolute-layout.cpp \
-  $(devel_api_src_dir)/layouting/linear-layout.cpp \
+  $(devel_api_src_dir)/layouting/bin-layout.cpp \
+  $(devel_api_src_dir)/layouting/flex-layout.cpp \
   $(devel_api_src_dir)/layouting/grid.cpp \
   $(devel_api_src_dir)/layouting/layout-item.cpp \
   $(devel_api_src_dir)/layouting/layout-item-impl.cpp \
   $(devel_api_src_dir)/layouting/layout-controller.cpp \
   $(devel_api_src_dir)/layouting/layout-group.cpp \
   $(devel_api_src_dir)/layouting/layout-group-impl.cpp \
+  $(devel_api_src_dir)/layouting/linear-layout.cpp \
+  $(devel_api_src_dir)/layouting/layout-transition-data.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
   $(devel_api_src_dir)/styling/style-manager-devel.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
@@ -99,6 +102,7 @@ devel_api_layouting_header_files = \
   $(devel_api_src_dir)/layouting/layout-length.h \
   $(devel_api_src_dir)/layouting/layout-parent-impl.h \
   $(devel_api_src_dir)/layouting/layout-size.h \
+  $(devel_api_src_dir)/layouting/layout-transition-data.h \
   $(devel_api_src_dir)/layouting/measured-size.h \
   $(devel_api_src_dir)/layouting/measure-spec.h
 
@@ -131,6 +135,9 @@ devel_api_visuals_header_files = \
   $(devel_api_src_dir)/visuals/image-visual-actions-devel.h \
   $(devel_api_src_dir)/visuals/text-visual-properties-devel.h \
   $(devel_api_src_dir)/visuals/visual-properties-devel.h
+
+devel_api_scene3d_view_header_files = \
+  $(devel_api_src_dir)/controls/scene3d-view/scene3d-view.h
 
 devel_api_shadow_view_header_files = \
   $(devel_api_src_dir)/controls/shadow-view/shadow-view.h

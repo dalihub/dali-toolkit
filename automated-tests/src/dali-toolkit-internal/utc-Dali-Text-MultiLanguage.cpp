@@ -1649,6 +1649,94 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
   Vector<FontDescriptionRun> fontDescriptions11;
   fontDescriptions11.PushBack( fontDescription1101 );
 
+  FontRun fontRun1201 =
+  {
+    {
+      0u,
+      6u
+    },
+    8u
+  };
+  FontRun fontRun1202 =
+  {
+    {
+      6u,
+      1u
+    },
+    9u
+  };
+  FontRun fontRun1203 =
+  {
+    {
+      7u,
+      5u
+    },
+    8u
+  };
+  Vector<FontRun> fontRuns12;
+  fontRuns12.PushBack( fontRun1201 );
+  fontRuns12.PushBack( fontRun1202 );
+  fontRuns12.PushBack( fontRun1203 );
+
+  FontDescriptionRun fontDescription1201 =
+  {
+    {
+      0u,
+      6u
+    },
+    const_cast<char*>( "TizenSans" ),
+    9u,
+    TextAbstraction::FontWeight::NORMAL,
+    TextAbstraction::FontWidth::NORMAL,
+    TextAbstraction::FontSlant::NORMAL,
+    0u,
+    true,
+    false,
+    false,
+    false,
+    false
+  };
+  FontDescriptionRun fontDescription1202 =
+  {
+    {
+      6u,
+      1u
+    },
+    const_cast<char*>( "TizenSans" ),
+    9u,
+    TextAbstraction::FontWeight::NORMAL,
+    TextAbstraction::FontWidth::NORMAL,
+    TextAbstraction::FontSlant::NORMAL,
+    0u,
+    true,
+    false,
+    false,
+    false,
+    false
+  };
+  FontDescriptionRun fontDescription1203 =
+  {
+    {
+      7u,
+      5u
+    },
+    const_cast<char*>( "TizenSans" ),
+    9u,
+    TextAbstraction::FontWeight::NORMAL,
+    TextAbstraction::FontWidth::NORMAL,
+    TextAbstraction::FontSlant::NORMAL,
+    0u,
+    true,
+    false,
+    false,
+    false,
+    false
+  };
+  Vector<FontDescriptionRun> fontDescriptions12;
+  fontDescriptions12.PushBack( fontDescription1201 );
+  fontDescriptions12.PushBack( fontDescription1202 );
+  fontDescriptions12.PushBack( fontDescription1203 );
+
   const ValidateFontsData data[] =
   {
     {
@@ -1761,8 +1849,18 @@ int UtcDaliTextMultiLanguageValidateFonts01(void)
       fontDescriptions11,
       fontRuns11
     },
+    {
+      "Common script.",
+      "Hello \tworld",
+      "/tizen/TizenSansRegular.ttf",
+      TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+      0u,
+      12u,
+      fontDescriptions12,
+      fontRuns12
+    },
   };
-  const unsigned int numberOfTests = 11u;
+  const unsigned int numberOfTests = 12u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {

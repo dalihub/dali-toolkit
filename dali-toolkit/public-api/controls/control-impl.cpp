@@ -573,6 +573,9 @@ void Control::OnStageConnection( int depth )
 
   // The clipping renderer is only created if required.
   CreateClippingRenderer( *this );
+
+  // Request to be laid out when the control is connected to the Stage.
+  Toolkit::DevelControl::RequestLayout( *this );
 }
 
 void Control::OnStageDisconnection()
@@ -708,6 +711,7 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 
 Vector3 Control::GetNaturalSize()
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::GetNaturalSize for %s\n", Self().GetName().c_str() );
   Toolkit::Visual::Base visual = mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
   if( visual )
   {
