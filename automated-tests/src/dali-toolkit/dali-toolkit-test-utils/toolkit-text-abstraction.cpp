@@ -70,8 +70,7 @@ public:
     }
     return bidirectionalSupportHandle;
   }
-  BidiInfoIndex CreateInfo( const Character* const paragraph, Length numberOfCharacters,
-                            bool matchSystemLanguageDirection, LayoutDirection::Type layoutDirection ){return 0;}
+  BidiInfoIndex CreateInfo( const Character* const paragraph, Length numberOfCharacters ){return 0;}
 
   void DestroyInfo( BidiInfoIndex bidiInfoIndex )
   {
@@ -303,11 +302,9 @@ BidirectionalSupport BidirectionalSupport::Get()
 }
 
 BidiInfoIndex BidirectionalSupport::CreateInfo( const Character* const paragraph,
-                                                Length numberOfCharacters,
-                                                bool matchSystemLanguageDirection,
-                                                LayoutDirection::Type layoutDirection )
+                                                Length numberOfCharacters )
 {
-  return GetImplementation( *this ).CreateInfo( paragraph, numberOfCharacters, matchSystemLanguageDirection, layoutDirection );
+  return GetImplementation( *this ).CreateInfo( paragraph, numberOfCharacters );
 }
 
 void BidirectionalSupport::DestroyInfo( BidiInfoIndex bidiInfoIndex )

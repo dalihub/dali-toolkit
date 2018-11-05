@@ -1286,10 +1286,6 @@ void TextField::OnInitialize()
   mController->SetNoTextDoubleTapAction( Controller::NoTextTap::HIGHLIGHT );
   mController->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
 
-  // Sets layoutDirection value
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
-  mController->SetLayoutDirection( layoutDirection );
-
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );

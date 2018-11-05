@@ -88,9 +88,7 @@ void SetBidirectionalInfo( const Vector<Character>& text,
                            const Vector<LineBreakInfo>& lineBreakInfo,
                            CharacterIndex startIndex,
                            Length numberOfCharacters,
-                           Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
-                           bool matchSystemLanguageDirection,
-                           Dali::LayoutDirection::Type layoutDirection )
+                           Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo )
 {
   // Find where to insert the new paragraphs.
   BidirectionalRunIndex bidiInfoIndex = 0u;
@@ -167,9 +165,7 @@ void SetBidirectionalInfo( const Vector<Character>& text,
 
         // Create the bidirectional info for the whole paragraph and store the index to the table with this info in the run.
         bidirectionalRun.bidirectionalInfoIndex = bidirectionalSupport.CreateInfo( textBuffer + bidirectionalRun.characterRun.characterIndex,
-                                                                                   bidirectionalRun.characterRun.numberOfCharacters,
-                                                                                   matchSystemLanguageDirection,
-                                                                                   layoutDirection );
+                                                                                   bidirectionalRun.characterRun.numberOfCharacters );
 
         bidirectionalInfo.Insert( bidirectionalInfo.Begin() + bidiInfoIndex, bidirectionalRun );
         ++bidiInfoIndex;
