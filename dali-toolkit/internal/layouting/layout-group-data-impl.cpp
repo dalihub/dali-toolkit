@@ -26,7 +26,8 @@ namespace Internal
 
 LayoutGroup::Impl::Impl()
 : mChildren(),
-  mNextLayoutId(1)
+  mNextLayoutId(1),
+  mResizePolicyMapped( false )
 {
 }
 

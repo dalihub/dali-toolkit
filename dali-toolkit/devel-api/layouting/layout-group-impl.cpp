@@ -784,11 +784,13 @@ void LayoutGroup::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMea
         // Check below will be true for legacy containers and controls with layout required set.
         // Other layouts will have their own OnMeasure (a checked requirement) hence not execute LayoutGroup::OnMeasure.
         // Controls which have set layout required will not be legacy controls hence should not have a ResizePolicy set.
-        if( childControl.GetChildCount() > 0 )
+        // Only need to map the resize policy the first time as the Layouting system will then set it to FIXED.
+        if( childControl.GetChildCount() > 0 && ! mImpl->mResizePolicyMapped )
         {
           // First pass, Static mappings that are not dependant on parent
           SizeNegotiationMapper::SetLayoutParametersUsingResizePolicy( childControl, childLayout, Dimension::WIDTH );
           SizeNegotiationMapper::SetLayoutParametersUsingResizePolicy( childControl, childLayout, Dimension::HEIGHT );
+          mImpl->mResizePolicyMapped = true;
         }
 
         // Second pass, if any mappings were not possible due to parent size dependancies then calculate an exact desired size for child

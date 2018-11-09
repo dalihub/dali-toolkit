@@ -44,6 +44,7 @@ public:
 
   std::vector<ChildLayout> mChildren;
   Toolkit::LayoutGroup::LayoutId mNextLayoutId;
+  bool mResizePolicyMapped;
 };
 
 
