@@ -30,7 +30,12 @@
 
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_LAYOUT" );
+#endif
+
 // Key tokens
+const char* TOKEN_CONDITION("condition");
 const char* TOKEN_PROPERTY("property");
 const char* TOKEN_INITIAL_VALUE("initialValue");
 const char* TOKEN_TARGET_VALUE("targetValue");
@@ -209,6 +214,10 @@ bool LayoutTransitionData::ConvertToLayoutAnimator( const Property::Map& animato
         Vector2 controlPoint2( controlPoints.z, controlPoints.w );
         layoutDataAnimator.alphaFunction = AlphaFunction( controlPoint1, controlPoint2 );
       }
+      else if ( value.GetType() == Property::INTEGER )
+      {
+        layoutDataAnimator.alphaFunction = AlphaFunction( static_cast<AlphaFunction::BuiltinFunction>( value.Get<int>() ) );
+      }
       else if ( value.GetType() == Property::STRING )
       {
         std::string alphaFunctionValue = value.Get<std::string>();
@@ -371,6 +380,10 @@ bool LayoutTransitionData::ConvertToLayoutDataElement( const PropertyAnimator& p
     if ( pair.first.type == Property::Key::STRING )
     {
       const std::string& key( pair.first.stringKey );
+      if ( key == TOKEN_CONDITION )
+      {
+        indexKey = Dali::Toolkit::LayoutTransitionData::AnimatorKey::CONDITION;
+      }
       if ( key == TOKEN_PROPERTY )
       {
         indexKey = Dali::Toolkit::LayoutTransitionData::AnimatorKey::PROPERTY;
@@ -393,7 +406,11 @@ bool LayoutTransitionData::ConvertToLayoutDataElement( const PropertyAnimator& p
       indexKey = pair.first.indexKey;
     }
 
-    if( indexKey == Dali::Toolkit::LayoutTransitionData::AnimatorKey::PROPERTY )
+    if( indexKey == Dali::Toolkit::LayoutTransitionData::AnimatorKey::CONDITION )
+    {
+      layoutDataElement.condition = value.Get<int>();
+    }
+    else if( indexKey == Dali::Toolkit::LayoutTransitionData::AnimatorKey::PROPERTY )
     {
       if( value.GetType() == Property::STRING )
       {
@@ -449,21 +466,63 @@ bool LayoutTransitionData::ConvertToLayoutDataElement( const PropertyAnimator& p
   return propertyFound;
 }
 
-void LayoutTransitionData::ConvertToLayoutDataElements( Actor owner, LayoutData& layoutData )
+void LayoutTransitionData::ConvertChildrenAnimatorsToLayoutDataElements( Actor child, LayoutData& layoutData )
 {
   LayoutDataArray& layoutDataArray = layoutData.layoutDataArray;
   // Add the children animators
   for( const PropertyAnimator& iter : layoutData.childrenPropertyAnimators )
   {
     LayoutDataElement layoutDataElement;
-    layoutDataElement.handle = owner;
+    layoutDataElement.handle = child;
     layoutDataElement.positionDataIndex = layoutData.layoutPositionDataArray.size() - 1;
 
     if( ConvertToLayoutDataElement( iter, layoutDataElement, layoutData ) )
     {
+      switch ( layoutDataElement.condition )
+      {
+      case Dali::Toolkit::LayoutTransitionData::Condition::ON_ADD:
+        if ( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_ADD
+            || layoutData.layoutTransition.gainedChild != child )
+        {
+          continue;
+        }
+        break;
+      case Dali::Toolkit::LayoutTransitionData::Condition::ON_REMOVE:
+        if( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_REMOVE
+            || layoutData.layoutTransition.lostChild != child )
+        {
+          continue;
+        }
+        break;
+      case Dali::Toolkit::LayoutTransitionData::Condition::ON_FOCUS_GAINED:
+        if( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_FOCUS
+            || layoutData.layoutTransition.gainedChild != child )
+        {
+          continue;
+        }
+        break;
+      case Dali::Toolkit::LayoutTransitionData::Condition::ON_FOCUS_LOST:
+        if( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_FOCUS
+            || layoutData.layoutTransition.lostChild != child )
+        {
+          continue;
+        }
+        break;
+      default:
+        break;
+      }
+
       layoutDataArray.push_back( layoutDataElement );
     }
   }
+}
+
+void LayoutTransitionData::ConvertToLayoutDataElements( Actor owner, LayoutData& layoutData )
+{
+  LayoutDataArray& layoutDataArray = layoutData.layoutDataArray;
+
+  // Add the children animators
+  ConvertChildrenAnimatorsToLayoutDataElements( owner, layoutData );
 
   // Add the transition animators
   for( const PropertyAnimator& iter : mPropertyAnimators )
@@ -493,7 +552,7 @@ void LayoutTransitionData::EmitSignalFinish( int layoutTransitionType )
   if ( !mFinishedSignal.Empty() )
   {
     Dali::Toolkit::LayoutTransitionData handle( this );
-    mFinishedSignal.Emit( static_cast<Dali::Toolkit::LayoutTransitionData::LayoutTransitionType>(layoutTransitionType), handle );
+    mFinishedSignal.Emit( static_cast<Dali::Toolkit::LayoutTransitionData::Type>(layoutTransitionType), handle );
   }
 }
 

@@ -552,7 +552,7 @@ void LayoutGroup::OnInitialize()
       }
     }
 
-    RequestLayout( Dali::Toolkit::LayoutTransitionData::LayoutTransitionType::ON_OWNER_SET );
+    RequestLayout( Dali::Toolkit::LayoutTransitionData::Type::ON_OWNER_SET );
   }
 }
 
@@ -585,7 +585,7 @@ void LayoutGroup::RemoveChild( LayoutItem& item )
 void LayoutGroup::ChildAddedToOwner( Actor child )
 {
   ChildAddedToOwnerImpl( child );
-  RequestLayout( Dali::Toolkit::LayoutTransitionData::LayoutTransitionType::ON_CHILD_ADD );
+  RequestLayout( Dali::Toolkit::LayoutTransitionData::Type::ON_CHILD_ADD, child, Actor() );
 }
 
 void LayoutGroup::ChildAddedToOwnerImpl( Actor child )
@@ -670,7 +670,7 @@ void LayoutGroup::ChildRemovedFromOwner( Actor child )
     if( childLayout )
     {
       Remove( *childLayout.Get() );
-      RequestLayout( Dali::Toolkit::LayoutTransitionData::LayoutTransitionType::ON_CHILD_REMOVE );
+      RequestLayout( Dali::Toolkit::LayoutTransitionData::Type::ON_CHILD_REMOVE, child, Actor() );
     }
   }
 }

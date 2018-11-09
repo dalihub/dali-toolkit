@@ -427,6 +427,11 @@ void Controller::SetMatchSystemLanguageDirection( bool match )
   mImpl->mModel->mMatchSystemLanguageDirection = match;
 }
 
+void Controller::SetLayoutDirection( Dali::LayoutDirection::Type layoutDirection )
+{
+  mImpl->mLayoutDirection = layoutDirection;
+}
+
 
 void Controller::SetLineWrapMode( Text::LineWrap::Mode lineWrapMode )
 {
@@ -2424,6 +2429,7 @@ void Controller::KeyboardFocusGainEvent()
       mImpl->ChangeState( EventData::EDITING );
       mImpl->mEventData->mUpdateCursorPosition = true; //If editing started without tap event, cursor update must be triggered.
       mImpl->mEventData->mUpdateInputStyle = true;
+      mImpl->mEventData->mScrollAfterUpdatePosition = true;
     }
     mImpl->NotifyInputMethodContextMultiLineStatus();
     if( mImpl->IsShowingPlaceholderText() )

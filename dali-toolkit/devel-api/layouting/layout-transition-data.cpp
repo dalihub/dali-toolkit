@@ -48,7 +48,7 @@ void LayoutTransitionData::AddPropertyAnimator( Actor actor, Property::Map map )
   GetImplementation( *this ).AddPropertyAnimator( actor, map );
 }
 
-void LayoutTransitionData::AddPropertyAnimator(  Actor actor, Property::Map map, KeyFrames keyFrames, Animation::Interpolation interpolation )
+void LayoutTransitionData::AddPropertyAnimator( Actor actor, Property::Map map, KeyFrames keyFrames, Animation::Interpolation interpolation )
 {
   GetImplementation( *this ).AddPropertyAnimator( actor, map, keyFrames, interpolation );
 }

@@ -101,6 +101,8 @@ const char* const PROPERTY_NAME_ENABLE_SELECTION                     = "enableSe
 const char* const PROPERTY_NAME_PLACEHOLDER                          = "placeholder";
 const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableShiftSelection";
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGrabHandle";
+const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
+
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -542,6 +544,7 @@ int UtcDaliTextEditorGetPropertyP(void)
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == DevelTextEditor::Property::PLACEHOLDER_TEXT_COLOR );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextEditor::Property::ENABLE_SHIFT_SELECTION );
   DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextEditor::Property::ENABLE_GRAB_HANDLE );
+  DALI_TEST_CHECK( editor.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
 
   END_TEST;
 }
@@ -2870,6 +2873,34 @@ int UtcDaliTextEditorEnableGrabHandleProperty(void)
   // Check the enable grab handle property
   editor.SetProperty( DevelTextEditor::Property::ENABLE_GRAB_HANDLE, false );
   DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::ENABLE_GRAB_HANDLE ), false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliTextEditorMatchSystemLanguageDirectionProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliTextEditorMatchSystemLanguageDirectionProperty");
+
+  TextEditor editor = TextEditor::New();
+  DALI_TEST_CHECK( editor );
+  editor.SetSize( 300.f, 50.f );
+  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  Stage::GetCurrent().Add( editor );
+
+  application.SendNotification();
+  application.Render();
+
+  // The default value of MATCH_SYSTEM_LANGUAGE_DIRECTION is 'false'.
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION ), false, TEST_LOCATION );
+
+  // Check the enable match system language direction property
+  editor.SetProperty( DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, true );
+  DALI_TEST_EQUALS( editor.GetProperty<bool>( DevelTextEditor::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();

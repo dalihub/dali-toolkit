@@ -23,6 +23,7 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
 #include <dali-toolkit/internal/layouting/layout-controller-debug.h>
+#include <dali-toolkit/devel-api/focus-manager/keyinput-focus-manager.h>
 
 using namespace Dali;
 
@@ -44,6 +45,7 @@ namespace Internal
 
 LayoutController::LayoutController()
 : mLayoutRequested( false ),
+  mFocusChangedFunctor( *this ),
   mSlotDelegate( this )
 {
 }
@@ -55,14 +57,32 @@ LayoutController::~LayoutController()
 void LayoutController::Initialize()
 {
   mAnimation = Animation::New( 0.0f );
+
+  Dali::Toolkit::KeyInputFocusManager manager = Dali::Toolkit::KeyInputFocusManager::Get();
+  manager.KeyInputFocusChangedSignal().Connect( mSlotDelegate.GetConnectionTracker(), mFocusChangedFunctor );
 }
 
-void LayoutController::RequestLayout( LayoutItem& layoutItem, int layoutTransitionType )
+void LayoutController::FocusChangedFunctor::operator() ( Dali::Toolkit::Control gainingControl, Dali::Toolkit::Control lostControl )
+{
+  Toolkit::LayoutItem layoutItem = Toolkit::DevelControl::GetLayout( gainingControl );
+  if( layoutItem )
+  {
+    Toolkit::Internal::LayoutItem& layoutItemImpl = GetImplementation( layoutItem );
+    LayoutParent* layoutParent = layoutItemImpl.GetParent();
+    if( layoutParent )
+    {
+      LayoutGroup* layoutGroup = static_cast< LayoutGroup* >( layoutParent );
+      layoutController.RequestLayout( dynamic_cast< Toolkit::Internal::LayoutItem& >( *layoutGroup ), Dali::Toolkit::LayoutTransitionData::ON_CHILD_FOCUS, gainingControl, lostControl );
+    }
+  }
+}
+
+void LayoutController::RequestLayout( LayoutItem& layoutItem, int layoutTransitionType, Actor gainedChild, Actor lostChild )
 {
   auto actor = Actor::DownCast( layoutItem.GetOwner() );
   if ( actor )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutController::RequestLayout owner[%s] layoutItem[%p] layoutAnimationType(%d)\n", actor.GetName().c_str(), &layoutItem, layoutTransitionType );
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutController::RequestLayout owner[%s] layoutItem[%p] layoutTransitionType(%d)\n", actor.GetName().c_str(), &layoutItem, layoutTransitionType );
   }
   else
   {
@@ -72,9 +92,10 @@ void LayoutController::RequestLayout( LayoutItem& layoutItem, int layoutTransiti
   mLayoutRequested = true;
   if( layoutTransitionType != -1 )
   {
-    LayoutTransition layoutTransition = LayoutTransition( layoutItem, layoutTransitionType );
+    LayoutTransition layoutTransition = LayoutTransition( layoutItem, layoutTransitionType, gainedChild, lostChild );
     if( std::find( mLayoutTransitions.begin(), mLayoutTransitions.end(), layoutTransition ) == mLayoutTransitions.end() && layoutItem.GetTransitionData( layoutTransitionType ).Get() )
     {
+      DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutController::RequestLayout Add transition layoutTransitionType(%d)\n", layoutTransitionType );
       mLayoutTransitions.push_back( layoutTransition );
     }
   }
@@ -215,8 +236,16 @@ void LayoutController::PerformLayoutPositioning( LayoutPositionDataArray& layout
     if( actor && ( !layoutPositionData.animated || all ) )
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayoutPositioning %s\n", actor.GetName().c_str() );
-      actor.SetPosition( layoutPositionData.left, layoutPositionData.top );
-      actor.SetSize( layoutPositionData.right - layoutPositionData.left, layoutPositionData.bottom - layoutPositionData.top );
+      if ( !layoutPositionData.animated )
+      {
+        actor.SetPosition( layoutPositionData.left, layoutPositionData.top );
+        actor.SetSize( layoutPositionData.right - layoutPositionData.left, layoutPositionData.bottom - layoutPositionData.top );
+      }
+      else
+      {
+        actor.SetPosition( actor.GetCurrentPosition() );
+        actor.SetSize( actor.GetCurrentSize() );
+      }
     }
   }
 }
@@ -328,13 +357,8 @@ void LayoutController::PerformLayoutAnimation( LayoutTransition& layoutTransitio
   {
     if( mAnimation.GetState() == Animation::PLAYING )
     {
-      mAnimation.Clear();
-      if( mAnimationFinishedFunctors.size() != 0 )
-      {
-        mAnimationFinishedFunctors.front()( mAnimation );
-      }
+      mAnimation.SetCurrentProgress( 1.0f );
     }
-
     mAnimation = animation;
     mAnimationFinishedFunctors.push_back( AnimationFinishedFunctor( *this, layoutTransition, layoutPositionDataArray ) );
     mAnimation.FinishedSignal().Connect( mSlotDelegate.GetConnectionTracker(), mAnimationFinishedFunctors.back() );
