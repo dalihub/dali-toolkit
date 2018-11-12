@@ -34,15 +34,17 @@ devel_api_src_files = \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
   $(devel_api_src_dir)/image-loader/image-atlas.cpp \
   $(devel_api_src_dir)/image-loader/texture-manager.cpp \
-  $(devel_api_src_dir)/layouting/flex-layout.cpp \
   $(devel_api_src_dir)/layouting/absolute-layout.cpp \
-  $(devel_api_src_dir)/layouting/linear-layout.cpp \
+  $(devel_api_src_dir)/layouting/bin-layout.cpp \
+  $(devel_api_src_dir)/layouting/flex-layout.cpp \
   $(devel_api_src_dir)/layouting/grid.cpp \
   $(devel_api_src_dir)/layouting/layout-item.cpp \
   $(devel_api_src_dir)/layouting/layout-item-impl.cpp \
   $(devel_api_src_dir)/layouting/layout-controller.cpp \
   $(devel_api_src_dir)/layouting/layout-group.cpp \
   $(devel_api_src_dir)/layouting/layout-group-impl.cpp \
+  $(devel_api_src_dir)/layouting/linear-layout.cpp \
+  $(devel_api_src_dir)/layouting/layout-transition-data.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
   $(devel_api_src_dir)/shader-effects/alpha-discard-effect.cpp \
   $(devel_api_src_dir)/shader-effects/dissolve-effect.cpp \
@@ -107,6 +109,7 @@ devel_api_layouting_header_files = \
   $(devel_api_src_dir)/layouting/layout-length.h \
   $(devel_api_src_dir)/layouting/layout-parent-impl.h \
   $(devel_api_src_dir)/layouting/layout-size.h \
+  $(devel_api_src_dir)/layouting/layout-transition-data.h \
   $(devel_api_src_dir)/layouting/measured-size.h \
   $(devel_api_src_dir)/layouting/measure-spec.h
 

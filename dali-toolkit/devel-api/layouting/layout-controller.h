@@ -62,10 +62,19 @@ public:
   static LayoutController Get();
 
   /**
-   * @brief Request for a particular layout (wrapping a control or a visual) to be measured and laid out.
-   * @param[in] layout The layout to measure & relayout.
-   */
+    * @brief Request for a particular layout (wrapping a control or a visual) to be measured and laid out. A specified layout transition
+    * will be triggered during the layout.
+    * @param[in] layout The layout to measure & relayout.
+    */
   void RequestLayout( LayoutItem layout );
+
+  /**
+   * @brief Request for a particular layout (wrapping a control or a visual) to be measured and laid out. A specified layout transition
+   * will be triggered during the layout.
+   * @param[in] layout The layout to measure & relayout.
+   * @param[in] layoutTransitionType The layout transition type.
+   */
+  void RequestLayout( LayoutItem layout, Dali::Toolkit::LayoutTransitionData::LayoutTransitionType layoutTransitionType );
 
 public:
   /// @cond internal

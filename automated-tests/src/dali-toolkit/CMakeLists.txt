@@ -10,6 +10,7 @@ SET(TC_SOURCES
   utc-Dali-AbsoluteLayout.cpp
   utc-Dali-Alignment.cpp
   utc-Dali-AnimatedImageVisual.cpp
+  utc-Dali-BinLayout.cpp
   utc-Dali-BloomView.cpp
   utc-Dali-BubbleEmitter.cpp
   utc-Dali-Builder.cpp
@@ -26,6 +27,10 @@ SET(TC_SOURCES
   utc-Dali-JsonParser.cpp
   utc-Dali-KeyInputFocusManager.cpp
   utc-Dali-Layouting.cpp
+  utc-Dali-LayoutingAnimation.cpp
+  utc-Dali-LayoutingNesting.cpp
+  utc-Dali-LayoutingResizePolicy.cpp
+  utc-Dali-LayoutingSettingAndRemoval.cpp
   utc-Dali-PageTurnView.cpp
   utc-Dali-Scene3dView.cpp
   utc-Dali-Script.cpp

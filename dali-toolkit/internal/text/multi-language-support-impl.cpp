@@ -436,8 +436,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   Vector<ScriptRun>::ConstIterator scriptRunEndIt = scripts.End();
   bool isNewParagraphCharacter = false;
 
-  FontId currentFontId = 0u;
-  FontId previousFontId = 0u;
   bool isPreviousEmojiScript = false;
 
   // Description of fallback font which is selected at current iteration.
@@ -465,7 +463,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
     // Get the font for the current character.
     FontId fontId = fontClient.GetFontId( currentFontDescription, currentFontPointSize );
-    currentFontId = fontId;
 
     // Get the script for the current character.
     Script script = GetScript( index,
@@ -553,133 +550,107 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       //      supports the 'white space'. However, that font may not support the DEVANAGARI script.
       isCommonScript = TextAbstraction::IsCommonScript( character );
 
-      if( isCommonScript )
+      // Check in the valid fonts cache.
+      ValidateFontsPerScript* validateFontsPerScript = *( validFontsPerScriptCacheBuffer + script );
+
+      if( NULL != validateFontsPerScript )
       {
-        if( isValidCachedDefaultFont &&
-            ( isDefaultFont || ( currentFontId == previousFontId ) ) &&
-            !isEmojiScript )
+        // This cache stores valid fonts set by the user.
+        isValidFont = validateFontsPerScript->IsValidFont( fontId );
+
+        // It may happen that a validated font for a script doesn't have all the glyphs for that script.
+        // i.e a font validated for the CJK script may contain glyphs for the chinese language but not for the Japanese.
+        if( isValidFont )
         {
-          // At this point the character common for all scripts has no font assigned.
-          // If there is a valid previously cached default font for it, use that one.
-          fontId = cachedDefaultFontId;
+          // Checks if the current character is supported by the font is needed.
+          isValidFont = fontClient.IsCharacterSupportedByFont( fontId, character );
         }
       }
-      else
+
+      if( !isValidFont ) // (2)
       {
-        // Check in the valid fonts cache.
-        ValidateFontsPerScript* validateFontsPerScript = *( validFontsPerScriptCacheBuffer + script );
+        // The selected font is not stored in any cache.
 
-        if( NULL != validateFontsPerScript )
+        // Checks if the current character is supported by the selected font.
+        isValidFont = fontClient.IsCharacterSupportedByFont( fontId, character );
+
+        // Emojis are present in many monochrome fonts; prefer color by default.
+        if( isValidFont &&
+            isEmojiScript )
         {
-          // This cache stores valid fonts set by the user.
-          isValidFont = validateFontsPerScript->IsValidFont( fontId );
+          const GlyphIndex glyphIndex = fontClient.GetGlyphIndex( fontId, character );
 
-          // It may happen that a validated font for a script doesn't have all the glyphs for that script.
-          // i.e a font validated for the CJK script may contain glyphs for the chinese language but not for the Japanese.
-          if( isValidFont )
-          {
-            // Checks if the current character is supported by the font is needed.
-            isValidFont = fontClient.IsCharacterSupportedByFont( fontId, character );
-          }
+          // For color emojis, the font is valid if the glyph is a color glyph (the bitmap is RGBA).
+          isValidFont = fontClient.IsColorGlyph( fontId, glyphIndex );
         }
 
-        if( !isValidFont ) // (2)
+        // If there is a valid font, cache it.
+        if( isValidFont && !isCommonScript )
         {
-          // The selected font is not stored in any cache.
-
-          // Checks if the current character is supported by the selected font.
-          isValidFont = fontClient.IsCharacterSupportedByFont( fontId, character );
-
-          // Emojis are present in many monochrome fonts; prefer color by default.
-          if( isValidFont &&
-              isEmojiScript )
+          if( NULL == validateFontsPerScript )
           {
-            const GlyphIndex glyphIndex = fontClient.GetGlyphIndex( fontId, character );
+            validateFontsPerScript = new ValidateFontsPerScript();
 
-            // For color emojis, the font is valid if the glyph is a color glyph (the bitmap is RGBA).
-            isValidFont = fontClient.IsColorGlyph( fontId, glyphIndex );
+            *( validFontsPerScriptCacheBuffer + script ) = validateFontsPerScript;
           }
 
-          // If there is a valid font, cache it.
-          if( isValidFont )
+          validateFontsPerScript->mValidFonts.PushBack( fontId );
+        }
+
+        if( !isValidFont && ( fontId != cachedDefaultFontId ) && ( !TextAbstraction::IsNewParagraph( character ) )) // (3)
+        {
+          // The selected font by the user or the platform's default font has failed to validate the character.
+
+          // Checks if the previously discarted cached default font supports the character.
+          bool isValidCachedFont = false;
+          if( isValidCachedDefaultFont )
           {
-            if( NULL == validateFontsPerScript )
-            {
-              validateFontsPerScript = new ValidateFontsPerScript();
-
-              *( validFontsPerScriptCacheBuffer + script ) = validateFontsPerScript;
-            }
-
-            validateFontsPerScript->mValidFonts.PushBack( fontId );
+            isValidCachedFont = fontClient.IsCharacterSupportedByFont( cachedDefaultFontId, character );
           }
 
-          if( !isValidFont && ( fontId != cachedDefaultFontId ) ) // (3)
+          if( isValidCachedFont )
           {
-            // The selected font by the user or the platform's default font has failed to validate the character.
+            // Use the cached default font for the script if there is one.
+            fontId = cachedDefaultFontId;
+          }
+          else
+          {
+            // There is no valid cached default font for the script.
 
-            // Checks if the previously discarted cached default font supports the character.
-            bool isValidCachedFont = false;
-            if( isValidCachedDefaultFont )
+            DefaultFonts* defaultFontsPerScript = NULL;
+
+            // Emojis are present in many monochrome fonts; prefer color by default.
+            const bool preferColor = ( TextAbstraction::EMOJI == script );
+
+            // Find a fallback-font.
+            fontId = fontClient.FindFallbackFont( character,
+                                                  currentFontDescription,
+                                                  currentFontPointSize,
+                                                  preferColor );
+
+            if( 0u == fontId )
             {
-              isValidCachedFont = fontClient.IsCharacterSupportedByFont( cachedDefaultFontId, character );
+              fontId = fontClient.FindDefaultFont( UTF32_A, currentFontPointSize );
             }
 
-            if( isValidCachedFont )
+            if ( !isCommonScript && (script != TextAbstraction::UNKNOWN) )
             {
-              // Use the cached default font for the script if there is one.
-              fontId = cachedDefaultFontId;
-            }
-            else
-            {
-              // There is no valid cached default font for the script.
-
-              DefaultFonts* defaultFontsPerScript = NULL;
-
-              // Emojis are present in many monochrome fonts; prefer color by default.
-              const bool preferColor = ( TextAbstraction::EMOJI == script );
-
-              // Find a fallback-font.
-              fontId = fontClient.FindFallbackFont( character,
-                                                    currentFontDescription,
-                                                    currentFontPointSize,
-                                                    preferColor );
-
-              if( 0u == fontId )
+              // Cache the font if it is not an unknown script
+              if( NULL == defaultFontsPerScript )
               {
-                // If the system does not support a suitable font, fallback to Latin
-                defaultFontsPerScript = *( defaultFontPerScriptCacheBuffer + TextAbstraction::LATIN );
-                if( NULL != defaultFontsPerScript )
-                {
-                  fontId = defaultFontsPerScript->FindFont( fontClient,
-                                                            currentFontDescription,
-                                                            currentFontPointSize );
-                }
-              }
+                defaultFontsPerScript = *( defaultFontPerScriptCacheBuffer + script );
 
-              if( 0u == fontId )
-              {
-                fontId = fontClient.FindDefaultFont( UTF32_A, currentFontPointSize );
-              }
-
-              if ( script != TextAbstraction::UNKNOWN )
-              {
-                // Cache the font if it is not an unknown script
                 if( NULL == defaultFontsPerScript )
                 {
-                  defaultFontsPerScript = *( defaultFontPerScriptCacheBuffer + script );
-
-                  if( NULL == defaultFontsPerScript )
-                  {
-                    defaultFontsPerScript = new DefaultFonts();
-                    *( defaultFontPerScriptCacheBuffer + script ) = defaultFontsPerScript;
-                  }
+                  defaultFontsPerScript = new DefaultFonts();
+                  *( defaultFontPerScriptCacheBuffer + script ) = defaultFontsPerScript;
                 }
-                defaultFontsPerScript->Cache( currentFontDescription, fontId );
               }
+              defaultFontsPerScript->Cache( currentFontDescription, fontId );
             }
-          } // !isValidFont (3)
-        } // !isValidFont (2)
-      } // !isCommonScript
+          }
+        } // !isValidFont (3)
+      } // !isValidFont (2)
     } // !isValidFont (1)
 
 #ifdef DEBUG_ENABLED
@@ -734,7 +705,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
     // Whether the current character is a new paragraph character.
     isNewParagraphCharacter = TextAbstraction::IsNewParagraph( character );
-    previousFontId = currentFontId;
     isPreviousEmojiScript = isEmojiScript;
   } // end traverse characters.
 
