@@ -363,7 +363,6 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
              // If request is enable (true) then start autoscroll as not already running
              else
              {
-               impl.mController->SetTextElideEnabled( false );
                impl.mController->SetAutoScrollEnabled( enableAutoScroll );
              }
           }

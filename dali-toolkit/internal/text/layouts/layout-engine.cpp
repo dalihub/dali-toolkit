@@ -555,6 +555,7 @@ struct Engine::Impl
    * @param[in,out] numberOfLines The number of laid-out lines.
    * @param[in] penY The vertical layout position.
    * @param[in] currentParagraphDirection The current paragraph's direction.
+   * @param[in,out] isAutoScrollEnabled If the isAutoScrollEnabled is true and the height of the text exceeds the boundaries of the control the text is elided and the isAutoScrollEnabled is set to false to disable the autoscroll
    *
    * return Whether the line is ellipsized.
    */
@@ -565,14 +566,17 @@ struct Engine::Impl
                      Vector2* glyphPositionsBuffer,
                      Length& numberOfLines,
                      float penY,
-                     CharacterDirection currentParagraphDirection )
+                     CharacterDirection currentParagraphDirection,
+                     bool& isAutoScrollEnabled )
   {
-    const bool ellipsis = ( ( penY - layout.descender > layoutParameters.boundingBox.height ) ||
-                            ( ( mLayout == SINGLE_LINE_BOX ) &&
-                              ( layout.extraBearing + layout.length + layout.extraWidth > layoutParameters.boundingBox.width ) ) );
+    const bool ellipsis = isAutoScrollEnabled ? ( penY - layout.descender > layoutParameters.boundingBox.height ) :
+                                                ( ( penY - layout.descender > layoutParameters.boundingBox.height ) ||
+                                                  ( ( mLayout == SINGLE_LINE_BOX ) &&
+                                                  ( layout.extraBearing + layout.length + layout.extraWidth > layoutParameters.boundingBox.width ) ) );
 
     if( ellipsis )
     {
+      isAutoScrollEnabled = false;
       // Do not layout more lines if ellipsis is enabled.
 
       // The last line needs to be completely filled with characters.
@@ -791,7 +795,8 @@ struct Engine::Impl
                    Vector<Vector2>& glyphPositions,
                    Vector<LineRun>& lines,
                    Size& layoutSize,
-                   bool elideTextEnabled )
+                   bool elideTextEnabled,
+                   bool& isAutoScrollEnabled )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->LayoutText\n" );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  box size %f, %f\n", layoutParameters.boundingBox.width, layoutParameters.boundingBox.height );
@@ -925,7 +930,8 @@ struct Engine::Impl
                                  glyphPositionsBuffer,
                                  numberOfLines,
                                  penY,
-                                 currentParagraphDirection );
+                                 currentParagraphDirection,
+                                 isAutoScrollEnabled );
       }
 
       if( ellipsis )
@@ -1291,13 +1297,15 @@ bool Engine::LayoutText( const Parameters& layoutParameters,
                          Vector<Vector2>& glyphPositions,
                          Vector<LineRun>& lines,
                          Size& layoutSize,
-                         bool elideTextEnabled )
+                         bool elideTextEnabled,
+                         bool& isAutoScrollEnabled )
 {
   return mImpl->LayoutText( layoutParameters,
                             glyphPositions,
                             lines,
                             layoutSize,
-                            elideTextEnabled );
+                            elideTextEnabled,
+                            isAutoScrollEnabled );
 }
 
 void Engine::ReLayoutRightToLeftLines( const Parameters& layoutParameters,
