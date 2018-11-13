@@ -94,7 +94,9 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
   void main()\n
   {\n
-    mediump vec4 vertexPosition = uProjection*uViewMatrix*uModelMatrix*ComputeVertexPosition();\n
+    mediump vec4 nonAlignedVertex = uViewMatrix*uModelMatrix*ComputeVertexPosition();\n
+    mediump vec4 pixelAlignedVertex = vec4 ( floor(nonAlignedVertex.xyz), 1.0 );\n
+    mediump vec4 vertexPosition = uProjection*pixelAlignedVertex;\n
 
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
     gl_Position = vertexPosition;\n
