@@ -2876,6 +2876,18 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
   application.SendNotification();
   application.Render();
 
+  // init direction for coverage
+  // Set horizontal alignment END
+  field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "END");
+
+  // Create a tap event to touch the text field.
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
   // Set MATCH_SYSTEM_LANGUAGE_DIRECTION to true to use the layout direction.
   field.SetProperty( DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, true );
   field.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );

@@ -68,12 +68,17 @@ LayoutController LayoutController::Get()
 
 void LayoutController::RequestLayout( LayoutItem layout )
 {
-  GetImpl( *this ).RequestLayout( GetImplementation( layout ), -1 );
+  GetImpl( *this ).RequestLayout( GetImplementation( layout ), -1, Actor(), Actor() );
 }
 
-void LayoutController::RequestLayout( LayoutItem layout, Dali::Toolkit::LayoutTransitionData::LayoutTransitionType layoutTransitionType  )
+void LayoutController::RequestLayout( LayoutItem layout, Dali::Toolkit::LayoutTransitionData::Type layoutTransitionType )
 {
-  GetImpl( *this ).RequestLayout( GetImplementation( layout ), layoutTransitionType );
+  GetImpl( *this ).RequestLayout( GetImplementation( layout ), layoutTransitionType, Actor(), Actor() );
+}
+
+void LayoutController::RequestLayout( LayoutItem layout, Dali::Toolkit::LayoutTransitionData::Type layoutTransitionType, Actor gainedChild, Actor lostChild  )
+{
+  GetImpl( *this ).RequestLayout( GetImplementation( layout ), layoutTransitionType, gainedChild, lostChild );
 }
 
 LayoutController::LayoutController( Internal::LayoutController *impl )

@@ -2742,40 +2742,23 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
     bool isRTL = false;
-    HorizontalAlignment::Type alignment = mModel->mHorizontalAlignment;
     if( mModel->mMatchSystemLanguageDirection )
     {
       isRTL = mLayoutDirection == LayoutDirection::RIGHT_TO_LEFT;
     }
-    // Swap the alignment type if the line is right to left.
-    if( isRTL )
-    {
-      switch( alignment )
-      {
-        case HorizontalAlignment::BEGIN:
-        {
-          alignment = HorizontalAlignment::END;
-          break;
-        }
-        case HorizontalAlignment::CENTER:
-        {
-          // Nothing to do.
-          break;
-        }
-        case HorizontalAlignment::END:
-        {
-          alignment = HorizontalAlignment::BEGIN;
-          break;
-        }
-      }
-    }
 
-
-    switch( alignment )
+    switch( mModel->mHorizontalAlignment )
     {
       case Text::HorizontalAlignment::BEGIN :
       {
-        cursorInfo.primaryPosition.x = 0.f;
+        if( isRTL )
+        {
+          cursorInfo.primaryPosition.x = mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
+        }
+        else
+        {
+          cursorInfo.primaryPosition.x = 0.f;
+        }
         break;
       }
       case Text::HorizontalAlignment::CENTER:
@@ -2785,7 +2768,14 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
       }
       case Text::HorizontalAlignment::END:
       {
-        cursorInfo.primaryPosition.x = mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
+        if( isRTL )
+        {
+          cursorInfo.primaryPosition.x = 0.f;
+        }
+        else
+        {
+          cursorInfo.primaryPosition.x = mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
+        }
         break;
       }
     }

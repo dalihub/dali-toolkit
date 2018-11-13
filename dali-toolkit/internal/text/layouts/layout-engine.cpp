@@ -1150,52 +1150,41 @@ struct Engine::Impl
                                      bool matchSystemLanguageDirection )
   {
     line.alignmentOffset = 0.f;
-    bool isLineRTL = RTL == line.direction;
-    bool isRTL = isLineRTL;
+    const bool isLineRTL = RTL == line.direction;
+    // Whether to swap the alignment.
+    // Swap if the line is RTL and is not required to match the direction of the system's language or if it's required to match the direction of the system's language and it's RTL.
+    bool isLayoutRTL = isLineRTL;
     float lineLength = line.width;
-    HorizontalAlignment::Type alignment = horizontalAlignment;
 
     // match align for system language direction
     if( matchSystemLanguageDirection )
     {
-      isRTL = layoutDirection == LayoutDirection::RIGHT_TO_LEFT;
+      // Swap the alignment type if the line is right to left.
+      isLayoutRTL = layoutDirection == LayoutDirection::RIGHT_TO_LEFT;
     }
-
-    // Swap the alignment type if the line is right to left.
-    if( isRTL )
-    {
-      switch( alignment )
-      {
-        case HorizontalAlignment::BEGIN:
-        {
-          alignment = HorizontalAlignment::END;
-          break;
-        }
-        case HorizontalAlignment::CENTER:
-        {
-          // Nothing to do.
-          break;
-        }
-        case HorizontalAlignment::END:
-        {
-          alignment = HorizontalAlignment::BEGIN;
-          break;
-        }
-      }
-
-    }
-
     // Calculate the horizontal line offset.
-    switch( alignment )
+    switch( horizontalAlignment )
     {
       case HorizontalAlignment::BEGIN:
       {
-        line.alignmentOffset = 0.f;
-
-        if( isLineRTL )
+        if( isLayoutRTL )
         {
-          // 'Remove' the white spaces at the end of the line (which are at the beginning in visual order)
-          line.alignmentOffset -= line.extraLength;
+          if( isLineRTL )
+          {
+            lineLength += line.extraLength;
+          }
+
+          line.alignmentOffset = boxWidth - lineLength;
+        }
+        else
+        {
+          line.alignmentOffset = 0.f;
+
+          if( isLineRTL )
+          {
+            // 'Remove' the white spaces at the end of the line (which are at the beginning in visual order)
+            line.alignmentOffset -= line.extraLength;
+          }
         }
         break;
       }
@@ -1213,12 +1202,25 @@ struct Engine::Impl
       }
       case HorizontalAlignment::END:
       {
-        if( isLineRTL )
+        if( isLayoutRTL )
         {
-          lineLength += line.extraLength;
-        }
+          line.alignmentOffset = 0.f;
 
-        line.alignmentOffset = boxWidth - lineLength;
+          if( isLineRTL )
+          {
+            // 'Remove' the white spaces at the end of the line (which are at the beginning in visual order)
+            line.alignmentOffset -= line.extraLength;
+          }
+        }
+        else
+        {
+          if( isLineRTL )
+          {
+            lineLength += line.extraLength;
+          }
+
+          line.alignmentOffset = boxWidth - lineLength;
+        }
         break;
       }
     }

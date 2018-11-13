@@ -55,7 +55,7 @@ bool LayoutItem::IsLayoutAnimated() const
   return GetImplementation( *this ).IsLayoutAnimated();
 }
 
-void LayoutItem::SetTransitionData( LayoutTransitionData::LayoutTransitionType layoutTransitionType, LayoutTransitionData layoutTransitionData )
+void LayoutItem::SetTransitionData( LayoutTransitionData::Type layoutTransitionType, LayoutTransitionData layoutTransitionData )
 {
   Toolkit::Internal::LayoutTransitionDataPtr layoutTransitionDataPtr = Toolkit::Internal::LayoutTransitionDataPtr();
   if ( layoutTransitionData )
@@ -65,7 +65,7 @@ void LayoutItem::SetTransitionData( LayoutTransitionData::LayoutTransitionType l
   GetImplementation( *this ).SetTransitionData( layoutTransitionType, layoutTransitionDataPtr );
 }
 
-LayoutTransitionData LayoutItem::GetTransitionData( LayoutTransitionData::LayoutTransitionType layoutTransitionType ) const
+LayoutTransitionData LayoutItem::GetTransitionData( LayoutTransitionData::Type layoutTransitionType ) const
 {
   return LayoutTransitionData( GetImplementation( *this ).GetTransitionData( layoutTransitionType ).Get() );
 }
