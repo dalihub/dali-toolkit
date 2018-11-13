@@ -36,6 +36,9 @@ namespace Internal
 class LayoutTransitionData;
 }
 
+/**
+ * @brief The LayoutTransitionData class to collect the actors properties animators for layout transitions.
+ */
 class DALI_TOOLKIT_API LayoutTransitionData final : public BaseHandle
 {
 public:
@@ -47,6 +50,7 @@ public:
   {
     enum Type
     {
+      CONDITION,          ///< A condition triggering the transition animation (the actor is added/removed/focus gained/focus lost)
       PROPERTY,           ///< A property to animate
       INITIAL_VALUE,      ///< Initial value of an animated property
       TARGET_VALUE,       ///< Target value of an animated property
@@ -60,14 +64,30 @@ public:
     };
   };
 
-  enum LayoutTransitionType
+  struct Condition
   {
-    ON_CHILD_ADD,
-    ON_CHILD_REMOVE,
-    ON_OWNER_SET
+    enum Type
+    {
+      NONE,            ///< Default, no conditions to animate property. The property is animated for all relevant animations related to a control
+      ON_ADD,          ///< A condition to animate property when a control is added to the container
+      ON_REMOVE,       ///< A condition to animate property when a control is removed from the container
+      ON_FOCUS_GAINED, ///< A condition to animate property when a control focus is gained
+      ON_FOCUS_LOST,   ///< A condition to animate property when a control focus is lost
+    };
   };
 
-  typedef Signal< void (LayoutTransitionData::LayoutTransitionType, LayoutTransitionData&) > LayoutTransitionSignalType; ///< Transition finished signal
+  enum Type
+  {
+    // Children related transitions
+    ON_CHILD_ADD,          ///< A transition is triggered when a control is added to the container
+    ON_CHILD_REMOVE,       ///< A transition is triggered when a control is removed from the container
+    ON_CHILD_FOCUS,        ///< A transition is triggered when a control focus is changed in the container
+    // Layout related transitions
+    ON_OWNER_SET,          ///< A transition is triggered when a layout is set to a new container
+    ON_LAYOUT_CHANGE,      ///< A transition is triggered when a layout geometry is changed
+  };
+
+  typedef Signal< void (LayoutTransitionData::Type, LayoutTransitionData&) > LayoutTransitionSignalType; ///< Transition finished signal
 
   /**
    * Create an uninitialized handle
@@ -102,7 +122,8 @@ public:
   /**
    * @brief Add a property animator for an actor
    *
-   * @param[in] actor An owner of the animated property
+   * @param[in] actor An owner of the animated property.
+   *                  If actor is empty then the property animator is generic and apply to all children excluding the parent if the condition is met.
    * @param[in] map The animated property map including animator map
    */
   void AddPropertyAnimator( Actor actor, Property::Map map );
@@ -111,6 +132,7 @@ public:
    * @brief Add a property animator for an actor
    *
    * @param[in] actor An owner of the animated property
+   *                  If actor is empty then the property animator is generic and apply to all children excluding the parent if the condition is met.
    * @param[in] map The properties map
    * @param[in] keyFrames key frames
    * @param[in] interpolation An interpolation
@@ -121,6 +143,7 @@ public:
    * @brief Add a property animator for an actor
    *
    * @param[in] actor An owner of the animated property
+   *                  If actor is empty then the property animator is generic and apply to all children excluding the parent if the condition is met.
    * @param[in] map A properties map
    * @param[in] path An animation path
    * @param[in] forward A forward vector for the path

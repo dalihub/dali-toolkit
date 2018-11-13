@@ -2741,11 +2741,24 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     cursorInfo.lineHeight = GetDefaultFontLineHeight();
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
+    bool isRTL = false;
+    if( mModel->mMatchSystemLanguageDirection )
+    {
+      isRTL = mLayoutDirection == LayoutDirection::RIGHT_TO_LEFT;
+    }
+
     switch( mModel->mHorizontalAlignment )
     {
       case Text::HorizontalAlignment::BEGIN :
       {
-        cursorInfo.primaryPosition.x = 0.f;
+        if( isRTL )
+        {
+          cursorInfo.primaryPosition.x = mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
+        }
+        else
+        {
+          cursorInfo.primaryPosition.x = 0.f;
+        }
         break;
       }
       case Text::HorizontalAlignment::CENTER:
@@ -2755,7 +2768,14 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
       }
       case Text::HorizontalAlignment::END:
       {
-        cursorInfo.primaryPosition.x = mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
+        if( isRTL )
+        {
+          cursorInfo.primaryPosition.x = 0.f;
+        }
+        else
+        {
+          cursorInfo.primaryPosition.x = mModel->mVisualModel->mControlSize.width - mEventData->mDecorator->GetCursorWidth();
+        }
         break;
       }
     }

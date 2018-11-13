@@ -80,9 +80,13 @@ public:
 
   static bool sUseZeroUnspecifiedMeasureSpec;
 
+  // Custom transitions
   LayoutTransitionDataPtr mOnChildAddTransitionData;
   LayoutTransitionDataPtr mOnChildRemoveTransitionData;
+  LayoutTransitionDataPtr mOnChildFocusTransitionData;
   LayoutTransitionDataPtr mOnOwnerSetTransitionData;
+  LayoutTransitionDataPtr mOnLayoutChangeTransitionData;
+  // Default transition
   LayoutTransitionDataPtr mDefaultTransitionData;
 
   // To pass layout data during perform layout

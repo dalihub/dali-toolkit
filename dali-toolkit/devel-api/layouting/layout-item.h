@@ -123,7 +123,7 @@ public:
    * @param[in] layoutTransitionType The type of the layout transition
    * @param[in] layoutTransitionData The layout transition data
    */
-  void SetTransitionData( LayoutTransitionData::LayoutTransitionType layoutTransitionType, LayoutTransitionData layoutTransitionData );
+  void SetTransitionData( LayoutTransitionData::Type layoutTransitionType, LayoutTransitionData layoutTransitionData );
 
   /**
    * @brief Get the layout transition data
@@ -132,7 +132,7 @@ public:
    *
    * @return The layout transition data
    */
-  LayoutTransitionData GetTransitionData( LayoutTransitionData::LayoutTransitionType layoutTransitionType ) const;
+  LayoutTransitionData GetTransitionData( LayoutTransitionData::Type layoutTransitionType ) const;
 
 public:
   /// @cond internal

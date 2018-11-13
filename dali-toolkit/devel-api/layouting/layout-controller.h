@@ -74,7 +74,17 @@ public:
    * @param[in] layout The layout to measure & relayout.
    * @param[in] layoutTransitionType The layout transition type.
    */
-  void RequestLayout( LayoutItem layout, Dali::Toolkit::LayoutTransitionData::LayoutTransitionType layoutTransitionType );
+  void RequestLayout( LayoutItem layout, Dali::Toolkit::LayoutTransitionData::Type layoutTransitionType );
+
+  /**
+   * @brief Request for a particular layout (wrapping a control or a visual) to be measured and laid out. A specified layout transition
+   * will be triggered during the layout.
+   * @param[in] layout The layout to measure & relayout.
+   * @param[in] layoutTransitionType The layout transition type.
+   * @param[in] gainedChild The gained layout owner's child.
+   * @param[in] lostChild The lost layout owner's child.
+   */
+  void RequestLayout( LayoutItem layout, Dali::Toolkit::LayoutTransitionData::Type layoutTransitionType, Actor gainedChild, Actor lostChild );
 
 public:
   /// @cond internal
