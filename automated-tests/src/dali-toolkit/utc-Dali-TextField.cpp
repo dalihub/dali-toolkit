@@ -103,7 +103,6 @@ const char* const PROPERTY_NAME_PLACEHOLDER                          = "placehol
 const char* const PROPERTY_NAME_ELLIPSIS                             = "ellipsis";
 const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableShiftSelection";
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGrabHandle";
-const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
 
 const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 
@@ -549,7 +548,6 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ELLIPSIS ) == TextField::Property::ELLIPSIS );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextField::Property::ENABLE_SHIFT_SELECTION );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextField::Property::ENABLE_GRAB_HANDLE );
-  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
 
   END_TEST;
 }
@@ -2825,108 +2823,6 @@ int UtcDaliTextFieldEnableGrabHandleProperty(void)
   END_TEST;
 }
 
-int UtcDaliTextFieldMatchSystemLanguageDirectionProperty(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline("UtcDaliTextFieldMatchSystemLanguageDirectionProperty");
-
-  TextField field = TextField::New();
-  DALI_TEST_CHECK( field );
-  field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  Stage::GetCurrent().Add( field );
-
-  application.SendNotification();
-  application.Render();
-
-  // The default value of MATCH_SYSTEM_LANGUAGE_DIRECTION is 'false'.
-  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION ), false, TEST_LOCATION );
-
-  // Check the match system language direction property
-  field.SetProperty( DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, true );
-  DALI_TEST_EQUALS( field.GetProperty<bool>( DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION ), true, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render();
-
-  END_TEST;
-}
-
-int utcDaliTextFieldLayoutDirectionCoverage(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldLayoutDirectionCoverage");
-
-  // Creates a tap event. After creating a tap event the text field should
-  // have the focus and add text with key events should be possible.
-  TextField field = TextField::New();
-  DALI_TEST_CHECK( field );
-
-  Stage::GetCurrent().Add( field );
-
-  field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-
-  // Avoid a crash when core load gl resources.
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Set MATCH_SYSTEM_LANGUAGE_DIRECTION to true to use the layout direction.
-  field.SetProperty( DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION, true );
-  field.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
-
-  // Set horizontal alignment BEGIN
-  field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "BEGIN");
-
-  // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Set horizontal alignment CENTER
-  field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "CENTER");
-
-  // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Set horizontal alignment END
-  field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "END");
-
-  // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  // Generate a Esc key event. The text field should lose the focus.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-
-  // Render and notify
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( false, field.HasKeyInputFocus(), TEST_LOCATION );
-
-  END_TEST;
-}
-
-
 int UtcDaliTextFieldGetInputMethodContext(void)
 {
   ToolkitTestApplication application;
@@ -2937,4 +2833,3 @@ int UtcDaliTextFieldGetInputMethodContext(void)
 
   END_TEST;
 }
-

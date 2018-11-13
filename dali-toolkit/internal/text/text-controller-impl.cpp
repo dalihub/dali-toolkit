@@ -2741,37 +2741,7 @@ void Controller::Impl::GetCursorPosition( CharacterIndex logical,
     cursorInfo.lineHeight = GetDefaultFontLineHeight();
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
-    bool isRTL = false;
-    HorizontalAlignment::Type alignment = mModel->mHorizontalAlignment;
-    if( mModel->mMatchSystemLanguageDirection )
-    {
-      isRTL = mLayoutDirection == LayoutDirection::RIGHT_TO_LEFT;
-    }
-    // Swap the alignment type if the line is right to left.
-    if( isRTL )
-    {
-      switch( alignment )
-      {
-        case HorizontalAlignment::BEGIN:
-        {
-          alignment = HorizontalAlignment::END;
-          break;
-        }
-        case HorizontalAlignment::CENTER:
-        {
-          // Nothing to do.
-          break;
-        }
-        case HorizontalAlignment::END:
-        {
-          alignment = HorizontalAlignment::BEGIN;
-          break;
-        }
-      }
-    }
-
-
-    switch( alignment )
+    switch( mModel->mHorizontalAlignment )
     {
       case Text::HorizontalAlignment::BEGIN :
       {
