@@ -1361,6 +1361,11 @@ public: // Text-input Event Queuing.
    */
   bool ShouldClearFocusOnEscape() const;
 
+  /**
+   * @brief UpdateLayoutDirectionChanged
+   */
+  void UpdateLayoutDirectionChanged( Dali::LayoutDirection::Type type );
+
 protected: // Inherit from Text::Decorator::ControllerInterface.
 
   /**
