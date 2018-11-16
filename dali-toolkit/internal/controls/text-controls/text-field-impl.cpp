@@ -1304,7 +1304,8 @@ void TextField::OnInitialize()
   mController->SetNoTextLongPressAction( Controller::NoTextTap::HIGHLIGHT );
 
   // Sets layoutDirection value
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  Dali::Stage stage = Dali::Stage::GetCurrent();
+  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( stage.GetRootLayer().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
   mController->SetLayoutDirection( layoutDirection );
 
   // Forward input events to controller
