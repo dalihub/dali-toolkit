@@ -71,9 +71,7 @@ int UtcDaliLayoutingNesting_01(void)
     |
   Control (LinearLayout Horizontal)
     |
-  Control (LayoutingRequired)
-    |
-  Control (LinearLayout Horizontal)
+  Control (LinearLayout Vertical)
     |
   LeafControl
 
@@ -81,8 +79,6 @@ int UtcDaliLayoutingNesting_01(void)
 
   ToolkitTestApplication application;
   tet_infoline("UtcDaliLayoutingNesting_01 - Nesting a LinearLayout (MATCH_PARENT) containing a leaf control within a LinearLayout");
-
-  Stage stage = Stage::GetCurrent();
 
   auto rootControl = Control::New();
   SetupRootLayoutControl( rootControl );
@@ -110,7 +106,7 @@ int UtcDaliLayoutingNesting_01(void)
 
   for( auto&& iter : controls )
   {
-    hbox.Add( iter );
+    vbox.Add( iter );
   }
 
   rootControl.Add( hbox );
@@ -134,10 +130,8 @@ int UtcDaliLayoutingNesting_02(void)
   Root
     |
   Control (LinearLayout Horizontal)
-    |
-  Control (LayoutingRequired)
-    |
-  Control (LinearLayout Horizontal)
+    |    |
+  Control (LinearLayout Vertical)
     |    |
   LeafControl
 
@@ -146,8 +140,6 @@ int UtcDaliLayoutingNesting_02(void)
   ToolkitTestApplication application;
   tet_infoline("UtcDaliLayoutingNesting_02 - Nesting a LinearLayout (MATCH_PARENT) containing a leaf control within a LinearLayout");
   tet_infoline("Then change the parent's size and test child responded correctly");
-
-  Stage stage = Stage::GetCurrent();
 
   auto rootControl = Control::New();
   SetupRootLayoutControl( rootControl );
@@ -175,7 +167,7 @@ int UtcDaliLayoutingNesting_02(void)
 
   for( auto&& iter : controls )
   {
-    hbox.Add( iter );
+    vbox.Add( iter );
   }
 
   rootControl.Add( hbox );
@@ -198,6 +190,65 @@ int UtcDaliLayoutingNesting_02(void)
   DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 400.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( vbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 400.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 40.0f, 40.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayoutingNesting_LeafSizeChange(void)
+{
+ /*
+  Root
+    |
+  Control (LayoutingRequired)
+    |
+  Control (LinearLayout Horizontal)  (WRAP_CONTENT)
+    |    |
+  TextLabel
+  */
+
+  ToolkitTestApplication application;
+  tet_infoline("UtcDaliLayoutingNesting_LeafSizeChange - Nesting a TextLabel within a layout that is parented to a control");
+  tet_infoline("Then change the TextLabels size and test the parent resized to wrap the new size");
+
+  auto rootControl = Control::New();
+  SetupRootLayoutControl( rootControl );
+
+  auto control = Control::New();
+  DevelControl::SetLayoutingRequired( control, true );
+  control.SetName( "control" );
+
+  auto hbox = Control::New();
+  auto hboxLayout = LinearLayout::New();
+  hboxLayout.SetOrientation( LinearLayout::Orientation::HORIZONTAL );
+  DevelControl::SetLayout( hbox, hboxLayout );
+  hbox.SetName( "hBox" );
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  hbox.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+
+  control.Add( hbox );
+
+  TextLabel textLabel = CreateTextLabel("SmallText" );
+
+  hbox.Add( textLabel );
+
+  rootControl.Add( control );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 260.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 260.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  tet_infoline("Changing to longer text");
+  textLabel.SetProperty( TextLabel::Property::TEXT, "muchlongerText" );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 432.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 432.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }
