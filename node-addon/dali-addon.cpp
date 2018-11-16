@@ -73,14 +73,6 @@ public:
       // 3. start the adaptor
       adaptor->Start();
 
-      // Set the view modes
-
-      if( options.stereo.viewMode > Dali::MONO )
-      {
-        adaptor->SetStereoBase( options.stereo.stereoBase );
-        adaptor->SetViewMode( options.stereo.viewMode );
-      }
-
       // fire the scene create signal
       adaptor->NotifySceneCreated();
 

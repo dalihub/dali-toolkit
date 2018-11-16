@@ -79,9 +79,6 @@
  + [Visual Debug Rendering](@ref debugrendering)
  + [Stagehand - DALi Visual Debugger](@ref stagehand)
 
-### Viewing Modes
- + [Overview](@ref viewing-modes)
-
 ### Extending DALi
  + [How to write Custom UI Components](@ref creating-custom-controls)
   + [Size Negotiation for Controls](@ref size-negotiation-controls)
