@@ -888,8 +888,15 @@ void TextLabel::OnInitialize()
   Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
   mController->SetLayoutDirection( layoutDirection );
 
+  self.LayoutDirectionChangedSignal().Connect( this, &TextLabel::OnLayoutDirectionChanged );
+
   Layout::Engine& engine = mController->GetLayoutEngine();
   engine.SetCursorWidth( 0u ); // Do not layout space for the cursor.
+}
+
+void TextLabel::OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type )
+{
+  mController->UpdateLayoutDirectionChanged( type );
 }
 
 void TextLabel::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
