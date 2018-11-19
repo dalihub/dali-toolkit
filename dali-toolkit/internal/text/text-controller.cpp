@@ -2328,6 +2328,7 @@ Controller::UpdateTextType Controller::Relayout( const Size& size, Dali::LayoutD
                         mImpl->mOperationsPending,
                         layoutSize ) || updated;
 
+
   if( updated )
   {
     updateTextType = MODEL_UPDATED;
@@ -3601,12 +3602,15 @@ bool Controller::DoRelayout( const Size& size,
     }
 
     // Update the visual model.
+    bool isAutoScrollEnabled = mImpl->mIsAutoScrollEnabled;
     Size newLayoutSize;
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
                                                    glyphPositions,
                                                    mImpl->mModel->mVisualModel->mLines,
                                                    newLayoutSize,
-                                                   elideTextEnabled );
+                                                   elideTextEnabled,
+                                                   isAutoScrollEnabled );
+    mImpl->mIsAutoScrollEnabled = isAutoScrollEnabled;
 
     viewUpdated = viewUpdated || ( newLayoutSize != layoutSize );
 

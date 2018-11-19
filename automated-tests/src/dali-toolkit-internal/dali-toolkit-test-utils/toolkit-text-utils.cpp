@@ -323,11 +323,13 @@ void CreateTextModel( const std::string& text,
   layoutParameters.startLineIndex = 0u;
   layoutParameters.estimatedNumberOfLines = logicalModel->mParagraphInfo.Count();
 
+  bool isAutoScroll = false;
   layoutEngine.LayoutText( layoutParameters,
                            glyphPositions,
                            lines,
                            layoutSize,
-                           false );
+                           false,
+                           isAutoScroll );
 
   // 10) Reorder the lines
   if( 0u != bidirectionalInfo.Count() )

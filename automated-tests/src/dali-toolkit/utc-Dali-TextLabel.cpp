@@ -553,9 +553,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::PIXEL_SIZE ), 20.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Check the ellipsis property
-  DALI_TEST_CHECK( !label.GetProperty<bool>( TextLabel::Property::ELLIPSIS ) );
-  label.SetProperty( TextLabel::Property::ELLIPSIS, true );
   DALI_TEST_CHECK( label.GetProperty<bool>( TextLabel::Property::ELLIPSIS ) );
+  label.SetProperty( TextLabel::Property::ELLIPSIS, false );
+  DALI_TEST_CHECK( !label.GetProperty<bool>( TextLabel::Property::ELLIPSIS ) );
 
   // Check the layout direction property
   label.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
