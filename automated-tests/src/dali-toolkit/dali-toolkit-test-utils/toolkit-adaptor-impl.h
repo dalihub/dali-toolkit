@@ -38,6 +38,10 @@ class TestRenderSurface : public RenderSurface
 public:
   virtual PositionSize GetPositionSize() const { PositionSize size; return size; }
 
+  virtual uint32_t GetOrientation() const { return 0; }
+
+  virtual bool IsPreRotationSupported() const { return false; }
+
   virtual void InitializeEgl( EglInterface& egl ) {}
 
   virtual void CreateEglSurface( EglInterface& egl ) {}
