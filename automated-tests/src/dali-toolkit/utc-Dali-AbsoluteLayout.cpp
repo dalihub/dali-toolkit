@@ -69,7 +69,6 @@ int UtcDaliLayouting_AbsoluteLayoutAssignment(void)
   END_TEST;
 }
 
-
 int UtcDaliLayouting_AbsoluteLayout01(void)
 {
   ToolkitTestApplication application;
@@ -117,6 +116,46 @@ int UtcDaliLayouting_AbsoluteLayout01(void)
   DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_AbsoluteLayout_SetPosition(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_AbsoluteLayout_GetWorldPosition - Testing WorldPosition");
+
+  Stage stage = Stage::GetCurrent();
+
+  Dali::Toolkit::Control layoutControl = Dali::Toolkit::Control::New();
+  layoutControl.SetName("AsoluteLayout");
+  layoutControl.SetAnchorPoint( Dali::AnchorPoint::CENTER );
+  layoutControl.SetParentOrigin( Dali::ParentOrigin::CENTER );
+
+  Dali::Toolkit::AbsoluteLayout absoluteLayout = Dali::Toolkit::AbsoluteLayout::New();
+  Dali::Toolkit::DevelControl::SetLayout( layoutControl, absoluteLayout );
+
+  stage.GetRootLayer().Add( layoutControl );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render(0);
+
+  Dali::Toolkit::Control control = Dali::Toolkit::Control::New();
+  control.SetSize( 100.0f, 100.0f );
+  control.SetParentOrigin( ParentOrigin::CENTER );
+  control.SetAnchorPoint( AnchorPoint::CENTER );
+  Vector3 parentPosition( 1.0f, 2.0f, 3.0f );
+  control.SetPosition( parentPosition );
+
+  layoutControl.Add( control );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render(0);
+
+  // The value of z should not be zero
+  DALI_TEST_EQUALS( control.GetCurrentPosition(), parentPosition, TEST_LOCATION );
 
   END_TEST;
 }
