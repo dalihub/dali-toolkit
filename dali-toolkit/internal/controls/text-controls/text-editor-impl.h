@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
 #include <dali/public-api/animation/animation.h>
+#include <dali/public-api/common/stage.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -259,13 +260,6 @@ private: // Implementation
    * Emit ScrollBarStateChanged Signal and toggle mScrollStarted flag to false
    */
   void OnScrollIndicatorAnimationFinished( Animation& animation );
-
-  /**
-   * @brief Callbacks when the layout direction changes
-   * @param[in] actor The actor whose layoutDirection is changed.
-   * @param[in] type  The layoutDirection.
-   */
-  void OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type );
 
   /**
    * Construct a new TextEditor.

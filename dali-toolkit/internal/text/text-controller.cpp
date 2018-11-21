@@ -2250,7 +2250,7 @@ Controller::UpdateTextType Controller::Relayout( const Size& size, Dali::LayoutD
 
   UpdateTextType updateTextType = NONE_UPDATED;
 
-  mImpl->mLayoutDirection = layoutDirection;
+
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
     if( 0u != mImpl->mModel->mVisualModel->mGlyphPositions.Count() )
@@ -2316,6 +2316,21 @@ Controller::UpdateTextType Controller::Relayout( const Size& size, Dali::LayoutD
                                                              REORDER );
     mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
     mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
+  }
+
+  if( mImpl->mModel->mMatchSystemLanguageDirection  && mImpl->mLayoutDirection != layoutDirection )
+  {
+    // Clear the update info. This info will be set the next time the text is updated.
+    mImpl->mTextUpdateInfo.mClearAll = true;
+    // Apply modifications to the model
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                             GET_GLYPH_METRICS         |
+                                                             SHAPE_TEXT                |
+                                                             UPDATE_DIRECTION          |
+                                                             LAYOUT                    |
+                                                             BIDI_INFO                 |
+                                                             REORDER );
+    mImpl->mLayoutDirection = layoutDirection;
   }
 
   // Make sure the model is up-to-date before layouting.
@@ -4076,14 +4091,6 @@ void Controller::SetControlInterface( ControlInterface* controlInterface )
 bool Controller::ShouldClearFocusOnEscape() const
 {
   return mImpl->mShouldClearFocusOnEscape;
-}
-
-void Controller::UpdateLayoutDirectionChanged(  Dali::LayoutDirection::Type type )
-{
-  mImpl->mLayoutDirection = type;
-  mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
-                                                                           BIDI_INFO );
-  mImpl->RequestRelayout();
 }
 
 // private : Private contructors & copy operator.
