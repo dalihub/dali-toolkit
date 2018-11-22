@@ -166,6 +166,11 @@ Dali::Animation ControlWrapper::CreateTransition( const Toolkit::TransitionData&
   return DevelControl::CreateTransition( *this, handle );
 }
 
+void ControlWrapper::EmitKeyInputFocusSignal( bool focusGained )
+{
+  Control::EmitKeyInputFocusSignal( focusGained );
+}
+
 void ControlWrapper::ApplyThemeStyle()
 {
   Toolkit::StyleManager styleManager = StyleManager::Get();
