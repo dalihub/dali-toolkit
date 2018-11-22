@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/property-map.h>
+#include <dali/public-api/common/stage.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -118,13 +119,6 @@ private: // from TextScroller
    * @copydoc Text::ScrollerInterface::ScrollingFinished()
    */
   virtual void ScrollingFinished();
-
-  /**
-   * @brief Callbacks when the layout direction changes
-   * @param[in] actor The actor whose layoutDirection is changed.
-   * @param[in] type  The layoutDirection.
-   */
-  void OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type );
 
 private: // Implementation
 
