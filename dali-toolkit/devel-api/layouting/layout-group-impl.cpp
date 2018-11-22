@@ -512,7 +512,6 @@ void LayoutGroup::OnInitialize()
 
     DevelActor::ChildAddedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildAddedToOwner );
     DevelActor::ChildRemovedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildRemovedFromOwner );
-    DevelActor::ChildOrderChangedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildOrderChanged );
     DevelHandle::PropertySetSignal( control ).Connect( mSlotDelegate, &LayoutGroup::OnOwnerPropertySet );
 
     if( control.GetParent() )
@@ -571,7 +570,6 @@ void LayoutGroup::OnUnparent()
   {
     DevelActor::ChildAddedSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::ChildAddedToOwner );
     DevelActor::ChildRemovedSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::ChildRemovedFromOwner );
-    DevelActor::ChildOrderChangedSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::ChildOrderChanged );
     DevelHandle::PropertySetSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::OnOwnerPropertySet );
   }
 }
