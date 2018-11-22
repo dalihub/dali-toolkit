@@ -238,19 +238,13 @@ void LayoutController::PerformLayoutPositioning( LayoutPositionDataArray& layout
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayoutPositioning %s\n", actor.GetName().c_str() );
       if ( !layoutPositionData.animated )
       {
-        actor.SetX( layoutPositionData.left );
-        actor.SetY( layoutPositionData.top );
-
-        actor.SetProperty( Actor::Property::SIZE_WIDTH, layoutPositionData.right - layoutPositionData.left );
-        actor.SetProperty( Actor::Property::SIZE_HEIGHT, layoutPositionData.bottom - layoutPositionData.top );
+        actor.SetPosition( layoutPositionData.left, layoutPositionData.top );
+        actor.SetSize( layoutPositionData.right - layoutPositionData.left, layoutPositionData.bottom - layoutPositionData.top );
       }
       else
       {
-        actor.SetX( actor.GetCurrentPosition().x );
-        actor.SetY( actor.GetCurrentPosition().y );
-
-        actor.SetProperty( Actor::Property::SIZE_WIDTH, actor.GetCurrentSize().x );
-        actor.SetProperty( Actor::Property::SIZE_HEIGHT, actor.GetCurrentSize().y );
+        actor.SetPosition( actor.GetCurrentPosition() );
+        actor.SetSize( actor.GetCurrentSize() );
       }
     }
   }
