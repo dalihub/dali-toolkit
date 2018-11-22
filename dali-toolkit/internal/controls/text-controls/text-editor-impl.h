@@ -261,13 +261,6 @@ private: // Implementation
   void OnScrollIndicatorAnimationFinished( Animation& animation );
 
   /**
-   * @brief Callbacks when the layout direction changes
-   * @param[in] actor The actor whose layoutDirection is changed.
-   * @param[in] type  The layoutDirection.
-   */
-  void OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type );
-
-  /**
    * Construct a new TextEditor.
    */
   TextEditor();

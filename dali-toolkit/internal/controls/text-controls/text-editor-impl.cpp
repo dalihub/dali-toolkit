@@ -1247,8 +1247,6 @@ void TextEditor::OnInitialize()
   Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
   mController->SetLayoutDirection( layoutDirection );
 
-  self.LayoutDirectionChangedSignal().Connect( this, &TextEditor::OnLayoutDirectionChanged );
-
   // Forward input events to controller
   EnableGestureDetection( static_cast<Gesture::Type>( Gesture::Tap | Gesture::Pan | Gesture::LongPress ) );
   GetTapGestureDetector().SetMaximumTapsRequired( 2 );
@@ -1293,11 +1291,6 @@ void TextEditor::OnInitialize()
   mStencil.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   self.Add( mStencil );
-}
-
-void TextEditor::OnLayoutDirectionChanged( Dali::Actor actor, Dali::LayoutDirection::Type type )
-{
-  mController->UpdateLayoutDirectionChanged( type );
 }
 
 void TextEditor::OnStyleChange( Toolkit::StyleManager styleManager, StyleChange::Type change )
