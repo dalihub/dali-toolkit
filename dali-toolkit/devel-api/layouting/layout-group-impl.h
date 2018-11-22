@@ -111,19 +111,6 @@ public:
   Toolkit::LayoutGroup::LayoutId Insert( LayoutItem& target, LayoutItem& child ) override;
 
   /**
-   * @brief Move a child to another position
-   * @param[in] target The target item
-   * @param[in] child The item to move
-   */
-  Toolkit::LayoutGroup::LayoutId Move( LayoutItem& target, LayoutItem& child ) override;
-
-  /**
-   * @brief Move a child to back
-   * @param[in] child The item to move
-   */
-  Toolkit::LayoutGroup::LayoutId MoveBack( LayoutItem& child ) override;
-
-  /**
    * @brief Remove all layout children.
    *
    * @note This will not unparent owner's children
@@ -302,11 +289,6 @@ private:
    * Callback when child is removed from owner
    */
   void ChildRemovedFromOwner( Actor child );
-
-  /**
-   * Callback when child order is changed
-   */
-  void ChildOrderChanged( Actor child );
 
   /**
    * Callback when an owner property is set. Triggers a relayout if it's a child property
