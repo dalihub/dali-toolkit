@@ -4078,6 +4078,14 @@ bool Controller::ShouldClearFocusOnEscape() const
   return mImpl->mShouldClearFocusOnEscape;
 }
 
+void Controller::UpdateLayoutDirectionChanged(  Dali::LayoutDirection::Type type )
+{
+  mImpl->mLayoutDirection = type;
+  mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                                           BIDI_INFO );
+  mImpl->RequestRelayout();
+}
+
 // private : Private contructors & copy operator.
 
 Controller::Controller()
