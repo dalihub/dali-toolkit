@@ -40,7 +40,8 @@ public:
     REGULAR_IMAGE,
     N_PATCH,
     SVG,
-    GIF
+    GIF,
+    JSON
   };
 
   enum ProtocolType
