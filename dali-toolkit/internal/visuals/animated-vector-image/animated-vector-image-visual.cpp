@@ -26,12 +26,13 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
-#include <dali-toolkit/internal/visuals/animated-vector-image/vector-image-rasterize-thread.h>
-#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
+#include <dali-toolkit/internal/visuals/animated-vector-image/vector-rasterize-thread.h>
 
 namespace Dali
 {
@@ -46,6 +47,7 @@ namespace
 {
 
 const Dali::Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
+constexpr auto LOOP_FOREVER = -1;
 
 } // unnamed namespace
 
@@ -69,8 +71,10 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
   mImageVisualShaderFactory( shaderFactory ),
   mUrl( imageUrl ),
   mVisualSize(),
+  mPlayRange( 0.0f, 1.0f ),
   mPlacementActor(),
   mVectorRasterizeThread(),
+  mLoopCount( LOOP_FOREVER ),
   mActionStatus( DevelAnimatedVectorImageVisual::Action::STOP )
 {
   // the rasterized image is with pre-multiplied alpha format
@@ -94,6 +98,8 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   {
     map.Insert( Toolkit::ImageVisual::Property::URL, mUrl.GetUrl() );
   }
+  map.Insert( Toolkit::DevelImageVisual::Property::LOOP_COUNT, static_cast< int >( mLoopCount ) );
+  map.Insert( Toolkit::DevelImageVisual::Property::PLAY_RANGE, static_cast< Vector2 >( mPlayRange ) );
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -111,11 +117,63 @@ void AnimatedVectorImageVisual::DoSetProperties( const Property::Map& propertyMa
     {
       DoSetProperty( keyValue.first.indexKey, keyValue.second );
     }
+    else
+    {
+       if( keyValue.first == LOOP_COUNT_NAME )
+       {
+          DoSetProperty( Toolkit::DevelImageVisual::Property::LOOP_COUNT, keyValue.second );
+       }
+       else if( keyValue.first == PLAY_RANGE_NAME )
+       {
+          DoSetProperty( Toolkit::DevelImageVisual::Property::PLAY_RANGE, keyValue.second );
+       }
+    }
   }
 }
 
 void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Property::Value& value )
 {
+  switch(index)
+  {
+    case Toolkit::DevelImageVisual::Property::LOOP_COUNT:
+    {
+      int32_t loopCount;
+      if( value.Get( loopCount ) )
+      {
+        mLoopCount = loopCount;
+        if( mVectorRasterizeThread )
+        {
+          mVectorRasterizeThread->SetLoopCount( loopCount );
+        }
+      }
+      break;
+    }
+    case Toolkit::DevelImageVisual::Property::PLAY_RANGE:
+    {
+      Vector2 range;
+      if( value.Get( range ) )
+      {
+        // Make sure the range specified is between 0.0 and 1.0
+        if( range.x >= 0.0f && range.x <= 1.0f && range.y >= 0.0f && range.y <= 1.0f )
+        {
+          Vector2 orderedRange( range );
+          // If the range is not in order swap values
+          if( range.x > range.y )
+          {
+            orderedRange = Vector2( range.y, range.x );
+          }
+
+          mPlayRange = orderedRange;
+
+          if( mVectorRasterizeThread )
+          {
+            mVectorRasterizeThread->SetPlayRange( mPlayRange );
+          }
+        }
+      }
+      break;
+    }
+  }
 }
 
 void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
@@ -193,6 +251,9 @@ void AnimatedVectorImageVisual::OnSetTransform()
         mVectorRasterizeThread = std::unique_ptr< VectorRasterizeThread >( new VectorRasterizeThread( mUrl.GetUrl(), mImpl->mRenderer, width, height ) );
 
         mVectorRasterizeThread->SetResourceReadyCallback( new EventThreadCallback( MakeCallback( this, &AnimatedVectorImageVisual::OnResourceReady ) ) );
+        mVectorRasterizeThread->SetLoopCount( mLoopCount );
+        mVectorRasterizeThread->SetPlayRange( mPlayRange );
+
         mVectorRasterizeThread->Start();
 
         if( mActionStatus == DevelAnimatedVectorImageVisual::Action::PLAY )
@@ -208,7 +269,10 @@ void AnimatedVectorImageVisual::OnSetTransform()
       }
       else
       {
-        // TODO: change size
+        uint32_t width = static_cast< uint32_t >( visualSize.width );
+        uint32_t height = static_cast< uint32_t >( visualSize.height );
+
+        mVectorRasterizeThread->SetSize( width, height );
       }
     }
   }

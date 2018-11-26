@@ -82,6 +82,7 @@ extern const char * const RELEASE_POLICY_NAME;
 extern const char * const ORIENTATION_CORRECTION_NAME;
 extern const char * const AUXILLARY_IMAGE_NAME;
 extern const char * const AUXILLARY_IMAGE_ALPHA_NAME;
+extern const char * const PLAY_RANGE_NAME;
 
 // Text visual
 extern const char * const TEXT_PROPERTY;

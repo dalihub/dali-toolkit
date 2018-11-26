@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali-toolkit/internal/visuals/animated-vector-image/vector-image-rasterize-thread.h>
+#include <dali-toolkit/internal/visuals/animated-vector-image/vector-rasterize-thread.h>
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/adaptors/adaptor.h>
@@ -36,6 +36,8 @@ namespace Internal
 namespace
 {
 
+constexpr auto LOOP_FOREVER = -1;
+
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VECTOR_ANIMATION" );
 #endif
@@ -45,11 +47,18 @@ Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging,
 VectorRasterizeThread::VectorRasterizeThread( const std::string& url, Renderer renderer, uint32_t width, uint32_t height )
 : mUrl( url ),
   mVectorRenderer(),
+  mConditionalWait(),
+  mMutex(),
   mResourceReadyTrigger( NULL ),
+  mPlayRange( 0.0f, 1.0f ),
   mCurrentFrame( 0 ),
   mTotalFrame( 0 ),
+  mStartFrame( 0 ),
+  mEndFrame( 0 ),
   mWidth( width ),
   mHeight( height ),
+  mLoopCount( LOOP_FOREVER ),
+  mCurrentLoop( 0 ),
   mNeedRender( false ),
   mPlaying( false ),
   mPaused( false ),
@@ -90,6 +99,14 @@ void VectorRasterizeThread::Run()
   {
     Rasterize();
   }
+}
+
+void VectorRasterizeThread::SetSize( uint32_t width, uint32_t height )
+{
+  ConditionalWait::ScopedLock lock( mConditionalWait );
+  mVectorRenderer.SetSize( width, height );
+
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetSize: width = %d, height = %d\n", width, height );
 }
 
 void VectorRasterizeThread::StartAnimation()
@@ -151,7 +168,32 @@ void VectorRasterizeThread::RenderFrame()
 
 void VectorRasterizeThread::SetResourceReadyCallback( EventThreadCallback* callback )
 {
+  ConditionalWait::ScopedLock lock( mConditionalWait );
   mResourceReadyTrigger = callback;
+}
+
+void VectorRasterizeThread::SetLoopCount( int16_t count )
+{
+  ConditionalWait::ScopedLock lock( mConditionalWait );
+
+  mLoopCount = count;
+
+  // Reset progress
+  mCurrentLoop = 0;
+  mCurrentFrame = mStartFrame;
+}
+
+void VectorRasterizeThread::SetPlayRange( Vector2 range )
+{
+  ConditionalWait::ScopedLock lock( mConditionalWait );
+
+  mPlayRange = range;
+
+  if( mTotalFrame != 0 )
+  {
+    mStartFrame = static_cast< uint32_t >( mPlayRange.x * mTotalFrame + 0.5f );
+    mEndFrame = static_cast< uint32_t >( mPlayRange.y * mTotalFrame + 0.5f );
+  }
 }
 
 bool VectorRasterizeThread::IsThreadReady()
@@ -164,7 +206,8 @@ bool VectorRasterizeThread::IsThreadReady()
 
     if( !mPlaying )
     {
-      mCurrentFrame = 0;
+      mCurrentFrame = mStartFrame;
+      mCurrentLoop = 0;
     }
 
     mConditionalWait.Wait( lock );
@@ -181,7 +224,12 @@ bool VectorRasterizeThread::StartRender()
 
   mTotalFrame = mVectorRenderer.GetTotalFrameNumber();
 
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StartRender: Renderer is started [%d]\n", mTotalFrame );
+  mStartFrame = static_cast< uint32_t >( mPlayRange.x * mTotalFrame + 0.5f );
+  mEndFrame = static_cast< uint32_t >( mPlayRange.y * mTotalFrame + 0.5f );
+
+  mCurrentFrame = mStartFrame;
+
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StartRender: Renderer is started [%d (%d, %d)]\n", mTotalFrame, mStartFrame, mEndFrame );
 
   return true;
 }
@@ -195,11 +243,26 @@ void VectorRasterizeThread::Rasterize()
 
   if( mPlaying && !mPaused )
   {
-    mCurrentFrame++;
-
-    if( mCurrentFrame >= mTotalFrame )
+    if( ++mCurrentFrame >= mEndFrame )
     {
-      mCurrentFrame = 0;
+      if( mLoopCount < 0 )
+      {
+        // repeat forever
+        mCurrentFrame = mStartFrame;
+      }
+      else
+      {
+        mCurrentLoop++;
+        if( mCurrentLoop >= mLoopCount )
+        {
+          // Animation is finished
+          mPlaying = false;
+        }
+        else
+        {
+          mCurrentFrame = mStartFrame;
+        }
+      }
     }
   }
 

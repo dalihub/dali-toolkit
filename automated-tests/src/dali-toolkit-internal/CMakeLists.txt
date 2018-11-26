@@ -45,6 +45,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-singleton-service.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-vector-animation-renderer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dali-test-suite-utils.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dummy-control.cpp
    ../dali-toolkit/dali-toolkit-test-utils/mesh-builder.cpp

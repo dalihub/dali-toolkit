@@ -160,8 +160,11 @@ private:
   ImageVisualShaderFactory&                    mImageVisualShaderFactory;
   VisualUrl                                    mUrl;
   Vector2                                      mVisualSize;
+  Vector2                                      mPlayRange;
   WeakHandle< Actor >                          mPlacementActor;
   std::unique_ptr< VectorRasterizeThread >     mVectorRasterizeThread;
+
+  int32_t                                      mLoopCount;
   DevelAnimatedVectorImageVisual::Action::Type mActionStatus;
 };
 
