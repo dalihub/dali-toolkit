@@ -242,7 +242,21 @@ TextureSet TextureManager::LoadTexture(
       }
 
       TextureManager::LoadState loadState = GetTextureStateInternal( textureId );
-      loadingStatus = ( loadState == TextureManager::LOADING );
+      switch (loadState)
+      {
+        case TextureManager::NOT_STARTED :
+        case TextureManager::LOADING :
+        case TextureManager::LOAD_FAILED :
+        {
+          loadingStatus = true;
+          break;
+        }
+        default :
+        {
+          loadingStatus = false;
+          break;
+        }
+      }
 
       if( loadState == TextureManager::UPLOADED )
       {
