@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -820,13 +820,13 @@ void Builder::LoadConfiguration( const TreeNode& root, Property::Map& intoMap )
                   // try to find other "{","}" pair after current left position.
                   pos = leftPos+1;
 
-                  for( unsigned int i = 0; i < mReplacementMap.Count() ; i++ )
+                  for( uint32_t i = 0; i < mReplacementMap.Count() ; i++ )
                   {
-                    std::string constant = mReplacementMap.GetKey(i);
+                    Property::Key constant = mReplacementMap.GetKeyAt(i);
 
                     // Compare string which is between "{" and "}" with constant string
                     // If they are same, change string in stringConfigValue to mapped constant value.
-                    if ( stringConfigValue.compare( leftPos+1, rightPos-leftPos-1,constant) == 0 )
+                    if ( 0 == stringConfigValue.compare( leftPos+1, rightPos-leftPos-1, constant.stringKey ) )
                     {
                       std::string replaceString;
                       mReplacementMap.GetValue(i).Get( replaceString );
