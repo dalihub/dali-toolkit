@@ -92,6 +92,27 @@ protected: // Implementation of Processor
   virtual void Process();
 
 private:
+  struct ActorSizeSpec
+  {
+    ActorSizeSpec(Actor actor)
+    : actor( actor )
+    , widthSpec( actor.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION ) )
+    , heightSpec( actor.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION ) )
+    {
+    }
+
+    Actor actor;
+    int widthSpec;
+    int heightSpec;
+  };
+  std::vector<ActorSizeSpec> mActorSizeSpecs;
+
+  void UpdateMeasureHierarchyForAnimation( LayoutData& layoutData );
+
+  void UpdateMeasureHierarchyForAnimation( Actor root, LayoutData& layoutData );
+
+  void RestoreActorsSpecs();
+
   std::list< LayoutTransition > mLayoutTransitions;
   struct AnimationFinishedFunctor
   {

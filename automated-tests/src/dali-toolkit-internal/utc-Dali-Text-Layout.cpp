@@ -187,11 +187,13 @@ bool LayoutTextTest( const LayoutTextData& data )
 
   layoutSize = Vector2::ZERO;
 
+  bool isAutoScroll = false;
   const bool updated = engine.LayoutText( layoutParameters,
                                           glyphPositions,
                                           lines,
                                           layoutSize,
-                                          data.ellipsis );
+                                          data.ellipsis,
+                                          isAutoScroll );
 
   // 4) Compare the results.
 

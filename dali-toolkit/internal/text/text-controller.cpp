@@ -2250,7 +2250,6 @@ Controller::UpdateTextType Controller::Relayout( const Size& size, Dali::LayoutD
 
   UpdateTextType updateTextType = NONE_UPDATED;
 
-  mImpl->mLayoutDirection = layoutDirection;
   if( ( size.width < Math::MACHINE_EPSILON_1000 ) || ( size.height < Math::MACHINE_EPSILON_1000 ) )
   {
     if( 0u != mImpl->mModel->mVisualModel->mGlyphPositions.Count() )
@@ -2318,6 +2317,22 @@ Controller::UpdateTextType Controller::Relayout( const Size& size, Dali::LayoutD
     mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
   }
 
+  if( mImpl->mModel->mMatchSystemLanguageDirection  && mImpl->mLayoutDirection != layoutDirection )
+  {
+    // Clear the update info. This info will be set the next time the text is updated.
+    mImpl->mTextUpdateInfo.mClearAll = true;
+    // Apply modifications to the model
+    // Shape the text again is needed because characters like '()[]{}' have to be mirrored and the glyphs generated again.
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                             GET_GLYPH_METRICS         |
+                                                             SHAPE_TEXT                |
+                                                             UPDATE_DIRECTION          |
+                                                             LAYOUT                    |
+                                                             BIDI_INFO                 |
+                                                             REORDER );
+    mImpl->mLayoutDirection = layoutDirection;
+  }
+
   // Make sure the model is up-to-date before layouting.
   ProcessModifyEvents();
   bool updated = mImpl->UpdateModel( mImpl->mOperationsPending );
@@ -2327,6 +2342,7 @@ Controller::UpdateTextType Controller::Relayout( const Size& size, Dali::LayoutD
   updated = DoRelayout( size,
                         mImpl->mOperationsPending,
                         layoutSize ) || updated;
+
 
   if( updated )
   {
@@ -3601,12 +3617,15 @@ bool Controller::DoRelayout( const Size& size,
     }
 
     // Update the visual model.
+    bool isAutoScrollEnabled = mImpl->mIsAutoScrollEnabled;
     Size newLayoutSize;
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
                                                    glyphPositions,
                                                    mImpl->mModel->mVisualModel->mLines,
                                                    newLayoutSize,
-                                                   elideTextEnabled );
+                                                   elideTextEnabled,
+                                                   isAutoScrollEnabled );
+    mImpl->mIsAutoScrollEnabled = isAutoScrollEnabled;
 
     viewUpdated = viewUpdated || ( newLayoutSize != layoutSize );
 

@@ -10,6 +10,7 @@ SET(TC_SOURCES
   utc-Dali-AbsoluteLayout.cpp
   utc-Dali-Alignment.cpp
   utc-Dali-AnimatedImageVisual.cpp
+  utc-Dali-AnimatedVectorImageVisual.cpp
   utc-Dali-BinLayout.cpp
   utc-Dali-BloomView.cpp
   utc-Dali-BubbleEmitter.cpp

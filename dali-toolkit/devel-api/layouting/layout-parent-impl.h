@@ -59,18 +59,6 @@ public:
    */
   virtual Toolkit::LayoutGroup::LayoutId Insert( LayoutItem& target, LayoutItem& item ) = 0;
 
-  /**
-   * @brief Move a child to another position
-   * @param[in] target The target item
-   * @param[in] item The item to move
-   */
-  virtual Toolkit::LayoutGroup::LayoutId Move( LayoutItem& target, LayoutItem& item ) = 0;
-
-  /**
-   * @brief Move a child to back
-   * @param[in] item The item to move
-   */
-  virtual Toolkit::LayoutGroup::LayoutId MoveBack( LayoutItem& item ) = 0;
 
 protected:
   virtual ~LayoutParent()

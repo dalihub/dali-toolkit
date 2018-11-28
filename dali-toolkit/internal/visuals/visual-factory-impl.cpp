@@ -41,6 +41,7 @@
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 #include <dali-toolkit/internal/visuals/animated-image/animated-image-visual.h>
+#include <dali-toolkit/internal/visuals/animated-vector-image/animated-vector-image-visual.h>
 #include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
@@ -161,6 +162,11 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
                 visualPtr = AnimatedImageVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap );
                 break;
               }
+              case VisualUrl::JSON:
+              {
+                visualPtr = AnimatedVectorImageVisual::New( GetFactoryCache(),  GetImageVisualShaderFactory(), imageUrl, propertyMap );
+                break;
+              }
               case VisualUrl::REGULAR_IMAGE:
               {
                 visualPtr = ImageVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl, propertyMap );
@@ -254,6 +260,17 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       visualPtr = AnimatedGradientVisual::New( GetFactoryCache(), propertyMap );
       break;
     }
+
+    case Toolkit::DevelVisual::ANIMATED_VECTOR_IMAGE:
+    {
+      Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
+      std::string imageUrl;
+      if( imageURLValue && imageURLValue->Get( imageUrl ) )
+      {
+        visualPtr = AnimatedVectorImageVisual::New( GetFactoryCache(),  GetImageVisualShaderFactory(), imageUrl, propertyMap );
+      }
+      break;
+    }
   }
 
   if( !visualPtr )
@@ -319,6 +336,11 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const std::string& url, Image
       case VisualUrl::GIF:
       {
         visualPtr = AnimatedImageVisual::New( GetFactoryCache(), GetImageVisualShaderFactory(), visualUrl );
+        break;
+      }
+      case VisualUrl::JSON:
+      {
+        visualPtr = AnimatedVectorImageVisual::New( GetFactoryCache(),  GetImageVisualShaderFactory(), visualUrl );
         break;
       }
       case VisualUrl::REGULAR_IMAGE:
