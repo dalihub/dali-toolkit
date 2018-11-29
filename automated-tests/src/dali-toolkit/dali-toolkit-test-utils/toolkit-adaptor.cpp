@@ -204,6 +204,15 @@ void Adaptor::SceneCreated()
 {
 }
 
+void Adaptor::SetViewMode( ViewMode mode )
+{
+}
+
+void Adaptor::SetStereoBase(  float stereoBase )
+{
+}
+
+
 class LogFactory : public LogFactoryInterface
 {
 public:
