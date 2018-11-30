@@ -172,61 +172,6 @@ Toolkit::LayoutGroup::LayoutId LayoutGroup::Insert( LayoutItem& target, LayoutIt
   return childLayout.layoutId;
 }
 
-Toolkit::LayoutGroup::LayoutId LayoutGroup::Move( LayoutItem& target, LayoutItem& child )
-{
-  // Remove child from the previous position
-  for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; ++iter )
-  {
-    if( iter->child.Get() == &child )
-    {
-      mImpl->mChildren.erase( iter );
-      break;
-    }
-  }
-
-  // Find target position
-  std::vector< Impl::ChildLayout >::iterator position;
-  for( auto iter = mImpl->mChildren.begin(); iter != mImpl->mChildren.end(); ++iter )
-  {
-    if( iter->child.Get() == &target )
-    {
-      position = iter;
-      break;
-    }
-  }
-
-  Impl::ChildLayout childLayout;
-  childLayout.layoutId = mImpl->mNextLayoutId++;
-  childLayout.child = &child;
-  mImpl->mChildren.insert( position, childLayout );
-
-  RequestLayout();
-
-  return childLayout.layoutId;
-}
-
-Toolkit::LayoutGroup::LayoutId LayoutGroup::MoveBack( LayoutItem& child )
-{
-  // Remove child from the previous position
-  for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; ++iter )
-  {
-    if( iter->child.Get() == &child )
-    {
-      mImpl->mChildren.erase( iter );
-      break;
-    }
-  }
-
-  Impl::ChildLayout childLayout;
-  childLayout.layoutId = mImpl->mNextLayoutId++;
-  childLayout.child = &child;
-  mImpl->mChildren.emplace_back( childLayout );
-
-  RequestLayout();
-
-  return childLayout.layoutId;
-}
-
 void LayoutGroup::RemoveAll()
 {
   for( auto iter = mImpl->mChildren.begin() ; iter != mImpl->mChildren.end() ; )
@@ -512,7 +457,6 @@ void LayoutGroup::OnInitialize()
 
     DevelActor::ChildAddedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildAddedToOwner );
     DevelActor::ChildRemovedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildRemovedFromOwner );
-    DevelActor::ChildOrderChangedSignal( control ).Connect( mSlotDelegate, &LayoutGroup::ChildOrderChanged );
     DevelHandle::PropertySetSignal( control ).Connect( mSlotDelegate, &LayoutGroup::OnOwnerPropertySet );
 
     if( control.GetParent() )
@@ -571,7 +515,6 @@ void LayoutGroup::OnUnparent()
   {
     DevelActor::ChildAddedSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::ChildAddedToOwner );
     DevelActor::ChildRemovedSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::ChildRemovedFromOwner );
-    DevelActor::ChildOrderChangedSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::ChildOrderChanged );
     DevelHandle::PropertySetSignal( control ).Disconnect( mSlotDelegate, &LayoutGroup::OnOwnerPropertySet );
   }
 }
@@ -671,42 +614,6 @@ void LayoutGroup::ChildRemovedFromOwner( Actor child )
     {
       Remove( *childLayout.Get() );
       RequestLayout( Dali::Toolkit::LayoutTransitionData::Type::ON_CHILD_REMOVE, child, Actor() );
-    }
-  }
-}
-
-void LayoutGroup::ChildOrderChanged( Actor child )
-{
-  Toolkit::Control childControl = Toolkit::Control::DownCast( child );
-  if( childControl )
-  {
-    Internal::Control& childControlImpl = GetImplementation( childControl );
-    Internal::Control::Impl& childControlDataImpl = Internal::Control::Impl::Get( childControlImpl );
-
-    auto childLayout = childControlDataImpl.GetLayout();
-    if( childLayout )
-    {
-      Toolkit::Control control = Toolkit::Control::DownCast( GetOwner() );
-      unsigned int count = control.GetChildCount();
-      unsigned int index = static_cast< unsigned int >( childControl.GetProperty< int >( DevelActor::Property::SIBLING_ORDER ) );
-
-      // Find insertion position
-      while( ++index < count )
-      {
-        auto sibling = Toolkit::Control::DownCast( control.GetChildAt( index ) );
-        if( sibling )
-        {
-          auto siblingLayout = DevelControl::GetLayout( sibling );
-          if( siblingLayout )
-          {
-            Internal::LayoutItem& siblingLayoutImpl = GetImplementation( siblingLayout );
-            Move( siblingLayoutImpl, *childLayout );
-            return;
-          }
-        }
-      }
-
-      MoveBack( *childLayout );
     }
   }
 }

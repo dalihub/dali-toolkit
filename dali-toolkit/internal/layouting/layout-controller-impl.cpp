@@ -127,17 +127,11 @@ void LayoutController::Process()
     MeasureSpec widthSpec( stageWidth, MeasureSpec::Mode::EXACTLY );
     MeasureSpec heightSpec( stageHeight, MeasureSpec::Mode::EXACTLY );
 
-    // Test how to perform a measure on each control.
-    MeasureHierarchy( stage.GetRootLayer(), widthSpec, heightSpec );
-
-    LAYOUT_DEBUG_MEASURE_STATES( stage.GetRootLayer() );
-
     LayoutTransition layoutTransition;
     LayoutPositionDataArray layoutPositionDataArray;
-    LayoutDataArray layoutDataArray;
     LayoutAnimatorArray layoutAnimatorArray;
-    layoutAnimatorArray.push_back( LayoutDataAnimator() );
-    PropertyAnimatorArray childrenPropertiesAnimators;
+    LayoutDataArray layoutDataArray;
+    LayoutDataArray childrenLayoutDataArray;
 
     if ( mLayoutTransitions.size() )
     {
@@ -150,8 +144,28 @@ void LayoutController::Process()
       mLayoutRequested = false;
     }
 
-    LayoutData layoutData( layoutTransition, layoutPositionDataArray, layoutDataArray, layoutAnimatorArray, childrenPropertiesAnimators );
+    LayoutData layoutData( layoutTransition, layoutPositionDataArray, layoutAnimatorArray, layoutDataArray, childrenLayoutDataArray );
     LayoutItem::Impl::sLayoutData = &layoutData;
+
+    if( layoutTransition.layoutTransitionType != -1 )
+    {
+      UpdateMeasureHierarchyForAnimation( layoutData );
+    }
+
+    // Test how to perform a measure on each control.
+    MeasureHierarchy( stage.GetRootLayer(), widthSpec, heightSpec );
+
+    LAYOUT_DEBUG_MEASURE_STATES( stage.GetRootLayer() );
+
+    if( layoutTransition.layoutTransitionType != -1 )
+    {
+      RestoreActorsSpecs();
+    }
+
+    layoutAnimatorArray.clear();
+    layoutDataArray.clear();
+    childrenLayoutDataArray.clear();
+
     PerformLayout( stage.GetRootLayer(), 0, 0, stageWidth, stageHeight );
 
     PerformLayoutPositioning( layoutPositionDataArray, false );
@@ -199,6 +213,93 @@ void LayoutController::MeasureHierarchy( Actor root, MeasureSpec widthSpec, Meas
   }
 }
 
+void LayoutController::UpdateMeasureHierarchyForAnimation( LayoutData& layoutData )
+{
+  LayoutTransition& layoutTransition = layoutData.layoutTransition;
+  Actor transitionOwner = Actor::DownCast( layoutTransition.layoutItem.Get()->GetOwner() );
+  LayoutTransitionDataPtr layoutTransitionDataPtr = layoutTransition.layoutItem->GetTransitionData( layoutTransition.layoutTransitionType );
+
+  if( !layoutTransitionDataPtr->HasUpdateMeasuredSize() )
+  {
+    return;
+  }
+
+  layoutData.updateMeasuredSize = true;
+  layoutTransitionDataPtr->CollectLayoutDataElements( transitionOwner, layoutData );
+
+  UpdateMeasureHierarchyForAnimation( transitionOwner, layoutData );
+
+  for( auto layoutDataElement : layoutData.layoutDataArray )
+  {
+    if( !layoutDataElement.updateMeasuredSize )
+    {
+      continue;
+    }
+
+    Actor actor = Actor::DownCast( layoutDataElement.handle );
+    LayoutDataAnimator animator = layoutData.layoutAnimatorArray[ layoutDataElement.animatorIndex ];
+    float width = actor.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
+    float height = actor.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
+
+    if( layoutDataElement.AdjustMeasuredSize( width, height, animator.animatorType ) )
+    {
+      mActorSizeSpecs.push_back( ActorSizeSpec( actor ) );
+      actor.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, static_cast<int>( width ) );
+      actor.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, static_cast<int>( height ) );
+    }
+  }
+
+  layoutData.updateMeasuredSize = false;
+}
+
+void LayoutController::UpdateMeasureHierarchyForAnimation( Actor root, LayoutData& layoutData )
+{
+  Toolkit::Control control = Toolkit::Control::DownCast( root );
+  if( control )
+  {
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::UpdateMeasureHierarchyForAnimation control:%s\n", control.GetName().c_str() );
+    Internal::Control& controlImpl = GetImplementation( control );
+    Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlImpl );
+    LayoutItemPtr layout = controlDataImpl.GetLayout();
+
+    if( layout )
+    {
+      auto layoutGroup = Toolkit::LayoutGroup::DownCast( layout.Get() );
+      if( layoutGroup )
+      {
+        unsigned int childCount = layoutGroup.GetChildCount();
+        for( unsigned int i=0; i<childCount; ++i )
+        {
+          auto childLayout = layoutGroup.GetChildAt( i );
+          if( childLayout )
+          {
+            auto childControl = Toolkit::Control::DownCast( childLayout.GetOwner() );
+            LayoutTransitionData::CollectChildrenLayoutDataElements( childControl, layoutData );
+          }
+        }
+      }
+    }
+  }
+  else
+  {
+    // Depth first descent through actor children
+    for( unsigned int i = 0, count = root.GetChildCount(); i < count; ++i )
+    {
+      UpdateMeasureHierarchyForAnimation( root.GetChildAt( i ), layoutData );
+    }
+  }
+}
+
+void LayoutController::RestoreActorsSpecs()
+{
+  for( auto& actorSizeSpec : mActorSizeSpecs )
+  {
+    Actor actor = actorSizeSpec.actor;
+    actor.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, actorSizeSpec.widthSpec );
+    actor.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, actorSizeSpec.heightSpec );
+  }
+}
+
 void LayoutController::PerformLayout( Actor root, int left, int top, int right, int bottom )
 {
   Toolkit::Control control = Toolkit::Control::DownCast( root );
@@ -235,7 +336,6 @@ void LayoutController::PerformLayoutPositioning( LayoutPositionDataArray& layout
     Actor actor = Actor::DownCast( layoutPositionData.handle );
     if( actor && ( !layoutPositionData.animated || all ) )
     {
-      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "LayoutController::PerformLayoutPositioning %s\n", actor.GetName().c_str() );
       if ( !layoutPositionData.animated )
       {
         actor.SetPosition( layoutPositionData.left, layoutPositionData.top );
@@ -256,16 +356,21 @@ void LayoutController::PerformLayoutAnimation( LayoutTransition& layoutTransitio
   Animation animation = Animation::New( 0 );
   bool isAnimatorAdded = false;
 
+  if( layoutAnimatorArray.size() == 0 )
+  {
+    layoutAnimatorArray.push_back( LayoutDataAnimator() );
+  }
+
   for( auto layoutDataElement : layoutDataArray )
   {
-    if ( layoutDataElement.animatorIndex >= 0 )
+    if( layoutDataElement.animatorIndex >= 0 )
     {
       Actor actor = Actor::DownCast( layoutDataElement.handle );
       if ( actor )
       {
         LayoutDataAnimator animator = layoutAnimatorArray[ layoutDataElement.animatorIndex ];
         TimePeriod timePeriod = TimePeriod( 0, animation.GetDuration() );
-        if (animator.timePeriod.durationSeconds >= 0)
+        if( animator.timePeriod.durationSeconds >= 0 )
         {
           timePeriod = animator.timePeriod;
         }
@@ -275,7 +380,7 @@ void LayoutController::PerformLayoutAnimation( LayoutTransition& layoutTransitio
         // Other values are set to current actor ones.
         if( value.GetType() == Property::NONE )
         {
-          if ( layoutDataElement.positionDataIndex < 0)
+          if( layoutDataElement.positionDataIndex < 0)
           {
             auto result = std::find_if( layoutPositionDataArray.begin(), layoutPositionDataArray.end(), [&actor](const LayoutPositionData& iter)
                           { return iter.handle == actor; } );
@@ -283,10 +388,23 @@ void LayoutController::PerformLayoutAnimation( LayoutTransition& layoutTransitio
             {
               continue;
             }
-            layoutDataElement.positionDataIndex = std::distance(layoutPositionDataArray.begin(), result);
+            layoutDataElement.positionDataIndex = std::distance( layoutPositionDataArray.begin(), result );
           }
 
           LayoutPositionData& positionData = layoutPositionDataArray[ layoutDataElement.positionDataIndex ];
+          // with updated measured size scale animation the measured size includes scale, so we need to fit in the centre of the measured rectangle
+          // the real size child so that the all scale related animations placed correctly
+          if( positionData.updateWithCurrentSize )
+          {
+            Vector3 size = actor.GetCurrentSize();
+            float dX = ( ( positionData.right - positionData.left ) - size.width ) / 2;
+            float dY = ( ( positionData.bottom - positionData.top ) - size.height ) / 2;
+            positionData.left += dX;
+            positionData.top += dY;
+            positionData.right -= dX;
+            positionData.bottom -= dY;
+            positionData.updateWithCurrentSize = false;
+          }
 
           switch ( layoutDataElement.propertyIndex )
           {
@@ -313,7 +431,7 @@ void LayoutController::PerformLayoutAnimation( LayoutTransition& layoutTransitio
           }
         }
 
-        // Failed to get target value, just move the next one
+        // Failed to get target value, just move to the next one
         if( value.GetType() == Property::NONE )
         {
           continue;
@@ -327,29 +445,31 @@ void LayoutController::PerformLayoutAnimation( LayoutTransition& layoutTransitio
         }
 
         // Create an animator for the property
-        switch (animator.animatorType)
+        switch( animator.animatorType )
         {
-        case LayoutDataAnimator::AnimatorType::ANIMATE_TO:
-        {
-          animation.AnimateTo( Property( actor, layoutDataElement.propertyIndex ), value, animator.alphaFunction, timePeriod );
-          break;
+          case Toolkit::LayoutTransitionData::Animator::ANIMATE_TO:
+          {
+            animation.AnimateTo( Property( actor, layoutDataElement.propertyIndex ), value, animator.alphaFunction, timePeriod );
+            break;
+          }
+          case Toolkit::LayoutTransitionData::Animator::ANIMATE_BY:
+          {
+            animation.AnimateBy( Property( actor, layoutDataElement.propertyIndex ), value, animator.alphaFunction, timePeriod );
+            break;
+          }
+          case Toolkit::LayoutTransitionData::Animator::ANIMATE_BETWEEN:
+          {
+            animation.AnimateBetween( Property( actor, layoutDataElement.propertyIndex ), animator.keyFrames, animator.alphaFunction, animator.interpolation );
+            break;
+          }
+          case Toolkit::LayoutTransitionData::Animator::ANIMATE_PATH:
+          {
+            animation.Animate( actor, animator.path, animator.forward, animator.alphaFunction, timePeriod );
+            break;
+          }
         }
-        case LayoutDataAnimator::AnimatorType::ANIMATE_BY:
-        {
-          animation.AnimateBy( Property( actor, layoutDataElement.propertyIndex ), value, animator.alphaFunction, timePeriod );
-          break;
-        }
-        case LayoutDataAnimator::AnimatorType::ANIMATE_BETWEEN:
-        {
-          animation.AnimateBetween( Property( actor, layoutDataElement.propertyIndex ), animator.keyFrames, animator.alphaFunction, animator.interpolation );
-          break;
-        }
-        case LayoutDataAnimator::AnimatorType::ANIMATE_PATH:
-          animation.Animate( actor, animator.path, animator.forward, animator.alphaFunction, timePeriod );
-          break;
-        }
+        isAnimatorAdded = true;
       }
-      isAnimatorAdded = true;
     }
   }
 

@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/common/stage.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/integration-api/debug.h>
@@ -884,7 +885,8 @@ void TextLabel::OnInitialize()
   mController->SetTextElideEnabled( true );   // If false then text larger than control will overflow
 
   // Sets layoutDirection value
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( self.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+  Dali::Stage stage = Dali::Stage::GetCurrent();
+  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( stage.GetRootLayer().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
   mController->SetLayoutDirection( layoutDirection );
 
   Layout::Engine& engine = mController->GetLayoutEngine();
