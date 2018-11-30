@@ -281,7 +281,7 @@ uint32_t Scene3dView::GetCameraCount()
 CameraActor Scene3dView::GetCamera( uint32_t cameraIndex )
 {
   CameraActor cameraActor;
-  if( cameraIndex < 0 || cameraIndex >= mCameraActorArray.size() )
+  if( cameraIndex >= mCameraActorArray.size() )
   {
     return cameraActor;
   }

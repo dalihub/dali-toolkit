@@ -102,7 +102,8 @@
       "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
       "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
       "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" },
-      "enableSelection":false
+      "enableSelection":false,
+      "matchSystemLanguageDirection":true
     },
 
     "TextFieldFontSize0":
@@ -218,7 +219,8 @@
       "enableScrollBar":true,
       "scrollBarShowDuration":0.8,
       "scrollBarFadeDuration":0.5,
-      "enableSelection":false
+      "enableSelection":false,
+      "matchSystemLanguageDirection":true
     },
     "ProgressBar":
     {

@@ -555,6 +555,7 @@ struct Engine::Impl
    * @param[in,out] numberOfLines The number of laid-out lines.
    * @param[in] penY The vertical layout position.
    * @param[in] currentParagraphDirection The current paragraph's direction.
+   * @param[in,out] isAutoScrollEnabled If the isAutoScrollEnabled is true and the height of the text exceeds the boundaries of the control the text is elided and the isAutoScrollEnabled is set to false to disable the autoscroll
    *
    * return Whether the line is ellipsized.
    */
@@ -565,14 +566,17 @@ struct Engine::Impl
                      Vector2* glyphPositionsBuffer,
                      Length& numberOfLines,
                      float penY,
-                     CharacterDirection currentParagraphDirection )
+                     CharacterDirection currentParagraphDirection,
+                     bool& isAutoScrollEnabled )
   {
-    const bool ellipsis = ( ( penY - layout.descender > layoutParameters.boundingBox.height ) ||
-                            ( ( mLayout == SINGLE_LINE_BOX ) &&
-                              ( layout.extraBearing + layout.length + layout.extraWidth > layoutParameters.boundingBox.width ) ) );
+    const bool ellipsis = isAutoScrollEnabled ? ( penY - layout.descender > layoutParameters.boundingBox.height ) :
+                                                ( ( penY - layout.descender > layoutParameters.boundingBox.height ) ||
+                                                  ( ( mLayout == SINGLE_LINE_BOX ) &&
+                                                  ( layout.extraBearing + layout.length + layout.extraWidth > layoutParameters.boundingBox.width ) ) );
 
     if( ellipsis )
     {
+      isAutoScrollEnabled = false;
       // Do not layout more lines if ellipsis is enabled.
 
       // The last line needs to be completely filled with characters.
@@ -791,7 +795,8 @@ struct Engine::Impl
                    Vector<Vector2>& glyphPositions,
                    Vector<LineRun>& lines,
                    Size& layoutSize,
-                   bool elideTextEnabled )
+                   bool elideTextEnabled,
+                   bool& isAutoScrollEnabled )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->LayoutText\n" );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  box size %f, %f\n", layoutParameters.boundingBox.width, layoutParameters.boundingBox.height );
@@ -925,7 +930,8 @@ struct Engine::Impl
                                  glyphPositionsBuffer,
                                  numberOfLines,
                                  penY,
-                                 currentParagraphDirection );
+                                 currentParagraphDirection,
+                                 isAutoScrollEnabled );
       }
 
       if( ellipsis )
@@ -1150,51 +1156,41 @@ struct Engine::Impl
                                      bool matchSystemLanguageDirection )
   {
     line.alignmentOffset = 0.f;
-    bool isRTL = RTL == line.direction;
+    const bool isLineRTL = RTL == line.direction;
+    // Whether to swap the alignment.
+    // Swap if the line is RTL and is not required to match the direction of the system's language or if it's required to match the direction of the system's language and it's RTL.
+    bool isLayoutRTL = isLineRTL;
     float lineLength = line.width;
-    HorizontalAlignment::Type alignment = horizontalAlignment;
 
     // match align for system language direction
     if( matchSystemLanguageDirection )
     {
-      isRTL = layoutDirection == LayoutDirection::RIGHT_TO_LEFT;
+      // Swap the alignment type if the line is right to left.
+      isLayoutRTL = layoutDirection == LayoutDirection::RIGHT_TO_LEFT;
     }
-
-    // Swap the alignment type if the line is right to left.
-    if( isRTL )
-    {
-      switch( alignment )
-      {
-        case HorizontalAlignment::BEGIN:
-        {
-          alignment = HorizontalAlignment::END;
-          break;
-        }
-        case HorizontalAlignment::CENTER:
-        {
-          // Nothing to do.
-          break;
-        }
-        case HorizontalAlignment::END:
-        {
-          alignment = HorizontalAlignment::BEGIN;
-          break;
-        }
-      }
-
-    }
-
     // Calculate the horizontal line offset.
-    switch( alignment )
+    switch( horizontalAlignment )
     {
       case HorizontalAlignment::BEGIN:
       {
-        line.alignmentOffset = 0.f;
-
-        if( isRTL )
+        if( isLayoutRTL )
         {
-          // 'Remove' the white spaces at the end of the line (which are at the beginning in visual order)
-          line.alignmentOffset -= line.extraLength;
+          if( isLineRTL )
+          {
+            lineLength += line.extraLength;
+          }
+
+          line.alignmentOffset = boxWidth - lineLength;
+        }
+        else
+        {
+          line.alignmentOffset = 0.f;
+
+          if( isLineRTL )
+          {
+            // 'Remove' the white spaces at the end of the line (which are at the beginning in visual order)
+            line.alignmentOffset -= line.extraLength;
+          }
         }
         break;
       }
@@ -1202,7 +1198,7 @@ struct Engine::Impl
       {
         line.alignmentOffset = 0.5f * ( boxWidth - lineLength );
 
-        if( isRTL )
+        if( isLineRTL )
         {
           line.alignmentOffset -= line.extraLength;
         }
@@ -1212,12 +1208,25 @@ struct Engine::Impl
       }
       case HorizontalAlignment::END:
       {
-        if( isRTL )
+        if( isLayoutRTL )
         {
-          lineLength += line.extraLength;
-        }
+          line.alignmentOffset = 0.f;
 
-        line.alignmentOffset = boxWidth - lineLength;
+          if( isLineRTL )
+          {
+            // 'Remove' the white spaces at the end of the line (which are at the beginning in visual order)
+            line.alignmentOffset -= line.extraLength;
+          }
+        }
+        else
+        {
+          if( isLineRTL )
+          {
+            lineLength += line.extraLength;
+          }
+
+          line.alignmentOffset = boxWidth - lineLength;
+        }
         break;
       }
     }
@@ -1288,13 +1297,15 @@ bool Engine::LayoutText( const Parameters& layoutParameters,
                          Vector<Vector2>& glyphPositions,
                          Vector<LineRun>& lines,
                          Size& layoutSize,
-                         bool elideTextEnabled )
+                         bool elideTextEnabled,
+                         bool& isAutoScrollEnabled )
 {
   return mImpl->LayoutText( layoutParameters,
                             glyphPositions,
                             lines,
                             layoutSize,
-                            elideTextEnabled );
+                            elideTextEnabled,
+                            isAutoScrollEnabled );
 }
 
 void Engine::ReLayoutRightToLeftLines( const Parameters& layoutParameters,

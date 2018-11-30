@@ -99,8 +99,10 @@ VisualUrl::Type ResolveType( const std::string& url )
     enum { SUFFIX, HASH, HASH_DOT } state = SUFFIX;
     char SVG[ 4 ] = { 'g', 'v', 's', '.' };
     char GIF[ 4 ] = { 'f', 'i', 'g', '.' };
+    char JSON[ 5 ] = { 'n', 'o', 's', 'j', '.' };
     unsigned int svgScore = 0;
     unsigned int gifScore = 0;
+    unsigned int jsonScore = 0;
     int index = count;
     while( --index >= 0 )
     {
@@ -120,6 +122,14 @@ VisualUrl::Type ResolveType( const std::string& url )
         if( ++gifScore == sizeof(GIF) )
         {
           return VisualUrl::GIF;
+        }
+      }
+      if( ( offsetFromEnd < sizeof(JSON) )&&( currentChar == JSON[ offsetFromEnd ] ) )
+      {
+        // early out if JSON as can't be used in N patch for now
+        if( ++jsonScore == sizeof(JSON) )
+        {
+          return VisualUrl::JSON;
         }
       }
       switch( state )

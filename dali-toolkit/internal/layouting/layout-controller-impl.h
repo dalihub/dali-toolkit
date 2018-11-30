@@ -57,7 +57,7 @@ public:
   /**
    * This marks the given layout and all its parents as dirty and triggers a transition if set.
    */
-  void RequestLayout( LayoutItem& layout, int layoutTransitionType );
+  void RequestLayout( LayoutItem& layout, int layoutTransitionType, Actor gainedChild, Actor lostChild );
 
   /**
    * Measures next level of layouts in the actor hierarchy.
@@ -79,6 +79,11 @@ public:
    */
   void PerformLayoutAnimation( LayoutTransition& layoutTransition, LayoutPositionDataArray& layoutPositionDataArray, LayoutDataArray& layoutDataArray, LayoutAnimatorArray& layoutAnimatorArray );
 
+  /**
+   * Focus change callback.
+   */
+  void KeyInputFocusChangedCallback( Control gainingActor, Control lostActor );
+
 protected: // Implementation of Processor
 
   /**
@@ -87,6 +92,27 @@ protected: // Implementation of Processor
   virtual void Process();
 
 private:
+  struct ActorSizeSpec
+  {
+    ActorSizeSpec(Actor actor)
+    : actor( actor )
+    , widthSpec( actor.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION ) )
+    , heightSpec( actor.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION ) )
+    {
+    }
+
+    Actor actor;
+    int widthSpec;
+    int heightSpec;
+  };
+  std::vector<ActorSizeSpec> mActorSizeSpecs;
+
+  void UpdateMeasureHierarchyForAnimation( LayoutData& layoutData );
+
+  void UpdateMeasureHierarchyForAnimation( Actor root, LayoutData& layoutData );
+
+  void RestoreActorsSpecs();
+
   std::list< LayoutTransition > mLayoutTransitions;
   struct AnimationFinishedFunctor
   {
@@ -119,6 +145,18 @@ private:
   bool mLayoutRequested;
   Animation mAnimation;
   std::list< AnimationFinishedFunctor > mAnimationFinishedFunctors;
+
+  struct FocusChangedFunctor
+  {
+    FocusChangedFunctor( LayoutController& layoutController )
+    : layoutController( layoutController )
+    {
+    }
+
+    void operator() ( Dali::Toolkit::Control gainingControl, Dali::Toolkit::Control lostActor );
+    LayoutController& layoutController;
+  };
+  FocusChangedFunctor mFocusChangedFunctor;
 
   SlotDelegate<LayoutController> mSlotDelegate;
 };

@@ -209,7 +209,17 @@ public:
    *
    * This will make this layout and all it's parent layouts dirty and set the transition queued.
    */
-  void RequestLayout( Dali::Toolkit::LayoutTransitionData::LayoutTransitionType layoutTranstionType );
+  void RequestLayout( Dali::Toolkit::LayoutTransitionData::Type layoutTranstionType );
+
+  /**
+   * @brief Request that this layout is re-laid out with particular transition.
+   * @param[in] layoutTranstionType The transition type
+   * @param[in] gainedChild The gained owners's child due to add/remove or focus gained/lost
+   * @param[in] lostChild The lost owners's child due to add/remove or focus gained/lost
+   *
+   * This will make this layout and all it's parent layouts dirty and set the transition queued.
+   */
+  void RequestLayout( Dali::Toolkit::LayoutTransitionData::Type layoutTranstionType, Actor gainedChild, Actor lostChild );
 
   /**
    * @brief Predicate to determine if this layout has been requested to re-layout

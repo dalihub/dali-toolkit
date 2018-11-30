@@ -30,7 +30,13 @@
 
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLayoutFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_LAYOUT" );
+#endif
+
 // Key tokens
+const char* TOKEN_CONDITION("condition");
+const char* TOKEN_AFFECTS_SIBLINGS("affectsSiblings");
 const char* TOKEN_PROPERTY("property");
 const char* TOKEN_INITIAL_VALUE("initialValue");
 const char* TOKEN_TARGET_VALUE("targetValue");
@@ -41,6 +47,13 @@ const char* TOKEN_TIME_PERIOD("timePeriod");
 const char* TOKEN_DURATION("duration");
 const char* TOKEN_DELAY("delay");
 const char* TOKEN_ALPHA_FUNCTION("alphaFunction");
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( ANIMATOR_TYPE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::LayoutTransitionData::Animator::Type, ANIMATE_TO )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::LayoutTransitionData::Animator::Type, ANIMATE_BY )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::LayoutTransitionData::Animator::Type, ANIMATE_BETWEEN )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::LayoutTransitionData::Animator::Type, ANIMATE_PATH )
+DALI_ENUM_TO_STRING_TABLE_END( ANIMATOR_TYPE )
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN( ALPHA_FUNCTION_BUILTIN )
 DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::AlphaFunction, LINEAR)
@@ -67,7 +80,135 @@ namespace Toolkit
 namespace Internal
 {
 
-LayoutTransitionData::LayoutTransitionData()
+bool LayoutDataElement::AdjustMeasuredSize( float& width, float& height, Toolkit::LayoutTransitionData::Animator::Type animatorType )
+{
+  bool adjusted = true;
+  if( targetValue.GetType() == Property::NONE )
+  {
+    return false;
+  }
+
+  Actor actor = Actor::DownCast( handle );
+  float animateByMultiplier = ( animatorType == Toolkit::LayoutTransitionData::Animator::Type::ANIMATE_BY ) ? 1.0f : 0.0f;
+  Vector3 size = actor.GetCurrentSize();
+
+  switch ( targetValue.GetType() )
+  {
+    case Property::Type::VECTOR3:
+    {
+      Vector3 value = targetValue.Get<Vector3>();
+      switch( propertyIndex )
+      {
+        case Actor::Property::SCALE:
+        {
+          width = size.x * ( animateByMultiplier + value.x );
+          height = size.y * ( animateByMultiplier + value.y );
+          break;
+        }
+        case Actor::Property::SIZE:
+        {
+          width = value.x + ( animateByMultiplier * size.x );
+          height = value.y + ( animateByMultiplier * size.y );
+          break;
+        }
+        default:
+        {
+          adjusted = false;
+          break;
+        }
+      }
+      break;
+    }
+    case Property::Type::FLOAT:
+    {
+      float value = targetValue.Get<float>();
+      switch( propertyIndex )
+      {
+        case Actor::Property::SCALE_X:
+        {
+          width = size.x * ( animateByMultiplier + value );
+          break;
+        }
+        case Actor::Property::SCALE_Y:
+        {
+          height = size.y * ( animateByMultiplier + value );
+          break;
+        }
+        case Actor::Property::SIZE_WIDTH:
+        {
+          width = value + ( animateByMultiplier * size.x );
+          break;
+        }
+        case Actor::Property::SIZE_HEIGHT:
+        {
+          height = value + ( animateByMultiplier * size.y );
+          break;
+        }
+        default:
+        {
+          adjusted = true;
+          break;
+        }
+      }
+      break;
+    }
+    default:
+    {
+      adjusted = false;
+      break;
+    }
+  }
+
+  return adjusted;
+}
+
+void LayoutDataElement::UpdatePropertyIndex()
+{
+  if( propertyIndex == -1 && handle && !propertyName.empty() )
+  {
+    Actor actor = Actor::DownCast( handle );
+    propertyIndex = DevelHandle::GetPropertyIndex( actor, Property::Key( propertyName ) );
+  }
+}
+
+void LayoutDataElement::UpdateAnimatorIndex( const LayoutAnimatorArray& animators )
+{
+  if( animatorIndex == -1 )
+  {
+    if( animatorName.empty() )
+    {
+      animatorIndex = 0;
+      return;
+    }
+
+    std::string animatorName = this->animatorName;
+    auto animator = std::find_if( animators.begin(), animators.end(), [ &animatorName ](const LayoutDataAnimator& iter) {
+      return ( iter.name == animatorName ); } );
+    if( animator != animators.end() )
+    {
+      animatorIndex = std::distance( animators.begin(), animator );
+    }
+  }
+}
+
+void LayoutDataElement::UpdatePositionDataIndex( LayoutData& layoutData )
+{
+    positionDataIndex = layoutData.layoutPositionDataArray.size() - 1;
+    switch( propertyIndex )
+    {
+      case Actor::Property::SCALE:
+      case Actor::Property::SCALE_X:
+      case Actor::Property::SCALE_Y:
+        if( positionDataIndex != -1 && updateMeasuredSize )
+        {
+          layoutData.layoutPositionDataArray[ positionDataIndex ].updateWithCurrentSize = true;
+        }
+        break;
+    }
+}
+
+LayoutTransitionData::LayoutTransitionData() :
+  mUpdateMeasuredSize( false )
 {
 }
 
@@ -114,17 +255,35 @@ LayoutTransitionData::PropertyAnimator::PropertyAnimator( Actor actor, Property:
 
 void LayoutTransitionData::AddPropertyAnimator( Actor actor, Property::Map map )
 {
-  mPropertyAnimators.push_back( PropertyAnimator( actor, map ) );
+  LayoutDataElement layoutDataElement;
+  if( ConvertToLayoutDataElement( PropertyAnimator( actor, map ), layoutDataElement ) )
+  {
+    mLayoutDataElements.push_back( layoutDataElement );
+  }
+
+  UpdateAnimatorsIndices();
 }
 
 void LayoutTransitionData::AddPropertyAnimator( Actor actor, Property::Map map, KeyFrames keyFrames, Animation::Interpolation interpolation )
 {
-  mPropertyAnimators.push_back( PropertyAnimator( actor, map, keyFrames, interpolation ) );
+  LayoutDataElement layoutDataElement;
+  if( ConvertToLayoutDataElement( PropertyAnimator( actor, map, keyFrames, interpolation ), layoutDataElement ) )
+  {
+    mLayoutDataElements.push_back( layoutDataElement );
+  }
+
+  UpdateAnimatorsIndices();
 }
 
 void LayoutTransitionData::AddPropertyAnimator( Actor actor, Property::Map map, Path path, Vector3 forward )
 {
-  mPropertyAnimators.push_back( PropertyAnimator( actor, map, path, forward ) );
+  LayoutDataElement layoutDataElement;
+  if( ConvertToLayoutDataElement( PropertyAnimator( actor, map, path, forward ), layoutDataElement ) )
+  {
+    mLayoutDataElements.push_back( layoutDataElement );
+  }
+
+  UpdateAnimatorsIndices();
 }
 
 bool LayoutTransitionData::ConvertToLayoutAnimator( const Property::Map& animatorMap, const PropertyAnimator& propertyAnimator, LayoutDataAnimator& layoutDataAnimator )
@@ -208,6 +367,10 @@ bool LayoutTransitionData::ConvertToLayoutAnimator( const Property::Map& animato
         Vector2 controlPoint1( controlPoints.x, controlPoints.y );
         Vector2 controlPoint2( controlPoints.z, controlPoints.w );
         layoutDataAnimator.alphaFunction = AlphaFunction( controlPoint1, controlPoint2 );
+      }
+      else if ( value.GetType() == Property::INTEGER )
+      {
+        layoutDataAnimator.alphaFunction = AlphaFunction( static_cast<AlphaFunction::BuiltinFunction>( value.Get<int>() ) );
       }
       else if ( value.GetType() == Property::STRING )
       {
@@ -296,25 +459,29 @@ bool LayoutTransitionData::ConvertToLayoutAnimator( const Property::Map& animato
       if( value.GetType() == Property::STRING )
       {
         std::string animatorType = value.Get<std::string>();
-        if( animatorType == "ANIMATE_TO" )
+        if( animatorType == ANIMATOR_TYPE_TABLE[ Toolkit::LayoutTransitionData::Animator::Type::ANIMATE_TO ].string )
         {
-          layoutDataAnimator.animatorType = LayoutDataAnimator::AnimatorType::ANIMATE_TO;
+          layoutDataAnimator.animatorType = Toolkit::LayoutTransitionData::Animator::Type::ANIMATE_TO;
         }
-        else if( animatorType == "ANIMATE_BY" )
+        else if( animatorType == ANIMATOR_TYPE_TABLE[ Toolkit::LayoutTransitionData::Animator::Type::ANIMATE_BY ].string )
         {
-          layoutDataAnimator.animatorType = LayoutDataAnimator::AnimatorType::ANIMATE_BY;
+          layoutDataAnimator.animatorType = Toolkit::LayoutTransitionData::Animator::Type::ANIMATE_BY;
         }
-        else if( animatorType == "ANIMATE_BETWEEN" )
+        else if( animatorType == ANIMATOR_TYPE_TABLE[ Toolkit::LayoutTransitionData::Animator::Type::ANIMATE_BETWEEN ].string )
         {
-          layoutDataAnimator.animatorType = LayoutDataAnimator::AnimatorType::ANIMATE_BETWEEN;
+          layoutDataAnimator.animatorType = Toolkit::LayoutTransitionData::Animator::Type::ANIMATE_BETWEEN;
           layoutDataAnimator.keyFrames = propertyAnimator.keyFrames;
         }
-        else if( animatorType == "ANIMATE_PATH" )
+        else if( animatorType == ANIMATOR_TYPE_TABLE[ Toolkit::LayoutTransitionData::Animator::Type::ANIMATE_PATH ].string )
         {
-          layoutDataAnimator.animatorType = LayoutDataAnimator::AnimatorType::ANIMATE_PATH;
+          layoutDataAnimator.animatorType = Toolkit::LayoutTransitionData::Animator::Type::ANIMATE_PATH;
           layoutDataAnimator.path = propertyAnimator.path;
           layoutDataAnimator.forward = propertyAnimator.forward;
         }
+      }
+      else if ( value.GetType() == Property::INTEGER )
+      {
+        layoutDataAnimator.animatorType = static_cast<Toolkit::LayoutTransitionData::Animator::Type>( pair.second.Get<int>() );
       }
     }
     else if ( indexKey == Dali::Toolkit::LayoutTransitionData::AnimatorKey::TIME_PERIOD )
@@ -357,10 +524,18 @@ bool LayoutTransitionData::ConvertToLayoutAnimator( const Property::Map& animato
   return valid;
 }
 
-bool LayoutTransitionData::ConvertToLayoutDataElement( const PropertyAnimator& propertyAnimator, LayoutDataElement& layoutDataElement, LayoutData& layoutData )
+bool LayoutTransitionData::ConvertToLayoutDataElement(
+    const PropertyAnimator& propertyAnimator, LayoutDataElement& layoutDataElement )
 {
   const Property::Map& map = propertyAnimator.map;
   bool propertyFound = false;
+
+  if( mLayoutAnimators.size() == 0 )
+  {
+    mLayoutAnimators.push_back( LayoutDataAnimator() );
+  }
+
+  layoutDataElement.handle = propertyAnimator.handle;
 
   for( unsigned int mapIdx = 0; mapIdx < map.Count(); ++mapIdx )
   {
@@ -371,6 +546,10 @@ bool LayoutTransitionData::ConvertToLayoutDataElement( const PropertyAnimator& p
     if ( pair.first.type == Property::Key::STRING )
     {
       const std::string& key( pair.first.stringKey );
+      if ( key == TOKEN_CONDITION )
+      {
+        indexKey = Dali::Toolkit::LayoutTransitionData::AnimatorKey::CONDITION;
+      }
       if ( key == TOKEN_PROPERTY )
       {
         indexKey = Dali::Toolkit::LayoutTransitionData::AnimatorKey::PROPERTY;
@@ -387,18 +566,34 @@ bool LayoutTransitionData::ConvertToLayoutDataElement( const PropertyAnimator& p
       {
         indexKey = Dali::Toolkit::LayoutTransitionData::AnimatorKey::ANIMATOR;
       }
+      else if( key == TOKEN_AFFECTS_SIBLINGS )
+      {
+        indexKey = Dali::Toolkit::LayoutTransitionData::AnimatorKey::AFFECTS_SIBLINGS;
+      }
     }
     else
     {
       indexKey = pair.first.indexKey;
     }
 
-    if( indexKey == Dali::Toolkit::LayoutTransitionData::AnimatorKey::PROPERTY )
+    if( indexKey == Dali::Toolkit::LayoutTransitionData::AnimatorKey::CONDITION )
+    {
+      layoutDataElement.condition = value.Get<int>();
+    }
+    else if ( indexKey == Dali::Toolkit::LayoutTransitionData::AnimatorKey::AFFECTS_SIBLINGS )
+    {
+      layoutDataElement.updateMeasuredSize = value.Get<bool>();
+      if( layoutDataElement.updateMeasuredSize )
+      {
+        mUpdateMeasuredSize = true;
+      }
+    }
+    else if( indexKey == Dali::Toolkit::LayoutTransitionData::AnimatorKey::PROPERTY )
     {
       if( value.GetType() == Property::STRING )
       {
-        Actor actor = Actor::DownCast( layoutDataElement.handle );
-        layoutDataElement.propertyIndex = DevelHandle::GetPropertyIndex( actor, Property::Key( value.Get<std::string>() ) );
+        layoutDataElement.propertyName = value.Get<std::string>();
+        layoutDataElement.UpdatePropertyIndex();
       }
       else
       {
@@ -418,20 +613,8 @@ bool LayoutTransitionData::ConvertToLayoutDataElement( const PropertyAnimator& p
     {
       if( value.GetType() == Property::STRING )
       {
-        std::string animatorName = value.Get<std::string>();
-        if ( animatorName.empty() )
-        {
-          layoutDataElement.animatorIndex = 0;
-        }
-        else
-        {
-          auto animator = std::find_if( layoutData.layoutAnimatorArray.begin(), layoutData.layoutAnimatorArray.end(), [&animatorName](const LayoutDataAnimator& iter) {
-            return (iter.name == animatorName); } );
-          if( animator != layoutData.layoutAnimatorArray.end() )
-          {
-            layoutDataElement.animatorIndex = std::distance( layoutData.layoutAnimatorArray.begin(), animator );
-          }
-        }
+        layoutDataElement.animatorName = value.Get<std::string>();
+        layoutDataElement.UpdateAnimatorIndex( mLayoutAnimators );
       }
       else if ( value.GetType() == Property::MAP )
       {
@@ -439,8 +622,8 @@ bool LayoutTransitionData::ConvertToLayoutDataElement( const PropertyAnimator& p
         LayoutDataAnimator layoutDataAnimator;
         if( ConvertToLayoutAnimator( animatorMap, propertyAnimator, layoutDataAnimator ) )
         {
-          layoutData.layoutAnimatorArray.push_back( layoutDataAnimator );
-          layoutDataElement.animatorIndex = layoutData.layoutAnimatorArray.size()-1;
+          mLayoutAnimators.push_back( layoutDataAnimator );
+          layoutDataElement.animatorIndex = mLayoutAnimators.size() - 1;
         }
       }
     }
@@ -449,37 +632,102 @@ bool LayoutTransitionData::ConvertToLayoutDataElement( const PropertyAnimator& p
   return propertyFound;
 }
 
-void LayoutTransitionData::ConvertToLayoutDataElements( Actor owner, LayoutData& layoutData )
+void LayoutTransitionData::CollectChildrenLayoutDataElements( Actor child, LayoutData& layoutData )
 {
   LayoutDataArray& layoutDataArray = layoutData.layoutDataArray;
   // Add the children animators
-  for( const PropertyAnimator& iter : layoutData.childrenPropertyAnimators )
+  for( const LayoutDataElement& iter : layoutData.childrenLayoutDataArray )
   {
-    LayoutDataElement layoutDataElement;
-    layoutDataElement.handle = owner;
-    layoutDataElement.positionDataIndex = layoutData.layoutPositionDataArray.size() - 1;
-
-    if( ConvertToLayoutDataElement( iter, layoutDataElement, layoutData ) )
+    if( iter.handle != nullptr && iter.handle != child )
     {
-      layoutDataArray.push_back( layoutDataElement );
-    }
-  }
-
-  // Add the transition animators
-  for( const PropertyAnimator& iter : mPropertyAnimators )
-  {
-    if( iter.handle == nullptr )
-    {
-      layoutData.childrenPropertyAnimators.push_back( iter );
       continue;
     }
 
-    LayoutDataElement layoutDataElement;
-    layoutDataElement.handle = iter.handle;
-    if( ConvertToLayoutDataElement( iter, layoutDataElement, layoutData ) )
+    LayoutDataElement layoutDataElement = iter;
+    switch ( layoutDataElement.condition )
     {
-      layoutDataArray.push_back( layoutDataElement );
+      case Dali::Toolkit::LayoutTransitionData::Condition::ON_ADD:
+        if ( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_ADD
+            || layoutData.layoutTransition.gainedChild != child )
+        {
+          continue;
+        }
+        break;
+      case Dali::Toolkit::LayoutTransitionData::Condition::ON_REMOVE:
+        if( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_REMOVE
+            || layoutData.layoutTransition.lostChild != child )
+        {
+          continue;
+        }
+        break;
+      case Dali::Toolkit::LayoutTransitionData::Condition::ON_FOCUS_GAINED:
+        if( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_FOCUS
+            || layoutData.layoutTransition.gainedChild != child )
+        {
+          continue;
+        }
+        break;
+      case Dali::Toolkit::LayoutTransitionData::Condition::ON_FOCUS_LOST:
+        if( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_FOCUS
+            || layoutData.layoutTransition.lostChild != child )
+        {
+          continue;
+        }
+        break;
+      default:
+        break;
     }
+
+    if( layoutData.updateMeasuredSize && !layoutDataElement.updateMeasuredSize )
+    {
+      continue;
+    }
+
+    layoutDataElement.handle = child;
+    layoutDataElement.UpdatePropertyIndex();
+    layoutDataElement.UpdatePositionDataIndex( layoutData );
+    layoutDataArray.push_back( layoutDataElement );
+  }
+}
+
+void LayoutTransitionData::UpdateAnimatorsIndices()
+{
+  for( LayoutDataElement& iter: mLayoutDataElements )
+  {
+    iter.UpdateAnimatorIndex( mLayoutAnimators );
+  }
+}
+
+void LayoutTransitionData::CollectLayoutDataElements( Actor owner, LayoutData& layoutData )
+{
+  LayoutAnimatorArray& layoutAnimatorArray = layoutData.layoutAnimatorArray;
+  LayoutAnimatorArray::iterator it = mLayoutAnimators.begin();
+  if (layoutAnimatorArray.size() != 0)
+  {
+    // skip default animator
+    ++it;
+  }
+  std::copy( it, mLayoutAnimators.end(), std::back_inserter( layoutAnimatorArray ) );
+
+  LayoutDataArray& layoutDataArray = layoutData.layoutDataArray;
+  // Collect the transition animators
+  for( const LayoutDataElement& iter : mLayoutDataElements )
+  {
+    if( iter.handle == nullptr || iter.handle != owner )
+    {
+      layoutData.childrenLayoutDataArray.push_back( iter );
+      continue;
+    }
+
+    LayoutDataElement layoutDataElement = iter;
+    if( layoutData.updateMeasuredSize && !layoutDataElement.updateMeasuredSize )
+    {
+      continue;
+    }
+
+    layoutDataElement.UpdatePropertyIndex();
+    layoutDataElement.UpdatePositionDataIndex( layoutData );
+    layoutDataArray.push_back( layoutDataElement );
   }
 }
 
@@ -493,8 +741,13 @@ void LayoutTransitionData::EmitSignalFinish( int layoutTransitionType )
   if ( !mFinishedSignal.Empty() )
   {
     Dali::Toolkit::LayoutTransitionData handle( this );
-    mFinishedSignal.Emit( static_cast<Dali::Toolkit::LayoutTransitionData::LayoutTransitionType>(layoutTransitionType), handle );
+    mFinishedSignal.Emit( static_cast<Dali::Toolkit::LayoutTransitionData::Type>(layoutTransitionType), handle );
   }
+}
+
+bool LayoutTransitionData::HasUpdateMeasuredSize()
+{
+  return mUpdateMeasuredSize;
 }
 
 } // namespace Internal
