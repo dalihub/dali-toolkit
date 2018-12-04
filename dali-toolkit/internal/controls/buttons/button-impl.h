@@ -519,13 +519,6 @@ private:
   bool ValidateState( State requestedState );
 
   /**
-   * Perform the given function on the visuals in the given state. Can be used to add and remove visuals.
-   * @param[in] functionPtr pointer to the function to perform an action on a visual
-   * @param[in] state Visuals in this state will be the target
-   */
-  void PerformFunctionOnVisualsInState( void(Button::*functionPtr)( Property::Index visualIndex), State state  );
-
-  /**
    * Changes the button state when an action occurs on it
    * @param[in] requestedState the state to change to
    */
