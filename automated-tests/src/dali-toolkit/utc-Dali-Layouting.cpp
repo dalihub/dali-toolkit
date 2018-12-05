@@ -3341,6 +3341,117 @@ int UtcDaliLayouting_SetLayout(void)
   END_TEST;
 }
 
+int UtcDaliLayouting_SetSizeExplictFollowedByWrapContent(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_SetSizeExplictFollowedByWrapContent");
+
+  Stage stage = Stage::GetCurrent();
+
+  AbsoluteLayout absoluteLayout = AbsoluteLayout::New();
+  Control container = Control::New();
+  container.SetName( "Container" );
+  DevelControl::SetLayout( container, absoluteLayout );
+  container.SetAnchorPoint( Dali::AnchorPoint::CENTER );
+  container.SetParentOrigin( Dali::ParentOrigin::CENTER );
+
+  TextLabel textLabel = CreateTextLabel( "W" );
+  tet_infoline("SetSize explicitly then set WRAP_CONTENT");
+  textLabel.SetSize( 300.0f, 200.0f );
+  textLabel.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  textLabel.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  textLabel.SetName( "text-label" );
+  tet_infoline("Adding child to container");
+  container.Add( textLabel );
+
+  tet_infoline("Adding container stage");
+  stage.Add( container );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION ); // Not re-laid out
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 54.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  textLabel.SetProperty( TextLabel::Property::TEXT, "WWW" );
+
+  application.SendNotification();
+  application.Render();
+
+  // Add container to stage here
+  // Should call RequestLayout() to measure and layout
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION ); // Stage Size
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 162.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_SetSizeExplictFollowedByResizePolicyNaturalSize(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_SetSizeExplictFollowedByResizePolicyNaturalSize");
+
+  Stage stage = Stage::GetCurrent();
+
+  AbsoluteLayout absoluteLayout = AbsoluteLayout::New();
+  Control container = Control::New();
+  container.SetName( "Container" );
+  DevelControl::SetLayout( container, absoluteLayout );
+  container.SetAnchorPoint( Dali::AnchorPoint::CENTER );
+  container.SetParentOrigin( Dali::ParentOrigin::CENTER );
+
+  TextLabel textLabel = CreateTextLabel( "W" );
+  tet_infoline("SetSize explicitly then set ResizePolicy::NaturalSize");
+  textLabel.SetSize( 300.0f, 200.0f );
+  textLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  textLabel.SetName( "text-label" );
+  tet_infoline("Adding child to container");
+  container.Add( textLabel );
+
+  tet_infoline("Adding container stage");
+  stage.Add( container );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION ); // Not re-laid out
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 54.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  textLabel.SetProperty( TextLabel::Property::TEXT, "WWW" );
+
+  application.SendNotification();
+  application.Render();
+
+  // Add container to stage here
+  // Should call RequestLayout() to measure and layout
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION ); // Stage Size
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 162.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliLayouting_StageAdd(void)
 {
   ToolkitTestApplication application;
@@ -3359,7 +3470,8 @@ int UtcDaliLayouting_StageAdd(void)
   child.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
   child.SetPosition( 0.0f, 0.0f );
   child.SetSize( 480.0f, 180.0f );
-  child.SetName( "Child Control" );
+  child.SetName( "ChildControl" );
+  tet_infoline("Adding child to container");
   container.Add( child );
 
   // Ensure layouting happens
@@ -3377,6 +3489,7 @@ int UtcDaliLayouting_StageAdd(void)
 
   // Add container to stage here
   // Should call RequestLayout() to measure and layout
+  tet_infoline("Adding container stage");
   stage.Add( container );
 
   application.SendNotification();
