@@ -126,26 +126,6 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
   if(gesture.state == Gesture::Started)
   {
     mDragLocalPosition = gesture.position;
-  }
-  if(gesture.state == Gesture::Continuing)
-  {
-      Vector2 screenPosition = gesture.screenPosition;
-      control.GetParent().ScreenToLocal(mLocalPosition.x, mLocalPosition.y, screenPosition.x, screenPosition.y);
-      mShadowControl.SetPosition(mLocalPosition.x - mDragLocalPosition.x, mLocalPosition.y - mDragLocalPosition.y);
-  }
-  if(gesture.state == Gesture::Finished)
-  {
-    mDragControl.GetParent().Remove(mShadowControl);
-    EmitEndedSignal(control);
-  }
-}
-
-bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchData& data)
-{
-  Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
-  PointState::Type type = data.GetState(0);
-  if(type == PointState::DOWN)
-  {
     mPointDown = true;
     mDragControl = control;
     mFirstEnter.clear();
@@ -164,9 +144,26 @@ bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchData& data)
     mShadowControl.SetParentOrigin(control.GetCurrentParentOrigin());
     mShadowControl.SetAnchorPoint(control.GetCurrentAnchorPoint());
     control.GetParent().Add(mShadowControl);
-    SetPosition(data.GetScreenPosition(0));
+    SetPosition(gesture.screenPosition);
     EmitStartedSignal(control);
   }
+  if(gesture.state == Gesture::Continuing)
+  {
+      Vector2 screenPosition = gesture.screenPosition;
+      control.GetParent().ScreenToLocal(mLocalPosition.x, mLocalPosition.y, screenPosition.x, screenPosition.y);
+      mShadowControl.SetPosition(mLocalPosition.x - mDragLocalPosition.x, mLocalPosition.y - mDragLocalPosition.y);
+  }
+  if(gesture.state == Gesture::Finished)
+  {
+    mDragControl.GetParent().Remove(mShadowControl);
+    EmitEndedSignal(control);
+  }
+}
+
+bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchData& data)
+{
+  Dali::Toolkit::Control control = Dali::Toolkit::Control::DownCast(actor);
+  PointState::Type type = data.GetState(0);
 
   if(type == PointState::MOTION)
   {
