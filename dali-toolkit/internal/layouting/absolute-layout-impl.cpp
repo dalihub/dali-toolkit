@@ -21,6 +21,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
@@ -158,6 +159,12 @@ void AbsoluteLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top
       LayoutLength childHeight = childLayout->GetMeasuredHeight();
 
       auto childPosition = childOwner.GetProperty< Vector3 >( Actor::Property::POSITION );
+      // Check if there on going position or size animation and skip it to avoid legacy application regressions
+      if( DevelActor::IsPositionOrSizeCurrentlyAnimating( Actor::DownCast( childOwner ) ) &&
+          !childLayout->IsLayoutAnimated() )
+      {
+        continue;
+      }
 
       LayoutLength childTop = childPosition.y;
       LayoutLength childLeft = childPosition.x;
