@@ -160,6 +160,7 @@ develapitextselectionpopupdir = $(develapicontrolsdir)/text-controls
 develapitextdir =               $(develapidir)/text
 develapivisualfactorydir =      $(develapidir)/visual-factory
 develapivisualsdir =            $(develapidir)/visuals
+develapidragdropdir =           $(develapidir)/drag-drop-detector
 
 # devel headers
 develapi_HEADERS =                  $(devel_api_header_files)
@@ -192,6 +193,7 @@ develapitooltip_HEADERS =           $(devel_api_tooltip_header_files)
 develapitransitioneffects_HEADERS = $(devel_api_transition_effects_header_files)
 develapitextselectionpopup_HEADERS = $(devel_api_text_controls_header_files)
 develapitext_HEADERS =              $(devel_api_text_header_files)
+develapidragdrop_HEADERS =          $(devel_api_drag_and_drop_detector_header_files)
 
 # public api source
 publicapidir =                     $(topleveldir)/public-api
