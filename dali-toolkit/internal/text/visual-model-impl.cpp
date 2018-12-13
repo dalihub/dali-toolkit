@@ -278,7 +278,13 @@ LineIndex VisualModel::GetLineOfCharacter( CharacterIndex characterIndex )
     return mCachedLineIndex;
   }
 
-  // 3) Is not in the cached line. Check in the other lines.
+  // 3) if ellipsis is true. then we should used index first position.
+  if( lineRun.ellipsis )
+  {
+    return 0u;
+  }
+
+  // 4) Is not in the cached line or ellipsis. Check in the other lines.
   LineIndex index = characterIndex < lineRun.characterRun.characterIndex ? 0u : mCachedLineIndex + 1u;
 
   for( Vector<LineRun>::ConstIterator it = mLines.Begin() + index,
