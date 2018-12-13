@@ -59,6 +59,7 @@ LayoutGroup::~LayoutGroup()
 {
   // An object with a unique_ptr to an opaque structure must define it's destructor in the translation unit
   // where the opaque structure is defined. It cannot use the default method in the header file.
+  RemoveAll();
 }
 
 Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutItem& child )
