@@ -83,6 +83,17 @@ enum Type
    */
   LOOP_COUNT = ORIENTATION_CORRECTION + 3,
 
+  /**
+   * @brief The playing range the AnimatedVectorImageVisual will use.
+   *
+   * Animation will play between the values specified. Both values should be between 0-1,
+   * otherwise they will be ignored. If the range provided is not in proper order ( minimum,maximum ), it will be reordered.
+   *
+   * @details Name "playRange", Type Property::VECTOR2, between 0 and 1
+   * @note Default 0 and 1
+   */
+  PLAY_RANGE = ORIENTATION_CORRECTION + 4
+
 };
 
 } //namespace Property

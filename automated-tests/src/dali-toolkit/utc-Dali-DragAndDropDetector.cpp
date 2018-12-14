@@ -305,12 +305,12 @@ int UtcDaliDragAndDropDetectorStartSignal(void)
   DragSignalFunctor functor(data);
   detector.StartedSignal().Connect(&application, functor);
 
-  Vector2 screenCoordinates(10.0f, 10.0f);
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Down, screenCoordinates));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(control, data.control, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(10.0f, 10.0f), data.detector.GetCurrentScreenPosition(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(12.0f, 12.0f), data.detector.GetCurrentScreenPosition(), TEST_LOCATION);
   data.Reset();
 
   END_TEST;
@@ -345,11 +345,10 @@ int UtcDaliDragAndDropDetectorEnteredSignal(void)
   DragSignalFunctor functor(data);
   detector.EnteredSignal().Connect(&application, functor);
 
-  Vector2 screenCoordinates(10.0f, 10.0f);
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Down, screenCoordinates));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
 
-  screenCoordinates.x = 10.0f;
-  screenCoordinates.y = 110.0f;
+  Vector2 screenCoordinates(10.0f, 110.0f);
   application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -390,11 +389,10 @@ int UtcDaliDragAndDropDetectorMovedSignal(void)
   DragSignalFunctor functor(data);
   detector.MovedSignal().Connect(&application, functor);
 
-  Vector2 screenCoordinates(10.0f, 10.0f);
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Down, screenCoordinates));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
 
-  screenCoordinates.x = 10.0f;
-  screenCoordinates.y = 110.0f;
+  Vector2 screenCoordinates(10.0f, 110.0f);
   application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
 
   screenCoordinates.x = 10.0f;
@@ -442,11 +440,10 @@ int UtcDaliDragAndDropDetectorExitedSignal(void)
   DragSignalFunctor functor(data);
   detector.ExitedSignal().Connect(&application, functor);
 
-  Vector2 screenCoordinates(10.0f, 10.0f);
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Down, screenCoordinates));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
 
-  screenCoordinates.x = 10.0f;
-  screenCoordinates.y = 110.0f;
+  Vector2 screenCoordinates(10.0f, 110.0f);
   application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
 
   screenCoordinates.x = 20.0f;
@@ -489,11 +486,10 @@ int UtcDaliDragAndDropDetectorDroppedSignal(void)
   DragSignalFunctor functor(data);
   detector.DroppedSignal().Connect(&application, functor);
 
-  Vector2 screenCoordinates(10.0f, 10.0f);
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Down, screenCoordinates));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
 
-  screenCoordinates.x = 10.0f;
-  screenCoordinates.y = 110.0f;
+  Vector2 screenCoordinates(10.0f, 110.0f);
   application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
 
   screenCoordinates.x = 10.0f;
@@ -585,11 +581,10 @@ int UtcDaliDragAndDropDetectorGetContent(void)
   DragSignalFunctor functor(data);
   detector.DroppedSignal().Connect(&application, functor);
 
-  Vector2 screenCoordinates(10.0f, 10.0f);
-  application.ProcessEvent(GenerateSingleTouch(TouchPoint::Down, screenCoordinates));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
 
-  screenCoordinates.x = 10.0f;
-  screenCoordinates.y = 110.0f;
+  Vector2 screenCoordinates(10.0f, 110.0f);
   application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
 
   screenCoordinates.x = 10.0f;

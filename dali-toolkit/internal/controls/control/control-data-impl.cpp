@@ -477,19 +477,13 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
   // ( If the control has been type registered )
   if( visual.GetName().empty() )
   {
-    try
+    // returns empty string if index is not found as long as index is not -1
+    std::string visualName = self.GetPropertyName( index );
+    if( !visualName.empty() )
     {
-      std::string visualName = self.GetPropertyName( index );
-      if( !visualName.empty() )
-      {
-        DALI_LOG_INFO( gLogFilter, Debug::Concise, "Setting visual name for property %d to %s\n",
-                       index, visualName.c_str() );
-        visual.SetName( visualName );
-      }
-    }
-    catch( Dali::DaliException e )
-    {
-      DALI_LOG_WARNING( "Attempting to register visual without a registered property, index: %d\n", index );
+      DALI_LOG_INFO( gLogFilter, Debug::Concise, "Setting visual name for property %d to %s\n",
+                     index, visualName.c_str() );
+      visual.SetName( visualName );
     }
   }
 
