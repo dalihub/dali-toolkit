@@ -99,15 +99,6 @@ void AbsoluteLayout::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec height
       // Determine the width and height needed by the children using their given position and size.
       // Children could overlap so find the left most and right most child.
       auto childPosition = childOwner.GetProperty< Vector3 >( Actor::Property::POSITION );
-      auto childSize = childOwner.GetProperty< Vector3 >( Actor::Property::SIZE );
-
-      // Check if there on going position or size animation and skip it to avoid legacy application regressions
-      if( childPosition != childOwner.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) ||
-          childSize != childOwner.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) )
-      {
-        break;
-      }
-
       LayoutLength childLeft = childPosition.x;
       LayoutLength childTop = childPosition.y;
 
@@ -167,14 +158,6 @@ void AbsoluteLayout::OnLayout( bool changed, LayoutLength left, LayoutLength top
       LayoutLength childHeight = childLayout->GetMeasuredHeight();
 
       auto childPosition = childOwner.GetProperty< Vector3 >( Actor::Property::POSITION );
-      auto childSize = childOwner.GetProperty< Vector3 >( Actor::Property::SIZE );
-
-      // Check if there on going position or size animation and skip it to avoid legacy application regressions
-      if( childPosition != childOwner.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) ||
-          childSize != childOwner.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) )
-      {
-        break;
-      }
 
       LayoutLength childTop = childPosition.y;
       LayoutLength childLeft = childPosition.x;
