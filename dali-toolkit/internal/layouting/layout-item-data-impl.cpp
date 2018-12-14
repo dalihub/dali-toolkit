@@ -37,6 +37,8 @@ LayoutItem::Impl::Impl()
   mMinimumSize(),
   mMeasuredWidth(0),
   mMeasuredHeight(0),
+  mTargetWidth(0),
+  mTargetHeight(0),
   mLeft( 0 ),
   mRight( 0 ),
   mTop( 0 ),

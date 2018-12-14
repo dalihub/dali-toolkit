@@ -353,7 +353,7 @@ LayoutLength LayoutItem::GetDefaultSize( LayoutLength size, MeasureSpec measureS
   auto specMode = measureSpec.GetMode();
   auto specSize = measureSpec.GetSize();
 
-  DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::GetDefaultSize MeasureSpec("<<measureSpec<< ") size:" << size << "\n" );
+  DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::GetDefaultSize size:" << size <<  "MeasureSpec(" << measureSpec << ") \n" );
 
   switch (specMode)
   {
@@ -366,10 +366,9 @@ LayoutLength LayoutItem::GetDefaultSize( LayoutLength size, MeasureSpec measureS
     {
       // Ensure the default size does not exceed the spec size unless the default size is 0.
       // Another container could provide a default size of 0.
-      LayoutLength tmp = specSize;
 
       // Do not set size to 0, use specSize in this case as could be a legacy container
-      if( size < tmp && size > LayoutLength( 0 ) )
+      if( ( size < specSize ) && ( size > LayoutLength( 0 ) )  )
       {
         result = size;
       }
@@ -394,8 +393,13 @@ void LayoutItem::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeas
   DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::OnMeasure\n");
 
   // GetDefaultSize will limit the MeasureSpec to the suggested minimumWidth and minimumHeight
-  SetMeasuredDimensions( GetDefaultSize( GetSuggestedMinimumWidth(), widthMeasureSpec ),
-                         GetDefaultSize( GetSuggestedMinimumHeight(), heightMeasureSpec ) );
+  auto minimumWidth = GetSuggestedMinimumWidth();
+  auto minimumHeight = GetSuggestedMinimumHeight();
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::OnMeasure minimumWidth(%f) minimumHeight(%f)\n",
+                 minimumWidth.AsInteger(), minimumHeight.AsInteger() );
+
+  SetMeasuredDimensions( GetDefaultSize( minimumWidth, widthMeasureSpec ),
+                         GetDefaultSize( minimumHeight, heightMeasureSpec ) );
 }
 
 void LayoutItem::OnLayout( bool changed, LayoutLength left, LayoutLength top, LayoutLength right, LayoutLength bottom )
@@ -519,8 +523,21 @@ LayoutLength LayoutItem::GetSuggestedMinimumWidth() const
   auto owner = GetOwner();
   auto actor = Actor::DownCast(owner);
   auto naturalSize = actor ? actor.GetNaturalSize() : Vector3::ZERO;
+  LayoutLength layoutMinimumWidth = GetMinimumWidth();
 
-  return std::max( mImpl->mMinimumSize.GetWidth(), LayoutLength( naturalSize.width ) );
+  // Set minimum size takes precedence over natural size.
+  LayoutLength result = std::max( layoutMinimumWidth, LayoutLength( naturalSize.width ) );
+
+  if( actor.GetChildCount() == 0 ) // If not a container
+  {
+    LayoutLength targetWidth = GetTargetWidth();
+    DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::GetSuggestedMinimumWidth targetWidth(%f)\n", targetWidth.AsInteger() );
+    result = (result > 0 && (targetWidth < 1 ) ) ? result : targetWidth;  // Use size set if no mininum width and control has no natural size.
+  }
+
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::GetSuggestedMinimumWidth control(%s) naturalWidth(%f) minimumSize.width(%f) targetWidth(%f) result(%f)\n",
+        actor.GetName().c_str(), LayoutLength( naturalSize.width ).AsInteger(), layoutMinimumWidth.AsInteger(), actor.GetTargetSize().width, result.AsInteger() );
+  return result;
 }
 
 LayoutLength LayoutItem::GetSuggestedMinimumHeight() const
@@ -528,8 +545,20 @@ LayoutLength LayoutItem::GetSuggestedMinimumHeight() const
   auto owner = GetOwner();
   auto actor = Actor::DownCast(owner);
   auto naturalSize = actor ? actor.GetNaturalSize() : Vector3::ZERO;
+  LayoutLength layoutMinimumHeight = GetMinimumHeight();
 
-  return std::max( mImpl->mMinimumSize.GetHeight(), LayoutLength( naturalSize.height ) );
+  // Set minimum size takes precedence over natural size.
+  LayoutLength result = std::max( layoutMinimumHeight, LayoutLength( naturalSize.height ) );
+
+  if( actor.GetChildCount() == 0 ) // If not a container
+  {
+    LayoutLength targetHeight = GetTargetHeight();
+    result = (result > 0 && (targetHeight < 1 ) )?result : targetHeight; // Use size set if no mininum width and control has no natural size.
+  }
+
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::GetSuggestedMinimumHeight control(%s) naturalHeight(%f) minimumHeight(%f) targetHeight(%f) result(%f)\n",
+          actor.GetName().c_str(), naturalSize.height, layoutMinimumHeight.AsInteger(), actor.GetTargetSize().height, result.AsInteger() );
+  return result;
 }
 
 MeasuredSize LayoutItem::ResolveSizeAndState( LayoutLength size, MeasureSpec measureSpec, MeasuredSize::State childMeasuredState )
@@ -583,6 +612,9 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
     changed = true;
     mImpl->ClearPrivateFlag( Impl::PRIVATE_FLAG_FORCE_SET_FRAME );
   }
+
+  DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame %s changed size(%s)\n",
+        Actor::DownCast( GetOwner() ).GetName().c_str(), (changed)?"yes":"no" );
 
   LayoutLength oldWidth = mImpl->mRight - mImpl->mLeft;
   LayoutLength oldHeight = mImpl->mBottom - mImpl->mTop;
@@ -658,6 +690,26 @@ bool LayoutItem::SetFrame( LayoutLength left, LayoutLength top, LayoutLength rig
   DALI_LOG_STREAM( gLayoutFilter, Debug::Verbose, "LayoutItem::SetFrame  exit(" << left << ", " << top << ", " << right << ", " << bottom << ")\n" );
 
   return changed;
+}
+
+LayoutLength LayoutItem::GetTargetWidth() const
+{
+  return mImpl->mTargetWidth;
+}
+
+LayoutLength LayoutItem::GetTargetHeight() const
+{
+  return mImpl->mTargetHeight;
+}
+
+void LayoutItem::SetTargetWidth( LayoutLength width )
+{
+  mImpl->mTargetWidth = width;
+}
+
+void LayoutItem::SetTargetHeight( LayoutLength height )
+{
+  mImpl->mTargetHeight = height;
 }
 
 void LayoutItem::OnLayoutAnimationFinished( Animation& animation )

@@ -707,6 +707,24 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
 void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
+    DALI_LOG_INFO( gLogFilter, Debug::General, "Control::OnSetResizePolicy for %s %d\n", Self().GetName().c_str(), policy );
+
+    if( mImpl->GetLayout() )
+    {
+      const ResizePolicy::Type resizePolicy = Self().GetResizePolicy( dimension );
+
+      if( ResizePolicy::FIXED != resizePolicy && ( Self().GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION ) < 0 ) && ( dimension == Dimension::WIDTH || dimension == Dimension::ALL_DIMENSIONS ) )
+      {
+        DALI_LOG_INFO( gLogFilter, Debug::General, "Control::OnSetResizePolicy Reseting MinimumWidth\n" );
+        mImpl->GetLayout()->SetMinimumWidth( 0 );
+      }
+
+      if( ResizePolicy::FIXED != resizePolicy && ( Self().GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION ) < 0 ) &&  ( dimension == Dimension::HEIGHT || dimension == Dimension::ALL_DIMENSIONS ) )
+      {
+        DALI_LOG_INFO( gLogFilter, Debug::General, "Control::OnSetResizePolicy Reseting MinimumHeight\n" );
+        mImpl->GetLayout()->SetMinimumHeight( 0 );
+      }
+    }
 }
 
 Vector3 Control::GetNaturalSize()

@@ -45,6 +45,9 @@ public:
   MeasuredSize mMeasuredWidth;
   MeasuredSize mMeasuredHeight;
 
+  LayoutLength mTargetWidth;  ///< Original fixed width that was set
+  LayoutLength mTargetHeight; ///< Original fixed height that was set
+
   LayoutLength mLeft;
   LayoutLength mRight;
   LayoutLength mTop;

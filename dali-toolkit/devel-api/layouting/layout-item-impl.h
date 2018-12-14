@@ -359,6 +359,40 @@ public:
    */
   Extents GetMargin() const;
 
+  /**
+   * @brief Sets the target width of the layout item.
+   *
+   * The item may not actually be drawn as this size but the value is stored
+   * so if space allows it may take up this size at some point.
+   *
+   * @param[in] width The target width the layout will try to be, in pixels
+   */
+  void SetTargetWidth( LayoutLength width );
+
+  /**
+   * @brief Sets the target height of the layout item.
+   *
+   * The item may not actually be drawn as this size but the value is stored
+   * so if space allows it may take up this size at some point.
+   *
+   * @param[in] height The target width the layout will try to be, in pixels
+   */
+  void SetTargetHeight( LayoutLength height );
+
+  /**
+   * @brief Gets the target width of this layout item.
+   *
+   * @return height The target width set on this layout item
+   */
+  LayoutLength GetTargetWidth() const;
+
+  /**
+   * @brief Gets the target height of the layout item.
+   *
+   * @return height The target width set on this layout item
+   */
+  LayoutLength GetTargetHeight() const;
+
 protected:
   /**
    * @brief Allow directly deriving classes to remove layout children when unparented
