@@ -37,6 +37,7 @@ struct ScriptRun
 {
   CharacterRun characterRun; ///< The initial character index and the number of characters of the run.
   Script       script;       ///< Script of the run.
+  bool         isRightToLeft; ///< Whether is right to left direction
 };
 
 } // namespace Text

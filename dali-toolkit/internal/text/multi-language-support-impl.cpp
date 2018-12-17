@@ -204,6 +204,9 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
   // Pointers to the text buffer.
   const Character* const textBuffer = text.Begin();
 
+  // Initialize whether is right to left direction
+  currentScriptRun.isRightToLeft = false;
+
   // Traverse all characters and set the scripts.
   const Length lastCharacter = startIndex + numberOfCharacters;
   for( Length index = startIndex; index < lastCharacter; ++index )
@@ -226,6 +229,9 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
     while( !endOfText &&
            ( TextAbstraction::COMMON == script ) )
     {
+      // Check if whether is right to left markup and Keeps true if the previous value was true.
+      currentScriptRun.isRightToLeft = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftMark( character );
+
       if( TextAbstraction::EMOJI == currentScriptRun.script )
       {
         // Emojis doesn't mix well with characters common to all scripts. Insert the emoji run.
@@ -262,6 +268,8 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
         currentScriptRun.characterRun.numberOfCharacters = 0u;
         currentScriptRun.script = TextAbstraction::UNKNOWN;
         numberOfAllScriptCharacters = 0u;
+        // Initialize whether is right to left direction
+        currentScriptRun.isRightToLeft = false;
       }
 
       // Get the next character.
@@ -288,7 +296,7 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
         ( TextAbstraction::EMOJI != script ) )
     {
       // Sets the direction of the first valid script.
-      isParagraphRTL = TextAbstraction::IsRightToLeftScript( script );
+      isParagraphRTL = currentScriptRun.isRightToLeft || TextAbstraction::IsRightToLeftScript( script );
       isFirstScriptToBeSet = false;
     }
 
@@ -332,6 +340,8 @@ void MultilanguageSupport::SetScripts( const Vector<Character>& text,
       currentScriptRun.characterRun.numberOfCharacters = numberOfAllScriptCharacters + 1u; // Adds the white spaces which are at the begining of the script.
       currentScriptRun.script = script;
       numberOfAllScriptCharacters = 0u;
+      // Check if whether is right to left script.
+      currentScriptRun.isRightToLeft = TextAbstraction::IsRightToLeftScript( currentScriptRun.script );
     }
     else
     {

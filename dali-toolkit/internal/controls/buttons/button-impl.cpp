@@ -122,7 +122,7 @@ const Scripting::StringEnum ALIGNMENT_STRING_TABLE[] =
 
 const unsigned int ALIGNMENT_STRING_TABLE_COUNT = sizeof( ALIGNMENT_STRING_TABLE ) / sizeof( ALIGNMENT_STRING_TABLE[0] );
 
-const Property::Index GET_VISUAL_INDEX_FOR_STATE[][Button::STATE_COUNT] =
+const Property::Index VISUAL_INDEX_FOR_STATE[][Button::STATE_COUNT] =
 {
   { Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, Toolkit::DevelButton::Property::UNSELECTED_VISUAL },
   { Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, Toolkit::DevelButton::Property::SELECTED_VISUAL  },
@@ -300,19 +300,6 @@ bool Button::ValidateState( State requestedState )
   return transitionTable[mButtonState][requestedState];
 }
 
-void Button::PerformFunctionOnVisualsInState( void(Button::*functionPtr)( Property::Index visualIndex), State state )
-{
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::PerformFunctionOnVisualsInState BACKROUND visual(%d) for state (%d)\n",
-                 GET_VISUAL_INDEX_FOR_STATE[state][BACKGROUND], state );
-  DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::PerformFunctionOnVisualsInState FOREGROUND visuals(%d)  for state (%d)\n",
-                 GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND], state );
-
-  (this->*functionPtr)( GET_VISUAL_INDEX_FOR_STATE[state][BACKGROUND] );
-  (this->*functionPtr)( GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND] );
-
-  RelayoutRequest();
-}
-
 void Button::ChangeState( State requestedState )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::ChangeState ReuestedState(%d)\n", requestedState );
@@ -331,10 +318,14 @@ void Button::ChangeState( State requestedState )
   if ( Self().OnStage() )
   {
     OnStateChange( mButtonState ); // Notify derived buttons
-    PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
+    SelectRequiredVisual( VISUAL_INDEX_FOR_STATE[ mButtonState ][ BACKGROUND ] );
+    SelectRequiredVisual( VISUAL_INDEX_FOR_STATE[ mButtonState ][ FOREGROUND ] );
     // If animation supported then visual removal should be performed after any transition animation has completed.
     // If Required Visual is not loaded before current visual is removed then a flickering will be evident.
-    PerformFunctionOnVisualsInState( &Button::OnButtonVisualRemoval, mPreviousButtonState ); // Derived button can override OnButtonVisualRemoval
+    // Derived button can override OnButtonVisualRemoval
+    OnButtonVisualRemoval( VISUAL_INDEX_FOR_STATE[ mPreviousButtonState ][ BACKGROUND ] );
+    OnButtonVisualRemoval( VISUAL_INDEX_FOR_STATE[ mPreviousButtonState ][ FOREGROUND ] );
+    RelayoutRequest();
   }
 
   Toolkit::Button handle( GetOwner() );
@@ -421,7 +412,6 @@ Button::Align Button::GetLabelAlignment()
  * 3) Register visual with control with false for enable flag. Button will later enable visual when needed ( Button::SelectRequiredVisual )
  * 4) Unregister visual if empty map was provided. This is the method to remove a visual
  */
-
 void Button::CreateVisualsForComponent( Property::Index index, const Property::Value& value, const int visualDepth )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent index(%d)\n", index );
@@ -453,14 +443,17 @@ void Button::CreateVisualsForComponent( Property::Index index, const Property::V
   {
     DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "CreateVisualsForComponent RegisterVisual index(%d) enabled(%s)\n",
                    index, DevelControl::IsVisualEnabled( *this, index )?"true":"false" );
-    DevelControl::RegisterVisual( *this, index, buttonVisual, DevelControl::IsVisualEnabled( *this, index ), visualDepth );
+    // enable the visual if needed for current state
+    const bool enabled = ( ( index == VISUAL_INDEX_FOR_STATE[ mButtonState ][ BACKGROUND ] )||
+                           ( index == VISUAL_INDEX_FOR_STATE[ mButtonState ][ FOREGROUND ] ) );
+    DevelControl::RegisterVisual( *this, index, buttonVisual, enabled, visualDepth );
   }
   else
   {
     DevelControl::UnregisterVisual( *this, index );
     DALI_LOG_INFO( gLogButtonFilter, Debug::General, "CreateVisualsForComponent Visual not created or empty map (clearing visual).(%d)\n", index);
   }
-  PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
+  RelayoutRequest();
 }
 
 bool Button::GetPropertyMapForVisual( Property::Index visualIndex, Property::Map& retreivedMap ) const
@@ -770,10 +763,13 @@ void Button::OnStageDisconnection()
 void Button::OnStageConnection( int depth )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::OnStageConnection ptr(%p) \n", this );
-  PerformFunctionOnVisualsInState( &Button::OnButtonVisualRemoval, mPreviousButtonState );
+  OnButtonVisualRemoval( VISUAL_INDEX_FOR_STATE[ mPreviousButtonState ][ BACKGROUND ] );
+  OnButtonVisualRemoval( VISUAL_INDEX_FOR_STATE[ mPreviousButtonState ][ FOREGROUND ] );
   SelectRequiredVisual( Toolkit::Button::Property::LABEL );
-  PerformFunctionOnVisualsInState( &Button::SelectRequiredVisual, mButtonState );
+  SelectRequiredVisual( VISUAL_INDEX_FOR_STATE[ mButtonState ][ BACKGROUND ] );
+  SelectRequiredVisual( VISUAL_INDEX_FOR_STATE[ mButtonState ][ FOREGROUND ] );
   Control::OnStageConnection( depth ); // Enabled visuals will be put on stage
+  RelayoutRequest();
 }
 
 Vector3 Button::GetNaturalSize()
@@ -790,7 +786,7 @@ Vector3 Button::GetNaturalSize()
 
   for ( int state = Button::UNSELECTED_STATE; state < Button::STATE_COUNT; state++ )
   {
-    Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, GET_VISUAL_INDEX_FOR_STATE[state][FOREGROUND] );
+    Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, VISUAL_INDEX_FOR_STATE[state][FOREGROUND] );
     Size visualSize;
     if ( visual )
     {
@@ -805,7 +801,7 @@ Vector3 Button::GetNaturalSize()
   {
     for ( int state = Button::UNSELECTED_STATE; state < Button::STATE_COUNT; state++ )
     {
-      Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, GET_VISUAL_INDEX_FOR_STATE[state][BACKGROUND] );
+      Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, VISUAL_INDEX_FOR_STATE[state][BACKGROUND] );
       Size visualSize;
       if ( visual )
       {
@@ -886,9 +882,8 @@ void Button::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "OnRelayout targetSize(%f,%f) ptr(%p) state[%d]\n", size.width, size.height, this, mButtonState );
 
-  Toolkit::Visual::Base currentVisual = DevelControl::GetVisual( *this, GET_VISUAL_INDEX_FOR_STATE[mButtonState][FOREGROUND] );
-
-  Toolkit::Visual::Base currentBackGroundVisual = DevelControl::GetVisual( *this, GET_VISUAL_INDEX_FOR_STATE[mButtonState][BACKGROUND] );
+  Toolkit::Visual::Base currentVisual = DevelControl::GetVisual( *this, VISUAL_INDEX_FOR_STATE[mButtonState][FOREGROUND] );
+  Toolkit::Visual::Base currentBackGroundVisual = DevelControl::GetVisual( *this, VISUAL_INDEX_FOR_STATE[mButtonState][BACKGROUND] );
 
   // Sizes and padding set to zero, if not present then values will no effect calculations.
   Vector2 visualPosition = Vector2::ZERO;
@@ -1103,8 +1098,11 @@ void Button::Released()
 void Button::SelectRequiredVisual( Property::Index visualIndex )
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::Verbose, "Button::SelectRequiredVisual index(%d) state(%d)\n", visualIndex, mButtonState );
-
-  DevelControl::EnableVisual( *this, visualIndex, true );
+  // only enable visuals that exist
+  if( DevelControl::GetVisual( *this, visualIndex ) )
+  {
+    DevelControl::EnableVisual( *this, visualIndex, true );
+  }
 }
 
 void Button::RemoveVisual( Property::Index visualIndex )
@@ -1256,7 +1254,6 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
         if( !outTextVisualProperties.Empty() )
         {
           GetImplementation( button ).CreateVisualsForComponent( index, outTextVisualProperties, DepthIndex::CONTENT );
-          GetImplementation( button ).RelayoutRequest();
         }
         break;
       }
@@ -1269,7 +1266,6 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
                                                     labelAlignment );
 
         GetImplementation( button ).SetLabelAlignment( labelAlignment );
-        GetImplementation( button ).RelayoutRequest();
         break;
       }
 
@@ -1284,7 +1280,6 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
       {
         Vector4 padding ( value.Get< Vector4 >() );
         GetImplementation( button ).SetForegroundPadding( Padding( padding.x, padding.y, padding.z, padding.w ) );
-        GetImplementation( button ).RelayoutRequest();
         break;
       }
     }

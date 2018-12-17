@@ -58,22 +58,30 @@ public:
   virtual ~VectorRasterizeThread();
 
   /**
-   * @brief Play the vector animation
+   * @brief Sets the target image size.
+   *
+   * @param[in] width The target image width
+   * @param[in] height The target image height
+   */
+  void SetSize( uint32_t width, uint32_t height );
+
+  /**
+   * @brief Play the vector animation.
    */
   void StartAnimation();
 
   /**
-   * @brief Stop the vector animation
+   * @brief Stop the vector animation.
    */
   void StopAnimation();
 
   /**
-   * @brief Pause the vector animation
+   * @brief Pause the vector animation.
    */
   void PauseAnimation();
 
   /**
-   * @brief Resume the vector animation
+   * @brief Resume the vector animation.
    */
   void ResumeAnimation();
 
@@ -84,9 +92,22 @@ public:
 
   /**
    * @brief This callback is called after the first frame is ready.
-   * @param callback The resource ready callback
+   * @param[in] callback The resource ready callback
    */
   void SetResourceReadyCallback( EventThreadCallback* callback );
+
+  /**
+   * @brief Enable looping for 'count' repeats. -1 means to repeat forever.
+   * @param[in] count The number of times to loop
+   */
+  void SetLoopCount( int16_t count );
+
+  /**
+   * @brief Set the playing range.
+   * @param[in] range Two values between [0,1] to specify minimum and maximum progress.
+   * The animation will play between those values.
+   */
+  void SetPlayRange( Vector2 range );
 
 protected:
 
@@ -127,10 +148,15 @@ private:
   ConditionalWait            mConditionalWait;
   Dali::Mutex                mMutex;
   EventThreadCallback*       mResourceReadyTrigger;
+  Vector2                    mPlayRange;
   uint32_t                   mCurrentFrame;
   uint32_t                   mTotalFrame;
+  uint32_t                   mStartFrame;
+  uint32_t                   mEndFrame;
   uint32_t                   mWidth;
   uint32_t                   mHeight;
+  int16_t                    mLoopCount;
+  int16_t                    mCurrentLoop;
   bool                       mNeedRender;
   bool                       mPlaying;
   bool                       mPaused;
