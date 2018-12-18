@@ -300,6 +300,11 @@ void SvgVisual::OnSetTransform()
       mVisualSize = visualSize;
     }
   }
+
+  if(mImpl->mRenderer)
+  {
+    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
+  }
 }
 
 } // namespace Internal
