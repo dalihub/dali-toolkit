@@ -60,8 +60,6 @@ const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT                 = "horizont
 const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT                   = "verticalAlignment";
 const char* const PROPERTY_NAME_TEXT_COLOR                           = "textColor";
 const char* const PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR               = "placeholderTextColor";
-const char* const PROPERTY_NAME_SHADOW_OFFSET                        = "shadowOffset";
-const char* const PROPERTY_NAME_SHADOW_COLOR                         = "shadowColor";
 const char* const PROPERTY_NAME_PRIMARY_CURSOR_COLOR                 = "primaryCursorColor";
 const char* const PROPERTY_NAME_SECONDARY_CURSOR_COLOR               = "secondaryCursorColor";
 const char* const PROPERTY_NAME_ENABLE_CURSOR_BLINK                  = "enableCursorBlink";
@@ -508,8 +506,6 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_VERTICAL_ALIGNMENT ) == TextField::Property::VERTICAL_ALIGNMENT );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_TEXT_COLOR ) == TextField::Property::TEXT_COLOR );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PLACEHOLDER_TEXT_COLOR ) == TextField::Property::PLACEHOLDER_TEXT_COLOR );
-  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_SHADOW_OFFSET ) == TextField::Property::SHADOW_OFFSET );
-  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_SHADOW_COLOR ) == TextField::Property::SHADOW_COLOR );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_PRIMARY_CURSOR_COLOR ) == TextField::Property::PRIMARY_CURSOR_COLOR );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_SECONDARY_CURSOR_COLOR ) == TextField::Property::SECONDARY_CURSOR_COLOR );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_CURSOR_BLINK ) == TextField::Property::ENABLE_CURSOR_BLINK );
@@ -676,12 +672,6 @@ int UtcDaliTextFieldSetPropertyP(void)
   // Check placeholder text's color property.
   field.SetProperty( TextField::Property::PLACEHOLDER_TEXT_COLOR, Color::RED );
   DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::PLACEHOLDER_TEXT_COLOR ), Color::RED, TEST_LOCATION );
-
-  // Check shadow properties.
-  field.SetProperty( TextField::Property::SHADOW_OFFSET, Vector2( 1.f, 1.f ) );
-  DALI_TEST_EQUALS( field.GetProperty<Vector2>( TextField::Property::SHADOW_OFFSET ), Vector2( 1.f, 1.f ), TEST_LOCATION );
-  field.SetProperty( TextField::Property::SHADOW_COLOR, Color::GREEN );
-  DALI_TEST_EQUALS( field.GetProperty<Vector4>( TextField::Property::SHADOW_COLOR ), Color::GREEN, TEST_LOCATION );
 
   // Check cursor properties
   field.SetProperty( TextField::Property::PRIMARY_CURSOR_COLOR, Color::RED );

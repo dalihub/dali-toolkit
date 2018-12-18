@@ -150,11 +150,6 @@ const IntegerPair EnumTable[] =
     { "COLOR_MODE_USE_OWN_MULTIPLY_PARENT_ALPHA",              USE_OWN_MULTIPLY_PARENT_ALPHA    },
 
 
-    { "POSITION_INHERITANCE_INHERIT_PARENT_POSITION",                    INHERIT_PARENT_POSITION                    },
-    { "POSITION_INHERITANCE_USE_PARENT_POSITION",                        USE_PARENT_POSITION                        },
-    { "POSITION_INHERITANCE_USE_PARENT_POSITION_PLUS_LOCAL_POSITION",    USE_PARENT_POSITION_PLUS_LOCAL_POSITION    },
-    { "POSITION_INHERITANCE_DONT_INHERIT_POSITION",                      DONT_INHERIT_POSITION                      },
-
     { "DRAW_MODE_NORMAL",                                   DrawMode::NORMAL     },
     { "DRAW_MODE_OVERLAY_2D",                               DrawMode::OVERLAY_2D },
 
