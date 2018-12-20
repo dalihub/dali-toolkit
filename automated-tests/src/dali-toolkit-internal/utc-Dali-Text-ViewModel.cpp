@@ -71,6 +71,7 @@ struct ElideData
   unsigned int numberOfLines;
   unsigned int numberOfGlyphs;
   float*       positions;
+  unsigned int ignoreOfGlyphs;
 };
 
 bool ElideTest( const ElideData& data )
@@ -130,7 +131,7 @@ bool ElideTest( const ElideData& data )
   if( numberOfLines != 0u )
   {
     const LineRun& lastLine = *( model->GetLines() + numberOfLines - 1u );
-    const Length numberOfLastLineGlyphs = data.numberOfGlyphs - lastLine.glyphRun.glyphIndex;
+    const Length numberOfLastLineGlyphs = data.numberOfGlyphs - lastLine.glyphRun.glyphIndex + data.ignoreOfGlyphs;
 
     std::cout << "  last line alignment offset : " << lastLine.alignmentOffset << std::endl;
 
@@ -594,6 +595,9 @@ int UtcDaliTextViewModelElideText02(void)
   Size textSize04( 80.f, 10.f );
   float positions04[] = { 2.f };
 
+  Size textSize05( 180.f, 100.f );
+  float positions05[] = { 0.f, 0.f };
+
   struct ElideData data[] =
   {
     {
@@ -602,7 +606,8 @@ int UtcDaliTextViewModelElideText02(void)
       textSize00,
       0u,
       0u,
-      NULL
+      NULL,
+      0u
     },
     {
       "Latin script",
@@ -610,7 +615,8 @@ int UtcDaliTextViewModelElideText02(void)
       textSize01,
       5u,
       42u,
-      positions01
+      positions01,
+      0u
     },
     {
       "Hebrew script",
@@ -618,7 +624,8 @@ int UtcDaliTextViewModelElideText02(void)
       textSize02,
       5u,
       49u,
-      positions02
+      positions02,
+      0u
     },
     {
       "Arabic script",
@@ -626,7 +633,8 @@ int UtcDaliTextViewModelElideText02(void)
       textSize03,
       5u,
       79u,
-      positions03
+      positions03,
+      0u
     },
     {
       "Small control size, no line fits.",
@@ -634,10 +642,20 @@ int UtcDaliTextViewModelElideText02(void)
       textSize04,
       1u,
       1u,
-      positions04
-    }
+      positions04,
+      0u
+    },
+    {
+      "Include newline character",
+      "<font family='TizenSans'>yesterday\n all\n my troubles\n seemed so far\n\n away now it looks</font>",
+      textSize05,
+      5u,
+      40,
+      positions05,
+      5u
+    },
   };
-  const unsigned int numberOfTests = 5u;
+  const unsigned int numberOfTests = 6u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
