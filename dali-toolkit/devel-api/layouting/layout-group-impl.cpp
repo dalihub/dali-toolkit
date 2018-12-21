@@ -614,7 +614,7 @@ void LayoutGroup::ChildRemovedFromOwner( Actor child )
     if( childLayout )
     {
       Remove( *childLayout.Get() );
-      RequestLayout( Dali::Toolkit::LayoutTransitionData::Type::ON_CHILD_REMOVE, child, Actor() );
+      RequestLayout( Dali::Toolkit::LayoutTransitionData::Type::ON_CHILD_REMOVE, Actor(), child );
     }
   }
 }

@@ -82,7 +82,10 @@ void LayoutController::RequestLayout( LayoutItem& layoutItem, int layoutTransiti
   auto actor = Actor::DownCast( layoutItem.GetOwner() );
   if ( actor )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutController::RequestLayout owner[%s] layoutItem[%p] layoutTransitionType(%d)\n", actor.GetName().c_str(), &layoutItem, layoutTransitionType );
+    DALI_LOG_INFO( gLogFilter, Debug::Concise, "LayoutController::RequestLayout owner[%s] layoutItem[%p] layoutTransitionType(%d) gainedChild[%s] lostChild[%s]\n",
+      actor.GetName().c_str(), &layoutItem, layoutTransitionType,
+      gainedChild ? gainedChild.GetName().c_str() : "",
+      lostChild ? lostChild.GetName().c_str() : "");
   }
   else
   {
@@ -236,16 +239,19 @@ void LayoutController::UpdateMeasureHierarchyForAnimation( LayoutData& layoutDat
       continue;
     }
 
-    Actor actor = Actor::DownCast( layoutDataElement.handle );
-    LayoutDataAnimator animator = layoutData.layoutAnimatorArray[ layoutDataElement.animatorIndex ];
-    float width = actor.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
-    float height = actor.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
-
-    if( layoutDataElement.AdjustMeasuredSize( width, height, animator.animatorType ) )
+    Actor actor = layoutDataElement.handle.GetHandle();
+    if( actor )
     {
-      mActorSizeSpecs.push_back( ActorSizeSpec( actor ) );
-      actor.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, static_cast<int>( width ) );
-      actor.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, static_cast<int>( height ) );
+      LayoutDataAnimator animator = layoutData.layoutAnimatorArray[ layoutDataElement.animatorIndex ];
+      float width = actor.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION );
+      float height = actor.GetProperty<int>( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION );
+
+      if( layoutDataElement.AdjustMeasuredSize( width, height, animator.animatorType ) )
+      {
+        mActorSizeSpecs.push_back( ActorSizeSpec( actor ) );
+        actor.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, static_cast<int>( width ) );
+        actor.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, static_cast<int>( height ) );
+      }
     }
   }
 
@@ -294,9 +300,12 @@ void LayoutController::RestoreActorsSpecs()
 {
   for( auto& actorSizeSpec : mActorSizeSpecs )
   {
-    Actor actor = actorSizeSpec.actor;
-    actor.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, actorSizeSpec.widthSpec );
-    actor.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, actorSizeSpec.heightSpec );
+    Actor actor = actorSizeSpec.actor.GetHandle();
+    if( actor )
+    {
+      actor.SetProperty( Toolkit::LayoutItem::ChildProperty::WIDTH_SPECIFICATION, actorSizeSpec.widthSpec );
+      actor.SetProperty( Toolkit::LayoutItem::ChildProperty::HEIGHT_SPECIFICATION, actorSizeSpec.heightSpec );
+    }
   }
 }
 
@@ -333,10 +342,10 @@ void LayoutController::PerformLayoutPositioning( LayoutPositionDataArray& layout
 
   for( auto layoutPositionData : layoutPositionDataArray )
   {
-    Actor actor = Actor::DownCast( layoutPositionData.handle );
+    Actor actor = layoutPositionData.handle.GetHandle();
     if( actor && ( !layoutPositionData.animated || all ) )
     {
-      if ( !layoutPositionData.animated )
+      if( !layoutPositionData.animated )
       {
         actor.SetPosition( layoutPositionData.left, layoutPositionData.top );
         actor.SetSize( layoutPositionData.right - layoutPositionData.left, layoutPositionData.bottom - layoutPositionData.top );
@@ -365,7 +374,7 @@ void LayoutController::PerformLayoutAnimation( LayoutTransition& layoutTransitio
   {
     if( layoutDataElement.animatorIndex >= 0 )
     {
-      Actor actor = Actor::DownCast( layoutDataElement.handle );
+      Actor actor = layoutDataElement.handle.GetHandle();
       if ( actor )
       {
         LayoutDataAnimator animator = layoutAnimatorArray[ layoutDataElement.animatorIndex ];
