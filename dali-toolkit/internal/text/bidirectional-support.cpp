@@ -148,7 +148,7 @@ void SetBidirectionalInfo( const Vector<Character>& text,
       break;
     }
 
-    if( !hasRightToLeftScript && TextAbstraction::IsRightToLeftScript( scriptRun.script ) )
+    if( !hasRightToLeftScript && scriptRun.isRightToLeft )
     {
       // The script is right to left.
       hasRightToLeftScript = true;
