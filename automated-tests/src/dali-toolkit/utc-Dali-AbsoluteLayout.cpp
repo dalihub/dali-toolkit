@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <dali-toolkit-test-suite-utils.h>
 
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/layouting/absolute-layout.h>
@@ -117,6 +118,176 @@ int UtcDaliLayouting_AbsoluteLayout01(void)
   DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[2].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[3].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+namespace
+{
+
+// Functor to test whether a Finish signal is emitted
+struct AnimationFinishCheck
+{
+  AnimationFinishCheck(bool& signalReceived)
+  : mSignalReceived(signalReceived)
+  {
+  }
+
+  void operator()(Animation& animation)
+  {
+    mSignalReceived = true;
+  }
+
+  void Reset()
+  {
+    mSignalReceived = false;
+  }
+
+  void CheckSignalReceived()
+  {
+    if (!mSignalReceived)
+    {
+      tet_printf("Expected Finish signal was not received\n");
+      tet_result(TET_FAIL);
+    }
+    else
+    {
+      tet_result(TET_PASS);
+    }
+  }
+
+  void CheckSignalNotReceived()
+  {
+    if (mSignalReceived)
+    {
+      tet_printf("Unexpected Finish signal was received\n");
+      tet_result(TET_FAIL);
+    }
+    else
+    {
+      tet_result(TET_PASS);
+    }
+  }
+
+  bool& mSignalReceived; // owned by individual tests
+};
+
+}
+
+int UtcDaliLayouting_AbsoluteLayoutWithStandaloneAnimation(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_AbsoluteLayoutWithStandaloneAnimation ");
+
+  Stage stage = Stage::GetCurrent();
+  auto root = Control::New();
+  auto layout = AbsoluteLayout::New();
+  layout.SetAnimateLayout( false );
+  DevelControl::SetLayout( root, layout );
+  root.SetName( "AsoluteLayout");
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 100, 100 ) );
+
+  controls[0].SetProperty( Actor::Property::POSITION, Vector3( 100.0f, 100.0f, 0.0f ) );
+
+  for( auto&& iter : controls )
+  {
+    root.Add( iter );
+  }
+
+  root.SetParentOrigin( ParentOrigin::CENTER );
+  root.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( root );
+
+  float durationSeconds = 1.0f;
+  Animation animation = Animation::New( durationSeconds );
+  Vector3 targetPosition( 200.0f, 200.0f, 0.0f );
+  animation.AnimateTo(Property( controls[0], Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR );
+  animation.Play();
+
+  DALI_TEST_EQUALS( true, DevelActor::IsPositionOrSizeCurrentlyAnimating( controls[0] ), TEST_LOCATION );
+
+  bool signalReceived( false );
+  AnimationFinishCheck finishCheck( signalReceived );
+  animation.FinishedSignal().Connect( &application, finishCheck );
+
+  application.SendNotification();
+  //  0.1 of a second, 10 pixel delta
+  application.Render( 100u );
+
+  DALI_TEST_EQUALS( controls[0].GetCurrentPosition(), Vector3( 110.0f, 110.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>( durationSeconds * 1000.0f ) - 100u + 1u );
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  DALI_TEST_EQUALS( false, DevelActor::IsPositionOrSizeCurrentlyAnimating( controls[0] ), TEST_LOCATION);
+  DALI_TEST_EQUALS( targetPosition, controls[0].GetCurrentPosition(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_AbsoluteLayoutAndLayoutGroupWithStandaloneAnimation(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_AbsoluteLayoutAndLayoutGroupWithStandaloneAnimation ");
+
+  Stage stage = Stage::GetCurrent();
+  auto root = Control::New();
+  auto layout = AbsoluteLayout::New();
+  layout.SetAnimateLayout( false );
+  DevelControl::SetLayout( root, layout );
+  root.SetName( "AsoluteLayout" );
+
+  Control container = CreateLeafControl( 200, 200 );
+  DevelControl::SetLayoutingRequired( container, true );
+  container.SetName( "Container" );
+  root.Add( container );
+
+  std::vector< Control > controls;
+  controls.push_back( CreateLeafControl( 100, 100 ) );
+  controls[0].SetProperty( Actor::Property::POSITION, Vector3( 100.0f, 100.0f, 0.0f ) );
+
+  for( auto&& iter : controls )
+  {
+    container.Add( iter );
+  }
+
+  root.SetParentOrigin( ParentOrigin::CENTER );
+  root.SetAnchorPoint( AnchorPoint::CENTER );
+  stage.Add( root );
+
+  float durationSeconds = 1.0f;
+  Animation animation = Animation::New( durationSeconds );
+  Vector3 targetPosition( 200.0f, 200.0f, 0.0f );
+  animation.AnimateTo(Property( controls[0], Actor::Property::POSITION ), targetPosition, AlphaFunction::LINEAR );
+  animation.Play();
+
+  DALI_TEST_EQUALS( true, DevelActor::IsPositionOrSizeCurrentlyAnimating( controls[0] ), TEST_LOCATION );
+
+  bool signalReceived( false );
+  AnimationFinishCheck finishCheck( signalReceived );
+  animation.FinishedSignal().Connect( &application, finishCheck );
+
+  application.SendNotification();
+  //  0.1 of a second, 10 pixel delta
+  application.Render( 100u );
+
+  DALI_TEST_EQUALS( controls[0].GetCurrentPosition(), Vector3( 110.0f, 110.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>( durationSeconds * 1000.0f ) - 100u + 1u );
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+
+  DALI_TEST_EQUALS( false, DevelActor::IsPositionOrSizeCurrentlyAnimating( controls[0] ), TEST_LOCATION);
+  DALI_TEST_EQUALS( targetPosition, controls[0].GetCurrentPosition(), TEST_LOCATION );
 
   END_TEST;
 }
