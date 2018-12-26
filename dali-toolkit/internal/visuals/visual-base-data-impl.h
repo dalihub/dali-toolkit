@@ -24,7 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/visual-resource-observer.h>
+#include <dali-toolkit/internal/visuals/visual-event-observer.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
@@ -119,7 +119,7 @@ struct Base::Impl
   Renderer        mRenderer;
   CustomShader*   mCustomShader;
   SlotDelegate<Visual::Base>* mBlendSlotDelegate; ///< Used to own mix color animation connection
-  ResourceObserver* mResourceObserver;  ///< Allows controls to observe when the visual resources are loaded and ready
+  EventObserver*  mEventObserver;  ///< Allows controls to observe when the visual has events to notify
   std::string     mName;
   Transform       mTransform;
   Vector4         mMixColor;

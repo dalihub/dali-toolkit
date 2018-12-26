@@ -150,6 +150,11 @@ private:
    */
   void OnResourceReady();
 
+  /**
+   * @brief Event callback from rasterize thread. This is called after the animation is finished.
+   */
+  void OnAnimationFinished();
+
   // Undefined
   AnimatedVectorImageVisual( const AnimatedVectorImageVisual& visual ) = delete;
 

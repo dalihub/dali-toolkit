@@ -334,6 +334,7 @@ Control::Impl::Impl( Control& controlImpl )
   mKeyInputFocusGainedSignal(),
   mKeyInputFocusLostSignal(),
   mResourceReadySignal(),
+  mVisualEventSignal(),
   mPinchGestureDetector(),
   mPanGestureDetector(),
   mTapGestureDetector(),
@@ -626,15 +627,15 @@ void Control::Impl::StopObservingVisual( Toolkit::Visual::Base& visual )
   Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
 
   // Stop observing the visual
-  visualImpl.RemoveResourceObserver( *this );
+  visualImpl.RemoveEventObserver( *this );
 }
 
 void Control::Impl::StartObservingVisual( Toolkit::Visual::Base& visual)
 {
   Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
 
-  // start observing the visual for resource ready
-  visualImpl.AddResourceObserver( *this );
+  // start observing the visual for events
+  visualImpl.AddEventObserver( *this );
 }
 
 // Called by a Visual when it's resource is ready
@@ -677,6 +678,20 @@ void Control::Impl::ResourceReady( Visual::Base& object)
   {
     Dali::Toolkit::Control handle( mControlImpl.GetOwner() );
     mResourceReadySignal.Emit( handle );
+  }
+}
+
+void Control::Impl::NotifyVisualEvent( Visual::Base& object, Property::Index signalId )
+{
+  for( auto registeredIter = mVisuals.Begin(),  end = mVisuals.End(); registeredIter != end; ++registeredIter )
+  {
+    Internal::Visual::Base& registeredVisualImpl = Toolkit::GetImplementation( (*registeredIter)->visual );
+    if( &object == &registeredVisualImpl )
+    {
+      Dali::Toolkit::Control handle( mControlImpl.GetOwner() );
+      mVisualEventSignal.Emit( handle, (*registeredIter)->index, signalId );
+      break;
+    }
   }
 }
 
@@ -1487,6 +1502,11 @@ void Control::Impl::SetLayoutingRequired( bool layoutingRequired )
 bool Control::Impl::IsLayoutingRequired()
 {
   return mControlImpl.mImpl->mIsLayoutingRequired;
+}
+
+DevelControl::VisualEventSignalType& Control::Impl::VisualEventSignal()
+{
+  return mVisualEventSignal;
 }
 
 } // namespace Internal

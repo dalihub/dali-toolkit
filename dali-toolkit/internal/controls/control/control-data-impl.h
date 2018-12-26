@@ -24,7 +24,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/visuals/visual-resource-observer.h>
+#include <dali-toolkit/internal/visuals/visual-event-observer.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
@@ -65,7 +65,7 @@ typedef Dali::OwnerContainer< RegisteredVisual* > RegisteredVisualContainer;
 /**
  * @brief Holds the Implementation for the internal control class
  */
-class Control::Impl : public ConnectionTracker, public Visual::ResourceObserver
+class Control::Impl : public ConnectionTracker, public Visual::EventObserver
 {
 
 public:
@@ -124,9 +124,17 @@ public:
   /**
    * @brief Called when a resource is ready.
    * @param[in] object The visual whose resources are ready
-   * @note Overriding method in Visual::ResourceObserver.
+   * @note Overriding method in Visual::EventObserver.
    */
-  virtual void ResourceReady( Visual::Base& object );
+  virtual void ResourceReady( Visual::Base& object ) override;
+
+  /**
+   * @brief Called when an event occurs.
+   * @param[in] object The visual whose events occur
+   * @param[in] signalId The signal to emit. See Visual to find supported signals
+   * @note Overriding method in Visual::EventObserver.
+   */
+  virtual void NotifyVisualEvent( Visual::Base& object, Property::Index signalId ) override;
 
   /**
    * @copydoc Dali::Toolkit::DevelControl::RegisterVisual()
@@ -355,6 +363,11 @@ public:
    */
   bool IsLayoutingRequired();
 
+  /**
+   * @copydoc DevelControl::VisualEventSignal()
+   */
+  DevelControl::VisualEventSignalType& VisualEventSignal();
+
 private:
 
   /**
@@ -418,6 +431,7 @@ public:
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusGainedSignal;
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
   Toolkit::Control::ResourceReadySignalType mResourceReadySignal;
+  DevelControl::VisualEventSignalType mVisualEventSignal;
 
   // Gesture Detection
   PinchGestureDetector mPinchGestureDetector;

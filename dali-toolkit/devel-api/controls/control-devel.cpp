@@ -166,6 +166,13 @@ bool IsLayoutingRequired( Control control )
   return controlDataImpl.IsLayoutingRequired();
 }
 
+VisualEventSignalType& VisualEventSignal( Control control )
+{
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
+  return controlDataImpl.VisualEventSignal();
+}
+
 } // namespace DevelControl
 
 } // namespace Toolkit
