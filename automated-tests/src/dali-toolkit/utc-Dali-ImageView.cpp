@@ -835,7 +835,8 @@ int UtcDaliImageViewSetImageOnstageN(void)
   DALI_TEST_CHECK( !value.Get( url ) );
 
   Property::Map map;
-  DALI_TEST_CHECK( !value.Get( map ) );
+  value.Get( map );
+  DALI_TEST_CHECK( map.Empty() );
 
   END_TEST;
 }
@@ -930,7 +931,8 @@ int UtcDaliImageViewSetImageOffstageN(void)
   DALI_TEST_CHECK( !value.Get( url ) );
 
   Property::Map map;
-  DALI_TEST_CHECK( !value.Get( map ) );
+  value.Get( map );
+  DALI_TEST_CHECK( map.Empty() );
 
   END_TEST;
 }
@@ -950,7 +952,8 @@ int UtcDaliImageViewSetImageN(void)
   DALI_TEST_CHECK( !value.Get( url ) );
 
   Property::Map map;
-  DALI_TEST_CHECK( !value.Get( map ) );
+  value.Get( map );
+  DALI_TEST_CHECK( map.Empty() );
 
   std::string resource_url;
   Property::Value val = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
@@ -979,7 +982,8 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
   application.Render( 16 );
 
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
-  DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+  value.Get( map );
+  DALI_TEST_CHECK( map.Empty() );        // Value should be empty
   DALI_TEST_CHECK( ! visual );           // Visual should be invalid
 
   // Set a URL
@@ -1005,7 +1009,8 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
   visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
 
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
-  DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+  value.Get( map );
+  DALI_TEST_CHECK( map.Empty() );        // Value should be empty
   DALI_TEST_CHECK( ! visual );           // Visual should be invalid
 
   // Set an Image
@@ -1032,7 +1037,8 @@ int UtcDaliImageViewSetImageTypeChangesP(void)
   visual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
 
   DALI_TEST_CHECK( ! value.Get( url ) ); // Value should be empty
-  DALI_TEST_CHECK( ! value.Get( map ) ); // Value should be empty
+  value.Get( map );
+  DALI_TEST_CHECK( map.Empty() );        // Value should be empty
   DALI_TEST_CHECK( ! visual );           // Visual should be invalid
 
   // Set a URL in property map

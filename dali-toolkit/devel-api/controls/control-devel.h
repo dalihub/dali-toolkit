@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -240,6 +240,22 @@ DALI_IMPORT_API Dali::Animation CreateTransition( Internal::Control& control, co
  * @param[in] attributes Optional attributes for the action.
  */
 DALI_IMPORT_API void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Property::Index actionId, const Dali::Property::Value attributes );
+
+/**
+ * @brief Visual Event signal type
+ */
+using VisualEventSignalType = Signal< void ( Control, Dali::Property::Index, Dali::Property::Index ) >;
+
+/**
+ * @brief This signal is emitted when a visual has an event to notify.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( Control control, Dali::Property::Index visualIndex, Dali::Property::Index signalId );
+ * @endcode
+ * @return The signal to connect to
+ */
+DALI_IMPORT_API VisualEventSignalType& VisualEventSignal( Control control );
 
 } // namespace DevelControl
 

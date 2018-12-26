@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,6 +94,13 @@ void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Proper
   Internal::Control& controlInternal = Toolkit::Internal::GetImplementation( control );
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( controlInternal );
   controlDataImpl.DoAction( visualIndex, actionId, attributes );
+}
+
+VisualEventSignalType& VisualEventSignal( Control control )
+{
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
+  return controlDataImpl.VisualEventSignal();
 }
 
 } // namespace DevelControl

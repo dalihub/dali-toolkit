@@ -28,6 +28,7 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-signals-devel.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -100,6 +101,15 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   }
   map.Insert( Toolkit::DevelImageVisual::Property::LOOP_COUNT, static_cast< int >( mLoopCount ) );
   map.Insert( Toolkit::DevelImageVisual::Property::PLAY_RANGE, static_cast< Vector2 >( mPlayRange ) );
+
+  if( mVectorRasterizeThread )
+  {
+    map.Insert( Toolkit::DevelImageVisual::Property::PLAY_STATE, static_cast< int >( mVectorRasterizeThread->GetPlayState() ) );
+  }
+  else
+  {
+    map.Insert( Toolkit::DevelImageVisual::Property::PLAY_STATE, static_cast< int >( DevelImageVisual::PlayState::STOPPED ) );
+  }
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -251,6 +261,7 @@ void AnimatedVectorImageVisual::OnSetTransform()
         mVectorRasterizeThread = std::unique_ptr< VectorRasterizeThread >( new VectorRasterizeThread( mUrl.GetUrl(), mImpl->mRenderer, width, height ) );
 
         mVectorRasterizeThread->SetResourceReadyCallback( new EventThreadCallback( MakeCallback( this, &AnimatedVectorImageVisual::OnResourceReady ) ) );
+        mVectorRasterizeThread->SetAnimationFinishedCallback( new EventThreadCallback( MakeCallback( this, &AnimatedVectorImageVisual::OnAnimationFinished ) ) );
         mVectorRasterizeThread->SetLoopCount( mLoopCount );
         mVectorRasterizeThread->SetPlayRange( mPlayRange );
 
@@ -280,11 +291,6 @@ void AnimatedVectorImageVisual::OnSetTransform()
 
 void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, const Property::Value& attributes )
 {
-  if( actionId == mActionStatus )
-  {
-    return;
-  }
-
   // Check if action is valid for this visual type and perform action if possible
   switch( actionId )
   {
@@ -311,22 +317,23 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
       mActionStatus = DevelAnimatedVectorImageVisual::Action::PAUSE;
       break;
     }
-    case DevelAnimatedVectorImageVisual::Action::RESUME:
-    {
-      if( mVectorRasterizeThread )
-      {
-        mVectorRasterizeThread->ResumeAnimation();
-        DevelStage::SetRenderingBehavior( Stage::GetCurrent(), DevelStage::Rendering::CONTINUOUSLY );
-      }
-      mActionStatus = DevelAnimatedVectorImageVisual::Action::RESUME;
-      break;
-    }
     case DevelAnimatedVectorImageVisual::Action::STOP:
     {
       if( mVectorRasterizeThread )
       {
+        bool emitSignal = false;
+        if( mVectorRasterizeThread->GetPlayState() != DevelImageVisual::PlayState::STOPPED )
+        {
+          emitSignal = true;
+        }
+
         mVectorRasterizeThread->StopAnimation();
         DevelStage::SetRenderingBehavior( Stage::GetCurrent(), DevelStage::Rendering::IF_REQUIRED );
+
+        if( emitSignal )
+        {
+          OnAnimationFinished();
+        }
       }
       mActionStatus = DevelAnimatedVectorImageVisual::Action::STOP;
       break;
@@ -345,6 +352,14 @@ void AnimatedVectorImageVisual::OnResourceReady()
     mPlacementActor.Reset();
 
     Stage::GetCurrent().KeepRendering( 0.0f );
+  }
+}
+
+void AnimatedVectorImageVisual::OnAnimationFinished()
+{
+  if( mImpl->mEventObserver )
+  {
+    mImpl->mEventObserver->NotifyVisualEvent( *this, DevelAnimatedVectorImageVisual::Signal::ANIMATION_FINISHED );
   }
 }
 

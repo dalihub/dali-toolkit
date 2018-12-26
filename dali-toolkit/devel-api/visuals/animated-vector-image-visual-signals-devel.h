@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_ACTIONS_DEVEL_H
-#define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_ACTIONS_DEVEL_H
+#ifndef DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_SIGNALS_DEVEL_H
+#define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_SIGNALS_DEVEL_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -28,21 +28,19 @@ namespace DevelAnimatedVectorImageVisual
 {
 
 /**
- * @brief Actions that the animated vector image visual can perform.  These actions are called through the Visual::Base::DoAction API.
+ * @brief Signal that the animated vector image visual can emit.
  */
-namespace Action
+namespace Signal
 {
 /**
- * @brief The available actions for this visual
+ * @brief The available signals for this visual
  */
 enum Type
 {
-  PLAY,        ///< Play the animated vector image.
-  PAUSE,       ///< Pause the animated vector image.
-  STOP         ///< Stop the animated vector image. This is also Default playback mode.
+  ANIMATION_FINISHED      ///< Animation has finished.
 };
 
-} // namespace Action
+} // namespace Signal
 
 } // namespace DevelAnimatedVectorImageVisual
 
@@ -50,4 +48,4 @@ enum Type
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_ACTIONS_DEVEL_H
+#endif // DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_SIGNALS_DEVEL_H

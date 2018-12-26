@@ -50,7 +50,9 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url, Renderer r
   mConditionalWait(),
   mMutex(),
   mResourceReadyTrigger( NULL ),
+  mAnimationFinishedTrigger( NULL ),
   mPlayRange( 0.0f, 1.0f ),
+  mPlayState( DevelImageVisual::PlayState::STOPPED ),
   mCurrentFrame( 0 ),
   mTotalFrame( 0 ),
   mStartFrame( 0 ),
@@ -60,8 +62,6 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url, Renderer r
   mLoopCount( LOOP_FOREVER ),
   mCurrentLoop( 0 ),
   mNeedRender( false ),
-  mPlaying( false ),
-  mPaused( false ),
   mDestroyThread( false ),
   mResourceReady( false ),
   mLogFactory( Dali::Adaptor::Get().GetLogFactory() )
@@ -86,6 +86,7 @@ VectorRasterizeThread::~VectorRasterizeThread()
   Join();
 
   delete mResourceReadyTrigger;
+  delete mAnimationFinishedTrigger;
 }
 
 void VectorRasterizeThread::Run()
@@ -112,10 +113,16 @@ void VectorRasterizeThread::SetSize( uint32_t width, uint32_t height )
 void VectorRasterizeThread::StartAnimation()
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
-  if( !mPlaying )
+  if( mPlayState != DevelImageVisual::PlayState::PLAYING )
   {
-    mPlaying = true;
-    mPaused = false;
+    if( mPlayState == DevelImageVisual::PlayState::STOPPED )
+    {
+      // Reset the current frame and the current loop
+      mCurrentFrame = mStartFrame;
+      mCurrentLoop = 0;
+    }
+
+    mPlayState = DevelImageVisual::PlayState::PLAYING;
     mConditionalWait.Notify( lock );
 
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StartAnimation: Start\n" );
@@ -125,10 +132,9 @@ void VectorRasterizeThread::StartAnimation()
 void VectorRasterizeThread::StopAnimation()
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
-  if( mPlaying )
+  if( mPlayState != DevelImageVisual::PlayState::STOPPED )
   {
-    mPlaying = false;
-    mPaused = false;
+    mPlayState = DevelImageVisual::PlayState::STOPPED;
 
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StopAnimation: Stop\n" );
   }
@@ -137,23 +143,11 @@ void VectorRasterizeThread::StopAnimation()
 void VectorRasterizeThread::PauseAnimation()
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
-  if( mPlaying && !mPaused )
+  if( mPlayState == DevelImageVisual::PlayState::PLAYING )
   {
-    mPaused = true;
+    mPlayState = DevelImageVisual::PlayState::PAUSED;
 
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::PauseAnimation: Pause\n" );
-  }
-}
-
-void VectorRasterizeThread::ResumeAnimation()
-{
-  ConditionalWait::ScopedLock lock( mConditionalWait );
-  if( mPlaying && mPaused )
-  {
-    mPaused = false;
-    mConditionalWait.Notify( lock );
-
-    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::ResumeAnimation: Resume\n" );
   }
 }
 
@@ -170,6 +164,12 @@ void VectorRasterizeThread::SetResourceReadyCallback( EventThreadCallback* callb
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
   mResourceReadyTrigger = callback;
+}
+
+void VectorRasterizeThread::SetAnimationFinishedCallback( EventThreadCallback* callback )
+{
+  ConditionalWait::ScopedLock lock( mConditionalWait );
+  mAnimationFinishedTrigger = callback;
 }
 
 void VectorRasterizeThread::SetLoopCount( int16_t count )
@@ -196,19 +196,18 @@ void VectorRasterizeThread::SetPlayRange( Vector2 range )
   }
 }
 
+DevelImageVisual::PlayState VectorRasterizeThread::GetPlayState()
+{
+  return mPlayState;
+}
+
 bool VectorRasterizeThread::IsThreadReady()
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
 
-  if( ( !mPlaying || mPaused ) && !mNeedRender && !mDestroyThread )
+  if( mPlayState != DevelImageVisual::PlayState::PLAYING && !mNeedRender && !mDestroyThread )
   {
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::IsThreadReady: Wait\n" );
-
-    if( !mPlaying )
-    {
-      mCurrentFrame = mStartFrame;
-      mCurrentLoop = 0;
-    }
 
     mConditionalWait.Wait( lock );
   }
@@ -241,7 +240,7 @@ void VectorRasterizeThread::Rasterize()
   // Rasterize
   mVectorRenderer.Render( mCurrentFrame );
 
-  if( mPlaying && !mPaused )
+  if( mPlayState == DevelImageVisual::PlayState::PLAYING )
   {
     if( ++mCurrentFrame >= mEndFrame )
     {
@@ -256,7 +255,11 @@ void VectorRasterizeThread::Rasterize()
         if( mCurrentLoop >= mLoopCount )
         {
           // Animation is finished
-          mPlaying = false;
+          mPlayState = DevelImageVisual::PlayState::STOPPED;
+
+          mAnimationFinishedTrigger->Trigger();
+
+          DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Animation is finished\n" );
         }
         else
         {

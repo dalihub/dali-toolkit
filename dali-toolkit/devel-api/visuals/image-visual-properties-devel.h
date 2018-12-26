@@ -92,11 +92,28 @@ enum Type
    * @details Name "playRange", Type Property::VECTOR2, between 0 and 1
    * @note Default 0 and 1
    */
-  PLAY_RANGE = ORIENTATION_CORRECTION + 4
+  PLAY_RANGE = ORIENTATION_CORRECTION + 4,
+
+  /**
+   * @brief The playing state the AnimatedVectorImageVisual will use.
+   * @details Name "playState", type PlayState (Property::INTEGER)
+   * @note This property is read-only.
+   */
+  PLAY_STATE = ORIENTATION_CORRECTION + 5
 
 };
 
 } //namespace Property
+
+/**
+ * @brief Enumeration for what state the animation is in.
+ */
+enum class PlayState
+{
+  STOPPED,   ///< Animation has stopped
+  PLAYING,   ///< The animation is playing
+  PAUSED     ///< The animation is paused
+};
 
 } // namespace DevelImageVisual
 
