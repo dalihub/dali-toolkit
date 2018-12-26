@@ -900,6 +900,15 @@ void LayoutGroup::OnLayout( bool changed, LayoutLength left, LayoutLength top, L
     {
 
       auto childOwner = childLayout->GetOwner();
+      if( !childLayout->IsLayoutAnimated() )
+      {
+        Actor actor = Actor::DownCast( childOwner );
+        if ( actor && DevelActor::IsPositionOrSizeCurrentlyAnimating( actor ) )
+        {
+          continue;
+        }
+      }
+
       LayoutLength childWidth = childLayout->GetMeasuredWidth();
       LayoutLength childHeight = childLayout->GetMeasuredHeight();
       Extents childMargin = childLayout->GetMargin();
