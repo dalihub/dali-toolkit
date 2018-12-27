@@ -101,7 +101,7 @@ private:
     {
     }
 
-    Actor actor;
+    WeakHandle<Actor> actor;
     int widthSpec;
     int heightSpec;
   };
@@ -129,7 +129,7 @@ private:
     {
       layoutController.PerformLayoutPositioning( layoutDataPositionArray, true );
       layoutController.mAnimationFinishedFunctors.pop_front();
-      if (layoutTransitionType != -1)
+      if( layoutTransitionType != -1 )
       {
         LayoutTransitionDataPtr layoutTransitionDataPtr = layoutItem->GetTransitionData( layoutTransitionType );
         layoutTransitionDataPtr->EmitSignalFinish( layoutTransitionType );

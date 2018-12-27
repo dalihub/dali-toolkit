@@ -66,14 +66,14 @@ LayoutItemPtr LayoutItem::New( Handle& owner )
 
 void LayoutItem::Initialize( Handle& owner, const std::string& containerType )
 {
-  mImpl->mOwner = &(owner.GetBaseObject());
+  mImpl->mOwner = owner;
   RegisterChildProperties( containerType );
   OnInitialize(); // Ensure direct deriving class gets initialized
 }
 
 Handle LayoutItem::GetOwner() const
 {
-  return Handle::DownCast(BaseHandle(mImpl->mOwner));
+  return mImpl->mOwner.GetHandle();
 }
 
 void LayoutItem::Unparent()
@@ -92,7 +92,7 @@ void LayoutItem::Unparent()
   SetParent(nullptr);
 
   // Last, clear owner
-  mImpl->mOwner = NULL;
+  mImpl->mOwner.Reset();
 }
 
 LayoutTransitionDataPtr LayoutItem::GetDefaultTransition()
@@ -317,7 +317,7 @@ void LayoutItem::SetMinimumHeight( LayoutLength minimumHeight )
 
 Extents LayoutItem::GetPadding() const
 {
-  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  Toolkit::Control control = Toolkit::Control::DownCast( GetOwner() );
   if( control )
   {
     Extents padding = control.GetProperty<Extents>( Toolkit::Control::Property::PADDING );
@@ -336,7 +336,7 @@ Extents LayoutItem::GetPadding() const
 
 Extents LayoutItem::GetMargin() const
 {
-  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  Toolkit::Control control = Toolkit::Control::DownCast( GetOwner() );
   if ( control )
   {
     return control.GetProperty<Extents>( Toolkit::Control::Property::MARGIN );
@@ -415,44 +415,47 @@ LayoutParent* LayoutItem::GetParent()
 
 void LayoutItem::RequestLayout()
 {
-  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  Toolkit::Control control = Toolkit::Control::DownCast( GetOwner() );
   if( control )
   {
     DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::RequestLayout control(%s)\n",
         control.GetName().c_str() );
+
+    // @todo Enforce failure if called in Measure/Layout passes.
+    mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
+    Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
+    layoutController.RequestLayout( Toolkit::LayoutItem( this ) );
   }
-  // @todo Enforce failure if called in Measure/Layout passes.
-  mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
-  Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
-  layoutController.RequestLayout( Toolkit::LayoutItem( this ) );
 }
 
 void LayoutItem::RequestLayout( Dali::Toolkit::LayoutTransitionData::Type layoutAnimationType )
 {
-  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  Toolkit::Control control = Toolkit::Control::DownCast( GetOwner() );
   if ( control )
   {
     DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::RequestLayout control(%s) layoutTranstionType(%d)\n",
         control.GetName().c_str(), (int)layoutAnimationType );
+
+    // @todo Enforce failure if called in Measure/Layout passes.
+    mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
+    Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
+    layoutController.RequestLayout( Toolkit::LayoutItem(this), layoutAnimationType );
   }
-  // @todo Enforce failure if called in Measure/Layout passes.
-  mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
-  Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
-  layoutController.RequestLayout( Toolkit::LayoutItem(this), layoutAnimationType );
 }
 
 void LayoutItem::RequestLayout( Dali::Toolkit::LayoutTransitionData::Type layoutAnimationType, Actor gainedChild, Actor lostChild )
 {
-  Toolkit::Control control = Toolkit::Control::DownCast( mImpl->mOwner );
+  Toolkit::Control control = Toolkit::Control::DownCast( GetOwner() );
   if ( control )
   {
     DALI_LOG_INFO( gLayoutFilter, Debug::Verbose, "LayoutItem::RequestLayout control(%s) layoutTranstionType(%d)\n",
         control.GetName().c_str(), (int)layoutAnimationType );
+
+    // @todo Enforce failure if called in Measure/Layout passes.
+    mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
+    Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
+    layoutController.RequestLayout( Toolkit::LayoutItem(this), layoutAnimationType, gainedChild, lostChild );
   }
-  // @todo Enforce failure if called in Measure/Layout passes.
-  mImpl->SetPrivateFlag( Impl::PRIVATE_FLAG_FORCE_LAYOUT );
-  Toolkit::LayoutController layoutController = Toolkit::LayoutController::Get();
-  layoutController.RequestLayout( Toolkit::LayoutItem(this), layoutAnimationType, gainedChild, lostChild );
 }
 
 bool LayoutItem::IsLayoutRequested() const
@@ -517,7 +520,7 @@ MeasuredSize LayoutItem::GetMeasuredHeightAndState() const
 LayoutLength LayoutItem::GetSuggestedMinimumWidth() const
 {
   auto owner = GetOwner();
-  auto actor = Actor::DownCast(owner);
+  auto actor = Actor::DownCast( owner );
   auto naturalSize = actor ? actor.GetNaturalSize() : Vector3::ZERO;
 
   return std::max( mImpl->mMinimumSize.GetWidth(), LayoutLength( naturalSize.width ) );
@@ -526,7 +529,7 @@ LayoutLength LayoutItem::GetSuggestedMinimumWidth() const
 LayoutLength LayoutItem::GetSuggestedMinimumHeight() const
 {
   auto owner = GetOwner();
-  auto actor = Actor::DownCast(owner);
+  auto actor = Actor::DownCast( owner );
   auto naturalSize = actor ? actor.GetNaturalSize() : Vector3::ZERO;
 
   return std::max( mImpl->mMinimumSize.GetHeight(), LayoutLength( naturalSize.height ) );
