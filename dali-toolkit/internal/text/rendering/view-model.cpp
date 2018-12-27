@@ -349,11 +349,6 @@ void ViewModel::ElideGlyphs()
           {
             if( index > 0u )
             {
-              // If the index decreases to the previous line, firstPenX must be recalculated.
-              if( numberOfLaidOutGlyphs - index == lastLine.glyphRun.numberOfGlyphs)
-              {
-                firstPenSet = false;
-              }
               --index;
             }
             else
