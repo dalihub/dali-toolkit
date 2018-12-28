@@ -15,6 +15,8 @@
  *
  */
 
+#include <cstdlib>
+
 #include <dali-toolkit-test-suite-utils.h>
 // GTest fails to compile with "error: return-statement with a value, in function returning 'void'" error
 // if using dali assert function so define new assert with returning void.
@@ -26,7 +28,7 @@
         fprintf(stderr, \
             "Following expression is not true:\n" \
                 "%s\n", #exp); \
-        return; \
+        std::abort(); \
     }
 #include <gtest/gtest.h>
 #undef GTEST_HAS_DEATH_TEST
@@ -76,10 +78,10 @@
 
 int UtcDaliFlexboxLayoutTest(void)
 {
-  ToolkitTestApplication application;
   tet_infoline("UtcDaliFlexboxLayoutTest");
-  int argc = 0;
-  testing::InitGoogleTest( &argc, static_cast<char**>(nullptr) );
+  int argc = 1;
+  const char* argv = "yoga-gtest";
+  testing::InitGoogleTest( &argc,  const_cast< char** >( &argv ) );
 
   // The test function is a 3rd party function that should return true if the test passes
   if( !RUN_ALL_TESTS() )
