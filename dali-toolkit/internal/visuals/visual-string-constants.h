@@ -83,6 +83,8 @@ extern const char * const ORIENTATION_CORRECTION_NAME;
 extern const char * const AUXILLARY_IMAGE_NAME;
 extern const char * const AUXILLARY_IMAGE_ALPHA_NAME;
 extern const char * const PLAY_RANGE_NAME;
+extern const char * const PLAY_STATE_NAME;
+extern const char * const CURRENT_PROGRESS_NAME;
 
 // Text visual
 extern const char * const TEXT_PROPERTY;

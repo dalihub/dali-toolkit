@@ -25,6 +25,7 @@
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptors/log-factory-interface.h>
 #include <string>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
@@ -141,6 +142,18 @@ public:
    */
   bool IsResourceReady() const;
 
+  /**
+   * @brief Sets the progress of the animation.
+   * @param[in] progress The new progress as a normalized value between [0,1] or between the play range if specified.
+   */
+  void SetCurrentProgress( float progress );
+
+  /**
+   * @brief Retrieves the current progress of the animation.
+   * @return The current progress as a normalized value between [0,1]
+   */
+  float GetCurrentProgress() const;
+
 protected:
 
   /**
@@ -179,8 +192,8 @@ private:
   VectorAnimationRenderer     mVectorRenderer;
   ConditionalWait             mConditionalWait;
   Dali::Mutex                 mMutex;
-  EventThreadCallback*        mResourceReadyTrigger;
-  EventThreadCallback*        mAnimationFinishedTrigger;
+  std::unique_ptr< EventThreadCallback > mResourceReadyTrigger;
+  std::unique_ptr< EventThreadCallback > mAnimationFinishedTrigger;
   Vector2                     mPlayRange;
   DevelImageVisual::PlayState mPlayState;
   float                       mProgress;

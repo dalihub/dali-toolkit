@@ -156,6 +156,11 @@ private:
    */
   void OnAnimationFinished();
 
+  /**
+   * @brief Send animation data to the rasterize thread.
+   */
+  void SendAnimationData();
+
   // Undefined
   AnimatedVectorImageVisual( const AnimatedVectorImageVisual& visual ) = delete;
 
@@ -167,7 +172,10 @@ private:
   VisualUrl                                    mUrl;
   VectorRasterizeThread                        mVectorRasterizeThread;
   Vector2                                      mVisualSize;
+  Vector2                                      mPlayRange;
   WeakHandle< Actor >                          mPlacementActor;
+  int32_t                                      mLoopCount;
+  uint32_t                                     mResendFlag;
   DevelAnimatedVectorImageVisual::Action::Type mActionStatus;
 };
 

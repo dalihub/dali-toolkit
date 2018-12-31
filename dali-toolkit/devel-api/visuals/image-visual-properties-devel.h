@@ -99,8 +99,14 @@ enum Type
    * @details Name "playState", type PlayState (Property::INTEGER)
    * @note This property is read-only.
    */
-  PLAY_STATE = ORIENTATION_CORRECTION + 5
+  PLAY_STATE = ORIENTATION_CORRECTION + 5,
 
+  /**
+   * @brief The animation progress the AnimatedVectorImageVisual will use.
+   * @details Name "currentProgress", Type Property::FLOAT, between [0, 1] or between the play range if specified
+   * @note This property is read-only.
+   */
+  CURRENT_PROGRESS = ORIENTATION_CORRECTION + 6
 };
 
 } //namespace Property

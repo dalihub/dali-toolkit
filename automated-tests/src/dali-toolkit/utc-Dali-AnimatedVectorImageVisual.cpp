@@ -543,6 +543,10 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   Renderer renderer = actor.GetRendererAt( 0u );
   DALI_TEST_CHECK( renderer );
 
+  Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  Property::Value* value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), playRange, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -584,6 +588,117 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
   DALI_TEST_CHECK( value->Get< int >() == static_cast< int >( DevelImageVisual::PlayState::STOPPED ) );
 
   DALI_TEST_EQUALS( gAnimationFinishedSignalFired, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualJumpToCurrentProgress(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatedVectorImageVisualJumpToCurrentProgress" );
+
+  Property::Map propertyMap;
+  propertyMap.Add( Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE )
+             .Add( ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME  );
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  DummyControl actor = DummyControl::New( true );
+  DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  Vector2 controlSize( 20.f, 30.f );
+  actor.SetSize( controlSize );
+
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 0.6f );
+
+  application.SendNotification();
+  application.Render();
+
+  Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  Property::Value* value = map.Find( DevelImageVisual::Property::CURRENT_PROGRESS );
+  DALI_TEST_EQUALS( value->Get< float >(), 0.6f, TEST_LOCATION );
+
+  Vector2 playRange( 0.0f, 0.4f );
+
+  Property::Map attributes;
+  attributes.Add( DevelImageVisual::Property::PLAY_RANGE, playRange );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 0.8f );
+
+  application.SendNotification();
+  application.Render();
+
+  map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  value = map.Find( DevelImageVisual::Property::CURRENT_PROGRESS );
+  DALI_TEST_EQUALS( value->Get< float >(), 0.4f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatedVectorImageVisualJumpToCurrentProgress" );
+
+  Vector2 playRange( 0.2f, 0.8f );
+
+  Property::Map propertyMap;
+  propertyMap.Add( Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE )
+             .Add( ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME  )
+             .Add( DevelImageVisual::Property::LOOP_COUNT, 3  )
+             .Add( DevelImageVisual::Property::PLAY_RANGE, playRange  );
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  DummyControl actor = DummyControl::New( true );
+  DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  Vector2 controlSize( 20.f, 30.f );
+  actor.SetSize( controlSize );
+
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  Property::Value* value = map.Find( DevelImageVisual::Property::LOOP_COUNT );
+  DALI_TEST_EQUALS( value->Get< int >(), 3, TEST_LOCATION );
+
+  value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), playRange, TEST_LOCATION );
+
+  Vector2 newPlayRange( 0.4f, 1.0f );
+
+  Property::Map attributes;
+  attributes.Add( DevelImageVisual::Property::PLAY_RANGE, newPlayRange );
+  attributes.Add( DevelImageVisual::Property::LOOP_COUNT, 5 );
+
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+
+  application.SendNotification();
+  application.Render();
+
+  map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  value = map.Find( DevelImageVisual::Property::LOOP_COUNT );
+  DALI_TEST_EQUALS( value->Get< int >(), 5, TEST_LOCATION );
+
+  value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), newPlayRange, TEST_LOCATION );
 
   END_TEST;
 }
