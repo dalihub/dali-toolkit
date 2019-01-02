@@ -573,6 +573,13 @@ void Controller::SetText( const std::string& text )
       utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
     }
 
+    const Length maxTextLength = 32768u; // 1024 * 32;
+    if( textSize > maxTextLength )
+    {
+      DALI_LOG_WARNING( "The text size is too large(%d), limit the length to 32,768u\n", textSize );
+      textSize = maxTextLength;
+    }
+
     //  Convert text into UTF-32
     Vector<Character>& utf32Characters = mImpl->mModel->mLogicalModel->mText;
     utf32Characters.Resize( textSize );
