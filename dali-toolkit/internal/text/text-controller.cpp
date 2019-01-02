@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -360,6 +360,9 @@ void Controller::SetMultiLineEnabled( bool enable )
 
     mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | layoutOperations );
+
+    // Need to recalculate natural size
+    mImpl->mRecalculateNaturalSize = true;
 
     mImpl->RequestRelayout();
   }

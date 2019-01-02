@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -408,25 +408,36 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // test natural size with multi-line and line spacing
   {
     TextLabel label3 = TextLabel::New("Some text here\nend there\nend here");
-    Vector3 expected0(414.f, 192.f, 0.0f);
-    Vector3 expected1(414.f, 252.f, 0.0f);
+    Vector3 oneLineNaturalSize = label3.GetNaturalSize();
     label3.SetProperty(TextLabel::Property::MULTI_LINE, true);
     label3.SetProperty(TextLabel::Property::LINE_SPACING, 0);
-    DALI_TEST_EQUALS(expected0, label3.GetNaturalSize(), TEST_LOCATION);
-    label3.SetProperty(TextLabel::Property::LINE_SPACING, 20);
-    DALI_TEST_EQUALS(expected1, label3.GetNaturalSize(), TEST_LOCATION);
+    Vector3 multiLineNaturalSize = label3.GetNaturalSize();
+
+    // The width of the text when multi-line is enabled will be smaller (lines separated on '\n')
+    // The height of the text when multi-line is enabled will be larger
+    DALI_TEST_CHECK( oneLineNaturalSize.width > multiLineNaturalSize.width );
+    DALI_TEST_CHECK( oneLineNaturalSize.height < multiLineNaturalSize.height );
+
+    // Change line spacing, meaning height will increase by 3 times the amount specified as we have three lines
+    // Everything else will remain the same
+    int lineSpacing = 20;
+    label3.SetProperty( TextLabel::Property::LINE_SPACING, lineSpacing );
+    Vector3 expectedAfterLineSpacingApplied( multiLineNaturalSize );
+    expectedAfterLineSpacingApplied.height += 3 * lineSpacing;
+    DALI_TEST_EQUALS( expectedAfterLineSpacingApplied, label3.GetNaturalSize(), TEST_LOCATION );
   }
 
-  // single line, line spacing must not affect natural size
+  // single line, line spacing must not affect natural size of the text, only add the spacing to the height
   {
-    const Vector3 expected0(948.f, 64.f, 0.0f);
-    const Vector3 expected1(948.f, 84.f, 0.0f);
     TextLabel label3 = TextLabel::New("Some text here end there end here");
     label3.SetProperty(TextLabel::Property::MULTI_LINE, false);
     label3.SetProperty(TextLabel::Property::LINE_SPACING, 0);
-    DALI_TEST_EQUALS(expected0, label3.GetNaturalSize(), TEST_LOCATION);
-    label3.SetProperty(TextLabel::Property::LINE_SPACING, 20);
-    DALI_TEST_EQUALS(expected1, label3.GetNaturalSize(), TEST_LOCATION);
+    Vector3 textNaturalSize = label3.GetNaturalSize();
+    int lineSpacing = 20;
+    label3.SetProperty( TextLabel::Property::LINE_SPACING, lineSpacing );
+    Vector3 expectedNaturalSizeWithLineSpacing( textNaturalSize );
+    expectedNaturalSizeWithLineSpacing.height += lineSpacing;
+    DALI_TEST_EQUALS( expectedNaturalSizeWithLineSpacing, label3.GetNaturalSize(), TEST_LOCATION );
   }
   // Check the line spacing property
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
