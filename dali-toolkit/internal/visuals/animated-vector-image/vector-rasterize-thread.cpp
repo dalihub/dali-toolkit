@@ -44,7 +44,7 @@ Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging,
 
 } // unnamed namespace
 
-VectorRasterizeThread::VectorRasterizeThread( const std::string& url, Renderer renderer, uint32_t width, uint32_t height )
+VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
 : mUrl( url ),
   mVectorRenderer(),
   mConditionalWait(),
@@ -53,12 +53,13 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url, Renderer r
   mAnimationFinishedTrigger( NULL ),
   mPlayRange( 0.0f, 1.0f ),
   mPlayState( DevelImageVisual::PlayState::STOPPED ),
+  mProgress( 0.0f ),
   mCurrentFrame( 0 ),
   mTotalFrame( 0 ),
   mStartFrame( 0 ),
   mEndFrame( 0 ),
-  mWidth( width ),
-  mHeight( height ),
+  mWidth( 0 ),
+  mHeight( 0 ),
   mLoopCount( LOOP_FOREVER ),
   mCurrentLoop( 0 ),
   mNeedRender( false ),
@@ -66,7 +67,7 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url, Renderer r
   mResourceReady( false ),
   mLogFactory( Dali::Adaptor::Get().GetLogFactory() )
 {
-  mVectorRenderer = VectorAnimationRenderer::New( mUrl, renderer, width, height );
+  mVectorRenderer = VectorAnimationRenderer::New( mUrl );
 }
 
 VectorRasterizeThread::~VectorRasterizeThread()
@@ -102,15 +103,32 @@ void VectorRasterizeThread::Run()
   }
 }
 
-void VectorRasterizeThread::SetSize( uint32_t width, uint32_t height )
+void VectorRasterizeThread::SetRenderer( Renderer renderer )
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
-  mVectorRenderer.SetSize( width, height );
 
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetSize: width = %d, height = %d\n", width, height );
+  mVectorRenderer.SetRenderer( renderer );
+
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetRenderer\n" );
 }
 
-void VectorRasterizeThread::StartAnimation()
+void VectorRasterizeThread::SetSize( uint32_t width, uint32_t height )
+{
+  if( mWidth != width || mHeight != height )
+  {
+    ConditionalWait::ScopedLock lock( mConditionalWait );
+    mVectorRenderer.SetSize( width, height );
+
+    mWidth = width;
+    mHeight = height;
+
+    mResourceReady = false;
+
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetSize: width = %d, height = %d\n", width, height );
+  }
+}
+
+void VectorRasterizeThread::PlayAnimation()
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
   if( mPlayState != DevelImageVisual::PlayState::PLAYING )
@@ -125,7 +143,7 @@ void VectorRasterizeThread::StartAnimation()
     mPlayState = DevelImageVisual::PlayState::PLAYING;
     mConditionalWait.Notify( lock );
 
-    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StartAnimation: Start\n" );
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::PlayAnimation: Start\n" );
   }
 }
 
@@ -172,7 +190,7 @@ void VectorRasterizeThread::SetAnimationFinishedCallback( EventThreadCallback* c
   mAnimationFinishedTrigger = callback;
 }
 
-void VectorRasterizeThread::SetLoopCount( int16_t count )
+void VectorRasterizeThread::SetLoopCount( int32_t count )
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
 
@@ -183,22 +201,48 @@ void VectorRasterizeThread::SetLoopCount( int16_t count )
   mCurrentFrame = mStartFrame;
 }
 
+int32_t VectorRasterizeThread::GetLoopCount() const
+{
+  return mLoopCount;
+}
+
 void VectorRasterizeThread::SetPlayRange( Vector2 range )
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
 
-  mPlayRange = range;
-
-  if( mTotalFrame != 0 )
+  // Make sure the range specified is between 0.0 and 1.0
+  if( range.x >= 0.0f && range.x <= 1.0f && range.y >= 0.0f && range.y <= 1.0f )
   {
-    mStartFrame = static_cast< uint32_t >( mPlayRange.x * mTotalFrame + 0.5f );
-    mEndFrame = static_cast< uint32_t >( mPlayRange.y * mTotalFrame + 0.5f );
+    Vector2 orderedRange( range );
+    // If the range is not in order swap values
+    if( range.x > range.y )
+    {
+      orderedRange = Vector2( range.y, range.x );
+    }
+
+    mPlayRange = orderedRange;
+
+    if( mTotalFrame != 0 )
+    {
+      mStartFrame = static_cast< uint32_t >( mPlayRange.x * mTotalFrame + 0.5f );
+      mEndFrame = static_cast< uint32_t >( mPlayRange.y * mTotalFrame + 0.5f );
+    }
   }
 }
 
-DevelImageVisual::PlayState VectorRasterizeThread::GetPlayState()
+Vector2 VectorRasterizeThread::GetPlayRange() const
+{
+  return mPlayRange;
+}
+
+DevelImageVisual::PlayState VectorRasterizeThread::GetPlayState() const
 {
   return mPlayState;
+}
+
+bool VectorRasterizeThread::IsResourceReady() const
+{
+  return mResourceReady;
 }
 
 bool VectorRasterizeThread::IsThreadReady()
