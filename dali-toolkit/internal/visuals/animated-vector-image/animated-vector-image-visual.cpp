@@ -76,7 +76,8 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
   mPlacementActor(),
   mVectorRasterizeThread(),
   mLoopCount( LOOP_FOREVER ),
-  mActionStatus( DevelAnimatedVectorImageVisual::Action::STOP )
+  mActionStatus( DevelAnimatedVectorImageVisual::Action::STOP ),
+  mNeedToSetRenderer( true )
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -205,6 +206,8 @@ void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
 
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 
+  mNeedToSetRenderer = true;
+
   mImpl->mRenderer = Renderer::New( geometry, shader );
 
   TextureSet textureSet = TextureSet::New();
@@ -258,32 +261,37 @@ void AnimatedVectorImageVisual::OnSetTransform()
         uint32_t width = static_cast< uint32_t >( visualSize.width );
         uint32_t height = static_cast< uint32_t >( visualSize.height );
 
-        mVectorRasterizeThread = std::unique_ptr< VectorRasterizeThread >( new VectorRasterizeThread( mUrl.GetUrl(), mImpl->mRenderer, width, height ) );
+        mVectorRasterizeThread = std::unique_ptr< VectorRasterizeThread >( new VectorRasterizeThread( mUrl.GetUrl() ) );
 
+        mVectorRasterizeThread->SetRenderer( mImpl->mRenderer );
+        mVectorRasterizeThread->SetSize( width, height );
         mVectorRasterizeThread->SetResourceReadyCallback( new EventThreadCallback( MakeCallback( this, &AnimatedVectorImageVisual::OnResourceReady ) ) );
         mVectorRasterizeThread->SetAnimationFinishedCallback( new EventThreadCallback( MakeCallback( this, &AnimatedVectorImageVisual::OnAnimationFinished ) ) );
         mVectorRasterizeThread->SetLoopCount( mLoopCount );
         mVectorRasterizeThread->SetPlayRange( mPlayRange );
 
         mVectorRasterizeThread->Start();
-
-        if( mActionStatus == DevelAnimatedVectorImageVisual::Action::PLAY )
-        {
-          mVectorRasterizeThread->StartAnimation();
-          DevelStage::SetRenderingBehavior( Stage::GetCurrent(), DevelStage::Rendering::CONTINUOUSLY );
-        }
-        else
-        {
-          // Render one frame
-          mVectorRasterizeThread->RenderFrame();
-        }
       }
       else
       {
         uint32_t width = static_cast< uint32_t >( visualSize.width );
         uint32_t height = static_cast< uint32_t >( visualSize.height );
 
+        mVectorRasterizeThread->SetRenderer( mImpl->mRenderer );
         mVectorRasterizeThread->SetSize( width, height );
+      }
+
+      mNeedToSetRenderer = false;
+
+      if( mActionStatus == DevelAnimatedVectorImageVisual::Action::PLAY )
+      {
+        mVectorRasterizeThread->StartAnimation();
+        DevelStage::SetRenderingBehavior( Stage::GetCurrent(), DevelStage::Rendering::CONTINUOUSLY );
+      }
+      else
+      {
+        // Render one frame
+        mVectorRasterizeThread->RenderFrame();
       }
     }
   }
@@ -298,7 +306,8 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
     {
       if( IsOnStage())
       {
-        if( mVectorRasterizeThread )
+        // When renderer has changed, do not StartAnimation before SetRenderer(newOne)
+        if( mVectorRasterizeThread && !mNeedToSetRenderer )
         {
           mVectorRasterizeThread->StartAnimation();
           DevelStage::SetRenderingBehavior( Stage::GetCurrent(), DevelStage::Rendering::CONTINUOUSLY );   //TODO: Should manage this globally
