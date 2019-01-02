@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-actions-devel.h>
+#include <dali-toolkit/internal/visuals/animated-vector-image/vector-rasterize-thread.h>
 
 namespace Dali
 {
@@ -164,12 +165,9 @@ private:
 private:
   ImageVisualShaderFactory&                    mImageVisualShaderFactory;
   VisualUrl                                    mUrl;
+  VectorRasterizeThread                        mVectorRasterizeThread;
   Vector2                                      mVisualSize;
-  Vector2                                      mPlayRange;
   WeakHandle< Actor >                          mPlacementActor;
-  std::unique_ptr< VectorRasterizeThread >     mVectorRasterizeThread;
-
-  int32_t                                      mLoopCount;
   DevelAnimatedVectorImageVisual::Action::Type mActionStatus;
 };
 
