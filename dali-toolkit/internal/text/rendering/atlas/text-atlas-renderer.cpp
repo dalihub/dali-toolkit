@@ -49,7 +49,7 @@ attribute mediump vec2    aPosition;
 attribute mediump vec2    aTexCoord;
 attribute mediump vec4    aColor;
 uniform   mediump vec2    uOffset;
-uniform   mediump mat4    uMvpMatrix;
+uniform     highp mat4    uMvpMatrix;
 varying   mediump vec2    vTexCoord;
 varying   mediump vec4    vColor;
 
