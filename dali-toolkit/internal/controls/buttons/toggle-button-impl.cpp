@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2018 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -305,8 +305,17 @@ const std::vector<std::string>& ToggleButton::GetToggleTooltips() const
 
 void ToggleButton::PrepareVisual(Property::Index index, Toolkit::Visual::Base& visual)
 {
-  DevelControl::RegisterVisual( *this, index, visual, true );
-  DevelControl::EnableVisual( *this, index, false );
+  bool enabled = false; // Disabled by default
+
+  // Unregister the visual with the given index if registered previously
+  if( DevelControl::GetVisual( *this, index ) )
+  {
+    // Check whether it was enabled to ensure we do the same with the new visual we're registering
+    enabled = DevelControl::IsVisualEnabled( *this, index );
+    DevelControl::UnregisterVisual( *this, index );
+  }
+
+  DevelControl::RegisterVisual( *this, index, visual, enabled );
 }
 
 void ToggleButton::RelayoutVisual( Property::Index index, const Vector2& size )

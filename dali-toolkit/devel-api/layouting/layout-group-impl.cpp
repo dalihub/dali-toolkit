@@ -59,6 +59,7 @@ LayoutGroup::~LayoutGroup()
 {
   // An object with a unique_ptr to an opaque structure must define it's destructor in the translation unit
   // where the opaque structure is defined. It cannot use the default method in the header file.
+  RemoveAll();
 }
 
 Toolkit::LayoutGroup::LayoutId LayoutGroup::Add( LayoutItem& child )
@@ -613,7 +614,7 @@ void LayoutGroup::ChildRemovedFromOwner( Actor child )
     if( childLayout )
     {
       Remove( *childLayout.Get() );
-      RequestLayout( Dali::Toolkit::LayoutTransitionData::Type::ON_CHILD_REMOVE, child, Actor() );
+      RequestLayout( Dali::Toolkit::LayoutTransitionData::Type::ON_CHILD_REMOVE, Actor(), child );
     }
   }
 }

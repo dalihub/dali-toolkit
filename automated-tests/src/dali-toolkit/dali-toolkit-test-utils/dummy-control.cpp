@@ -201,6 +201,8 @@ Toolkit::DummyControl Impl::DummyControl::New()
   return control;
 }
 
+int Impl::DummyControl::constructorCount;
+int Impl::DummyControl::destructorCount;
 
 Impl::DummyControl::DummyControl()
 : DummyControlImpl(),
@@ -227,10 +229,13 @@ Impl::DummyControl::DummyControl()
   keyInputFocusGained(false),
   keyInputFocusLost(false)
 {
+  ++constructorCount;
 }
 
-Impl::DummyControl::~DummyControl() { }
-
+Impl::DummyControl::~DummyControl()
+{
+  ++destructorCount;
+}
 
 void Impl::DummyControl::OnInitialize() { initializeCalled = true; }
 bool Impl::DummyControl::OnAccessibilityActivated() { activatedCalled = true; return true; }

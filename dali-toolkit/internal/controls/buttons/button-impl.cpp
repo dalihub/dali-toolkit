@@ -445,7 +445,8 @@ void Button::CreateVisualsForComponent( Property::Index index, const Property::V
                    index, DevelControl::IsVisualEnabled( *this, index )?"true":"false" );
     // enable the visual if needed for current state
     const bool enabled = ( ( index == VISUAL_INDEX_FOR_STATE[ mButtonState ][ BACKGROUND ] )||
-                           ( index == VISUAL_INDEX_FOR_STATE[ mButtonState ][ FOREGROUND ] ) );
+                           ( index == VISUAL_INDEX_FOR_STATE[ mButtonState ][ FOREGROUND ] )||
+                           ( index == Toolkit::Button::Property::LABEL ) );
     DevelControl::RegisterVisual( *this, index, buttonVisual, enabled, visualDepth );
   }
   else

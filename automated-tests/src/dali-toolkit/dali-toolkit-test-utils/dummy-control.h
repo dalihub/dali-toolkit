@@ -207,6 +207,8 @@ public:
   bool keyEventCalled;
   bool keyInputFocusGained;
   bool keyInputFocusLost;
+  static int constructorCount;
+  static int destructorCount;
 
   Property::Map mLayouts;
   RelayoutCallbackFunc mRelayoutCallback;
