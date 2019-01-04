@@ -22,6 +22,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/animation/animation.h>
 
@@ -60,8 +61,8 @@ struct LayoutTransition
 
   LayoutItemPtr layoutItem;
   int layoutTransitionType;
-  Actor gainedChild;
-  Actor lostChild;
+  WeakHandle<Actor> gainedChild;
+  WeakHandle<Actor> lostChild;
 };
 
 const float DEFAULT_TRANSITION_DURATION( 0.5f );
@@ -92,12 +93,12 @@ using LayoutAnimatorArray = std::vector< LayoutDataAnimator >;
 
 struct LayoutPositionData
 {
-  LayoutPositionData( Handle handle, float left, float top, float right, float bottom, bool animated ) :
+  LayoutPositionData( Actor handle, float left, float top, float right, float bottom, bool animated ) :
       handle( handle ), left( left ), top( top ), right( right ), bottom( bottom ), animated( animated ), updateWithCurrentSize(false)
   {
   };
 
-  BaseHandle handle;
+  WeakHandle<Actor> handle;
   float left;
   float top;
   float right;
@@ -124,7 +125,7 @@ struct LayoutDataElement
   void UpdateAnimatorIndex( const LayoutAnimatorArray& animators );
   void UpdatePositionDataIndex( LayoutData& layoutData );
 
-  BaseHandle handle;
+  WeakHandle<Actor> handle;
   std::string propertyName;
   Property::Index propertyIndex;
   Property::Value initialValue;
@@ -154,7 +155,7 @@ public:
     PropertyAnimator( Actor actor, Property::Map map, Path path, Vector3 forward );
     PropertyAnimator( Actor actor, Property::Map map, KeyFrames keyFrames, Animation::Interpolation interpolation );
 
-    BaseHandle handle;
+    WeakHandle<Actor> handle;
 
     Property::Map map;
 
