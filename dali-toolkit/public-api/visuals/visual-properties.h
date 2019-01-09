@@ -129,7 +129,7 @@ enum
 } // namespace Property
 
 /**
- * @brief Visual Transfrom for the offset or size.
+ * @brief Visual Transform for the offset or size.
  * @SINCE_1_2.60
  */
 namespace Transform
@@ -162,7 +162,7 @@ namespace Property
 {
 
 /**
- * @brief Enumeration for the type of Transfrom Property.
+ * @brief Enumeration for the type of Transform Property.
  * @SINCE_1_2.60
  */
 enum Type
