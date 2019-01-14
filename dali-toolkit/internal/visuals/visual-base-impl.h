@@ -47,7 +47,7 @@ namespace Internal
 namespace Visual
 {
 
-class ResourceObserver;
+class EventObserver;
 
 using FittingMode = DevelVisual::FittingMode;
 
@@ -227,16 +227,15 @@ public:
                         Internal::TransitionData::Animator& animator );
 
   /**
-   * @brief Add an observer to watch for when the Visuals resources are loaded.
+   * @brief Add an observer to watch for when the Visuals have events to notify
    * Currently only supports a single observer
-   *
    */
-  void AddResourceObserver( Visual::ResourceObserver& observer );
+  void AddEventObserver( Visual::EventObserver& observer );
 
   /**
    * @brief Remove an observer
    */
-  void RemoveResourceObserver( Visual::ResourceObserver& observer );
+  void RemoveEventObserver( Visual::EventObserver& observer );
 
   /**
    * @brief Called when the visuals resources are loaded / ready

@@ -463,9 +463,15 @@ Property::Value ImageView::GetProperty( BaseObject* object, Property::Index prop
           Scripting::CreatePropertyMap( impl.mImage, map );
           value = map;
         }
-        else if( !impl.mPropertyMap.Empty() )
+        else
         {
-          value = impl.mPropertyMap;
+          Property::Map map;
+          Toolkit::Visual::Base visual = DevelControl::GetVisual( impl, Toolkit::ImageView::Property::IMAGE );
+          if( visual )
+          {
+            visual.CreatePropertyMap( map );
+          }
+          value = map;
         }
         break;
       }

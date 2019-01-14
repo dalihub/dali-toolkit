@@ -188,7 +188,17 @@ void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index in
 
 Property::Value DummyControlImpl::GetProperty( BaseObject* object, Dali::Property::Index propertyIndex )
 {
-  Dali::Property::Value value;
+  Toolkit::DummyControl control = Toolkit::DummyControl::DownCast( Dali::BaseHandle( object ) );
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>( control.GetImplementation() );
+
+  Visual::Base visual = dummyImpl.GetVisual( propertyIndex );
+  Property::Map map;
+  if( visual )
+  {
+    visual.CreatePropertyMap( map );
+  }
+  Dali::Property::Value value = map;
+
   return value;
 }
 

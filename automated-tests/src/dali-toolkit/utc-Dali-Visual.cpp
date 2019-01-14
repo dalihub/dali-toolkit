@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -276,7 +276,7 @@ int UtcDaliVisualSetGetDepthIndex(void)
 int UtcDaliVisualSize(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualGetNaturalSize" );
+  tet_infoline( "UtcDaliVisualSize" );
 
   VisualFactory factory = VisualFactory::Get();
   Vector2 controlSize( 20.f, 30.f );
@@ -373,15 +373,15 @@ int UtcDaliVisualSize(void)
   propertyMap.Clear();
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::TEXT );
   propertyMap.Insert( TextVisual::Property::ENABLE_MARKUP, true );
-  propertyMap.Insert( TextVisual::Property::TEXT, "<font family='TizenSans' size='12'>Hello world</font>" );
+  propertyMap.Insert( TextVisual::Property::TEXT, "<font family='TizenSansRegular' size='12'>Hello world</font>" );
   propertyMap.Insert( TextVisual::Property::MULTI_LINE, true );
 
   Visual::Base textVisual = factory.CreateVisual( propertyMap );
   textVisual.GetNaturalSize( naturalSize );
-  DALI_TEST_EQUALS( naturalSize, Size( 80.f, 20.f ), TEST_LOCATION );
+  DALI_TEST_EQUALS( naturalSize, Size( 86.f, 20.f ), TEST_LOCATION );
 
   const float height = textVisual.GetHeightForWidth( 40.f );
-  DALI_TEST_EQUALS( height, 40.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( height, 57.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   //AnimatedImageVisual
   Visual::Base animatedImageVisual = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );

@@ -39,7 +39,6 @@ StereoInfo StereoModeTable[] = {
     { "mono",                 Dali::MONO},
     { "stereoHorizontal",     Dali::STEREO_HORIZONTAL },
     { "stereoVertical",       Dali::STEREO_VERTICAL },
-    { "stereoInterlaced",     Dali::STEREO_INTERLACED },
 };
 
 const unsigned int numberViewModes = sizeof( StereoModeTable ) / sizeof( StereoModeTable[0] );

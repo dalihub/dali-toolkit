@@ -117,7 +117,7 @@ bool GetPolicyFromValue( const Property::Value& value, Vector2& policy )
 Internal::Visual::Base::Impl::Impl(FittingMode fittingMode)
 : mCustomShader( NULL ),
   mBlendSlotDelegate( NULL ),
-  mResourceObserver( NULL ),
+  mEventObserver( NULL ),
   mTransform(),
   mMixColor( Color::WHITE ),
   mControlSize( Vector2::ZERO ),

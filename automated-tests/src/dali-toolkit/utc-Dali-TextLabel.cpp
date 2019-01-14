@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,11 +49,6 @@ const char* const PROPERTY_NAME_MULTI_LINE =  "multiLine";
 const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
 const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT = "verticalAlignment";
 const char* const PROPERTY_NAME_TEXT_COLOR = "textColor";
-const char* const PROPERTY_NAME_SHADOW_OFFSET = "shadowOffset";
-const char* const PROPERTY_NAME_SHADOW_COLOR = "shadowColor";
-const char* const PROPERTY_NAME_UNDERLINE_ENABLED = "underlineEnabled";
-const char* const PROPERTY_NAME_UNDERLINE_COLOR = "underlineColor";
-const char* const PROPERTY_NAME_UNDERLINE_HEIGHT = "underlineHeight";
 const char* const PROPERTY_NAME_ENABLE_MARKUP = "enableMarkup";
 const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL = "enableAutoScroll";
 const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL_SPEED = "autoScrollSpeed";
@@ -241,11 +236,6 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_HORIZONTAL_ALIGNMENT ) == TextLabel::Property::HORIZONTAL_ALIGNMENT );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_VERTICAL_ALIGNMENT ) == TextLabel::Property::VERTICAL_ALIGNMENT );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_TEXT_COLOR ) == TextLabel::Property::TEXT_COLOR );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_SHADOW_OFFSET ) == TextLabel::Property::SHADOW_OFFSET );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_SHADOW_COLOR ) == TextLabel::Property::SHADOW_COLOR );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_ENABLED ) == TextLabel::Property::UNDERLINE_ENABLED );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_COLOR ) == TextLabel::Property::UNDERLINE_COLOR );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_HEIGHT) == TextLabel::Property::UNDERLINE_HEIGHT );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_MARKUP) == TextLabel::Property::ENABLE_MARKUP );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_AUTO_SCROLL ) == TextLabel::Property::ENABLE_AUTO_SCROLL );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_AUTO_SCROLL_SPEED ) == TextLabel::Property::AUTO_SCROLL_SPEED );
@@ -359,8 +349,6 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // Check that text color can be properly set
   label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::BLUE );
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ), Color::BLUE, TEST_LOCATION );
-  // The underline color is changed as well.
-  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::BLUE, TEST_LOCATION );
 
   Property::Map underlineMapSet;
   Property::Map underlineMapGet;
@@ -372,20 +360,6 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   underlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::UNDERLINE );
   DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
-
-  // Check that shadow parameters can be correctly set
-  label.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 3.0f, 3.0f ) );
-  DALI_TEST_EQUALS( label.GetProperty<Vector2>( TextLabel::Property::SHADOW_OFFSET ), Vector2( 3.0f, 3.0f ), TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::SHADOW_COLOR, Color::BLUE );
-  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::SHADOW_COLOR ), Color::BLUE, TEST_LOCATION );
-
-  // Check that underline parameters can be correctly set
-  label.SetProperty( TextLabel::Property::UNDERLINE_ENABLED, true );
-  DALI_TEST_EQUALS( label.GetProperty<bool>( TextLabel::Property::UNDERLINE_ENABLED ), true, TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::UNDERLINE_COLOR, Color::RED );
-  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::RED, TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::UNDERLINE_HEIGHT, 1.0f );
-  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 1.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   TextLabel label2 = TextLabel::New( "New text" );
   DALI_TEST_CHECK( label2 );
@@ -434,25 +408,36 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // test natural size with multi-line and line spacing
   {
     TextLabel label3 = TextLabel::New("Some text here\nend there\nend here");
-    Vector3 expected0(414.f, 192.f, 0.0f);
-    Vector3 expected1(414.f, 252.f, 0.0f);
+    Vector3 oneLineNaturalSize = label3.GetNaturalSize();
     label3.SetProperty(TextLabel::Property::MULTI_LINE, true);
     label3.SetProperty(TextLabel::Property::LINE_SPACING, 0);
-    DALI_TEST_EQUALS(expected0, label3.GetNaturalSize(), TEST_LOCATION);
-    label3.SetProperty(TextLabel::Property::LINE_SPACING, 20);
-    DALI_TEST_EQUALS(expected1, label3.GetNaturalSize(), TEST_LOCATION);
+    Vector3 multiLineNaturalSize = label3.GetNaturalSize();
+
+    // The width of the text when multi-line is enabled will be smaller (lines separated on '\n')
+    // The height of the text when multi-line is enabled will be larger
+    DALI_TEST_CHECK( oneLineNaturalSize.width > multiLineNaturalSize.width );
+    DALI_TEST_CHECK( oneLineNaturalSize.height < multiLineNaturalSize.height );
+
+    // Change line spacing, meaning height will increase by 3 times the amount specified as we have three lines
+    // Everything else will remain the same
+    int lineSpacing = 20;
+    label3.SetProperty( TextLabel::Property::LINE_SPACING, lineSpacing );
+    Vector3 expectedAfterLineSpacingApplied( multiLineNaturalSize );
+    expectedAfterLineSpacingApplied.height += 3 * lineSpacing;
+    DALI_TEST_EQUALS( expectedAfterLineSpacingApplied, label3.GetNaturalSize(), TEST_LOCATION );
   }
 
-  // single line, line spacing must not affect natural size
+  // single line, line spacing must not affect natural size of the text, only add the spacing to the height
   {
-    const Vector3 expected0(948.f, 64.f, 0.0f);
-    const Vector3 expected1(948.f, 84.f, 0.0f);
     TextLabel label3 = TextLabel::New("Some text here end there end here");
     label3.SetProperty(TextLabel::Property::MULTI_LINE, false);
     label3.SetProperty(TextLabel::Property::LINE_SPACING, 0);
-    DALI_TEST_EQUALS(expected0, label3.GetNaturalSize(), TEST_LOCATION);
-    label3.SetProperty(TextLabel::Property::LINE_SPACING, 20);
-    DALI_TEST_EQUALS(expected1, label3.GetNaturalSize(), TEST_LOCATION);
+    Vector3 textNaturalSize = label3.GetNaturalSize();
+    int lineSpacing = 20;
+    label3.SetProperty( TextLabel::Property::LINE_SPACING, lineSpacing );
+    Vector3 expectedNaturalSizeWithLineSpacing( textNaturalSize );
+    expectedNaturalSizeWithLineSpacing.height += lineSpacing;
+    DALI_TEST_EQUALS( expectedNaturalSizeWithLineSpacing, label3.GetNaturalSize(), TEST_LOCATION );
   }
   // Check the line spacing property
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -582,10 +567,16 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   // Turn on all the effects
   label.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
   label.SetProperty( TextLabel::Property::MULTI_LINE, true );
-  label.SetProperty( TextLabel::Property::UNDERLINE_ENABLED, true );
-  label.SetProperty( TextLabel::Property::UNDERLINE_COLOR, Color::RED );
-  label.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 1.0f, 1.0f ) );
-  label.SetProperty( TextLabel::Property::SHADOW_COLOR, Color::BLUE );
+
+  Property::Map underlineMap;
+  underlineMap.Insert( "enable", "true" );
+  underlineMap.Insert( "color", "red" );
+  label.SetProperty( TextLabel::Property::UNDERLINE, underlineMap );
+
+  Property::Map shadowMap;
+  shadowMap.Insert( "color", Color::BLUE );
+  shadowMap.Insert( "offset", Vector2( 1.0f, 1.0f ) );
+  label.SetProperty( TextLabel::Property::SHADOW, shadowMap );
 
   try
   {

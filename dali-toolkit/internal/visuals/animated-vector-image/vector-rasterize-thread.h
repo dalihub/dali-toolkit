@@ -25,6 +25,10 @@
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/adaptors/log-factory-interface.h>
 #include <string>
+#include <memory>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 
 namespace Dali
 {
@@ -81,11 +85,6 @@ public:
   void PauseAnimation();
 
   /**
-   * @brief Resume the vector animation.
-   */
-  void ResumeAnimation();
-
-  /**
    * @brief Render one frame. The current frame number will be increased.
    */
   void RenderFrame();
@@ -95,6 +94,12 @@ public:
    * @param[in] callback The resource ready callback
    */
   void SetResourceReadyCallback( EventThreadCallback* callback );
+
+  /**
+   * @brief This callback is called after the animation is finished.
+   * @param[in] callback The animation finished callback
+   */
+  void SetAnimationFinishedCallback( EventThreadCallback* callback );
 
   /**
    * @brief Enable looping for 'count' repeats. -1 means to repeat forever.
@@ -108,6 +113,12 @@ public:
    * The animation will play between those values.
    */
   void SetPlayRange( Vector2 range );
+
+  /**
+   * @brief Get the play state
+   * @return The play state
+   */
+  DevelImageVisual::PlayState GetPlayState();
 
 protected:
 
@@ -143,25 +154,25 @@ private:
 
 private:
 
-  std::string                mUrl;
-  VectorAnimationRenderer    mVectorRenderer;
-  ConditionalWait            mConditionalWait;
-  Dali::Mutex                mMutex;
-  EventThreadCallback*       mResourceReadyTrigger;
-  Vector2                    mPlayRange;
-  uint32_t                   mCurrentFrame;
-  uint32_t                   mTotalFrame;
-  uint32_t                   mStartFrame;
-  uint32_t                   mEndFrame;
-  uint32_t                   mWidth;
-  uint32_t                   mHeight;
-  int16_t                    mLoopCount;
-  int16_t                    mCurrentLoop;
-  bool                       mNeedRender;
-  bool                       mPlaying;
-  bool                       mPaused;
-  bool                       mDestroyThread;  ///< Whether the thread be destroyed
-  bool                       mResourceReady;
+  std::string                 mUrl;
+  VectorAnimationRenderer     mVectorRenderer;
+  ConditionalWait             mConditionalWait;
+  Dali::Mutex                 mMutex;
+  std::unique_ptr< EventThreadCallback > mResourceReadyTrigger;
+  std::unique_ptr< EventThreadCallback > mAnimationFinishedTrigger;
+  Vector2                     mPlayRange;
+  DevelImageVisual::PlayState mPlayState;
+  uint32_t                    mCurrentFrame;
+  uint32_t                    mTotalFrame;
+  uint32_t                    mStartFrame;
+  uint32_t                    mEndFrame;
+  uint32_t                    mWidth;
+  uint32_t                    mHeight;
+  int16_t                     mLoopCount;
+  int16_t                     mCurrentLoop;
+  bool                        mNeedRender;
+  bool                        mDestroyThread;  ///< Whether the thread be destroyed
+  bool                        mResourceReady;
   const Dali::LogFactoryInterface& mLogFactory; ///< The log factory
 
 };
