@@ -38,7 +38,7 @@ void FreeFontFamilyNames( Vector<FontDescriptionRun>& fontDescriptionRuns )
        it != endIt;
        ++it )
   {
-    delete (*it).familyName;
+    delete[] (*it).familyName;
   }
 
   fontDescriptionRuns.Clear();
