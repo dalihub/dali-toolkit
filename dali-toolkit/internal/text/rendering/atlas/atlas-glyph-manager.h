@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_H__
-#define __DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_H__
+#ifndef DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_H
+#define DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,19 @@ public:
     AtlasManager::Metrics mAtlasMetrics;    ///< metrics from the Atlas Manager
   };
 
+  struct GlyphStyle
+  {
+    GlyphStyle()
+    : outline{ 0u },
+      isItalic{ false },
+      isBold{ false }
+    {}
+
+    uint16_t outline; ///< The outline width of this glyph
+    bool isItalic:1;  ///< Whether the glyph is italic.
+    bool isBold:1;    ///< Whether the glyph is bold.
+  };
+
   /**
    * @brief Create a AtlasGlyphManager handle.
    *
@@ -80,12 +93,12 @@ public:
    * @brief Ask Atlas Manager to add a glyph
    *
    * @param[in] glyph glyph to add to an atlas
-   * @param[in] outlineWidth the outline width of the glyph
+   * @param[in] style The style of this glyph
    * @param[in] bitmap bitmap to use for glyph addition
    * @param[out] slot information returned by atlas manager for addition
    */
   void Add( const Text::GlyphInfo& glyph,
-            const uint32_t outlineWidth,
+            const GlyphStyle& style,
             const PixelData& bitmap,
             AtlasManager::AtlasSlot& slot );
 
@@ -105,14 +118,14 @@ public:
    *
    * @param[in] fontId The font that this glyph comes from
    * @param[in] index The GlyphIndex of this glyph
-   * @param[in] outlineWidth The outline width of this glyph
+   * @param[in] style The style of this glyph
    * @param[out] slot container holding information about the glyph( mImage = 0 indicates not being cached )
    *
    * @return Whether glyph is cached or not ?
    */
   bool IsCached( Text::FontId fontId,
                  Text::GlyphIndex index,
-                 uint32_t outlineWidth,
+                 const GlyphStyle& style,
                  AtlasManager::AtlasSlot& slot );
 
   /**
@@ -164,10 +177,10 @@ public:
    *
    * @param[in] fontId The font this image came from
    * @param[in] index The index of the glyph
-   * @param[in] outlineWidth The outline width of the glyph
+   * @param[in] style The style of this glyph
    * @param[in] delta The adjustment to make to the reference count
    */
-  void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, uint32_t outlineWidth, int32_t delta );
+  void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, const GlyphStyle& style, int32_t delta );
 
 private:
 
@@ -179,4 +192,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_H__
+#endif // DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_H

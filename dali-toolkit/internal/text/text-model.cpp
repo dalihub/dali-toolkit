@@ -162,7 +162,7 @@ const Vector4& Model::GetOutlineColor() const
   return mVisualModel->GetOutlineColor();
 }
 
-float Model::GetOutlineWidth() const
+uint16_t Model::GetOutlineWidth() const
 {
   return mVisualModel->GetOutlineWidth();
 }
