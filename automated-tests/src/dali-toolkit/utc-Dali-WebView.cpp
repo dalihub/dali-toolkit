@@ -265,13 +265,11 @@ int UtcDaliWebViewMethodsForCoverage(void)
   WebView view = WebView::New( "ko-KR", "Asia/Seoul" );
 
   view.LoadHTMLString( "<body>Hello World!</body>" );
-  view.AddJavaScriptInterface( "jsObject", "jsFunction",
-    []( const std::string& arg ) -> std::string {
-      return arg + " World!";
+  view.AddJavaScriptMessageHandler( "jsObject",
+    []( const std::string& arg ) {
     }
   );
-  view.EvaluateJavaScript( "jsObject.jsFunction('Hello')" );
-  view.RemoveJavascriptInterface( "jsObject", "jsFunction" );
+  view.EvaluateJavaScript( "jsObject.postMessage('Hello')" );
 
   DALI_TEST_CHECK( view );
 

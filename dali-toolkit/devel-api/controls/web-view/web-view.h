@@ -191,28 +191,37 @@ public:
   void GoBack();
 
   /**
-    * @brief Evaluates JavaScript code represented as a string.
-    *
-    * @param[in] script The JavaScript code
-    */
+   * @brief Evaluates JavaScript code represented as a string.
+   *
+   * @param[in] script The JavaScript code
+   */
   void EvaluateJavaScript( const std::string& script );
 
   /**
-    * @brief Adds a JavaScript interface.
-    *
-    * @param[in] exposedObjectName The name of exposed object
-    * @param[in] jsFunctionName The name of JavaScript function
-    * @param[in] callback The callback function
-    */
-  void AddJavaScriptInterface( const std::string& exposedObjectName, const std::string& jsFunctionName, std::function< std::string(const std::string&) > callback );
-
-  /**
-    * @brief Removes a JavaScript interface.
-    *
-    * @param[in] exposedObjectName The name of exposed object
-    * @param[in] jsFunctionName The name of JavaScript function
-    */
-  void RemoveJavascriptInterface( const std::string& exposedObjectName, const std::string& jsFunctionName );
+   * @brief Inject a JavaScript object with a message handler into the WebView.
+   *
+   * @note The injected object will appear in the JavaScript context to be loaded next.
+   *
+   * Example:
+   *
+   * 1. Native
+   *
+   *     webview.AddJavaScriptMessageHandler( "myObject", []( const std::string& message ) {
+   *         printf( "Received a message from JS: %s", message.c_str() );
+   *     });
+   *
+   *     // Start WebView by loading URL
+   *     webview.LoadUrl( url );
+   *
+   * 2. JavaScript
+   *
+   *     myObject.postMessage( "Hello World!" ); // "Received a message from JS: Hello World!"
+   *
+   *
+   * @param[in] exposedObjectName The name of exposed object
+   * @param[in] handler The callback function
+   */
+  void AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void( const std::string& ) > handler );
 
   /**
    * @brief Clears the history of Web.

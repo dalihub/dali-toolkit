@@ -169,6 +169,31 @@ public:
       UNUSED_PROPERTY_TEXT_COLOR,
 
       /**
+       * @brief This property is removed because it's deprecated.
+       */
+      RESERVED_PROPERTY_01,
+
+      /**
+       * @brief This property is removed because it's deprecated.
+       */
+      RESERVED_PROPERTY_02,
+
+      /**
+       * @brief This property is removed because it's deprecated.
+       */
+      RESERVED_PROPERTY_03,
+
+      /**
+       * @brief This property is removed because it's deprecated.
+       */
+      RESERVED_PROPERTY_04,
+
+      /**
+       * @brief This property is removed because it's deprecated.
+       */
+      RESERVED_PROPERTY_05,
+
+      /**
        * @brief Whether the mark-up processing is enabled.
        * @details Name "enableMarkup", type Property::BOOLEAN.
        * @SINCE_1_0.0
