@@ -169,16 +169,6 @@ public:
       PLACEHOLDER_TEXT_COLOR,
 
       /**
-       * @brief This property is removed because it's deprecated.
-       */
-      RESERVED_PROPERTY_01,
-
-      /**
-       * @brief This property is removed because it's deprecated.
-       */
-      RESERVED_PROPERTY_02,
-
-      /**
        * @brief The color to apply to the primary cursor.
        * @details Name "primaryCursorColor", type Property::VECTOR4.
        * @SINCE_1_0.0

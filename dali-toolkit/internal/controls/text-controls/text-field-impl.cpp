@@ -91,8 +91,6 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "horizontalAlignment",          
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "verticalAlignment",                    STRING,    VERTICAL_ALIGNMENT                   )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "textColor",                            VECTOR4,   TEXT_COLOR                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholderTextColor",                 VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "reservedProperty01",                   STRING,    RESERVED_PROPERTY_01                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "reservedProperty02",                   STRING,    RESERVED_PROPERTY_02                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "primaryCursorColor",                   VECTOR4,   PRIMARY_CURSOR_COLOR                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "secondaryCursorColor",                 VECTOR4,   SECONDARY_CURSOR_COLOR               )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableCursorBlink",                    BOOLEAN,   ENABLE_CURSOR_BLINK                  )
