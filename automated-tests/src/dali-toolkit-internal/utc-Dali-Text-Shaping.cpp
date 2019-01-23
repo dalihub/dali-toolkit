@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -328,18 +328,18 @@ int UtcDaliTextShape(void)
 
   struct GlyphInfoData glyphs04[] =
   {
-    { 2u, 160u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 2u, 123u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 2u, 153u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 2u, 160u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 2u, 150u, 0.f, 0.f, 0.f, 0.f, 14.f, 0.f },
-    { 2u, 153u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 2u, 160u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 2u, 151u, 0.f, 0.f, 0.f, 0.f, 12.f, 0.f },
-    { 2u, 153u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 2u, 160u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 2u, 147u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 2u, 153u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
+    { 2u, 1733u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 2u, 1693u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f },
+    { 2u, 1725u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 2u, 1733u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 2u, 1721u, 0.f, 0.f, 0.f, 0.f, 20.f, 0.f },
+    { 2u, 1725u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 2u, 1733u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 2u, 1722u, 0.f, 0.f, 0.f, 0.f, 18.f, 0.f },
+    { 2u, 1725u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 2u, 1733u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 2u, 1718u, 0.f, 0.f, 0.f, 0.f, 14.f, 0.f },
+    { 2u, 1725u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
   };
 
   CharacterIndex characterIndices04[] = { 0u, 0u, 0u, 2u, 2u, 2u, 4u, 4u, 4u, 6u, 6u, 6u };
@@ -382,7 +382,7 @@ int UtcDaliTextShape(void)
     { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
     { 1u, 71u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
     { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 5034u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
+    { 1u, 5039u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
     { 1u, 81u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
     { 1u, 76u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
     { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
@@ -551,15 +551,15 @@ int UtcDaliTextSoftwareStyling(void)
 
   struct GlyphInfoData glyphs01[] =
   {
-    { 2u, 14750u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
-    { 2u, 9802u, 0.f, 0.f, 0.f, 0.f,  16.f, 0.f, true, true },
-    { 2u, 12811u, 0.f, 0.f, 0.f, 0.f,  16.f, 0.f, true, true },
+    { 2u, 4857u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, false },
+    { 2u, 7316u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, false },
+    { 2u, 4364u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, false },
   };
   struct GlyphInfoData glyphs02[] =
   {
-    { 2u, 14750u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, false, false },
-    { 2u, 9802u, 0.f, 0.f, 0.f, 0.f,  16.f, 0.f, false, true },
-    { 2u, 12811u, 0.f, 0.f, 0.f, 0.f,  16.f, 0.f, true, false },
+    { 2u, 4857u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, false, false },
+    { 2u, 7316u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, false, false },
+    { 2u, 4364u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true,  false },
   };
 
   CharacterIndex characterIndices[] = { 0u, 1u, 2u };
