@@ -3226,14 +3226,14 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     mImpl->mModel->mLogicalModel->RetrieveStyle( styleIndex, style );
 
     // Whether to add a new text color run.
-    const bool addColorRun = ( style.textColor != mImpl->mEventData->mInputStyle.textColor );
+    const bool addColorRun = ( style.textColor != mImpl->mEventData->mInputStyle.textColor ) && !mImpl->mEventData->mInputStyle.isDefaultColor;
 
     // Whether to add a new font run.
-    const bool addFontNameRun = style.familyName != mImpl->mEventData->mInputStyle.familyName;
-    const bool addFontWeightRun = style.weight != mImpl->mEventData->mInputStyle.weight;
-    const bool addFontWidthRun = style.width != mImpl->mEventData->mInputStyle.width;
-    const bool addFontSlantRun = style.slant != mImpl->mEventData->mInputStyle.slant;
-    const bool addFontSizeRun = style.size != mImpl->mEventData->mInputStyle.size;
+    const bool addFontNameRun = ( style.familyName != mImpl->mEventData->mInputStyle.familyName ) && mImpl->mEventData->mInputStyle.isFamilyDefined;
+    const bool addFontWeightRun = ( style.weight != mImpl->mEventData->mInputStyle.weight ) && mImpl->mEventData->mInputStyle.isWeightDefined;
+    const bool addFontWidthRun = ( style.width != mImpl->mEventData->mInputStyle.width ) && mImpl->mEventData->mInputStyle.isWidthDefined;
+    const bool addFontSlantRun = ( style.slant != mImpl->mEventData->mInputStyle.slant ) && mImpl->mEventData->mInputStyle.isSlantDefined;
+    const bool addFontSizeRun = ( style.size != mImpl->mEventData->mInputStyle.size ) && mImpl->mEventData->mInputStyle.isSizeDefined ;
 
     // Add style runs.
     if( addColorRun )
