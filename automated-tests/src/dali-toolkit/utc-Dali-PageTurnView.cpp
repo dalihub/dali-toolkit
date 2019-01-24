@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,9 +185,8 @@ class TestPageFactory : public PageFactory
 {
 public:
 
-  TestPageFactory(ToolkitTestApplication& application, bool returnValidTexture = true )
-  : mApplication( application ),
-    mValidTexture( returnValidTexture )
+  TestPageFactory( bool returnValidTexture = true )
+  : mValidTexture( returnValidTexture )
   {
     mTotalPageNumber = TOTAL_PAGE_NUMBER;
   }
@@ -216,7 +215,6 @@ public:
   }
 
 private:
-  ToolkitTestApplication& mApplication;
   unsigned int            mTotalPageNumber;
   bool                    mValidTexture;
 };
@@ -244,7 +242,7 @@ int UtcDaliPageTurnPortraitViewNew(void)
   DALI_TEST_CHECK( !portraitView );
 
   // Test object creation
-  TestPageFactory factory(application);
+  TestPageFactory factory;
   portraitView = PageTurnPortraitView::New( factory, PAGE_SIZE );
   DALI_TEST_CHECK( portraitView );
 
@@ -255,7 +253,7 @@ int UtcDaliPageTurnPortraitViewNew(void)
   gObjectCreatedCallBackCalled = false;
   registry.ObjectCreatedSignal().Connect( &TestCallback );
   {
-    TestPageFactory factory(application);
+    TestPageFactory factory;
     PageTurnView portraitView = PageTurnPortraitView::New( factory, PAGE_SIZE );
   }
   DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
@@ -284,7 +282,7 @@ int UtcDaliPageTurnLandscapeViewNew(void)
   DALI_TEST_CHECK( !landscapeView );
 
   // Test object creation
-  TestPageFactory factory(application);
+  TestPageFactory factory;
   landscapeView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
   DALI_TEST_CHECK( landscapeView );
 
@@ -295,7 +293,7 @@ int UtcDaliPageTurnLandscapeViewNew(void)
   gObjectCreatedCallBackCalled = false;
   registry.ObjectCreatedSignal().Connect( &TestCallback );
   {
-    TestPageFactory factory(application);
+    TestPageFactory factory;
     PageTurnView landscapeView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
   }
   DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
@@ -324,7 +322,7 @@ int UtcDaliPageTurnPortraitViewCopyConstructorAndAssignment(void)
   DALI_TEST_CHECK( !portraitView );
 
   // Test object creation
-  TestPageFactory factory(application);
+  TestPageFactory factory;
   portraitView = PageTurnPortraitView::New( factory, PAGE_SIZE );
   DALI_TEST_CHECK( portraitView );
 
@@ -358,7 +356,7 @@ int UtcDaliPageTurnLandscapeViewCopyConstructorAndAssignment(void)
   DALI_TEST_CHECK( !landscapeView );
 
   // Test object creation
-  TestPageFactory factory(application);
+  TestPageFactory factory;
   landscapeView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
   DALI_TEST_CHECK( landscapeView );
 
@@ -387,7 +385,7 @@ int UtcDaliPageTurnViewSetGetProperty(void)
 
   tet_infoline(" UtcDaliPageTurnViewSetGetProperty ");
 
-  TestPageFactory factory(application);
+  TestPageFactory factory;
   PageTurnView landscapeView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
   DALI_TEST_CHECK( landscapeView );
 
@@ -438,7 +436,7 @@ int UtcDaliPageTurnPortraitViewSignals(void)
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
 
-  TestPageFactory factory(application);
+  TestPageFactory factory;
   Vector2 size = Stage::GetCurrent().GetSize();
   PageTurnView portraitView = PageTurnPortraitView::New( factory, size );
   portraitView.SetParentOrigin( ParentOrigin::CENTER );
@@ -575,7 +573,7 @@ int UtcDaliPageTurnLanscapeViewSignals(void)
    * ----------------
    */
 
-  TestPageFactory factory(application);
+  TestPageFactory factory;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   PageTurnView landscapeView = PageTurnLandscapeView::New( factory, Vector2(stageSize.x*0.5f, stageSize.x*0.8f) );
   landscapeView.SetParentOrigin( ParentOrigin::CENTER );
@@ -687,7 +685,7 @@ int UtcDaliPageTurnLanscapeViewSignals(void)
 int UtcDaliPageImageFactoryGetExtention(void)
 {
   ToolkitTestApplication application;
-  TestPageFactory factory(application);
+  TestPageFactory factory;
   DALI_TEST_CHECK( factory.GetExtension() == NULL );
   END_TEST;
 }
@@ -700,7 +698,7 @@ int UtcDaliPageTurnEmptyTextureHandle(void)
 
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE );
 
-  TestPageFactory factory(application, false); // returns empty handles
+  TestPageFactory factory( false /* returns empty handles */ );
   Vector2 size = Stage::GetCurrent().GetSize();
   try
   {

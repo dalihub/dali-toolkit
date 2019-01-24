@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_MODEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,27 +61,27 @@ public:
   /**
    * @copydoc ModelInterface::GetControlSize()
    */
-  virtual const Size& GetControlSize() const;
+  virtual const Size& GetControlSize() const override;
 
   /**
    * @copydoc ModelInterface::GetLayoutSize()
    */
-  virtual const Size& GetLayoutSize() const;
+  virtual const Size& GetLayoutSize() const override;
 
   /**
    * @copydoc ModelInterface::GetScrollPosition()
    */
-  virtual const Vector2& GetScrollPosition() const;
+  virtual const Vector2& GetScrollPosition() const override;
 
   /**
    * @copydoc ModelInterface::GetHorizontalAlignment()
    */
-  virtual HorizontalAlignment::Type GetHorizontalAlignment() const;
+  virtual HorizontalAlignment::Type GetHorizontalAlignment() const override;
 
   /**
    * @copydoc ModelInterface::GetVerticalAlignment()
    */
-  virtual VerticalAlignment::Type GetVerticalAlignment() const;
+  virtual VerticalAlignment::Type GetVerticalAlignment() const override;
 
   /**
    * @copydoc ModelInterface::GetVerticalLineAlignment()
@@ -91,117 +91,117 @@ public:
   /**
    * @copydoc ModelInterface::IsTextElideEnabled()
    */
-  virtual bool IsTextElideEnabled() const;
+  virtual bool IsTextElideEnabled() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfLines()
    */
-  virtual Length GetNumberOfLines() const;
+  virtual Length GetNumberOfLines() const override;
 
   /**
    * @copydoc ModelInterface::GetLines()
    */
-  virtual const LineRun* const GetLines() const;
+  virtual const LineRun* const GetLines() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfScripts()
    */
-  virtual Length GetNumberOfScripts() const;
+  virtual Length GetNumberOfScripts() const override;
 
   /**
    * @copydoc ModelInterface::GetScriptRuns()
    */
-  virtual const ScriptRun* const GetScriptRuns() const;
+  virtual const ScriptRun* const GetScriptRuns() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfGlyphs()
    */
-  virtual Length GetNumberOfGlyphs() const;
+  virtual Length GetNumberOfGlyphs() const override;
 
   /**
    * @copydoc ModelInterface::GetGlyphs()
    */
-  virtual const GlyphInfo* const GetGlyphs() const;
+  virtual const GlyphInfo* const GetGlyphs() const override;
 
   /**
    * @copydoc ModelInterface::GetLayout()
    */
-  virtual const Vector2* const GetLayout() const;
+  virtual const Vector2* const GetLayout() const override;
 
   /**
    * @copydoc ModelInterface::GetColors()
    */
-  virtual const Vector4* const GetColors() const;
+  virtual const Vector4* const GetColors() const override;
 
   /**
    * @copydoc ModelInterface::GetColorIndices()
    */
-  virtual const ColorIndex* const GetColorIndices() const;
+  virtual const ColorIndex* const GetColorIndices() const override;
 
   /**
    * @copydoc ModelInterface::GetDefaultColor()
    */
-  virtual const Vector4& GetDefaultColor() const;
+  virtual const Vector4& GetDefaultColor() const override;
 
   /**
    * @copydoc ModelInterface::GetShadowOffset()
    */
-  virtual const Vector2& GetShadowOffset() const;
+  virtual const Vector2& GetShadowOffset() const override;
 
   /**
    * @copydoc ModelInterface::GetShadowColor()
    */
-  virtual const Vector4& GetShadowColor() const;
+  virtual const Vector4& GetShadowColor() const override;
 
   /**
    * @copydoc ModelInterface::GetShadowBlurRadius()
    */
-  virtual const float& GetShadowBlurRadius() const;
+  virtual const float& GetShadowBlurRadius() const override;
 
   /**
    * @copydoc ModelInterface::GetUnderlineColor()
    */
-  virtual const Vector4& GetUnderlineColor() const;
+  virtual const Vector4& GetUnderlineColor() const override;
 
   /**
    * @copydoc ModelInterface::IsUnderlineEnabled()
    */
-  virtual bool IsUnderlineEnabled() const;
+  virtual bool IsUnderlineEnabled() const override;
 
   /**
    * @copydoc ModelInterface::GetUnderlineHeight()
    */
-  virtual float GetUnderlineHeight() const;
+  virtual float GetUnderlineHeight() const override;
 
   /**
    * @copydoc ModelInterface::GetNumberOfUnderlineRuns()
    */
-  virtual Length GetNumberOfUnderlineRuns() const;
+  virtual Length GetNumberOfUnderlineRuns() const override;
 
   /**
    * @copydoc ModelInterface::GetUnderlineRuns()
    */
-  virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const;
+  virtual void GetUnderlineRuns( GlyphRun* underlineRuns, UnderlineRunIndex index, Length numberOfRuns ) const override;
 
   /**
    * @copydoc ModelInterface::GetOutlineColor()
    */
-  virtual const Vector4& GetOutlineColor() const;
+  virtual const Vector4& GetOutlineColor() const override;
 
   /**
    * @copydoc ModelInterface::GetOutlineWidth()
    */
-  virtual float GetOutlineWidth() const;
+  virtual float GetOutlineWidth() const override;
 
   /**
    * @copydoc ModelInterface::GetBackgroundColor()
    */
-  virtual const Vector4& GetBackgroundColor() const;
+  virtual const Vector4& GetBackgroundColor() const override;
 
   /**
    * @copydoc ModelInterface::IsBackgroundEnabled()
    */
-  virtual bool IsBackgroundEnabled() const;
+  virtual bool IsBackgroundEnabled() const override;
 
 private: // Private contructors & copy operator.
 

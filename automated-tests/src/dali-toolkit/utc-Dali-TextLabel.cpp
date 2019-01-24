@@ -67,7 +67,6 @@ const char* const PROPERTY_NAME_PIXEL_SIZE = "pixelSize";
 const char* const PROPERTY_NAME_ELLIPSIS = "ellipsis";
 const char* const PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY = "autoScrollLoopDelay";
 
-const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
 

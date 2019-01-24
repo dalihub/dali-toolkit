@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,8 +101,7 @@ class FontClient : public BaseObject
 {
 public:
   FontClient()
-  : mDpiHorizontal( 0 ),
-    mDpiVertical( 0 )
+  : mGlyphInfo()
   {
   }
 
@@ -163,8 +162,6 @@ public:
   const GlyphInfo& GetEllipsisGlyph( PointSize26Dot6 pointSize ){return mGlyphInfo;}
   bool IsColorGlyph( FontId fontId, GlyphIndex glyphIndex ){return false;}
 private:
-  unsigned int mDpiHorizontal;
-  unsigned int mDpiVertical;
   GlyphInfo    mGlyphInfo;
 }; // class FontClient
 
@@ -172,8 +169,11 @@ private:
 class Shaping : public BaseObject
 {
 public:
-  Shaping() : mText(NULL)
-  {}
+  Shaping()
+  : mText( NULL ),
+    mNumChars( 0 )
+  {
+  }
 
   ~Shaping()
   {
@@ -255,25 +255,11 @@ inline static TextAbstraction::Internal::FontClient& GetImplementation(TextAbstr
   return static_cast<TextAbstraction::Internal::FontClient&>(handle);
 }
 
-inline static const TextAbstraction::Internal::FontClient& GetImplementation(const TextAbstraction::FontClient& fontClient)
-{
-  DALI_ASSERT_ALWAYS( fontClient && "fontClient handle is empty" );
-  const BaseObject& handle = fontClient.GetBaseObject();
-  return static_cast<const TextAbstraction::Internal::FontClient&>(handle);
-}
-
 inline static TextAbstraction::Internal::Shaping& GetImplementation(TextAbstraction::Shaping& shaping)
 {
   DALI_ASSERT_ALWAYS( shaping && "shaping handle is empty" );
   BaseObject& handle = shaping.GetBaseObject();
   return static_cast<TextAbstraction::Internal::Shaping&>(handle);
-}
-
-inline static const TextAbstraction::Internal::Shaping& GetImplementation(const TextAbstraction::Shaping& shaping)
-{
-  DALI_ASSERT_ALWAYS( shaping && "shaping handle is empty" );
-  const BaseObject& handle = shaping.GetBaseObject();
-  return static_cast<const TextAbstraction::Internal::Shaping&>(handle);
 }
 
 

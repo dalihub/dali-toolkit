@@ -41,7 +41,10 @@ const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
 void TestDebugVisual( Visual::Base& visual, Visual::Type actualType, Vector2 expectedNaturalSize )
 {
-  DALI_TEST_CHECK( &typeid( Toolkit::Internal::WireframeVisual ) == &typeid( GetImplementation(visual) ) );
+  {
+    auto& impl = GetImplementation( visual );
+    DALI_TEST_CHECK( &typeid( Toolkit::Internal::WireframeVisual ) == &typeid( impl ) );
+  }
 
   Vector2 naturalSize;
   visual.GetNaturalSize( naturalSize );
@@ -177,7 +180,10 @@ int UtcDaliDebugRenderingGetVisual1(void)
 
   Visual::Base textVisual = factory.CreateVisual( propertyMap7 );
   DALI_TEST_CHECK( textVisual );
-  DALI_TEST_CHECK( &typeid( Toolkit::Internal::WireframeVisual ) == &typeid( GetImplementation(textVisual) ) );
+  {
+    auto&& impl = GetImplementation( textVisual );
+    DALI_TEST_CHECK( &typeid( Toolkit::Internal::WireframeVisual ) == &typeid( impl ) );
+  }
 
   Vector2 naturalSize;
   textVisual.GetNaturalSize( naturalSize );
