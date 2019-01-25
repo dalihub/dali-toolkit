@@ -200,19 +200,11 @@ void WebView::EvaluateJavaScript( const std::string& script )
   }
 }
 
-void WebView::AddJavaScriptInterface( const std::string& exposedObjectName, const std::string& jsFunctionName, std::function< std::string(const std::string&) > callback )
+void WebView::AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void( const std::string& ) > handler )
 {
   if ( mWebEngine )
   {
-    mWebEngine.AddJavaScriptInterface( exposedObjectName, jsFunctionName, callback );
-  }
-}
-
-void WebView::RemoveJavascriptInterface( const std::string& exposedObjectName, const std::string& jsFunctionName )
-{
-  if ( mWebEngine )
-  {
-    mWebEngine.RemoveJavascriptInterface( exposedObjectName, jsFunctionName );
+    mWebEngine.AddJavaScriptMessageHandler( exposedObjectName, handler );
   }
 }
 

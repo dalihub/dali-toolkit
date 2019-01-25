@@ -113,14 +113,9 @@ public:
   void EvaluateJavaScript( const std::string& script );
 
   /**
-   * @copydoc Dali::WebEngine::AddJavaScriptInterface()
+   * @copydoc Dali::WebEngine::AddJavaScriptMessageHandler()
    */
-  void AddJavaScriptInterface( const std::string& exposedObjectName, const std::string& jsFunctionName, std::function< std::string(const std::string&) > callback );
-
-  /**
-   * @copydoc Dali::WebEngine::RemoveJavascriptInterface()
-   */
-  void RemoveJavascriptInterface( const std::string& exposedObjectName, const std::string& jsFunctionName );
+  void AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void( const std::string& ) > handler );
 
   /**
    * @copydoc Dali::WebEngine::ClearHistory()
