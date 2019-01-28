@@ -23,6 +23,7 @@
 #include <toolkit-adaptor-impl.h>
 #include <dali/integration-api/debug.h>
 #include <test-application.h>
+#include <test-render-surface.h>
 
 namespace Dali
 {
@@ -42,9 +43,9 @@ Dali::Adaptor& Adaptor::Get()
   return *adaptor;
 }
 
-Dali::RenderSurface& Adaptor::GetSurface()
+Dali::RenderSurfaceInterface& Adaptor::GetSurface()
 {
-  Dali::RenderSurface *renderSurface = new Dali::TestRenderSurface;
+  Dali::RenderSurfaceInterface* renderSurface = reinterpret_cast <Dali::RenderSurfaceInterface*>( new Dali::TestRenderSurface( Dali::PositionSize( 0, 0, 480, 800 ) ) );
   return *renderSurface;
 }
 
@@ -67,12 +68,12 @@ Adaptor& Adaptor::New( Window window, Configuration::ContextLoss configuration )
   return Internal::Adaptor::Adaptor::Get();
 }
 
-Adaptor& Adaptor::New( Any nativeWindow, const Dali::RenderSurface& surface )
+Adaptor& Adaptor::New( Any nativeWindow, const Dali::RenderSurfaceInterface& surface )
 {
   return Internal::Adaptor::Adaptor::Get();
 }
 
-Adaptor& Adaptor::New( Any nativeWindow, const Dali::RenderSurface& surface, Configuration::ContextLoss configuration )
+Adaptor& Adaptor::New( Any nativeWindow, const Dali::RenderSurfaceInterface& surface, Configuration::ContextLoss configuration )
 {
   return Internal::Adaptor::Adaptor::Get();
 }
@@ -129,7 +130,7 @@ void Adaptor::RemoveIdle( CallbackBase* callback )
   }
 }
 
-void Adaptor::ReplaceSurface( Any nativeWindow, Dali::RenderSurface& surface )
+void Adaptor::ReplaceSurface( Any nativeWindow, Dali::RenderSurfaceInterface& surface )
 {
 }
 
@@ -143,7 +144,7 @@ Adaptor::AdaptorSignalType& Adaptor::LanguageChangedSignal()
   return Internal::Adaptor::Adaptor::AdaptorSignal();
 }
 
-RenderSurface& Adaptor::GetSurface()
+Dali::RenderSurfaceInterface& Adaptor::GetSurface()
 {
   return Internal::Adaptor::Adaptor::GetSurface();
 }

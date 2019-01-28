@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/integration-api/adaptors/render-surface.h>
+#include <dali/integration-api/adaptors/render-surface-interface.h>
 
 namespace Dali
 {
@@ -45,40 +45,6 @@ class GlAbstraction;
 
 } // namespace Integration
 
-class TestRenderSurface : public RenderSurface
-{
-public:
-  virtual PositionSize GetPositionSize() const { PositionSize size; return size; }
-
-  virtual void GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVertical ) { dpiHorizontal = dpiVertical = 96; }
-
-  virtual void InitializeGraphics( Dali::Internal::Adaptor::GraphicsInterface& graphics, Dali::DisplayConnection& displayConnection ) {};
-
-  virtual void CreateSurface() {}
-
-  virtual void DestroySurface() {}
-
-  virtual bool ReplaceGraphicsSurface() { return false; }
-
-  virtual void MoveResize( Dali::PositionSize positionSize ) {}
-
-  virtual void SetViewMode( ViewMode viewMode ) {}
-
-  virtual void StartRender() {}
-
-  virtual bool PreRender( bool resizingSurface ) { return false; }
-
-  virtual void PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface ) {}
-
-  virtual void StopRender() {}
-
-  virtual void ReleaseLock() {}
-
-  virtual void SetThreadSynchronization( ThreadSynchronizationInterface& threadSynchronization ) {}
-
-  virtual RenderSurface::Type GetSurfaceType() { return RenderSurface::WINDOW_RENDER_SURFACE; }
-};
-
 namespace Internal
 {
 namespace Adaptor
@@ -92,7 +58,7 @@ public:
   ~Adaptor();
 
 public:
-  static Dali::RenderSurface& GetSurface();
+  static Dali::RenderSurfaceInterface& GetSurface();
   static Dali::Adaptor::AdaptorSignalType& AdaptorSignal();
   static bool mAvailable;
   static Vector<CallbackBase*> mCallbacks;
