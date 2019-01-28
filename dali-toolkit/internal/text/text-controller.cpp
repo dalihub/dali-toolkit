@@ -2610,9 +2610,9 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
 
       // This branch avoids calling the InsertText() method of the 'else' branch which can delete selected text.
     }
-    else if( Dali::DALI_KEY_SHIFT_LEFT == keyCode )
+    else if( ( Dali::DALI_KEY_SHIFT_LEFT == keyCode ) || ( Dali::DALI_KEY_SHIFT_RIGHT == keyCode ) )
     {
-      // DALI_KEY_SHIFT_LEFT is the key code for the Left Shift. It's sent (by the InputMethodContext?) when the predictive text is enabled
+      // DALI_KEY_SHIFT_LEFT or DALI_KEY_SHIFT_RIGHT is the key code for the Left Shift. It's sent (by the InputMethodContext?) when the predictive text is enabled
       // and a character is typed after the type of a upper case latin character.
 
       // Do nothing.
@@ -2642,6 +2642,7 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
          ( mImpl->mEventData->mState != EventData::INACTIVE ) &&
          ( !isNullKey ) &&
          ( Dali::DALI_KEY_SHIFT_LEFT != keyCode ) &&
+         ( Dali::DALI_KEY_SHIFT_RIGHT != keyCode ) &&
          ( Dali::DALI_KEY_VOLUME_UP != keyCode ) &&
          ( Dali::DALI_KEY_VOLUME_DOWN != keyCode ) )
     {
