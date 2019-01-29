@@ -338,6 +338,36 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
     value = map.Find( DevelImageVisual::Property::PLAY_STATE );
     DALI_TEST_CHECK( value->Get< int >() == static_cast< int >( DevelImageVisual::PlayState::PLAYING ) );
 
+    tet_infoline( "Off stage" );
+    dummyControl.Unparent();
+
+    application.SendNotification();
+    application.Render(16);
+
+    map = dummyControl.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+    value = map.Find( DevelImageVisual::Property::PLAY_STATE );
+    DALI_TEST_CHECK( value->Get< int >() == static_cast< int >( DevelImageVisual::PlayState::PAUSED ) );
+
+    tet_infoline( "On stage again" );
+    Stage::GetCurrent().Add( dummyControl );
+
+    application.SendNotification();
+    application.Render(16);
+
+    map = dummyControl.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+    value = map.Find( DevelImageVisual::Property::PLAY_STATE );
+    DALI_TEST_CHECK( value->Get< int >() == static_cast< int >( DevelImageVisual::PlayState::PAUSED ) );
+
+    tet_infoline( "Test Play action" );
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
+
+    application.SendNotification();
+    application.Render(16);
+
+    map = dummyControl.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+    value = map.Find( DevelImageVisual::Property::PLAY_STATE );
+    DALI_TEST_CHECK( value->Get< int >() == static_cast< int >( DevelImageVisual::PlayState::PLAYING ) );
+
     // Change Size
     Vector3 newSize( 100.0f, 100.0f, 0.0f );
     dummyControl.SetSize( newSize );
