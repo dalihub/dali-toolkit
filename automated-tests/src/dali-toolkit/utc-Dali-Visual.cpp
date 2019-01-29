@@ -370,18 +370,29 @@ int UtcDaliVisualSize(void)
 
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
 
+  // Create a TextVisual with a font size of 12 first
   propertyMap.Clear();
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::TEXT );
   propertyMap.Insert( TextVisual::Property::ENABLE_MARKUP, true );
-  propertyMap.Insert( TextVisual::Property::TEXT, "<font family='TizenSansRegular' size='12'>Hello world</font>" );
+  propertyMap.Insert( TextVisual::Property::TEXT, "<font family='TizenSans' size='12'>Hello world</font>" );
   propertyMap.Insert( TextVisual::Property::MULTI_LINE, true );
 
-  Visual::Base textVisual = factory.CreateVisual( propertyMap );
-  textVisual.GetNaturalSize( naturalSize );
-  DALI_TEST_EQUALS( naturalSize, Size( 86.f, 20.f ), TEST_LOCATION );
+  Visual::Base smallTextVisual = factory.CreateVisual( propertyMap );
+  Vector2 smallTextVisualNaturalSize;
+  smallTextVisual.GetNaturalSize( smallTextVisualNaturalSize );
 
-  const float height = textVisual.GetHeightForWidth( 40.f );
-  DALI_TEST_EQUALS( height, 57.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  // Then create a TextVisual with a font size of 20
+  propertyMap[ TextVisual::Property::TEXT ] = "<font family='TizenSans' size='20'>Hello world</font>";
+  Visual::Base largeTextVisual = factory.CreateVisual( propertyMap );
+  Vector2 largeTextVisualNaturalSize;
+  largeTextVisual.GetNaturalSize( largeTextVisualNaturalSize );
+
+  // Compare the sizes of the two text visuals, the second one should be bigger as it has a larger point size in the markup.
+  DALI_TEST_CHECK( smallTextVisualNaturalSize.width < largeTextVisualNaturalSize.width &&
+                   smallTextVisualNaturalSize.height < largeTextVisualNaturalSize.height );
+
+  // The height returned for a particular width should also be greater for the large text visual
+  DALI_TEST_CHECK( smallTextVisual.GetHeightForWidth( 40.f ) < largeTextVisual.GetHeightForWidth( 40.f ) );
 
   //AnimatedImageVisual
   Visual::Base animatedImageVisual = factory.CreateVisual( TEST_GIF_FILE_NAME, ImageDimensions() );
