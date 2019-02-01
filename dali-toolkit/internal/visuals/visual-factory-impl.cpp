@@ -60,6 +60,10 @@ namespace Internal
 namespace
 {
 
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_CONTROL_VISUALS");
+#endif
+
 BaseHandle Create()
 {
   BaseHandle handle = Toolkit::VisualFactory::Get();
@@ -273,9 +277,19 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
     }
   }
 
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "VisualFactory::CreateVisual( VisualType:%s %s%s)\n",
+                 Scripting::GetEnumerationName<Toolkit::DevelVisual::Type>( visualType,
+                                                                            VISUAL_TYPE_TABLE,
+                                                                            VISUAL_TYPE_TABLE_COUNT ),
+                 visualType==Toolkit::DevelVisual::IMAGE?"url:":"",
+                 visualType==Toolkit::DevelVisual::IMAGE ?
+                 propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME)->Get<std::string>().c_str()
+                 :"" );
+
+
   if( !visualPtr )
   {
-    DALI_LOG_ERROR( "Renderer type unknown\n" );
+    DALI_LOG_ERROR( "VisualType unknown\n" );
   }
 
   if( mDebugEnabled && visualType !=  Toolkit::DevelVisual::WIREFRAME )

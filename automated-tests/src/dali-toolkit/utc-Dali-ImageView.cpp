@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1841,6 +1841,8 @@ int UtcDaliImageViewCustomShader(void)
     application.SendNotification();
     application.Render();
 
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
     Renderer renderer = imageView.GetRendererAt( 0 );
     Shader shader2 = renderer.GetShader();
     Property::Value value = shader2.GetProperty( Shader::Property::PROGRAM );
@@ -1873,6 +1875,7 @@ int UtcDaliImageViewCustomShader(void)
 
     application.SendNotification();
     application.Render();
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
     Renderer renderer = imageView.GetRendererAt( 0 );
     Shader shader2 = renderer.GetShader();
@@ -1910,6 +1913,7 @@ int UtcDaliImageViewCustomShader(void)
 
     application.SendNotification();
     application.Render();
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
     Renderer renderer = imageView.GetRendererAt( 0 );
     Shader shader2 = renderer.GetShader();
@@ -1947,6 +1951,7 @@ int UtcDaliImageViewCustomShader(void)
 
     application.SendNotification();
     application.Render();
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
     Renderer renderer = imageView.GetRendererAt( 0 );
     Shader shader2 = renderer.GetShader();
@@ -1960,6 +1965,63 @@ int UtcDaliImageViewCustomShader(void)
     Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
     DALI_TEST_EQUALS( vertexShader, vertex->Get< std::string >(), TEST_LOCATION );
   }
+
+  END_TEST;
+}
+
+
+namespace
+{
+static int gFailCounter = 0;
+const int MAX_RETRIES(3);
+
+void ReloadImage(ImageView imageView)
+{
+  Property::Map imageImmediateLoadingMap;
+  imageImmediateLoadingMap[ ImageVisual::Property::URL ] = "Non-existant-image.jpg";
+  imageImmediateLoadingMap[ ImageVisual::Property::LOAD_POLICY ] =  ImageVisual::LoadPolicy::IMMEDIATE;
+
+  tet_infoline("Immediate load an image");
+  imageView.SetProperty( ImageView::Property::IMAGE, imageImmediateLoadingMap );
+}
+
+void ResourceFailedReload( Control control )
+{
+  gFailCounter++;
+  if( gFailCounter < MAX_RETRIES )
+  {
+    ReloadImage(ImageView::DownCast(control));
+  }
+}
+}
+
+int UtcDaliImageViewReloadFailedOnResourceReadySignal(void)
+{
+  tet_infoline("Test reloading failed image from within signal handler.");
+
+  ToolkitTestApplication application;
+
+  gFailCounter = 0;
+
+  ImageView imageView = ImageView::New();
+  imageView.ResourceReadySignal().Connect( &ResourceFailedReload );
+  DALI_TEST_EQUALS( gFailCounter, 0, TEST_LOCATION );
+  ReloadImage(imageView);
+
+  // loading started, this waits for the loader thread to complete
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( gFailCounter, 1, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( gFailCounter, 2, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+  DALI_TEST_EQUALS( gFailCounter, 3, TEST_LOCATION );
 
   END_TEST;
 }
