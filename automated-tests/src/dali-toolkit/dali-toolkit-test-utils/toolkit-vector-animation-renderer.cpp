@@ -32,12 +32,17 @@ class VectorAnimationRenderer: public Dali::BaseObject
 {
 public:
 
-  VectorAnimationRenderer( const std::string& url, Dali::Renderer renderer, uint32_t width, uint32_t height )
+  VectorAnimationRenderer( const std::string& url )
   : mUrl( url ),
-    mRenderer( renderer ),
-    mWidth( width ),
-    mHeight( height )
+    mRenderer(),
+    mWidth( 0 ),
+    mHeight( 0 )
   {
+  }
+
+  void SetRenderer( Dali::Renderer renderer )
+  {
+    mRenderer = renderer;
   }
 
   void SetSize( uint32_t width, uint32_t height )
@@ -96,9 +101,9 @@ inline const VectorAnimationRenderer& GetImplementation( const Dali::VectorAnima
 /*********************************  PUBLIC CLASS  *******************************/
 /********************************************************************************/
 
-VectorAnimationRenderer VectorAnimationRenderer::New( const std::string& url, Renderer renderer, uint32_t width, uint32_t height )
+VectorAnimationRenderer VectorAnimationRenderer::New( const std::string& url )
 {
-  Internal::Adaptor::VectorAnimationRenderer* animationRenderer = new Internal::Adaptor::VectorAnimationRenderer( url, renderer, width, height );
+  Internal::Adaptor::VectorAnimationRenderer* animationRenderer = new Internal::Adaptor::VectorAnimationRenderer( url );
 
   return VectorAnimationRenderer( animationRenderer );
 }
@@ -125,6 +130,11 @@ VectorAnimationRenderer& VectorAnimationRenderer::operator=( const VectorAnimati
 {
   BaseHandle::operator=( rhs );
   return *this;
+}
+
+void VectorAnimationRenderer::SetRenderer( Renderer renderer )
+{
+  Internal::Adaptor::GetImplementation( *this ).SetRenderer( renderer );
 }
 
 void VectorAnimationRenderer::SetSize( uint32_t width, uint32_t height )

@@ -1,7 +1,7 @@
 #ifndef DALI_TOOLKIT_LAYOUTING_LAYOUT_GROUP_H
 #define DALI_TOOLKIT_LAYOUTING_LAYOUT_GROUP_H
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,14 +53,6 @@ class DALI_TOOLKIT_API LayoutGroup : public LayoutItem
 public:
   using LayoutId = unsigned int;
   static const unsigned int UNKNOWN_ID = 0;
-
-  struct ChildProperty
-  {
-    enum
-    {
-    };
-  };
-
 
   /**
    * @brief Creates an uninitialized LayoutGroup handle.

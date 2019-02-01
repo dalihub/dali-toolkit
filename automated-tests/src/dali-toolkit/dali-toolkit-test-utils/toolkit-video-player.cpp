@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +34,15 @@ class VideoPlayer: public Dali::BaseObject
 public:
 
   VideoPlayer()
+  : mUrl(),
+    mVolumeLeft( 0.0f ),
+    mVolumeRight( 0.0f ),
+    mFinishedSignal(),
+    mMuted( false ),
+    mLooping( false),
+    mPlayPosition( 0 ),
+    mDisplyMode( Dali::VideoPlayerPlugin::DisplayMode::DST_ROI )
   {
-    mMuted = false;
-    mLooping = false;
-    mPlayPosition = 0;
-    mDisplyMode = Dali::VideoPlayerPlugin::DisplayMode::DST_ROI;
   }
 
   void SetMuted( bool muted )
@@ -84,9 +88,9 @@ public:
     return mDisplyMode;
   }
 
-  void SetDisplayMode( Dali::VideoPlayerPlugin::DisplayMode::Type mDisplyMode )
+  void SetDisplayMode( Dali::VideoPlayerPlugin::DisplayMode::Type mode )
   {
-    mDisplyMode = mDisplyMode;
+    mDisplyMode = mode;
   }
 
 

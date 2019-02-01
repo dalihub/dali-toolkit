@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,19 +103,10 @@ const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableSh
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGrabHandle";
 const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
 
-const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
-
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
 
-const unsigned int CURSOR_BLINK_INTERVAL = 500u; // Cursor blink interval
 const float RENDER_FRAME_INTERVAL = 16.66f;
-
-const float TO_MILLISECONDS = 1000.f;
-const float TO_SECONDS = 1.f / TO_MILLISECONDS;
-
-const float SCROLL_THRESHOLD = 10.f;
-const float SCROLL_SPEED = 300.f;
 
 const unsigned int DEFAULT_FONT_SIZE = 1152u;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
