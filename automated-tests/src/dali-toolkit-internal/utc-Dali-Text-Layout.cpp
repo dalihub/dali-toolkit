@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -717,7 +717,7 @@ int UtcDaliTextLayoutSmallTextArea02(void)
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun );
   Size textArea(1.f, 1.f);
-  Size layoutSize(80.f, 20.f);
+  Size layoutSize(80.f, 19.f);
   float positions[] = { 1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f };
   struct LineRun line =
   {
@@ -725,7 +725,7 @@ int UtcDaliTextLayoutSmallTextArea02(void)
     { 0u, 11u },
     80.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -801,7 +801,7 @@ int UtcDaliTextLayoutMultilineText01(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun1 );
   fontDescriptionRuns.PushBack( fontDescriptionRun2 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(95.f, 97.f);
+  Size layoutSize(95.f, 95.f);
   float positions[] =
   {
     1.f, -12.f, 11.f,  -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f,  -0.f, 40.f, -9.f, 51.f,  -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
@@ -816,7 +816,7 @@ int UtcDaliTextLayoutMultilineText01(void)
     { 0u, 12u },
     80.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -829,7 +829,7 @@ int UtcDaliTextLayoutMultilineText01(void)
     { 12u, 6u },
     43.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1000,7 +1000,7 @@ int UtcDaliTextLayoutMultilineText02(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun4 );
   fontDescriptionRuns.PushBack( fontDescriptionRun5 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(80.f, 120.f);
+  Size layoutSize(80.f, 114.f);
   float positions[] =
   {
     1.f, -12.f, 11.f,  -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f,  -0.f, 40.f,  -9.f, 51.f,  -9.f, 61.f,  -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
@@ -1016,7 +1016,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     { 0u, 12u },
     80.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1029,7 +1029,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     { 12u, 10u },
     76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1042,7 +1042,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     { 22u, 6u },
     34.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1055,7 +1055,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     { 28u, 10u },
     67.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1068,7 +1068,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     { 38u, 12u },
     78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1081,7 +1081,7 @@ int UtcDaliTextLayoutMultilineText02(void)
     { 50u, 5u },
     43.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1150,7 +1150,7 @@ int UtcDaliTextLayoutMultilineText03(void)
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun );
   Size textArea(100.f, 300.f);
-  Size layoutSize(96.f, 60.f);
+  Size layoutSize(96.f, 57.f);
   float positions[] =
   {
     1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f,  -9.f, 36.f,  -9.f, 47.f, -9.f, 57.f, -9.f, 63.f, -13.f, 66.f, -13.f, 75.f, -13.f, 84.f,  -9.f,
@@ -1163,7 +1163,7 @@ int UtcDaliTextLayoutMultilineText03(void)
     { 0u, 12u },
     93.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1176,7 +1176,7 @@ int UtcDaliTextLayoutMultilineText03(void)
     { 12u, 12u },
     96.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1189,7 +1189,7 @@ int UtcDaliTextLayoutMultilineText03(void)
     { 24u, 5u },
     43.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1254,7 +1254,7 @@ int UtcDaliTextLayoutMultilineText04(void)
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun );
   Size textArea(100.f, 300.f);
-  Size layoutSize(83.f, 40.f);
+  Size layoutSize(83.f, 38.f);
   float positions[] =
   {
     1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -2.f, 82.f, -12.f
@@ -1265,7 +1265,7 @@ int UtcDaliTextLayoutMultilineText04(void)
     { 0u, 13u },
     83.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     false,
@@ -1277,7 +1277,7 @@ int UtcDaliTextLayoutMultilineText04(void)
     { 13u, 0u },
     0.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1368,19 +1368,19 @@ int UtcDaliTextLayoutMultilineText05(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun2 );
   fontDescriptionRuns.PushBack( fontDescriptionRun3 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(88.f, 53.f);
+  Size layoutSize(89.f, 51.f);
   float positions[] =
   {
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -14.f, 59.f, -9.f, 69.f, -9.f, 75.f, -13.f, 78.f, -13.f, 87.f, -0.f,
+    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -14.f, 60.f, -9.f, 70.f, -9.f, 76.f, -13.f, 79.f, -13.f, 88.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f,  -9.f, 30.f,  -9.f, 39.f, -2.f
   };
   struct LineRun line0 =
   {
     { 0u, 12u },
     { 0u, 12u },
-    88.f,
+    89.f,
     25.f,
-    -8.f,
+    -7.f,
     4.f,
     0.f,
     0.f,
@@ -1393,7 +1393,7 @@ int UtcDaliTextLayoutMultilineText05(void)
     { 12u, 5u },
     43.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1683,7 +1683,7 @@ int UtcDaliTextUpdateLayout01(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(92.f, 380.f);
+  Size layoutSize(92.f, 361.f);
   float positions[] =
   {
     1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
@@ -1712,7 +1712,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 0u, 12u },
     80.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1725,7 +1725,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 12u, 10u },
     76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1738,7 +1738,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 22u, 6u },
     34.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1751,7 +1751,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 28u, 20u },
     92.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1764,7 +1764,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 48u, 11u },
     76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1777,7 +1777,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 59u, 5u },
     31.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1790,7 +1790,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 64u, 10u },
     67.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1803,7 +1803,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 74u, 12u },
     78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     1.f,
     0.f,
@@ -1816,7 +1816,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 86u, 6u },
     43.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1829,7 +1829,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 92u, 12u },
     78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1842,7 +1842,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 104u, 19u },
     90.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1855,7 +1855,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 123u, 5u },
     31.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1868,7 +1868,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 128u, 12u },
     80.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1881,7 +1881,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 140u, 10u },
     76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1894,7 +1894,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 150u, 6u },
     34.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1907,7 +1907,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 156u, 10u },
     67.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1920,7 +1920,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 166u, 12u },
     79.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1933,7 +1933,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 178u, 14u },
     55.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1946,7 +1946,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 192u, 0u },
     0.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2258,7 +2258,7 @@ int UtcDaliTextUpdateLayout02(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(92.f, 380.f);
+  Size layoutSize(92.f, 361.f);
   float positions[] =
   {
     1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
@@ -2287,7 +2287,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 0u, 12u },
     80.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2300,7 +2300,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 12u, 10u },
     76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2313,7 +2313,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 22u, 6u },
     34.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2326,7 +2326,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 28u, 20u },
     92.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2339,7 +2339,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 48u, 11u },
     76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2352,7 +2352,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 59u, 5u },
     31.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2365,7 +2365,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 64u, 10u },
     67.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2378,7 +2378,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 74u, 12u },
     78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     1.f,
     0.f,
@@ -2391,7 +2391,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 86u, 6u },
     43.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2404,7 +2404,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 92u, 12u },
     78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2417,7 +2417,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 104u, 19u },
     90.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2430,7 +2430,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 123u, 5u },
     31.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2443,7 +2443,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 128u, 12u },
     80.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2456,7 +2456,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 140u, 10u },
     76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2469,7 +2469,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 150u, 6u },
     34.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2482,7 +2482,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 156u, 10u },
     67.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2495,7 +2495,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 166u, 12u },
     79.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2508,7 +2508,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 178u, 14u },
     55.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2521,7 +2521,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 192u, 0u },
     0.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2833,7 +2833,7 @@ int UtcDaliTextUpdateLayout03(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(92.f, 380.f);
+  Size layoutSize(92.f, 361.f);
   float positions[] =
   {
     1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
@@ -2862,7 +2862,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 0u, 12u },
     80.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2875,7 +2875,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 12u, 10u },
     76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2888,7 +2888,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 22u, 6u },
     34.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2901,7 +2901,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 28u, 20u },
     92.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2914,7 +2914,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 48u, 11u },
     76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2927,7 +2927,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 59u, 5u },
     31.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2940,7 +2940,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 64u, 10u },
     67.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2953,7 +2953,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 74u, 12u },
     78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     1.f,
     0.f,
@@ -2966,7 +2966,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 86u, 6u },
     43.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2979,7 +2979,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 92u, 12u },
     78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2992,7 +2992,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 104u, 19u },
     90.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3005,7 +3005,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 123u, 5u },
     31.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3018,7 +3018,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 128u, 12u },
     80.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3031,7 +3031,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 140u, 10u },
     76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3044,7 +3044,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 150u, 6u },
     34.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3057,7 +3057,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 156u, 10u },
     67.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3070,7 +3070,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 166u, 12u },
     79.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3083,7 +3083,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 178u, 14u },
     55.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3096,7 +3096,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 192u, 0u },
     0.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3188,7 +3188,7 @@ int UtcDaliTextLayoutEllipsis01(void)
     { 0u, 13u },
     93.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3204,7 +3204,7 @@ int UtcDaliTextLayoutEllipsis01(void)
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 20.f );
+  Size layoutSize( 100.f, 19.f );
 
   LayoutTextData data =
   {
@@ -3265,7 +3265,7 @@ int UtcDaliTextLayoutEllipsis02(void)
     { 0u, 12u },
     80.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3278,7 +3278,7 @@ int UtcDaliTextLayoutEllipsis02(void)
     { 12u, 12u },
     93.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3296,7 +3296,7 @@ int UtcDaliTextLayoutEllipsis02(void)
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 40.f );
+  Size layoutSize( 100.f, 38.f );
 
   LayoutTextData data =
   {
@@ -3423,7 +3423,7 @@ int UtcDaliTextLayoutEllipsis03(void)
     { 0u, 16u },
     95.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3439,7 +3439,7 @@ int UtcDaliTextLayoutEllipsis03(void)
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 20.f );
+  Size layoutSize( 100.f, 19.f );
 
   LayoutTextData data =
   {
@@ -3566,7 +3566,7 @@ int UtcDaliTextLayoutEllipsis04(void)
     { 0u, 16u },
     96.f,
     15.f,
-    -5.f,
+    -4.f,
     3.f,
     0.f,
     0.f,
@@ -3579,7 +3579,7 @@ int UtcDaliTextLayoutEllipsis04(void)
     { 16u, 18u },
     97.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3597,7 +3597,7 @@ int UtcDaliTextLayoutEllipsis04(void)
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 40.f );
+  Size layoutSize( 100.f, 38.f );
 
   LayoutTextData data =
   {
@@ -3656,12 +3656,12 @@ int UtcDaliTextLayoutEllipsis05(void)
     { 0u, 11u },
     80.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
     false,
-    true
+    false
   };
   Vector<LineRun> lines;
   lines.PushBack( line01 );
@@ -3672,7 +3672,7 @@ int UtcDaliTextLayoutEllipsis05(void)
   };
 
   Size textArea( 100.f, 19.f );
-  Size layoutSize( 100.f, 20.f );
+  Size layoutSize( 80.f, 19.f );
 
   LayoutTextData data =
   {
