@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,26 +58,19 @@ struct CallbackFunctor
   bool* mCallbackFlag;
 };
 
-const int MILLISECONDS_PER_SECOND = 1000;
 const int RENDER_FRAME_INTERVAL = 16;                           ///< Duration of each frame in ms. (at approx 60FPS)
-const int RENDER_ANIMATION_TEST_DURATION_MS = 1000;             ///< 1000ms to test animation
 
 const int RENDER_DELAY_SCROLL = 1000;                           ///< duration to wait for any scroll to complete.
 
 // For Clamp Signal testing...
 const float CLAMP_EXCESS_WIDTH = 200.0f;                        ///< Amount of width that can be panned outside scrollview
 const float CLAMP_EXCESS_HEIGHT = 200.0f;                       ///< Amount of height that can be panned outside scrollview
-const int CLAMP_STEP_0_CHECK_NOTCLAMPED = 0;                    ///< FSM: "First check that scrollview isn't clamped"
-const int CLAMP_STEP_1_CHECK_CLAMPED_WEST = 1;                  ///< FSM: "Next check that scrollview clamps against left side"
-const int CLAMP_STEP_2_CHECK_CLAMPED_SOUTH_WEST = 2;            ///< FSM: "Then check that scrollview clamps against bottom-left side"
-const int CLAMP_STEP_3_SUCCESS = 3;                             ///< FSM: "Finished (Success)"
 const Vector2 CLAMP_START_SCROLL_POSITION(30.0f, 100.0f);       ///< Scroll start position for the Clamping tests.
 const Vector2 CLAMP_TOUCH_START( 100.0f, 100.0f );              ///< Start point to touch from for the Clamping tests.
 const Vector2 CLAMP_TOUCH_MOVEMENT( 5.0f, -5.0f );              ///< Amount to move touch for each frame for the Clamping tests.
 const int CLAMP_GESTURE_FRAMES = 100;                           ///< Number of Frames to synthesize a gesture for the Clamping tests.
 const Vector3 TEST_ACTOR_POSITION(100.0f, 100.0f, 0.0f);        ///< A Test actor position offset (arbitrary value)
 const Vector3 TEST_CONSTRAINT_OFFSET(1.0f, 2.0f, 0.0f);         ///< A Test constraint offset (arbitrary value to test effects)
-const float TEST_RATIO_TOLERANCE = 0.05;                        ///< +/-5% tolerance for ratio comparisons.
 
 const float DEFAULT_SNAP_OVERSHOOT_DURATION(0.5f);                  ///< Default overshoot snapping animation time.
 const float DEFAULT_MAX_OVERSHOOT(100.0f);                          ///< Default maximum allowed overshoot in pixels

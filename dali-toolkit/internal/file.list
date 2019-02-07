@@ -29,7 +29,7 @@ toolkit_src_files = \
    $(toolkit_src_dir)/visuals/animated-image/rolling-image-cache.cpp \
    $(toolkit_src_dir)/visuals/animated-image/rolling-gif-image-cache.cpp \
    $(toolkit_src_dir)/visuals/animated-vector-image/animated-vector-image-visual.cpp \
-   $(toolkit_src_dir)/visuals/animated-vector-image/vector-image-rasterize-thread.cpp \
+   $(toolkit_src_dir)/visuals/animated-vector-image/vector-rasterize-thread.cpp \
    $(toolkit_src_dir)/visuals/border/border-visual.cpp \
    $(toolkit_src_dir)/visuals/color/color-visual.cpp \
    $(toolkit_src_dir)/visuals/gradient/gradient-visual.cpp \
@@ -174,4 +174,5 @@ toolkit_src_files = \
    $(toolkit_src_dir)/transition-effects/cube-transition-wave-effect-impl.cpp \
    $(toolkit_src_dir)/scripting/script-impl.cpp \
    $(toolkit_src_dir)/scripting/script-plugin-proxy.cpp \
-   $(toolkit_src_dir)/text/xhtml-entities.cpp
+   $(toolkit_src_dir)/text/xhtml-entities.cpp \
+   $(toolkit_src_dir)/drag-drop-detector/drag-and-drop-detector-impl.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -250,7 +250,7 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation01(void)
   manager.SetFocus( dummy3 );
   DALI_TEST_CHECK( dummy3Impl.keyInputFocusGained );
 
-  Integration::KeyEvent event( "a", "a", 0, 0, 0, Integration::KeyEvent::Up, "", "", Device::Class::TOUCH, Device::Subclass::NONE );
+  Integration::KeyEvent event( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Up, "", "", Device::Class::TOUCH, Device::Subclass::NONE );
   application.ProcessEvent(event);
 
   DALI_TEST_CHECK( callback1.mIsCalled );
@@ -296,7 +296,7 @@ int UtcDaliKeyInputFocusManagerKeyEventPropagation02(void)
   manager.SetFocus( dummy3 );
   DALI_TEST_CHECK( dummy3Impl.keyInputFocusGained );
 
-  Integration::KeyEvent event( "a", "a", 0, 0, 0, Integration::KeyEvent::Up, "", "", Device::Class::TOUCH, Device::Subclass::NONE );
+  Integration::KeyEvent event( "a", "", "a", 0, 0, 0, Integration::KeyEvent::Up, "", "", Device::Class::TOUCH, Device::Subclass::NONE );
   application.ProcessEvent(event);
 
   DALI_TEST_CHECK( !callback1.mIsCalled );

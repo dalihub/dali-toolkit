@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -463,9 +463,15 @@ Property::Value ImageView::GetProperty( BaseObject* object, Property::Index prop
           Scripting::CreatePropertyMap( impl.mImage, map );
           value = map;
         }
-        else if( !impl.mPropertyMap.Empty() )
+        else
         {
-          value = impl.mPropertyMap;
+          Property::Map map;
+          Toolkit::Visual::Base visual = DevelControl::GetVisual( impl, Toolkit::ImageView::Property::IMAGE );
+          if( visual )
+          {
+            visual.CreatePropertyMap( map );
+          }
+          value = map;
         }
         break;
       }

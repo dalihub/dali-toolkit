@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -200,19 +200,11 @@ void WebView::EvaluateJavaScript( const std::string& script )
   }
 }
 
-void WebView::AddJavaScriptInterface( const std::string& exposedObjectName, const std::string& jsFunctionName, std::function< std::string(const std::string&) > callback )
+void WebView::AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void( const std::string& ) > handler )
 {
   if ( mWebEngine )
   {
-    mWebEngine.AddJavaScriptInterface( exposedObjectName, jsFunctionName, callback );
-  }
-}
-
-void WebView::RemoveJavascriptInterface( const std::string& exposedObjectName, const std::string& jsFunctionName )
-{
-  if ( mWebEngine )
-  {
-    mWebEngine.RemoveJavascriptInterface( exposedObjectName, jsFunctionName );
+    mWebEngine.AddJavaScriptMessageHandler( exposedObjectName, handler );
   }
 }
 

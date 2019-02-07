@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,7 +188,17 @@ void DummyControlImpl::SetProperty( BaseObject* object, Dali::Property::Index in
 
 Property::Value DummyControlImpl::GetProperty( BaseObject* object, Dali::Property::Index propertyIndex )
 {
-  Dali::Property::Value value;
+  Toolkit::DummyControl control = Toolkit::DummyControl::DownCast( Dali::BaseHandle( object ) );
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>( control.GetImplementation() );
+
+  Visual::Base visual = dummyImpl.GetVisual( propertyIndex );
+  Property::Map map;
+  if( visual )
+  {
+    visual.CreatePropertyMap( map );
+  }
+  Dali::Property::Value value = map;
+
   return value;
 }
 
@@ -201,6 +211,8 @@ Toolkit::DummyControl Impl::DummyControl::New()
   return control;
 }
 
+int Impl::DummyControl::constructorCount;
+int Impl::DummyControl::destructorCount;
 
 Impl::DummyControl::DummyControl()
 : DummyControlImpl(),
@@ -227,10 +239,13 @@ Impl::DummyControl::DummyControl()
   keyInputFocusGained(false),
   keyInputFocusLost(false)
 {
+  ++constructorCount;
 }
 
-Impl::DummyControl::~DummyControl() { }
-
+Impl::DummyControl::~DummyControl()
+{
+  ++destructorCount;
+}
 
 void Impl::DummyControl::OnInitialize() { initializeCalled = true; }
 bool Impl::DummyControl::OnAccessibilityActivated() { activatedCalled = true; return true; }

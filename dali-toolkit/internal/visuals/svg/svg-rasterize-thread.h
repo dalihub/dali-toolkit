@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SVG_RASTERIZE_THREAD_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -183,7 +183,7 @@ protected:
    * The entry function of the worker thread.
    * It fetches task from the Queue, rasterizes the image and apply to the renderer.
    */
-  virtual void Run();
+  void Run() override;
 
 private:
 

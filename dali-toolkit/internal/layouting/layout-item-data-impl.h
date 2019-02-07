@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_LAYOUTING_LAYOUT_BASE_DATA_IMPL_H_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <dali/public-api/object/weak-handle.h>
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
 #include <dali-toolkit/devel-api/layouting/layout-size.h>
@@ -35,7 +35,7 @@ public:
   Impl();
 
 public:
-  BaseObject* mOwner; ///< Control or Visual that owns this layout. Raw pointer to prevent cyclic references
+  WeakHandle<Handle> mOwner; ///< Control or Visual that owns this layout. Weak pointer to prevent cyclic references
   LayoutParent* mLayoutParent; ///< The containing layout parent.
 
   MeasureSpec mOldWidthMeasureSpec;

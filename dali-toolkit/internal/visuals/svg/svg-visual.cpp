@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -310,6 +310,11 @@ void SvgVisual::OnSetTransform()
       AddRasterizationTask( visualSize );
       mVisualSize = visualSize;
     }
+  }
+
+  if(mImpl->mRenderer)
+  {
+    mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
 }
 

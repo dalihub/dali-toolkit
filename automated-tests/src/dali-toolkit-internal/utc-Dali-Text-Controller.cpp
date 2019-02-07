@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ using namespace Text;
 namespace
 {
 
-const char* const OPTION_SELECT_WORD("option-select_word"); // "Select Word" popup option.
 const char* const OPTION_SELECT_ALL("option-select_all");   // "Select All" popup option.
 const char* const OPTION_CUT("optionCut");                  // "Cut" popup option.
 const char* const OPTION_COPY("optionCopy");                // "Copy" popup option.

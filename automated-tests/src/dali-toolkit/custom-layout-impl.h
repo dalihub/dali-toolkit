@@ -2,7 +2,7 @@
 #define TEST_INTERNAL_CUSTOM_LAYOUT_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,6 +108,8 @@ private:
    * @param[out] resultingHeight resulting height of layout after children are measured
    */
   void MeasureChildren( Dali::Toolkit::Internal::LayoutItemPtr childLayout, MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpec, LayoutLength resultingWidth, LayoutLength resultingHeight );
+
+  using Dali::Toolkit::Internal::LayoutGroup::MeasureChildren; ///< To tell the compiler that we really do want to overload MeasureChildren in this class & were not trying to override it
 
   private:
 

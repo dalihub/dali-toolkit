@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_VECTOR_IMAGE_VISUAL_ACTIONS_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ enum Type
 {
   PLAY,        ///< Play the animated vector image.
   PAUSE,       ///< Pause the animated vector image.
-  RESUME,      ///< Resume the animated vector image.
   STOP         ///< Stop the animated vector image. This is also Default playback mode.
 };
 

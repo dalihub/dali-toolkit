@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -334,6 +334,7 @@ Control::Impl::Impl( Control& controlImpl )
   mKeyInputFocusGainedSignal(),
   mKeyInputFocusLostSignal(),
   mResourceReadySignal(),
+  mVisualEventSignal(),
   mPinchGestureDetector(),
   mPanGestureDetector(),
   mTapGestureDetector(),
@@ -477,19 +478,13 @@ void Control::Impl::RegisterVisual( Property::Index index, Toolkit::Visual::Base
   // ( If the control has been type registered )
   if( visual.GetName().empty() )
   {
-    try
+    // returns empty string if index is not found as long as index is not -1
+    std::string visualName = self.GetPropertyName( index );
+    if( !visualName.empty() )
     {
-      std::string visualName = self.GetPropertyName( index );
-      if( !visualName.empty() )
-      {
-        DALI_LOG_INFO( gLogFilter, Debug::Concise, "Setting visual name for property %d to %s\n",
-                       index, visualName.c_str() );
-        visual.SetName( visualName );
-      }
-    }
-    catch( Dali::DaliException e )
-    {
-      DALI_LOG_WARNING( "Attempting to register visual without a registered property, index: %d\n", index );
+      DALI_LOG_INFO( gLogFilter, Debug::Concise, "Setting visual name for property %d to %s\n",
+                     index, visualName.c_str() );
+      visual.SetName( visualName );
     }
   }
 
@@ -632,15 +627,15 @@ void Control::Impl::StopObservingVisual( Toolkit::Visual::Base& visual )
   Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
 
   // Stop observing the visual
-  visualImpl.RemoveResourceObserver( *this );
+  visualImpl.RemoveEventObserver( *this );
 }
 
 void Control::Impl::StartObservingVisual( Toolkit::Visual::Base& visual)
 {
   Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
 
-  // start observing the visual for resource ready
-  visualImpl.AddResourceObserver( *this );
+  // start observing the visual for events
+  visualImpl.AddEventObserver( *this );
 }
 
 // Called by a Visual when it's resource is ready
@@ -683,6 +678,20 @@ void Control::Impl::ResourceReady( Visual::Base& object)
   {
     Dali::Toolkit::Control handle( mControlImpl.GetOwner() );
     mResourceReadySignal.Emit( handle );
+  }
+}
+
+void Control::Impl::NotifyVisualEvent( Visual::Base& object, Property::Index signalId )
+{
+  for( auto registeredIter = mVisuals.Begin(),  end = mVisuals.End(); registeredIter != end; ++registeredIter )
+  {
+    Internal::Visual::Base& registeredVisualImpl = Toolkit::GetImplementation( (*registeredIter)->visual );
+    if( &object == &registeredVisualImpl )
+    {
+      Dali::Toolkit::Control handle( mControlImpl.GetOwner() );
+      mVisualEventSignal.Emit( handle, (*registeredIter)->index, signalId );
+      break;
+    }
   }
 }
 
@@ -1493,6 +1502,11 @@ void Control::Impl::SetLayoutingRequired( bool layoutingRequired )
 bool Control::Impl::IsLayoutingRequired()
 {
   return mControlImpl.mImpl->mIsLayoutingRequired;
+}
+
+DevelControl::VisualEventSignalType& Control::Impl::VisualEventSignal()
+{
+  return mVisualEventSignal;
 }
 
 } // namespace Internal

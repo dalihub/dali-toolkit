@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUTTON_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -517,13 +517,6 @@ private:
    *  @return bool true if state change valid
    */
   bool ValidateState( State requestedState );
-
-  /**
-   * Perform the given function on the visuals in the given state. Can be used to add and remove visuals.
-   * @param[in] functionPtr pointer to the function to perform an action on a visual
-   * @param[in] state Visuals in this state will be the target
-   */
-  void PerformFunctionOnVisualsInState( void(Button::*functionPtr)( Property::Index visualIndex), State state  );
 
   /**
    * Changes the button state when an action occurs on it

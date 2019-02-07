@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_PROPERTIES_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ enum
 } // namespace Property
 
 /**
- * @brief Visual Transfrom for the offset or size.
+ * @brief Visual Transform for the offset or size.
  * @SINCE_1_2.60
  */
 namespace Transform
@@ -162,7 +162,7 @@ namespace Property
 {
 
 /**
- * @brief Enumeration for the type of Transfrom Property.
+ * @brief Enumeration for the type of Transform Property.
  * @SINCE_1_2.60
  */
 enum Type

@@ -77,6 +77,7 @@ SET(TC_SOURCES
   utc-Dali-AsyncImageLoader.cpp
   utc-Dali-SyncImageLoader.cpp
   utc-Dali-ControlWrapper.cpp
+  utc-Dali-DragAndDropDetector.cpp
 )
 
 # Append list of test harness files (Won't get parsed for test cases)
@@ -98,6 +99,7 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/toolkit-timer.cpp
   dali-toolkit-test-utils/toolkit-tts-player.cpp
   dali-toolkit-test-utils/toolkit-native-image-source.cpp
+  dali-toolkit-test-utils/toolkit-vector-animation-renderer.cpp
   dali-toolkit-test-utils/toolkit-video-player.cpp
   dali-toolkit-test-utils/toolkit-web-engine.cpp
   dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp

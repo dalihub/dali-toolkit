@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 #include <dali-toolkit/devel-api/layouting/layout-group-impl.h>
 
 #include <../custom-layout.h>
+#include <dummy-control.h>
 
 #include <layout-utils.h>
 
@@ -1793,6 +1794,75 @@ int UtcDaliLayouting_DefaultTransition01(void)
   DALI_TEST_EQUALS( container.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 480.0f, 800.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   DALI_TEST_EQUALS( controls[1].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 100.0f, 100.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLayouting_CheckResourceLeak01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_CheckResourceLeak01 - Remove animating layout and add child to stage" );
+
+  Dali::Toolkit::Impl::DummyControl::constructorCount = 0;
+  Dali::Toolkit::Impl::DummyControl::destructorCount = 0;
+
+  Stage stage = Stage::GetCurrent();
+  auto container = Control::New();
+  auto linearLayout = LinearLayout::New();
+  linearLayout.SetAnimateLayout( true );
+
+  DevelControl::SetLayout( container, linearLayout );
+  container.SetName( "Container" );
+
+  stage.Add( container );
+
+  DummyControl control = DummyControl::New( true );
+  control.SetName( "DummyControl01" );
+  control.SetSize( 100, 100 );
+  container.Add( control );
+
+  control = DummyControl::New( true );
+  control.SetName( "DummyControl02" );
+  control.SetSize( 100, 100 );
+  container.Add( control );
+
+  linearLayout.SetAnimateLayout( true );
+
+  DALI_TEST_EQUALS( Dali::Toolkit::Impl::DummyControl::constructorCount, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::Toolkit::Impl::DummyControl::destructorCount, 0, TEST_LOCATION );
+
+  // Initial rendering done
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>( 0.5f * 1000.0f ) + 1u /*just after the end of the animation*/ );
+
+  DALI_TEST_EQUALS( Dali::Toolkit::Impl::DummyControl::constructorCount, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::Toolkit::Impl::DummyControl::destructorCount, 0, TEST_LOCATION );
+
+  stage.Remove( container );
+  container.Reset();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>( 0.5f * 1000.0f ) + 1u /*just after the end of the animation*/ );
+
+  DALI_TEST_EQUALS( Dali::Toolkit::Impl::DummyControl::constructorCount, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::Toolkit::Impl::DummyControl::destructorCount, 1, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>( 0.5f * 1000.0f ) + 1u /*just after the end of the animation*/ );
+
+  DALI_TEST_EQUALS( Dali::Toolkit::Impl::DummyControl::constructorCount, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::Toolkit::Impl::DummyControl::destructorCount, 1, TEST_LOCATION );
+
+  stage.Remove( control );
+  control.Reset();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>( 0.5f * 1000.0f ) + 1u /*just after the end of the animation*/ );
+
+  DALI_TEST_EQUALS( Dali::Toolkit::Impl::DummyControl::constructorCount, 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::Toolkit::Impl::DummyControl::destructorCount, 2, TEST_LOCATION );
 
   END_TEST;
 }

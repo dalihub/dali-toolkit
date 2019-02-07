@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,7 @@ const char * const RELEASE_POLICY_NAME("releasePolicy");
 const char * const ORIENTATION_CORRECTION_NAME("orientationCorrection");
 const char * const AUXILIARY_IMAGE_NAME("auxiliaryImage");
 const char * const AUXILIARY_IMAGE_ALPHA_NAME("auxiliaryImageAlpha");
+const char * const PLAY_RANGE_NAME("playRange");
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );

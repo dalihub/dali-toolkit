@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXT_VISUAL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,22 +128,22 @@ public: // from Visual::Base
   /**
    * @copydoc Visual::Base::GetHeightForWidth()
    */
-  virtual float GetHeightForWidth( float width );
+  float GetHeightForWidth( float width ) override;
 
   /**
    * @copydoc Visual::Base::GetNaturalSize()
    */
-  virtual void GetNaturalSize( Vector2& naturalSize );
+  void GetNaturalSize( Vector2& naturalSize ) override;
 
   /**
    * @copydoc Visual::Base::CreatePropertyMap()
    */
-  virtual void DoCreatePropertyMap( Property::Map& map ) const;
+  void DoCreatePropertyMap( Property::Map& map ) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  virtual void DoCreateInstancePropertyMap( Property::Map& map ) const;
+  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
 
 protected:
 
@@ -164,22 +164,22 @@ protected:
   /**
    * @copydoc Visual::Base::DoSetProperties()
    */
-  virtual void DoSetProperties( const Property::Map& propertyMap );
+  void DoSetProperties( const Property::Map& propertyMap ) override;
 
   /**
    * @copydoc Visual::Base::DoSetOnStage()
    */
-  virtual void DoSetOnStage( Actor& actor );
+  void DoSetOnStage( Actor& actor ) override;
 
   /**
    * @copydoc Visual::Base::DoSetOffStage()
    */
-  virtual void DoSetOffStage( Actor& actor );
+  void DoSetOffStage( Actor& actor ) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
    */
-  virtual void OnSetTransform();
+  void OnSetTransform() override;
 
 private:
   /**

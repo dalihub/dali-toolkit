@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,6 +174,7 @@ struct PopupTestFunctor
 
 // Generate a KeyEvent to send to Core.
 Integration::KeyEvent GenerateKey( const std::string& keyName,
+                                   const std::string& logicalKey,
                                    const std::string& keyString,
                                    int keyCode,
                                    int keyModifier,
@@ -186,6 +187,7 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                    )
 {
   return Integration::KeyEvent( keyName,
+                                logicalKey,
                                 keyString,
                                 keyCode,
                                 keyModifier,
@@ -1434,7 +1436,7 @@ int UtcDaliPopupOnKeyEvent(void)
 
   popup.SetKeyInputFocus();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", "", Device::Class::TOUCH, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", "", Device::Class::TOUCH, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 

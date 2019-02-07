@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ void SetBidirectionalInfo( const Vector<Character>& text,
       break;
     }
 
-    if( !hasRightToLeftScript && TextAbstraction::IsRightToLeftScript( scriptRun.script ) )
+    if( !hasRightToLeftScript && scriptRun.isRightToLeft )
     {
       // The script is right to left.
       hasRightToLeftScript = true;

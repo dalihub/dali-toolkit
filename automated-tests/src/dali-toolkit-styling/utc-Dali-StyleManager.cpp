@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1348,7 +1348,7 @@ int UtcDaliStyleManagerConfigSectionTest(void)
 
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( editor );
 
-  application.ProcessEvent( Integration::KeyEvent( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( Integration::KeyEvent( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 

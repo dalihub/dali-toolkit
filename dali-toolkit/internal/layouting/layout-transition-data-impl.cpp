@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ bool LayoutDataElement::AdjustMeasuredSize( float& width, float& height, Toolkit
     return false;
   }
 
-  Actor actor = Actor::DownCast( handle );
+  Actor actor = handle.GetHandle();
   float animateByMultiplier = ( animatorType == Toolkit::LayoutTransitionData::Animator::Type::ANIMATE_BY ) ? 1.0f : 0.0f;
   Vector3 size = actor.GetCurrentSize();
 
@@ -164,10 +164,13 @@ bool LayoutDataElement::AdjustMeasuredSize( float& width, float& height, Toolkit
 
 void LayoutDataElement::UpdatePropertyIndex()
 {
-  if( propertyIndex == -1 && handle && !propertyName.empty() )
+  if( propertyIndex == -1 && !propertyName.empty() )
   {
-    Actor actor = Actor::DownCast( handle );
-    propertyIndex = DevelHandle::GetPropertyIndex( actor, Property::Key( propertyName ) );
+    Actor actor = handle.GetHandle();
+    if( actor )
+    {
+      propertyIndex = DevelHandle::GetPropertyIndex( actor, Property::Key( propertyName ) );
+    }
   }
 }
 
@@ -223,7 +226,7 @@ LayoutTransitionDataPtr LayoutTransitionData::New()
 }
 
 LayoutTransitionData::PropertyAnimator::PropertyAnimator( )
-  : handle( Actor( ) )
+  : handle()
   , map()
   , interpolation( Animation::Linear )
 {
@@ -638,38 +641,41 @@ void LayoutTransitionData::CollectChildrenLayoutDataElements( Actor child, Layou
   // Add the children animators
   for( const LayoutDataElement& iter : layoutData.childrenLayoutDataArray )
   {
-    if( iter.handle != nullptr && iter.handle != child )
+    Actor actor = iter.handle.GetHandle();
+    if( actor && actor != child )
     {
       continue;
     }
 
     LayoutDataElement layoutDataElement = iter;
+    Actor gainedChild = layoutData.layoutTransition.gainedChild.GetHandle();
+    Actor lostChild = layoutData.layoutTransition.lostChild.GetHandle();
     switch ( layoutDataElement.condition )
     {
       case Dali::Toolkit::LayoutTransitionData::Condition::ON_ADD:
         if ( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_ADD
-            || layoutData.layoutTransition.gainedChild != child )
+            || gainedChild != child )
         {
           continue;
         }
         break;
       case Dali::Toolkit::LayoutTransitionData::Condition::ON_REMOVE:
         if( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_REMOVE
-            || layoutData.layoutTransition.lostChild != child )
+            || lostChild != child )
         {
           continue;
         }
         break;
       case Dali::Toolkit::LayoutTransitionData::Condition::ON_FOCUS_GAINED:
         if( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_FOCUS
-            || layoutData.layoutTransition.gainedChild != child )
+            || gainedChild != child )
         {
           continue;
         }
         break;
       case Dali::Toolkit::LayoutTransitionData::Condition::ON_FOCUS_LOST:
         if( layoutData.layoutTransition.layoutTransitionType != Dali::Toolkit::LayoutTransitionData::ON_CHILD_FOCUS
-            || layoutData.layoutTransition.lostChild != child )
+            || lostChild != child )
         {
           continue;
         }
@@ -713,7 +719,8 @@ void LayoutTransitionData::CollectLayoutDataElements( Actor owner, LayoutData& l
   // Collect the transition animators
   for( const LayoutDataElement& iter : mLayoutDataElements )
   {
-    if( iter.handle == nullptr || iter.handle != owner )
+    Actor actor = iter.handle.GetHandle();
+    if( !actor || actor != owner )
     {
       layoutData.childrenLayoutDataArray.push_back( iter );
       continue;

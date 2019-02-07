@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
+#include <dali-toolkit/devel-api/controls/text-controls/text-style-properties-devel.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 
 using namespace Dali;
@@ -49,11 +50,6 @@ const char* const PROPERTY_NAME_MULTI_LINE =  "multiLine";
 const char* const PROPERTY_NAME_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
 const char* const PROPERTY_NAME_VERTICAL_ALIGNMENT = "verticalAlignment";
 const char* const PROPERTY_NAME_TEXT_COLOR = "textColor";
-const char* const PROPERTY_NAME_SHADOW_OFFSET = "shadowOffset";
-const char* const PROPERTY_NAME_SHADOW_COLOR = "shadowColor";
-const char* const PROPERTY_NAME_UNDERLINE_ENABLED = "underlineEnabled";
-const char* const PROPERTY_NAME_UNDERLINE_COLOR = "underlineColor";
-const char* const PROPERTY_NAME_UNDERLINE_HEIGHT = "underlineHeight";
 const char* const PROPERTY_NAME_ENABLE_MARKUP = "enableMarkup";
 const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL = "enableAutoScroll";
 const char* const PROPERTY_NAME_ENABLE_AUTO_SCROLL_SPEED = "autoScrollSpeed";
@@ -71,59 +67,77 @@ const char* const PROPERTY_NAME_PIXEL_SIZE = "pixelSize";
 const char* const PROPERTY_NAME_ELLIPSIS = "ellipsis";
 const char* const PROPERTY_NAME_AUTO_SCROLL_LOOP_DELAY = "autoScrollLoopDelay";
 
-const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 const unsigned int EMOJI_FONT_SIZE = 3840u; // 60 * 64
 
-bool DaliTestCheckMaps( const Property::Map& fontStyleMapGet, const Property::Map& fontStyleMapSet )
+bool DaliTestCheckMaps( const Property::Map& mapGet, const Property::Map& mapSet, const std::vector<std::string>& indexConversionTable = std::vector<std::string>() )
 {
-  if( fontStyleMapGet.Count() == fontStyleMapSet.Count() )
+  const Property::Map::SizeType size = mapGet.Count();
+
+  if( size == mapSet.Count() )
   {
-    for( unsigned int index = 0u; index < fontStyleMapGet.Count(); ++index )
+    for( unsigned int index = 0u; index < size; ++index )
     {
-      const KeyValuePair& valueGet = fontStyleMapGet.GetKeyValue( index );
+      const KeyValuePair& valueGet = mapGet.GetKeyValue( index );
 
-      Property::Value* valueSet = NULL;
-      if ( valueGet.first.type == Property::Key::INDEX )
+      // Find the keys of the 'get' map
+      Property::Index indexKey = valueGet.first.indexKey;
+      std::string stringKey = valueGet.first.stringKey;
+
+      if( !indexConversionTable.empty() )
       {
-        valueSet = fontStyleMapSet.Find( valueGet.first.indexKey );
-      }
-      else
-      {
-        // Get Key is a string so searching Set Map for a string key
-        valueSet = fontStyleMapSet.Find( valueGet.first.stringKey );
+        if( stringKey.empty() )
+        {
+          stringKey = indexConversionTable[ indexKey ];
+        }
+
+        if( ( indexKey == Property::INVALID_INDEX ) && !stringKey.empty() )
+        {
+          Property::Index index = 0u;
+          for( auto key : indexConversionTable )
+          {
+            if( key == stringKey )
+            {
+              indexKey = index;
+              break;
+            }
+            ++index;
+          }
+        }
       }
 
-      if( NULL != valueSet )
+      const Property::Value* const valueSet = mapSet.Find( indexKey, stringKey );
+
+      if( nullptr != valueSet )
       {
-        if( valueSet->GetType() == Dali::Property::STRING && ( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() ) )
+        if( ( valueSet->GetType() == Dali::Property::STRING ) && ( valueGet.second.Get<std::string>() != valueSet->Get<std::string>() ) )
         {
           tet_printf( "Value got : [%s], expected : [%s]", valueGet.second.Get<std::string>().c_str(), valueSet->Get<std::string>().c_str() );
           return false;
         }
-        else if( valueSet->GetType() == Dali::Property::BOOLEAN && ( valueGet.second.Get<bool>() != valueSet->Get<bool>() ) )
+        else if( ( valueSet->GetType() == Dali::Property::BOOLEAN ) && ( valueGet.second.Get<bool>() != valueSet->Get<bool>() ) )
         {
           tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<bool>(), valueSet->Get<bool>() );
           return false;
         }
-        else if( valueSet->GetType() == Dali::Property::INTEGER && ( valueGet.second.Get<int>() != valueSet->Get<int>() ) )
+        else if( ( valueSet->GetType() == Dali::Property::INTEGER ) && ( valueGet.second.Get<int>() != valueSet->Get<int>() ) )
         {
           tet_printf( "Value got : [%d], expected : [%d]", valueGet.second.Get<int>(), valueSet->Get<int>() );
           return false;
         }
-        else if( valueSet->GetType() == Dali::Property::FLOAT && ( valueGet.second.Get<float>() != valueSet->Get<float>() ) )
+        else if( ( valueSet->GetType() == Dali::Property::FLOAT ) && ( valueGet.second.Get<float>() != valueSet->Get<float>() ) )
         {
           tet_printf( "Value got : [%f], expected : [%f]", valueGet.second.Get<float>(), valueSet->Get<float>() );
           return false;
         }
-        else if( valueSet->GetType() == Dali::Property::VECTOR2 && ( valueGet.second.Get<Vector2>() != valueSet->Get<Vector2>() ) )
+        else if( ( valueSet->GetType() == Dali::Property::VECTOR2 ) && ( valueGet.second.Get<Vector2>() != valueSet->Get<Vector2>() ) )
         {
           Vector2 vector2Get = valueGet.second.Get<Vector2>();
           Vector2 vector2Set = valueSet->Get<Vector2>();
           tet_printf( "Value got : [%f, %f], expected : [%f, %f]", vector2Get.x, vector2Get.y, vector2Set.x, vector2Set.y );
           return false;
         }
-        else if( valueSet->GetType() == Dali::Property::VECTOR4 && ( valueGet.second.Get<Vector4>() != valueSet->Get<Vector4>() ) )
+        else if( ( valueSet->GetType() == Dali::Property::VECTOR4 ) && ( valueGet.second.Get<Vector4>() != valueSet->Get<Vector4>() ) )
         {
           Vector4 vector4Get = valueGet.second.Get<Vector4>();
           Vector4 vector4Set = valueSet->Get<Vector4>();
@@ -241,11 +255,6 @@ int UtcDaliToolkitTextLabelGetPropertyP(void)
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_HORIZONTAL_ALIGNMENT ) == TextLabel::Property::HORIZONTAL_ALIGNMENT );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_VERTICAL_ALIGNMENT ) == TextLabel::Property::VERTICAL_ALIGNMENT );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_TEXT_COLOR ) == TextLabel::Property::TEXT_COLOR );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_SHADOW_OFFSET ) == TextLabel::Property::SHADOW_OFFSET );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_SHADOW_COLOR ) == TextLabel::Property::SHADOW_COLOR );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_ENABLED ) == TextLabel::Property::UNDERLINE_ENABLED );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_COLOR ) == TextLabel::Property::UNDERLINE_COLOR );
-  DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_UNDERLINE_HEIGHT) == TextLabel::Property::UNDERLINE_HEIGHT );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_MARKUP) == TextLabel::Property::ENABLE_MARKUP );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_AUTO_SCROLL ) == TextLabel::Property::ENABLE_AUTO_SCROLL );
   DALI_TEST_CHECK( label.GetPropertyIndex( PROPERTY_NAME_ENABLE_AUTO_SCROLL_SPEED ) == TextLabel::Property::AUTO_SCROLL_SPEED );
@@ -359,8 +368,6 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // Check that text color can be properly set
   label.SetProperty( TextLabel::Property::TEXT_COLOR, Color::BLUE );
   DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::TEXT_COLOR ), Color::BLUE, TEST_LOCATION );
-  // The underline color is changed as well.
-  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::BLUE, TEST_LOCATION );
 
   Property::Map underlineMapSet;
   Property::Map underlineMapGet;
@@ -372,20 +379,6 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   underlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::UNDERLINE );
   DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
-
-  // Check that shadow parameters can be correctly set
-  label.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 3.0f, 3.0f ) );
-  DALI_TEST_EQUALS( label.GetProperty<Vector2>( TextLabel::Property::SHADOW_OFFSET ), Vector2( 3.0f, 3.0f ), TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::SHADOW_COLOR, Color::BLUE );
-  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::SHADOW_COLOR ), Color::BLUE, TEST_LOCATION );
-
-  // Check that underline parameters can be correctly set
-  label.SetProperty( TextLabel::Property::UNDERLINE_ENABLED, true );
-  DALI_TEST_EQUALS( label.GetProperty<bool>( TextLabel::Property::UNDERLINE_ENABLED ), true, TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::UNDERLINE_COLOR, Color::RED );
-  DALI_TEST_EQUALS( label.GetProperty<Vector4>( TextLabel::Property::UNDERLINE_COLOR ), Color::RED, TEST_LOCATION );
-  label.SetProperty( TextLabel::Property::UNDERLINE_HEIGHT, 1.0f );
-  DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::UNDERLINE_HEIGHT ), 1.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   TextLabel label2 = TextLabel::New( "New text" );
   DALI_TEST_CHECK( label2 );
@@ -434,25 +427,36 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   // test natural size with multi-line and line spacing
   {
     TextLabel label3 = TextLabel::New("Some text here\nend there\nend here");
-    Vector3 expected0(414.f, 192.f, 0.0f);
-    Vector3 expected1(414.f, 252.f, 0.0f);
+    Vector3 oneLineNaturalSize = label3.GetNaturalSize();
     label3.SetProperty(TextLabel::Property::MULTI_LINE, true);
     label3.SetProperty(TextLabel::Property::LINE_SPACING, 0);
-    DALI_TEST_EQUALS(expected0, label3.GetNaturalSize(), TEST_LOCATION);
-    label3.SetProperty(TextLabel::Property::LINE_SPACING, 20);
-    DALI_TEST_EQUALS(expected1, label3.GetNaturalSize(), TEST_LOCATION);
+    Vector3 multiLineNaturalSize = label3.GetNaturalSize();
+
+    // The width of the text when multi-line is enabled will be smaller (lines separated on '\n')
+    // The height of the text when multi-line is enabled will be larger
+    DALI_TEST_CHECK( oneLineNaturalSize.width > multiLineNaturalSize.width );
+    DALI_TEST_CHECK( oneLineNaturalSize.height < multiLineNaturalSize.height );
+
+    // Change line spacing, meaning height will increase by 3 times the amount specified as we have three lines
+    // Everything else will remain the same
+    int lineSpacing = 20;
+    label3.SetProperty( TextLabel::Property::LINE_SPACING, lineSpacing );
+    Vector3 expectedAfterLineSpacingApplied( multiLineNaturalSize );
+    expectedAfterLineSpacingApplied.height += 3 * lineSpacing;
+    DALI_TEST_EQUALS( expectedAfterLineSpacingApplied, label3.GetNaturalSize(), TEST_LOCATION );
   }
 
-  // single line, line spacing must not affect natural size
+  // single line, line spacing must not affect natural size of the text, only add the spacing to the height
   {
-    const Vector3 expected0(948.f, 64.f, 0.0f);
-    const Vector3 expected1(948.f, 84.f, 0.0f);
     TextLabel label3 = TextLabel::New("Some text here end there end here");
     label3.SetProperty(TextLabel::Property::MULTI_LINE, false);
     label3.SetProperty(TextLabel::Property::LINE_SPACING, 0);
-    DALI_TEST_EQUALS(expected0, label3.GetNaturalSize(), TEST_LOCATION);
-    label3.SetProperty(TextLabel::Property::LINE_SPACING, 20);
-    DALI_TEST_EQUALS(expected1, label3.GetNaturalSize(), TEST_LOCATION);
+    Vector3 textNaturalSize = label3.GetNaturalSize();
+    int lineSpacing = 20;
+    label3.SetProperty( TextLabel::Property::LINE_SPACING, lineSpacing );
+    Vector3 expectedNaturalSizeWithLineSpacing( textNaturalSize );
+    expectedNaturalSizeWithLineSpacing.height += lineSpacing;
+    DALI_TEST_EQUALS( expectedNaturalSizeWithLineSpacing, label3.GetNaturalSize(), TEST_LOCATION );
   }
   // Check the line spacing property
   DALI_TEST_EQUALS( label.GetProperty<float>( TextLabel::Property::LINE_SPACING ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
@@ -475,13 +479,32 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
 
   underlineMapSet.Clear();
+  underlineMapSet.Insert( Toolkit::DevelText::Underline::Property::ENABLE, "true" );
+  underlineMapSet.Insert( Toolkit::DevelText::Underline::Property::COLOR, "green" );
+  underlineMapSet.Insert( Toolkit::DevelText::Underline::Property::HEIGHT, "2" );
+
+  label.SetProperty( TextLabel::Property::UNDERLINE, underlineMapSet );
+
+  application.SendNotification();
+  application.Render();
+
+  underlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::UNDERLINE );
+  DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
+  std::vector<std::string> underlineIndicesConversionTable = { "enable", "color", "height" };
+  DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet, underlineIndicesConversionTable ), true, TEST_LOCATION );
+
+  underlineMapSet.Clear();
 
   Property::Map underlineDisabledMapGet;
   underlineDisabledMapGet.Insert( "enable", "false" );
-  underlineDisabledMapGet.Insert( "color", "red" );
-  underlineDisabledMapGet.Insert( "height", "1" );
+  underlineDisabledMapGet.Insert( "color", "green" );
+  underlineDisabledMapGet.Insert( "height", "2" );
 
   label.SetProperty( TextLabel::Property::UNDERLINE, underlineMapSet );
+
+  application.SendNotification();
+  application.Render();
+
   underlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::UNDERLINE );
   DALI_TEST_EQUALS( underlineMapGet.Count(), underlineDisabledMapGet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineDisabledMapGet ), true, TEST_LOCATION );
@@ -502,10 +525,29 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( DaliTestCheckMaps( shadowMapGet, shadowMapSet ), true, TEST_LOCATION );
 
   shadowMapSet.Clear();
+
+  shadowMapSet.Insert( Toolkit::DevelText::Shadow::Property::COLOR, Color::BLUE );
+  shadowMapSet.Insert( Toolkit::DevelText::Shadow::Property::OFFSET, "3.0 3.0" );
+  shadowMapSet.Insert( Toolkit::DevelText::Shadow::Property::BLUR_RADIUS, 3.0f );
+
+  label.SetProperty( TextLabel::Property::SHADOW, shadowMapSet );
+
+  // Replace the offset (string) by a vector2
+  shadowMapSet.Clear();
+  shadowMapSet.Insert( Toolkit::DevelText::Shadow::Property::COLOR, Color::BLUE );
+  shadowMapSet.Insert( Toolkit::DevelText::Shadow::Property::OFFSET, Vector2( 3.0, 3.0 ) );
+  shadowMapSet.Insert( Toolkit::DevelText::Shadow::Property::BLUR_RADIUS, 3.0f );
+
+  shadowMapGet = label.GetProperty<Property::Map>( TextLabel::Property::SHADOW );
+  DALI_TEST_EQUALS( shadowMapGet.Count(), shadowMapSet.Count(), TEST_LOCATION );
+  std::vector<std::string> shadowIndicesConversionTable = { "color", "offset", "blurRadius" };
+  DALI_TEST_EQUALS( DaliTestCheckMaps( shadowMapGet, shadowMapSet, shadowIndicesConversionTable ), true, TEST_LOCATION );
+
+  shadowMapSet.Clear();
   Property::Map shadowDisabledMapGet;
-  shadowDisabledMapGet.Insert( "color", Color::GREEN );
+  shadowDisabledMapGet.Insert( "color", Color::BLUE );
   shadowDisabledMapGet.Insert( "offset", Vector2(0.0f, 0.0f) );
-  shadowDisabledMapGet.Insert( "blurRadius", 5.0f );
+  shadowDisabledMapGet.Insert( "blurRadius", 3.0f );
 
   label.SetProperty( TextLabel::Property::SHADOW, shadowMapSet );
 
@@ -536,6 +578,16 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet ), true, TEST_LOCATION );
 
+  outlineMapSet.Clear();
+  outlineMapSet[Toolkit::DevelText::Outline::Property::COLOR] = Color::BLUE;
+  outlineMapSet[Toolkit::DevelText::Outline::Property::WIDTH] = 3.0f;
+  label.SetProperty( TextLabel::Property::OUTLINE, outlineMapSet );
+
+  outlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::OUTLINE );
+  DALI_TEST_EQUALS( outlineMapGet.Count(), outlineMapSet.Count(), TEST_LOCATION );
+  std::vector<std::string> outlineIndicesConversionTable = { "color", "width" };
+  DALI_TEST_EQUALS( DaliTestCheckMaps( outlineMapGet, outlineMapSet, outlineIndicesConversionTable ), true, TEST_LOCATION );
+
   // Check the background property
   Property::Map backgroundMapSet;
   Property::Map backgroundMapGet;
@@ -547,6 +599,16 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   backgroundMapGet = label.GetProperty<Property::Map>( DevelTextLabel::Property::BACKGROUND );
   DALI_TEST_EQUALS( backgroundMapGet.Count(), backgroundMapSet.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( DaliTestCheckMaps( backgroundMapGet, backgroundMapSet ), true, TEST_LOCATION );
+
+  backgroundMapSet.Clear();
+  backgroundMapSet[Toolkit::DevelText::Background::Property::ENABLE] = true;
+  backgroundMapSet[Toolkit::DevelText::Background::Property::COLOR] = Color::GREEN;
+  label.SetProperty( DevelTextLabel::Property::BACKGROUND, backgroundMapSet );
+
+  backgroundMapGet = label.GetProperty<Property::Map>( DevelTextLabel::Property::BACKGROUND );
+  DALI_TEST_EQUALS( backgroundMapGet.Count(), backgroundMapSet.Count(), TEST_LOCATION );
+  std::vector<std::string> backgroundIndicesConversionTable = { "enable", "color" };
+  DALI_TEST_EQUALS( DaliTestCheckMaps( backgroundMapGet, backgroundMapSet, backgroundIndicesConversionTable ), true, TEST_LOCATION );
 
   // Check the pixel size of font
   label.SetProperty( TextLabel::Property::PIXEL_SIZE, 20.f );
@@ -582,10 +644,16 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   // Turn on all the effects
   label.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
   label.SetProperty( TextLabel::Property::MULTI_LINE, true );
-  label.SetProperty( TextLabel::Property::UNDERLINE_ENABLED, true );
-  label.SetProperty( TextLabel::Property::UNDERLINE_COLOR, Color::RED );
-  label.SetProperty( TextLabel::Property::SHADOW_OFFSET, Vector2( 1.0f, 1.0f ) );
-  label.SetProperty( TextLabel::Property::SHADOW_COLOR, Color::BLUE );
+
+  Property::Map underlineMap;
+  underlineMap.Insert( "enable", "true" );
+  underlineMap.Insert( "color", "red" );
+  label.SetProperty( TextLabel::Property::UNDERLINE, underlineMap );
+
+  Property::Map shadowMap;
+  shadowMap.Insert( "color", Color::BLUE );
+  shadowMap.Insert( "offset", Vector2( 1.0f, 1.0f ) );
+  label.SetProperty( TextLabel::Property::SHADOW, shadowMap );
 
   try
   {

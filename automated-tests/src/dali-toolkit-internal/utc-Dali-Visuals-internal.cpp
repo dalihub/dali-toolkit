@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <toolkit-text-utils.h>
+#include <toolkit-event-thread-callback.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
@@ -317,6 +318,57 @@ int UtcDaliAnimatedVectorImageVisualCreateInstancePropertyMap(void)
 
   // check the property values from the returned map from a visual
   DALI_TEST_CHECK( resultMap.Empty() );   // Now the map is empty
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualSetProperties(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatedVectorImageVisualSetProperties" );
+
+  Property::Map propertyMap;
+  propertyMap.Add( Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE )
+             .Add( ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME  )
+             .Add( DevelImageVisual::Property::LOOP_COUNT, 3  )
+             .Add( DevelImageVisual::Property::PLAY_RANGE, Vector2( 0.2f, 0.8f )  );
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
+  Toolkit::Internal::Visual::Base& visualImpl = GetImplementation( visual );
+  DALI_TEST_CHECK( visual );
+
+  DummyControl actor = DummyControl::New( true );
+  DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+  actor.SetSize( 200.0f, 200.0f );
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  // Wait for resource ready event callback
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  // renderer is added to actor
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  Renderer renderer = actor.GetRendererAt( 0u );
+  DALI_TEST_CHECK( renderer );
+
+  Property::Map propertyMap1;
+  propertyMap1.Add( DevelImageVisual::Property::LOOP_COUNT, 1  )
+              .Add( DevelImageVisual::Property::PLAY_RANGE, Vector2( 0.4f, 0.6f )  );
+
+  visualImpl.SetProperties( propertyMap1 );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  renderer = actor.GetRendererAt( 0u );
+  DALI_TEST_CHECK( renderer );
+
+  actor.Unparent( );
+  DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 
   END_TEST;
 }

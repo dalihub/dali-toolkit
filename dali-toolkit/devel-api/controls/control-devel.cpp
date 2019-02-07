@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,6 +164,13 @@ bool IsLayoutingRequired( Control control )
   Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
   Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
   return controlDataImpl.IsLayoutingRequired();
+}
+
+VisualEventSignalType& VisualEventSignal( Control control )
+{
+  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
+  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
+  return controlDataImpl.VisualEventSignal();
 }
 
 } // namespace DevelControl

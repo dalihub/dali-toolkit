@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,8 +91,8 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "horizontalAlignment",          
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "verticalAlignment",                    STRING,    VERTICAL_ALIGNMENT                   )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "textColor",                            VECTOR4,   TEXT_COLOR                           )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "placeholderTextColor",                 VECTOR4,   PLACEHOLDER_TEXT_COLOR               )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadowOffset",                         VECTOR2,   SHADOW_OFFSET                        )
-DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "shadowColor",                          VECTOR4,   SHADOW_COLOR                         )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "reservedProperty01",                   STRING,    RESERVED_PROPERTY_01                 )
+DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "reservedProperty02",                   STRING,    RESERVED_PROPERTY_02                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "primaryCursorColor",                   VECTOR4,   PRIMARY_CURSOR_COLOR                 )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "secondaryCursorColor",                 VECTOR4,   SECONDARY_CURSOR_COLOR               )
 DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "enableCursorBlink",                    BOOLEAN,   ENABLE_CURSOR_BLINK                  )
@@ -335,36 +335,6 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           if( impl.mController->GetPlaceholderTextColor() != textColor )
           {
             impl.mController->SetPlaceholderTextColor( textColor );
-            impl.mRenderer.Reset();
-          }
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::SHADOW_OFFSET:
-      {
-        if( impl.mController )
-        {
-          const Vector2& shadowOffset = value.Get< Vector2 >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SHADOW_OFFSET %f,%f\n", impl.mController.Get(), shadowOffset.x, shadowOffset.y );
-
-          if ( impl.mController->GetShadowOffset() != shadowOffset )
-          {
-            impl.mController->SetShadowOffset( shadowOffset );
-            impl.mRenderer.Reset();
-          }
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::SHADOW_COLOR:
-      {
-        if( impl.mController )
-        {
-          const Vector4& shadowColor = value.Get< Vector4 >();
-          DALI_LOG_INFO( gLogFilter, Debug::General, "TextField %p SHADOW_COLOR %f,%f,%f,%f\n", impl.mController.Get(), shadowColor.r, shadowColor.g, shadowColor.b, shadowColor.a );
-
-          if ( impl.mController->GetShadowColor() != shadowColor )
-          {
-            impl.mController->SetShadowColor( shadowColor );
             impl.mRenderer.Reset();
           }
         }
@@ -919,22 +889,6 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         if ( impl.mController )
         {
           value = impl.mController->GetPlaceholderTextColor();
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::SHADOW_OFFSET:
-      {
-        if ( impl.mController )
-        {
-          value = impl.mController->GetShadowOffset();
-        }
-        break;
-      }
-      case Toolkit::TextField::Property::SHADOW_COLOR:
-      {
-        if ( impl.mController )
-        {
-          value = impl.mController->GetShadowColor();
         }
         break;
       }

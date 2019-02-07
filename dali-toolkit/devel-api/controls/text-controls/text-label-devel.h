@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXT_LABEL_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,11 @@ namespace Property
     HORIZONTAL_ALIGNMENT = Dali::Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT,
     VERTICAL_ALIGNMENT = Dali::Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT,
     UNUSED_PROPERTY_TEXT_COLOR = Dali::Toolkit::TextLabel::Property::UNUSED_PROPERTY_TEXT_COLOR,
-    SHADOW_OFFSET = Dali::Toolkit::TextLabel::Property::SHADOW_OFFSET,
-    SHADOW_COLOR = Dali::Toolkit::TextLabel::Property::SHADOW_COLOR,
-    UNDERLINE_ENABLED = Dali::Toolkit::TextLabel::Property::UNDERLINE_ENABLED,
-    UNDERLINE_COLOR = Dali::Toolkit::TextLabel::Property::UNDERLINE_COLOR,
-    UNDERLINE_HEIGHT = Dali::Toolkit::TextLabel::Property::UNDERLINE_HEIGHT,
+    RESERVED_PROPERTY_01 = Dali::Toolkit::TextLabel::Property::RESERVED_PROPERTY_01,
+    RESERVED_PROPERTY_02 = Dali::Toolkit::TextLabel::Property::RESERVED_PROPERTY_02,
+    RESERVED_PROPERTY_03 = Dali::Toolkit::TextLabel::Property::RESERVED_PROPERTY_03,
+    RESERVED_PROPERTY_04 = Dali::Toolkit::TextLabel::Property::RESERVED_PROPERTY_04,
+    RESERVED_PROPERTY_05 = Dali::Toolkit::TextLabel::Property::RESERVED_PROPERTY_05,
     ENABLE_MARKUP = Dali::Toolkit::TextLabel::Property::ENABLE_MARKUP,
     ENABLE_AUTO_SCROLL = Dali::Toolkit::TextLabel::Property::ENABLE_AUTO_SCROLL,
     AUTO_SCROLL_SPEED = Dali::Toolkit::TextLabel::Property::AUTO_SCROLL_SPEED,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ bool LayoutItem::Impl::sUseZeroUnspecifiedMeasureSpec = false;
 LayoutData* LayoutItem::Impl::sLayoutData = nullptr;
 
 LayoutItem::Impl::Impl()
-: mOwner( nullptr ),
+: mOwner(),
   mLayoutParent( nullptr ),
   mOldWidthMeasureSpec( 0 ),
   mOldHeightMeasureSpec( 0 ),

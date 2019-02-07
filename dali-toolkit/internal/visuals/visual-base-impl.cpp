@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -434,14 +434,14 @@ const Vector4& Visual::Base::GetMixColor() const
   return mImpl->mMixColor;
 }
 
-void Visual::Base::AddResourceObserver( Visual::ResourceObserver& observer)
+void Visual::Base::AddEventObserver( Visual::EventObserver& observer)
 {
-  mImpl->mResourceObserver = &observer;
+  mImpl->mEventObserver = &observer;
 }
 
-void Visual::Base::RemoveResourceObserver( Visual::ResourceObserver& observer )
+void Visual::Base::RemoveEventObserver( Visual::EventObserver& observer )
 {
-  mImpl->mResourceObserver = NULL;
+  mImpl->mEventObserver = NULL;
 }
 
 void Visual::Base::ResourceReady(Toolkit::Visual::ResourceStatus resourceStatus)
@@ -450,10 +450,10 @@ void Visual::Base::ResourceReady(Toolkit::Visual::ResourceStatus resourceStatus)
   {
     mImpl->mResourceStatus = resourceStatus;
 
-    if( mImpl->mResourceObserver )
+    if( mImpl->mEventObserver )
     {
       // observer is currently a control impl
-      mImpl->mResourceObserver->ResourceReady( *this );
+      mImpl->mEventObserver->ResourceReady( *this );
     }
   }
 }

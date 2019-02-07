@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -270,14 +270,14 @@ DALI_TOOLKIT_API void DoAction( Control& control, Dali::Property::Index visualIn
  */
 DALI_TOOLKIT_API void SetInputMethodContext( Internal::Control& control, InputMethodContext& inputMethodContext );
 
-/*
+/**
  * @brief Get the layout associated with this control, if any.
  *
  * @return A handle to the layout, or empty.
  */
 DALI_TOOLKIT_API Toolkit::LayoutItem GetLayout( Internal::Control& control );
 
-/*
+/**
  * @brief Get the layout associated with a control, if any.
  *
  * @return A handle to the layout, or empty.
@@ -327,6 +327,22 @@ DALI_TOOLKIT_API void SetLayoutingRequired( Control control, bool layoutingRequi
  * @return true if the control needs layouting
  */
 DALI_TOOLKIT_API bool IsLayoutingRequired( Control control );
+
+/**
+ * @brief Visual Event signal type
+ */
+using VisualEventSignalType = Signal< void ( Control, Dali::Property::Index, Dali::Property::Index ) >;
+
+/**
+ * @brief This signal is emitted when a visual has an event to notify.
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( Control control, Dali::Property::Index visualIndex, Dali::Property::Index signalId );
+ * @endcode
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API VisualEventSignalType& VisualEventSignal( Control control );
 
 } // namespace DevelControl
 

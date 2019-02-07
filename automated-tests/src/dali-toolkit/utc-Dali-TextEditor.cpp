@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,18 +104,10 @@ const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGr
 const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
 
 
-const int DEFAULT_RENDERING_BACKEND = Dali::Toolkit::Text::DEFAULT_RENDERING_BACKEND;
-
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
 
-const unsigned int CURSOR_BLINK_INTERVAL = 500u; // Cursor blink interval
-const float TO_MILLISECONDS = 1000.f;
-const float TO_SECONDS = 1.f / TO_MILLISECONDS;
 const float RENDER_FRAME_INTERVAL = 16.66f;
-
-const float SCROLL_THRESHOLD = 10.f;
-const float SCROLL_SPEED = 300.f;
 
 const unsigned int DEFAULT_FONT_SIZE = 1152u;
 const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
@@ -214,6 +206,7 @@ Integration::PanGestureEvent GeneratePan( Gesture::State state,
 
 // Generate a KeyEvent to send to Core.
 Integration::KeyEvent GenerateKey( const std::string& keyName,
+                                   const std::string& logicalKey,
                                    const std::string& keyString,
                                    int keyCode,
                                    int keyModifier,
@@ -225,6 +218,7 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                    const Device::Subclass::Type& deviceSubclass = Device::Subclass::NONE )
 {
   return Integration::KeyEvent( keyName,
+                                logicalKey,
                                 keyString,
                                 keyCode,
                                 keyModifier,
@@ -1017,7 +1011,7 @@ int utcDaliTextEditorTextChangedP(void)
   editor.SetKeyInputFocus();
 
   gTextChangedCallBackCalled = false;
-  application.ProcessEvent( GenerateKey( "D", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "D", "", "D", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "D", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   DALI_TEST_CHECK( gTextChangedCallBackCalled );
 
   END_TEST;
@@ -1337,7 +1331,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   gInputStyleMask = TextEditor::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1362,7 +1356,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   gInputStyleMask = TextEditor::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1378,7 +1372,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   gInputStyleMask = TextEditor::InputStyle::NONE;
   inputStyleChangedSignal = false;
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1419,7 +1413,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   editor.SetProperty( TextEditor::Property::INPUT_EMBOSS, "emboss" );
   editor.SetProperty( TextEditor::Property::INPUT_OUTLINE, "outline" );
 
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1527,7 +1521,7 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // Add a key event but as the text editor has not the focus it should do nothing.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1544,8 +1538,8 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // Now the text editor has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1576,8 +1570,8 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // The second text editor has the focus. It should handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1633,8 +1627,8 @@ int utcDaliTextEditorEvent02(void)
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   // Now the text editor has the focus, so it can handle the key events.
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "a", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "a", "", "a", KEY_A_CODE, 0, 0, Integration::KeyEvent::Down, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1658,8 +1652,8 @@ int utcDaliTextEditorEvent02(void)
   // Move the cursor and check the position changes.
   Vector3 position1 = cursor.GetCurrentPosition();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1669,8 +1663,8 @@ int utcDaliTextEditorEvent02(void)
 
   DALI_TEST_CHECK( position2.x < position1.x );
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1708,8 +1702,8 @@ int utcDaliTextEditorEvent02(void)
   DALI_TEST_CHECK( position5.x > position4.x );
 
   // Remove all the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   editor.SetProperty( TextEditor::Property::TEXT, "" );
 
   // Render and notify
@@ -1858,8 +1852,8 @@ int utcDaliTextEditorEvent04(void)
   application.Render();
 
   // Move at the end of the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1867,8 +1861,8 @@ int utcDaliTextEditorEvent04(void)
 
   for( unsigned int index = 0u; index < 10u; ++index )
   {
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
     // Render and notify
     application.SendNotification();
@@ -1876,7 +1870,7 @@ int utcDaliTextEditorEvent04(void)
   }
 
   // Add a character
-  application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1885,8 +1879,8 @@ int utcDaliTextEditorEvent04(void)
   DALI_TEST_EQUALS( "Hello\nworld", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   // Add some key events
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_UP, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1894,8 +1888,8 @@ int utcDaliTextEditorEvent04(void)
 
   for( unsigned int index = 0u; index < 10u; ++index )
   {
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
     // Render and notify
     application.SendNotification();
@@ -1903,7 +1897,7 @@ int utcDaliTextEditorEvent04(void)
   }
 
   // Add a character
-  application.ProcessEvent( GenerateKey( " ", " ", KEY_WHITE_SPACE_CODE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( " ", "", " ", KEY_WHITE_SPACE_CODE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1953,8 +1947,8 @@ int utcDaliTextEditorEvent05(void)
   application.Render();
 
   // Move at the end of the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -1963,7 +1957,7 @@ int utcDaliTextEditorEvent05(void)
   for( unsigned int index = 0u; index < 10u; ++index )
   {
     // Add a character
-    application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
     // Render and notify
     application.SendNotification();
@@ -1975,7 +1969,7 @@ int utcDaliTextEditorEvent05(void)
   // Continuous scroll left to increase coverage
   for( unsigned int index = 0u; index < 10u; ++index )
   {
-    application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+    application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
     // Render and notify
     application.SendNotification();
@@ -1988,7 +1982,7 @@ int utcDaliTextEditorEvent05(void)
   DALI_TEST_EQUALS( editor.GetProperty<float>( TextEditor::Property::SCROLL_BAR_FADE_DURATION ), 0.2f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Press Escape to increase coverage
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Up, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
@@ -2031,7 +2025,7 @@ int utcDaliTextEditorEvent06(void)
   application.Render();
 
   // Move to seconds line of the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2041,12 +2035,12 @@ int utcDaliTextEditorEvent06(void)
 
 
   // Add  another script characters ( glyph height is defferent )
-  application.ProcessEvent( GenerateKey( "d", "ㅁ", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "ㅁ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "d", "ኢ", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "ኢ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "", "ㅁ", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "ㅁ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "", "ኢ", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "ኢ", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Delete characters
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   DALI_TEST_EQUALS( layoutHeight, editor.GetHeightForWidth( 100.f ), TEST_LOCATION );
 
@@ -2057,31 +2051,31 @@ int utcDaliTextEditorEvent06(void)
   DALI_TEST_EQUALS( "Hello\nworld\nHello world", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   // For coverage
-  application.ProcessEvent( GenerateKey( "", "", 0, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", 0, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_VOLUME_UP, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_VOLUME_UP, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_VOLUME_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_VOLUME_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_DELETE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
-  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
   application.Render();
 
@@ -2122,25 +2116,25 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // Move to second line of the text.
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Select some text in the right of the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Cut the selected text
-  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "x", "x", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "x", "", "x", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2149,34 +2143,34 @@ int utcDaliTextEditorEvent07(void)
   DALI_TEST_EQUALS( "Hello\nld\nHello world", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   // Select some text in the left of the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down,  "",DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down,  "",DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Copy the selected text
-  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "c", "c", KEY_C_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "c", "", "c", KEY_C_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Move the cursor to the third line
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_DOWN, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Paste the selected text at the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "v", "v", KEY_V_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, "v", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "v", "", "v", KEY_V_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, "v", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2189,18 +2183,18 @@ int utcDaliTextEditorEvent07(void)
   editor.SetProperty( DevelTextEditor::Property::ENABLE_SHIFT_SELECTION, false );
 
   // Test to select some text in the right of the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Cut the selected text
-  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "x", "x", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "x", "", "x", KEY_X_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2210,18 +2204,18 @@ int utcDaliTextEditorEvent07(void)
   DALI_TEST_EQUALS( "Hello\nld\nHello lo\nworld", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   // Test to select some text in the left of the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Copy the selected text
-  application.ProcessEvent( GenerateKey( "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "c", "c", KEY_C_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", Dali::DevelKey::DALI_KEY_CONTROL_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "c", "", "c", KEY_C_CODE, KEY_CONTROL_MODIFIER, 0, Integration::KeyEvent::Down, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2268,54 +2262,54 @@ int utcDaliTextEditorEvent08(void)
 
   // When the left selection handle and the right selection handle are at the same position, the highlight box should be deactivated.
   // Test to select some text in the left of the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Test to the left selection handle position and the right selection handle position
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Test to select full text in the left of the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Test to release the current full text selection
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Test to move the current cursor position correctly
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Add a character
-  application.ProcessEvent( GenerateKey( "d", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "d", "", "d", KEY_D_CODE, 0, 0, Integration::KeyEvent::Down, "d", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2324,23 +2318,23 @@ int utcDaliTextEditorEvent08(void)
   DALI_TEST_EQUALS( "DdALi", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   // Test to select some text in the right of the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Test the cursor position with right arrow key
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Add a character
-  application.ProcessEvent( GenerateKey( "c", "c", KEY_C_CODE, 0, 0, Integration::KeyEvent::Down, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "c", "", "c", KEY_C_CODE, 0, 0, Integration::KeyEvent::Down, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2349,25 +2343,25 @@ int utcDaliTextEditorEvent08(void)
   DALI_TEST_EQUALS( "DdALci", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   // Test to select some text in the left of the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Test the cursor position with left arrow key
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Add a character
-  application.ProcessEvent( GenerateKey( "c", "c", KEY_C_CODE, 0, 0, Integration::KeyEvent::Down, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "c", "", "c", KEY_C_CODE, 0, 0, Integration::KeyEvent::Down, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2376,24 +2370,24 @@ int utcDaliTextEditorEvent08(void)
   DALI_TEST_EQUALS( "DcdALci", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   // Test to select some text in the right of the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Test the cursor position with left arrow key
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Add a character
-  application.ProcessEvent( GenerateKey( "x", "x", KEY_X_CODE, 0, 0, Integration::KeyEvent::Down, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "x", "", "x", KEY_X_CODE, 0, 0, Integration::KeyEvent::Down, "x", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
@@ -2402,24 +2396,24 @@ int utcDaliTextEditorEvent08(void)
   DALI_TEST_EQUALS( "DcxdALci", editor.GetProperty<std::string>( TextEditor::Property::TEXT ), TEST_LOCATION );
 
   // Test to select some text in the left of the current cursor position
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_SHIFT_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, KEY_SHIFT_MODIFIER, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Test the cursor position with right arrow key
-  application.ProcessEvent( GenerateKey( "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Add a character
-  application.ProcessEvent( GenerateKey( "c", "c", KEY_C_CODE, 0, 0, Integration::KeyEvent::Down, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "c", "", "c", KEY_C_CODE, 0, 0, Integration::KeyEvent::Down, "c", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();

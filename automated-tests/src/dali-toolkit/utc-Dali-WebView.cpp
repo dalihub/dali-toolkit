@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,7 +233,7 @@ int UtcDaliWebViewTouchAndKeys(void)
 
   // Key event
   Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( view );
-  application.ProcessEvent( Integration::KeyEvent( "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( Integration::KeyEvent( "", "", "", DALI_KEY_ESCAPE, 0, 0, Integration::KeyEvent::Down, "", "", Device::Class::NONE, Device::Subclass::NONE ) );
   application.SendNotification();
 
   DALI_TEST_CHECK( gTouched );
@@ -265,13 +265,11 @@ int UtcDaliWebViewMethodsForCoverage(void)
   WebView view = WebView::New( "ko-KR", "Asia/Seoul" );
 
   view.LoadHTMLString( "<body>Hello World!</body>" );
-  view.AddJavaScriptInterface( "jsObject", "jsFunction",
-    []( const std::string& arg ) -> std::string {
-      return arg + " World!";
+  view.AddJavaScriptMessageHandler( "jsObject",
+    []( const std::string& arg ) {
     }
   );
-  view.EvaluateJavaScript( "jsObject.jsFunction('Hello')" );
-  view.RemoveJavascriptInterface( "jsObject", "jsFunction" );
+  view.EvaluateJavaScript( "jsObject.postMessage('Hello')" );
 
   DALI_TEST_CHECK( view );
 
