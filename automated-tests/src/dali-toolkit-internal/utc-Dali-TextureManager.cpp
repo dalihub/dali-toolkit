@@ -25,6 +25,18 @@
 
 using namespace Dali::Toolkit::Internal;
 
+
+void utc_dali_toolkit_texture_manager_startup(void)
+{
+  setenv( "LOG_TEXTURE_MANAGER", "3", 1 );
+  test_return_value = TET_UNDEF;
+}
+
+void utc_dali_toolkit_texture_manager_cleanup(void)
+{
+  test_return_value = TET_PASS;
+}
+
 class TestObserver : public Dali::Toolkit::TextureUploadObserver
 {
 public:
