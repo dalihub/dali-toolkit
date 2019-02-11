@@ -332,12 +332,6 @@ void ViewModel::ElideGlyphs()
               glyphInfo = ellipsisGlyph;
 
               // Change the 'x' and 'y' position of the ellipsis glyph.
-
-              if( position.x > firstPenX )
-              {
-                position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
-              }
-
               position.x += ellipsisGlyph.xBearing;
               position.y = penY - ellipsisGlyph.yBearing;
 
@@ -349,11 +343,6 @@ void ViewModel::ElideGlyphs()
           {
             if( index > 0u )
             {
-              // If the index decreases to the previous line, firstPenX must be recalculated.
-              if( numberOfLaidOutGlyphs - index == lastLine.glyphRun.numberOfGlyphs)
-              {
-                firstPenSet = false;
-              }
               --index;
             }
             else
