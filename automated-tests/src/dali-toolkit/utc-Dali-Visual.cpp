@@ -3294,7 +3294,7 @@ int UtcDaliVisualPremultipliedAlpha(void)
 
   VisualFactory factory = VisualFactory::Get();
 
-  // image visual, test default value ( false )
+  // image visual, test default value ( true )
   {
     Visual::Base imageVisual = factory.CreateVisual(
           Property::Map()
@@ -3307,7 +3307,7 @@ int UtcDaliVisualPremultipliedAlpha(void)
 
     // test values
     DALI_TEST_CHECK( value );
-    DALI_TEST_EQUALS( value->Get<bool>(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( value->Get<bool>(), true, TEST_LOCATION );
   }
 
   // image visual, override premultiplied
@@ -3316,7 +3316,7 @@ int UtcDaliVisualPremultipliedAlpha(void)
           Property::Map()
           .Add( Toolkit::Visual::Property::TYPE, Visual::IMAGE )
           .Add( ImageVisual::Property::URL, TEST_IMAGE_FILE_NAME )
-          .Add( Visual::Property::PREMULTIPLIED_ALPHA, true ) );
+          .Add( Visual::Property::PREMULTIPLIED_ALPHA, false ) );
 
     Dali::Property::Map visualMap;
     imageVisual.CreatePropertyMap( visualMap );
@@ -3324,7 +3324,7 @@ int UtcDaliVisualPremultipliedAlpha(void)
 
     // test values
     DALI_TEST_CHECK( value );
-    DALI_TEST_EQUALS( value->Get<bool>(), true, TEST_LOCATION);
+    DALI_TEST_EQUALS( value->Get<bool>(), false, TEST_LOCATION);
   }
 
   // svg visual ( premultiplied alpha by default is true )
