@@ -28,6 +28,7 @@
 #include <dali-toolkit/dali-toolkit.h>
 #include <test-button.h>
 #include <test-animation-data.h>
+#include <dummy-control.h>
 
 
 #define STRINGIFY(A)#A
@@ -1787,6 +1788,43 @@ int UtcDaliBuilderBuilderControl(void)
   application.Render();
 
   DALI_TEST_EQUALS( BuilderControlProperty::gSetPropertyCalledCount, 4, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliBuilderCustomControl(void)
+{
+  ToolkitTestApplication application;
+
+  std::string json(
+    "{"
+       "\"stage\":"
+       "[{"
+         "\"type\": \"DummyControl\","
+         "\"name\": \"I can haz custom Control\""
+      "}]"
+    "}"
+  );
+
+  Actor rootActor = Actor::New();
+  Stage::GetCurrent().Add( rootActor );
+
+  Builder builder = Builder::New();
+  builder.LoadFromString( json );
+  builder.AddActors( rootActor );
+
+  application.SendNotification();
+  application.Render();
+
+  Actor customControl = rootActor.FindChildByName( "I can haz custom Control" );
+
+  // Test that we have the correct type of custom control
+  DummyControl dummyControl = DummyControl::DownCast( customControl );
+  DALI_TEST_CHECK( dummyControl );
+  if( dummyControl )
+  {
+    DALI_TEST_CHECK( typeid(dummyControl.GetImplementation()) == typeid(DummyControlImpl) );
+  }
 
   END_TEST;
 }
