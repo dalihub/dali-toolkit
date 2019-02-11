@@ -3296,7 +3296,7 @@ int UtcDaliVisualPremultipliedAlpha(void)
 
     // test values
     DALI_TEST_CHECK( value );
-    DALI_TEST_EQUALS( value->Get<bool>(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( value->Get<bool>(), true, TEST_LOCATION );
   }
 
   // image visual, override premultiplied

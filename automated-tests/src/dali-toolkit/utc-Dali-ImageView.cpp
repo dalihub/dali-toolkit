@@ -353,7 +353,7 @@ int UtcDaliImageViewSetGetProperty03(void)
   Property::Value value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
   bool enable;
   DALI_TEST_CHECK( value.Get( enable ) );
-  DALI_TEST_CHECK( !enable );
+  DALI_TEST_CHECK( enable );
 
   // pre-multiplied alpha blending
   imageView.SetProperty( Toolkit::ImageView::Property::PRE_MULTIPLIED_ALPHA, true );
@@ -364,6 +364,64 @@ int UtcDaliImageViewSetGetProperty03(void)
   int destFactorRgb   = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
   int srcFactorAlpha  = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
   int destFactorAlpha = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
+  DALI_TEST_CHECK( srcFactorRgb == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
+
+  value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( enable );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewPreMultipliedAlpha(void)
+{
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New( gImage_34_RGBA );
+
+  // Disable pre-multiplied alpha blending
+  imageView.SetProperty( Toolkit::ImageView::Property::PRE_MULTIPLIED_ALPHA, false );
+
+  Stage::GetCurrent().Add( imageView );
+
+  application.SendNotification();
+  application.Render();
+
+  // loading started, this waits for the loader thread for max 30 seconds
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  // conventional alpha blending
+  Renderer renderer = imageView.GetRendererAt( 0 );
+  Property::Value value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  bool enable;
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( !enable );
+
+  int srcFactorRgb    = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
+  int destFactorRgb   = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
+  int srcFactorAlpha  = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
+  int destFactorAlpha = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
+  DALI_TEST_CHECK( srcFactorRgb == BlendFactor::SRC_ALPHA );
+  DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
+
+  value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( !enable );
+
+  // Enable pre-multiplied alpha blending
+  imageView.SetProperty( Toolkit::ImageView::Property::PRE_MULTIPLIED_ALPHA, true );
+  application.SendNotification();
+  application.Render();
+
+  srcFactorRgb    = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
+  destFactorRgb   = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
+  srcFactorAlpha  = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
+  destFactorAlpha = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
   DALI_TEST_CHECK( srcFactorRgb == BlendFactor::ONE );
   DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
   DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
