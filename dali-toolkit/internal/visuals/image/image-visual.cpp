@@ -953,39 +953,41 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
                                   const Vector4& atlasRectangle, bool preMultiplied )
 {
   Toolkit::Visual::ResourceStatus resourceStatus;
-  Actor actor = mPlacementActor.GetHandle();
-  if( actor )
+  if( mImpl->mRenderer )
   {
-    if( mImpl->mRenderer )
+    if( usingAtlas )
     {
-      if( usingAtlas )
-      {
-        mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, mAtlasRect );
-      }
+      mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, mAtlasRect );
+    }
 
-      EnablePreMultipliedAlpha( preMultiplied );
+    EnablePreMultipliedAlpha( preMultiplied );
 
+    Actor actor = mPlacementActor.GetHandle();
+    if( actor )
+    {
       actor.AddRenderer( mImpl->mRenderer );
       // reset the weak handle so that the renderer only get added to actor once
       mPlacementActor.Reset();
-      if( loadingSuccess )
-      {
-        Sampler sampler = Sampler::New();
-        sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
-        textureSet.SetSampler( 0u, sampler );
-        mImpl->mRenderer.SetTextures(textureSet);
-      }
-      else
-      {
-        Image brokenImage = mFactoryCache.GetBrokenVisualImage();
+    }
 
-        textureSet = TextureSet::New();
-        mImpl->mRenderer.SetTextures( textureSet );
+    if( loadingSuccess )
+    {
+      Sampler sampler = Sampler::New();
+      sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
+      textureSet.SetSampler( 0u, sampler );
+      mImpl->mRenderer.SetTextures(textureSet);
+    }
+    else
+    {
+      Image brokenImage = mFactoryCache.GetBrokenVisualImage();
 
-        ApplyImageToSampler( brokenImage );
-      }
+      textureSet = TextureSet::New();
+      mImpl->mRenderer.SetTextures( textureSet );
+
+      ApplyImageToSampler( brokenImage );
     }
   }
+
   // Storing TextureSet needed when renderer staged.
   if( ! mImpl->mRenderer )
   {
