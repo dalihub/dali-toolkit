@@ -806,9 +806,9 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map underlineMapSet;
   Property::Map underlineMapGet;
 
-  underlineMapSet.Insert( "enable", "true" );
-  underlineMapSet.Insert( "color", "red" );
-  underlineMapSet.Insert( "height", "1" );
+  underlineMapSet.Insert( "enable", true );
+  underlineMapSet.Insert( "color", Color::RED );
+  underlineMapSet.Insert( "height", 1 );
 
   // Check the underline property
   field.SetProperty( TextField::Property::UNDERLINE, underlineMapSet );
