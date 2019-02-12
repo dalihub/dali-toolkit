@@ -50,16 +50,20 @@ public:
    * @brief Constructor.
    *
    * @param[in] url The url of the vector animation file
-   * @param[in] renderer The renderer used to render the image
-   * @param[in] width The width of the content
-   * @param[in] height The height of the content
    */
-  VectorRasterizeThread( const std::string& url, Renderer renderer, uint32_t width, uint32_t height );
+  VectorRasterizeThread( const std::string& url );
 
   /**
    * @brief Destructor.
    */
   virtual ~VectorRasterizeThread();
+
+  /**
+   * @brief Sets the renderer used to display the result image.
+   *
+   * @param[in] renderer The renderer used to display the result image
+   */
+  void SetRenderer( Renderer renderer );
 
   /**
    * @brief Sets the target image size.
@@ -72,7 +76,7 @@ public:
   /**
    * @brief Play the vector animation.
    */
-  void StartAnimation();
+  void PlayAnimation();
 
   /**
    * @brief Stop the vector animation.
@@ -105,7 +109,13 @@ public:
    * @brief Enable looping for 'count' repeats. -1 means to repeat forever.
    * @param[in] count The number of times to loop
    */
-  void SetLoopCount( int16_t count );
+  void SetLoopCount( int32_t count );
+
+  /**
+   * @brief Gets the loop count. -1 means to repeat forever.
+   * @return The number of times to loop
+   */
+  int32_t GetLoopCount() const;
 
   /**
    * @brief Set the playing range.
@@ -115,10 +125,34 @@ public:
   void SetPlayRange( Vector2 range );
 
   /**
+   * @brief Gets the playing range.
+   * @return The play range defined for the animation
+   */
+  Vector2 GetPlayRange() const;
+
+  /**
    * @brief Get the play state
    * @return The play state
    */
-  DevelImageVisual::PlayState GetPlayState();
+  DevelImageVisual::PlayState GetPlayState() const;
+
+  /**
+   * @brief Queries whether the resource is ready.
+   * @return true if ready, false otherwise
+   */
+  bool IsResourceReady() const;
+
+  /**
+   * @brief Sets the progress of the animation.
+   * @param[in] progress The new progress as a normalized value between [0,1] or between the play range if specified.
+   */
+  void SetCurrentProgress( float progress );
+
+  /**
+   * @brief Retrieves the current progress of the animation.
+   * @return The current progress as a normalized value between [0,1]
+   */
+  float GetCurrentProgress() const;
 
 protected:
 
@@ -162,14 +196,15 @@ private:
   std::unique_ptr< EventThreadCallback > mAnimationFinishedTrigger;
   Vector2                     mPlayRange;
   DevelImageVisual::PlayState mPlayState;
+  float                       mProgress;
   uint32_t                    mCurrentFrame;
   uint32_t                    mTotalFrame;
   uint32_t                    mStartFrame;
   uint32_t                    mEndFrame;
   uint32_t                    mWidth;
   uint32_t                    mHeight;
-  int16_t                     mLoopCount;
-  int16_t                     mCurrentLoop;
+  int32_t                     mLoopCount;
+  int32_t                     mCurrentLoop;
   bool                        mNeedRender;
   bool                        mDestroyThread;  ///< Whether the thread be destroyed
   bool                        mResourceReady;

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,22 +172,22 @@ public:  // from Visual
   /**
    * @copydoc Visual::Base::GetNaturalSize
    */
-  virtual void GetNaturalSize( Vector2& naturalSize );
+  void GetNaturalSize( Vector2& naturalSize ) override;
 
   /**
    * @copydoc Visual::Base::CreatePropertyMap
    */
-  virtual void DoCreatePropertyMap( Property::Map& map ) const;
+  void DoCreatePropertyMap( Property::Map& map ) const override;
 
   /**
    * @copydoc Visual::Base::CreateInstancePropertyMap
    */
-  virtual void DoCreateInstancePropertyMap( Property::Map& map ) const;
+  void DoCreateInstancePropertyMap( Property::Map& map ) const override;
 
   /**
    * @copydoc Visual::Base::OnDoAction
    */
-  virtual void OnDoAction( const Dali::Property::Index actionName, const Dali::Property::Value& attributes ) override;
+  void OnDoAction( const Dali::Property::Index actionName, const Dali::Property::Value& attributes ) override;
 
 protected:
 
@@ -227,27 +227,27 @@ protected:
   /**
    * @copydoc Visual::Base::DoSetProperties
    */
-  virtual void DoSetProperties( const Property::Map& propertyMap );
+  void DoSetProperties( const Property::Map& propertyMap ) override;
 
   /**
    * @copydoc Visual::Base::DoSetOnStage
    */
-  virtual void DoSetOnStage( Actor& actor );
+  void DoSetOnStage( Actor& actor ) override;
 
   /**
    * @copydoc Visual::Base::DoSetOffStage
    */
-  virtual void DoSetOffStage( Actor& actor ) ;
+  void DoSetOffStage( Actor& actor ) override;
 
   /**
    * @copydoc Visual::Base::OnSetTransform
    */
-  virtual void OnSetTransform() ;
+  void OnSetTransform() override;
 
   /**
    * @copydoc Visual::Base::IsResourceReady
    */
-  virtual bool IsResourceReady() const;
+  bool IsResourceReady() const override;
 
 public:
 
@@ -257,7 +257,7 @@ public:
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  virtual void UploadCompleted() override;
+  void UploadCompleted() override;
 
   /**
    * @copydoc TextureUploadObserver::UploadCompleted
@@ -265,8 +265,8 @@ public:
    * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
    * This callback is the place to add the renderer as it would be called once the loading is finished.
    */
-  virtual void UploadComplete( bool success, int32_t textureId, TextureSet textureSet,
-                               bool usingAtlas, const Vector4& atlasRectangle, bool preMultiplied ) override;
+  void UploadComplete( bool success, int32_t textureId, TextureSet textureSet,
+                       bool usingAtlas, const Vector4& atlasRectangle, bool preMultiplied ) override;
 
 private:
 

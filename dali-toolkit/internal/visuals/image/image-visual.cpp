@@ -811,6 +811,7 @@ void ImageVisual::DoSetOffStage( Actor& actor )
   if( mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED )
   {
     RemoveTexture(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
+    mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
   }
 
   if( mImageUrl.IsValid() )

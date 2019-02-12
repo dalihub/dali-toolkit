@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,10 @@ const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
 void TestDebugVisual( Visual::Base& visual, Visual::Type actualType, Vector2 expectedNaturalSize )
 {
-  DALI_TEST_CHECK( &typeid( Toolkit::Internal::WireframeVisual ) == &typeid( GetImplementation(visual) ) );
+  {
+    auto& impl = GetImplementation( visual );
+    DALI_TEST_CHECK( &typeid( Toolkit::Internal::WireframeVisual ) == &typeid( impl ) );
+  }
 
   Vector2 naturalSize;
   visual.GetNaturalSize( naturalSize );
@@ -177,14 +180,17 @@ int UtcDaliDebugRenderingGetVisual1(void)
 
   Visual::Base textVisual = factory.CreateVisual( propertyMap7 );
   DALI_TEST_CHECK( textVisual );
-  DALI_TEST_CHECK( &typeid( Toolkit::Internal::WireframeVisual ) == &typeid( GetImplementation(textVisual) ) );
+  {
+    auto&& impl = GetImplementation( textVisual );
+    DALI_TEST_CHECK( &typeid( Toolkit::Internal::WireframeVisual ) == &typeid( impl ) );
+  }
 
   Vector2 naturalSize;
   textVisual.GetNaturalSize( naturalSize );
   DALI_TEST_EQUALS( naturalSize, Vector2( 80.f, 20.f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   const float height = textVisual.GetHeightForWidth( 40.f );
-  DALI_TEST_EQUALS( height, 40.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( height, 38.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   // Test that NPatchVisual is replaced with debug visual
   // TEST_NPATCH_FILE_NAME: image_01.9.jpg

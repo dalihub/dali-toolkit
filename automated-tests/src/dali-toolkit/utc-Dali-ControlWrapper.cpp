@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,9 +78,11 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
           mDaliProperty( Property::INVALID_INDEX ),
           mSizeSet( Vector3::ZERO ),
           mTargetSize( Vector3::ZERO ),
-          mNego( nego )
+          mNego( nego ),
+          mDepth( 0u )
   {
   }
+
   /**
    * Destructor
    */
@@ -95,6 +97,7 @@ struct TestCustomControl : public Toolkit::Internal::ControlWrapper
     OnInitialize( name );
   }
 
+  using Control::OnInitialize; ///< To tell the compiler that we really do want to overload OnInitialize in this class & were not trying to override it
   virtual void OnInitialize( const char* name ) {}
 
   // From Toolkit::Internal::ControlWrapper

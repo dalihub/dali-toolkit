@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ using namespace Text;
 namespace
 {
 
-const char* const OPTION_SELECT_WORD("option-select_word"); // "Select Word" popup option.
 const char* const OPTION_SELECT_ALL("option-select_all");   // "Select All" popup option.
 const char* const OPTION_CUT("optionCut");                  // "Cut" popup option.
 const char* const OPTION_COPY("optionCopy");                // "Copy" popup option.
@@ -559,8 +558,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // single line, line spacing = 0px
   {
     const float EXPECTED_SPACING = 0.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 326.0f, 19.0f);
-    const Vector3 EXPECTED_NATURAL_SIZE( 326.0f, 20.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 343.0f, 19.0f);
+    const Vector3 EXPECTED_NATURAL_SIZE( 344.0f, 20.0f, 0.0f );
 
     controller->SetText(textSingle);
     controller->Relayout(size);
@@ -578,8 +577,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // single line, line spacing = 20px
   {
     const float EXPECTED_SPACING = 20.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 326.0f, 19.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 326.0f, 40.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 343.0f, 19.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 344.0f, 40.0f, 0.0f );
 
     controller->SetText(textSingle);
     controller->Relayout(size);
@@ -598,8 +597,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // multi-line, line spacing = 0px
   {
     const float EXPECTED_SPACING = 0.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 318.0f, 39.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 58.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 333.0f, 39.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 120.0f, 58.0f, 0.0f );
 
     controller->SetText(textMulti);
     controller->Relayout(size);
@@ -618,8 +617,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // multi-line, line spacing = 20px
   {
     const float EXPECTED_SPACING = 20.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 115.0f, 57.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 118.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 119.0f, 57.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 120.0f, 118.0f, 0.0f );
 
     controller->SetText(textMulti);
     controller->Relayout(size);
@@ -638,8 +637,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // multi-line, line spacing = 30px
   {
     const float EXPECTED_SPACING = 30.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 115.0f, 117.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 148.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 119.0f, 117.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 120.0f, 148.0f, 0.0f );
 
     controller->SetText(textMulti);
     controller->Relayout(size);
