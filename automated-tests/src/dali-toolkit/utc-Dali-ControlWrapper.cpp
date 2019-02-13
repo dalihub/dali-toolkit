@@ -51,6 +51,15 @@ void utc_dali_toolkit_control_wrapper_cleanup(void)
 namespace
 {
 bool gOnRelayout = false;
+
+static bool gKeyInputFocusCallBackCalled;
+
+static void TestKeyInputFocusCallback( Control control )
+{
+  tet_infoline(" TestKeyInputFocusCallback");
+
+  gKeyInputFocusCallBackCalled = true;
+}
 } // namespace
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -807,6 +816,26 @@ int UtcDaliControlWrapperAnimateVisual(void)
   }
 
   DALI_TEST_EQUALS( objectDestructionTracker.IsDestroyed(), true, TEST_LOCATION ); // Should be destroyed
+
+  END_TEST;
+}
+
+int UtcDaliControlWrapperEmitKeyFocusSignal(void)
+{
+  ToolkitTestApplication application;
+
+  Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
+  ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
+
+  gKeyInputFocusCallBackCalled = false;
+  controlWrapper.KeyInputFocusGainedSignal().Connect(&TestKeyInputFocusCallback);
+
+  application.SendNotification();
+  application.Render();
+
+  controlWrapperImpl->EmitKeyInputFocusSignal( true );
+
+  DALI_TEST_CHECK( gKeyInputFocusCallBackCalled );
 
   END_TEST;
 }
