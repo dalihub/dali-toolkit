@@ -221,16 +221,8 @@ void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
   // Hold the weak handle of the placement actor and delay the adding of renderer until the rasterization is finished.
   mPlacementActor = actor;
 
-  if( mVectorRasterizeThread )
-  {
-    // We can use the previous rendered image
-    mVectorRasterizeThread->SetRenderer( mImpl->mRenderer );
-
-    actor.AddRenderer( mImpl->mRenderer );
-    mPlacementActor.Reset();
-
-    ResourceReady( Toolkit::Visual::ResourceStatus::READY );
-  }
+  // This visual needs it's size set before it can be rasterized hence set ResourceReady once on stage
+  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 void AnimatedVectorImageVisual::DoSetOffStage( Actor& actor )
@@ -370,8 +362,6 @@ void AnimatedVectorImageVisual::OnResourceReady()
 
     Stage::GetCurrent().KeepRendering( 0.0f );
   }
-
-  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
 }
 
 void AnimatedVectorImageVisual::OnAnimationFinished()
