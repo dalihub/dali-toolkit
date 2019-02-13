@@ -49,20 +49,16 @@ public:
    * @brief Constructor.
    *
    * @param[in] url The url of the vector animation file
+   * @param[in] renderer The renderer used to render the image
+   * @param[in] width The width of the content
+   * @param[in] height The height of the content
    */
-  VectorRasterizeThread( const std::string& url );
+  VectorRasterizeThread( const std::string& url, Renderer renderer, uint32_t width, uint32_t height );
 
   /**
    * @brief Destructor.
    */
   virtual ~VectorRasterizeThread();
-
-  /**
-   * @brief Sets the renderer used to display the result image.
-   *
-   * @param[in] renderer The renderer used to display the result image
-   */
-  void SetRenderer( Renderer renderer );
 
   /**
    * @brief Sets the target image size.

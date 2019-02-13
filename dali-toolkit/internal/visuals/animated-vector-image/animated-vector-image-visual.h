@@ -171,8 +171,6 @@ private:
 
   int32_t                                      mLoopCount;
   DevelAnimatedVectorImageVisual::Action::Type mActionStatus;
-
-  bool                                         mNeedToSetRenderer;
 };
 
 } // namespace Internal

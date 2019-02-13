@@ -44,7 +44,7 @@ Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging,
 
 } // unnamed namespace
 
-VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
+VectorRasterizeThread::VectorRasterizeThread( const std::string& url, Renderer renderer, uint32_t width, uint32_t height )
 : mUrl( url ),
   mVectorRenderer(),
   mConditionalWait(),
@@ -57,8 +57,8 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
   mTotalFrame( 0 ),
   mStartFrame( 0 ),
   mEndFrame( 0 ),
-  mWidth( 0 ),
-  mHeight( 0 ),
+  mWidth( width ),
+  mHeight( height ),
   mLoopCount( LOOP_FOREVER ),
   mCurrentLoop( 0 ),
   mNeedRender( false ),
@@ -66,7 +66,7 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
   mResourceReady( false ),
   mLogFactory( Dali::Adaptor::Get().GetLogFactory() )
 {
-  mVectorRenderer = VectorAnimationRenderer::New( mUrl );
+  mVectorRenderer = VectorAnimationRenderer::New( mUrl, renderer, width, height );
 }
 
 VectorRasterizeThread::~VectorRasterizeThread()
@@ -100,18 +100,6 @@ void VectorRasterizeThread::Run()
   {
     Rasterize();
   }
-}
-
-void VectorRasterizeThread::SetRenderer( Renderer renderer )
-{
-  ConditionalWait::ScopedLock lock( mConditionalWait );
-
-  mVectorRenderer.SetRenderer( renderer );
-
-  // Need to trigger resource ready again
-  mResourceReady = false;
-
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetRenderer\n" );
 }
 
 void VectorRasterizeThread::SetSize( uint32_t width, uint32_t height )
