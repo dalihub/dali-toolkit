@@ -142,6 +142,18 @@ public:
    */
   bool IsResourceReady() const;
 
+  /**
+   * @brief Sets the progress of the animation.
+   * @param[in] progress The new progress as a normalized value between [0,1] or between the play range if specified.
+   */
+  void SetCurrentProgress( float progress );
+
+  /**
+   * @brief Retrieves the current progress of the animation.
+   * @return The current progress as a normalized value between [0,1]
+   */
+  float GetCurrentProgress() const;
+
 protected:
 
   /**

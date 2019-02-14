@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_LAYOUT_CONTROLLER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  */
 #include <list>
 #include <dali/public-api/object/base-object.h>
-#include <dali/integration-api/core.h>
+#include <dali/integration-api/processor-interface.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
