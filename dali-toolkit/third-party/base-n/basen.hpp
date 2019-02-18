@@ -20,6 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 **/
+
+/*
+ * In the original file, static analysis complains about return type from decode methods
+ * not being testable against Error constant (due to difference of type sizes).
+ *
+ * Modified decode methods to return error through an out parameter instead.
+ */
+
 #ifndef BASEN_HPP
 #define BASEN_HPP
 
@@ -92,14 +100,20 @@ struct b16_conversion_traits
         return dictionary[index];
     }
 
-    static char decode(char c)
+    /*
+     * In the original file, error code was passed through return value, but used int -1 (out of range of char).
+     * Separated error value from return value by using out parameter.
+     */
+    static char decode(char c, bool& error)
     {
+        error=false;
         if (c >= '0' && c <= '9') {
             return c - '0';
         } else if (c >= 'A' && c <= 'F') {
             return c - 'A' + 10;
         }
-        return Error;
+        error=true;
+        return 0;
     }
 };
 
@@ -117,14 +131,20 @@ struct b32_conversion_traits
         return dictionary[index];
     }
 
-    static char decode(char c)
+    /*
+     * In the original file, error code was passed through return value, but used int -1 (out of range of char).
+     * Separated error value from return value by using out parameter.
+     */
+    static char decode(char c, bool& error)
     {
+        error=false;
         if (c >= 'A' && c <= 'Z') {
             return c - 'A';
         } else if (c >= '2' && c <= '7') {
             return c - '2' + 26;
         }
-        return Error;
+        error=true;
+        return 0;
     }
 };
 
@@ -142,8 +162,13 @@ struct b64_conversion_traits
         return dictionary[index];
     }
 
-    static char decode(char c)
+    /*
+     * In the original file, error code was passed through return value, but used int -1 (out of range of char).
+     * Separated error value from return value by using out parameter.
+     */
+    static char decode(char c, bool& error)
     {
+        error=false;
         const int alph_len = 26;
         if (c >= 'A' && c <= 'Z') {
             return c - 'A';
@@ -156,7 +181,8 @@ struct b64_conversion_traits
         } else if (c == '/') {
             return c - '/' + alph_len * 2 + 11;
         }
-        return Error;
+        error=true;
+        return 0;
     }
 };
 
@@ -172,8 +198,14 @@ void decode(Iter1 start, Iter1 end, Iter2 out)
             ++iter;
             continue;
         }
-        char value = ConversionTraits::decode(*iter);
-        if (value == Error) {
+
+        /*
+         * In the original file, error value was out of range of return type.
+         * Separated error value from return value by using out parameter.
+         */
+        bool error=false;
+        char value = ConversionTraits::decode(*iter, error);
+        if (error) {
             // malformed data, but let's go on...
             ++iter;
             continue;
