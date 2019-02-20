@@ -58,21 +58,41 @@ void GetGlyphsMetrics( GlyphIndex glyphIndex,
   const GlyphInfo& firstGlyph = *( glyphsBuffer + glyphIndex );
 
   Text::FontMetrics fontMetrics;
-  metrics->GetFontMetrics( firstGlyph.fontId, fontMetrics );
+  if( 0u != firstGlyph.fontId )
+  {
+    metrics->GetFontMetrics( firstGlyph.fontId, fontMetrics );
+  }
+  else if( 0u != firstGlyph.index )
+  {
+    // It may be an embedded image.
+    fontMetrics.ascender = firstGlyph.height;
+    fontMetrics.descender = 0.f;
+    fontMetrics.height = fontMetrics.ascender;
+  }
+
+  const bool isItalicFont = metrics->HasItalicStyle( firstGlyph.fontId );
 
   glyphMetrics.fontId = firstGlyph.fontId;
   glyphMetrics.fontHeight = fontMetrics.height;
-  glyphMetrics.width = firstGlyph.width;
+  glyphMetrics.width = firstGlyph.width + ( ( firstGlyph.isItalicRequired && !isItalicFont ) ? static_cast<unsigned int>( TextAbstraction::FontClient::DEFAULT_ITALIC_ANGLE * static_cast<float>( firstGlyph.height ) ) : 0u );
   glyphMetrics.advance = firstGlyph.advance;
   glyphMetrics.ascender = fontMetrics.ascender;
   glyphMetrics.xBearing = firstGlyph.xBearing;
 
-  for( unsigned int i = 1u; i < numberOfGlyphs; ++i )
+  if( 1u < numberOfGlyphs )
   {
-    const GlyphInfo& glyphInfo = *( glyphsBuffer + glyphIndex + i );
+    const float widthInit = firstGlyph.xBearing;
 
-    glyphMetrics.advance += glyphInfo.advance;
-    glyphMetrics.width += glyphInfo.width;
+    for( unsigned int i = 1u; i < numberOfGlyphs; ++i )
+    {
+      const GlyphInfo& glyphInfo = *( glyphsBuffer + glyphIndex + i );
+
+      glyphMetrics.width = glyphMetrics.advance + glyphInfo.xBearing + glyphInfo.width + ( ( firstGlyph.isItalicRequired && !isItalicFont ) ? static_cast<unsigned int>( TextAbstraction::FontClient::DEFAULT_ITALIC_ANGLE * static_cast<float>( firstGlyph.height ) ) : 0u );
+      glyphMetrics.advance += glyphInfo.advance;
+
+    }
+
+    glyphMetrics.width -= widthInit;
   }
 }
 

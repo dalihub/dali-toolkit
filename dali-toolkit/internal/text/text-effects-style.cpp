@@ -175,7 +175,7 @@ bool ParseOutlineProperties( const Property::Map& underlinePropertiesMap,
                                bool& colorDefined,
                                Vector4& color,
                                bool& widthDefined,
-                               unsigned int& width )
+                               uint16_t& width )
 {
   const unsigned int numberOfItems = underlinePropertiesMap.Count();
 
@@ -194,7 +194,7 @@ bool ParseOutlineProperties( const Property::Map& underlinePropertiesMap,
     {
       /// Width key.
       widthDefined = true;
-      width = static_cast<unsigned int>( valueGet.second.Get<float>() );
+      width = static_cast<uint16_t>( valueGet.second.Get<float>() );
     }
   }
 
@@ -587,7 +587,7 @@ bool SetOutlineProperties( ControllerPtr controller, const Property::Value& valu
         bool colorDefined = false;
         Vector4 color;
         bool widthDefined = false;
-        unsigned int width = 0u;
+        uint16_t width = 0u;
 
         bool empty = true;
 
@@ -668,7 +668,7 @@ void GetOutlineProperties( ControllerPtr controller, Property::Value& value, Eff
         else
         {
           const Vector4& color = controller->GetOutlineColor();
-          const unsigned int width = controller->GetOutlineWidth();
+          const uint16_t width = controller->GetOutlineWidth();
 
           Property::Map map;
           map.Insert( COLOR_KEY, color );

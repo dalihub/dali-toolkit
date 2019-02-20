@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,9 +111,13 @@ void ShapeText( const Vector<Character>& text,
   // There is no way to know the number of glyphs before shaping the text.
   // To avoid reallocations it's reserved space for a slightly biger number of glyphs than the number of characters.
 
+  GlyphInfo glyphInfo;
+  glyphInfo.isItalicRequired = false;
+  glyphInfo.isBoldRequired = false;
+
   const Length currentNumberOfGlyphs = glyphs.Count();
   const Length numberOfGlyphsReserved = static_cast<Length>( numberOfCharacters * 1.3f );
-  glyphs.Resize( currentNumberOfGlyphs + numberOfGlyphsReserved );
+  glyphs.Resize( currentNumberOfGlyphs + numberOfGlyphsReserved, glyphInfo );
   glyphToCharacterMap.Resize( currentNumberOfGlyphs + numberOfGlyphsReserved );
 
   // The actual number of glyphs.
@@ -137,8 +141,8 @@ void ShapeText( const Vector<Character>& text,
 
     currentFontId = fontRun.fontId;
     currentScript = scriptRun.script;
-    bool softwareItalic = fontRun.softwareItalic;
-    bool softwareBold = fontRun.softwareBold;
+    const bool isItalicRequired = fontRun.isItalicRequired;
+    const bool isBoldRequired = fontRun.isBoldRequired;
 
     // Get the min index to the last character of both runs.
     CharacterIndex currentIndex = min( fontRun.characterRun.characterIndex + fontRun.characterRun.numberOfCharacters,
@@ -174,8 +178,8 @@ void ShapeText( const Vector<Character>& text,
     Vector<CharacterIndex> tmpGlyphToCharacterMap;
 
     GlyphInfo glyphInfo;
-    glyphInfo.softwareItalic = softwareItalic;
-    glyphInfo.softwareBold = softwareBold;
+    glyphInfo.isItalicRequired = isItalicRequired;
+    glyphInfo.isBoldRequired = isBoldRequired;
 
     tmpGlyphs.Resize( numberOfGlyphs, glyphInfo );
     tmpGlyphToCharacterMap.Resize( numberOfGlyphs );

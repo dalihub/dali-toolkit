@@ -47,6 +47,8 @@ devel_api_src_files = \
   $(devel_api_src_dir)/layouting/layout-transition-data.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
   $(devel_api_src_dir)/styling/style-manager-devel.cpp \
+  $(devel_api_src_dir)/text/bitmap-font.cpp \
+  $(devel_api_src_dir)/text/text-utils-devel.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-cross-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-effect.cpp \
   $(devel_api_src_dir)/transition-effects/cube-transition-fold-effect.cpp \
@@ -182,7 +184,9 @@ devel_api_text_controls_header_files = \
   $(devel_api_src_dir)/controls/text-controls/text-style-properties-devel.h
 
 devel_api_text_header_files = \
-  $(devel_api_src_dir)/text/text-enumerations-devel.h
+  $(devel_api_src_dir)/text/text-enumerations-devel.h \
+  $(devel_api_src_dir)/text/bitmap-font.h \
+  $(devel_api_src_dir)/text/text-utils-devel.h
 
 devel_api_tool_bar_header_files = \
   $(devel_api_src_dir)/controls/tool-bar/tool-bar.h

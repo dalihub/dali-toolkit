@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -435,6 +435,8 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
   currentFontRun.characterRun.characterIndex = startIndex;
   currentFontRun.characterRun.numberOfCharacters = 0u;
   currentFontRun.fontId = 0u;
+  currentFontRun.isBoldRequired = false;
+  currentFontRun.isItalicRequired = false;
 
   // Get the font client.
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
@@ -448,16 +450,13 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
   bool isPreviousEmojiScript = false;
 
-  // Description of fallback font which is selected at current iteration.
-  TextAbstraction::FontDescription selectedFontDescription;
-
   CharacterIndex lastCharacter = startIndex + numberOfCharacters;
   for( Length index = startIndex; index < lastCharacter; ++index )
   {
     // Get the current character.
     const Character character = *( textBuffer + index );
-    bool needSoftwareBoldening = false;
-    bool needSoftwareItalic = false;
+    bool isItalicRequired = false;
+    bool isBoldRequired = false;
 
     // new description for current character
     TextAbstraction::FontDescription currentFontDescription;
@@ -536,6 +535,8 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       currentFontRun.characterRun.characterIndex = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
       currentFontRun.characterRun.numberOfCharacters = 0u;
       currentFontRun.fontId = fontId;
+      currentFontRun.isItalicRequired = false;
+      currentFontRun.isBoldRequired = false;
     }
 
     // If the given font is not valid, it means either:
@@ -676,22 +677,17 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
     }
 #endif
 
-    if( fontId != currentFontRun.fontId )
-    {
-      fontClient.GetDescription(fontId,selectedFontDescription);
-    }
+    // Whether bols style is required.
+    isBoldRequired = ( currentFontDescription.weight >= TextAbstraction::FontWeight::BOLD );
 
-    // Developer sets bold to character but selected font cannot support it
-    needSoftwareBoldening = ( currentFontDescription.weight >= TextAbstraction::FontWeight::BOLD ) && ( selectedFontDescription.weight < TextAbstraction::FontWeight::BOLD );
-
-    // Developer sets italic to character but selected font cannot support it
-    needSoftwareItalic = ( currentFontDescription.slant == TextAbstraction::FontSlant::ITALIC ) && ( selectedFontDescription.slant < TextAbstraction::FontSlant::ITALIC );
+    // Whether italic style is required.
+    isItalicRequired = ( currentFontDescription.slant >= TextAbstraction::FontSlant::ITALIC );
 
     // The font is now validated.
     if( ( fontId != currentFontRun.fontId ) ||
         isNewParagraphCharacter ||
         // If font id is same as previous but style is diffrent, initialize new one
-        ( ( fontId == currentFontRun.fontId ) && ( ( needSoftwareBoldening != currentFontRun.softwareBold ) || ( needSoftwareItalic != currentFontRun.softwareItalic ) ) ) )
+        ( ( fontId == currentFontRun.fontId ) && ( ( isBoldRequired != currentFontRun.isBoldRequired ) || ( isItalicRequired != currentFontRun.isItalicRequired ) ) ) )
     {
       // Current run needs to be stored and a new one initialized.
 
@@ -706,8 +702,8 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
       currentFontRun.characterRun.characterIndex = currentFontRun.characterRun.characterIndex + currentFontRun.characterRun.numberOfCharacters;
       currentFontRun.characterRun.numberOfCharacters = 0u;
       currentFontRun.fontId = fontId;
-      currentFontRun.softwareItalic = needSoftwareItalic;
-      currentFontRun.softwareBold = needSoftwareBoldening;
+      currentFontRun.isBoldRequired = isBoldRequired;
+      currentFontRun.isItalicRequired = isItalicRequired;
     }
 
     // Add one more character to the run.
