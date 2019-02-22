@@ -36,6 +36,7 @@ using namespace Text;
 
 namespace
 {
+
   ///////////////////////////////////////////////////////////
 
   struct TokenComparisonData
@@ -182,8 +183,19 @@ namespace
 
     Vector<ColorRun> colorRuns;
     Vector<FontDescriptionRun> fontRuns;
-    MarkupProcessData markupProcessData( colorRuns, fontRuns );
+    Vector<EmbeddedItem> items;
+    MarkupProcessData markupProcessData( colorRuns, fontRuns, items );
     ProcessMarkupString( data.xHTMLEntityString, markupProcessData );
+
+    for( Vector<EmbeddedItem>::Iterator it = items.Begin(),
+           endIt = items.End();
+         it != endIt;
+         ++it )
+    {
+      EmbeddedItem& item = *it;
+      delete[] item.url;
+    }
+    items.Clear();
 
     if( markupProcessData.markupProcessedText != data.expectedString )
     {

@@ -663,6 +663,7 @@ void TextureManager::LoadOrQueueTexture( TextureInfo& textureInfo, TextureUpload
                                   textureInfo.useAtlas, textureInfo.atlasRect,
                                   textureInfo.preMultiplied );
       }
+      break;
     }
     case CANCELLED:
     case LOAD_FINISHED:

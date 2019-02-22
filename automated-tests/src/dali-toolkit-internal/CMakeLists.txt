@@ -16,6 +16,7 @@ SET(TC_SOURCES
  utc-Dali-PropertyHelper.cpp
  utc-Dali-SizeNegotiationMapper.cpp
  utc-Dali-Text-CharacterSetConversion.cpp
+ utc-Dali-Text-Circular.cpp
  utc-Dali-Text-Controller.cpp
  utc-Dali-Text-Cursor.cpp
  utc-Dali-Text-Layout.cpp

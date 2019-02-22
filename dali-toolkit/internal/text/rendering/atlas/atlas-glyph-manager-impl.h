@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_IMPL_H__
-#define __DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_IMPL_H__
+#ifndef DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_IMPL_H
+#define DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_IMPL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,9 +51,11 @@ public:
   struct GlyphRecordEntry
   {
     Text::GlyphIndex mIndex;
-    uint32_t mOutlineWidth;
     uint32_t mImageId;
     int32_t mCount;
+    uint16_t mOutlineWidth;
+    bool isItalic:1;
+    bool isBold:1;
   };
 
   struct FontGlyphRecord
@@ -71,7 +73,7 @@ public:
    * @copydoc Toolkit::AtlasGlyphManager::Add
    */
   void Add( const Text::GlyphInfo& glyph,
-            const uint32_t outlineWidth,
+            const Toolkit::AtlasGlyphManager::GlyphStyle& style,
             const PixelData& bitmap,
             Dali::Toolkit::AtlasManager::AtlasSlot& slot );
 
@@ -87,7 +89,7 @@ public:
    */
   bool IsCached( Text::FontId fontId,
                  Text::GlyphIndex index,
-                 uint32_t outlineWidth,
+                 const Toolkit::AtlasGlyphManager::GlyphStyle& style,
                  Dali::Toolkit::AtlasManager::AtlasSlot& slot );
 
   /**
@@ -108,7 +110,7 @@ public:
   /**
    * @copydoc toolkit::AtlasGlyphManager::AdjustReferenceCount
    */
-  void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, uint32_t outlineWidth, int32_t delta );
+  void AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, const Toolkit::AtlasGlyphManager::GlyphStyle& style, int32_t delta );
 
   /**
    * @copydoc Toolkit::AtlasGlyphManager::GetTextures
@@ -158,4 +160,4 @@ inline Internal::AtlasGlyphManager& GetImplementation(Toolkit::AtlasGlyphManager
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_IMPL_H__
+#endif // DALI_TOOLKIT_ATLAS_GLYPH_MANAGER_IMPL_H

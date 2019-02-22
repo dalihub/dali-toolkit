@@ -372,9 +372,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   Property::Map underlineMapSet;
   Property::Map underlineMapGet;
 
-  underlineMapSet.Insert( "enable", "false" );
-  underlineMapSet.Insert( "color", "blue" );
-  underlineMapSet.Insert( "height", "0" );
+  underlineMapSet.Insert( "enable", false );
+  underlineMapSet.Insert( "color", Color::BLUE );
+  underlineMapSet.Insert( "height", 0 );
 
   underlineMapGet = label.GetProperty<Property::Map>( TextLabel::Property::UNDERLINE );
   DALI_TEST_EQUALS( underlineMapGet.Count(), underlineMapSet.Count(), TEST_LOCATION );
@@ -465,9 +465,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
 
   // Check the underline property
   underlineMapSet.Clear();
-  underlineMapSet.Insert( "enable", "true" );
-  underlineMapSet.Insert( "color", "red" );
-  underlineMapSet.Insert( "height", "1" );
+  underlineMapSet.Insert( "enable", true );
+  underlineMapSet.Insert( "color", Color::RED );
+  underlineMapSet.Insert( "height", 1 );
 
   label.SetProperty( TextLabel::Property::UNDERLINE, underlineMapSet );
 
@@ -479,9 +479,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   DALI_TEST_EQUALS( DaliTestCheckMaps( underlineMapGet, underlineMapSet ), true, TEST_LOCATION );
 
   underlineMapSet.Clear();
-  underlineMapSet.Insert( Toolkit::DevelText::Underline::Property::ENABLE, "true" );
-  underlineMapSet.Insert( Toolkit::DevelText::Underline::Property::COLOR, "green" );
-  underlineMapSet.Insert( Toolkit::DevelText::Underline::Property::HEIGHT, "2" );
+  underlineMapSet.Insert( Toolkit::DevelText::Underline::Property::ENABLE, true );
+  underlineMapSet.Insert( Toolkit::DevelText::Underline::Property::COLOR, Color::GREEN );
+  underlineMapSet.Insert( Toolkit::DevelText::Underline::Property::HEIGHT, 2 );
 
   label.SetProperty( TextLabel::Property::UNDERLINE, underlineMapSet );
 
@@ -496,9 +496,9 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   underlineMapSet.Clear();
 
   Property::Map underlineDisabledMapGet;
-  underlineDisabledMapGet.Insert( "enable", "false" );
-  underlineDisabledMapGet.Insert( "color", "green" );
-  underlineDisabledMapGet.Insert( "height", "2" );
+  underlineDisabledMapGet.Insert( "enable", false );
+  underlineDisabledMapGet.Insert( "color", Color::GREEN );
+  underlineDisabledMapGet.Insert( "height", 2 );
 
   label.SetProperty( TextLabel::Property::UNDERLINE, underlineMapSet );
 
@@ -646,8 +646,8 @@ int UtcDaliToolkitTextlabelAtlasRenderP(void)
   label.SetProperty( TextLabel::Property::MULTI_LINE, true );
 
   Property::Map underlineMap;
-  underlineMap.Insert( "enable", "true" );
-  underlineMap.Insert( "color", "red" );
+  underlineMap.Insert( "enable", true );
+  underlineMap.Insert( "color", Color::RED );
   label.SetProperty( TextLabel::Property::UNDERLINE, underlineMap );
 
   Property::Map shadowMap;

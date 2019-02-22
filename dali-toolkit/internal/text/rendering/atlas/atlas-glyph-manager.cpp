@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,11 +69,11 @@ AtlasGlyphManager::AtlasGlyphManager(Internal::AtlasGlyphManager *impl)
 }
 
 void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
-                             const uint32_t outlineWidth,
+                             const GlyphStyle& style,
                              const PixelData& bitmap,
                              AtlasManager::AtlasSlot& slot )
 {
-  GetImplementation(*this).Add( glyph, outlineWidth, bitmap, slot );
+  GetImplementation(*this).Add( glyph, style, bitmap, slot );
 }
 
 void AtlasGlyphManager::GenerateMeshData( uint32_t imageId,
@@ -87,10 +87,10 @@ void AtlasGlyphManager::GenerateMeshData( uint32_t imageId,
 
 bool AtlasGlyphManager::IsCached( Text::FontId fontId,
                                   Text::GlyphIndex index,
-                                  uint32_t outlineWidth,
+                                  const GlyphStyle& style,
                                   AtlasManager::AtlasSlot& slot )
 {
-  return GetImplementation(*this).IsCached( fontId, index, outlineWidth, slot );
+  return GetImplementation(*this).IsCached( fontId, index, style, slot );
 }
 
 void AtlasGlyphManager::SetNewAtlasSize( uint32_t width, uint32_t height, uint32_t blockWidth, uint32_t blockHeight )
@@ -118,9 +118,9 @@ const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
   return GetImplementation(*this).GetMetrics();
 }
 
-void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, uint32_t outlineWidth, int32_t delta )
+void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, const GlyphStyle& style, int32_t delta )
 {
-  GetImplementation(*this).AdjustReferenceCount( fontId, index, outlineWidth, delta );
+  GetImplementation(*this).AdjustReferenceCount( fontId, index, style, delta );
 }
 
 } // namespace Toolkit

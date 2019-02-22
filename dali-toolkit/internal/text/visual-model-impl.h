@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H__
-#define __DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H__
+#ifndef DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H
+#define DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -320,14 +320,14 @@ public:
    *
    * @param[in] width The width in pixels of the outline, 0 indicates no outline
    */
-  void SetOutlineWidth( unsigned int width );
+  void SetOutlineWidth( uint16_t width );
 
   /**
    * @brief Retrieves the width of an outline
    *
    * @return The width of the outline.
    */
-  unsigned int GetOutlineWidth() const;
+  uint16_t GetOutlineWidth() const;
 
   /**
    * @brief Sets the text's background color.
@@ -398,8 +398,8 @@ public:
   Size                   mControlSize;          ///< The size of the UI control.
   Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
   float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
-  unsigned int           mOutlineWidth;         ///< Width of outline.
   float                  mShadowBlurRadius;     ///< Blur radius of shadow, 0 indicates no blur.
+  uint16_t           mOutlineWidth;         ///< Width of outline.
 
 private:
 
@@ -422,4 +422,4 @@ public:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H__
+#endif // DALI_TOOLKIT_TEXT_VISUAL_MODEL_IMPL_H

@@ -1,5 +1,5 @@
-#ifndef DALI_TOOLKIT_TEXT_FONT_RUN_H
-#define DALI_TOOLKIT_TEXT_FONT_RUN_H
+#ifndef DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_EMBEDDED_ITEM_H
+#define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_EMBEDDED_ITEM_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -18,9 +18,6 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/character-run.h>
-
 namespace Dali
 {
 
@@ -30,16 +27,16 @@ namespace Toolkit
 namespace Text
 {
 
+struct Tag;
+struct EmbeddedItem;
+
 /**
- * @brief Run of characters with the same font.
+ * @brief Retrieves the @e embedded @e item from the @p tag.
+ *
+ * @param[in] tag The embedded item tag and its attributes.
+ * @param[in,out] embeddedItem The embedded item.
  */
-struct FontRun
-{
-  CharacterRun characterRun;       ///< The initial character index and the number of characters of the run.
-  FontId       fontId;             ///< Font id of the run.
-  bool         isItalicRequired:1; ///< Whether the italic style is required.
-  bool         isBoldRequired:1;   ///< Whether the bold style is required.
-};
+void ProcessEmbeddedItem( const Tag& tag, EmbeddedItem& embeddedItem );
 
 } // namespace Text
 
@@ -47,4 +44,4 @@ struct FontRun
 
 } // namespace Dali
 
-#endif // DALI_TOOLKIT_TEXT_FONT_RUN_H
+#endif // DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_EMBEDDED_ITEM_H
