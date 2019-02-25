@@ -558,8 +558,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // single line, line spacing = 0px
   {
     const float EXPECTED_SPACING = 0.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 343.0f, 19.0f);
-    const Vector3 EXPECTED_NATURAL_SIZE( 344.0f, 20.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 342.0f, 19.0f);
+    const Vector3 EXPECTED_NATURAL_SIZE( 342.0f, 20.0f, 0.0f );
 
     controller->SetText(textSingle);
     controller->Relayout(size);
@@ -577,8 +577,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // single line, line spacing = 20px
   {
     const float EXPECTED_SPACING = 20.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 343.0f, 19.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 344.0f, 40.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 342.0f, 19.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 342.0f, 40.0f, 0.0f );
 
     controller->SetText(textSingle);
     controller->Relayout(size);
@@ -597,8 +597,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // multi-line, line spacing = 0px
   {
     const float EXPECTED_SPACING = 0.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 333.0f, 39.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 120.0f, 58.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 332.0f, 39.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 118.0f, 58.0f, 0.0f );
 
     controller->SetText(textMulti);
     controller->Relayout(size);
@@ -617,8 +617,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // multi-line, line spacing = 20px
   {
     const float EXPECTED_SPACING = 20.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 119.0f, 57.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 120.0f, 118.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 118.0f, 57.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 118.0f, 118.0f, 0.0f );
 
     controller->SetText(textMulti);
     controller->Relayout(size);
@@ -637,8 +637,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // multi-line, line spacing = 30px
   {
     const float EXPECTED_SPACING = 30.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 119.0f, 117.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 120.0f, 148.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 118.0f, 117.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 118.0f, 148.0f, 0.0f );
 
     controller->SetText(textMulti);
     controller->Relayout(size);

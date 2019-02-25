@@ -56,7 +56,7 @@ const Length LOREM_NUMBER_OF_GLYPHS = 632;
 const Length LOREM_NUMBER_OF_GLYPHS_ELIDED = 395u;
 
 // The expected layout size for UtcDaliTextViewModelGetLayoutSize
-const Size LAYOUT_SIZE( 197.f, 45.f );
+const Size LAYOUT_SIZE( 194.f, 45.f );
 
 // The expected color indices for UtcDaliTextViewModelGetColors
 const ColorIndex COLOR_INDICES[] = { 0u, 0u, 0u, 0u, 0u, 0u, 1u, 1u, 1u, 2u, 2u, 2u, 2u, 2u, 1u, 1u, 1u, 1u, 1u, 3u, 1u, 1u, 1u, 0u, 0u, 0u, 0u };
@@ -586,10 +586,10 @@ int UtcDaliTextViewModelElideText02(void)
   float positions01[] = { 0.f, 8.f, 16.f, 26.f, 33.f, 41.f, 45.f, 54.f, 64.0f };
 
   Size textSize02( 80.f, 100.f );
-  float positions02[] = { 72.f, 63.f, 54.f, 50.f, 43.f, 38.f, 30.f, 23.0f };
+  float positions02[] = { 75.f, 66.f, 57.f, 53.f, 46.f, 41.f, 33.f, 26.0f };
 
   Size textSize03( 80.f, 100.f );
-  float positions03[] = { 78.f, 73.f, 70.f, 65.f, 57.f, 55.f, 51.f, 50.f, 45.f, 35.f, 32.f, 24.f, 21.f };
+  float positions03[] = { 79.f, 74.f, 71.f, 66.f, 58.f, 56.f, 52.f, 51.f, 46.f, 36.f, 33.f, 25.f, 22.f };
 
   Size textSize04( 80.f, 10.f );
   float positions04[] = { 2.f };

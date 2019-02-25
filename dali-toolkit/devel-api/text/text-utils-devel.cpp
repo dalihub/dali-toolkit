@@ -588,6 +588,7 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   layoutParameters.numberOfGlyphs = numberOfGlyphs;
   layoutParameters.startLineIndex = 0u;
   layoutParameters.estimatedNumberOfLines = 1u;
+  layoutParameters.interGlyphExtraAdvance = 0.f;
 
   // Update the visual model.
   Size newLayoutSize;
