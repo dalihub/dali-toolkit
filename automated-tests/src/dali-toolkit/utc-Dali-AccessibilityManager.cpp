@@ -2131,30 +2131,6 @@ int UtcDaliAccessibilityManagerActionZoomSignalN(void)
   END_TEST;
 }
 
-int UtcDaliAccessibilityManagerActionReadIndicatorInformationSignalP(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( " UtcDaliAccessibilityManagerActionReadIndicatorInformationSignalP" );
-
-  AccessibilityManagerSignalHandler callback;
-
-  Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
-  Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
-  accAdaptor.HandleActionEnableEvent();
-
-  AccessibilityManager manager = AccessibilityManager::Get();
-  DALI_TEST_CHECK( manager );
-
-  manager.ActionReadIndicatorInformationSignal().Connect( &callback, &AccessibilityManagerSignalHandler::Callback );
-
-  Dali::AccessibilityAdaptor accessibilityAdaptor = Dali::AccessibilityAdaptor::Get();
-  accessibilityAdaptor.HandleActionReadIndicatorInformationEvent();
-
-  DALI_TEST_EQUALS( callback.GetCalls(), 1u, TEST_LOCATION );
-
-  END_TEST;
-}
-
 int UtcDaliAccessibilityManagerActionReadIndicatorInformationSignalN(void)
 {
   ToolkitTestApplication application;

@@ -19,6 +19,7 @@
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
 
 // INTERNAL INCLUDES
@@ -323,6 +324,8 @@ AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::Actio
 
 AccessibilityManager::AccessibilityActionSignalType& AccessibilityManager::ActionReadIndicatorInformationSignal()
 {
+  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: ActionReadIndicatorInformationSignal is deprecated and will be removed from next release.\n" );
+
   return GetImpl(*this).ActionReadIndicatorInformationSignal();
 }
 
