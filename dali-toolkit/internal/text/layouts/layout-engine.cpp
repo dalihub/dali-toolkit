@@ -117,25 +117,30 @@ struct Engine::Impl
   /**
    * @brief Updates the line ascender and descender with the metrics of a new font.
    *
-   * @param[in] fontId The id of the new font.
+   * @param[in] glyphMetrics The metrics of the new font.
    * @param[in,out] lineLayout The line layout.
    */
-  void UpdateLineHeight( FontId fontId, LineLayout& lineLayout )
+  void UpdateLineHeight( const GlyphMetrics& glyphMetrics, LineLayout& lineLayout )
   {
     Text::FontMetrics fontMetrics;
-    mMetrics->GetFontMetrics( fontId, fontMetrics );
+    if( 0u != glyphMetrics.fontId )
+    {
+      mMetrics->GetFontMetrics( glyphMetrics.fontId, fontMetrics );
+    }
+    else
+    {
+      fontMetrics.ascender = glyphMetrics.fontHeight;
+      fontMetrics.descender = 0.f;
+      fontMetrics.height = fontMetrics.ascender;
+      fontMetrics.underlinePosition = 0.f;
+      fontMetrics.underlineThickness = 1.f;
+    }
 
     // Sets the maximum ascender.
-    if( fontMetrics.ascender > lineLayout.ascender )
-    {
-      lineLayout.ascender = fontMetrics.ascender;
-    }
+    lineLayout.ascender = std::max( lineLayout.ascender, fontMetrics.ascender );
 
     // Sets the minimum descender.
-    if( fontMetrics.descender < lineLayout.descender )
-    {
-      lineLayout.descender = fontMetrics.descender;
-    }
+    lineLayout.descender = std::min( lineLayout.descender, fontMetrics.descender );
 
     // set the line spacing
     lineLayout.lineSpacing = mDefaultLineSpacing;
@@ -158,22 +163,18 @@ struct Engine::Impl
     {
       lineLayout.length += lineLayout.wsLengthEndOfLine;
 
-      lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
+    lineLayout.wsLengthEndOfLine = tmpLineLayout.wsLengthEndOfLine;
     }
     else
     {
       lineLayout.wsLengthEndOfLine += tmpLineLayout.wsLengthEndOfLine;
     }
 
-    if( tmpLineLayout.ascender > lineLayout.ascender )
-    {
-      lineLayout.ascender = tmpLineLayout.ascender;
-    }
+    // Sets the maximum ascender.
+    lineLayout.ascender = std::max( lineLayout.ascender, tmpLineLayout.ascender );
 
-    if( tmpLineLayout.descender < lineLayout.descender )
-    {
-      lineLayout.descender = tmpLineLayout.descender;
-    }
+    // Sets the minimum descender.
+    lineLayout.descender = std::min( lineLayout.descender, tmpLineLayout.descender );
   }
 
   /**
@@ -239,7 +240,7 @@ struct Engine::Impl
 
     // Calculate the line height if there is no characters.
     FontId lastFontId = glyphMetrics.fontId;
-    UpdateLineHeight( lastFontId, tmpLineLayout );
+    UpdateLineHeight( glyphMetrics, tmpLineLayout );
 
     bool oneWordLaidOut = false;
 
@@ -266,7 +267,7 @@ struct Engine::Impl
       // If it's different the ascender and descender need to be updated.
       if( lastFontId != glyphMetrics.fontId )
       {
-        UpdateLineHeight( glyphMetrics.fontId, tmpLineLayout );
+        UpdateLineHeight( glyphMetrics, tmpLineLayout );
         lastFontId = glyphMetrics.fontId;
       }
 
@@ -572,7 +573,7 @@ struct Engine::Impl
     const bool ellipsis = isAutoScrollEnabled ? ( penY - layout.descender > layoutParameters.boundingBox.height ) :
                                                 ( ( penY - layout.descender > layoutParameters.boundingBox.height ) ||
                                                   ( ( mLayout == SINGLE_LINE_BOX ) &&
-                                                  ( layout.extraBearing + layout.length + layout.extraWidth > layoutParameters.boundingBox.width ) ) );
+                                                    ( layout.length > layoutParameters.boundingBox.width ) ) );
 
     if( ellipsis )
     {
@@ -613,7 +614,7 @@ struct Engine::Impl
       lineRun->characterRun.characterIndex = ellipsisLayout.characterIndex;
       lineRun->characterRun.numberOfCharacters = ellipsisLayout.numberOfCharacters;
       lineRun->width = ellipsisLayout.length;
-      lineRun->extraLength =  ( ellipsisLayout.wsLengthEndOfLine > 0.f ) ? ellipsisLayout.wsLengthEndOfLine - ellipsisLayout.extraWidth : 0.f;
+      lineRun->extraLength =  std::ceil( ( ellipsisLayout.wsLengthEndOfLine > 0.f ) ? ellipsisLayout.wsLengthEndOfLine - ellipsisLayout.extraWidth : 0.f );
       lineRun->ascender = ellipsisLayout.ascender;
       lineRun->descender = ellipsisLayout.descender;
       lineRun->direction = !RTL;
@@ -679,8 +680,12 @@ struct Engine::Impl
     else
     {
       lineRun.width = layout.extraBearing + layout.length + layout.extraWidth;
-      lineRun.extraLength = ( layout.wsLengthEndOfLine > 0.f ) ? layout.wsLengthEndOfLine - layout.extraWidth : 0.f;
+      lineRun.extraLength = std::ceil( ( layout.wsLengthEndOfLine > 0.f ) ? layout.wsLengthEndOfLine - layout.extraWidth : 0.f );
     }
+
+    // Rounds upward to avoid a non integer size.
+    lineRun.width = std::ceil( lineRun.width );
+
     lineRun.ascender = layout.ascender;
     lineRun.descender = layout.descender;
     lineRun.direction = !RTL;
@@ -716,7 +721,10 @@ struct Engine::Impl
     const GlyphInfo& glyphInfo = *( layoutParameters.glyphsBuffer + layoutParameters.totalNumberOfGlyphs - 1u );
 
     Text::FontMetrics fontMetrics;
-    mMetrics->GetFontMetrics( glyphInfo.fontId, fontMetrics );
+    if( 0u != glyphInfo.fontId )
+    {
+      mMetrics->GetFontMetrics( glyphInfo.fontId, fontMetrics );
+    }
 
     LineRun& lineRun = *( linesBuffer + numberOfLines );
     ++numberOfLines;
@@ -832,6 +840,9 @@ struct Engine::Impl
       UpdateLayoutSize( lines,
                         layoutSize );
 
+      // Rounds upward to avoid a non integer size.
+      layoutSize.height = std::ceil( layoutSize.height );
+
       // Nothing else do if there are no glyphs to layout.
       return false;
     }
@@ -910,6 +921,10 @@ struct Engine::Impl
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--LayoutText width too small!\n\n" );
 
         lines.Resize( numberOfLines );
+
+        // Rounds upward to avoid a non integer size.
+        layoutSize.height = std::ceil( layoutSize.height );
+
         return false;
       }
 
@@ -1040,6 +1055,9 @@ struct Engine::Impl
     {
       lines.Resize( numberOfLines );
     }
+
+    // Rounds upward to avoid a non integer size.
+    layoutSize.height = std::ceil( layoutSize.height );
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "<--LayoutText\n\n" );
 

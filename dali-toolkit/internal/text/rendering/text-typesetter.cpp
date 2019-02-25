@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -285,7 +285,7 @@ PixelData Typesetter::Render( const Vector2& size, Toolkit::DevelText::TextDirec
   // Retrieves the layout size.
   const Size& layoutSize = mModel->GetLayoutSize();
 
-  const float outlineWidth = mModel->GetOutlineWidth();
+  const int outlineWidth = static_cast<int>( mModel->GetOutlineWidth() );
 
   // Set the offset for the horizontal alignment according to the text direction and outline width.
   int penX = 0;
@@ -304,13 +304,13 @@ PixelData Typesetter::Render( const Vector2& size, Toolkit::DevelText::TextDirec
     }
     case HorizontalAlignment::END:
     {
-      penX += ( textDirection == Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT ) ? -outlineWidth * 2.0f : outlineWidth * 2.0f;
+      penX += ( textDirection == Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT ) ? -outlineWidth * 2 : outlineWidth * 2;
       break;
     }
   }
 
   // Set the offset for the vertical alignment.
-  int penY = 0;
+  int penY = 0u;
 
   switch( mModel->GetVerticalAlignment() )
   {
@@ -390,8 +390,8 @@ PixelData Typesetter::Render( const Vector2& size, Toolkit::DevelText::TextDirec
   {
 
     // Generate the outline if enabled
-    const float outlineWidth = mModel->GetOutlineWidth();
-    if ( outlineWidth > Math::MACHINE_EPSILON_1 )
+    const uint16_t outlineWidth = mModel->GetOutlineWidth();
+    if ( outlineWidth != 0u )
     {
       // Create the image buffer for outline
       Devel::PixelBuffer outlineImageBuffer = CreateImageBuffer( bufferWidth, bufferHeight, Typesetter::STYLE_OUTLINE, ignoreHorizontalAlignment, pixelFormat, penX, penY, 0u, numberOfGlyphs -1 );
@@ -505,7 +505,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
     }
 
     // Retrieves the glyph's outline width
-    float outlineWidth = mModel->GetOutlineWidth();
+    float outlineWidth = static_cast<float>( mModel->GetOutlineWidth() );
 
     if( style == Typesetter::STYLE_OUTLINE )
     {
@@ -672,10 +672,10 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
       {
         fontClient.CreateBitmap( glyphInfo->fontId,
                                  glyphInfo->index,
-                                 glyphInfo->softwareItalic,
-                                 glyphInfo->softwareBold,
+                                 glyphInfo->isItalicRequired,
+                                 glyphInfo->isBoldRequired,
                                  glyphData.glyphBitmap,
-                                 outlineWidth );
+                                 static_cast<int>( outlineWidth ) );
       }
 
 

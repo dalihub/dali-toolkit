@@ -191,7 +191,7 @@ public:
   /**
    * @copydoc ModelInterface::GetOutlineWidth()
    */
-  virtual float GetOutlineWidth() const;
+  virtual uint16_t GetOutlineWidth() const;
 
   /**
    * @copydoc ModelInterface::GetBackgroundColor()

@@ -65,7 +65,7 @@ const char * const PLACEHOLDER_ELLIPSIS = "ellipsis";
 float ConvertToEven( float value )
 {
   int intValue(static_cast<int>( value ));
-  return static_cast<float>(intValue % 2 == 0) ? intValue : (intValue + 1);
+  return static_cast<float>( intValue + ( intValue & 1 ) );
 }
 
 } // namespace
@@ -556,7 +556,8 @@ void Controller::SetText( const std::string& text )
     mImpl->mModel->mVisualModel->SetTextColor( mImpl->mTextColor );
 
     MarkupProcessData markupProcessData( mImpl->mModel->mLogicalModel->mColorRuns,
-                                         mImpl->mModel->mLogicalModel->mFontDescriptionRuns );
+                                         mImpl->mModel->mLogicalModel->mFontDescriptionRuns,
+                                         mImpl->mModel->mLogicalModel->mEmbeddedItems );
 
     Length textSize = 0u;
     const uint8_t* utf8 = NULL;
@@ -1241,14 +1242,14 @@ const Vector4& Controller::GetOutlineColor() const
   return mImpl->mModel->mVisualModel->GetOutlineColor();
 }
 
-void Controller::SetOutlineWidth( unsigned int width )
+void Controller::SetOutlineWidth( uint16_t width )
 {
   mImpl->mModel->mVisualModel->SetOutlineWidth( width );
 
   mImpl->RequestRelayout();
 }
 
-unsigned int Controller::GetOutlineWidth() const
+uint16_t Controller::GetOutlineWidth() const
 {
   return mImpl->mModel->mVisualModel->GetOutlineWidth();
 }
@@ -3938,6 +3939,9 @@ void Controller::ResetText()
 {
   // Reset buffers.
   mImpl->mModel->mLogicalModel->mText.Clear();
+
+  // Reset the embedded images buffer.
+  mImpl->mModel->mLogicalModel->ClearEmbeddedImages();
 
   // We have cleared everything including the placeholder-text
   mImpl->PlaceholderCleared();

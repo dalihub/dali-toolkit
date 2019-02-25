@@ -344,7 +344,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
 {
   // First check if the requested Texture is cached.
   const TextureHash textureHash = GenerateHash( url.GetUrl(), desiredSize, fittingMode, samplingMode, useAtlas,
-                                                maskTextureId, preMultiplyOnLoad );
+                                                maskTextureId );
 
   TextureManager::TextureId textureId = INVALID_TEXTURE_ID;
 
@@ -663,6 +663,7 @@ void TextureManager::LoadOrQueueTexture( TextureInfo& textureInfo, TextureUpload
                                   textureInfo.useAtlas, textureInfo.atlasRect,
                                   textureInfo.preMultiplied );
       }
+      break;
     }
     case CANCELLED:
     case LOAD_FINISHED:
@@ -977,8 +978,7 @@ TextureManager::TextureHash TextureManager::GenerateHash(
   const FittingMode::Type        fittingMode,
   const Dali::SamplingMode::Type samplingMode,
   const UseAtlas                 useAtlas,
-  TextureId                      maskTextureId,
-  TextureManager::MultiplyOnLoad preMultiplyOnLoad)
+  TextureId                      maskTextureId )
 {
   std::string hashTarget( url );
   const size_t urlLength = hashTarget.length();
@@ -1038,22 +1038,6 @@ TextureManager::TextureHash TextureManager::GenerateHash(
     }
   }
 
-  auto premultipliedIndex = hashTarget.length();
-  hashTarget.resize( premultipliedIndex + 1 );
-  switch( preMultiplyOnLoad )
-  {
-    case TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD:
-    {
-      hashTarget[ premultipliedIndex ] = 't';
-      break;
-    }
-    case TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY:
-    {
-      hashTarget[ premultipliedIndex ] = 'f';
-      break;
-    }
-  }
-
   return Dali::CalculateHash( hashTarget );
 }
 
@@ -1078,21 +1062,24 @@ int TextureManager::FindCachedTexture(
     {
       // We have a match, now we check all the original parameters in case of a hash collision.
       TextureInfo& textureInfo( mTextureInfoContainer[i] );
-      auto multiplyOnLoad = textureInfo.preMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD :
-        TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
       if( ( url == textureInfo.url.GetUrl() ) &&
           ( useAtlas == textureInfo.useAtlas ) &&
           ( maskTextureId == textureInfo.maskTextureId ) &&
           ( size == textureInfo.desiredSize ) &&
-          ( preMultiplyOnLoad ==  multiplyOnLoad ) &&
           ( ( size.GetWidth() == 0 && size.GetHeight() == 0 ) ||
             ( fittingMode == textureInfo.fittingMode &&
               samplingMode == textureInfo.samplingMode ) ) )
       {
-        // The found Texture is a match.
-        cacheIndex = i;
-        break;
+        // 1. If preMultiplyOnLoad is MULTIPLY_ON_LOAD, then textureInfo.preMultiplyOnLoad should be true. The premultiplication result can be different.
+        // 2. If preMultiplyOnLoad is LOAD_WITHOUT_MULTIPLY, then textureInfo.preMultiplied should be false.
+        if( ( preMultiplyOnLoad == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD && textureInfo.preMultiplyOnLoad )
+            || ( preMultiplyOnLoad == TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY && !textureInfo.preMultiplied ) )
+        {
+          // The found Texture is a match.
+          cacheIndex = i;
+          break;
+        }
       }
     }
   }

@@ -665,8 +665,8 @@ private:
   TextureHash GenerateHash( const std::string& url, const ImageDimensions size,
                             const FittingMode::Type fittingMode,
                             const Dali::SamplingMode::Type samplingMode, const UseAtlas useAtlas,
-                            TextureId maskTextureId,
-                            MultiplyOnLoad preMultiplyOnLoad);
+                            TextureId maskTextureId );
+
   /**
    * @brief Looks up a cached texture by its hash.
    * If found, the given parameters are used to check there is no hash-collision.

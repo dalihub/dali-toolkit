@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ AtlasGlyphManager::AtlasGlyphManager()
 }
 
 void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
-                             const uint32_t outlineWidth,
+                             const Toolkit::AtlasGlyphManager::GlyphStyle& style,
                              const PixelData& bitmap,
                              Dali::Toolkit::AtlasManager::AtlasSlot& slot )
 {
@@ -63,9 +63,11 @@ void AtlasGlyphManager::Add( const Text::GlyphInfo& glyph,
 
   GlyphRecordEntry record;
   record.mIndex = glyph.index;
-  record.mOutlineWidth = outlineWidth;
   record.mImageId = slot.mImageId;
   record.mCount = 1;
+  record.mOutlineWidth = style.outline;
+  record.isItalic = style.isItalic;
+  record.isBold = style.isBold;
 
   // Have glyph records been created for this fontId ?
   bool foundGlyph = false;
@@ -99,9 +101,9 @@ void AtlasGlyphManager::GenerateMeshData( uint32_t imageId,
 }
 
 bool AtlasGlyphManager::IsCached( Text::FontId fontId,
-                                Text::GlyphIndex index,
-                                uint32_t outlineWidth,
-                                Dali::Toolkit::AtlasManager::AtlasSlot& slot )
+                                  Text::GlyphIndex index,
+                                  const Toolkit::AtlasGlyphManager::GlyphStyle& style,
+                                  Dali::Toolkit::AtlasManager::AtlasSlot& slot )
 {
   for ( std::vector< FontGlyphRecord >::iterator fontGlyphRecordIt = mFontGlyphRecords.begin();
         fontGlyphRecordIt != mFontGlyphRecords.end();
@@ -113,7 +115,10 @@ bool AtlasGlyphManager::IsCached( Text::FontId fontId,
             glyphRecordIt != fontGlyphRecordIt->mGlyphRecords.End();
             ++glyphRecordIt )
       {
-        if ( glyphRecordIt->mIndex == index && glyphRecordIt->mOutlineWidth == outlineWidth )
+        if ( ( glyphRecordIt->mIndex == index ) &&
+             ( glyphRecordIt->mOutlineWidth == style.outline ) &&
+             ( glyphRecordIt->isItalic == style.isItalic ) &&
+             ( glyphRecordIt->isBold == style.isBold ) )
         {
           slot.mImageId = glyphRecordIt->mImageId;
           slot.mAtlasId = mAtlasManager.GetAtlas( slot.mImageId );
@@ -174,7 +179,7 @@ const Toolkit::AtlasGlyphManager::Metrics& AtlasGlyphManager::GetMetrics()
   return mMetrics;
 }
 
-void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, uint32_t outlineWidth, int32_t delta )
+void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIndex index, const Toolkit::AtlasGlyphManager::GlyphStyle& style, int32_t delta )
 {
   if( 0 != delta )
   {
@@ -190,7 +195,10 @@ void AtlasGlyphManager::AdjustReferenceCount( Text::FontId fontId, Text::GlyphIn
               glyphRecordIt != fontGlyphRecordIt->mGlyphRecords.End();
               ++glyphRecordIt )
         {
-          if ( glyphRecordIt->mIndex == index && glyphRecordIt->mOutlineWidth == outlineWidth )
+          if ( ( glyphRecordIt->mIndex == index ) &&
+               ( glyphRecordIt->mOutlineWidth == style.outline ) &&
+               ( glyphRecordIt->isItalic == style.isItalic ) &&
+               ( glyphRecordIt->isBold == style.isBold ) )
           {
             glyphRecordIt->mCount += delta;
             DALI_ASSERT_DEBUG( glyphRecordIt->mCount >= 0 && "Glyph ref-count should not be negative" );

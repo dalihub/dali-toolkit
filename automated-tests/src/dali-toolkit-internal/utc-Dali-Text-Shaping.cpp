@@ -55,8 +55,8 @@ struct GlyphInfoData
   float yBearing;    ///< The distance from the baseline to the topmost border of the glyph
   float advance;     ///< The distance to move the cursor for this glyph
   float scaleFactor; ///< The scaling applied (fixed-size fonts only)
-  bool softwareItalic; ///< Whether glyph needs software support to draw italic style
-  bool softwareBold;   ///< Whether glyph needs software support to draw bold style
+  bool isItalicRequired; ///< Whether the italic style is required.
+  bool isBoldRequired;   ///< Whether the bold style is required.
 };
 
 bool IsEqualGlyph ( const GlyphInfoData& glyphData, const GlyphInfo& glyph )
@@ -93,11 +93,11 @@ bool IsEqualGlyph ( const GlyphInfoData& glyphData, const GlyphInfo& glyph )
   {
     return false;
   }
-  if( glyphData.softwareItalic != glyph.softwareItalic )
+  if( glyphData.isItalicRequired != glyph.isItalicRequired )
   {
     return false;
   }
-  if( glyphData.softwareBold != glyph.softwareBold )
+  if( glyphData.isBoldRequired != glyph.isBoldRequired )
   {
     return false;
   }
@@ -551,14 +551,14 @@ int UtcDaliTextSoftwareStyling(void)
 
   struct GlyphInfoData glyphs01[] =
   {
-    { 2u, 4857u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, false },
-    { 2u, 7316u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, false },
-    { 2u, 4364u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, false },
+    { 2u, 4857u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, true },
+    { 2u, 7316u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, true },
+    { 2u, 4364u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, true },
   };
   struct GlyphInfoData glyphs02[] =
   {
     { 2u, 4857u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, false, false },
-    { 2u, 7316u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, false, false },
+    { 2u, 7316u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, false, true },
     { 2u, 4364u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true,  false },
   };
 

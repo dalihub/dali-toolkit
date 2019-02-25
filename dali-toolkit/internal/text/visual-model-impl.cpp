@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -373,7 +373,7 @@ void VisualModel::SetUnderlineHeight( float height )
   mUnderlineHeight = height;
 }
 
-void VisualModel::SetOutlineWidth( unsigned int width )
+void VisualModel::SetOutlineWidth( uint16_t width )
 {
   mOutlineWidth = width;
 }
@@ -428,7 +428,7 @@ float VisualModel::GetUnderlineHeight() const
   return mUnderlineHeight;
 }
 
-unsigned int VisualModel::GetOutlineWidth() const
+uint16_t VisualModel::GetOutlineWidth() const
 {
   return mOutlineWidth;
 }
@@ -473,8 +473,8 @@ VisualModel::VisualModel()
   mControlSize(),
   mShadowOffset(),
   mUnderlineHeight( 0.0f ),
-  mOutlineWidth( 0u ),
   mShadowBlurRadius( 0.0f ),
+  mOutlineWidth( 0u ),
   mNaturalSize(),
   mLayoutSize(),
   mCachedLineIndex( 0u ),

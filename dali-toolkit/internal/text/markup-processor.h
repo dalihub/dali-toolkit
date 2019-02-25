@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H__
-#define __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H__
+#ifndef DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H
+#define DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/color-run.h>
+#include <dali-toolkit/internal/text/embedded-item.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
 
 namespace Dali
@@ -41,15 +42,17 @@ namespace Text
 struct MarkupProcessData
 {
 MarkupProcessData( Vector<ColorRun>& colorRuns,
-                   Vector<FontDescriptionRun>& fontRuns )
+                   Vector<FontDescriptionRun>& fontRuns,
+                   Vector<EmbeddedItem>& items )
   : colorRuns( colorRuns ),
     fontRuns( fontRuns ),
+    items(items),
     markupProcessedText()
   {}
 
   Vector<ColorRun>&           colorRuns;           ///< The color runs.
   Vector<FontDescriptionRun>& fontRuns;            ///< The font description runs.
-
+  Vector<EmbeddedItem>&       items;               ///< The embedded items.
   std::string                 markupProcessedText; ///< The mark-up string.
 };
 
@@ -67,4 +70,4 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H__
+#endif // DALI_TOOLKIT_TEXT_MARKUP_PROCESSOR_H

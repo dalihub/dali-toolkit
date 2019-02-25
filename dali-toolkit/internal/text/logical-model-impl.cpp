@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,20 @@ void FreeFontFamilyNames( Vector<FontDescriptionRun>& fontDescriptionRuns )
   }
 
   fontDescriptionRuns.Clear();
+}
+
+void FreeEmbeddedItems( Vector<EmbeddedItem>& embeddedItem )
+{
+  for( Vector<EmbeddedItem>::Iterator it = embeddedItem.Begin(),
+         endIt = embeddedItem.End();
+       it != endIt;
+       ++it )
+  {
+    EmbeddedItem& item = *it;
+    delete[] item.url;
+  }
+
+  embeddedItem.Clear();
 }
 
 LogicalModelPtr LogicalModel::New()
@@ -550,9 +564,15 @@ void LogicalModel::FindParagraphs( CharacterIndex index,
   }
 }
 
+void LogicalModel::ClearEmbeddedImages()
+{
+  FreeEmbeddedItems( mEmbeddedItems );
+}
+
 LogicalModel::~LogicalModel()
 {
   ClearFontDescriptionRuns();
+  ClearEmbeddedImages();
 }
 
 LogicalModel::LogicalModel()
