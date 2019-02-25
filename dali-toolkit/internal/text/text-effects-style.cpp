@@ -358,9 +358,16 @@ void GetUnderlineProperties( ControllerPtr controller, Property::Value& value, E
         {
           Property::Map map;
 
-          map.Insert( ENABLE_KEY, enabled );
-          map.Insert( COLOR_KEY, color );
-          map.Insert( HEIGHT_KEY, height );
+          const std::string enabledStr = enabled ? TRUE_TOKEN : FALSE_TOKEN;
+          map.Insert( ENABLE_KEY, enabledStr );
+
+          std::string colorStr;
+          Vector4ToColorString( color, colorStr );
+          map.Insert( COLOR_KEY, colorStr );
+
+          std::string heightStr;
+          FloatToString( height, heightStr );
+          map.Insert( HEIGHT_KEY, heightStr );
 
           value = map;
         }
