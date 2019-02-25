@@ -185,11 +185,6 @@ Dali::TypeInfo ControlWrapper::GetTypeInfo()
   return DevelCustomActor::GetTypeInfo(Self());
 }
 
-void ControlWrapper::EmitKeyInputFocusSignal(bool focusGained)
-{
-  Control::EmitKeyInputFocusSignal( focusGained );
-}
-
 } // namespace Internal
 
 } // namespace Toolkit
