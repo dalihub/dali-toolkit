@@ -21,8 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
-
-// INTERNAL INCLUDES
+#include <chrono>
+#include <thread>
 
 namespace Dali
 {
@@ -37,6 +37,7 @@ namespace
 {
 
 constexpr auto LOOP_FOREVER = -1;
+constexpr auto NANOSECONDS_PER_SECOND( 1e+9 );
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VECTOR_ANIMATION" );
@@ -53,7 +54,9 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
   mAnimationFinishedTrigger(),
   mPlayRange( 0.0f, 1.0f ),
   mPlayState( DevelImageVisual::PlayState::STOPPED ),
+  mFrameDurationNanoSeconds( 0 ),
   mProgress( 0.0f ),
+  mFrameRate( 60.0f ),
   mCurrentFrame( 0 ),
   mTotalFrame( 0 ),
   mStartFrame( 0 ),
@@ -313,15 +316,16 @@ bool VectorRasterizeThread::StartRender()
 
   mCurrentFrame = std::max( static_cast< uint32_t >( mTotalFrame * mProgress + 0.5f ), mStartFrame );
 
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StartRender: Renderer is started [%d (%d, %d)]\n", mTotalFrame, mStartFrame, mEndFrame );
+  mFrameRate = mVectorRenderer.GetFrameRate();
+  mFrameDurationNanoSeconds = NANOSECONDS_PER_SECOND / mFrameRate;
+
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StartRender: Renderer is started [%d, %f fps]\n", mTotalFrame, mFrameRate );
 
   return true;
 }
 
 void VectorRasterizeThread::Rasterize()
 {
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: [%d]\n", mCurrentFrame );
-
   bool needRender, resourceReady;
 
   {
@@ -329,6 +333,8 @@ void VectorRasterizeThread::Rasterize()
     needRender = mNeedRender;
     resourceReady = mResourceReady;
   }
+
+  auto currentFrameStartTime = std::chrono::system_clock::now();
 
   // Rasterize
   mVectorRenderer.Render( mCurrentFrame );
@@ -378,6 +384,16 @@ void VectorRasterizeThread::Rasterize()
     mResourceReadyTrigger->Trigger();
     mResourceReady = true;
   }
+
+  auto timeToSleepUntil = currentFrameStartTime + std::chrono::nanoseconds( mFrameDurationNanoSeconds );
+
+#if defined(DEBUG_ENABLED)
+  auto sleepDuration = std::chrono::duration_cast< std::chrono::milliseconds >( timeToSleepUntil - std::chrono::system_clock::now() );
+
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: [current = %d, sleep duration = %lld]\n", mCurrentFrame, sleepDuration.count() );
+#endif
+
+  std::this_thread::sleep_until( timeToSleepUntil );
 }
 
 } // namespace Internal
