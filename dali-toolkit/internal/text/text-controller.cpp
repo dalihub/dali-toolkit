@@ -2628,14 +2628,19 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p keyString %s\n", this, keyString.c_str() );
 
-      // InputMethodContext is no longer handling key-events
-      mImpl->ClearPreEditFlag();
+      if( !keyString.empty() )
+      {
+        // InputMethodContext is no longer handling key-events
+        mImpl->ClearPreEditFlag();
 
-      InsertText( keyString, COMMIT );
-      textChanged = true;
+        InsertText( keyString, COMMIT );
 
-      // Will request for relayout.
-      relayoutNeeded = true;
+        textChanged = true;
+
+        // Will request for relayout.
+        relayoutNeeded = true;
+      }
+
     }
 
     if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
