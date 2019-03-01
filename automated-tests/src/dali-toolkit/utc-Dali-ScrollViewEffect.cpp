@@ -217,6 +217,7 @@ void CleanupTest()
 
 int UtcDaliScrollViewPagePathEffectSetup(void)
 {
+  ToolkitTestApplication application;
   tet_infoline(" UtcDaliScrollViewPagePathEffectSetup");
 
   ScrollViewPagePathEffect effect;

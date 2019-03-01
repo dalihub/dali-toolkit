@@ -88,7 +88,6 @@ public:
   bool HandleActionReadFromTopEvent();
   bool HandleActionReadFromNextEvent();
   bool HandleActionZoomEvent();
-  bool HandleActionReadIndicatorInformationEvent();
   bool HandleActionReadPauseResumeEvent();
   bool HandleActionStartStopEvent();
 
@@ -385,15 +384,6 @@ bool AccessibilityAdaptor::HandleActionZoomEvent()
   return false;
 }
 
-bool AccessibilityAdaptor::HandleActionReadIndicatorInformationEvent()
-{
-  if( mActionHandler )
-  {
-    return mActionHandler->AccessibilityActionReadIndicatorInformation();
-  }
-  return false;
-}
-
 bool AccessibilityAdaptor::HandleActionReadPauseResumeEvent()
 {
   if( mActionHandler )
@@ -588,11 +578,6 @@ bool AccessibilityAdaptor::HandleActionReadFromNextEvent()
 bool AccessibilityAdaptor::HandleActionZoomEvent()
 {
   return Internal::Adaptor::GetImplementation(*this).HandleActionZoomEvent();
-}
-
-bool AccessibilityAdaptor::HandleActionReadIndicatorInformationEvent()
-{
-  return Internal::Adaptor::GetImplementation(*this).HandleActionReadIndicatorInformationEvent();
 }
 
 bool AccessibilityAdaptor::HandleActionReadPauseResumeEvent()

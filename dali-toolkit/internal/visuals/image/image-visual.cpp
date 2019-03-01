@@ -187,6 +187,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mLoading( false ),
   mOrientationCorrection( true )
 {
+  EnablePreMultipliedAlpha( mFactoryCache.GetPreMultiplyOnLoad() );
 }
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image )
@@ -211,6 +212,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFac
   mLoading( false ),
   mOrientationCorrection( true )
 {
+  EnablePreMultipliedAlpha( mFactoryCache.GetPreMultiplyOnLoad() );
 }
 
 ImageVisual::~ImageVisual()
@@ -683,7 +685,7 @@ void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& t
     atlasUploadObserver = this;
   }
 
-  auto preMultiplyOnLoad = mFactoryCache.GetPreMultiplyOnLoad() && !mImpl->mCustomShader
+  auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader
     ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
     : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
