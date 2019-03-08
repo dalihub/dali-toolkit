@@ -44,6 +44,44 @@ void utc_dali_toolkit_grid_layouting_cleanup(void)
   test_return_value = TET_PASS;
 }
 
+int UtcDaliLayouting_GridLayout00(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliLayouting_GridLayout00 1 Column, 0 Items");
+
+  const auto NUMBER_OF_COLUMNS = 1;
+  const auto NUMBER_OF_ITEMS = 0;
+
+  tet_printf( "Testing %d columns with %d items\n", NUMBER_OF_COLUMNS, NUMBER_OF_ITEMS );
+
+  Stage stage = Stage::GetCurrent();
+
+  auto rootControl = Control::New();
+  auto absoluteLayout = AbsoluteLayout::New();
+  DevelControl::SetLayout( rootControl, absoluteLayout );
+  rootControl.SetName( "AbsoluteLayout" );
+  stage.Add( rootControl );
+
+  auto gridContainer = Control::New();
+  auto gridLayout = Grid::New();
+  gridLayout.SetNumberOfColumns( NUMBER_OF_COLUMNS );
+  gridContainer.SetName( "GridLayout");
+  DevelControl::SetLayout( gridContainer, gridLayout );
+  gridContainer.SetProperty( LayoutItem::ChildProperty::WIDTH_SPECIFICATION, ChildLayoutData::WRAP_CONTENT );
+  gridContainer.SetProperty( LayoutItem::ChildProperty::HEIGHT_SPECIFICATION,  ChildLayoutData::WRAP_CONTENT );
+
+  rootControl.Add( gridContainer );
+
+  // Ensure layouting happens
+  application.SendNotification();
+  application.Render();
+
+  tet_printf( "Confirm number of columns is as set\n");
+  DALI_TEST_EQUALS( gridLayout.GetNumberOfColumns(), NUMBER_OF_COLUMNS, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliLayouting_GridLayout01(void)
 {
   ToolkitTestApplication application;

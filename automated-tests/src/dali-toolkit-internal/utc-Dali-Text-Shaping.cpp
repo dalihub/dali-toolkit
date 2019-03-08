@@ -551,15 +551,15 @@ int UtcDaliTextSoftwareStyling(void)
 
   struct GlyphInfoData glyphs01[] =
   {
-    { 2u, 4857u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, true },
-    { 2u, 7316u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, true },
-    { 2u, 4364u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true, true },
+    { 2u, 21154u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
+    { 2u, 12298, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
+    { 2u, 17828u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
   };
   struct GlyphInfoData glyphs02[] =
   {
-    { 2u, 4857u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, false, false },
-    { 2u, 7316u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, false, true },
-    { 2u, 4364u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f, true,  false },
+    { 2u, 21154u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, false, false },
+    { 2u, 12298, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, false, true },
+    { 2u, 17828u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true,  false },
   };
 
   CharacterIndex characterIndices[] = { 0u, 1u, 2u };
