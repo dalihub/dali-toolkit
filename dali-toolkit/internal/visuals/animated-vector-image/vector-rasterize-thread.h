@@ -165,12 +165,6 @@ protected:
 private:
 
   /**
-   * @brief Called by the rasterize thread which ensures a wait if required.
-   * @return false if the thread should stop.
-   */
-  bool IsThreadReady();
-
-  /**
    * @brief Start rendering
    */
   bool StartRender();
@@ -191,7 +185,6 @@ private:
   std::string                 mUrl;
   VectorAnimationRenderer     mVectorRenderer;
   ConditionalWait             mConditionalWait;
-  Dali::Mutex                 mMutex;
   std::unique_ptr< EventThreadCallback > mResourceReadyTrigger;
   std::unique_ptr< EventThreadCallback > mAnimationFinishedTrigger;
   Vector2                     mPlayRange;
@@ -210,6 +203,7 @@ private:
   bool                        mNeedRender;
   bool                        mDestroyThread;  ///< Whether the thread be destroyed
   bool                        mResourceReady;
+  bool                        mCurrentFrameUpdated;
   const Dali::LogFactoryInterface& mLogFactory; ///< The log factory
 
 };

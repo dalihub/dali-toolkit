@@ -318,6 +318,12 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
       if( attributes.Get( progress ) )
       {
         mVectorRasterizeThread.SetCurrentProgress( progress );
+
+        if( mVectorRasterizeThread.GetPlayState() != DevelImageVisual::PlayState::PLAYING )
+        {
+          mVectorRasterizeThread.RenderFrame();
+          Stage::GetCurrent().KeepRendering( 0.0f );    // Trigger rendering
+        }
       }
       break;
     }
