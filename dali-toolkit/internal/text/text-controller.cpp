@@ -1341,7 +1341,7 @@ void Controller::SetInputColor( const Vector4& color )
     mImpl->mEventData->mInputStyle.textColor = color;
     mImpl->mEventData->mInputStyle.isDefaultColor = false;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       const bool handlesCrossed = mImpl->mEventData->mLeftSelectionPosition > mImpl->mEventData->mRightSelectionPosition;
 
@@ -1388,7 +1388,7 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
     mImpl->mEventData->mInputStyle.familyName = fontFamily;
     mImpl->mEventData->mInputStyle.isFamilyDefined = true;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
@@ -1447,7 +1447,7 @@ void Controller::SetInputFontWeight( FontWeight weight )
     mImpl->mEventData->mInputStyle.weight = weight;
     mImpl->mEventData->mInputStyle.isWeightDefined = true;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
@@ -1513,7 +1513,7 @@ void Controller::SetInputFontWidth( FontWidth width )
     mImpl->mEventData->mInputStyle.width = width;
     mImpl->mEventData->mInputStyle.isWidthDefined = true;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
@@ -1579,7 +1579,7 @@ void Controller::SetInputFontSlant( FontSlant slant )
     mImpl->mEventData->mInputStyle.slant = slant;
     mImpl->mEventData->mInputStyle.isSlantDefined = true;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
@@ -1645,7 +1645,7 @@ void Controller::SetInputFontPointSize( float size )
     mImpl->mEventData->mInputStyle.size = size;
     mImpl->mEventData->mInputStyle.isSizeDefined = true;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
