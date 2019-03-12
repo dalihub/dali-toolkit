@@ -196,7 +196,9 @@ private:
   std::unique_ptr< EventThreadCallback > mAnimationFinishedTrigger;
   Vector2                     mPlayRange;
   DevelImageVisual::PlayState mPlayState;
+  int64_t                     mFrameDurationNanoSeconds;
   float                       mProgress;
+  float                       mFrameRate;
   uint32_t                    mCurrentFrame;
   uint32_t                    mTotalFrame;
   uint32_t                    mStartFrame;

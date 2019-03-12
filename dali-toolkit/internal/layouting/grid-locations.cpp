@@ -55,9 +55,7 @@ GridLocations::~GridLocations(){}
 void GridLocations::CalculateLocations( int numberOfColumns,
                                         unsigned int availableWidth,
                                         unsigned int availableHeight,
-                                        unsigned int numberOfCells,
-                                        unsigned int columnWidth,
-                                        unsigned int rowHeight )
+                                        unsigned int numberOfCells )
 {
   DALI_ASSERT_DEBUG( numberOfColumns > 0 && "number of columns should be greater than 0" );
   numberOfColumns = std::max ( numberOfColumns, 1 );
@@ -70,30 +68,14 @@ void GridLocations::CalculateLocations( int numberOfColumns,
   // If number of cells not cleanly dividable by colums, add another row to house remainder cells.
   numberOfRows += (numberOfCells%numberOfColumns)?1:0;
 
-  unsigned int maxColumnWidth = availableWidth / numberOfColumns;
+  // Safe as numberOfColumns is guaranteed to be > 0
+  unsigned int columnWidth = availableWidth / numberOfColumns;
 
-  if( columnWidth > 0 )
-  {
-    // Column width supplied so use this unless exceeds available width.
-    columnWidth = std::min( columnWidth, maxColumnWidth );
-  }
-  else
-  {
-    // Column width not supplied so use calculated value
-    columnWidth = maxColumnWidth;
-  }
+  unsigned int rowHeight = availableHeight;
 
-  unsigned int maxRowHeight = availableHeight / numberOfRows;
-
-  if( rowHeight > 0 )
+  if( numberOfRows > 0 )
   {
-    // Column height supplied so use this unless exceeds available height.
-    rowHeight = std::min( rowHeight, maxRowHeight );
-  }
-  else
-  {
-    // Column height not supplied so use calculated value
-    rowHeight = maxRowHeight;
+    rowHeight = availableHeight / numberOfRows;
   }
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "ColumWidth[%d] RowHeight[%d] NumberOfRows[%d] NumberOfColumns[%d]\n",

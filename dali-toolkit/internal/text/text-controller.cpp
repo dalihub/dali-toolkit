@@ -1341,7 +1341,7 @@ void Controller::SetInputColor( const Vector4& color )
     mImpl->mEventData->mInputStyle.textColor = color;
     mImpl->mEventData->mInputStyle.isDefaultColor = false;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       const bool handlesCrossed = mImpl->mEventData->mLeftSelectionPosition > mImpl->mEventData->mRightSelectionPosition;
 
@@ -1388,7 +1388,7 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
     mImpl->mEventData->mInputStyle.familyName = fontFamily;
     mImpl->mEventData->mInputStyle.isFamilyDefined = true;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
@@ -1447,7 +1447,7 @@ void Controller::SetInputFontWeight( FontWeight weight )
     mImpl->mEventData->mInputStyle.weight = weight;
     mImpl->mEventData->mInputStyle.isWeightDefined = true;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
@@ -1513,7 +1513,7 @@ void Controller::SetInputFontWidth( FontWidth width )
     mImpl->mEventData->mInputStyle.width = width;
     mImpl->mEventData->mInputStyle.isWidthDefined = true;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
@@ -1579,7 +1579,7 @@ void Controller::SetInputFontSlant( FontSlant slant )
     mImpl->mEventData->mInputStyle.slant = slant;
     mImpl->mEventData->mInputStyle.isSlantDefined = true;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
@@ -1645,7 +1645,7 @@ void Controller::SetInputFontPointSize( float size )
     mImpl->mEventData->mInputStyle.size = size;
     mImpl->mEventData->mInputStyle.isSizeDefined = true;
 
-    if( EventData::SELECTING == mImpl->mEventData->mState )
+    if( EventData::SELECTING == mImpl->mEventData->mState || EventData::EDITING == mImpl->mEventData->mState || EventData::INACTIVE == mImpl->mEventData->mState )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
@@ -2626,14 +2626,19 @@ bool Controller::KeyEvent( const Dali::KeyEvent& keyEvent )
     {
       DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::KeyEvent %p keyString %s\n", this, keyString.c_str() );
 
-      // InputMethodContext is no longer handling key-events
-      mImpl->ClearPreEditFlag();
+      if( !keyString.empty() )
+      {
+        // InputMethodContext is no longer handling key-events
+        mImpl->ClearPreEditFlag();
 
-      InsertText( keyString, COMMIT );
-      textChanged = true;
+        InsertText( keyString, COMMIT );
 
-      // Will request for relayout.
-      relayoutNeeded = true;
+        textChanged = true;
+
+        // Will request for relayout.
+        relayoutNeeded = true;
+      }
+
     }
 
     if ( ( mImpl->mEventData->mState != EventData::INTERRUPTED ) &&
@@ -3221,14 +3226,14 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     mImpl->mModel->mLogicalModel->RetrieveStyle( styleIndex, style );
 
     // Whether to add a new text color run.
-    const bool addColorRun = ( style.textColor != mImpl->mEventData->mInputStyle.textColor );
+    const bool addColorRun = ( style.textColor != mImpl->mEventData->mInputStyle.textColor ) && !mImpl->mEventData->mInputStyle.isDefaultColor;
 
     // Whether to add a new font run.
-    const bool addFontNameRun = style.familyName != mImpl->mEventData->mInputStyle.familyName;
-    const bool addFontWeightRun = style.weight != mImpl->mEventData->mInputStyle.weight;
-    const bool addFontWidthRun = style.width != mImpl->mEventData->mInputStyle.width;
-    const bool addFontSlantRun = style.slant != mImpl->mEventData->mInputStyle.slant;
-    const bool addFontSizeRun = style.size != mImpl->mEventData->mInputStyle.size;
+    const bool addFontNameRun = ( style.familyName != mImpl->mEventData->mInputStyle.familyName ) && mImpl->mEventData->mInputStyle.isFamilyDefined;
+    const bool addFontWeightRun = ( style.weight != mImpl->mEventData->mInputStyle.weight ) && mImpl->mEventData->mInputStyle.isWeightDefined;
+    const bool addFontWidthRun = ( style.width != mImpl->mEventData->mInputStyle.width ) && mImpl->mEventData->mInputStyle.isWidthDefined;
+    const bool addFontSlantRun = ( style.slant != mImpl->mEventData->mInputStyle.slant ) && mImpl->mEventData->mInputStyle.isSlantDefined;
+    const bool addFontSizeRun = ( style.size != mImpl->mEventData->mInputStyle.size ) && mImpl->mEventData->mInputStyle.isSizeDefined ;
 
     // Add style runs.
     if( addColorRun )

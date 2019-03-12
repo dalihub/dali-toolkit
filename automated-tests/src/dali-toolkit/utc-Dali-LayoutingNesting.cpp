@@ -237,8 +237,8 @@ int UtcDaliLayoutingNesting_LeafSizeChange(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 260.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 260.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 254.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 254.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   tet_infoline("Changing to longer text");
   textLabel.SetProperty( TextLabel::Property::TEXT, "muchlongerText" );
@@ -247,8 +247,8 @@ int UtcDaliLayoutingNesting_LeafSizeChange(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 432.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 432.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( hbox.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 426.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 426.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }
