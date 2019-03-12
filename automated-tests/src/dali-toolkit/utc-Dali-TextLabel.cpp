@@ -1173,7 +1173,7 @@ int UtcDaliToolkitTextlabelTextWrapMode(void)
   application.Render();
 
   lineCount =  label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
-  DALI_TEST_EQUALS( lineCount, 4, TEST_LOCATION );
+  DALI_TEST_EQUALS( lineCount, 2, TEST_LOCATION );
 
   label.SetProperty( TextLabel::Property::LINE_WRAP_MODE, "CHARACTER" );
   DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::CHARACTER ), TEST_LOCATION );
@@ -1188,7 +1188,7 @@ int UtcDaliToolkitTextlabelTextWrapMode(void)
   application.Render();
 
   lineCount =  label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
-  DALI_TEST_EQUALS( lineCount, 4, TEST_LOCATION );
+  DALI_TEST_EQUALS( lineCount, 2, TEST_LOCATION );
 
   label.SetProperty( TextLabel::Property::LINE_WRAP_MODE, Text::LineWrap::CHARACTER );
   DALI_TEST_EQUALS( label.GetProperty< int >( TextLabel::Property::LINE_WRAP_MODE ), static_cast< int >( Text::LineWrap::CHARACTER ), TEST_LOCATION );
@@ -1197,7 +1197,7 @@ int UtcDaliToolkitTextlabelTextWrapMode(void)
   application.Render();
 
   lineCount =  label.GetProperty<int>( TextLabel::Property::LINE_COUNT );
-  DALI_TEST_EQUALS( lineCount, 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( lineCount, 2, TEST_LOCATION );
 
   tet_infoline( "Ensure invalid string does not change wrapping mode" );
   label.SetProperty( TextLabel::Property::LINE_WRAP_MODE, "InvalidWrapMode" );
