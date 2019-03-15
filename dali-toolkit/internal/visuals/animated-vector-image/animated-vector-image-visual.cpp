@@ -279,7 +279,7 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
   {
     case DevelAnimatedVectorImageVisual::Action::PLAY:
     {
-      if( IsOnStage() )
+      if( IsOnStage() && mVisualSize != Vector2::ZERO )
       {
         mVectorRasterizeThread.PlayAnimation();
 

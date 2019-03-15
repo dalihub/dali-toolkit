@@ -64,9 +64,14 @@ public:
   {
   }
 
-  uint32_t GetTotalFrameNumber()
+  uint32_t GetTotalFrameNumber() const
   {
     return 5;
+  }
+
+  float GetFrameRate() const
+  {
+    return 60.0f;
   }
 
 public:
@@ -157,9 +162,14 @@ void VectorAnimationRenderer::Render( uint32_t frameNumber )
   Internal::Adaptor::GetImplementation( *this ).Render( frameNumber );
 }
 
-uint32_t VectorAnimationRenderer::GetTotalFrameNumber()
+uint32_t VectorAnimationRenderer::GetTotalFrameNumber() const
 {
   return Internal::Adaptor::GetImplementation( *this ).GetTotalFrameNumber();
+}
+
+float VectorAnimationRenderer::GetFrameRate() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetFrameRate();
 }
 
 } // namespace Dali;

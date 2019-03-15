@@ -1741,7 +1741,7 @@ int UtcDaliLayouting_HboxLayout_TextLabel(void)
   application.Render();
 
   DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 368.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 54.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 52.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   textLabel.SetProperty( TextLabel::Property::TEXT, "WWWW" );
 
@@ -1750,7 +1750,7 @@ int UtcDaliLayouting_HboxLayout_TextLabel(void)
   application.Render();
 
   DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 368.0f, 0.0f ), 0.0001f, TEST_LOCATION );
-  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 216.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( controls[0].GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 214.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   textLabel.SetProperty( TextLabel::Property::POINT_SIZE, 10.0f );
 
@@ -2804,7 +2804,7 @@ int UtcDaliLayouting_LayoutGroup01(void)
   application.Render();
 
   tet_infoline("Test text is it's natural size");
-  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 230.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 228.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   tet_infoline("Test control is width of it's parent and height of it's child");
   DALI_TEST_EQUALS( control.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 600.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
@@ -2853,7 +2853,7 @@ int UtcDaliLayouting_LayoutGroup02(void)
   application.Render();
 
   tet_infoline("Test text is it's natural size");
-  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 230.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 228.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   tet_infoline("Test text is centered in the control, the control is the size of the largest child");
   DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3( 0.0f, 0.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
@@ -3023,9 +3023,9 @@ int UtcDaliLayouting_LayoutGroupWithPadding01(void)
   application.Render();
 
   tet_infoline("Test text is it's natural size");
-  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 230.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 228.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   tet_infoline("Test control is size of it's child and control it's own padding");
-  DALI_TEST_EQUALS( control.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 245.0f, 86.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 243.0f, 86.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -3073,9 +3073,9 @@ int UtcDaliLayouting_LayoutGroupWithChildMargin01(void)
   application.Render();
 
   tet_infoline("Test text is it's natural size");
-  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 230.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( textLabel.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 228.0f, 64.0f, 0.0f ), 0.0001f, TEST_LOCATION );
   tet_infoline("Test control is width of it's parent and height of it's child");
-  DALI_TEST_EQUALS( control.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 255.0f, 91.0f, 0.0f ), 0.0001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( control.GetProperty<Vector3>( Actor::Property::SIZE ), Vector3( 253.0f, 91.0f, 0.0f ), 0.0001f, TEST_LOCATION );
 
   END_TEST;
 }

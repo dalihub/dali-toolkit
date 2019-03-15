@@ -552,13 +552,13 @@ int UtcDaliTextSoftwareStyling(void)
   struct GlyphInfoData glyphs01[] =
   {
     { 2u, 21154u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
-    { 2u, 12298, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
+    { 2u, 12298u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
     { 2u, 17828u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
   };
   struct GlyphInfoData glyphs02[] =
   {
     { 2u, 21154u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, false, false },
-    { 2u, 12298, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, false, true },
+    { 2u, 12298u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, false, true },
     { 2u, 17828u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true,  false },
   };
 

@@ -68,12 +68,12 @@ Adaptor& Adaptor::New( Window window, Configuration::ContextLoss configuration )
   return Internal::Adaptor::Adaptor::Get();
 }
 
-Adaptor& Adaptor::New( Any nativeWindow, const Dali::RenderSurfaceInterface& surface )
+Adaptor& Adaptor::New( Window window, const Dali::RenderSurfaceInterface& surface )
 {
   return Internal::Adaptor::Adaptor::Get();
 }
 
-Adaptor& Adaptor::New( Any nativeWindow, const Dali::RenderSurfaceInterface& surface, Configuration::ContextLoss configuration )
+Adaptor& Adaptor::New( Window window, const Dali::RenderSurfaceInterface& surface, Configuration::ContextLoss configuration )
 {
   return Internal::Adaptor::Adaptor::Get();
 }
@@ -130,7 +130,7 @@ void Adaptor::RemoveIdle( CallbackBase* callback )
   }
 }
 
-void Adaptor::ReplaceSurface( Any nativeWindow, Dali::RenderSurfaceInterface& surface )
+void Adaptor::ReplaceSurface( Window window, Dali::RenderSurfaceInterface& surface )
 {
 }
 
