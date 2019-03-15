@@ -18,6 +18,7 @@ SET(TC_SOURCES
   utc-Dali-CubeTransitionEffect.cpp
   utc-Dali-EffectsView.cpp
   utc-Dali-FlexContainer.cpp
+  utc-Dali-FlexNode.cpp
   utc-Dali-GaussianBlurView.cpp
   utc-Dali-ImageView.cpp
   utc-Dali-ImageVisual.cpp
