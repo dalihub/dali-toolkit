@@ -44,7 +44,7 @@ Stagehand connects to DALi via network using a TCP/IP connection, to enable this
 
 Here is an example dali-adaptor configure line:
 ~~~
-$ CXXFLAGS="-g -O0 -Wno-unused-local-typedefs" CXX="ccache g++" ./configure --prefix=$DESKTOP_PREFIX --enable-debug=yes --enable-profile=UBUNTU --enable-gles=20 --enable-networklogging
+$ CXXFLAGS="-g -O0 -Wno-unused-local-typedefs" CXX="ccache g++" ./configure --prefix=$DESKTOP_PREFIX --enable-debug=yes --enable-profile=UBUNTU --enable-networklogging
 ~~~
 
 Once this RPM is installed, you can run your DALi application and connect Stagehand to it.
