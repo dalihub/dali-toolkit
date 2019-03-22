@@ -51,7 +51,7 @@ make install -j8
 ~~~{.sh}
 cd dali-adaptor/build/tizen
 autoreconf --install
-./configure --prefix=$DESKTOP_PREFIX --enable-profile=UBUNTU
+./configure --prefix=$DESKTOP_PREFIX --enable-profile=UBUNTU --enable-gles=20
 make install -j8
 ~~~
 
