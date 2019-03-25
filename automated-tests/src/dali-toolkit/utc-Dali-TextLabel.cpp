@@ -24,6 +24,8 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-label-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-style-properties-devel.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali/devel-api/text-abstraction/bitmap-font.h>
+#include <dali-toolkit/devel-api/text/bitmap-font.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -1416,6 +1418,53 @@ int UtcDaliToolkitTextlabelVerticalLineAlignment(void)
 
   label.SetProperty( DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT, DevelText::VerticalLineAlignment::BOTTOM  );
   DALI_TEST_EQUALS( label.GetProperty< int >( DevelTextLabel::Property::VERTICAL_LINE_ALIGNMENT ), static_cast< int >( Toolkit::DevelText::VerticalLineAlignment::BOTTOM ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextLabelBitmapFont(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextLabelBitmapFont");
+
+  DevelText::BitmapFontDescription fontDescription;
+  fontDescription.name = "Digits";
+  fontDescription.underlinePosition = 0.f;
+  fontDescription.underlineThickness = 0.f;
+
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0030.png", ":", 34.f, 0.f } );
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0031.png", "0", 34.f, 0.f } );
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0032.png", "1", 34.f, 0.f } );
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0033.png", "2", 34.f, 0.f } );
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0034.png", "3", 34.f, 0.f } );
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0035.png", "4", 34.f, 0.f } );
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0036.png", "5", 34.f, 0.f } );
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0037.png", "6", 34.f, 0.f } );
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0038.png", "7", 34.f, 0.f } );
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0039.png", "8", 34.f, 0.f } );
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u003a.png", "9", 34.f, 0.f } );
+
+  TextAbstraction::BitmapFont bitmapFont;
+  DevelText::CreateBitmapFont( fontDescription, bitmapFont );
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.GetFontId( bitmapFont );
+
+  TextLabel label = TextLabel::New();
+
+  label.SetProperty( TextLabel::Property::TEXT, "0123456789:" );
+  label.SetProperty( TextLabel::Property::FONT_FAMILY, "Digits" );
+
+  // The text has been laid out with the bitmap font if the natural size is the sum of all the width (322) and 34 height.
+  DALI_TEST_EQUALS( label.GetNaturalSize(), Vector3(322.f, 34.f, 0.f), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( label );
+
+  application.SendNotification();
+  application.Render();
+
+  // The text has been rendered if the height of the text-label is the height of the line.
+  DALI_TEST_EQUALS( label.GetCurrentSize().height, 34.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }
