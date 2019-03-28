@@ -340,7 +340,7 @@ void TextScroller::AutoScrollAnimationFinished( Dali::Animation& animation )
 
 void TextScroller::StartScrolling( Actor scrollingTextActor, float scrollAmount, float scrollDuration, int loopCount )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::StartScrolling scrollAmount[%f] scrollDuration[%f], loop[%d] speed[%d]\n", scrollAmount, scrollDuration, loopCount, mScrollSpeed );
+  DALI_LOG_RELEASE_INFO("TextScroller::StartScrolling scrollAmount[%f] scrollDuration[%f], loop[%d] speed[%d]\n", scrollAmount, scrollDuration, loopCount, mScrollSpeed );
 
   mScrollAnimation = Animation::New( scrollDuration );
   mScrollAnimation.AnimateTo( Property( scrollingTextActor, mScrollDeltaIndex ), scrollAmount, TimePeriod( mLoopDelay, scrollDuration ) );
