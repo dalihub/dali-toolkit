@@ -44,13 +44,21 @@ constexpr auto NANOSECONDS_PER_SECOND( 1e+9 );
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VECTOR_ANIMATION" );
 #endif
 
+inline void ResetToStart( bool& updated, uint32_t& value, uint32_t startValue, ConditionalWait& conditionalWait )
+{
+  ConditionalWait::ScopedLock lock( conditionalWait );
+  if( !updated )
+  {
+    value = startValue;
+  }
+}
+
 } // unnamed namespace
 
 VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
 : mUrl( url ),
   mVectorRenderer(),
   mConditionalWait(),
-  mMutex(),
   mResourceReadyTrigger(),
   mAnimationFinishedTrigger(),
   mPlayRange( 0.0f, 1.0f ),
@@ -69,6 +77,7 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
   mNeedRender( false ),
   mDestroyThread( false ),
   mResourceReady( false ),
+  mCurrentFrameUpdated( false ),
   mLogFactory( Dali::Adaptor::Get().GetLogFactory() )
 {
   mVectorRenderer = VectorAnimationRenderer::New( mUrl );
@@ -99,7 +108,7 @@ void VectorRasterizeThread::Run()
   //TODO: check the return value
   StartRender();
 
-  while( IsThreadReady() )
+  while( !mDestroyThread )
   {
     Rasterize();
   }
@@ -149,10 +158,6 @@ void VectorRasterizeThread::StopAnimation()
   {
     mPlayState = DevelImageVisual::PlayState::STOPPED;
 
-    // Reset the current frame and the current loop
-    mCurrentFrame = mStartFrame;
-    mCurrentLoop = 0;
-
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StopAnimation: Stop\n" );
   }
 }
@@ -200,9 +205,6 @@ void VectorRasterizeThread::SetLoopCount( int32_t count )
     ConditionalWait::ScopedLock lock( mConditionalWait );
 
     mLoopCount = count;
-
-    // Reset progress
-    mCurrentLoop = 0;
   }
 }
 
@@ -239,12 +241,14 @@ void VectorRasterizeThread::SetPlayRange( Vector2 range )
         {
           mCurrentFrame = mStartFrame;
 
+          mCurrentFrameUpdated = true;
           mResourceReady = false;
         }
         else if( mEndFrame < mCurrentFrame )
         {
           mCurrentFrame = mEndFrame;
 
+          mCurrentFrameUpdated = true;
           mResourceReady = false;
         }
       }
@@ -268,6 +272,7 @@ void VectorRasterizeThread::SetCurrentProgress( float progress )
     if( mTotalFrame != 0 )
     {
       mCurrentFrame = static_cast< uint32_t >( mTotalFrame * progress + 0.5f );
+      mCurrentFrameUpdated = true;
     }
 
     mResourceReady = false;
@@ -289,21 +294,6 @@ DevelImageVisual::PlayState VectorRasterizeThread::GetPlayState() const
 bool VectorRasterizeThread::IsResourceReady() const
 {
   return mResourceReady;
-}
-
-bool VectorRasterizeThread::IsThreadReady()
-{
-  ConditionalWait::ScopedLock lock( mConditionalWait );
-
-  if( mPlayState != DevelImageVisual::PlayState::PLAYING && !mNeedRender && !mDestroyThread )
-  {
-    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::IsThreadReady: Wait\n" );
-
-    mConditionalWait.Wait( lock );
-  }
-
-  // Keep the thread alive if this thread is NOT to be destroyed
-  return !mDestroyThread;
 }
 
 bool VectorRasterizeThread::StartRender()
@@ -328,55 +318,71 @@ bool VectorRasterizeThread::StartRender()
 
 void VectorRasterizeThread::Rasterize()
 {
-  bool needRender, resourceReady;
+  bool resourceReady;
+  uint32_t currentFrame, startFrame, endFrame;
+  int32_t loopCount;
+  DevelImageVisual::PlayState playState;
 
   {
     ConditionalWait::ScopedLock lock( mConditionalWait );
-    needRender = mNeedRender;
+
+    if( mPlayState != DevelImageVisual::PlayState::PLAYING && !mNeedRender && !mDestroyThread )
+    {
+      DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Wait\n" );
+
+      if( mPlayState == DevelImageVisual::PlayState::STOPPED )
+      {
+        // Reset the current frame and the current loop
+        mCurrentFrame = mStartFrame;
+        mCurrentLoop = 0;
+      }
+      mConditionalWait.Wait( lock );
+    }
+
     resourceReady = mResourceReady;
+    currentFrame = mCurrentFrame++;
+    startFrame = mStartFrame;
+    endFrame = mEndFrame;
+    loopCount = mLoopCount;
+    playState = mPlayState;
+
+    mNeedRender = false;
+    mResourceReady = true;
+    mCurrentFrameUpdated = false;
   }
 
   auto currentFrameStartTime = std::chrono::system_clock::now();
 
   // Rasterize
-  mVectorRenderer.Render( mCurrentFrame );
+  mVectorRenderer.Render( currentFrame );
 
-  if( mPlayState == DevelImageVisual::PlayState::PLAYING )
+  if( playState == DevelImageVisual::PlayState::PLAYING )
   {
-    if( ++mCurrentFrame >= mEndFrame )
+    if( currentFrame >= endFrame )
     {
-      if( mLoopCount < 0 )
+      if( loopCount < 0 )
       {
         // repeat forever
-        mCurrentFrame = mStartFrame;
+        ResetToStart( mCurrentFrameUpdated, mCurrentFrame, startFrame, mConditionalWait );  // If the current frame is changed in the event thread, don't overwrite it.
       }
       else
       {
         mCurrentLoop++;
-        if( mCurrentLoop >= mLoopCount )
+        if( mCurrentLoop >= loopCount )
         {
-          // Animation is finished
           mPlayState = DevelImageVisual::PlayState::STOPPED;
 
-          // Reset the current frame and the current loop
-          mCurrentFrame = mStartFrame;
-          mCurrentLoop = 0;
-
+          // Animation is finished
           mAnimationFinishedTrigger->Trigger();
 
           DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Animation is finished\n" );
         }
         else
         {
-          mCurrentFrame = mStartFrame;
+          ResetToStart( mCurrentFrameUpdated, mCurrentFrame, startFrame, mConditionalWait );
         }
       }
     }
-  }
-
-  if( needRender )
-  {
-    mNeedRender = false;
   }
 
   if( !resourceReady )
@@ -384,7 +390,6 @@ void VectorRasterizeThread::Rasterize()
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Resource ready trigger\n" );
 
     mResourceReadyTrigger->Trigger();
-    mResourceReady = true;
   }
 
   auto timeToSleepUntil = currentFrameStartTime + std::chrono::nanoseconds( mFrameDurationNanoSeconds );
