@@ -458,8 +458,18 @@ int UtcDaliAnimatedVectorImageVisualNaturalSize(void)
   Vector2 controlSize( 20.f, 30.f );
   Vector2 naturalSize;
 
-  actor.SetSize( controlSize );
   Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  visual.GetNaturalSize( naturalSize );
+
+  DALI_TEST_EQUALS( naturalSize, Vector2( 100.0f, 100.0f ), TEST_LOCATION );    // 100x100 is the content default size.
+
+  actor.SetSize( controlSize );
 
   application.SendNotification();
   application.Render();
