@@ -154,6 +154,12 @@ public:
    */
   float GetCurrentProgress() const;
 
+  /**
+   * @brief Gets the default size of the file,.
+   * @return The default size of the file
+   */
+  void GetDefaultSize( uint32_t& width, uint32_t& height ) const;
+
 protected:
 
   /**
@@ -165,9 +171,9 @@ protected:
 private:
 
   /**
-   * @brief Start rendering
+   * @brief Initialize the vector renderer.
    */
-  bool StartRender();
+  void Initialize();
 
   /**
    * @brief Rasterize the current frame.
