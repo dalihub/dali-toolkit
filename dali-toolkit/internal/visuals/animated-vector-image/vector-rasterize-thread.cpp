@@ -156,6 +156,9 @@ void VectorRasterizeThread::StopAnimation()
   {
     mPlayState = DevelImageVisual::PlayState::STOPPED;
 
+    mCurrentFrame = mStartFrame;
+    mCurrentFrameUpdated = true;
+
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StopAnimation: Stop\n" );
   }
 }
@@ -330,8 +333,7 @@ void VectorRasterizeThread::Rasterize()
 
       if( mPlayState == DevelImageVisual::PlayState::STOPPED )
       {
-        // Reset the current frame and the current loop
-        mCurrentFrame = mStartFrame;
+        // Reset the current loop
         mCurrentLoop = 0;
       }
       mConditionalWait.Wait( lock );
