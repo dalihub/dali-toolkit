@@ -477,6 +477,12 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
   StyleStack::RunIndex colorRunIndex = 0u;
   StyleStack::RunIndex fontRunIndex = 0u;
 
+  // check tag reference
+  int colorTagReference = 0u;
+  int fontTagReference = 0u;
+  int iTagReference = 0u;
+  int bTagReference = 0u;
+
   // Give an initial default value to the model's vectors.
   markupProcessData.colorRuns.Reserve( DEFAULT_VECTOR_SIZE );
   markupProcessData.fontRuns.Reserve( DEFAULT_VECTOR_SIZE );
@@ -515,12 +521,19 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
 
           // Point the next color run.
           ++colorRunIndex;
+
+          // Increase reference
+          ++colorTagReference;
         }
         else
         {
-          // Pop the top of the stack and set the number of characters of the run.
-          ColorRun& colorRun = *( markupProcessData.colorRuns.Begin() + styleStack.Pop() );
-          colorRun.characterRun.numberOfCharacters = characterIndex - colorRun.characterRun.characterIndex;
+          if( colorTagReference > 0 )
+          {
+            // Pop the top of the stack and set the number of characters of the run.
+            ColorRun& colorRun = *( markupProcessData.colorRuns.Begin() + styleStack.Pop() );
+            colorRun.characterRun.numberOfCharacters = characterIndex - colorRun.characterRun.characterIndex;
+            --colorTagReference;
+          }
         }
       } // <color></color>
       else if( TokenComparison( XHTML_I_TAG, tag.buffer, tag.length ) )
@@ -544,12 +557,19 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
 
           // Point the next free font run.
           ++fontRunIndex;
+
+          // Increase reference
+          ++iTagReference;
         }
         else
         {
-          // Pop the top of the stack and set the number of characters of the run.
-          FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
-          fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
+          if( iTagReference > 0 )
+          {
+            // Pop the top of the stack and set the number of characters of the run.
+            FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
+            fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
+            --iTagReference;
+          }
         }
       } // <i></i>
       else if( TokenComparison( XHTML_U_TAG, tag.buffer, tag.length ) )
@@ -584,12 +604,19 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
 
           // Point the next free font run.
           ++fontRunIndex;
+
+          // Increase reference
+          ++bTagReference;
         }
         else
         {
-          // Pop the top of the stack and set the number of characters of the run.
-          FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
-          fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
+          if( bTagReference > 0 )
+          {
+            // Pop the top of the stack and set the number of characters of the run.
+            FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
+            fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
+            --bTagReference;
+          }
         }
       } // <b></b>
       else if( TokenComparison( XHTML_FONT_TAG, tag.buffer, tag.length ) )
@@ -613,12 +640,19 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
 
           // Point the next free font run.
           ++fontRunIndex;
+
+          // Increase reference
+          ++fontTagReference;
         }
         else
         {
-          // Pop the top of the stack and set the number of characters of the run.
-          FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
-          fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
+          if( fontTagReference > 0 )
+          {
+            // Pop the top of the stack and set the number of characters of the run.
+            FontDescriptionRun& fontRun = *( markupProcessData.fontRuns.Begin() + styleStack.Pop() );
+            fontRun.characterRun.numberOfCharacters = characterIndex - fontRun.characterRun.characterIndex;
+            --fontTagReference;
+          }
         }
       } // <font></font>
       else if( TokenComparison( XHTML_SHADOW_TAG, tag.buffer, tag.length ) )
