@@ -395,8 +395,18 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty( TextLabel::Property::TEXT, "<color value='white'>Markup</color><color value='cyan'>Text</color>" );
   DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::TEXT ), std::string("MarkupText"), TEST_LOCATION );
 
-  application.SendNotification();
-  application.Render();
+  // Check for incomplete marks.
+  label.SetProperty( TextLabel::Property::TEXT, "<color='white'><i>Markup</i><b>Text</b></color>" );
+  DALI_TEST_EQUALS( label.GetProperty<std::string>( TextLabel::Property::TEXT ), std::string("MarkupText"), TEST_LOCATION );
+  try
+  {
+    application.SendNotification();
+    application.Render();
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
 
   // Check autoscroll properties
   const int SCROLL_SPEED = 80;
