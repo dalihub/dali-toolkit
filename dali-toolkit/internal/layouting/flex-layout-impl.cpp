@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -335,10 +335,11 @@ YGSize FlexLayout::OnChildMeasure( YGNodeRef node,
   LayoutLength measuredWidth = childLayout->GetMeasuredWidth() - padding.end - padding.start;
   LayoutLength measuredHeight = childLayout->GetMeasuredHeight() - padding.bottom - padding.top;
 
-  return YGSize{
-    .width = measuredWidth.AsDecimal(),
-    .height = measuredHeight.AsDecimal(),
-  };
+  // Create struct instance first and manually set params to support all compiler versions
+  YGSize ygSize;
+  ygSize.width = measuredWidth.AsDecimal();
+  ygSize.height = measuredHeight.AsDecimal();
+  return ygSize;
 }
 
 void FlexLayout::SetChildrenStyle()
