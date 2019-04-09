@@ -16,6 +16,8 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <chrono>
+#include <thread>
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-timer.h>
 #include <toolkit-event-thread-callback.h>
@@ -282,6 +284,8 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
     application.SendNotification();
     application.Render( 16 );
 
+    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );    // wait for one animation loop (16fps, 5frames, need 80ms)
+
     DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
     Property::Map map = dummyControl.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
@@ -293,6 +297,8 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
 
     application.SendNotification();
     application.Render(16);
+
+    std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
 
     map = dummyControl.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
     value = map.Find( DevelImageVisual::Property::PLAY_STATE );
@@ -642,6 +648,29 @@ int UtcDaliAnimatedVectorImageVisualJumpToCurrentProgress(void)
   value = map.Find( DevelImageVisual::Property::CURRENT_PROGRESS );
   DALI_TEST_EQUALS( value->Get< float >(), 0.4f, TEST_LOCATION );
 
+  // Change play range
+  attributes.Clear();
+  attributes.Add( DevelImageVisual::Property::PLAY_RANGE, Vector2( 0.0f, 1.0f ) );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+
+  attributes.Clear();
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
+
+  application.SendNotification();
+  application.Render();
+
+  // Stop and jump to 0.2
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::STOP, attributes );
+
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 0.2f );
+
+  application.SendNotification();
+  application.Render();
+
+  map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  value = map.Find( DevelImageVisual::Property::CURRENT_PROGRESS );
+  DALI_TEST_EQUALS( value->Get< float >(), 0.2f, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -650,7 +679,7 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   ToolkitTestApplication application;
   tet_infoline( "UtcDaliAnimatedVectorImageVisualJumpToCurrentProgress" );
 
-  Vector2 playRange( 0.2f, 0.8f );
+  Vector2 playRange( 0.2f, 0.5f );
 
   Property::Map propertyMap;
   propertyMap.Add( Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE )
@@ -682,7 +711,7 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
   DALI_TEST_EQUALS( value->Get< Vector2 >(), playRange, TEST_LOCATION );
 
-  Vector2 newPlayRange( 0.4f, 1.0f );
+  Vector2 newPlayRange( 0.6f, 1.0f );
 
   Property::Map attributes;
   attributes.Add( DevelImageVisual::Property::PLAY_RANGE, newPlayRange );
@@ -699,6 +728,18 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
 
   value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
   DALI_TEST_EQUALS( value->Get< Vector2 >(), newPlayRange, TEST_LOCATION );
+
+  attributes.Clear();
+  attributes.Add( DevelImageVisual::Property::PLAY_RANGE, playRange );
+
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+
+  application.SendNotification();
+  application.Render();
+
+  map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), playRange, TEST_LOCATION );
 
   END_TEST;
 }
