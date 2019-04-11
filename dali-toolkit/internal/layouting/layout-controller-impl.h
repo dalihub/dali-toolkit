@@ -18,7 +18,7 @@
  */
 #include <list>
 #include <dali/public-api/object/base-object.h>
-#include <dali/integration-api/core.h>
+#include <dali/integration-api/processor-interface.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/layouting/layout-controller.h>
 #include <dali-toolkit/devel-api/layouting/layout-item-impl.h>

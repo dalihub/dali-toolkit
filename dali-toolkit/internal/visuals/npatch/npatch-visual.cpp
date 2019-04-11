@@ -173,7 +173,7 @@ void NPatchVisual::LoadImages()
 {
   if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocalResource() )
   {
-    bool preMultiplyOnLoad = mFactoryCache.GetPreMultiplyOnLoad() && !mImpl->mCustomShader ? true : false;
+    bool preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader ? true : false;
 
     mId = mLoader.Load( mImageUrl.GetUrl(), mBorder, preMultiplyOnLoad );
 
@@ -316,6 +316,7 @@ NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
   mBorder(),
   mAuxiliaryImageAlpha( 0.0f )
 {
+  EnablePreMultipliedAlpha( mFactoryCache.GetPreMultiplyOnLoad() );
 }
 
 NPatchVisual::~NPatchVisual()

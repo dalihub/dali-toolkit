@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -307,7 +307,7 @@ void FeedbackStyle::LoadFromString( const string& data )
 
             if( signalFeedbackInfo.mHasHapticFeedbackInfo || signalFeedbackInfo.mHasSoundFeedbackInfo )
             {
-              AddSignalInfo( themeInfo, signalFeedbackInfo );
+              AddSignalInfo( themeInfo, std::move( signalFeedbackInfo ) );
             }
           }
         }
@@ -320,10 +320,10 @@ void FeedbackStyle::LoadFromString( const string& data )
 
 } // LoadFromString()
 
-void FeedbackStyle::AddSignalInfo( FeedbackStyleInfo& styleInfo, SignalFeedbackInfo signalInfo )
+void FeedbackStyle::AddSignalInfo( FeedbackStyleInfo& styleInfo, SignalFeedbackInfo&& signalInfo )
 {
   bool updated = false;
-  std::vector<SignalFeedbackInfo>::iterator iter;
+  SignalFeedbackInfoContainer::iterator iter;
 
   // If info exists for the signal then update it, else add new
   for( iter = styleInfo.mSignalFeedbackInfoList.begin(); iter != styleInfo.mSignalFeedbackInfoList.end(); ++iter )
@@ -344,7 +344,7 @@ void FeedbackStyle::AddSignalInfo( FeedbackStyleInfo& styleInfo, SignalFeedbackI
 
   if( !updated )
   {
-    styleInfo.mSignalFeedbackInfoList.push_back( signalInfo );
+    styleInfo.mSignalFeedbackInfoList.emplace_back( std::move( signalInfo ) );
   }
 }
 

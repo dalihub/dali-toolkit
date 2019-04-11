@@ -46,7 +46,16 @@ namespace Internal
 namespace
 {
 
+constexpr auto LOOP_FOREVER = -1;
+
 const Dali::Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
+
+// Flags for re-sending data to the rasterize thread
+enum Flags
+{
+  RESEND_PLAY_RANGE  = 1 << 0,
+  RESEND_LOOP_COUNT  = 1 << 1
+};
 
 } // unnamed namespace
 
@@ -71,7 +80,10 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
   mUrl( imageUrl ),
   mVectorRasterizeThread( imageUrl.GetUrl() ),
   mVisualSize(),
+  mPlayRange( 0.0f, 1.0f ),
   mPlacementActor(),
+  mLoopCount( LOOP_FOREVER ),
+  mResendFlag( 0 ),
   mActionStatus( DevelAnimatedVectorImageVisual::Action::STOP )
 {
   // the rasterized image is with pre-multiplied alpha format
@@ -100,9 +112,10 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   {
     map.Insert( Toolkit::ImageVisual::Property::URL, mUrl.GetUrl() );
   }
-  map.Insert( Toolkit::DevelImageVisual::Property::LOOP_COUNT, static_cast< int >( mVectorRasterizeThread.GetLoopCount() ) );
-  map.Insert( Toolkit::DevelImageVisual::Property::PLAY_RANGE, static_cast< Vector2 >( mVectorRasterizeThread.GetPlayRange() ) );
+  map.Insert( Toolkit::DevelImageVisual::Property::LOOP_COUNT, mLoopCount );
+  map.Insert( Toolkit::DevelImageVisual::Property::PLAY_RANGE, mPlayRange );
   map.Insert( Toolkit::DevelImageVisual::Property::PLAY_STATE, static_cast< int >( mVectorRasterizeThread.GetPlayState() ) );
+  map.Insert( Toolkit::DevelImageVisual::Property::CURRENT_PROGRESS, mVectorRasterizeThread.GetCurrentProgress() );
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -143,7 +156,8 @@ void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Prop
       int32_t loopCount;
       if( value.Get( loopCount ) )
       {
-        mVectorRasterizeThread.SetLoopCount( loopCount );
+        mLoopCount = loopCount;
+        mResendFlag |= RESEND_LOOP_COUNT;
       }
       break;
     }
@@ -152,7 +166,8 @@ void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Prop
       Vector2 range;
       if( value.Get( range ) )
       {
-        mVectorRasterizeThread.SetPlayRange( range );
+        mPlayRange = range;
+        mResendFlag |= RESEND_PLAY_RANGE;
       }
       break;
     }
@@ -238,6 +253,8 @@ void AnimatedVectorImageVisual::OnSetTransform()
       mVectorRasterizeThread.SetSize( width, height );
     }
 
+    SendAnimationData();
+
     if( mActionStatus == DevelAnimatedVectorImageVisual::Action::PLAY )
     {
       mVectorRasterizeThread.PlayAnimation();
@@ -271,7 +288,7 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
   {
     case DevelAnimatedVectorImageVisual::Action::PLAY:
     {
-      if( IsOnStage() )
+      if( IsOnStage() && mVisualSize != Vector2::ZERO )
       {
         mVectorRasterizeThread.PlayAnimation();
 
@@ -303,6 +320,32 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
       mActionStatus = DevelAnimatedVectorImageVisual::Action::STOP;
       break;
     }
+    case DevelAnimatedVectorImageVisual::Action::JUMP_TO:
+    {
+      float progress;
+      if( attributes.Get( progress ) )
+      {
+        mVectorRasterizeThread.SetCurrentProgress( progress );
+
+        if( mVectorRasterizeThread.GetPlayState() != DevelImageVisual::PlayState::PLAYING )
+        {
+          mVectorRasterizeThread.RenderFrame();
+          Stage::GetCurrent().KeepRendering( 0.0f );    // Trigger rendering
+        }
+      }
+      break;
+    }
+    case DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY:
+    {
+      Property::Map* map = attributes.GetMap();
+      if( map )
+      {
+        DoSetProperties( *map );
+
+        SendAnimationData();
+      }
+      break;
+    }
   }
 }
 
@@ -315,9 +358,9 @@ void AnimatedVectorImageVisual::OnResourceReady()
     actor.AddRenderer( mImpl->mRenderer );
     // reset the weak handle so that the renderer only get added to actor once
     mPlacementActor.Reset();
-  }
 
-  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
+    ResourceReady( Toolkit::Visual::ResourceStatus::READY );
+  }
 }
 
 void AnimatedVectorImageVisual::OnAnimationFinished()
@@ -332,6 +375,41 @@ void AnimatedVectorImageVisual::OnAnimationFinished()
   if( mImpl->mRenderer )
   {
     mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED );
+  }
+}
+
+void AnimatedVectorImageVisual::SendAnimationData()
+{
+  if( mResendFlag )
+  {
+    bool isPlaying = false;
+    if( mVectorRasterizeThread.GetPlayState() == DevelImageVisual::PlayState::PLAYING )
+    {
+      mVectorRasterizeThread.PauseAnimation();
+      isPlaying = true;
+    }
+
+    if( mResendFlag & RESEND_LOOP_COUNT )
+    {
+      mVectorRasterizeThread.SetLoopCount( mLoopCount );
+    }
+
+    if( mResendFlag & RESEND_PLAY_RANGE )
+    {
+      mVectorRasterizeThread.SetPlayRange( mPlayRange );
+    }
+
+    if( isPlaying )
+    {
+      mVectorRasterizeThread.PlayAnimation();
+    }
+    else
+    {
+      mVectorRasterizeThread.RenderFrame();
+      Stage::GetCurrent().KeepRendering( 0.0f );
+    }
+
+    mResendFlag = 0;
   }
 }
 

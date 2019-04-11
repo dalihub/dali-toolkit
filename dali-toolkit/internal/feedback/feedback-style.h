@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_FEEDBACK_STYLE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,7 +121,7 @@ private:
    * @param [in] styleInfo The information will be stored here.
    * @param [in] signalInfo The information to add.
    */
-  void AddSignalInfo( FeedbackStyleInfo& styleInfo, SignalFeedbackInfo signalInfo );
+  void AddSignalInfo( FeedbackStyleInfo& styleInfo, SignalFeedbackInfo&& signalInfo );
 
   /**
    * Map a pattern string to feedback pattern ID.

@@ -108,7 +108,8 @@ void CreateTextModel( const std::string& text,
   visualModel = VisualModel::New();
 
   MarkupProcessData markupProcessData( logicalModel->mColorRuns,
-                                       logicalModel->mFontDescriptionRuns );
+                                       logicalModel->mFontDescriptionRuns,
+                                       logicalModel->mEmbeddedItems );
 
   Length textSize = 0u;
   const uint8_t* utf8 = NULL;

@@ -95,6 +95,15 @@ void JumpToWhiteSpace( const char*& stringBuffer,
                        const char* const stringEndBuffer );
 
 /**
+* @brief Converts a string into an unsigned int.
+*
+* @param[in] uintStr An unsigned int packed inside a string.
+*
+* @return The unsigned int value.
+*/
+unsigned int StringToUint( const char* const uintStr );
+
+/**
  * @brief Converts a string into an hexadecimal unsigned int.
  *
  * @param[in] uintStr An hexadecimal unsigned int packed inside a string.

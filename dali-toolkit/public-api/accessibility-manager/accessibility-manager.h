@@ -763,6 +763,7 @@ public:
   AccessibilityActionSignalType& ActionZoomSignal();
 
   /**
+   * @DEPRECATED_1_4.9
    * @brief This is emitted when accessibility action is received to read the information
    * in the indicator (by two fingers triple tap).
    *

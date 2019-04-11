@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_FONT_DESCRIPTION_RUN_H__
-#define __DALI_TOOLKIT_TEXT_FONT_DESCRIPTION_RUN_H__
+#ifndef DALI_TOOLKIT_TEXT_FONT_DESCRIPTION_RUN_H
+#define DALI_TOOLKIT_TEXT_FONT_DESCRIPTION_RUN_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,50 @@ namespace Text
  */
 struct FontDescriptionRun
 {
+  /**
+   * Default constructor to set the default values of bitfields
+   */
+  FontDescriptionRun()
+  : characterRun{},
+    familyName{ nullptr },
+    familyLength{ 0u },
+    weight{ FontWeight::NONE },
+    width{ FontWidth::NONE },
+    slant{ FontSlant::NONE },
+    size{ 0u },
+    familyDefined{ false },
+    weightDefined{ false },
+    widthDefined{ false },
+    slantDefined{ false },
+    sizeDefined{ false }
+  {}
+
+  FontDescriptionRun( const CharacterRun& characterRun,
+                      char* familyName,
+                      Length familyLength,
+                      FontWeight weight,
+                      FontWidth width,
+                      FontSlant slant,
+                      PointSize26Dot6 size,
+                      bool familyDefined,
+                      bool weightDefined,
+                      bool widthDefined,
+                      bool slantDefined,
+                      bool sizeDefined )
+  : characterRun{ characterRun },
+    familyName{ familyName },
+    familyLength{ familyLength },
+    weight{ weight },
+    width{ width },
+    slant{ slant },
+    size{ size },
+    familyDefined{ familyDefined },
+    weightDefined{ weightDefined },
+    widthDefined{ widthDefined },
+    slantDefined{ slantDefined },
+    sizeDefined{ sizeDefined }
+  {}
+
   CharacterRun    characterRun; ///< The initial character index and the number of characters of the run.
   char*           familyName;   ///< The font's family name.
   Length          familyLength; ///< The length of the font's family name.
@@ -47,11 +91,11 @@ struct FontDescriptionRun
   FontSlant       slant;        ///< The font's slant.
   PointSize26Dot6 size;         ///< The font's size.
 
-  bool familyDefined : 1; ///< Whether the font's family is defined.
-  bool weightDefined : 1; ///< Whether the font's weight is defined.
-  bool widthDefined  : 1; ///< Whether the font's width is defined.
-  bool slantDefined  : 1; ///< Whether the font's slant is defined.
-  bool sizeDefined   : 1; ///< Whether the font's size is defined.
+  bool familyDefined : 1;       ///< Whether the font's family is defined.
+  bool weightDefined : 1;       ///< Whether the font's weight is defined.
+  bool widthDefined  : 1;       ///< Whether the font's width is defined.
+  bool slantDefined  : 1;       ///< Whether the font's slant is defined.
+  bool sizeDefined   : 1;       ///< Whether the font's size is defined.
 };
 
 } // namespace Text
@@ -60,4 +104,4 @@ struct FontDescriptionRun
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_FONT_DESCRIPTION_RUN_H__
+#endif // DALI_TOOLKIT_TEXT_FONT_DESCRIPTION_RUN_H

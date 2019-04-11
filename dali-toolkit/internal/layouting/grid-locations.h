@@ -73,8 +73,7 @@ public:
    * Uses the given parameters to calculate the x,y coordinates of each cell and cell size.
    */
   void CalculateLocations( int numberOfColumns, unsigned int availableWidth,
-                           unsigned int availableHeight, unsigned int numberOfCells,
-                           unsigned int columnWidth, unsigned int rowHeight );
+                           unsigned int availableHeight, unsigned int numberOfCells );
 
   LocationVector GetLocations();
 

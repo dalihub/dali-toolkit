@@ -867,8 +867,8 @@ int UtcDaliGetLogicalCursorIndex(void)
   unsigned int characterIndex06[] = {  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,
                                       12u, 12u, 12u, 12u, 12u, 12u };
 
-  unsigned int logicalIndex06[] = { 10u,  9u,  8u,  7u,  6u,  5u,  4u,  3u,  2u,  1u,  0u,
-                                    16u, 15u, 14u, 13u, 12u, 11u };
+  unsigned int logicalIndex06[] = { 11u, 10u,  9u,  8u,  7u,  6u,  5u,  4u,  3u,  2u,  1u,
+                                    13u, 16u, 15u, 14u, 13u, 12u };
 
   unsigned int bidirectionalLineIndex06[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
                                               1u, 1u, 1u, 1u, 1u, 1u };

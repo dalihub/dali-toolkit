@@ -92,6 +92,11 @@ void JumpToWhiteSpace( const char*& stringBuffer,
   for( ; ( WHITE_SPACE != *stringBuffer ) && ( stringBuffer < stringEndBuffer ); ++stringBuffer );
 }
 
+unsigned int StringToUint( const char* const uintStr )
+{
+  return static_cast<unsigned int>( strtoul( uintStr, NULL, 10 ) );
+}
+
 unsigned int StringToHex( const char* const uintStr )
 {
   return static_cast<unsigned int>( strtoul( uintStr, NULL, 16 ) );

@@ -424,6 +424,8 @@ private:
 
   typedef size_t TextureHash; ///< The type used to store the hash used for Texture caching.
 
+  // Structs:
+
   /**
    * @brief This struct is used to manage the life-cycle of Texture loading and caching.
    */
@@ -495,7 +497,20 @@ private:
     bool preMultiplied:1;          ///< true if the image's color was multiplied by it's alpha
   };
 
-  // Structs:
+  /**
+   * Structure to hold info about a texture load queued during NotifyObservers
+   */
+  struct LoadQueueElement
+  {
+    LoadQueueElement( TextureId textureId, TextureUploadObserver* observer )
+    : mTextureId( textureId ),
+      mObserver( observer )
+    {
+    }
+
+    TextureId mTextureId; ///< The texture id of the requested load.
+    TextureUploadObserver* mObserver; ///< Observer of texture load.
+  };
 
   /**
    * Struct to hold information about a requested Async load.
@@ -519,16 +534,35 @@ private:
   typedef std::vector<TextureInfo>      TextureInfoContainerType;       ///< The container type used to manage the life-cycle and caching of Textures
 
   /**
+   * @brief Initiate a load or queue load if NotifyObservers is invoking callbacks
+   * @param[in] textureInfo The TextureInfo struct associated with the Texture
+   * @param[in] observer The observer wishing to observe the texture upload
+   */
+  void LoadOrQueueTexture( TextureInfo& textureInfo, TextureUploadObserver* observer );
+
+  /**
+   * @brief Queue a texture load to be subsequently handled by ProcessQueuedTextures.
+   * @param[in] textureInfo The TextureInfo struct associated with the Texture
+   * @param[in] observer The observer wishing to observe the texture upload
+   */
+  void QueueLoadTexture( TextureInfo& textureInfo, TextureUploadObserver* observer );
+
+  /**
    * @brief Used internally to initiate a load.
    * @param[in] textureInfo The TextureInfo struct associated with the Texture
-   * @return                True if the load was initiated
+   * @param[in] observer The observer wishing to observe the texture upload
    */
-  bool LoadTexture( TextureInfo& textureInfo );
+  void LoadTexture( TextureInfo& textureInfo, TextureUploadObserver* observer );
+
+  /**
+   * @brief Initiate load of textures queued whilst NotifyObservers invoking callbacks.
+   */
+  void ProcessQueuedTextures();
 
   /**
    * Add the observer to the observer list
    * @param[in] textureInfo The TextureInfo struct associated with the texture
-   * observer The observer wishing to observe the texture upload
+   * @param[in] observer The observer wishing to observe the texture upload
    */
   void ObserveTexture( TextureInfo & textureInfo, TextureUploadObserver* observer );
 
@@ -631,8 +665,8 @@ private:
   TextureHash GenerateHash( const std::string& url, const ImageDimensions size,
                             const FittingMode::Type fittingMode,
                             const Dali::SamplingMode::Type samplingMode, const UseAtlas useAtlas,
-                            TextureId maskTextureId,
-                            MultiplyOnLoad preMultiplyOnLoad);
+                            TextureId maskTextureId );
+
   /**
    * @brief Looks up a cached texture by its hash.
    * If found, the given parameters are used to check there is no hash-collision.
@@ -747,8 +781,10 @@ private:  // Member Variables:
   RoundRobinContainerView< AsyncLoadingHelper > mAsyncRemoteLoaders;   ///< The Asynchronous image loaders used to provide all remote async loads
   std::vector< ExternalTextureInfo >            mExternalTextures;     ///< Externally provided textures
   Dali::Vector<LifecycleObserver*>              mLifecycleObservers;   ///< Lifecycle observers of texture manager
+  Dali::Vector<LoadQueueElement>                mLoadQueue;            ///< Queue of textures to load after NotifyObservers
   std::string                                   mBrokenImageUrl;       ///< Broken image url
   TextureId                                     mCurrentTextureId;     ///< The current value used for the unique Texture Id generation
+  bool                                          mQueueLoadFlag;        ///< Flag that causes Load Textures to be queued.
 };
 
 
