@@ -25,11 +25,10 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/character-set-conversion.h>
 #include <dali-toolkit/internal/text/markup-processor-color.h>
+#include <dali-toolkit/internal/text/markup-processor-embedded-item.h>
 #include <dali-toolkit/internal/text/markup-processor-font.h>
 #include <dali-toolkit/internal/text/markup-processor-helper-functions.h>
 #include <dali-toolkit/internal/text/xhtml-entities.h>
-
-
 
 namespace Dali
 {
@@ -53,6 +52,7 @@ const std::string XHTML_U_TAG("u");
 const std::string XHTML_SHADOW_TAG("shadow");
 const std::string XHTML_GLOW_TAG("glow");
 const std::string XHTML_OUTLINE_TAG("outline");
+const std::string XHTML_ITEM_TAG("item");
 
 const char LESS_THAN      = '<';
 const char GREATER_THAN   = '>';
@@ -66,7 +66,7 @@ const char SEMI_COLON     = ';';
 const char CHAR_ARRAY_END = '\0';
 const char HEX_CODE       = 'x';
 
-const char WHITE_SPACE    = 0x20; // ASCII value of the white space.
+const char WHITE_SPACE    = 0x20;        // ASCII value of the white space.
 
 // Range 1 0x0u < XHTML_DECIMAL_ENTITY_RANGE <= 0xD7FFu
 // Range 2 0xE000u < XHTML_DECIMAL_ENTITY_RANGE <= 0xFFFDu
@@ -310,12 +310,15 @@ bool IsTag( const char*& markupStringBuffer,
   bool isQuotationOpen = false;
   bool attributesFound = false;
   tag.isEndTag = false;
+  bool isPreviousLessThan = false;
+  bool isPreviousSlash = false;
 
   const char character = *markupStringBuffer;
   if( LESS_THAN == character ) // '<'
   {
     tag.buffer = NULL;
     tag.length = 0u;
+    isPreviousLessThan = true;
 
     // if the iterator is pointing to a '<' character, then check if it's a mark-up tag is needed.
     ++markupStringBuffer;
@@ -327,12 +330,20 @@ bool IsTag( const char*& markupStringBuffer,
       {
         const char character = *markupStringBuffer;
 
-        if( SLASH == character ) // '/'
+        if( !isQuotationOpen && ( SLASH == character ) ) // '/'
         {
-          // if the tag has a '/' then it's an end or empty tag.
-          tag.isEndTag = true;
+          if (isPreviousLessThan)
+          {
+            tag.isEndTag = true;
+          }
+          else
+          {
+            // if the tag has a '/' it may be an end tag.
+            isPreviousSlash = true;
+          }
 
-          if( ( markupStringBuffer + 1u < markupStringEndBuffer ) && ( WHITE_SPACE >= *( markupStringBuffer + 1u ) ) && ( !isQuotationOpen ) )
+          isPreviousLessThan = false;
+          if( ( markupStringBuffer + 1u < markupStringEndBuffer ) && ( WHITE_SPACE >= *( markupStringBuffer + 1u ) ) )
           {
             ++markupStringBuffer;
             SkipWhiteSpace( markupStringBuffer, markupStringEndBuffer );
@@ -342,11 +353,21 @@ bool IsTag( const char*& markupStringBuffer,
         else if( GREATER_THAN == character ) // '>'
         {
           isTag = true;
+          if (isPreviousSlash)
+          {
+            tag.isEndTag = true;
+          }
+
+          isPreviousSlash = false;
+          isPreviousLessThan = false;
         }
         else if( QUOTATION_MARK == character )
         {
           isQuotationOpen = !isQuotationOpen;
           ++tag.length;
+
+          isPreviousSlash = false;
+          isPreviousLessThan = false;
         }
         else if( WHITE_SPACE >= character ) // ' '
         {
@@ -366,6 +387,9 @@ bool IsTag( const char*& markupStringBuffer,
 
           // If it's not any of the 'special' characters then just add it to the tag string.
           ++tag.length;
+
+          isPreviousSlash = false;
+          isPreviousLessThan = false;
         }
       }
     }
@@ -466,6 +490,8 @@ bool XHTMLNumericEntityToUtf8 ( const char* markupText, char* utf8 )
 
 void ProcessMarkupString( const std::string& markupString, MarkupProcessData& markupProcessData )
 {
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "markupString: %s\n", markupString.c_str() );
+
   // Reserve space for the plain text.
   const Length markupStringSize = markupString.size();
   markupProcessData.markupProcessedText.reserve( markupStringSize );
@@ -489,6 +515,7 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
   CharacterIndex characterIndex = 0u;
   for( ; markupStringBuffer < markupStringEndBuffer; )
   {
+    tag.attributes.Clear();
     if( IsTag( markupStringBuffer,
                markupStringEndBuffer,
                tag ) )
@@ -654,6 +681,22 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
           // Pop the top of the stack and set the number of characters of the run.
         }
       } // <outline></outline>
+      else if (TokenComparison(XHTML_ITEM_TAG, tag.buffer, tag.length))
+      {
+        if (tag.isEndTag)
+        {
+          // Create an embedded item instance.
+          EmbeddedItem item;
+          item.characterIndex = characterIndex;
+          ProcessEmbeddedItem(tag, item);
+
+          markupProcessData.items.PushBack(item);
+
+          // Insert white space character that will be replaced by the item.
+          markupProcessData.markupProcessedText.append( 1u, WHITE_SPACE );
+          ++characterIndex;
+        }
+      }
     }  // end if( IsTag() )
     else if( markupStringBuffer < markupStringEndBuffer )
     {
@@ -753,6 +796,14 @@ void ProcessMarkupString( const std::string& markupString, MarkupProcessData& ma
   else
   {
     markupProcessData.colorRuns.Resize( colorRunIndex );
+
+#ifdef DEBUG_ENABLED
+    for( unsigned int i=0; i<colorRunIndex; ++i )
+    {
+      ColorRun& run = markupProcessData.colorRuns[i];
+      DALI_LOG_INFO( gLogFilter, Debug::Verbose, "run[%d] index: %d, length: %d, color %f,%f,%f,%f\n", i, run.characterRun.characterIndex, run.characterRun.numberOfCharacters, run.color.r, run.color.g, run.color.b, run.color.a );
+    }
+#endif
   }
 }
 

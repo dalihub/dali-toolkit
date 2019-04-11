@@ -51,6 +51,8 @@ typedef TextAbstraction::Script             Script;             ///< The charact
 typedef TextAbstraction::LineBreakInfo      LineBreakInfo;      ///< Line break info (must break, allow break, no break). Possible values are: @e LINE_MUST_BREAK, @e LINE_ALLOW_BREAK and @e LINE_NO_BREAK (in the TextAbstraction namespace).
 typedef TextAbstraction::WordBreakInfo      WordBreakInfo;      ///< Word break info (break, no break). Possible values are: @e WORD_BREAK and @e WORD_NO_BREAK (in the TextAbstraction namespace).
 typedef TextAbstraction::CharacterDirection CharacterDirection; ///< The character's direction: @e false is left to right, @e true is right to left.
+typedef TextAbstraction::ColorBlendingMode  ColorBlendingMode;  ///< Defines how a color is blended.
+typedef TextAbstraction::ColorIndex         ColorIndex;         ///< An index into an array of colors.
 
 typedef uint32_t                         GlyphIndex;                ///< An index into an array of glyphs.
 typedef uint32_t                         ScriptRunIndex;            ///< An index into an array of script runs.
@@ -60,7 +62,6 @@ typedef uint32_t                         BidirectionalRunIndex;     ///< An inde
 typedef uint32_t                         BidirectionalLineRunIndex; ///< An index into an array of bidirectional line info.
 typedef uint32_t                         LineIndex;                 ///< An index into an array of lines.
 typedef uint32_t                         ParagraphRunIndex;         ///< An index into an array of paragraphs.
-typedef uint32_t                         ColorIndex;                ///< An index into an array of colors.
 
 } // namespace Text
 

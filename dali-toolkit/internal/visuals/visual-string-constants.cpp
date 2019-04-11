@@ -100,7 +100,9 @@ const char * const RELEASE_POLICY_NAME("releasePolicy");
 const char * const ORIENTATION_CORRECTION_NAME("orientationCorrection");
 const char * const AUXILIARY_IMAGE_NAME("auxiliaryImage");
 const char * const AUXILIARY_IMAGE_ALPHA_NAME("auxiliaryImageAlpha");
-const char * const PLAY_RANGE_NAME("playRange");
+const char * const PLAY_RANGE_NAME( "playRange" );
+const char * const PLAY_STATE_NAME( "playState" );
+const char * const CURRENT_PROGRESS_NAME( "currentProgress" );
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );

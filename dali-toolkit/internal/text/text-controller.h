@@ -861,14 +861,14 @@ public: // Default style & Input style
    *
    * @param[in] width The width in pixels of the outline, 0 indicates no outline
    */
-  void SetOutlineWidth( unsigned int width );
+  void SetOutlineWidth( uint16_t width );
 
   /**
    * @brief Retrieves the width of an outline
    *
    * @return The width of the outline.
    */
-  unsigned int GetOutlineWidth() const;
+  uint16_t GetOutlineWidth() const;
 
   /**
    * @brief Set the background color.

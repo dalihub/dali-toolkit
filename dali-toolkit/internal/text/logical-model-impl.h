@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H__
-#define __DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H__
+#ifndef DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H
+#define DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali-toolkit/internal/text/bidirectional-line-info-run.h>
 #include <dali-toolkit/internal/text/bidirectional-paragraph-info-run.h>
 #include <dali-toolkit/internal/text/color-run.h>
+#include <dali-toolkit/internal/text/embedded-item.h>
 #include <dali-toolkit/internal/text/font-run.h>
 #include <dali-toolkit/internal/text/font-description-run.h>
 #include <dali-toolkit/internal/text/paragraph-run.h>
@@ -177,6 +178,13 @@ public:
                        Length numberOfCharacters,
                        Vector<ParagraphRunIndex>& paragraphs );
 
+  // Embedded images
+
+  /**
+   * @brief Clears the embedded images.
+   */
+  void ClearEmbeddedImages();
+
 protected:
 
   /**
@@ -210,6 +218,7 @@ public:
   Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;
   Vector<CharacterDirection>            mCharacterDirections;              ///< For each character, whether is right to left. ( @e flase is left to right, @e true right to left ).
   Vector<BidirectionalLineInfoRun>      mBidirectionalLineInfo;
+  Vector<EmbeddedItem>                  mEmbeddedItems;
 
   BidirectionalLineRunIndex             mBidirectionalLineIndex;           ///< The last fetched bidirectional line info.
 };
@@ -220,4 +229,4 @@ public:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H__
+#endif // DALI_TOOLKIT_TEXT_LOGICAL_MODEL_IMPL_H

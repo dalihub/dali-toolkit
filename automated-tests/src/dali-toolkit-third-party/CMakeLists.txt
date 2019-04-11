@@ -26,6 +26,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dali-test-suite-utils.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/dali-toolkit-test-suite-utils.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dummy-control.cpp
    ../dali-toolkit/dali-toolkit-test-utils/mesh-builder.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-actor-utils.cpp
@@ -38,6 +39,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-gl-sync-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-platform-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-render-controller.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/test-render-surface.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-trace-call-stack.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-native-image.cpp
 )

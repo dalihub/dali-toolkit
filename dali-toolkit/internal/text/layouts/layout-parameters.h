@@ -100,9 +100,10 @@ struct Parameters
     estimatedNumberOfLines( 0u ),
     lineWrapMode( lineWrapMode ),
     outlineWidth( outlineWidth ),
-    isLastNewParagraph( false ),
     ignoreSpaceAfterText( ignoreSpaceAfterText ),
-    matchSystemLanguageDirection ( matchSystemLanguageDirection )
+    matchSystemLanguageDirection ( matchSystemLanguageDirection ),
+    interGlyphExtraAdvance( 0.f ),
+    isLastNewParagraph( false )
   {}
 
   Vector2                         boundingBox;                     ///< The size of the box containing the text.
@@ -125,9 +126,10 @@ struct Parameters
   Length                          estimatedNumberOfLines;          ///< The estimated number of lines.
   Text::LineWrap::Mode            lineWrapMode;                    ///< The line wrap mode for moving to next line.
   float                           outlineWidth;                    ///< The outline width.
-  bool                            isLastNewParagraph:1;            ///< Whether the last character is a new paragraph character.
   bool                            ignoreSpaceAfterText:1;          ///< Whether ignoring spaces after text or not. Default is true.
   bool                            matchSystemLanguageDirection:1;  ///< Whether match align for system language direction or not. Default is false.
+  float                           interGlyphExtraAdvance;          ///< Extra advance added to each glyph.
+  bool                            isLastNewParagraph:1;            ///< Whether the last character is a new paragraph character.
 };
 
 } // namespace Layout

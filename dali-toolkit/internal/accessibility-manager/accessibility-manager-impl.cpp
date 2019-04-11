@@ -1240,19 +1240,6 @@ bool AccessibilityManager::AccessibilityActionZoom()
   return ret;
 }
 
-bool AccessibilityManager::AccessibilityActionReadIndicatorInformation()
-{
-  Dali::Toolkit::AccessibilityManager handle( this );
-  if( !mActionReadIndicatorInformationSignal.Empty() )
-  {
-    mActionReadIndicatorInformationSignal.Emit( handle );
-  }
-
-  // TODO: Read the information in the indicator
-
-  return mIsAccessibilityTtsEnabled;
-}
-
 bool AccessibilityManager::AccessibilityActionReadPauseResume()
 {
   Dali::Toolkit::AccessibilityManager handle( this );

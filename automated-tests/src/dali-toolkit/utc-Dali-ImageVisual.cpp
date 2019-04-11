@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <vector>
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-timer.h>
 #include <toolkit-event-thread-callback.h>
@@ -43,6 +44,7 @@ void dali_image_visual_cleanup(void)
 namespace
 {
 const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/gallery-small-1.jpg";
+const char* TEST_BROKEN_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/a-random-nonimage.jpg";
 const char* TEST_LARGE_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/tbcol.png";
 const char* TEST_SMALL_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/icon-edit.png";
 const char* TEST_REMOTE_IMAGE_FILE_NAME = "https://www.tizen.org/sites/all/themes/tizen_theme/logo.png";
@@ -53,10 +55,15 @@ const char* TEST_ROTATED_IMAGE =  TEST_RESOURCE_DIR  "/keyboard-Landscape.jpg";
 
 
 bool gResourceReadySignalFired = false;
-
+std::vector<int> gReadyIds = {};
 void ResourceReadySignal( Control control )
 {
   gResourceReadySignalFired = true;
+  gReadyIds.push_back(control.GetId());
+}
+void ClearReadyIds()
+{
+  gReadyIds.clear();
 }
 
 Actor CreateActorWithImageVisual(const Property::Map& map)
@@ -2175,6 +2182,100 @@ int UtcDaliImageVisualCustomShader(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  END_TEST;
+}
+
+
+void ResourceReadyLoadNext( Control control )
+{
+  static int callNumber = 0;
+
+  gResourceReadySignalFired = true;
+  gReadyIds.push_back(control.GetId());
+
+  if( callNumber == 0 )
+  {
+    DALI_TEST_EQUALS( control.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL), Toolkit::Visual::ResourceStatus::FAILED, TEST_LOCATION );
+
+    tet_infoline( "Create visual with loaded image from within the signal handler" );
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base imageVisual = factory.CreateVisual( TEST_IMAGE_FILE_NAME, ImageDimensions{20,30} );
+
+    Impl::DummyControl& controlImpl = static_cast<Impl::DummyControl&>(control.GetImplementation());
+    controlImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual ); // This should trigger another signal.
+    callNumber = 1;
+  }
+  else
+  {
+    tet_infoline( "3rd signal called" );
+    DALI_TEST_CHECK(true);
+  }
+}
+
+int UtcDaliImageVisualLoadReady01(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliImageVisualLoadReady01");
+  tet_infoline( "First part:  Load an image visual for one resource, then another image visual for a second resource.");
+  tet_infoline( "Second part, In the ready signal for the second image visual, add a 3rd visual with the first URL" );
+  tet_infoline( "Should get a ready signal for all three visuals");
+
+  ClearReadyIds();
+
+  tet_infoline( "Create a control and connect to resource ready signal" );
+  DummyControl actor = DummyControl::New(true);
+  int actor1Id = actor.GetId();
+  actor.ResourceReadySignal().Connect( &ResourceReadySignal);
+  Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(actor.GetImplementation());
+  actor.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add(actor);
+
+  tet_infoline( "Create visual with IMMEDIATE load policy" );
+  Visual::Base imageVisual1 = CreateVisualWithPolicy( TEST_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
+
+  tet_infoline( "Registering visual allows control to get a signal once loaded even if visual not enabled( staged )" );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual1 );
+
+
+  tet_infoline( "Allow image time to load" );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+  application.Render();
+
+  tet_infoline( "Testing texture is loaded and resource ready signal fired" );
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gReadyIds[0], actor1Id, TEST_LOCATION );
+
+
+  tet_infoline( "Original control correctly signalled, now testing failing image" );
+
+  gResourceReadySignalFired = false; // Reset signal check ready for testing next Control
+  ClearReadyIds();
+
+  Visual::Base imageVisual2 = CreateVisualWithPolicy( TEST_BROKEN_IMAGE_FILE_NAME, ImageVisual::Property::LOAD_POLICY, ImageVisual::LoadPolicy::IMMEDIATE );
+
+  DummyControl actor2 = DummyControl::New(true);
+  int actor2Id = actor2.GetId();
+  Impl::DummyControl& dummyImpl2 = static_cast<Impl::DummyControl&>(actor2.GetImplementation());
+  actor2.ResourceReadySignal().Connect( &ResourceReadyLoadNext);
+
+  tet_infoline( "Registering visual this should trigger the ready signal when the image fails to load" );
+  dummyImpl2.RegisterVisual( DummyControl::Property::TEST_VISUAL, imageVisual2 );
+
+  actor2.SetSize(200.f, 200.f);
+  Stage::GetCurrent().Add(actor2);
+
+  tet_infoline( "Wait for loading thread to finish");
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( gReadyIds[0], actor2Id, TEST_LOCATION);
+
+  tet_infoline( "Check for 3rd signal");
+  application.SendNotification();
+  DALI_TEST_EQUALS( gReadyIds.size(), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( gReadyIds[1], actor2Id, TEST_LOCATION);
 
   END_TEST;
 }

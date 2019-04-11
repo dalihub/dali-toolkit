@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/image-loader/texture-manager.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
+#include <dali-toolkit/devel-api/visuals/image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 
 #include <test-native-image.h>
@@ -353,7 +354,7 @@ int UtcDaliImageViewSetGetProperty03(void)
   Property::Value value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
   bool enable;
   DALI_TEST_CHECK( value.Get( enable ) );
-  DALI_TEST_CHECK( !enable );
+  DALI_TEST_CHECK( enable );
 
   // pre-multiplied alpha blending
   imageView.SetProperty( Toolkit::ImageView::Property::PRE_MULTIPLIED_ALPHA, true );
@@ -372,6 +373,205 @@ int UtcDaliImageViewSetGetProperty03(void)
   value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
   DALI_TEST_CHECK( value.Get( enable ) );
   DALI_TEST_CHECK( enable );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewPreMultipliedAlphaPng(void)
+{
+  ToolkitTestApplication application;
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable( true );
+
+  Property::Map imageMap;
+  imageMap[ ImageVisual::Property::URL ] = gImage_34_RGBA;
+  imageMap[ ImageVisual::Property::RELEASE_POLICY] = ImageVisual::ReleasePolicy::NEVER;   // To keep the texture cache
+
+  ImageView imageView1 = ImageView::New();
+  imageView1.SetProperty( ImageView::Property::IMAGE, imageMap );
+
+  Stage::GetCurrent().Add( imageView1 );
+
+  Property::Value value = imageView1.GetProperty( ImageView::Property::PRE_MULTIPLIED_ALPHA );
+  bool enable;
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( enable );    // Default value is true
+
+  // loading started, this waits for the loader thread for max 30 seconds
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  value = imageView1.GetProperty( ImageView::Property::PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( enable );    // Keep true
+
+  // conventional alpha blending
+  Renderer renderer1 = imageView1.GetRendererAt( 0 );
+  value = renderer1.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( enable );
+
+  int srcFactorRgb    = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
+  int destFactorRgb   = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
+  int srcFactorAlpha  = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
+  int destFactorAlpha = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
+  DALI_TEST_CHECK( srcFactorRgb == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );  // A new texture should be generated.
+  textureTrace.Reset();
+
+  // Disable pre-multiplied alpha blending
+  imageView1.SetProperty( ImageView::Property::PRE_MULTIPLIED_ALPHA, false );
+
+  // Reload the image
+  Property::Map attributes;
+  DevelControl::DoAction( imageView1, ImageView::Property::IMAGE, DevelImageVisual::Action::RELOAD, attributes );
+
+  // loading started, this waits for the loader thread for max 30 seconds
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  value = imageView1.GetProperty( ImageView::Property::PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( !enable );
+
+  // conventional alpha blending
+  value = renderer1.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( !enable );
+
+  srcFactorRgb    = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
+  destFactorRgb   = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
+  srcFactorAlpha  = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
+  destFactorAlpha = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
+  DALI_TEST_CHECK( srcFactorRgb == BlendFactor::SRC_ALPHA );
+  DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );  // A new texture should be generated.
+  textureTrace.Reset();
+
+  // Make a new ImageView using the same image
+  ImageView imageView2 = ImageView::New();
+  imageView2.SetProperty( ImageView::Property::IMAGE, imageMap );
+
+  Stage::GetCurrent().Add( imageView2 );
+
+  application.SendNotification();
+  application.Render();
+
+  Renderer renderer2 = imageView2.GetRendererAt( 0 );
+  value = renderer2.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( enable );
+
+  srcFactorRgb    = renderer2.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
+  destFactorRgb   = renderer2.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
+  srcFactorAlpha  = renderer2.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
+  destFactorAlpha = renderer2.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
+  DALI_TEST_CHECK( srcFactorRgb == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION ); // The cached texture should be used.
+
+  END_TEST;
+}
+
+int UtcDaliImageViewPreMultipliedAlphaJpg(void)
+{
+  ToolkitTestApplication application;
+
+  // Set up trace debug
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable( true );
+
+  Property::Map imageMap;
+  imageMap[ ImageVisual::Property::URL ] = gImage_600_RGB;
+  imageMap[ ImageVisual::Property::RELEASE_POLICY] = ImageVisual::ReleasePolicy::NEVER;   // To keep the texture cache
+
+  ImageView imageView1 = ImageView::New();
+  imageView1.SetProperty( ImageView::Property::IMAGE, imageMap );
+
+  Stage::GetCurrent().Add( imageView1 );
+
+  Property::Value value = imageView1.GetProperty( ImageView::Property::PRE_MULTIPLIED_ALPHA );
+  bool enable;
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( enable );    // Default value is true
+
+  // loading started, this waits for the loader thread for max 30 seconds
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  value = imageView1.GetProperty( ImageView::Property::PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( !enable );    // Should be false after loading
+
+  // conventional alpha blending
+  Renderer renderer1 = imageView1.GetRendererAt( 0 );
+  value = renderer1.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( !enable );
+
+  int srcFactorRgb    = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
+  int destFactorRgb   = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
+  int srcFactorAlpha  = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
+  int destFactorAlpha = renderer1.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
+  DALI_TEST_CHECK( srcFactorRgb == BlendFactor::SRC_ALPHA );
+  DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), true, TEST_LOCATION );  // A new texture should be generated.
+  textureTrace.Reset();
+
+  ImageView imageView2 = ImageView::New();
+  imageView2.SetProperty( ImageView::Property::IMAGE, imageMap );
+
+  // Disable pre-multiplied alpha blending
+  imageView2.SetProperty( ImageView::Property::PRE_MULTIPLIED_ALPHA, false );
+
+  Stage::GetCurrent().Add( imageView2 );
+
+  application.SendNotification();
+  application.Render();
+
+  value = imageView2.GetProperty( ImageView::Property::PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( !enable );
+
+  // conventional alpha blending
+  Renderer renderer2 = imageView2.GetRendererAt( 0 );
+  value = renderer2.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+  DALI_TEST_CHECK( value.Get( enable ) );
+  DALI_TEST_CHECK( !enable );
+
+  srcFactorRgb    = renderer2.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
+  destFactorRgb   = renderer2.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
+  srcFactorAlpha  = renderer2.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
+  destFactorAlpha = renderer2.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
+  DALI_TEST_CHECK( srcFactorRgb == BlendFactor::SRC_ALPHA );
+  DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
+
+  DALI_TEST_EQUALS( textureTrace.FindMethod("GenTextures"), false, TEST_LOCATION ); // The cached texture should be used.
 
   END_TEST;
 }
@@ -1841,6 +2041,8 @@ int UtcDaliImageViewCustomShader(void)
     application.SendNotification();
     application.Render();
 
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
     Renderer renderer = imageView.GetRendererAt( 0 );
     Shader shader2 = renderer.GetShader();
     Property::Value value = shader2.GetProperty( Shader::Property::PROGRAM );
@@ -1873,6 +2075,7 @@ int UtcDaliImageViewCustomShader(void)
 
     application.SendNotification();
     application.Render();
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
     Renderer renderer = imageView.GetRendererAt( 0 );
     Shader shader2 = renderer.GetShader();
@@ -1910,6 +2113,7 @@ int UtcDaliImageViewCustomShader(void)
 
     application.SendNotification();
     application.Render();
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
     Renderer renderer = imageView.GetRendererAt( 0 );
     Shader shader2 = renderer.GetShader();
@@ -1947,6 +2151,7 @@ int UtcDaliImageViewCustomShader(void)
 
     application.SendNotification();
     application.Render();
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
     Renderer renderer = imageView.GetRendererAt( 0 );
     Shader shader2 = renderer.GetShader();
@@ -1960,6 +2165,63 @@ int UtcDaliImageViewCustomShader(void)
     Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
     DALI_TEST_EQUALS( vertexShader, vertex->Get< std::string >(), TEST_LOCATION );
   }
+
+  END_TEST;
+}
+
+
+namespace
+{
+static int gFailCounter = 0;
+const int MAX_RETRIES(3);
+
+void ReloadImage(ImageView imageView)
+{
+  Property::Map imageImmediateLoadingMap;
+  imageImmediateLoadingMap[ ImageVisual::Property::URL ] = "Non-existant-image.jpg";
+  imageImmediateLoadingMap[ ImageVisual::Property::LOAD_POLICY ] =  ImageVisual::LoadPolicy::IMMEDIATE;
+
+  tet_infoline("Immediate load an image");
+  imageView.SetProperty( ImageView::Property::IMAGE, imageImmediateLoadingMap );
+}
+
+void ResourceFailedReload( Control control )
+{
+  gFailCounter++;
+  if( gFailCounter < MAX_RETRIES )
+  {
+    ReloadImage(ImageView::DownCast(control));
+  }
+}
+}
+
+int UtcDaliImageViewReloadFailedOnResourceReadySignal(void)
+{
+  tet_infoline("Test reloading failed image from within signal handler.");
+
+  ToolkitTestApplication application;
+
+  gFailCounter = 0;
+
+  ImageView imageView = ImageView::New();
+  imageView.ResourceReadySignal().Connect( &ResourceFailedReload );
+  DALI_TEST_EQUALS( gFailCounter, 0, TEST_LOCATION );
+  ReloadImage(imageView);
+
+  // loading started, this waits for the loader thread to complete
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( gFailCounter, 1, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( gFailCounter, 2, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  application.SendNotification();
+  DALI_TEST_EQUALS( gFailCounter, 3, TEST_LOCATION );
 
   END_TEST;
 }
