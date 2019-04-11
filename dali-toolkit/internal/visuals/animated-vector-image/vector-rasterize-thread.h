@@ -142,6 +142,18 @@ public:
    */
   bool IsResourceReady() const;
 
+  /**
+   * @brief Sets the progress of the animation.
+   * @param[in] progress The new progress as a normalized value between [0,1] or between the play range if specified.
+   */
+  void SetCurrentProgress( float progress );
+
+  /**
+   * @brief Retrieves the current progress of the animation.
+   * @return The current progress as a normalized value between [0,1]
+   */
+  float GetCurrentProgress() const;
+
 protected:
 
   /**
@@ -151,12 +163,6 @@ protected:
   void Run() override;
 
 private:
-
-  /**
-   * @brief Called by the rasterize thread which ensures a wait if required.
-   * @return false if the thread should stop.
-   */
-  bool IsThreadReady();
 
   /**
    * @brief Start rendering
@@ -179,12 +185,13 @@ private:
   std::string                 mUrl;
   VectorAnimationRenderer     mVectorRenderer;
   ConditionalWait             mConditionalWait;
-  Dali::Mutex                 mMutex;
   std::unique_ptr< EventThreadCallback > mResourceReadyTrigger;
   std::unique_ptr< EventThreadCallback > mAnimationFinishedTrigger;
   Vector2                     mPlayRange;
   DevelImageVisual::PlayState mPlayState;
+  int64_t                     mFrameDurationNanoSeconds;
   float                       mProgress;
+  float                       mFrameRate;
   uint32_t                    mCurrentFrame;
   uint32_t                    mTotalFrame;
   uint32_t                    mStartFrame;
@@ -196,6 +203,7 @@ private:
   bool                        mNeedRender;
   bool                        mDestroyThread;  ///< Whether the thread be destroyed
   bool                        mResourceReady;
+  bool                        mCurrentFrameUpdated;
   const Dali::LogFactoryInterface& mLogFactory; ///< The log factory
 
 };

@@ -187,6 +187,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
   mLoading( false ),
   mOrientationCorrection( true )
 {
+  EnablePreMultipliedAlpha( mFactoryCache.GetPreMultiplyOnLoad() );
 }
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image )
@@ -211,6 +212,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFac
   mLoading( false ),
   mOrientationCorrection( true )
 {
+  EnablePreMultipliedAlpha( mFactoryCache.GetPreMultiplyOnLoad() );
 }
 
 ImageVisual::~ImageVisual()
@@ -683,7 +685,7 @@ void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& t
     atlasUploadObserver = this;
   }
 
-  auto preMultiplyOnLoad = mFactoryCache.GetPreMultiplyOnLoad() && !mImpl->mCustomShader
+  auto preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader
     ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD
     : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
@@ -811,6 +813,7 @@ void ImageVisual::DoSetOffStage( Actor& actor )
   if( mReleasePolicy == Toolkit::ImageVisual::ReleasePolicy::DETACHED )
   {
     RemoveTexture(); // If INVALID_TEXTURE_ID then removal will be attempted on atlas
+    mImpl->mResourceStatus = Toolkit::Visual::ResourceStatus::PREPARING;
   }
 
   if( mImageUrl.IsValid() )
@@ -952,39 +955,41 @@ void ImageVisual::UploadComplete( bool loadingSuccess, int32_t textureId, Textur
                                   const Vector4& atlasRectangle, bool preMultiplied )
 {
   Toolkit::Visual::ResourceStatus resourceStatus;
-  Actor actor = mPlacementActor.GetHandle();
-  if( actor )
+  if( mImpl->mRenderer )
   {
-    if( mImpl->mRenderer )
+    if( usingAtlas )
     {
-      if( usingAtlas )
-      {
-        mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, mAtlasRect );
-      }
+      mImpl->mRenderer.RegisterProperty( ATLAS_RECT_UNIFORM_NAME, mAtlasRect );
+    }
 
-      EnablePreMultipliedAlpha( preMultiplied );
+    EnablePreMultipliedAlpha( preMultiplied );
 
+    Actor actor = mPlacementActor.GetHandle();
+    if( actor )
+    {
       actor.AddRenderer( mImpl->mRenderer );
       // reset the weak handle so that the renderer only get added to actor once
       mPlacementActor.Reset();
-      if( loadingSuccess )
-      {
-        Sampler sampler = Sampler::New();
-        sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
-        textureSet.SetSampler( 0u, sampler );
-        mImpl->mRenderer.SetTextures(textureSet);
-      }
-      else
-      {
-        Image brokenImage = mFactoryCache.GetBrokenVisualImage();
+    }
 
-        textureSet = TextureSet::New();
-        mImpl->mRenderer.SetTextures( textureSet );
+    if( loadingSuccess )
+    {
+      Sampler sampler = Sampler::New();
+      sampler.SetWrapMode(  mWrapModeU, mWrapModeV  );
+      textureSet.SetSampler( 0u, sampler );
+      mImpl->mRenderer.SetTextures(textureSet);
+    }
+    else
+    {
+      Image brokenImage = mFactoryCache.GetBrokenVisualImage();
 
-        ApplyImageToSampler( brokenImage );
-      }
+      textureSet = TextureSet::New();
+      mImpl->mRenderer.SetTextures( textureSet );
+
+      ApplyImageToSampler( brokenImage );
     }
   }
+
   // Storing TextureSet needed when renderer staged.
   if( ! mImpl->mRenderer )
   {

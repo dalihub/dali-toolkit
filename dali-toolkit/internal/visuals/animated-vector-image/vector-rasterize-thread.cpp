@@ -22,8 +22,8 @@
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
-
-// INTERNAL INCLUDES
+#include <chrono>
+#include <thread>
 
 namespace Dali
 {
@@ -38,10 +38,20 @@ namespace
 {
 
 constexpr auto LOOP_FOREVER = -1;
+constexpr auto NANOSECONDS_PER_SECOND( 1e+9 );
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VECTOR_ANIMATION" );
 #endif
+
+inline void ResetToStart( bool& updated, uint32_t& value, uint32_t startValue, ConditionalWait& conditionalWait )
+{
+  ConditionalWait::ScopedLock lock( conditionalWait );
+  if( !updated )
+  {
+    value = startValue;
+  }
+}
 
 } // unnamed namespace
 
@@ -49,12 +59,13 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
 : mUrl( url ),
   mVectorRenderer(),
   mConditionalWait(),
-  mMutex(),
   mResourceReadyTrigger(),
   mAnimationFinishedTrigger(),
   mPlayRange( 0.0f, 1.0f ),
   mPlayState( DevelImageVisual::PlayState::STOPPED ),
+  mFrameDurationNanoSeconds( 0 ),
   mProgress( 0.0f ),
+  mFrameRate( 60.0f ),
   mCurrentFrame( 0 ),
   mTotalFrame( 0 ),
   mStartFrame( 0 ),
@@ -66,6 +77,7 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
   mNeedRender( false ),
   mDestroyThread( false ),
   mResourceReady( false ),
+  mCurrentFrameUpdated( false ),
   mLogFactory( Dali::Adaptor::Get().GetLogFactory() )
 {
   mVectorRenderer = VectorAnimationRenderer::New( mUrl );
@@ -96,7 +108,7 @@ void VectorRasterizeThread::Run()
   //TODO: check the return value
   StartRender();
 
-  while( IsThreadReady() )
+  while( !mDestroyThread )
   {
     Rasterize();
   }
@@ -132,13 +144,6 @@ void VectorRasterizeThread::PlayAnimation()
   ConditionalWait::ScopedLock lock( mConditionalWait );
   if( mPlayState != DevelImageVisual::PlayState::PLAYING )
   {
-    if( mPlayState == DevelImageVisual::PlayState::STOPPED )
-    {
-      // Reset the current frame and the current loop
-      mCurrentFrame = mStartFrame;
-      mCurrentLoop = 0;
-    }
-
     mPlayState = DevelImageVisual::PlayState::PLAYING;
     mConditionalWait.Notify( lock );
 
@@ -171,10 +176,14 @@ void VectorRasterizeThread::PauseAnimation()
 void VectorRasterizeThread::RenderFrame()
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
-  mNeedRender = true;
-  mConditionalWait.Notify( lock );
 
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::RenderFrame: Render\n" );
+  if( !mResourceReady )
+  {
+    mNeedRender = true;
+    mConditionalWait.Notify( lock );
+
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::RenderFrame: Render\n" );
+  }
 }
 
 void VectorRasterizeThread::SetResourceReadyCallback( EventThreadCallback* callback )
@@ -191,13 +200,12 @@ void VectorRasterizeThread::SetAnimationFinishedCallback( EventThreadCallback* c
 
 void VectorRasterizeThread::SetLoopCount( int32_t count )
 {
-  ConditionalWait::ScopedLock lock( mConditionalWait );
+  if( mLoopCount != count )
+  {
+    ConditionalWait::ScopedLock lock( mConditionalWait );
 
-  mLoopCount = count;
-
-  // Reset progress
-  mCurrentLoop = 0;
-  mCurrentFrame = mStartFrame;
+    mLoopCount = count;
+  }
 }
 
 int32_t VectorRasterizeThread::GetLoopCount() const
@@ -207,8 +215,6 @@ int32_t VectorRasterizeThread::GetLoopCount() const
 
 void VectorRasterizeThread::SetPlayRange( Vector2 range )
 {
-  ConditionalWait::ScopedLock lock( mConditionalWait );
-
   // Make sure the range specified is between 0.0 and 1.0
   if( range.x >= 0.0f && range.x <= 1.0f && range.y >= 0.0f && range.y <= 1.0f )
   {
@@ -219,12 +225,33 @@ void VectorRasterizeThread::SetPlayRange( Vector2 range )
       orderedRange = Vector2( range.y, range.x );
     }
 
-    mPlayRange = orderedRange;
-
-    if( mTotalFrame != 0 )
+    if( mPlayRange != orderedRange )
     {
-      mStartFrame = static_cast< uint32_t >( mPlayRange.x * mTotalFrame + 0.5f );
-      mEndFrame = static_cast< uint32_t >( mPlayRange.y * mTotalFrame + 0.5f );
+      ConditionalWait::ScopedLock lock( mConditionalWait );
+
+      mPlayRange = orderedRange;
+
+      if( mTotalFrame != 0 )
+      {
+        mStartFrame = static_cast< uint32_t >( mPlayRange.x * mTotalFrame + 0.5f );
+        mEndFrame = static_cast< uint32_t >( mPlayRange.y * mTotalFrame + 0.5f );
+
+        // If the current frame is out of the range, change the current frame also.
+        if( mStartFrame > mCurrentFrame )
+        {
+          mCurrentFrame = mStartFrame;
+
+          mCurrentFrameUpdated = true;
+          mResourceReady = false;
+        }
+        else if( mEndFrame < mCurrentFrame )
+        {
+          mCurrentFrame = mEndFrame;
+
+          mCurrentFrameUpdated = true;
+          mResourceReady = false;
+        }
+      }
     }
   }
 }
@@ -232,6 +259,31 @@ void VectorRasterizeThread::SetPlayRange( Vector2 range )
 Vector2 VectorRasterizeThread::GetPlayRange() const
 {
   return mPlayRange;
+}
+
+void VectorRasterizeThread::SetCurrentProgress( float progress )
+{
+  ConditionalWait::ScopedLock lock( mConditionalWait );
+
+  if( progress >= mPlayRange.x && progress <= mPlayRange.y )
+  {
+    mProgress = progress;
+
+    if( mTotalFrame != 0 )
+    {
+      mCurrentFrame = static_cast< uint32_t >( mTotalFrame * progress + 0.5f );
+      mCurrentFrameUpdated = true;
+    }
+
+    mResourceReady = false;
+
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetCurrentProgress: progress = %f (%d)\n", progress, mCurrentFrame );
+  }
+}
+
+float VectorRasterizeThread::GetCurrentProgress() const
+{
+  return ( static_cast< float >( mCurrentFrame ) / static_cast< float >( mTotalFrame ) );
 }
 
 DevelImageVisual::PlayState VectorRasterizeThread::GetPlayState() const
@@ -244,21 +296,6 @@ bool VectorRasterizeThread::IsResourceReady() const
   return mResourceReady;
 }
 
-bool VectorRasterizeThread::IsThreadReady()
-{
-  ConditionalWait::ScopedLock lock( mConditionalWait );
-
-  if( mPlayState != DevelImageVisual::PlayState::PLAYING && !mNeedRender && !mDestroyThread )
-  {
-    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::IsThreadReady: Wait\n" );
-
-    mConditionalWait.Wait( lock );
-  }
-
-  // Keep the thread alive if this thread is NOT to be destroyed
-  return !mDestroyThread;
-}
-
 bool VectorRasterizeThread::StartRender()
 {
   //TODO: check the return value
@@ -269,58 +306,101 @@ bool VectorRasterizeThread::StartRender()
   mStartFrame = static_cast< uint32_t >( mPlayRange.x * mTotalFrame + 0.5f );
   mEndFrame = static_cast< uint32_t >( mPlayRange.y * mTotalFrame + 0.5f );
 
-  mCurrentFrame = mStartFrame;
+  mCurrentFrame = std::max( static_cast< uint32_t >( mTotalFrame * mProgress + 0.5f ), mStartFrame );
 
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StartRender: Renderer is started [%d (%d, %d)]\n", mTotalFrame, mStartFrame, mEndFrame );
+  mFrameRate = mVectorRenderer.GetFrameRate();
+  mFrameDurationNanoSeconds = NANOSECONDS_PER_SECOND / mFrameRate;
+
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StartRender: Renderer is started [%d, %f fps]\n", mTotalFrame, mFrameRate );
 
   return true;
 }
 
 void VectorRasterizeThread::Rasterize()
 {
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: [%d]\n", mCurrentFrame );
+  bool resourceReady;
+  uint32_t currentFrame, startFrame, endFrame;
+  int32_t loopCount;
+  DevelImageVisual::PlayState playState;
+
+  {
+    ConditionalWait::ScopedLock lock( mConditionalWait );
+
+    if( mPlayState != DevelImageVisual::PlayState::PLAYING && !mNeedRender && !mDestroyThread )
+    {
+      DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Wait\n" );
+
+      if( mPlayState == DevelImageVisual::PlayState::STOPPED )
+      {
+        // Reset the current frame and the current loop
+        mCurrentFrame = mStartFrame;
+        mCurrentLoop = 0;
+      }
+      mConditionalWait.Wait( lock );
+    }
+
+    resourceReady = mResourceReady;
+    currentFrame = mCurrentFrame++;
+    startFrame = mStartFrame;
+    endFrame = mEndFrame;
+    loopCount = mLoopCount;
+    playState = mPlayState;
+
+    mNeedRender = false;
+    mResourceReady = true;
+    mCurrentFrameUpdated = false;
+  }
+
+  auto currentFrameStartTime = std::chrono::system_clock::now();
 
   // Rasterize
-  mVectorRenderer.Render( mCurrentFrame );
+  mVectorRenderer.Render( currentFrame );
 
-  if( mPlayState == DevelImageVisual::PlayState::PLAYING )
+  if( playState == DevelImageVisual::PlayState::PLAYING )
   {
-    if( ++mCurrentFrame >= mEndFrame )
+    if( currentFrame >= endFrame )
     {
-      if( mLoopCount < 0 )
+      if( loopCount < 0 )
       {
         // repeat forever
-        mCurrentFrame = mStartFrame;
+        ResetToStart( mCurrentFrameUpdated, mCurrentFrame, startFrame, mConditionalWait );  // If the current frame is changed in the event thread, don't overwrite it.
       }
       else
       {
         mCurrentLoop++;
-        if( mCurrentLoop >= mLoopCount )
+        if( mCurrentLoop >= loopCount )
         {
-          // Animation is finished
           mPlayState = DevelImageVisual::PlayState::STOPPED;
 
+          // Animation is finished
           mAnimationFinishedTrigger->Trigger();
 
           DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Animation is finished\n" );
         }
         else
         {
-          mCurrentFrame = mStartFrame;
+          ResetToStart( mCurrentFrameUpdated, mCurrentFrame, startFrame, mConditionalWait );
         }
       }
     }
   }
 
-  mNeedRender = false;
-
-  if( !mResourceReady )
+  if( !resourceReady )
   {
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Resource ready trigger\n" );
 
     mResourceReadyTrigger->Trigger();
-    mResourceReady = true;
   }
+
+  auto timeToSleepUntil = currentFrameStartTime + std::chrono::nanoseconds( mFrameDurationNanoSeconds );
+
+#if defined(DEBUG_ENABLED)
+  auto sleepDuration = std::chrono::duration_cast< std::chrono::milliseconds >( timeToSleepUntil - std::chrono::system_clock::now() );
+
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: [current = %d, sleep duration = %lld]\n", mCurrentFrame, sleepDuration.count() );
+#endif
+
+  std::this_thread::sleep_until( timeToSleepUntil );
 }
 
 } // namespace Internal

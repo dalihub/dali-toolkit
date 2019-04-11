@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ const float HALF( 0.5f );
 const float ONE( 1.0f );
 const uint32_t DEFAULT_ATLAS_WIDTH = 512u;
 const uint32_t DEFAULT_ATLAS_HEIGHT = 512u;
-const uint32_t NO_OUTLINE = 0;
+const uint16_t NO_OUTLINE = 0u;
 }
 
 struct AtlasRenderer::Impl
@@ -168,17 +168,21 @@ struct AtlasRenderer::Impl
   struct TextCacheEntry
   {
     TextCacheEntry()
-    : mFontId( 0 ),
-      mIndex( 0 ),
-      mOutlineWidth( 0 ),
-      mImageId( 0 )
+    : mFontId{ 0u },
+      mIndex{ 0u },
+      mImageId{ 0u },
+      mOutlineWidth{ 0u },
+      isItalic{ false },
+      isBold{ false }
     {
     }
 
     FontId mFontId;
     Text::GlyphIndex mIndex;
-    uint32_t mOutlineWidth;
     uint32_t mImageId;
+    uint16_t mOutlineWidth;
+    bool isItalic:1;
+    bool isBold:1;
   };
 
   Impl()
@@ -211,9 +215,9 @@ struct AtlasRenderer::Impl
     return false;
   }
 
-  void CacheGlyph( const GlyphInfo& glyph, FontId lastFontId, uint32_t outline, AtlasManager::AtlasSlot& slot )
+  void CacheGlyph( const GlyphInfo& glyph, FontId lastFontId, const AtlasGlyphManager::GlyphStyle& style, AtlasManager::AtlasSlot& slot )
   {
-    const bool glyphNotCached = !mGlyphManager.IsCached( glyph.fontId, glyph.index, outline, slot );  // Check FontGlyphRecord vector for entry with glyph index and fontId
+    const bool glyphNotCached = !mGlyphManager.IsCached( glyph.fontId, glyph.index, style, slot );  // Check FontGlyphRecord vector for entry with glyph index and fontId
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "AddGlyphs fontID[%u] glyphIndex[%u] [%s]\n", glyph.fontId, glyph.index, (glyphNotCached)?"not cached":"cached" );
 
@@ -243,7 +247,7 @@ struct AtlasRenderer::Impl
       PixelData bitmap;
 
       // Whether the glyph is an outline.
-      const bool isOutline = 0u != outline;
+      const bool isOutline = 0u != style.outline;
 
       // Whether the current glyph is a color one.
       const bool isColorGlyph = mFontClient.IsColorGlyph( glyph.fontId, glyph.index );
@@ -257,10 +261,10 @@ struct AtlasRenderer::Impl
 
         mFontClient.CreateBitmap( glyph.fontId,
                                   glyph.index,
-                                  glyph.softwareItalic,
-                                  glyph.softwareBold,
+                                  glyph.isItalicRequired,
+                                  glyph.isBoldRequired,
                                   glyphBufferData,
-                                  outline );
+                                  style.outline );
 
         // Create the pixel data.
         bitmap = PixelData::New( glyphBufferData.buffer,
@@ -292,21 +296,21 @@ struct AtlasRenderer::Impl
                                          blockSize.mNeededBlockHeight );
 
           // Locate a new slot for our glyph
-          mGlyphManager.Add( glyph, outline, bitmap, slot ); // slot will be 0 is glyph not added
+          mGlyphManager.Add( glyph, style, bitmap, slot ); // slot will be 0 is glyph not added
         }
       }
     }
     else
     {
       // We have 2+ copies of the same glyph
-      mGlyphManager.AdjustReferenceCount( glyph.fontId, glyph.index, outline, 1 ); //increment
+      mGlyphManager.AdjustReferenceCount( glyph.fontId, glyph.index, style, 1 ); //increment
     }
   }
 
   void GenerateMesh( const GlyphInfo& glyph,
                      const Vector2& position,
                      const Vector4& color,
-                     uint32_t outline,
+                     uint16_t outline,
                      AtlasManager::AtlasSlot& slot,
                      bool underlineGlyph,
                      float currentUnderlinePosition,
@@ -324,6 +328,8 @@ struct AtlasRenderer::Impl
     textCacheEntry.mImageId = slot.mImageId;
     textCacheEntry.mIndex = glyph.index;
     textCacheEntry.mOutlineWidth = outline;
+    textCacheEntry.isItalic = glyph.isItalicRequired;
+    textCacheEntry.isBold = glyph.isBoldRequired;
 
     newTextCache.PushBack( textCacheEntry );
 
@@ -445,7 +451,7 @@ struct AtlasRenderer::Impl
     const bool underlineEnabled = view.IsUnderlineEnabled();
     const Vector4& underlineColor( view.GetUnderlineColor() );
     const float underlineHeight = view.GetUnderlineHeight();
-    const unsigned int outlineWidth = view.GetOutlineWidth();
+    const uint16_t outlineWidth = view.GetOutlineWidth();
     const Vector4& outlineColor( view.GetOutlineColor() );
     const bool isOutline = 0u != outlineWidth;
 
@@ -528,13 +534,18 @@ struct AtlasRenderer::Impl
           lastUnderlinedFontId = glyph.fontId;
         } // underline
 
+        AtlasGlyphManager::GlyphStyle style;
+        style.isItalic = glyph.isItalicRequired;
+        style.isBold = glyph.isBoldRequired;
+
         // Retrieves and caches the glyph's bitmap.
-        CacheGlyph( glyph, lastFontId, NO_OUTLINE, slot );
+        CacheGlyph( glyph, lastFontId, style, slot );
 
         // Retrieves and caches the outline glyph's bitmap.
         if( isOutline )
         {
-          CacheGlyph( glyph, lastFontId, outlineWidth, slotOutline );
+          style.outline = outlineWidth;
+          CacheGlyph( glyph, lastFontId, style, slotOutline );
         }
 
         // Move the origin (0,0) of the mesh to the center of the actor
@@ -655,7 +666,11 @@ struct AtlasRenderer::Impl
   {
     for( Vector< TextCacheEntry >::Iterator oldTextIter = mTextCache.Begin(); oldTextIter != mTextCache.End(); ++oldTextIter )
     {
-      mGlyphManager.AdjustReferenceCount( oldTextIter->mFontId, oldTextIter->mIndex, oldTextIter->mOutlineWidth, -1/*decrement*/ );
+      AtlasGlyphManager::GlyphStyle style;
+      style.outline = oldTextIter->mOutlineWidth;
+      style.isItalic = oldTextIter->isItalic;
+      style.isBold = oldTextIter->isBold;
+      mGlyphManager.AdjustReferenceCount( oldTextIter->mFontId, oldTextIter->mIndex, style, -1/*decrement*/ );
     }
     mTextCache.Resize( 0 );
   }

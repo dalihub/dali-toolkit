@@ -87,6 +87,18 @@ public:
     return mFontClient.GetGlyphMetrics( array, size, mGlyphType, true ); // inline for performance
   }
 
+  /**
+   * @brief Whether the font has Italic style.
+   *
+   * @param[in] fontId The font identifier.
+   *
+   * @return true if the font has italic style.
+   */
+  bool HasItalicStyle( FontId fontId ) const
+  {
+    return mFontClient.HasItalicStyle( fontId );
+  }
+
 protected:
 
   /**

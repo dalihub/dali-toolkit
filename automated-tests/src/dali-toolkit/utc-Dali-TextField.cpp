@@ -806,9 +806,9 @@ int UtcDaliTextFieldSetPropertyP(void)
   Property::Map underlineMapSet;
   Property::Map underlineMapGet;
 
-  underlineMapSet.Insert( "enable", "true" );
-  underlineMapSet.Insert( "color", "red" );
-  underlineMapSet.Insert( "height", "1" );
+  underlineMapSet.Insert( "enable", true );
+  underlineMapSet.Insert( "color", Color::RED );
+  underlineMapSet.Insert( "height", 1 );
 
   // Check the underline property
   field.SetProperty( TextField::Property::UNDERLINE, underlineMapSet );
@@ -1749,8 +1749,6 @@ int utcDaliTextFieldEvent02(void)
 
   // Move the cursor and check the position changes.
   Vector3 position1 = cursor.GetCurrentPosition();
-
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
@@ -1758,10 +1756,8 @@ int utcDaliTextFieldEvent02(void)
   application.Render();
 
   Vector3 position2 = cursor.GetCurrentPosition();
-
   DALI_TEST_CHECK( position2.x < position1.x );
 
-  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
@@ -1769,8 +1765,18 @@ int utcDaliTextFieldEvent02(void)
   application.Render();
 
   Vector3 position3 = cursor.GetCurrentPosition();
-
   DALI_TEST_EQUALS( position1, position3, TEST_LOCATION ); // Should be in the same position1.
+
+
+  // Move the cursor to the first position.
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+  application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Vector3 position4 = cursor.GetCurrentPosition();
 
   // Send some taps and check the cursor positions.
 
@@ -1783,9 +1789,9 @@ int utcDaliTextFieldEvent02(void)
   application.Render();
 
   // Cursor position should be the same than position1.
-  Vector3 position4 = cursor.GetCurrentPosition();
+  Vector3 position5 = cursor.GetCurrentPosition();
 
-  DALI_TEST_EQUALS( position2, position4, TEST_LOCATION ); // Should be in the same position2.
+  DALI_TEST_EQUALS( position4, position5, TEST_LOCATION ); // Should be in the same position2.
 
   // Tap away from the start position.
   application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 16.f, 25.0f ) ) );
@@ -1795,9 +1801,9 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 position5 = cursor.GetCurrentPosition();
+  Vector3 position6 = cursor.GetCurrentPosition();
 
-  DALI_TEST_CHECK( position5.x > position4.x );
+  DALI_TEST_CHECK( position6.x > position5.x );
 
   // Remove all the text.
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_BACKSPACE, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
@@ -1809,9 +1815,9 @@ int utcDaliTextFieldEvent02(void)
   application.Render();
 
   // Cursor position should be the same than position2.
-  Vector3 position6 = cursor.GetCurrentPosition();
+  Vector3 position7 = cursor.GetCurrentPosition();
 
-  DALI_TEST_EQUALS( position2, position6, TEST_LOCATION );// Should be in the same position2.
+  DALI_TEST_EQUALS( position4, position7, TEST_LOCATION );// Should be in the same position2.
 
   // Should not be a renderer.
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );

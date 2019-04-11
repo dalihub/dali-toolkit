@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,22 @@ std::string gClipboardText;
 void ContentSelectedCallback( ClipboardEventNotifier& notifier )
 {
   gClipboardText = notifier.GetContent();
+}
+
+// Generate a KeyEvent to send to Core.
+Dali::KeyEvent GenerateKey( const std::string& keyName,
+                            const std::string& keyString,
+                            int keyCode,
+                            int keyModifier,
+                            unsigned long timeStamp,
+                            const Dali::KeyEvent::State& keyState )
+{
+  return Dali::KeyEvent( keyName,
+                         keyString,
+                         keyCode,
+                         keyModifier,
+                         timeStamp,
+                         keyState );
 }
 
 } // namespace
@@ -558,8 +574,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // single line, line spacing = 0px
   {
     const float EXPECTED_SPACING = 0.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 326.0f, 19.0f);
-    const Vector3 EXPECTED_NATURAL_SIZE( 326.0f, 20.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 342.0f, 19.0f);
+    const Vector3 EXPECTED_NATURAL_SIZE( 342.0f, 20.0f, 0.0f );
 
     controller->SetText(textSingle);
     controller->Relayout(size);
@@ -577,8 +593,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // single line, line spacing = 20px
   {
     const float EXPECTED_SPACING = 20.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 326.0f, 19.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 326.0f, 40.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 342.0f, 19.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 342.0f, 40.0f, 0.0f );
 
     controller->SetText(textSingle);
     controller->Relayout(size);
@@ -597,8 +613,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // multi-line, line spacing = 0px
   {
     const float EXPECTED_SPACING = 0.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 318.0f, 39.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 58.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 332.0f, 39.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 118.0f, 58.0f, 0.0f );
 
     controller->SetText(textMulti);
     controller->Relayout(size);
@@ -617,8 +633,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // multi-line, line spacing = 20px
   {
     const float EXPECTED_SPACING = 20.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 115.0f, 57.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 118.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 118.0f, 57.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 118.0f, 118.0f, 0.0f );
 
     controller->SetText(textMulti);
     controller->Relayout(size);
@@ -637,8 +653,8 @@ int UtcDaliTextControllerSetGetLineSpacingProperty(void)
   // multi-line, line spacing = 30px
   {
     const float EXPECTED_SPACING = 30.0f;
-    const Vector2 EXPECTED_LAYOUT_SIZE( 115.0f, 117.0f );
-    const Vector3 EXPECTED_NATURAL_SIZE( 116.0f, 148.0f, 0.0f );
+    const Vector2 EXPECTED_LAYOUT_SIZE( 118.0f, 117.0f );
+    const Vector3 EXPECTED_NATURAL_SIZE( 118.0f, 148.0f, 0.0f );
 
     controller->SetText(textMulti);
     controller->Relayout(size);
@@ -681,6 +697,302 @@ int UtcDaliTextControllerCheckBufferIndices(void)
   mImpl.mTextUpdateInfo.mNumberOfCharactersToRemove = 0u;
   mImpl.mTextUpdateInfo.mPreviousNumberOfCharacters = 0u;
   mImpl.mOperationsPending = Controller::ALL_OPERATIONS;
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+int UtcDaliTextControllerCheckInputColorChanged(void)
+{
+  tet_infoline(" UtcDaliTextControllerCheckInputColorChanged");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  // Enable the text input.
+  // Creates a decorator.
+  Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
+                                                       *controller );
+  InputMethodContext inputMethodContext = InputMethodContext::New();
+  // Enables the text input.
+  controller->EnableTextInput( decorator, inputMethodContext );
+
+  // Set the text
+  const std::string text("Hello World!");
+  controller->SetText(text);
+
+  const Vector4 inputColor( 0.0f, 0.0f, 0.0f, 1.0f );
+  controller->SetInputColor( inputColor );
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  //  Reset operation
+  mImpl.mOperationsPending = Controller::NO_OPERATION;
+
+  // simulate a key event.
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+
+  // change the input color
+  const Vector4 newInputColor( 1.0f, 0.0f, 0.0f, 1.0f );
+  controller->SetInputColor( newInputColor );
+
+  // Check if relayout is requested or not when event state is INACTIVE.
+  DALI_TEST_EQUALS( EventData::INACTIVE, mImpl.mEventData->mState, TEST_LOCATION );
+  DALI_TEST_EQUALS( Controller::COLOR, static_cast<Controller::OperationsMask>( mImpl.mOperationsPending & Controller::COLOR ), TEST_LOCATION );
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+int UtcDaliTextControllerCheckInputFontFamilyChanged(void)
+{
+  tet_infoline(" UtcDaliTextControllerCheckInputFontFamilyChanged");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  // Enable the text input.
+  // Creates a decorator.
+  Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
+                                                       *controller );
+  InputMethodContext inputMethodContext = InputMethodContext::New();
+  // Enables the text input.
+  controller->EnableTextInput( decorator, inputMethodContext );
+
+  // Set the text and font family
+  const std::string text("Hello World!");
+  controller->SetText(text);
+  controller->SetInputFontFamily("SamsungOneUI_200");
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  //  Reset operation
+  mImpl.mOperationsPending = Controller::NO_OPERATION;
+
+  // simulate a key event.
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+
+  // change the input font family
+  controller->SetInputFontFamily("SamsungOneUI_300");
+
+  // Check if relayout is requested or not when event state is INACTIVE.
+  DALI_TEST_EQUALS( EventData::INACTIVE, mImpl.mEventData->mState, TEST_LOCATION );
+  DALI_TEST_EQUALS( Controller::VALIDATE_FONTS, static_cast<Controller::OperationsMask>( mImpl.mOperationsPending & Controller::VALIDATE_FONTS ),
+                    TEST_LOCATION );
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+int UtcDaliTextControllerCheckInputFontWeightChanged(void)
+{
+  tet_infoline(" UtcDaliTextControllerCheckInputFontWeightChanged");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  // Enable the text input.
+  // Creates a decorator.
+  Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
+                                                       *controller );
+  InputMethodContext inputMethodContext = InputMethodContext::New();
+  // Enables the text input.
+  controller->EnableTextInput( decorator, inputMethodContext );
+
+  // Set the text
+  const std::string text("Hello World!");
+  controller->SetText(text);
+  controller->SetInputFontWeight( TextAbstraction::FontWeight::NORMAL );
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  // Reset operation
+  mImpl.mOperationsPending = Controller::NO_OPERATION;
+
+  // simulate a key event.
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+
+  // change the input font weight
+  controller->SetInputFontWeight( TextAbstraction::FontWeight::BOLD );
+
+  // Check if relayout is requested or not when event state is INACTIVE.
+  DALI_TEST_EQUALS( EventData::INACTIVE, mImpl.mEventData->mState, TEST_LOCATION );
+  DALI_TEST_EQUALS( Controller::VALIDATE_FONTS, static_cast<Controller::OperationsMask>( mImpl.mOperationsPending & Controller::VALIDATE_FONTS ),
+                    TEST_LOCATION );
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+int UtcDaliTextControllerCheckInputFontWidthChanged(void)
+{
+  tet_infoline(" UtcDaliTextControllerCheckInputFontWidthChanged");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  // Enable the text input.
+  // Creates a decorator.
+  Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
+                                                       *controller );
+  InputMethodContext inputMethodContext = InputMethodContext::New();
+  // Enables the text input.
+  controller->EnableTextInput( decorator, inputMethodContext );
+
+  // Set the text
+  const std::string text("Hello World!");
+  controller->SetText(text);
+  controller->SetInputFontWidth( TextAbstraction::FontWidth::NORMAL );
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  // Reset operation
+  mImpl.mOperationsPending = Controller::NO_OPERATION;
+
+  // simulate a key event.
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+
+  // change the input font width
+  controller->SetInputFontWidth( TextAbstraction::FontWidth::EXPANDED );
+
+  // Check if relayout is requested or not when event state is INACTIVE.
+  DALI_TEST_EQUALS( EventData::INACTIVE, mImpl.mEventData->mState, TEST_LOCATION );
+  DALI_TEST_EQUALS( Controller::VALIDATE_FONTS, static_cast<Controller::OperationsMask>( mImpl.mOperationsPending & Controller::VALIDATE_FONTS ),
+                    TEST_LOCATION );
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+int UtcDaliTextControllerCheckInputFontSlantChanged(void)
+{
+  tet_infoline(" UtcDaliTextControllerCheckInputFontSlantChanged");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  // Enable the text input.
+  // Creates a decorator.
+  Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
+                                                       *controller );
+  InputMethodContext inputMethodContext = InputMethodContext::New();
+  // Enables the text input.
+  controller->EnableTextInput( decorator, inputMethodContext );
+
+  // Set the text
+  const std::string text("Hello World!");
+  controller->SetText(text);
+  controller->SetInputFontSlant( TextAbstraction::FontSlant::NORMAL );
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  //  Reset operation
+  mImpl.mOperationsPending = Controller::NO_OPERATION;
+
+  // simulate a key event.
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+
+  // change the input font slant
+  controller->SetInputFontSlant( TextAbstraction::FontSlant::ROMAN );
+
+  // Check if relayout is requested or not when event state is INACTIVE.
+  DALI_TEST_EQUALS( EventData::INACTIVE, mImpl.mEventData->mState, TEST_LOCATION );
+  DALI_TEST_EQUALS( Controller::VALIDATE_FONTS, static_cast<Controller::OperationsMask>( mImpl.mOperationsPending & Controller::VALIDATE_FONTS ),
+                    TEST_LOCATION );
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+int UtcDaliTextControllerCheckInputFontPointSizeChanged(void)
+{
+  tet_infoline(" UtcDaliTextControllerCheckInputFontPointSizeChanged");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  // Enable the text input.
+  // Creates a decorator.
+  Text::DecoratorPtr decorator = Text::Decorator::New( *controller,
+                                                       *controller );
+  InputMethodContext inputMethodContext = InputMethodContext::New();
+  // Enables the text input.
+  controller->EnableTextInput( decorator, inputMethodContext );
+
+  // Set the text
+  const std::string text("Hello World!");
+  controller->SetText(text);
+  controller->SetInputFontPointSize( 1.0f );
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  //  Reset operation
+  mImpl.mOperationsPending = Controller::NO_OPERATION;
+
+  // simulate a key event.
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Dali::KeyEvent::Down ) );
+
+  // change the input font point size
+  controller->SetInputFontPointSize( 1.2f );
+
+  // Check if relayout is requested or not when event state is INACTIVE.
+  DALI_TEST_EQUALS( EventData::INACTIVE, mImpl.mEventData->mState, TEST_LOCATION );
+  DALI_TEST_EQUALS( Controller::VALIDATE_FONTS, static_cast<Controller::OperationsMask>( mImpl.mOperationsPending & Controller::VALIDATE_FONTS ),
+                    TEST_LOCATION );
 
   // Perform a relayout
   const Size size( Dali::Stage::GetCurrent().GetSize() );

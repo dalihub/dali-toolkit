@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -594,7 +594,7 @@ int UtcDaliTextLayoutSetGetCursorWidth(void)
 
   Layout::Engine engine;
 
-  DALI_TEST_EQUALS( 1, engine.GetCursorWidth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 0, engine.GetCursorWidth(), TEST_LOCATION );
 
   engine.SetCursorWidth( 2 );
   DALI_TEST_EQUALS( 2, engine.GetCursorWidth(), TEST_LOCATION );
@@ -717,15 +717,15 @@ int UtcDaliTextLayoutSmallTextArea02(void)
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun );
   Size textArea(1.f, 1.f);
-  Size layoutSize(80.f, 20.f);
-  float positions[] = { 1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f };
+  Size layoutSize(78.f, 19.f);
+  float positions[] = { 0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f };
   struct LineRun line =
   {
     { 0u, 11u },
     { 0u, 11u },
-    80.f,
+    78.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -801,22 +801,22 @@ int UtcDaliTextLayoutMultilineText01(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun1 );
   fontDescriptionRuns.PushBack( fontDescriptionRun2 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(95.f, 97.f);
+  Size layoutSize(91.f, 95.f);
   float positions[] =
   {
-    1.f, -12.f, 11.f,  -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f,  -0.f, 40.f, -9.f, 51.f,  -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -12.f, 10.f,  -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f,  -0.f, 39.f, -9.f, 50.f,  -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
     0.f, -13.f,  9.f,  -9.f, 18.f,  -9.f, 30.f,  -9.f, 39.f, -2.f, 42.f, -12.f,
-    1.f, -12.f,  9.f,  -9.f, 17.f,  -9.f, 27.f,  -9.f, 36.f, -9.f, 45.f, -11.f, 51.f, -0.f,
-    1.f, -12.f, 11.f, -12.f, 15.f, -12.f, 26.f,  -9.f, 35.f, -9.f, 41.f,  -9.f, 50.f, -9.f, 59.f, -11.f, 65.f, -0.f,
-    1.f, -12.f,  5.f, -12.f,  9.f,  -9.f, 19.f,  -9.f, 28.f, -9.f, 35.f,  -0.f, 41.f, -9.f, 50.f, -12.f, 54.f, -0.f, 59.f, -11.f, 66.f,  -9.f, 75.f, -9.f, 83.f, -11.f, 91.f, -2.f
+    0.f, -12.f,  8.f,  -9.f, 16.f,  -9.f, 26.f,  -9.f, 35.f, -9.f, 44.f, -11.f, 50.f, -0.f,
+    0.f, -12.f, 10.f, -12.f, 14.f, -12.f, 25.f,  -9.f, 34.f, -9.f, 40.f,  -9.f, 49.f, -9.f, 58.f, -11.f, 64.f, -0.f,
+    0.f, -12.f,  4.f, -12.f,  8.f,  -9.f, 18.f,  -9.f, 27.f, -9.f, 34.f,  -0.f, 40.f, -9.f, 49.f, -12.f, 53.f, -0.f, 58.f, -11.f, 65.f,  -9.f, 74.f, -9.f, 82.f, -11.f, 90.f, -2.f
   };
   struct LineRun line0 =
   {
     { 0u, 12u },
     { 0u, 12u },
-    80.f,
+    78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -827,9 +827,9 @@ int UtcDaliTextLayoutMultilineText01(void)
   {
     { 12u, 6u },
     { 12u, 6u },
-    43.f,
+    42.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -840,7 +840,7 @@ int UtcDaliTextLayoutMultilineText01(void)
   {
     { 18u, 7u },
     { 18u, 7u },
-    52.f,
+    49.f,
     15.f,
     -4.f,
     5.f,
@@ -853,7 +853,7 @@ int UtcDaliTextLayoutMultilineText01(void)
   {
     { 25u, 9u },
     { 25u, 10u },
-    66.f,
+    63.f,
     15.f,
     -4.f,
     5.f,
@@ -866,7 +866,7 @@ int UtcDaliTextLayoutMultilineText01(void)
   {
     { 34u, 14u },
     { 35u, 14u },
-    95.f,
+    91.f,
     15.f,
     -4.f,
     0.f,
@@ -1000,23 +1000,23 @@ int UtcDaliTextLayoutMultilineText02(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun4 );
   fontDescriptionRuns.PushBack( fontDescriptionRun5 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(80.f, 120.f);
+  Size layoutSize(78.f, 114.f);
   float positions[] =
   {
-    1.f, -12.f, 11.f,  -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f,  -0.f, 40.f,  -9.f, 51.f,  -9.f, 61.f,  -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -12.f, 10.f,  -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f,  -0.f, 39.f,  -9.f, 50.f,  -9.f, 60.f,  -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
     0.f, -13.f,  9.f,  -9.f, 18.f,  -9.f, 30.f,  -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f,  -0.f,
-    1.f, -10.f,  9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -2.f, 33.f, -12.f,
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f,  -0.f,
-    1.f, -13.f,  9.f,  -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f,  -0.f, 38.f,  -9.f, 49.f,  -9.f, 59.f,  -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -10.f,  8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f,  -0.f,
+    0.f, -13.f,  8.f,  -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f,  -0.f, 37.f,  -9.f, 48.f,  -9.f, 58.f,  -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
     0.f, -13.f,  9.f,  -9.f, 18.f,  -9.f, 30.f,  -9.f, 39.f, -2.f,
   };
   struct LineRun line0 =
   {
     { 0u, 12u },
     { 0u, 12u },
-    80.f,
+    78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1027,9 +1027,9 @@ int UtcDaliTextLayoutMultilineText02(void)
   {
     { 12u, 10u },
     { 12u, 10u },
-    76.f,
+    75.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1040,9 +1040,9 @@ int UtcDaliTextLayoutMultilineText02(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    34.f,
+    32.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1053,9 +1053,9 @@ int UtcDaliTextLayoutMultilineText02(void)
   {
     { 28u, 10u },
     { 28u, 10u },
-    67.f,
+    65.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1066,9 +1066,9 @@ int UtcDaliTextLayoutMultilineText02(void)
   {
     { 38u, 12u },
     { 38u, 12u },
-    78.f,
+    76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1079,9 +1079,9 @@ int UtcDaliTextLayoutMultilineText02(void)
   {
     { 50u, 5u },
     { 50u, 5u },
-    43.f,
+    42.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1150,20 +1150,20 @@ int UtcDaliTextLayoutMultilineText03(void)
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun );
   Size textArea(100.f, 300.f);
-  Size layoutSize(96.f, 60.f);
+  Size layoutSize(94.f, 57.f);
   float positions[] =
   {
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f,  -9.f, 36.f,  -9.f, 47.f, -9.f, 57.f, -9.f, 63.f, -13.f, 66.f, -13.f, 75.f, -13.f, 84.f,  -9.f,
-    1.f,  -9.f, 13.f, -9.f, 23.f, -13.f, 31.f,  -9.f, 40.f, -13.f, 44.f, -13.f, 47.f, -9.f, 56.f, -9.f, 67.f,  -9.f, 77.f,  -9.f, 83.f, -13.f, 86.f, -13.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f,  -9.f, 35.f,  -9.f, 46.f, -9.f, 56.f, -9.f, 62.f, -13.f, 65.f, -13.f, 74.f, -13.f, 83.f,  -9.f,
+    0.f,  -9.f, 12.f, -9.f, 22.f, -13.f, 30.f,  -9.f, 39.f, -13.f, 43.f, -13.f, 46.f, -9.f, 55.f, -9.f, 66.f,  -9.f, 76.f,  -9.f, 82.f, -13.f, 85.f, -13.f,
     0.f, -13.f,  9.f, -9.f, 18.f,  -9.f, 30.f,  -9.f, 39.f,  -2.f,
   };
   struct LineRun line0 =
   {
     { 0u, 12u },
     { 0u, 12u },
-    93.f,
+    91.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1174,9 +1174,9 @@ int UtcDaliTextLayoutMultilineText03(void)
   {
     { 12u, 12u },
     { 12u, 12u },
-    96.f,
+    94.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1187,9 +1187,9 @@ int UtcDaliTextLayoutMultilineText03(void)
   {
     { 24u, 5u },
     { 24u, 5u },
-    43.f,
+    42.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1254,18 +1254,18 @@ int UtcDaliTextLayoutMultilineText04(void)
   Vector<FontDescriptionRun> fontDescriptionRuns;
   fontDescriptionRuns.PushBack( fontDescriptionRun );
   Size textArea(100.f, 300.f);
-  Size layoutSize(83.f, 40.f);
+  Size layoutSize(81.f, 38.f);
   float positions[] =
   {
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -2.f, 82.f, -12.f
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -2.f, 81.f, -12.f
   };
   struct LineRun line0 =
   {
     { 0u, 13u },
     { 0u, 13u },
-    83.f,
+    81.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     false,
@@ -1277,7 +1277,7 @@ int UtcDaliTextLayoutMultilineText04(void)
     { 13u, 0u },
     0.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1368,19 +1368,19 @@ int UtcDaliTextLayoutMultilineText05(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun2 );
   fontDescriptionRuns.PushBack( fontDescriptionRun3 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(88.f, 53.f);
+  Size layoutSize(87.f, 51.f);
   float positions[] =
   {
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -14.f, 59.f, -9.f, 69.f, -9.f, 75.f, -13.f, 78.f, -13.f, 87.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -14.f, 59.f, -9.f, 69.f, -9.f, 75.f, -13.f, 78.f, -13.f, 87.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f,  -9.f, 30.f,  -9.f, 39.f, -2.f
   };
   struct LineRun line0 =
   {
     { 0u, 12u },
     { 0u, 12u },
-    88.f,
+    87.f,
     25.f,
-    -8.f,
+    -7.f,
     4.f,
     0.f,
     0.f,
@@ -1391,9 +1391,9 @@ int UtcDaliTextLayoutMultilineText05(void)
   {
     { 12u, 5u },
     { 12u, 5u },
-    43.f,
+    42.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1683,26 +1683,26 @@ int UtcDaliTextUpdateLayout01(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(92.f, 380.f);
+  Size layoutSize(92.f, 361.f);
   float positions[] =
   {
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -2.f, 33.f, -12.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -13.f, 67.f, -9.f, 76.f, -13.f, 80.f, -13.f, 83.f, -9.f, 92.f, -0.f,
     0.f, -9.f, 11.f, -9.f, 21.f, -9.f, 27.f, -13.f, 30.f, -13.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f,  9.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -2.f, 42.f, -12.f,
-    1.f, -13.f,  9.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -2.f, 33.f, -12.f,
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f,  9.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f,
   };
 
@@ -1710,9 +1710,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 0u, 12u },
     { 0u, 12u },
-    80.f,
+    78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1723,9 +1723,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 12u, 10u },
     { 12u, 10u },
-    76.f,
+    75.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1736,9 +1736,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    34.f,
+    32.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1751,20 +1751,20 @@ int UtcDaliTextUpdateLayout01(void)
     { 28u, 20u },
     92.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
-    false,
+    true,
     false
   };
   struct LineRun line05 =
   {
     { 48u, 11u },
     { 48u, 11u },
-    76.f,
+    75.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1775,9 +1775,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 59u, 5u },
     { 59u, 5u },
-    31.f,
+    29.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1788,35 +1788,35 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 64u, 10u },
     { 64u, 10u },
-    67.f,
+    65.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
-    false,
+    true,
     false
   };
   struct LineRun line08 =
   {
     { 74u, 12u },
     { 74u, 12u },
-    78.f,
+    76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
-    1.f,
     0.f,
-    false,
+    0.f,
+    true,
     false
   };
   struct LineRun line09 =
   {
     { 86u, 6u },
     { 86u, 6u },
-    43.f,
+    42.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1827,9 +1827,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 92u, 12u },
     { 92u, 12u },
-    78.f,
+    76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1842,7 +1842,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 104u, 19u },
     90.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1853,9 +1853,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 123u, 5u },
     { 123u, 5u },
-    31.f,
+    29.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1866,9 +1866,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 128u, 12u },
     { 128u, 12u },
-    80.f,
+    78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1879,9 +1879,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 140u, 10u },
     { 140u, 10u },
-    76.f,
+    75.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1892,9 +1892,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 150u, 6u },
     { 150u, 6u },
-    34.f,
+    32.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1905,22 +1905,22 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 156u, 10u },
     { 156u, 10u },
-    67.f,
+    65.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
-    false,
+    true,
     false
   };
   struct LineRun line17 =
   {
     { 166u, 12u },
     { 166u, 12u },
-    79.f,
+    76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -1931,9 +1931,9 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 178u, 14u },
     { 178u, 14u },
-    55.f,
+    56.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -1946,7 +1946,7 @@ int UtcDaliTextUpdateLayout01(void)
     { 192u, 0u },
     0.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2258,26 +2258,26 @@ int UtcDaliTextUpdateLayout02(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(92.f, 380.f);
+  Size layoutSize(92.f, 361.f);
   float positions[] =
   {
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -2.f, 33.f, -12.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -13.f, 67.f, -9.f, 76.f, -13.f, 80.f, -13.f, 83.f, -9.f, 92.f, -0.f,
     0.f, -9.f, 11.f, -9.f, 21.f, -9.f, 27.f, -13.f, 30.f, -13.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f,  9.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -2.f, 42.f, -12.f,
-    1.f, -13.f,  9.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -2.f, 33.f, -12.f,
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f,  9.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f,
   };
 
@@ -2285,9 +2285,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 0u, 12u },
     { 0u, 12u },
-    80.f,
+    78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2298,9 +2298,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 12u, 10u },
     { 12u, 10u },
-    76.f,
+    75.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2311,9 +2311,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    34.f,
+    32.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2326,20 +2326,20 @@ int UtcDaliTextUpdateLayout02(void)
     { 28u, 20u },
     92.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
-    false,
+    true,
     false
   };
   struct LineRun line05 =
   {
     { 48u, 11u },
     { 48u, 11u },
-    76.f,
+    75.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2350,9 +2350,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 59u, 5u },
     { 59u, 5u },
-    31.f,
+    29.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2363,9 +2363,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 64u, 10u },
     { 64u, 10u },
-    67.f,
+    65.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2376,9 +2376,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 74u, 12u },
     { 74u, 12u },
-    78.f,
+    76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     1.f,
     0.f,
@@ -2389,9 +2389,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 86u, 6u },
     { 86u, 6u },
-    43.f,
+    42.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2402,9 +2402,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 92u, 12u },
     { 92u, 12u },
-    78.f,
+    76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2417,7 +2417,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 104u, 19u },
     90.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2428,9 +2428,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 123u, 5u },
     { 123u, 5u },
-    31.f,
+    29.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2441,9 +2441,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 128u, 12u },
     { 128u, 12u },
-    80.f,
+    78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2454,9 +2454,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 140u, 10u },
     { 140u, 10u },
-    76.f,
+    75.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2467,9 +2467,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 150u, 6u },
     { 150u, 6u },
-    34.f,
+    32.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2480,9 +2480,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 156u, 10u },
     { 156u, 10u },
-    67.f,
+    65.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2493,9 +2493,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 166u, 12u },
     { 166u, 12u },
-    79.f,
+    76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2506,9 +2506,9 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 178u, 14u },
     { 178u, 14u },
-    55.f,
+    56.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2521,7 +2521,7 @@ int UtcDaliTextUpdateLayout02(void)
     { 192u, 0u },
     0.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2833,26 +2833,26 @@ int UtcDaliTextUpdateLayout03(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(92.f, 380.f);
+  Size layoutSize(92.f, 361.f);
   float positions[] =
   {
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -2.f, 33.f, -12.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -13.f, 67.f, -9.f, 76.f, -13.f, 80.f, -13.f, 83.f, -9.f, 92.f, -0.f,
     0.f, -9.f, 11.f, -9.f, 21.f, -9.f, 27.f, -13.f, 30.f, -13.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f,  9.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -2.f, 42.f, -12.f,
-    1.f, -13.f,  9.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -2.f, 33.f, -12.f,
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f,
-    1.f, -13.f,  9.f, -9.f, 18.f, -13.f, 22.f, -13.f, 25.f, -9.f, 34.f, -0.f, 38.f, -9.f, 49.f, -9.f, 59.f, -9.f, 65.f, -13.f, 68.f, -13.f, 77.f, -0.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f,
   };
 
@@ -2860,9 +2860,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 0u, 12u },
     { 0u, 12u },
-    80.f,
+    78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2873,9 +2873,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 12u, 10u },
     { 12u, 10u },
-    76.f,
+    75.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2886,9 +2886,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 22u, 6u },
     { 22u, 6u },
-    34.f,
+    32.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2901,7 +2901,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 28u, 20u },
     92.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2912,9 +2912,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 48u, 11u },
     { 48u, 11u },
-    76.f,
+    75.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2925,9 +2925,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 59u, 5u },
     { 59u, 5u },
-    31.f,
+    29.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2938,9 +2938,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 64u, 10u },
     { 64u, 10u },
-    67.f,
+    65.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2951,9 +2951,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 74u, 12u },
     { 74u, 12u },
-    78.f,
+    76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     1.f,
     0.f,
@@ -2964,9 +2964,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 86u, 6u },
     { 86u, 6u },
-    43.f,
+    42.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -2977,9 +2977,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 92u, 12u },
     { 92u, 12u },
-    78.f,
+    76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -2992,7 +2992,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 104u, 19u },
     90.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3003,9 +3003,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 123u, 5u },
     { 123u, 5u },
-    31.f,
+    29.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3016,9 +3016,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 128u, 12u },
     { 128u, 12u },
-    80.f,
+    78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3029,9 +3029,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 140u, 10u },
     { 140u, 10u },
-    76.f,
+    75.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3042,9 +3042,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 150u, 6u },
     { 150u, 6u },
-    34.f,
+    32.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3055,9 +3055,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 156u, 10u },
     { 156u, 10u },
-    67.f,
+    65.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3068,9 +3068,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 166u, 12u },
     { 166u, 12u },
-    79.f,
+    76.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3081,9 +3081,9 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 178u, 14u },
     { 178u, 14u },
-    55.f,
+    56.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3096,7 +3096,7 @@ int UtcDaliTextUpdateLayout03(void)
     { 192u, 0u },
     0.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3184,11 +3184,11 @@ int UtcDaliTextLayoutEllipsis01(void)
 
   struct LineRun line01 =
   {
-    { 0u, 13u },
-    { 0u, 13u },
-    93.f,
+    { 0u, 14u },
+    { 0u, 14u },
+    99.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3200,11 +3200,11 @@ int UtcDaliTextLayoutEllipsis01(void)
 
   float positions[] =
   {
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f, 83.f, -13.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f, 82.f, -13.f,
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 20.f );
+  Size layoutSize( 100.f, 19.f );
 
   LayoutTextData data =
   {
@@ -3263,9 +3263,9 @@ int UtcDaliTextLayoutEllipsis02(void)
   {
     { 0u, 12u },
     { 0u, 12u },
-    80.f,
+    78.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3278,7 +3278,7 @@ int UtcDaliTextLayoutEllipsis02(void)
     { 12u, 12u },
     93.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3291,12 +3291,12 @@ int UtcDaliTextLayoutEllipsis02(void)
 
   float positions[] =
   {
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f, 79.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
     0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -13.f, 52.f, -9.f, 61.f, -13.f, 65.f, -13.f, 68.f, -9.f, 77.f, -0.f, 81.f, -9.f,
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 40.f );
+  Size layoutSize( 100.f, 38.f );
 
   LayoutTextData data =
   {
@@ -3419,11 +3419,11 @@ int UtcDaliTextLayoutEllipsis03(void)
 
   struct LineRun line01 =
   {
-    { 0u, 16u },
-    { 0u, 16u },
-    95.f,
+    { 0u, 17u },
+    { 0u, 17u },
+    99.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
@@ -3435,11 +3435,11 @@ int UtcDaliTextLayoutEllipsis03(void)
 
   float positions[] =
   {
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f, 69.f, -8.f, 76.f, -6.f, 81.f, -8.f, 87.f, -7.f, 92.f, -11.f, 94.f, -0.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 20.f );
+  Size layoutSize( 100.f, 19.f );
 
   LayoutTextData data =
   {
@@ -3564,9 +3564,9 @@ int UtcDaliTextLayoutEllipsis04(void)
   {
     { 0u, 16u },
     { 0u, 16u },
-    96.f,
+    94.f,
     15.f,
-    -5.f,
+    -4.f,
     3.f,
     0.f,
     0.f,
@@ -3579,7 +3579,7 @@ int UtcDaliTextLayoutEllipsis04(void)
     { 16u, 18u },
     97.f,
     15.f,
-    -5.f,
+    -4.f,
     4.f,
     0.f,
     0.f,
@@ -3592,12 +3592,12 @@ int UtcDaliTextLayoutEllipsis04(void)
 
   float positions[] =
   {
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f, 69.f, -8.f, 76.f, -6.f, 81.f, -8.f, 87.f, -7.f, 92.f, -11.f, 94.f, -0.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
     0.f, -7.f, 5.f, -11.f, 6.f, -11.f, 9.f, -8.f, 17.f, -11.f, 18.f, -11.f, 22.f, -8.f, 28.f, -0.f, 32.f, -10.f, 43.f, -13.f, 50.f, -10.f, 55.f, -10.f, 63.f, -0.f, 68.f, -10.f, 76.f, -10.f, 81.f, -13.f, 89.f, -10.f, 97.f, -0.f,
   };
 
   Size textArea( 100.f, 50.f );
-  Size layoutSize( 100.f, 40.f );
+  Size layoutSize( 100.f, 38.f );
 
   LayoutTextData data =
   {
@@ -3654,25 +3654,25 @@ int UtcDaliTextLayoutEllipsis05(void)
   {
     { 0u, 11u },
     { 0u, 11u },
-    80.f,
+    78.f,
     15.f,
-    -5.f,
+    -4.f,
     0.f,
     0.f,
     0.f,
     false,
-    true
+    false
   };
   Vector<LineRun> lines;
   lines.PushBack( line01 );
 
   float positions[] =
   {
-    1.f, -12.f
+    0.f, -12.f
   };
 
   Size textArea( 100.f, 19.f );
-  Size layoutSize( 100.f, 20.f );
+  Size layoutSize( 78.f, 19.f );
 
   LayoutTextData data =
   {
@@ -3729,7 +3729,7 @@ int UtcDaliTextReorderLayout01(void)
 
   float positions[] =
   {
-    1.f, -12.f, 11.f, -9.f, 20.f, -13.f, 24.f, -13.f, 27.f, -9.f, 36.f, -0.f, 40.f, -9.f, 51.f, -9.f, 61.f, -9.f, 67.f, -13.f, 70.f, -13.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f,
   };
 
   Size textArea( 100.f, 300.f );
@@ -3852,8 +3852,8 @@ int UtcDaliTextReorderLayout02(void)
     87.f, -10.f, 79.f, -13.f, 74.f, -10.f, 66.f, -10.f, 61.f, -0.f, 53.f, -10.f, 48.f, -10.f, 41.f, -13.f, 32.f, -10.f, 27.f, -0.f, 20.f, -8.f, 15.f, -6.f, 8.f, -8.f, 5.f, -7.f, 4.f, -11.f, 0.f, -0.f,
     23.f, -7.f, 22.f, -11.f, 17.f, -11.f, 11.f, -8.f, 10.f, -11.f, 5.f, -11.f, 0.f, -8.f, 0.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f, 69.f, -8.f, 76.f, -6.f, 81.f, -8.f, 87.f, -7.f, 92.f, -11.f, 94.f, -0.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
     0.f, -7.f, 5.f, -11.f, 6.f, -11.f, 9.f, -8.f, 17.f, -11.f, 18.f, -11.f, 22.f, -8.f, 30.f, -2.f,
   };
 
@@ -3976,11 +3976,11 @@ int UtcDaliTextReorderLayout03(void)
 
   float positions[] =
   {
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f, 69.f, -8.f, 76.f, -6.f, 81.f, -8.f, 87.f, -7.f, 92.f, -11.f, 94.f, -0.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
     0.f, -7.f,  5.f, -11.f, 6.f, -11.f, 9.f, -8.f, 17.f, -11.f, 18.f, -11.f, 22.f, -8.f, 28.f, -0.f,
     86.f, -8.f, 81.f, -6.f, 74.f, -8.f, 71.f, -7.f, 70.f, -11.f, 66.f, -0.f, 62.f, -7.f, 61.f, -11.f, 56.f, -11.f, 50.f, -8.f, 49.f, -11.f, 44.f, -11.f, 39.f, -8.f, 36.f, -0.f, 26.f, -10.f, 18.f, -13.f, 13.f, -10.f, 5.f, -10.f, 0.f, -0.f,
     22.f, -10.f, 17.f, -10.f, 10.f, -13.f, 1.f, -10.f, 0.f, -0.f,
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f, 69.f, -8.f, 76.f, -6.f, 81.f, -8.f, 87.f, -7.f, 92.f, -11.f, 94.f, -0.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
     0.f, -7.f, 5.f, -11.f, 6.f, -11.f, 9.f, -8.f, 17.f, -11.f, 18.f, -11.f, 22.f, -8.f, 30.f, -2.f,
   };
 
@@ -4103,12 +4103,12 @@ int UtcDaliTextReorderLayout04(void)
 
   float positions[] =
   {
-    1.f, -10.f, 12.f, -13.f, 19.f, -10.f, 24.f, -10.f, 32.f, -0.f, 37.f, -10.f, 45.f, -10.f, 50.f, -13.f, 58.f, -10.f, 66.f, -0.f, 69.f, -8.f, 76.f, -6.f, 81.f, -8.f, 87.f, -7.f, 92.f, -11.f, 94.f, -0.f,
+    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
     0.f, -7.f, 5.f, -11.f, 6.f, -11.f, 9.f, -8.f, 17.f, -11.f, 18.f, -11.f, 22.f, -8.f, 28.f, -0.f,
     0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
-    1.f, -10.f, 9.f, -10.f, 14.f, -13.f, 22.f, -10.f, 30.f, -0.f,
+    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
     87.f, -10.f, 79.f, -13.f, 74.f, -10.f, 66.f, -10.f, 61.f, -0.f, 53.f, -10.f, 48.f, -10.f, 41.f, -13.f, 32.f, -10.f, 27.f, -0.f, 20.f, -8.f, 15.f, -6.f, 8.f, -8.f, 5.f, -7.f, 4.f, -11.f, 0.f, -0.f,
-    28.f, -7.f, 27.f, -11.f, 22.f, -11.f, 16.f, -8.f, 15.f, -11.f, 10.f, -11.f, 5.f, -8.f, 2.f, -2.f,
+    26.f, -7.f, 25.f, -11.f, 20.f, -11.f, 14.f, -8.f, 13.f, -11.f, 8.f, -11.f, 3.f, -8.f, 0.f, -2.f,
   };
 
   Size textArea( 100.f, 300.f );
@@ -4350,7 +4350,7 @@ int UtcDaliTextAlign02(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 0.f, 0.f, 2.f, 60.f, 0.f, 0.f };
+  float positions[] = { 0.f, 0.f, 2.f, 61.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -4592,7 +4592,7 @@ int UtcDaliTextAlign04(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 10.f, 16.f, 0.f, 0.f, 0.f, 0.f };
+  float positions[] = { 11.f, 17.f, 0.f, 0.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -4834,7 +4834,7 @@ int UtcDaliTextAlign06(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 0.f, 0.f, 0.f, 0.f, 10.f, 20.f };
+  float positions[] = { 0.f, 0.f, 0.f, 0.f, 11.f, 21.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -4955,7 +4955,7 @@ int UtcDaliTextAlign07(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 20.f, 33.f, 0.f, 0.f, 0.f, 0.f };
+  float positions[] = { 22.f, 35.f, 0.f, 0.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -5197,7 +5197,7 @@ int UtcDaliTextAlign09(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 0.f, 0.f, 0.f, 0.f, 20.f, 40.f };
+  float positions[] = { 0.f, 0.f, 0.f, 0.f, 22.f, 42.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -5439,7 +5439,7 @@ int UtcDaliTextAlign11(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 20.f, 33.f, 2.f, 0.f, 0.f, 0.f };
+  float positions[] = { 22.f, 35.f, 2.f, 0.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =

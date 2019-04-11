@@ -761,9 +761,9 @@ int UtcDaliTextEditorSetPropertyP(void)
   Property::Map underlineMapSet;
   Property::Map underlineMapGet;
 
-  underlineMapSet.Insert( "enable", "true" );
-  underlineMapSet.Insert( "color", "red" );
-  underlineMapSet.Insert( "height", "1" );
+  underlineMapSet.Insert( "enable", true );
+  underlineMapSet.Insert( "color", Color::RED );
+  underlineMapSet.Insert( "height", 1 );
 
   editor.SetProperty( TextEditor::Property::UNDERLINE, underlineMapSet );
 
@@ -2596,9 +2596,9 @@ int utcDaliTextEditorUnderPropertyStringP(void)
   // Check the input underline property
   Property::Map underlineMapSet;
   Property::Map underlineMapGet;
-  underlineMapSet.Insert( "enable", "true" );
-  underlineMapSet.Insert( "color", "blue" );
-  underlineMapSet.Insert( "height", "2" );
+  underlineMapSet.Insert( "enable", true );
+  underlineMapSet.Insert( "color", Color::BLUE );
+  underlineMapSet.Insert( "height", 2 );
 
   editor.SetProperty( TextEditor::Property::UNDERLINE, underlineMapSet );
   underlineMapGet = editor.GetProperty<Property::Map>( TextEditor::Property::UNDERLINE );

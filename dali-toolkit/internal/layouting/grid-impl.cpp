@@ -196,7 +196,7 @@ void Grid::OnMeasure( MeasureSpec widthMeasureSpec, MeasureSpec heightMeasureSpe
   DetermineNumberOfColumns( availableContentWidth );
 
   // Locations define the start, end,top and bottom of each cell.
-  mLocations->CalculateLocations( mNumColumns, availableContentWidth.AsInteger(), availableContentHeight.AsInteger(), childCount, 0, 0 );
+  mLocations->CalculateLocations( mNumColumns, availableContentWidth.AsInteger(), availableContentHeight.AsInteger(), childCount );
 
 
   SetMeasuredDimensions( ResolveSizeAndState( widthSize, widthMeasureSpec, MeasuredSize::State::MEASURED_SIZE_OK ),
