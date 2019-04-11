@@ -34,7 +34,6 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-button.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-harness.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/test-gesture-manager.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-gl-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-gl-sync-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-platform-abstraction.cpp

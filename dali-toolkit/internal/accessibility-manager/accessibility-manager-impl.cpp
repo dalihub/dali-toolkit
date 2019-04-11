@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1298,11 +1298,11 @@ bool AccessibilityManager::AccessibilityActionTouch(const TouchEvent& touchEvent
   return handled;
 }
 
-bool AccessibilityManager::HandlePanGesture(const Integration::PanGestureEvent& panEvent)
+bool AccessibilityManager::HandlePanGesture(const AccessibilityGestureEvent& panEvent)
 {
   bool handled = false;
 
-  if( panEvent.state == Gesture::Started )
+  if( panEvent.state == AccessibilityGestureEvent::Started )
   {
     // Find the focusable actor at the event position
     Dali::HitTestAlgorithm::Results results;
@@ -1319,7 +1319,7 @@ bool AccessibilityManager::HandlePanGesture(const Integration::PanGestureEvent& 
 
   // Gesture::Finished (Up) events are delivered with previous (Motion) event position
   // Use the real previous position; otherwise we may incorrectly get a ZERO velocity
-  if ( Gesture::Finished != panEvent.state )
+  if ( AccessibilityGestureEvent::Finished != panEvent.state )
   {
     // Store the previous position for next Gesture::Finished iteration.
     mPreviousPosition = panEvent.previousPosition;
@@ -1327,7 +1327,8 @@ bool AccessibilityManager::HandlePanGesture(const Integration::PanGestureEvent& 
 
   Actor rootActor = Stage::GetCurrent().GetRootLayer();
 
-  Dali::PanGesture pan(panEvent.state);
+  Dali::PanGesture pan( static_cast<Dali::Gesture::State>(panEvent.state) );
+
   pan.time = panEvent.time;
   pan.numberOfTouches = panEvent.numberOfTouches;
   pan.screenPosition = panEvent.currentPosition;

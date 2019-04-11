@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2344,7 +2344,7 @@ int UtcDaliAccessibilityManagerHandlePanGesture(void)
   dummyControl.SetSize(480, 800);
   Stage::GetCurrent().Add( dummyControl );
 
-  Dali::Integration::PanGestureEvent panGestureEvent(Gesture::Started);
+  AccessibilityGestureEvent panGestureEvent(AccessibilityGestureEvent::Started);
   panGestureEvent.previousPosition = Vector2(0.f, 0.f);
   panGestureEvent.currentPosition = Vector2(100.f, 0.f);
   panGestureEvent.timeDelta = 16;
@@ -2352,12 +2352,12 @@ int UtcDaliAccessibilityManagerHandlePanGesture(void)
 
   Test::AccessibilityAdaptor::SendPanGesture( accessibilityAdaptor, panGestureEvent );
 
-  panGestureEvent.state = Gesture::Continuing;
+  panGestureEvent.state = AccessibilityGestureEvent::Continuing;
   panGestureEvent.previousPosition = Vector2(100.f, 0.f);
   panGestureEvent.currentPosition = Vector2(200.f, 0.f);
   Test::AccessibilityAdaptor::SendPanGesture( accessibilityAdaptor, panGestureEvent );
 
-  panGestureEvent.state = Gesture::Finished;
+  panGestureEvent.state = AccessibilityGestureEvent::Finished;
   panGestureEvent.previousPosition = Vector2(200.f, 0.f);
   panGestureEvent.currentPosition = Vector2(300.f, 0.f);
   Test::AccessibilityAdaptor::SendPanGesture( accessibilityAdaptor, panGestureEvent );

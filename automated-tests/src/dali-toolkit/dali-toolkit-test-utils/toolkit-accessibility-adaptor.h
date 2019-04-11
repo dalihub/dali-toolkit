@@ -1,8 +1,8 @@
-#ifndef __DALI_TEST_TOOLKIT_ACCESSIBILITY_ADAPTOR_H__
-#define __DALI_TEST_TOOLKIT_ACCESSIBILITY_ADAPTOR_H__
+#ifndef DALI_TEST_TOOLKIT_ACCESSIBILITY_ADAPTOR_H
+#define DALI_TEST_TOOLKIT_ACCESSIBILITY_ADAPTOR_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/accessibility-adaptor.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
+#include <dali/devel-api/adaptor-framework/accessibility-gesture-event.h>
 
 namespace Test
 {
@@ -29,9 +29,9 @@ namespace AccessibilityAdaptor
 
 void MockSetReadPosition( Dali::AccessibilityAdaptor adaptor, Dali::Vector2& position );
 void SetEnabled( Dali::AccessibilityAdaptor adaptor, bool enabled);
-void SendPanGesture( Dali::AccessibilityAdaptor adaptor, const Dali::Integration::PanGestureEvent& panEvent );
+void SendPanGesture( Dali::AccessibilityAdaptor adaptor, const Dali::AccessibilityGestureEvent& panEvent );
 
 } // namespace AccessibilityAdaptor
 } // namespace Test
 
-#endif //
+#endif // DALI_TEST_TOOLKIT_ACCESSIBILITY_ADAPTOR_H

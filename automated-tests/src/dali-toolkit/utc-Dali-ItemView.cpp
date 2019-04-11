@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
+
 
 using namespace Dali;
 using namespace Toolkit;
@@ -66,46 +66,18 @@ static void OnScrollUpdate( const Vector2& position )
   gOnScrollUpdateCalled = true;
 }
 
-// Generate a PanGestureEvent to send to Core
-Integration::PanGestureEvent GeneratePan(
-    Gesture::State state,
-    const Vector2& previousPosition,
-    const Vector2& currentPosition,
-    unsigned long timeDelta,
-    unsigned int numberOfTouches = 1)
+Integration::TouchEvent GenerateSingleTouch( PointState::Type state, const Vector2& screenPosition, uint32_t time )
 {
-  Integration::PanGestureEvent pan(state);
-
-  pan.previousPosition = previousPosition;
-  pan.currentPosition = currentPosition;
-  pan.timeDelta = timeDelta;
-  pan.numberOfTouches = numberOfTouches;
-
-  return pan;
-}
-
-/**
- * Helper to generate PanGestureEvent
- *
- * @param[in] application Application instance
- * @param[in] state The Gesture State
- * @param[in] pos The current position of touch.
- */
-static void SendPan(ToolkitTestApplication& application, Gesture::State state, const Vector2& pos)
-{
-  static Vector2 last;
-
-  if( (state == Gesture::Started) ||
-      (state == Gesture::Possible) )
-  {
-    last.x = pos.x;
-    last.y = pos.y;
-  }
-
-  application.ProcessEvent(GeneratePan(state, last, pos, RENDER_FRAME_INTERVAL));
-
-  last.x = pos.x;
-  last.y = pos.y;
+  Integration::TouchEvent touchEvent;
+  Integration::Point point;
+  point.SetState( state );
+  point.SetDeviceId(4);
+  point.SetScreenPosition( screenPosition );
+  point.SetDeviceClass( Device::Class::TOUCH );
+  point.SetDeviceSubclass( Device::Subclass::NONE );
+  touchEvent.points.push_back( point );
+  touchEvent.time = time;
+  return touchEvent;
 }
 
 /*
@@ -1144,36 +1116,41 @@ int UtcDaliItemViewOvershootVertical(void)
 
   // Do a pan starting from 100,100 and moving down
   Vector2 pos(100.0f, 100.0f);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
+
+  application.ProcessEvent( GenerateSingleTouch(PointState::DOWN, pos, 100 ) );
+  application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
+
   pos.y += 5.0f;
   Wait(application, 100);
 
   for(int i = 0;i<200;i++)
   {
-    SendPan(application, Gesture::Continuing, pos);
+    application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
     pos.y += 5.0f;
     Wait(application);
   }
 
-  SendPan(application, Gesture::Finished, pos);
+  application.ProcessEvent( GenerateSingleTouch(PointState::UP, pos, 100 ) );
+
   Wait(application, 100);
 
   // Do a pan starting from 100,100 and moving up
   pos = Vector2(100.0f, 300.0f);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
+
+  application.ProcessEvent( GenerateSingleTouch(PointState::DOWN, pos, 100 ) );
+  application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
+
   pos.y -= 5.0f;
   Wait(application, 100);
 
   for(int i = 0;i<200;i++)
   {
-    SendPan(application, Gesture::Continuing, pos);
+    application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
     pos.y -= 5.0f;
     Wait(application);
   }
 
-  SendPan(application, Gesture::Finished, pos);
+  application.ProcessEvent( GenerateSingleTouch(PointState::UP, pos, 100 ) );
   Wait(application, 100);
   END_TEST;
 }
@@ -1205,36 +1182,36 @@ int UtcDaliItemViewOvershootHorizontal(void)
 
   // Do a pan starting from 100,100 and moving left
   Vector2 pos(100.0f, 100.0f);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
+  application.ProcessEvent( GenerateSingleTouch(PointState::DOWN, pos, 100 ));
+  application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ));
   pos.x -= 5.0f;
   Wait(application, 100);
 
   for(int i = 0;i<200;i++)
   {
-    SendPan(application, Gesture::Continuing, pos);
+    application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
     pos.x -= 5.0f;
     Wait(application);
   }
 
-  SendPan(application, Gesture::Finished, pos);
+  application.ProcessEvent( GenerateSingleTouch(PointState::UP, pos, 100 ) );
   Wait(application, 100);
 
   // Do a pan starting from 100,100 and moving right
   pos = Vector2(100.0f, 100.0f);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
+  application.ProcessEvent( GenerateSingleTouch(PointState::DOWN, pos, 100 ) );
+  application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
   pos.x += 5.0f;
   Wait(application, 100);
 
   for(int i = 0;i<200;i++)
   {
-    SendPan(application, Gesture::Continuing, pos);
+    application.ProcessEvent( GenerateSingleTouch(PointState::MOTION, pos, 100 ) );
     pos.x += 5.0f;
     Wait(application);
   }
 
-  SendPan(application, Gesture::Finished, pos);
+  application.ProcessEvent( GenerateSingleTouch(PointState::UP, pos, 100 ) );
   Wait(application, 100);
 
   END_TEST;
