@@ -59,7 +59,8 @@ BitmapFontDescription::BitmapFontDescription()
 : glyphs{},
   name{},
   underlinePosition{ 0.f },
-  underlineThickness{ 1.f }
+  underlineThickness{ 1.f },
+  isColorFont{ false }
 {}
 
 BitmapFontDescription::~BitmapFontDescription()
