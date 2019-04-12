@@ -185,7 +185,10 @@ int UtcDaliTextCircularBitmapFont(void)
   Dali::Toolkit::DevelText::BitmapFontDescription description;
   Dali::Toolkit::DevelText::Glyph glyph;
   glyph.url = "BitmapFontUrl";
-  glyph.utf8 = "BitmapFontUrl";
+  glyph.utf8[0u] = 0u;
+  glyph.utf8[1u] = 0u;
+  glyph.utf8[2u] = 0u;
+  glyph.utf8[3u] = 0u;
   glyph.ascender = 1.f;
   glyph.descender = 1.f;
   description.glyphs.push_back( glyph );
