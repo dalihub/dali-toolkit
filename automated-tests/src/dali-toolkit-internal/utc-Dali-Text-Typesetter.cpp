@@ -28,6 +28,8 @@
 #include <dali-toolkit/internal/text/rendering/view-model.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
+#include <dali/devel-api/text-abstraction/bitmap-font.h>
+#include <dali-toolkit/devel-api/text/bitmap-font.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -192,6 +194,56 @@ int UtcDaliTextTypesetterVerticalLineAlignment(void)
     auto bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
     DALI_TEST_EQUALS( 60u, bitmap.GetHeight(), TEST_LOCATION );
   }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextTypesetterBitmapFont(void)
+{
+  tet_infoline("UtcDaliTextTypesetterBitmapFont ");
+  ToolkitTestApplication application;
+
+  DevelText::BitmapFontDescription fontDescription;
+  fontDescription.name = "Digits";
+  fontDescription.underlinePosition = 0.f;
+  fontDescription.underlineThickness = 0.f;
+  fontDescription.isColorFont = true;
+
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0031.png", "0", 34.f, 0.f } );
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0032.png", "1", 34.f, 0.f } );
+
+  TextAbstraction::BitmapFont bitmapFont;
+  DevelText::CreateBitmapFont( fontDescription, bitmapFont );
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.GetFontId( bitmapFont );
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  // Configures the text controller similarly to the text-label.
+  ConfigureTextLabel( controller );
+
+  // Sets the text.
+  controller->SetMarkupProcessorEnabled( true );
+  controller->SetText( "<font family='Digits'><color 'value'='red'>0</color></font>" );
+
+  // Creates the text's model and relais-out the text.
+  const Size relayoutSize( 31.f, 34.f );
+  controller->Relayout( relayoutSize );
+
+  // Tests the rendering controller has been created.
+  TypesetterPtr renderingController = Typesetter::New( controller->GetTextModel() );
+  DALI_TEST_CHECK( renderingController );
+
+  controller->Relayout( relayoutSize );
+
+  // Renders the text and creates the final bitmap.
+  auto bitmap = renderingController->Render( relayoutSize, Toolkit::DevelText::TextDirection::LEFT_TO_RIGHT );
+
+  DALI_TEST_EQUALS( 31u, bitmap.GetWidth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 34u, bitmap.GetHeight(), TEST_LOCATION );
 
   tet_result(TET_PASS);
   END_TEST;

@@ -23,6 +23,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <toolkit-text-utils.h>
+#include <dali-toolkit/internal/controls/text-controls/text-field-impl.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
@@ -999,6 +1000,48 @@ int UtcDaliTextControllerCheckInputFontPointSizeChanged(void)
   controller->Relayout(size);
 
   tet_result(TET_PASS);
+
+  END_TEST;
+}
+
+int UtcDaliTextControllerSelectEvent(void)
+{
+  tet_infoline(" UtcDaliTextControllerSelectEvent");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  // Configures the text controller similarly to the text-field.
+  ConfigureTextField( controller );
+
+  // Set the text
+  const std::string text("Hello World!");
+  controller->SetText( text );
+
+  // Select the whole text.
+  controller->SelectEvent( 0.f, 0.f, false );
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  // Check if the whole text is selected or not.
+  std::string retrieved_text;
+  mImpl.RetrieveSelection( retrieved_text, false );
+  DALI_TEST_EQUALS( "Hello", retrieved_text, TEST_LOCATION );
+
+  // Select the whole text.
+  controller->SelectEvent( 0.f, 0.f, true );
+
+  // Perform a relayout
+  controller->Relayout( size );
+
+  mImpl.RetrieveSelection( retrieved_text, false );
+  DALI_TEST_EQUALS( text, retrieved_text, TEST_LOCATION );
 
   END_TEST;
 }

@@ -43,17 +43,26 @@ public:
   void SetRenderer( Dali::Renderer renderer )
   {
     mRenderer = renderer;
+
+    if( mWidth != 0 && mHeight != 0 )
+    {
+      Dali::TextureSet textureSet = mRenderer.GetTextures();
+      Dali::Texture texture = Dali::Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, mWidth, mHeight );
+      textureSet.SetTexture( 0, texture );
+    }
   }
 
   void SetSize( uint32_t width, uint32_t height )
   {
     mWidth = width;
     mHeight = height;
-  }
 
-  bool StartRender()
-  {
-    return true;
+    if( mRenderer )
+    {
+      Dali::TextureSet textureSet = mRenderer.GetTextures();
+      Dali::Texture texture = Dali::Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, mWidth, mHeight );
+      textureSet.SetTexture( 0, texture );
+    }
   }
 
   void StopRender()
@@ -74,13 +83,18 @@ public:
     return 60.0f;
   }
 
+  void GetDefaultSize( uint32_t& width, uint32_t& height ) const
+  {
+    width = 100;
+    height = 100;
+  }
+
 public:
 
   std::string mUrl;
   Dali::Renderer mRenderer;
   uint32_t mWidth;
   uint32_t mHeight;
-
 };
 
 inline VectorAnimationRenderer& GetImplementation( Dali::VectorAnimationRenderer& renderer )
@@ -147,11 +161,6 @@ void VectorAnimationRenderer::SetSize( uint32_t width, uint32_t height )
   Internal::Adaptor::GetImplementation( *this ).SetSize( width, height );
 }
 
-bool VectorAnimationRenderer::StartRender()
-{
-  return Internal::Adaptor::GetImplementation( *this ).StartRender();
-}
-
 void VectorAnimationRenderer::StopRender()
 {
   Internal::Adaptor::GetImplementation( *this ).StopRender();
@@ -170,6 +179,11 @@ uint32_t VectorAnimationRenderer::GetTotalFrameNumber() const
 float VectorAnimationRenderer::GetFrameRate() const
 {
   return Internal::Adaptor::GetImplementation( *this ).GetFrameRate();
+}
+
+void VectorAnimationRenderer::GetDefaultSize( uint32_t& width, uint32_t& height ) const
+{
+  Internal::Adaptor::GetImplementation( *this ).GetDefaultSize( width, height );
 }
 
 } // namespace Dali;

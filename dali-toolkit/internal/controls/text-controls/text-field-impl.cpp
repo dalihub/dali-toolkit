@@ -133,6 +133,7 @@ DALI_PROPERTY_REGISTRATION( Toolkit, TextField, "ellipsis",                     
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableShiftSelection",           BOOLEAN,   ENABLE_SHIFT_SELECTION               )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableGrabHandle",               BOOLEAN,   ENABLE_GRAB_HANDLE                   )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "matchSystemLanguageDirection",   BOOLEAN,   MATCH_SYSTEM_LANGUAGE_DIRECTION      )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableGrabHandlePopup",          BOOLEAN,   ENABLE_GRAB_HANDLE_POPUP             )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -764,6 +765,17 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP:
+      {
+        if (impl.mController)
+        {
+          const bool grabHandlePopupEnabled = value.Get<bool>();
+          DALI_LOG_INFO(gLogFilter, Debug::General, "TextField %p ENABLE_GRAB_HANDLE_POPUP %d\n", impl.mController.Get(), grabHandlePopupEnabled);
+
+          impl.mController->SetGrabHandlePopupEnabled(grabHandlePopupEnabled);
+          break;
+        }
+      }
     } // switch
   } // textfield
 }
@@ -1171,10 +1183,27 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP:
+      {
+        if (impl.mController)
+        {
+          value = impl.mController->IsGrabHandlePopupEnabled();
+        }
+        break;
+      }
     } //switch
   }
 
   return value;
+}
+
+void TextField::SelectWholeText()
+{
+  if( mController && mController->IsShowingRealText() )
+  {
+    mController->SelectEvent( 0.f, 0.f, true );
+    SetKeyInputFocus();
+  }
 }
 
 InputMethodContext TextField::GetInputMethodContext()

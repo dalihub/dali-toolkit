@@ -458,8 +458,18 @@ int UtcDaliAnimatedVectorImageVisualNaturalSize(void)
   Vector2 controlSize( 20.f, 30.f );
   Vector2 naturalSize;
 
-  actor.SetSize( controlSize );
   Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  visual.GetNaturalSize( naturalSize );
+
+  DALI_TEST_EQUALS( naturalSize, Vector2( 100.0f, 100.0f ), TEST_LOCATION );    // 100x100 is the content default size.
+
+  actor.SetSize( controlSize );
 
   application.SendNotification();
   application.Render();
@@ -647,6 +657,29 @@ int UtcDaliAnimatedVectorImageVisualJumpToCurrentProgress(void)
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::CURRENT_PROGRESS );
   DALI_TEST_EQUALS( value->Get< float >(), 0.4f, TEST_LOCATION );
+
+  // Change play range
+  attributes.Clear();
+  attributes.Add( DevelImageVisual::Property::PLAY_RANGE, Vector2( 0.0f, 1.0f ) );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+
+  attributes.Clear();
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
+
+  application.SendNotification();
+  application.Render();
+
+  // Stop and jump to 0.2
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::STOP, attributes );
+
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::JUMP_TO, 0.2f );
+
+  application.SendNotification();
+  application.Render();
+
+  map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  value = map.Find( DevelImageVisual::Property::CURRENT_PROGRESS );
+  DALI_TEST_EQUALS( value->Get< float >(), 0.2f, TEST_LOCATION );
 
   END_TEST;
 }
