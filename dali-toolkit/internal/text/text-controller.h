@@ -421,6 +421,20 @@ public: // Configure the text controller.
   bool IsGrabHandleEnabled() const;
 
   /**
+   * @brief Enable or disable the grab handles for text selection.
+   *
+   * @param[in] enabled Whether to enable the grab handles
+   */
+  void SetGrabHandlePopupEnabled( bool enabled );
+
+  /**
+   * @brief Returns whether the grab handles are enabled.
+   *
+   * @return True if the grab handles are enabled
+   */
+  bool IsGrabHandlePopupEnabled() const;
+
+  /**
    * @brief Sets input type to password
    *
    * @note The string is displayed hidden character
@@ -1261,6 +1275,11 @@ public: // Queries & retrieves.
    */
   void SetLayoutDirection( Dali::LayoutDirection::Type layoutDirection );
 
+  /**
+   * @brief Retrieves if showing real text or not.
+   * @return The value of showing real text.
+   */
+  bool IsShowingRealText() const;
 
 public: // Relayout.
 
@@ -1339,6 +1358,17 @@ public: // Text-input Event Queuing.
    * @param[in] y The y position relative to the top-left of the parent control.
    */
   void LongPressEvent( Gesture::State state, float x, float y );
+
+  /**
+   * @brief Creates a selection event.
+   *
+   * It could be called from the TapEvent (double tap) or when the text selection popup's sellect all button is pressed.
+   *
+   * @param[in] x The x position relative to the top-left of the parent control.
+   * @param[in] y The y position relative to the top-left of the parent control.
+   * @param[in] selectAll Whether the whole text is selected.
+   */
+  void SelectEvent( float x, float y, bool selectAll );
 
   /**
    * @brief Event received from input method context
@@ -1473,17 +1503,6 @@ private: // Events.
    * @brief Used to process an event queued from backspace key etc.
    */
   void TextDeletedEvent();
-
-  /**
-   * @brief Creates a selection event.
-   *
-   * It could be called from the TapEvent (double tap) or when the text selection popup's sellect all button is pressed.
-   *
-   * @param[in] x The x position relative to the top-left of the parent control.
-   * @param[in] y The y position relative to the top-left of the parent control.
-   * @param[in] selectAll Whether the whole text is selected.
-   */
-  void SelectEvent( float x, float y, bool selectAll );
 
   /**
    * @brief Helper to KeyEvent() to handle the backspace or delete key case.

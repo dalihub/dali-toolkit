@@ -1847,15 +1847,13 @@ void Controller::Impl::OnSelectAllEvent()
 
   if( mEventData->mSelectionEnabled )
   {
-    ChangeState( EventData::SELECTING );
+    // Calculates the logical position from the start.
+    RepositionSelectionHandles( 0.f - mModel->mScrollPosition.x,
+                                0.f - mModel->mScrollPosition.y,
+                                Controller::NoTextTap::HIGHLIGHT );
 
     mEventData->mLeftSelectionPosition = 0u;
     mEventData->mRightSelectionPosition = mModel->mLogicalModel->mText.Count();
-
-    mEventData->mScrollAfterUpdatePosition = true;
-    mEventData->mUpdateLeftSelectionPosition = true;
-    mEventData->mUpdateRightSelectionPosition = true;
-    mEventData->mUpdateHighlightBox = true;
   }
 }
 

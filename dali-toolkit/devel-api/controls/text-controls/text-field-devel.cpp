@@ -33,6 +33,11 @@ InputMethodContext GetInputMethodContext( TextField textField )
   return GetImpl( textField ).GetInputMethodContext();
 }
 
+void SelectWholeText( TextField textField )
+{
+  GetImpl( textField ).SelectWholeText();
+}
+
 } // namespace DevelText
 
 } // namespace Toolkit
