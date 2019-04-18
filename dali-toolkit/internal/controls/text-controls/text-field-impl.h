@@ -102,6 +102,11 @@ public:
    */
   Toolkit::TextField::InputStyleChangedSignalType& InputStyleChangedSignal();
 
+  /**
+   * @brief Called to select the whole texts.
+   */
+  void SelectWholeText();
+
 private: // From Control
 
   /**

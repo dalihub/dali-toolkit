@@ -19,29 +19,38 @@
 #include <dali-toolkit/devel-api/text/bitmap-font.h>
 
 // EXTERNAL INCLUDE
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
+#include <cstring>
 
 // INTERNAL INCLUDE
 #include <dali-toolkit/internal/text/character-set-conversion.h>
-#include <dali-toolkit/internal/text/text-definitions.h>
-
 
 namespace Dali
 {
 
 namespace Toolkit
 {
-using namespace Text;
+
 namespace DevelText
 {
 
 Glyph::Glyph()
 : url{},
-  utf8{ 0u },
+  utf8{},
   ascender{ 0.f },
   descender{ 0.f }
 {}
+
+Glyph::Glyph( const std::string& url, const std::string utf8Character, float ascender, float descender )
+: url{ url },
+  utf8{},
+  ascender{ ascender },
+  descender{ descender }
+{
+  DALI_ASSERT_DEBUG( utf8Character.size() <= 4u );
+
+  std::copy( utf8Character.begin(), utf8Character.end(), utf8 );
+}
 
 Glyph::~Glyph()
 {}
@@ -50,7 +59,8 @@ BitmapFontDescription::BitmapFontDescription()
 : glyphs{},
   name{},
   underlinePosition{ 0.f },
-  underlineThickness{ 1.f }
+  underlineThickness{ 1.f },
+  isColorFont{ false }
 {}
 
 BitmapFontDescription::~BitmapFontDescription()
@@ -62,20 +72,14 @@ void CreateBitmapFont( const BitmapFontDescription& description, TextAbstraction
   bitmapFont.name = description.name;
   bitmapFont.underlinePosition = description.underlinePosition;
   bitmapFont.underlineThickness = description.underlineThickness;
+  bitmapFont.isColorFont = description.isColorFont;
 
   for( const auto& glyph : description.glyphs )
   {
-    // 1) Convert to utf32
-    Vector<Character> utf32;
-    utf32.Resize( glyph.utf8.size() );
+    uint32_t c = 0u;
+    Text::Utf8ToUtf32( glyph.utf8, Text::GetUtf8Length( glyph.utf8[0u] ), &c );
 
-    const uint32_t numberOfCharacters = ( glyph.utf8.size() == 0 ) ? 0 :
-        Text::Utf8ToUtf32( reinterpret_cast<const uint8_t* const>( glyph.utf8.c_str() ),
-                           glyph.utf8.size(),
-                           &utf32[0u] );
-    utf32.Resize( numberOfCharacters );
-
-    TextAbstraction::BitmapGlyph bitmapGlyph( glyph.url, utf32[0u], glyph.ascender, glyph.descender );
+    TextAbstraction::BitmapGlyph bitmapGlyph( glyph.url, c, glyph.ascender, glyph.descender );
 
     bitmapFont.glyphs.push_back( std::move( bitmapGlyph ) );
   }

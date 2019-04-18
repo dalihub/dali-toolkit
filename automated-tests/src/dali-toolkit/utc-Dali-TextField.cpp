@@ -102,6 +102,7 @@ const char* const PROPERTY_NAME_ELLIPSIS                             = "ellipsis
 const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableShiftSelection";
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGrabHandle";
 const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
+const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGrabHandlePopup";
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
@@ -539,6 +540,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_SHIFT_SELECTION ) == DevelTextField::Property::ENABLE_SHIFT_SELECTION );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextField::Property::ENABLE_GRAB_HANDLE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP ) == DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP );
 
   END_TEST;
 }
@@ -992,6 +994,11 @@ int UtcDaliTextFieldSetPropertyP(void)
 
   field.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
   DALI_TEST_EQUALS( field.GetProperty<int>( Actor::Property::LAYOUT_DIRECTION ), static_cast<int>( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
+
+  // Test the ENABLE_GRAB_HANDLE_POPUP property
+  DALI_TEST_CHECK( field.GetProperty<bool>( DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP ) );
+  field.SetProperty( DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP, false );
+  DALI_TEST_CHECK( !field.GetProperty<bool>( DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP ) );
 
   application.SendNotification();
   application.Render();
@@ -2927,7 +2934,6 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
   END_TEST;
 }
 
-
 int UtcDaliTextFieldGetInputMethodContext(void)
 {
   ToolkitTestApplication application;
@@ -2939,3 +2945,54 @@ int UtcDaliTextFieldGetInputMethodContext(void)
   END_TEST;
 }
 
+int UtcDaliTextFieldSelectWholeText(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldSelectWholeText ");
+
+  TextField textField = TextField::New();
+
+  Stage::GetCurrent().Add( textField );
+
+  textField.SetSize( 300.f, 50.f );
+  textField.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  textField.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( 1u, textField.GetChildCount(), TEST_LOCATION );
+
+  DevelTextField::SelectWholeText( textField );
+
+  application.SendNotification();
+  application.Render();
+
+  // Nothing should have been selected. The number of children is still 1
+  DALI_TEST_EQUALS( 1u, textField.GetChildCount(), TEST_LOCATION );
+
+  textField.SetProperty( TextField::Property::TEXT, "Hello world" );
+
+  application.SendNotification();
+  application.Render();
+
+  DevelTextField::SelectWholeText( textField );
+
+  application.SendNotification();
+  application.Render();
+
+  // Should be 2 children, the stencil and the layer
+  DALI_TEST_EQUALS( 2u, textField.GetChildCount(), TEST_LOCATION );
+
+  // The offscreen root actor should have two actors: the renderer and the highlight actor.
+  Actor stencil = textField.GetChildAt( 0u );
+
+  // The highlight actor is drawn first, so is the first actor in the list
+  Renderer highlight = stencil.GetChildAt( 0u ).GetRendererAt( 0u );
+  DALI_TEST_CHECK( highlight );
+
+  END_TEST;
+}
