@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,62 +108,6 @@ void DoAction( Control& control, Dali::Property::Index visualIndex, Dali::Proper
 void SetInputMethodContext( Internal::Control& control, InputMethodContext& inputMethodContext )
 {
   Internal::Control::Impl::Get( control ).SetInputMethodContext( inputMethodContext );
-}
-
-Toolkit::LayoutItem GetLayout( Control control )
-{
-  const Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
-  const Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
-  return Toolkit::LayoutItem( controlDataImpl.GetLayout().Get() );
-}
-
-Toolkit::LayoutItem GetLayout( Internal::Control& control )
-{
-  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
-  return Toolkit::LayoutItem( controlDataImpl.GetLayout().Get() );
-}
-
-void SetLayout( Internal::Control& control, Toolkit::LayoutItem layout )
-{
-  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
-  controlDataImpl.SetLayout( GetImplementation( layout ) );
-}
-
-void SetLayout( Control control, Toolkit::LayoutItem layout )
-{
-  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
-  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
-  if( layout )
-  {
-    controlDataImpl.SetLayout( GetImplementation( layout ) );
-  }
-  else
-  {
-    controlDataImpl.RemoveLayout();
-  }
-}
-
-void RequestLayout( Internal::Control& control )
-{
-  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( control );
-  Toolkit::Internal::LayoutItemPtr layoutItem = controlDataImpl.GetLayout();
-  if ( layoutItem )
-  {
-    layoutItem->RequestLayout();
-  }
-}
-void SetLayoutingRequired( Control control, bool layoutingRequired )
-{
-  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
-  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
-  controlDataImpl.SetLayoutingRequired( layoutingRequired );
-}
-
-bool IsLayoutingRequired( Control control )
-{
-  Internal::Control& internalControl = Toolkit::Internal::GetImplementation( control );
-  Internal::Control::Impl& controlDataImpl = Internal::Control::Impl::Get( internalControl );
-  return controlDataImpl.IsLayoutingRequired();
 }
 
 VisualEventSignalType& VisualEventSignal( Control control )

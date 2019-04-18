@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
-#include <dali-toolkit/devel-api/layouting/layout-item.h>
 
 namespace Dali
 {
@@ -269,64 +268,6 @@ DALI_TOOLKIT_API void DoAction( Control& control, Dali::Property::Index visualIn
  * @param[in] inputMethodContext The input method context.
  */
 DALI_TOOLKIT_API void SetInputMethodContext( Internal::Control& control, InputMethodContext& inputMethodContext );
-
-/**
- * @brief Get the layout associated with this control, if any.
- *
- * @return A handle to the layout, or empty.
- */
-DALI_TOOLKIT_API Toolkit::LayoutItem GetLayout( Internal::Control& control );
-
-/**
- * @brief Get the layout associated with a control, if any.
- *
- * @return A handle to the layout, or empty.
- */
-DALI_TOOLKIT_API Toolkit::LayoutItem GetLayout( Control control );
-
-/**
- * @brief Set the layout on this control.
- *
- * @param[in] control The internal Control to set the layout on
- * @param[in] layout Pointer to the layout
- * @note Providing an empty layout will remove the current layout and
- *       replace it with a BinLayout.
- *       Setting a layout that has already been set will result in the
- *       original control becoming a BinLayout.  Two Controls can not share
- *       the same layout.
- */
-DALI_TOOLKIT_API void SetLayout( Internal::Control& control, Toolkit::LayoutItem layout );
-
-/**
- * @brief Set the layout on a control.
- *
- * @param[in] control The Control to set the layout on
- * @param[in] layout Pointer to the layout
- * @note Providing an empty layout will remove the current layout and
- *       replace it with a BinLayout.
- */
-DALI_TOOLKIT_API void SetLayout( Control control, Toolkit::LayoutItem layout );
-
-/**
- * @brief Request the control layout.
- *
- * @param[in] control The internal Control to request the layout of
- */
-DALI_TOOLKIT_API void RequestLayout( Internal::Control& control );
-
-/**
- * @brief Set whether the control should have a layout
- * @param[in] control The Control to set the behaviour on
- * @param[in] layoutingRequired true if the control should have a layout
- */
-DALI_TOOLKIT_API void SetLayoutingRequired( Control control, bool layoutingRequired );
-
-/**
- * @brief Check if the control has been set to require layouting
- * @param[in] control The Control to query
- * @return true if the control needs layouting
- */
-DALI_TOOLKIT_API bool IsLayoutingRequired( Control control );
 
 /**
  * @brief Visual Event signal type

@@ -575,8 +575,9 @@ void Control::OnStageConnection( int depth )
   CreateClippingRenderer( *this );
 
   // Request to be laid out when the control is connected to the Stage.
-  Toolkit::DevelControl::RequestLayout( *this );
+  // Signal that a Relayout may be needed
 }
+
 
 void Control::OnStageDisconnection()
 {

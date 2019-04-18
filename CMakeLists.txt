@@ -20,7 +20,7 @@ ADD_DEFINITIONS(
 )
 
 #head file path
-INCLUDE_DIRECTORIES(  
+INCLUDE_DIRECTORIES(
 ./
 ../dali-core
 ../dali-adaptor
@@ -62,14 +62,6 @@ SET ( SOURCES ${SOURCES}
   ${devel_api_src_dir}/image-loader/atlas-upload-observer.cpp
   ${devel_api_src_dir}/image-loader/image-atlas.cpp
   ${devel_api_src_dir}/image-loader/texture-manager.cpp
-  ${devel_api_src_dir}/layouting/absolute-layout.cpp
-  ${devel_api_src_dir}/layouting/grid.cpp
-  ${devel_api_src_dir}/layouting/linear-layout.cpp
-  ${devel_api_src_dir}/layouting/layout-item-impl.cpp
-  ${devel_api_src_dir}/layouting/layout-item.cpp
-  ${devel_api_src_dir}/layouting/layout-group-impl.cpp
-  ${devel_api_src_dir}/layouting/layout-group.cpp
-  ${devel_api_src_dir}/layouting/layout-controller.cpp
   ${devel_api_src_dir}/scripting/script.cpp
   ${devel_api_src_dir}/styling/style-manager-devel.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-cross-effect.cpp
@@ -96,15 +88,6 @@ SET( SOURCES ${SOURCES}
    ${internal_src_dir}/builder/style.cpp
    ${internal_src_dir}/builder/tree-node-manipulator.cpp
    ${internal_src_dir}/builder/replacement.cpp
-   ${internal_src_dir}/layouting/absolute-layout-impl.cpp
-   ${internal_src_dir}/layouting/grid-impl.cpp
-   ${internal_src_dir}/layouting/grid-locations.cpp
-   ${internal_src_dir}/layouting/linear-layout-impl.cpp
-   ${internal_src_dir}/layouting/layout-item-data-impl.cpp
-   ${internal_src_dir}/layouting/layout-group-data-impl.cpp
-   ${internal_src_dir}/layouting/layout-controller-impl.cpp
-   ${internal_src_dir}/layouting/layout-controller-debug.cpp
-   ${internal_src_dir}/layouting/layout-transition-data-impl.cpp
    ${internal_src_dir}/visuals/animated-image/animated-image-visual.cpp
    ${internal_src_dir}/visuals/animated-image/image-cache.cpp
    ${internal_src_dir}/visuals/animated-image/fixed-image-cache.cpp
@@ -322,5 +305,5 @@ target_link_libraries(dali-toolkit WindowsPlatform.lib)
 add_dependencies(dali-toolkit dali-core)
 add_dependencies(dali-toolkit dali-adaptor)
 
-#add link library  
+#add link library
 #TARGET_LINK_LIBRARIES(${FS_BUILD_BINARY_PREFIX}sqrt ${LIBRARIES})
