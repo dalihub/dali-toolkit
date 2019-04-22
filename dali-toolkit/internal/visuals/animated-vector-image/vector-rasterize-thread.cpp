@@ -80,7 +80,7 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
   mCurrentFrameUpdated( false ),
   mLogFactory( Dali::Adaptor::Get().GetLogFactory() )
 {
-  mVectorRenderer = VectorAnimationRenderer::New( mUrl );
+  Initialize();
 }
 
 VectorRasterizeThread::~VectorRasterizeThread()
@@ -104,9 +104,6 @@ void VectorRasterizeThread::Run()
 {
   SetThreadName( "VectorImageThread" );
   mLogFactory.InstallLogFunction();
-
-  //TODO: check the return value
-  StartRender();
 
   while( !mDestroyThread )
   {
@@ -234,26 +231,23 @@ void VectorRasterizeThread::SetPlayRange( Vector2 range )
 
       mPlayRange = orderedRange;
 
-      if( mTotalFrame != 0 )
+      mStartFrame = static_cast< uint32_t >( mPlayRange.x * mTotalFrame + 0.5f );
+      mEndFrame = static_cast< uint32_t >( mPlayRange.y * mTotalFrame + 0.5f );
+
+      // If the current frame is out of the range, change the current frame also.
+      if( mStartFrame > mCurrentFrame )
       {
-        mStartFrame = static_cast< uint32_t >( mPlayRange.x * mTotalFrame + 0.5f );
-        mEndFrame = static_cast< uint32_t >( mPlayRange.y * mTotalFrame + 0.5f );
+        mCurrentFrame = mStartFrame;
 
-        // If the current frame is out of the range, change the current frame also.
-        if( mStartFrame > mCurrentFrame )
-        {
-          mCurrentFrame = mStartFrame;
+        mCurrentFrameUpdated = true;
+        mResourceReady = false;
+      }
+      else if( mEndFrame < mCurrentFrame )
+      {
+        mCurrentFrame = mEndFrame;
 
-          mCurrentFrameUpdated = true;
-          mResourceReady = false;
-        }
-        else if( mEndFrame < mCurrentFrame )
-        {
-          mCurrentFrame = mEndFrame;
-
-          mCurrentFrameUpdated = true;
-          mResourceReady = false;
-        }
+        mCurrentFrameUpdated = true;
+        mResourceReady = false;
       }
     }
   }
@@ -272,11 +266,8 @@ void VectorRasterizeThread::SetCurrentProgress( float progress )
   {
     mProgress = progress;
 
-    if( mTotalFrame != 0 )
-    {
-      mCurrentFrame = static_cast< uint32_t >( mTotalFrame * progress + 0.5f );
-      mCurrentFrameUpdated = true;
-    }
+    mCurrentFrame = static_cast< uint32_t >( mTotalFrame * progress + 0.5f );
+    mCurrentFrameUpdated = true;
 
     mResourceReady = false;
 
@@ -289,6 +280,11 @@ float VectorRasterizeThread::GetCurrentProgress() const
   return ( static_cast< float >( mCurrentFrame ) / static_cast< float >( mTotalFrame ) );
 }
 
+void VectorRasterizeThread::GetDefaultSize( uint32_t& width, uint32_t& height ) const
+{
+  mVectorRenderer.GetDefaultSize( width, height );
+}
+
 DevelImageVisual::PlayState VectorRasterizeThread::GetPlayState() const
 {
   return mPlayState;
@@ -299,10 +295,9 @@ bool VectorRasterizeThread::IsResourceReady() const
   return mResourceReady;
 }
 
-bool VectorRasterizeThread::StartRender()
+void VectorRasterizeThread::Initialize()
 {
-  //TODO: check the return value
-  mVectorRenderer.StartRender();
+  mVectorRenderer = VectorAnimationRenderer::New( mUrl );
 
   mTotalFrame = mVectorRenderer.GetTotalFrameNumber();
 
@@ -314,9 +309,7 @@ bool VectorRasterizeThread::StartRender()
   mFrameRate = mVectorRenderer.GetFrameRate();
   mFrameDurationNanoSeconds = NANOSECONDS_PER_SECOND / mFrameRate;
 
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::StartRender: Renderer is started [%d, %f fps]\n", mTotalFrame, mFrameRate );
-
-  return true;
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Initialize: file = %s [%d frames, %f fps]\n", mUrl.c_str(), mTotalFrame, mFrameRate );
 }
 
 void VectorRasterizeThread::Rasterize()

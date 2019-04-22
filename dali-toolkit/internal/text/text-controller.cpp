@@ -435,6 +435,11 @@ void Controller::SetLayoutDirection( Dali::LayoutDirection::Type layoutDirection
   mImpl->mLayoutDirection = layoutDirection;
 }
 
+bool Controller::IsShowingRealText() const
+{
+  return mImpl->IsShowingRealText();
+}
+
 
 void Controller::SetLineWrapMode( Text::LineWrap::Mode lineWrapMode )
 {
@@ -520,6 +525,16 @@ void Controller::SetGrabHandleEnabled( bool enabled )
 bool Controller::IsGrabHandleEnabled() const
 {
   return mImpl->mEventData->mGrabHandleEnabled;
+}
+
+void Controller::SetGrabHandlePopupEnabled(bool enabled)
+{
+  mImpl->mEventData->mGrabHandlePopupEnabled = enabled;
+}
+
+bool Controller::IsGrabHandlePopupEnabled() const
+{
+  return mImpl->mEventData->mGrabHandlePopupEnabled;
 }
 
 // public : Update
@@ -2814,6 +2829,32 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
   }
 }
 
+void Controller::SelectEvent( float x, float y, bool selectAll )
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SelectEvent\n" );
+
+  if( NULL != mImpl->mEventData )
+  {
+    if( selectAll )
+    {
+      Event event( Event::SELECT_ALL );
+      mImpl->mEventData->mEventQueue.push_back( event );
+    }
+    else
+    {
+      Event event( Event::SELECT );
+      event.p2.mFloat = x;
+      event.p3.mFloat = y;
+      mImpl->mEventData->mEventQueue.push_back( event );
+    }
+
+    mImpl->mEventData->mCheckScrollAmount = true;
+    mImpl->mEventData->mIsLeftHandleSelected = true;
+    mImpl->mEventData->mIsRightHandleSelected = true;
+    mImpl->RequestRelayout();
+  }
+}
+
 InputMethodContext::CallbackData Controller::OnInputMethodContextEvent( InputMethodContext& inputMethodContext, const InputMethodContext::EventData& inputMethodContextEvent )
 {
   // Whether the text needs to be relaid-out.
@@ -3860,32 +3901,6 @@ void Controller::TextDeletedEvent()
 
   // Apply modifications to the model; TODO - Optimize this
   mImpl->mOperationsPending = ALL_OPERATIONS;
-}
-
-void Controller::SelectEvent( float x, float y, bool selectAll )
-{
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SelectEvent\n" );
-
-  if( NULL != mImpl->mEventData )
-  {
-    if( selectAll )
-    {
-      Event event( Event::SELECT_ALL );
-      mImpl->mEventData->mEventQueue.push_back( event );
-    }
-    else
-    {
-      Event event( Event::SELECT );
-      event.p2.mFloat = x;
-      event.p3.mFloat = y;
-      mImpl->mEventData->mEventQueue.push_back( event );
-    }
-
-    mImpl->mEventData->mCheckScrollAmount = true;
-    mImpl->mEventData->mIsLeftHandleSelected = true;
-    mImpl->mEventData->mIsRightHandleSelected = true;
-    mImpl->RequestRelayout();
-  }
 }
 
 bool Controller::DeleteEvent( int keyCode )

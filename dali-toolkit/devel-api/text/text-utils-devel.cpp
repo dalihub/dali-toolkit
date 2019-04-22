@@ -802,8 +802,6 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   // Set the position of the embedded items (if there is any).
   EmbeddedItemInfo* embeddedItemLayoutBuffer = embeddedItemLayout.Begin();
 
-  auto transformToArc = isClockwise ? &Dali::TextAbstraction::TransformToArcClockwise : &Dali::TextAbstraction::TransformToArcAntiClockwise;
-
   for( Length index = 0u, endIndex = embeddedItemLayout.Count(); index < endIndex; ++index )
   {
     EmbeddedItemInfo& embeddedItem = *( embeddedItemLayoutBuffer + index );
@@ -842,7 +840,7 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
       }
       embeddedItem.angle = Degree( Radian( radians ) );
 
-      transformToArc( circularTextParameters, centerX, centerY );
+      Dali::TextAbstraction::TransformToArc( circularTextParameters, centerX, centerY );
 
       // Recalculate the size of the embedded item after the rotation to position it correctly.
       float width = embeddedItem.size.width;

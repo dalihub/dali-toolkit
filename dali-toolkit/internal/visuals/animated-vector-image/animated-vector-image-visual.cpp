@@ -100,7 +100,25 @@ AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
 
 void AnimatedVectorImageVisual::GetNaturalSize( Vector2& naturalSize )
 {
-  naturalSize = mVisualSize;
+  if( mImpl->mRenderer ) // Check if we have a rendered image
+  {
+    auto textureSet = mImpl->mRenderer.GetTextures();
+    if( textureSet )
+    {
+      if( textureSet.GetTextureCount() > 0 )
+      {
+        auto texture = textureSet.GetTexture( 0 );
+        naturalSize.x = texture.GetWidth();
+        naturalSize.y = texture.GetHeight();
+        return;
+      }
+    }
+  }
+
+  uint32_t width, height;
+  mVectorRasterizeThread.GetDefaultSize( width, height );
+  naturalSize.x = width;
+  naturalSize.y = height;
 }
 
 void AnimatedVectorImageVisual::DoCreatePropertyMap( Property::Map& map ) const
