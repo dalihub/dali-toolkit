@@ -17,6 +17,7 @@
 
 // CLASS HEADER
 #include <dali/integration-api/adaptors/adaptor.h>
+#include <dali/integration-api/adaptors/scene-holder.h>
 
 #include <dali/public-api/object/base-object.h>
 
@@ -78,6 +79,26 @@ Adaptor& Adaptor::New( Window window, const Dali::RenderSurfaceInterface& surfac
   return Internal::Adaptor::Adaptor::Get();
 }
 
+Adaptor& Adaptor::New( Dali::Integration::SceneHolder window )
+{
+  return Internal::Adaptor::Adaptor::Get();
+}
+
+Adaptor& Adaptor::New( Dali::Integration::SceneHolder window, Configuration::ContextLoss configuration )
+{
+  return Internal::Adaptor::Adaptor::Get();
+}
+
+Adaptor& Adaptor::New( Dali::Integration::SceneHolder window, const Dali::RenderSurfaceInterface& surface )
+{
+  return Internal::Adaptor::Adaptor::Get();
+}
+
+Adaptor& Adaptor::New( Dali::Integration::SceneHolder window, const Dali::RenderSurfaceInterface& surface, Configuration::ContextLoss configuration )
+{
+  return Internal::Adaptor::Adaptor::Get();
+}
+
 Adaptor::~Adaptor()
 {
 }
@@ -131,6 +152,10 @@ void Adaptor::RemoveIdle( CallbackBase* callback )
 }
 
 void Adaptor::ReplaceSurface( Window window, Dali::RenderSurfaceInterface& surface )
+{
+}
+
+void Adaptor::ReplaceSurface( Dali::Integration::SceneHolder window, Dali::RenderSurfaceInterface& surface )
 {
 }
 
