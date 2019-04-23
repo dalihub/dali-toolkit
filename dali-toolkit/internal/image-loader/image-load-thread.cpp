@@ -33,14 +33,15 @@ namespace Internal
 {
 
 LoadingTask::LoadingTask( uint32_t id, const VisualUrl& url, ImageDimensions dimensions,
-                          FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection )
+                          FittingMode::Type fittingMode, SamplingMode::Type samplingMode, bool orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad )
 : pixelBuffer(),
   url( url ),
   id( id ),
   dimensions( dimensions ),
   fittingMode( fittingMode ),
   samplingMode( samplingMode ),
-  orientationCorrection( orientationCorrection )
+  orientationCorrection( orientationCorrection ),
+  preMultiplyOnLoad( preMultiplyOnLoad )
 {
 }
 
@@ -53,6 +54,14 @@ void LoadingTask::Load()
   else
   {
     pixelBuffer = Dali::DownloadImageSynchronously ( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
+  }
+
+  if( pixelBuffer && Pixel::HasAlpha( pixelBuffer.GetPixelFormat() ) )
+  {
+    if( preMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON )
+    {
+      pixelBuffer.MultiplyColorByAlpha();
+    }
   }
 }
 

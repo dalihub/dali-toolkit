@@ -713,13 +713,15 @@ private:
      * @param[in] samplingMode          The SamplingMode to use
      * @param[in] orientationCorrection Whether to use image metadata to rotate or flip the image,
      *                                  e.g., from portrait to landscape
+     * @param[in] preMultiplyOnLoad     if the image's color should be multiplied by it's alpha.
      */
     void Load(TextureId textureId,
               const VisualUrl& url,
               ImageDimensions desiredSize,
               FittingMode::Type fittingMode,
               SamplingMode::Type samplingMode,
-              bool orientationCorrection);
+              bool orientationCorrection,
+              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   public:
     AsyncLoadingHelper(const AsyncLoadingHelper&) = delete;
