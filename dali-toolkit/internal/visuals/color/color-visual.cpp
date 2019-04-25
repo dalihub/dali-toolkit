@@ -45,7 +45,7 @@ namespace
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
-  uniform mediump mat4 uMvpMatrix;\n
+  uniform highp   mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   \n
 

@@ -53,7 +53,7 @@ const char * const INDEX_NAME("indices");
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   attribute mediump vec2 aDrift;\n
-  uniform mediump mat4 uMvpMatrix;\n
+  uniform highp   mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   uniform mediump float borderSize;\n
   \n
@@ -93,7 +93,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 const char* VERTEX_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   attribute mediump vec2 aDrift;\n
-  uniform mediump mat4 uMvpMatrix;\n
+  uniform highp   mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   uniform mediump float borderSize;\n
   varying mediump float vAlpha;\n

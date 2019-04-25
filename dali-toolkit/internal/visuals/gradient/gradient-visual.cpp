@@ -103,7 +103,7 @@ const char* VERTEX_SHADER[] =
 // vertex shader for gradient units as OBJECT_BOUNDING_BOX
  DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
-  uniform mediump mat4 uMvpMatrix;\n
+  uniform highp   mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   uniform mediump mat3 uAlignmentMatrix;\n
   varying mediump vec2 vTexCoord;\n
@@ -135,7 +135,7 @@ const char* VERTEX_SHADER[] =
 // vertex shader for gradient units as USER_SPACE
 DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
-  uniform mediump mat4 uMvpMatrix;\n
+  uniform highp   mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   uniform mediump mat3 uAlignmentMatrix;\n
   varying mediump vec2 vTexCoord;\n

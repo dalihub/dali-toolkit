@@ -126,7 +126,7 @@ const Toolkit::DevelAnimatedGradientVisual::AnimationParameter::EasingType::Type
 
 const char* const BASIC_VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;
-  uniform mediump mat4 uMvpMatrix;
+  uniform highp   mat4 uMvpMatrix;
   uniform mediump vec3 uSize;
 
   uniform mediump vec2 start_point;

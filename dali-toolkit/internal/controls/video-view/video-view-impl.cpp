@@ -87,7 +87,7 @@ const char* const CUSTOM_SAMPLER_TYPE_NAME( "samplerExternalOES" );
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
-  uniform mediump mat4 uMvpMatrix;\n
+  uniform highp   mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   \n
   void main()\n
@@ -109,7 +109,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 const char* VERTEX_SHADER_TEXTURE = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying mediump vec2 vTexCoord;\n
-  uniform mediump mat4 uMvpMatrix;\n
+  uniform highp   mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   varying mediump vec2 sTexCoordRect;\n
   void main()\n
