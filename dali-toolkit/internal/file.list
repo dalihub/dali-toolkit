@@ -11,18 +11,6 @@ toolkit_src_files = \
    $(toolkit_src_dir)/builder/style.cpp \
    $(toolkit_src_dir)/builder/tree-node-manipulator.cpp \
    $(toolkit_src_dir)/builder/replacement.cpp \
-   $(toolkit_src_dir)/layouting/absolute-layout-impl.cpp \
-   $(toolkit_src_dir)/layouting/bin-layout-impl.cpp \
-   $(toolkit_src_dir)/layouting/flex-layout-impl.cpp \
-   $(toolkit_src_dir)/layouting/grid-locations.cpp \
-   $(toolkit_src_dir)/layouting/grid-impl.cpp \
-   $(toolkit_src_dir)/layouting/layout-item-data-impl.cpp \
-   $(toolkit_src_dir)/layouting/layout-group-data-impl.cpp \
-   $(toolkit_src_dir)/layouting/layout-controller-debug.cpp \
-   $(toolkit_src_dir)/layouting/layout-controller-impl.cpp \
-   $(toolkit_src_dir)/layouting/linear-layout-impl.cpp \
-   $(toolkit_src_dir)/layouting/layout-transition-data-impl.cpp \
-   $(toolkit_src_dir)/layouting/size-negotiation-mapper.cpp \
    $(toolkit_src_dir)/visuals/animated-image/animated-image-visual.cpp \
    $(toolkit_src_dir)/visuals/animated-image/image-cache.cpp \
    $(toolkit_src_dir)/visuals/animated-image/fixed-image-cache.cpp \

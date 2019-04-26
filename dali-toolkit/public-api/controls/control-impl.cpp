@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -575,8 +575,9 @@ void Control::OnStageConnection( int depth )
   CreateClippingRenderer( *this );
 
   // Request to be laid out when the control is connected to the Stage.
-  Toolkit::DevelControl::RequestLayout( *this );
+  // Signal that a Relayout may be needed
 }
+
 
 void Control::OnStageDisconnection()
 {
@@ -658,44 +659,32 @@ void Control::OnRelayout( const Vector2& size, RelayoutContainer& container )
     Actor child = Self().GetChildAt( i );
     Vector2 newChildSize( size );
 
-    // When setting the padding or margin on the control child should be resized and repositioned for legacy reasons.
+    // When set the padding or margin on the control, child should be resized and repositioned.
     if( ( mImpl->mPadding.start != 0 ) || ( mImpl->mPadding.end != 0 ) || ( mImpl->mPadding.top != 0 ) || ( mImpl->mPadding.bottom != 0 ) ||
         ( mImpl->mMargin.start != 0 ) || ( mImpl->mMargin.end != 0 ) || ( mImpl->mMargin.top != 0 ) || ( mImpl->mMargin.bottom != 0 ) )
     {
-      // Cannot use childs Position property as it can already have margin applied on it,
-      // so we end up cumulatively applying them over and over again.
-      Toolkit::Control childControl = Toolkit::Control::DownCast( child );
+      Extents padding = mImpl->mPadding;
 
-      // If control not a LayoutItem layout then must be the old Relayout algorithm hence account
-      // for margins and padding.
-      // Padding is incorrect but may have to keep this functionality for compatibility.
-      if ( childControl && ! Toolkit::DevelControl::GetLayout( childControl ) )
+      Dali::CustomActor ownerActor(GetOwner());
+      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( ownerActor.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+
+      if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
       {
-        Extents padding = mImpl->mPadding;
-
-        Dali::CustomActor ownerActor(GetOwner());
-        Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( ownerActor.GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
-
-        if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
-        {
-          std::swap( padding.start, padding.end );
-        }
-
-        // Child size should include padding, this is the wrong use of padding but kept for compatibility.
-        newChildSize.width = size.width - ( padding.start + padding.end );
-        newChildSize.height = size.height - ( padding.top + padding.bottom );
-
-        // Cannot use childs Position property as it can already have padding and margin applied on it,
-        // so we end up cumulatively applying them over and over again.
-        Vector2 childOffset( 0.f, 0.f );
-        childOffset.x += ( mImpl->mMargin.start + padding.start );
-        childOffset.y += ( mImpl->mMargin.top + padding.top );
-
-        child.SetPosition( childOffset.x, childOffset.y );
+        std::swap( padding.start, padding.end );
       }
-    }
 
-    container.Add( child, size );
+      newChildSize.width = size.width - ( padding.start + padding.end );
+      newChildSize.height = size.height - ( padding.top + padding.bottom );
+
+      // Cannot use childs Position property as it can already have padding and margin applied on it,
+      // so we end up cumulatively applying them over and over again.
+      Vector2 childOffset( 0.f, 0.f );
+      childOffset.x += ( mImpl->mMargin.start + padding.start );
+      childOffset.y += ( mImpl->mMargin.top + padding.top );
+
+      child.SetPosition( childOffset.x, childOffset.y );
+    }
+    container.Add( child, newChildSize );
   }
 
   Toolkit::Visual::Base visual = mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );

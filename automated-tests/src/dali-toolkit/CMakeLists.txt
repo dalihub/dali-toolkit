@@ -7,11 +7,9 @@ SET(CAPI_LIB "dali-toolkit")
 
 # List of test case sources (Only these get parsed for test cases)
 SET(TC_SOURCES
-  utc-Dali-AbsoluteLayout.cpp
   utc-Dali-Alignment.cpp
   utc-Dali-AnimatedImageVisual.cpp
   utc-Dali-AnimatedVectorImageVisual.cpp
-  utc-Dali-BinLayout.cpp
   utc-Dali-BloomView.cpp
   utc-Dali-BubbleEmitter.cpp
   utc-Dali-Builder.cpp
@@ -20,18 +18,11 @@ SET(TC_SOURCES
   utc-Dali-CubeTransitionEffect.cpp
   utc-Dali-EffectsView.cpp
   utc-Dali-FlexContainer.cpp
-  utc-Dali-FlexLayout.cpp
   utc-Dali-GaussianBlurView.cpp
-  utc-Dali-GridLayout.cpp
   utc-Dali-ImageView.cpp
   utc-Dali-ImageVisual.cpp
   utc-Dali-JsonParser.cpp
   utc-Dali-KeyInputFocusManager.cpp
-  utc-Dali-Layouting.cpp
-  utc-Dali-LayoutingAnimation.cpp
-  utc-Dali-LayoutingNesting.cpp
-  utc-Dali-LayoutingResizePolicy.cpp
-  utc-Dali-LayoutingSettingAndRemoval.cpp
   utc-Dali-PageTurnView.cpp
   utc-Dali-Scene3dView.cpp
   utc-Dali-Script.cpp
@@ -82,8 +73,6 @@ SET(TC_SOURCES
 
 # Append list of test harness files (Won't get parsed for test cases)
 LIST(APPEND TC_SOURCES
-  custom-layout.cpp
-  custom-layout-impl.cpp
   dali-toolkit-test-utils/toolkit-adaptor.cpp
   dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
   dali-toolkit-test-utils/toolkit-application.cpp
@@ -106,7 +95,6 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/dali-test-suite-utils.cpp
   dali-toolkit-test-utils/dali-toolkit-test-suite-utils.cpp
   dali-toolkit-test-utils/dummy-control.cpp
-  dali-toolkit-test-utils/layout-utils.cpp
   dali-toolkit-test-utils/mesh-builder.cpp
   dali-toolkit-test-utils/test-actor-utils.cpp
   dali-toolkit-test-utils/test-animation-data.cpp

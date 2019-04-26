@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_DATA_IMPL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 #include <dali-toolkit/internal/visuals/visual-event-observer.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/common/owner-container.h>
-#include <dali-toolkit/devel-api/layouting/layout-item-impl.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
 #include <dali-toolkit/internal/controls/tooltip/tooltip.h>
 #include <dali-toolkit/internal/builder/style.h>
@@ -333,37 +332,6 @@ public:
   bool FilterKeyEvent( const KeyEvent& event );
 
   /**
-   * @brief Get the layout associated with this control, if any.
-   *
-   * @return A pointer to the layout, or NULL.
-   */
-  Toolkit::Internal::LayoutItemPtr GetLayout() const;
-
-  /**
-   * @brief Set the layout on this control.
-   * @param[in] layout Pointer to the layout
-   */
-  void SetLayout( Toolkit::Internal::LayoutItem& layout );
-
-  /**
-   * @brief Remove the layout from this control
-   *
-   * @note This does not remove any children from this control, nor does it strip
-   * layouts from them but it does remove them from the layout hierarchy.
-   */
-  void RemoveLayout();
-
-  /**
-   * @copydoc DevelControl::SetLayoutingRequired
-   */
-  void SetLayoutingRequired( bool layoutingRequired );
-
-  /**
-   * @copydoc DevelControl::IsLayoutingRequired()
-   */
-  bool IsLayoutingRequired();
-
-  /**
    * @copydoc DevelControl::VisualEventSignal()
    */
   DevelControl::VisualEventSignalType& VisualEventSignal();
@@ -413,9 +381,6 @@ public:
   DevelControl::State mState;
   std::string mSubStateName;
 
-  // Layout
-  Toolkit::Internal::LayoutItemPtr mLayout;
-
   int mLeftFocusableActorId;       ///< Actor ID of Left focusable control.
   int mRightFocusableActorId;      ///< Actor ID of Right focusable control.
   int mUpFocusableActorId;         ///< Actor ID of Up focusable control.
@@ -447,7 +412,6 @@ public:
   ControlBehaviour mFlags : CONTROL_BEHAVIOUR_FLAG_COUNT;    ///< Flags passed in from constructor.
   bool mIsKeyboardNavigationSupported :1;  ///< Stores whether keyboard navigation is supported by the control.
   bool mIsKeyboardFocusGroup :1;           ///< Stores whether the control is a focus group.
-  bool mIsLayoutingRequired :1;            ///< Stores whether the control needs to be Layout
 
   RegisteredVisualContainer mRemoveVisuals;         ///< List of visuals that are being replaced by another visual once ready
 

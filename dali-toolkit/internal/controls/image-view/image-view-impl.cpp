@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,14 +120,14 @@ void ImageView::SetImage( Image image )
   }
   else
   {
-    // Unregister the exsiting visual
+    // Unregister the existing visual
     DevelControl::UnregisterVisual( *this, Toolkit::ImageView::Property::IMAGE );
 
     // Trigger a size negotiation request that may be needed when unregistering a visual.
     RelayoutRequest();
   }
 
-  Toolkit::DevelControl::RequestLayout( *this );
+  // Signal that a Relayout may be needed
 }
 
 void ImageView::SetImage( const Property::Map& map )
@@ -163,7 +163,7 @@ void ImageView::SetImage( const Property::Map& map )
     RelayoutRequest();
   }
 
-  Toolkit::DevelControl::RequestLayout( *this );
+  // Signal that a Relayout may be needed
 }
 
 void ImageView::SetImage( const std::string& url, ImageDimensions size )
@@ -200,7 +200,7 @@ void ImageView::SetImage( const std::string& url, ImageDimensions size )
     RelayoutRequest();
   }
 
-  Toolkit::DevelControl::RequestLayout( *this );
+  // Signal that a Relayout may be needed
 }
 
 Image ImageView::GetImage() const
@@ -344,7 +344,7 @@ void ImageView::OnResourceReady( Toolkit::Control control )
 {
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
   mVisual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
-  Toolkit::DevelControl::RequestLayout( *this );
+  // Signal that a Relayout may be needed
 }
 
 ///////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -930,7 +930,7 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
 void TextLabel::RequestTextRelayout()
 {
   RelayoutRequest();
-  Toolkit::DevelControl::RequestLayout( *this );
+  // Signal that a Relayout may be needed
 }
 
 void TextLabel::SetUpAutoScrolling()
