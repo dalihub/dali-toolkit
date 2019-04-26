@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_CONTROL_IMPL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -685,7 +685,7 @@ private:
   DALI_INTERNAL Control& operator=( const Control& );
 
 public:
-  class Impl; // Class declaration is public so we can internally add devel API's to the Controls Impl
+  class DALI_INTERNAL Impl; // Class declaration is public so we can internally add devel API's to the Controls Impl
 
 private:
   Impl* mImpl;
