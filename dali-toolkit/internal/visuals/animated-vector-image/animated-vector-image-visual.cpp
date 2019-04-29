@@ -57,6 +57,10 @@ enum Flags
   RESEND_LOOP_COUNT  = 1 << 1
 };
 
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VECTOR_ANIMATION" );
+#endif
+
 } // unnamed namespace
 
 AnimatedVectorImageVisualPtr AnimatedVectorImageVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties )
@@ -253,6 +257,8 @@ void AnimatedVectorImageVisual::OnSetTransform()
 
   if( IsOnStage() )
   {
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnSetTransform: width = %f, height = %f\n", visualSize.width, visualSize.height );
+
     if( visualSize != mVisualSize )
     {
       mVisualSize = visualSize;
@@ -337,7 +343,7 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
       {
         mVectorRasterizeThread.SetCurrentProgress( progress );
 
-        if( mVectorRasterizeThread.GetPlayState() != DevelImageVisual::PlayState::PLAYING )
+        if( IsOnStage() && mVectorRasterizeThread.GetPlayState() != DevelImageVisual::PlayState::PLAYING )
         {
           mVectorRasterizeThread.RenderFrame();
           Stage::GetCurrent().KeepRendering( 0.0f );    // Trigger rendering
@@ -409,14 +415,17 @@ void AnimatedVectorImageVisual::SendAnimationData()
       mVectorRasterizeThread.SetPlayRange( mPlayRange );
     }
 
-    if( isPlaying )
+    if( IsOnStage() )
     {
-      mVectorRasterizeThread.PlayAnimation();
-    }
-    else
-    {
-      mVectorRasterizeThread.RenderFrame();
-      Stage::GetCurrent().KeepRendering( 0.0f );
+      if( isPlaying )
+      {
+        mVectorRasterizeThread.PlayAnimation();
+      }
+      else
+      {
+        mVectorRasterizeThread.RenderFrame();
+        Stage::GetCurrent().KeepRendering( 0.0f );
+      }
     }
 
     mResendFlag = 0;

@@ -107,6 +107,8 @@ void VectorRasterizeThread::Run()
   {
     Rasterize();
   }
+
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Run: End of thread\n" );
 }
 
 void VectorRasterizeThread::SetRenderer( Renderer renderer )
@@ -137,6 +139,7 @@ void VectorRasterizeThread::SetSize( uint32_t width, uint32_t height )
 void VectorRasterizeThread::PlayAnimation()
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
+
   if( mPlayState != DevelImageVisual::PlayState::PLAYING )
   {
     mPlayState = DevelImageVisual::PlayState::PLAYING;
@@ -203,6 +206,8 @@ void VectorRasterizeThread::SetLoopCount( int32_t count )
     ConditionalWait::ScopedLock lock( mConditionalWait );
 
     mLoopCount = count;
+
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetLoopCount: [%d]\n", count );
   }
 }
 
@@ -247,6 +252,8 @@ void VectorRasterizeThread::SetPlayRange( Vector2 range )
         mCurrentFrameUpdated = true;
         mResourceReady = false;
       }
+
+      DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetPlayRange: [%d, %d]\n", mStartFrame, mEndFrame );
     }
   }
 }
@@ -306,6 +313,11 @@ void VectorRasterizeThread::Initialize()
 
   mFrameRate = mVectorRenderer.GetFrameRate();
   mFrameDurationNanoSeconds = NANOSECONDS_PER_SECOND / mFrameRate;
+
+  uint32_t width, height;
+  mVectorRenderer.GetDefaultSize( width, height );
+
+  SetSize( width, height );
 
   DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Initialize: file = %s [%d frames, %f fps]\n", mUrl.c_str(), mTotalFrame, mFrameRate );
 }
@@ -390,7 +402,7 @@ void VectorRasterizeThread::Rasterize()
 #if defined(DEBUG_ENABLED)
   auto sleepDuration = std::chrono::duration_cast< std::chrono::milliseconds >( timeToSleepUntil - std::chrono::system_clock::now() );
 
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: [current = %d, sleep duration = %lld]\n", mCurrentFrame, sleepDuration.count() );
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: [current = %d, sleep duration = %lld]\n", currentFrame, sleepDuration.count() );
 #endif
 
   std::this_thread::sleep_until( timeToSleepUntil );
