@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,6 @@
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-wrapper-impl.h>
-#include <dali-toolkit/devel-api/layouting/bin-layout.h>
-#include <dali-toolkit/devel-api/layouting/layout-item.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -69,7 +67,6 @@ namespace
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_CONTROL_VISUALS");
-Debug::Filter* gLogFilterLayout = Debug::Filter::New( Debug::NoLogging, false, "LOG_LAYOUT");
 #endif
 
 
@@ -320,7 +317,6 @@ Control::Impl::Impl( Control& controlImpl )
 : mControlImpl( controlImpl ),
   mState( Toolkit::DevelControl::NORMAL ),
   mSubStateName(""),
-  mLayout( NULL ),
   mLeftFocusableActorId( -1 ),
   mRightFocusableActorId( -1 ),
   mUpFocusableActorId( -1 ),
@@ -343,8 +339,7 @@ Control::Impl::Impl( Control& controlImpl )
   mInputMethodContext(),
   mFlags( Control::ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mIsKeyboardNavigationSupported( false ),
-  mIsKeyboardFocusGroup( false ),
-  mIsLayoutingRequired( false )
+  mIsKeyboardFocusGroup( false )
 {
 }
 
@@ -1441,67 +1436,6 @@ bool Control::Impl::FilterKeyEvent( const KeyEvent& event )
     consumed = mInputMethodContext.FilterEventKey( event );
   }
   return consumed;
-}
-
-Toolkit::Internal::LayoutItemPtr Control::Impl::GetLayout() const
-{
-  return mLayout;
-}
-
-void Control::Impl::SetLayout( Toolkit::Internal::LayoutItem& layout )
-{
-  DALI_LOG_INFO( gLogFilterLayout, Debug::Verbose, "Control::SetLayout control:%s  replacing existing layout:%s\n",
-                                   mControlImpl.Self().GetName().c_str(),
-                                   mLayout?"true":"false" );
-  // Check if layout already has an owner.
-  auto control = Toolkit::Control::DownCast( layout.GetOwner() );
-  if ( control )
-  {
-    // If the owner is not this control then the owning control can no longer own it.
-    Dali::Toolkit::Control handle( mControlImpl.GetOwner() );
-    if( control != handle )
-    {
-      DALI_LOG_INFO( gLogFilterLayout, Debug::Verbose, "Control::SetLayout Layout already in use, %s will now have a BinLayout\n",
-                                                        control.GetName().c_str() );
-      Toolkit::BinLayout binLayout = Toolkit::BinLayout::New();
-      // Previous owner of the layout gets a BinLayout instead of the layout.
-      DevelControl::SetLayout( control, binLayout ) ;
-    }
-    else
-    {
-      return; // layout is already set to this control.
-    }
-  }
-
-  if( mLayout )
-  {
-    mLayout->Unparent();
-    mLayout.Reset();
-  }
-
-  mLayout = &layout;
-
-  auto controlHandle = Toolkit::Control::DownCast( mControlImpl.Self() ); // Get a handle of this control implementation without copying internals.
-  mLayout->Initialize( controlHandle, controlHandle.GetTypeName() ); // LayoutGroup takes ownership of existing children
-}
-
-void Control::Impl::RemoveLayout()
-{
-  DALI_LOG_INFO( gLogFilterLayout, Debug::Verbose, "Control::Impl::RemoveLayout\n");
-
-  Toolkit::BinLayout binLayout = Toolkit::BinLayout::New();
-
-  mControlImpl.mImpl->SetLayout( GetImplementation( binLayout ) ) ;
-}
-
-void Control::Impl::SetLayoutingRequired( bool layoutingRequired )
-{
-  mControlImpl.mImpl->mIsLayoutingRequired = layoutingRequired;
-}
-
-bool Control::Impl::IsLayoutingRequired()
-{
-  return mControlImpl.mImpl->mIsLayoutingRequired;
 }
 
 DevelControl::VisualEventSignalType& Control::Impl::VisualEventSignal()
