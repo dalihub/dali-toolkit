@@ -65,7 +65,8 @@ using namespace Dali;
 
 ImageView::ImageView()
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
-  mImageSize()
+  mImageSize(),
+  mImageVisualPaddingSetByTransform( false )
 {
 }
 
@@ -293,7 +294,8 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
     Extents padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
     const Visual::FittingMode fittingMode = Toolkit::GetImplementation(mVisual).GetFittingMode();
 
-    if( ( padding != Extents() ) || // If padding is not zero
+    bool zeroPadding = ( padding == Extents() );
+    if( ( !zeroPadding ) || // If padding is not zero
         ( fittingMode == Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ) )
     {
       Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(
@@ -305,6 +307,7 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
       }
 
       auto finalOffset = Vector2( padding.start, padding.top );
+      mImageVisualPaddingSetByTransform = true;
 
       // remove padding from the size to know how much is left for the visual
       auto finalSize = size - Vector2( padding.start + padding.end, padding.top + padding.bottom );
@@ -335,6 +338,15 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
                   .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY,
                       Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) );
     }
+    else if ( mImageVisualPaddingSetByTransform && zeroPadding )  // Reset offset to zero only if padding applied previously
+    {
+      mImageVisualPaddingSetByTransform = false;
+      // Reset the transform map
+      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2::ZERO )
+                  .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY,
+                        Vector2( Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE ) );
+    }
+
 
     mVisual.SetTransformAndSize( transformMap, size );
   }
