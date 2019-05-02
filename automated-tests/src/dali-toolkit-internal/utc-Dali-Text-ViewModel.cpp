@@ -586,10 +586,10 @@ int UtcDaliTextViewModelElideText02(void)
   float positions01[] = { 0.f, 8.f, 16.f, 26.f, 33.f, 41.f, 45.f, 54.f, 64.0f };
 
   Size textSize02( 80.f, 100.f );
-  float positions02[] = { 75.f, 66.f, 57.f, 53.f, 46.f, 41.f, 33.f, 26.0f };
+  float positions02[] = { 75.f, 66.f, 57.f, 53.f, 46.f, 41.f, 33.f, 12.0f };
 
   Size textSize03( 80.f, 100.f );
-  float positions03[] = { 79.f, 74.f, 71.f, 66.f, 58.f, 56.f, 52.f, 51.f, 46.f, 36.f, 33.f, 25.f, 22.f };
+  float positions03[] = { 79.f, 74.f, 71.f, 66.f, 58.f, 56.f, 52.f, 51.f, 46.f, 36.f, 33.f, 25.f, 8.f };
 
   Size textSize04( 80.f, 10.f );
   float positions04[] = { 2.f };
