@@ -46,7 +46,7 @@ namespace
 {
 const char* VERTEX_SHADER = MAKE_SHADER(
 attribute mediump vec2    aPosition;
-uniform   mediump mat4    uMvpMatrix;
+uniform   highp mat4      uMvpMatrix;
 
 void main()
 {

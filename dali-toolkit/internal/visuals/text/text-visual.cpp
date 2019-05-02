@@ -68,13 +68,9 @@ const Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
-  uniform mediump mat4 uMvpMatrix;\n
+  uniform highp   mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
   uniform mediump vec4 pixelArea;\n
-
-  uniform mediump mat4 uModelMatrix;\n
-  uniform mediump mat4 uViewMatrix;\n
-  uniform mediump mat4 uProjection;\n
 
   varying mediump vec2 vTexCoord;\n
 
@@ -94,12 +90,8 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
 
   void main()\n
   {\n
-    mediump vec4 nonAlignedVertex = uViewMatrix*uModelMatrix*ComputeVertexPosition();\n
-    mediump vec4 pixelAlignedVertex = vec4 ( floor(nonAlignedVertex.xyz), 1.0 );\n
-    mediump vec4 vertexPosition = uProjection*pixelAlignedVertex;\n
-
+    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
     vTexCoord = pixelArea.xy+pixelArea.zw*(aPosition + vec2(0.5) );\n
-    gl_Position = vertexPosition;\n
   }\n
 );
 

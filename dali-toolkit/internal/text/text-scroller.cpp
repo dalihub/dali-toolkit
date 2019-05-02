@@ -50,9 +50,7 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
   uniform mediump float uHorizontalAlign;\n
   uniform mediump float uVerticalAlign;\n
   \n
-  uniform mediump mat4 uModelMatrix;\n
-  uniform mediump mat4 uViewMatrix;\n
-  uniform mediump mat4 uProjection;\n
+  uniform highp   mat4 uMvpMatrix;\n
   \n
   //Visual size and offset
   uniform mediump vec2 offset;\n
@@ -71,7 +69,7 @@ const char* VERTEX_SHADER_SCROLL = DALI_COMPOSE_SHADER(
     \n
     mediump vec4 vertexPosition = vec4( floor( ( aPosition + anchorPoint ) * visualSize + ( visualOffset + origin ) * uSize.xy ), 0.0, 1.0 );\n
     \n
-    gl_Position = uProjection * uViewMatrix * uModelMatrix * vertexPosition;\n
+    gl_Position = uMvpMatrix * vertexPosition;\n
   }\n
 );
 
