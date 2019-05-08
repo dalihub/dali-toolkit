@@ -332,11 +332,6 @@ void ViewModel::ElideGlyphs()
               glyphInfo = ellipsisGlyph;
 
               // Change the 'x' and 'y' position of the ellipsis glyph.
-              if( position.x > firstPenX && firstPenX != 0.f)
-              {
-                position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
-              }
-
               position.x += ellipsisGlyph.xBearing;
               position.y = penY - ellipsisGlyph.yBearing;
 
