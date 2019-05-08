@@ -70,11 +70,6 @@ void WebView::LoadUrl( const std::string& url )
   Dali::Toolkit::GetImpl( *this ).LoadUrl( url );
 }
 
-const std::string& WebView::GetUrl()
-{
-  return Dali::Toolkit::GetImpl( *this ).GetUrl();
-}
-
 void WebView::LoadHTMLString( const std::string& htmlString )
 {
   Dali::Toolkit::GetImpl( *this ).LoadHTMLString( htmlString );
@@ -88,6 +83,16 @@ void WebView::Reload()
 void WebView::StopLoading()
 {
   Dali::Toolkit::GetImpl( *this ).StopLoading();
+}
+
+void WebView::Suspend()
+{
+  Dali::Toolkit::GetImpl( *this ).Suspend();
+}
+
+void WebView::Resume()
+{
+  Dali::Toolkit::GetImpl( *this ).Resume();
 }
 
 bool WebView::CanGoForward()
@@ -110,9 +115,14 @@ void WebView::GoBack()
   Dali::Toolkit::GetImpl( *this ).GoBack();
 }
 
+void WebView::EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler )
+{
+  Dali::Toolkit::GetImpl( *this ).EvaluateJavaScript( script, resultHandler );
+}
+
 void WebView::EvaluateJavaScript( const std::string& script )
 {
-  Dali::Toolkit::GetImpl( *this ).EvaluateJavaScript( script );
+  Dali::Toolkit::GetImpl( *this ).EvaluateJavaScript( script, nullptr );
 }
 
 void WebView::AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void( const std::string& ) > handler )
@@ -130,14 +140,24 @@ void WebView::ClearCache()
   Dali::Toolkit::GetImpl( *this ).ClearCache();
 }
 
-WebView::WebViewSignalType& WebView::PageLoadStartedSignal()
+void WebView::ClearCookies()
+{
+  Dali::Toolkit::GetImpl( *this ).ClearCookies();
+}
+
+WebView::WebViewPageLoadSignalType& WebView::PageLoadStartedSignal()
 {
   return Dali::Toolkit::GetImpl( *this ).PageLoadStartedSignal();
 }
 
-WebView::WebViewSignalType& WebView::PageLoadFinishedSignal()
+WebView::WebViewPageLoadSignalType& WebView::PageLoadFinishedSignal()
 {
   return Dali::Toolkit::GetImpl( *this ).PageLoadFinishedSignal();
+}
+
+WebView::WebViewPageLoadErrorSignalType& WebView::PageLoadErrorSignal()
+{
+  return Dali::Toolkit::GetImpl( *this ).PageLoadErrorSignal();
 }
 
 WebView::WebView( Internal::WebView& implementation )
