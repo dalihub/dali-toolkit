@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H__
-#define __DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H__
+#ifndef DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H
+#define DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,6 +168,8 @@ private:
   Property::Map    mPropertyMap;  ///< the Property::Map if the image came from a Property::Map, empty otherwise
   Property::Map    mShaderMap;    ///< the Property::Map if the custom shader is set, empty otherwise
   ImageDimensions  mImageSize;    ///< the image size
+
+  bool mImageVisualPaddingSetByTransform :1; //< Flag to indicate Padding was set using a transform.
 };
 
 } // namespace Internal
@@ -191,4 +193,4 @@ inline const Toolkit::Internal::ImageView& GetImpl( const Toolkit::ImageView& ob
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H__
+#endif // DALI_TOOLKIT_INTERNAL_IMAGE_VIEW_H

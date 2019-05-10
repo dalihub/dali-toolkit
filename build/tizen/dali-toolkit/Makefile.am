@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018 Samsung Electronics Co., Ltd.
+# Copyright (c) 2019 Samsung Electronics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -91,24 +91,6 @@ LIBDALI_TOOLKIT_LA_LIBADD = \
 
 
 # The library
-if ENABLE_CXX03_ABI
-
-lib_LTLIBRARIES = libdali-toolkit.la
-libdali_toolkit_la_SOURCES = $(LIBDALI_TOOLKIT_LA_SOURCES)
-libdali_toolkit_la_LIBADD = $(LIBDALI_TOOLKIT_LA_LIBADD)
-libdali_toolkit_la_CXXFLAGS = $(LIBDALI_TOOLKIT_LA_CXXFLAGS)
-libdali_toolkit_la_CFLAGS = $(LIBDALI_TOOLKTI_LA_CFLAGS)
-
-if ENABLE_RENAME_SO
-#rename
-install: install-am
-	rm -rf $(libdir)/libdali-toolkit.so
-	rm -rf $(libdir)/libdali-toolkit-cxx03.so
-	ln -s $(libdir)/libdali-toolkit.so.0.0.* $(libdir)/libdali-toolkit-cxx03.so
-endif
-
-else
-
 lib_LTLIBRARIES = libdali-toolkit-cxx11.la
 libdali_toolkit_cxx11_la_SOURCES = $(LIBDALI_TOOLKIT_LA_SOURCES)
 libdali_toolkit_cxx11_la_LIBADD = $(LIBDALI_TOOLKIT_LA_LIBADD)
@@ -121,8 +103,6 @@ install: install-am
 	rm -rf $(libdir)/libdali-toolkit-cxx11.so
 	rm -rf $(libdir)/libdali-toolkit.so
 	ln -s $(libdir)/libdali-toolkit-cxx11.so.0.0.* $(libdir)/libdali-toolkit.so
-endif
-
 endif
 
 # Install headers
