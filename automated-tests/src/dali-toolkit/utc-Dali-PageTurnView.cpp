@@ -20,7 +20,7 @@
 #include <string.h>
 #include <sstream>
 #include <dali-toolkit-test-suite-utils.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
+#include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-factory.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-landscape-view.h>
 #include <dali-toolkit/devel-api/controls/page-turn-view/page-turn-portrait-view.h>
@@ -50,82 +50,47 @@ static void TestCallback(BaseHandle handle)
  * @param application Test application instance
  * @param duration Time to pass in milliseconds.
  */
-void Wait(ToolkitTestApplication& application, int duration = 0)
+int Wait(ToolkitTestApplication& application, int duration = 0)
 {
+  int time = 0;
+
   for(int i = 0; i <= ( duration / RENDER_FRAME_INTERVAL); i++)
   {
     application.SendNotification();
     application.Render(RENDER_FRAME_INTERVAL);
-  }
-}
-
-// Generate a PanGestureEvent to send to Core
-Integration::PanGestureEvent GeneratePan(
-    Gesture::State state,
-    const Vector2& previousPosition,
-    const Vector2& currentPosition,
-    unsigned long timeDelta,
-    unsigned int numberOfTouches = 1)
-{
-  Integration::PanGestureEvent pan(state);
-
-  pan.previousPosition = previousPosition;
-  pan.currentPosition = currentPosition;
-  pan.timeDelta = timeDelta;
-  pan.numberOfTouches = numberOfTouches;
-
-  return pan;
-}
-
-/**
- * Helper to generate PanGestureEvent
- *
- * @param[in] application Application instance
- * @param[in] state The Gesture State
- * @param[in] pos The current position of touch.
- */
-static void SendPan(ToolkitTestApplication& application, Gesture::State state, const Vector2& pos)
-{
-  static Vector2 last;
-
-  if( (state == Gesture::Started) ||
-      (state == Gesture::Possible) )
-  {
-    last.x = pos.x;
-    last.y = pos.y;
+    time += RENDER_FRAME_INTERVAL;
   }
 
-  application.ProcessEvent(GeneratePan(state, last, pos, RENDER_FRAME_INTERVAL));
-
-  last.x = pos.x;
-  last.y = pos.y;
+  return time;
 }
 
-static Vector2 PerformGestureDiagonalSwipe(ToolkitTestApplication& application, Vector2 start, Vector2 direction, int frames, bool toStart = true, bool toFinish = true)
+
+static Vector2 PerformGestureDiagonalSwipe(ToolkitTestApplication& application, Vector2 start, Vector2 direction, int frames, uint32_t& time, bool toStart = true, bool toFinish = true)
 {
-  // Now do a pan starting from (start) and heading (direction)
-  Vector2 pos(start);
+  Vector2 pos( start );
 
   if( toStart )
   {
-    SendPan(application, Gesture::Possible, pos);
-    Wait(application);
-    SendPan(application, Gesture::Started, pos);
-    Wait(application);
+    // Now do a pan starting from (start + 20) and heading (direction)
+    Vector2 pos_start_jump( start + Vector2(15.0f, 0.0f) );
+    TestStartPan( application, start, pos_start_jump, time );
+    pos += direction;
   }
+
+  time += Wait(application);
 
   for(int i = 0;i<frames;i++)
   {
-    pos += direction; // Move in this direction
-    SendPan(application, Gesture::Continuing, pos);
-    Wait(application);
+    pos += direction;
+    TestMovePan(application, pos, time );
+    time += Wait(application);
   }
 
   if(toFinish)
   {
-    pos += direction; // Move in this direction
-    SendPan(application, Gesture::Finished, pos);
-    Wait(application);
+    pos += direction;
+    TestEndPan(application, pos, time );
+    time += Wait(application);
   }
 
   return pos;
@@ -475,22 +440,23 @@ int UtcDaliPageTurnPortraitViewSignals(void)
   //-----Test 1: pan 10 frames from position(size * 0.75f) to position(size * 0.25f), page 0 will be turned forward----
   pageIndex = 0;
   isTurningForwards = true;
-  // Do a pan moving up diagonally.
+  // Do a pan moving up diagonally
+  uint32_t time = 0;
   Vector2 start = size * 0.75f;
   Vector2 direction = -size*0.05f; //-size*0.5f/10.f;
 
   DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 0, TEST_LOCATION );
-  PerformGestureDiagonalSwipe( application, start, direction, 5, true, false);
+  PerformGestureDiagonalSwipe( application, start, direction, 5, time, true, false);
   DALI_TEST_CHECK( callbackTurnStarted.mSignalVerified );
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
   DALI_TEST_CHECK( callbackPanStarted.mSignalVerified );
   DALI_TEST_CHECK( !callbackPanFinished.mSignalVerified );
 
-  PerformGestureDiagonalSwipe( application, start+direction*5.f, direction, 5, false, true);
+  PerformGestureDiagonalSwipe( application, start+direction*5.f, direction, 5, time, false, true);
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
   DALI_TEST_CHECK( callbackPanFinished.mSignalVerified );
 
-  Wait(application, 1000);
+  time += Wait(application, 1000);
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
   // the page is turned over
   DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), (int)(pageIndex+1), TEST_LOCATION );
@@ -507,7 +473,7 @@ int UtcDaliPageTurnPortraitViewSignals(void)
   //pan 10 frames from position( size.width, size.height*0.5f ) to position( size * 0.75f )
   start = Vector2( size.width, size.height*0.5f );
   direction = Vector2(-size.width*0.025f, size.height*0.025f);
-  PerformGestureDiagonalSwipe( application, start, direction, 5, true, false);
+  PerformGestureDiagonalSwipe( application, start, direction, 5, time, true, false);
   DALI_TEST_CHECK( callbackPanStarted.mSignalVerified );
   DALI_TEST_CHECK( callbackTurnStarted.mSignalVerified );
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
@@ -515,12 +481,12 @@ int UtcDaliPageTurnPortraitViewSignals(void)
 
   signalVerified[0] = false;
   isTurningForwards = false;
-  PerformGestureDiagonalSwipe( application, start + direction*2 , direction, 5, false, true);
+  PerformGestureDiagonalSwipe( application, start + direction*2 , direction, 5, time, false, true);
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
   DALI_TEST_CHECK( callbackPanFinished.mSignalVerified );
   DALI_TEST_CHECK( callbackTurnStarted.mSignalVerified ); // start the sliding back
 
-  Wait(application, 1000);
+  time += Wait(application, 1000);
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
   DALI_TEST_EQUALS( portraitView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), (int)pageIndex, TEST_LOCATION ); // the page is not turned over
 
@@ -534,13 +500,13 @@ int UtcDaliPageTurnPortraitViewSignals(void)
   isTurningForwards = false;
   start = size*0.25f;
   direction = Vector2(size.x*0.05f, 0.f);
-  PerformGestureDiagonalSwipe( application, start, direction, 5, true, false);
+  PerformGestureDiagonalSwipe( application, start, direction, 4, time, true, false);
   DALI_TEST_CHECK( callbackPanStarted.mSignalVerified );
   DALI_TEST_CHECK( !callbackTurnStarted.mSignalVerified );
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
   DALI_TEST_CHECK( !callbackPanFinished.mSignalVerified );
 
-  PerformGestureDiagonalSwipe( application, start+direction*5.f, direction, 5, false, true);
+  PerformGestureDiagonalSwipe( application, start+direction*5.f, direction, 5, time, false, true);
   DALI_TEST_CHECK( callbackTurnStarted.mSignalVerified );
   DALI_TEST_CHECK( callbackPanFinished.mSignalVerified );
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
@@ -613,21 +579,22 @@ int UtcDaliPageTurnLanscapeViewSignals(void)
   pageIndex = 0;
   isTurningForwards = true;
   // Do a pan to the left.
+  uint32_t time = 0;
   Vector2 start = Vector2(stageSize.x * 0.85f, stageSize.y*0.5);
   Vector2 direction = Vector2(-stageSize.x*0.04f, -stageSize.x*0.03f);
 
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 0, TEST_LOCATION );
-  PerformGestureDiagonalSwipe( application, start, direction, 5, true, false);
+  PerformGestureDiagonalSwipe( application, start, direction, 5, time, true, false);
   DALI_TEST_CHECK( callbackTurnStarted.mSignalVerified );
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
   DALI_TEST_CHECK( callbackPanStarted.mSignalVerified );
   DALI_TEST_CHECK( !callbackPanFinished.mSignalVerified );
 
-  PerformGestureDiagonalSwipe( application, start+direction*5.f, direction, 5, false, true);
+  PerformGestureDiagonalSwipe( application, start+direction*5.f, direction, 5, time, false, true);
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
   DALI_TEST_CHECK( callbackPanFinished.mSignalVerified );
 
-  Wait(application, 1000);
+  time += Wait(application, 1000);
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
   // the page is turned over
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), (int)(pageIndex+1), TEST_LOCATION );
@@ -642,17 +609,17 @@ int UtcDaliPageTurnLanscapeViewSignals(void)
   //pan 10 frames from position( size.width, size.height*0.5f ) to position( size * 0.75f )
   start = Vector2( stageSize.x * 0.15f, stageSize.y*0.5f );
   direction = Vector2(stageSize.x * 0.03f, 0.f);
-  PerformGestureDiagonalSwipe( application, start, direction, 5, true, false);
+  PerformGestureDiagonalSwipe( application, start, direction, 5, time, true, false);
   DALI_TEST_CHECK( callbackPanStarted.mSignalVerified );
   DALI_TEST_CHECK( callbackTurnStarted.mSignalVerified );
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
   DALI_TEST_CHECK( !callbackPanFinished.mSignalVerified );
 
-  PerformGestureDiagonalSwipe( application, start + direction*5.f , direction, 5, false, true);
+  PerformGestureDiagonalSwipe( application, start + direction*5.f , direction, 5, time, false, true);
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
   DALI_TEST_CHECK( callbackPanFinished.mSignalVerified );
 
-  Wait(application, 1000);
+  time += Wait(application, 1000);
   DALI_TEST_CHECK( callbackTurnFinished.mSignalVerified );
   DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::CURRENT_PAGE_ID).Get<int>(), 0, TEST_LOCATION ); // the first page is turned back
 
@@ -664,13 +631,13 @@ int UtcDaliPageTurnLanscapeViewSignals(void)
   isTurningForwards = false;
   start = stageSize*0.55f;
   direction = Vector2(stageSize.x*0.025f, 0.f);
-  PerformGestureDiagonalSwipe( application, start, direction, 5, true, false);
+  PerformGestureDiagonalSwipe( application, start, direction, 5, time, true, false);
   DALI_TEST_CHECK( callbackPanStarted.mSignalVerified );
   DALI_TEST_CHECK( !callbackTurnStarted.mSignalVerified );
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );
   DALI_TEST_CHECK( !callbackPanFinished.mSignalVerified );
 
-  PerformGestureDiagonalSwipe( application, start+direction*5.f, direction, 5, false, true);
+  PerformGestureDiagonalSwipe( application, start+direction*5.f, direction, 5, time, false, true);
   DALI_TEST_CHECK( !callbackTurnStarted.mSignalVerified );
   DALI_TEST_CHECK( callbackPanFinished.mSignalVerified );
   DALI_TEST_CHECK( !callbackTurnFinished.mSignalVerified );

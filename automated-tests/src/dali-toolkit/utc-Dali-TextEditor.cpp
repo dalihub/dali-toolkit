@@ -23,9 +23,6 @@
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/events/tap-gesture-event.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-editor-devel.h>
@@ -159,51 +156,6 @@ static void TestInputStyleChangedCallback( TextEditor control, TextEditor::Input
   gInputStyleMask = mask;
 }
 
-// Generate a TapGestureEvent to send to Core.
-Integration::TapGestureEvent GenerateTap(
-    Gesture::State state,
-    unsigned int numberOfTaps,
-    unsigned int numberOfTouches,
-    Vector2 point)
-{
-  Integration::TapGestureEvent tap( state );
-
-  tap.numberOfTaps = numberOfTaps;
-  tap.numberOfTouches = numberOfTouches;
-  tap.point = point;
-
-  return tap;
-}
-
-Integration::LongPressGestureEvent GenerateLongPress(
-    Gesture::State state,
-    unsigned int numberOfTouches,
-    Vector2 point)
-{
-  Integration::LongPressGestureEvent longPress( state );
-
-  longPress.numberOfTouches = numberOfTouches;
-  longPress.point = point;
-  return longPress;
-}
-
-// Generate a PanGestureEvent to send to Core
-Integration::PanGestureEvent GeneratePan( Gesture::State state,
-                                          const Vector2& previousPosition,
-                                          const Vector2& currentPosition,
-                                          unsigned long timeDelta,
-                                          unsigned int numberOfTouches = 1u )
-{
-  Integration::PanGestureEvent pan(state);
-
-  pan.previousPosition = previousPosition;
-  pan.currentPosition = currentPosition;
-  pan.timeDelta = timeDelta;
-  pan.numberOfTouches = numberOfTouches;
-
-  return pan;
-}
-
 // Generate a KeyEvent to send to Core.
 Integration::KeyEvent GenerateKey( const std::string& keyName,
                                    const std::string& logicalKey,
@@ -228,53 +180,6 @@ Integration::KeyEvent GenerateKey( const std::string& keyName,
                                 deviceName,
                                 deviceClass,
                                 deviceSubclass );
-}
-
-/**
- * Helper to generate PanGestureEvent
- *
- * @param[in] application Application instance
- * @param[in] state The Gesture State
- * @param[in] pos The current position of touch.
- */
-static void SendPan(ToolkitTestApplication& application, Gesture::State state, const Vector2& pos)
-{
-  static Vector2 last;
-
-  if( (state == Gesture::Started) ||
-      (state == Gesture::Possible) )
-  {
-    last.x = pos.x;
-    last.y = pos.y;
-  }
-
-  application.ProcessEvent( GeneratePan( state, last, pos, 16 ) );
-
-  last.x = pos.x;
-  last.y = pos.y;
-}
-
-/*
- * Simulate time passed by.
- *
- * @note this will always process at least 1 frame (1/60 sec)
- *
- * @param application Test application instance
- * @param duration Time to pass in milliseconds.
- * @return The actual time passed in milliseconds
- */
-static int Wait(ToolkitTestApplication& application, int duration = 0)
-{
-  int time = 0;
-
-  for(int i = 0; i <= ( duration / RENDER_FRAME_INTERVAL); i++)
-  {
-    application.SendNotification();
-    application.Render(RENDER_FRAME_INTERVAL);
-    time += RENDER_FRAME_INTERVAL;
-  }
-
-  return time;
 }
 
 Dali::Integration::Point GetPointDownInside( Vector2& pos )
@@ -1072,8 +977,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 18.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 18.f, 25.f ) ) );
+  TestGenerateTap( application, 18.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1100,8 +1004,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 30.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 30.f, 25.f ) ) );
+  TestGenerateTap( application, 30.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1118,8 +1021,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 43.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 43.f, 25.f ) ) );
+  TestGenerateTap( application, 43.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1143,8 +1045,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 88.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 88.f, 25.f ) ) );
+  TestGenerateTap( application, 88.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1177,8 +1078,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 115.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 115.f, 25.f ) ) );
+  TestGenerateTap( application, 115.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1195,8 +1095,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 164.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 164.f, 25.f ) ) );
+  TestGenerateTap( application, 164.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1224,8 +1123,7 @@ int utcDaliTextEditorInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 191.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 191.f, 25.f ) ) );
+  TestGenerateTap( application, 191.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1295,10 +1193,8 @@ int utcDaliTextEditorInputStyleChanged02(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 53.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 53.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 53.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 53.f, 25.f ) ) );
+  TestGenerateTap( application, 53.0f, 25.0f, 100 );
+  TestGenerateTap( application, 53.0f, 25.0f, 200 );
 
   // Render and notify
   application.SendNotification();
@@ -1426,8 +1322,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   DALI_TEST_CHECK( !inputStyleChangedSignal );
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 63.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 63.f, 25.f ) ) );
+  TestGenerateTap( application, 63.0f, 25.0f, 900 );
 
   // Render and notify
   application.SendNotification();
@@ -1469,8 +1364,7 @@ int utcDaliTextEditorInputStyleChanged02(void)
   editor.SetProperty( TextEditor::Property::FONT_STYLE, fontStyleMapSet );
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 30.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 30.f, 25.f ) ) );
+  TestGenerateTap( application, 30.0f, 25.0f, 1500 );
 
   // Render and notify
   application.SendNotification();
@@ -1530,8 +1424,7 @@ int utcDaliTextEditorEvent01(void)
   DALI_TEST_EQUALS( editor.GetProperty<std::string>( TextEditor::Property::TEXT ), std::string(""), TEST_LOCATION );
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1562,8 +1455,7 @@ int utcDaliTextEditorEvent01(void)
   application.Render();
 
   // Create a tap event on the second text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 125.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 125.0f ) ) );
+  TestGenerateTap( application, 150.0f, 125.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1613,8 +1505,7 @@ int utcDaliTextEditorEvent02(void)
   Actor stencil = editor.GetChildAt( 0u );
 
   // Create a tap event to touch the text editor.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f, 100 );
 
   // Render and notify
   application.SendNotification();
@@ -1677,8 +1568,7 @@ int utcDaliTextEditorEvent02(void)
   // Send some taps and check the cursor positions.
 
   // Try to tap at the beginning.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateTap( application, 1.0f, 25.0f, 700 );
 
   // Render and notify
   application.SendNotification();
@@ -1690,8 +1580,7 @@ int utcDaliTextEditorEvent02(void)
   DALI_TEST_EQUALS( position2, position4, TEST_LOCATION ); // Should be in the same position2.
 
   // Tap away from the start position.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 16.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 16.0f, 25.0f ) ) );
+  TestGenerateTap( application, 16.0f, 25.0f, 1400 );
 
   // Render and notify
   application.SendNotification();
@@ -1749,8 +1638,7 @@ int utcDaliTextEditorEvent03(void)
   // Send some taps and check text controller with clipboard window
   Dali::Clipboard clipboard = Clipboard::Get();
   clipboard.ShowClipboard();
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f, 100 );
   clipboard.HideClipboard();
 
   // Render and notify
@@ -1758,16 +1646,14 @@ int utcDaliTextEditorEvent03(void)
   application.Render();
 
   // Tap first to get the focus.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f, 1000 );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Double tap to select a word.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f, 1100 );
 
   // Render and notify
   application.SendNotification();
@@ -1789,8 +1675,8 @@ int utcDaliTextEditorEvent03(void)
   }
 
   // Double tap out of bounds
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 29.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 29.f, 25.0f ) ) );
+  TestGenerateTap( application, 29.0f, 25.0f, 1700 );
+  TestGenerateTap( application, 29.0f, 25.0f, 1800 );
 
   // Render and notify
   application.SendNotification();
@@ -1808,8 +1694,7 @@ int utcDaliTextEditorEvent03(void)
   }
 
   // Long Press
-  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateLongPress(application, 1.0f, 25.0f);
 
   // Render and notify
   application.SendNotification();
@@ -1844,8 +1729,7 @@ int utcDaliTextEditorEvent04(void)
   application.Render();
 
   // Tap on the text editor
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1939,8 +1823,7 @@ int utcDaliTextEditorEvent05(void)
   application.Render();
 
   // Tap on the text editor
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -2017,8 +1900,7 @@ int utcDaliTextEditorEvent06(void)
   application.Render();
 
   // Tap on the text editor
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -2108,8 +1990,7 @@ int utcDaliTextEditorEvent07(void)
   application.Render();
 
   // Tap on the text editor
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -2253,8 +2134,7 @@ int utcDaliTextEditorEvent08(void)
   application.Render();
 
   // Tap on the text editor
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -2461,16 +2341,14 @@ int utcDaliTextEditorHandles(void)
   application.Render();
 
   // Tap first to get the focus.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f, 100 );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Tap to create the grab handle.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f, 700 );
 
   // Render and notify
   application.SendNotification();
@@ -2498,22 +2376,6 @@ int utcDaliTextEditorHandles(void)
   application.SendNotification();
   application.Render();
 
-  // drag grab handle right
-  SendPan(application, Gesture::Possible, touchPos);
-  SendPan(application, Gesture::Started, touchPos);
-  touchPos.x += 5.0f;
-  Wait(application, 100);
-
-  for(int i = 0;i<20;i++)
-  {
-    SendPan(application, Gesture::Continuing, touchPos);
-    touchPos.x += 5.0f;
-    Wait(application);
-  }
-
-  SendPan(application, Gesture::Finished, touchPos);
-  Wait(application);
-
   // Release the grab handle.
   event = Dali::Integration::TouchEvent();
   event.AddPoint( GetPointUpInside( touchPos ) );
@@ -2524,16 +2386,14 @@ int utcDaliTextEditorHandles(void)
   application.Render();
 
   // Tap first to get the focus.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f, 1400 );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Double tap to select a word and create the selection handles.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f, 1500 );
 
   // Render and notify
   application.SendNotification();
@@ -2549,22 +2409,6 @@ int utcDaliTextEditorHandles(void)
   // Render and notify
   application.SendNotification();
   application.Render();
-
-  // drag the left selection handle right
-  SendPan(application, Gesture::Possible, touchPos);
-  SendPan(application, Gesture::Started, touchPos);
-  touchPos.x += 5.0f;
-  Wait(application, 100);
-
-  for(int i = 0;i<20;i++)
-  {
-    SendPan(application, Gesture::Continuing, touchPos);
-    touchPos.x += 5.0f;
-    Wait(application);
-  }
-
-  SendPan(application, Gesture::Finished, touchPos);
-  Wait(application);
 
   // Release the left selection handle.
   event = Dali::Integration::TouchEvent();

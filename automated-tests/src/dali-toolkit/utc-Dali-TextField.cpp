@@ -21,10 +21,8 @@
 
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/integration-api/events/key-event-integ.h>
-#include <dali/integration-api/events/tap-gesture-event.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
-#include <dali/integration-api/events/long-press-gesture-event.h>
+
 #include <dali/devel-api/adaptor-framework/key-devel.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
@@ -150,48 +148,6 @@ static void LoadMarkerImages(ToolkitTestApplication& app, TextField textField)
   textField.SetProperty( Toolkit::TextField::Property::GRAB_HANDLE_PRESSED_IMAGE, propertyMap );
 }
 
-// Generate a PanGestureEvent to send to Core
-static Integration::PanGestureEvent GeneratePan(
-    Gesture::State state,
-    const Vector2& previousPosition,
-    const Vector2& currentPosition,
-    unsigned long timeDelta,
-    unsigned int numberOfTouches = 1)
-{
-  Integration::PanGestureEvent pan(state);
-
-  pan.previousPosition = previousPosition;
-  pan.currentPosition = currentPosition;
-  pan.timeDelta = timeDelta;
-  pan.numberOfTouches = numberOfTouches;
-
-  return pan;
-}
-
-/**
- * Helper to generate PanGestureEvent
- *
- * @param[in] application Application instance
- * @param[in] state The Gesture State
- * @param[in] pos The current position of touch.
- */
-static void SendPan(ToolkitTestApplication& application, Gesture::State state, const Vector2& pos)
-{
-  static Vector2 last;
-
-  if( (state == Gesture::Started) ||
-      (state == Gesture::Possible) )
-  {
-    last.x = pos.x;
-    last.y = pos.y;
-  }
-
-  application.ProcessEvent(GeneratePan(state, last, pos, 16));
-
-  last.x = pos.x;
-  last.y = pos.y;
-}
-
 /*
  * Simulate time passed by.
  *
@@ -265,34 +221,6 @@ static void TestInputStyleChangedCallback( TextField control, TextField::InputSt
 
   gInputStyleChangedCallbackCalled = true;
   gInputStyleMask = mask;
-}
-
-// Generate a TapGestureEvent to send to Core.
-Integration::TapGestureEvent GenerateTap(
-    Gesture::State state,
-    unsigned int numberOfTaps,
-    unsigned int numberOfTouches,
-    Vector2 point)
-{
-  Integration::TapGestureEvent tap( state );
-
-  tap.numberOfTaps = numberOfTaps;
-  tap.numberOfTouches = numberOfTouches;
-  tap.point = point;
-
-  return tap;
-}
-
-Integration::LongPressGestureEvent GenerateLongPress(
-    Gesture::State state,
-    unsigned int numberOfTouches,
-    Vector2 point)
-{
-  Integration::LongPressGestureEvent longPress( state );
-
-  longPress.numberOfTouches = numberOfTouches;
-  longPress.point = point;
-  return longPress;
 }
 
 // Generate a KeyEvent to send to Core.
@@ -1216,8 +1144,7 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 18.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 18.f, 25.f ) ) );
+  TestGenerateTap( application, 18.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1244,8 +1171,7 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 30.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 30.f, 25.f ) ) );
+  TestGenerateTap( application, 30.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1262,8 +1188,7 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 43.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 43.f, 25.f ) ) );
+  TestGenerateTap( application, 43.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1287,8 +1212,7 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 88.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 88.f, 25.f ) ) );
+  TestGenerateTap( application, 88.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1320,8 +1244,7 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 115.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 115.f, 25.f ) ) );
+  TestGenerateTap( application, 115.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1338,8 +1261,7 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 164.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 164.f, 25.f ) ) );
+  TestGenerateTap( application, 164.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1363,8 +1285,7 @@ int utcDaliTextFieldInputStyleChanged01(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 191.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 191.f, 25.f ) ) );
+  TestGenerateTap( application, 191.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1406,7 +1327,6 @@ int utcDaliTextFieldInputStyleChanged02(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
 
-
   field.SetSize( 300.f, 50.f );
   field.SetParentOrigin( ParentOrigin::TOP_LEFT );
   field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
@@ -1434,10 +1354,8 @@ int utcDaliTextFieldInputStyleChanged02(void)
   inputStyleChangedSignal = false;
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 53.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 53.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 53.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 53.f, 25.f ) ) );
+  TestGenerateTap( application, 53.0f, 25.0f, 100 );
+  TestGenerateTap( application, 53.0f, 25.0f, 200 );
 
   // Render and notify
   application.SendNotification();
@@ -1562,8 +1480,7 @@ int utcDaliTextFieldInputStyleChanged02(void)
   DALI_TEST_CHECK( !inputStyleChangedSignal );
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 63.f, 25.f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 63.f, 25.f ) ) );
+  TestGenerateTap( application, 63.0f, 25.0f, 300 );
 
   // Render and notify
   application.SendNotification();
@@ -1610,6 +1527,10 @@ int utcDaliTextFieldEvent01(void)
   field.SetParentOrigin( ParentOrigin::TOP_LEFT );
   field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
 
@@ -1627,8 +1548,7 @@ int utcDaliTextFieldEvent01(void)
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string(""), TEST_LOCATION );
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1655,8 +1575,8 @@ int utcDaliTextFieldEvent01(void)
 
   field2.SetParentOrigin( ParentOrigin::TOP_LEFT );
   field2.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  field2.SetSize( 100.f, 100.f );
-  field2.SetPosition( 100.f, 100.f );
+  field2.SetSize( 100.f, 100.0f );
+  field2.SetPosition( 100.0f, 100.0f );
 
   Stage::GetCurrent().Add( field2 );
 
@@ -1665,8 +1585,7 @@ int utcDaliTextFieldEvent01(void)
   application.Render();
 
   // Create a tap event on the second text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 125.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 125.0f ) ) );
+  TestGenerateTap( application, 150.0f, 125.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1700,7 +1619,7 @@ int utcDaliTextFieldEvent02(void)
 
   Stage::GetCurrent().Add( field );
 
-  field.SetSize( 300.f, 50.f );
+  field.SetSize( 300.0f, 50.0f );
   field.SetParentOrigin( ParentOrigin::TOP_LEFT );
   field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 
@@ -1718,8 +1637,7 @@ int utcDaliTextFieldEvent02(void)
   DALI_TEST_EQUALS( stencil.GetChildCount(), 0u, TEST_LOCATION );
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f, 300 );
 
   // Render and notify
   application.SendNotification();
@@ -1788,8 +1706,7 @@ int utcDaliTextFieldEvent02(void)
   // Send some taps and check the cursor positions.
 
   // Try to tap at the beginning.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateTap( application, 1.0f, 25.0f, 900 );
 
   // Render and notify
   application.SendNotification();
@@ -1801,8 +1718,7 @@ int utcDaliTextFieldEvent02(void)
   DALI_TEST_EQUALS( position4, position5, TEST_LOCATION ); // Should be in the same position2.
 
   // Tap away from the start position.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 16.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 16.0f, 25.0f ) ) );
+  TestGenerateTap( application, 16.0f, 25.0f, 1500 );
 
   // Render and notify
   application.SendNotification();
@@ -1869,16 +1785,14 @@ int utcDaliTextFieldEvent03(void)
   application.Render();
 
   // Tap first to get the focus.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Double tap to select a word.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 3.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 3.f, 25.0f ) ) );
+  TestGenerateTap( application, 3.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -1930,32 +1844,28 @@ int utcDaliTextFieldEvent04(void)
   application.Render();
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
   // Render and notify
   application.SendNotification();
   application.Render();
 
 
   // Tap first to get the focus.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateTap( application, 1.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Double tap to select a word.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateTap( application, 1.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Tap grab handle
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 0.f, 40.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 0.f, 40.0f ) ) );
+  TestGenerateTap( application, 0.0f, 40.0f );
   END_TEST;
 }
 
@@ -1987,44 +1897,24 @@ int utcDaliTextFieldEvent05(void)
   application.Render();
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Tap first to get the focus.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateTap( application, 1.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Double tap to select a word.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateTap( application, 1.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
   application.Render();
-
-  // drag grab handle right
-  Vector2 pos(0.0f, 40.0f);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
-  pos.x += 5.0f;
-  Wait(application, 100);
-
-  for(int i = 0;i<20;i++)
-  {
-    SendPan(application, Gesture::Continuing, pos);
-    pos.x += 5.0f;
-    Wait(application);
-  }
-
-  SendPan(application, Gesture::Finished, pos);
-  Wait(application, RENDER_FRAME_INTERVAL);
 
   Actor stencil = field.GetChildAt( 1u );
   END_TEST;
@@ -2058,24 +1948,21 @@ int utcDaliTextFieldEvent06(void)
   application.Render();
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
   // Render and notify
   application.SendNotification();
   application.Render();
 
 
   // Tap first to get the focus.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateTap( application, 1.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Long Press
-  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateLongPress(application, 1.0f, 25.0f);
 
   // Render and notify
   application.SendNotification();
@@ -2115,8 +2002,7 @@ int utcDaliTextFieldEvent07(void)
   application.Render();
 
   // Long Press
-  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateLongPress(application, 1.0f, 25.0f);
 
   // Render and notify
   application.SendNotification();
@@ -2156,8 +2042,7 @@ int utcDaliTextFieldEvent08(void)
   application.Render();
 
   // Long Press
-  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateLongPress( application, 1.0f, 25.0f, 20 );
 
   // Render and notify
   application.SendNotification();
@@ -2165,12 +2050,12 @@ int utcDaliTextFieldEvent08(void)
 
   Wait(application, 500);
 
+  TestEndLongPress( application, 1.0f, 25.0f, 520 );
+
   // Long Press
-  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateLongPress( application, 1.0f, 25.0f, 600 );
 
   // Render and notify
-  application.SendNotification();
   application.Render();
 
   Wait(application, 500);
@@ -2222,8 +2107,7 @@ int utcDaliTextFieldEvent09(void)
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
   application.SendNotification();
   application.Render();
 
@@ -2313,24 +2197,21 @@ int utcDaliTextFieldStyleWhilstSelected(void)
   application.Render();
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
   // Render and notify
   application.SendNotification();
   application.Render();
 
 
   // Tap first to get the focus.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateTap( application, 1.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Double tap to select a word.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateTap( application, 1.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -2429,8 +2310,7 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
   DALI_TEST_EQUALS( field.GetProperty<std::string>( TextField::Property::TEXT ), std::string(""), TEST_LOCATION );
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -2501,24 +2381,21 @@ int utcDaliTextFieldSomeSpecialKeys(void)
   application.Render();
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Tap first to get the focus.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateTap( application, 1.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
   // Double tap to select a word.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 2u, 1u, Vector2( 1.f, 25.0f ) ) );
+  TestGenerateTap( application, 1.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -2772,7 +2649,7 @@ int UtcDaliTextFieldEnableShiftSelectionProperty(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  field.SetSize( 300.f, 50.f );
+  field.SetSize( 300.0f, 50.0f );
   field.SetParentOrigin( ParentOrigin::TOP_LEFT );
   field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
@@ -2800,7 +2677,7 @@ int UtcDaliTextFieldEnableGrabHandleProperty(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  field.SetSize( 300.f, 50.f );
+  field.SetSize( 300.0f, 50.0f );
   field.SetParentOrigin( ParentOrigin::TOP_LEFT );
   field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
@@ -2828,7 +2705,7 @@ int UtcDaliTextFieldMatchSystemLanguageDirectionProperty(void)
 
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
-  field.SetSize( 300.f, 50.f );
+  field.SetSize( 300.0f, 50.0f );
   field.SetParentOrigin( ParentOrigin::TOP_LEFT );
   field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
@@ -2861,7 +2738,7 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
 
   Stage::GetCurrent().Add( field );
 
-  field.SetSize( 300.f, 50.f );
+  field.SetSize( 300.0f, 50.0f );
   field.SetParentOrigin( ParentOrigin::TOP_LEFT );
   field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
 
@@ -2877,8 +2754,7 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
   field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "END");
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -2892,8 +2768,7 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
   field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "BEGIN");
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -2903,8 +2778,7 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
   field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "CENTER");
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();
@@ -2914,8 +2788,7 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
   field.SetProperty( TextField::Property::HORIZONTAL_ALIGNMENT, "END");
 
   // Create a tap event to touch the text field.
-  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
-  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, Vector2( 150.0f, 25.0f ) ) );
+  TestGenerateTap( application, 150.0f, 25.0f );
 
   // Render and notify
   application.SendNotification();

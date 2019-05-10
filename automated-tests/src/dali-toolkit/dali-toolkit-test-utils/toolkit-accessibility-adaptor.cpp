@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
  */
 
 #include <dali/public-api/object/base-object.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali/devel-api/adaptor-framework/accessibility-adaptor.h>
 #include <dali/devel-api/adaptor-framework/accessibility-action-handler.h>
 #include <dali/devel-api/adaptor-framework/accessibility-gesture-handler.h>
+#include <dali/devel-api/adaptor-framework/accessibility-gesture-event.h>
 
 namespace Dali
 {
@@ -53,7 +53,7 @@ public:
     mIsEnabled = enabled;
   }
 
-  void SendPanGesture( const Dali::Integration::PanGestureEvent& panEvent );
+  void SendPanGesture( const AccessibilityGestureEvent& panEvent );
 
 public:
 
@@ -140,7 +140,7 @@ bool AccessibilityAdaptor::IsEnabled() const
   return mIsEnabled;
 }
 
-void AccessibilityAdaptor::SendPanGesture( const Integration::PanGestureEvent& panEvent )
+void AccessibilityAdaptor::SendPanGesture( const AccessibilityGestureEvent& panEvent )
 {
   mGestureHandler->HandlePanGesture( panEvent );
 }
@@ -615,7 +615,7 @@ void SetEnabled( Dali::AccessibilityAdaptor adaptor, bool enabled )
   Dali::Internal::Adaptor::GetImplementation(adaptor).SetEnabled(enabled);
 }
 
-void SendPanGesture( Dali::AccessibilityAdaptor adaptor, const Dali::Integration::PanGestureEvent& panEvent )
+void SendPanGesture( Dali::AccessibilityAdaptor adaptor, const Dali::AccessibilityGestureEvent& panEvent )
 {
   Dali::Internal::Adaptor::GetImplementation(adaptor).SendPanGesture( panEvent );
 }

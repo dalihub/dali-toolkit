@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 #include <string>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -39,48 +38,6 @@ namespace
 {
 
 const int RENDER_FRAME_INTERVAL = 16;                       ///< Duration of each frame in ms. (at approx 60FPS)
-
-// Generate a PanGestureEvent to send to Core
-Integration::PanGestureEvent GeneratePan(
-    Gesture::State state,
-    const Vector2& previousPosition,
-    const Vector2& currentPosition,
-    unsigned long timeDelta,
-    unsigned int numberOfTouches = 1)
-{
-  Integration::PanGestureEvent pan(state);
-
-  pan.previousPosition = previousPosition;
-  pan.currentPosition = currentPosition;
-  pan.timeDelta = timeDelta;
-  pan.numberOfTouches = numberOfTouches;
-
-  return pan;
-}
-
-/**
- * Helper to generate PanGestureEvent
- *
- * @param[in] application Application instance
- * @param[in] state The Gesture State
- * @param[in] pos The current position of touch.
- */
-static void SendPan(ToolkitTestApplication& application, Gesture::State state, const Vector2& pos)
-{
-  static Vector2 last;
-
-  if( (state == Gesture::Started) ||
-      (state == Gesture::Possible) )
-  {
-    last.x = pos.x;
-    last.y = pos.y;
-  }
-
-  application.ProcessEvent(GeneratePan(state, last, pos, RENDER_FRAME_INTERVAL));
-
-  last.x = pos.x;
-  last.y = pos.y;
-}
 
 /*
  * Simulate time passed by.
@@ -143,25 +100,29 @@ static void OnScrollPositionIntervalReached( float position )
   gOnScrollPositionIntervalReachedSignalCalled = true;
 }
 
-static Vector2 PerformGestureSwipe(ToolkitTestApplication& application, Vector2 start, Vector2 direction, int frames)
+static Vector2 PerformGestureSwipe(ToolkitTestApplication& application, Vector2 start, Vector2 direction, int frames, uint32_t start_time)
 {
   gOnPanFinishedCalled = false;
 
   // Now do a pan starting from (start) and heading (direction)
-  Vector2 pos(start);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
+  Vector2 pos( start + ( direction * 15 ) );
+  uint32_t time = start_time;
+
+  TestStartPan( application, start, pos, time );
+
   Wait(application);
 
   for(int i = 0; i < frames; i++)
   {
     pos += direction; // Move in this direction
-    SendPan(application, Gesture::Continuing, pos);
+    time += RENDER_FRAME_INTERVAL;
+    TestMovePan( application, pos, time);
     Wait(application);
   }
 
   pos += direction; // Move in this direction.
-  SendPan(application, Gesture::Finished, pos);
+  time += RENDER_FRAME_INTERVAL;
+  TestEndPan(application, pos, time );
   Wait(application);
 
   return pos;
@@ -1754,7 +1715,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalP(void)
   application.Render();
 
   // Perform a swipe gesture on the indicator
-  PerformGestureSwipe(application, Vector2(1.0f, 1.0f), Vector2(Vector2::YAXIS * 1.0f), 20);
+  PerformGestureSwipe(application, Vector2(1.0f, 1.0f), Vector2(Vector2::YAXIS * 1.0f), 1, 500);
   DALI_TEST_EQUALS( gOnPanFinishedCalled, true, TEST_LOCATION );
   DALI_TEST_EQUALS( panFinished, true, TEST_LOCATION );
 
@@ -1790,7 +1751,7 @@ int UtcDaliToolkitScrollBarPanFinishedSignalN(void)
   application.Render();
 
   // Perform a vertical swipe gesture on the indicator when there is no source object set on the scroll bar
-  PerformGestureSwipe(application, Vector2(1.0f, 1.0f), Vector2(Vector2::YAXIS * 1.0f), 20);
+  PerformGestureSwipe(application, Vector2(1.0f, 1.0f), Vector2(Vector2::YAXIS * 1.0f), 20, 500);
   DALI_TEST_EQUALS( gOnPanFinishedCalled, false, TEST_LOCATION );
 
   // Create a source actor that owns the scroll properties required by the scroll bar
@@ -1816,12 +1777,12 @@ int UtcDaliToolkitScrollBarPanFinishedSignalN(void)
   application.Render();
 
   // Perform a swipe gesture on the scroll bar but not on the indicator
-  PerformGestureSwipe(application, Vector2(1.0f, 780.0f), Vector2(Vector2::YAXIS * -1.0f), 20);
+  PerformGestureSwipe(application, Vector2(1.0f, 780.0f), Vector2(Vector2::YAXIS * -1.0f), 20, 2000);
   DALI_TEST_EQUALS( gOnPanFinishedCalled, false, TEST_LOCATION );
   DALI_TEST_EQUALS( panFinished, false, TEST_LOCATION );
 
   // Perform a swipe gesture on the indicator
-  PerformGestureSwipe(application, Vector2(1.0f, 1.0f), Vector2(Vector2::YAXIS * 1.0f), 20);
+  PerformGestureSwipe(application, Vector2(1.0f, 1.0f), Vector2(Vector2::YAXIS * 1.0f), 20, 4000);
   DALI_TEST_EQUALS( gOnPanFinishedCalled, true, TEST_LOCATION );
   DALI_TEST_EQUALS( panFinished, true, TEST_LOCATION );
 
