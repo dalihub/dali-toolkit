@@ -1915,6 +1915,146 @@ int UtcDaliImageViewPaddingProperty02(void)
   END_TEST;
 }
 
+int UtcDaliImageViewPaddingProperty03(void)
+{
+  tet_infoline("Test Setting Image Padding then removing it.");
+
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+  Property::Map imagePropertyMap;
+  imagePropertyMap[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imagePropertyMap[ Toolkit::ImageVisual::Property::URL ] = TEST_RESOURCE_DIR "/Kid1.svg" ;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_WIDTH ] = 128;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 128;
+  imagePropertyMap[ DevelVisual::Property::VISUAL_FITTING_MODE ] = Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE , imagePropertyMap );
+  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
+  Stage::GetCurrent().Add( imageView );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Extents>( Control::Property::PADDING ), Extents( 15, 10, 5, 10 ), TEST_LOCATION );
+
+  tet_infoline("Remove Padding and test Visual is position correctly");
+
+  imageView.SetProperty( Control::Property::PADDING, Extents( 0, 0, 0, 0 ) );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( imageView );
+  Toolkit::Visual::Base imageVisual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+  Property::Map resultMap;
+  imageVisual.CreatePropertyMap( resultMap );
+
+  Property::Value* transformValue = resultMap.Find( Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( transformValue );
+  Property::Map* retMap = transformValue->GetMap();
+  DALI_TEST_CHECK( retMap );
+
+  // Image Visual should be positioned depending on ImageView's padding
+  DALI_TEST_EQUALS( retMap->Find( Visual::Transform::Property::OFFSET )->Get< Vector2 >(), Vector2( 0, 0 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewPaddingProperty04(void)
+{
+  tet_infoline("Test Setting Image Padding then removing it. Visual Fitting Mode as Fill");
+
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+  Property::Map imagePropertyMap;
+  imagePropertyMap[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imagePropertyMap[ Toolkit::ImageVisual::Property::URL ] = TEST_RESOURCE_DIR "/Kid1.svg" ;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_WIDTH ] = 128;
+  imagePropertyMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 128;
+  imagePropertyMap[ DevelVisual::Property::VISUAL_FITTING_MODE ] = Toolkit::DevelVisual::FILL;
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE , imagePropertyMap );
+  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
+  Stage::GetCurrent().Add( imageView );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetProperty<Extents>( Control::Property::PADDING ), Extents( 15, 10, 5, 10 ), TEST_LOCATION );
+
+  tet_infoline("Remove Padding and test Visual is position correctly");
+
+  imageView.SetProperty( Control::Property::PADDING, Extents( 0, 0, 0, 0 ) );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( imageView );
+  Toolkit::Visual::Base imageVisual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+  Property::Map resultMap;
+  imageVisual.CreatePropertyMap( resultMap );
+
+  Property::Value* transformValue = resultMap.Find( Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( transformValue );
+  Property::Map* retMap = transformValue->GetMap();
+  DALI_TEST_CHECK( retMap );
+
+  // Image Visual should be positioned depending on ImageView's padding
+  DALI_TEST_EQUALS( retMap->Find( Visual::Transform::Property::OFFSET )->Get< Vector2 >(), Vector2( 0, 0 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewTransformTest01(void)
+{
+  tet_infoline("Test Setting a offset transform on the ImageView");
+
+  ToolkitTestApplication application;
+
+  ImageView imageView = ImageView::New();
+  Property::Map imagePropertyMap;
+  imagePropertyMap.Add( Toolkit::Visual::Property::TYPE,Toolkit::Visual::IMAGE )
+                  .Add( Toolkit::ImageVisual::Property::URL,TEST_RESOURCE_DIR "/Kid1.svg" )
+                  .Add( ImageVisual::Property::DESIRED_WIDTH,120 )
+                  .Add( ImageVisual::Property::DESIRED_HEIGHT,120 )
+                  .Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FILL )
+                  .Add( Visual::Property::TRANSFORM,
+                        Property::Map().Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY,
+                                             Vector2( Visual::Transform::Policy::ABSOLUTE, Visual::Transform::Policy::ABSOLUTE ) )
+                                       .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( 8, 8 ) ) );
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE , imagePropertyMap );
+  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  Stage::GetCurrent().Add( imageView );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check whether Image Visual transforms on ImageVieiw::OnRelayout()
+  Toolkit::Internal::Control& controlImpl = Toolkit::Internal::GetImplementation( imageView );
+  Toolkit::Visual::Base imageVisual = DevelControl::GetVisual( controlImpl, ImageView::Property::IMAGE );
+  Property::Map resultMap;
+  imageVisual.CreatePropertyMap( resultMap );
+
+  Property::Value* transformValue = resultMap.Find( Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( transformValue );
+  Property::Map* retMap = transformValue->GetMap();
+  DALI_TEST_CHECK( retMap );
+
+  // Image Visual should be positioned depending on ImageView's padding
+  DALI_TEST_EQUALS( retMap->Find( Visual::Transform::Property::OFFSET )->Get< Vector2 >(), Vector2( 8, 8 ), TEST_LOCATION );
+  DALI_TEST_EQUALS( retMap->Find( Visual::Transform::Property::OFFSET_POLICY )->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliImageViewUsingAtlasAndGetNaturalSize(void)
 {
   ToolkitTestApplication application;
@@ -1945,7 +2085,7 @@ int UtcDaliImageViewFillMode(void)
   ToolkitTestApplication application;
 
   tet_infoline( "Create an ImageVisual without padding and set the fill-mode to fill" );
-  tet_infoline( "  There should be no need to change the transform, our size-policy should be relative and size shoudl be [1,1]");
+  tet_infoline( "  There should be no need to change the transform, our size-policy should be relative and size should be [1,1]");
 
   ImageView imageView = ImageView::New();
   Property::Map imageMap;

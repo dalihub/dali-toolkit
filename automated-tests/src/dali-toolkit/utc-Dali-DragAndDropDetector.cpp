@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 
 #include <dali-toolkit/devel-api/drag-drop-detector/drag-and-drop-detector.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -91,25 +90,6 @@ namespace
     touchEvent.points.push_back(point);
     return touchEvent;
   }
-
-  Integration::PanGestureEvent GeneratePan(
-    Gesture::State state,
-    Vector2 previousPosition,
-    Vector2 currentPosition,
-    unsigned long timeDelta,
-    unsigned int numberOfTouches = 1,
-    unsigned int time = 1u)
-  {
-    Integration::PanGestureEvent pan(state);
-    pan.previousPosition = previousPosition;
-    pan.currentPosition = currentPosition;
-    pan.timeDelta = timeDelta;
-    pan.numberOfTouches = numberOfTouches;
-    pan.time = time;
-
-    return pan;
-  }
-
 }
 
 int UtcDaliDragAndDropDetectorConstructorN(void)
@@ -305,12 +285,11 @@ int UtcDaliDragAndDropDetectorStartSignal(void)
   DragSignalFunctor functor(data);
   detector.StartedSignal().Connect(&application, functor);
 
-  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
-  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  TestGenerateMiniPan(application);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(control, data.control, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector2(12.0f, 12.0f), data.detector.GetCurrentScreenPosition(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.0f, 40.0f), data.detector.GetCurrentScreenPosition(), TEST_LOCATION);
   data.Reset();
 
   END_TEST;
@@ -345,8 +324,7 @@ int UtcDaliDragAndDropDetectorEnteredSignal(void)
   DragSignalFunctor functor(data);
   detector.EnteredSignal().Connect(&application, functor);
 
-  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
-  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  TestGenerateMiniPan(application);
 
   Vector2 screenCoordinates(10.0f, 110.0f);
   application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
@@ -389,8 +367,7 @@ int UtcDaliDragAndDropDetectorMovedSignal(void)
   DragSignalFunctor functor(data);
   detector.MovedSignal().Connect(&application, functor);
 
-  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
-  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  TestGenerateMiniPan(application);
 
   Vector2 screenCoordinates(10.0f, 110.0f);
   application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
@@ -440,8 +417,7 @@ int UtcDaliDragAndDropDetectorExitedSignal(void)
   DragSignalFunctor functor(data);
   detector.ExitedSignal().Connect(&application, functor);
 
-  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
-  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  TestGenerateMiniPan(application);
 
   Vector2 screenCoordinates(10.0f, 110.0f);
   application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
@@ -486,8 +462,7 @@ int UtcDaliDragAndDropDetectorDroppedSignal(void)
   DragSignalFunctor functor(data);
   detector.DroppedSignal().Connect(&application, functor);
 
-  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
-  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  TestGenerateMiniPan(application);
 
   Vector2 screenCoordinates(10.0f, 110.0f);
   application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));
@@ -535,13 +510,9 @@ int UtcDaliDragAndDropDetectorEndedSignal(void)
   DragSignalFunctor functor(data);
   detector.EndedSignal().Connect(&application, functor);
 
-  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
-  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  TestGenerateMiniPan(application);
 
   application.ProcessEvent(GenerateSingleTouch(TouchPoint::Down, Vector2(10.0f, 10.0f)));
-
-  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(10.0f, 10.0f), Vector2(120.0f, 12.0f), 10));
-  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(120.0f, 12.0f), Vector2(120.0f, 20.0f), 10));
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(control1, data.control, TEST_LOCATION);
@@ -581,8 +552,7 @@ int UtcDaliDragAndDropDetectorGetContent(void)
   DragSignalFunctor functor(data);
   detector.DroppedSignal().Connect(&application, functor);
 
-  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
-  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 10.0f), Vector2(12.0f, 12.0f), 10));
+  TestGenerateMiniPan(application);
 
   Vector2 screenCoordinates(10.0f, 110.0f);
   application.ProcessEvent(GenerateSingleTouch(TouchPoint::Motion, screenCoordinates));

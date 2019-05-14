@@ -43,6 +43,7 @@ static int gInstanceCount = 0;
 bool OnGoBack();
 bool OnGoForward();
 bool OnLoadUrl();
+bool OnEvaluteJavaScript();
 bool OnClearHistory();
 
 static void ConnectToGlobalSignal( bool (*func)() )
@@ -65,6 +66,14 @@ public:
   WebEngine()
     : mUrl()
     , mCurrentPlusOnePos( 0 )
+    , mCacheModel( Dali::WebEnginePlugin::CacheModel::DOCUMENT_VIEWER )
+    , mCookieAcceptPolicy( Dali::WebEnginePlugin::CookieAcceptPolicy::NO_THIRD_PARTY )
+    , mUserAgent()
+    , mEnableJavaScript( true )
+    , mLoadImagesAutomatically( true )
+    , mDefaultTextEncodingName()
+    , mDefaultFontSize( 16 )
+    , mEvaluating( false )
   {
     gInstanceCount++;
     gInstance = this;
@@ -73,7 +82,7 @@ public:
   virtual ~WebEngine()
   {
     gInstanceCount--;
-    if ( !gInstanceCount )
+    if( !gInstanceCount )
     {
       gInstance = NULL;
     }
@@ -110,26 +119,123 @@ public:
     ConnectToGlobalSignal( &OnGoBack );
   }
 
+  void EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler )
+  {
+    if( resultHandler )
+    {
+      if( !mEvaluating )
+      {
+        ConnectToGlobalSignal( &OnEvaluteJavaScript );
+      }
+      mResultCallbacks.push_back( resultHandler );
+    }
+  }
+
   void ClearHistory()
   {
     ConnectToGlobalSignal( &OnClearHistory );
   }
 
-  Dali::WebEnginePlugin::WebEngineSignalType& PageLoadStartedSignal()
+  Dali::WebEnginePlugin::CacheModel GetCacheModel() const
+  {
+    return mCacheModel;
+  }
+
+  void SetCacheModel( Dali::WebEnginePlugin::CacheModel cacheModel )
+  {
+    mCacheModel = cacheModel;
+  }
+
+  Dali::WebEnginePlugin::CookieAcceptPolicy GetCookieAcceptPolicy() const
+  {
+    return mCookieAcceptPolicy;
+  }
+
+  void SetCookieAcceptPolicy( Dali::WebEnginePlugin::CookieAcceptPolicy policy )
+  {
+    mCookieAcceptPolicy = policy;
+  }
+
+  const std::string& GetUserAgent() const
+  {
+    return mUserAgent;
+  }
+
+  void SetUserAgent( const std::string& userAgent )
+  {
+    mUserAgent = userAgent;
+  }
+
+  bool IsJavaScriptEnabled() const
+  {
+    return mEnableJavaScript;
+  }
+
+  void EnableJavaScript( bool enabled )
+  {
+    mEnableJavaScript = enabled;
+  }
+
+  bool AreImagesAutomaticallyLoaded() const
+  {
+    return mLoadImagesAutomatically;
+  }
+
+  void LoadImagesAutomatically( bool automatic )
+  {
+    mLoadImagesAutomatically = automatic;
+  }
+
+  const std::string& GetDefaultTextEncodingName() const
+  {
+    return mDefaultTextEncodingName;
+  }
+
+  void SetDefaultTextEncodingName( const std::string& defaultTextEncodingName )
+  {
+    mDefaultTextEncodingName = defaultTextEncodingName;
+  }
+
+  int GetDefaultFontSize() const
+  {
+    return mDefaultFontSize;
+  }
+
+  void SetDefaultFontSize( int defaultFontSize )
+  {
+    mDefaultFontSize = defaultFontSize;
+  }
+
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadStartedSignal()
   {
     return mPageLoadStartedSignal;
   }
 
-  Dali::WebEnginePlugin::WebEngineSignalType& PageLoadFinishedSignal()
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType& PageLoadFinishedSignal()
   {
     return mPageLoadFinishedSignal;
   }
 
-  std::string mUrl;
-  std::vector< std::string > mHistory;
-  size_t mCurrentPlusOnePos;
-  Dali::WebEnginePlugin::WebEngineSignalType mPageLoadStartedSignal;
-  Dali::WebEnginePlugin::WebEngineSignalType mPageLoadFinishedSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType& PageLoadErrorSignal()
+  {
+    return mPageLoadErrorSignal;
+  }
+
+  std::string                                                mUrl;
+  std::vector< std::string >                                 mHistory;
+  size_t                                                     mCurrentPlusOnePos;
+  Dali::WebEnginePlugin::CacheModel                          mCacheModel;
+  Dali::WebEnginePlugin::CookieAcceptPolicy                  mCookieAcceptPolicy;
+  std::string                                                mUserAgent;
+  bool                                                       mEnableJavaScript;
+  bool                                                       mLoadImagesAutomatically;
+  std::string                                                mDefaultTextEncodingName;
+  int                                                        mDefaultFontSize;
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType         mPageLoadStartedSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadSignalType         mPageLoadFinishedSignal;
+  Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType    mPageLoadErrorSignal;
+  std::vector< std::function< void( const std::string& ) > > mResultCallbacks;
+  bool                                                       mEvaluating;
 };
 
 inline WebEngine& GetImplementation( Dali::WebEngine& webEngine )
@@ -153,7 +259,7 @@ bool OnGoBack()
 {
   DisconnectFromGlobalSignal( &OnGoBack );
 
-  if ( gInstance && gInstance->CanGoBack() )
+  if( gInstance && gInstance->CanGoBack() )
   {
     gInstance->mCurrentPlusOnePos--;
   }
@@ -164,7 +270,7 @@ bool OnGoForward()
 {
   DisconnectFromGlobalSignal( &OnGoForward );
 
-  if ( gInstance && gInstance->CanGoForward() )
+  if( gInstance && gInstance->CanGoForward() )
   {
     gInstance->mCurrentPlusOnePos++;
   }
@@ -175,9 +281,9 @@ bool OnLoadUrl()
 {
   DisconnectFromGlobalSignal( &OnLoadUrl );
 
-  if ( gInstance )
+  if( gInstance )
   {
-    if ( gInstance->mHistory.size() > gInstance->mCurrentPlusOnePos )
+    if( gInstance->mHistory.size() > gInstance->mCurrentPlusOnePos )
     {
       gInstance->mHistory.erase( gInstance->mHistory.begin() + gInstance->mCurrentPlusOnePos, gInstance->mHistory.end() );
     }
@@ -186,7 +292,21 @@ bool OnLoadUrl()
     gInstance->mPageLoadStartedSignal.Emit( gInstance->mUrl );
     gInstance->mPageLoadFinishedSignal.Emit( gInstance->mUrl );
   }
+  return false;
+}
 
+bool OnEvaluteJavaScript()
+{
+  DisconnectFromGlobalSignal( &OnEvaluteJavaScript );
+
+  if( gInstance )
+  {
+    for( auto& func : gInstance->mResultCallbacks )
+    {
+      func("undefined");
+    }
+    gInstance->mResultCallbacks.clear();
+  }
   return false;
 }
 
@@ -194,7 +314,7 @@ bool OnClearHistory()
 {
   DisconnectFromGlobalSignal( &OnClearHistory );
 
-  if ( gInstance && gInstance->mCurrentPlusOnePos ) {
+  if( gInstance && gInstance->mCurrentPlusOnePos ) {
     std::string url = gInstance->mHistory[ gInstance->mCurrentPlusOnePos - 1 ];
     std::vector< std::string >().swap( gInstance->mHistory );
     gInstance->mHistory.push_back( url );
@@ -283,6 +403,14 @@ void WebEngine::StopLoading()
 {
 }
 
+void WebEngine::Suspend()
+{
+}
+
+void WebEngine::Resume()
+{
+}
+
 bool WebEngine::CanGoForward()
 {
   return Internal::Adaptor::GetImplementation( *this ).CanGoForward();
@@ -303,8 +431,9 @@ void WebEngine::GoBack()
   Internal::Adaptor::GetImplementation( *this ).GoBack();
 }
 
-void WebEngine::EvaluateJavaScript( const std::string& script )
+void WebEngine::EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler )
 {
+  Internal::Adaptor::GetImplementation( *this ).EvaluateJavaScript( script, resultHandler );
 }
 
 void WebEngine::AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void(const std::string&) > handler )
@@ -318,6 +447,80 @@ void WebEngine::ClearHistory()
 
 void WebEngine::ClearCache()
 {
+}
+
+void WebEngine::ClearCookies()
+{
+}
+
+Dali::WebEnginePlugin::CacheModel WebEngine::GetCacheModel() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetCacheModel();
+}
+
+void WebEngine::SetCacheModel( Dali::WebEnginePlugin::CacheModel cacheModel )
+{
+  Internal::Adaptor::GetImplementation( *this ).SetCacheModel( cacheModel );
+}
+
+Dali::WebEnginePlugin::CookieAcceptPolicy WebEngine::GetCookieAcceptPolicy() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetCookieAcceptPolicy();
+}
+
+void WebEngine::SetCookieAcceptPolicy( Dali::WebEnginePlugin::CookieAcceptPolicy policy )
+{
+  Internal::Adaptor::GetImplementation( *this ).SetCookieAcceptPolicy( policy );
+}
+
+const std::string& WebEngine::GetUserAgent() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetUserAgent();
+}
+
+void WebEngine::SetUserAgent( const std::string& userAgent )
+{
+  Internal::Adaptor::GetImplementation( *this ).SetUserAgent( userAgent );
+}
+
+bool WebEngine::IsJavaScriptEnabled() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).IsJavaScriptEnabled();
+}
+
+void WebEngine::EnableJavaScript( bool enabled )
+{
+  Internal::Adaptor::GetImplementation( *this ).EnableJavaScript( enabled );
+}
+
+bool WebEngine::AreImagesAutomaticallyLoaded() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).AreImagesAutomaticallyLoaded();
+}
+
+void WebEngine::LoadImagesAutomatically( bool automatic )
+{
+  Internal::Adaptor::GetImplementation( *this ).LoadImagesAutomatically( automatic );
+}
+
+const std::string& WebEngine::GetDefaultTextEncodingName() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetDefaultTextEncodingName();
+}
+
+void WebEngine::SetDefaultTextEncodingName( const std::string& defaultTextEncodingName )
+{
+  Internal::Adaptor::GetImplementation( *this ).SetDefaultTextEncodingName( defaultTextEncodingName );
+}
+
+int WebEngine::GetDefaultFontSize() const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetDefaultFontSize();
+}
+
+void WebEngine::SetDefaultFontSize( int defaultFontSize )
+{
+  Internal::Adaptor::GetImplementation( *this ).SetDefaultFontSize( defaultFontSize );
 }
 
 void WebEngine::SetSize( int width, int height )
@@ -334,14 +537,19 @@ bool WebEngine::SendKeyEvent( const KeyEvent& event )
   return true;
 }
 
-Dali::WebEnginePlugin::WebEngineSignalType& WebEngine::PageLoadStartedSignal()
+Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadStartedSignal()
 {
   return Internal::Adaptor::GetImplementation( *this ).PageLoadStartedSignal();
 }
 
-Dali::WebEnginePlugin::WebEngineSignalType& WebEngine::PageLoadFinishedSignal()
+Dali::WebEnginePlugin::WebEnginePageLoadSignalType& WebEngine::PageLoadFinishedSignal()
 {
   return Internal::Adaptor::GetImplementation( *this ).PageLoadFinishedSignal();
+}
+
+Dali::WebEnginePlugin::WebEnginePageLoadErrorSignalType& WebEngine::PageLoadErrorSignal()
+{
+  return Internal::Adaptor::GetImplementation( *this ).PageLoadErrorSignal();
 }
 
 } // namespace Dali;

@@ -297,7 +297,7 @@ void ViewModel::ElideGlyphs()
             // Need to reshape the glyph as the font may be different in size.
             const GlyphInfo& ellipsisGlyph = fontClient.GetEllipsisGlyph( fontClient.GetPointSize( glyphToRemove.fontId ) );
 
-            if( !firstPenSet )
+            if( !firstPenSet || glyphToRemove.advance == 0.f )
             {
               const Vector2& position = *( elidedPositionsBuffer + index );
 
@@ -332,6 +332,11 @@ void ViewModel::ElideGlyphs()
               glyphInfo = ellipsisGlyph;
 
               // Change the 'x' and 'y' position of the ellipsis glyph.
+              if( position.x > firstPenX )
+              {
+                position.x = firstPenX + removedGlypsWidth - ellipsisGlyphWidth;
+              }
+
               position.x += ellipsisGlyph.xBearing;
               position.y = penY - ellipsisGlyph.yBearing;
 

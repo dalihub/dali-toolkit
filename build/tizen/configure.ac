@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2016 Samsung Electronics Co., Ltd.
+# Copyright (c) 2019 Samsung Electronics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,24 +74,13 @@ AC_ARG_ENABLE([csharp],
               [enable_csharp=$enableval],
               [enable_csharp=automatic])
 
-AC_ARG_ENABLE([cxx03_abi],
-              [AC_HELP_STRING([--enable-cxx03-abi],
-                              [Specify abi for the build])],
-              [enable_cxx03_abi=$enableval],
-              [enable_cxx03_abi=no])
-
 AC_ARG_ENABLE([rename_so],
               [AC_HELP_STRING([--enable-rename-so],
                               [Specify whether so file is renamed or not])],
               [enable_rename_so=$enableval],
               [enable_rename_so=yes])
 
-AM_CONDITIONAL([ENABLE_CXX03_ABI], [test x$enable_cxx03_abi = xyes])
 AM_CONDITIONAL([ENABLE_RENAME_SO], [test x$enable_rename_so = xyes])
-
-if test "x$enable_cxx03_abi" = "xyes"; then
-  DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -D_GLIBCXX_USE_CXX11_ABI=0"
-fi
 
 if test "x$enable_debug" = "xyes"; then
   DALI_TOOLKIT_CFLAGS="$DALI_TOOLKIT_CFLAGS -DDEBUG_ENABLED"
@@ -195,13 +184,8 @@ DOXYGEN_ROOT_DIR=../../..
 AC_SUBST(DOXYGEN_DOCS_DIR)
 AC_SUBST(DOXYGEN_ROOT_DIR)
 
-if test "x$enable_cxx03_abi" = "xyes"; then
-PKG_CHECK_MODULES(DALI, dali-core-cxx03)
-PKG_CHECK_MODULES(DALIDAPTOR, dali-adaptor-cxx03)
-else
 PKG_CHECK_MODULES(DALICORE, dali-core)
 PKG_CHECK_MODULES(DALIADAPTOR, dali-adaptor)
-fi
 
 # Enable csharp plugin
 build_csharp_plugin=no
@@ -244,11 +228,8 @@ AC_CONFIG_FILES([
  docs/dali.doxy
  docs-internal/dali-internal.doxy
  ../../automated-tests/CMakeLists.txt
+ dali-toolkit.pc
 ])
-
-if test "x$enable_cxx03_abi" = "xno"; then
-AC_CONFIG_FILES([dali-toolkit.pc])
-fi
 
 AC_OUTPUT
 

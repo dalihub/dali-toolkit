@@ -53,6 +53,60 @@ class DALI_TOOLKIT_API WebView : public Control
 public:
 
   /**
+   * @brief A structure used to contain the cache model enumeration.
+   */
+  struct CacheModel
+  {
+    /**
+     * @brief Enumeration for cache model options.
+     */
+    enum Type
+    {
+      /**
+       * @brief Use the smallest cache capacity.
+       */
+      DOCUMENT_VIEWER,
+
+      /**
+       * @brief Use the bigger cache capacity than DocumentBrowser.
+       */
+      DOCUMENT_BROWSER,
+
+      /**
+       * @brief Use the biggest cache capacity.
+       */
+      PRIMARY_WEB_BROWSER
+    };
+  };
+
+  /**
+   * @brief A structure used to contain the cookie acceptance policy enumeration.
+   */
+  struct CookieAcceptPolicy
+  {
+    /**
+     * @brief Enumeration for the cookies accept policies.
+     */
+    enum Type
+    {
+      /**
+       * @brief Accepts every cookie sent from any page.
+       */
+      ALWAYS,
+
+      /**
+       * @brief Rejects all the cookies.
+       */
+      NEVER,
+
+      /**
+       * @brief Accepts only cookies set by the main document that is loaded.
+       */
+      NO_THIRD_PARTY
+    };
+  };
+
+  /**
    * @brief Enumeration for the start and end property ranges for this control.
    */
   enum PropertyRange
@@ -69,15 +123,153 @@ public:
     enum
     {
       /**
-       * @brief name "url", type string
-       *
-       * @details Sets the url to load
+       * @brief The url to load.
+       * @details name "url", type Property::STRING.
        */
-      URL = PROPERTY_START_INDEX
+      URL = PROPERTY_START_INDEX,
+
+      /**
+       * @brief The cache model.
+       * @details Name "cacheModel", type WebView::CacheModel::Type (Property::INTEGER) or Property::STRING.
+       * @note Default is WebView::CacheModel::DOCUMENT_VIEWER.
+       * @see WebView::CacheModel::Type
+       */
+      CACHE_MODEL,
+
+      /**
+       * @brief The cookie acceptance policy.
+       * @details Name "cookieAcceptPolicy", type WebView::CookieAcceptPolicy::Type (Property::INTEGER) or Property::STRING.
+       * @note Default is WebView::CookieAcceptPolicy::NO_THIRD_PARTY.
+       * @see WebView::CookieAcceptPolicy::Type
+       */
+      COOKIE_ACCEPT_POLICY,
+
+      /**
+       * @brief The user agent string.
+       * @details Name "userAgent", type Property::STRING.
+       */
+      USER_AGENT,
+
+      /**
+       * @brief Whether JavaScript is enabled.
+       * @details Name "enableJavaScript", type Property::BOOLEAN.
+       * @note Default is true.
+       */
+      ENABLE_JAVASCRIPT,
+
+      /**
+       * @brief Whether images can be loaded automatically.
+       * @details Name "loadImagesAutomatically", type Property::BOOLEAN.
+       * @note Default is true.
+       */
+      LOAD_IMAGES_AUTOMATICALLY,
+
+      /**
+       * @brief The default text encoding name.
+       * @details Name "defaultTextEncodingName", type Property::STRING.
+       * @note If the value is not set, the web engine detects web page's text encoding.
+       */
+      DEFAULT_TEXT_ENCODING_NAME,
+
+      /**
+       * @brief The default font size in pixel.
+       * @details Name "defaultFontSize", type Property::INT.
+       * @note Default is 16.
+       */
+      DEFAULT_FONT_SIZE
     };
   };
 
-  typedef Signal< void ( WebView, const std::string& ) > WebViewSignalType;
+  /**
+   * @brief Enumeration for indicating error code of page loading.
+   */
+  enum class LoadErrorCode
+  {
+    /**
+     * @brief Unknown.
+     */
+    UNKNOWN = 0,
+
+    /**
+     * @brief User canceled.
+     */
+    CANCELED,
+
+    /**
+     * @brief Can't show the page for this MIME type.
+     */
+    CANT_SUPPORT_MIMETYPE,
+
+    /**
+     * @brief File IO error.
+     */
+    FAILED_FILE_IO,
+
+    /**
+     * @brief Cannot connect to the network.
+     */
+    CANT_CONNECT,
+
+    /**
+     * @brief Fail to look up host from the DNS.
+     */
+    CANT_LOOKUP_HOST,
+
+    /**
+     * @brief Fail to SSL/TLS handshake.
+     */
+    FAILED_TLS_HANDSHAKE,
+
+    /**
+     * @brief Received certificate is invalid.
+     */
+    INVALID_CERTIFICATE,
+
+    /**
+     * @brief Connection timeout.
+     */
+    REQUEST_TIMEOUT,
+
+    /**
+     * @brief Too many redirects.
+     */
+    TOO_MANY_REDIRECTS,
+
+    /**
+     * @brief Too many requests during this load.
+     */
+    TOO_MANY_REQUESTS,
+
+    /**
+     * @brief Malformed URL.
+     */
+    BAD_URL,
+
+    /**
+     * @brief Unsupported scheme.
+     */
+    UNSUPPORTED_SCHEME,
+
+    /**
+     * @brief User authentication failed on the server.
+     */
+    AUTHENTICATION,
+
+    /**
+     * @brief Web server has an internal server error.
+     */
+    INTERNAL_SERVER
+  };
+
+  /**
+   * @brief WebView signal type related with page loading.
+   */
+  typedef Signal< void ( WebView, const std::string& ) > WebViewPageLoadSignalType;
+
+  /**
+   * @brief WebView signal type related with page loading error.
+   */
+  typedef Signal< void ( WebView, const std::string&, LoadErrorCode ) > WebViewPageLoadErrorSignalType;
 
 public:
 
@@ -143,13 +335,6 @@ public:
   void LoadUrl( const std::string& url );
 
   /**
-   * @brief Returns the URL of the Web.
-   *
-   * @return Url of string type
-   */
-  const std::string& GetUrl();
-
-  /**
    * @brief Loads a given string as web contents.
    *
    * @param [in] htmlString The string to use as the contents of the web page
@@ -165,6 +350,16 @@ public:
    * @brief Stops loading web contents on the current page.
    */
   void StopLoading();
+
+  /**
+   * @brief Suspends the operation associated with the view.
+   */
+  void Suspend();
+
+  /**
+   * @brief Resumes the operation associated with the view object after calling Suspend().
+   */
+  void Resume();
 
   /**
    * @brief Returns whether forward is possible.
@@ -189,6 +384,14 @@ public:
    * @brief Goes back in the navigation history.
    */
   void GoBack();
+
+  /**
+   * @brief Evaluates JavaScript code represented as a string.
+   *
+   * @param[in] script The JavaScript code
+   * @param[in] resultHandler The callback function to be called by the JavaScript runtime. This carries evaluation result.
+   */
+  void EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler );
 
   /**
    * @brief Evaluates JavaScript code represented as a string.
@@ -234,18 +437,30 @@ public:
   void ClearCache();
 
   /**
+   * @brief Clears all the cookies of Web.
+   */
+  void ClearCookies();
+
+  /**
    * @brief Connects to this signal to be notified when page loading is started.
    *
    * @return A signal object to connect with
    */
-  WebViewSignalType& PageLoadStartedSignal();
+  WebViewPageLoadSignalType& PageLoadStartedSignal();
 
   /**
    * @brief Connects to this signal to be notified when page loading is finished.
    *
    * @return A signal object to connect with
    */
-  WebViewSignalType& PageLoadFinishedSignal();
+  WebViewPageLoadSignalType& PageLoadFinishedSignal();
+
+  /**
+   * @brief Connects to this signal to be notified when an error occurs in page loading.
+   *
+   * @return A signal object to connect with.
+   */
+  WebViewPageLoadErrorSignalType& PageLoadErrorSignal();
 
 public: // Not intended for application developers
 

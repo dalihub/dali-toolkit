@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_MANAGER_H__
-#define __DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_MANAGER_H__
+#ifndef DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_MANAGER_H
+#define DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_MANAGER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/adaptor-framework/accessibility-action-handler.h>
 #include <dali/devel-api/adaptor-framework/accessibility-gesture-handler.h>
+#include <dali/devel-api/adaptor-framework/accessibility-gesture-event.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
@@ -498,7 +498,7 @@ private:
    * @param[in]  panEvent  The pan event to be handled.
    * @return whether the gesture is handled successfully or not.
    */
-  virtual bool HandlePanGesture(const Integration::PanGestureEvent& panEvent);
+  virtual bool HandlePanGesture(const AccessibilityGestureEvent& panEvent);
 
   /**
    * Change the accessibility status when Accessibility feature(screen-reader) turned on or off.
@@ -765,4 +765,4 @@ inline const Internal::AccessibilityManager& GetImpl(const Dali::Toolkit::Access
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_MANAGER_H__
+#endif // DALI_TOOLKIT_INTERNAL_ACCESSIBILITY_MANAGER_H
