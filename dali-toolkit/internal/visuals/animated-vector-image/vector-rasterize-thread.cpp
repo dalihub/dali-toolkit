@@ -377,6 +377,8 @@ void VectorRasterizeThread::Rasterize()
         {
           mPlayState = DevelImageVisual::PlayState::STOPPED;
 
+          ResetToStart( mCurrentFrameUpdated, mCurrentFrame, startFrame, mConditionalWait );
+
           // Animation is finished
           mAnimationFinishedTrigger->Trigger();
 
