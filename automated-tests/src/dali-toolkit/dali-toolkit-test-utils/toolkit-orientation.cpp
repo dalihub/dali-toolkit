@@ -42,21 +42,7 @@ struct RotationEvent
   int height;    ///< new window height
 };
 
-/**
- * The RotationObserver can be overridden in order to listen to rotation events.
- */
-class RotationObserver
-{
-public:
-  virtual void OnRotationPrepare( const RotationEvent& rotation ) = 0;
-  virtual void OnRotationRequest( ) = 0;
-
-protected:
-  RotationObserver(){}
-  virtual ~RotationObserver(){}
-};
-
-class Orientation : public BaseObject, public RotationObserver
+class Orientation : public BaseObject
 {
 public:
   typedef Dali::Orientation::OrientationSignalType OrientationSignalType;
@@ -75,9 +61,6 @@ protected:
   {
   }
 public:
-  void SetAdaptor(Dali::Adaptor& adaptor)
-  {
-  }
   int GetDegrees() const
   {
     return 0;
@@ -86,16 +69,13 @@ public:
   {
     return 0.0f;
   }
+  void OnOrientationChanged( const RotationEvent& rotation )
+  {
+  }
   OrientationSignalType& ChangedSignal()
   {
     return mChangedSignal;
   }
-  virtual void OnRotationPrepare( const RotationEvent& rotation )
-  {
-  };
-  virtual void OnRotationRequest( )
-  {
-  };
 
 private:
   Orientation(const Orientation&);
