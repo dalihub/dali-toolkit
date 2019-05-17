@@ -68,74 +68,89 @@ public:
   void LoadUrl( const std::string& url );
 
   /**
-   * @copydoc Dali::Toolkit::WebView::GetUrl()
-   */
-  const std::string& GetUrl();
-
-  /**
    * @copydoc Dali::WebEngine::LoadHTMLString()
    */
   void LoadHTMLString( const std::string& htmlString );
 
   /**
-   * @copydoc Dali::WebEngine::Reload()
+   * @copydoc Dali::Toolkit::WebView::Reload()
    */
   void Reload();
 
   /**
-   * @copydoc Dali::WebEngine::StopLoading()
+   * @copydoc Dali::Toolkit::WebView::StopLoading()
    */
   void StopLoading();
 
   /**
-   * @copydoc Dali::WebEngine::CanGoForward()
+   * @copydoc Dali::Toolkit::WebView::StopLoading()
+   */
+  void Suspend();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::Resume()
+   */
+  void Resume();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::CanGoForward()
    */
   bool CanGoForward();
 
   /**
-   * @copydoc Dali::WebEngine::GoForward()
+   * @copydoc Dali::Toolkit::WebView::GoForward()
    */
   void GoForward();
 
   /**
-   * @copydoc Dali::WebEngine::CanGoBack()
+   * @copydoc Dali::Toolkit::WebView::CanGoBack()
    */
   bool CanGoBack();
 
   /**
-   * @copydoc Dali::WebEngine::GoBack()
+   * @copydoc Dali::Toolkit::WebView::GoBack()
    */
   void GoBack();
 
   /**
-   * @copydoc Dali::WebEngine::EvaluateJavaScript()
+   * @copydoc Dali::Toolkit::WebView::EvaluateJavaScript()
    */
-  void EvaluateJavaScript( const std::string& script );
+  void EvaluateJavaScript( const std::string& script, std::function< void( const std::string& ) > resultHandler );
 
   /**
-   * @copydoc Dali::WebEngine::AddJavaScriptMessageHandler()
+   * @copydoc Dali::Toolkit::WebView::AddJavaScriptMessageHandler()
    */
   void AddJavaScriptMessageHandler( const std::string& exposedObjectName, std::function< void( const std::string& ) > handler );
 
   /**
-   * @copydoc Dali::WebEngine::ClearHistory()
+   * @copydoc Dali::Toolkit::WebView::ClearHistory()
    */
   void ClearHistory();
 
   /**
-   * @copydoc Dali::WebEngine::ClearCache()
+   * @copydoc Dali::Toolkit::WebView::ClearCache()
    */
   void ClearCache();
 
   /**
+   * @copydoc Dali::Toolkit::WebView::ClearCookies()
+   */
+  void ClearCookies();
+
+  /**
    * @copydoc Dali::Toolkit::WebView::PageLoadStartedSignal()
    */
-  Dali::Toolkit::WebView::WebViewSignalType& PageLoadStartedSignal();
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadStartedSignal();
 
   /**
    * @copydoc Dali::Toolkit::WebView::PageLoadFinishedSignal()
    */
-  Dali::Toolkit::WebView::WebViewSignalType& PageLoadFinishedSignal();
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType& PageLoadFinishedSignal();
+
+  /**
+   * @copydoc Dali::Toolkit::WebView::PageLoadErrorSignal()
+   */
+  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType& PageLoadErrorSignal();
 
 public: // Properties
 
@@ -205,18 +220,129 @@ private:
 
   WebView& operator=( const WebView& webView );
 
+  /**
+   * @brief Get cache model option. The default isToolkit::WebView::CacheModel::DOCUMENT_VIEWER.
+   * @see Toolkit::WebView::CacheModel::Type
+   */
+  Toolkit::WebView::CacheModel::Type GetCacheModel() const;
+
+  /**
+   * @brief Set cache model option. The default isToolkit::WebView::CacheModel::DOCUMENT_VIEWER.
+   * @param[in] cacheModel The cache model option
+   * @see Toolkit::WebView::CacheModel::Type
+   */
+  void SetCacheModel( Toolkit::WebView::CacheModel::Type cacheModel );
+
+  /**
+   * @brief Gets the cookie acceptance policy. The default is Toolkit::WebView::CookieAcceptPolicy::NO_THIRD_PARTY.
+   * @see Toolkit::WebView::CookieAcceptPolicy::Type
+   */
+  Toolkit::WebView::CookieAcceptPolicy::Type GetCookieAcceptPolicy() const;
+
+  /**
+   * @brief Sets the cookie acceptance policy. The default is Toolkit::WebView::CookieAcceptPolicy::NO_THIRD_PARTY.
+   * @param[in] policy The cookie acceptance policy
+   * @see Toolkit::WebView::CookieAcceptPolicy::Type
+   */
+  void SetCookieAcceptPolicy( Toolkit::WebView::CookieAcceptPolicy::Type policy );
+
+  /**
+   * @brief Get user agent string.
+   * @return The string value of user agent
+   */
+  const std::string& GetUserAgent() const;
+
+  /**
+   * @brief Set user agent string.
+   * @param[in] userAgent The string value of user agent
+   */
+  void SetUserAgent( const std::string& userAgent );
+
+  /**
+   * @brief Returns whether JavaScript can be executable. The default is true.
+   *
+   * @return true if JavaScript executing is enabled, false otherwise
+   */
+  bool IsJavaScriptEnabled() const;
+
+  /**
+   * @brief Enables/disables JavaScript executing. The default is enabled.
+   *
+   * @param[in] enabled True if JavaScript executing is enabled, false otherwise
+   */
+  void EnableJavaScript( bool enabled );
+
+  /**
+   * @brief Returns whether images can be loaded automatically. The default is true.
+   *
+   * @return true if images are loaded automatically, false otherwise
+   */
+  bool AreImagesAutomaticallyLoaded() const;
+
+  /**
+   * @brief Enables/disables auto loading of images. The default is enabled.
+   *
+   * @param[in] automatic True if images are loaded automatically, false otherwise
+   */
+  void LoadImagesAutomatically( bool automatic );
+
+  /**
+   * @brief Gets the default text encoding name (e.g. UTF-8).
+   *
+   * @return The default text encoding name
+   */
+  const std::string& GetDefaultTextEncodingName() const;
+
+  /**
+   * @brief Sets the default text encoding name (e.g. UTF-8).
+   *
+   * @param[in] defaultTextEncodingName The default text encoding name
+   */
+  void SetDefaultTextEncodingName( const std::string& defaultTextEncodingName );
+
+  /**
+   * @brief Returns the default font size in pixel. The default value is 16.
+   *
+   * @return The default font size
+   */
+  int GetDefaultFontSize() const;
+
+  /**
+   * @brief Sets the default font size in pixel. The default value is 16.
+   *
+   * @param[in] defaultFontSize A new default font size to set
+   */
+  void SetDefaultFontSize( int defaultFontSize );
+
+  /**
+   * @brief Callback function to be called when page load started.
+   * @param[in] url The url currently being loaded
+   */
   void OnPageLoadStarted( const std::string& url );
 
+  /**
+   * @brief Callback function to be called when page load finished.
+   * @param[in] url The url currently being loaded
+   */
   void OnPageLoadFinished( const std::string& url );
+
+  /**
+   * @brief Callback function to be called when there is an error in page loading.
+   * @param[in] url The url currently being loaded
+   * @param[in] errorCode The error code
+   */
+  void OnPageLoadError( const std::string& url, int errorCode );
 
 private:
 
-  std::string mUrl;
-  Dali::Toolkit::Visual::Base mVisual;
-  Dali::Size mWebViewSize;
-  Dali::WebEngine mWebEngine;
-  Dali::Toolkit::WebView::WebViewSignalType mPageLoadStartedSignal;
-  Dali::Toolkit::WebView::WebViewSignalType mPageLoadFinishedSignal;
+  std::string                                            mUrl;
+  Dali::Toolkit::Visual::Base                            mVisual;
+  Dali::Size                                             mWebViewSize;
+  Dali::WebEngine                                        mWebEngine;
+
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadStartedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadSignalType      mPageLoadFinishedSignal;
+  Dali::Toolkit::WebView::WebViewPageLoadErrorSignalType mPageLoadErrorSignal;
 };
 
 } // namespace Internal

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 // CLASS HEADER
 #include <dali/integration-api/adaptors/adaptor.h>
+#include <dali/integration-api/adaptors/scene-holder.h>
 
 #include <dali/public-api/object/base-object.h>
 
@@ -78,6 +79,26 @@ Adaptor& Adaptor::New( Window window, const Dali::RenderSurfaceInterface& surfac
   return Internal::Adaptor::Adaptor::Get();
 }
 
+Adaptor& Adaptor::New( Dali::Integration::SceneHolder window )
+{
+  return Internal::Adaptor::Adaptor::Get();
+}
+
+Adaptor& Adaptor::New( Dali::Integration::SceneHolder window, Configuration::ContextLoss configuration )
+{
+  return Internal::Adaptor::Adaptor::Get();
+}
+
+Adaptor& Adaptor::New( Dali::Integration::SceneHolder window, const Dali::RenderSurfaceInterface& surface )
+{
+  return Internal::Adaptor::Adaptor::Get();
+}
+
+Adaptor& Adaptor::New( Dali::Integration::SceneHolder window, const Dali::RenderSurfaceInterface& surface, Configuration::ContextLoss configuration )
+{
+  return Internal::Adaptor::Adaptor::Get();
+}
+
 Adaptor::~Adaptor()
 {
 }
@@ -134,6 +155,10 @@ void Adaptor::ReplaceSurface( Window window, Dali::RenderSurfaceInterface& surfa
 {
 }
 
+void Adaptor::ReplaceSurface( Dali::Integration::SceneHolder window, Dali::RenderSurfaceInterface& surface )
+{
+}
+
 Adaptor::AdaptorSignalType& Adaptor::ResizedSignal()
 {
   return Internal::Adaptor::Adaptor::AdaptorSignal();
@@ -182,10 +207,6 @@ void Adaptor::NotifySceneCreated()
 }
 
 void Adaptor::NotifyLanguageChanged()
-{
-}
-
-void Adaptor::SetMinimumPinchDistance(float distance)
 {
 }
 

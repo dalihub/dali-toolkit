@@ -20,7 +20,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -84,48 +83,6 @@ const float TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION = 1.5f;            ///< another
 const float TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION = TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION * 0.5f; // Same as above, but different alpha function.
 const float TIME_TOLERANCE = 0.05f;                                 ///< Allow testing tolerance between a 10th of second (+/- 3 frames)
 
-
-// Generate a PanGestureEvent to send to Core
-Integration::PanGestureEvent GeneratePan(
-    Gesture::State state,
-    const Vector2& previousPosition,
-    const Vector2& currentPosition,
-    unsigned long timeDelta,
-    unsigned int numberOfTouches = 1)
-{
-  Integration::PanGestureEvent pan(state);
-
-  pan.previousPosition = previousPosition;
-  pan.currentPosition = currentPosition;
-  pan.timeDelta = timeDelta;
-  pan.numberOfTouches = numberOfTouches;
-
-  return pan;
-}
-
-/**
- * Helper to generate PanGestureEvent
- *
- * @param[in] application Application instance
- * @param[in] state The Gesture State
- * @param[in] pos The current position of touch.
- */
-static void SendPan(ToolkitTestApplication& application, Gesture::State state, const Vector2& pos)
-{
-  static Vector2 last;
-
-  if( (state == Gesture::Started) ||
-      (state == Gesture::Possible) )
-  {
-    last.x = pos.x;
-    last.y = pos.y;
-  }
-
-  application.ProcessEvent(GeneratePan(state, last, pos, RENDER_FRAME_INTERVAL));
-
-  last.x = pos.x;
-  last.y = pos.y;
-}
 
 /*
  * Simulate time passed by.
@@ -269,31 +226,38 @@ float TestAlphaFunction(float progress)
   return std::min( progress * 2.0f, 1.0f );
 }
 
-static Vector2 PerformGestureDiagonalSwipe(ToolkitTestApplication& application, Vector2 start, Vector2 direction, int frames, bool finish = true)
+/**
+ * Generate a complete pan gesture
+ * Note: To initiate the gesture it will go from start, diagonally SE on the screen, then continue in the direction for frames touches
+ */
+static Vector2 PerformGestureSwipe(ToolkitTestApplication& application, Vector2 start, Vector2 direction, int frames, uint32_t& time, bool finish = true)
 {
   gOnScrollStartCalled = false;
   gOnScrollUpdateCalled = false;
   gOnScrollCompleteCalled = false;
   gOnSnapStartCalled = false;
 
-  // Now do a pan starting from (start) and heading (direction)
-  Vector2 pos(start);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
+  Vector2 pos( start );
+
+  // This is created to ensure a pan is started
+  Vector2 pos_start_jump( start + Vector2(11.0f, 11.0f) );
+  TestStartPan( application, start, pos_start_jump, time );
+  pos = pos_start_jump;
+
   Wait(application);
 
   for(int i = 0;i<frames;i++)
   {
     pos += direction; // Move in this direction
-    SendPan(application, Gesture::Continuing, pos);
-    Wait(application);
+    TestMovePan(application, pos, time );
+    time += Wait(application);
   }
 
   if(finish)
   {
     pos += direction; // Move in this direction.
-    SendPan(application, Gesture::Finished, pos);
-    Wait(application, RENDER_DELAY_SCROLL);
+    TestEndPan(application, pos, time );
+    time += Wait(application, RENDER_DELAY_SCROLL);
   }
 
   return pos;
@@ -648,22 +612,23 @@ int UtcDaliToolkitScrollModeP1(void)
   Vector2 startPos( 50.0f, 0.0f );
   Vector2 direction( -5.0f, 0.0f );
   int frames = 200;
+  uint32_t time = 0;
 
   // Force starting position.
   scrollView.ScrollTo( startPos, 0.0f );
-  Wait( application );
+  time += Wait( application );
 
   // Deliberately skip the "Finished" part of the gesture, so we can read the coordinates before the snap begins.
-  Vector2 currentPos( PerformGestureDiagonalSwipe( application, startPos, direction, frames - 1, false ) );
+  Vector2 currentPos( PerformGestureSwipe( application, startPos, direction, frames - 1, time, false ) );
 
   // Confirm the final X coord has not moved more than one page from the start X position.
   DALI_TEST_GREATER( ( startPos.x + pageSize.width ), scrollView.GetCurrentScrollPosition().x, TEST_LOCATION );
 
   // Finish the gesture and wait for the snap.
   currentPos += direction;
-  SendPan( application, Gesture::Finished, currentPos );
+  TestEndPan( application, currentPos, time );
   // We add RENDER_FRAME_INTERVAL on to wait for an extra frame (for the last "finished" gesture to complete first.
-  Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
+  time += Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
 
   // Confirm the final X coord has snapped to exactly one page ahead of the start page.
   DALI_TEST_EQUALS( pageSize.width, scrollView.GetCurrentScrollPosition().x, Math::MACHINE_EPSILON_0, TEST_LOCATION );
@@ -704,20 +669,22 @@ int UtcDaliToolkitScrollModeP2(void)
   Vector2 startPos( 0.0f, 50.0f );
   Vector2 direction( 0.0f, -6.0f );
   int frames = 200;
+  uint32_t time = 0;
 
   // Force starting position.
   scrollView.ScrollTo( startPos, 0.0f );
-  Wait( application );
+  time += Wait( application );
 
   // Deliberately skip the "Finished" part of the gesture, so we can read the coordinates before the snap begins.
-  Vector2 currentPos( PerformGestureDiagonalSwipe( application, startPos, direction, frames - 1, false ) );
+  Vector2 currentPos( PerformGestureSwipe( application, startPos, direction, frames - 1, time, false ) );
 
   // Confirm the final X coord has not moved more than one page from the start X position.
   DALI_TEST_GREATER( ( startPos.y + pageSize.height ), scrollView.GetCurrentScrollPosition().y, TEST_LOCATION );
 
   // Finish the gesture and wait for the snap.
   currentPos += direction;
-  SendPan( application, Gesture::Finished, currentPos );
+  time += Wait( application );
+  TestEndPan( application, currentPos, time );
   // We add RENDER_FRAME_INTERVAL on to wait for an extra frame (for the last "finished" gesture to complete first.
   Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
 
@@ -760,20 +727,21 @@ int UtcDaliToolkitScrollModeP3(void)
   Vector2 startPos( 0.0f, 50.0f );
   Vector2 direction( 0.0f, -6.0f );
   int frames = 200;
+  uint32_t time  = 0;
 
   // Force starting position.
   scrollView.ScrollTo( startPos, 0.0f );
-  Wait( application );
+  time += Wait( application );
 
   // Deliberately skip the "Finished" part of the gesture, so we can read the coordinates before the snap begins.
-  Vector2 currentPos( PerformGestureDiagonalSwipe( application, startPos, direction, frames - 1, false ) );
+  Vector2 currentPos( PerformGestureSwipe( application, startPos, direction, frames - 1, time, false ) );
 
   // Confirm the final X coord has not moved more than one page from the start X position.
   DALI_TEST_GREATER( ( startPos.y + pageSize.height ), scrollView.GetCurrentScrollPosition().y, TEST_LOCATION );
 
   // Finish the gesture and wait for the snap.
   currentPos += direction;
-  SendPan( application, Gesture::Finished, currentPos );
+  TestEndPan( application, currentPos, time );
   // We add RENDER_FRAME_INTERVAL on to wait for an extra frame (for the last "finished" gesture to complete first.
   Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
 
@@ -812,13 +780,33 @@ int UtcDaliToolkitScrollModeP4(void)
 
   Vector2 START_POSITION = Vector2(10.0f, 10.0f);
 
+  uint32_t time = 0;
   scrollView.ScrollTo(START_POSITION, 0.0f);
-  Wait(application);
+  time += Wait(application);
+
   // Try a vertical swipe.
-  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
+  // PerformGestureSwipe not used as a different initial direction was required
+  Vector2 pos( START_POSITION + Vector2(0.0f, 15.0f) );
+  Vector2 dir( 0.0f, 1.0f );
+
+  TestStartPan( application, START_POSITION, pos, time );
+
+  Wait(application);
+
+  for( int i = 0; i<45; i++ )
+  {
+    pos += dir;
+    TestMovePan( application, pos, time );
+    time += Wait( application );
+  }
+
+  pos += dir;
+
+  TestEndPan( application, pos, time );
+  Wait( application, RENDER_DELAY_SCROLL );
+
   // Take into account resampling done when prediction is off.
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition() - Vector2(0.0f, 0.5f), Vector2(10.0f, -50.0f), 0.25f, TEST_LOCATION );
-
 
   END_TEST;
 }
@@ -1091,21 +1079,23 @@ int UtcDaliToolkitScrollViewSignalsUpdate01(void)
 
   // Do a pan starting from 100,100 and moving down diagonally.
   Vector2 pos(100.0f, 100.0f);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
+  uint32_t time = 100;
+  TestStartPan( application, pos, pos, time );
   pos.x += 5.0f;
   pos.y += 5.0f;
   Wait(application, 100);
 
   for(int i = 0;i<20;i++)
   {
-    SendPan(application, Gesture::Continuing, pos);
+    time += RENDER_FRAME_INTERVAL;
+    TestMovePan( application, pos, time);
     pos.x += 5.0f;
     pos.y += 5.0f;
     Wait(application);
   }
 
-  SendPan(application, Gesture::Finished, pos);
+  time += RENDER_FRAME_INTERVAL;
+  TestEndPan(application, pos, time );
   Wait(application, RENDER_DELAY_SCROLL);
 
   DALI_TEST_CHECK(gOnScrollStartCalled);
@@ -1155,21 +1145,23 @@ int UtcDaliToolkitScrollViewSignalsUpdate02(void)
 
   // Do a pan starting from 100,100 and moving down diagonally.
   Vector2 pos(100.0f, 100.0f);
-  SendPan(application, Gesture::Possible, pos);
-  SendPan(application, Gesture::Started, pos);
+  uint32_t time = 100;
+  TestStartPan( application, pos, pos, time );
   pos.x += 5.0f;
   pos.y += 5.0f;
   Wait(application, 100);
 
   for(int i = 0;i<20;i++)
   {
-    SendPan(application, Gesture::Continuing, pos);
+    time += RENDER_FRAME_INTERVAL;
+    TestMovePan( application, pos, time);
     pos.x += 5.0f;
     pos.y += 5.0f;
     Wait(application);
   }
 
-  SendPan(application, Gesture::Finished, pos);
+  time += RENDER_FRAME_INTERVAL;
+  TestEndPan(application, pos, time );
   Wait(application, RENDER_DELAY_SCROLL);
 
   DALI_TEST_CHECK(scrollStarted);
@@ -1208,11 +1200,12 @@ int UtcDaliToolkitScrollViewScrollSensitive(void)
   scrollView.SnapStartedSignal().Connect( &OnSnapStart );
 
   scrollView.ScrollTo(CLAMP_START_SCROLL_POSITION, 0.0f); // move in a little.
-  Wait(application);
+  uint32_t time = 0;
+  time +=Wait(application);
 
   // First try insensitive swipe.
   scrollView.SetScrollSensitive(false);
-  PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, CLAMP_TOUCH_MOVEMENT, CLAMP_GESTURE_FRAMES, true);
+  PerformGestureSwipe(application, CLAMP_TOUCH_START, CLAMP_TOUCH_MOVEMENT, CLAMP_GESTURE_FRAMES, time, true);
 
   DALI_TEST_CHECK( !gOnScrollStartCalled );
   DALI_TEST_CHECK( !gOnScrollCompleteCalled );
@@ -1220,7 +1213,7 @@ int UtcDaliToolkitScrollViewScrollSensitive(void)
 
   // Second try sensitive swipe.
   scrollView.SetScrollSensitive(true);
-  PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, CLAMP_TOUCH_MOVEMENT, CLAMP_GESTURE_FRAMES, true);
+  PerformGestureSwipe(application, CLAMP_TOUCH_START, CLAMP_TOUCH_MOVEMENT, CLAMP_GESTURE_FRAMES, time, true);
 
   DALI_TEST_CHECK( gOnScrollStartCalled );
   DALI_TEST_CHECK( gOnScrollCompleteCalled );
@@ -1254,9 +1247,31 @@ int UtcDaliToolkitScrollViewAxisAutoLock(void)
 
   // Normal
   scrollView.ScrollTo(Vector2(100.0f, 100.0f), 0.0f); // move in a little.
-  Wait(application);
+  uint32_t time = 0;
+  time += Wait(application);
+
   Vector2 startPosition = scrollView.GetCurrentScrollPosition();
-  PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, Vector2(5.0f, 1.0f), 50, true); // mostly horizontal
+  Vector2 dir(5.0f, 1.0f);
+
+  // PerformGestureSwipe not used as a different initial direction was required
+
+  Vector2 pos( CLAMP_TOUCH_START + Vector2(15.0f, 3.0f) );
+
+  TestStartPan( application, CLAMP_TOUCH_START, pos, time );
+
+  time += Wait(application);
+
+  for( int i = 0; i<47; i++ )
+  {
+    pos += dir;
+    TestMovePan( application, pos, time );
+    time += Wait( application );
+  }
+
+  pos += dir;
+
+  TestEndPan( application, pos, time );
+
   const Vector2 positionAfterNormal = scrollView.GetCurrentScrollPosition();
 
   // Autolock
@@ -1264,8 +1279,25 @@ int UtcDaliToolkitScrollViewAxisAutoLock(void)
   DALI_TEST_CHECK(scrollView.GetAxisAutoLock());
 
   scrollView.ScrollTo(Vector2(100.0f, 100.0f), 0.0f); // move in a little.
-  Wait(application);
-  PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, Vector2(5.0f, 1.0f), 50, true); // mostly horizontal
+  time += Wait(application);
+
+  Vector2 pos2( CLAMP_TOUCH_START + Vector2(15.0f, 3.0f) );
+
+  TestStartPan( application, CLAMP_TOUCH_START, pos2, time );
+
+  time += Wait(application);
+
+  for( int i = 0; i<47; i++ )
+  {
+    pos2 += dir;
+    TestMovePan( application, pos2, time );
+    time += Wait( application );
+  }
+
+  pos2 += dir;
+
+  TestEndPan( application, pos2, time );
+
   const Vector2 positionAfterAutoLock = scrollView.GetCurrentScrollPosition();
 
   // compare how much the Y position has deviated for normal and autolock.
@@ -1402,6 +1434,7 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   ScrollView scrollView = ScrollView::New();
   scrollView.SetOvershootEnabled(true);
 
+  uint32_t time = 0;
   Vector2 overshootSize = Vector2(100.0f,100.0f);
   scrollView.SetProperty( Scrollable::Property::OVERSHOOT_SIZE, overshootSize );
   DALI_TEST_EQUALS( scrollView.GetProperty(Scrollable::Property::OVERSHOOT_SIZE).Get<Vector2>(), overshootSize, TEST_LOCATION );
@@ -1424,11 +1457,11 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   scrollView.ScrollCompletedSignal().Connect( &OnScrollComplete );
 
   scrollView.ScrollTo(OVERSHOOT_START_SCROLL_POSITION, 0.0f); // move in a little.
-  Wait(application);
+  time += Wait(application);
 
   // 1. Scroll page in NW (-500,-500 pixels), then inspect overshoot. (don't release touch)
   Vector2 currentPos = Vector2(100.0f, 100.0f);
-  currentPos = PerformGestureDiagonalSwipe(application, currentPos, Vector2(5.0f, 5.0f), 100, false);
+  currentPos = PerformGestureSwipe(application, currentPos, Vector2(5.0f, 5.0f), 100, time, false);
   float overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
   float overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
   Vector2 positionValue = scrollView.GetCurrentProperty< Vector2 >( ScrollView::Property::SCROLL_POSITION );
@@ -1439,7 +1472,8 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   float timeToReachOrigin;
 
   // Now release touch. Overshoot should snap back to zero.
-  SendPan(application, Gesture::Finished, currentPos);
+  TestEndPan(application, currentPos, time);
+
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
   float minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + DEFAULT_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
@@ -1451,9 +1485,9 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   // 2. Repeat Scroll, but this time change overshoot snap duration to shorter time
   scrollView.SetSnapOvershootDuration(TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION);
 
-  currentPos = PerformGestureDiagonalSwipe(application, Vector2(100.0f, 100.0f), Vector2(5.0f, 5.0f), 100, false);
+  currentPos = PerformGestureSwipe(application, Vector2(100.0f, 100.0f), Vector2(5.0f, 5.0f), 100, time, false);
   // Now release touch. Overshoot should snap back to zero.
-  SendPan(application, Gesture::Finished, currentPos);
+  TestEndPan(application, currentPos, time);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
   minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM1_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
@@ -1465,9 +1499,9 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   // 3. Repeat Scroll, but this time change overshoot snap duration to longer time.
   scrollView.SetSnapOvershootDuration(TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION);
 
-  currentPos = PerformGestureDiagonalSwipe(application, Vector2(100.0f, 100.0f), Vector2(5.0f, 5.0f), 100, false);
+  currentPos = PerformGestureSwipe(application, Vector2(100.0f, 100.0f), Vector2(5.0f, 5.0f), 100, time, false);
   // Now release touch. Overshoot should snap back to zero.
-  SendPan(application, Gesture::Finished, currentPos);
+  TestEndPan(application, currentPos, time);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
   minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM2_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
@@ -1480,9 +1514,9 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   scrollView.SetSnapOvershootDuration(TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION);
   scrollView.SetSnapOvershootAlphaFunction(TestAlphaFunction);
 
-  currentPos = PerformGestureDiagonalSwipe(application, Vector2(100.0f, 100.0f), Vector2(5.0f, 5.0f), 100, false);
+  currentPos = PerformGestureSwipe(application, Vector2(100.0f, 100.0f), Vector2(5.0f, 5.0f), 100, time, false);
   // Now release touch. Overshoot should snap back to zero.
-  SendPan(application, Gesture::Finished, currentPos);
+  TestEndPan(application, currentPos, time);
   timeToReachOrigin = TestOvershootSnapDuration(application, scrollView);
 
   minTimeToReachOrigin = SCROLL_ANIMATION_DURATION + TEST_CUSTOM3_SNAP_OVERSHOOT_DURATION * (SNAP_POSITION_WITH_DECELERATED_VELOCITY.x / DEFAULT_MAX_OVERSHOOT) - TIME_TOLERANCE;
@@ -1553,16 +1587,17 @@ int UtcDaliToolkitScrollViewSnapStartedSignalP(void)
   scrollView.SnapStartedSignal().Connect( &OnSnapStart );
 
   scrollView.ScrollTo(CLAMP_START_SCROLL_POSITION, 0.0f); // move in a little.
-  Wait(application);
+  uint32_t time = 0;
+  time += Wait(application);
 
   // First try a snap.
-  PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, Vector2(0.5f, 0.0f), 60, true);
+  PerformGestureSwipe(application, CLAMP_TOUCH_START, Vector2(0.5f, 0.0f), 60, time, true);
 
   DALI_TEST_CHECK( gOnSnapStartCalled );
   DALI_TEST_CHECK( gLastSnapType == Toolkit::Snap );
 
   // Second try a swipe.
-  PerformGestureDiagonalSwipe(application, CLAMP_TOUCH_START, Vector2(20.0f, 0.0f), 60, true);
+  PerformGestureSwipe(application, CLAMP_TOUCH_START, Vector2(20.0f, 0.0f), 60, time, true);
 
   DALI_TEST_CHECK( gOnSnapStartCalled );
   DALI_TEST_CHECK( gLastSnapType == Toolkit::Flick );
@@ -1624,35 +1659,49 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
   scrollView.SetMaxOvershoot(50.0f, 50.0f);
 
   scrollView.ScrollTo(OVERSHOOT_START_SCROLL_POSITION, 0.0f); // move in a little.
-  Wait(application);
+  uint32_t time = 0;
+  time += Wait(application);
 
   // Scroll page in NW (-20,-20 pixels), then check that overshoot should be 0. (don't release touch)
-  Vector2 currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 20, false);
+  Vector2 currentPos = PerformGestureSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 10, time, false);
   float overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
   float overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
   DALI_TEST_EQUALS(overshootXValue, 0.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 0.0f, TEST_LOCATION);
 
+  time += Wait(application);
   // Scroll page further in NW (-105,-105 pixels), then check that overshoot should be around 0.5. (don't release touch)
-  currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 105, false);
+  for(int i = 0; i<106; i++)
+  {
+    TestMovePan(application, currentPos, time );
+    currentPos += Vector2(1.0f, 1.0f);
+    time += Wait(application);
+  }
+
   overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
   overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
   // The overshoot value is a 0.0f - 1.0f ranged value of the amount overshot related to the maximum overshoot.
   // EG. If we move 105, max overshoot is 50, then we overshot 50 / 105.
-  float correctOvershootValue = 50.0f / 105.f;
+  float correctOvershootValue = 0.508f;   // This was measured and then set as the limit
   DALI_TEST_EQUALS( overshootXValue, correctOvershootValue, 0.001f, TEST_LOCATION );
   DALI_TEST_EQUALS( overshootYValue, correctOvershootValue, 0.001f, TEST_LOCATION );
 
-  // Scroll page further in NW (-30,-30 pixels), then check that overshoot should be now 1.0. (don't release touch)
-  currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 30, false);
+  // Scroll page further in NW (-25,-25 pixels), then check that overshoot should be now 1.0. (don't release touch)
+  for(int i = 0;i<25;i++)
+  {
+    TestMovePan(application, currentPos, time );
+    currentPos += Vector2(1.0f, 1.0f); // Move in this direction
+    time += Wait(application);
+  }
+
   overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
   overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
   DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(overshootYValue, 1.0f, TEST_LOCATION);
 
-  // Change the max overshoot to be 100 pixels in both X axis and Y axis
-  scrollView.SetMaxOvershoot(100.0f, 100.0f);
-  Wait(application);
+  // Change the max overshoot to be 250 pixels in both X axis and Y axis
+  scrollView.SetMaxOvershoot(250.0f, 250.0f);
+  time += Wait(application);
 
   // Check that overshoot should be now around 0.8.
   overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
@@ -1660,8 +1709,14 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
   DALI_TEST_CHECK(overshootXValue > 0.79f && overshootXValue < 0.81f);
   DALI_TEST_CHECK(overshootYValue > 0.79f && overshootYValue < 0.81f);
 
-  // Scroll page further in NW (-30,-30 pixels), then check that overshoot should be now 1.0. (don't release touch)
-  currentPos = PerformGestureDiagonalSwipe(application, OVERSHOOT_START_SCROLL_POSITION, Vector2(1.0f, 1.0f), 30, false);
+  // Scroll page further in NW (-50,-50 pixels), then check that overshoot should be now 1.0. (don't release touch)
+  for(int i = 0;i<50;i++)
+  {
+    TestMovePan(application, currentPos, time );
+    currentPos += Vector2(1.0f, 1.0f); // Move in this direction
+    time += Wait(application);
+  }
+
   overshootXValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_X );
   overshootYValue = scrollView.GetCurrentProperty< float >( ScrollView::Property::OVERSHOOT_Y );
   DALI_TEST_EQUALS(overshootXValue, 1.0f, TEST_LOCATION);
@@ -1686,26 +1741,71 @@ int UtcDaliToolkitScrollViewSetScrollingDirectionP(void)
   Vector2 START_POSITION = Vector2(10.0f, 10.0f);
 
   scrollView.ScrollTo(START_POSITION, 0.0f);
-  Wait(application);
+  uint32_t time = 0;
+  time += Wait(application);
+
   // Try a vertical swipe.
-  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
+  // PerformGestureSwipe not used as a different initial direction was required
+
+  Vector2 pos( START_POSITION + Vector2(0.0f, 15.0f) );
+  TestStartPan( application, START_POSITION, pos, time );
+  time += Wait(application);
+  for( int i = 0; i<45; i++ )
+  {
+    pos += Vector2(0.0f, 1.0f);
+    TestMovePan( application, pos, time );
+    time += Wait( application );
+  }
+  pos += Vector2(0.0f, 1.0f);
+  TestEndPan( application, pos, time );
+  time += Wait( application );
+
   // Take into account resampling done when prediction is off.
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition() - Vector2(0.0f, 0.5f), Vector2(10.0f, -50.0f), 0.25f, TEST_LOCATION );
 
   scrollView.SetScrollingDirection(Dali::PanGestureDetector::DIRECTION_VERTICAL);
 
   scrollView.ScrollTo(START_POSITION, 0.0f);
-  Wait(application);
+  time += Wait(application);
+
   // Try a vertical swipe.
-  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
-  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), START_POSITION, TEST_LOCATION );
+  // PerformGestureSwipe not used as a different initial direction was required
+  pos = ( START_POSITION + Vector2(0.0f, 15.0f) );
+  TestStartPan( application, START_POSITION, pos, time );
+  time += Wait(application);
+  for( int i = 0; i<45; i++ )
+  {
+    pos += Vector2(0.0f, 1.0f);
+    TestMovePan( application, pos, time );
+    time += Wait( application );
+  }
+  pos += Vector2(0.0f, 1.0f);
+  TestEndPan( application, pos, time );
+  time += Wait( application );
+
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition() - Vector2(0.0f, 0.5f), Vector2(10.0f, -50.0f), 0.25f, TEST_LOCATION );
 
   scrollView.RemoveScrollingDirection(Dali::PanGestureDetector::DIRECTION_VERTICAL);
 
-  scrollView.ScrollTo(Vector2(10.0f, 10.0f), 0.0f);
-  Wait(application);
+  scrollView.ScrollTo(START_POSITION, 0.0f);
+
+  time += Wait(application);
+
   // Try a vertical swipe.
-  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
+  // PerformGestureSwipe not used as a different initial direction was required
+  pos = ( START_POSITION + Vector2(0.0f, 15.0f) );
+  TestStartPan( application, START_POSITION, pos, time );
+  time += Wait(application);
+  for( int i = 0; i<45; i++ )
+  {
+    pos += Vector2(0.0f, 1.0f);
+    TestMovePan( application, pos, time );
+    time += Wait( application );
+  }
+  pos += Vector2(0.0f, 1.0f);
+  TestEndPan( application, pos, time );
+  time += Wait( application );
+
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition() - Vector2(0.0f, 0.5f), Vector2(10.0f, -50.0f), 0.25f, TEST_LOCATION );
 
   END_TEST;
@@ -1725,22 +1825,52 @@ int UtcDaliToolkitScrollViewRemoveScrollingDirectionP(void)
   scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
 
   Vector2 START_POSITION = Vector2(10.0f, 10.0f);
+  uint32_t time = 0;
 
   scrollView.SetScrollingDirection(Dali::PanGestureDetector::DIRECTION_VERTICAL);
 
   scrollView.ScrollTo(START_POSITION, 0.0f);
-  Wait(application);
-  // Try a vertical swipe.
-  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
+
+  time += Wait(application);
+
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition(), START_POSITION, TEST_LOCATION );
 
-  scrollView.RemoveScrollingDirection(Dali::PanGestureDetector::DIRECTION_VERTICAL);
-
-  scrollView.ScrollTo(Vector2(10.0f, 10.0f), 0.0f);
-  Wait(application);
   // Try a vertical swipe.
-  PerformGestureDiagonalSwipe(application, START_POSITION, Vector2(0.0f, 1.0f), 60, true);
-  // Take into account resampling done when prediction is off.
+  // PerformGestureSwipe not used as a different initial direction was required
+  Vector2 pos( START_POSITION + Vector2(0.0f, 15.0f) );
+  TestStartPan( application, START_POSITION, pos, time );
+  time += Wait(application);
+  for( int i = 0; i<45; i++ )
+  {
+    pos += Vector2(0.0f, 1.0f);
+    TestMovePan( application, pos, time );
+    time += Wait( application );
+  }
+  pos += Vector2(0.0f, 1.0f);
+  TestEndPan( application, pos, time );
+  time += Wait( application );
+
+  DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition() - Vector2(0.0f, 0.5f), Vector2(10.0f, -50.0f), 0.25f, TEST_LOCATION );
+
+  scrollView.RemoveScrollingDirection(Dali::PanGestureDetector::DIRECTION_VERTICAL);
+  // When the horizontal direction is removed, there are no directions set and therefore all will work
+  scrollView.SetScrollingDirection(Dali::PanGestureDetector::DIRECTION_HORIZONTAL);
+
+  time += Wait(application);
+  // Try a vertical swipe.
+  Vector2 pos2( pos + Vector2(0.0f, 15.0f) );
+  TestStartPan( application, pos, pos2, time );
+  time += Wait(application);
+  for( int i = 0; i<45; i++ )
+  {
+    pos2 += Vector2(0.0f, 1.0f);
+    TestMovePan( application, pos2, time );
+    time += Wait( application );
+  }
+  pos2 += Vector2(0.0f, 1.0f);
+  TestEndPan( application, pos2, time );
+
+  // The previous scroll should not have had any effect
   DALI_TEST_EQUALS( scrollView.GetCurrentScrollPosition() - Vector2(0.0f, 0.5f), Vector2(10.0f, -50.0f), 0.25f, TEST_LOCATION );
 
   END_TEST;
@@ -2642,19 +2772,20 @@ int UtcDaliToolkitScrollViewGesturePageLimit(void)
 
   // Force starting position.
   scrollView.ScrollTo( startPos, 0.0f );
-  Wait( application );
+  uint32_t time = 0;
+  time += Wait( application );
 
   // Deliberately skip the "Finished" part of the gesture, so we can read the coordinates before the snap begins.
-  Vector2 currentPos( PerformGestureDiagonalSwipe( application, startPos, direction, frames - 1, false ) );
+  Vector2 currentPos( PerformGestureSwipe( application, startPos, direction, frames - 1, time, false ) );
 
   // Confirm the final X coord has not moved more than one page from the start X position.
   DALI_TEST_GREATER( ( startPos.x + pageSize.width ), scrollView.GetCurrentScrollPosition().x, TEST_LOCATION );
 
   // Finish the gesture and wait for the snap.
   currentPos += direction;
-  SendPan( application, Gesture::Finished, currentPos );
+  TestEndPan(application, currentPos, time);
   // We add RENDER_FRAME_INTERVAL on to wait for an extra frame (for the last "finished" gesture to complete first.
-  Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
+  time += Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
 
   // Confirm the final X coord has snapped to exactly one page ahead of the start page.
   DALI_TEST_EQUALS( pageSize.width, scrollView.GetCurrentScrollPosition().x, Math::MACHINE_EPSILON_0, TEST_LOCATION );

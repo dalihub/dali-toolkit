@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/events/pan-gesture-event.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;

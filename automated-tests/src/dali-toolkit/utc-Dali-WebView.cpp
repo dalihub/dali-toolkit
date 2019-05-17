@@ -39,6 +39,7 @@ const char* const TEST_URL2( "http://www.somewhere.valid2.com" );
 
 static int gPageLoadStartedCallbackCalled = 0;
 static int gPageLoadFinishedCallbackCalled = 0;
+static int gEvaluateJavaScriptCallbackCalled = 0;
 static bool gTouched = false;
 
 struct CallbackFunctor
@@ -63,6 +64,15 @@ static void OnPageLoadStarted( WebView view, const std::string& url )
 static void OnPageLoadFinished( WebView view, const std::string& url )
 {
   gPageLoadFinishedCallbackCalled++;
+}
+
+static void OnPageLoadError( WebView view, const std::string& url, WebView::LoadErrorCode errorCode )
+{
+}
+
+static void OnEvaluateJavaScript( const std::string& result )
+{
+  gEvaluateJavaScriptCallbackCalled++;
 }
 
 static bool OnTouched( Actor actor, const Dali::TouchData& touch )
@@ -146,6 +156,7 @@ int UtcDaliWebViewPageNavigation(void)
   ConnectionTracker* testTracker = new ConnectionTracker();
   view.PageLoadStartedSignal().Connect( &OnPageLoadStarted );
   view.PageLoadFinishedSignal().Connect( &OnPageLoadFinished );
+  view.PageLoadErrorSignal().Connect( &OnPageLoadError );
   bool signal1 = false;
   bool signal2 = false;
   bool signal3 = false;
@@ -159,7 +170,6 @@ int UtcDaliWebViewPageNavigation(void)
   view.LoadUrl( TEST_URL1 );
   view.GetNaturalSize();
   Test::EmitGlobalTimerSignal();
-  DALI_TEST_CHECK( view.GetUrl().find( TEST_URL1 ) != std::string::npos );
   DALI_TEST_EQUALS( view.CanGoBack(), false, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadStartedCallbackCalled, 1, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadFinishedCallbackCalled, 1, TEST_LOCATION );
@@ -167,11 +177,12 @@ int UtcDaliWebViewPageNavigation(void)
   DALI_TEST_CHECK( !signal3 );
 
   view.LoadUrl( TEST_URL2 );
+  view.Suspend();
   view.SetSize( 400, 300 );
   application.SendNotification();
   application.Render();
   Test::EmitGlobalTimerSignal();
-  DALI_TEST_CHECK( view.GetUrl().find( TEST_URL2 ) != std::string::npos );
+  view.Resume();
   DALI_TEST_EQUALS( view.CanGoBack(), true, TEST_LOCATION );
   DALI_TEST_EQUALS( view.CanGoForward(), false, TEST_LOCATION );
   DALI_TEST_EQUALS( gPageLoadStartedCallbackCalled, 2, TEST_LOCATION );
@@ -191,6 +202,7 @@ int UtcDaliWebViewPageNavigation(void)
   view.StopLoading();
   view.ClearHistory();
   view.ClearCache();
+  view.ClearCookies();
   Test::EmitGlobalTimerSignal();
   DALI_TEST_CHECK( !view.CanGoBack() );
   DALI_TEST_CHECK( !view.CanGoForward() );
@@ -244,6 +256,7 @@ int UtcDaliWebViewTouchAndKeys(void)
 
 int UtcDaliWebViewProperty1(void)
 {
+  // URL
   ToolkitTestApplication application;
 
   WebView view = WebView::New();
@@ -258,6 +271,217 @@ int UtcDaliWebViewProperty1(void)
   END_TEST;
 }
 
+int UtcDaliWebViewProperty2(void)
+{
+  // CACHE_MODEL
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  const std::string kDefaultValue = "DOCUMENT_VIEWER";
+  const WebView::CacheModel::Type kTestEnum = WebView::CacheModel::PRIMARY_WEB_BROWSER;
+  const std::string kTestValue = "PRIMARY_WEB_BROWSER";
+
+  // Check default value
+  std::string output;
+  Property::Value value = view.GetProperty( WebView::Property::CACHE_MODEL );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
+
+  // Check Set/GetProperty
+  view.SetProperty( WebView::Property::CACHE_MODEL, kTestEnum );
+  value = view.GetProperty( WebView::Property::CACHE_MODEL );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  view.SetProperty( WebView::Property::CACHE_MODEL, kTestValue );
+  value = view.GetProperty( WebView::Property::CACHE_MODEL );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewProperty3(void)
+{
+  // COOKIE_ACCEPT_POLICY
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  const std::string kDefaultValue = "NO_THIRD_PARTY";
+  const WebView::CookieAcceptPolicy::Type kTestEnum = WebView::CookieAcceptPolicy::NEVER;
+  const std::string kTestValue = "NEVER";
+
+  // Check default value
+  std::string output;
+  Property::Value value = view.GetProperty( WebView::Property::COOKIE_ACCEPT_POLICY );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
+
+  // Check Set/GetProperty
+  view.SetProperty( WebView::Property::COOKIE_ACCEPT_POLICY, kTestEnum );
+  value = view.GetProperty( WebView::Property::COOKIE_ACCEPT_POLICY );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  view.SetProperty( WebView::Property::COOKIE_ACCEPT_POLICY, kTestValue );
+  value = view.GetProperty( WebView::Property::COOKIE_ACCEPT_POLICY );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewProperty4(void)
+{
+  // USER_AGENT
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  const std::string kDefaultValue;
+  const std::string kTestValue = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36";
+
+  // Check default value
+  std::string output;
+  Property::Value value = view.GetProperty( WebView::Property::USER_AGENT );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
+
+  // Check Set/GetProperty
+  view.SetProperty( WebView::Property::USER_AGENT, kTestValue );
+  value = view.GetProperty( WebView::Property::USER_AGENT );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewProperty5(void)
+{
+  // ENABLE_JAVASCRIPT
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  const bool kDefaultValue = true;
+  const bool kTestValue = false;
+
+  // Check default value
+  bool output;
+  Property::Value value = view.GetProperty( WebView::Property::ENABLE_JAVASCRIPT );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
+
+  // Check Set/GetProperty
+  view.SetProperty( WebView::Property::ENABLE_JAVASCRIPT, kTestValue );
+  value = view.GetProperty( WebView::Property::ENABLE_JAVASCRIPT );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewProperty6(void)
+{
+  // LOAD_IMAGES_AUTOMATICALLY
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  const bool kDefaultValue = true;
+  const bool kTestValue = false;
+
+  // Check default value
+  bool output;
+  Property::Value value = view.GetProperty( WebView::Property::LOAD_IMAGES_AUTOMATICALLY );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
+
+  // Check Set/GetProperty
+  view.SetProperty( WebView::Property::LOAD_IMAGES_AUTOMATICALLY, kTestValue );
+  value = view.GetProperty( WebView::Property::LOAD_IMAGES_AUTOMATICALLY );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewProperty7(void)
+{
+  // DEFAULT_TEXT_ENCODING_NAME
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  const std::string kDefaultValue;
+  const std::string kTestValue = "UTF-8";
+
+  // Check default value
+  std::string output;
+  Property::Value value = view.GetProperty( WebView::Property::DEFAULT_TEXT_ENCODING_NAME );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
+
+  // Check Set/GetProperty
+  view.SetProperty( WebView::Property::DEFAULT_TEXT_ENCODING_NAME, kTestValue );
+  value = view.GetProperty( WebView::Property::DEFAULT_TEXT_ENCODING_NAME );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewProperty8(void)
+{
+  // DEFAULT_FONT_SIZE
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New();
+  DALI_TEST_CHECK( view );
+
+  const int kDefaultValue = 16;
+  const int kTestValue = 26;
+
+  // Check default value
+  int output;
+  Property::Value value = view.GetProperty( WebView::Property::DEFAULT_FONT_SIZE );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kDefaultValue, TEST_LOCATION );
+
+  // Check Set/GetProperty
+  view.SetProperty( WebView::Property::DEFAULT_FONT_SIZE, kTestValue );
+  value = view.GetProperty( WebView::Property::DEFAULT_FONT_SIZE );
+  DALI_TEST_CHECK( value.Get( output ) );
+  DALI_TEST_EQUALS( output, kTestValue, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliWebViewEvaluteJavaScript(void)
+{
+  ToolkitTestApplication application;
+
+  WebView view = WebView::New( "ko-KR", "Asia/Seoul" );
+
+  view.LoadHTMLString( "<body>Hello World!</body>" );
+  view.EvaluateJavaScript( "jsObject.postMessage('Hello')" );
+  view.EvaluateJavaScript( "jsObject.postMessage('World')", OnEvaluateJavaScript );
+  Test::EmitGlobalTimerSignal();
+
+  DALI_TEST_EQUALS( gEvaluateJavaScriptCallbackCalled, 1, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
 int UtcDaliWebViewMethodsForCoverage(void)
 {
   ToolkitTestApplication application;
@@ -269,7 +493,6 @@ int UtcDaliWebViewMethodsForCoverage(void)
     []( const std::string& arg ) {
     }
   );
-  view.EvaluateJavaScript( "jsObject.postMessage('Hello')" );
 
   DALI_TEST_CHECK( view );
 
