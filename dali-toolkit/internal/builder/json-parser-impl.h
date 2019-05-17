@@ -1,8 +1,8 @@
-#ifndef __DALI_JSON_PARSER_IMPL_H__
-#define __DALI_JSON_PARSER_IMPL_H__
+#ifndef DALI_JSON_PARSER_IMPL_H
+#define DALI_JSON_PARSER_IMPL_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,4 +155,4 @@ inline Internal::JsonParser& GetImplementation(Toolkit::JsonParser& parser)
 } // namespace Dali
 
 
-#endif // __DALI_JSON_PARSER_IMPL_H__
+#endif // DALI_JSON_PARSER_IMPL_H

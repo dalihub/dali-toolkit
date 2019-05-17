@@ -1,8 +1,8 @@
-#ifndef __DALI_V8PLUGIN_SCRIPT_H__
-#define __DALI_V8PLUGIN_SCRIPT_H__
+#ifndef DALI_V8PLUGIN_SCRIPT_H
+#define DALI_V8PLUGIN_SCRIPT_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,12 +61,10 @@ public: // ScriptV8Plugin overrides
    * @copydoc Dali::Toolkit::ScriptPlugin::ExecuteFile()
    */
   virtual bool ExecuteFile(const std::string& fileName);
-
-
 };
 
 }  // namespace V8Plugin
 
 }  // namespace Dali
 
-#endif // __FEEDBACK_PLUGIN_H__
+#endif // DALI_V8PLUGIN_SCRIPT_H

@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_BUILDER_DECLARATIONS_H__
-#define __DALI_TOOLKIT_BUILDER_DECLARATIONS_H__
+#ifndef DALI_TOOLKIT_BUILDER_DECLARATIONS_H
+#define DALI_TOOLKIT_BUILDER_DECLARATIONS_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,4 +49,4 @@ typedef OptionalValue<Dali::Matrix3> OptionalMatrix3;
 typedef OptionalValue<Dali::Rect<int> > OptionalRect;
 typedef OptionalValue<Dali::Extents> OptionalExtents;
 
-#endif // __DALI_TOOLKIT_BUILDER_DECLARATIONS_H__
+#endif // DALI_TOOLKIT_BUILDER_DECLARATIONS_H

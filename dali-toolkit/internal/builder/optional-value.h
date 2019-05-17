@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_BUILDER_OPTIONAL__
-#define __DALI_TOOLKIT_INTERNAL_BUILDER_OPTIONAL__
+#ifndef DALI_TOOLKIT_INTERNAL_BUILDER_OPTIONAL_H
+#define DALI_TOOLKIT_INTERNAL_BUILDER_OPTIONAL_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,4 +87,4 @@ bool operator!=( const OptionalValue<T>& lhs, const OptionalValue<U>& rhs )
   return false;
 }
 
-#endif // header
+#endif // DALI_TOOLKIT_INTERNAL_BUILDER_OPTIONAL_H

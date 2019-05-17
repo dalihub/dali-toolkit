@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_VERSION_H__
-#define __DALI_TOOLKIT_VERSION_H__
+#ifndef DALI_TOOLKIT_VERSION_H
+#define DALI_TOOLKIT_VERSION_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,4 +32,4 @@ DALI_TOOLKIT_API extern const char * const TOOLKIT_BUILD_DATE;    ///< The date/
 } // namespace Toolkit
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_VERSION_H__
+#endif // DALI_TOOLKIT_VERSION_H

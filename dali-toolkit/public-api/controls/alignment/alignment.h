@@ -1,8 +1,8 @@
-#ifndef __DALI_ALIGNMENT_H__
-#define __DALI_ALIGNMENT_H__
+#ifndef DALI_ALIGNMENT_H
+#define DALI_ALIGNMENT_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,8 +258,9 @@ public: // Not intended for application developers
 /**
  * @}
  */
+
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_LAYOUT_H__
+#endif // DALI_ALIGNMENT_H

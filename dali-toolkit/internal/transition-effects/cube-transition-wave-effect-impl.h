@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_WAVE_EFFECT_H__
-#define __DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_WAVE_EFFECT_H__
+#ifndef DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_WAVE_EFFECT_H
+#define DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_WAVE_EFFECT_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,4 +124,4 @@ inline const Internal::CubeTransitionWaveEffect& GetImpl( const Dali::Toolkit::C
 
 } // namespace Dali
 
-#endif /* __DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_WAVE_EFFECT_H__ */
+#endif // DALI_TOOLKIT_INTERNAL_CUBE_TRANSITION_WAVE_EFFECT_H

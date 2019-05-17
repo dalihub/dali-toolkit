@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_EVENT_THREAD_CALLBACK_H__
-#define __DALI_TOOLKIT_EVENT_THREAD_CALLBACK_H__
+#ifndef DALI_TOOLKIT_EVENT_THREAD_CALLBACK_H
+#define DALI_TOOLKIT_EVENT_THREAD_CALLBACK_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-#define __DALI_EVENT_THREAD_CALLBACK_H_
+#define DALI_EVENT_THREAD_CALLBACK_H
 
 // EXTERNAL INCLUDES
 #include <dali-toolkit/public-api/dali-toolkit-common.h>
@@ -71,4 +71,4 @@ bool WaitForEventThreadTrigger( int triggerCount, int timeoutInSeconds=30 );
 }
 
 
-#endif /* __DALI_TOOLKIT_EVENT_THREAD_CALLBACK_H__ */
+#endif // DALI_TOOLKIT_EVENT_THREAD_CALLBACK_H

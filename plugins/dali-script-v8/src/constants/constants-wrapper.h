@@ -1,7 +1,7 @@
-#ifndef __DALI_V8PLUGIN_DALI_CONSTANTS_WRAPPER
-#define __DALI_V8PLUGIN_DALI_CONSTANTS_WRAPPER
+#ifndef DALI_V8PLUGIN_DALI_CONSTANTS_WRAPPER
+#define DALI_V8PLUGIN_DALI_CONSTANTS_WRAPPER
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,4 +36,5 @@ void AddDaliConstants( v8::Isolate* isolate, v8::Local<v8::Object >& obj  );
 } // namespace V8Plugin
 
 } // namespace Dali
-#endif
+
+#endif // DALI_V8PLUGIN_DALI_CONSTANTS_WRAPPER

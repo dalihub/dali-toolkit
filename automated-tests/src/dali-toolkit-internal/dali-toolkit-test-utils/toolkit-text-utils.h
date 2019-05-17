@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_UTILS_H__
-#define __DALI_TOOLKIT_TEXT_UTILS_H__
+#ifndef DALI_TOOLKIT_TEXT_UTILS_H
+#define DALI_TOOLKIT_TEXT_UTILS_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,4 +98,4 @@ void ConfigureTextEditor( ControllerPtr controller );
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TEXT_UTILS_H__
+#endif // DALI_TOOLKIT_TEXT_UTILS_H
