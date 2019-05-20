@@ -1,8 +1,8 @@
-#ifndef __DALI_V8PLUGIN_MODULE_H__
-#define __DALI_V8PLUGIN_MODULE_H__
+#ifndef DALI_V8PLUGIN_MODULE_H
+#define DALI_V8PLUGIN_MODULE_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,12 +74,10 @@ private:
     Module( const Module& );            ///< undefined copy constructor
     Module& operator=( const Module& ); ///< undefined assignment operator
 
-
-
 };
 
 } // namespace V8Plugin
 
 } // namespace Dali
 
-#endif // header MODULE_LOADER
+#endif // DALI_V8PLUGIN_MODULE_H

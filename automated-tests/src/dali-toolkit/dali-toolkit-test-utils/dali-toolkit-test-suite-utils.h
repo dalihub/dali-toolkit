@@ -1,5 +1,5 @@
-#ifndef __DALI_TOOLKIT_TEST_SUITE_UTILS_H__
-#define __DALI_TOOLKIT_TEST_SUITE_UTILS_H__
+#ifndef DALI_TOOLKIT_TEST_SUITE_UTILS_H
+#define DALI_TOOLKIT_TEST_SUITE_UTILS_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -33,4 +33,4 @@ std::ostream& operator<<( std::ostream& ostream, Dali::Toolkit::Visual::Resource
 #include "toolkit-input-method-context.h"
 #include "toolkit-clipboard-event-notifier.h"
 
-#endif // __DALI_TOOLKIT_TEST_SUITE_UTILS_H__
+#endif // DALI_TOOLKIT_TEST_SUITE_UTILS_H
