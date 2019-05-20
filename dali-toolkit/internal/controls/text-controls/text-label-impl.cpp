@@ -74,6 +74,12 @@ namespace
     0.5f,  // VerticalAlignment::CENTER
     1.0f   // VerticalAlignment::BOTTOM
   };
+
+  const std::string TEXT_FIT_ENABLE_KEY( "enable" );
+  const std::string TEXT_FIT_MIN_SIZE_KEY( "minSize" );
+  const std::string TEXT_FIT_MAX_SIZE_KEY( "maxSize" );
+  const std::string TEXT_FIT_STEP_SIZE_KEY( "stepSize" );
+  const std::string TEXT_FIT_FONT_SIZE_TYPE_KEY( "fontSizeType" );
 }
 
 namespace
@@ -134,6 +140,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "verticalLineAlignment
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textBackground",            MAP,     BACKGROUND                 )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "ignoreSpacesAfterText",     BOOLEAN, IGNORE_SPACES_AFTER_TEXT   )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "matchSystemLanguageDirection", BOOLEAN, MATCH_SYSTEM_LANGUAGE_DIRECTION )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textFit",                   MAP,     TEXT_FIT                 )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -478,6 +485,74 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         impl.mController->SetMatchSystemLanguageDirection(value.Get< bool >());
         break;
       }
+      case Toolkit::DevelTextLabel::Property::TEXT_FIT:
+      {
+        const Property::Map& propertiesMap = value.Get<Property::Map>();
+
+        bool enabled = false;
+        float minSize = 0.f;
+        float maxSize = 0.f;
+        float stepSize = 0.f;
+        bool isMinSizeSet = false, isMaxSizeSet = false, isStepSizeSet = false;
+        Controller::FontSizeType type = Controller::FontSizeType::POINT_SIZE;
+
+        if ( !propertiesMap.Empty() )
+        {
+          const unsigned int numberOfItems = propertiesMap.Count();
+
+          // Parses and applies
+          for( unsigned int index = 0u; index < numberOfItems; ++index )
+          {
+            const KeyValuePair& valueGet = propertiesMap.GetKeyValue( index );
+
+            if( ( Controller::TextFitInfo::Property::TEXT_FIT_ENABLE == valueGet.first.indexKey ) || ( TEXT_FIT_ENABLE_KEY == valueGet.first.stringKey ) )
+            {
+              /// Enable key.
+              enabled = valueGet.second.Get< bool >();
+            }
+            else if( ( Controller::TextFitInfo::Property::TEXT_FIT_MIN_SIZE == valueGet.first.indexKey ) || ( TEXT_FIT_MIN_SIZE_KEY == valueGet.first.stringKey ) )
+            {
+              /// min size.
+              minSize = valueGet.second.Get< float >();
+              isMinSizeSet = true;
+            }
+            else if( ( Controller::TextFitInfo::Property::TEXT_FIT_MAX_SIZE == valueGet.first.indexKey ) || ( TEXT_FIT_MAX_SIZE_KEY == valueGet.first.stringKey ) )
+            {
+              /// max size.
+              maxSize = valueGet.second.Get< float >();
+              isMaxSizeSet = true;
+            }
+            else if( ( Controller::TextFitInfo::Property::TEXT_FIT_STEP_SIZE == valueGet.first.indexKey ) || ( TEXT_FIT_STEP_SIZE_KEY == valueGet.first.stringKey ) )
+            {
+              /// step size.
+              stepSize = valueGet.second.Get< float >();
+              isStepSizeSet = true;
+            }
+            else if( ( Controller::TextFitInfo::Property::TEXT_FIT_FONT_SIZE_TYPE == valueGet.first.indexKey ) || ( TEXT_FIT_FONT_SIZE_TYPE_KEY == valueGet.first.stringKey ) )
+            {
+              if( "pixelSize" == valueGet.second.Get< std::string >() )
+              {
+                type = Controller::FontSizeType::PIXEL_SIZE;
+              }
+            }
+          }
+
+          impl.mController->SetTextFitEnabled( enabled );
+          if( isMinSizeSet )
+          {
+            impl.mController->SetTextFitMinSize( minSize, type );
+          }
+          if( isMaxSizeSet )
+          {
+            impl.mController->SetTextFitMaxSize( maxSize, type );
+          }
+          if( isStepSizeSet )
+          {
+            impl.mController->SetTextFitStepSize( stepSize, type );
+          }
+        }
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -489,10 +564,6 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
       impl.RequestTextRelayout();
     }
   }
-
-
-
-
 }
 
 Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index index )
@@ -746,6 +817,23 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         value = impl.mController->IsMatchSystemLanguageDirection();
         break;
       }
+      case Toolkit::DevelTextLabel::Property::TEXT_FIT:
+      {
+        const bool enabled = impl.mController->IsTextFitEnabled();
+        const float minSize = impl.mController->GetTextFitMinSize();
+        const float maxSize = impl.mController->GetTextFitMaxSize();
+        const float stepSize = impl.mController->GetTextFitStepSize();
+
+        Property::Map map;
+        map.Insert( TEXT_FIT_ENABLE_KEY, enabled );
+        map.Insert( TEXT_FIT_MIN_SIZE_KEY, minSize );
+        map.Insert( TEXT_FIT_MAX_SIZE_KEY, maxSize );
+        map.Insert( TEXT_FIT_STEP_SIZE_KEY, stepSize );
+        map.Insert( TEXT_FIT_FONT_SIZE_TYPE_KEY, "pointSize" );
+
+        value = map;
+        break;
+      }
     }
   }
 
@@ -870,6 +958,14 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
   padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
 
   Vector2 contentSize( size.x - ( padding.start + padding.end ), size.y - ( padding.top + padding.bottom ) );
+
+  // If the same text comes for relayouting for same layout size we don't need to calculate point size again.
+  // Like for color change.
+  if (mController->IsTextFitEnabled() && (mController->GetTextFitContentSize() != contentSize ) )
+  {
+    mController->FitPointSizeforLayout(contentSize);
+    mController->SetTextFitContentSize(contentSize);
+  }
 
   // Support Right-To-Left
   Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( Self().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );

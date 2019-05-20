@@ -143,6 +143,18 @@ public: // Enumerated types.
     };
   };
 
+  struct TextFitInfo
+  {
+    enum Property
+    {
+      TEXT_FIT_ENABLE,
+      TEXT_FIT_MIN_SIZE,
+      TEXT_FIT_MAX_SIZE,
+      TEXT_FIT_STEP_SIZE,
+      TEXT_FIT_FONT_SIZE_TYPE
+    };
+  };
+
 public: // Constructor.
 
   /**
@@ -369,6 +381,79 @@ public: // Configure the text controller.
    * @copydoc ModelInterface::IsTextElideEnabled()
    */
   bool IsTextElideEnabled() const;
+
+  /**
+   * @brief Enable or disable the text fit.
+   *
+   * @param[in] enabled Whether to enable the text fit.
+   */
+  void SetTextFitEnabled(bool enabled);
+
+  /**
+   * @brief Whether the text fit is enabled or not.
+   *
+   * @return True if the text fit is enabled
+   */
+  bool IsTextFitEnabled() const;
+
+  /**
+   * @brief Sets minimum size valid for text fit.
+   *
+   * @param[in] minimum size value.
+   * @param[in] type The font size type is point size or pixel size
+   */
+  void SetTextFitMinSize( float pointSize, FontSizeType type );
+
+  /**
+   * @brief Retrieves the minimum point size valid for text fit.
+   *
+   * @return The minimum point size valid for text fit
+   */
+  float GetTextFitMinSize() const;
+
+  /**
+   * @brief Sets maximum size valid for text fit.
+   *
+   * @param[in] maximum size value.
+   * @param[in] type The font size type is point size or pixel size
+   */
+  void SetTextFitMaxSize( float pointSize, FontSizeType type );
+
+  /**
+   * @brief Retrieves the maximum point size valid for text fit.
+   *
+   * @return The maximum point size valid for text fit
+   */
+  float GetTextFitMaxSize() const;
+
+  /**
+   * @brief Sets step size for font increase valid for text fit.
+   *
+   * @param[in] step size value.
+   * @param[in] type The font size type is point size or pixel size
+   */
+  void SetTextFitStepSize( float step, FontSizeType type );
+
+  /**
+   * @brief Retrieves the step point size valid for text fit.
+   *
+   * @return The step point size valid for text fit
+   */
+  float GetTextFitStepSize() const;
+
+  /**
+   * @brief Sets content size valid for text fit.
+   *
+   * @param[in] Content size value.
+   */
+  void SetTextFitContentSize(Vector2 size);
+
+  /**
+   * @brief Retrieves the content size valid for text fit.
+   *
+   * @return The content size valid for text fit
+   */
+  Vector2 GetTextFitContentSize() const;
 
   /**
    * @brief Enable or disable the placeholder text elide.
@@ -1169,6 +1254,18 @@ public: // Queries & retrieves.
    * @copydoc Control::GetHeightForWidth()
    */
   float GetHeightForWidth( float width );
+
+  /**
+   * @brief Calculates the point size for text for given layout()
+   */
+  void FitPointSizeforLayout( Size layoutSize );
+
+  /**
+   * @brief Checks if the point size fits within the layout size.
+   *
+   * @return Whether the point size fits within the layout size.
+   */
+  bool CheckForTextFit( float pointSize, Size& layoutSize );
 
   /**
    * @brief Retrieves the text's number of lines for a given width.

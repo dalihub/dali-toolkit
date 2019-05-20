@@ -122,6 +122,24 @@ namespace Property
      *
      */
     MATCH_SYSTEM_LANGUAGE_DIRECTION,
+
+    /**
+     * @brief The text fit parameters.
+     * @details Name "textFit", type Property::MAP.
+     * @note The default value is false
+     *
+     * The textFit map contains the following keys:
+     *
+     * | %Property Name       | Type     | Required | Description                                                                                                        |
+     * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
+     * | enable               | BOOLEAN  | No       | True to enable the text fit or false to disable (the default value is false)                                     |
+     * | minSize              | FLOAT    | No       | Minimum Size for text fit (the default value is 10.f)                                                     |
+     * | maxSize              | FLOAT    | No       | Maximum Size for text fit (the default value is 100.f)                                                     |
+     * | stepSize             | FLOAT    | No       | Step Size for font increase (the default value is 1.f)                                                     |
+     * | fontSizeType         | STRING   | No       | The size type of font, You can choose between "pointSize" or "pixelSize". (the default value is "pointSize")                                                     |
+     */
+    TEXT_FIT,
+
   };
 
 } // namespace Property

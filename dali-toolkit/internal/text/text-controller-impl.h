@@ -39,6 +39,10 @@ namespace Toolkit
 namespace Text
 {
 
+const float DEFAULT_TEXTFIT_MIN = 10.f;
+const float DEFAULT_TEXTFIT_MAX = 100.f;
+const float DEFAULT_TEXTFIT_STEP = 1.f;
+
 //Forward declarations
 struct CursorInfo;
 struct FontDefaults;
@@ -182,6 +186,7 @@ struct FontDefaults
   FontDefaults()
   : mFontDescription(),
     mDefaultPointSize( 0.f ),
+    mFitPointSize( 0.f ),
     mFontId( 0u ),
     familyDefined( false ),
     weightDefined( false ),
@@ -207,6 +212,7 @@ struct FontDefaults
 
   TextAbstraction::FontDescription mFontDescription;  ///< The default font's description.
   float                            mDefaultPointSize; ///< The default font's point size.
+  float                            mFitPointSize; ///< The fit font's point size.
   FontId                           mFontId;           ///< The font's id of the default font.
   bool familyDefined:1; ///< Whether the default font's family name is defined.
   bool weightDefined:1; ///< Whether the default font's weight is defined.
@@ -330,7 +336,11 @@ struct Controller::Impl
     mOutlineSetByString( false ),
     mFontStyleSetByString( false ),
     mShouldClearFocusOnEscape( true ),
-    mLayoutDirection( LayoutDirection::LEFT_TO_RIGHT )
+    mLayoutDirection( LayoutDirection::LEFT_TO_RIGHT ),
+    mTextFitMinSize( DEFAULT_TEXTFIT_MIN ),
+    mTextFitMaxSize( DEFAULT_TEXTFIT_MAX ),
+    mTextFitStepSize( DEFAULT_TEXTFIT_STEP ),
+    mTextFitEnabled( false )
   {
     mModel = Model::New();
 
@@ -753,6 +763,7 @@ public:
   OperationsMask mOperationsPending;       ///< Operations pending to be done to layout the text.
   Length mMaximumNumberOfCharacters;       ///< Maximum number of characters that can be inserted.
   HiddenText* mHiddenInput;                ///< Avoid allocating this when the user does not specify hidden input mode.
+  Vector2 mTextFitContentSize;             ///< Size of Text fit content
 
   bool mRecalculateNaturalSize:1;          ///< Whether the natural size needs to be recalculated.
   bool mMarkupProcessorEnabled:1;          ///< Whether the mark-up procesor is enabled.
@@ -767,6 +778,11 @@ public:
   bool mFontStyleSetByString:1;            ///< Set when font style is set by string (legacy) instead of map
   bool mShouldClearFocusOnEscape:1;        ///< Whether text control should clear key input focus
   LayoutDirection::Type mLayoutDirection;  ///< Current system language direction
+
+  float mTextFitMinSize;                   ///< Minimum Font Size for text fit. Default 10
+  float mTextFitMaxSize;                   ///< Maximum Font Size for text fit. Default 100
+  float mTextFitStepSize;                  ///< Step Size for font intervalse. Default 1
+  bool  mTextFitEnabled : 1;               ///< Whether the text's fit is enabled.
 };
 
 } // namespace Text
