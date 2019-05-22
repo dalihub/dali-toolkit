@@ -28,6 +28,11 @@ namespace Dali
 namespace Toolkit
 {
 
+/**
+ * @addtogroup dali_toolkit_image_loader
+ * @{
+ */
+
 namespace SyncImageLoader
 {
 
@@ -99,6 +104,9 @@ DALI_IMPORT_API PixelData Load( const std::string& url,
 
 } // namespace SyncImageLoader
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

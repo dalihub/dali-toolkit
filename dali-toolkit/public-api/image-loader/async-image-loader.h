@@ -36,6 +36,11 @@ class AsyncImageLoader;
 }
 
 /**
+ * @addtogroup dali_toolkit_image_loader
+ * @{
+ */
+
+/**
  * @brief The AsyncImageLoader is used to load pixel data from a URL asynchronously.
  *
  * The images are loaded in a worker thread to avoid blocking the main event thread.
@@ -239,6 +244,9 @@ public: // Not intended for developer use
 
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

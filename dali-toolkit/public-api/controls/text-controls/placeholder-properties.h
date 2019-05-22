@@ -25,7 +25,7 @@ namespace Toolkit
 {
 
 /**
- * @addtogroup dali_toolkit_controls
+ * @addtogroup dali_toolkit_controls_text_controls
  * @{
  */
 
