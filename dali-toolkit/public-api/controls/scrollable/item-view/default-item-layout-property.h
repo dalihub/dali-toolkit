@@ -23,6 +23,10 @@ namespace Dali
 
 namespace Toolkit
 {
+/**
+ * @addtogroup dali_toolkit_controls_item_view
+ * @{
+ */
 
 /**
  * @brief Default item layout property.
@@ -277,6 +281,9 @@ enum Property
   SPIRAL_TOP_ITEM_ALIGNMENT,
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali
