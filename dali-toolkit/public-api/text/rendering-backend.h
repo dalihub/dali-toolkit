@@ -23,6 +23,10 @@ namespace Dali
 
 namespace Toolkit
 {
+/**
+ * @addtogroup dali_toolkit_controls_text_controls
+ * @{
+ */
 
 namespace Text
 {
@@ -41,6 +45,9 @@ const unsigned int DEFAULT_RENDERING_BACKEND = RENDERING_SHARED_ATLAS;
 
 } // namespace Text
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

@@ -140,6 +140,10 @@
  *    <td>@ref dali_toolkit_visuals</td>
  *    <td>Visuals can control rendering the contents as using Property.</td>
  * </tr>
+ * <tr>
+ *    <td>@ref dali_toolkit_image_loader</td>
+ *    <td>The ImageLoader is used to load pixel data from a URL.</td>
+ * </tr>
  * </table>
  *
  * \ifnot show_tizen_feature
@@ -218,6 +222,9 @@
 
  *   @defgroup dali_toolkit_visuals Visuals
  *   @brief Visuals can control rendering the contents as using Property.
+
+ *   @defgroup dali_toolkit_image_loader Image Loader
+ *   @brief The ImageLoader is used to load pixel data from a URL.
 
  * @}
  */
