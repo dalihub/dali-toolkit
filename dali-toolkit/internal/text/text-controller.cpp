@@ -61,6 +61,7 @@ const char * const PLACEHOLDER_FONT_STYLE = "fontStyle";
 const char * const PLACEHOLDER_POINT_SIZE = "pointSize";
 const char * const PLACEHOLDER_PIXEL_SIZE = "pixelSize";
 const char * const PLACEHOLDER_ELLIPSIS = "ellipsis";
+const unsigned int MAX_TEXT_LENGTH = 1024u * 32u;
 
 float ConvertToEven( float value )
 {
@@ -309,7 +310,7 @@ bool Controller::IsSmoothHandlePanEnabled() const
 
 void Controller::SetMaximumNumberOfCharacters( Length maxCharacters )
 {
-  mImpl->mMaximumNumberOfCharacters = maxCharacters;
+  mImpl->mMaximumNumberOfCharacters = std::min( maxCharacters, MAX_TEXT_LENGTH );
 }
 
 int Controller::GetMaximumNumberOfCharacters()
@@ -590,6 +591,13 @@ void Controller::SetText( const std::string& text )
 
       // This is a bit horrible but std::string returns a (signed) char*
       utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
+    }
+
+    // Limit the text size. If the text size is too large, crash or deadlock will occur.
+    if( textSize > MAX_TEXT_LENGTH )
+    {
+      DALI_LOG_WARNING( "The text size is too large(%d), limit the length to 32,768u\n", textSize );
+      textSize = MAX_TEXT_LENGTH;
     }
 
     //  Convert text into UTF-32

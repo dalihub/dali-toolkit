@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TOOLKIT_INPUT_METHOD_CONTEXT_H__
-#define __DALI_TOOLKIT_TOOLKIT_INPUT_METHOD_CONTEXT_H__
+#ifndef DALI_TOOLKIT_TOOLKIT_INPUT_METHOD_CONTEXT_H
+#define DALI_TOOLKIT_TOOLKIT_INPUT_METHOD_CONTEXT_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#define __DALI_INPUT_METHOD_CONTEXT_H__
+#define DALI_INPUT_METHOD_CONTEXT_H
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
 #include <dali/devel-api/adaptor-framework/input-method-options.h>
@@ -306,4 +306,4 @@ public:
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_TOOLKIT_INPUT_METHOD_CONTEXT_H__
+#endif // DALI_TOOLKIT_TOOLKIT_INPUT_METHOD_CONTEXT_H

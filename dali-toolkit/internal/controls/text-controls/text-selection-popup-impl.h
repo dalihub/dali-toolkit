@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H__
-#define __DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H__
+#ifndef DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H
+#define DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -339,5 +339,5 @@ inline const Toolkit::Internal::TextSelectionPopup& GetImpl( const Toolkit::Text
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H__
+#endif // DALI_TOOLKIT_INTERNAL_TEXT_SELECTION_POPUP_H
 

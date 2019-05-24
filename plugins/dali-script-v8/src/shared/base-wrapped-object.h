@@ -1,8 +1,8 @@
-#ifndef __DALI_V8PLUGIN_BASE_WRAPPED_OBJECT_H__
-#define __DALI_V8PLUGIN_BASE_WRAPPED_OBJECT_H__
+#ifndef DALI_V8PLUGIN_BASE_WRAPPED_OBJECT_H
+#define DALI_V8PLUGIN_BASE_WRAPPED_OBJECT_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,8 +189,8 @@ private:
   GarbageCollectorInterface& mGarbageCollector;         ///< Dali garbage collector
 };
 
-} // V8Plugin
+} // namespace V8Plugin
 
-} // Dali
+} // namespace Dali
 
-#endif // header __DALI_V8PLUGIN_DALI_OBJECT_LIFETIME_MANAGER_H__
+#endif // DALI_V8PLUGIN_BASE_WRAPPED_OBJECT_H

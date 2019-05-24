@@ -1,8 +1,8 @@
-#ifndef __DALI_V8PLUGIN_EVENT_OBJECT_GENERATOR_H__
-#define __DALI_V8PLUGIN_EVENT_OBJECT_GENERATOR_H__
+#ifndef DALI_V8PLUGIN_EVENT_OBJECT_GENERATOR_H
+#define DALI_V8PLUGIN_EVENT_OBJECT_GENERATOR_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,13 +47,10 @@ namespace EventObjectGenerator
   v8::Handle<v8::Object> CreateWheelEvent( v8::Isolate* isolate, const WheelEvent& wheelEvent);
   v8::Handle<v8::Object> CreateKeyEvent( v8::Isolate* isolate, const KeyEvent& keyEvent);
   v8::Handle<v8::Object> CreatePanGesture( v8::Isolate* isolate, const PanGesture& panGesture);
-
-
-
 };
 
 } // namespace V8Plugin
 
 } // namespace Dali
 
-#endif // header
+#endif // DALI_V8PLUGIN_EVENT_OBJECT_GENERATOR_H

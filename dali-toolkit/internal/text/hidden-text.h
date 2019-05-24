@@ -1,8 +1,8 @@
-#ifndef __DALI_HIDDEN_TEXT_H__
-#define __DALI_HIDDEN_TEXT_H__
+#ifndef DALI_HIDDEN_TEXT_H
+#define DALI_HIDDEN_TEXT_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,4 +100,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_HIDDEN_TEXT_H__
+#endif // DALI_HIDDEN_TEXT_H

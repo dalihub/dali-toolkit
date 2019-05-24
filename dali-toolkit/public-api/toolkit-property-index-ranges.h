@@ -26,6 +26,10 @@ namespace Dali
 
 namespace Toolkit
 {
+/**
+ * @addtogroup dali_toolkit_controls
+ * @{
+ */
 
 /**
  * @brief Enumeration for the start and end property ranges.
@@ -39,6 +43,9 @@ enum PropertyRanges
   VISUAL_PROPERTY_END_INDEX   = VISUAL_PROPERTY_START_INDEX + 100000,          ///< Visual Property End Index. @SINCE_1_1.45
 };
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali

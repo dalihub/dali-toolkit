@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_DOC_H__
-#define __DALI_TOOLKIT_DOC_H__
+#ifndef DALI_TOOLKIT_DOC_H
+#define DALI_TOOLKIT_DOC_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,6 +140,10 @@
  *    <td>@ref dali_toolkit_visuals</td>
  *    <td>Visuals can control rendering the contents as using Property.</td>
  * </tr>
+ * <tr>
+ *    <td>@ref dali_toolkit_image_loader</td>
+ *    <td>The ImageLoader is used to load pixel data from a URL.</td>
+ * </tr>
  * </table>
  *
  * \ifnot show_tizen_feature
@@ -219,8 +223,10 @@
  *   @defgroup dali_toolkit_visuals Visuals
  *   @brief Visuals can control rendering the contents as using Property.
 
+ *   @defgroup dali_toolkit_image_loader Image Loader
+ *   @brief The ImageLoader is used to load pixel data from a URL.
+
  * @}
  */
 
-
-#endif  /* __DALI_TOOLKIT_DOC_H__ */
+#endif // DALI_TOOLKIT_DOC_H

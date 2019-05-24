@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_TEXT_SELECTION_POPUP_CALLBACK_INTERFACE_H__
-#define __DALI_TOOLKIT_TEXT_SELECTION_POPUP_CALLBACK_INTERFACE_H__
+#ifndef DALI_TOOLKIT_TEXT_SELECTION_POPUP_CALLBACK_INTERFACE_H
+#define DALI_TOOLKIT_TEXT_SELECTION_POPUP_CALLBACK_INTERFACE_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,4 +52,4 @@ public:
 } // namespace Dali
 
 
-#endif // __DALI_TOOLKIT_TEXT_SELECTION_POPUP_CALLBACK_INTERFACE_H__
+#endif // DALI_TOOLKIT_TEXT_SELECTION_POPUP_CALLBACK_INTERFACE_H
