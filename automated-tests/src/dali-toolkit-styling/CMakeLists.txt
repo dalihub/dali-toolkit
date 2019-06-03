@@ -23,6 +23,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-feedback-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-file-loader.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-context.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-native-image-source.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-orientation.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
@@ -35,6 +36,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-video-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-virtual-keyboard.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-window.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dummy-control.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dali-test-suite-utils.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dali-toolkit-test-suite-utils.cpp
