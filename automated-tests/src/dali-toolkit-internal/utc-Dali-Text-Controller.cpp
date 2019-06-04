@@ -1045,3 +1045,41 @@ int UtcDaliTextControllerSelectEvent(void)
 
   END_TEST;
 }
+
+
+int UtcDaliTextControllerMaxLengthSetText(void)
+{
+  tet_infoline(" UtcDaliTextControllerMaxLengthSetText");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  const Length MAX_TEXT_LENGTH = 1024u * 32u;
+
+  // make over length world
+  int maxLength = (1024u * 32u) + 10u;
+  char world[maxLength];
+  for( int i = 0; i < maxLength; i++ )
+  {
+    world[i] = 'a';
+  }
+
+  // Set the text
+  std::string text(world);
+  controller->SetText( text );
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  // check text length
+  controller->GetText( text );
+  Length textSize = text.size();
+
+  DALI_TEST_EQUALS( MAX_TEXT_LENGTH, textSize, TEST_LOCATION );
+
+  END_TEST;
+}

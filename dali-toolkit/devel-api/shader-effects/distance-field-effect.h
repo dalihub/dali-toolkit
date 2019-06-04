@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_SHADER_EFFECT_DISTANCEFIELD_H__
-#define __DALI_TOOLKIT_SHADER_EFFECT_DISTANCEFIELD_H__
+#ifndef DALI_TOOLKIT_SHADER_EFFECT_DISTANCEFIELD_H
+#define DALI_TOOLKIT_SHADER_EFFECT_DISTANCEFIELD_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,4 +180,4 @@ inline Dali::Property::Map CreateDistanceFieldEffect()
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_SHADER_EFFECT_SPOT_H__
+#endif // DALI_TOOLKIT_SHADER_EFFECT_DISTANCEFIELD_H

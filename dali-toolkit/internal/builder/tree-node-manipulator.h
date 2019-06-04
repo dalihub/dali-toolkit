@@ -1,8 +1,8 @@
-#ifndef __DALI_SCRIPT_TREE_NODE_MANIPULATOR_H__
-#define __DALI_SCRIPT_TREE_NODE_MANIPULATOR_H__
+#ifndef DALI_SCRIPT_TREE_NODE_MANIPULATOR_H
+#define DALI_SCRIPT_TREE_NODE_MANIPULATOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -260,4 +260,4 @@ char *CopyString( const char *fromString, VectorCharIter& iter, const VectorChar
 
 } // namespace Dali
 
-#endif // __DALI_SCRIPT_TREE_NODE_MANIPULATOR_H__
+#endif // DALI_SCRIPT_TREE_NODE_MANIPULATOR_H

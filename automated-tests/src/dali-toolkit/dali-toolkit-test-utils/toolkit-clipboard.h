@@ -1,8 +1,8 @@
-#ifndef  __TOOLKIT_CLIPBOARD_H__
-#define  __TOOLKIT_CLIPBOARD_H__
+#ifndef  TOOLKIT_CLIPBOARD_H
+#define  TOOLKIT_CLIPBOARD_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  *
  */
 
-#define __DALI_CLIPBOARD_H__
+#define DALI_CLIPBOARD_H
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
@@ -103,4 +103,4 @@ public:
 };
 } // namespace Dali
 
-#endif // __TOOLKIT_CLIPBOARD_H__
+#endif // TOOLKIT_CLIPBOARD_H

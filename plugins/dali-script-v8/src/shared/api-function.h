@@ -1,8 +1,8 @@
-#ifndef __DALI_V8PLUGIN_API_FUNCTION_H__
-#define __DALI_V8PLUGIN_API_FUNCTION_H__
+#ifndef DALI_V8PLUGIN_API_FUNCTION_H
+#define DALI_V8PLUGIN_API_FUNCTION_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,8 @@ struct ApiFunction
   void (*function)( const v8::FunctionCallbackInfo< v8::Value >& args);
 };
 
+} // namespace V8Plugin
 
-} // V8Plugin
+} // namespace Dali
 
-} // Dali
-
-#endif
+#endif // DALI_V8PLUGIN_API_FUNCTION_H

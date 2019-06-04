@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_BUILDER_FILESYSTEM_H__
-#define __DALI_TOOLKIT_INTERNAL_BUILDER_FILESYSTEM_H__
+#ifndef DALI_TOOLKIT_INTERNAL_BUILDER_FILESYSTEM_H
+#define DALI_TOOLKIT_INTERNAL_BUILDER_FILESYSTEM_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,4 +58,4 @@ inline std::string GetFileContents(const std::string &fn)
   return std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
 }
 
-#endif // __DALI_TOOLKIT_INTERNAL_BUILDER_FILESYSTEM_H__
+#endif // DALI_TOOLKIT_INTERNAL_BUILDER_FILESYSTEM_H

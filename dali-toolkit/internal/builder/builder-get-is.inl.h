@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_INTERNAL_BUILDER_GET_IS_INL__
-#define __DALI_TOOLKIT_INTERNAL_BUILDER_GET_IS_INL__
+#ifndef DALI_TOOLKIT_INTERNAL_BUILDER_GET_IS_INL
+#define DALI_TOOLKIT_INTERNAL_BUILDER_GET_IS_INL
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -441,4 +441,4 @@ inline int GetInteger(const TreeNode &child)
 
 
 
-#endif // __DALI_TOOLKIT_INTERNAL_BUILDER_GET_IS_INL__
+#endif // DALI_TOOLKIT_INTERNAL_BUILDER_GET_IS_INL

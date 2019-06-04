@@ -1,8 +1,8 @@
-#ifndef __DALI_TOOLKIT_RENDERING_BACKEND_H__
-#define __DALI_TOOLKIT_RENDERING_BACKEND_H__
+#ifndef DALI_TOOLKIT_RENDERING_BACKEND_H
+#define DALI_TOOLKIT_RENDERING_BACKEND_H
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,10 @@ namespace Dali
 
 namespace Toolkit
 {
+/**
+ * @addtogroup dali_toolkit_controls_text_controls
+ * @{
+ */
 
 namespace Text
 {
@@ -41,8 +45,11 @@ const unsigned int DEFAULT_RENDERING_BACKEND = RENDERING_SHARED_ATLAS;
 
 } // namespace Text
 
+/**
+ * @}
+ */
 } // namespace Toolkit
 
 } // namespace Dali
 
-#endif // __DALI_TOOLKIT_RENDERING_BACKEND_H__
+#endif // DALI_TOOLKIT_RENDERING_BACKEND_H

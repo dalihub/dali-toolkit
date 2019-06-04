@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_FEEDBACK_STYLE_H__
-#define __DALI_INTERNAL_FEEDBACK_STYLE_H__
+#ifndef DALI_INTERNAL_FEEDBACK_STYLE_H
+#define DALI_INTERNAL_FEEDBACK_STYLE_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -157,4 +157,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_FEEDBACK_STYLE_H__
+#endif // DALI_INTERNAL_FEEDBACK_STYLE_H
