@@ -34,6 +34,7 @@ devel_api_src_files = \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.cpp \
   $(devel_api_src_dir)/image-loader/image-atlas.cpp \
   $(devel_api_src_dir)/image-loader/texture-manager.cpp \
+  $(devel_api_src_dir)/layouting/flex-node.cpp \
   $(devel_api_src_dir)/scripting/script.cpp \
   $(devel_api_src_dir)/styling/style-manager-devel.cpp \
   $(devel_api_src_dir)/text/bitmap-font.cpp \
@@ -78,6 +79,9 @@ devel_api_builder_header_files = \
 
 devel_api_effects_view_header_files = \
   $(devel_api_src_dir)/controls/effects-view/effects-view.h
+
+devel_api_layouting_header_files = \
+  $(devel_api_src_dir)/layouting/flex-node.h
 
 devel_api_magnifier_header_files = \
   $(devel_api_src_dir)/controls/magnifier/magnifier.h
