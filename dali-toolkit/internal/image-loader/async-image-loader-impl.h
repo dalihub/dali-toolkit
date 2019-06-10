@@ -50,13 +50,14 @@ public:
   static IntrusivePtr<AsyncImageLoader> New();
 
   /**
-   * @copydoc Toolkit::AsyncImageLoader::Load( const std::string&, ImageDimensions, FittingMode::Type, SamplingMode::Type, bool )
+   * @copydoc Toolkit::AsyncImageLoader::Load( const std::string&, ImageDimensions, FittingMode::Type, SamplingMode::Type, bool , DevelAsyncImageLoader::PreMultiplyOnLoad )
    */
   uint32_t Load( const VisualUrl& url,
                  ImageDimensions dimensions,
                  FittingMode::Type fittingMode,
                  SamplingMode::Type samplingMode,
-                 bool orientationCorrection );
+                 bool orientationCorrection,
+                 DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
 
   /**
    * @copydoc Toolkit::AsyncImageLoader::ImageLoadedSignal

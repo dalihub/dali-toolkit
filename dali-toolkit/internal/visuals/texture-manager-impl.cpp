@@ -690,10 +690,12 @@ void TextureManager::LoadTexture( TextureInfo& textureInfo, TextureUploadObserve
   {
     auto& loadersContainer = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
     auto loadingHelperIt = loadersContainer.GetNext();
+    auto premultiplyOnLoad = textureInfo.preMultiplyOnLoad? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
     DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
     loadingHelperIt->Load(textureInfo.textureId, textureInfo.url,
                           textureInfo.desiredSize, textureInfo.fittingMode,
-                          textureInfo.samplingMode, textureInfo.orientationCorrection );
+                          textureInfo.samplingMode, textureInfo.orientationCorrection,
+                          premultiplyOnLoad );
   }
   ObserveTexture( textureInfo, observer );
 }
@@ -873,13 +875,8 @@ void TextureManager::UploadTexture( Devel::PixelBuffer& pixelBuffer, TextureInfo
   {
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::General, "  TextureManager::UploadTexture() New Texture for textureId:%d\n", textureInfo.textureId );
 
-    // If the texture doesn't have an alpha channel, can't pre-multiply it.
-    // Ensure that we don't change the load parameter (it's used for hashing), and instead set
-    // the status for use in the observer.
-    auto preMultiply = textureInfo.preMultiplyOnLoad ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD :
-      TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
-    PreMultiply( pixelBuffer, preMultiply );
-    textureInfo.preMultiplied = (preMultiply == TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD );
+    // Check if this pixelBuffer is premultiplied
+    textureInfo.preMultiplied = pixelBuffer.IsAlphaPreMultiplied();
 
     Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D, pixelBuffer.GetPixelFormat(),
                                     pixelBuffer.GetWidth(), pixelBuffer.GetHeight() );
@@ -1120,10 +1117,11 @@ void TextureManager::AsyncLoadingHelper::Load(TextureId          textureId,
                                               ImageDimensions    desiredSize,
                                               FittingMode::Type  fittingMode,
                                               SamplingMode::Type samplingMode,
-                                              bool               orientationCorrection)
+                                              bool               orientationCorrection,
+                                              DevelAsyncImageLoader::PreMultiplyOnLoad  preMultiplyOnLoad)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id = mLoader.Load(url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection);
+  auto id = DevelAsyncImageLoader::Load(mLoader, url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
   mLoadingInfoContainer.back().loadId = id;
 }
 
