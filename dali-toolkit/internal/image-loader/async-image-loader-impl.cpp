@@ -53,15 +53,15 @@ uint32_t AsyncImageLoader::Load( const VisualUrl& url,
                                  ImageDimensions dimensions,
                                  FittingMode::Type fittingMode,
                                  SamplingMode::Type samplingMode,
-                                 bool orientationCorrection )
+                                 bool orientationCorrection,
+                                 DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
   if( !mIsLoadThreadStarted )
   {
     mLoadThread.Start();
     mIsLoadThreadStarted = true;
   }
-
-  mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, url, dimensions, fittingMode, samplingMode, orientationCorrection ) );
+  mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, url, dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad ) );
 
   return mLoadTaskId;
 }

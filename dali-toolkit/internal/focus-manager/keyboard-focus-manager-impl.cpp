@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/devel-api/adaptor-framework/accessibility-adaptor.h>
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
+#include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/events/key-event.h>
@@ -31,6 +33,7 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/images/resource-image.h>
+#include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -130,8 +133,31 @@ KeyboardFocusManager::KeyboardFocusManager()
   mCustomAlgorithmInterface(NULL)
 {
   // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorShown.
-  Stage::GetCurrent().KeyEventSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
-  Stage::GetCurrent().TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
+
+  LifecycleController::Get().InitSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnAdaptorInit );
+}
+
+void KeyboardFocusManager::OnAdaptorInit()
+{
+  if( Adaptor::IsAvailable() )
+  {
+    // Retrieve all the existing widnows
+    Dali::WindowContainer windows = Adaptor::Get().GetWindows();
+    for ( auto iter = windows.begin(); iter != windows.end(); ++iter )
+    {
+      DevelWindow::KeyEventSignal( *iter ).Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
+      DevelWindow::TouchSignal( *iter ).Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch);
+    }
+
+    // Get notified when any new window is created afterwards
+    Adaptor::Get().WindowCreatedSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnWindowCreated);
+  }
+}
+
+void KeyboardFocusManager::OnWindowCreated( Dali::Window& window )
+{
+  DevelWindow::KeyEventSignal( window ).Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
+  DevelWindow::TouchSignal( window ).Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch);
 }
 
 KeyboardFocusManager::~KeyboardFocusManager()
@@ -298,10 +324,11 @@ bool KeyboardFocusManager::IsLayoutControl(Actor actor) const
 Toolkit::Control KeyboardFocusManager::GetParentLayoutControl(Actor actor) const
 {
   // Get the actor's parent layout control that supports two dimensional keyboard navigation
-  Actor rootActor = Stage::GetCurrent().GetRootLayer();
+  Actor rootActor;
   Actor parent;
   if(actor)
   {
+    rootActor = DevelWindow::Get( actor ).GetRootLayer();
     parent = actor.GetParent();
   }
 
@@ -383,7 +410,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
 
           if( !nextFocusableActor )
           {
-            nextFocusableActor = Stage::GetCurrent().GetRootLayer().FindChildById( actorId );
+            nextFocusableActor = DevelWindow::Get( currentFocusActor ).GetRootLayer().FindChildById( actorId );
           }
         }
       }

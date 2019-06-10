@@ -18,6 +18,7 @@ SET(TC_SOURCES
   utc-Dali-CubeTransitionEffect.cpp
   utc-Dali-EffectsView.cpp
   utc-Dali-FlexContainer.cpp
+  utc-Dali-FlexNode.cpp
   utc-Dali-GaussianBlurView.cpp
   utc-Dali-ImageView.cpp
   utc-Dali-ImageVisual.cpp
@@ -81,6 +82,7 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
   dali-toolkit-test-utils/toolkit-environment-variable.cpp
   dali-toolkit-test-utils/toolkit-input-method-context.cpp
+  dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp
   dali-toolkit-test-utils/toolkit-orientation.cpp
   dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
   dali-toolkit-test-utils/toolkit-style-monitor.cpp
@@ -91,6 +93,7 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/toolkit-vector-animation-renderer.cpp
   dali-toolkit-test-utils/toolkit-video-player.cpp
   dali-toolkit-test-utils/toolkit-web-engine.cpp
+  dali-toolkit-test-utils/toolkit-window.cpp
   dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
   dali-toolkit-test-utils/dali-test-suite-utils.cpp
   dali-toolkit-test-utils/dali-toolkit-test-suite-utils.cpp

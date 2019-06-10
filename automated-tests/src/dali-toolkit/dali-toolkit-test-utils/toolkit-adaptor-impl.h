@@ -25,6 +25,9 @@ namespace Dali
 class EglInterface;
 class DisplayConnection;
 class ThreadSynchronizationInterface;
+class Window;
+
+using WindowContainer = std::vector<Window>;
 
 namespace Internal
 {
@@ -59,9 +62,13 @@ public:
 
 public:
   static Dali::RenderSurfaceInterface& GetSurface();
+  static Dali::WindowContainer GetWindows();
   static Dali::Adaptor::AdaptorSignalType& AdaptorSignal();
+  static Dali::Adaptor::WindowCreatedSignalType& WindowCreatedSignal();
   static bool mAvailable;
   static Vector<CallbackBase*> mCallbacks;
+  static Dali::WindowContainer mWindows;
+  static Dali::Adaptor::WindowCreatedSignalType* mWindowCreatedSignal;
 };
 
 } // namespace Adaptor

@@ -36,7 +36,7 @@ namespace Internal
 {
 
 /**
- * FlexContainer is a custom control for laying out actors in a flexbox layout
+ * FlexContainer is a custom control for laying out actors in a Flexbox layout
  * @see Dali::Toolkit:FlexContainer for more details
  */
 class FlexContainer : public Control
