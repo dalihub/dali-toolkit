@@ -40,7 +40,7 @@ enum Type
   PLAY,            ///< Play the animated vector image.
   PAUSE,           ///< Pause the animated vector image.
   STOP,            ///< Stop the animated vector image. This is also Default playback mode.
-  JUMP_TO,         ///< Jump to the specified frame. Property::FLOAT value should be passed.
+  JUMP_TO,         ///< Jump to the specified frame. Property::INTEGER value should be passed.
   UPDATE_PROPERTY  ///< Update the properties of the animated vector image.
 };
 

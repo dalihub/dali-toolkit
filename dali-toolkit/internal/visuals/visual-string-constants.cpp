@@ -102,7 +102,8 @@ const char * const AUXILIARY_IMAGE_NAME("auxiliaryImage");
 const char * const AUXILIARY_IMAGE_ALPHA_NAME("auxiliaryImageAlpha");
 const char * const PLAY_RANGE_NAME( "playRange" );
 const char * const PLAY_STATE_NAME( "playState" );
-const char * const CURRENT_PROGRESS_NAME( "currentProgress" );
+const char * const CURRENT_FRAME_NUMBER_NAME( "currentFrameNumber" );
+const char * const TOTAL_FRAME_NUMBER_NAME( "totalFrameNumber" );
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );

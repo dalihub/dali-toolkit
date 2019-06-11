@@ -61,10 +61,8 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
   mConditionalWait(),
   mResourceReadyTrigger(),
   mAnimationFinishedTrigger(),
-  mPlayRange( 0.0f, 1.0f ),
   mPlayState( DevelImageVisual::PlayState::STOPPED ),
   mFrameDurationNanoSeconds( 0 ),
-  mProgress( 0.0f ),
   mFrameRate( 60.0f ),
   mCurrentFrame( 0 ),
   mTotalFrame( 0 ),
@@ -213,31 +211,25 @@ void VectorRasterizeThread::SetLoopCount( int32_t count )
   }
 }
 
-int32_t VectorRasterizeThread::GetLoopCount() const
+void VectorRasterizeThread::SetPlayRange( uint32_t startFrame, uint32_t endFrame )
 {
-  return mLoopCount;
-}
-
-void VectorRasterizeThread::SetPlayRange( Vector2 range )
-{
-  // Make sure the range specified is between 0.0 and 1.0
-  if( range.x >= 0.0f && range.x <= 1.0f && range.y >= 0.0f && range.y <= 1.0f )
+  // Make sure the range specified is between 0 and the total frame number
+  if( startFrame >= 0 && startFrame < mTotalFrame && endFrame >= 0 && endFrame < mTotalFrame )
   {
-    Vector2 orderedRange( range );
     // If the range is not in order swap values
-    if( range.x > range.y )
+    if( startFrame > endFrame )
     {
-      orderedRange = Vector2( range.y, range.x );
+      uint32_t temp = startFrame;
+      startFrame = endFrame;
+      endFrame = temp;
     }
 
-    if( mPlayRange != orderedRange )
+    if( startFrame != mStartFrame || endFrame != mEndFrame )
     {
       ConditionalWait::ScopedLock lock( mConditionalWait );
 
-      mPlayRange = orderedRange;
-
-      mStartFrame = static_cast< uint32_t >( mPlayRange.x * mTotalFrame + 0.5f );
-      mEndFrame = static_cast< uint32_t >( mPlayRange.y * mTotalFrame + 0.5f );
+      mStartFrame = startFrame;
+      mEndFrame = endFrame;
 
       // If the current frame is out of the range, change the current frame also.
       if( mStartFrame > mCurrentFrame )
@@ -255,36 +247,38 @@ void VectorRasterizeThread::SetPlayRange( Vector2 range )
         mResourceReady = false;
       }
 
-      DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetPlayRange: [%d, %d]\n", mStartFrame, mEndFrame );
+      DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetPlayRangeInFrame: [%d, %d]\n", mStartFrame, mEndFrame );
     }
   }
 }
 
-Vector2 VectorRasterizeThread::GetPlayRange() const
-{
-  return mPlayRange;
-}
-
-void VectorRasterizeThread::SetCurrentProgress( float progress )
+void VectorRasterizeThread::SetCurrentFrameNumber( uint32_t frameNumber )
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
 
-  if( progress >= mPlayRange.x && progress <= mPlayRange.y )
+  if( frameNumber >= mStartFrame && frameNumber <= mEndFrame )
   {
-    mProgress = progress;
-
-    mCurrentFrame = static_cast< uint32_t >( mTotalFrame * progress + 0.5f );
+    mCurrentFrame = frameNumber;
     mCurrentFrameUpdated = true;
 
     mResourceReady = false;
 
-    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetCurrentProgress: progress = %f (%d)\n", progress, mCurrentFrame );
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetCurrentFrameNumber: frame number = %f (%d)\n", mCurrentFrame );
+  }
+  else
+  {
+    DALI_LOG_ERROR( "Invalid frame number [%d (%d, %d)]\n", frameNumber, mStartFrame, mEndFrame );
   }
 }
 
-float VectorRasterizeThread::GetCurrentProgress() const
+uint32_t VectorRasterizeThread::GetCurrentFrameNumber() const
 {
-  return ( static_cast< float >( mCurrentFrame ) / static_cast< float >( mTotalFrame ) );
+  return mCurrentFrame;
+}
+
+uint32_t VectorRasterizeThread::GetTotalFrameNumber() const
+{
+  return mTotalFrame;
 }
 
 void VectorRasterizeThread::GetDefaultSize( uint32_t& width, uint32_t& height ) const
@@ -308,10 +302,7 @@ void VectorRasterizeThread::Initialize()
 
   mTotalFrame = mVectorRenderer.GetTotalFrameNumber();
 
-  mStartFrame = static_cast< uint32_t >( mPlayRange.x * mTotalFrame + 0.5f );
-  mEndFrame = static_cast< uint32_t >( mPlayRange.y * mTotalFrame + 0.5f );
-
-  mCurrentFrame = std::max( static_cast< uint32_t >( mTotalFrame * mProgress + 0.5f ), mStartFrame );
+  mEndFrame = mTotalFrame;
 
   mFrameRate = mVectorRenderer.GetFrameRate();
   mFrameDurationNanoSeconds = NANOSECONDS_PER_SECOND / mFrameRate;
