@@ -139,6 +139,7 @@ int UtcDaliKeyInputFocusManagerGet(void)
 
   // Check that focus manager is a singleton
   DALI_TEST_CHECK(manager == newManager);
+
   END_TEST;
 }
 
@@ -428,5 +429,51 @@ int UtcDaliKeyInputFocusManagerSignalKeyInputFocusChanged(void)
 
   DALI_TEST_CHECK( gainActor == Control() );
   DALI_TEST_CHECK( lostActor == Control() );
+  END_TEST;
+}
+
+int UtcDaliKeyInputFocusManagerSignalKeyInputFocusChangedforNewWindow(void)
+{
+  ToolkitTestApplication application;
+  KeyInputFocusManager manager = KeyInputFocusManager::Get();
+
+  tet_infoline(" UtcDaliKeyInputFocusManagerSignalKeyInputFocusChanged");
+
+  PushButton pushButton1 = PushButton::New();
+  PushButton pushButton2 = PushButton::New();
+
+  Window window = Window::New(PositionSize(0,0,0,0) ,"", false);
+  DALI_TEST_CHECK( window );
+
+  window.Add( pushButton1 );
+  window.Add( pushButton2 );
+
+  PushButton gainActor, lostActor;
+  KeyInputFocusChangedCallback callback( gainActor, lostActor );
+  manager.KeyInputFocusChangedSignal().Connect( &callback, &KeyInputFocusChangedCallback::Callback );
+
+  manager.SetFocus(pushButton1);
+
+  DALI_TEST_CHECK( gainActor == pushButton1 );
+  DALI_TEST_CHECK( lostActor == Control() );
+
+  gainActor.Reset();
+  lostActor.Reset();
+
+  manager.SetFocus(pushButton2);
+
+  DALI_TEST_CHECK( gainActor == pushButton2 );
+  DALI_TEST_CHECK( lostActor == pushButton1 );
+
+  gainActor.Reset();
+  lostActor.Reset();
+
+  // Removing the focus actor from the window would also result in signal emission.
+  window.Remove( pushButton1 );
+  window.Remove( pushButton2 );
+  DALI_TEST_CHECK( gainActor == Control() );
+  DALI_TEST_CHECK( lostActor == Control() );
+
+  window.Reset();
   END_TEST;
 }

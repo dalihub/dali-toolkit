@@ -217,6 +217,34 @@ public:
   Actor mActivatedActor;
 };
 
+class KeyEventCallback : public Dali::ConnectionTracker
+{
+public:
+  /**
+   * Constructor
+   * @param[in]  returnValue  Set return value of KeyEvent callback.
+   * */
+  KeyEventCallback( bool consumed )
+  : mConsumed( consumed ),
+    mIsCalled( false )
+  {
+  }
+
+  bool Callback( Control control, const KeyEvent& keyEvent )
+  {
+    mIsCalled = true;
+    return mConsumed;
+  }
+
+  void Callback( const KeyEvent& keyEvent )
+  {
+    mIsCalled = true;
+  }
+
+  bool mConsumed;
+  bool mIsCalled;
+};
+
 // Used to connect to signals via the ConnectSignal Handle method
 struct CallbackFunctor
 {
@@ -1517,5 +1545,38 @@ int UtcDaliKeyboardFocusManagerEnableFocusIndicator(void)
   END_TEST;
 }
 
+int UtcDaliKeyboardFocusManagerCheckConsumedKeyEvent(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Ensure Window can't receive KeyEvent when Control already consumed it" );
+  Dali::Integration::Scene scene = application.GetScene();
+
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK( ! manager.GetCurrentFocusActor() );
+
+  // Create the first actor and add it to the stage
+  Control control = Control::New();
+  control.SetKeyboardFocusable(true);
+  scene.Add(control);
+
+  KeyEventCallback controlCallback( true );
+  control.KeyEventSignal().Connect( &controlCallback, &KeyEventCallback::Callback );
+
+  KeyEventCallback sceneCallback( false );
+  scene.KeyEventSignal().Connect( &sceneCallback, &KeyEventCallback::Callback );
+
+  manager.SetCurrentFocusActor( control );
+
+  // Press Any key to notice physical keyboard event is comming to KeyboardFocusManager
+  // It makes mIsFocusIndicatorEnabled true and add focus indicator to focused actor.
+  Integration::KeyEvent event1( "Right", "", "", 0, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE );
+  application.ProcessEvent(event1);
+
+  DALI_TEST_CHECK( controlCallback.mIsCalled );
+  DALI_TEST_CHECK( !sceneCallback.mIsCalled );
+
+  END_TEST;
+}
 
 
