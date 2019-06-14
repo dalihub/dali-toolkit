@@ -41,6 +41,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-environment-variable.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-context.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-orientation.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-style-monitor.cpp
@@ -48,6 +49,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-vector-animation-renderer.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-window.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dali-test-suite-utils.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dali-toolkit-test-suite-utils.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dummy-control.cpp

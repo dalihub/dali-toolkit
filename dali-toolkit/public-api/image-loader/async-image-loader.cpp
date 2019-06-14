@@ -64,12 +64,12 @@ AsyncImageLoader AsyncImageLoader::New()
 
 uint32_t AsyncImageLoader::Load( const std::string& url )
 {
-  return GetImplementation( *this ).Load( Toolkit::Internal::VisualUrl(url), ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
+  return GetImplementation( *this ).Load( Toolkit::Internal::VisualUrl(url), ImageDimensions(), FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF );
 }
 
 uint32_t AsyncImageLoader::Load( const std::string& url, ImageDimensions dimensions )
 {
-  return GetImplementation( *this ).Load( Toolkit::Internal::VisualUrl(url), dimensions, FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
+  return GetImplementation( *this ).Load( Toolkit::Internal::VisualUrl(url), dimensions, FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true , DevelAsyncImageLoader::PreMultiplyOnLoad::OFF );
 }
 
 uint32_t AsyncImageLoader::Load( const std::string& url,
@@ -78,7 +78,7 @@ uint32_t AsyncImageLoader::Load( const std::string& url,
                                  SamplingMode::Type samplingMode,
                                  bool orientationCorrection )
 {
-  return GetImplementation(*this).Load( Toolkit::Internal::VisualUrl(url), dimensions, fittingMode, samplingMode, orientationCorrection );
+  return GetImplementation(*this).Load( Toolkit::Internal::VisualUrl(url), dimensions, fittingMode, samplingMode, orientationCorrection, DevelAsyncImageLoader::PreMultiplyOnLoad::OFF );
 }
 
 bool AsyncImageLoader::Cancel( uint32_t loadingTaskId )

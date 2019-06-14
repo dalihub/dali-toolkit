@@ -24,6 +24,17 @@ namespace Toolkit
 namespace DevelAsyncImageLoader
 {
 
+uint32_t Load( AsyncImageLoader asyncImageLoader,
+               const std::string& url,
+               ImageDimensions dimensions,
+               FittingMode::Type fittingMode,
+               SamplingMode::Type samplingMode,
+               bool orientationCorrection,
+               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad )
+{
+  return GetImplementation( asyncImageLoader ).Load( Toolkit::Internal::VisualUrl(url), dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
+}
+
 PixelBufferLoadedSignalType& PixelBufferLoadedSignal( AsyncImageLoader asyncImageLoader )
 {
   return GetImplementation( asyncImageLoader ).PixelBufferLoadedSignal();

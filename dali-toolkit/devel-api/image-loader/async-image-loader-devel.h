@@ -31,6 +31,36 @@ namespace DevelAsyncImageLoader
 typedef Signal< void ( uint32_t, Devel::PixelBuffer ) > PixelBufferLoadedSignalType;
 
 /**
+ * @brief Whether to multiply alpha into color channels on load
+ */
+enum class PreMultiplyOnLoad
+{
+  OFF = 0, ///< Don't modify the image
+  ON           ///< Multiply alpha into color channels on load
+};
+
+/**
+ * @brief Starts an image loading task.
+ * @REMARK_INTERNET
+ * @REMARK_STORAGE
+ * @param[in] asyncImageLoader The ayncImageLoader
+ * @param[in] url The URL of the image file to load
+ * @param[in] dimensions The width and height to fit the loaded image to
+ * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
+ * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
+ * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
+ * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha
+ * @return The loading task id
+ */
+DALI_TOOLKIT_API uint32_t Load(  AsyncImageLoader asyncImageLoader,
+                const std::string& url,
+                ImageDimensions dimensions,
+                FittingMode::Type fittingMode,
+                SamplingMode::Type samplingMode,
+                bool orientationCorrection,
+                DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
+
+/**
  * Connect to this signal if you want to load a PixelBuffer instead of a PixelData.
  * @note Connecting to this signal prevents the emission of the ImageLoadedSignal.
  */
