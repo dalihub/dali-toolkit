@@ -24,7 +24,6 @@
 #include <dali/integration-api/adaptors/adaptor.h>
 #include <toolkit-adaptor-impl.h>
 #include <toolkit-singleton-service.h>
-#include <toolkit-lifecycle-controller.h>
 
 namespace Dali
 {
@@ -50,19 +49,6 @@ public:
     if( fontClient )
     {
       fontClient.SetDpi( mDpi.x, mDpi.y );
-    }
-
-    bool isAdaptorAvailable = Dali::Internal::Adaptor::Adaptor::Get().IsAvailable();
-    if ( isAdaptorAvailable )
-    {
-      Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
-      lifecycleController.InitSignal().Emit();
-
-      Dali::Window window = Dali::Internal::Adaptor::Adaptor::mWindows.front();
-      if ( window )
-      {
-        Dali::Internal::Adaptor::Adaptor::WindowCreatedSignal().Emit( window );
-      }
     }
   }
 

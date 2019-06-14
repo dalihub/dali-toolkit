@@ -15,12 +15,8 @@
  *
  */
 
-#include <toolkit-window.h>
-
-// Don't want to include the actual window.h which otherwise will be indirectly included by adaptor.h.
-#define DALI_WINDOW_H
+// CLASS HEADER
 #include <dali/integration-api/adaptors/adaptor.h>
-
 #include <dali/integration-api/adaptors/scene-holder.h>
 
 #include <dali/public-api/object/base-object.h>
@@ -40,8 +36,6 @@ namespace Adaptor
 
 bool Adaptor::mAvailable = false;
 Vector<CallbackBase*> Adaptor::mCallbacks = Vector<CallbackBase*>();
-Dali::WindowContainer Adaptor::mWindows;
-Dali::Adaptor::WindowCreatedSignalType* Adaptor::mWindowCreatedSignal = nullptr;
 
 Dali::Adaptor& Adaptor::Get()
 {
@@ -56,25 +50,10 @@ Dali::RenderSurfaceInterface& Adaptor::GetSurface()
   return *renderSurface;
 }
 
-Dali::WindowContainer Adaptor::GetWindows()
-{
-  return Adaptor::mWindows;
-}
-
 Dali::Adaptor::AdaptorSignalType& Adaptor::AdaptorSignal()
 {
   Dali::Adaptor::AdaptorSignalType* signal = new Dali::Adaptor::AdaptorSignalType;
   return *signal;
-}
-
-Dali::Adaptor::WindowCreatedSignalType& Adaptor::WindowCreatedSignal()
-{
-  if ( !Adaptor::mWindowCreatedSignal )
-  {
-    Adaptor::mWindowCreatedSignal = new Dali::Adaptor::WindowCreatedSignalType;
-  }
-
-  return *Adaptor::mWindowCreatedSignal;
 }
 
 } // namespace Adaptor
@@ -190,19 +169,9 @@ Adaptor::AdaptorSignalType& Adaptor::LanguageChangedSignal()
   return Internal::Adaptor::Adaptor::AdaptorSignal();
 }
 
-Adaptor::WindowCreatedSignalType& Adaptor::WindowCreatedSignal()
-{
-  return Internal::Adaptor::Adaptor::WindowCreatedSignal();
-}
-
 Dali::RenderSurfaceInterface& Adaptor::GetSurface()
 {
   return Internal::Adaptor::Adaptor::GetSurface();
-}
-
-Dali::WindowContainer Adaptor::GetWindows() const
-{
-  return Internal::Adaptor::Adaptor::GetWindows();
 }
 
 Any Adaptor::GetNativeWindowHandle()
@@ -287,12 +256,6 @@ const LogFactoryInterface& Adaptor::GetLogFactory()
 Adaptor::Adaptor()
 : mImpl( NULL )
 {
-  Dali::PositionSize win_size;
-  win_size.width = 640;
-  win_size.height = 800;
-
-  Dali::Window window = Dali::Window::New( win_size, "" );
-  Internal::Adaptor::Adaptor::mWindows.push_back( window );
 }
 
 } // namespace Dali

@@ -30,8 +30,6 @@
 namespace Dali
 {
 
-class Window;
-
 namespace Toolkit
 {
 
@@ -41,7 +39,7 @@ namespace Internal
 /**
  * @copydoc Toolkit::KeyboardFocusManager
  */
-class KeyboardFocusManager : public Dali::BaseObject, public ConnectionTracker
+class KeyboardFocusManager : public Dali::BaseObject
 {
 public:
 
@@ -176,17 +174,6 @@ private:
 
   typedef std::vector< WeakHandle< Actor > > FocusStack; ///< Define Dali::Vector< Dali::BaseObject* > as FocusStack to contain focus history
   typedef FocusStack::iterator FocusStackIterator; ///< Define FocusStack::Iterator as FocusStackIterator to navigate FocusStack
-
-  /**
-   * This will be called when the adaptor is initialized
-   */
-  void OnAdaptorInit();
-
-  /**
-   * This will be called when a new wndow is created
-   * @param window The new window
-   */
-  void OnWindowCreated( Dali::Window& window );
 
   /**
    * Get configuration from StyleManager.
