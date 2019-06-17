@@ -20,7 +20,6 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/devel-api/common/stage-devel.h>
 
 // INTERNAL INCLUDES
 #include "toolkit-window.h"
@@ -106,11 +105,6 @@ Window Get( Actor actor )
 KeyEventSignalType& KeyEventSignal( Window window )
 {
   return Dali::Stage::GetCurrent().KeyEventSignal();
-}
-
-KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Window window )
-{
-  return DevelStage::KeyEventGeneratedSignal( Dali::Stage::GetCurrent() );
 }
 
 TouchSignalType& TouchSignal( Window window )
