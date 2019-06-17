@@ -1478,3 +1478,59 @@ int UtcDaliToolkitTextLabelBitmapFont(void)
 
   END_TEST;
 }
+
+int ConvertPointToPixel( float point )
+{
+  unsigned int horizontalDpi = 0u;
+  unsigned int verticalDpi = 0u;
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.GetDpi( horizontalDpi, verticalDpi );
+
+  return ( point * 72.f ) / static_cast< float >( horizontalDpi );
+}
+
+int UtcDaliToolkitTextlabelTextFit(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelTextFit");
+  TextLabel label = TextLabel::New();
+  Vector2 size( 460.0f, 100.0f );
+  label.SetSize( size );
+  label.SetProperty( TextLabel::Property::TEXT, "Hello world" );
+
+  // check point size
+  Property::Map textFitMapSet;
+  textFitMapSet["enable"] = true;
+  textFitMapSet["minSize"] = 10.f;
+  textFitMapSet["maxSize"] = 100.f;
+  textFitMapSet["stepSize"] = -1.f;
+  textFitMapSet["fontSizeType"] = "pointSize";
+
+  label.SetProperty( Toolkit::DevelTextLabel::Property::TEXT_FIT, textFitMapSet );
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 120.f);
+
+  Stage::GetCurrent().Add( label );
+
+  application.SendNotification();
+  application.Render();
+
+  const Vector3 EXPECTED_NATURAL_SIZE( 460.0f, 98.0f, 0.0f );
+  DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION );
+
+  // check pixel size
+  textFitMapSet.Clear();
+  textFitMapSet["enable"] = true;
+  textFitMapSet["minSize"] = ConvertPointToPixel( 10.f );
+  textFitMapSet["maxSize"] = ConvertPointToPixel( 100.f );
+  textFitMapSet["stepSize"] = ConvertPointToPixel ( 1.f );
+  textFitMapSet["fontSizeType"] = "pixelSize";
+
+  label.SetProperty( Toolkit::DevelTextLabel::Property::TEXT_FIT, textFitMapSet );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION );
+
+  END_TEST;
+}

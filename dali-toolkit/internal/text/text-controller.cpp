@@ -69,6 +69,17 @@ float ConvertToEven( float value )
   return static_cast<float>( intValue + ( intValue & 1 ) );
 }
 
+int ConvertPixelToPint( float pixel )
+{
+  unsigned int horizontalDpi = 0u;
+  unsigned int verticalDpi = 0u;
+  Dali::TextAbstraction::FontClient fontClient = Dali::TextAbstraction::FontClient::Get();
+  fontClient.GetDpi( horizontalDpi, verticalDpi );
+
+  return ( pixel * 72.f ) / static_cast< float >( horizontalDpi );
+}
+
+
 } // namespace
 
 namespace Dali
@@ -478,6 +489,92 @@ void Controller::SetTextElideEnabled( bool enabled )
 bool Controller::IsTextElideEnabled() const
 {
   return mImpl->mModel->mElideEnabled;
+}
+
+void Controller::SetTextFitEnabled(bool enabled)
+{
+  mImpl->mTextFitEnabled = enabled;
+}
+
+bool Controller::IsTextFitEnabled() const
+{
+  return mImpl->mTextFitEnabled;
+}
+
+void Controller::SetTextFitMinSize( float minSize, FontSizeType type )
+{
+  switch( type )
+  {
+    case POINT_SIZE:
+    {
+      mImpl->mTextFitMinSize = minSize;
+      break;
+    }
+    case PIXEL_SIZE:
+    {
+      mImpl->mTextFitMinSize = ConvertPixelToPint( minSize );
+      break;
+    }
+  }
+}
+
+float Controller::GetTextFitMinSize() const
+{
+  return mImpl->mTextFitMinSize;
+}
+
+void Controller::SetTextFitMaxSize( float maxSize, FontSizeType type )
+{
+  switch( type )
+  {
+    case POINT_SIZE:
+    {
+      mImpl->mTextFitMaxSize = maxSize;
+      break;
+    }
+    case PIXEL_SIZE:
+    {
+      mImpl->mTextFitMaxSize = ConvertPixelToPint( maxSize );
+      break;
+    }
+  }
+}
+
+float Controller::GetTextFitMaxSize() const
+{
+  return mImpl->mTextFitMaxSize;
+}
+
+void Controller::SetTextFitStepSize( float step, FontSizeType type )
+{
+  switch( type )
+  {
+    case POINT_SIZE:
+    {
+      mImpl->mTextFitStepSize = step;
+      break;
+    }
+    case PIXEL_SIZE:
+    {
+      mImpl->mTextFitStepSize = ConvertPixelToPint( step );
+      break;
+    }
+  }
+}
+
+float Controller::GetTextFitStepSize() const
+{
+  return mImpl->mTextFitStepSize;
+}
+
+void Controller::SetTextFitContentSize(Vector2 size)
+{
+  mImpl->mTextFitContentSize = size;
+}
+
+Vector2 Controller::GetTextFitContentSize() const
+{
+  return mImpl->mTextFitContentSize;
 }
 
 void Controller::SetPlaceholderTextElideEnabled( bool enabled )
@@ -1989,6 +2086,94 @@ Vector3 Controller::GetNaturalSize()
   naturalSize.y = ConvertToEven( naturalSize.y );
 
   return naturalSize;
+}
+
+bool Controller::CheckForTextFit( float pointSize, Size& layoutSize )
+{
+  Size textSize;
+  mImpl->mFontDefaults->mFitPointSize = pointSize;
+  mImpl->mFontDefaults->sizeDefined = true;
+  ClearFontData();
+
+  // Operations that can be done only once until the text changes.
+  const OperationsMask onlyOnceOperations = static_cast<OperationsMask>( CONVERT_TO_UTF32 |
+                                                                              GET_SCRIPTS |
+                                                                           VALIDATE_FONTS |
+                                                                          GET_LINE_BREAKS |
+                                                                          GET_WORD_BREAKS |
+                                                                                BIDI_INFO |
+                                                                                SHAPE_TEXT|
+                                                                         GET_GLYPH_METRICS );
+
+  mImpl->mTextUpdateInfo.mParagraphCharacterIndex = 0u;
+  mImpl->mTextUpdateInfo.mRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
+
+  // Make sure the model is up-to-date before layouting
+  mImpl->UpdateModel( onlyOnceOperations );
+
+  DoRelayout( Size( layoutSize.width, MAX_FLOAT ),
+              static_cast<OperationsMask>( onlyOnceOperations | LAYOUT),
+              textSize);
+
+  // Clear the update info. This info will be set the next time the text is updated.
+  mImpl->mTextUpdateInfo.Clear();
+  mImpl->mTextUpdateInfo.mClearAll = true;
+
+  if( textSize.width > layoutSize.width || textSize.height > layoutSize.height )
+  {
+    return false;
+  }
+  return true;
+}
+
+void Controller::FitPointSizeforLayout( Size layoutSize )
+{
+    bool actualellipsis = mImpl->mModel->mElideEnabled;
+    float minPointSize = mImpl->mTextFitMinSize;
+    float maxPointSize = mImpl->mTextFitMaxSize;
+    float pointInterval = mImpl->mTextFitStepSize;
+
+    mImpl->mModel->mElideEnabled = false;
+    Vector<float> pointSizeArray;
+
+    // check zero value
+    if( pointInterval < 1.f )
+    {
+      mImpl->mTextFitStepSize = pointInterval = 1.0f;
+    }
+
+    pointSizeArray.Reserve( static_cast< unsigned int >( ceil( ( maxPointSize - minPointSize ) / pointInterval ) ) );
+
+    for( float i = minPointSize; i < maxPointSize; i += pointInterval )
+    {
+      pointSizeArray.PushBack( i );
+    }
+
+    pointSizeArray.PushBack( maxPointSize );
+
+    int bestSizeIndex = 0;
+    int min = bestSizeIndex + 1;
+    int max = pointSizeArray.Size() - 1;
+    while( min <= max )
+    {
+      int destI = ( min + max ) / 2;
+
+      if( CheckForTextFit( pointSizeArray[destI], layoutSize ) )
+      {
+        bestSizeIndex = min;
+        min = destI + 1;
+      }
+      else
+      {
+        max = destI - 1;
+        bestSizeIndex = max;
+      }
+    }
+
+    mImpl->mModel->mElideEnabled = actualellipsis;
+    mImpl->mFontDefaults->mFitPointSize = pointSizeArray[bestSizeIndex];
+    mImpl->mFontDefaults->sizeDefined = true;
+    ClearFontData();
 }
 
 float Controller::GetHeightForWidth( float width )
