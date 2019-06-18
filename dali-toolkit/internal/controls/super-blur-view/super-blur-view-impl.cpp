@@ -30,6 +30,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL_INCLUDES
+#include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
@@ -94,6 +95,104 @@ struct ActorOpacityConstraint
   Vector2 mRange;
 };
 
+#define DALI_COMPOSE_SHADER(STR) #STR
+
+const char * const BASIC_VERTEX_SOURCE = DALI_COMPOSE_SHADER(
+  precision mediump float;\n
+  attribute mediump vec2 aPosition;\n
+  attribute mediump vec2 aTexture;\n
+  varying mediump vec2 vTexCoord;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition * uSize.xy, 0.0, 1.0);\n
+    vTexCoord = aTexture;\n
+    gl_Position = uMvpMatrix * vertexPosition;\n
+  }\n
+);
+
+const char * const BASIC_FRAGMENT_SOURCE = DALI_COMPOSE_SHADER(
+  precision mediump float;\n
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform vec4 uColor;\n
+  \n
+  void main()\n
+  {\n
+    gl_FragColor = texture2D(sTexture, vTexCoord);\n
+    gl_FragColor *= uColor;
+  }\n
+);
+
+Renderer CreateRenderer( const char* vertexSrc, const char* fragmentSrc )
+{
+  Shader shader = Shader::New( vertexSrc, fragmentSrc );
+
+  Geometry texturedQuadGeometry = Geometry::New();
+
+  struct VertexPosition { Vector2 position; };
+  struct VertexTexture { Vector2 texture; };
+
+  VertexPosition positionArray[] =
+  {
+    { Vector2( -0.5f, -0.5f ) },
+    { Vector2(  0.5f, -0.5f ) },
+    { Vector2( -0.5f,  0.5f ) },
+    { Vector2(  0.5f,  0.5f ) }
+  };
+  uint32_t numberOfVertices = sizeof(positionArray)/sizeof(VertexPosition);
+
+  VertexTexture uvArray[] =
+  {
+    { Vector2( 0.0f, 0.0f ) },
+    { Vector2( 1.0f, 0.0f ) },
+    { Vector2( 0.0f, 1.0f ) },
+    { Vector2( 1.0f, 1.0f ) }
+  };
+
+  Property::Map positionVertexFormat;
+  positionVertexFormat["aPosition"] = Property::VECTOR2;
+  PropertyBuffer positionVertices = PropertyBuffer::New( positionVertexFormat );
+  positionVertices.SetData( positionArray, numberOfVertices );
+  texturedQuadGeometry.AddVertexBuffer( positionVertices );
+
+  Property::Map textureVertexFormat;
+  textureVertexFormat["aTexture"] = Property::VECTOR2;
+  PropertyBuffer textureVertices = PropertyBuffer::New( textureVertexFormat );
+  textureVertices.SetData( uvArray, numberOfVertices );
+  texturedQuadGeometry.AddVertexBuffer( textureVertices );
+
+  const uint16_t indices[] = { 0, 3, 1, 0, 2, 3 };
+  texturedQuadGeometry.SetIndexBuffer ( &indices[0], sizeof( indices )/ sizeof( indices[0] ) );
+
+  Renderer renderer = Renderer::New( texturedQuadGeometry, shader );
+
+  TextureSet textureSet = TextureSet::New();
+  renderer.SetTextures( textureSet );
+
+  return renderer;
+}
+
+void SetRendererTexture( Renderer& renderer, Texture& texture )
+{
+  if( renderer )
+  {
+    TextureSet textureSet = renderer.GetTextures();
+    textureSet.SetTexture( 0u, texture );
+  }
+}
+
+void SetRendererTexture( Renderer& renderer, FrameBuffer& frameBuffer )
+{
+  if( frameBuffer )
+  {
+    Texture texture = frameBuffer.GetColorTexture();
+    SetRendererTexture( renderer, texture );
+  }
+}
+
 } // namespace
 
 namespace Dali
@@ -118,7 +217,7 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::SuperBlurView, Toolkit::Control, Create )
 
-DALI_PROPERTY_REGISTRATION( Toolkit, SuperBlurView, "image", MAP, IMAGE )
+DALI_PROPERTY_REGISTRATION( Toolkit, SuperBlurView, "imageUrl", STRING, IMAGE_URL )
 
 DALI_TYPE_REGISTRATION_END()
 
@@ -133,8 +232,8 @@ SuperBlurView::SuperBlurView( unsigned int blurLevels )
 {
   DALI_ASSERT_ALWAYS( mBlurLevels > 0 && " Minimal blur level is one, otherwise no blur is needed" );
   mGaussianBlurView.assign( blurLevels, Toolkit::GaussianBlurView() );
-  mBlurredImage.assign( blurLevels, FrameBufferImage() );
-  mVisuals.assign( blurLevels+1, Toolkit::Visual::Base() );
+  mBlurredImage.assign( blurLevels, FrameBuffer() );
+  mRenderers.assign( blurLevels+1, Dali::Renderer() );
 }
 
 SuperBlurView::~SuperBlurView()
@@ -158,12 +257,15 @@ Toolkit::SuperBlurView SuperBlurView::New( unsigned int blurLevels )
 
 void SuperBlurView::OnInitialize()
 {
-  mBlurStrengthPropertyIndex = Self().RegisterProperty( "blurStrength", 0.f );
+  Actor self( Self() );
+
+  mBlurStrengthPropertyIndex = self.RegisterProperty( "blurStrength", 0.f );
 }
 
-void SuperBlurView::SetImage(Image inputImage)
+void SuperBlurView::SetTexture( Texture texture )
 {
-  mInputImage = inputImage;
+  mInputTexture = texture;
+
   if( mTargetSize == Vector2::ZERO )
   {
     return;
@@ -173,22 +275,19 @@ void SuperBlurView::SetImage(Image inputImage)
 
   Actor self( Self() );
 
-  mVisuals[0] = Toolkit::VisualFactory::Get().CreateVisual( mInputImage );
-  DevelControl::RegisterVisual( *this, 0, mVisuals[0], 0 ); // Will clean up previously registered visuals for this index.
-  // custom shader is not applied on the original image.
+  BlurTexture( 0, mInputTexture );
+  SetRendererTexture( mRenderers[0], texture );
 
-  BlurImage( 0,  inputImage);
-  for(unsigned int i=1; i<mBlurLevels;i++)
+  unsigned int i = 1;
+  for(; i<mBlurLevels; i++)
   {
-    BlurImage( i, mBlurredImage[i-1]);
+    BlurTexture( i, mBlurredImage[i-1].GetColorTexture() );
+    SetRendererTexture( mRenderers[i], mBlurredImage[i-1] );
   }
 
-  mResourcesCleared = false;
-}
+  SetRendererTexture( mRenderers[i], mBlurredImage[i-1] );
 
-Image SuperBlurView::GetImage()
-{
-  return mInputImage;
+  mResourcesCleared = false;
 }
 
 Property::Index SuperBlurView::GetBlurStrengthPropertyIndex() const
@@ -214,13 +313,16 @@ Toolkit::SuperBlurView::SuperBlurViewSignal& SuperBlurView::BlurFinishedSignal()
   return mBlurFinishedSignal;
 }
 
-Image SuperBlurView::GetBlurredImage( unsigned int level )
+Texture SuperBlurView::GetBlurredTexture( unsigned int level )
 {
   DALI_ASSERT_ALWAYS( level>0 && level<=mBlurLevels );
-  return mBlurredImage[level-1];
+
+  FrameBuffer frameBuffer = mBlurredImage[level-1];
+
+  return frameBuffer.GetColorTexture();
 }
 
-void SuperBlurView::BlurImage( unsigned int idx, Image image )
+void SuperBlurView::BlurTexture( unsigned int idx, Texture texture )
 {
   DALI_ASSERT_ALWAYS( mGaussianBlurView.size()>idx );
   mGaussianBlurView[idx] = Toolkit::GaussianBlurView::New( GAUSSIAN_BLUR_DEFAULT_NUM_SAMPLES+GAUSSIAN_BLUR_NUM_SAMPLES_INCREMENTATION*idx,
@@ -230,7 +332,9 @@ void SuperBlurView::BlurImage( unsigned int idx, Image image )
   mGaussianBlurView[idx].SetParentOrigin(ParentOrigin::CENTER);
   mGaussianBlurView[idx].SetSize(mTargetSize);
   Stage::GetCurrent().Add( mGaussianBlurView[idx] );
-  mGaussianBlurView[idx].SetUserImageAndOutputRenderTarget( image, mBlurredImage[idx] );
+
+  mGaussianBlurView[idx].SetUserImageAndOutputRenderTarget( texture, mBlurredImage[idx] );
+
   mGaussianBlurView[idx].ActivateOnce();
   if( idx == mBlurLevels-1 )
   {
@@ -258,15 +362,6 @@ void SuperBlurView::ClearBlurResource()
     mResourcesCleared = true;
   }
 }
-void SuperBlurView::SetShaderEffect( Toolkit::Visual::Base& visual )
-{
-  Property::Map shaderMap;
-  std::stringstream verterShaderString;
-  shaderMap[ "fragmentShader" ] = FRAGMENT_SHADER;
-
-  Internal::Visual::Base& visualImpl = Toolkit::GetImplementation( visual );
-  visualImpl.SetCustomShader( shaderMap );
-}
 
 void SuperBlurView::OnSizeSet( const Vector3& targetSize )
 {
@@ -278,17 +373,18 @@ void SuperBlurView::OnSizeSet( const Vector3& targetSize )
     for( unsigned int i = 1; i <= mBlurLevels; i++ )
     {
       float exponent = static_cast<float>(i);
-      mBlurredImage[i-1] = FrameBufferImage::New( mTargetSize.width/std::pow(2.f,exponent) , mTargetSize.height/std::pow(2.f,exponent),
-                                                GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT );
 
-      mVisuals[i] = Toolkit::VisualFactory::Get().CreateVisual( mBlurredImage[i - 1] );
-      DevelControl::RegisterVisual( *this, i, mVisuals[i], int( i ) ); // Will clean up existing visual with same index.
-      SetShaderEffect( mVisuals[i] );
+      unsigned int width = mTargetSize.width/std::pow(2.f,exponent);
+      unsigned int height = mTargetSize.height/std::pow(2.f,exponent);
+
+      mBlurredImage[i-1] = FrameBuffer::New( width, height, FrameBuffer::Attachment::NONE );
+      Texture texture = Texture::New( TextureType::TEXTURE_2D, GAUSSIAN_BLUR_RENDER_TARGET_PIXEL_FORMAT, unsigned(width), unsigned(height) );
+      mBlurredImage[i-1].AttachColorTexture( texture );
     }
 
-    if( mInputImage )
+    if( mInputTexture )
     {
-      SetImage( mInputImage );
+      SetTexture( mInputTexture );
     }
   }
 
@@ -306,29 +402,51 @@ void SuperBlurView::OnStageConnection( int depth )
   Control::OnStageConnection( depth );
 
   Actor self = Self();
-  for(unsigned int i=0; i<=mBlurLevels;i++)
+
+  for(unsigned int i=0; i<mBlurLevels+1;i++)
   {
-    // Note that the renderer indices are depending on the order they been added to the actor
-    // which might be different from the blur level of its texture.
-    // We can check the depth index of the renderer to know which blurred image it renders.
-    // All visuals WILL have renderers at this point as we are simply creating visuals with an Image handle.
-    Renderer renderer = self.GetRendererAt( i );
-    int depthIndex = renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX);
-    if( depthIndex > 0 )
+    mRenderers[i] = CreateRenderer( BASIC_VERTEX_SOURCE, FRAGMENT_SHADER );
+    mRenderers[i].SetProperty( Dali::Renderer::Property::DEPTH_INDEX, (int)i );
+    self.AddRenderer( mRenderers[i] );
+
+    if( i > 0 )
     {
+      Renderer renderer = mRenderers[i];
       Property::Index index = renderer.RegisterProperty( ALPHA_UNIFORM_NAME, 0.f );
-      Constraint constraint = Constraint::New<float>( renderer, index, ActorOpacityConstraint(mBlurLevels, depthIndex-1) );
+      Constraint constraint = Constraint::New<float>( renderer, index, ActorOpacityConstraint(mBlurLevels, i-1) );
       constraint.AddSource( Source( self, mBlurStrengthPropertyIndex ) );
       constraint.Apply();
     }
   }
+
+  if( mInputTexture )
+  {
+    SetRendererTexture( mRenderers[0], mInputTexture );
+    unsigned int i = 1;
+    for(; i<mBlurLevels; i++)
+    {
+      SetRendererTexture( mRenderers[i], mBlurredImage[i-1] );
+    }
+    SetRendererTexture( mRenderers[i], mBlurredImage[i-1] );
+  }
+}
+
+void SuperBlurView::OnStageDisconnection()
+{
+  for(unsigned int i=0; i<mBlurLevels+1;i++)
+  {
+    Self().RemoveRenderer( mRenderers[i] );
+    mRenderers[i].Reset();
+  }
+
+  Control::OnStageDisconnection();
 }
 
 Vector3 SuperBlurView::GetNaturalSize()
 {
-  if( mInputImage )
+  if( mInputTexture )
   {
-    return Vector3( mInputImage.GetWidth(), mInputImage.GetHeight(), 0.f );
+    return Vector3( mInputTexture.GetWidth(), mInputTexture.GetHeight(), 0.f );
   }
   return Vector3::ZERO;
 }
@@ -341,12 +459,18 @@ void SuperBlurView::SetProperty( BaseObject* object, Property::Index propertyInd
   {
     SuperBlurView& superBlurViewImpl( GetImpl( superBlurView ) );
 
-    if( propertyIndex == Toolkit::SuperBlurView::Property::IMAGE )
+    if( propertyIndex == Toolkit::SuperBlurView::Property::IMAGE_URL )
     {
-      Dali::Image image = Scripting::NewImage( value );
-      if ( image )
+      value.Get( superBlurViewImpl.mUrl );
+
+      PixelData pixels = SyncImageLoader::Load( superBlurViewImpl.mUrl );
+
+      if ( pixels )
       {
-        superBlurViewImpl.SetImage( image );
+        Texture texture = Texture::New( TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight() );
+        texture.Upload( pixels, 0, 0, 0, 0, pixels.GetWidth(), pixels.GetHeight() );
+
+        superBlurViewImpl.SetTexture( texture );
       }
       else
       {
@@ -366,15 +490,9 @@ Property::Value SuperBlurView::GetProperty( BaseObject* object, Property::Index 
   {
     SuperBlurView& superBlurViewImpl( GetImpl( blurView ) );
 
-    if( propertyIndex == Toolkit::SuperBlurView::Property::IMAGE )
+    if( propertyIndex == Toolkit::SuperBlurView::Property::IMAGE_URL )
     {
-      Property::Map map;
-      Image inputImage = superBlurViewImpl.GetImage();
-      if( inputImage )
-      {
-        Scripting::CreatePropertyMap( inputImage, map );
-      }
-      value = Property::Value( map );
+      value = superBlurViewImpl.mUrl;
     }
   }
 

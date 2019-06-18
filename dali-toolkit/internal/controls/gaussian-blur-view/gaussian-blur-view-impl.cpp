@@ -26,6 +26,10 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/rendering/geometry.h>
+#include <dali/public-api/rendering/property-buffer.h>
+#include <dali/public-api/rendering/renderer.h>
+#include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/integration-api/debug.h>
 
@@ -54,13 +58,13 @@
 // 2 modes:
 // 1st mode, this control has a tree of actors (use Add() to add children) that are rendered and blurred.
 // mRenderChildrenTask renders children to FB mRenderTargetForRenderingChildren
-// mHorizBlurTask renders mImageViewHorizBlur Actor showing FB mRenderTargetForRenderingChildren into FB mRenderTarget2
-// mVertBlurTask renders mImageViewVertBlur Actor showing FB mRenderTarget2 into FB mRenderTarget1
-// mCompositeTask renders mImageViewComposite Actor showing FB mRenderTarget1 into FB mRenderTargetForRenderingChildren
+// mHorizBlurTask renders mHorizBlurActor Actor showing FB mRenderTargetForRenderingChildren into FB mRenderTarget2
+// mVertBlurTask renders mVertBlurActor Actor showing FB mRenderTarget2 into FB mRenderTarget1
+// mCompositeTask renders mCompositingActor Actor showing FB mRenderTarget1 into FB mRenderTargetForRenderingChildren
 //
 // 2nd mode, an image is blurred and rendered to a supplied target framebuffer
-// mHorizBlurTask renders mImageViewHorizBlur Actor showing mUserInputImage into FB mRenderTarget2
-// mVertBlurTask renders mImageViewVertBlur Actor showing mRenderTarget2 into FB mUserOutputRenderTarget
+// mHorizBlurTask renders mHorizBlurActor Actor showing mUserInputImage into FB mRenderTarget2
+// mVertBlurTask renders mVertBlurActor Actor showing mRenderTarget2 into FB mUserOutputRenderTarget
 //
 // Only this 2nd mode handles ActivateOnce
 
@@ -96,22 +100,120 @@ const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE = 0.5f;
 
 const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 
-const char* const GAUSSIAN_BLUR_FRAGMENT_SOURCE =
-    "varying mediump vec2 vTexCoord;\n"
-    "uniform sampler2D sTexture;\n"
-    "uniform lowp vec4 uColor;\n"
-    "uniform mediump vec2 uSampleOffsets[NUM_SAMPLES];\n"
-    "uniform mediump float uSampleWeights[NUM_SAMPLES];\n"
+#define DALI_COMPOSE_SHADER(STR) #STR
 
-    "void main()\n"
-    "{\n"
-    "   mediump vec4 col = texture2D(sTexture, vTexCoord + uSampleOffsets[0]) * uSampleWeights[0];\n"
-    "   for (int i=1; i<NUM_SAMPLES; ++i)\n"
-    "   {\n"
-    "     col += texture2D(sTexture, vTexCoord + uSampleOffsets[i]) * uSampleWeights[i];\n"
-    "   }\n"
-    "   gl_FragColor = col;\n"
-    "}\n";
+const char * const BASIC_VERTEX_SOURCE = DALI_COMPOSE_SHADER(
+  precision mediump float;\n
+  attribute mediump vec2 aPosition;\n
+  attribute mediump vec2 aTexture;\n
+  varying mediump vec2 vTexCoord;\n
+  uniform mediump mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  \n
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition * uSize.xy, 0.0, 1.0);\n
+    vTexCoord = aTexture;\n
+    gl_Position = uMvpMatrix * vertexPosition;\n
+  }\n
+);
+
+const char * const BASIC_FRAGMENT_SOURCE = DALI_COMPOSE_SHADER(
+  precision mediump float;\n
+  varying mediump vec2 vTexCoord;\n
+  uniform sampler2D sTexture;\n
+  uniform vec4 uColor;\n
+  \n
+  void main()\n
+  {\n
+    gl_FragColor = texture2D(sTexture, vTexCoord);\n
+    gl_FragColor *= uColor;
+  }\n
+);
+
+const char* const GAUSSIAN_BLUR_FRAGMENT_SOURCE = DALI_COMPOSE_SHADER(
+    varying mediump vec2 vTexCoord;\n
+    uniform sampler2D sTexture;\n
+    uniform lowp vec4 uColor;\n
+    uniform mediump vec2 uSampleOffsets[NUM_SAMPLES];\n
+    uniform mediump float uSampleWeights[NUM_SAMPLES];\n
+
+    void main()\n
+    {\n
+       mediump vec4 col = texture2D(sTexture, vTexCoord + uSampleOffsets[0]) * uSampleWeights[0];\n
+       for (int i=1; i<NUM_SAMPLES; ++i)\n
+       {\n
+         col += texture2D(sTexture, vTexCoord + uSampleOffsets[i]) * uSampleWeights[i];\n
+       }\n
+       gl_FragColor = col;\n
+    }\n
+);
+
+Renderer CreateRenderer( const char* vertexSrc, const char* fragmentSrc )
+{
+  Shader shader = Shader::New( vertexSrc, fragmentSrc );
+
+  Geometry texturedQuadGeometry = Geometry::New();
+
+  struct VertexPosition { Vector2 position; };
+  struct VertexTexture { Vector2 texture; };
+
+  VertexPosition positionArray[] =
+  {
+    { Vector2( -0.5f, -0.5f ) },
+    { Vector2(  0.5f, -0.5f ) },
+    { Vector2( -0.5f,  0.5f ) },
+    { Vector2(  0.5f,  0.5f ) }
+  };
+  uint32_t numberOfVertices = sizeof(positionArray)/sizeof(VertexPosition);
+
+  VertexTexture uvArray[] =
+  {
+    { Vector2( 0.0f, 0.0f ) },
+    { Vector2( 1.0f, 0.0f ) },
+    { Vector2( 0.0f, 1.0f ) },
+    { Vector2( 1.0f, 1.0f ) }
+  };
+
+  Property::Map positionVertexFormat;
+  positionVertexFormat["aPosition"] = Property::VECTOR2;
+  PropertyBuffer positionVertices = PropertyBuffer::New( positionVertexFormat );
+  positionVertices.SetData( positionArray, numberOfVertices );
+  texturedQuadGeometry.AddVertexBuffer( positionVertices );
+
+  Property::Map textureVertexFormat;
+  textureVertexFormat["aTexture"] = Property::VECTOR2;
+  PropertyBuffer textureVertices = PropertyBuffer::New( textureVertexFormat );
+  textureVertices.SetData( uvArray, numberOfVertices );
+  texturedQuadGeometry.AddVertexBuffer( textureVertices );
+
+  const uint16_t indices[] = { 0, 3, 1, 0, 2, 3 };
+  texturedQuadGeometry.SetIndexBuffer ( &indices[0], sizeof( indices )/ sizeof( indices[0] ) );
+
+  Renderer renderer = Renderer::New( texturedQuadGeometry, shader );
+
+  TextureSet textureSet = TextureSet::New();
+  renderer.SetTextures( textureSet );
+
+  return renderer;
+}
+
+void SetTexture( Actor actor, Texture texture )
+{
+  if( Renderer renderer = actor.GetRendererAt(0) )
+  {
+    TextureSet textureSet = renderer.GetTextures();
+    textureSet.SetTexture( 0u, texture );
+  }
+}
+
+void SetTexture( Actor actor, FrameBuffer frameBuffer )
+{
+  if( frameBuffer )
+  {
+    SetTexture( actor, frameBuffer.GetColorTexture() );
+  }
+}
 
 } // namespace
 
@@ -213,19 +315,19 @@ void GaussianBlurView::Remove(Actor child)
   mChildrenRoot.Remove(child);
 }
 
-void GaussianBlurView::SetUserImageAndOutputRenderTarget(Image inputImage, FrameBufferImage outputRenderTarget)
+void GaussianBlurView::SetUserImageAndOutputRenderTarget(Texture inputImage, FrameBuffer outputRenderTarget)
 {
   // can only do this if the GaussianBlurView object was created with this parameter set
   DALI_ASSERT_ALWAYS(mBlurUserImage);
 
   mUserInputImage = inputImage;
-  mImageViewHorizBlur.SetImage( mUserInputImage );
-  mImageViewHorizBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, mCustomShader );
+
+  SetTexture( mHorizBlurActor, inputImage );
 
   mUserOutputRenderTarget = outputRenderTarget;
 }
 
-FrameBufferImage GaussianBlurView::GetBlurredRenderTarget() const
+FrameBuffer GaussianBlurView::GetBlurredRenderTarget() const
 {
   if(!mUserOutputRenderTarget)
   {
@@ -259,23 +361,25 @@ void GaussianBlurView::OnInitialize()
   //////////////////////////////////////////////////////
   // Create shaders
 
-  std::ostringstream horizFragmentShaderStringStream;
-  horizFragmentShaderStringStream << "#define NUM_SAMPLES " << mNumSamples << "\n";
-  horizFragmentShaderStringStream << GAUSSIAN_BLUR_FRAGMENT_SOURCE;
-  Property::Map source;
-  source[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = horizFragmentShaderStringStream.str();
-  mCustomShader[ Toolkit::Visual::Property::SHADER ] = source;
+  std::ostringstream fragmentStringStream;
+  fragmentStringStream << "#define NUM_SAMPLES " << mNumSamples << "\n";
+  fragmentStringStream << GAUSSIAN_BLUR_FRAGMENT_SOURCE;
+  std::string fragmentSource(fragmentStringStream.str());
 
   //////////////////////////////////////////////////////
   // Create actors
 
-  // Create an image view for performing a horizontal blur on the texture
-  mImageViewHorizBlur = Toolkit::ImageView::New();
-  mImageViewHorizBlur.SetParentOrigin(ParentOrigin::CENTER);
+  // Create an actor for performing a horizontal blur on the texture
+  mHorizBlurActor = Actor::New();
+  mHorizBlurActor.SetParentOrigin(ParentOrigin::CENTER);
+  Renderer renderer = CreateRenderer( BASIC_VERTEX_SOURCE, fragmentSource.c_str() );
+  mHorizBlurActor.AddRenderer( renderer );
 
-  // Create an image view for performing a vertical blur on the texture
-  mImageViewVertBlur = Toolkit::ImageView::New();
-  mImageViewVertBlur.SetParentOrigin(ParentOrigin::CENTER);
+  // Create an actor for performing a vertical blur on the texture
+  mVertBlurActor = Actor::New();
+  mVertBlurActor.SetParentOrigin(ParentOrigin::CENTER);
+  renderer = CreateRenderer( BASIC_VERTEX_SOURCE, fragmentSource.c_str() );
+  mVertBlurActor.AddRenderer( renderer );
 
   // Register a property that the user can control to fade the blur in / out via the GaussianBlurView object
   Actor self = Self();
@@ -284,17 +388,21 @@ void GaussianBlurView::OnInitialize()
   // Create an image view for compositing the blur and the original child actors render
   if(!mBlurUserImage)
   {
-    mImageViewComposite = Toolkit::ImageView::New();
-    mImageViewComposite.SetParentOrigin(ParentOrigin::CENTER);
-    mImageViewComposite.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
+    mCompositingActor = Actor::New();
+    mCompositingActor.SetParentOrigin(ParentOrigin::CENTER);
+    mCompositingActor.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
+    renderer = CreateRenderer( BASIC_VERTEX_SOURCE, BASIC_FRAGMENT_SOURCE );
+    mCompositingActor.AddRenderer( renderer );
 
-    Constraint blurStrengthConstraint = Constraint::New<float>( mImageViewComposite, Actor::Property::COLOR_ALPHA, EqualToConstraint());
+    Constraint blurStrengthConstraint = Constraint::New<float>( mCompositingActor, Actor::Property::COLOR_ALPHA, EqualToConstraint());
     blurStrengthConstraint.AddSource( Source( self, mBlurStrengthPropertyIndex) );
     blurStrengthConstraint.Apply();
 
     // Create an image view for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
-    mTargetActor = Toolkit::ImageView::New();
+    mTargetActor = Actor::New();
     mTargetActor.SetParentOrigin(ParentOrigin::CENTER);
+    renderer = CreateRenderer( BASIC_VERTEX_SOURCE, BASIC_FRAGMENT_SOURCE );
+    mTargetActor.AddRenderer( renderer );
 
     //////////////////////////////////////////////////////
     // Create cameras for the renders corresponding to the view size
@@ -302,14 +410,12 @@ void GaussianBlurView::OnInitialize()
     mRenderFullSizeCamera.SetInvertYAxis( true );
     mRenderFullSizeCamera.SetParentOrigin(ParentOrigin::CENTER);
 
-
     //////////////////////////////////////////////////////
     // Connect to actor tree
-    mInternalRoot.Add( mImageViewComposite );
+    mInternalRoot.Add( mCompositingActor );
     mInternalRoot.Add( mTargetActor );
     mInternalRoot.Add( mRenderFullSizeCamera );
   }
-
 
   //////////////////////////////////////////////////////
   // Create camera for the renders corresponding to the (potentially downsampled) render targets' size
@@ -317,13 +423,12 @@ void GaussianBlurView::OnInitialize()
   mRenderDownsampledCamera.SetInvertYAxis( true );
   mRenderDownsampledCamera.SetParentOrigin(ParentOrigin::CENTER);
 
-
   //////////////////////////////////////////////////////
   // Connect to actor tree
   Self().Add( mChildrenRoot );
   Self().Add( mInternalRoot );
-  mInternalRoot.Add( mImageViewHorizBlur );
-  mInternalRoot.Add( mImageViewVertBlur );
+  mInternalRoot.Add( mHorizBlurActor );
+  mInternalRoot.Add( mVertBlurActor );
   mInternalRoot.Add( mRenderDownsampledCamera );
 }
 
@@ -336,7 +441,7 @@ void GaussianBlurView::OnSizeSet(const Vector3& targetSize)
 
   if( !mBlurUserImage )
   {
-    mImageViewComposite.SetSize(targetSize);
+    mCompositingActor.SetSize(targetSize);
     mTargetActor.SetSize(targetSize);
 
     // Children render camera must move when GaussianBlurView object is resized. This is since we cannot change render target size - so we need to remap the child actors' rendering
@@ -409,32 +514,36 @@ void GaussianBlurView::AllocateResources()
       mRenderFullSizeCamera.SetPosition(0.0f, 0.0f, mTargetSize.height * cameraPosConstraintScale);
 
       // create offscreen buffer of new size to render our child actors to
-      mRenderTargetForRenderingChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
+      mRenderTargetForRenderingChildren = FrameBuffer::New( mTargetSize.width, mTargetSize.height, FrameBuffer::Attachment::NONE );
+      Texture texture = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mTargetSize.width), unsigned(mTargetSize.height) );
+      mRenderTargetForRenderingChildren.AttachColorTexture( texture );
 
-      // Set image view for performing a horizontal blur on the texture
-      mImageViewHorizBlur.SetImage( mRenderTargetForRenderingChildren );
-      mImageViewHorizBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, mCustomShader );
+      // Set actor for performing a horizontal blur
+      SetTexture( mHorizBlurActor, mRenderTargetForRenderingChildren );
 
       // Create offscreen buffer for vert blur pass
-      mRenderTarget1 = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat );
+      mRenderTarget1 = FrameBuffer::New( mDownsampledWidth, mDownsampledHeight, FrameBuffer::Attachment::NONE );
+      texture = Texture::New(TextureType::TEXTURE_2D, mPixelFormat, unsigned(mDownsampledWidth), unsigned(mDownsampledHeight));
+      mRenderTarget1.AttachColorTexture( texture );
 
       // use the completed blur in the first buffer and composite with the original child actors render
-      mImageViewComposite.SetImage( mRenderTarget1 );
+      SetTexture( mCompositingActor, mRenderTarget1 );
 
       // set up target actor for rendering result, i.e. the blurred image
-      mTargetActor.SetImage(mRenderTargetForRenderingChildren);
+      SetTexture( mTargetActor, mRenderTargetForRenderingChildren );
     }
 
     // Create offscreen buffer for horiz blur pass
-    mRenderTarget2 = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat );
+    mRenderTarget2 = FrameBuffer::New( mDownsampledWidth, mDownsampledHeight, FrameBuffer::Attachment::NONE );
+    Texture texture = Texture::New(TextureType::TEXTURE_2D, mPixelFormat, unsigned(mDownsampledWidth), unsigned(mDownsampledHeight));
+    mRenderTarget2.AttachColorTexture( texture );
 
     // size needs to match render target
-    mImageViewHorizBlur.SetSize(mDownsampledWidth, mDownsampledHeight);
+    mHorizBlurActor.SetSize(mDownsampledWidth, mDownsampledHeight);
 
     // size needs to match render target
-    mImageViewVertBlur.SetImage( mRenderTarget2 );
-    mImageViewVertBlur.SetProperty( Toolkit::ImageView::Property::IMAGE, mCustomShader );
-    mImageViewVertBlur.SetSize(mDownsampledWidth, mDownsampledHeight);
+    mVertBlurActor.SetSize(mDownsampledWidth, mDownsampledHeight);
+    SetTexture( mVertBlurActor, mRenderTarget2 );
 
     // set gaussian blur up for new sized render targets
     SetShaderConstants();
@@ -456,18 +565,18 @@ void GaussianBlurView::CreateRenderTasks()
     mRenderChildrenTask.SetClearColor( mBackgroundColor );
 
     mRenderChildrenTask.SetCameraActor(mRenderFullSizeCamera);
-    mRenderChildrenTask.SetTargetFrameBuffer( mRenderTargetForRenderingChildren );
+    mRenderChildrenTask.SetFrameBuffer( mRenderTargetForRenderingChildren );
   }
 
   // perform a horizontal blur targeting the second buffer
   mHorizBlurTask = taskList.CreateTask();
-  mHorizBlurTask.SetSourceActor( mImageViewHorizBlur );
+  mHorizBlurTask.SetSourceActor( mHorizBlurActor );
   mHorizBlurTask.SetExclusive(true);
   mHorizBlurTask.SetInputEnabled( false );
   mHorizBlurTask.SetClearEnabled( true );
   mHorizBlurTask.SetClearColor( mBackgroundColor );
   mHorizBlurTask.SetCameraActor(mRenderDownsampledCamera);
-  mHorizBlurTask.SetTargetFrameBuffer( mRenderTarget2 );
+  mHorizBlurTask.SetFrameBuffer( mRenderTarget2 );
   if( mRenderOnce && mBlurUserImage )
   {
     mHorizBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
@@ -475,7 +584,7 @@ void GaussianBlurView::CreateRenderTasks()
 
   // use the second buffer and perform a horizontal blur targeting the first buffer
   mVertBlurTask = taskList.CreateTask();
-  mVertBlurTask.SetSourceActor( mImageViewVertBlur );
+  mVertBlurTask.SetSourceActor( mVertBlurActor );
   mVertBlurTask.SetExclusive(true);
   mVertBlurTask.SetInputEnabled( false );
   mVertBlurTask.SetClearEnabled( true );
@@ -483,11 +592,11 @@ void GaussianBlurView::CreateRenderTasks()
   mVertBlurTask.SetCameraActor(mRenderDownsampledCamera);
   if(mUserOutputRenderTarget)
   {
-    mVertBlurTask.SetTargetFrameBuffer( mUserOutputRenderTarget );
+    mVertBlurTask.SetFrameBuffer( mUserOutputRenderTarget );
   }
   else
   {
-    mVertBlurTask.SetTargetFrameBuffer( mRenderTarget1 );
+    mVertBlurTask.SetFrameBuffer( mRenderTarget1 );
   }
   if( mRenderOnce && mBlurUserImage )
   {
@@ -499,12 +608,12 @@ void GaussianBlurView::CreateRenderTasks()
   if(!mBlurUserImage)
   {
     mCompositeTask = taskList.CreateTask();
-    mCompositeTask.SetSourceActor( mImageViewComposite );
+    mCompositeTask.SetSourceActor( mCompositingActor );
     mCompositeTask.SetExclusive(true);
     mCompositeTask.SetInputEnabled( false );
 
     mCompositeTask.SetCameraActor(mRenderFullSizeCamera);
-    mCompositeTask.SetTargetFrameBuffer( mRenderTargetForRenderingChildren );
+    mCompositeTask.SetFrameBuffer( mRenderTargetForRenderingChildren );
   }
 }
 
@@ -601,11 +710,11 @@ void GaussianBlurView::SetShaderConstants()
   Vector2 yAxis(0.0f, 1.0f);
   for (i = 0; i < mNumSamples; ++i )
   {
-    mImageViewHorizBlur.RegisterProperty( GetSampleOffsetsPropertyName( i ), uvOffsets[ i ] * xAxis );
-    mImageViewHorizBlur.RegisterProperty( GetSampleWeightsPropertyName( i ), weights[ i ] );
+    mHorizBlurActor.RegisterProperty( GetSampleOffsetsPropertyName( i ), uvOffsets[ i ] * xAxis );
+    mHorizBlurActor.RegisterProperty( GetSampleWeightsPropertyName( i ), weights[ i ] );
 
-    mImageViewVertBlur.RegisterProperty( GetSampleOffsetsPropertyName( i ), uvOffsets[ i ] * yAxis );
-    mImageViewVertBlur.RegisterProperty( GetSampleWeightsPropertyName( i ), weights[ i ] );
+    mVertBlurActor.RegisterProperty( GetSampleOffsetsPropertyName( i ), uvOffsets[ i ] * yAxis );
+    mVertBlurActor.RegisterProperty( GetSampleWeightsPropertyName( i ), weights[ i ] );
   }
 
   delete[] uvOffsets;

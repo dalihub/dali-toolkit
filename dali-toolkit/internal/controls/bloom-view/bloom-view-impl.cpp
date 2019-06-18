@@ -365,10 +365,16 @@ void BloomView::AllocateResources()
 
     // create off screen buffer of new size to render our child actors to
     mRenderTargetForRenderingChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
-    mBloomExtractTarget = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat );
-    FrameBufferImage mBlurExtractTarget = FrameBufferImage::New( mDownsampledWidth, mDownsampledHeight, mPixelFormat );
-    mOutputRenderTarget = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
 
+    mBloomExtractTarget = FrameBuffer::New( mDownsampledWidth, mDownsampledHeight, FrameBuffer::Attachment::NONE );
+    Texture texture = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mDownsampledWidth), unsigned(mDownsampledHeight) );
+    mBloomExtractTarget.AttachColorTexture( texture );
+
+    FrameBuffer blurExtractTarget = FrameBuffer::New( mDownsampledWidth, mDownsampledHeight, FrameBuffer::Attachment::NONE );
+    texture = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mDownsampledWidth), unsigned(mDownsampledHeight) );
+    blurExtractTarget.AttachColorTexture( texture );
+
+    mOutputRenderTarget = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
 
     //////////////////////////////////////////////////////
     // Point actors and render tasks at new render targets
@@ -383,7 +389,7 @@ void BloomView::AllocateResources()
     mBloomExtractImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
 
     // set GaussianBlurView to blur our extracted bloom
-    mGaussianBlurView.SetUserImageAndOutputRenderTarget(mBloomExtractTarget, mBlurExtractTarget);
+    mGaussianBlurView.SetUserImageAndOutputRenderTarget( mBloomExtractTarget.GetColorTexture(), blurExtractTarget );
 
     // use the completed blur in the first buffer and composite with the original child actors render
     mCompositeImageView.SetImage( mRenderTargetForRenderingChildren );
@@ -392,7 +398,7 @@ void BloomView::AllocateResources()
     visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
     mCompositeImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
     TextureSet textureSet = mCompositeImageView.GetRendererAt(0).GetTextures();
-    TextureSetImage( textureSet, 1u, mBlurExtractTarget );
+    textureSet.SetTexture( 1u, blurExtractTarget.GetColorTexture() );
 
     // set up target actor for rendering result, i.e. the blurred image
     mTargetImageView.SetImage(mOutputRenderTarget);
@@ -419,7 +425,7 @@ void BloomView::CreateRenderTasks()
   mBloomExtractTask.SetInputEnabled( false );
   mBloomExtractTask.SetClearEnabled( true );
   mBloomExtractTask.SetCameraActor(mRenderDownsampledCamera);
-  mBloomExtractTask.SetTargetFrameBuffer( mBloomExtractTarget );
+  mBloomExtractTask.SetFrameBuffer( mBloomExtractTarget );
 
   // GaussianBlurView tasks must be created here, so they are executed in the correct order with respect to BloomView tasks
   GetImpl(mGaussianBlurView).CreateRenderTasks();
