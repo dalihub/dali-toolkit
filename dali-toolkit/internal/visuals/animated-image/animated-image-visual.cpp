@@ -527,7 +527,10 @@ void AnimatedImageVisual::StartFirstFrame( TextureSet& textureSet )
   DALI_LOG_INFO(gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::StartFirstFrame()\n");
 
   mStartFirstFrame = false;
-  mImpl->mRenderer.SetTextures( textureSet );
+  if(mImpl->mRenderer)
+  {
+    mImpl->mRenderer.SetTextures( textureSet );
+  }
   Actor actor = mPlacementActor.GetHandle();
   if( actor )
   {
@@ -594,7 +597,10 @@ void AnimatedImageVisual::FrameReady( TextureSet textureSet )
   }
   else
   {
-    mImpl->mRenderer.SetTextures( textureSet );
+    if(mImpl->mRenderer)
+    {
+      mImpl->mRenderer.SetTextures( textureSet );
+    }
   }
 }
 

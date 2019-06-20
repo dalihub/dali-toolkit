@@ -932,7 +932,15 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       {
         // Set the normal font and the placeholder font.
         defaultFontDescription = mFontDefaults->mFontDescription;
-        defaultPointSize = mFontDefaults->mDefaultPointSize * 64u;
+
+        if( mTextFitEnabled )
+        {
+          defaultPointSize = mFontDefaults->mFitPointSize * 64u;
+        }
+        else
+        {
+          defaultPointSize = mFontDefaults->mDefaultPointSize * 64u;
+        }
       }
 
       // Validates the fonts. If there is a character with no assigned font it sets a default one.
