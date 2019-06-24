@@ -219,10 +219,6 @@ void Adaptor::SetRenderRefreshRate( unsigned int numberOfVSyncsPerRender )
 {
 }
 
-void Adaptor::SetUseHardwareVSync(bool useHardware)
-{
-}
-
 Adaptor& Adaptor::Get()
 {
   return Internal::Adaptor::Adaptor::Get();
