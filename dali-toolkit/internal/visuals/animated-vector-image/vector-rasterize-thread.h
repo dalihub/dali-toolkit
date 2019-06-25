@@ -112,23 +112,12 @@ public:
   void SetLoopCount( int32_t count );
 
   /**
-   * @brief Gets the loop count. -1 means to repeat forever.
-   * @return The number of times to loop
-   */
-  int32_t GetLoopCount() const;
-
-  /**
-   * @brief Set the playing range.
-   * @param[in] range Two values between [0,1] to specify minimum and maximum progress.
+   * @brief Set the playing range in frame number.
+   * @param[in] startFrame The frame number to specify minimum progress.
+   * @param[in] endFrame The frame number to specify maximum progress.
    * The animation will play between those values.
    */
-  void SetPlayRange( Vector2 range );
-
-  /**
-   * @brief Gets the playing range.
-   * @return The play range defined for the animation
-   */
-  Vector2 GetPlayRange() const;
+  void SetPlayRange( uint32_t startFrame, uint32_t endFrame );
 
   /**
    * @brief Get the play state
@@ -143,16 +132,22 @@ public:
   bool IsResourceReady() const;
 
   /**
-   * @brief Sets the progress of the animation.
-   * @param[in] progress The new progress as a normalized value between [0,1] or between the play range if specified.
+   * @brief Sets the current frame number of the animation.
+   * @param[in] frameNumber The new frame number between [0, the maximum frame number] or between the play range if specified.
    */
-  void SetCurrentProgress( float progress );
+  void SetCurrentFrameNumber( uint32_t frameNumber );
 
   /**
-   * @brief Retrieves the current progress of the animation.
-   * @return The current progress as a normalized value between [0,1]
+   * @brief Retrieves the current frame number of the animation.
+   * @return The current frame number
    */
-  float GetCurrentProgress() const;
+  uint32_t GetCurrentFrameNumber() const;
+
+  /**
+   * @brief Retrieves the total frame number of the animation.
+   * @return The total frame number
+   */
+  uint32_t GetTotalFrameNumber() const;
 
   /**
    * @brief Gets the default size of the file,.
@@ -196,7 +191,6 @@ private:
   Vector2                     mPlayRange;
   DevelImageVisual::PlayState mPlayState;
   int64_t                     mFrameDurationNanoSeconds;
-  float                       mProgress;
   float                       mFrameRate;
   uint32_t                    mCurrentFrame;
   uint32_t                    mTotalFrame;

@@ -172,9 +172,10 @@ private:
   VisualUrl                                    mUrl;
   VectorRasterizeThread                        mVectorRasterizeThread;
   Vector2                                      mVisualSize;
-  Vector2                                      mPlayRange;
   WeakHandle< Actor >                          mPlacementActor;
   int32_t                                      mLoopCount;
+  int32_t                                      mStartFrame;
+  int32_t                                      mEndFrame;
   uint32_t                                     mResendFlag;
   DevelAnimatedVectorImageVisual::Action::Type mActionStatus;
 };

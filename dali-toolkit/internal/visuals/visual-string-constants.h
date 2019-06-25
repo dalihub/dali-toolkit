@@ -87,7 +87,8 @@ extern const char * const AUXILLARY_IMAGE_NAME;
 extern const char * const AUXILLARY_IMAGE_ALPHA_NAME;
 extern const char * const PLAY_RANGE_NAME;
 extern const char * const PLAY_STATE_NAME;
-extern const char * const CURRENT_PROGRESS_NAME;
+extern const char * const CURRENT_FRAME_NUMBER_NAME;
+extern const char * const TOTAL_FRAME_NUMBER_NAME;
 
 // Text visual
 extern const char * const TEXT_PROPERTY;

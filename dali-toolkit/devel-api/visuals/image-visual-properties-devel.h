@@ -77,7 +77,7 @@ enum Type
   AUXILIARY_IMAGE_ALPHA = ORIENTATION_CORRECTION + 2,
 
   /**
-   * @brief The number of times the AnimatedImageVisual will be looped.
+   * @brief The number of times the AnimatedImageVisual or AnimatedVectorImageVisual will be looped.
    * @details Name "loopCount", type Property::INTEGER.
    * @note For Animated images only. Default -1. if < 0, loop unlimited. else, loop loopCount times.
    */
@@ -86,11 +86,12 @@ enum Type
   /**
    * @brief The playing range the AnimatedVectorImageVisual will use.
    *
-   * Animation will play between the values specified. Both values should be between 0-1,
-   * otherwise they will be ignored. If the range provided is not in proper order ( minimum,maximum ), it will be reordered.
+   * Animation will play between the values specified. The array can only have two values, and more will be ignored.
+   * Both values should be between 0 and the total frame number, otherwise they will be ignored.
+   * If the range provided is not in proper order ( minimum, maximum ), it will be reordered.
    *
-   * @details Name "playRange", Type Property::VECTOR2, between 0 and 1
-   * @note Default 0 and 1
+   * @details Name "playRange", Type Property::ARRAY of Property::INTEGER
+   * @note Default 0 and the total frame number.
    */
   PLAY_RANGE = ORIENTATION_CORRECTION + 4,
 
@@ -102,11 +103,18 @@ enum Type
   PLAY_STATE = ORIENTATION_CORRECTION + 5,
 
   /**
-   * @brief The animation progress the AnimatedVectorImageVisual will use.
-   * @details Name "currentProgress", Type Property::FLOAT, between [0, 1] or between the play range if specified
+   * @brief The current frame number the AnimatedVectorImageVisual will use.
+   * @details Name "currentFrameNumber", Type Property::INTEGER, between [0, the maximum frame number] or between the play range if specified
    * @note This property is read-only.
    */
-  CURRENT_PROGRESS = ORIENTATION_CORRECTION + 6
+  CURRENT_FRAME_NUMBER = ORIENTATION_CORRECTION + 6,
+
+  /**
+   * @brief The total frame number the AnimatedVectorImageVisual will use.
+   * @details Name "totalFrameNumber", Type Property::INTEGER.
+   * @note This property is read-only.
+   */
+  TOTAL_FRAME_NUMBER = ORIENTATION_CORRECTION + 7
 };
 
 } //namespace Property
