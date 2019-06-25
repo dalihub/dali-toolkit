@@ -320,6 +320,14 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
     // Should provide a transform that handles aspect ratio according to image size
     mVisual.SetTransformAndSize( transformMap, size );
+
+    // mVisual is not updated util the resource is ready in the case of visual replacement.
+    // So apply the transform and size to the new visual.
+    Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
+    if( visual && visual != mVisual )
+    {
+      visual.SetTransformAndSize( transformMap, size );
+    }
   }
 }
 
