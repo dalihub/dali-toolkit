@@ -34,6 +34,7 @@
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/integration-api/adaptors/adaptor.h>
+#include <dali/integration-api/adaptors/scene-holder.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -328,7 +329,7 @@ Toolkit::Control KeyboardFocusManager::GetParentLayoutControl(Actor actor) const
   Actor parent;
   if(actor)
   {
-    rootActor = DevelWindow::Get( actor ).GetRootLayer();
+    rootActor = Integration::SceneHolder::Get( actor ).GetRootLayer();
     parent = actor.GetParent();
   }
 
@@ -410,7 +411,7 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
 
           if( !nextFocusableActor )
           {
-            nextFocusableActor = DevelWindow::Get( currentFocusActor ).GetRootLayer().FindChildById( actorId );
+            nextFocusableActor = Integration::SceneHolder::Get( currentFocusActor ).GetRootLayer().FindChildById( actorId );
           }
         }
       }

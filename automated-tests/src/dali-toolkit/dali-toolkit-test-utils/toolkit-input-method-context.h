@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #define DALI_INPUT_METHOD_CONTEXT_H
+#include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
 #include <dali/devel-api/adaptor-framework/input-method-options.h>
@@ -146,6 +147,14 @@ public:
    * @return A handle to the InputMethodContext.
    */
   static InputMethodContext New();
+
+  /**
+   * @brief Create a handle to the instance of InputMethodContext.
+   *
+   * @param[in] actor The actor that uses the new InputMethodContext instance.
+   * @return A handle to the InputMethodContext.
+   */
+  static InputMethodContext New( Actor actor );
 
   /**
    * @brief Finalize the InputMethodContext.
