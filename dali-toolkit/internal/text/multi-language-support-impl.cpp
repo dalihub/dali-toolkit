@@ -585,16 +585,6 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
         // Checks if the current character is supported by the selected font.
         isValidFont = fontClient.IsCharacterSupportedByFont( fontId, character );
 
-        // Emojis are present in many monochrome fonts; prefer color by default.
-        if( isValidFont &&
-            isEmojiScript )
-        {
-          const GlyphIndex glyphIndex = fontClient.GetGlyphIndex( fontId, character );
-
-          // For color emojis, the font is valid if the glyph is a color glyph (the bitmap is RGBA).
-          isValidFont = fontClient.IsColorGlyph( fontId, glyphIndex );
-        }
-
         // If there is a valid font, cache it.
         if( isValidFont && !isCommonScript )
         {
@@ -630,14 +620,11 @@ void MultilanguageSupport::ValidateFonts( const Vector<Character>& text,
 
             DefaultFonts* defaultFontsPerScript = NULL;
 
-            // Emojis are present in many monochrome fonts; prefer color by default.
-            const bool preferColor = ( TextAbstraction::EMOJI == script );
-
             // Find a fallback-font.
             fontId = fontClient.FindFallbackFont( character,
                                                   currentFontDescription,
                                                   currentFontPointSize,
-                                                  preferColor );
+                                                  false );
 
             if( 0u == fontId )
             {

@@ -83,9 +83,10 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
   mUrl( imageUrl ),
   mVectorRasterizeThread( imageUrl.GetUrl() ),
   mVisualSize(),
-  mPlayRange( 0.0f, 1.0f ),
   mPlacementActor(),
   mLoopCount( LOOP_FOREVER ),
+  mStartFrame( 0 ),
+  mEndFrame( 0 ),
   mResendFlag( 0 ),
   mActionStatus( DevelAnimatedVectorImageVisual::Action::STOP )
 {
@@ -134,9 +135,15 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap( Property::Map& map ) const
     map.Insert( Toolkit::ImageVisual::Property::URL, mUrl.GetUrl() );
   }
   map.Insert( Toolkit::DevelImageVisual::Property::LOOP_COUNT, mLoopCount );
-  map.Insert( Toolkit::DevelImageVisual::Property::PLAY_RANGE, mPlayRange );
+
+  Property::Array playRange;
+  playRange.PushBack( mStartFrame );
+  playRange.PushBack( mEndFrame );
+  map.Insert( Toolkit::DevelImageVisual::Property::PLAY_RANGE, playRange );
+
   map.Insert( Toolkit::DevelImageVisual::Property::PLAY_STATE, static_cast< int >( mVectorRasterizeThread.GetPlayState() ) );
-  map.Insert( Toolkit::DevelImageVisual::Property::CURRENT_PROGRESS, mVectorRasterizeThread.GetCurrentProgress() );
+  map.Insert( Toolkit::DevelImageVisual::Property::CURRENT_FRAME_NUMBER, static_cast< int32_t >( mVectorRasterizeThread.GetCurrentFrameNumber() ) );
+  map.Insert( Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, static_cast< int32_t >( mVectorRasterizeThread.GetTotalFrameNumber() ) );
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -184,11 +191,28 @@ void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Prop
     }
     case Toolkit::DevelImageVisual::Property::PLAY_RANGE:
     {
-      Vector2 range;
-      if( value.Get( range ) )
+      Property::Array* array = value.GetArray();
+      if( array )
       {
-        mPlayRange = range;
-        mResendFlag |= RESEND_PLAY_RANGE;
+        size_t count = array->Count();
+        if( count >= 2 )
+        {
+          int startFrame, endFrame;
+          int totalFrame = mVectorRasterizeThread.GetTotalFrameNumber();
+          array->GetElementAt( 0 ).Get( startFrame );
+          array->GetElementAt( 1 ).Get( endFrame );
+
+          if( startFrame >= 0 && startFrame < totalFrame && endFrame >= 0 && endFrame < totalFrame )
+          {
+            mStartFrame = startFrame;
+            mEndFrame = endFrame;
+            mResendFlag |= RESEND_PLAY_RANGE;
+          }
+          else
+          {
+            DALI_LOG_ERROR( "Invalid play range [%d, %d / %d]\n", startFrame, endFrame, totalFrame );
+          }
+        }
       }
       break;
     }
@@ -337,10 +361,10 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
     }
     case DevelAnimatedVectorImageVisual::Action::JUMP_TO:
     {
-      float progress;
-      if( attributes.Get( progress ) )
+      int32_t frameNumber;
+      if( attributes.Get( frameNumber ) )
       {
-        mVectorRasterizeThread.SetCurrentProgress( progress );
+        mVectorRasterizeThread.SetCurrentFrameNumber( frameNumber );
 
         if( IsOnStage() && mVectorRasterizeThread.GetPlayState() != DevelImageVisual::PlayState::PLAYING )
         {
@@ -411,7 +435,7 @@ void AnimatedVectorImageVisual::SendAnimationData()
 
     if( mResendFlag & RESEND_PLAY_RANGE )
     {
-      mVectorRasterizeThread.SetPlayRange( mPlayRange );
+      mVectorRasterizeThread.SetPlayRange( mStartFrame, mEndFrame );
     }
 
     if( IsOnStage() )
