@@ -217,31 +217,6 @@ Property lookup via index should always be used unless the indicies cannot be kn
 
 <br>
 <hr>
-@section property-use-example-js Property use in JavaScript
-
-Note that constraints cannot be used within JavaScript, so below is a simple example that sets one of the default properties; scale:
-
-@code
-var imageView = new dali.Control( "ImageView" );
-
-// by default an actor is anchored to the top-left of it's parent actor
-// change it to the middle
-imageView.parentOrigin = dali.CENTER;
-
-// Set an image view property
-imageView.image = {
-  "visualType" : "IMAGE",
-  "url": "images/icon-0.png",
-  "desiredWidth" : 100,
-  "desiredHeight" : 100
-};
-
-// add to the stage
-dali.stage.add( imageView );
-@endcode
-
-<br>
-<hr>
 @section property-use-example-json Property use in JSON
 
 This is a basic example of a button defined in JSON by setting the default properties.

@@ -17,7 +17,7 @@
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
    sodipodi:docname="example-fitting-mode-options.svg"
-   inkscape:export-filename="/tmp/1.png"
+   inkscape:export-filename="1.png"
    inkscape:export-xdpi="89.269394"
    inkscape:export-ydpi="89.269394">
   <defs
@@ -83,11 +83,11 @@
      id="layer1"
      transform="translate(0,-308.2677)">
     <image
-       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/door.jpg"
+       sodipodi:absref="door.jpg"
        xlink:href="door.jpg"
        inkscape:export-ydpi="89.269394"
        inkscape:export-xdpi="89.269394"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        width="256"
        height="256"
        id="image6106"
@@ -96,15 +96,15 @@
     <g
        id="g6199"
        transform="matrix(0.75,0,0,0.75,158.83024,-448.90946)"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394">
       <image
-         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/door.jpg"
+         sodipodi:absref="door.jpg"
          xlink:href="door.jpg"
          inkscape:export-ydpi="89.269394"
          inkscape:export-xdpi="89.269394"
-         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/door-scale-to-fill2.png"
+         inkscape:export-filename="door-scale-to-fill2.png"
          y="764.36218"
          x="512"
          id="image6106-0"
@@ -117,7 +117,7 @@
          width="51.309372"
          id="rect6179"
          style="fill:#ffffff;fill-opacity:1;stroke:none"
-         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/door-scale-to-fill.png"
+         inkscape:export-filename="door-scale-to-fill.png"
          inkscape:export-xdpi="89.269394"
          inkscape:export-ydpi="89.269394" />
       <rect
@@ -127,13 +127,13 @@
          width="48.189934"
          id="rect6179-2"
          style="fill:#ffffff;fill-opacity:1;stroke:none"
-         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/door-scale-to-fill.png"
+         inkscape:export-filename="door-scale-to-fill.png"
          inkscape:export-xdpi="89.269394"
          inkscape:export-ydpi="89.269394" />
       <rect
          inkscape:export-ydpi="89.269394"
          inkscape:export-xdpi="89.269394"
-         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/door-scale-to-fill2.png"
+         inkscape:export-filename="door-scale-to-fill2.png"
          y="764.36218"
          x="560"
          height="256.00003"
@@ -148,15 +148,15 @@
        height="192.00003"
        x="356"
        y="124.36218"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394" />
     <image
-       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/door.jpg"
+       sodipodi:absref="door.jpg"
        xlink:href="door.jpg"
        inkscape:export-ydpi="89.269394"
        inkscape:export-xdpi="89.269394"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        width="120"
        height="135.85014"
        id="image6106-5"
@@ -169,15 +169,15 @@
        height="192.00003"
        x="804"
        y="124.36212"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394" />
     <image
-       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/door.jpg"
+       sodipodi:absref="door.jpg"
        xlink:href="door.jpg"
        inkscape:export-ydpi="89.269394"
        inkscape:export-xdpi="89.269394"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        width="120"
        height="135.85014"
        id="image6106-5-3"
@@ -190,15 +190,15 @@
        height="192.00003"
        x="1030.3395"
        y="124.36212"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394" />
     <image
-       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/door.jpg"
+       sodipodi:absref="door.jpg"
        xlink:href="door.jpg"
        inkscape:export-ydpi="89.269394"
        inkscape:export-xdpi="89.269394"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        width="192"
        height="192"
        id="image6106-4"
@@ -211,15 +211,15 @@
        height="192.00003"
        x="1254.3396"
        y="124.36218"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394" />
     <image
-       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/dog.jpg"
+       sodipodi:absref="dog.jpg"
        xlink:href="dog.jpg"
        inkscape:export-ydpi="89.269394"
        inkscape:export-xdpi="89.269394"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        width="256"
        height="256"
        id="image6359"
@@ -232,18 +232,18 @@
        height="192"
        x="-604.36218"
        y="320"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394"
        transform="matrix(0,-1,1,0,0,0)" />
     <g
        id="g6476"
        transform="translate(-7.128906e-7,-384.82965)"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394">
       <image
-         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/dog.jpg"
+         sodipodi:absref="dog.jpg"
          xlink:href="dog.jpg"
          y="829.19183"
          x="544"
@@ -270,7 +270,7 @@
          transform="matrix(0,-1,1,0,0,0)"
          inkscape:export-ydpi="89.269394"
          inkscape:export-xdpi="89.269394"
-         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/example-scale-to-fill-sequence.png"
+         inkscape:export-filename="example-scale-to-fill-sequence.png"
          y="544"
          x="-989.19183"
          height="192"
@@ -279,11 +279,11 @@
          style="fill:none;stroke:#ff0000;stroke-width:3.31857371;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     </g>
     <image
-       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/dog.jpg"
+       sodipodi:absref="dog.jpg"
        xlink:href="dog.jpg"
        inkscape:export-ydpi="89.269394"
        inkscape:export-xdpi="89.269394"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        width="192"
        height="192"
        id="image6359-2-2"
@@ -296,16 +296,16 @@
        height="192"
        x="-605.19183"
        y="994.33954"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394"
        transform="matrix(0,-1,1,0,0,0)" />
     <image
-       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/dog.jpg"
+       sodipodi:absref="dog.jpg"
        xlink:href="dog.jpg"
        inkscape:export-ydpi="89.269394"
        inkscape:export-xdpi="89.269394"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        width="128"
        height="128"
        id="image6359-2-2-2"
@@ -318,16 +318,16 @@
        height="192"
        x="-605.19183"
        y="1218.3396"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394"
        transform="matrix(0,-1,1,0,0,0)" />
     <image
-       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/dog.jpg"
+       sodipodi:absref="dog.jpg"
        xlink:href="dog.jpg"
        inkscape:export-ydpi="89.269394"
        inkscape:export-xdpi="89.269394"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        width="128"
        height="128"
        id="image6359-2-2-2-1"
@@ -340,7 +340,7 @@
        height="192"
        x="-604.36218"
        y="768"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394"
        transform="matrix(0,-1,1,0,0,0)" />
@@ -349,7 +349,7 @@
        id="flowRoot3024"
        style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        transform="translate(0,244.2677)"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394"><flowRegion
          id="flowRegion3026"><rect
@@ -363,7 +363,7 @@
        id="flowRoot3032"
        style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        transform="translate(0,244.2677)"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394"><flowRegion
          id="flowRegion3034"><rect
@@ -377,7 +377,7 @@
        id="flowRoot3040"
        style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        transform="translate(0,244.2677)"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394"><flowRegion
          id="flowRegion3042"><rect
@@ -391,7 +391,7 @@
        id="flowRoot3048"
        style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        transform="translate(0,244.2677)"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394"><flowRegion
          id="flowRegion3050"><rect
@@ -405,7 +405,7 @@
        id="flowRoot3056"
        style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        transform="translate(0,244.2677)"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394"><flowRegion
          id="flowRegion3058"><rect
@@ -419,7 +419,7 @@
        id="flowRoot3064"
        style="font-size:24px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        transform="translate(0,244.2677)"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394"><flowRegion
          id="flowRegion3066"><rect
@@ -429,11 +429,11 @@
            x="1215.7982"
            y="744.88245" /></flowRegion><flowPara
          id="flowPara3070">FIT_HEIGHT</flowPara></flowRoot>    <image
-       sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/liberty.jpg"
+       sodipodi:absref="liberty.jpg"
        xlink:href="liberty.jpg"
        inkscape:export-ydpi="89.269394"
        inkscape:export-xdpi="89.269394"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        width="256"
        height="256"
        id="image3239"
@@ -441,7 +441,7 @@
        y="700.36218" />
     <g
        id="g4034"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394">
       <rect
@@ -451,18 +451,18 @@
          width="128"
          id="rect3244"
          style="fill:none;stroke:#ff0000;stroke-width:4.19999981;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         inkscape:export-filename="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/shared-javascript-and-cpp-documentation/fitting-mode-options.png"
+         inkscape:export-filename="fitting-mode-options.png"
          inkscape:export-xdpi="89.269394"
          inkscape:export-ydpi="89.269394" />
     </g>
     <g
        transform="translate(224,-1.9531262e-7)"
        id="g4034-5"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394">
       <image
-         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/liberty.jpg"
+         sodipodi:absref="liberty.jpg"
          xlink:href="liberty.jpg"
          y="764.36218"
          x="352"
@@ -480,11 +480,11 @@
     <g
        transform="translate(448,-1.9531262e-7)"
        id="g4034-4"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394">
       <image
-         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/liberty.jpg"
+         sodipodi:absref="liberty.jpg"
          xlink:href="liberty.jpg"
          y="764.36218"
          x="352"
@@ -502,11 +502,11 @@
     <g
        transform="translate(672,-1.9531262e-7)"
        id="g4034-3"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394">
       <image
-         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/liberty.jpg"
+         sodipodi:absref="liberty.jpg"
          xlink:href="liberty.jpg"
          y="764.36218"
          x="352"
@@ -524,11 +524,11 @@
     <g
        transform="translate(896,-1.9531262e-7)"
        id="g4034-2"
-       inkscape:export-filename="/tmp/fitting-mode-options.png"
+       inkscape:export-filename="fitting-mode-options.png"
        inkscape:export-xdpi="89.269394"
        inkscape:export-ydpi="89.269394">
       <image
-         sodipodi:absref="/home/SERILOCAL/andrew.cox/git/opendali-features/dali-toolkit/docs/content/figures/liberty.jpg"
+         sodipodi:absref="liberty.jpg"
          xlink:href="liberty.jpg"
          y="764.36218"
          x="352"
