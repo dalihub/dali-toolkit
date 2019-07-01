@@ -30,6 +30,8 @@
 namespace Dali
 {
 
+class Window;
+
 namespace Toolkit
 {
 
@@ -90,6 +92,11 @@ protected:
   virtual ~KeyInputFocusManager();
 
 private:
+  /**
+   * This will be called when a new window is created
+   * @param window The new window
+   */
+  void OnWindowCreated( Dali::Window& window );
 
   /**
    * Callback for the key event when no actor in the stage has gained the key input focus
