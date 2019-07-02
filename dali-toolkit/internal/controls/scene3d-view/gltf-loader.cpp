@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 #include <dali-toolkit/internal/controls/scene3d-view/gltf-shader.h>
 
 // EXTERNAL INCLUDES
-#include <fstream>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/file-loader.h>
@@ -237,12 +236,15 @@ void FitBuffer( Dali::Vector<Vector4>& bufferDestination, Dali::Vector<T>& buffe
 template <typename T>
 bool ReadBinFile( Vector<T> &dataBuffer, std::string url, int32_t offset, int32_t count )
 {
-  dataBuffer.Resize( count );
-  FILE* fp = fopen( url.c_str(), "rb" );
-  if( fp == NULL )
+  std::streampos bufferSize = 0;
+  Dali::Vector<char> fileBuffer;
+  if( !Dali::FileLoader::ReadFile( url, bufferSize, fileBuffer, FileLoader::FileType::BINARY ) )
   {
     return false;
   }
+
+  FILE* fp = fmemopen( &fileBuffer[0], bufferSize, "rb" );
+  dataBuffer.Resize( count );
   ssize_t result = -1;
   if( !fseek( fp, offset, SEEK_SET ) )
   {
@@ -1228,11 +1230,16 @@ bool Loader::LoadScene( const std::string& filePath, Internal::Scene3dView& scen
 
 bool Loader::ParseGltf( const std::string& filePath )
 {
-  std::ifstream fileStream( filePath.c_str() );
-  std::string fileBuffer( ( std::istreambuf_iterator<char>( fileStream ) ),
-    ( std::istreambuf_iterator<char>() ) );
-  mParser = Dali::Toolkit::JsonParser::New();
+  std::streampos bufferSize = 0;
+  Dali::Vector<char> buffer;
+  std::string fileBuffer;
+  if( !Dali::FileLoader::ReadFile( filePath, bufferSize, buffer, FileLoader::FileType::BINARY ) )
+  {
+    return false;
+  }
 
+  fileBuffer.assign( &buffer[0], bufferSize );
+  mParser = Dali::Toolkit::JsonParser::New();
   return mParser.Parse( fileBuffer );
 }
 

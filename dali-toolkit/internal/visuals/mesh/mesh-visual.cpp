@@ -25,7 +25,6 @@
 #include <dali/devel-api/adaptor-framework/file-loader.h>
 #include <dali/devel-api/scripting/enum-helper.h>
 #include <dali/devel-api/scripting/scripting.h>
-#include <fstream>
 
 //INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
