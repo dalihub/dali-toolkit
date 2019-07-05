@@ -35,7 +35,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/image-loader/image-atlas.cpp \
   $(devel_api_src_dir)/image-loader/texture-manager.cpp \
   $(devel_api_src_dir)/layouting/flex-node.cpp \
-  $(devel_api_src_dir)/scripting/script.cpp \
   $(devel_api_src_dir)/styling/style-manager-devel.cpp \
   $(devel_api_src_dir)/text/bitmap-font.cpp \
   $(devel_api_src_dir)/text/text-utils-devel.cpp \
@@ -130,10 +129,6 @@ devel_api_image_loader_header_files = \
   $(devel_api_src_dir)/image-loader/atlas-upload-observer.h \
   $(devel_api_src_dir)/image-loader/image-atlas.h \
   $(devel_api_src_dir)/image-loader/texture-manager.h
-
-devel_api_scripting_header_files = \
-  $(devel_api_src_dir)/scripting/script.h \
-  $(devel_api_src_dir)/scripting/script-plugin.h
 
 devel_api_shader_effects_header_files = \
   $(devel_api_src_dir)/shader-effects/alpha-discard-effect.h \

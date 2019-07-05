@@ -23,7 +23,6 @@
 ### Programming Guide
  + [Programming Languages:](@ref programming-languages)
   + [C++](@ref c-plus-plus)
-  + [JavaScript](@ref java-script-support)
   + [JSON](@ref json-support)
  + [Application](@ref dali-application)
  + [Actors](@ref actors-and-stage)
@@ -68,7 +67,7 @@
  + [Overview](@ref shader-intro)
 
 ### Scripting
- + [JSON and JavaScript Overview](@ref scriptoverview)
+ + [JSON Overview](@ref scriptoverview)
  + [JSON Syntax](@ref script-json-specification)
  + [Scripting Hello World](@ref script-hello)
 
@@ -85,7 +84,6 @@
   + [Type Registration](@ref type-registration)
  + [Automated Tests](@ref auto_testing)
  + [Programming Guide](@ref documentationguide)
- + [JavaScript Wrapping Guide for DALi developers](@ref javascriptwrapping)
 
 ### Application Optimization Guide
  + [Rescaling Images](@ref resourceimagescaling)
