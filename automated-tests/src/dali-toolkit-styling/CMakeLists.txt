@@ -21,7 +21,6 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-environment-variable.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-feedback-player.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-file-loader.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-context.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-native-image-source.cpp

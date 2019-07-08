@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Samsung Electronics Co., Ltd.
+# Copyright (c) 2019 Samsung Electronics Co., Ltd.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,14 +15,6 @@
 #
 
 SUBDIRS = dali-toolkit
-
-if ENABLE_JAVASCRIPT_PLUGIN
-SUBDIRS +=plugins/javascript
-endif
-
-if ENABLE_CSHARP_PLUGIN
-SUBDIRS +=plugins/csharp
-endif
 
 # perform documentation last, so it doesn't prevent code from building if there's an error
 SUBDIRS += docs

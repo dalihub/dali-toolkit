@@ -26,7 +26,6 @@ SET(TC_SOURCES
   utc-Dali-KeyInputFocusManager.cpp
   utc-Dali-PageTurnView.cpp
   utc-Dali-Scene3dView.cpp
-  utc-Dali-Script.cpp
   utc-Dali-ScrollBar.cpp
   utc-Dali-ScrollView.cpp
   utc-Dali-ShaderEffects.cpp

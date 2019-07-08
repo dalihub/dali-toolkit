@@ -62,7 +62,6 @@ SET ( SOURCES ${SOURCES}
   ${devel_api_src_dir}/image-loader/atlas-upload-observer.cpp
   ${devel_api_src_dir}/image-loader/image-atlas.cpp
   ${devel_api_src_dir}/image-loader/texture-manager.cpp
-  ${devel_api_src_dir}/scripting/script.cpp
   ${devel_api_src_dir}/styling/style-manager-devel.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-cross-effect.cpp
   ${devel_api_src_dir}/transition-effects/cube-transition-effect.cpp
@@ -231,8 +230,6 @@ SET( SOURCES ${SOURCES}
    ${internal_src_dir}/transition-effects/cube-transition-cross-effect-impl.cpp
    ${internal_src_dir}/transition-effects/cube-transition-fold-effect-impl.cpp
    ${internal_src_dir}/transition-effects/cube-transition-wave-effect-impl.cpp
-   ${internal_src_dir}/scripting/script-impl.cpp
-   ${internal_src_dir}/scripting/script-plugin-proxy.cpp
    ${internal_src_dir}/text/xhtml-entities.cpp
 )
 

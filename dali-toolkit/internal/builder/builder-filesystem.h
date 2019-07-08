@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <dali/devel-api/adaptor-framework/file-loader.h>
+
 inline std::string ExpandPath(const std::string &name)
 {
   wordexp_t p;
@@ -54,8 +56,14 @@ inline std::string ExePath(void)
 
 inline std::string GetFileContents(const std::string &fn)
 {
-  std::ifstream t(fn.c_str());
-  return std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+  std::streampos bufferSize = 0;
+  Dali::Vector<char> fileBuffer;
+  if( !Dali::FileLoader::ReadFile( fn, bufferSize, fileBuffer, Dali::FileLoader::FileType::BINARY ) )
+  {
+      return std::string();
+  }
+
+  return std::string( &fileBuffer[0], bufferSize );
 }
 
 #endif // DALI_TOOLKIT_INTERNAL_BUILDER_FILESYSTEM_H
