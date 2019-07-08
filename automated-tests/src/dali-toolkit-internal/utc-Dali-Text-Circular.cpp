@@ -797,6 +797,10 @@ int UtcDaliTextUpdateBufferFormatCheck(void)
 
   Dali::Toolkit::DevelText::UpdateBuffer(srcBuffer, dstBuffer, 0, 0, true);
 
+  Devel::PixelBuffer compressedSrcBuffer = Devel::PixelBuffer::New( 10, 10, Pixel::COMPRESSED_R11_EAC );
+  Devel::PixelBuffer compressedDstBuffer = Devel::PixelBuffer::New( 10, 10, Pixel::COMPRESSED_R11_EAC );
+  Dali::Toolkit::DevelText::UpdateBuffer(compressedSrcBuffer, compressedDstBuffer, 0, 0, true);
+
   tet_result(TET_PASS);
   END_TEST;
 }
