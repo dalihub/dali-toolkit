@@ -22,7 +22,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/devel-api/adaptor-framework/file-loader.h>
+#include <dali/devel-api/adaptor-framework/file-stream.h>
 
 namespace Dali
 {
@@ -236,21 +236,19 @@ void FitBuffer( Dali::Vector<Vector4>& bufferDestination, Dali::Vector<T>& buffe
 template <typename T>
 bool ReadBinFile( Vector<T> &dataBuffer, std::string url, int32_t offset, int32_t count )
 {
-  std::streampos bufferSize = 0;
-  Dali::Vector<char> fileBuffer;
-  if( !Dali::FileLoader::ReadFile( url, bufferSize, fileBuffer, FileLoader::FileType::BINARY ) )
+  Dali::FileStream fileStream( url, FileStream::READ || FileStream::BINARY );
+  FILE* fp = fileStream.GetFile();
+  if( !fp )
   {
     return false;
   }
 
-  FILE* fp = fmemopen( &fileBuffer[0], bufferSize, "rb" );
   dataBuffer.Resize( count );
   ssize_t result = -1;
   if( !fseek( fp, offset, SEEK_SET ) )
   {
     result = fread( &dataBuffer[0], sizeof( T ), count, fp );
   }
-  fclose( fp );
 
   return ( result >= 0 );
 }
