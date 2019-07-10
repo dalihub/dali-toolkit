@@ -23,6 +23,7 @@
 #include <cmath>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/images/frame-buffer-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -137,7 +138,7 @@ private:
 
   /////////////////////////////////////////////////////////////
   // for extracting bright parts of image to an offscreen target
-  FrameBufferImage mBloomExtractTarget; // for rendering bright parts of image into separate texture, also used as target for gaussian blur
+  FrameBuffer mBloomExtractTarget; // for rendering bright parts of image into separate texture, also used as target for gaussian blur
   RenderTask mBloomExtractTask;
   Toolkit::ImageView mBloomExtractImageView;
 

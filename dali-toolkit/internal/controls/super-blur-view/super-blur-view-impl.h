@@ -18,6 +18,10 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/rendering/frame-buffer.h>
+#include <dali/public-api/rendering/renderer.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/super-blur-view/super-blur-view.h>
@@ -51,13 +55,7 @@ public:
   /**
    * @copydoc Dali::Toolkit::SuperBlurView::SetImage
    */
-  void SetImage(Image inputImage);
-
-  /**
-   * Get the image for blurring.
-   * @return The image for blurring.
-   */
-  Image GetImage();
+  void SetTexture( Texture texture );
 
   /**
    * @copydoc Dali::Toolkit::SuperBlurView::GetBlurStrengthPropertyIndex
@@ -80,9 +78,9 @@ public:
   Dali::Toolkit::SuperBlurView::SuperBlurViewSignal& BlurFinishedSignal();
 
   /**
-   * @copydoc Dali::Toolkit::SuperBlurView::GetBlurredImage
+   * @copydoc Dali::Toolkit::SuperBlurView::GetBlurredTexture
    */
-  Image GetBlurredImage( unsigned int level );
+  Texture GetBlurredTexture( unsigned int level );
 
   // Properties
 
@@ -132,6 +130,11 @@ private: // from Control
   virtual void OnStageConnection( int depth );
 
   /**
+   * @copydoc CustomActorImpl::OnStageDisconnection()
+   */
+  virtual void OnStageDisconnection();
+
+  /**
    * @copydoc CustomActorImpl::GetNaturalSize()
    */
   virtual Vector3 GetNaturalSize();
@@ -141,9 +144,9 @@ private:
   /**
    * Carry out the idx-th pass of blurring
    * @param[in] idx The blur pass index
-   * @param[in] image The input image for the current blurring, it is either the original image or the blurred image from the previous pass
+   * @param[in] texture The input texture for the current blurring, it is either the original image or the blurred texture from the previous pass
    */
-  void BlurImage( unsigned int idx, Image image );
+  void BlurTexture( unsigned int idx, Texture texture );
 
   /**
    * Signal handler to tell when the last blur view completes
@@ -156,27 +159,22 @@ private:
    */
   void ClearBlurResource();
 
-  /**
-   * Sets shader effect on the control renderer
-   * @param[in,out] Sets custom shader effect on the given visual
-   */
-  void SetShaderEffect( Toolkit::Visual::Base& visual );
-
 private:
   std::vector<Toolkit::GaussianBlurView> mGaussianBlurView;
-  std::vector<FrameBufferImage>          mBlurredImage;
-  std::vector<Toolkit::Visual::Base>     mVisuals;
-  Image                                  mInputImage;
+  std::vector<FrameBuffer>               mBlurredImage;
+  std::vector<Renderer>                  mRenderers;
+  Texture                                mInputTexture;
   Vector2                                mTargetSize;
 
   Toolkit::SuperBlurView::SuperBlurViewSignal mBlurFinishedSignal; ///< Signal emitted when blur has completed.
 
+  std::string                            mUrl;
   Property::Index                        mBlurStrengthPropertyIndex;
   unsigned int                           mBlurLevels;
   bool                                   mResourcesCleared;
 };
 
-}  // namespace Internal
+}
 
 // Helpers for public-api forwarding methods
 inline Toolkit::Internal::SuperBlurView& GetImpl( Toolkit::SuperBlurView& obj )
@@ -193,8 +191,8 @@ inline const Toolkit::Internal::SuperBlurView& GetImpl( const Toolkit::SuperBlur
   return static_cast<const Toolkit::Internal::SuperBlurView&>(handle);
 }
 
-} // namespace Toolkit
+}
 
-} // namespace Dali
+}
 
 #endif // DALI_TOOLKIT_INTERNAL_SUPER_BLUR_VIEW_H
