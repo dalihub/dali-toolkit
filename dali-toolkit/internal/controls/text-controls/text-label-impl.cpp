@@ -959,12 +959,10 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
 
   Vector2 contentSize( size.x - ( padding.start + padding.end ), size.y - ( padding.top + padding.bottom ) );
 
-  // If the same text comes for relayouting for same layout size we don't need to calculate point size again.
-  // Like for color change.
-  if (mController->IsTextFitEnabled() && (mController->GetTextFitContentSize() != contentSize ) )
+  if( mController->IsTextFitEnabled() )
   {
-    mController->FitPointSizeforLayout(contentSize);
-    mController->SetTextFitContentSize(contentSize);
+    mController->FitPointSizeforLayout( contentSize );
+    mController->SetTextFitContentSize( contentSize );
   }
 
   // Support Right-To-Left
