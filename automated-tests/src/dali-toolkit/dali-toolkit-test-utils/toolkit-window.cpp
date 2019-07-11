@@ -15,6 +15,9 @@
  *
  */
 
+// CLASS HEADER
+#include "toolkit-window.h"
+
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/layer.h>
@@ -22,7 +25,7 @@
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
-#include "toolkit-window.h"
+#include "test-render-surface.h"
 
 namespace Dali
 {
@@ -37,32 +40,41 @@ namespace Internal
 {
 namespace Adaptor
 {
-
 class Window : public Dali::BaseObject
 {
 public:
 
-  Window()
+  Window( const PositionSize& positionSize )
+  : mScene( Dali::Integration::Scene::New( Size( positionSize.width, positionSize.height ) ) ),
+    mRenderSurface( new TestRenderSurface( positionSize ) )
   {
+    mScene.SetSurface( *mRenderSurface );
   }
 
   virtual ~Window()
   {
+    delete mRenderSurface;
+    mRenderSurface = nullptr;
   }
 
   static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent)
   {
-    return new Window();
+    return new Window( positionSize );
   }
 
-  static Dali::Window Get( Dali::Actor actor )
-  {
-    return Dali::Window();
-  }
+  Integration::Scene mScene;
+  TestRenderSurface* mRenderSurface;
 };
 
 } // Adaptor
 } // Internal
+
+inline Internal::Adaptor::Window& GetImplementation(Dali::Window& window)
+{
+  DALI_ASSERT_ALWAYS( window && "Window handle is empty" );
+  BaseObject& object = window.GetBaseObject();
+  return static_cast<Internal::Adaptor::Window&>(object);
+}
 
 Window::Window()
 {
@@ -94,22 +106,42 @@ Window::Window( Internal::Adaptor::Window* window )
 {
 }
 
+Integration::Scene Window::GetScene()
+{
+  return GetImplementation( *this ).mScene;
+}
+
+Integration::RenderSurface& Window::GetRenderSurface()
+{
+  return *GetImplementation( *this ).mRenderSurface;
+}
+
 namespace DevelWindow
 {
 
 Window Get( Actor actor )
 {
-  return Internal::Adaptor::Window::Get( actor );
+  return Window();
+}
+
+EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window )
+{
+  return GetImplementation( window ).mScene.EventProcessingFinishedSignal();
 }
 
 KeyEventSignalType& KeyEventSignal( Window window )
 {
-  return Dali::Stage::GetCurrent().KeyEventSignal();
+  return GetImplementation( window ).mScene.KeyEventSignal();
 }
 
 TouchSignalType& TouchSignal( Window window )
 {
-  return Dali::Stage::GetCurrent().TouchSignal();
+  return GetImplementation( window ).mScene.TouchSignal();
+}
+
+WheelEventSignalType& WheelEventSignal( Window window )
+{
+  return GetImplementation( window ).mScene.WheelEventSignal();
 }
 
 } // namespace DevelWindow

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -276,7 +276,7 @@ int UtcDaliImageAtlasUploadP(void)
 
 int UtcDaliImageAtlasUploadWithObserver01(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
   ImageAtlas atlas = ImageAtlas::New( 200, 200 );
 
 
@@ -303,7 +303,7 @@ int UtcDaliImageAtlasUploadWithObserver01(void)
 
 int UtcDaliImageAtlasUploadWithObserver02(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
   ImageAtlas atlas = ImageAtlas::New( 200, 200 );
 
   gCountOfTestFuncCall = 0;
@@ -333,7 +333,7 @@ int UtcDaliImageAtlasUploadWithObserver02(void)
 
 int UtcDaliImageAtlasUploadWithObserver03(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   gCountOfTestFuncCall = 0;
   TestUploadObserver* uploadObserver = new TestUploadObserver;
@@ -364,7 +364,7 @@ int UtcDaliImageAtlasUploadWithObserver03(void)
 
 int UtcDaliImageAtlasRemove(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
   unsigned int size = 100;
   ImageAtlas atlas = ImageAtlas::New( size, size );
   Vector4 textureRect1;

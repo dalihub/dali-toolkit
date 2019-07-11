@@ -25,6 +25,7 @@
 #include <dali-toolkit/devel-api/controls/text-controls/text-style-properties-devel.h>
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali-toolkit/devel-api/text/bitmap-font.h>
 
 using namespace Dali;

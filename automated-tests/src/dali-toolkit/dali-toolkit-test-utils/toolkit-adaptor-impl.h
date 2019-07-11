@@ -27,6 +27,11 @@ class DisplayConnection;
 class ThreadSynchronizationInterface;
 class Window;
 
+namespace Integration
+{
+class Scene;
+}
+
 using WindowContainer = std::vector<Window>;
 
 namespace Internal
@@ -53,22 +58,39 @@ namespace Internal
 namespace Adaptor
 {
 
-class Adaptor: public BaseObject
+class Adaptor
 {
 public:
+  static Dali::Adaptor& New();
   static Dali::Adaptor& Get();
   Adaptor();
   ~Adaptor();
 
-public:
-  static Dali::RenderSurfaceInterface& GetSurface();
-  static Dali::WindowContainer GetWindows();
-  static Dali::Adaptor::AdaptorSignalType& AdaptorSignal();
-  static Dali::Adaptor::WindowCreatedSignalType& WindowCreatedSignal();
-  static bool mAvailable;
-  static Vector<CallbackBase*> mCallbacks;
-  static Dali::WindowContainer mWindows;
-  static Dali::Adaptor::WindowCreatedSignalType* mWindowCreatedSignal;
+  void Start( Dali::Window window );
+
+  bool AddIdle( CallbackBase* callback, bool hasReturnValue );
+  void RemoveIdle( CallbackBase* callback );
+  void RunIdles();
+
+  static Integration::Scene GetScene( Dali::Window window );
+
+  Dali::RenderSurfaceInterface& GetSurface();
+  Dali::WindowContainer GetWindows();
+
+  Dali::Adaptor::AdaptorSignalType& ResizedSignal();
+  Dali::Adaptor::AdaptorSignalType& LanguageChangedSignal();
+  Dali::Adaptor::WindowCreatedSignalType& WindowCreatedSignal();
+
+  static Adaptor& GetImpl( Dali::Adaptor& adaptor ) { return *adaptor.mImpl; }
+  static const Adaptor& GetImpl( const Dali::Adaptor& adaptor ) { return *adaptor.mImpl; }
+
+private:
+
+  Vector<CallbackBase*> mCallbacks;
+  Dali::WindowContainer mWindows;
+  Dali::Adaptor::AdaptorSignalType mResizedSignal;
+  Dali::Adaptor::AdaptorSignalType mLanguageChangedSignal;
+  Dali::Adaptor::WindowCreatedSignalType mWindowCreatedSignal;
 };
 
 } // namespace Adaptor

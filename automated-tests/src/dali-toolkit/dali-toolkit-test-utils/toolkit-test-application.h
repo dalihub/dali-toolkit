@@ -18,19 +18,21 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <memory>
+
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
-#include <dali/devel-api/text-abstraction/font-client.h>
-#include <dali/integration-api/adaptors/adaptor.h>
-#include <toolkit-adaptor-impl.h>
-#include <toolkit-singleton-service.h>
-#include <toolkit-lifecycle-controller.h>
 
 namespace Dali
 {
 
+class Adaptor;
+
 /**
  * Adds some functionality on top of TestApplication that is required by the Toolkit.
+ *
+ * This includes creation and destruction of the Adaptor and Window classes.
  */
 class ToolkitTestApplication : public TestApplication
 {
@@ -39,53 +41,9 @@ public:
   ToolkitTestApplication( size_t surfaceWidth  = DEFAULT_SURFACE_WIDTH,
                           size_t surfaceHeight = DEFAULT_SURFACE_HEIGHT,
                           float  horizontalDpi = DEFAULT_HORIZONTAL_DPI,
-                          float  verticalDpi   = DEFAULT_VERTICAL_DPI )
-  : TestApplication( surfaceWidth, surfaceHeight, horizontalDpi, verticalDpi )
-  {
-    auto singletonService = SingletonService::Get();
-    Test::SetApplication( singletonService, *this );
+                          float  verticalDpi   = DEFAULT_VERTICAL_DPI );
 
-    // set the DPI value for font rendering
-    Dali::TextAbstraction::FontClient fontClient = Dali::TextAbstraction::FontClient::Get();
-    if( fontClient )
-    {
-      fontClient.SetDpi( mDpi.x, mDpi.y );
-    }
-
-    bool isAdaptorAvailable = Dali::Internal::Adaptor::Adaptor::Get().IsAvailable();
-    if ( isAdaptorAvailable )
-    {
-      Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
-      lifecycleController.InitSignal().Emit();
-
-      Dali::Window window = Dali::Internal::Adaptor::Adaptor::mWindows.front();
-      if ( window )
-      {
-        Dali::Internal::Adaptor::Adaptor::WindowCreatedSignal().Emit( window );
-      }
-    }
-  }
-
-  ~ToolkitTestApplication()
-  {
-    // Need to delete core before we delete the adaptor.
-    delete mCore;
-    mCore = NULL;
-  }
-
-  //ToolkitOrientation& GetOrientation()
-  //{
-  //return mOrientation;
-  //}
-
-  /**
-   * @brief Creates an adaptor implementation for those controls like the
-   * text-field and the text-editor which connects a callback to the idle signal.
-   */
-  void CreateAdaptor()
-  {
-    Adaptor::Get();
-  }
+  ~ToolkitTestApplication();
 
   /**
    * @brief Executes the idle callbacks.
@@ -93,26 +51,10 @@ public:
    * Some controls like the text-field and the text-editor connect callbacks to the
    * idle signal.
    */
-  void RunIdles()
-  {
-    if( Adaptor::IsAvailable() )
-    {
-      for( Vector<CallbackBase*>::Iterator it = Internal::Adaptor::Adaptor::mCallbacks.Begin(),
-             endIt = Internal::Adaptor::Adaptor::mCallbacks.End();
-           it != endIt;
-           ++it )
-      {
-        CallbackBase* callback = *it;
-
-        CallbackBase::Execute( *callback );
-      }
-
-      Internal::Adaptor::Adaptor::mCallbacks.Clear();
-    }
-  }
+  void RunIdles();
 
 private:
-  //ToolkitOrientation mOrientation;
+  std::unique_ptr< Adaptor > mAdaptor;
 };
 
 } // namespace Dali

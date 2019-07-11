@@ -23,14 +23,16 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal.h>
+#include <dali/integration-api/scene.h>
 
 namespace Dali
 {
 
 class Actor;
 class Layer;
-class KeyEvent;
+struct KeyEvent;
 class TouchData;
+struct WheelEvent;
 
 typedef Dali::Rect<int> PositionSize;
 
@@ -48,11 +50,15 @@ public:
 
   static Window New(PositionSize windowPosition, const std::string& name, bool isTransparent = false);
   static Window New(PositionSize windowPosition, const std::string& name, const std::string& className, bool isTransparent = false);
+
   Window();
   ~Window();
   Window(const Window& handle);
   Window& operator=(const Window& rhs);
   Layer GetRootLayer() const;
+
+  Integration::Scene GetScene();
+  Integration::RenderSurface& GetRenderSurface();
 
 public:
   explicit Window( Internal::Adaptor::Window* window );
@@ -60,13 +66,17 @@ public:
 
 namespace DevelWindow
 {
-
+typedef Signal< void () > EventProcessingFinishedSignalType;
 typedef Signal< void (const KeyEvent&) > KeyEventSignalType;
 typedef Signal< void (const TouchData&) > TouchSignalType;
+typedef Signal< void (const WheelEvent&) > WheelEventSignalType;
 
 Dali::Window Get( Actor actor );
+
+EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window );
 KeyEventSignalType& KeyEventSignal( Dali::Window window );
 TouchSignalType& TouchSignal( Dali::Window window );
+WheelEventSignalType& WheelEventSignal( Window window );
 
 }
 
