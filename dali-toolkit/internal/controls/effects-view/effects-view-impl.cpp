@@ -66,7 +66,7 @@ DALI_TYPE_REGISTRATION_END()
 
 const Pixel::Format EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT = Pixel::RGBA8888;
 const float         ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
-const Vector4       EFFECTS_VIEW_DEFAULT_BACKGROUND_COLOR( 1.0f, 1.0f, 1.0f, 0.0 );
+const Vector4       EFFECTS_VIEW_DEFAULT_BACKGROUND_COLOR( 0.0f, 0.0f, 0.0f, 0.0 );
 const bool          EFFECTS_VIEW_REFRESH_ON_DEMAND(false);
 
 // Visuals are not stylable or public

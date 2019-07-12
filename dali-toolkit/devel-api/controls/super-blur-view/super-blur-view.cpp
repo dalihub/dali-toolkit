@@ -70,9 +70,9 @@ SuperBlurView::SuperBlurView(Dali::Internal::CustomActor* internal)
   VerifyCustomActorPointer<Internal::SuperBlurView>( internal );
 }
 
-void SuperBlurView::SetImage(Image inputImage)
+void SuperBlurView::SetTexture( Texture texture )
 {
-  GetImpl(*this).SetImage( inputImage );
+  GetImpl(*this).SetTexture( texture );
 }
 
 Property::Index SuperBlurView::GetBlurStrengthPropertyIndex() const
@@ -95,9 +95,9 @@ SuperBlurView::SuperBlurViewSignal& SuperBlurView::BlurFinishedSignal()
   return GetImpl(*this).BlurFinishedSignal();
 }
 
-Image SuperBlurView::GetBlurredImage( unsigned int level )
+Texture SuperBlurView::GetBlurredTexture( unsigned int level )
 {
-  return GetImpl(*this).GetBlurredImage( level );
+  return GetImpl(*this).GetBlurredTexture( level );
 }
 } // namespace Toolkit
 

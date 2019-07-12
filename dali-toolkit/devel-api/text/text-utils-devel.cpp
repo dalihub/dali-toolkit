@@ -1281,6 +1281,10 @@ void UpdateBuffer(Devel::PixelBuffer src, Devel::PixelBuffer dst, unsigned int x
   }
 
   const unsigned int bytesPerPixel = Dali::Pixel::GetBytesPerPixel(pixelFormat);
+  if( bytesPerPixel == 0u )
+  {
+    return;
+  }
   const unsigned int alphaIndex = bytesPerPixel - 1u;
 
   const unsigned char* const srcBuffer = src.GetBuffer();

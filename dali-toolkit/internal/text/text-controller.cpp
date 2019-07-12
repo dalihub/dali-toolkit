@@ -2128,6 +2128,9 @@ bool Controller::CheckForTextFit( float pointSize, Size& layoutSize )
 
 void Controller::FitPointSizeforLayout( Size layoutSize )
 {
+  const OperationsMask operations  = mImpl->mOperationsPending;
+  if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
+  {
     bool actualellipsis = mImpl->mModel->mElideEnabled;
     float minPointSize = mImpl->mTextFitMinSize;
     float maxPointSize = mImpl->mTextFitMaxSize;
@@ -2174,6 +2177,7 @@ void Controller::FitPointSizeforLayout( Size layoutSize )
     mImpl->mFontDefaults->mFitPointSize = pointSizeArray[bestSizeIndex];
     mImpl->mFontDefaults->sizeDefined = true;
     ClearFontData();
+  }
 }
 
 float Controller::GetHeightForWidth( float width )

@@ -26,7 +26,7 @@ using namespace Dali::Toolkit;
 
 namespace
 {
-const char* TEST_IMAGE_FILE_NAME =  "gallery_image_01.jpg";
+const char* TEST_IMAGE_FILE_NAME = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
 } // namespace
 
 void utc_gaussian_blur_view_startup(void)
@@ -216,8 +216,12 @@ int UtcDaliGaussianBlurViewSetGetRenderTarget(void)
   Stage::GetCurrent().Add(view);
   view.Activate();
 
-  FrameBufferImage renderTarget = FrameBufferImage::New( 480.0f, 800.0f, Pixel::RGB888 );
-  view.SetUserImageAndOutputRenderTarget(ResourceImage::New(TEST_IMAGE_FILE_NAME), renderTarget);
+  PixelData pixels = Toolkit::SyncImageLoader::Load( TEST_IMAGE_FILE_NAME );
+  Texture texture = Texture::New( TextureType::TEXTURE_2D, pixels.GetPixelFormat(), pixels.GetWidth(), pixels.GetHeight() );
+  texture.Upload( pixels, 0, 0, 0, 0, pixels.GetWidth(), pixels.GetHeight() );
+
+  FrameBuffer renderTarget = FrameBuffer::New( 480, 800, FrameBuffer::Attachment::NONE );
+  view.SetUserImageAndOutputRenderTarget(texture, renderTarget);
   DALI_TEST_CHECK( view.GetBlurredRenderTarget() == renderTarget );
   END_TEST;
 }
@@ -249,7 +253,7 @@ int UtcDaliGaussianBlurViewActivateOnce(void)
 int UtcDaliGaussianBlurViewFinishedSignalN(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliGaussianBlurViewSetGetRenderTarget");
+  tet_infoline("UtcDaliGaussianBlurViewFinishedSignalN");
 
   Toolkit::GaussianBlurView view = Toolkit::GaussianBlurView::New(5, 1.5f, Pixel::RGB888, 0.5f, 0.5f, true);
   DALI_TEST_CHECK( view );
