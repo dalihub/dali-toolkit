@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 // INTERNAL INCLUDES
 #include "image-filter.h"
@@ -89,19 +88,19 @@ private:
 
 private: // Attributes
 
-  // To perform horizontal blur from mInputImage to mImageForHorz
+  // To perform horizontal blur from mInputTexture to mFrameBufferForHorz
   RenderTask         mRenderTaskForHorz;
-  Toolkit::ImageView mActorForInput;
-  FrameBufferImage   mImageForHorz;
+  Actor              mActorForInput;
+  FrameBuffer        mFrameBufferForHorz;
 
-  // To perform vertical blur from mImageForHorz to mOutputImage
+  // To perform vertical blur from mFrameBufferForHorz to mOutputFrameBuffer
   RenderTask         mRenderTaskForVert;
-  Toolkit::ImageView mActorForHorz;
-  FrameBufferImage   mBlurredImage;
+  Actor              mActorForHorz;
+  FrameBuffer        mBlurredFrameBuffer;
 
   // To blend the blurred image and input image according to the blur strength
   RenderTask         mRenderTaskForBlending;
-  Toolkit::ImageView mActorForBlending;
+  Actor              mActorForBlending;
   Actor              mRootActorForBlending;
   Property::Index    mBlurStrengthPropertyIndex;
 

@@ -137,14 +137,14 @@ private:
   void CreateBlurFilter();
 
 private:
-  Toolkit::ImageView mShadowPlane; // Shadow renders into this actor
+  Actor mShadowPlane; // Shadow renders into this actor
   Actor mShadowPlaneBg; // mShadowPlane renders directly in front of this actor
   Actor mPointLight;  // Shadow is cast from this point light
 
   /////////////////////////////////////////////////////////////
-  FrameBufferImage mSceneFromLightRenderTarget;  // for rendering normal scene seen from light to texture instead of the screen
+  FrameBuffer mSceneFromLightRenderTarget;  // for rendering normal scene seen from light to texture instead of the screen
 
-  FrameBufferImage mOutputImage;
+  FrameBuffer mOutputFrameBuffer;
 
   Actor mChildrenRoot; // Subtree for all user added child actors that should be rendered normally
   Actor mBlurRootActor; // Root actor for blur filter processing

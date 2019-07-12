@@ -188,16 +188,6 @@ public:
   void CreateRenderTask( const std::string &name );
 
   /**
-   * @copydoc Toolkit::Builder::GetFrameBufferImage
-   */
-  FrameBufferImage GetFrameBufferImage( const std::string &name );
-
-  /**
-   * @copydoc Toolkit::Builder::GetFrameBufferImage
-   */
-  FrameBufferImage GetFrameBufferImage( const std::string &name, const Replacement& constant );
-
-  /**
    * @copydoc Toolkit::Builder::GetPath
    */
   Path GetPath( const std::string &name );
@@ -251,7 +241,6 @@ private:
   typedef struct{ std::string name; Dali::PathConstrainer pathConstrainer; } PathConstrainerEntry;
   typedef std::vector<PathConstrainerEntry> PathConstrainerLut;
   typedef std::map<const std::string, Path> PathLut;
-  typedef std::map<const std::string, FrameBufferImage> ImageLut;
 
 private:
   // Undefined
@@ -385,7 +374,6 @@ private:
 
 private:
   Toolkit::JsonParser                 mParser;
-  ImageLut                            mFrameBufferImageLut;
   PathLut                             mPathLut;
   PathConstrainerLut                  mPathConstrainerLut;
   LinearConstrainerLut                mLinearConstrainerLut;

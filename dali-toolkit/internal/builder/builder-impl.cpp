@@ -458,48 +458,6 @@ void Builder::CreateRenderTask( const std::string &name )
   }
 }
 
-FrameBufferImage Builder::GetFrameBufferImage( const std::string &name )
-{
-  Replacement constant( mReplacementMap );
-  return GetFrameBufferImage(name, constant);
-}
-
-FrameBufferImage Builder::GetFrameBufferImage( const std::string &name, const Replacement& constant )
-{
-  DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
-
-  FrameBufferImage ret;
-
-  ImageLut::const_iterator iter( mFrameBufferImageLut.find( name ) );
-  if( iter != mFrameBufferImageLut.end() )
-  {
-    ret = iter->second;
-  }
-  else
-  {
-    if( OptionalChild images = IsChild( *mParser.GetRoot(), "frameBufferImages") )
-    {
-      if( OptionalChild image = IsChild( *images, name ) )
-      {
-        Dali::Property::Value property(Property::MAP);
-        if( DeterminePropertyFromNode( *image, Property::MAP, property, constant ) )
-        {
-          Property::Map* map = property.GetMap();
-
-          if( map )
-          {
-            (*map)[ KEYNAME_TYPE ] = Property::Value(std::string("FrameBufferImage") );
-            ret = FrameBufferImage::DownCast( Dali::Scripting::NewImage( property ) );
-            mFrameBufferImageLut[ name ] = ret;
-          }
-        }
-      }
-    }
-  }
-
-  return ret;
-}
-
 Path Builder::GetPath( const std::string& name )
 {
   DALI_ASSERT_ALWAYS(mParser.GetRoot() && "Builder script not loaded");
@@ -1111,19 +1069,6 @@ void Builder::SetupTask( RenderTask& task, const TreeNode& node, const Replaceme
     else
     {
       DALI_SCRIPT_WARNING("Cannot find camera actor on stage for render task called '%s'\n", (*s).c_str() );
-    }
-  }
-
-  if( OptionalString s = constant.IsString( IsChild(node, "targetFrameBuffer") ) )
-  {
-    FrameBufferImage fb = GetFrameBufferImage( *s, constant );
-    if(fb)
-    {
-      task.SetTargetFrameBuffer( fb );
-    }
-    else
-    {
-      DALI_SCRIPT_WARNING("Cannot find target frame buffer '%s'\n", (*s).c_str() );
     }
   }
 

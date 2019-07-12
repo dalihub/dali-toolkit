@@ -51,14 +51,14 @@ void ImageFilter::SetRefreshOnDemand( bool onDemand )
   mRefreshOnDemand = onDemand;
 }
 
-void ImageFilter::SetInputImage( Image image )
+void ImageFilter::SetInputTexture( Texture texture )
 {
-  mInputImage = image;
+  mInputTexture = texture;
 }
 
-void ImageFilter::SetOutputImage( FrameBufferImage image )
+void ImageFilter::SetOutputFrameBuffer( FrameBuffer frameBuffer )
 {
-  mOutputImage = image;
+  mOutputFrameBuffer = frameBuffer;
 }
 
 void ImageFilter::SetSize( const Vector2& size )

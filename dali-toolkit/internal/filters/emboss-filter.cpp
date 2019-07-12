@@ -25,13 +25,9 @@
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
-#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 
 namespace Dali
 {
@@ -91,32 +87,36 @@ EmbossFilter::~EmbossFilter()
 
 void EmbossFilter::Enable()
 {
-  mImageForEmboss1 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
-  mImageForEmboss2 = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
+  mFrameBufferForEmboss1 = FrameBuffer::New( mTargetSize.width, mTargetSize.height, FrameBuffer::Attachment::NONE );
+  Texture texture1 = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mTargetSize.width), unsigned(mTargetSize.height) );
+  mFrameBufferForEmboss1.AttachColorTexture( texture1 );
 
-  Property::Map customShader;
-  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = EMBOSS_FRAGMENT_SOURCE;
-  Property::Map visualMap;
-  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
+  mFrameBufferForEmboss2 = FrameBuffer::New( mTargetSize.width, mTargetSize.height, FrameBuffer::Attachment::NONE );
+  Texture texture2 = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mTargetSize.width), unsigned(mTargetSize.height) );
+  mFrameBufferForEmboss2.AttachColorTexture( texture2 );
 
   // create actor to render input with applied emboss effect
-  mActorForInput1 = Toolkit::ImageView::New(mInputImage);
+  mActorForInput1 = Actor::New();
   mActorForInput1.SetParentOrigin( ParentOrigin::CENTER );
   mActorForInput1.SetSize(mTargetSize);
   Vector2 textureScale( 1.5f/mTargetSize.width, 1.5f/mTargetSize.height);
   mActorForInput1.RegisterProperty( TEX_SCALE_UNIFORM_NAME, textureScale );
   mActorForInput1.RegisterProperty( COEFFICIENT_UNIFORM_NAME, Vector3( 2.f, -1.f, -1.f ) );
   // set EMBOSS custom shader
-  mActorForInput1.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
+  Renderer renderer1 = CreateRenderer( BASIC_VERTEX_SOURCE, EMBOSS_FRAGMENT_SOURCE );
+  SetRendererTexture( renderer1, mInputTexture );
+  mActorForInput1.AddRenderer( renderer1 );
   mRootActor.Add( mActorForInput1 );
 
-  mActorForInput2 = Toolkit::ImageView::New(mInputImage);
+  mActorForInput2 = Actor::New();
   mActorForInput2.SetParentOrigin( ParentOrigin::CENTER );
   mActorForInput2.SetSize(mTargetSize);
   mActorForInput2.RegisterProperty( TEX_SCALE_UNIFORM_NAME, textureScale );
   mActorForInput2.RegisterProperty( COEFFICIENT_UNIFORM_NAME, Vector3( -1.f, -1.f, 2.f ) );
   // set EMBOSS custom shader
-  mActorForInput2.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
+  Renderer renderer2 = CreateRenderer( BASIC_VERTEX_SOURCE, EMBOSS_FRAGMENT_SOURCE );
+  SetRendererTexture( renderer2, mInputTexture );
+  mActorForInput2.AddRenderer( renderer2 );
   mRootActor.Add( mActorForInput2 );
 
   mActorForComposite = Actor::New();
@@ -124,16 +124,17 @@ void EmbossFilter::Enable()
   mActorForComposite.SetSize(mTargetSize);
   mActorForComposite.SetColor( Color::BLACK );
 
-  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = COMPOSITE_FRAGMENT_SOURCE;
-
   mRootActor.Add( mActorForComposite );
 
-  Internal::InitializeVisual( mActorForComposite, mVisualForEmboss1, mImageForEmboss1 );
-  Toolkit::GetImplementation( mVisualForEmboss1 ).SetCustomShader( customShader );
-  mActorForComposite.GetRendererAt(0).RegisterProperty( COLOR_UNIFORM_NAME, Color::BLACK );
-  Internal::InitializeVisual( mActorForComposite, mVisualForEmboss2, mImageForEmboss2 );
-  Toolkit::GetImplementation( mVisualForEmboss2 ).SetCustomShader( customShader );
-  mActorForComposite.GetRendererAt(1).RegisterProperty( COLOR_UNIFORM_NAME, Color::WHITE );
+  mRendererForEmboss1 = CreateRenderer( BASIC_VERTEX_SOURCE, COMPOSITE_FRAGMENT_SOURCE );
+  SetRendererTexture( mRendererForEmboss1, mFrameBufferForEmboss1 );
+  mRendererForEmboss1.RegisterProperty( COLOR_UNIFORM_NAME, Color::BLACK );
+  mActorForComposite.AddRenderer( mRendererForEmboss1 );
+
+  mRendererForEmboss2 = CreateRenderer( BASIC_VERTEX_SOURCE, COMPOSITE_FRAGMENT_SOURCE );
+  SetRendererTexture( mRendererForEmboss2, mFrameBufferForEmboss2 );
+  mRendererForEmboss2.RegisterProperty( COLOR_UNIFORM_NAME, Color::WHITE );
+  mActorForComposite.AddRenderer( mRendererForEmboss2 );
 
   SetupCamera();
   CreateRenderTasks();
@@ -163,10 +164,12 @@ void EmbossFilter::Disable()
 
     if( mActorForComposite )
     {
-      Toolkit::GetImplementation(mVisualForEmboss1).SetOffStage( mActorForComposite );
-      Toolkit::GetImplementation(mVisualForEmboss2).SetOffStage( mActorForComposite );
-      mVisualForEmboss1.Reset();
-      mVisualForEmboss2.Reset();
+      mActorForComposite.RemoveRenderer( mRendererForEmboss1 );
+      mRendererForEmboss1.Reset();
+
+      mActorForComposite.RemoveRenderer( mRendererForEmboss2 );
+      mRendererForEmboss2.Reset();
+
       mRootActor.Remove( mActorForComposite );
       mActorForComposite.Reset();
     }
@@ -231,7 +234,7 @@ void EmbossFilter::CreateRenderTasks()
   mRenderTaskForEmboss1.SetInputEnabled( false );
   mRenderTaskForEmboss1.SetClearColor( Vector4( 0.0f, 0.0f, 0.0f, 0.0f ) );
   mRenderTaskForEmboss1.SetClearEnabled( true );
-  mRenderTaskForEmboss1.SetTargetFrameBuffer( mImageForEmboss1 );
+  mRenderTaskForEmboss1.SetFrameBuffer( mFrameBufferForEmboss1 );
   mRenderTaskForEmboss1.SetCameraActor( mCameraActor );
 
   mRenderTaskForEmboss2 = taskList.CreateTask();
@@ -241,7 +244,7 @@ void EmbossFilter::CreateRenderTasks()
   mRenderTaskForEmboss2.SetInputEnabled( false );
   mRenderTaskForEmboss2.SetClearColor( Vector4( 1.0f, 1.0f, 1.0f, 0.0f ) );
   mRenderTaskForEmboss2.SetClearEnabled( true );
-  mRenderTaskForEmboss2.SetTargetFrameBuffer( mImageForEmboss2 );
+  mRenderTaskForEmboss2.SetFrameBuffer( mFrameBufferForEmboss2 );
   mRenderTaskForEmboss2.SetCameraActor( mCameraActor );
 
   mRenderTaskForOutput = taskList.CreateTask();
@@ -251,7 +254,7 @@ void EmbossFilter::CreateRenderTasks()
   mRenderTaskForOutput.SetInputEnabled( false );
   mRenderTaskForOutput.SetClearColor( Vector4( 0.5f, 0.5f, 0.5f, 0.0f ) );
   mRenderTaskForOutput.SetClearEnabled( true );
-  mRenderTaskForOutput.SetTargetFrameBuffer( mOutputImage );
+  mRenderTaskForOutput.SetFrameBuffer( mOutputFrameBuffer );
   mRenderTaskForOutput.SetCameraActor( mCameraActor );
 }
 

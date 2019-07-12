@@ -35,6 +35,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 
 // TODO:
 // pixel format / size - set from JSON
@@ -100,37 +101,6 @@ const float GAUSSIAN_BLUR_VIEW_DEFAULT_DOWNSAMPLE_HEIGHT_SCALE = 0.5f;
 
 const float ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 
-#define DALI_COMPOSE_SHADER(STR) #STR
-
-const char * const BASIC_VERTEX_SOURCE = DALI_COMPOSE_SHADER(
-  precision mediump float;\n
-  attribute mediump vec2 aPosition;\n
-  attribute mediump vec2 aTexture;\n
-  varying mediump vec2 vTexCoord;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition * uSize.xy, 0.0, 1.0);\n
-    vTexCoord = aTexture;\n
-    gl_Position = uMvpMatrix * vertexPosition;\n
-  }\n
-);
-
-const char * const BASIC_FRAGMENT_SOURCE = DALI_COMPOSE_SHADER(
-  precision mediump float;\n
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform vec4 uColor;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = texture2D(sTexture, vTexCoord);\n
-    gl_FragColor *= uColor;
-  }\n
-);
-
 const char* const GAUSSIAN_BLUR_FRAGMENT_SOURCE = DALI_COMPOSE_SHADER(
     varying mediump vec2 vTexCoord;\n
     uniform sampler2D sTexture;\n
@@ -148,72 +118,6 @@ const char* const GAUSSIAN_BLUR_FRAGMENT_SOURCE = DALI_COMPOSE_SHADER(
        gl_FragColor = col;\n
     }\n
 );
-
-Renderer CreateRenderer( const char* vertexSrc, const char* fragmentSrc )
-{
-  Shader shader = Shader::New( vertexSrc, fragmentSrc );
-
-  Geometry texturedQuadGeometry = Geometry::New();
-
-  struct VertexPosition { Vector2 position; };
-  struct VertexTexture { Vector2 texture; };
-
-  VertexPosition positionArray[] =
-  {
-    { Vector2( -0.5f, -0.5f ) },
-    { Vector2(  0.5f, -0.5f ) },
-    { Vector2( -0.5f,  0.5f ) },
-    { Vector2(  0.5f,  0.5f ) }
-  };
-  uint32_t numberOfVertices = sizeof(positionArray)/sizeof(VertexPosition);
-
-  VertexTexture uvArray[] =
-  {
-    { Vector2( 0.0f, 0.0f ) },
-    { Vector2( 1.0f, 0.0f ) },
-    { Vector2( 0.0f, 1.0f ) },
-    { Vector2( 1.0f, 1.0f ) }
-  };
-
-  Property::Map positionVertexFormat;
-  positionVertexFormat["aPosition"] = Property::VECTOR2;
-  PropertyBuffer positionVertices = PropertyBuffer::New( positionVertexFormat );
-  positionVertices.SetData( positionArray, numberOfVertices );
-  texturedQuadGeometry.AddVertexBuffer( positionVertices );
-
-  Property::Map textureVertexFormat;
-  textureVertexFormat["aTexture"] = Property::VECTOR2;
-  PropertyBuffer textureVertices = PropertyBuffer::New( textureVertexFormat );
-  textureVertices.SetData( uvArray, numberOfVertices );
-  texturedQuadGeometry.AddVertexBuffer( textureVertices );
-
-  const uint16_t indices[] = { 0, 3, 1, 0, 2, 3 };
-  texturedQuadGeometry.SetIndexBuffer ( &indices[0], sizeof( indices )/ sizeof( indices[0] ) );
-
-  Renderer renderer = Renderer::New( texturedQuadGeometry, shader );
-
-  TextureSet textureSet = TextureSet::New();
-  renderer.SetTextures( textureSet );
-
-  return renderer;
-}
-
-void SetTexture( Actor actor, Texture texture )
-{
-  if( Renderer renderer = actor.GetRendererAt(0) )
-  {
-    TextureSet textureSet = renderer.GetTextures();
-    textureSet.SetTexture( 0u, texture );
-  }
-}
-
-void SetTexture( Actor actor, FrameBuffer frameBuffer )
-{
-  if( frameBuffer )
-  {
-    SetTexture( actor, frameBuffer.GetColorTexture() );
-  }
-}
 
 } // namespace
 
@@ -322,7 +226,7 @@ void GaussianBlurView::SetUserImageAndOutputRenderTarget(Texture inputImage, Fra
 
   mUserInputImage = inputImage;
 
-  SetTexture( mHorizBlurActor, inputImage );
+  SetRendererTexture( mHorizBlurActor.GetRendererAt(0), inputImage );
 
   mUserOutputRenderTarget = outputRenderTarget;
 }
@@ -519,7 +423,7 @@ void GaussianBlurView::AllocateResources()
       mRenderTargetForRenderingChildren.AttachColorTexture( texture );
 
       // Set actor for performing a horizontal blur
-      SetTexture( mHorizBlurActor, mRenderTargetForRenderingChildren );
+      SetRendererTexture( mHorizBlurActor.GetRendererAt(0), mRenderTargetForRenderingChildren );
 
       // Create offscreen buffer for vert blur pass
       mRenderTarget1 = FrameBuffer::New( mDownsampledWidth, mDownsampledHeight, FrameBuffer::Attachment::NONE );
@@ -527,10 +431,10 @@ void GaussianBlurView::AllocateResources()
       mRenderTarget1.AttachColorTexture( texture );
 
       // use the completed blur in the first buffer and composite with the original child actors render
-      SetTexture( mCompositingActor, mRenderTarget1 );
+      SetRendererTexture( mCompositingActor.GetRendererAt(0), mRenderTarget1 );
 
       // set up target actor for rendering result, i.e. the blurred image
-      SetTexture( mTargetActor, mRenderTargetForRenderingChildren );
+      SetRendererTexture( mTargetActor.GetRendererAt(0), mRenderTargetForRenderingChildren );
     }
 
     // Create offscreen buffer for horiz blur pass
@@ -543,7 +447,7 @@ void GaussianBlurView::AllocateResources()
 
     // size needs to match render target
     mVertBlurActor.SetSize(mDownsampledWidth, mDownsampledHeight);
-    SetTexture( mVertBlurActor, mRenderTarget2 );
+    SetRendererTexture( mVertBlurActor.GetRendererAt(0), mRenderTarget2 );
 
     // set gaussian blur up for new sized render targets
     SetShaderConstants();
