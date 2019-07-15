@@ -428,9 +428,9 @@ struct InternalPrePositionConstraint
         // Note: A further 1.0f is subtracted to handle a compensation that happens later within the flick handling code in SnapWithVelocity().
         //       When a flick is completed, an adjustment of 1.0f is sometimes made to allow for the scenario where:
         //       A flick finishes before the update thread has advanced the scroll position past the previous snap point.
-        Vector2 pageSizeLimit( size.x - ( 1.0f + 1.0f ), size.y - ( 1.0f - 1.0f ) );
-        Vector2 minPosition( mStartPosition.x - pageSizeLimit.x, mStartPosition.y - pageSizeLimit.y );
-        Vector2 maxPosition( mStartPosition.x + pageSizeLimit.x, mStartPosition.y + pageSizeLimit.y );
+        Vector2 viewPageSizeLimit( size.x - ( 1.0f + 1.0f ), size.y - ( 1.0f - 1.0f ) );
+        Vector2 minPosition( mStartPosition.x - viewPageSizeLimit.x, mStartPosition.y - viewPageSizeLimit.y );
+        Vector2 maxPosition( mStartPosition.x + viewPageSizeLimit.x, mStartPosition.y + viewPageSizeLimit.y );
 
         if( mFixedRulerX )
         {

@@ -48,10 +48,10 @@ public:
    * @param[in] path Pages will follow this path
    * @param[in] forward Vector in page local space which will be aligned with tangent of the path
    * @param[in] inputPropertyIndex index of the property in the scrollview used to drivce the path
-   * @param[in] pageSize size of a page in the scrollview
+   * @param[in] viewPageSize size of a page in the scrollview
    * @param[in] pageCount total number of pages in the scrollview
    */
-  ScrollViewPagePathEffect(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& pageSize, unsigned int pageCount );
+  ScrollViewPagePathEffect(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& viewPageSize, unsigned int pageCount );
 
 public:
 

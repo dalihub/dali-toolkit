@@ -71,10 +71,10 @@ public:
    * @brief Create an initialized PageTurnLandscapeView control
    * @SINCE_1_0.0
    * @param[in] pageFactory The factory which provides PageTurnView with pages.
-   * @param[in] pageSize The size of the page
+   * @param[in] viewPageSize The size of the page
    * @return A handle to the PageTurnLandscapeView control.
    */
-  static PageTurnLandscapeView New( PageFactory& pageFactory, const Vector2& pageSize );
+  static PageTurnLandscapeView New( PageFactory& pageFactory, const Vector2& viewPageSize );
 
   /**
    * @brief Downcast an Object handle to PageTurnPortraitView. If handle points to a PageTurnLandscapeView the

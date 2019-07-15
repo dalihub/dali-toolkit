@@ -81,8 +81,8 @@ public:
   {
     enum
     {
-      PAGE_SIZE = PROPERTY_START_INDEX, ///< name "pageSize",        type Vector2 @SINCE_1_1.4
-      CURRENT_PAGE_ID,                  ///< name "currentPageId",   type Integer @SINCE_1_1.4
+      VIEW_PAGE_SIZE = PROPERTY_START_INDEX, ///< name "viewPageSize",        type Vector2 @SINCE_1_1.4
+      CURRENT_PAGE_ID,                       ///< name "currentPageId",       type Integer @SINCE_1_1.4
 
       /**
        * The two values are the major&minor radius (in pixels) to form an ellipse shape.

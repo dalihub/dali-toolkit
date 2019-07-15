@@ -48,8 +48,8 @@ const float PAGE_TURN_OVER_ANIMATION_DURATION(0.5f);
 
 }
 
-PageTurnPortraitView::PageTurnPortraitView( PageFactory& pageFactory, const Vector2& pageSize )
-: PageTurnView( pageFactory, pageSize )
+PageTurnPortraitView::PageTurnPortraitView( PageFactory& pageFactory, const Vector2& viewPageSize )
+: PageTurnView( pageFactory, viewPageSize )
 {
 }
 
@@ -57,10 +57,10 @@ PageTurnPortraitView::~PageTurnPortraitView()
 {
 }
 
-Toolkit::PageTurnPortraitView PageTurnPortraitView::New( PageFactory& pageFactory, const Vector2& pageSize )
+Toolkit::PageTurnPortraitView PageTurnPortraitView::New( PageFactory& pageFactory, const Vector2& viewPageSize )
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr< PageTurnPortraitView > internalPageTurnView = new PageTurnPortraitView( pageFactory, pageSize );
+  IntrusivePtr< PageTurnPortraitView > internalPageTurnView = new PageTurnPortraitView( pageFactory, viewPageSize );
 
   // Pass ownership to CustomActor
   Dali::Toolkit::PageTurnPortraitView pageTurnView( *internalPageTurnView );
