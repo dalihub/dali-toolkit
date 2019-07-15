@@ -62,12 +62,10 @@ namespace DevelWindow
 {
 
 typedef Signal< void (const KeyEvent&) > KeyEventSignalType;
-typedef Signal< bool (const KeyEvent&) > KeyEventGeneratedSignalType;
 typedef Signal< void (const TouchData&) > TouchSignalType;
 
 Dali::Window Get( Actor actor );
 KeyEventSignalType& KeyEventSignal( Dali::Window window );
-KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Dali::Window window );
 TouchSignalType& TouchSignal( Dali::Window window );
 
 }
