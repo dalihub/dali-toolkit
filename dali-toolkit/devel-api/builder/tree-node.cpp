@@ -16,7 +16,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cctype>
 #include <cstring>
+#include <string>
 #include <algorithm>
 
 // INTERNAL INCLUDES

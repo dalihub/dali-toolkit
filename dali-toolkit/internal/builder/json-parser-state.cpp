@@ -19,6 +19,7 @@
 #include <dali-toolkit/internal/builder/json-parser-state.h>
 
 // EXTERNAL INCLUDES
+#include <string>
 #include <algorithm>
 
 namespace Dali

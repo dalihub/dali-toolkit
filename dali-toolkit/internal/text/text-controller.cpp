@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <limits>
+#include <cmath>
 #include <memory.h>
 #include <dali/public-api/adaptor-framework/key.h>
 #include <dali/integration-api/debug.h>
@@ -1440,7 +1441,7 @@ const std::string& Controller::GetDefaultOutlineProperties() const
 
 bool Controller::SetDefaultLineSpacing( float lineSpacing )
 {
-  if( std::abs(lineSpacing - mImpl->mLayoutEngine.GetDefaultLineSpacing()) > Math::MACHINE_EPSILON_1000 )
+  if( std::fabs( lineSpacing - mImpl->mLayoutEngine.GetDefaultLineSpacing() ) > Math::MACHINE_EPSILON_1000 )
   {
     mImpl->mLayoutEngine.SetDefaultLineSpacing(lineSpacing);
     mImpl->mRecalculateNaturalSize = true;
