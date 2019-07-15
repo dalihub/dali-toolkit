@@ -106,7 +106,7 @@ void GaussianBlurView::Deactivate()
   GetImpl(*this).Deactivate();
 }
 
-void GaussianBlurView::SetUserImageAndOutputRenderTarget(Image inputImage, FrameBufferImage outputRenderTarget)
+void GaussianBlurView::SetUserImageAndOutputRenderTarget(Texture inputImage, FrameBuffer outputRenderTarget)
 {
   GetImpl(*this).SetUserImageAndOutputRenderTarget(inputImage, outputRenderTarget);
 }
@@ -116,7 +116,7 @@ Property::Index GaussianBlurView::GetBlurStrengthPropertyIndex() const
   return GetImpl(*this).GetBlurStrengthPropertyIndex();
 }
 
-FrameBufferImage GaussianBlurView::GetBlurredRenderTarget() const
+FrameBuffer GaussianBlurView::GetBlurredRenderTarget() const
 {
   return GetImpl(*this).GetBlurredRenderTarget();
 }

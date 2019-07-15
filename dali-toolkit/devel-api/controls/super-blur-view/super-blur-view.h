@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
@@ -44,8 +45,7 @@ class SuperBlurView;
  *  Stage::GetCurrent().Add(blurView);\n
  *
  *  // Set the input image
- *  ResourceImage image = ResourceImage::New(...);\n
- *  blurView.SetImage(image);\n
+ *  blurView.SetProperty( SuperBlurView::Property::IMAGE_URL, url );\n
  *
  *  // animate the strength of the blur - this can fade between no blur and full blur. .\n
  *  Animation blurAnimation = Animation::New( ... );\n
@@ -72,7 +72,7 @@ public:
   {
     enum
     {
-      IMAGE = PROPERTY_START_INDEX, ///< name "image",    @see SetImage,    type Map
+      IMAGE_URL = PROPERTY_START_INDEX, ///< name "imageUrl",    @see SetTexture,    type String
     };
   };
 
@@ -89,7 +89,7 @@ public:
   /**
    * @brief Create an initialized SuperBlurView.
    *
-   * @param[in] blurLevels The final blur strength level. It decides how many filtering passes are used to create the group of blurred images.
+   * @param[in] blurLevels The final blur strength level. It decides how many filtering passes are used to create the group of blurred textures.
    * @return A handle to a newly allocated Dali resource
    */
   static SuperBlurView New( unsigned int blurLevels );
@@ -129,11 +129,11 @@ public:
   static SuperBlurView DownCast( BaseHandle handle );
 
   /**
-   * @brief Sets a custom image to be blurred.
+   * @brief Sets a custom texture to be blurred.
    *
-   * @param[in] inputImage The image that the user wishes to blur
+   * @param[in] texture The texture that the user wishes to blur
    */
-  void SetImage(Image inputImage);
+  void SetTexture( Texture texture );
 
   /**
    * @brief Get the index of the property that can be used to fade the blur in / out.
@@ -145,9 +145,9 @@ public:
   Dali::Property::Index GetBlurStrengthPropertyIndex() const;
 
   /**
-   * @brief Set the blur strength to display the image.
+   * @brief Set the blur strength to display the texture.
    *
-   * @param[in] blurStrength The blur strength used to display the image.
+   * @param[in] blurStrength The blur strength used to display the texture.
    */
   void SetBlurStrength( float blurStrength );
 
@@ -166,13 +166,13 @@ public:
   SuperBlurViewSignal& BlurFinishedSignal();
 
   /**
-   * @brief Get the blurred image.
+   * @brief Get the blurred texture.
    *
    * Should wait for the BlurFinishedSignal before calling this method.
-   * @param[in] level Indicate which blurred image to get, must be a value between 1 and  blurLevels
-   * @return The level-th blurred image
+   * @param[in] level Indicate which blurred texture to get, must be a value between 1 and  blurLevels
+   * @return The level-th blurred texture
    */
-  Image GetBlurredImage( unsigned int level );
+  Texture GetBlurredTexture( unsigned int level );
 
 public: // Not intended for application developers
 

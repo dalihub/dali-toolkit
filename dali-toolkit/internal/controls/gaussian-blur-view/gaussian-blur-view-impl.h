@@ -78,10 +78,10 @@ public:
   void ActivateOnce();
   void Deactivate();
 
-  void SetUserImageAndOutputRenderTarget(Image inputImage, FrameBufferImage outputRenderTarget);
+  void SetUserImageAndOutputRenderTarget(Texture inputImage, FrameBuffer outputRenderTarget);
 
   Property::Index GetBlurStrengthPropertyIndex() const {return mBlurStrengthPropertyIndex;}
-  FrameBufferImage GetBlurredRenderTarget() const;
+  FrameBuffer GetBlurredRenderTarget() const;
 
   /// @copydoc Dali::Toolkit::GaussianBlurView::SetBackgroundColor(const Vector4&)
   void SetBackgroundColor( const Vector4& color );
@@ -159,30 +159,28 @@ private:
 
   /////////////////////////////////////////////////////////////
   // for rendering all user added children to offscreen target
-  FrameBufferImage mRenderTargetForRenderingChildren;
+  FrameBuffer mRenderTargetForRenderingChildren;
   RenderTask mRenderChildrenTask;
 
   /////////////////////////////////////////////////////////////
   // for rendering separated blur passes to offscreen targets
-  FrameBufferImage mRenderTarget1;
-  FrameBufferImage mRenderTarget2;
+  FrameBuffer mRenderTarget1;
+  FrameBuffer mRenderTarget2;
 
-  Toolkit::ImageView mImageViewHorizBlur;
-  Toolkit::ImageView mImageViewVertBlur;
-
-  Property::Map mCustomShader;
+  Actor mHorizBlurActor;
+  Actor mVertBlurActor;
 
   RenderTask mHorizBlurTask;
   RenderTask mVertBlurTask;
 
   /////////////////////////////////////////////////////////////
   // for compositing blur and children renders to offscreen target
-  Toolkit::ImageView mImageViewComposite;
+  Actor mCompositingActor;
   RenderTask mCompositeTask;
 
   /////////////////////////////////////////////////////////////
   // for holding blurred result
-  Toolkit::ImageView mTargetActor;
+  Actor mTargetActor;
 
   /////////////////////////////////////////////////////////////
   // for animating fade in / out of blur, hiding internal implementation but allowing user to set via GaussianBlurView interface
@@ -190,8 +188,8 @@ private:
 
   /////////////////////////////////////////////////////////////
   // User can specify image to blur and output target, so we can use GaussianBlurView for arbitrary blur processes
-  Image mUserInputImage;
-  FrameBufferImage mUserOutputRenderTarget;
+  Texture mUserInputImage;
+  FrameBuffer mUserOutputRenderTarget;
 
   Dali::Toolkit::GaussianBlurView::GaussianBlurViewSignal mFinishedSignal; ///< Signal emitted when blur has completed.
 
