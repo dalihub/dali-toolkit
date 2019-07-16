@@ -89,6 +89,8 @@ extern const char * const PLAY_RANGE_NAME;
 extern const char * const PLAY_STATE_NAME;
 extern const char * const CURRENT_FRAME_NUMBER_NAME;
 extern const char * const TOTAL_FRAME_NUMBER_NAME;
+extern const char * const STOP_BEHAVIOR_NAME;
+extern const char * const LOOPING_MODE_NAME;
 
 // Text visual
 extern const char * const TEXT_PROPERTY;
