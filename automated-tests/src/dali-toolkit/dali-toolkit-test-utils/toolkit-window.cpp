@@ -84,6 +84,17 @@ Window::~Window()
 {
 }
 
+Window::Window(const Window& handle)
+: BaseHandle( handle )
+{
+}
+
+Window& Window::operator=(const Window& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
 Dali::Window Window::New( PositionSize windowPosition, const std::string& name, bool isTransparent )
 {
   Internal::Adaptor::Window* window = Internal::Adaptor::Window::New( windowPosition, name, "", isTransparent );

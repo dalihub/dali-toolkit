@@ -81,6 +81,7 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
   dali-toolkit-test-utils/toolkit-environment-variable.cpp
   dali-toolkit-test-utils/toolkit-input-method-context.cpp
+  dali-toolkit-test-utils/toolkit-input-method-options.cpp
   dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp
   dali-toolkit-test-utils/toolkit-orientation.cpp
   dali-toolkit-test-utils/toolkit-physical-keyboard.cpp

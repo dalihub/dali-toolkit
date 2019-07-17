@@ -22,6 +22,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-environment-variable.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-feedback-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-context.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-options.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-native-image-source.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-orientation.cpp
@@ -56,11 +57,6 @@ LIST(APPEND TC_SOURCES
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
   dali-core
   dali-toolkit
-  dali-adaptor
-)
-
-PKG_CHECK_MODULES(DALI_ADAPTOR REQUIRED
-  dali-adaptor
 )
 
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
