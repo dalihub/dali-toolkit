@@ -15,6 +15,8 @@
  *
  */
 
+#include <algorithm>
+
 #include <toolkit-window.h>
 
 // Don't want to include the actual window.h which otherwise will be indirectly included by adaptor.h.
@@ -23,105 +25,155 @@
 
 #include <dali/integration-api/adaptors/scene-holder.h>
 
-#include <dali/public-api/object/base-object.h>
-
 #include <toolkit-adaptor-impl.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/scene.h>
 #include <test-application.h>
 #include <test-render-surface.h>
 
 namespace Dali
 {
 
+namespace
+{
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// LogFactoryStub
+//
+///////////////////////////////////////////////////////////////////////////////
+
+class LogFactory : public LogFactoryInterface
+{
+public:
+  LogFactory() = default;
+  virtual ~LogFactory() = default;
+
+private:
+  void InstallLogFunction() const override
+  {
+    Dali::Integration::Log::InstallLogFunction( &TestApplication::LogMessage );
+  }
+};
+LogFactory* gLogFactory = NULL; // For some reason, destroying this when the Adaptor is destroyed causes a crash in some test cases when running all of them.
+} //unnamed namespace
+
 namespace Internal
 {
 namespace Adaptor
 {
 
-bool Adaptor::mAvailable = false;
-Vector<CallbackBase*> Adaptor::mCallbacks = Vector<CallbackBase*>();
-Dali::WindowContainer Adaptor::mWindows;
-Dali::Adaptor::WindowCreatedSignalType* Adaptor::mWindowCreatedSignal = nullptr;
+///////////////////////////////////////////////////////////////////////////////
+//
+// Dali::Internal::Adaptor::Adaptor Stub
+//
+///////////////////////////////////////////////////////////////////////////////
+
+Dali::Adaptor* gAdaptor = nullptr;
+
+Dali::Adaptor& Adaptor::New()
+{
+  DALI_ASSERT_ALWAYS( ! gAdaptor );
+  gAdaptor = new Dali::Adaptor;
+  return *gAdaptor;
+}
 
 Dali::Adaptor& Adaptor::Get()
 {
-  Dali::Adaptor* adaptor = new Dali::Adaptor;
-  Adaptor::mAvailable = true;
-  return *adaptor;
+  DALI_ASSERT_ALWAYS( gAdaptor );
+  return *gAdaptor;
+}
+
+Adaptor::Adaptor()
+{
+}
+
+Adaptor::~Adaptor()
+{
+  gAdaptor = nullptr;
+}
+
+void Adaptor::Start( Dali::Window window )
+{
+  if ( window )
+  {
+    mWindows.push_back( window );
+    mWindowCreatedSignal.Emit( window );
+  }
+}
+
+Integration::Scene Adaptor::GetScene( Dali::Window window )
+{
+  return window.GetScene();
+}
+
+bool Adaptor::AddIdle( CallbackBase* callback, bool hasReturnValue )
+{
+  mCallbacks.PushBack( callback );
+  return true;
+}
+
+void Adaptor::RemoveIdle( CallbackBase* callback )
+{
+  mCallbacks.Erase( std::find_if( mCallbacks.Begin(), mCallbacks.End(),
+                                  [ &callback ] ( CallbackBase* current ) { return callback == current; } ) );
+}
+
+void Adaptor::RunIdles()
+{
+  for( auto& callback : mCallbacks )
+  {
+    CallbackBase::Execute( *callback );
+  }
+
+  mCallbacks.Clear();
 }
 
 Dali::RenderSurfaceInterface& Adaptor::GetSurface()
 {
-  Dali::RenderSurfaceInterface* renderSurface = reinterpret_cast <Dali::RenderSurfaceInterface*>( new Dali::TestRenderSurface( Dali::PositionSize( 0, 0, 480, 800 ) ) );
-  return *renderSurface;
+  DALI_ASSERT_ALWAYS( ! mWindows.empty() );
+
+  return reinterpret_cast < Dali::RenderSurfaceInterface& >( mWindows.front().GetRenderSurface() );
 }
 
 Dali::WindowContainer Adaptor::GetWindows()
 {
-  return Adaptor::mWindows;
+  return mWindows;
 }
 
-Dali::Adaptor::AdaptorSignalType& Adaptor::AdaptorSignal()
+Dali::Adaptor::AdaptorSignalType& Adaptor::ResizedSignal()
 {
-  Dali::Adaptor::AdaptorSignalType* signal = new Dali::Adaptor::AdaptorSignalType;
-  return *signal;
+  return mResizedSignal;
+}
+
+Dali::Adaptor::AdaptorSignalType& Adaptor::LanguageChangedSignal()
+{
+  return mLanguageChangedSignal;
 }
 
 Dali::Adaptor::WindowCreatedSignalType& Adaptor::WindowCreatedSignal()
 {
-  if ( !Adaptor::mWindowCreatedSignal )
-  {
-    Adaptor::mWindowCreatedSignal = new Dali::Adaptor::WindowCreatedSignalType;
-  }
-
-  return *Adaptor::mWindowCreatedSignal;
+  return mWindowCreatedSignal;
 }
 
 } // namespace Adaptor
 } // namespace Internal
 
-Adaptor& Adaptor::New( Window window )
-{
-  return Internal::Adaptor::Adaptor::Get();
-}
+///////////////////////////////////////////////////////////////////////////////
+//
+// Dali::Adaptor Stub
+//
+///////////////////////////////////////////////////////////////////////////////
 
-Adaptor& Adaptor::New( Window window, Configuration::ContextLoss configuration )
+Adaptor::Adaptor()
+: mImpl( new Internal::Adaptor::Adaptor )
 {
-  return Internal::Adaptor::Adaptor::Get();
-}
-
-Adaptor& Adaptor::New( Window window, const Dali::RenderSurfaceInterface& surface )
-{
-  return Internal::Adaptor::Adaptor::Get();
-}
-
-Adaptor& Adaptor::New( Window window, const Dali::RenderSurfaceInterface& surface, Configuration::ContextLoss configuration )
-{
-  return Internal::Adaptor::Adaptor::Get();
-}
-
-Adaptor& Adaptor::New( Dali::Integration::SceneHolder window )
-{
-  return Internal::Adaptor::Adaptor::Get();
-}
-
-Adaptor& Adaptor::New( Dali::Integration::SceneHolder window, Configuration::ContextLoss configuration )
-{
-  return Internal::Adaptor::Adaptor::Get();
-}
-
-Adaptor& Adaptor::New( Dali::Integration::SceneHolder window, const Dali::RenderSurfaceInterface& surface )
-{
-  return Internal::Adaptor::Adaptor::Get();
-}
-
-Adaptor& Adaptor::New( Dali::Integration::SceneHolder window, const Dali::RenderSurfaceInterface& surface, Configuration::ContextLoss configuration )
-{
-  return Internal::Adaptor::Adaptor::Get();
 }
 
 Adaptor::~Adaptor()
 {
+  Internal::Adaptor::gAdaptor = nullptr;
+  delete mImpl;
 }
 
 void Adaptor::Start()
@@ -142,34 +194,12 @@ void Adaptor::Stop()
 
 bool Adaptor::AddIdle( CallbackBase* callback, bool hasReturnValue )
 {
-  const bool isAvailable = IsAvailable();
-
-  if( isAvailable )
-  {
-    Internal::Adaptor::Adaptor::mCallbacks.PushBack( callback );
-  }
-
-  return isAvailable;
+  return mImpl->AddIdle( callback, hasReturnValue );
 }
 
 void Adaptor::RemoveIdle( CallbackBase* callback )
 {
-  const bool isAvailable = IsAvailable();
-
-  if( isAvailable )
-  {
-    for( Vector<CallbackBase*>::Iterator it = Internal::Adaptor::Adaptor::mCallbacks.Begin(),
-           endIt = Internal::Adaptor::Adaptor::mCallbacks.End();
-         it != endIt;
-         ++it )
-    {
-      if( callback == *it )
-      {
-        Internal::Adaptor::Adaptor::mCallbacks.Remove( it );
-        return;
-      }
-    }
-  }
+  mImpl->RemoveIdle( callback );
 }
 
 void Adaptor::ReplaceSurface( Window window, Dali::RenderSurfaceInterface& surface )
@@ -182,27 +212,27 @@ void Adaptor::ReplaceSurface( Dali::Integration::SceneHolder window, Dali::Rende
 
 Adaptor::AdaptorSignalType& Adaptor::ResizedSignal()
 {
-  return Internal::Adaptor::Adaptor::AdaptorSignal();
+  return mImpl->ResizedSignal();
 }
 
 Adaptor::AdaptorSignalType& Adaptor::LanguageChangedSignal()
 {
-  return Internal::Adaptor::Adaptor::AdaptorSignal();
+  return mImpl->LanguageChangedSignal();
 }
 
 Adaptor::WindowCreatedSignalType& Adaptor::WindowCreatedSignal()
 {
-  return Internal::Adaptor::Adaptor::WindowCreatedSignal();
+  return mImpl->WindowCreatedSignal();
 }
 
 Dali::RenderSurfaceInterface& Adaptor::GetSurface()
 {
-  return Internal::Adaptor::Adaptor::GetSurface();
+  return mImpl->GetSurface();
 }
 
 Dali::WindowContainer Adaptor::GetWindows() const
 {
-  return Internal::Adaptor::Adaptor::GetWindows();
+  return mImpl->GetWindows();
 }
 
 Any Adaptor::GetNativeWindowHandle()
@@ -226,7 +256,7 @@ Adaptor& Adaptor::Get()
 
 bool Adaptor::IsAvailable()
 {
-  return Internal::Adaptor::Adaptor::mAvailable;
+  return Internal::Adaptor::gAdaptor;
 }
 
 void Adaptor::NotifySceneCreated()
@@ -253,24 +283,6 @@ void Adaptor::SceneCreated()
 {
 }
 
-class LogFactory : public LogFactoryInterface
-{
-public:
-  virtual void InstallLogFunction() const
-  {
-    Dali::Integration::Log::LogFunction logFunction(&TestApplication::LogMessage);
-    Dali::Integration::Log::InstallLogFunction(logFunction);
-  }
-
-  LogFactory()
-  {
-  }
-  virtual ~LogFactory()
-  {
-  }
-};
-
-LogFactory* gLogFactory = NULL;
 const LogFactoryInterface& Adaptor::GetLogFactory()
 {
   if( gLogFactory == NULL )
@@ -278,17 +290,6 @@ const LogFactoryInterface& Adaptor::GetLogFactory()
     gLogFactory = new LogFactory;
   }
   return *gLogFactory;
-}
-
-Adaptor::Adaptor()
-: mImpl( NULL )
-{
-  Dali::PositionSize win_size;
-  win_size.width = 640;
-  win_size.height = 800;
-
-  Dali::Window window = Dali::Window::New( win_size, "" );
-  Internal::Adaptor::Adaptor::mWindows.push_back( window );
 }
 
 } // namespace Dali

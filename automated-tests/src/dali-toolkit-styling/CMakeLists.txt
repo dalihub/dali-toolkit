@@ -29,6 +29,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-style-monitor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-singleton-service.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-sound-player.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-test-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-text-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
