@@ -247,7 +247,7 @@ int UtcDaliCheckBoxSetLabelPadding(void)
              .Add( Toolkit::TextVisual::Property::TEXT, "activate" )
              .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );
 
-  checkBox.SetProperty( Toolkit::DevelButton::Property::LABEL, propertyMap );
+  checkBox.SetProperty( Toolkit::Button::Property::LABEL, propertyMap );
 
   application.SendNotification();
   application.Render();
@@ -286,7 +286,7 @@ int UtcDaliCheckBoxSetForegroundPadding(void)
              .Add( Toolkit::TextVisual::Property::TEXT, "activate" )
              .Add( Toolkit::TextVisual::Property::POINT_SIZE, 15.0f );
 
-  checkBox.SetProperty( Toolkit::DevelButton::Property::LABEL, propertyMap );
+  checkBox.SetProperty( Toolkit::Button::Property::LABEL, propertyMap );
   checkBox.SetProperty( Toolkit::DevelButton::Property::LABEL_PADDING, Vector4( 5.0f, 5.0f, 5.0f, 5.0f ) );
 
   application.SendNotification();
@@ -297,8 +297,8 @@ int UtcDaliCheckBoxSetForegroundPadding(void)
   TestPlatformAbstraction& platform = application.GetPlatform();
   platform.SetClosestImageSize( TEST_IMAGE_SIZE );
 
-  checkBox.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, TEST_IMAGE_ONE );
-  checkBox.SetProperty( Toolkit::DevelButton::Property::SELECTED_VISUAL, TEST_IMAGE_ONE );
+  checkBox.SetProperty( Toolkit::Button::Property::UNSELECTED_VISUAL, TEST_IMAGE_ONE );
+  checkBox.SetProperty( Toolkit::Button::Property::SELECTED_VISUAL, TEST_IMAGE_ONE );
 
 
   application.SendNotification();
@@ -343,19 +343,19 @@ int UtcDaliCheckBoxButtonSetGetSelected(void)
   // global var used to check if CheckBoxButtonClicked is called;
   gCheckBoxButtonState = false;
 
-  checkBoxButton.SetSelected( true );
+  checkBoxButton.SetProperty( Button::Property::SELECTED, true );
 
-  DALI_TEST_CHECK( checkBoxButton.IsSelected() );
+  DALI_TEST_EQUALS( checkBoxButton.GetProperty( Button::Property::SELECTED ).Get<bool>(), true, TEST_LOCATION );
   DALI_TEST_CHECK( gCheckBoxButtonState );
 
-  checkBoxButton.SetSelected( false );
+  checkBoxButton.SetProperty( Button::Property::SELECTED, false );
 
-  DALI_TEST_CHECK( !checkBoxButton.IsSelected() );
+  DALI_TEST_EQUALS( checkBoxButton.GetProperty( Button::Property::SELECTED ).Get<bool>(), false, TEST_LOCATION );
   DALI_TEST_CHECK( !gCheckBoxButtonState );
 
-  checkBoxButton.SetSelected( true );
+  checkBoxButton.SetProperty( Button::Property::SELECTED, true );
 
-  DALI_TEST_CHECK( checkBoxButton.IsSelected() );
+  DALI_TEST_EQUALS( checkBoxButton.GetProperty( Button::Property::SELECTED ).Get<bool>(), true, TEST_LOCATION );
   DALI_TEST_CHECK( gCheckBoxButtonState );
   END_TEST;
 }
@@ -368,7 +368,7 @@ int UtcDaliCheckBoxSetLabelDisabledP(void)
   Stage::GetCurrent().Add( checkBox );
 
   checkBox.SetSize( Vector2( 20.0f, 20.0f ) );
-  checkBox.SetDisabledBackgroundImage( "Image.jpg" );
+  checkBox.SetProperty(Button::Property::DISABLED_UNSELECTED_VISUAL, "Image.jpg" );
 
   application.SendNotification();
   application.Render();
@@ -383,7 +383,7 @@ int UtcDaliCheckBoxSetLabelDisabledP(void)
   checkBox.SetProperty( checkBox.GetPropertyIndex("label"), propertyMap );
 
   DALI_TEST_CHECK(  checkBox.GetProperty<bool>(checkBox.GetPropertyIndex("disabled")) );
-  DALI_TEST_EQUALS( checkBox.GetLabelText(), "activate", TEST_LOCATION );
+  DALI_TEST_EQUALS( GetButtonText(checkBox), "activate", TEST_LOCATION );
 
   END_TEST;
 }

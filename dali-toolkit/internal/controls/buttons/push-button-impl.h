@@ -93,48 +93,6 @@ public:
    */
   static Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex );
 
-  /**
-   * Deprecated API for Setting Pushbutton image using an Actor
-   * @param[in] image, Image Actor that has a url which can be used to create an image visual
-   */
-  void SetButtonImage( Actor image );
-
-  /**
-   * Deprecated API for Setting Pushbutton image using an Actor
-   * @param[in] image, Image Actor that has a url which can be used to create an image visual
-   */
-  void SetBackgroundImage( Actor image );
-
-  /**
-   * Deprecated API for Setting Pushbutton image using an Actor
-   * @param[in] image, Image Actor that has a url which can be used to create an image visual
-   */
-  void SetSelectedImage( Actor image );
-
-  /**
-   * Deprecated API for Setting Pushbutton image using an Actor
-   * @param[in] image, Image Actor that has a url which can be used to create an image visual
-   */
-  void SetSelectedBackgroundImage( Actor image );
-
-  /**
-   * Deprecated API for Setting Pushbutton image using an Actor
-   * @param[in] image, Image Actor that has a url which can be used to create an image visual
-   */
-  void SetDisabledBackgroundImage( Actor image );
-
-  /**
-   * Deprecated API for Setting Pushbutton image using an Actor
-   * @param[in] image, Image Actor that has a url which can be used to create an image visual
-   */
-  void SetDisabledImage( Actor image );
-
-  /**
-   * Deprecated API for Setting Pushbutton image using an Actor
-   * @param[in] image, Image Actor that has a url which can be used to create an image visual
-   */
-  void SetDisabledSelectedImage( Actor image );
-
 private: // From Button
 
   /**

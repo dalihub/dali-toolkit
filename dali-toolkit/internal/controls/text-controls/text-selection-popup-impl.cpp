@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,10 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
-#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-selection-popup-callback-interface.h>
+#include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/helpers/color-conversion.h>
@@ -740,12 +740,17 @@ std::string TextSelectionPopup::GetPressedImage() const
    }
 
    // 3. Set the normal option image (blank / Transparent).
-   option.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, "" );
+   option.SetProperty( Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL, "" );
 
    // 4. Set the pressed option image.
-   // The image can be blank, the color can be used regardless.
-   option.SetProperty( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, mPressedImage );
-   option.SetProperty( Toolkit::Button::Property::SELECTED_COLOR, mPressedColor );
+   Property::Value selectedBackgroundValue( mPressedImage );
+   if( mPressedImage.empty() )
+   {
+     // The image can be blank, the color can be used in that case.
+     selectedBackgroundValue = Property::Value{ { Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR  },
+                                                { Toolkit::ColorVisual::Property::MIX_COLOR, mPressedColor } };
+   }
+   option.SetProperty( Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL, selectedBackgroundValue );
    option.SetProperty( Toolkit::Control::Property::STYLE_NAME, TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME );
 
    // 5 Add option to tool bar
