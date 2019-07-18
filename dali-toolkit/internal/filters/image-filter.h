@@ -20,6 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/camera-actor.h>
+#include <dali/public-api/rendering/frame-buffer.h>
+#include <dali/public-api/rendering/texture.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -36,7 +38,7 @@ namespace Internal
 
 /**
  * An interface class that provides a interface for image filters that perform
- * a simple shader effect on an input image, rendering the output to a FrameBufferImage.
+ * a simple shader effect on an input texture, rendering the output to a FrameBuffer.
  */
 class ImageFilter
 {
@@ -76,16 +78,16 @@ public:
   void SetRefreshOnDemand( bool onDemand );
 
   /**
-   * Set the input image
-   * @param[in] The input/original image.
+   * Set the input texture
+   * @param[in] The input/original texture.
    */
-  void SetInputImage( Image image );
+  void SetInputTexture( Texture texture );
 
   /**
-   * Set the output image
-   * @return The output image.
+   * Set the output frame buffer
+   * @return The output frame buffer.
    */
-  void SetOutputImage( FrameBufferImage image );
+  void SetOutputFrameBuffer( FrameBuffer frameBuffer );
 
   /**
    * Set size of ImageFilter. Used to create internal offscreen buffers
@@ -145,8 +147,8 @@ protected:
   void SetupCamera();
 
 protected:
-  Image            mInputImage;
-  FrameBufferImage mOutputImage;
+  Texture          mInputTexture;
+  FrameBuffer      mOutputFrameBuffer;
   FilterKernel     mKernel;
   Actor            mRootActor;
   CameraActor      mCameraActor;

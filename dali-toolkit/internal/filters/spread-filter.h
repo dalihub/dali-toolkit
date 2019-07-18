@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
 // INTERNAL INCLUDES
 #include "image-filter.h"
@@ -82,14 +81,14 @@ private:
 
 private: // Attributes
 
-  // To perform horizontal spread from mInputImage to mImageForHorz
+  // To perform horizontal spread from mInputTexture to mFrameBufferForHorz
   RenderTask         mRenderTaskForHorz;
-  Toolkit::ImageView mActorForInput;
-  FrameBufferImage   mImageForHorz;
+  Actor              mActorForInput;
+  FrameBuffer        mFrameBufferForHorz;
 
-  // To perform vertical spread from mImageForHorz to mOutputImage
+  // To perform vertical spread from mFrameBufferForHorz to mOutputFrameBuffer
   RenderTask         mRenderTaskForVert;
-  Toolkit::ImageView mActorForHorz;
+  Actor              mActorForHorz;
 
   int                mSpread;
 }; // class SpreadFilter

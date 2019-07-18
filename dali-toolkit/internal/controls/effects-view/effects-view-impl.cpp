@@ -28,18 +28,14 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
-#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 #include <dali-toolkit/internal/filters/emboss-filter.h>
 #include <dali-toolkit/internal/filters/spread-filter.h>
-#include <dali-toolkit/internal/visuals/visual-base-impl.h>
-#include <dali-toolkit/internal/visuals/visual-factory-impl.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 
 namespace Dali
 {
@@ -68,10 +64,6 @@ const Pixel::Format EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT = Pixel::RGBA8888;
 const float         ARBITRARY_FIELD_OF_VIEW = Math::PI / 4.0f;
 const Vector4       EFFECTS_VIEW_DEFAULT_BACKGROUND_COLOR( 0.0f, 0.0f, 0.0f, 0.0 );
 const bool          EFFECTS_VIEW_REFRESH_ON_DEMAND(false);
-
-// Visuals are not stylable or public
-const Property::Index CHILD_VISUAL( Toolkit::EffectsView::ANIMATABLE_PROPERTY_START_INDEX - 1);
-const Property::Index POST_FILTER_VISUAL( CHILD_VISUAL-1 );
 
 #define DALI_COMPOSE_SHADER(STR) #STR
 
@@ -153,7 +145,7 @@ EffectsView::EffectsView()
   mEffectType( Toolkit::EffectsView::INVALID_TYPE ),
   mPixelFormat( EFFECTS_VIEW_DEFAULT_PIXEL_FORMAT ),
   mEnabled( false ),
-  mRefreshOnDemand(EFFECTS_VIEW_REFRESH_ON_DEMAND)
+  mRefreshOnDemand( EFFECTS_VIEW_REFRESH_ON_DEMAND )
 {
 }
 
@@ -191,16 +183,6 @@ void EffectsView::SetType( Toolkit::EffectsView::EffectType type )
       }
     }
 
-    FrameBufferImage dummyImage = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
-
-    Internal::InitializeVisual( self, mVisualPostFilter, dummyImage );
-    DevelControl::RegisterVisual( *this, POST_FILTER_VISUAL, mVisualPostFilter );
-
-    Property::Map customShader;
-    customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = EFFECTS_VIEW_VERTEX_SOURCE;
-    customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = EFFECTS_VIEW_FRAGMENT_SOURCE;
-    Toolkit::GetImplementation( mVisualPostFilter ).SetCustomShader( customShader );
-
     mEffectType = type;
   }
 }
@@ -221,7 +203,6 @@ void EffectsView::Enable()
 void EffectsView::Disable()
 {
   // stop render tasks processing
-  // Note: render target resources are automatically freed since we set the Image::Unused flag
   RemoveRenderTasks();
   mLastSize = Vector2::ZERO; // Ensure resources are reallocated on subsequent enable
   mEnabled = false;
@@ -309,6 +290,17 @@ void EffectsView::OnSizeSet(const Vector3& targetSize)
 
 void EffectsView::OnStageConnection( int depth )
 {
+  Actor self( Self() );
+
+  // Create renderers
+  mRendererPostFilter = CreateRenderer( EFFECTS_VIEW_VERTEX_SOURCE, EFFECTS_VIEW_FRAGMENT_SOURCE );
+  mRendererPostFilter.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, DepthIndex::CONTENT );
+  self.AddRenderer( mRendererPostFilter );
+
+  mRendererForChildren = CreateRenderer( BASIC_VERTEX_SOURCE, BASIC_FRAGMENT_SOURCE );
+  mRendererForChildren.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, DepthIndex::CONTENT + 1 );
+  self.AddRenderer( mRendererForChildren );
+
   Enable();
 
   Control::OnStageConnection( depth );
@@ -316,6 +308,8 @@ void EffectsView::OnStageConnection( int depth )
 
 void EffectsView::OnStageDisconnection()
 {
+  Actor self( Self() );
+
   Disable();
 
   const size_t numFilters( mFilters.Size() );
@@ -323,6 +317,13 @@ void EffectsView::OnStageDisconnection()
   {
     mFilters[i]->Disable();
   }
+
+  // Remove renderers
+  self.RemoveRenderer( mRendererForChildren );
+  mRendererForChildren.Reset();
+
+  self.RemoveRenderer( mRendererPostFilter );
+  mRendererPostFilter.Reset();
 
   Control::OnStageDisconnection();
 }
@@ -351,8 +352,8 @@ void EffectsView::SetupFilters()
     case Toolkit::EffectsView::DROP_SHADOW:
     {
       SpreadFilter* spreadFilter = static_cast< SpreadFilter* >( mFilters[0] );
-      spreadFilter->SetInputImage( mImageForChildren );
-      spreadFilter->SetOutputImage( mImagePostFilter );
+      spreadFilter->SetInputTexture( mFrameBufferForChildren.GetColorTexture() );
+      spreadFilter->SetOutputFrameBuffer( mFrameBufferPostFilter );
       spreadFilter->SetRootActor( mChildrenRoot );
       spreadFilter->SetBackgroundColor( mBackgroundColor );
       spreadFilter->SetPixelFormat( mPixelFormat );
@@ -360,8 +361,8 @@ void EffectsView::SetupFilters()
       spreadFilter->SetSpread( mEffectSize );
 
       BlurTwoPassFilter* blurFilter = static_cast< BlurTwoPassFilter* >( mFilters[1] );
-      blurFilter->SetInputImage( mImagePostFilter );
-      blurFilter->SetOutputImage( mImagePostFilter );
+      blurFilter->SetInputTexture( mFrameBufferPostFilter.GetColorTexture() );
+      blurFilter->SetOutputFrameBuffer( mFrameBufferPostFilter );
       blurFilter->SetRootActor( mChildrenRoot );
       blurFilter->SetBackgroundColor( mBackgroundColor );
       blurFilter->SetPixelFormat( mPixelFormat );
@@ -384,8 +385,8 @@ void EffectsView::SetupFilters()
     case Toolkit::EffectsView::EMBOSS:
     {
       SpreadFilter* spreadFilter = static_cast< SpreadFilter* >( mFilters[0] );
-      spreadFilter->SetInputImage( mImageForChildren );
-      spreadFilter->SetOutputImage( mImagePostFilter );
+      spreadFilter->SetInputTexture( mFrameBufferForChildren.GetColorTexture() );
+      spreadFilter->SetOutputFrameBuffer( mFrameBufferPostFilter );
       spreadFilter->SetRootActor( mChildrenRoot );
       spreadFilter->SetBackgroundColor( mBackgroundColor );
       spreadFilter->SetPixelFormat( Pixel::RGBA8888 );
@@ -393,16 +394,16 @@ void EffectsView::SetupFilters()
       spreadFilter->SetSpread( mEffectSize );
 
       EmbossFilter* embossFilter = static_cast< EmbossFilter* >( mFilters[1] );
-      embossFilter->SetInputImage( mImagePostFilter );
-      embossFilter->SetOutputImage( mImagePostFilter );
+      embossFilter->SetInputTexture( mFrameBufferPostFilter.GetColorTexture() );
+      embossFilter->SetOutputFrameBuffer( mFrameBufferPostFilter );
       embossFilter->SetRootActor( mChildrenRoot );
       embossFilter->SetBackgroundColor( mBackgroundColor );
       embossFilter->SetPixelFormat( Pixel::RGBA8888 );
       embossFilter->SetSize( mTargetSize );
 
       BlurTwoPassFilter* blurFilter = static_cast< BlurTwoPassFilter* >( mFilters[2] );
-      blurFilter->SetInputImage( mImagePostFilter );
-      blurFilter->SetOutputImage( mImagePostFilter );
+      blurFilter->SetInputTexture( mFrameBufferPostFilter.GetColorTexture() );
+      blurFilter->SetOutputFrameBuffer( mFrameBufferPostFilter );
       blurFilter->SetRootActor( mChildrenRoot );
       blurFilter->SetBackgroundColor( Vector4( 0.5f, 0.5f, 0.5f, 0.0 ) );
       blurFilter->SetPixelFormat( Pixel::RGBA8888 );
@@ -417,6 +418,7 @@ void EffectsView::SetupFilters()
     }
   }
 }
+
 void EffectsView::AllocateResources()
 {
   if(mTargetSize != mLastSize)
@@ -426,15 +428,17 @@ void EffectsView::AllocateResources()
 
     Actor self( Self() );
 
-    mImageForChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
-    Internal::InitializeVisual( self, mVisualForChildren, mImageForChildren );
-    DevelControl::RegisterVisual( *this, CHILD_VISUAL, mVisualForChildren, DepthIndex::CONTENT + 1 );
+    mFrameBufferForChildren = FrameBuffer::New( mTargetSize.width, mTargetSize.height, FrameBuffer::Attachment::NONE );
+    Texture textureForChildren = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mTargetSize.width), unsigned(mTargetSize.height) );
+    mFrameBufferForChildren.AttachColorTexture( textureForChildren );
 
-    mImagePostFilter = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
-    TextureSet textureSet = TextureSet::New();
-    TextureSetImage( textureSet, 0u,  mImagePostFilter );
-    self.GetRendererAt( 0 ).SetTextures( textureSet );
-    mVisualPostFilter.SetDepthIndex( DepthIndex::CONTENT );
+    SetRendererTexture( mRendererForChildren, textureForChildren );
+
+    mFrameBufferPostFilter = FrameBuffer::New( mTargetSize.width, mTargetSize.height, FrameBuffer::Attachment::NONE );
+    Texture texturePostFilter = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mTargetSize.width), unsigned(mTargetSize.height) );
+    mFrameBufferPostFilter.AttachColorTexture( texturePostFilter );
+
+    SetRendererTexture( mRendererPostFilter, texturePostFilter );
 
     SetupFilters();
   }
@@ -479,7 +483,7 @@ void EffectsView::CreateRenderTasks()
   mRenderTaskForChildren.SetInputEnabled( false );
   mRenderTaskForChildren.SetClearColor( mBackgroundColor );
   mRenderTaskForChildren.SetClearEnabled( true );
-  mRenderTaskForChildren.SetTargetFrameBuffer( mImageForChildren );
+  mRenderTaskForChildren.SetFrameBuffer( mFrameBufferForChildren );
   mRenderTaskForChildren.SetCameraActor(mCameraForChildren); // use camera that covers render target exactly
 
   // Enable image filters

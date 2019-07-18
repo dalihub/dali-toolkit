@@ -394,15 +394,6 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
   void CreateRenderTask( const std::string &name );
 
   /**
-   * Get or create FrameBufferImage from the FrameBufferImage instance library.
-   * An empty handle is returned otherwise.
-   * @pre The Builder has been initialized.
-   * @param name The name of a FrameBufferImage in the loaded representation
-   * @return A handle to a FrameBufferImage if found, otherwise empty
-   */
-  FrameBufferImage GetFrameBufferImage( const std::string &name );
-
-  /**
    * Get or create Path from the Path instance library.
    * An empty handle is returned otherwise.
    * @pre The Builder has been initialized.
