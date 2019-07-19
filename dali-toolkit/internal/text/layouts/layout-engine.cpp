@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <limits>
+#include <cmath>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 
@@ -397,7 +398,7 @@ struct Engine::Impl
       const GlyphInfo& glyph = *( glyphsBuffer + i );
       Vector2& position = *( glyphPositionsBuffer + i );
 
-      position.x = std::round( penX + glyph.xBearing );
+      position.x = std::roundf( penX + glyph.xBearing );
       position.y = -glyph.yBearing;
 
       penX += ( glyph.advance + interGlyphExtraAdvance );

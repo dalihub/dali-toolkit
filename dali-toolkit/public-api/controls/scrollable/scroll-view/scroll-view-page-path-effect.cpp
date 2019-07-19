@@ -29,9 +29,9 @@ namespace Dali
 namespace Toolkit
 {
 
-ScrollViewPagePathEffect ScrollViewPagePathEffect::New(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& pageSize, unsigned int pageCount)
+ScrollViewPagePathEffect ScrollViewPagePathEffect::New(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& viewPageSize, unsigned int pageCount)
 {
-  return ScrollViewPagePathEffect(new Internal::ScrollViewPagePathEffect(path, forward, inputPropertyIndex, pageSize,pageCount));
+  return ScrollViewPagePathEffect(new Internal::ScrollViewPagePathEffect(path, forward, inputPropertyIndex, viewPageSize,pageCount));
 }
 
 ScrollViewPagePathEffect::ScrollViewPagePathEffect()

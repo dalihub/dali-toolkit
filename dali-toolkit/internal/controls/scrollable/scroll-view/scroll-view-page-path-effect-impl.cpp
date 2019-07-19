@@ -33,8 +33,8 @@ namespace Toolkit
 namespace Internal
 {
 
-ScrollViewPagePathEffect::ScrollViewPagePathEffect(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& pageSize, unsigned int pageCount)
-:mPageSize(pageSize),
+ScrollViewPagePathEffect::ScrollViewPagePathEffect(Path path, const Vector3& forward, Dali::Property::Index inputPropertyIndex, const Vector3& viewPageSize, unsigned int pageCount)
+:mPageSize(viewPageSize),
  mInputPropertyIndex(inputPropertyIndex),
  mPageCount(pageCount)
 {

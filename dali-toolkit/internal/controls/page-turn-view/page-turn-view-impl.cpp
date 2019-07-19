@@ -51,13 +51,13 @@ const char * const PROPERTY_PAN_CENTER( "panCenter" );// property used to constr
 // default grid density for page turn effect, 20 pixels by 20 pixels
 const float DEFAULT_GRID_DENSITY(20.0f);
 
-// to bent the page, the minimal horizontal pan start position is pageSize.x * MINIMUM_START_POSITION_RATIO
+// to bent the page, the minimal horizontal pan start position is viewPageSize.x * MINIMUM_START_POSITION_RATIO
 const float MINIMUM_START_POSITION_RATIO(0.6f);
 
-// the maximum vertical displacement of pan gesture, if exceed, will reduce it: pageSize.y * MAXIMUM_VERTICAL_MOVEMENT_RATIO
+// the maximum vertical displacement of pan gesture, if exceed, will reduce it: viewPageSize.y * MAXIMUM_VERTICAL_MOVEMENT_RATIO
 const float MAXIMUM_VERTICAL_MOVEMENT_RATIO(0.15f);
 
-// when the x component of pan position reaches pageSize.x * PAGE_TURN_OVER_THRESHOLD_RATIO, page starts to turn over
+// when the x component of pan position reaches viewPageSize.x * PAGE_TURN_OVER_THRESHOLD_RATIO, page starts to turn over
 const float PAGE_TURN_OVER_THRESHOLD_RATIO(0.5f);
 
 // duration of animation, shorter for faster speed
@@ -237,7 +237,7 @@ BaseHandle Create()
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::PageTurnView, Toolkit::Control, Create );
 
-DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "pageSize",        VECTOR2, PAGE_SIZE )
+DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "viewPageSize",        VECTOR2, VIEW_PAGE_SIZE )
 DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "currentPageId",   INTEGER, CURRENT_PAGE_ID )
 DALI_PROPERTY_REGISTRATION( Toolkit, PageTurnView, "spineShadow",     VECTOR2, SPINE_SHADOW )
 
@@ -340,10 +340,10 @@ void PageTurnView::Page::SetCurrentCenter( const Vector2& value )
   actor.SetProperty( propertyCurrentCenter, value );
 }
 
-PageTurnView::PageTurnView( PageFactory& pageFactory, const Vector2& pageSize )
+PageTurnView::PageTurnView( PageFactory& pageFactory, const Vector2& viewPageSize )
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mPageFactory( &pageFactory ),
-  mPageSize( pageSize ),
+  mPageSize( viewPageSize ),
   mSpineShadowParameter( DEFAULT_SPINE_SHADOW_PARAMETER ),
   mDistanceUpCorner( 0.f ),
   mDistanceBottomCorner( 0.f ),
@@ -494,9 +494,9 @@ void PageTurnView::OnStageDisconnection()
   Control::OnStageDisconnection();
 }
 
-void PageTurnView::SetPageSize( const Vector2& pageSize )
+void PageTurnView::SetPageSize( const Vector2& viewPageSize )
 {
-  mPageSize = pageSize;
+  mPageSize = viewPageSize;
 
   if( mPointLight )
   {
@@ -1044,7 +1044,7 @@ void PageTurnView::SetProperty( BaseObject* object, Property::Index index, const
 
     switch( index )
     {
-      case Toolkit::PageTurnView::Property::PAGE_SIZE:
+      case Toolkit::PageTurnView::Property::VIEW_PAGE_SIZE:
       {
         pageTurnViewImpl.SetPageSize( value.Get<Vector2>() );
         break;
@@ -1075,7 +1075,7 @@ Property::Value PageTurnView::GetProperty( BaseObject* object, Property::Index i
 
     switch( index )
     {
-      case Toolkit::PageTurnView::Property::PAGE_SIZE:
+      case Toolkit::PageTurnView::Property::VIEW_PAGE_SIZE:
       {
         value = pageTurnViewImpl.GetPageSize();
         break;

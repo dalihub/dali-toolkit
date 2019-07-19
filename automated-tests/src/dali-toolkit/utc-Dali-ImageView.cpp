@@ -163,7 +163,7 @@ void TestUrl( ImageView imageView, const std::string url )
 
 int UtcDaliImageViewNewP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   ImageView imageView = ImageView::New();
 
@@ -174,7 +174,7 @@ int UtcDaliImageViewNewP(void)
 
 int UtcDaliImageViewNewImageP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   BufferImage image = CreateBufferImage( 100, 200, Vector4( 1.f, 1.f, 1.f, 1.f ) );
   ImageView imageView = ImageView::New( image );
@@ -187,7 +187,7 @@ int UtcDaliImageViewNewImageP(void)
 
 int UtcDaliImageViewNewUrlP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   ImageView imageView = ImageView::New( TEST_IMAGE_FILE_NAME );
   DALI_TEST_CHECK( imageView );
@@ -199,7 +199,7 @@ int UtcDaliImageViewNewUrlP(void)
 
 int UtcDaliImageViewConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   ImageView imageView;
 
@@ -210,7 +210,7 @@ int UtcDaliImageViewConstructorP(void)
 
 int UtcDaliImageViewCopyConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Initialize an object, ref count == 1
   ImageView imageView = ImageView::New();
@@ -223,7 +223,7 @@ int UtcDaliImageViewCopyConstructorP(void)
 
 int UtcDaliImageViewAssignmentOperatorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   ImageView imageView = ImageView::New();
 
@@ -236,7 +236,7 @@ int UtcDaliImageViewAssignmentOperatorP(void)
 
 int UtcDaliImageViewDownCastP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   ImageView imageView = ImageView::New();
 
@@ -253,7 +253,7 @@ int UtcDaliImageViewDownCastP(void)
 
 int UtcDaliImageViewDownCastN(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   BaseHandle unInitializedObject;
 

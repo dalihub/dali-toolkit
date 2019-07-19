@@ -123,7 +123,7 @@ protected:
    * Constructor.
    * It initializes the PageTurnView members
    */
-  PageTurnView( PageFactory& pageFactory, const Vector2& pageSize );
+  PageTurnView( PageFactory& pageFactory, const Vector2& viewPageSize );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -134,9 +134,9 @@ public:
 
   /**
    * Set the page size
-   * @param[in] pageSize The size of pages
+   * @param[in] viewPageSize The size of pages
    */
-  void SetPageSize( const Vector2& pageSize );
+  void SetPageSize( const Vector2& viewPageSize );
 
   /**
    * Retrieve the page size.

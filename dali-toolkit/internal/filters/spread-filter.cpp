@@ -25,7 +25,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 
 namespace Dali
 {
@@ -83,31 +83,32 @@ void SpreadFilter::SetSpread( float spread )
 void SpreadFilter::Enable()
 {
   // create actor to render input with applied emboss effect
-  mActorForInput = Toolkit::ImageView::New( mInputImage );
+  mActorForInput = Actor::New();
   mActorForInput.SetParentOrigin( ParentOrigin::CENTER );
   mActorForInput.SetSize(mTargetSize);
   // register properties as shader uniforms
   mActorForInput.RegisterProperty( SPREAD_UNIFORM_NAME, mSpread );
   mActorForInput.RegisterProperty( TEX_SCALE_UNIFORM_NAME, Vector2( 1.0f / mTargetSize.width, 0.0f ) );
 
+  Renderer rendererForInput = CreateRenderer( BASIC_VERTEX_SOURCE, SPREAD_FRAGMENT_SOURCE );
+  SetRendererTexture( rendererForInput, mInputTexture );
+  mActorForInput.AddRenderer( rendererForInput );
+
   // create internal offscreen for result of horizontal pass
-  mImageForHorz = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
+  mFrameBufferForHorz = FrameBuffer::New( mTargetSize.width, mTargetSize.height, FrameBuffer::Attachment::NONE );
+  Texture textureForHorz = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mTargetSize.width), unsigned(mTargetSize.height) );
+  mFrameBufferForHorz.AttachColorTexture( textureForHorz );
+
   // create an actor to render mImageForHorz for vertical blur pass
-  mActorForHorz = Toolkit::ImageView::New( mImageForHorz );
+  mActorForHorz = Actor::New();
   mActorForHorz.SetParentOrigin( ParentOrigin::CENTER );
   mActorForHorz.SetSize(mTargetSize);
   // register properties as shader uniforms
   mActorForHorz.RegisterProperty( SPREAD_UNIFORM_NAME, mSpread );
   mActorForHorz.RegisterProperty( TEX_SCALE_UNIFORM_NAME, Vector2( 0.0f, 1.0f / mTargetSize.height ) );
-
-  Property::Map customShader;
-  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = SPREAD_FRAGMENT_SOURCE;
-  Property::Map visualMap;
-  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
-
-  // set SPREAD custom shader
-  mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
-  mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
+  Renderer rendererForHorz = CreateRenderer( BASIC_VERTEX_SOURCE, SPREAD_FRAGMENT_SOURCE );
+  SetRendererTexture( rendererForHorz, textureForHorz );
+  mActorForHorz.AddRenderer( rendererForHorz );
 
   mRootActor.Add( mActorForInput );
   mRootActor.Add( mActorForHorz );
@@ -191,7 +192,7 @@ void SpreadFilter::CreateRenderTasks()
   mRenderTaskForHorz.SetInputEnabled( false );
   mRenderTaskForHorz.SetClearEnabled( true );
   mRenderTaskForHorz.SetClearColor( mBackgroundColor );
-  mRenderTaskForHorz.SetTargetFrameBuffer( mImageForHorz );
+  mRenderTaskForHorz.SetFrameBuffer( mFrameBufferForHorz );
   mRenderTaskForHorz.SetCameraActor( mCameraActor );
 
   // use the internal buffer and perform a horizontal blur targeting the output buffer
@@ -202,7 +203,7 @@ void SpreadFilter::CreateRenderTasks()
   mRenderTaskForVert.SetInputEnabled( false );
   mRenderTaskForVert.SetClearEnabled( true );
   mRenderTaskForVert.SetClearColor( mBackgroundColor );
-  mRenderTaskForVert.SetTargetFrameBuffer( mOutputImage );
+  mRenderTaskForVert.SetFrameBuffer( mOutputFrameBuffer );
   mRenderTaskForVert.SetCameraActor( mCameraActor );
 }
 

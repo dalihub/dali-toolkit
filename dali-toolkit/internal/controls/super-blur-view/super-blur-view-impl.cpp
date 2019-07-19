@@ -32,6 +32,7 @@
 // INTERNAL_INCLUDES
 #include <dali-toolkit/public-api/image-loader/sync-image-loader.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 
@@ -94,104 +95,6 @@ struct ActorOpacityConstraint
 
   Vector2 mRange;
 };
-
-#define DALI_COMPOSE_SHADER(STR) #STR
-
-const char * const BASIC_VERTEX_SOURCE = DALI_COMPOSE_SHADER(
-  precision mediump float;\n
-  attribute mediump vec2 aPosition;\n
-  attribute mediump vec2 aTexture;\n
-  varying mediump vec2 vTexCoord;\n
-  uniform mediump mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
-  \n
-  void main()\n
-  {\n
-    mediump vec4 vertexPosition = vec4(aPosition * uSize.xy, 0.0, 1.0);\n
-    vTexCoord = aTexture;\n
-    gl_Position = uMvpMatrix * vertexPosition;\n
-  }\n
-);
-
-const char * const BASIC_FRAGMENT_SOURCE = DALI_COMPOSE_SHADER(
-  precision mediump float;\n
-  varying mediump vec2 vTexCoord;\n
-  uniform sampler2D sTexture;\n
-  uniform vec4 uColor;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = texture2D(sTexture, vTexCoord);\n
-    gl_FragColor *= uColor;
-  }\n
-);
-
-Renderer CreateRenderer( const char* vertexSrc, const char* fragmentSrc )
-{
-  Shader shader = Shader::New( vertexSrc, fragmentSrc );
-
-  Geometry texturedQuadGeometry = Geometry::New();
-
-  struct VertexPosition { Vector2 position; };
-  struct VertexTexture { Vector2 texture; };
-
-  VertexPosition positionArray[] =
-  {
-    { Vector2( -0.5f, -0.5f ) },
-    { Vector2(  0.5f, -0.5f ) },
-    { Vector2( -0.5f,  0.5f ) },
-    { Vector2(  0.5f,  0.5f ) }
-  };
-  uint32_t numberOfVertices = sizeof(positionArray)/sizeof(VertexPosition);
-
-  VertexTexture uvArray[] =
-  {
-    { Vector2( 0.0f, 0.0f ) },
-    { Vector2( 1.0f, 0.0f ) },
-    { Vector2( 0.0f, 1.0f ) },
-    { Vector2( 1.0f, 1.0f ) }
-  };
-
-  Property::Map positionVertexFormat;
-  positionVertexFormat["aPosition"] = Property::VECTOR2;
-  PropertyBuffer positionVertices = PropertyBuffer::New( positionVertexFormat );
-  positionVertices.SetData( positionArray, numberOfVertices );
-  texturedQuadGeometry.AddVertexBuffer( positionVertices );
-
-  Property::Map textureVertexFormat;
-  textureVertexFormat["aTexture"] = Property::VECTOR2;
-  PropertyBuffer textureVertices = PropertyBuffer::New( textureVertexFormat );
-  textureVertices.SetData( uvArray, numberOfVertices );
-  texturedQuadGeometry.AddVertexBuffer( textureVertices );
-
-  const uint16_t indices[] = { 0, 3, 1, 0, 2, 3 };
-  texturedQuadGeometry.SetIndexBuffer ( &indices[0], sizeof( indices )/ sizeof( indices[0] ) );
-
-  Renderer renderer = Renderer::New( texturedQuadGeometry, shader );
-
-  TextureSet textureSet = TextureSet::New();
-  renderer.SetTextures( textureSet );
-
-  return renderer;
-}
-
-void SetRendererTexture( Renderer& renderer, Texture& texture )
-{
-  if( renderer )
-  {
-    TextureSet textureSet = renderer.GetTextures();
-    textureSet.SetTexture( 0u, texture );
-  }
-}
-
-void SetRendererTexture( Renderer& renderer, FrameBuffer& frameBuffer )
-{
-  if( frameBuffer )
-  {
-    Texture texture = frameBuffer.GetColorTexture();
-    SetRendererTexture( renderer, texture );
-  }
-}
 
 } // namespace
 

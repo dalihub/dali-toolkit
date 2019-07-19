@@ -25,10 +25,9 @@
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
-#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 
 namespace Dali
 {
@@ -116,7 +115,7 @@ BlurTwoPassFilter::BlurTwoPassFilter()
 {
   // create blending actor and register the property in constructor
   // to make sure that GetBlurStrengthPropertyIndex() always returns a valid index
-  mActorForBlending = Toolkit::ImageView::New();
+  mActorForBlending = Actor::New();
   mBlurStrengthPropertyIndex = mActorForBlending.RegisterProperty( BLUR_STRENGTH_UNIFORM_NAME, 1.f );
 }
 
@@ -126,31 +125,53 @@ BlurTwoPassFilter::~BlurTwoPassFilter()
 
 void BlurTwoPassFilter::Enable()
 {
-  // create actor to render input with applied emboss effect
-  mActorForInput = Toolkit::ImageView::New( mInputImage );
-  mActorForInput.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForInput.SetSize( mTargetSize );
-
-  // create internal offscreen for result of horizontal pass
-  mImageForHorz = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
-  // create an actor to render mImageForHorz for vertical blur pass
-  mActorForHorz = Toolkit::ImageView::New( mImageForHorz );
-  mActorForHorz.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForHorz.SetSize( mTargetSize );
-
-  // create internal offscreen for result of the two pass blurred image
-  mBlurredImage = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
-  // create an actor to blend the blurred image and the input image with the given blur strength
-  mActorForBlending.SetImage( mBlurredImage );
-  mActorForBlending.SetParentOrigin( ParentOrigin::CENTER );
-  mActorForBlending.SetSize( mTargetSize );
-
   // create custom shader effect
   if( !GetKernelSize() )
   {
     CreateKernel( DEFAULT_KERNEL4, sizeof(DEFAULT_KERNEL4)/sizeof(DEFAULT_KERNEL4[0]) );
   }
   int kernelSize( static_cast< int >(GetKernelSize()) );
+
+  // Set up blur-two-pass custom shader
+  std::ostringstream sstream;
+  sstream << "#define NUM_SAMPLES " << kernelSize << "\n";
+  sstream << BLUR_TWO_PASS_FRAGMENT_SOURCE;
+  std::string fragmentSource( sstream.str() );
+
+  // create actor to render input with applied emboss effect
+  mActorForInput = Actor::New();
+  mActorForInput.SetParentOrigin( ParentOrigin::CENTER );
+  mActorForInput.SetSize( mTargetSize );
+  Renderer rendererForInput = CreateRenderer( BASIC_VERTEX_SOURCE, fragmentSource.c_str() );
+  SetRendererTexture( rendererForInput, mInputTexture );
+  mActorForInput.AddRenderer( rendererForInput );
+
+  // create internal offscreen for result of horizontal pass
+  mFrameBufferForHorz = FrameBuffer::New( mTargetSize.width, mTargetSize.height, FrameBuffer::Attachment::NONE );
+  Texture textureForHorz = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mTargetSize.width), unsigned(mTargetSize.height) );
+  mFrameBufferForHorz.AttachColorTexture( textureForHorz );
+
+  // create an actor to render mImageForHorz for vertical blur pass
+  mActorForHorz = Actor::New();
+  mActorForHorz.SetParentOrigin( ParentOrigin::CENTER );
+  mActorForHorz.SetSize( mTargetSize );
+  Renderer rendererForHorz = CreateRenderer( BASIC_VERTEX_SOURCE, fragmentSource.c_str() );
+  SetRendererTexture( rendererForHorz, textureForHorz );
+  mActorForHorz.AddRenderer( rendererForHorz );
+
+  // create internal offscreen for result of the two pass blurred image
+  mBlurredFrameBuffer = FrameBuffer::New( mTargetSize.width, mTargetSize.height, FrameBuffer::Attachment::NONE );
+  Texture blurredTexture = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mTargetSize.width), unsigned(mTargetSize.height) );
+  mBlurredFrameBuffer.AttachColorTexture( blurredTexture );
+
+  // create an actor to blend the blurred image and the input image with the given blur strength
+  Renderer rendererForBlending = CreateRenderer( BASIC_VERTEX_SOURCE, BLEND_TWO_IMAGES_FRAGMENT_SOURCE );
+  TextureSet textureSetForBlending = rendererForBlending.GetTextures();
+  textureSetForBlending.SetTexture( 0u, blurredTexture );
+  textureSetForBlending.SetTexture( 1u, mInputTexture );
+  mActorForBlending.AddRenderer( rendererForBlending );
+  mActorForBlending.SetParentOrigin( ParentOrigin::CENTER );
+  mActorForBlending.SetSize( mTargetSize );
 
   for( int i = 0; i < kernelSize; ++i )
   {
@@ -164,33 +185,9 @@ void BlurTwoPassFilter::Enable()
     mActorForHorz.RegisterProperty( weightUniform, mKernel[i].z );
   }
 
-  // Set up blur-two-pass custom shader
-  std::ostringstream fragmentSource;
-  fragmentSource << "#define NUM_SAMPLES " << kernelSize << "\n";
-  fragmentSource << BLUR_TWO_PASS_FRAGMENT_SOURCE;
-
-  Property::Map customShader;
-  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = fragmentSource.str();
-  Property::Map visualMap;
-  visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
-  mActorForInput.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
-  mActorForHorz.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
-
-  // Set up blend-two-image custom shader
-  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = BLEND_TWO_IMAGES_FRAGMENT_SOURCE;
-  visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
-  mActorForBlending.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
-
   mRootActor.Add( mActorForInput );
   mRootActor.Add( mActorForHorz );
   mRootActor.Add( mActorForBlending );
-
-  // Add effect texture to blend-two-image custom shader
-  TextureSet textureSet = mActorForBlending.GetRendererAt(0).GetTextures();
-  if( textureSet )
-  {
-    TextureSetImage( textureSet, 1u, mInputImage );
-  }
 
   SetupCamera();
   CreateRenderTasks();
@@ -289,7 +286,7 @@ void BlurTwoPassFilter::CreateRenderTasks()
   mRenderTaskForHorz.SetInputEnabled( false );
   mRenderTaskForHorz.SetClearEnabled( true );
   mRenderTaskForHorz.SetClearColor( mBackgroundColor );
-  mRenderTaskForHorz.SetTargetFrameBuffer( mImageForHorz );
+  mRenderTaskForHorz.SetFrameBuffer( mFrameBufferForHorz );
   mRenderTaskForHorz.SetCameraActor( mCameraActor );
 
   // use the internal buffer and perform a horizontal blur targeting the output buffer
@@ -300,7 +297,7 @@ void BlurTwoPassFilter::CreateRenderTasks()
   mRenderTaskForVert.SetInputEnabled( false );
   mRenderTaskForVert.SetClearEnabled( true );
   mRenderTaskForVert.SetClearColor( mBackgroundColor );
-  mRenderTaskForVert.SetTargetFrameBuffer( mBlurredImage );
+  mRenderTaskForVert.SetFrameBuffer( mBlurredFrameBuffer );
   mRenderTaskForVert.SetCameraActor( mCameraActor );
 
   //Perform a blending between the blurred image and the input image
@@ -311,7 +308,7 @@ void BlurTwoPassFilter::CreateRenderTasks()
   mRenderTaskForBlending.SetInputEnabled( false );
   mRenderTaskForBlending.SetClearEnabled( true );
   mRenderTaskForBlending.SetClearColor( mBackgroundColor );
-  mRenderTaskForBlending.SetTargetFrameBuffer( mOutputImage );
+  mRenderTaskForBlending.SetFrameBuffer( mOutputFrameBuffer );
   mRenderTaskForBlending.SetCameraActor( mCameraActor );
 }
 

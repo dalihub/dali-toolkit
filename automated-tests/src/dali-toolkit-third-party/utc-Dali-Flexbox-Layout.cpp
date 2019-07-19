@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #include <cstdlib>
 
-#include <dali-toolkit-test-suite-utils.h>
+#include <dali-test-suite-utils.h>
 // GTest fails to compile with "error: return-statement with a value, in function returning 'void'" error
 // if using dali assert function so define new assert with returning void.
 #define _ASSERT_H_

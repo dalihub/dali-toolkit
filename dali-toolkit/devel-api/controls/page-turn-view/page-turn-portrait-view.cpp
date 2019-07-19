@@ -61,9 +61,9 @@ PageTurnPortraitView::~PageTurnPortraitView()
 {
 }
 
-PageTurnPortraitView PageTurnPortraitView::New( PageFactory& pageFactory, const Vector2& pageSize)
+PageTurnPortraitView PageTurnPortraitView::New( PageFactory& pageFactory, const Vector2& viewPageSize)
 {
-  return Internal::PageTurnPortraitView::New(pageFactory, pageSize);
+  return Internal::PageTurnPortraitView::New(pageFactory, viewPageSize);
 }
 
 PageTurnPortraitView PageTurnPortraitView::DownCast( BaseHandle handle )

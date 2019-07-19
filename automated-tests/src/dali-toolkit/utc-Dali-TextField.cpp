@@ -24,6 +24,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 
 #include <dali/devel-api/adaptor-framework/key-devel.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/text-controls/text-field-devel.h>
@@ -1091,15 +1092,13 @@ int utcDaliTextFieldMaxCharactersReachedN(void)
 
 int utcDaliTextFieldInputStyleChanged01(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldInputStyleChanged01");
-
   // The text-field emits signals when the input style changes. These changes of style are
   // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
   // can't be emitted during the size negotiation as the callbacks may update the UI.
   // The text-field adds an idle callback to the adaptor to emit the signals after the size negotiation.
-  // This creates an implementation of the adaptor stub and a queue of idle callbacks.
-  application.CreateAdaptor();
+  // The ToolkitTestApplication creates an implementation of the adaptor stub and a queue of idle callbacks.
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldInputStyleChanged01");
 
   // Load some fonts.
 
@@ -1302,15 +1301,13 @@ int utcDaliTextFieldInputStyleChanged01(void)
 
 int utcDaliTextFieldInputStyleChanged02(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextFieldInputStyleChanged02");
-
   // The text-field emits signals when the input style changes. These changes of style are
   // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
   // can't be emitted during the size negotiation as the callbacks may update the UI.
   // The text-field adds an idle callback to the adaptor to emit the signals after the size negotiation.
-  // This creates an implementation of the adaptor stub and a queue of idle callbacks.
-  application.CreateAdaptor();
+  // The ToolkitTestApplication creates an implementation of the adaptor stub and a queue of idle callbacks.
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextFieldInputStyleChanged02");
 
   // Load some fonts.
 

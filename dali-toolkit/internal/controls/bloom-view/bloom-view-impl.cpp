@@ -29,13 +29,12 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/renderer.h>
-#include <dali/devel-api/images/texture-set-image.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/controls/gaussian-blur-view/gaussian-blur-view.h>
 #include <dali-toolkit/devel-api/controls/bloom-view/bloom-view.h>
-#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 
 namespace Dali
 {
@@ -230,16 +229,16 @@ void BloomView::OnInitialize()
   // Create actors
 
   // Create an image view for rendering from the scene texture to the bloom texture
-  mBloomExtractImageView = Toolkit::ImageView::New();
-  mBloomExtractImageView.SetParentOrigin( ParentOrigin::CENTER );
+  mBloomExtractActor = Actor::New();
+  mBloomExtractActor.SetParentOrigin( ParentOrigin::CENTER );
 
   // Create an image view for compositing the result (scene and bloom textures) to output
-  mCompositeImageView = Toolkit::ImageView::New();
-  mCompositeImageView.SetParentOrigin( ParentOrigin::CENTER );
+  mCompositeActor = Actor::New();
+  mCompositeActor.SetParentOrigin( ParentOrigin::CENTER );
 
   // Create an image view for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
-  mTargetImageView = Toolkit::ImageView::New();
-  mTargetImageView.SetParentOrigin( ParentOrigin::CENTER );
+  mTargetActor = Actor::New();
+  mTargetActor.SetParentOrigin( ParentOrigin::CENTER );
 
   // Create the Gaussian Blur object + render tasks
   // Note that we use mBloomExtractTarget as the source image and also re-use this as the gaussian blur final render target. This saves the gaussian blur code from creating it
@@ -264,10 +263,10 @@ void BloomView::OnInitialize()
   // Connect to actor tree
   Self().Add( mChildrenRoot );
   Self().Add( mInternalRoot );
-  mInternalRoot.Add( mBloomExtractImageView );
+  mInternalRoot.Add( mBloomExtractActor );
   mInternalRoot.Add( mGaussianBlurView );
-  mInternalRoot.Add( mCompositeImageView );
-  mInternalRoot.Add( mTargetImageView );
+  mInternalRoot.Add( mCompositeActor );
+  mInternalRoot.Add( mTargetActor );
   mInternalRoot.Add( mRenderDownsampledCamera );
   mInternalRoot.Add( mRenderFullSizeCamera );
 
@@ -279,8 +278,8 @@ void BloomView::OnSizeSet(const Vector3& targetSize)
 {
   mTargetSize = Vector2(targetSize);
   mChildrenRoot.SetSize(targetSize);
-  mCompositeImageView.SetSize(targetSize);
-  mTargetImageView.SetSize(targetSize);
+  mCompositeActor.SetSize(targetSize);
+  mTargetActor.SetSize(targetSize);
 
   // Children render camera must move when GaussianBlurView object is
   // resized. This is since we cannot change render target size - so we need
@@ -336,7 +335,6 @@ void BloomView::AllocateResources()
 
     // Create and place a camera for the renders corresponding to the (potentially downsampled) render targets' size
     mRenderDownsampledCamera.SetFieldOfView(ARBITRARY_FIELD_OF_VIEW);
-    // TODO: how do we pick a reasonable value for near clip? Needs to relate to normal camera the user renders with, but we don't have a handle on it
     mRenderDownsampledCamera.SetNearClippingPlane(1.0f);
     mRenderDownsampledCamera.SetAspectRatio(mDownsampledWidth / mDownsampledHeight);
     mRenderDownsampledCamera.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
@@ -345,7 +343,6 @@ void BloomView::AllocateResources()
 
     // Create and place a camera for the children render, corresponding to its render target size
     mRenderFullSizeCamera.SetFieldOfView(ARBITRARY_FIELD_OF_VIEW);
-    // TODO: how do we pick a reasonable value for near clip? Needs to relate to normal camera the user renders with, but we don't have a handle on it
     mRenderFullSizeCamera.SetNearClippingPlane(1.0f);
     mRenderFullSizeCamera.SetAspectRatio(mTargetSize.width / mTargetSize.height);
     mRenderFullSizeCamera.SetType(Dali::Camera::FREE_LOOK); // camera orientation based solely on actor
@@ -364,7 +361,9 @@ void BloomView::AllocateResources()
     // Create render targets
 
     // create off screen buffer of new size to render our child actors to
-    mRenderTargetForRenderingChildren = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
+    mRenderTargetForRenderingChildren = FrameBuffer::New( mTargetSize.width, mTargetSize.height, FrameBuffer::Attachment::NONE );
+    Texture textureForChildren = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mTargetSize.width), unsigned(mTargetSize.height) );
+    mRenderTargetForRenderingChildren.AttachColorTexture( textureForChildren );
 
     mBloomExtractTarget = FrameBuffer::New( mDownsampledWidth, mDownsampledHeight, FrameBuffer::Attachment::NONE );
     Texture texture = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mDownsampledWidth), unsigned(mDownsampledHeight) );
@@ -374,34 +373,33 @@ void BloomView::AllocateResources()
     texture = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mDownsampledWidth), unsigned(mDownsampledHeight) );
     blurExtractTarget.AttachColorTexture( texture );
 
-    mOutputRenderTarget = FrameBufferImage::New( mTargetSize.width, mTargetSize.height, mPixelFormat );
+    mOutputRenderTarget = FrameBuffer::New( mTargetSize.width, mTargetSize.height, FrameBuffer::Attachment::NONE );
+    Texture outputTexture = Texture::New( TextureType::TEXTURE_2D, mPixelFormat, unsigned(mTargetSize.width), unsigned(mTargetSize.height) );
+    mOutputRenderTarget.AttachColorTexture( outputTexture );
 
     //////////////////////////////////////////////////////
     // Point actors and render tasks at new render targets
 
-    mBloomExtractImageView.SetImage( mRenderTargetForRenderingChildren );
-    mBloomExtractImageView.SetSize(mDownsampledWidth, mDownsampledHeight); // size needs to match render target
-    // Create shader used for extracting the bright parts of an image
-    Property::Map customShader;
-    customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = BLOOM_EXTRACT_FRAGMENT_SOURCE;
-    Property::Map visualMap;
-    visualMap.Insert( Toolkit::Visual::Property::SHADER, customShader );
-    mBloomExtractImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
+    Renderer bloomRenderer = CreateRenderer( BASIC_VERTEX_SOURCE, BLOOM_EXTRACT_FRAGMENT_SOURCE );
+    SetRendererTexture( bloomRenderer, mRenderTargetForRenderingChildren );
+    mBloomExtractActor.AddRenderer( bloomRenderer );
+    mBloomExtractActor.SetSize( mDownsampledWidth, mDownsampledHeight ); // size needs to match render target
 
     // set GaussianBlurView to blur our extracted bloom
     mGaussianBlurView.SetUserImageAndOutputRenderTarget( mBloomExtractTarget.GetColorTexture(), blurExtractTarget );
 
     // use the completed blur in the first buffer and composite with the original child actors render
-    mCompositeImageView.SetImage( mRenderTargetForRenderingChildren );
-    // Create shader used to composite bloom and original image to output render target
-    customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = COMPOSITE_FRAGMENT_SOURCE;
-    visualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
-    mCompositeImageView.SetProperty( Toolkit::ImageView::Property::IMAGE, visualMap );
-    TextureSet textureSet = mCompositeImageView.GetRendererAt(0).GetTextures();
+    Renderer compositeRenderer = CreateRenderer( BASIC_VERTEX_SOURCE, COMPOSITE_FRAGMENT_SOURCE );
+    SetRendererTexture( compositeRenderer, mRenderTargetForRenderingChildren );
+    TextureSet textureSet = compositeRenderer.GetTextures();
+    textureSet.SetTexture( 0u, mRenderTargetForRenderingChildren.GetColorTexture() );
     textureSet.SetTexture( 1u, blurExtractTarget.GetColorTexture() );
+    mCompositeActor.AddRenderer( compositeRenderer );
 
     // set up target actor for rendering result, i.e. the blurred image
-    mTargetImageView.SetImage(mOutputRenderTarget);
+    Renderer targetRenderer = CreateRenderer( BASIC_VERTEX_SOURCE, BASIC_FRAGMENT_SOURCE );
+    SetRendererTexture( targetRenderer, mOutputRenderTarget );
+    mTargetActor.AddRenderer( targetRenderer );
   }
 }
 
@@ -416,11 +414,11 @@ void BloomView::CreateRenderTasks()
   mRenderChildrenTask.SetInputEnabled( false );
   mRenderChildrenTask.SetClearEnabled( true );
   mRenderChildrenTask.SetCameraActor(mRenderFullSizeCamera); // use camera that covers render target exactly
-  mRenderChildrenTask.SetTargetFrameBuffer( mRenderTargetForRenderingChildren );
+  mRenderChildrenTask.SetFrameBuffer( mRenderTargetForRenderingChildren );
 
   // Extract the bright part of the image and render to a new buffer. Downsampling also occurs at this stage to save pixel fill, if it is set up.
   mBloomExtractTask = taskList.CreateTask();
-  mBloomExtractTask.SetSourceActor( mBloomExtractImageView );
+  mBloomExtractTask.SetSourceActor( mBloomExtractActor );
   mBloomExtractTask.SetExclusive(true);
   mBloomExtractTask.SetInputEnabled( false );
   mBloomExtractTask.SetClearEnabled( true );
@@ -432,12 +430,12 @@ void BloomView::CreateRenderTasks()
 
   // Use an image view displaying the children render and composite it with the blurred bloom buffer, targeting the output
   mCompositeTask = taskList.CreateTask();
-  mCompositeTask.SetSourceActor( mCompositeImageView );
+  mCompositeTask.SetSourceActor( mCompositeActor );
   mCompositeTask.SetExclusive(true);
   mCompositeTask.SetInputEnabled( false );
   mCompositeTask.SetClearEnabled( true );
   mCompositeTask.SetCameraActor(mRenderFullSizeCamera);
-  mCompositeTask.SetTargetFrameBuffer( mOutputRenderTarget );
+  mCompositeTask.SetFrameBuffer( mOutputRenderTarget );
 }
 
 void BloomView::RemoveRenderTasks()
@@ -471,9 +469,9 @@ void BloomView::Deactivate()
   mOutputRenderTarget.Reset();
 
   // Reset children
-  mBloomExtractImageView.SetImage( "" );
-  mTargetImageView.SetImage( "" );
-  mCompositeImageView.SetImage( "" );
+  mBloomExtractActor.RemoveRenderer( 0u );
+  mTargetActor.RemoveRenderer( 0u );
+  mCompositeActor.RemoveRenderer( 0u );
 
   mGaussianBlurView.SetVisible( false );
 
@@ -506,19 +504,19 @@ void BloomView::SetupProperties()
   // bloom threshold
 
   // set defaults, makes sure properties are registered with shader
-  mBloomExtractImageView.RegisterProperty( BLOOM_THRESHOLD_PROPERTY_NAME, BLOOM_THRESHOLD_DEFAULT );
-  mBloomExtractImageView.RegisterProperty( RECIP_ONE_MINUS_BLOOM_THRESHOLD_PROPERTY_NAME, 1.0f / (1.0f - BLOOM_THRESHOLD_DEFAULT) );
+  mBloomExtractActor.RegisterProperty( BLOOM_THRESHOLD_PROPERTY_NAME, BLOOM_THRESHOLD_DEFAULT );
+  mBloomExtractActor.RegisterProperty( RECIP_ONE_MINUS_BLOOM_THRESHOLD_PROPERTY_NAME, 1.0f / (1.0f - BLOOM_THRESHOLD_DEFAULT) );
 
   // Register a property that the user can control to change the bloom threshold
   mBloomThresholdPropertyIndex = self.RegisterProperty(BLOOM_THRESHOLD_PROPERTY_NAME, BLOOM_THRESHOLD_DEFAULT);
-  Property::Index shaderBloomThresholdPropertyIndex = mBloomExtractImageView.GetPropertyIndex(BLOOM_THRESHOLD_PROPERTY_NAME);
-  Constraint bloomThresholdConstraint = Constraint::New<float>( mBloomExtractImageView, shaderBloomThresholdPropertyIndex, EqualToConstraint());
+  Property::Index shaderBloomThresholdPropertyIndex = mBloomExtractActor.GetPropertyIndex(BLOOM_THRESHOLD_PROPERTY_NAME);
+  Constraint bloomThresholdConstraint = Constraint::New<float>( mBloomExtractActor, shaderBloomThresholdPropertyIndex, EqualToConstraint());
   bloomThresholdConstraint.AddSource( Source(self, mBloomThresholdPropertyIndex) );
   bloomThresholdConstraint.Apply();
 
   // precalc 1.0 / (1.0 - threshold) on CPU to save shader insns, using constraint to tie to the normal threshold property
-  Property::Index shaderRecipOneMinusBloomThresholdPropertyIndex = mBloomExtractImageView.GetPropertyIndex(RECIP_ONE_MINUS_BLOOM_THRESHOLD_PROPERTY_NAME);
-  Constraint thresholdConstraint = Constraint::New<float>( mBloomExtractImageView, shaderRecipOneMinusBloomThresholdPropertyIndex, RecipOneMinusConstraint());
+  Property::Index shaderRecipOneMinusBloomThresholdPropertyIndex = mBloomExtractActor.GetPropertyIndex(RECIP_ONE_MINUS_BLOOM_THRESHOLD_PROPERTY_NAME);
+  Constraint thresholdConstraint = Constraint::New<float>( mBloomExtractActor, shaderRecipOneMinusBloomThresholdPropertyIndex, RecipOneMinusConstraint());
   thresholdConstraint.AddSource( LocalSource(shaderBloomThresholdPropertyIndex) );
   thresholdConstraint.Apply();
 
@@ -538,9 +536,9 @@ void BloomView::SetupProperties()
 
   // Register a property that the user can control to fade the bloom intensity via internally hidden shader
   mBloomIntensityPropertyIndex = self.RegisterProperty(BLOOM_INTENSITY_PROPERTY_NAME, BLOOM_INTENSITY_DEFAULT);
-  mCompositeImageView.RegisterProperty( BLOOM_INTENSITY_PROPERTY_NAME, BLOOM_INTENSITY_DEFAULT );
-  Property::Index shaderBloomIntensityPropertyIndex = mCompositeImageView.GetPropertyIndex(BLOOM_INTENSITY_PROPERTY_NAME);
-  Constraint bloomIntensityConstraint = Constraint::New<float>( mCompositeImageView, shaderBloomIntensityPropertyIndex, EqualToConstraint());
+  mCompositeActor.RegisterProperty( BLOOM_INTENSITY_PROPERTY_NAME, BLOOM_INTENSITY_DEFAULT );
+  Property::Index shaderBloomIntensityPropertyIndex = mCompositeActor.GetPropertyIndex(BLOOM_INTENSITY_PROPERTY_NAME);
+  Constraint bloomIntensityConstraint = Constraint::New<float>( mCompositeActor, shaderBloomIntensityPropertyIndex, EqualToConstraint());
   bloomIntensityConstraint.AddSource( Source(self, mBloomIntensityPropertyIndex) );
   bloomIntensityConstraint.Apply();
 
@@ -550,9 +548,9 @@ void BloomView::SetupProperties()
 
   // Register a property that the user can control to fade the bloom saturation via internally hidden shader
   mBloomSaturationPropertyIndex = self.RegisterProperty(BLOOM_SATURATION_PROPERTY_NAME, BLOOM_SATURATION_DEFAULT);
-  mCompositeImageView.RegisterProperty( BLOOM_SATURATION_PROPERTY_NAME, BLOOM_SATURATION_DEFAULT );
-  Property::Index shaderBloomSaturationPropertyIndex = mCompositeImageView.GetPropertyIndex(BLOOM_SATURATION_PROPERTY_NAME);
-  Constraint bloomSaturationConstraint = Constraint::New<float>( mCompositeImageView, shaderBloomSaturationPropertyIndex, EqualToConstraint());
+  mCompositeActor.RegisterProperty( BLOOM_SATURATION_PROPERTY_NAME, BLOOM_SATURATION_DEFAULT );
+  Property::Index shaderBloomSaturationPropertyIndex = mCompositeActor.GetPropertyIndex(BLOOM_SATURATION_PROPERTY_NAME);
+  Constraint bloomSaturationConstraint = Constraint::New<float>( mCompositeActor, shaderBloomSaturationPropertyIndex, EqualToConstraint());
   bloomSaturationConstraint.AddSource( Source(self, mBloomSaturationPropertyIndex) );
   bloomSaturationConstraint.Apply();
 
@@ -562,9 +560,9 @@ void BloomView::SetupProperties()
 
   // Register a property that the user can control to fade the image intensity via internally hidden shader
   mImageIntensityPropertyIndex = self.RegisterProperty(IMAGE_INTENSITY_PROPERTY_NAME, IMAGE_INTENSITY_DEFAULT);
-  mCompositeImageView.RegisterProperty( IMAGE_INTENSITY_PROPERTY_NAME, IMAGE_INTENSITY_DEFAULT );
-  Property::Index shaderImageIntensityPropertyIndex = mCompositeImageView.GetPropertyIndex(IMAGE_INTENSITY_PROPERTY_NAME);
-  Constraint imageIntensityConstraint = Constraint::New<float>( mCompositeImageView, shaderImageIntensityPropertyIndex, EqualToConstraint());
+  mCompositeActor.RegisterProperty( IMAGE_INTENSITY_PROPERTY_NAME, IMAGE_INTENSITY_DEFAULT );
+  Property::Index shaderImageIntensityPropertyIndex = mCompositeActor.GetPropertyIndex(IMAGE_INTENSITY_PROPERTY_NAME);
+  Constraint imageIntensityConstraint = Constraint::New<float>( mCompositeActor, shaderImageIntensityPropertyIndex, EqualToConstraint());
   imageIntensityConstraint.AddSource( Source(self, mImageIntensityPropertyIndex) );
   imageIntensityConstraint.Apply();
 
@@ -574,9 +572,9 @@ void BloomView::SetupProperties()
 
   // Register a property that the user can control to fade the image saturation via internally hidden shader
   mImageSaturationPropertyIndex = self.RegisterProperty(IMAGE_SATURATION_PROPERTY_NAME, IMAGE_SATURATION_DEFAULT);
-  mCompositeImageView.RegisterProperty( IMAGE_SATURATION_PROPERTY_NAME, IMAGE_SATURATION_DEFAULT );
-  Property::Index shaderImageSaturationPropertyIndex = mCompositeImageView.GetPropertyIndex(IMAGE_SATURATION_PROPERTY_NAME);
-  Constraint imageSaturationConstraint = Constraint::New<float>( mCompositeImageView, shaderImageSaturationPropertyIndex, EqualToConstraint());
+  mCompositeActor.RegisterProperty( IMAGE_SATURATION_PROPERTY_NAME, IMAGE_SATURATION_DEFAULT );
+  Property::Index shaderImageSaturationPropertyIndex = mCompositeActor.GetPropertyIndex(IMAGE_SATURATION_PROPERTY_NAME);
+  Constraint imageSaturationConstraint = Constraint::New<float>( mCompositeActor, shaderImageSaturationPropertyIndex, EqualToConstraint());
   imageSaturationConstraint.AddSource( Source(self, mImageSaturationPropertyIndex) );
   imageSaturationConstraint.Apply();
 }

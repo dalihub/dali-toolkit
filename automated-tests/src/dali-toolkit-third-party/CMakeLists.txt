@@ -12,22 +12,7 @@ SET(TC_SOURCES
 
 # Append list of test harness files (Won't get parsed for test cases)
 LIST(APPEND TC_SOURCES
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-application.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-environment-variable.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-context.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-orientation.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-style-monitor.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-singleton-service.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-timer.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-tts-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/dali-test-suite-utils.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/dali-toolkit-test-suite-utils.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/dummy-control.cpp
    ../dali-toolkit/dali-toolkit-test-utils/mesh-builder.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-actor-utils.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-animation-data.cpp
@@ -51,8 +36,8 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
 )
 
 # Locate GTest
-cmake_minimum_required(VERSION 2.6)
-find_package(GTest REQUIRED)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+FIND_PACKAGE(GTest REQUIRED)
 
 #ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
 # ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )

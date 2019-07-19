@@ -139,11 +139,6 @@ void Builder::CreateRenderTask( const std::string &name )
   GetImpl(*this).CreateRenderTask( name );
 }
 
-FrameBufferImage Builder::GetFrameBufferImage( const std::string &name )
-{
-  return GetImpl(*this).GetFrameBufferImage( name );
-}
-
 Path Builder::GetPath( const std::string &name )
 {
   return GetImpl(*this).GetPath( name );

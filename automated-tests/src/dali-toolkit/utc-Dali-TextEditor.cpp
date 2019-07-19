@@ -21,6 +21,7 @@
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/adaptor-framework/key-devel.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-toolkit-test-suite-utils.h>
@@ -924,15 +925,13 @@ int utcDaliTextEditorTextChangedP(void)
 
 int utcDaliTextEditorInputStyleChanged01(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextEditorInputStyleChanged01");
-
   // The text-editor emits signals when the input style changes. These changes of style are
   // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
   // can't be emitted during the size negotiation as the callbacks may update the UI.
   // The text-editor adds an idle callback to the adaptor to emit the signals after the size negotiation.
-  // This creates an implementation of the adaptor stub and a queue of idle callbacks.
-  application.CreateAdaptor();
+  // The ToolkitTestApplication creates an implementation of the adaptor stub and a queue of idle callbacks.
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorInputStyleChanged01");
 
   // Load some fonts.
 
@@ -1140,15 +1139,13 @@ int utcDaliTextEditorInputStyleChanged01(void)
 
 int utcDaliTextEditorInputStyleChanged02(void)
 {
-  ToolkitTestApplication application;
-  tet_infoline(" utcDaliTextEditorInputStyleChanged02");
-
   // The text-editor emits signals when the input style changes. These changes of style are
   // detected during the relayout process (size negotiation), i.e after the cursor has been moved. Signals
   // can't be emitted during the size negotiation as the callbacks may update the UI.
   // The text-editor adds an idle callback to the adaptor to emit the signals after the size negotiation.
-  // This creates an implementation of the adaptor stub and a queue of idle callbacks.
-  application.CreateAdaptor();
+  // The ToolkitTestApplication creates an implementation of the adaptor stub and a queue of idle callbacks.
+  ToolkitTestApplication application;
+  tet_infoline(" utcDaliTextEditorInputStyleChanged02");
 
   // Load some fonts.
 

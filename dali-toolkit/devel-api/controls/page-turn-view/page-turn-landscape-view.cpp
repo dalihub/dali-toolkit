@@ -61,9 +61,9 @@ PageTurnLandscapeView::~PageTurnLandscapeView()
 {
 }
 
-PageTurnLandscapeView PageTurnLandscapeView::New( PageFactory& pageFactory, const Vector2& pageSize )
+PageTurnLandscapeView PageTurnLandscapeView::New( PageFactory& pageFactory, const Vector2& viewPageSize )
 {
-  return Internal::PageTurnLandscapeView::New(pageFactory, pageSize);
+  return Internal::PageTurnLandscapeView::New(pageFactory, viewPageSize);
 }
 
 PageTurnLandscapeView PageTurnLandscapeView::DownCast( BaseHandle handle )
