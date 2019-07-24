@@ -41,7 +41,7 @@ public:
   /**
    * @copydoc Toolkit::PageTurnPortraitView::New( PageFactory&, const Vector2& )
    */
-  static Toolkit::PageTurnPortraitView New( PageFactory& pageFactory, const Vector2& pageSize );
+  static Toolkit::PageTurnPortraitView New( PageFactory& pageFactory, const Vector2& viewPageSize );
 
 protected:
 
@@ -49,9 +49,9 @@ protected:
    * Constructor.
    * It initializes the PageTurnPortraitView members
    * @param[in] pageFactory The factory which provides image to PageTurnView as the page content.
-   * @param[in] pageSize The size of the page
+   * @param[in] viewPageSize The size of the page
    */
-  PageTurnPortraitView( PageFactory& pageFactory, const Vector2& pageSize );
+  PageTurnPortraitView( PageFactory& pageFactory, const Vector2& viewPageSize );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()

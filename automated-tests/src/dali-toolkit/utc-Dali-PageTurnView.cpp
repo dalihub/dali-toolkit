@@ -33,7 +33,7 @@ namespace
 {
 const int RENDER_FRAME_INTERVAL = 16;                           ///< Duration of each frame in ms. (at approx 60FPS)
 const unsigned int TOTAL_PAGE_NUMBER = 20;
-const Vector2 PAGE_SIZE( 300.f,400.f );
+const Vector2 VIEW_PAGE_SIZE( 300.f,400.f );
 const Vector2 SPINE_SHADOW_PARAMETER( 60.0f, 30.0f );
 
 static bool gObjectCreatedCallBackCalled;
@@ -208,7 +208,7 @@ int UtcDaliPageTurnPortraitViewNew(void)
 
   // Test object creation
   TestPageFactory factory;
-  portraitView = PageTurnPortraitView::New( factory, PAGE_SIZE );
+  portraitView = PageTurnPortraitView::New( factory, VIEW_PAGE_SIZE );
   DALI_TEST_CHECK( portraitView );
 
   //Additional check to ensure object is created by checking if it's registered
@@ -219,7 +219,7 @@ int UtcDaliPageTurnPortraitViewNew(void)
   registry.ObjectCreatedSignal().Connect( &TestCallback );
   {
     TestPageFactory factory;
-    PageTurnView portraitView = PageTurnPortraitView::New( factory, PAGE_SIZE );
+    PageTurnView portraitView = PageTurnPortraitView::New( factory, VIEW_PAGE_SIZE );
   }
   DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
 
@@ -248,7 +248,7 @@ int UtcDaliPageTurnLandscapeViewNew(void)
 
   // Test object creation
   TestPageFactory factory;
-  landscapeView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
+  landscapeView = PageTurnLandscapeView::New( factory, VIEW_PAGE_SIZE );
   DALI_TEST_CHECK( landscapeView );
 
   //Additional check to ensure object is created by checking if it's registered
@@ -259,7 +259,7 @@ int UtcDaliPageTurnLandscapeViewNew(void)
   registry.ObjectCreatedSignal().Connect( &TestCallback );
   {
     TestPageFactory factory;
-    PageTurnView landscapeView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
+    PageTurnView landscapeView = PageTurnLandscapeView::New( factory, VIEW_PAGE_SIZE );
   }
   DALI_TEST_CHECK( gObjectCreatedCallBackCalled );
 
@@ -288,7 +288,7 @@ int UtcDaliPageTurnPortraitViewCopyConstructorAndAssignment(void)
 
   // Test object creation
   TestPageFactory factory;
-  portraitView = PageTurnPortraitView::New( factory, PAGE_SIZE );
+  portraitView = PageTurnPortraitView::New( factory, VIEW_PAGE_SIZE );
   DALI_TEST_CHECK( portraitView );
 
   // Test copy constructor
@@ -322,7 +322,7 @@ int UtcDaliPageTurnLandscapeViewCopyConstructorAndAssignment(void)
 
   // Test object creation
   TestPageFactory factory;
-  landscapeView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
+  landscapeView = PageTurnLandscapeView::New( factory, VIEW_PAGE_SIZE );
   DALI_TEST_CHECK( landscapeView );
 
   // Test copy constructor
@@ -351,23 +351,23 @@ int UtcDaliPageTurnViewSetGetProperty(void)
   tet_infoline(" UtcDaliPageTurnViewSetGetProperty ");
 
   TestPageFactory factory;
-  PageTurnView landscapeView = PageTurnLandscapeView::New( factory, PAGE_SIZE );
+  PageTurnView landscapeView = PageTurnLandscapeView::New( factory, VIEW_PAGE_SIZE );
   DALI_TEST_CHECK( landscapeView );
 
   Stage::GetCurrent().Add( landscapeView );
 
-  // Test "pageSize" property
-  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("pageSize") == PageTurnView::Property::PAGE_SIZE  );
-  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::PAGE_SIZE).Get<Vector2>(), PAGE_SIZE, TEST_LOCATION );
+  // Test "viewPageSize" property
+  DALI_TEST_CHECK( landscapeView.GetPropertyIndex("viewPageSize") == PageTurnView::Property::VIEW_PAGE_SIZE  );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::VIEW_PAGE_SIZE).Get<Vector2>(), VIEW_PAGE_SIZE, TEST_LOCATION );
 
-  Vector2 newSize( PAGE_SIZE.x*0.75, PAGE_SIZE.y*0.5f );
-  landscapeView.SetProperty( PageTurnView::Property::PAGE_SIZE, newSize );
-  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::PAGE_SIZE).Get<Vector2>(), newSize, TEST_LOCATION );
+  Vector2 newSize( VIEW_PAGE_SIZE.x*0.75, VIEW_PAGE_SIZE.y*0.5f );
+  landscapeView.SetProperty( PageTurnView::Property::VIEW_PAGE_SIZE, newSize );
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::VIEW_PAGE_SIZE).Get<Vector2>(), newSize, TEST_LOCATION );
   Wait( application);
   DALI_TEST_EQUALS( Vector2(landscapeView.GetTargetSize()), Vector2(newSize.x*2.f, newSize.y), TEST_LOCATION);
 
-  landscapeView.SetProperty( PageTurnView::Property::PAGE_SIZE,newSize*1.5f);
-  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::PAGE_SIZE).Get<Vector2>(), newSize*1.5f, TEST_LOCATION );
+  landscapeView.SetProperty( PageTurnView::Property::VIEW_PAGE_SIZE,newSize*1.5f);
+  DALI_TEST_EQUALS( landscapeView.GetProperty(PageTurnView::Property::VIEW_PAGE_SIZE).Get<Vector2>(), newSize*1.5f, TEST_LOCATION );
   Wait( application);
   DALI_TEST_EQUALS( Vector2(landscapeView.GetTargetSize()), Vector2(newSize.x*3.f, newSize.y*1.5f), TEST_LOCATION);
 

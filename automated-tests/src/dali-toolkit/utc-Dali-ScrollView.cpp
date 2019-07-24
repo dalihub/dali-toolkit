@@ -588,9 +588,9 @@ int UtcDaliToolkitScrollModeP1(void)
   ScrollView scrollView = ScrollView::New();
 
   // Do not rely on stage size for UTC tests.
-  Vector2 pageSize( 720.0f, 1280.0f );
+  Vector2 viewPageSize( 720.0f, 1280.0f );
   scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  scrollView.SetSize( pageSize );
+  scrollView.SetSize( viewPageSize );
   scrollView.SetParentOrigin( ParentOrigin::CENTER );
   scrollView.SetAnchorPoint( AnchorPoint::CENTER );
   scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
@@ -598,8 +598,8 @@ int UtcDaliToolkitScrollModeP1(void)
   // Position rulers.
   Property::Map rulerMap;
   rulerMap.Add( ScrollMode::X_AXIS_SCROLL_ENABLED, true );
-  rulerMap.Add( ScrollMode::X_AXIS_SNAP_TO_INTERVAL, pageSize.width );
-  rulerMap.Add( ScrollMode::X_AXIS_SCROLL_BOUNDARY, pageSize.width*3 );
+  rulerMap.Add( ScrollMode::X_AXIS_SNAP_TO_INTERVAL, viewPageSize.width );
+  rulerMap.Add( ScrollMode::X_AXIS_SCROLL_BOUNDARY, viewPageSize.width*3 );
   rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_ENABLED, false );
   scrollView.SetProperty( ScrollView::Property::SCROLL_MODE, rulerMap);
 
@@ -622,7 +622,7 @@ int UtcDaliToolkitScrollModeP1(void)
   Vector2 currentPos( PerformGestureSwipe( application, startPos, direction, frames - 1, time, false ) );
 
   // Confirm the final X coord has not moved more than one page from the start X position.
-  DALI_TEST_GREATER( ( startPos.x + pageSize.width ), scrollView.GetCurrentScrollPosition().x, TEST_LOCATION );
+  DALI_TEST_GREATER( ( startPos.x + viewPageSize.width ), scrollView.GetCurrentScrollPosition().x, TEST_LOCATION );
 
   // Finish the gesture and wait for the snap.
   currentPos += direction;
@@ -631,7 +631,7 @@ int UtcDaliToolkitScrollModeP1(void)
   time += Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
 
   // Confirm the final X coord has snapped to exactly one page ahead of the start page.
-  DALI_TEST_EQUALS( pageSize.width, scrollView.GetCurrentScrollPosition().x, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( viewPageSize.width, scrollView.GetCurrentScrollPosition().x, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   END_TEST;
 }
@@ -645,9 +645,9 @@ int UtcDaliToolkitScrollModeP2(void)
   ScrollView scrollView = ScrollView::New();
 
   // Do not rely on stage size for UTC tests.
-  Vector2 pageSize( 720.0f, 1280.0f );
+  Vector2 viewPageSize( 720.0f, 1280.0f );
   scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  scrollView.SetSize( pageSize );
+  scrollView.SetSize( viewPageSize );
   scrollView.SetParentOrigin( ParentOrigin::CENTER );
   scrollView.SetAnchorPoint( AnchorPoint::CENTER );
   scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
@@ -656,8 +656,8 @@ int UtcDaliToolkitScrollModeP2(void)
   Property::Map rulerMap;
   rulerMap.Add( ScrollMode::X_AXIS_SCROLL_ENABLED, false );
   rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_ENABLED, true );
-  rulerMap.Add( ScrollMode::Y_AXIS_SNAP_TO_INTERVAL, pageSize.height );
-  rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_BOUNDARY, pageSize.height*3 );
+  rulerMap.Add( ScrollMode::Y_AXIS_SNAP_TO_INTERVAL, viewPageSize.height );
+  rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_BOUNDARY, viewPageSize.height*3 );
   scrollView.SetProperty( ScrollView::Property::SCROLL_MODE, rulerMap);
 
   scrollView.SetWrapMode( false );
@@ -679,7 +679,7 @@ int UtcDaliToolkitScrollModeP2(void)
   Vector2 currentPos( PerformGestureSwipe( application, startPos, direction, frames - 1, time, false ) );
 
   // Confirm the final X coord has not moved more than one page from the start X position.
-  DALI_TEST_GREATER( ( startPos.y + pageSize.height ), scrollView.GetCurrentScrollPosition().y, TEST_LOCATION );
+  DALI_TEST_GREATER( ( startPos.y + viewPageSize.height ), scrollView.GetCurrentScrollPosition().y, TEST_LOCATION );
 
   // Finish the gesture and wait for the snap.
   currentPos += direction;
@@ -689,7 +689,7 @@ int UtcDaliToolkitScrollModeP2(void)
   Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
 
   // Confirm the final Y coord has snapped to exactly one page ahead of the start page.
-  DALI_TEST_EQUALS( pageSize.height, scrollView.GetCurrentScrollPosition().y, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( viewPageSize.height, scrollView.GetCurrentScrollPosition().y, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   END_TEST;
 }
@@ -703,9 +703,9 @@ int UtcDaliToolkitScrollModeP3(void)
   ScrollView scrollView = ScrollView::New();
 
   // Do not rely on stage size for UTC tests.
-  Vector2 pageSize( 720.0f, 1280.0f );
+  Vector2 viewPageSize( 720.0f, 1280.0f );
   scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  scrollView.SetSize( pageSize );
+  scrollView.SetSize( viewPageSize );
   scrollView.SetParentOrigin( ParentOrigin::CENTER );
   scrollView.SetAnchorPoint( AnchorPoint::CENTER );
   scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
@@ -714,8 +714,8 @@ int UtcDaliToolkitScrollModeP3(void)
   Property::Map rulerMap;
   rulerMap.Add( ScrollMode::X_AXIS_SCROLL_ENABLED, false );
   rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_ENABLED, true );
-  rulerMap.Add( ScrollMode::Y_AXIS_SNAP_TO_INTERVAL, pageSize.height );
-  rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_BOUNDARY, pageSize.height*3 );
+  rulerMap.Add( ScrollMode::Y_AXIS_SNAP_TO_INTERVAL, viewPageSize.height );
+  rulerMap.Add( ScrollMode::Y_AXIS_SCROLL_BOUNDARY, viewPageSize.height*3 );
   scrollView.SetProperty( ScrollView::Property::SCROLL_MODE, rulerMap);
 
   scrollView.SetWrapMode( false );
@@ -737,7 +737,7 @@ int UtcDaliToolkitScrollModeP3(void)
   Vector2 currentPos( PerformGestureSwipe( application, startPos, direction, frames - 1, time, false ) );
 
   // Confirm the final X coord has not moved more than one page from the start X position.
-  DALI_TEST_GREATER( ( startPos.y + pageSize.height ), scrollView.GetCurrentScrollPosition().y, TEST_LOCATION );
+  DALI_TEST_GREATER( ( startPos.y + viewPageSize.height ), scrollView.GetCurrentScrollPosition().y, TEST_LOCATION );
 
   // Finish the gesture and wait for the snap.
   currentPos += direction;
@@ -746,7 +746,7 @@ int UtcDaliToolkitScrollModeP3(void)
   Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
 
   // Confirm the final Y coord has snapped to exactly one page ahead of the start page.
-  DALI_TEST_EQUALS( pageSize.height, scrollView.GetCurrentScrollPosition().y, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( viewPageSize.height, scrollView.GetCurrentScrollPosition().y, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   END_TEST;
 }
@@ -760,9 +760,9 @@ int UtcDaliToolkitScrollModeP4(void)
   ScrollView scrollView = ScrollView::New();
 
   // Do not rely on stage size for UTC tests.
-  Vector2 pageSize( 720.0f, 1280.0f );
+  Vector2 viewPageSize( 720.0f, 1280.0f );
   scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  scrollView.SetSize( pageSize );
+  scrollView.SetSize( viewPageSize );
   scrollView.SetParentOrigin( ParentOrigin::TOP_LEFT );
   scrollView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
@@ -2742,19 +2742,19 @@ int UtcDaliToolkitScrollViewGesturePageLimit(void)
   ScrollView scrollView = ScrollView::New();
 
   // Do not rely on stage size for UTC tests.
-  Vector2 pageSize( 720.0f, 1280.0f );
+  Vector2 viewPageSize( 720.0f, 1280.0f );
   scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
-  scrollView.SetSize( pageSize );
+  scrollView.SetSize( viewPageSize );
   scrollView.SetParentOrigin( ParentOrigin::CENTER );
   scrollView.SetAnchorPoint( AnchorPoint::CENTER );
   scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
 
   // Position rulers.
   // We set the X ruler to fixed to give us pages to snap to.
-  Dali::Toolkit::FixedRuler* rulerX = new Dali::Toolkit::FixedRuler( pageSize.width );
+  Dali::Toolkit::FixedRuler* rulerX = new Dali::Toolkit::FixedRuler( viewPageSize.width );
   // Note: The 3x page width is arbitary, but we need enough to show that we are
   // capping page movement by the page limiter, and not the domain.
-  rulerX->SetDomain( Dali::Toolkit::RulerDomain( 0.0f, pageSize.width * 3.0f, false ) );
+  rulerX->SetDomain( Dali::Toolkit::RulerDomain( 0.0f, viewPageSize.width * 3.0f, false ) );
   Dali::Toolkit::RulerPtr rulerY = new Dali::Toolkit::DefaultRuler();
   rulerY->Disable();
   scrollView.SetRulerX( rulerX );
@@ -2779,7 +2779,7 @@ int UtcDaliToolkitScrollViewGesturePageLimit(void)
   Vector2 currentPos( PerformGestureSwipe( application, startPos, direction, frames - 1, time, false ) );
 
   // Confirm the final X coord has not moved more than one page from the start X position.
-  DALI_TEST_GREATER( ( startPos.x + pageSize.width ), scrollView.GetCurrentScrollPosition().x, TEST_LOCATION );
+  DALI_TEST_GREATER( ( startPos.x + viewPageSize.width ), scrollView.GetCurrentScrollPosition().x, TEST_LOCATION );
 
   // Finish the gesture and wait for the snap.
   currentPos += direction;
@@ -2788,7 +2788,7 @@ int UtcDaliToolkitScrollViewGesturePageLimit(void)
   time += Wait( application, RENDER_DELAY_SCROLL + RENDER_FRAME_INTERVAL );
 
   // Confirm the final X coord has snapped to exactly one page ahead of the start page.
-  DALI_TEST_EQUALS( pageSize.width, scrollView.GetCurrentScrollPosition().x, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( viewPageSize.width, scrollView.GetCurrentScrollPosition().x, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   END_TEST;
 }

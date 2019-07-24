@@ -31,6 +31,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/controls/shadow-view/shadow-view-impl.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
 
@@ -153,19 +154,22 @@ void ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
 {
   mShadowPlaneBg = shadowPlaneBackground;
 
-  mShadowPlane = Toolkit::ImageView::New( mOutputImage );
+  mShadowPlane = Actor::New();
   mShadowPlane.SetName( "SHADOW_PLANE" );
-  mShadowPlane.SetParentOrigin(ParentOrigin::CENTER);
-  mShadowPlane.SetAnchorPoint(AnchorPoint::CENTER);
+  mShadowPlane.SetParentOrigin( ParentOrigin::CENTER );
+  mShadowPlane.SetAnchorPoint( AnchorPoint::CENTER );
+  Renderer shadowRenderer = CreateRenderer( RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE, Shader::Hint::OUTPUT_IS_TRANSPARENT, Uint16Pair(20,20) );
+  TextureSet textureSet = shadowRenderer.GetTextures();
+  textureSet.SetTexture( 0u, mOutputFrameBuffer.GetColorTexture() );
+  mShadowPlane.AddRenderer( shadowRenderer );
 
-  mShadowPlane.SetProperty( Toolkit::ImageView::Property::IMAGE, mShadowVisualMap );
   SetShaderConstants();
 
   // Rather than parent the shadow plane drawable and have constraints to move it to the same
   // position, instead parent the shadow plane drawable on the shadow plane passed in.
-  mShadowPlaneBg.Add(mShadowPlane);
-  mShadowPlane.SetParentOrigin(ParentOrigin::CENTER);
-  mShadowPlane.SetZ(1.0f);
+  mShadowPlaneBg.Add( mShadowPlane );
+  mShadowPlane.SetParentOrigin( ParentOrigin::CENTER );
+  mShadowPlane.SetZ( 1.0f );
 
   ConstrainCamera();
 
@@ -242,22 +246,14 @@ void ShadowView::OnInitialize()
   mCameraActor.SetOrientation(Radian(Degree(180)), Vector3::YAXIS);
   mCameraActor.SetPosition(DEFAULT_LIGHT_POSITION);
 
-
-  Property::Map customShader;
-  customShader[ Toolkit::Visual::Shader::Property::VERTEX_SHADER ] = RENDER_SHADOW_VERTEX_SOURCE;
-  customShader[ Toolkit::Visual::Shader::Property::FRAGMENT_SHADER ] = RENDER_SHADOW_FRAGMENT_SOURCE;
-
-  customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_X ] = 20;
-  customShader[ Toolkit::Visual::Shader::Property::SUBDIVIDE_GRID_Y ] = 20;
-
-  customShader[ Toolkit::Visual::Shader::Property::HINTS ] = Shader::Hint::OUTPUT_IS_TRANSPARENT;
-
-  mShadowVisualMap[ Toolkit::Visual::Property::SHADER ] = customShader;
-
   // Create render targets needed for rendering from light's point of view
-  mSceneFromLightRenderTarget = FrameBufferImage::New( stageSize.width, stageSize.height, Pixel::RGBA8888 );
+  mSceneFromLightRenderTarget = FrameBuffer::New( stageSize.width, stageSize.height, FrameBuffer::Attachment::NONE );
+  Texture textureFromLight = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width), unsigned(stageSize.height) );
+  mSceneFromLightRenderTarget.AttachColorTexture( textureFromLight );
 
-  mOutputImage = FrameBufferImage::New( stageSize.width * 0.5f, stageSize.height * 0.5f, Pixel::RGBA8888 );
+  mOutputFrameBuffer = FrameBuffer::New( stageSize.width * 0.5f, stageSize.height * 0.5f, FrameBuffer::Attachment::NONE );
+  Texture outputTexture = Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width * 0.5f), unsigned(stageSize.height * 0.5f) );
+  mOutputFrameBuffer.AttachColorTexture( outputTexture );
 
   //////////////////////////////////////////////////////
   // Connect to actor tree
@@ -265,23 +261,23 @@ void ShadowView::OnInitialize()
   Self().Add( mChildrenRoot );
   Stage::GetCurrent().Add( mCameraActor );
 
-  mBlurFilter.SetRefreshOnDemand(false);
-  mBlurFilter.SetInputImage(mSceneFromLightRenderTarget);
-  mBlurFilter.SetOutputImage(mOutputImage);
-  mBlurFilter.SetSize(stageSize * 0.5f);
-  mBlurFilter.SetPixelFormat(Pixel::RGBA8888);
+  mBlurFilter.SetRefreshOnDemand( false );
+  mBlurFilter.SetInputTexture( mSceneFromLightRenderTarget.GetColorTexture() );
+  mBlurFilter.SetOutputFrameBuffer( mOutputFrameBuffer );
+  mBlurFilter.SetSize( stageSize * 0.5f );
+  mBlurFilter.SetPixelFormat( Pixel::RGBA8888 );
 
   mBlurRootActor = Actor::New();
   mBlurRootActor.SetName( "BLUR_ROOT_ACTOR" );
 
   // Turn off inheritance to ensure filter renders properly
   mBlurRootActor.SetParentOrigin( ParentOrigin::CENTER );
-  mBlurRootActor.SetInheritPosition(false);
-  mBlurRootActor.SetInheritOrientation(false);
-  mBlurRootActor.SetInheritScale(false);
-  mBlurRootActor.SetColorMode(USE_OWN_COLOR);
+  mBlurRootActor.SetInheritPosition( false );
+  mBlurRootActor.SetInheritOrientation( false );
+  mBlurRootActor.SetInheritScale( false );
+  mBlurRootActor.SetColorMode( USE_OWN_COLOR );
 
-  Self().Add(mBlurRootActor);
+  Self().Add( mBlurRootActor );
 
   mBlurFilter.SetRootActor(mBlurRootActor);
   mBlurFilter.SetBackgroundColor(Vector4::ZERO);
@@ -340,7 +336,7 @@ void ShadowView::CreateRenderTasks()
 
   mRenderSceneTask.SetCameraActor( mCameraActor );
   mRenderSceneTask.SetSourceActor( mChildrenRoot );
-  mRenderSceneTask.SetTargetFrameBuffer( mSceneFromLightRenderTarget );
+  mRenderSceneTask.SetFrameBuffer( mSceneFromLightRenderTarget );
   mRenderSceneTask.SetInputEnabled( false );
   mRenderSceneTask.SetClearEnabled( true );
 

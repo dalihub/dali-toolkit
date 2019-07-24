@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ void checkbox_button_cleanup(void)
 
 int UtcDaliCheckBoxButtonConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   CheckBoxButton checkBox;
 
@@ -80,7 +80,7 @@ int UtcDaliCheckBoxButtonConstructorP(void)
 
 int UtcDaliCheckBoxButtonCopyConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Initialize an object, ref count == 1
   CheckBoxButton checkBox = CheckBoxButton::New();
@@ -92,7 +92,7 @@ int UtcDaliCheckBoxButtonCopyConstructorP(void)
 
 int UtcDaliCheckBoxButtonAssignmentOperatorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   CheckBoxButton checkBox = CheckBoxButton::New();
 
@@ -105,7 +105,7 @@ int UtcDaliCheckBoxButtonAssignmentOperatorP(void)
 
 int UtcDaliCheckBoxButtonNewP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   CheckBoxButton checkBox = CheckBoxButton::New();
 
@@ -115,7 +115,7 @@ int UtcDaliCheckBoxButtonNewP(void)
 
 int UtcDaliCheckBoxButtonDownCastP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   CheckBoxButton checkBox = CheckBoxButton::New();
 
@@ -131,7 +131,7 @@ int UtcDaliCheckBoxButtonDownCastP(void)
 
 int UtcDaliCheckBoxButtonDownCastN(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   BaseHandle unInitializedObject;
 
@@ -173,7 +173,7 @@ int UtcDaliCheckBoxButtonSelectedPropertyP(void)
 
 int UtcDaliCheckBoxSetLabelP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   CheckBoxButton checkBox = CheckBoxButton::New();
 
@@ -191,7 +191,7 @@ int UtcDaliCheckBoxSetLabelP(void)
 
 int UtcDaliCheckBoxSetDisabledPropertyP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   CheckBoxButton checkBox = CheckBoxButton::New();
   Stage::GetCurrent().Add( checkBox );
@@ -362,7 +362,7 @@ int UtcDaliCheckBoxButtonSetGetSelected(void)
 
 int UtcDaliCheckBoxSetLabelDisabledP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   CheckBoxButton checkBox = CheckBoxButton::New();
   Stage::GetCurrent().Add( checkBox );

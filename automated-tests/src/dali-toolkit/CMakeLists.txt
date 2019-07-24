@@ -81,19 +81,21 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
   dali-toolkit-test-utils/toolkit-environment-variable.cpp
   dali-toolkit-test-utils/toolkit-input-method-context.cpp
+  dali-toolkit-test-utils/toolkit-input-method-options.cpp
   dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp
   dali-toolkit-test-utils/toolkit-orientation.cpp
   dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
   dali-toolkit-test-utils/toolkit-style-monitor.cpp
   dali-toolkit-test-utils/toolkit-singleton-service.cpp
+  dali-toolkit-test-utils/toolkit-test-application.cpp
   dali-toolkit-test-utils/toolkit-timer.cpp
+  dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
   dali-toolkit-test-utils/toolkit-tts-player.cpp
   dali-toolkit-test-utils/toolkit-native-image-source.cpp
   dali-toolkit-test-utils/toolkit-vector-animation-renderer.cpp
   dali-toolkit-test-utils/toolkit-video-player.cpp
   dali-toolkit-test-utils/toolkit-web-engine.cpp
   dali-toolkit-test-utils/toolkit-window.cpp
-  dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
   dali-toolkit-test-utils/dali-test-suite-utils.cpp
   dali-toolkit-test-utils/dali-toolkit-test-suite-utils.cpp
   dali-toolkit-test-utils/dummy-control.cpp

@@ -21,6 +21,7 @@
 #include <toolkit-event-thread-callback.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>

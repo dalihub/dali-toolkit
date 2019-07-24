@@ -52,9 +52,24 @@ const Dali::Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
 // Flags for re-sending data to the rasterize thread
 enum Flags
 {
-  RESEND_PLAY_RANGE  = 1 << 0,
-  RESEND_LOOP_COUNT  = 1 << 1
+  RESEND_PLAY_RANGE    = 1 << 0,
+  RESEND_LOOP_COUNT    = 1 << 1,
+  RESEND_STOP_BEHAVIOR = 1 << 2,
+  RESEND_LOOPING_MODE  = 1 << 3
 };
+
+// stop behavior
+DALI_ENUM_TO_STRING_TABLE_BEGIN( STOP_BEHAVIOR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::DevelImageVisual::StopBehavior, CURRENT_FRAME )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::DevelImageVisual::StopBehavior, FIRST_FRAME )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::DevelImageVisual::StopBehavior, LAST_FRAME )
+DALI_ENUM_TO_STRING_TABLE_END( STOP_BEHAVIOR )
+
+// looping mode
+DALI_ENUM_TO_STRING_TABLE_BEGIN( LOOPING_MODE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::DevelImageVisual::LoopingMode, RESTART )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::DevelImageVisual::LoopingMode, AUTO_REVERSE )
+DALI_ENUM_TO_STRING_TABLE_END( LOOPING_MODE )
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VECTOR_ANIMATION" );
@@ -88,7 +103,9 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
   mStartFrame( 0 ),
   mEndFrame( 0 ),
   mResendFlag( 0 ),
-  mActionStatus( DevelAnimatedVectorImageVisual::Action::STOP )
+  mActionStatus( DevelAnimatedVectorImageVisual::Action::STOP ),
+  mStopBehavior( DevelImageVisual::StopBehavior::CURRENT_FRAME ),
+  mLoopingMode( DevelImageVisual::LoopingMode::RESTART )
 {
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
@@ -144,6 +161,9 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::DevelImageVisual::Property::PLAY_STATE, static_cast< int >( mVectorRasterizeThread.GetPlayState() ) );
   map.Insert( Toolkit::DevelImageVisual::Property::CURRENT_FRAME_NUMBER, static_cast< int32_t >( mVectorRasterizeThread.GetCurrentFrameNumber() ) );
   map.Insert( Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, static_cast< int32_t >( mVectorRasterizeThread.GetTotalFrameNumber() ) );
+
+  map.Insert( Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mStopBehavior );
+  map.Insert( Toolkit::DevelImageVisual::Property::LOOPING_MODE, mLoopingMode );
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -170,6 +190,14 @@ void AnimatedVectorImageVisual::DoSetProperties( const Property::Map& propertyMa
        else if( keyValue.first == PLAY_RANGE_NAME )
        {
           DoSetProperty( Toolkit::DevelImageVisual::Property::PLAY_RANGE, keyValue.second );
+       }
+       else if( keyValue.first == STOP_BEHAVIOR_NAME )
+       {
+          DoSetProperty( Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, keyValue.second );
+       }
+       else if( keyValue.first == LOOPING_MODE_NAME )
+       {
+          DoSetProperty( Toolkit::DevelImageVisual::Property::LOOPING_MODE, keyValue.second );
        }
     }
   }
@@ -214,6 +242,22 @@ void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Prop
           }
         }
       }
+      break;
+    }
+    case Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR:
+    {
+      int32_t stopBehavior;
+      Scripting::GetEnumerationProperty( value, STOP_BEHAVIOR_TABLE, STOP_BEHAVIOR_TABLE_COUNT, stopBehavior );
+      mStopBehavior = DevelImageVisual::StopBehavior::Type( stopBehavior );
+      mResendFlag |= RESEND_STOP_BEHAVIOR;
+      break;
+    }
+    case Toolkit::DevelImageVisual::Property::LOOPING_MODE:
+    {
+      int32_t loopingMode;
+      Scripting::GetEnumerationProperty( value, LOOPING_MODE_TABLE, LOOPING_MODE_TABLE_COUNT, loopingMode );
+      mLoopingMode = DevelImageVisual::LoopingMode::Type( loopingMode );
+      mResendFlag |= RESEND_LOOPING_MODE;
       break;
     }
   }
@@ -436,6 +480,16 @@ void AnimatedVectorImageVisual::SendAnimationData()
     if( mResendFlag & RESEND_PLAY_RANGE )
     {
       mVectorRasterizeThread.SetPlayRange( mStartFrame, mEndFrame );
+    }
+
+    if( mResendFlag & RESEND_STOP_BEHAVIOR )
+    {
+      mVectorRasterizeThread.SetStopBehavior( mStopBehavior );
+    }
+
+    if( mResendFlag & RESEND_LOOPING_MODE )
+    {
+      mVectorRasterizeThread.SetLoopingMode( mLoopingMode );
     }
 
     if( IsOnStage() )

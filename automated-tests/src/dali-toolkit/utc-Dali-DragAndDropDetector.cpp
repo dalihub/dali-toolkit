@@ -266,7 +266,7 @@ int UtcDaliDragAndDropDetectorGetAttachedControlP(void)
 
 int UtcDaliDragAndDropDetectorStartSignal(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control = Control::New();
@@ -297,7 +297,7 @@ int UtcDaliDragAndDropDetectorStartSignal(void)
 
 int UtcDaliDragAndDropDetectorEnteredSignal(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control1 = Control::New();
@@ -340,7 +340,7 @@ int UtcDaliDragAndDropDetectorEnteredSignal(void)
 
 int UtcDaliDragAndDropDetectorMovedSignal(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control1 = Control::New();
@@ -387,7 +387,7 @@ int UtcDaliDragAndDropDetectorMovedSignal(void)
 
 int UtcDaliDragAndDropDetectorExitedSignal(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control1 = Control::New();
@@ -435,7 +435,7 @@ int UtcDaliDragAndDropDetectorExitedSignal(void)
 
 int UtcDaliDragAndDropDetectorDroppedSignal(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control1 = Control::New();
@@ -483,7 +483,7 @@ int UtcDaliDragAndDropDetectorDroppedSignal(void)
 
 int UtcDaliDragAndDropDetectorEndedSignal(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control1 = Control::New();
@@ -523,7 +523,7 @@ int UtcDaliDragAndDropDetectorEndedSignal(void)
 
 int UtcDaliDragAndDropDetectorGetContent(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Dali::Toolkit::DragAndDropDetector detector = Dali::Toolkit::DragAndDropDetector::New();
   Control control1 = Control::New();

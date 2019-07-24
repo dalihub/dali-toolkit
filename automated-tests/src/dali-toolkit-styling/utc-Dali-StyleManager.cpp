@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ Integration::Bitmap* CreateBitmap( unsigned int imageWidth, unsigned int imageHe
   return bitmap;
 }
 
-Integration::ResourcePointer CustomizeNinePatch( TestApplication& application,
+Integration::ResourcePointer CustomizeNinePatch( ToolkitTestApplication& application,
                                                  unsigned int ninePatchImageWidth,
                                                  unsigned int ninePatchImageHeight)
 {
@@ -119,7 +119,7 @@ int UtcDaliStyleManagerConstructorP(void)
 
 int UtcDaliStyleManagerCopyConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   StyleManager styleManager = StyleManager::Get();
   StyleManager copyOfStyleManager( styleManager );
@@ -130,7 +130,7 @@ int UtcDaliStyleManagerCopyConstructorP(void)
 
 int UtcDaliStyleManagerAssignmentOperatorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   StyleManager styleManager = StyleManager::Get();
   StyleManager copyOfStyleManager = styleManager;

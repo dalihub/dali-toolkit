@@ -39,18 +39,18 @@ DALI_TYPE_REGISTRATION_END()
 
 }
 
-PageTurnLandscapeView::PageTurnLandscapeView( PageFactory& pageFactory, const Vector2& pageSize )
-: PageTurnView( pageFactory, pageSize )
+PageTurnLandscapeView::PageTurnLandscapeView( PageFactory& pageFactory, const Vector2& viewPageSize )
+: PageTurnView( pageFactory, viewPageSize )
 {
 }
 
 PageTurnLandscapeView::~PageTurnLandscapeView()
 {}
 
-Toolkit::PageTurnLandscapeView PageTurnLandscapeView::New( PageFactory& pageFactory, const Vector2& pageSize )
+Toolkit::PageTurnLandscapeView PageTurnLandscapeView::New( PageFactory& pageFactory, const Vector2& viewPageSize )
 {
   // Create the implementation, temporarily owned on stack
-  IntrusivePtr< PageTurnLandscapeView > internalPageTurnView = new PageTurnLandscapeView( pageFactory, pageSize );
+  IntrusivePtr< PageTurnLandscapeView > internalPageTurnView = new PageTurnLandscapeView( pageFactory, viewPageSize );
 
   // Pass ownership to CustomActor
   Dali::Toolkit::PageTurnLandscapeView pageTurnView( *internalPageTurnView );

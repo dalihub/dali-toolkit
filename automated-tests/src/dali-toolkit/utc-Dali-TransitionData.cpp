@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,7 +136,7 @@ void CHECK_MAP_EQUALS( Property::Map test, Property::Map result )
 
 int UtcDaliTransitionDataNew(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Property::Map map = CreateMap();
   Dali::Toolkit::TransitionData transition = TransitionData::New( map );
@@ -147,7 +147,7 @@ int UtcDaliTransitionDataNew(void)
 
 int UtcDaliTransitionDataDownCast(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Property::Map map = CreateMap();
 
@@ -161,7 +161,7 @@ int UtcDaliTransitionDataDownCast(void)
 
 int UtcDaliTransitionDataCopyConstructor(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Property::Map map = CreateMap();
 
@@ -176,7 +176,7 @@ int UtcDaliTransitionDataCopyConstructor(void)
 
 int UtcDaliTransitionDataAssignmentOperator(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Property::Map map = CreateMap();
 
@@ -195,7 +195,7 @@ int UtcDaliTransitionDataAssignmentOperator(void)
 
 int UtcDaliTransitionDataCount(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Property::Map map = CreateMap();
   TransitionData transitionData = TransitionData::New( map );
@@ -216,7 +216,7 @@ int UtcDaliTransitionDataCount(void)
 
 int UtcDaliTransitionDataMap1P(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_printf("Testing animation of a visual property using stylesheet equivalent maps\n");
 
@@ -284,7 +284,7 @@ int UtcDaliTransitionDataMap1P(void)
 
 int UtcDaliTransitionDataMap2P(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_printf("Testing animation of a visual property using programmatic maps\n");
 
@@ -352,7 +352,7 @@ int UtcDaliTransitionDataMap2P(void)
 
 int UtcDaliTransitionDataMap2Pb(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_printf("Testing animation of a visual property using programmatic maps\n");
 
@@ -424,7 +424,7 @@ int UtcDaliTransitionDataMap2Pb(void)
 
 int UtcDaliTransitionDataMap3P(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_printf("Testing animation of an actor's position property using bezier curve\n");
 
@@ -480,7 +480,7 @@ int UtcDaliTransitionDataMap3P(void)
 
 int UtcDaliTransitionDataMap4P(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_printf("Testing animation of a visual's transform property using programmatic maps\n");
 
@@ -552,7 +552,7 @@ int UtcDaliTransitionDataMap4P(void)
 
 int UtcDaliTransitionDataMap5P(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_printf("Testing animation visual opacity using stylesheet equivalent maps\n");
 
@@ -625,7 +625,7 @@ int UtcDaliTransitionDataMap5P(void)
 
 int UtcDaliTransitionDataMap6P(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_printf("Testing animation visual opacity using stylesheet equivalent maps\n");
 
@@ -699,7 +699,7 @@ int UtcDaliTransitionDataMap6P(void)
 
 int UtcDaliTransitionDataMap1N(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Property::Map map;
   map["target"] = "Actor1";
@@ -731,7 +731,7 @@ int UtcDaliTransitionDataMap1N(void)
 
 int UtcDaliTransitionDataMapN3(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_printf("Testing visual lookup with no renderers\n");
 
@@ -773,7 +773,7 @@ int UtcDaliTransitionDataMapN3(void)
 
 int UtcDaliTransitionDataMapN4(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_printf("Testing visual doesn't animate with duff bezier data \n");
 
@@ -825,7 +825,7 @@ int UtcDaliTransitionDataMapN4(void)
 
 int UtcDaliTransitionDataMapN5(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_printf("Testing visual doesn't animate with duff bezier data \n");
 
@@ -876,7 +876,7 @@ int UtcDaliTransitionDataMapN5(void)
 
 int UtcDaliTransitionDataMapN6(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   tet_printf("Testing visual doesn't animate with duff bezier data \n");
 
@@ -929,7 +929,7 @@ int UtcDaliTransitionDataMapN6(void)
 
 int UtcDaliTransitionDataArrayP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Property::Map map1;
   map1["target"] = "Actor1";
@@ -1005,7 +1005,7 @@ int UtcDaliTransitionDataArrayP(void)
 
 int UtcDaliTransitionDataGetAnimatorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Property::Map map1;
   map1["target"] = "Actor1";

@@ -19,7 +19,9 @@
 #include <dali-toolkit/internal/controls/text-controls/text-selection-popup-impl.h>
 
 // EXTERNAL INCLUDES
+#if defined(__GLIBC__)
 #include <libintl.h>
+#endif
 #include <string.h>
 #include <cfloat>
 #include <dali/public-api/animation/animation.h>
@@ -53,8 +55,9 @@ namespace Internal
 
 namespace
 {
-
+#if defined(__GLIBC__)
 #define GET_LOCALE_TEXT(string) dgettext("dali-toolkit", string)
+#endif
 
 const std::string TEXT_SELECTION_POPUP_BUTTON_STYLE_NAME( "TextSelectionPopupButton" );
 const Dali::Vector4 DEFAULT_OPTION_PRESSED_COLOR( Dali::Vector4( 0.24f, 0.72f, 0.8f, 1.0f ) );
@@ -805,6 +808,7 @@ std::string TextSelectionPopup::GetPressedImage() const
 
    // Whether to mirror the list of buttons (for right to left languages)
    bool mirror = false;
+#if defined(__GLIBC__)
    char* idsLtr = GET_LOCALE_TEXT( IDS_LTR.c_str() );
    if( NULL != idsLtr )
    {
@@ -815,6 +819,7 @@ std::string TextSelectionPopup::GetPressedImage() const
        std::reverse( mOrderListOfButtons.begin(), mOrderListOfButtons.end() );
      }
    }
+#endif
 
    // Iterate list of buttons and add active ones to Toolbar
    std::size_t numberOfOptionsRequired =  GetNumberOfEnabledOptions();

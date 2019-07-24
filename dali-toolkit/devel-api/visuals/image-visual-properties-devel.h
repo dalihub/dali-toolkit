@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_IMAGE_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ enum Type
   ORIENTATION_CORRECTION = Dali::Toolkit::ImageVisual::Property::ORIENTATION_CORRECTION,
 
   /**
-   * @brief Overlays the auxiliary iamge on top of an NPatch image.
+   * @brief Overlays the auxiliary image on top of an NPatch image.
    *
    * The resulting visual image will be at least as large as the
    * smallest possible n-patch or the auxiliary image, whichever is
@@ -97,7 +97,7 @@ enum Type
 
   /**
    * @brief The playing state the AnimatedVectorImageVisual will use.
-   * @details Name "playState", type PlayState (Property::INTEGER)
+   * @details Name "playState", Type PlayState::Type (Property::INTEGER)
    * @note This property is read-only.
    */
   PLAY_STATE = ORIENTATION_CORRECTION + 5,
@@ -114,7 +114,21 @@ enum Type
    * @details Name "totalFrameNumber", Type Property::INTEGER.
    * @note This property is read-only.
    */
-  TOTAL_FRAME_NUMBER = ORIENTATION_CORRECTION + 7
+  TOTAL_FRAME_NUMBER = ORIENTATION_CORRECTION + 7,
+
+  /**
+   * @brief  The stop behavior the AnimatedVectorImageVisual will use.
+   * @details Name "stopBehavior", Type StopBehavior::Type (Property::INTEGER)
+   * @note Default value is StopBehavior::CURRENT_FRAME.
+   */
+  STOP_BEHAVIOR = ORIENTATION_CORRECTION + 8,
+
+  /**
+   * @brief  The looping mode the AnimatedVectorImageVisual will use.
+   * @details Name "loopingMode", Type LoopingMode::Type (Property::INTEGER)
+   * @note Default value is LoopingMode::RESTART.
+   */
+  LOOPING_MODE = ORIENTATION_CORRECTION + 9
 };
 
 } //namespace Property
@@ -122,12 +136,46 @@ enum Type
 /**
  * @brief Enumeration for what state the animation is in.
  */
-enum class PlayState
+namespace PlayState
+{
+
+enum Type
 {
   STOPPED,   ///< Animation has stopped
   PLAYING,   ///< The animation is playing
   PAUSED     ///< The animation is paused
 };
+
+} // namespace PlayState
+
+/**
+ * @brief Enumeration for what to do when the animation is stopped.
+ */
+namespace StopBehavior
+{
+
+enum Type
+{
+  CURRENT_FRAME,  ///< When the animation is stopped, the current frame is shown.
+  FIRST_FRAME,    ///< When the animation is stopped, the first frame is shown.
+  LAST_FRAME      ///< When the animation is stopped, the last frame is shown.
+};
+
+} // namespace StopBehavoir
+
+/**
+ * @brief Enumeration for what looping mode is in.
+ */
+namespace LoopingMode
+{
+
+enum Type
+{
+  RESTART,      ///< When the animation arrives at the end in looping mode, the animation restarts from the beginning.
+  AUTO_REVERSE  ///< When the animation arrives at the end in looping mode, the animation reverses direction and runs backwards again.
+};
+
+} // namespace LoopingMode
 
 } // namespace DevelImageVisual
 
