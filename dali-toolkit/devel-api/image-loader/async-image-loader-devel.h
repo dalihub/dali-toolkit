@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_IMAGE_LOADER_ASYNC_IMAGE_LOADER_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace Toolkit
 namespace DevelAsyncImageLoader
 {
 
-typedef Signal< void ( uint32_t, Devel::PixelBuffer ) > PixelBufferLoadedSignalType;
+typedef Signal< void ( uint32_t, Devel::PixelBuffer, bool ) > PixelBufferLoadedSignalType;
 
 /**
  * @brief Whether to multiply alpha into color channels on load
@@ -52,13 +52,30 @@ enum class PreMultiplyOnLoad
  * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha
  * @return The loading task id
  */
-DALI_TOOLKIT_API uint32_t Load(  AsyncImageLoader asyncImageLoader,
-                const std::string& url,
-                ImageDimensions dimensions,
-                FittingMode::Type fittingMode,
-                SamplingMode::Type samplingMode,
-                bool orientationCorrection,
-                DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
+DALI_TOOLKIT_API uint32_t Load( AsyncImageLoader asyncImageLoader,
+                                const std::string& url,
+                                ImageDimensions dimensions,
+                                FittingMode::Type fittingMode,
+                                SamplingMode::Type samplingMode,
+                                bool orientationCorrection,
+                                DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
+
+/**
+ * @brief Starts an mask applying task.
+ * @REMARK_INTERNET
+ * @REMARK_STORAGE
+ * @param[in] asyncImageLoader The ayncImageLoader
+ * @param[in] pixelBuffer Pointer to raw pixel data to be masked
+ * @param[in] maskPixelBuffer Pointer to raw masking data
+ * @param[in] contentScale The factor to scale the content
+ * @param[in] cropToMask Whether to crop the content to the mask size
+ * @return The masking task id
+ */
+DALI_TOOLKIT_API uint32_t ApplyMask( AsyncImageLoader asyncImageLoader,
+                                     Devel::PixelBuffer pixelBuffer,
+                                     Devel::PixelBuffer maskPixelBuffer,
+                                     float contentScale,
+                                     bool cropToMask );
 
 /**
  * Connect to this signal if you want to load a PixelBuffer instead of a PixelData.

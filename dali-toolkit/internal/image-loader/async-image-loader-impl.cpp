@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,21 @@ uint32_t AsyncImageLoader::Load( const VisualUrl& url,
   return mLoadTaskId;
 }
 
+uint32_t AsyncImageLoader::ApplyMask( Devel::PixelBuffer pixelBuffer,
+                                      Devel::PixelBuffer maskPixelBuffer,
+                                      float contentScale,
+                                      bool cropToMask )
+{
+  if( !mIsLoadThreadStarted )
+  {
+    mLoadThread.Start();
+    mIsLoadThreadStarted = true;
+  }
+  mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask ) );
+
+  return mLoadTaskId;
+}
+
 Toolkit::AsyncImageLoader::ImageLoadedSignalType& AsyncImageLoader::ImageLoadedSignal()
 {
   return mLoadedSignal;
@@ -92,7 +107,7 @@ void AsyncImageLoader::ProcessLoadedImage()
   {
     if( mPixelBufferLoadedSignal.GetConnectionCount() > 0 )
     {
-      mPixelBufferLoadedSignal.Emit( next->id, next->pixelBuffer );
+      mPixelBufferLoadedSignal.Emit( next->id, next->pixelBuffer, next->isMaskTask );
     }
     else if( mLoadedSignal.GetConnectionCount() > 0 )
     {

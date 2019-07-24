@@ -85,6 +85,8 @@ Debug::Filter* gTextureManagerLogFilter = Debug::Filter::New( Debug::NoLogging, 
     loadState == TextureManager::LOADING ? "LOADING" :                   \
     loadState == TextureManager::LOAD_FINISHED ? "LOAD_FINISHED" :       \
     loadState == TextureManager::WAITING_FOR_MASK ? "WAITING_FOR_MASK" : \
+    loadState == TextureManager::MASK_APPLYING ? "MASK_APPLYING" :         \
+    loadState == TextureManager::MASK_APPLIED ? "MASK_APPLIED" :         \
     loadState == TextureManager::UPLOADED ? "UPLOADED" :                 \
     loadState == TextureManager::CANCELLED ? "CANCELLED" :               \
     loadState == TextureManager::LOAD_FAILED ? "LOAD_FAILED" : "Unknown"
@@ -263,6 +265,9 @@ TextureSet TextureManager::LoadTexture(
       // If we are loading the texture, or waiting for the ready signal handler to complete, inform
       // caller that they need to wait.
       loadingStatus = ( loadState == TextureManager::LOADING ||
+                        loadState == TextureManager::WAITING_FOR_MASK ||
+                        loadState == TextureManager::MASK_APPLYING ||
+                        loadState == TextureManager::MASK_APPLIED ||
                         loadState == TextureManager::NOT_STARTED ||
                         mQueueLoadFlag );
 
@@ -393,7 +398,11 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
                  GET_LOAD_STATE_STRING(textureInfo.loadState ) );
 
   // Force reloading of texture by setting loadState unless already loading or cancelled.
-  if ( TextureManager::ReloadPolicy::FORCED == reloadPolicy && TextureManager::LOADING != textureInfo.loadState &&
+  if ( TextureManager::ReloadPolicy::FORCED == reloadPolicy &&
+       TextureManager::LOADING != textureInfo.loadState &&
+       TextureManager::WAITING_FOR_MASK != textureInfo.loadState &&
+       TextureManager::MASK_APPLYING != textureInfo.loadState &&
+       TextureManager::MASK_APPLIED != textureInfo.loadState &&
        TextureManager::CANCELLED != textureInfo.loadState )
   {
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Verbose, "TextureManager::RequestLoad( url=%s observer=%p ) ForcedReload cacheIndex:%d, textureId=%d\n",
@@ -412,6 +421,9 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
       break;
     }
     case TextureManager::LOADING:
+    case TextureManager::WAITING_FOR_MASK:
+    case TextureManager::MASK_APPLYING:
+    case TextureManager::MASK_APPLIED:
     {
       ObserveTexture( textureInfo, observer );
       break;
@@ -433,7 +445,6 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
       break;
     }
     case TextureManager::LOAD_FINISHED:
-    case TextureManager::WAITING_FOR_MASK:
       // Loading has already completed. Do nothing.
       break;
   }
@@ -648,7 +659,6 @@ void TextureManager::LoadOrQueueTexture( TextureInfo& textureInfo, TextureUpload
       }
       break;
     }
-    case LOADING:
     case UPLOADED:
     {
       if( mQueueLoadFlag )
@@ -665,9 +675,12 @@ void TextureManager::LoadOrQueueTexture( TextureInfo& textureInfo, TextureUpload
       }
       break;
     }
+    case LOADING:
     case CANCELLED:
     case LOAD_FINISHED:
     case WAITING_FOR_MASK:
+    case MASK_APPLYING:
+    case MASK_APPLIED:
     {
       break;
     }
@@ -737,7 +750,7 @@ void TextureManager::ObserveTexture( TextureInfo& textureInfo,
 }
 
 void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingContainer, uint32_t id,
-                                        Devel::PixelBuffer pixelBuffer )
+                                        Devel::PixelBuffer pixelBuffer, bool isMaskTask )
 {
   DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::AsyncLoadComplete( id:%d )\n", id );
 
@@ -758,6 +771,10 @@ void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingCo
 
         if( textureInfo.loadState != CANCELLED )
         {
+          if( isMaskTask )
+          {
+            textureInfo.loadState = MASK_APPLIED;
+          }
           // textureInfo can be invalidated after this call (as the mTextureInfoContainer may be modified)
           PostLoad( textureInfo, pixelBuffer );
         }
@@ -787,17 +804,24 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pix
       // wait for the mask to finish loading.
       if( textureInfo.maskTextureId != INVALID_TEXTURE_ID )
       {
-        LoadState maskLoadState = GetTextureStateInternal( textureInfo.maskTextureId );
-        if( maskLoadState == LOADING )
+        if( textureInfo.loadState == MASK_APPLIED )
         {
-          textureInfo.pixelBuffer = pixelBuffer; // Store the pixel buffer temporarily
-          textureInfo.loadState = WAITING_FOR_MASK;
-        }
-        else if( maskLoadState == LOAD_FINISHED )
-        {
-          ApplyMask( pixelBuffer, textureInfo.maskTextureId, textureInfo.scaleFactor, textureInfo.cropToMask );
           UploadTexture( pixelBuffer, textureInfo );
           NotifyObservers( textureInfo, true );
+        }
+        else
+        {
+          LoadState maskLoadState = GetTextureStateInternal( textureInfo.maskTextureId );
+          textureInfo.pixelBuffer = pixelBuffer; // Store the pixel buffer temporarily
+          if( maskLoadState == LOADING )
+          {
+            textureInfo.loadState = WAITING_FOR_MASK;
+          }
+          else if( maskLoadState == LOAD_FINISHED )
+          {
+            // Send New Task to Thread
+            ApplyMask( textureInfo, textureInfo.maskTextureId );
+          }
         }
       }
       else
@@ -818,7 +842,6 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pix
   }
   else
   {
-    DALI_LOG_ERROR( "TextureManager::AsyncImageLoad(%s) failed\n", textureInfo.url.GetUrl().c_str() );
     // @todo If the load was unsuccessful, upload the broken image.
     textureInfo.loadState = LOAD_FAILED;
     CheckForWaitingTexture( textureInfo );
@@ -838,18 +861,15 @@ void TextureManager::CheckForWaitingTexture( TextureInfo& maskTextureInfo )
         mTextureInfoContainer[cacheIndex].loadState == WAITING_FOR_MASK )
     {
       TextureInfo& textureInfo( mTextureInfoContainer[cacheIndex] );
-      Devel::PixelBuffer pixelBuffer = textureInfo.pixelBuffer;
-      textureInfo.pixelBuffer.Reset();
 
       if( maskTextureInfo.loadState == LOAD_FINISHED )
       {
-        ApplyMask( pixelBuffer, maskTextureInfo.textureId, textureInfo.scaleFactor, textureInfo.cropToMask );
-        UploadTexture( pixelBuffer, textureInfo );
-        NotifyObservers( textureInfo, true );
+        // Send New Task to Thread
+        ApplyMask( textureInfo, maskTextureInfo.textureId );
       }
       else
       {
-        DALI_LOG_ERROR( "TextureManager::ApplyMask to %s failed\n", textureInfo.url.GetUrl().c_str() );
+        textureInfo.pixelBuffer.Reset();
         textureInfo.loadState = LOAD_FAILED;
         NotifyObservers( textureInfo, false );
       }
@@ -857,15 +877,23 @@ void TextureManager::CheckForWaitingTexture( TextureInfo& maskTextureInfo )
   }
 }
 
-void TextureManager::ApplyMask(
-  Devel::PixelBuffer& pixelBuffer, TextureId maskTextureId,
-  float contentScale, bool cropToMask )
+void TextureManager::ApplyMask( TextureInfo& textureInfo, TextureId maskTextureId )
 {
   int maskCacheIndex = GetCacheIndexFromId( maskTextureId );
   if( maskCacheIndex != INVALID_CACHE_INDEX )
   {
     Devel::PixelBuffer maskPixelBuffer = mTextureInfoContainer[maskCacheIndex].pixelBuffer;
-    pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
+    Devel::PixelBuffer pixelBuffer = textureInfo.pixelBuffer;
+    textureInfo.pixelBuffer.Reset();
+
+    DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::ApplyMask(): url:%s sync:%s\n",
+                   textureInfo.url.GetUrl().c_str(), textureInfo.loadSynchronously?"T":"F" );
+
+    textureInfo.loadState = MASK_APPLYING;
+    auto& loadersContainer = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
+    auto loadingHelperIt = loadersContainer.GetNext();
+    DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
+    loadingHelperIt->ApplyMask( textureInfo.textureId, pixelBuffer, maskPixelBuffer, textureInfo.scaleFactor, textureInfo.cropToMask );
   }
 }
 
@@ -1121,7 +1149,18 @@ void TextureManager::AsyncLoadingHelper::Load(TextureId          textureId,
                                               DevelAsyncImageLoader::PreMultiplyOnLoad  preMultiplyOnLoad)
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id = DevelAsyncImageLoader::Load(mLoader, url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
+  auto id = DevelAsyncImageLoader::Load( mLoader, url.GetUrl(), desiredSize, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad );
+  mLoadingInfoContainer.back().loadId = id;
+}
+
+void TextureManager::AsyncLoadingHelper::ApplyMask( TextureId textureId,
+                                               Devel::PixelBuffer pixelBuffer,
+                                               Devel::PixelBuffer maskPixelBuffer,
+                                               float contentScale,
+                                               bool cropToMask )
+{
+  mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
+  auto id = DevelAsyncImageLoader::ApplyMask( mLoader, pixelBuffer, maskPixelBuffer, contentScale, cropToMask );
   mLoadingInfoContainer.back().loadId = id;
 }
 
@@ -1143,9 +1182,10 @@ TextureManager::AsyncLoadingHelper::AsyncLoadingHelper(
 }
 
 void TextureManager::AsyncLoadingHelper::AsyncLoadComplete(uint32_t           id,
-                                                           Devel::PixelBuffer pixelBuffer)
+                                                           Devel::PixelBuffer pixelBuffer,
+                                                           bool isMaskTask)
 {
-  mTextureManager.AsyncLoadComplete(mLoadingInfoContainer, id, pixelBuffer);
+  mTextureManager.AsyncLoadComplete(mLoadingInfoContainer, id, pixelBuffer, isMaskTask);
 }
 
 void TextureManager::SetBrokenImageUrl(const std::string& brokenImageUrl)
