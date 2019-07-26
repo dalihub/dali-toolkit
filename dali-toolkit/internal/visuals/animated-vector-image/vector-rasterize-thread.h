@@ -123,7 +123,7 @@ public:
    * @brief Get the play state
    * @return The play state
    */
-  DevelImageVisual::PlayState GetPlayState() const;
+  DevelImageVisual::PlayState::Type GetPlayState() const;
 
   /**
    * @brief Queries whether the resource is ready.
@@ -155,6 +155,19 @@ public:
    */
   void GetDefaultSize( uint32_t& width, uint32_t& height ) const;
 
+  /**
+   * @brief Sets the stop behavior of the animation. This is performed when the animation is stopped.
+   * @param[in] stopBehavior The stop behavior
+   */
+  void SetStopBehavior( DevelImageVisual::StopBehavior::Type stopBehavior );
+
+  /**
+   * @brief Sets the looping mode.
+   * Animation plays forwards and then restarts from the beginning or runs backwards again.
+   * @param[in] loopingMode The looping mode
+   */
+  void SetLoopingMode( DevelImageVisual::LoopingMode::Type loopingMode );
+
 protected:
 
   /**
@@ -166,14 +179,19 @@ protected:
 private:
 
   /**
-   * @brief Initialize the vector renderer.
+   * @brief Initializes the vector renderer.
    */
   void Initialize();
 
   /**
-   * @brief Rasterize the current frame.
+   * @brief Rasterizes the current frame.
    */
   void Rasterize();
+
+  /**
+   * @brief Gets the frame number when the animation is stopped according to the stop behavior.
+   */
+  uint32_t GetStoppedFrame( uint32_t startFrame, uint32_t endFrame, uint32_t currentFrame );
 
   // Undefined
   VectorRasterizeThread( const VectorRasterizeThread& thread ) = delete;
@@ -183,13 +201,23 @@ private:
 
 private:
 
+  enum class PlayState
+  {
+    STOPPING,  ///< The animation is stopping
+    STOPPED,   ///< The animation has stopped
+    PLAYING,   ///< The animation is playing
+    PAUSED     ///< The animation is paused
+  };
+
   std::string                 mUrl;
   VectorAnimationRenderer     mVectorRenderer;
   ConditionalWait             mConditionalWait;
   std::unique_ptr< EventThreadCallback > mResourceReadyTrigger;
   std::unique_ptr< EventThreadCallback > mAnimationFinishedTrigger;
   Vector2                     mPlayRange;
-  DevelImageVisual::PlayState mPlayState;
+  PlayState                   mPlayState;
+  DevelImageVisual::StopBehavior::Type mStopBehavior;
+  DevelImageVisual::LoopingMode::Type mLoopingMode;
   int64_t                     mFrameDurationNanoSeconds;
   float                       mFrameRate;
   uint32_t                    mCurrentFrame;
@@ -204,6 +232,8 @@ private:
   bool                        mDestroyThread;  ///< Whether the thread be destroyed
   bool                        mResourceReady;
   bool                        mCurrentFrameUpdated;
+  bool                        mForward;
+  bool                        mUpdateFrameNumber;
   const Dali::LogFactoryInterface& mLogFactory; ///< The log factory
 
 };

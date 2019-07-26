@@ -45,25 +45,20 @@ class Window : public Dali::BaseObject
 public:
 
   Window( const PositionSize& positionSize )
-  : mScene( Dali::Integration::Scene::New( Size( positionSize.width, positionSize.height ) ) ),
-    mRenderSurface( new TestRenderSurface( positionSize ) )
+  : mRenderSurface( positionSize ),
+    mScene( Dali::Integration::Scene::New( mRenderSurface ) )
   {
-    mScene.SetSurface( *mRenderSurface );
   }
 
-  virtual ~Window()
-  {
-    delete mRenderSurface;
-    mRenderSurface = nullptr;
-  }
+  virtual ~Window() = default;
 
   static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent)
   {
     return new Window( positionSize );
   }
 
+  TestRenderSurface mRenderSurface;
   Integration::Scene mScene;
-  TestRenderSurface* mRenderSurface;
 };
 
 } // Adaptor
@@ -124,7 +119,7 @@ Integration::Scene Window::GetScene()
 
 Integration::RenderSurface& Window::GetRenderSurface()
 {
-  return *GetImplementation( *this ).mRenderSurface;
+  return GetImplementation( *this ).mRenderSurface;
 }
 
 namespace DevelWindow

@@ -178,6 +178,8 @@ private:
   int32_t                                      mEndFrame;
   uint32_t                                     mResendFlag;
   DevelAnimatedVectorImageVisual::Action::Type mActionStatus;
+  DevelImageVisual::StopBehavior::Type         mStopBehavior;
+  DevelImageVisual::LoopingMode::Type          mLoopingMode;
 };
 
 } // namespace Internal
