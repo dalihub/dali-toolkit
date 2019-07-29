@@ -23,6 +23,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/devel-api/common/stage-devel.h>
 
 // INTERNAL INCLUDES
 #include "test-render-surface.h"
@@ -138,6 +139,11 @@ EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window 
 KeyEventSignalType& KeyEventSignal( Window window )
 {
   return GetImplementation( window ).mScene.KeyEventSignal();
+}
+
+KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Window window )
+{
+  return DevelStage::KeyEventGeneratedSignal( Dali::Stage::GetCurrent() );
 }
 
 TouchSignalType& TouchSignal( Window window )
