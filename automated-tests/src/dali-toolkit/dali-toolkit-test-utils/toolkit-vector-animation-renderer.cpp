@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@ public:
   : mUrl( url ),
     mRenderer(),
     mWidth( 0 ),
-    mHeight( 0 )
+    mHeight( 0 ),
+    mPreviousFrame( 0 )
   {
   }
 
@@ -69,8 +70,16 @@ public:
   {
   }
 
-  void Render( uint32_t frameNumber )
+  bool Render( uint32_t frameNumber )
   {
+    if( frameNumber == 1 && mPreviousFrame != frameNumber )
+    {
+      mPreviousFrame = frameNumber;
+      // For test corverage
+      return false;
+    }
+    mPreviousFrame = frameNumber;
+    return true;
   }
 
   uint32_t GetTotalFrameNumber() const
@@ -95,6 +104,7 @@ public:
   Dali::Renderer mRenderer;
   uint32_t mWidth;
   uint32_t mHeight;
+  uint32_t mPreviousFrame;
 };
 
 inline VectorAnimationRenderer& GetImplementation( Dali::VectorAnimationRenderer& renderer )
@@ -166,9 +176,9 @@ void VectorAnimationRenderer::StopRender()
   Internal::Adaptor::GetImplementation( *this ).StopRender();
 }
 
-void VectorAnimationRenderer::Render( uint32_t frameNumber )
+bool VectorAnimationRenderer::Render( uint32_t frameNumber )
 {
-  Internal::Adaptor::GetImplementation( *this ).Render( frameNumber );
+  return Internal::Adaptor::GetImplementation( *this ).Render( frameNumber );
 }
 
 uint32_t VectorAnimationRenderer::GetTotalFrameNumber() const
