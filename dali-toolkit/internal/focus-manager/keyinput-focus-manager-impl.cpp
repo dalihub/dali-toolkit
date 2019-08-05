@@ -23,8 +23,6 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/common/stage-devel.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
-#include <dali/integration-api/adaptors/adaptor.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -52,24 +50,11 @@ KeyInputFocusManager::KeyInputFocusManager()
 : mSlotDelegate( this ),
   mCurrentFocusControl()
 {
-  // Retrieve all the existing widnows
-  Dali::WindowContainer windows = Adaptor::Get().GetWindows();
-  for ( auto iter = windows.begin(); iter != windows.end(); ++iter )
-  {
-    DevelWindow::KeyEventGeneratedSignal( *iter ).Connect( mSlotDelegate, &KeyInputFocusManager::OnKeyEvent);
-  }
-
-  // Get notified when any new window is created afterwards
-  Adaptor::Get().WindowCreatedSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnWindowCreated);
+  DevelStage::KeyEventGeneratedSignal( Stage::GetCurrent() ).Connect(mSlotDelegate, &KeyInputFocusManager::OnKeyEvent);
 }
 
 KeyInputFocusManager::~KeyInputFocusManager()
 {
-}
-
-void KeyInputFocusManager::OnWindowCreated( Dali::Window& window )
-{
-  DevelWindow::KeyEventGeneratedSignal( window ).Connect( mSlotDelegate, &KeyInputFocusManager::OnKeyEvent);
 }
 
 void KeyInputFocusManager::SetFocus( Toolkit::Control control )
