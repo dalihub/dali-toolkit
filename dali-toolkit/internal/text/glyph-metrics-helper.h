@@ -50,10 +50,10 @@ struct GlyphMetrics
 
   FontId fontId;     ///< The font id of the glyphs.
   float  fontHeight; ///< The font's height of those glyphs.
-  float  width;      ///< The sum of all the widths of all the glyphs.
+  float  width;      ///< The width of the group.
   float  advance;    ///< The sum of all the advances of all the glyphs.
   float  ascender;   ///< The font's ascender.
-  float  xBearing;   ///< The x bearing of the first glyph.
+  float  xBearing;   ///< The x bearing of the group.
 };
 
 /**

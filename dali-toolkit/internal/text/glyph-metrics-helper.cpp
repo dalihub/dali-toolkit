@@ -74,26 +74,33 @@ void GetGlyphsMetrics( GlyphIndex glyphIndex,
 
   glyphMetrics.fontId = firstGlyph.fontId;
   glyphMetrics.fontHeight = fontMetrics.height;
-  glyphMetrics.width = firstGlyph.width + ( ( firstGlyph.isItalicRequired && !isItalicFont ) ? static_cast<unsigned int>( TextAbstraction::FontClient::DEFAULT_ITALIC_ANGLE * static_cast<float>( firstGlyph.height ) ) : 0u );
+  glyphMetrics.width = firstGlyph.width;
   glyphMetrics.advance = firstGlyph.advance;
   glyphMetrics.ascender = fontMetrics.ascender;
   glyphMetrics.xBearing = firstGlyph.xBearing;
 
   if( 1u < numberOfGlyphs )
   {
-    const float widthInit = firstGlyph.xBearing;
+    float  maxWidthEdge = firstGlyph.xBearing + firstGlyph.width;
 
     for( unsigned int i = 1u; i < numberOfGlyphs; ++i )
     {
       const GlyphInfo& glyphInfo = *( glyphsBuffer + glyphIndex + i );
 
-      glyphMetrics.width = glyphMetrics.advance + glyphInfo.xBearing + glyphInfo.width + ( ( firstGlyph.isItalicRequired && !isItalicFont ) ? static_cast<unsigned int>( TextAbstraction::FontClient::DEFAULT_ITALIC_ANGLE * static_cast<float>( firstGlyph.height ) ) : 0u );
-      glyphMetrics.advance += glyphInfo.advance;
+      // update the initial xBearing if smaller.
+      glyphMetrics.xBearing = std::min( glyphMetrics.xBearing, glyphMetrics.advance + glyphInfo.xBearing );
 
+      // update the max width edge if bigger.
+      const float currentMaxGlyphWidthEdge = glyphMetrics.advance + glyphInfo.xBearing + glyphInfo.width;
+      maxWidthEdge = std::max( maxWidthEdge, currentMaxGlyphWidthEdge );
+
+      glyphMetrics.advance += glyphInfo.advance;
     }
 
-    glyphMetrics.width -= widthInit;
+    glyphMetrics.width = maxWidthEdge - glyphMetrics.xBearing;
   }
+
+  glyphMetrics.width += ( firstGlyph.isItalicRequired && !isItalicFont ) ? TextAbstraction::FontClient::DEFAULT_ITALIC_ANGLE * firstGlyph.height : 0.f;
 }
 
 } // namespace Text
