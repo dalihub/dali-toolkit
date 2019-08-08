@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,21 +75,15 @@ DALI_PROPERTY_REGISTRATION( Toolkit, Button, "initialAutoRepeatingDelay",       
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "nextAutoRepeatingDelay",             FLOAT,   NEXT_AUTO_REPEATING_DELAY             )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "togglable",                          BOOLEAN, TOGGLABLE                             )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selected",                           BOOLEAN, SELECTED                              )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedStateImage",               MAP,     UNSELECTED_STATE_IMAGE                ) // Deprecated property
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedStateImage",                 MAP,     SELECTED_STATE_IMAGE                  ) // Deprecated property
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledStateImage",                 MAP,     DISABLED_STATE_IMAGE                  ) // Deprecated property
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedColor",                    VECTOR4, UNSELECTED_COLOR                      ) // Deprecated property
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedColor",                      VECTOR4, SELECTED_COLOR                        ) // Deprecated property
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedVisual",                   MAP,     UNSELECTED_VISUAL                     )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedVisual",                     MAP,     SELECTED_VISUAL                       )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledSelectedVisual",             MAP,     DISABLED_SELECTED_VISUAL              )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledUnselectedVisual",           MAP,     DISABLED_UNSELECTED_VISUAL            )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedBackgroundVisual",         MAP,     UNSELECTED_BACKGROUND_VISUAL          )
 DALI_PROPERTY_REGISTRATION( Toolkit, Button, "label",                              MAP,     LABEL                                 )
-DALI_PROPERTY_REGISTRATION( Toolkit, Button, "labelText",                          STRING,  LABEL_TEXT                            ) // Deprecated property
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedVisual",                   MAP,     UNSELECTED_VISUAL                     )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "selectedVisual",                     MAP,     SELECTED_VISUAL                       )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "disabledSelectedVisual",             MAP,     DISABLED_SELECTED_VISUAL              )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "disabledUnselectedVisual",           MAP,     DISABLED_UNSELECTED_VISUAL            )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "unselectedBackgroundVisual",         MAP,     UNSELECTED_BACKGROUND_VISUAL          )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "selectedBackgroundVisual",           MAP,     SELECTED_BACKGROUND_VISUAL            )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "disabledUnselectedBackgroundVisual", MAP,     DISABLED_UNSELECTED_BACKGROUND_VISUAL )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "disabledSelectedBackgroundVisual",   MAP,     DISABLED_SELECTED_BACKGROUND_VISUAL   )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "selectedBackgroundVisual",           MAP,     SELECTED_BACKGROUND_VISUAL            )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledUnselectedBackgroundVisual", MAP,     DISABLED_UNSELECTED_BACKGROUND_VISUAL )
+DALI_PROPERTY_REGISTRATION( Toolkit, Button, "disabledSelectedBackgroundVisual",   MAP,     DISABLED_SELECTED_BACKGROUND_VISUAL   )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "labelRelativeAlignment",             STRING,  LABEL_RELATIVE_ALIGNMENT              )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "labelPadding",                       VECTOR4, LABEL_PADDING                         )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, Button, "visualPadding",                      VECTOR4, VISUAL_PADDING                        )
@@ -124,10 +118,10 @@ const unsigned int ALIGNMENT_STRING_TABLE_COUNT = sizeof( ALIGNMENT_STRING_TABLE
 
 const Property::Index VISUAL_INDEX_FOR_STATE[][Button::STATE_COUNT] =
 {
-  { Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, Toolkit::DevelButton::Property::UNSELECTED_VISUAL },
-  { Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, Toolkit::DevelButton::Property::SELECTED_VISUAL  },
-  { Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL },
-  { Toolkit::DevelButton::Property::DISABLED_SELECTED_BACKGROUND_VISUAL, Toolkit::DevelButton::Property::DISABLED_SELECTED_VISUAL }
+  { Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::UNSELECTED_VISUAL },
+  { Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::SELECTED_VISUAL  },
+  { Toolkit::Button::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL },
+  { Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL, Toolkit::Button::Property::DISABLED_SELECTED_VISUAL }
 };
 
 /**
@@ -187,31 +181,16 @@ void Button::SetAutoRepeating( bool autoRepeating )
   }
 }
 
-bool Button::IsAutoRepeating() const
-{
-  return mAutoRepeating;
-}
-
 void Button::SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay )
 {
   DALI_ASSERT_DEBUG( initialAutoRepeatingDelay > 0.f );
   mInitialAutoRepeatingDelay = initialAutoRepeatingDelay;
 }
 
-float Button::GetInitialAutoRepeatingDelay() const
-{
-  return mInitialAutoRepeatingDelay;
-}
-
 void Button::SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay )
 {
   DALI_ASSERT_DEBUG( nextAutoRepeatingDelay > 0.f );
   mNextAutoRepeatingDelay = nextAutoRepeatingDelay;
-}
-
-float Button::GetNextAutoRepeatingDelay() const
-{
-  return mNextAutoRepeatingDelay;
 }
 
 void Button::SetTogglableButton( bool togglable )
@@ -223,11 +202,6 @@ void Button::SetTogglableButton( bool togglable )
   {
     mAutoRepeating = false;
   }
-}
-
-bool Button::IsTogglableButton() const
-{
-  return mTogglableButton;
 }
 
 void Button::SetSelected( bool selected )
@@ -337,31 +311,6 @@ bool Button::IsSelected() const
 {
   bool selected = ( mButtonState == SELECTED_STATE ) || ( mButtonState == DISABLED_SELECTED_STATE );
   return mTogglableButton && selected;
-}
-
-void Button::SetLabelText( const std::string& label )
-{
-  Self().SetProperty( Toolkit::Button::Property::LABEL, label );
-}
-
-std::string Button::GetLabelText() const
-{
-  Property::Value value = Self().GetProperty( Toolkit::Button::Property::LABEL );
-
-  Property::Map *labelProperty = value.GetMap();
-
-  std::string textLabel;
-
-  if ( labelProperty )
-  {
-    Property::Value* value = labelProperty->Find( Toolkit::TextVisual::Property::TEXT );
-    if( value )
-    {
-      value->Get( textLabel );
-    }
-  }
-
-  return textLabel;
 }
 
 void Button::MergeWithExistingLabelProperties( const Property::Map& inMap, Property::Map& outMap )
@@ -1172,57 +1121,21 @@ void Button::SetProperty( BaseObject* object, Property::Index index, const Prope
         break;
       }
 
-      case Toolkit::Button::Property::UNSELECTED_STATE_IMAGE: // Legacy Tizen 3.0
-      {
-        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, value, DepthIndex::BACKGROUND );
-        break;
-      }
-      case Toolkit::Button::Property::DISABLED_STATE_IMAGE:  // Legacy Tizen 3.0
-      {
-        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, value, DepthIndex::BACKGROUND );
-        break;
-      }
-      case Toolkit::Button::Property::SELECTED_STATE_IMAGE:  // Legacy Tizen 3.0
-      {
-        GetImplementation( button ).CreateVisualsForComponent( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, value, DepthIndex::BACKGROUND );
-        break;
-      }
-      case Toolkit::DevelButton::Property::UNSELECTED_VISUAL:
-      case Toolkit::DevelButton::Property::SELECTED_VISUAL:
-      case Toolkit::DevelButton::Property::DISABLED_SELECTED_VISUAL:
-      case Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL:
+      case Toolkit::Button::Property::UNSELECTED_VISUAL:
+      case Toolkit::Button::Property::SELECTED_VISUAL:
+      case Toolkit::Button::Property::DISABLED_SELECTED_VISUAL:
+      case Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL:
       {
         GetImplementation( button ).CreateVisualsForComponent( index, value, DepthIndex::CONTENT );
         break;
       }
 
-      case Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL:
-      case Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL:
-      case Toolkit::DevelButton::Property::DISABLED_SELECTED_BACKGROUND_VISUAL:
-      case Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL:
       {
         GetImplementation( button ).CreateVisualsForComponent( index , value, DepthIndex::BACKGROUND);
-        break;
-      }
-
-      case Toolkit::Button::Property::UNSELECTED_COLOR:
-      {
-        DALI_LOG_WARNING("[%s] Using deprecated Property Button::Property::UNSELECTED_COLOR instead use Button::Property::UNSELECTED_BACKGROUND_VISUAL\n", __FUNCTION__);
-        GetImplementation( button ).SetColor( value.Get< Vector4 >(), Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
-        break;
-      }
-
-      case Toolkit::Button::Property::SELECTED_COLOR:
-      {
-        DALI_LOG_WARNING("[%s] Using deprecated Property Button::Property::SELECTED_COLOR instead use Button::Property::SELECTED_BACKGROUND_VISUAL\n", __FUNCTION__);
-        GetImplementation( button ).SetColor( value.Get< Vector4 >(), Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL );
-        break;
-      }
-
-      case Toolkit::Button::Property::LABEL_TEXT:
-      {
-        DALI_LOG_WARNING("[%s] Using deprecated Property Button::Property::LABEL_TEXT instead use Button::Property::LABEL\n", __FUNCTION__);
-        GetImplementation( button ).SetLabelText(value.Get< std::string >() );
         break;
       }
 
@@ -1333,32 +1246,14 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
         break;
       }
 
-      case Toolkit::Button::Property::UNSELECTED_STATE_IMAGE:
-      {
-        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
-        break;
-      }
-
-      case Toolkit::Button::Property::SELECTED_STATE_IMAGE:
-      {
-        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL );
-        break;
-      }
-
-      case Toolkit::Button::Property::DISABLED_STATE_IMAGE:
-      {
-        value = GetImplementation( button ).GetUrlForImageVisual( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL );
-        break;
-      }
-
-      case Toolkit::DevelButton::Property::UNSELECTED_VISUAL:
-      case Toolkit::DevelButton::Property::SELECTED_VISUAL:
-      case Toolkit::DevelButton::Property::DISABLED_SELECTED_VISUAL:
-      case Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL:
-      case Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL:
-      case Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL:
-      case Toolkit::DevelButton::Property::DISABLED_SELECTED_BACKGROUND_VISUAL:
-      case Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::UNSELECTED_VISUAL:
+      case Toolkit::Button::Property::SELECTED_VISUAL:
+      case Toolkit::Button::Property::DISABLED_SELECTED_VISUAL:
+      case Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL:
+      case Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL:
+      case Toolkit::Button::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL:
       case Toolkit::Button::Property::LABEL:
       {
         Property::Map visualProperty;
@@ -1366,24 +1261,6 @@ Property::Value Button::GetProperty( BaseObject* object, Property::Index propert
         {
           value = visualProperty;
         }
-        break;
-      }
-
-      case Toolkit::Button::Property::UNSELECTED_COLOR:
-      {
-        value = GetImplementation( button ).GetUnselectedColor();
-        break;
-      }
-
-      case Toolkit::Button::Property::SELECTED_COLOR:
-      {
-        value = GetImplementation( button ).GetSelectedColor();
-        break;
-      }
-
-      case Toolkit::Button::Property::LABEL_TEXT:
-      {
-        value = GetImplementation( button ).GetLabelText();
         break;
       }
 
@@ -1440,212 +1317,6 @@ void Button::SetForegroundPadding( const Padding& padding)
 Padding Button::GetForegroundPadding()
 {
   return mForegroundPadding;
-}
-
-////////////////////////////////////////////////////////////////////////
-// Legacy functions from Tizen 2.4 and 3.0
-
-// Legacy code needed whilst Color can be set by direct Property setting ( deprecated ) instead of setting a Visual
-void Button::SetColor( const Vector4& color, Property::Index visualIndex )
-{
-  if ( visualIndex == Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL )
-  {
-    mSelectedColor = color;
-  }
-  else
-  {
-    mUnselectedColor = color;
-  }
-
-  Property::Map map;
-  map[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::COLOR;
-  map[ Toolkit::ColorVisual::Property::MIX_COLOR ] = color;
-
-  CreateVisualsForComponent( visualIndex, map, DepthIndex::BACKGROUND );
-}
-
-const Vector4 Button::GetUnselectedColor() const
-{
-  return mUnselectedColor;
-}
-
-const Vector4 Button::GetSelectedColor() const
-{
-  return mSelectedColor;
-}
-
-void Button::SetAnimationTime( float animationTime )
-{
-  // Used by deprecated API
-  mAnimationTime = animationTime;
-}
-
-float Button::GetAnimationTime() const
-{
-  // Used by deprecated API
-  return mAnimationTime;
-}
-
-void Button::SetLabel( Actor label )
-{
-  if ( label )
-  {
-    Property::Value value ="";
-    value = label.GetProperty(Toolkit::TextLabel::Property::TEXT);
-
-    SetLabelText( value.Get<std::string>() );
-  }
-}
-
-void Button::SetUnselectedImage( const std::string& filename )
-{
-  SetBackgroundImage( filename );
-}
-
-void Button::SetBackgroundImage( const std::string& filename )
-{
-  if( !filename.empty() )
-  {
-    CreateVisualsForComponent( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
-  }
-  else
-  {
-    DevelControl::UnregisterVisual( *this, Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
-  }
-}
-
-void Button::SetSelectedImage( const std::string& filename )
-{
-    SetSelectedBackgroundImage( filename );
-}
-
-void Button::SetSelectedBackgroundImage( const std::string& filename )
-{
-  if( !filename.empty() )
-  {
-    CreateVisualsForComponent( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
-  }
-  else
-  {
-    DevelControl::UnregisterVisual( *this, Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL );
-  }
-}
-
-void Button::SetDisabledBackgroundImage( const std::string& filename )
-{
-  if( !filename.empty() )
-  {
-    CreateVisualsForComponent( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, filename, DepthIndex::BACKGROUND );
-  }
-}
-
-void Button::SetDisabledImage( const std::string& filename )
-{
-  if( !filename.empty() )
-  {
-    CreateVisualsForComponent( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL, filename, DepthIndex::CONTENT );
-  }
-}
-
-void Button::SetDisabledSelectedImage( const std::string& filename )
-{
-  if( !filename.empty() )
-  {
-    CreateVisualsForComponent( Toolkit::DevelButton::Property::DISABLED_SELECTED_VISUAL, filename, DepthIndex::CONTENT );
-  }
-}
-
-// Used by Deprecated Properties which don't use the Visual Property maps for setting and getting
-std::string Button::GetUrlForImageVisual( const Property::Index index ) const
-{
-  Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, index );
-  std::string result;
-
-  if ( visual )
-  {
-    Dali::Property::Map retreivedMap;
-    visual.CreatePropertyMap( retreivedMap );
-    Property::Value* value = retreivedMap.Find(  Toolkit::ImageVisual::Property::URL,  Property::STRING );
-    if ( value )
-    {
-      result = value->Get<std::string>();
-    }
-  }
-
-  return result;
-}
-
-// Below functions DEPRECATED_1_0.50 - Return empty Actors
-
-namespace
-{
-std::string GetUrlFromImage( Image& image )
-{
-  ResourceImage resourceImage = ResourceImage::DownCast( image );
-
-  std::string imageUrl;
-
-  if ( resourceImage )
-  {
-    imageUrl = resourceImage.GetUrl();
-  }
-  return imageUrl;
-}
-
-} // namespace
-
-
-void Button::SetButtonImage( Image image )
-{
-  DALI_LOG_WARNING("Button::SetButtonImage @DEPRECATED_1_0.50\n");
-  SetUnselectedImage( GetUrlFromImage( image ) );
-  mSetButtonImage = image;
-}
-
-void Button::SetSelectedImage( Image image )
-{
-  DALI_LOG_WARNING("Button::SetSelectedImage @DEPRECATED_1_0.50\n");
-  SetSelectedImage( GetUrlFromImage( image ) );
-  mSetSelectedImage = image;
-}
-
-Actor Button::GetButtonImage() const
-{
-  // When deprecated ImageView API removed then this button API can be removed too.
-  DALI_LOG_WARNING("Button::GetButtonImage @DEPRECATED_1_0.50\n");
-
-  Actor imageView;
-
-  if ( mSetButtonImage )
-  {
-    imageView = Toolkit::ImageView::New( mSetButtonImage );
-  }
-  else
-  {
-    ResourceImage image = ResourceImage::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL ) );
-    imageView = Toolkit::ImageView::New( image );
-  }
-
-  return imageView;
-}
-
-Actor Button::GetSelectedImage() const
-{
-  // When deprecated ImageView API removed then this button API can be removed too.
-  DALI_LOG_WARNING("Button::GetSelectedImage @DEPRECATED_1_0.50\n");
-
-  Actor imageView;
-
-  if ( mSetSelectedImage )
-  {
-    imageView = Toolkit::ImageView::New( mSetSelectedImage );
-  }
-  else
-  {
-    ResourceImage image = ResourceImage::New( GetUrlForImageVisual( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL ) );
-    imageView = Toolkit::ImageView::New( image );
-  }
-  return imageView;
 }
 
 } // namespace Internal

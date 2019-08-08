@@ -298,8 +298,8 @@ void SetVisualsOffStage( const RegisteredVisualContainer& container, Actor paren
 
 // Properties registered without macro to use specific member variables.
 const PropertyRegistration Control::Impl::PROPERTY_1( typeRegistration, "styleName",              Toolkit::Control::Property::STYLE_NAME,                   Property::STRING,  &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "backgroundColor",        Toolkit::Control::Property::BACKGROUND_COLOR,             Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
-const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "backgroundImage",        Toolkit::Control::Property::BACKGROUND_IMAGE,             Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_2( typeRegistration, "reservedProperty01",     Toolkit::Control::Property::RESERVED_PROPERTY_01,         Property::VECTOR4, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_3( typeRegistration, "reservedProperty02",     Toolkit::Control::Property::RESERVED_PROPERTY_02,         Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_4( typeRegistration, "keyInputFocus",          Toolkit::Control::Property::KEY_INPUT_FOCUS,              Property::BOOLEAN, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_5( typeRegistration, "background",             Toolkit::Control::Property::BACKGROUND,                   Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_6( typeRegistration, "margin",                 Toolkit::Control::Property::MARGIN,                       Property::EXTENTS, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
@@ -909,29 +909,6 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
       }
       break;
 
-      case Toolkit::Control::Property::BACKGROUND_COLOR:
-      {
-        DALI_LOG_WARNING( "BACKGROUND_COLOR property is deprecated. Use BACKGROUND property instead\n" );
-        controlImpl.SetBackgroundColor( value.Get< Vector4 >() );
-        break;
-      }
-
-      case Toolkit::Control::Property::BACKGROUND_IMAGE:
-      {
-        DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
-        Image image = Scripting::NewImage( value );
-        if ( image )
-        {
-          controlImpl.SetBackgroundImage( image );
-        }
-        else
-        {
-          // An empty image means the background is no longer required
-          controlImpl.ClearBackground();
-        }
-        break;
-      }
-
       case Toolkit::Control::Property::KEY_INPUT_FOCUS:
       {
         if ( value.Get< bool >() )
@@ -1061,26 +1038,6 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
       case Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID:
       {
         value = controlImpl.mImpl->mDownFocusableActorId;
-        break;
-      }
-
-      case Toolkit::Control::Property::BACKGROUND_COLOR:
-      {
-        DALI_LOG_WARNING( "BACKGROUND_COLOR property is deprecated. Use BACKGROUND property instead\n" );
-        value = controlImpl.GetBackgroundColor();
-        break;
-      }
-
-      case Toolkit::Control::Property::BACKGROUND_IMAGE:
-      {
-        DALI_LOG_WARNING( "BACKGROUND_IMAGE property is deprecated. Use BACKGROUND property instead\n" );
-        Property::Map map;
-        Toolkit::Visual::Base visual = controlImpl.mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
-        if( visual )
-        {
-          visual.CreatePropertyMap( map );
-        }
-        value = map;
         break;
       }
 

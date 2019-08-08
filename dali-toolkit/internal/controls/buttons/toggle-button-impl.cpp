@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
-#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/public-api/align-enumerations.h>
@@ -267,10 +266,10 @@ void ToggleButton::SetToggleStates( const Property::Array& states )
 
     DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::Began to register visual.\n" );
 
-    PrepareVisual( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, mToggleVisuals[mCurrentToggleIndex] );
-    PrepareVisual( Toolkit::DevelButton::Property::SELECTED_VISUAL, mToggleSelectedVisuals[mCurrentToggleIndex] );
-    PrepareVisual( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL, mToggleDisabledVisuals[mCurrentToggleIndex] );
-    PrepareVisual( Toolkit::DevelButton::Property::DISABLED_SELECTED_VISUAL, mToggleDisabledSelectedVisuals[mCurrentToggleIndex] );
+    PrepareVisual( Toolkit::Button::Property::UNSELECTED_VISUAL, mToggleVisuals[mCurrentToggleIndex] );
+    PrepareVisual( Toolkit::Button::Property::SELECTED_VISUAL, mToggleSelectedVisuals[mCurrentToggleIndex] );
+    PrepareVisual( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, mToggleDisabledVisuals[mCurrentToggleIndex] );
+    PrepareVisual( Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, mToggleDisabledSelectedVisuals[mCurrentToggleIndex] );
 
     RelayoutRequest();
   }
@@ -347,10 +346,10 @@ void ToggleButton::OnRelayout( const Vector2& size, RelayoutContainer& container
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::OnRelayout targetSize(%f,%f) ptr(%p)\n", size.width, size.height, this );
 
-  RelayoutVisual( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, size );
-  RelayoutVisual( Toolkit::DevelButton::Property::SELECTED_VISUAL, size );
-  RelayoutVisual( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL, size );
-  RelayoutVisual( Toolkit::DevelButton::Property::DISABLED_SELECTED_VISUAL, size );
+  RelayoutVisual( Toolkit::Button::Property::UNSELECTED_VISUAL, size );
+  RelayoutVisual( Toolkit::Button::Property::SELECTED_VISUAL, size );
+  RelayoutVisual( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, size );
+  RelayoutVisual( Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, size );
 }
 
 void ToggleButton::OnPressed()
@@ -360,10 +359,10 @@ void ToggleButton::OnPressed()
   mCurrentToggleIndex = ( mCurrentToggleIndex + 1 ) % mToggleVisuals.size();
 
   // Both create SelectedVisual and UnselectedVisual
-  PrepareVisual( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, mToggleVisuals[mCurrentToggleIndex] );
-  PrepareVisual( Toolkit::DevelButton::Property::SELECTED_VISUAL, mToggleSelectedVisuals[mCurrentToggleIndex] );
-  PrepareVisual( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_VISUAL, mToggleDisabledVisuals[mCurrentToggleIndex] );
-  PrepareVisual( Toolkit::DevelButton::Property::DISABLED_SELECTED_VISUAL, mToggleDisabledSelectedVisuals[mCurrentToggleIndex] );
+  PrepareVisual( Toolkit::Button::Property::UNSELECTED_VISUAL, mToggleVisuals[mCurrentToggleIndex] );
+  PrepareVisual( Toolkit::Button::Property::SELECTED_VISUAL, mToggleSelectedVisuals[mCurrentToggleIndex] );
+  PrepareVisual( Toolkit::Button::Property::DISABLED_UNSELECTED_VISUAL, mToggleDisabledVisuals[mCurrentToggleIndex] );
+  PrepareVisual( Toolkit::Button::Property::DISABLED_SELECTED_VISUAL, mToggleDisabledSelectedVisuals[mCurrentToggleIndex] );
 
   //Need to check mCurrentToggleIndex, it must less than the size of mToggleTooltips.
   if ( !mToggleTooltips.empty() && ( mCurrentToggleIndex < mToggleTooltips.size() ) )

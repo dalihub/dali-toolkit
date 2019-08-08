@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
-#include <dali-toolkit/devel-api/controls/buttons/button-devel.h>
 
 #if defined(DEBUG_ENABLED)
   extern Debug::Filter* gLogButtonFilter;
@@ -165,12 +164,12 @@ void PushButton::SetProperty( BaseObject* object, Property::Index propertyIndex,
     {
       case Toolkit::PushButton::Property::UNSELECTED_ICON:
       {
-        pushButtonImpl.CreateVisualsForComponent( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
+        pushButtonImpl.CreateVisualsForComponent( Toolkit::Button::Property::UNSELECTED_VISUAL, value, DepthIndex::CONTENT );
         break;
       }
       case Toolkit::PushButton::Property::SELECTED_ICON:
       {
-        pushButtonImpl.CreateVisualsForComponent( Toolkit::DevelButton::Property::SELECTED_VISUAL, value, DepthIndex::CONTENT );
+        pushButtonImpl.CreateVisualsForComponent( Toolkit::Button::Property::SELECTED_VISUAL, value, DepthIndex::CONTENT );
         break;
       }
       case Toolkit::PushButton::Property::ICON_ALIGNMENT:
@@ -241,104 +240,6 @@ Property::Value PushButton::GetProperty( BaseObject* object, Property::Index pro
   }
 
   return value;
-}
-
-// Deprecated API using Actor to set images
-
-void PushButton::SetButtonImage( Actor image )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetButtonImage() is deprecated and will be removed from next release. Use Button.SetProperty UNSELECTED_STATE_IMAGE or Styling file instead.\n" );
-
-  Image retreivedButtonImage = Toolkit::ImageView::DownCast( image ).GetImage();
-  if ( retreivedButtonImage )
-  {
-    ResourceImage resourceImage = ResourceImage::DownCast( retreivedButtonImage );
-
-    if ( resourceImage )
-    {
-      Self().SetProperty( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, resourceImage.GetUrl() );
-
-    }
-  }
-}
-
-void PushButton::SetBackgroundImage( Actor image )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetBackgroundImage() is deprecated and will be removed from next release.\n" );
-
-  SetButtonImage( image );
-
-}
-
-void PushButton::SetSelectedImage( Actor image )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetSelectedImage() is deprecated and will be removed from next release. Use Button.SetProperty SELECTED_STATE_IMAGE or Styling file instead.\n" );
-
-  Image retreivedButtonImage = Toolkit::ImageView::DownCast( image ).GetImage();
-  if ( retreivedButtonImage )
-  {
-    ResourceImage resourceImage = ResourceImage::DownCast( retreivedButtonImage );
-
-    if ( resourceImage )
-    {
-      Self().SetProperty( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, resourceImage.GetUrl() );
-    }
-  }
-}
-
-void PushButton::SetSelectedBackgroundImage( Actor image )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetSelectedBackgroundImage() is deprecated and will be removed from next release.\n" );
-
-  SetSelectedImage( image );
-}
-
-void PushButton::SetDisabledBackgroundImage( Actor image )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetDisabledBackgroundImage() is deprecated and will be removed from next release.\n" );
-
-  Image retreivedButtonImage = Toolkit::ImageView::DownCast( image ).GetImage();
-  if ( retreivedButtonImage )
-  {
-    ResourceImage resourceImage = ResourceImage::DownCast( retreivedButtonImage );
-
-    if ( resourceImage )
-    {
-      Self().SetProperty( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, resourceImage.GetUrl() );
-    }
-  }
-}
-
-void PushButton::SetDisabledImage( Actor image )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetDisabledImage() is deprecated and will be removed from next release. Use Button.SetProperty DISABLED_STATE_IMAGE or Styling file instead.\n" );
-
-  Image retreivedButtonImage = Toolkit::ImageView::DownCast( image ).GetImage();
-  if ( retreivedButtonImage )
-  {
-    ResourceImage resourceImage = ResourceImage::DownCast( retreivedButtonImage );
-
-    if ( resourceImage )
-    {
-      Self().SetProperty( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL, resourceImage.GetUrl() );
-    }
-  }
-}
-
-void PushButton::SetDisabledSelectedImage( Actor image )
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: SetDisabledSelectedImage() is deprecated and will be removed from next release.\n" );
-
-  Image retreivedButtonImage = Toolkit::ImageView::DownCast( image ).GetImage();
-  if ( retreivedButtonImage )
-  {
-    ResourceImage resourceImage = ResourceImage::DownCast( retreivedButtonImage );
-
-    if ( resourceImage )
-    {
-      Self().SetProperty( Toolkit::DevelButton::Property::DISABLED_SELECTED_BACKGROUND_VISUAL, resourceImage.GetUrl() );
-    }
-  }
 }
 
 } // namespace Internal

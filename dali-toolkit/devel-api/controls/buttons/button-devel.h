@@ -29,104 +29,15 @@ namespace Toolkit
 
 namespace DevelButton
 {
-/**
- *
- * @section ButtonProperties Properties
- * |%Property enum                                         |String name                             |Type          |Writable|Animatable|
- * |-------------------------------------------------------|----------------------------------------|--------------|--------|----------|
- * | Property::DISABLED                                    | disabled                               |  BOOLEAN     | Y      | N        |
- * | Property::AUTO_REPEATING                              | autoRepeating                          |  BOOLEAN     | Y      | N        |
- * | Property::INITIAL_AUTO_REPEATING_DELAY                | initialAutoRepeatingDelay              |  FLOAT       | Y      | N        |
- * | Property::NEXT_AUTO_REPEATING_DELAY                   | nextAutoRepeatingDelay                 |  FLOAT       | Y      | N        |
- * | Property::TOGGLABLE                                   | togglable                              |  BOOLEAN     | Y      | N        |
- * | Property::SELECTED                                    | selected                               |  BOOLEAN     | Y      | N        |
- * | Property::LABEL                                       | label                                  |  MAP         | Y      | N        |
- * | Property::UNSELECTED_STATE_VISUAL                     | unselectedVisual                       |  MAP         | Y      | N        |
- * | Property::SELECTED_VISUAL                             | selectedVisual                         |  MAP         | Y      | N        |
- * | Property::DISABLED_SELECTED_VISUAL                    | disabledSelectedVisual                 |  MAP         | Y      | N        |
- * | Property::DISABLED_UNSELECTED_VISUAL                  | disabledUnselectedVisual               |  MAP         | Y      | N        |
- * | Property::UNSELECTED_BACKGROUND_VISUAL                | unselectedBackgroundVisual             |  MAP         | Y      | N        |
- * | Property::SELECTED_BACKGROUND_VISUAL                  | selectedBackgroundVisual               |  MAP         | Y      | N        |
- * | Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL       | disabledUnselectedBackgroundVisual     |  MAP         | Y      | N        |
- * | Property::DISABLED_SELECTED_BACKGROUND_VISUAL         | disabledSelectedBackgroundVisual       |  MAP         | Y      | N        |
- * | Property::LABEL_RELATIVE_ALIGNMENT                    | labelRelativeAlignment                 |  STRING      | Y      | N        |
- * -------------------------------------------------------------------------------------------------------------------------------------
- *
- *
- */
-
   namespace Property
   {
     enum Type
     {
-      DISABLED = Dali::Toolkit::Button::Property::DISABLED,
-      AUTO_REPEATING = Dali::Toolkit::Button::Property::AUTO_REPEATING,
-      INITIAL_AUTO_REPEATING_DELAY = Dali::Toolkit::Button::Property::INITIAL_AUTO_REPEATING_DELAY,
-      NEXT_AUTO_REPEATING_DELAY = Dali::Toolkit::Button::Property:: NEXT_AUTO_REPEATING_DELAY,
-      TOGGLABLE = Dali::Toolkit::Button::Property::TOGGLABLE,
-      SELECTED = Dali::Toolkit::Button::Property::SELECTED,
-      UNSELECTED_STATE_IMAGE = Dali::Toolkit::Button::Property::UNSELECTED_STATE_IMAGE,
-      SELECTED_STATE_IMAGE = Dali::Toolkit::Button::Property::SELECTED_STATE_IMAGE,
-      DISABLED_STATE_IMAGE = Dali::Toolkit::Button::Property::DISABLED_STATE_IMAGE,
-      UNSELECTED_COLOR = Dali::Toolkit::Button::Property::UNSELECTED_COLOR,
-      SELECTED_COLOR = Dali::Toolkit::Button::Property::SELECTED_COLOR,
-      LABEL = Dali::Toolkit::Button::Property::LABEL,
-      LABEL_TEXT = Dali::Toolkit::Button::Property::LABEL_TEXT,
-
-      /**
-       * @brief name "unselectedVisual", type string if it is a url, map otherwise
-       * @details Sets the unselected button foreground/icon visual
-       */
-      UNSELECTED_VISUAL = LABEL_TEXT + 1,
-
-      /**
-       * @brief name "selectedImage", type string if it is a url, map otherwise
-       * @details Sets the selected button foreground/icon visual
-       * @SINCE_1_2.18
-       */
-      SELECTED_VISUAL,
-
-      /**
-       * @brief name "disabledSelectedVisual", type string if it is a url, map otherwise
-       * @details Sets the disabled selected state foreground/icon button visual
-       */
-      DISABLED_SELECTED_VISUAL,
-
-      /**
-       * @brief name "disabledUnSelectedVisual", type string if it is a url, map otherwise
-       * @details Sets the disabled unselected state foreground/icon visual
-       */
-      DISABLED_UNSELECTED_VISUAL,
-
-      /**
-       * @brief name "unselectedBackgroundVisual", type string if it is a url, map otherwise
-       * @details Sets the disabled in the unselected state background, button visual
-       */
-      UNSELECTED_BACKGROUND_VISUAL,
-
-      /**
-       * @brief name "selectedBackgroundVisual", type string if it is a url, map otherwise
-       * @details Sets the selected background button visual
-       */
-      SELECTED_BACKGROUND_VISUAL,
-
-      /**
-       * @brief name "disabledUnselectedBackgroundVisual", type string if it is a url, map otherwise
-       * @details Sets the disabled while unselected background button visual
-       */
-      DISABLED_UNSELECTED_BACKGROUND_VISUAL,
-
-      /**
-       * @brief name "disabledSelectedBackgroundVisual", type string if it is a url, map otherwise
-       * @details Sets the disabled while selected background button visual
-       */
-      DISABLED_SELECTED_BACKGROUND_VISUAL,
-
       /**
        * @brief name "labelRelativeAlignment", type STRING
        * @details Sets the position of the the label in relation to the foreground/icon if both present
        */
-      LABEL_RELATIVE_ALIGNMENT,
+      LABEL_RELATIVE_ALIGNMENT = Dali::Toolkit::Button::Property::DISABLED_SELECTED_BACKGROUND_VISUAL + 1,
 
       /**
        * @brief name "labelPadding", type Vector4
