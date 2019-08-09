@@ -139,8 +139,6 @@ Dali::Integration::Point GetPointUpOutside()
   return point;
 }
 
-static float ANIMATION_TIME( 0.5f );
-
 } // namespace
 
 int UtcDaliButtonConstructorP(void)
@@ -277,7 +275,7 @@ int UtcDaliButtonSetDisabledWithDifferentStates02P(void)
   DALI_TEST_EQUALS( isSelected, SELECTED , TEST_LOCATION );
   tet_infoline("Set button to DISABLED = false whilst disabled and then set to unselected\n");
 
-  button.SetProperty( Button::Property::DISABLED, false );
+  button.SetProperty( Button::Property::DISABLED, false);
   button.SetProperty( Button::Property::SELECTED, !SELECTED );
 
   isSelected = button.GetProperty<bool>( Button::Property::SELECTED );
@@ -304,13 +302,13 @@ int UtcDaliButtonIsDisabledP(void)
 
   Button button = PushButton::New();
 
-  button.SetDisabled( true );
+  button.SetProperty( Button::Property::DISABLED, true);
 
-  DALI_TEST_CHECK( button.IsDisabled() );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::DISABLED ), true, TEST_LOCATION );
 
-  button.SetDisabled( false );
+  button.SetProperty( Button::Property::DISABLED, false);
 
-  DALI_TEST_CHECK( !button.IsDisabled() );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::DISABLED ), false, TEST_LOCATION );
   END_TEST;
 }
 
@@ -332,9 +330,6 @@ int UtcDaliButtonAutoRepeatingPropertyP(void)
 
   DALI_TEST_EQUALS( button.GetProperty<bool>( button.GetPropertyIndex("autoRepeating")), true, TEST_LOCATION );
 
-  button.SetAutoRepeating( false );
-
-  DALI_TEST_CHECK( !button.IsAutoRepeating() );
   END_TEST;
 }
 
@@ -344,13 +339,14 @@ int UtcDaliButtonIsAutoRepeatingP(void)
 
   Button button = PushButton::New();
 
-  button.SetAutoRepeating( true );
+  button.SetProperty( Button::Property::AUTO_REPEATING, true);
 
-  DALI_TEST_CHECK( button.IsAutoRepeating() );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::AUTO_REPEATING ), true, TEST_LOCATION );
 
-  button.SetAutoRepeating( false );
+  button.SetProperty( Button::Property::AUTO_REPEATING, false);
 
-  DALI_TEST_CHECK( !button.IsAutoRepeating() );
+  DALI_TEST_EQUALS( button.GetProperty<bool>( Button::Property::AUTO_REPEATING ), false, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -477,19 +473,6 @@ int UtcDaliButtonSelectedPropertyP(void)
   button.SetProperty( button.GetPropertyIndex("selected"), false );
 
   DALI_TEST_EQUALS( button.GetProperty<bool>( button.GetPropertyIndex("selected")), false, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliButtonSetAnimationTimeP(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliButtonSetAnimationTimeP");
-
-  Button button = PushButton::New();
-
-  button.SetAnimationTime( ANIMATION_TIME );
-
-  DALI_TEST_EQUALS( button.GetAnimationTime(), ANIMATION_TIME, TEST_LOCATION );
   END_TEST;
 }
 
@@ -848,121 +831,6 @@ int UtcDaliButtonSetProperty(void)
   pushButton.SetProperty(pushButton.GetPropertyIndex("disabled"), true);
   DALI_TEST_EQUALS( pushButton.GetProperty<bool>( pushButton.GetPropertyIndex("disabled")), true, TEST_LOCATION );
 
-  END_TEST;
-}
-
-// Deprecated API Tests
-
-int UtcDaliButtonSetDisabledP(void)
-{
-  ToolkitTestApplication application;
-
-  Button button = PushButton::New();
-
-  button.SetDisabled( true );
-
-  DALI_TEST_CHECK( button.IsDisabled() );
-
-  button.SetDisabled( false );
-
-  DALI_TEST_CHECK( !button.IsDisabled() );
-
-  button.SetDisabled( true );
-
-  DALI_TEST_CHECK( button.IsDisabled() );
-
-  button.SetDisabled( false );
-
-  DALI_TEST_CHECK( !button.IsDisabled() );
-  END_TEST;
-}
-
-int UtcDaliButtonSetAutoRepeatingP(void)
-{
-  ToolkitTestApplication application;
-
-  Button button = PushButton::New();
-
-  button.SetAutoRepeating( true );
-
-  DALI_TEST_CHECK( button.IsAutoRepeating() );
-
-  button.SetAutoRepeating( false );
-
-  DALI_TEST_CHECK( !button.IsAutoRepeating() );
-
-  button.SetAutoRepeating( true );
-
-  DALI_TEST_CHECK( button.IsAutoRepeating() );
-
-  button.SetAutoRepeating( false );
-
-  DALI_TEST_CHECK( !button.IsAutoRepeating() );
-  END_TEST;
-}
-
-int UtcDaliButtonSetInitialAutoRepeatingDelayP(void)
-{
-  ToolkitTestApplication application;
-
-  Button button = PushButton::New();
-
-  button.SetInitialAutoRepeatingDelay( 0.5f );
-
-  DALI_TEST_EQUALS( button.GetInitialAutoRepeatingDelay(), 0.5f, TEST_LOCATION );
-
-  button.SetInitialAutoRepeatingDelay( 0.2f );
-
-  DALI_TEST_EQUALS( button.GetInitialAutoRepeatingDelay(), 0.2f, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliButtonSetNextAutoRepeatingDelayP(void)
-{
-  ToolkitTestApplication application;
-
-  Button button = PushButton::New();
-
-  button.SetNextAutoRepeatingDelay( 0.5f );
-
-  DALI_TEST_EQUALS( button.GetNextAutoRepeatingDelay(), 0.5f, TEST_LOCATION );
-
-  button.SetProperty( Button::Property::NEXT_AUTO_REPEATING_DELAY, 0.2f );
-
-  DALI_TEST_EQUALS( button.GetNextAutoRepeatingDelay(), 0.2f, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliButtonSetTogglableButtonP(void)
-{
-  ToolkitTestApplication application;
-
-  Button button = PushButton::New();
-
-  button.SetTogglableButton( true );
-
-  DALI_TEST_CHECK( button.IsTogglableButton() );
-
-  button.SetTogglableButton( false );
-
-  DALI_TEST_CHECK( !button.IsTogglableButton() );
-  END_TEST;
-}
-
-int UtcDaliButtonSetSelectedP(void)
-{
-  ToolkitTestApplication application;
-
-  Button button = PushButton::New();
-  button.SetTogglableButton( true );
-
-  button.SetSelected( true );
-
-  DALI_TEST_CHECK( button.IsSelected() );
-
-  button.SetSelected( false );
-
-  DALI_TEST_CHECK( !button.IsSelected() );
   END_TEST;
 }
 

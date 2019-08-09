@@ -154,42 +154,39 @@ public:
       SELECTED,
 
       /**
-       * @DEPRECATED_1_1.XX Use UNSELECTED_VISUAL
-       * @brief name "unselectedStateImage", type string if it is a url, map otherwise
-       * @details Sets the unselected button foreground image
-       * @SINCE_1_0.0
+       * @brief name "unselectedVisual", type string if it is a url, map otherwise.
+       * @details Sets the unselected button foreground/icon visual
+       * @SINCE_1_4.32
        */
-      UNSELECTED_STATE_IMAGE,
+      UNSELECTED_VISUAL,
 
       /**
-       * @DEPRECATED_1_1.XX Use SELECTED_VISUAL
-       * @brief name "selectedStateImage", type string if it is a url, map otherwise
-       * @details Sets the selected button foreground image
-       * @SINCE_1_0.0
+       * @brief name "selectedImage", type string if it is a url, map otherwise
+       * @details Sets the selected button foreground/icon visual
+       * @SINCE_1_4.32
        */
-      SELECTED_STATE_IMAGE,
+      SELECTED_VISUAL,
 
       /**
-       * @DEPRECATED_1_1.XX Use DISABLED_UNSELECTED_VISUAL
-       * @brief name "disabledStateImage", type string if it is a url, map otherwise
-       * @details Sets the disabled whilst unselected foreground button visual
-       * @SINCE_1_0.0
+       * @brief name "disabledSelectedVisual", type string if it is a url, map otherwise
+       * @details Sets the disabled selected state foreground/icon button visual
+       * @SINCE_1_4.32
        */
-      DISABLED_STATE_IMAGE,
+      DISABLED_SELECTED_VISUAL,
 
       /**
-       * @DEPRECATED_1_1.XX Use UNSELECTED_BACKGROUND_VISUAL
-       * @brief name "unselectedColor", type Vector4
-       * @SINCE_1_0.0
+       * @brief name "disabledUnselectedVisual", type string if it is a url, map otherwise
+       * @details Sets the disabled unselected state foreground/icon visual
+       * @SINCE_1_4.32
        */
-      UNSELECTED_COLOR,
+      DISABLED_UNSELECTED_VISUAL,
 
       /**
-       * @DEPRECATED_1_1.XX Use SELECTED_BACKGROUND_VISUAL
-       * @brief name "selectedColor", type Vector4
-       * @SINCE_1_0.0
+       * @brief name "unselectedBackgroundVisual", type string if it is a url, map otherwise
+       * @details Sets the disabled in the unselected state background, button visual
+       * @SINCE_1_4.32
        */
-      SELECTED_COLOR,
+      UNSELECTED_BACKGROUND_VISUAL,
 
       /**
        * @brief name "label", type Property::Map or std::string
@@ -198,11 +195,25 @@ public:
       LABEL,
 
       /**
-       * @DEPRECATED_1_1.32 Use LABEL
-       * @brief name "labelText", type std::string
-       * @SINCE_1_0.0
+       * @brief name "selectedBackgroundVisual", type string if it is a url, map otherwise
+       * @details Sets the selected background button visual
+       * @SINCE_1_4.32
        */
-      LABEL_TEXT
+      SELECTED_BACKGROUND_VISUAL,
+
+      /**
+       * @brief name "disabledUnselectedBackgroundVisual", type string if it is a url, map otherwise
+       * @details Sets the disabled while unselected background button visual
+       * @SINCE_1_4.32
+       */
+      DISABLED_UNSELECTED_BACKGROUND_VISUAL,
+
+      /**
+       * @brief name "disabledSelectedBackgroundVisual", type string if it is a url, map otherwise
+       * @details Sets the disabled while selected background button visual
+       * @SINCE_1_4.32
+       */
+      DISABLED_SELECTED_BACKGROUND_VISUAL,
     };
   };
 
@@ -251,305 +262,6 @@ public:
    * @SINCE_1_0.0
    */
   ~Button();
-
-  // Deprecated API
-
-  /**
-   * @DEPRECATED_1_1.32 Use SetProperty DISABLED or Styling file
-   *
-   * @brief Sets the button as \e disabled.
-   *
-   * No signals are emitted when the \e disabled property is set.
-   *
-   * @SINCE_1_0.0
-   * @param[in] disabled Disabled property
-   */
-  void SetDisabled( bool disabled ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 Use GetProperty DISABLED
-   *
-   * @brief Returns if the button is disabled.
-   * @SINCE_1_0.0
-   * @return \e true if the button is \e disabled
-   */
-  bool IsDisabled() const DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 SetProperty AUTO_REPEATING or Styling file
-   *
-   * @brief Sets the \e autorepeating property.
-   *
-   * If the \e autorepeating property is set to \e true, then the \e togglable property is set to false
-   * but no signal is emitted.
-   *
-   * @SINCE_1_0.0
-   * @param[in] autoRepeating \e autorepeating property
-   */
-  void SetAutoRepeating( bool autoRepeating ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 GetProperty AUTO_REPEATING
-   *
-   * @brief Returns if the autorepeating property is set.
-   * @SINCE_1_0.0
-   * @return \e true if the \e autorepeating property is set
-   */
-  bool IsAutoRepeating() const DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 SetProperty INITIAL_AUTO_REPEATING_DELAY or Styling file
-   *
-   * @brief Sets the initial autorepeating delay.
-   *
-   * By default, this value is set to 0.15 seconds.
-   *
-   * @SINCE_1_0.0
-   * @param[in] initialAutoRepeatingDelay in seconds
-   * @pre initialAutoRepeatingDelay must be greater than zero.
-   */
-  void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 GetProperty INITIAL_AUTO_REPEATING_DELAY
-   *
-   * @brief Gets the initial autorepeating delay in seconds.
-   * @SINCE_1_0.0
-   * @return The initial autorepeating delay in seconds
-   */
-  float GetInitialAutoRepeatingDelay() const DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 SetProperty NEXT_AUTO_REPEATING_DELAY or Styling file
-   *
-   * @brief Sets the next autorepeating delay.
-   *
-   * By default, this value is set to 0.05 seconds.
-   *
-   * @SINCE_1_0.0
-   * @param[in] nextAutoRepeatingDelay in seconds
-   * @pre nextAutoRepeatingDelay must be greater than zero.
-   */
-  void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 GetProperty NEXT_AUTO_REPEATING_DELAY
-   *
-   * @brief Gets the next autorepeating delay in seconds.
-   * @SINCE_1_0.0
-   * @return The next autorepeating delay in seconds
-   */
-  float GetNextAutoRepeatingDelay() const DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 SetProperty TOGGLABLE or Styling file
-   *
-   * @brief Sets the \e togglable property.
-   *
-   * If the \e togglable property is set to \e true, then the \e autorepeating property is set to false.
-   *
-   * @SINCE_1_0.0
-   * @param[in] togglable Togglable property
-   */
-  void SetTogglableButton( bool togglable ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 GetProperty TOGGLABLE
-   *
-   * @brief Returns if the togglable property is set.
-   * @SINCE_1_0.0
-   * @return \e true if the \e togglable property is set
-   */
-  bool IsTogglableButton() const DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 SetProperty SELECTED
-   *
-   * @brief Sets the button as selected or unselected.
-   *
-   * \e togglable property must be set to \e true.
-   *
-   * Emits a Button::StateChangedSignal() signal.
-   *
-   * @SINCE_1_0.0
-   * @param[in] selected Selected property
-   */
-  void SetSelected( bool selected ) DALI_DEPRECATED_API;
-
-  /**
-   * DEPRECATED_1_1.32  GetProperty SELECTED
-   *
-   * @brief Returns if the selected property is set and the button is togglable.
-   * @SINCE_1_0.0
-   * @return \e true if the button is \e selected
-   */
-  bool IsSelected() const DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 Use Styling file to set animation
-   *
-   * @brief Sets the animation time.
-   *
-   * @SINCE_1_0.0
-   * @param[in] animationTime The animation time in seconds
-   */
-  void SetAnimationTime( float animationTime ) DALI_DEPRECATED_API;
-
-  /**
-   * DEPRECATED_1_1.32 Use Styling file to set animation
-   *
-   * @brief Retrieves button's animation time.
-   *
-   * @SINCE_1_0.0
-   * @return The animation time in seconds
-   */
-  float GetAnimationTime() const DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 SetProperty Property::LABEL or Styling file
-   *
-   * @brief Sets the button's label.
-   *
-   * @SINCE_1_0.0
-   * @param[in] label The label text
-   */
-  void SetLabelText( const std::string& label ) DALI_DEPRECATED_API;
-
-  /**
-   * DEPRECATED_1_1.32 GetProperty LABEL
-   *
-   * @brief Gets the label.
-   *
-   * @SINCE_1_0.0
-   * @return The label text
-   */
-  std::string GetLabelText() const DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 Use Styling file Property::UNSELECTED_STATE_IMAGE
-   *
-   * @brief Sets the unselected button image.
-   *
-   * @SINCE_1_0.0
-   * @param[in] filename The button image
-   */
-  void SetUnselectedImage( const std::string& filename ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 Use styling Set Control::Property::BACKGROUND which is same as un-selected background
-   * Or use DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL
-   *
-   * @brief Sets the background image.
-   *
-   * @SINCE_1_0.0
-   * @param[in] filename The background image
-   */
-  void SetBackgroundImage( const std::string& filename ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 Use styling file, Property::SELECTED_STATE_IMAGE
-   *
-   * @brief Sets the selected image.
-   *
-   * @SINCE_1_0.0
-   * @param[in] filename The selected image
-   */
-  void SetSelectedImage( const std::string& filename ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 Set Control::Property::BACKGROUND which is same as un-selected background
-   * Or use DevelButton::Property::SELECTED_BACKGROUND_VISUAL
-   *
-   * @brief Sets the selected background image.
-   *
-   * @SINCE_1_0.0
-   * @param[in] filename The selected background image
-   */
-  void SetSelectedBackgroundImage( const std::string& filename ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 Only able to set Property::DISABLED_STATE_IMAGE
-   * Or use DevelButton::Property::DISABLED_SELECTED_BACKGROUND_VISUAL
-   *
-   * @brief Sets the disabled background image.
-   *
-   * @SINCE_1_0.0
-   * @param[in] filename The disabled background image
-   */
-  void SetDisabledBackgroundImage( const std::string& filename ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 Use styling file Property::DISABLED_STATE_IMAGE
-   *
-   * @brief Sets the disabled button image.
-   *
-   * @SINCE_1_0.0
-   * @param[in] filename The disabled button image
-   */
-  void SetDisabledImage( const std::string& filename ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_1.32 Use Property::DISABLED_STATE_IMAGE which provides same disabled image for un/selected
-   * Or DevelButton::Property::DISABLED_SELECTED_VISUAL to disable selected visual.
-   *
-   * @brief Sets the disabled selected button image.
-   *
-   * @SINCE_1_0.0
-   * @param[in] filename The disabled selected button image
-   */
-  void SetDisabledSelectedImage( const std::string& filename ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_0.50. Instead, use SetLabelText
-   *
-   * @brief Sets the label with an actor.
-   *
-   * @SINCE_1_0.0
-   * @param[in] label The actor to use as a label
-   */
-  void SetLabel( Actor label ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_0.50. Instead, use SetUnselectedImage.
-   *
-   * @brief Sets the button image.
-   *
-   * @SINCE_1_0.0
-   * @param[in] image The button image
-   */
-  void SetButtonImage( Image image ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_0.50. Instead, use SetSelectedImage( const std::string& filename ).
-   *
-   * @brief Sets the selected image.
-   *
-   * @SINCE_1_0.0
-   * @param[in] image The selected image
-   */
-  void SetSelectedImage( Image image ) DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_0.50
-   *
-   * @brief Gets the button image.
-   *
-   * @SINCE_1_0.0
-   * @remarks Avoid using this method as it's a legacy code.
-   * @return An actor with the button image
-   */
-  Actor GetButtonImage() const DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_0.50
-   *
-   * @brief Gets the selected image.
-   *
-   * @SINCE_1_0.0
-   * @remarks Avoid using this method as it's a legacy code.
-   * @return An actor with the selected image
-   */
-  Actor GetSelectedImage() const DALI_DEPRECATED_API;
 
 public: //Signals
 

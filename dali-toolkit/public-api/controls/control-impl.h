@@ -98,16 +98,6 @@ public:
   void SetBackgroundColor( const Vector4& color );
 
   /**
-   * @copydoc Dali::Toolkit::Control::GetBackgroundColor
-   */
-  Vector4 GetBackgroundColor() const;
-
-  /**
-   * @copydoc Dali::Toolkit::Control::SetBackgroundImage
-   */
-  void SetBackgroundImage( Image image );
-
-  /**
    * @brief Sets the background with a property map.
    *
    * @SINCE_1_0.0

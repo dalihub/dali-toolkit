@@ -52,13 +52,13 @@ namespace Property
 
 enum
 {
-  STYLE_NAME        = Control::Property::STYLE_NAME,
-  BACKGROUND_COLOR  = Control::Property::BACKGROUND_COLOR,
-  BACKGROUND_IMAGE  = Control::Property::BACKGROUND_IMAGE,
-  KEY_INPUT_FOCUS   = Control::Property::KEY_INPUT_FOCUS,
-  BACKGROUND        = Control::Property::BACKGROUND,
-  MARGIN            = Control::Property::MARGIN,
-  PADDING           = Control::Property::PADDING,
+  STYLE_NAME            = Control::Property::STYLE_NAME,
+  RESERVED_PROPERTY_01  = Control::Property::RESERVED_PROPERTY_01,
+  RESERVED_PROPERTY_02  = Control::Property::RESERVED_PROPERTY_02,
+  KEY_INPUT_FOCUS       = Control::Property::KEY_INPUT_FOCUS,
+  BACKGROUND            = Control::Property::BACKGROUND,
+  MARGIN                = Control::Property::MARGIN,
+  PADDING               = Control::Property::PADDING,
 
   /**
    * @brief Displays a tooltip when the control is hovered over.
