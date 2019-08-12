@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -296,6 +296,8 @@ void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
   mPlacementActor = actor;
 
   mVectorRasterizeThread.SetRenderer( mImpl->mRenderer );
+
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOnStage [%p]\n", this );
 }
 
 void AnimatedVectorImageVisual::DoSetOffStage( Actor& actor )
@@ -316,6 +318,8 @@ void AnimatedVectorImageVisual::DoSetOffStage( Actor& actor )
 
   // Reset the visual size to zero so that when adding the actor back to stage the rasterization is forced
   mVisualSize = Vector2::ZERO;
+
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOffStage [%p]\n", this );
 }
 
 void AnimatedVectorImageVisual::OnSetTransform()
@@ -324,7 +328,7 @@ void AnimatedVectorImageVisual::OnSetTransform()
 
   if( IsOnStage() )
   {
-    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnSetTransform: width = %f, height = %f\n", visualSize.width, visualSize.height );
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnSetTransform: width = %f, height = %f [%p]\n", visualSize.width, visualSize.height, this );
 
     if( visualSize != mVisualSize )
     {
@@ -357,6 +361,8 @@ void AnimatedVectorImageVisual::OnSetTransform()
       {
         actor.AddRenderer( mImpl->mRenderer );
         mPlacementActor.Reset();
+
+        DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnSetTransform: Renderer is added [%p]\n", this );
       }
 
       ResourceReady( Toolkit::Visual::ResourceStatus::READY );
@@ -443,6 +449,8 @@ void AnimatedVectorImageVisual::OnResourceReady()
     mPlacementActor.Reset();
 
     ResourceReady( Toolkit::Visual::ResourceStatus::READY );
+
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnResourceReady: Renderer is added [%p]\n", this );
   }
 }
 

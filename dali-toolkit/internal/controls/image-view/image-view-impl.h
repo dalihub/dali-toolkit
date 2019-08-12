@@ -90,7 +90,7 @@ public:
   /**
    * @brief Query whether alpha is pre-multiplied.
    *
-   * @return True is alpha is pre-multiplied, false otherwise.
+   * @return True if alpha is pre-multiplied, false otherwise.
    */
   bool IsPreMultipliedAlphaEnabled() const;
 

@@ -52,7 +52,7 @@ BaseHandle Create()
 
 // Setup properties, signals and actions using the type-registry.
 DALI_TYPE_REGISTRATION_BEGIN( Toolkit::ImageView, Toolkit::Control, Create );
-DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "resourceUrl", STRING, RESOURCE_URL )
+DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "reservedProperty01", STRING, RESERVED_PROPERTY_01 )
 DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "image", MAP, IMAGE )
 DALI_PROPERTY_REGISTRATION( Toolkit, ImageView, "preMultipliedAlpha", BOOLEAN, PRE_MULTIPLIED_ALPHA )
 
@@ -381,16 +381,6 @@ void ImageView::SetProperty( BaseObject* object, Property::Index index, const Pr
     ImageView& impl = GetImpl( imageView );
     switch ( index )
     {
-      case Toolkit::ImageView::Property::RESOURCE_URL:
-      {
-        std::string imageUrl;
-        if( value.Get( imageUrl ) )
-        {
-          impl.SetImage( imageUrl, ImageDimensions() );
-        }
-        break;
-      }
-
       case Toolkit::ImageView::Property::IMAGE:
       {
         std::string imageUrl;
@@ -462,15 +452,6 @@ Property::Value ImageView::GetProperty( BaseObject* object, Property::Index prop
     ImageView& impl = GetImpl( imageview );
     switch ( propertyIndex )
     {
-      case Toolkit::ImageView::Property::RESOURCE_URL:
-      {
-        if ( !impl.mUrl.empty() )
-        {
-          value = impl.mUrl;
-        }
-        break;
-      }
-
       case Toolkit::ImageView::Property::IMAGE:
       {
         if ( !impl.mUrl.empty() )

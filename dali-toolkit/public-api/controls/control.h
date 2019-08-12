@@ -107,26 +107,8 @@ public:
        */
       STYLE_NAME = PROPERTY_START_INDEX,
 
-      /**
-       * @DEPRECATED_1_1.3
-       * @brief The background color of the control.
-       *
-       * Mutually exclusive with BACKGROUND_IMAGE & BACKGROUND.
-       * @details Name "backgroundColor", type Property::VECTOR4.
-       * @see Toolkit::Control::SetStyleName()
-       * @SINCE_1_0.0
-       */
-      BACKGROUND_COLOR,
-
-      /**
-       * @DEPRECATED_1_1.3
-       * @brief The background image of the control.
-       *
-       * Mutually exclusive with BACKGROUND_COLOR & BACKGROUND.
-       * @details Name "backgroundImage", type Property::MAP.
-       * @SINCE_1_0.0
-       */
-      BACKGROUND_IMAGE,
+      RESERVED_PROPERTY_01, ///< Reserved index for a removed property.
+      RESERVED_PROPERTY_02, ///< Reserved index for a removed property.
 
       /**
        * @brief Receives key events to the control.
@@ -139,7 +121,6 @@ public:
       /**
        * @brief The background of the control.
        *
-       * Mutually exclusive with BACKGROUND_COLOR & BACKGROUND_IMAGE.
        * @details Name "background", type Property::MAP or std::string for URL or Property::VECTOR4 for Color.
        * @SINCE_1_1.3
        */
@@ -360,26 +341,6 @@ public:
    * @note The background color fully blends with the actor color.
    */
   void SetBackgroundColor( const Vector4& color );
-
-  /**
-   * @DEPRECATED_1_1.3
-   *
-   * @brief Retrieves the background color of the control.
-   *
-   * @SINCE_1_0.0
-   * @return The background color of the control
-   */
-  Vector4 GetBackgroundColor() const DALI_DEPRECATED_API;
-
-  /**
-   * @DEPRECATED_1_2_8, use Property::BACKGROUND instead
-   *
-   * @brief Sets an image as the background of the control.
-   *
-   * @SINCE_1_0.0
-   * @param[in] image The image to set as the background
-   */
-  void SetBackgroundImage( Image image ) DALI_DEPRECATED_API;
 
   /**
    * @brief Clears the background.

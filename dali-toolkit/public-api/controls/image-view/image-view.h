@@ -104,12 +104,7 @@ public:
     {
       // Event side properties
 
-      /**
-       * @DEPRECATED_1_1.16. Use IMAGE instead.
-       * @brief name "resourceUrl", type string.
-       * @SINCE_1_0.0
-       */
-      RESOURCE_URL = PROPERTY_START_INDEX,
+      RESERVED_PROPERTY_01 = PROPERTY_START_INDEX, ///< Reserved index for a removed property.
 
       /**
        * @brief name "image", type string if it is a url, map otherwise.

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_BUTTON_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,84 +69,52 @@ public:
 public:
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetDisabled
+   * @brief Sets the button as \e disabled.
+   * @param[in] disabled Disabled property
    */
   void SetDisabled( bool disabled );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsDisabled
+   * @brief Returns if the button is disabled.
+   * @return \e true if the button is \e disabled
    */
   bool IsDisabled() const;
 
   /**
-   * @copydoc Dali::Toolkit::Button::SetAutoRepeating
+   * @brief Sets the \e autorepeating property.
+   * @param[in] autoRepeating \e autorepeating property
    */
   void SetAutoRepeating( bool autoRepeating );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsAutoRepeating
-   */
-  bool IsAutoRepeating() const;
-
-  /**
-   * @copydoc Dali::Toolkit::Button::SetInitialAutoRepeatingDelay
+   * @brief Sets the initial autorepeating delay.
+   * @param[in] initialAutoRepeatingDelay in seconds
    */
   void SetInitialAutoRepeatingDelay( float initialAutoRepeatingDelay );
 
   /**
-   * @copydoc Dali::Toolkit::Button::GetInitialAutoRepeatingDelay
-   */
-  float GetInitialAutoRepeatingDelay() const;
-
-  /**
-   * @copydoc Dali::Toolkit::Button::SetNextAutoRepeatingDelay
+   * @brief Sets the next autorepeating delay.
+   * @param[in] nextAutoRepeatingDelay in seconds
    */
   void SetNextAutoRepeatingDelay( float nextAutoRepeatingDelay );
 
   /**
-   * @copydoc Dali::Toolkit::Button::GetNextAutoRepeatingDelay
-   */
-  float GetNextAutoRepeatingDelay() const;
-
-  /**
-   * @copydoc Dali::Toolkit::Button::SetTogglableButton
+   * @brief Sets the \e togglable property.
+   * @param[in] togglable Togglable property
    */
   void SetTogglableButton( bool togglable );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsTogglableButton
-   */
-  bool IsTogglableButton() const;
-
-  /**
-   * @copydoc Dali::Toolkit::Button::SetSelected
+   * @brief Sets the button as selected or unselected.
+   * @param[in] selected Selected property
    */
   void SetSelected( bool selected );
 
   /**
-   * @copydoc Dali::Toolkit::Button::IsSelected
+   * @brief Returns if the selected property is set and the button is togglable.
+   * @return \e true if the button is \e selected
    */
   bool IsSelected() const;
-
-  /**
-   * @copydoc Dali::Toolkit::Button::SetAnimationTime
-   */
-  void SetAnimationTime( float animationTime );
-
-  /**
-   * @copydoc Dali::Toolkit::Button::GetAnimationTime
-   */
-  float GetAnimationTime() const;
-
-  /**
-   * @copydoc Dali::Toolkit::Button::SetLabelText
-   */
-  void SetLabelText( const std::string& label );
-
-  /**
-   * @copydoc Dali::Toolkit::Button::GetLabelText
-   */
-  std::string GetLabelText() const;
 
   /**
    * @brief Produces a Property::Map of Text properties to create a Text Visual, merging existing properties with supplied map
@@ -165,84 +133,6 @@ public:
    * @return true if action has been accepted by this control
    */
   static bool DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes );
-
-public: // Deprecated API
-
-  /**
-   * @copydoc Dali::Toolkit::Button::SetLabel( Actor label )
-   */
-  void SetLabel( Actor label );
-
-  /**
-   * @deprecated Sets the unselected image with an url.
-   * @param[in] image The Actor to use.
-   */
-  void SetUnselectedImage( const std::string& filename );
-
-  /**
-   * @deprecated Sets the selected image with an url.
-   * @param[in] filename The url of the image to use to use.
-   */
-  void SetSelectedImage( const std::string& filename );
-
-  /**
-   * @deprecated Sets the selected background image with an url.
-   * @param[in] filename The url of the image to use to use.
-   */
-  void SetSelectedBackgroundImage( const std::string& filename );
-
-  /**
-   * @deprecated Sets the background image with an url.
-   * @param[in] filename The url of the image to use to use.
-   */
-  void SetBackgroundImage( const std::string& filename );
-
-  /**
-   * @deprecated Sets the disabled unselected background image with an url.
-   * @param[in] filename The url of the image to use to use.
-   */
-  void SetDisabledBackgroundImage( const std::string& filename );
-
-  /**
-   * @deprecated Sets the disabled unselected image with an url.
-   * @param[in] filename The url of the image to use to use.
-   */
-  void SetDisabledImage( const std::string& filename );
-
-  /**
-   * @deprecated Sets the disabled selected image with an url.
-   * @param[in] filename The url of the image to use to use.
-   */
-  void SetDisabledSelectedImage( const std::string& filename );
-
-  /**
-   * @deprecated Sets the unselected image with an Actor.
-   * @param[in] image The Image to use.
-   */
-  void SetButtonImage( Image image );
-
-  /**
-   * @deprecated Sets the selected image with an Actor.
-   * @param[in] image The Image to use.
-   */
-  void SetSelectedImage( Image image );
-
-  /**
-   * @Gets url of a image visual, used by GetProperty but for deprecated Properties
-   * @param[in] index Visual index of url required
-   * @return filename for the corresponding visual
-   */
-  std::string GetUrlForImageVisual( const Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Toolkit::Button::GetButtonImage
-   */
-  Actor GetButtonImage() const;
-
-  /**
-   * @copydoc Dali::Toolkit::Button::GetSelectedImage
-   */
-  Actor GetSelectedImage() const;
 
 public:
 
@@ -525,26 +415,6 @@ private:
   void ChangeState( State requestedState );
 
   /**
-   * @brief Get unselected button color
-   * @return color as vector4
-   */
-  const Vector4 GetUnselectedColor() const;
-
-  /**
-   * @brief Get selected button color
-   * @return color as vector4
-   */
-  const Vector4 GetSelectedColor() const;
-
-  /**
-   * Sets the color of button in selected or unselected state, if image also supplied this color will be appplied to it.
-   * If no visual exists, it is created.
-   * @param[in]  color The color to use.
-   * @param[in]  visualIndex The Visual to apply the color
-   */
-  void SetColor( const Vector4& color, Property::Index visualIndex );
-
-  /**
    * This method is called when the button is released.
    */
   void Released();
@@ -655,9 +525,6 @@ private:
 
   TapGestureDetector mTapDetector;
 
-  Vector4          mUnselectedColor;
-  Vector4          mSelectedColor;
-
   bool             mAutoRepeating;              ///< Stores the autorepeating property.
   bool             mTogglableButton;            ///< Stores the togglable property as a flag.
   bool             mTextStringSetFlag;          ///< Stores if text has been set. Required in relayout but don't want to calculate there.
@@ -673,11 +540,6 @@ private:
 
   // Actions
   bool             mClickActionPerforming;      ///< Used to manage signal emissions during action
-
-  // Deprecated API support
-  Image            mSetButtonImage;             ///< Store set image if deprecated SetButtonImage used.
-  Image            mSetSelectedImage;           ///< Store set image if deprecated SetSelectedImage used.
-
 };
 
 } // namespace Internal

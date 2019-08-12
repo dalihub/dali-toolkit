@@ -46,7 +46,6 @@ void utc_dali_toolkit_pushbutton_cleanup(void)
 namespace
 {
 static const char* TEST_IMAGE_ONE = TEST_RESOURCE_DIR "/gallery-small-1.jpg";
-static const char* TEST_IMAGE_TWO = TEST_RESOURCE_DIR "/icon-delete.jpg";
 
 static const Vector2 INSIDE_TOUCH_POINT_POSITON  = Vector2( 240, 400 );
 static const Vector3 BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS  = Vector3( 200, 360, 0 );
@@ -142,8 +141,8 @@ void SetupButtonForTestTouchEvents( ToolkitTestApplication& application, Button&
     const Vector2 TEST_IMAGE_SIZE = Vector2( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
     TestPlatformAbstraction& platform = application.GetPlatform();
     platform.SetClosestImageSize( TEST_IMAGE_SIZE );
-    button.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, TEST_IMAGE_ONE );
-    button.SetProperty( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, TEST_IMAGE_ONE );
+    button.SetProperty( Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL, TEST_IMAGE_ONE );
+    button.SetProperty( Toolkit::Button::Property::SELECTED_BACKGROUND_VISUAL, TEST_IMAGE_ONE );
   }
 }
 
@@ -1066,7 +1065,7 @@ int UtcDaliPushButtonSetUnSelectedVisual01P(void)
   propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
   propertyMap.Insert(ColorVisual::Property::MIX_COLOR, Color::BLUE);
 
-  pushButton.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, propertyMap );
+  pushButton.SetProperty( Toolkit::Button::Property::UNSELECTED_BACKGROUND_VISUAL, propertyMap );
 
   tet_infoline(" UNSELECTED_VISUAL Added to button\n");
 
@@ -1092,7 +1091,7 @@ int UtcDaliPushButtonSetUnSelectedVisual01P(void)
   Property::Map propertyMap2;
   propertyMap2.Insert(Visual::Property::TYPE,  Visual::COLOR);
   propertyMap2.Insert(ColorVisual::Property::MIX_COLOR, Color::RED);
-  pushButton.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, propertyMap2 );
+  pushButton.SetProperty( Toolkit::Button::Property::UNSELECTED_VISUAL, propertyMap2 );
 
   tet_printf("Added UNSELECTED_VISUAL and add button back to Stage\n");
 
@@ -1135,7 +1134,7 @@ int UtcDaliPushButtonSetSelectedVisualN(void)
   colorMap.Insert(Visual::Property::TYPE,  BROKEN_VISUAL_TYPE);
   colorMap.Insert(BorderVisual::Property::COLOR,  Color::BLUE);
   colorMap.Insert(BorderVisual::Property::SIZE,  5.f);
-  pushButton.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_VISUAL, colorMap );
+  pushButton.SetProperty( Toolkit::Button::Property::UNSELECTED_VISUAL, colorMap );
 
   Stage::GetCurrent().Add( pushButton );
   application.SendNotification();
@@ -1144,147 +1143,6 @@ int UtcDaliPushButtonSetSelectedVisualN(void)
   unsigned int postRendererCount  = pushButton.GetRendererCount();
   tet_printf("RendererCount post broken visual (%d)\n", postRendererCount);
   DALI_TEST_EQUALS( postRendererCount, 0, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetButtonImageP(void)
-{
-  ToolkitTestApplication application;
-
-  PushButton button = PushButton::New();
-  Stage::GetCurrent().Add( button );
-
-  try
-  {
-    button.SetButtonImage( ImageView::New() );
-    DALI_TEST_CHECK( true );
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK( false );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetBackgroundImageP(void)
-{
-  ToolkitTestApplication application;
-
-  PushButton button = PushButton::New();
-  Stage::GetCurrent().Add( button );
-
-  try
-  {
-    button.SetBackgroundImage( ImageView::New() );
-    DALI_TEST_CHECK( true );
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK( false );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetSelectedImageP(void)
-{
-  ToolkitTestApplication application;
-
-  PushButton button = PushButton::New();
-  Stage::GetCurrent().Add( button );
-
-  try
-  {
-    button.SetSelectedImage( ImageView::New() );
-    DALI_TEST_CHECK( true );
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK( false );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetSelectedBackgroundImageP(void)
-{
-  ToolkitTestApplication application;
-
-  PushButton button = PushButton::New();
-  Stage::GetCurrent().Add( button );
-
-  try
-  {
-    button.SetSelectedBackgroundImage( ImageView::New() );
-    DALI_TEST_CHECK( true );
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK( false );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetDisabledBackgroundImageP(void)
-{
-  ToolkitTestApplication application;
-
-  PushButton button = PushButton::New();
-  Stage::GetCurrent().Add( button );
-
-  try
-  {
-    button.SetDisabledBackgroundImage( ImageView::New() );
-    DALI_TEST_CHECK( true );
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK( false );
-  }
-
-  END_TEST;
-}
-
-
-int UtcDaliPushButtonSetDisabledImageP(void)
-{
-  ToolkitTestApplication application;
-
-  PushButton button = PushButton::New();
-  Stage::GetCurrent().Add( button );
-
-  try
-  {
-    button.SetDisabledImage( ImageView::New() );
-    DALI_TEST_CHECK( true );
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK( false );
-  }
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetDisabledSelectedImageP(void)
-{
-  ToolkitTestApplication application;
-
-  PushButton button = PushButton::New();
-  Stage::GetCurrent().Add( button );
-
-  try
-  {
-    button.SetDisabledSelectedImage( ImageView::New() );
-    DALI_TEST_CHECK( true );
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK( false );
-  }
 
   END_TEST;
 }
@@ -1332,17 +1190,17 @@ int UtcDaliPushButtonSetGetAutoRepeating(void)
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetAutoRepeating( true );
+  pushButton.SetProperty( Button::Property::AUTO_REPEATING, true );
 
-  DALI_TEST_CHECK( pushButton.IsAutoRepeating() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::AUTO_REPEATING ), true, TEST_LOCATION );
 
-  pushButton.SetAutoRepeating( false );
+  pushButton.SetProperty( Button::Property::AUTO_REPEATING, false );
 
-  DALI_TEST_CHECK( !pushButton.IsAutoRepeating() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::AUTO_REPEATING ), false, TEST_LOCATION );
 
-  pushButton.SetAutoRepeating( true );
+  pushButton.SetProperty( Button::Property::AUTO_REPEATING, true );
 
-  DALI_TEST_CHECK( pushButton.IsAutoRepeating() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::AUTO_REPEATING ), true, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1353,17 +1211,17 @@ int UtcDaliPushButtonSetGetTogglableButton(void)
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetTogglableButton( true );
+  pushButton.SetProperty( Button::Property::TOGGLABLE, true );
 
-  DALI_TEST_CHECK( pushButton.IsTogglableButton() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::TOGGLABLE ), true, TEST_LOCATION );
 
-  pushButton.SetTogglableButton( false );
+  pushButton.SetProperty( Button::Property::TOGGLABLE, false );
 
-  DALI_TEST_CHECK( !pushButton.IsTogglableButton() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::TOGGLABLE ), false, TEST_LOCATION );
 
-  pushButton.SetTogglableButton( true );
+  pushButton.SetProperty( Button::Property::TOGGLABLE, true );
 
-  DALI_TEST_CHECK( pushButton.IsTogglableButton() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::TOGGLABLE ), true, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1374,17 +1232,18 @@ int UtcDaliPushButtonSetGetAutoRepeatingAndTogglableButton(void)
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetAutoRepeating( true );
-  pushButton.SetTogglableButton( true );
+  pushButton.SetProperty( Button::Property::AUTO_REPEATING, true );
+  pushButton.SetProperty( Button::Property::TOGGLABLE, true);
 
-  DALI_TEST_CHECK( pushButton.IsTogglableButton() );
-  DALI_TEST_CHECK( !pushButton.IsAutoRepeating() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::TOGGLABLE ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::AUTO_REPEATING ), false, TEST_LOCATION );
 
-  pushButton.SetTogglableButton( true );
-  pushButton.SetAutoRepeating( true );
+  pushButton.SetProperty( Button::Property::TOGGLABLE, true);
+  pushButton.SetProperty( Button::Property::AUTO_REPEATING, true );
 
-  DALI_TEST_CHECK( pushButton.IsAutoRepeating() );
-  DALI_TEST_CHECK( !pushButton.IsTogglableButton() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::AUTO_REPEATING ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::TOGGLABLE ), false, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -1395,23 +1254,23 @@ int UtcDaliPushButtonSetGetSelected01(void)
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetTogglableButton( true );
+  pushButton.SetProperty( Button::Property::TOGGLABLE, true);
   pushButton.StateChangedSignal().Connect( &PushButtonSelected );
 
   gPushButtonSelectedState = false;
-  pushButton.SetSelected( true );
+  pushButton.SetProperty( Button::Property::SELECTED, true );
 
-  DALI_TEST_CHECK( pushButton.IsSelected() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::SELECTED), true, TEST_LOCATION );
   DALI_TEST_CHECK( gPushButtonSelectedState );
 
-  pushButton.SetSelected( false );
+  pushButton.SetProperty( Button::Property::SELECTED, false );
 
-  DALI_TEST_CHECK( !pushButton.IsSelected() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::SELECTED), false, TEST_LOCATION );
   DALI_TEST_CHECK( !gPushButtonSelectedState );
 
-  pushButton.SetSelected( true );
+  pushButton.SetProperty( Button::Property::SELECTED, true );
 
-  DALI_TEST_CHECK( pushButton.IsSelected() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::SELECTED), true, TEST_LOCATION );
   DALI_TEST_CHECK( gPushButtonSelectedState );
   END_TEST;
 }
@@ -1423,24 +1282,27 @@ int UtcDaliPushButtonSetGetSelected02(void)
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetTogglableButton( false );
+  tet_infoline(" Set Toggle feature off");
+  pushButton.SetProperty( Button::Property::TOGGLABLE, false);
   pushButton.StateChangedSignal().Connect( &PushButtonSelected );
 
   gPushButtonSelectedState = false;
-  pushButton.SetSelected( true );
+  tet_infoline(" Try to set to selected, expecting failure as not a toggle button");
+  pushButton.SetProperty( Button::Property::SELECTED, true );
 
-  DALI_TEST_CHECK( !pushButton.IsSelected() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::SELECTED), false, TEST_LOCATION );
   DALI_TEST_CHECK( !gPushButtonSelectedState );
 
-  pushButton.SetSelected( false );
+  pushButton.SetProperty( Button::Property::SELECTED, false );
 
-  DALI_TEST_CHECK( !pushButton.IsSelected() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::SELECTED), false, TEST_LOCATION );
   DALI_TEST_CHECK( !gPushButtonSelectedState );
 
-  pushButton.SetSelected( true );
+  pushButton.SetProperty( Button::Property::SELECTED, true );
 
-  DALI_TEST_CHECK( !pushButton.IsSelected() );
+  DALI_TEST_EQUALS( pushButton.GetProperty<bool>( Button::Property::SELECTED ), false, TEST_LOCATION );
   DALI_TEST_CHECK( !gPushButtonSelectedState );
+
   END_TEST;
 }
 
@@ -1451,13 +1313,14 @@ int UtcDaliPushButtonSetGetAutorepeatingDelayValues01(void)
 
   PushButton pushButton = PushButton::New();
 
-  pushButton.SetAutoRepeating( true );
+  pushButton.SetProperty( Button::Property::AUTO_REPEATING, true );
 
-  pushButton.SetInitialAutoRepeatingDelay( 1.f );
-  DALI_TEST_EQUALS( pushButton.GetInitialAutoRepeatingDelay(), 1.f, TEST_LOCATION );
+  pushButton.SetProperty( Button::Property::INITIAL_AUTO_REPEATING_DELAY, 1.f);
+  DALI_TEST_EQUALS( pushButton.GetProperty<float>( Button::Property::INITIAL_AUTO_REPEATING_DELAY ), 1.f, TEST_LOCATION );
 
-  pushButton.SetNextAutoRepeatingDelay( 1.f );
-  DALI_TEST_EQUALS( pushButton.GetNextAutoRepeatingDelay(), 1.f, TEST_LOCATION );
+  pushButton.SetProperty( Button::Property::NEXT_AUTO_REPEATING_DELAY, 1.f);
+
+  DALI_TEST_EQUALS( pushButton.GetProperty<float>( Button::Property::NEXT_AUTO_REPEATING_DELAY ), 1.f, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1471,11 +1334,11 @@ int UtcDaliPushButtonSetGetAutorepeatingDelayValues02(void)
   bool assert1( false );
   bool assert2( false );
 
-  pushButton.SetAutoRepeating( true );
+  pushButton.SetProperty( Button::Property::AUTO_REPEATING, true );
 
   try
   {
-    pushButton.SetInitialAutoRepeatingDelay( -1.f );
+    pushButton.SetProperty( Button::Property::INITIAL_AUTO_REPEATING_DELAY, -1.f );
   }
   catch( Dali::DaliException& e )
   {
@@ -1486,7 +1349,7 @@ int UtcDaliPushButtonSetGetAutorepeatingDelayValues02(void)
 
   try
   {
-    pushButton.SetNextAutoRepeatingDelay( -1.f );
+    pushButton.SetProperty( Button::Property::NEXT_AUTO_REPEATING_DELAY, -1.f );
   }
   catch( Dali::DaliException& e )
   {
@@ -1516,336 +1379,9 @@ int UtcDaliPushButtonSetLabelText(void)
   application.SendNotification();
   application.Render();
 
-  pushButton.SetLabelText( STR );
+  pushButton.SetProperty( Button::Property::LABEL, STR );
 
-  DALI_TEST_EQUALS( pushButton.GetLabelText(), STR, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetButtonImageDeprecatedP(void)
-{
-  ToolkitTestApplication application;
-  Image setButtonImage = ResourceImage::New( TEST_IMAGE_ONE);
-  PushButton pushButton = PushButton::New();
-  pushButton.SetButtonImage( setButtonImage );
-  Image retreivedButtonImage = ImageView::DownCast(pushButton.GetButtonImage()).GetImage();
-  DALI_TEST_EQUALS( retreivedButtonImage, setButtonImage ,  TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetSelectedImageDeprecatedP(void)
-{
-  ToolkitTestApplication application;
-  Image setButtonImage = ResourceImage::New( TEST_IMAGE_ONE);
-  PushButton pushButton = PushButton::New();
-  pushButton.SetSelectedImage( setButtonImage );
-  Image retreivedButtonImage = ImageView::DownCast(pushButton.GetSelectedImage()).GetImage();
-  DALI_TEST_EQUALS( retreivedButtonImage, setButtonImage ,  TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonGetButtonImageURLDeprecatedP(void)
-{
-  tet_infoline(" UtcDaliPushButtonGetButtonImageURLDeprecatedP Testing mix use of API");
-
-  ToolkitTestApplication application;
-
-  PushButton pushButton = PushButton::New();
-  pushButton.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, TEST_IMAGE_ONE );
-
-  ImageView retreivedButtonImageView = ImageView::DownCast(pushButton.GetButtonImage());
-  Image retreivedButtonImage = retreivedButtonImageView.GetImage();
-  ResourceImage resourceImage = ResourceImage::DownCast( retreivedButtonImage );
-
-  DALI_TEST_EQUALS( resourceImage.GetUrl(), TEST_IMAGE_ONE ,  TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonGetSelectedImageURLDeprecatedP(void)
-{
-  tet_infoline(" UtcDaliPushButtonGetSelectedImageURLDeprecatedP Testing mix use of API");
-
-  ToolkitTestApplication application;
-
-  PushButton pushButton = PushButton::New();
-
-  pushButton.SetProperty( Toolkit::DevelButton::Property::SELECTED_BACKGROUND_VISUAL, TEST_IMAGE_ONE );
-
-  Image retreivedButtonImage = ImageView::DownCast(pushButton.GetSelectedImage()).GetImage();
-  ResourceImage resourceImage = ResourceImage::DownCast( retreivedButtonImage );
-  DALI_TEST_EQUALS( resourceImage.GetUrl(), TEST_IMAGE_ONE ,  TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetSelectedImageWithActorDeprecatedP(void)
-{
-  tet_infoline(" UtcDaliPushButton SetSelectedImage With ImageView (Actor)");
-
-  ToolkitTestApplication application;
-
-  Image image = ResourceImage::New( TEST_IMAGE_ONE );
-
-  DALI_TEST_CHECK( image );
-
-  ImageView imgViewSet = ImageView::New(image);
-
-  DALI_TEST_CHECK(imgViewSet );
-
-  PushButton pushButton = PushButton::New();
-
-  DALI_TEST_CHECK( pushButton );
-
-  pushButton.SetSelectedImage( imgViewSet );
-
-  ImageView imageView = ImageView::DownCast( pushButton.GetSelectedImage());
-
-  DALI_TEST_CHECK( imageView );
-
-  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-  Property::Map map;
-  value.Get( map );
-  DALI_TEST_CHECK( !map.Empty() );
-  DALI_TEST_EQUALS( map[ "filename" ].Get<std::string>(), TEST_IMAGE_ONE , TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetButtonImageWithActorDeprecatedP(void)
-{
-  tet_infoline(" UtcDaliPushButton SetButtonImage With ImageView (Actor)");
-
-  ToolkitTestApplication application;
-
-  Image image = ResourceImage::New( TEST_IMAGE_ONE );
-
-  DALI_TEST_CHECK( image );
-
-  ImageView imgViewSet = ImageView::New(image);
-
-  DALI_TEST_CHECK(imgViewSet );
-
-  PushButton pushButton = PushButton::New();
-
-  DALI_TEST_CHECK( pushButton );
-
-  pushButton.SetButtonImage( imgViewSet );
-
-  ImageView imageView = ImageView::DownCast( pushButton.GetButtonImage());
-
-  DALI_TEST_CHECK( imageView );
-
-  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-  Property::Map map;
-  value.Get( map );
-  DALI_TEST_CHECK( !map.Empty() );
-  DALI_TEST_EQUALS( map[ "filename" ].Get<std::string>(), TEST_IMAGE_ONE , TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetBackgroundImageWithActorDeprecatedP(void)
-{
-  tet_infoline(" UtcDaliPushButton SetBackgroundImage With ImageView (Actor)");
-
-  ToolkitTestApplication application;
-
-  Image image = ResourceImage::New( TEST_IMAGE_ONE );
-
-  DALI_TEST_CHECK( image );
-
-  ImageView imgViewSet = ImageView::New(image);
-
-  DALI_TEST_CHECK(imgViewSet );
-
-  PushButton pushButton = PushButton::New();
-
-  DALI_TEST_CHECK( pushButton );
-
-  pushButton.SetBackgroundImage( imgViewSet );
-
-  ImageView imageView = ImageView::DownCast( pushButton.GetButtonImage());
-
-  DALI_TEST_CHECK( imageView );
-
-  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-  Property::Map map;
-  value.Get( map );
-  DALI_TEST_CHECK( !map.Empty() );
-  DALI_TEST_EQUALS( map[ "filename" ].Get<std::string>(), TEST_IMAGE_ONE , TEST_LOCATION );
-
-  END_TEST;
-}
-
-
-int UtcDaliPushButtonSetSelectedBackgroundImageWithActorDeprecatedP(void)
-{
-  tet_infoline(" UtcDaliPushButton SetSelectedBackgroundImage With ImageView (Actor)");
-
-  ToolkitTestApplication application;
-
-  Image image = ResourceImage::New( TEST_IMAGE_ONE );
-
-  DALI_TEST_CHECK( image );
-
-  ImageView imgViewSet = ImageView::New(image);
-
-  DALI_TEST_CHECK(imgViewSet );
-
-  PushButton pushButton = PushButton::New();
-
-  DALI_TEST_CHECK( pushButton );
-
-  pushButton.SetSelectedBackgroundImage( imgViewSet );
-
-  ImageView imageView = ImageView::DownCast( pushButton.GetSelectedImage());
-
-  DALI_TEST_CHECK( imageView );
-
-  Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
-  Property::Map map;
-  value.Get( map );
-  DALI_TEST_CHECK( !map.Empty() );
-  DALI_TEST_EQUALS( map[ "filename" ].Get<std::string>(), TEST_IMAGE_ONE , TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetDisabledBackgroundImageWithActorDeprecatedP(void)
-{
-  tet_infoline(" UtcDaliPushButton SetDisabledBackgroundImage With ImageView (Actor)");
-
-  ToolkitTestApplication application;
-
-  Image image = ResourceImage::New( TEST_IMAGE_ONE );
-
-  DALI_TEST_CHECK( image );
-
-  ImageView imgViewSet = ImageView::New(image);
-
-  DALI_TEST_CHECK(imgViewSet );
-
-  PushButton pushButton = PushButton::New();
-
-  DALI_TEST_CHECK( pushButton );
-
-  pushButton.SetDisabledBackgroundImage( imgViewSet );
-
-  Property::Value value = pushButton.GetProperty( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL );
-  Property::Map map;
-  value.Get( map );
-
-  Property::Value* urlValue = map.Find( ImageVisual::Property::URL );
-
-  std::string urlString;
-  urlValue->Get( urlString );
-  DALI_TEST_EQUALS( urlString , TEST_IMAGE_ONE , TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetDisabledImageWithActorDeprecatedP(void)
-{
-  tet_infoline(" UtcDaliPushButton SetDisabledImage With ImageView (Actor)");
-
-  ToolkitTestApplication application;
-
-  Image image = ResourceImage::New( TEST_IMAGE_ONE );
-
-  DALI_TEST_CHECK( image );
-
-  ImageView imgViewSet = ImageView::New(image);
-
-  DALI_TEST_CHECK(imgViewSet );
-
-  PushButton pushButton = PushButton::New();
-
-  DALI_TEST_CHECK( pushButton );
-
-  pushButton.SetDisabledImage( imgViewSet );
-
-  Property::Value value = pushButton.GetProperty( Toolkit::DevelButton::Property::DISABLED_UNSELECTED_BACKGROUND_VISUAL );
-
-  Property::Map map;
-  value.Get( map );
-
-  Property::Value* urlValue = map.Find( ImageVisual::Property::URL );
-
-  std::string urlString;
-  urlValue->Get( urlString );
-  DALI_TEST_EQUALS( urlString , TEST_IMAGE_ONE , TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonSetDisabledSelectedImageWithActorDeprecatedP(void)
-{
-  tet_infoline(" UtcDaliPushButton SetDisabledSelectedImage With ImageView (Actor)");
-
-  ToolkitTestApplication application;
-
-  Image image = ResourceImage::New( TEST_IMAGE_ONE );
-
-  DALI_TEST_CHECK( image );
-
-  ImageView imgViewSet = ImageView::New(image);
-
-  DALI_TEST_CHECK(imgViewSet );
-
-  PushButton pushButton = PushButton::New();
-
-  DALI_TEST_CHECK( pushButton );
-
-  pushButton.SetDisabledSelectedImage( imgViewSet );
-
-  Property::Value value = pushButton.GetProperty( Toolkit::DevelButton::Property::DISABLED_SELECTED_BACKGROUND_VISUAL );
-
-  Property::Map map;
-  value.Get( map );
-
-  Property::Value* urlValue = map.Find( ImageVisual::Property::URL );
-
-  std::string urlString;
-  urlValue->Get( urlString );
-  DALI_TEST_EQUALS( urlString , TEST_IMAGE_ONE , TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcDaliPushButtonReplaceButtonImageP2(void)
-{
-  tet_infoline("Set button image then replace with new image and query url");
-
-  ToolkitTestApplication application;
-
-  ResourceImage setImage = ResourceImage::New( TEST_IMAGE_ONE );
-  DALI_TEST_CHECK(setImage);
-
-  Actor imgActorSet = ImageView::New(setImage);
-  DALI_TEST_CHECK(imgActorSet);
-
-  PushButton pushButton = PushButton::New();
-  pushButton.SetProperty( Toolkit::DevelButton::Property::UNSELECTED_BACKGROUND_VISUAL, TEST_IMAGE_TWO );
-
-
-  Stage::GetCurrent().Add( pushButton );
-
-  pushButton.SetButtonImage( imgActorSet );
-  application.SendNotification();
-  application.Render();
-
-  tet_infoline("Get button image before it has been able to load");
-
-  ImageView imageView = ImageView::DownCast(pushButton.GetButtonImage());
-
-  ResourceImage getImage = ResourceImage::DownCast( imageView.GetImage() );
-
-  tet_infoline("Check if url matches last assignment even if not loaded yet");
-  DALI_TEST_EQUALS( getImage.GetUrl(), setImage.GetUrl() , TEST_LOCATION );
+  DALI_TEST_EQUALS(GetButtonText( pushButton ), STR, TEST_LOCATION);
 
   END_TEST;
 }

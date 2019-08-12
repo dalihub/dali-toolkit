@@ -865,9 +865,16 @@ int UtcDaliImageViewSizeWithBackground(void)
 
   int width = 100;
   int height = 200;
-  Image image = CreateBufferImage( width, height, Vector4(1.f, 1.f, 1.f, 1.f) );
   ImageView imageView = ImageView::New();
-  imageView.SetBackgroundImage( image );
+
+  imageView.SetProperty( Control::Property::BACKGROUND,
+                         {
+                           { Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE },
+                           { Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg" },
+                           { ImageVisual::Property::DESIRED_WIDTH, width },
+                           { ImageVisual::Property::DESIRED_HEIGHT, height },
+                         }
+                       );
 
   Stage::GetCurrent().Add( imageView );
   application.SendNotification();
@@ -887,11 +894,19 @@ int UtcDaliImageViewSizeWithBackgroundAndImage(void)
   int heightBackground = 200;
   int width = 300;
   int height = 400;
-  Image imageBackground = CreateBufferImage( widthBackground, heightBackground, Vector4(1.f, 1.f, 1.f, 1.f) );
   Image image = CreateBufferImage( width, height, Vector4(1.f, 1.f, 1.f, 1.f) );
 
   ImageView imageView = ImageView::New();
-  imageView.SetBackgroundImage( imageBackground );
+
+  imageView.SetProperty( Control::Property::BACKGROUND,
+                         {
+                           { Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE },
+                           { Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg" },
+                           { ImageVisual::Property::DESIRED_WIDTH, widthBackground },
+                           { ImageVisual::Property::DESIRED_HEIGHT, heightBackground },
+                          }
+                       );
+
   imageView.SetImage( image );
 
   Stage::GetCurrent().Add( imageView );
@@ -910,10 +925,17 @@ int UtcDaliImageViewHeightForWidthBackground(void)
 
   int widthBackground = 100;
   int heightBackground = 200;
-  Image imageBackground = CreateBufferImage( widthBackground, heightBackground, Vector4(1.f, 1.f, 1.f, 1.f) );
 
   ImageView imageView = ImageView::New();
-  imageView.SetBackgroundImage( imageBackground );
+
+  imageView.SetProperty( Control::Property::BACKGROUND,
+                         {
+                           { Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE },
+                           { Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg" },
+                           { ImageVisual::Property::DESIRED_WIDTH, widthBackground },
+                           { ImageVisual::Property::DESIRED_HEIGHT, heightBackground }
+                         }
+                       );
 
   Stage::GetCurrent().Add( imageView );
   application.SendNotification();
@@ -935,11 +957,20 @@ int UtcDaliImageViewHeightForWidthBackgroundAndImage(void)
   int heightBackground = 200;
   int width = 300;
   int height = 400;
-  Image imageBackground = CreateBufferImage( widthBackground, heightBackground, Vector4(1.f, 1.f, 1.f, 1.f) );
+
   Image image = CreateBufferImage( width, height, Vector4(1.f, 1.f, 1.f, 1.f) );
 
   ImageView imageView = ImageView::New();
-  imageView.SetBackgroundImage( imageBackground );
+
+  imageView.SetProperty( Control::Property::BACKGROUND,
+                         {
+                           { Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE },
+                           { Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg" },
+                           { ImageVisual::Property::DESIRED_WIDTH, widthBackground },
+                           { ImageVisual::Property::DESIRED_HEIGHT, heightBackground }
+                         }
+                       );
+
   imageView.SetImage( image );
 
   Stage::GetCurrent().Add( imageView );
@@ -1080,15 +1111,17 @@ int UtcDaliImageViewCheckResourceReady(void)
 
   gResourceReadySignalFired = false;
 
-
-  int width = 100;
-  int height = 200;
-  Image image = CreateBufferImage( width, height, Vector4(1.f, 1.f, 1.f, 1.f) );
-
   // Check ImageView with background and main image, to ensure both visuals are marked as loaded
   ImageView imageView = ImageView::New( TEST_GIF_FILE_NAME );
 
-  imageView.SetBackgroundImage( image );
+  imageView.SetProperty( Control::Property::BACKGROUND,
+                         {
+                           { Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE },
+                           { Toolkit::ImageVisual::Property::URL, TEST_RESOURCE_DIR "/gallery-small-1.jpg" },
+                           { ImageVisual::Property::DESIRED_WIDTH, 100 },
+                           { ImageVisual::Property::DESIRED_HEIGHT, 200 }
+                          }
+                       );
 
   DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
 
@@ -1096,9 +1129,11 @@ int UtcDaliImageViewCheckResourceReady(void)
 
   Stage::GetCurrent().Add( imageView );
 
+  // loading started, this waits for the loader thread
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
   application.SendNotification();
   application.Render(16);
-
 
   DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
 
@@ -1293,10 +1328,10 @@ int UtcDaliImageViewResourceUrlP(void)
   ToolkitTestApplication application;
 
   ImageView imageView = ImageView::New();
-  DALI_TEST_CHECK( imageView.GetProperty( ImageView::Property::RESOURCE_URL ).Get< std::string >().empty() );
+  DALI_TEST_CHECK( imageView.GetProperty( ImageView::Property::IMAGE ).Get< std::string >().empty() );
 
-  imageView.SetProperty( ImageView::Property::RESOURCE_URL, "TestString" );
-  DALI_TEST_EQUALS( imageView.GetProperty( ImageView::Property::RESOURCE_URL ).Get< std::string >(), "TestString", TEST_LOCATION );
+  imageView.SetProperty( ImageView::Property::IMAGE, "TestString" );
+  DALI_TEST_EQUALS( imageView.GetProperty( ImageView::Property::IMAGE ).Get< std::string >(), "TestString", TEST_LOCATION );
 
   END_TEST;
 }
