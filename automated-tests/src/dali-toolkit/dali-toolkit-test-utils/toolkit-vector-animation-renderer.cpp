@@ -66,10 +66,6 @@ public:
     }
   }
 
-  void StopRender()
-  {
-  }
-
   bool Render( uint32_t frameNumber )
   {
     if( frameNumber == 1 && mPreviousFrame != frameNumber )
@@ -169,11 +165,6 @@ void VectorAnimationRenderer::SetRenderer( Renderer renderer )
 void VectorAnimationRenderer::SetSize( uint32_t width, uint32_t height )
 {
   Internal::Adaptor::GetImplementation( *this ).SetSize( width, height );
-}
-
-void VectorAnimationRenderer::StopRender()
-{
-  Internal::Adaptor::GetImplementation( *this ).StopRender();
 }
 
 bool VectorAnimationRenderer::Render( uint32_t frameNumber )
