@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_ASYNC_IMAGE_LOADER_IMPL_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,19 @@ public:
                  SamplingMode::Type samplingMode,
                  bool orientationCorrection,
                  DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
+
+  /**
+   * @brief Starts an mask applying task.
+   * @param[in] pixelBuffer of the to be masked image
+   * @param[in] maskPixelBuffer of the mask image
+   * @param[in] contentScale The factor to scale the content
+   * @param[in] cropToMask Whether to crop the content to the mask size
+   * @return The loading task id
+   */
+  uint32_t ApplyMask( Devel::PixelBuffer pixelBuffer,
+                      Devel::PixelBuffer maskPixelBuffer,
+                      float contentScale,
+                      bool cropToMask );
 
   /**
    * @copydoc Toolkit::AsyncImageLoader::ImageLoadedSignal

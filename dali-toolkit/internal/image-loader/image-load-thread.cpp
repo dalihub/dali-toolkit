@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,27 @@ LoadingTask::LoadingTask( uint32_t id, const VisualUrl& url, ImageDimensions dim
   fittingMode( fittingMode ),
   samplingMode( samplingMode ),
   orientationCorrection( orientationCorrection ),
-  preMultiplyOnLoad( preMultiplyOnLoad )
+  preMultiplyOnLoad( preMultiplyOnLoad ),
+  isMaskTask( false ),
+  maskPixelBuffer(),
+  contentScale( 1.0f ),
+  cropToMask( false )
+{
+}
+
+LoadingTask::LoadingTask( uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask )
+: pixelBuffer( pixelBuffer ),
+  url( "" ),
+  id( id ),
+  dimensions(),
+  fittingMode(),
+  samplingMode(),
+  orientationCorrection(),
+  preMultiplyOnLoad(),
+  isMaskTask( true ),
+  maskPixelBuffer( maskPixelBuffer ),
+  contentScale( contentScale ),
+  cropToMask( cropToMask )
 {
 }
 
@@ -65,6 +85,10 @@ void LoadingTask::Load()
   }
 }
 
+void LoadingTask::ApplyMask()
+{
+  pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
+}
 
 ImageLoadThread::ImageLoadThread( EventThreadCallback* trigger )
 : mTrigger( trigger ),
@@ -89,7 +113,15 @@ void ImageLoadThread::Run()
 
   while( LoadingTask* task = NextTaskToProcess() )
   {
-    task->Load();
+    if( !task->isMaskTask )
+    {
+      task->Load();
+    }
+    else
+    {
+      task->ApplyMask();
+    }
+
     AddCompletedTask( task );
   }
 }
