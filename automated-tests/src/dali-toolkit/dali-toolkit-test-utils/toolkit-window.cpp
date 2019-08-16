@@ -24,8 +24,14 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/base-object.h>
 
+#define DALI_WINDOW_H
+#include <dali/integration-api/adaptors/adaptor.h>
+#include <toolkit-adaptor-impl.h>
+
 // INTERNAL INCLUDES
 #include "test-render-surface.h"
+
+using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
 
 namespace Dali
 {
@@ -92,13 +98,15 @@ Window& Window::operator=(const Window& rhs)
 
 Dali::Window Window::New( PositionSize windowPosition, const std::string& name, bool isTransparent )
 {
-  Internal::Adaptor::Window* window = Internal::Adaptor::Window::New( windowPosition, name, "", isTransparent );
-  return Window( window );
+  return New( windowPosition, name, "", isTransparent );
 }
 
 Dali::Window Window::New(PositionSize windowPosition, const std::string& name, const std::string& className, bool isTransparent )
 {
   Internal::Adaptor::Window* window = Internal::Adaptor::Window::New( windowPosition, name, className, isTransparent );
+  Dali::Window newWindow = Window( window );
+  Dali::Adaptor::WindowCreatedSignalType& windowCreatedSignal = AdaptorImpl::Get().WindowCreatedSignal();
+  windowCreatedSignal.Emit( newWindow );
   return Window( window );
 }
 
@@ -140,6 +148,11 @@ KeyEventSignalType& KeyEventSignal( Window window )
   return GetImplementation( window ).mScene.KeyEventSignal();
 }
 
+KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Window window )
+{
+  return GetImplementation( window ).mScene.KeyEventGeneratedSignal();
+}
+
 TouchSignalType& TouchSignal( Window window )
 {
   return GetImplementation( window ).mScene.TouchSignal();
@@ -149,7 +162,6 @@ WheelEventSignalType& WheelEventSignal( Window window )
 {
   return GetImplementation( window ).mScene.WheelEventSignal();
 }
-
 } // namespace DevelWindow
 
 } // Dali

@@ -84,6 +84,7 @@ bool LayoutTextTest( const LayoutTextData& data )
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf" );
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansArabicRegular.ttf" );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHindiRegular.ttf" );
 
   // 1) Create the model.
   LogicalModelPtr logicalModel;
@@ -5599,6 +5600,200 @@ int UtcDaliTextLayoutSetGetDefaultLineSpacing(void)
 
   engine.SetDefaultLineSpacing( 10.f );
   DALI_TEST_EQUALS( 10.f, engine.GetDefaultLineSpacing(), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextLayoutGetGlyphMetrics(void)
+{
+  tet_infoline(" UtcDaliTextLayoutGetGlyphMetrics");
+
+  // Test retrieving metrics from group of characters
+
+  const std::string fontFamily( "TizenSansHindi" );
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun01;
+  fontDescriptionRun01.characterRun.characterIndex = 0u;
+  fontDescriptionRun01.characterRun.numberOfCharacters = 2u;
+  fontDescriptionRun01.familyLength = fontFamily.size();
+  fontDescriptionRun01.familyName = new char[fontDescriptionRun01.familyLength];
+  memcpy( fontDescriptionRun01.familyName, fontFamily.c_str(), fontDescriptionRun01.familyLength );
+  fontDescriptionRun01.familyDefined = true;
+  fontDescriptionRun01.weightDefined = false;
+  fontDescriptionRun01.widthDefined = false;
+  fontDescriptionRun01.slantDefined = false;
+  fontDescriptionRun01.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun02;
+  fontDescriptionRun02.characterRun.characterIndex = 0u;
+  fontDescriptionRun02.characterRun.numberOfCharacters = 2u;
+  fontDescriptionRun02.familyLength = fontFamily.size();
+  fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
+  memcpy( fontDescriptionRun02.familyName, fontFamily.c_str(), fontDescriptionRun02.familyLength );
+  fontDescriptionRun02.familyDefined = true;
+  fontDescriptionRun02.weightDefined = false;
+  fontDescriptionRun02.widthDefined = false;
+  fontDescriptionRun02.slantDefined = false;
+  fontDescriptionRun02.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun03;
+  fontDescriptionRun03.characterRun.characterIndex = 0u;
+  fontDescriptionRun03.characterRun.numberOfCharacters = 2u;
+  fontDescriptionRun03.familyLength = fontFamily.size();
+  fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
+  memcpy( fontDescriptionRun03.familyName, fontFamily.c_str(), fontDescriptionRun03.familyLength );
+  fontDescriptionRun03.familyDefined = true;
+  fontDescriptionRun03.weightDefined = false;
+  fontDescriptionRun03.widthDefined = false;
+  fontDescriptionRun03.slantDefined = false;
+  fontDescriptionRun03.sizeDefined = false;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns01;
+  fontDescriptionRuns01.PushBack( fontDescriptionRun01 );
+
+  Vector<FontDescriptionRun> fontDescriptionRuns02;
+  fontDescriptionRuns02.PushBack( fontDescriptionRun02 );
+
+  Vector<FontDescriptionRun> fontDescriptionRuns03;
+  fontDescriptionRuns03.PushBack( fontDescriptionRun03 );
+
+  // Set a text area.
+  Size textArea(100.f, 100.f);
+
+
+  // Group: second glyph doesn't exceed the width of the first glyph
+  float positions01[] = { 0.f, -11.f };
+
+  struct LineRun line01 =
+  {
+    { 0u, 1u },
+    { 0u, 1u },
+    11.f,
+    15.f,
+    -4.f,
+    0.f,
+    0.f,
+    0.f,
+    false,
+    false
+  };
+  Vector<LineRun> lines01;
+  lines01.PushBack( line01 );
+
+  Size layoutSize01 = Vector2(11.f, 19.f);
+
+  // Group: second glyph doesn't exceed the width of the first glyph
+  float positions02[] = { 0.f, -11.f , 7.f, -15.f };
+
+  struct LineRun line02 =
+  {
+    { 0u, 2u },
+    { 0u, 2u },
+    15.f,
+    15.f,
+    -4.f,
+    0.f,
+    0.f,
+    0.f,
+    false,
+    false
+  };
+  Vector<LineRun> lines02;
+  lines02.PushBack( line02 );
+
+  Size layoutSize02 = Vector2(15.f, 19.f);
+
+  // Group: second glyph doesn't exceed the width of the first glyph
+  float positions03[] = { 0.f, -11.f , 2.f, -15.f };
+
+  struct LineRun line03 =
+  {
+    { 0u, 2u },
+    { 0u, 2u },
+    11.f,
+    15.f,
+    -4.f,
+    0.f,
+    0.f,
+    0.f,
+    false,
+    false
+  };
+  Vector<LineRun> lines03;
+  lines03.PushBack( line03 );
+
+  Size layoutSize03 = Vector2(11.f, 19.f);
+
+ /////////////////////////////
+
+  struct LayoutTextData data[] =
+  {
+    {
+      "Single glyph",
+      "प",
+      textArea,
+      1u,
+      fontDescriptionRuns01.Begin(),
+      layoutSize01,
+      1u,
+      positions01,
+      1u,
+      lines01.Begin(),
+      Layout::Engine::SINGLE_LINE_BOX,
+      0u,
+      1u,
+      false,
+      true
+    },
+    {
+      "Group: second glyph exceeds the width of the first glyph",
+      "पो",
+      textArea,
+      1u,
+      fontDescriptionRuns02.Begin(),
+      layoutSize02,
+      2u,
+      positions02,
+      1u,
+      lines02.Begin(),
+      Layout::Engine::SINGLE_LINE_BOX,
+      0u,
+      2u,
+      false,
+      true
+    },
+   {
+      "Group: second glyph doesn't exceed the width of the first glyph",
+      "पे",
+      textArea,
+      1u,
+      fontDescriptionRuns03.Begin(),
+      layoutSize03,
+      2u,
+      positions03,
+      1u,
+      lines03.Begin(),
+      Layout::Engine::SINGLE_LINE_BOX,
+      0u,
+      2u,
+      false,
+      true
+    }
+  };
+  const unsigned int numberOfTests = sizeof(data)/sizeof(LayoutTextData);
+
+  for( unsigned int index = 0u; index < numberOfTests; ++index )
+  {
+    ToolkitTestApplication application;
+    if( !LayoutTextTest( data[index] ) )
+    {
+      tet_result(TET_FAIL);
+    }
+  }
 
   tet_result(TET_PASS);
   END_TEST;
