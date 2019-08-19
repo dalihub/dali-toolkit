@@ -346,9 +346,6 @@ int UtcDaliAnimatedVectorImageVisualSetProperties(void)
   application.SendNotification();
   application.Render();
 
-  // Wait for resource ready event callback
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
-
   // renderer is added to actor
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
   Renderer renderer = actor.GetRendererAt( 0u );

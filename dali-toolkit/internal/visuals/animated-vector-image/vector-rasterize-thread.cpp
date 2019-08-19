@@ -60,7 +60,6 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
 : mUrl( url ),
   mVectorRenderer(),
   mConditionalWait(),
-  mResourceReadyTrigger(),
   mAnimationFinishedTrigger(),
   mPlayState( PlayState::STOPPED ),
   mStopBehavior( DevelImageVisual::StopBehavior::CURRENT_FRAME ),
@@ -190,12 +189,6 @@ void VectorRasterizeThread::RenderFrame()
   }
 }
 
-void VectorRasterizeThread::SetResourceReadyCallback( EventThreadCallback* callback )
-{
-  ConditionalWait::ScopedLock lock( mConditionalWait );
-  mResourceReadyTrigger = std::unique_ptr< EventThreadCallback >( callback );
-}
-
 void VectorRasterizeThread::SetAnimationFinishedCallback( EventThreadCallback* callback )
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
@@ -291,7 +284,13 @@ void VectorRasterizeThread::SetCurrentFrameNumber( uint32_t frameNumber )
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
 
-  if( frameNumber >= mStartFrame && frameNumber <= mEndFrame && mCurrentFrame != frameNumber )
+  if( mCurrentFrame == frameNumber )
+  {
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetCurrentFrameNumber: Set same frame [%d] [%p]\n", frameNumber, this );
+    return;
+  }
+
+  if( frameNumber >= mStartFrame && frameNumber <= mEndFrame )
   {
     mCurrentFrame = frameNumber;
     mCurrentFrameUpdated = true;
@@ -337,6 +336,11 @@ void VectorRasterizeThread::SetLoopingMode( DevelImageVisual::LoopingMode::Type 
   DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetLoopingMode: looping mode = %d [%p]\n", mLoopingMode, this );
 }
 
+VectorRasterizeThread::UploadCompletedSignalType& VectorRasterizeThread::UploadCompletedSignal()
+{
+  return mVectorRenderer.UploadCompletedSignal();
+}
+
 void VectorRasterizeThread::Initialize()
 {
   mVectorRenderer = VectorAnimationRenderer::New( mUrl );
@@ -358,7 +362,7 @@ void VectorRasterizeThread::Initialize()
 
 void VectorRasterizeThread::Rasterize()
 {
-  bool resourceReady, stopped = false;
+  bool stopped = false;
   uint32_t currentFrame, startFrame, endFrame;
   int32_t loopCount;
 
@@ -376,14 +380,13 @@ void VectorRasterizeThread::Rasterize()
       mCurrentFrame = mForward ? mCurrentFrame + 1 : mCurrentFrame - 1;
     }
 
-    resourceReady = mResourceReady;
     currentFrame = mCurrentFrame;
     startFrame = mStartFrame;
     endFrame = mEndFrame;
     loopCount = mLoopCount;
 
-    mNeedRender = false;
     mResourceReady = true;
+    mNeedRender = false;
     mCurrentFrameUpdated = false;
     mUpdateFrameNumber = true;
   }
@@ -450,13 +453,6 @@ void VectorRasterizeThread::Rasterize()
   {
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Rendering failed. Try again later.[%d] [%p]\n", currentFrame, this );
     mUpdateFrameNumber = false;
-  }
-
-  if( !resourceReady )
-  {
-    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Resource ready trigger [current = %d] [%p]\n", currentFrame, this );
-
-    mResourceReadyTrigger->Trigger();
   }
 
   if( stopped )

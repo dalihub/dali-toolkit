@@ -21,7 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/weak-handle.h>
-#include <memory>
+#include <dali/public-api/object/property-notification.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -54,7 +54,7 @@ using AnimatedVectorImageVisualPtr = IntrusivePtr< AnimatedVectorImageVisual >;
  * | url                      | STRING           |
  *
  */
-class AnimatedVectorImageVisual: public Visual::Base
+class AnimatedVectorImageVisual: public Visual::Base, public ConnectionTracker
 {
 public:
 
@@ -147,9 +147,9 @@ private:
   void DoSetProperty( Property::Index index, const Property::Value& value );
 
   /**
-   * @brief Event callback from rasterize thread. This is called after the first frame is ready.
+   * @brief Called when the texture upload is completed.
    */
-  void OnResourceReady();
+  void OnUploadCompleted();
 
   /**
    * @brief Event callback from rasterize thread. This is called after the animation is finished.
@@ -161,6 +161,21 @@ private:
    */
   void SendAnimationData();
 
+  /**
+   * @brief Set the vector image size.
+   */
+  void SetVectorImageSize();
+
+  /**
+   * @brief Callback when the world scale factor changes.
+   */
+  void OnScaleNotification( PropertyNotification& source );
+
+  /**
+   * @brief Callback when the size changes.
+   */
+  void OnSizeNotification( PropertyNotification& source );
+
   // Undefined
   AnimatedVectorImageVisual( const AnimatedVectorImageVisual& visual ) = delete;
 
@@ -171,7 +186,10 @@ private:
   ImageVisualShaderFactory&                    mImageVisualShaderFactory;
   VisualUrl                                    mUrl;
   VectorRasterizeThread                        mVectorRasterizeThread;
+  PropertyNotification                         mScaleNotification;
+  PropertyNotification                         mSizeNotification;
   Vector2                                      mVisualSize;
+  Vector2                                      mVisualScale;
   WeakHandle< Actor >                          mPlacementActor;
   int32_t                                      mLoopCount;
   int32_t                                      mStartFrame;
@@ -180,6 +198,7 @@ private:
   DevelAnimatedVectorImageVisual::Action::Type mActionStatus;
   DevelImageVisual::StopBehavior::Type         mStopBehavior;
   DevelImageVisual::LoopingMode::Type          mLoopingMode;
+  bool                                         mRendererAdded;
 };
 
 } // namespace Internal
