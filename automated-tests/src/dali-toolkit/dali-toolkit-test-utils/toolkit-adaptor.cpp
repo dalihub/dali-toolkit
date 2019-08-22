@@ -24,6 +24,7 @@
 #include <dali/integration-api/adaptors/adaptor.h>
 
 #include <dali/integration-api/adaptors/scene-holder.h>
+#include <toolkit-scene-holder-impl.h>
 
 #include <toolkit-adaptor-impl.h>
 #include <dali/integration-api/debug.h>
@@ -98,7 +99,8 @@ void Adaptor::Start( Dali::Window window )
   if ( window )
   {
     mWindows.push_back( window );
-    mWindowCreatedSignal.Emit( window );
+
+    mSceneHolders.emplace_back( static_cast<SceneHolder*>( &window.GetBaseObject() ) );
   }
 }
 
@@ -139,6 +141,11 @@ Dali::RenderSurfaceInterface& Adaptor::GetSurface()
 Dali::WindowContainer Adaptor::GetWindows()
 {
   return mWindows;
+}
+
+Dali::SceneHolderList Adaptor::GetSceneHolders()
+{
+  return mSceneHolders;
 }
 
 Dali::Adaptor::AdaptorSignalType& Adaptor::ResizedSignal()
@@ -233,6 +240,11 @@ Dali::RenderSurfaceInterface& Adaptor::GetSurface()
 Dali::WindowContainer Adaptor::GetWindows() const
 {
   return mImpl->GetWindows();
+}
+
+Dali::SceneHolderList Adaptor::GetSceneHolders() const
+{
+  return mImpl->GetSceneHolders();
 }
 
 Any Adaptor::GetNativeWindowHandle()

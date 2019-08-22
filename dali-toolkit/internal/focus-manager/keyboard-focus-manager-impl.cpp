@@ -23,7 +23,6 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/devel-api/adaptor-framework/accessibility-adaptor.h>
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
@@ -142,23 +141,23 @@ void KeyboardFocusManager::OnAdaptorInit()
 {
   if( Adaptor::IsAvailable() )
   {
-    // Retrieve all the existing widnows
-    Dali::WindowContainer windows = Adaptor::Get().GetWindows();
-    for ( auto iter = windows.begin(); iter != windows.end(); ++iter )
+    // Retrieve all the existing scene holders
+    Dali::SceneHolderList sceneHolders = Adaptor::Get().GetSceneHolders();
+    for( auto iter = sceneHolders.begin(); iter != sceneHolders.end(); ++iter )
     {
-      DevelWindow::KeyEventSignal( *iter ).Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
-      DevelWindow::TouchSignal( *iter ).Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch);
+      ( *iter ).KeyEventSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent );
+      ( *iter ).TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
     }
 
-    // Get notified when any new window is created afterwards
-    Adaptor::Get().WindowCreatedSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnWindowCreated);
+    // Get notified when any new scene holder is created afterwards
+    Adaptor::Get().WindowCreatedSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnSceneHolderCreated );
   }
 }
 
-void KeyboardFocusManager::OnWindowCreated( Dali::Window& window )
+void KeyboardFocusManager::OnSceneHolderCreated( Dali::Integration::SceneHolder& sceneHolder )
 {
-  DevelWindow::KeyEventSignal( window ).Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
-  DevelWindow::TouchSignal( window ).Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch);
+  sceneHolder.KeyEventSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent );
+  sceneHolder.TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
 }
 
 KeyboardFocusManager::~KeyboardFocusManager()

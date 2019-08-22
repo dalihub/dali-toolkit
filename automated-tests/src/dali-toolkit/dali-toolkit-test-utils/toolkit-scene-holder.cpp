@@ -15,15 +15,27 @@
  *
  */
 
+#include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/adaptors/scene-holder.h>
+
+#include <toolkit-scene-holder-impl.h>
 
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/base-object.h>
 
+#include <dali/integration-api/adaptors/adaptor.h>
+#include <toolkit-adaptor-impl.h>
+
 namespace Dali
 {
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Dali::Internal::Adaptor::SceneHolder Stub
+//
+///////////////////////////////////////////////////////////////////////////////
 
 namespace Internal
 {
@@ -31,20 +43,84 @@ namespace Internal
 namespace Adaptor
 {
 
-class SceneHolder: public Dali::BaseObject
+SceneHolder::SceneHolder( const Dali::Rect<int>& positionSize )
+: mRenderSurface( positionSize ),
+  mScene( Dali::Integration::Scene::New( mRenderSurface ) )
 {
+}
 
-};
+SceneHolder::~SceneHolder()
+{
+}
 
-} // Adaptor
+void SceneHolder::SetBackgroundColor( Vector4 color )
+{
+  return mScene.SetBackgroundColor( color );
+}
 
-} // Internal
+Vector4 SceneHolder::GetBackgroundColor() const
+{
+  return mScene.GetBackgroundColor();
+}
+
+void SceneHolder::FeedTouchPoint( Dali::TouchPoint& point, int timeStamp )
+{
+}
+
+void SceneHolder::FeedWheelEvent( Dali::WheelEvent& wheelEvent )
+{
+}
+
+void SceneHolder::FeedKeyEvent( Dali::KeyEvent& keyEvent )
+{
+}
+
+Dali::Integration::SceneHolder::KeyEventSignalType& SceneHolder::KeyEventSignal()
+{
+  return mScene.KeyEventSignal();
+}
+
+Dali::Integration::SceneHolder::KeyEventGeneratedSignalType& SceneHolder::KeyEventGeneratedSignal()
+{
+  return mScene.KeyEventGeneratedSignal();
+}
+
+Dali::Integration::SceneHolder::TouchSignalType& SceneHolder::TouchSignal()
+{
+  return mScene.TouchSignal();
+}
+
+Dali::Integration::SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()
+{
+  return mScene.WheelEventSignal();
+}
+
+Integration::Scene SceneHolder::GetScene()
+{
+  return mScene;
+}
+
+Integration::RenderSurface& SceneHolder::GetRenderSurface()
+{
+  return mRenderSurface;
+}
+
+} // namespace Adaptor
+
+} // namespace Internal
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Dali::Integration::SceneHolder Stub
+//
+///////////////////////////////////////////////////////////////////////////////
 
 namespace Integration
 {
 
 SceneHolder::SceneHolder()
 {
+  // Dali::Internal::Adaptor::Adaptor::Get().WindowCreatedSignal().Emit( *this );
 }
 
 SceneHolder::~SceneHolder()
@@ -75,30 +151,59 @@ void SceneHolder::Remove( Actor actor )
 {
 }
 
-Layer SceneHolder::GetRootLayer() const
+Dali::Layer SceneHolder::GetRootLayer() const
 {
   return Dali::Stage::GetCurrent().GetRootLayer();
 }
 
 void SceneHolder::SetBackgroundColor( Vector4 color )
 {
+  GetImplementation( *this ).SetBackgroundColor( color );
 }
 
 Vector4 SceneHolder::GetBackgroundColor() const
 {
-  return Dali::Stage::GetCurrent().GetBackgroundColor();
+  return GetImplementation( *this ).GetBackgroundColor();
 }
 
 void SceneHolder::FeedTouchPoint( Dali::TouchPoint& point, int timeStamp )
 {
+  GetImplementation( *this ).FeedTouchPoint( point, timeStamp );
 }
 
 void SceneHolder::FeedWheelEvent( Dali::WheelEvent& wheelEvent )
 {
+  GetImplementation( *this ).FeedWheelEvent( wheelEvent );
 }
 
 void SceneHolder::FeedKeyEvent( Dali::KeyEvent& keyEvent )
 {
+  GetImplementation( *this ).FeedKeyEvent( keyEvent );
+}
+
+SceneHolder::KeyEventSignalType& SceneHolder::KeyEventSignal()
+{
+  return GetImplementation( *this ).KeyEventSignal();
+}
+
+SceneHolder::KeyEventGeneratedSignalType& SceneHolder::KeyEventGeneratedSignal()
+{
+  return GetImplementation( *this ).KeyEventGeneratedSignal();
+}
+
+SceneHolder::TouchSignalType& SceneHolder::TouchSignal()
+{
+  return GetImplementation( *this ).TouchSignal();
+}
+
+SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()
+{
+  return GetImplementation( *this ).WheelEventSignal();
+}
+
+SceneHolder SceneHolder::Get( Actor actor )
+{
+  return SceneHolder();
 }
 
 } // Integration

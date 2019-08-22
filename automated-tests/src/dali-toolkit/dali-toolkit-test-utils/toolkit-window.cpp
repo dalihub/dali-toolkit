@@ -24,6 +24,9 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/base-object.h>
 
+#include <dali/integration-api/adaptors/scene-holder.h>
+#include <toolkit-scene-holder-impl.h>
+
 #define DALI_WINDOW_H
 #include <dali/integration-api/adaptors/adaptor.h>
 #include <toolkit-adaptor-impl.h>
@@ -46,13 +49,12 @@ namespace Internal
 {
 namespace Adaptor
 {
-class Window : public Dali::BaseObject
+class Window : public SceneHolder
 {
 public:
 
   Window( const PositionSize& positionSize )
-  : mRenderSurface( positionSize ),
-    mScene( Dali::Integration::Scene::New( mRenderSurface ) )
+  : SceneHolder( positionSize )
   {
   }
 
@@ -62,9 +64,6 @@ public:
   {
     return new Window( positionSize );
   }
-
-  TestRenderSurface mRenderSurface;
-  Integration::Scene mScene;
 };
 
 } // Adaptor
@@ -104,10 +103,13 @@ Dali::Window Window::New( PositionSize windowPosition, const std::string& name, 
 Dali::Window Window::New(PositionSize windowPosition, const std::string& name, const std::string& className, bool isTransparent )
 {
   Internal::Adaptor::Window* window = Internal::Adaptor::Window::New( windowPosition, name, className, isTransparent );
-  Dali::Window newWindow = Window( window );
-  Dali::Adaptor::WindowCreatedSignalType& windowCreatedSignal = AdaptorImpl::Get().WindowCreatedSignal();
-  windowCreatedSignal.Emit( newWindow );
-  return Window( window );
+
+  Dali::Window result( window );
+
+  Dali::Integration::SceneHolder sceneHolder( static_cast<Dali::Internal::Adaptor::SceneHolder*>( window ) );
+  Dali::Internal::Adaptor::Adaptor::Get().WindowCreatedSignal().Emit( sceneHolder );
+
+  return result;
 }
 
 Dali::Layer Window::GetRootLayer() const
@@ -122,12 +124,12 @@ Window::Window( Internal::Adaptor::Window* window )
 
 Integration::Scene Window::GetScene()
 {
-  return GetImplementation( *this ).mScene;
+  return GetImplementation( *this ).GetScene();
 }
 
 Integration::RenderSurface& Window::GetRenderSurface()
 {
-  return GetImplementation( *this ).mRenderSurface;
+  return GetImplementation( *this ).GetRenderSurface();
 }
 
 namespace DevelWindow
@@ -140,27 +142,27 @@ Window Get( Actor actor )
 
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window )
 {
-  return GetImplementation( window ).mScene.EventProcessingFinishedSignal();
+  return GetImplementation( window ).GetScene().EventProcessingFinishedSignal();
 }
 
 KeyEventSignalType& KeyEventSignal( Window window )
 {
-  return GetImplementation( window ).mScene.KeyEventSignal();
+  return GetImplementation( window ).KeyEventSignal();
 }
 
 KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Window window )
 {
-  return GetImplementation( window ).mScene.KeyEventGeneratedSignal();
+  return GetImplementation( window ).KeyEventGeneratedSignal();
 }
 
 TouchSignalType& TouchSignal( Window window )
 {
-  return GetImplementation( window ).mScene.TouchSignal();
+  return GetImplementation( window ).TouchSignal();
 }
 
 WheelEventSignalType& WheelEventSignal( Window window )
 {
-  return GetImplementation( window ).mScene.WheelEventSignal();
+  return GetImplementation( window ).WheelEventSignal();
 }
 } // namespace DevelWindow
 

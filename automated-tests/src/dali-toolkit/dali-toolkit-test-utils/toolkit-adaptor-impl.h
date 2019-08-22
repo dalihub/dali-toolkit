@@ -76,6 +76,7 @@ public:
 
   Dali::RenderSurfaceInterface& GetSurface();
   Dali::WindowContainer GetWindows();
+  Dali::SceneHolderList GetSceneHolders();
 
   Dali::Adaptor::AdaptorSignalType& ResizedSignal();
   Dali::Adaptor::AdaptorSignalType& LanguageChangedSignal();
@@ -88,6 +89,7 @@ private:
 
   Vector<CallbackBase*> mCallbacks;
   Dali::WindowContainer mWindows;
+  Dali::SceneHolderList mSceneHolders;
   Dali::Adaptor::AdaptorSignalType mResizedSignal;
   Dali::Adaptor::AdaptorSignalType mLanguageChangedSignal;
   Dali::Adaptor::WindowCreatedSignalType mWindowCreatedSignal;
