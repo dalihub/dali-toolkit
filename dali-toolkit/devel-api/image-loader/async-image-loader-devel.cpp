@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,15 @@ uint32_t Load( AsyncImageLoader asyncImageLoader,
                DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad )
 {
   return GetImplementation( asyncImageLoader ).Load( Toolkit::Internal::VisualUrl(url), dimensions, fittingMode, samplingMode, orientationCorrection, preMultiplyOnLoad);
+}
+
+uint32_t ApplyMask( AsyncImageLoader asyncImageLoader,
+                    Devel::PixelBuffer pixelBuffer,
+                    Devel::PixelBuffer maskPixelBuffer,
+                    float contentScale,
+                    bool cropToMask )
+{
+  return GetImplementation( asyncImageLoader ).ApplyMask( pixelBuffer, maskPixelBuffer, contentScale, cropToMask );
 }
 
 PixelBufferLoadedSignalType& PixelBufferLoadedSignal( AsyncImageLoader asyncImageLoader )

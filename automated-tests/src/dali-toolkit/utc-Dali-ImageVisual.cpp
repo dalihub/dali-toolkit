@@ -1298,7 +1298,7 @@ int UtcDaliImageVisualAlphaMask(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
@@ -1354,7 +1354,7 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
@@ -1410,7 +1410,7 @@ int UtcDaliImageVisualAlphaMaskCrop(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 3 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
