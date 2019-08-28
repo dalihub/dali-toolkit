@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_MANAGER_IMPL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,6 +99,8 @@ public:
     LOADING,         ///< Loading has been started, but not finished.
     LOAD_FINISHED,   ///< Loading has finished. (for CPU storage only)
     WAITING_FOR_MASK,///< Loading has finished, but waiting for mask image
+    MASK_APPLYING,   ///< Loading has finished, Mask is applying
+    MASK_APPLIED,    ///< Loading has finished, Mask is applyied by GPU
     UPLOADED,        ///< Uploaded and ready. (For GPU upload only)
     CANCELLED,       ///< Removed before loading completed
     LOAD_FAILED      ///< Async loading failed, e.g. connection problem
@@ -585,8 +587,9 @@ private:
    * @param[in] container The Async loading container
    * @param[in] id        This is the async image loaders Id
    * @param[in] pixelBuffer The loaded image data
+   * @param[in] isMaskTask whether this task is for mask or not
    */
-  void AsyncLoadComplete( AsyncLoadingInfoContainerType& container, uint32_t id, Devel::PixelBuffer pixelBuffer );
+  void AsyncLoadComplete( AsyncLoadingInfoContainerType& container, uint32_t id, Devel::PixelBuffer pixelBuffer, bool isMaskTask );
 
   /**
    * @brief Performs Post-Load steps including atlasing.
@@ -605,13 +608,10 @@ private:
 
   /**
    * Apply the mask to the pixelBuffer.
-   * @param[in] pixelBuffer The pixelBuffer to apply the mask to
+   * @param[in] textureInfo The information of texture to apply the mask to
    * @param[in] maskTextureId The texture id of the mask.
-   * @param[in] contentScale The factor to scale the content
-   * @param[in] cropToMask Whether to crop the content to the mask size
    */
-  void ApplyMask( Devel::PixelBuffer& pixelBuffer, TextureId maskTextureId,
-                  float contentScale, bool cropToMask );
+  void ApplyMask( TextureInfo& textureInfo, TextureId maskTextureId );
 
   /**
    * Upload the texture specified in pixelBuffer to the appropriate location
@@ -723,6 +723,20 @@ private:
               bool orientationCorrection,
               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
+    /**
+     * @brief Apply mask
+     * @param [in] id of the texture
+     * @param [in] pixelBuffer of the to be masked image
+     * @param [in] maskPixelBuffer of the mask image
+     * @param [in] contentScale The factor to scale the content
+     * @param [in] cropToMask Whether to crop the content to the mask size
+     */
+    void ApplyMask( TextureId textureId,
+                    Devel::PixelBuffer pixelBuffer,
+                    Devel::PixelBuffer maskPixelBuffer,
+                    float contentScale,
+                    bool cropToMask );
+
   public:
     AsyncLoadingHelper(const AsyncLoadingHelper&) = delete;
     AsyncLoadingHelper& operator=(const AsyncLoadingHelper&) = delete;
@@ -742,8 +756,9 @@ private:
      * @brief Callback to be called when texture loading is complete, it passes the pixel buffer on to texture manager.
      * @param[in] id          Loader id
      * @param[in] pixelBuffer Image data
+     * @param[in] isMaskTask whether this task is for mask or not
      */
-    void AsyncLoadComplete(uint32_t id, Devel::PixelBuffer pixelBuffer);
+    void AsyncLoadComplete(uint32_t id, Devel::PixelBuffer pixelBuffer, bool isMaskTask);
 
   private:
     Toolkit::AsyncImageLoader     mLoader;

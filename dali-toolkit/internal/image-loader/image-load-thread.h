@@ -54,15 +54,37 @@ struct LoadingTask
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha.
    */
-  LoadingTask( uint32_t id, const VisualUrl& url, ImageDimensions dimensions,
-               FittingMode::Type fittingMode, SamplingMode::Type samplingMode,
+  LoadingTask( uint32_t id,
+               const VisualUrl& url,
+               ImageDimensions dimensions,
+               FittingMode::Type fittingMode,
+               SamplingMode::Type samplingMode,
                bool orientationCorrection,
-               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
+               DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
+
+  /**
+   * Constructor.
+   * @param [in] id of the task
+   * @param [in] pixelBuffer of the to be masked image
+   * @param [in] maskPixelBuffer of the mask image
+   * @param [in] contentScale The factor to scale the content
+   * @param [in] cropToMask Whether to crop the content to the mask size
+   */
+  LoadingTask( uint32_t id,
+              Devel::PixelBuffer pixelBuffer,
+              Devel::PixelBuffer maskPixelBuffer,
+              float contentScale,
+              bool cropToMask );
 
   /**
    * Load the image
    */
   void Load();
+
+  /**
+   * Apply mask
+   */
+  void ApplyMask();
 
 private:
 
@@ -75,6 +97,7 @@ private:
 public:
 
   Devel::PixelBuffer pixelBuffer;   ///< pixelBuffer handle after successful load
+                                    ///< or pixelBuffer to be masked image in the mask task
   VisualUrl          url;           ///< url of the image to load
   uint32_t           id;            ///< The unique id associated with this task.
   ImageDimensions    dimensions;    ///< dimensions to load
@@ -82,6 +105,11 @@ public:
   SamplingMode::Type samplingMode;  ///< sampling options
   bool               orientationCorrection:1; ///< if orientation correction is needed
   DevelAsyncImageLoader::PreMultiplyOnLoad            preMultiplyOnLoad; //< if the image's color should be multiplied by it's alpha
+
+  bool isMaskTask;                  ///< whether this task is for mask or not
+  Devel::PixelBuffer maskPixelBuffer; ///< pixelBuffer of mask image
+  float contentScale;               ///< The factor to scale the content
+  bool cropToMask;                  ///< Whether to crop the content to the mask size
 };
 
 
