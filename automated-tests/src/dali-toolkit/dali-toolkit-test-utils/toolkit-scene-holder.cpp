@@ -28,6 +28,8 @@
 #include <dali/integration-api/adaptors/adaptor.h>
 #include <toolkit-adaptor-impl.h>
 
+using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
+
 namespace Dali
 {
 
@@ -51,6 +53,25 @@ SceneHolder::SceneHolder( const Dali::Rect<int>& positionSize )
 
 SceneHolder::~SceneHolder()
 {
+  if ( Dali::Adaptor::IsAvailable() )
+  {
+    AdaptorImpl::GetImpl( AdaptorImpl::Get() ).RemoveWindow( this );
+  }
+}
+
+void SceneHolder::Add( Dali::Actor actor )
+{
+  mScene.Add( actor );
+}
+
+void SceneHolder::Remove( Dali::Actor actor )
+{
+  mScene.Add( actor );
+}
+
+Dali::Layer SceneHolder::GetRootLayer() const
+{
+  return mScene.GetRootLayer();
 }
 
 void SceneHolder::SetBackgroundColor( Vector4 color )
@@ -143,17 +164,31 @@ SceneHolder& SceneHolder::operator=( const SceneHolder& rhs )
   return *this;
 }
 
+Dali::Integration::SceneHolder SceneHolder::Get( Dali::Actor actor )
+{
+  Internal::Adaptor::SceneHolder* sceneHolderImpl = nullptr;
+
+  if ( Dali::Adaptor::IsAvailable() )
+  {
+    sceneHolderImpl = AdaptorImpl::GetImpl( AdaptorImpl::Get() ).GetWindow( actor );
+  }
+
+  return Dali::Integration::SceneHolder( sceneHolderImpl );
+}
+
 void SceneHolder::Add( Actor actor )
 {
+  GetImplementation( *this ).Add( actor );
 }
 
 void SceneHolder::Remove( Actor actor )
 {
+  GetImplementation( *this ).Remove( actor );
 }
 
 Dali::Layer SceneHolder::GetRootLayer() const
 {
-  return Dali::Stage::GetCurrent().GetRootLayer();
+  return GetImplementation( *this ).GetRootLayer();
 }
 
 void SceneHolder::SetBackgroundColor( Vector4 color )
@@ -199,11 +234,6 @@ SceneHolder::TouchSignalType& SceneHolder::TouchSignal()
 SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()
 {
   return GetImplementation( *this ).WheelEventSignal();
-}
-
-SceneHolder SceneHolder::Get( Actor actor )
-{
-  return SceneHolder();
 }
 
 } // Integration

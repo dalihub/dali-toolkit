@@ -41,6 +41,10 @@ public:
 
   virtual ~SceneHolder();
 
+  void Add( Dali::Actor actor );
+
+  void Remove( Dali::Actor actor );
+
   Dali::Layer GetRootLayer() const;
 
   void SetBackgroundColor( Vector4 color );

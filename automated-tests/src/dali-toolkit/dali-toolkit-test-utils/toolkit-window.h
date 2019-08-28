@@ -55,7 +55,6 @@ public:
   ~Window();
   Window(const Window& handle);
   Window& operator=(const Window& rhs);
-  Layer GetRootLayer() const;
 
   Integration::Scene GetScene();
   Integration::RenderSurface& GetRenderSurface();
@@ -63,6 +62,9 @@ public:
 public:
   explicit Window( Internal::Adaptor::Window* window );
 };
+
+Internal::Adaptor::Window& GetImplementation(Dali::Window& window);
+const Internal::Adaptor::Window& GetImplementation(const Dali::Window& window);
 
 namespace DevelWindow
 {

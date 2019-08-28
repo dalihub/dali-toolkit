@@ -328,7 +328,12 @@ Toolkit::Control KeyboardFocusManager::GetParentLayoutControl(Actor actor) const
   Actor parent;
   if(actor)
   {
-    rootActor = Integration::SceneHolder::Get( actor ).GetRootLayer();
+    Integration::SceneHolder window = Integration::SceneHolder::Get( actor );
+    if ( window )
+    {
+      rootActor = window.GetRootLayer();
+    }
+
     parent = actor.GetParent();
   }
 
@@ -410,7 +415,11 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
 
           if( !nextFocusableActor )
           {
-            nextFocusableActor = Integration::SceneHolder::Get( currentFocusActor ).GetRootLayer().FindChildById( actorId );
+            Integration::SceneHolder window = Integration::SceneHolder::Get( currentFocusActor );
+            if ( window )
+            {
+              nextFocusableActor = window.GetRootLayer().FindChildById( actorId );
+            }
           }
         }
       }

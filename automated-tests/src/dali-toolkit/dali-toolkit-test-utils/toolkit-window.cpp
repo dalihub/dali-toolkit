@@ -16,16 +16,13 @@
  */
 
 // CLASS HEADER
-#include "toolkit-window.h"
+#include "toolkit-window-impl.h"
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/base-object.h>
-
-#include <dali/integration-api/adaptors/scene-holder.h>
-#include <toolkit-scene-holder-impl.h>
 
 #define DALI_WINDOW_H
 #include <dali/integration-api/adaptors/adaptor.h>
@@ -49,22 +46,16 @@ namespace Internal
 {
 namespace Adaptor
 {
-class Window : public SceneHolder
+
+Window::Window( const PositionSize& positionSize )
+: SceneHolder( positionSize )
 {
-public:
+}
 
-  Window( const PositionSize& positionSize )
-  : SceneHolder( positionSize )
-  {
-  }
-
-  virtual ~Window() = default;
-
-  static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent)
-  {
-    return new Window( positionSize );
-  }
-};
+Window* Window::New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent)
+{
+  return new Window( positionSize );
+}
 
 } // Adaptor
 } // Internal
@@ -74,6 +65,13 @@ inline Internal::Adaptor::Window& GetImplementation(Dali::Window& window)
   DALI_ASSERT_ALWAYS( window && "Window handle is empty" );
   BaseObject& object = window.GetBaseObject();
   return static_cast<Internal::Adaptor::Window&>(object);
+}
+
+inline const Internal::Adaptor::Window& GetImplementation(const Dali::Window& window)
+{
+  DALI_ASSERT_ALWAYS( window && "Window handle is empty" );
+  const BaseObject& object = window.GetBaseObject();
+  return static_cast<const Internal::Adaptor::Window&>(object);
 }
 
 Window::Window()
@@ -106,15 +104,10 @@ Dali::Window Window::New(PositionSize windowPosition, const std::string& name, c
 
   Dali::Window result( window );
 
-  Dali::Integration::SceneHolder sceneHolder( static_cast<Dali::Internal::Adaptor::SceneHolder*>( window ) );
-  Dali::Internal::Adaptor::Adaptor::Get().WindowCreatedSignal().Emit( sceneHolder );
+  // This will also emit the window created signals
+  AdaptorImpl::GetImpl( AdaptorImpl::Get() ).AddWindow( window );
 
   return result;
-}
-
-Dali::Layer Window::GetRootLayer() const
-{
-  return Dali::Stage::GetCurrent().GetRootLayer();
 }
 
 Window::Window( Internal::Adaptor::Window* window )
@@ -137,7 +130,14 @@ namespace DevelWindow
 
 Window Get( Actor actor )
 {
-  return Window();
+  Internal::Adaptor::Window* windowImpl = nullptr;
+
+  if ( Dali::Adaptor::IsAvailable() )
+  {
+    windowImpl = static_cast<Internal::Adaptor::Window*>( AdaptorImpl::GetImpl( AdaptorImpl::Get() ).GetWindow( actor ) );
+  }
+
+  return Dali::Window( windowImpl );
 }
 
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window )
