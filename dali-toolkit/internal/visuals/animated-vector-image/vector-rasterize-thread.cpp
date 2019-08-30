@@ -60,7 +60,6 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
 : mUrl( url ),
   mVectorRenderer(),
   mConditionalWait(),
-  mResourceReadyTrigger(),
   mAnimationFinishedTrigger(),
   mPlayState( PlayState::STOPPED ),
   mStopBehavior( DevelImageVisual::StopBehavior::CURRENT_FRAME ),
@@ -93,9 +92,6 @@ VectorRasterizeThread::~VectorRasterizeThread()
     ConditionalWait::ScopedLock lock( mConditionalWait );
     mDestroyThread = true;
     mConditionalWait.Notify( lock );
-
-    // This should be called in the main thread to stop waiting for the dequeuable buffer.
-    mVectorRenderer.StopRender();
   }
 
   DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::~VectorRasterizeThread: Join [%p]\n", this );
@@ -193,12 +189,6 @@ void VectorRasterizeThread::RenderFrame()
   }
 }
 
-void VectorRasterizeThread::SetResourceReadyCallback( EventThreadCallback* callback )
-{
-  ConditionalWait::ScopedLock lock( mConditionalWait );
-  mResourceReadyTrigger = std::unique_ptr< EventThreadCallback >( callback );
-}
-
 void VectorRasterizeThread::SetAnimationFinishedCallback( EventThreadCallback* callback )
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
@@ -294,6 +284,12 @@ void VectorRasterizeThread::SetCurrentFrameNumber( uint32_t frameNumber )
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
 
+  if( mCurrentFrame == frameNumber )
+  {
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetCurrentFrameNumber: Set same frame [%d] [%p]\n", frameNumber, this );
+    return;
+  }
+
   if( frameNumber >= mStartFrame && frameNumber <= mEndFrame )
   {
     mCurrentFrame = frameNumber;
@@ -340,6 +336,11 @@ void VectorRasterizeThread::SetLoopingMode( DevelImageVisual::LoopingMode::Type 
   DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetLoopingMode: looping mode = %d [%p]\n", mLoopingMode, this );
 }
 
+VectorRasterizeThread::UploadCompletedSignalType& VectorRasterizeThread::UploadCompletedSignal()
+{
+  return mVectorRenderer.UploadCompletedSignal();
+}
+
 void VectorRasterizeThread::Initialize()
 {
   mVectorRenderer = VectorAnimationRenderer::New( mUrl );
@@ -361,7 +362,7 @@ void VectorRasterizeThread::Initialize()
 
 void VectorRasterizeThread::Rasterize()
 {
-  bool resourceReady, stopped = false;
+  bool stopped = false;
   uint32_t currentFrame, startFrame, endFrame;
   int32_t loopCount;
 
@@ -379,14 +380,13 @@ void VectorRasterizeThread::Rasterize()
       mCurrentFrame = mForward ? mCurrentFrame + 1 : mCurrentFrame - 1;
     }
 
-    resourceReady = mResourceReady;
     currentFrame = mCurrentFrame;
     startFrame = mStartFrame;
     endFrame = mEndFrame;
     loopCount = mLoopCount;
 
-    mNeedRender = false;
     mResourceReady = true;
+    mNeedRender = false;
     mCurrentFrameUpdated = false;
     mUpdateFrameNumber = true;
   }
@@ -455,13 +455,6 @@ void VectorRasterizeThread::Rasterize()
     mUpdateFrameNumber = false;
   }
 
-  if( !resourceReady )
-  {
-    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Resource ready trigger [%p]\n", this );
-
-    mResourceReadyTrigger->Trigger();
-  }
-
   if( stopped )
   {
     mPlayState = PlayState::STOPPED;
@@ -471,7 +464,7 @@ void VectorRasterizeThread::Rasterize()
     // Animation is finished
     mAnimationFinishedTrigger->Trigger();
 
-    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Animation is finished [%p]\n", this );
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Animation is finished [current = %d] [%p]\n", currentFrame, this );
   }
 
   auto timeToSleepUntil = currentFrameStartTime + std::chrono::nanoseconds( mFrameDurationNanoSeconds );

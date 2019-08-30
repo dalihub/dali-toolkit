@@ -46,6 +46,8 @@ class VectorRasterizeThread : public Thread
 {
 public:
 
+  using UploadCompletedSignalType = Dali::VectorAnimationRenderer::UploadCompletedSignalType;
+
   /**
    * @brief Constructor.
    *
@@ -92,12 +94,6 @@ public:
    * @brief Render one frame. The current frame number will be increased.
    */
   void RenderFrame();
-
-  /**
-   * @brief This callback is called after the first frame is ready.
-   * @param[in] callback The resource ready callback
-   */
-  void SetResourceReadyCallback( EventThreadCallback* callback );
 
   /**
    * @brief This callback is called after the animation is finished.
@@ -168,6 +164,12 @@ public:
    */
   void SetLoopingMode( DevelImageVisual::LoopingMode::Type loopingMode );
 
+  /**
+   * @brief Connect to this signal to be notified when the texture upload is completed.
+   * @return The signal to connect to.
+   */
+  UploadCompletedSignalType& UploadCompletedSignal();
+
 protected:
 
   /**
@@ -212,7 +214,6 @@ private:
   std::string                 mUrl;
   VectorAnimationRenderer     mVectorRenderer;
   ConditionalWait             mConditionalWait;
-  std::unique_ptr< EventThreadCallback > mResourceReadyTrigger;
   std::unique_ptr< EventThreadCallback > mAnimationFinishedTrigger;
   Vector2                     mPlayRange;
   PlayState                   mPlayState;

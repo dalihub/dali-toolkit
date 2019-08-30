@@ -50,6 +50,7 @@ public:
       Dali::TextureSet textureSet = mRenderer.GetTextures();
       Dali::Texture texture = Dali::Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, mWidth, mHeight );
       textureSet.SetTexture( 0, texture );
+      mUploadCompletedSignal.Emit();
     }
   }
 
@@ -63,11 +64,8 @@ public:
       Dali::TextureSet textureSet = mRenderer.GetTextures();
       Dali::Texture texture = Dali::Texture::New( TextureType::TEXTURE_2D, Pixel::RGBA8888, mWidth, mHeight );
       textureSet.SetTexture( 0, texture );
+      mUploadCompletedSignal.Emit();
     }
-  }
-
-  void StopRender()
-  {
   }
 
   bool Render( uint32_t frameNumber )
@@ -98,6 +96,11 @@ public:
     height = 100;
   }
 
+  Dali::VectorAnimationRenderer::UploadCompletedSignalType& UploadCompletedSignal()
+  {
+    return mUploadCompletedSignal;
+  }
+
 public:
 
   std::string mUrl;
@@ -105,6 +108,7 @@ public:
   uint32_t mWidth;
   uint32_t mHeight;
   uint32_t mPreviousFrame;
+  Dali::VectorAnimationRenderer::UploadCompletedSignalType mUploadCompletedSignal;
 };
 
 inline VectorAnimationRenderer& GetImplementation( Dali::VectorAnimationRenderer& renderer )
@@ -171,11 +175,6 @@ void VectorAnimationRenderer::SetSize( uint32_t width, uint32_t height )
   Internal::Adaptor::GetImplementation( *this ).SetSize( width, height );
 }
 
-void VectorAnimationRenderer::StopRender()
-{
-  Internal::Adaptor::GetImplementation( *this ).StopRender();
-}
-
 bool VectorAnimationRenderer::Render( uint32_t frameNumber )
 {
   return Internal::Adaptor::GetImplementation( *this ).Render( frameNumber );
@@ -194,6 +193,11 @@ float VectorAnimationRenderer::GetFrameRate() const
 void VectorAnimationRenderer::GetDefaultSize( uint32_t& width, uint32_t& height ) const
 {
   Internal::Adaptor::GetImplementation( *this ).GetDefaultSize( width, height );
+}
+
+VectorAnimationRenderer::UploadCompletedSignalType& VectorAnimationRenderer::UploadCompletedSignal()
+{
+  return Internal::Adaptor::GetImplementation( *this ).UploadCompletedSignal();
 }
 
 } // namespace Dali;
