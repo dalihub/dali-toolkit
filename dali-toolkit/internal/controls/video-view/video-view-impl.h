@@ -316,6 +316,16 @@ private:
    */
   bool GetStringFromProperty( const Dali::Property::Value& value, std::string& output );
 
+  /*
+   * @brief Internal version of SetProperty
+   */
+  void SetPropertyInternal( Property::Index index, const Property::Value& value );
+
+  /*
+   * @brief Apply properties after reset video player
+   */
+  void ApplyBackupProperties();
+
 private:
 
   Dali::VideoPlayer mVideoPlayer;
@@ -331,6 +341,7 @@ private:
   Dali::PropertyNotification mPositionUpdateNotification;
   Dali::PropertyNotification mSizeUpdateNotification;
   Dali::PropertyNotification mScaleUpdateNotification;
+  Dali::Property::Map mPropertyBackup;
 
   int mCurrentVideoPlayPosition;
   bool mIsPlay;

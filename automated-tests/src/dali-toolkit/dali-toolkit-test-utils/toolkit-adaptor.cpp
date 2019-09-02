@@ -241,6 +241,11 @@ Any Adaptor::GetNativeWindowHandle()
   return window;
 }
 
+Any Adaptor::GetNativeWindowHandle( Actor actor )
+{
+  return GetNativeWindowHandle();
+}
+
 void Adaptor::ReleaseSurfaceLock()
 {
 }

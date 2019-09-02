@@ -157,7 +157,6 @@ Toolkit::VideoView VideoView::New()
 void VideoView::OnInitialize()
 {
   mVideoPlayer.FinishedSignal().Connect( this, &VideoView::EmitSignalFinish );
-  SetWindowSurfaceTarget();
 }
 
 void VideoView::SetUrl( const std::string& url )
@@ -228,7 +227,7 @@ bool VideoView::IsLooping()
 
 void VideoView::Play()
 {
-  if( mIsUnderlay )
+  if( mOverlayRenderer )
   {
     Self().AddRenderer( mOverlayRenderer );
   }
@@ -295,7 +294,7 @@ Dali::Toolkit::VideoView::VideoViewSignalType& VideoView::FinishedSignal()
 
 void VideoView::EmitSignalFinish()
 {
-  if( mIsUnderlay )
+  if( mOverlayRenderer )
   {
     Self().RemoveRenderer( mOverlayRenderer );
   }
@@ -378,6 +377,88 @@ bool VideoView::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   return connected;
 }
 
+void VideoView::SetPropertyInternal( Property::Index index, const Property::Value& value )
+{
+  switch( index )
+  {
+    case Toolkit::VideoView::Property::VIDEO:
+    {
+      std::string videoUrl;
+      Property::Map map;
+
+      if( value.Get( videoUrl ) )
+      {
+        SetUrl( videoUrl );
+      }
+      else if( value.Get( map ) )
+      {
+        SetPropertyMap( map );
+      }
+      break;
+    }
+    case Toolkit::VideoView::Property::LOOPING:
+    {
+      bool looping;
+      if( value.Get( looping ) )
+      {
+        SetLooping( looping );
+      }
+      break;
+    }
+    case Toolkit::VideoView::Property::MUTED:
+    {
+      bool mute;
+      if( value.Get( mute ) )
+      {
+        SetMute( mute );
+      }
+      break;
+    }
+    case Toolkit::VideoView::Property::VOLUME:
+    {
+      Property::Map map;
+      float left, right;
+      if( value.Get( map ) )
+      {
+        Property::Value* volumeLeft = map.Find( VOLUME_LEFT );
+        Property::Value* volumeRight = map.Find( VOLUME_RIGHT );
+        if( volumeLeft && volumeLeft->Get( left ) && volumeRight && volumeRight->Get( right ) )
+        {
+          SetVolume( left, right );
+        }
+      }
+      break;
+    }
+    case Toolkit::VideoView::Property::UNDERLAY:
+    {
+      bool underlay;
+      if( value.Get( underlay ) )
+      {
+        SetUnderlay( underlay );
+      }
+      break;
+    }
+    case Toolkit::VideoView::Property::PLAY_POSITION:
+    {
+      int pos;
+      if( value.Get( pos ) )
+      {
+        SetPlayPosition( pos );
+      }
+      break;
+    }
+    case Toolkit::VideoView::Property::DISPLAY_MODE:
+    {
+      int mode;
+      if( value.Get( mode ) )
+      {
+        SetDisplayMode( mode );
+      }
+      break;
+    }
+  }
+}
+
 void VideoView::SetProperty( BaseObject* object, Property::Index index, const Property::Value& value )
 {
   Toolkit::VideoView videoView = Toolkit::VideoView::DownCast( Dali::BaseHandle( object ) );
@@ -386,83 +467,13 @@ void VideoView::SetProperty( BaseObject* object, Property::Index index, const Pr
   {
     VideoView& impl = GetImpl( videoView );
 
-    switch( index )
-    {
-      case Toolkit::VideoView::Property::VIDEO:
-      {
-        std::string videoUrl;
-        Property::Map map;
+    impl.SetPropertyInternal( index, value );
 
-        if( value.Get( videoUrl ) )
-        {
-          impl.SetUrl( videoUrl );
-        }
-        else if( value.Get( map ) )
-        {
-            impl.SetPropertyMap( map );
-          }
-        break;
-      }
-      case Toolkit::VideoView::Property::LOOPING:
-      {
-        bool looping;
-        if( value.Get( looping ) )
-        {
-          impl.SetLooping( looping );
-        }
-        break;
-      }
-      case Toolkit::VideoView::Property::MUTED:
-      {
-        bool mute;
-        if( value.Get( mute ) )
-        {
-          impl.SetMute( mute );
-        }
-        break;
-      }
-      case Toolkit::VideoView::Property::VOLUME:
-      {
-        Property::Map map;
-        float left, right;
-        if( value.Get( map ) )
-        {
-          Property::Value* volumeLeft = map.Find( VOLUME_LEFT );
-          Property::Value* volumeRight = map.Find( VOLUME_RIGHT );
-          if( volumeLeft && volumeLeft->Get( left ) && volumeRight && volumeRight->Get( right ) )
-          {
-            impl.SetVolume( left, right );
-          }
-        }
-        break;
-      }
-      case Toolkit::VideoView::Property::UNDERLAY:
-      {
-        bool underlay;
-        if( value.Get( underlay ) )
-        {
-          impl.SetUnderlay( underlay );
-        }
-        break;
-      }
-      case Toolkit::VideoView::Property::PLAY_POSITION:
-      {
-        int pos;
-        if( value.Get( pos ) )
-        {
-          impl.SetPlayPosition( pos );
-        }
-        break;
-      }
-      case Toolkit::VideoView::Property::DISPLAY_MODE:
-      {
-        int mode;
-        if( value.Get( mode ) )
-        {
-          impl.SetDisplayMode( mode );
-        }
-        break;
-      }
+    if( index != Toolkit::VideoView::Property::UNDERLAY )
+    {
+      // Backup values.
+      // These values will be used when underlay mode is changed.
+      impl.mPropertyBackup[index] = value;
     }
   }
 }
@@ -543,6 +554,11 @@ void VideoView::SetDepthIndex( int depthIndex )
 void VideoView::OnStageConnection( int depth )
 {
   Control::OnStageConnection( depth );
+
+  if( mIsUnderlay )
+  {
+    SetWindowSurfaceTarget();
+  }
 }
 
 void VideoView::OnStageDisconnection()
@@ -594,6 +610,13 @@ float VideoView::GetWidthForHeight( float height )
 void VideoView::SetWindowSurfaceTarget()
 {
   Actor self = Self();
+
+  if( !self.OnStage() )
+  {
+    // When the control is off the stage, it does not have Window.
+    return;
+  }
+
   int curPos = mVideoPlayer.GetPlayPosition();
 
   if( mIsPlay )
@@ -613,8 +636,10 @@ void VideoView::SetWindowSurfaceTarget()
     self.RemoveRenderer( mTextureRenderer );
   }
 
-  mVideoPlayer.SetRenderingTarget( Dali::Adaptor::Get().GetNativeWindowHandle() );
-  mVideoPlayer.SetUrl( mUrl );
+  // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)
+  mVideoPlayer.SetRenderingTarget( Dali::Adaptor::Get().GetNativeWindowHandle( self ) );
+
+  ApplyBackupProperties();
 
   if( !mOverlayRenderer )
   {
@@ -655,6 +680,8 @@ void VideoView::SetNativeImageTarget()
   if( mOverlayRenderer )
   {
     self.RemoveRenderer( mOverlayRenderer );
+
+    mOverlayRenderer.Reset();
   }
 
   self.RemovePropertyNotification( mPositionUpdateNotification );
@@ -684,8 +711,10 @@ void VideoView::SetNativeImageTarget()
   }
   Self().AddRenderer( mTextureRenderer );
 
+  // Note VideoPlayer::SetRenderingTarget resets all the options. (e.g. url, mute, looping)
   mVideoPlayer.SetRenderingTarget( nativeImageSourcePtr );
-  mVideoPlayer.SetUrl( mUrl );
+
+  ApplyBackupProperties();
 
   if( mIsPlay )
   {
@@ -833,6 +862,19 @@ bool VideoView::GetStringFromProperty( const Dali::Property::Value& value, std::
   }
 
   return extracted;
+}
+
+void VideoView::ApplyBackupProperties()
+{
+  Property::Map::SizeType pos = 0;
+  Property::Map::SizeType count = mPropertyBackup.Count();
+
+  for( ; pos < count; pos++ )
+  {
+    KeyValuePair property = mPropertyBackup.GetKeyValue( pos );
+
+    SetPropertyInternal( property.first.indexKey, property.second );
+  }
 }
 
 } // namespace Internal
