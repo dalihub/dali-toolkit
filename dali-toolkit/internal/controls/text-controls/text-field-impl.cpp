@@ -1267,7 +1267,7 @@ void TextField::OnInitialize()
   mDecorator = Text::Decorator::New( *mController,
                                      *mController );
 
-  mInputMethodContext = InputMethodContext::New();
+  mInputMethodContext = InputMethodContext::New( self );
 
   mController->GetLayoutEngine().SetLayout( Layout::Engine::SINGLE_LINE_BOX );
 

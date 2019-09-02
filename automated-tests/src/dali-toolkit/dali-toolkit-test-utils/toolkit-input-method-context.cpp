@@ -231,6 +231,11 @@ InputMethodContext::~InputMethodContext()
 
 InputMethodContext InputMethodContext::New()
 {
+  return InputMethodContext::New( Actor() );
+}
+
+InputMethodContext InputMethodContext::New( Actor actor )
+{
   return Internal::Adaptor::InputMethodContext::New();
 }
 
