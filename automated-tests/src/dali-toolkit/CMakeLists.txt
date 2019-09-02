@@ -96,6 +96,7 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/toolkit-video-player.cpp
   dali-toolkit-test-utils/toolkit-web-engine.cpp
   dali-toolkit-test-utils/toolkit-window.cpp
+  dali-toolkit-test-utils/toolkit-scene-holder.cpp
   dali-toolkit-test-utils/dali-test-suite-utils.cpp
   dali-toolkit-test-utils/dali-toolkit-test-suite-utils.cpp
   dali-toolkit-test-utils/dummy-control.cpp
