@@ -28,6 +28,7 @@ namespace Dali
 {
 
 class Adaptor;
+class Window;
 
 /**
  * Adds some functionality on top of TestApplication that is required by the Toolkit.
@@ -54,6 +55,8 @@ public:
   void RunIdles();
 
 private:
+
+  std::unique_ptr<Dali::Window> mMainWindow;
   std::unique_ptr< Adaptor > mAdaptor;
 };
 

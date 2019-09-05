@@ -17,13 +17,14 @@
 
 #include <algorithm>
 
-#include <toolkit-window.h>
+#include <toolkit-window-impl.h>
 
 // Don't want to include the actual window.h which otherwise will be indirectly included by adaptor.h.
 #define DALI_WINDOW_H
 #include <dali/integration-api/adaptors/adaptor.h>
 
 #include <dali/integration-api/adaptors/scene-holder.h>
+#include <toolkit-scene-holder-impl.h>
 
 #include <toolkit-adaptor-impl.h>
 #include <dali/integration-api/debug.h>
@@ -95,11 +96,7 @@ Adaptor::~Adaptor()
 
 void Adaptor::Start( Dali::Window window )
 {
-  if ( window )
-  {
-    mWindows.push_back( window );
-    mWindowCreatedSignal.Emit( window );
-  }
+  AddWindow( &GetImplementation( window ) );
 }
 
 Integration::Scene Adaptor::GetScene( Dali::Window window )
@@ -133,12 +130,71 @@ Dali::RenderSurfaceInterface& Adaptor::GetSurface()
 {
   DALI_ASSERT_ALWAYS( ! mWindows.empty() );
 
-  return reinterpret_cast < Dali::RenderSurfaceInterface& >( mWindows.front().GetRenderSurface() );
+  return reinterpret_cast < Dali::RenderSurfaceInterface& >( mWindows.front()->GetRenderSurface() );
 }
 
 Dali::WindowContainer Adaptor::GetWindows()
 {
-  return mWindows;
+  Dali::WindowContainer windows;
+
+  for ( auto iter = mWindows.begin(); iter != mWindows.end(); ++iter )
+  {
+    // Downcast to Dali::Window
+    Dali::Window window( dynamic_cast<Dali::Internal::Adaptor::Window*>( *iter ) );
+    if ( window )
+    {
+      windows.push_back( window );
+    }
+  }
+
+  return windows;
+}
+
+Dali::SceneHolderList Adaptor::GetSceneHolders()
+{
+  Dali::SceneHolderList sceneHolderList;
+
+  for( auto iter = mWindows.begin(); iter != mWindows.end(); ++iter )
+  {
+    sceneHolderList.push_back( Dali::Integration::SceneHolder( *iter ) );
+  }
+
+  return sceneHolderList;
+}
+
+Dali::Internal::Adaptor::SceneHolder* Adaptor::GetWindow( Dali::Actor& actor )
+{
+  Dali::Integration::Scene scene = Dali::Integration::Scene::Get( actor );
+
+  for( auto window : mWindows )
+  {
+    if ( scene == window->GetScene() )
+    {
+      return window;
+    }
+  }
+
+  return nullptr;
+}
+
+void Adaptor::AddWindow( Internal::Adaptor::SceneHolder* window )
+{
+  if ( window )
+  {
+    mWindows.push_back( window );
+
+    Dali::Integration::SceneHolder newWindow( window );
+    mWindowCreatedSignal.Emit( newWindow );
+  }
+}
+
+void Adaptor::RemoveWindow( Internal::Adaptor::SceneHolder* window )
+{
+  auto iter = std::find( mWindows.begin(), mWindows.end(), window );
+  if( iter != mWindows.end() )
+  {
+    mWindows.erase( iter );
+  }
 }
 
 Dali::Adaptor::AdaptorSignalType& Adaptor::ResizedSignal()
@@ -235,10 +291,20 @@ Dali::WindowContainer Adaptor::GetWindows() const
   return mImpl->GetWindows();
 }
 
+Dali::SceneHolderList Adaptor::GetSceneHolders() const
+{
+  return mImpl->GetSceneHolders();
+}
+
 Any Adaptor::GetNativeWindowHandle()
 {
   Any window;
   return window;
+}
+
+Any Adaptor::GetNativeWindowHandle( Actor actor )
+{
+  return GetNativeWindowHandle();
 }
 
 void Adaptor::ReleaseSurfaceLock()

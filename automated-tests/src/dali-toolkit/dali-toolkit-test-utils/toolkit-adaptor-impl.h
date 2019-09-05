@@ -41,6 +41,7 @@ namespace Adaptor
 {
 
 class GraphicsInterface;
+class SceneHolder;
 
 } // namespace Adaptor
 
@@ -76,6 +77,11 @@ public:
 
   Dali::RenderSurfaceInterface& GetSurface();
   Dali::WindowContainer GetWindows();
+  Dali::SceneHolderList GetSceneHolders();
+
+  Dali::Internal::Adaptor::SceneHolder* GetWindow( Dali::Actor& actor );
+  void AddWindow( Internal::Adaptor::SceneHolder* window );
+  void RemoveWindow( Internal::Adaptor::SceneHolder* window );
 
   Dali::Adaptor::AdaptorSignalType& ResizedSignal();
   Dali::Adaptor::AdaptorSignalType& LanguageChangedSignal();
@@ -87,7 +93,7 @@ public:
 private:
 
   Vector<CallbackBase*> mCallbacks;
-  Dali::WindowContainer mWindows;
+  std::vector<Internal::Adaptor::SceneHolder*> mWindows;
   Dali::Adaptor::AdaptorSignalType mResizedSignal;
   Dali::Adaptor::AdaptorSignalType mLanguageChangedSignal;
   Dali::Adaptor::WindowCreatedSignalType mWindowCreatedSignal;

@@ -30,7 +30,12 @@
 namespace Dali
 {
 
-class Window;
+namespace Integration
+{
+
+class SceneHolder;
+
+} // namespace Integration
 
 namespace Toolkit
 {
@@ -183,10 +188,10 @@ private:
   void OnAdaptorInit();
 
   /**
-   * This will be called when a new wndow is created
-   * @param window The new window
+   * This will be called when a new scene holder is created
+   * @param sceneHolder The new scene holder
    */
-  void OnWindowCreated( Dali::Window& window );
+  void OnSceneHolderCreated( Dali::Integration::SceneHolder& sceneHolder );
 
   /**
    * Get configuration from StyleManager.

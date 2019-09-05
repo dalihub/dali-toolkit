@@ -1221,7 +1221,7 @@ void TextEditor::OnInitialize()
   mDecorator = Text::Decorator::New( *mController,
                                      *mController );
 
-  mInputMethodContext = InputMethodContext::New();
+  mInputMethodContext = InputMethodContext::New( self );
 
   mController->GetLayoutEngine().SetLayout( Layout::Engine::MULTI_LINE_BOX );
 
