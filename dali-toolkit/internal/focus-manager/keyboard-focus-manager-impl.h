@@ -26,6 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/focus-manager/keyboard-focus-manager.h>
 #include <dali-toolkit/devel-api/focus-manager/keyboard-focus-manager-devel.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 
 namespace Dali
 {
@@ -51,6 +52,25 @@ class KeyboardFocusManager : public Dali::BaseObject, public ConnectionTracker
 public:
 
   typedef Toolkit::DevelKeyboardFocusManager::CustomAlgorithmInterface CustomAlgorithmInterface;
+
+  enum FocusIndicatorState
+  {
+    UNKNOWN = -1,   ///< Unknown state
+    HIDE = 0,          ///< FocusIndicator is hidden
+    SHOW = 1,          ///< FocusIndicator is shown
+  };
+
+  enum EnableFocusedIndicatorState
+  {
+    DISABLE = 0,          ///< FocusIndicator is disable
+    ENABLE = 1,          ///< FocusIndicator is enable
+  };
+
+  enum FocusedIndicatorModeState
+  {
+    NONE = 0,          ///< Set nothing
+    ALWAYS_SHOW = 1,          ///< FocusIndicator is always shown
+  };
 
   /**
    * @copydoc Toolkit::KeyboardFocusManager::Get
@@ -260,7 +280,7 @@ private:
    * Callback for the key event when no actor in the stage has gained the key input focus
    * @param[in] event The KeyEvent event.
    */
-  void OnKeyEvent(const KeyEvent& event);
+  void OnKeyEvent( const KeyEvent& event );
 
   /**
    * Callback for the touch event when the screen is touched and when the touch ends
@@ -268,6 +288,18 @@ private:
    * @param[in] touch The touch information
    */
   void OnTouch( const TouchData& touch );
+
+  /**
+   * Called when the window focus is changed.
+   * @param[in] window The window whose focus is changed
+   * @param[in] focusIn Whether the focus is in/out
+   */
+  void OnWindowFocusChanged( Window window, bool focusIn );
+
+  /**
+   * Get the focus Actor from current window
+   */
+  Actor GetFocusActorFromCurrentWindow();
 
 private:
 
@@ -287,24 +319,29 @@ private:
 
   Actor mFocusIndicatorActor; ///< The focus indicator actor shared by all the keyboard focusable actors for highlight
 
-  int mIsFocusIndicatorShown; ///< Whether indicator should be shown / hidden when getting focus. It could be enabled when keyboard focus feature is enabled and navigation keys or 'Tab' key are pressed.
-
-  bool mFocusGroupLoopEnabled:1; ///< Whether the focus movement is looped within the same focus group
-
-  bool mIsWaitingKeyboardFocusChangeCommit:1; /// A flag to indicate PreFocusChangeSignal emitted but the proposed focus actor is not commited by the application yet.
-
-  bool mClearFocusOnTouch:1; ///< Whether clear focus on touch.
-
-  bool mEnableFocusIndicator;  ///< Whether use focus indicator
-
-  bool mAlwaysShowIndicator; ///< Whether always show indicator. If true, the indicator would be directly shown when focused.
-
   FocusStack mFocusHistory; ///< Stack to contain pre-focused actor's BaseObject*
 
   SlotDelegate< KeyboardFocusManager > mSlotDelegate;
 
   CustomAlgorithmInterface* mCustomAlgorithmInterface; ///< The user's (application / toolkit) implementation of CustomAlgorithmInterface
 
+  typedef std::vector< std::pair< WeakHandle< Layer >, WeakHandle< Actor > > > FocusActorContainer;
+
+  FocusActorContainer mCurrentFocusActors; ///< A container of focused actors
+
+  WeakHandle< Layer > mCurrentFocusedWindow; ///< A weak handle to the current focused window's root layer
+
+  FocusIndicatorState mIsFocusIndicatorShown; ///< Whether indicator should be shown / hidden when getting focus. It could be enabled when keyboard focus feature is enabled and navigation keys or 'Tab' key are pressed.
+
+  EnableFocusedIndicatorState mEnableFocusIndicator;  ///< Whether use focus indicator
+
+  FocusedIndicatorModeState mAlwaysShowIndicator; ///< Whether always show indicator. If true, the indicator would be directly shown when focused
+
+  bool mFocusGroupLoopEnabled:1; ///< Whether the focus movement is looped within the same focus group
+
+  bool mIsWaitingKeyboardFocusChangeCommit:1; /// A flag to indicate PreFocusChangeSignal emitted but the proposed focus actor is not commited by the application yet.
+
+  bool mClearFocusOnTouch:1; ///< Whether clear focus on touch.
 };
 
 } // namespace Internal

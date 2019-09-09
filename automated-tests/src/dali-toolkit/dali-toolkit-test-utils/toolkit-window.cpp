@@ -125,6 +125,41 @@ Integration::RenderSurface& Window::GetRenderSurface()
   return GetImplementation( *this ).GetRenderSurface();
 }
 
+void Window::Add( Actor actor )
+{
+  GetImplementation( *this ).Add( actor );
+}
+
+void Window::Remove( Actor actor )
+{
+  GetImplementation( *this ).Remove( actor );
+}
+
+Dali::Layer Window::GetRootLayer() const
+{
+  return GetImplementation( *this ).GetRootLayer();
+}
+
+void Window::SetBackgroundColor( const Vector4& color )
+{
+  GetImplementation( *this ).SetBackgroundColor( color );
+}
+
+Vector4 Window::GetBackgroundColor() const
+{
+  return GetImplementation( *this ).GetBackgroundColor();
+}
+
+void Window::Raise()
+{
+  GetImplementation( *this ).mFocusChangeSignal.Emit(*this, true);
+}
+
+FocusChangeSignalType& Window::FocusChangeSignal()
+{
+  return GetImplementation( *this ).mFocusChangeSignal;
+}
+
 namespace DevelWindow
 {
 
@@ -137,6 +172,16 @@ Window Get( Actor actor )
     windowImpl = static_cast<Internal::Adaptor::Window*>( AdaptorImpl::GetImpl( AdaptorImpl::Get() ).GetWindow( actor ) );
   }
 
+  return Dali::Window( windowImpl );
+}
+
+Window DownCast( BaseHandle handle )
+{
+  Internal::Adaptor::Window* windowImpl = nullptr;
+  if ( Dali::Adaptor::IsAvailable() )
+  {
+    windowImpl = dynamic_cast<Dali::Internal::Adaptor::Window*>( handle.GetObjectPtr());
+  }
   return Dali::Window( windowImpl );
 }
 
@@ -164,6 +209,7 @@ WheelEventSignalType& WheelEventSignal( Window window )
 {
   return GetImplementation( window ).WheelEventSignal();
 }
+
 } // namespace DevelWindow
 
 } // Dali
