@@ -23,7 +23,6 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/devel-api/adaptor-framework/accessibility-adaptor.h>
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
-#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>
@@ -123,15 +122,16 @@ KeyboardFocusManager::KeyboardFocusManager()
   mFocusedActorEnterKeySignal(),
   mCurrentFocusActor(),
   mFocusIndicatorActor(),
-  mIsFocusIndicatorShown( -1 ),
-  mFocusGroupLoopEnabled( false ),
-  mIsWaitingKeyboardFocusChangeCommit( false ),
-  mClearFocusOnTouch( true ),
-  mEnableFocusIndicator( true ),
-  mAlwaysShowIndicator( true ),
   mFocusHistory(),
   mSlotDelegate( this ),
-  mCustomAlgorithmInterface(NULL)
+  mCustomAlgorithmInterface(NULL),
+  mCurrentFocusedWindow(),
+  mIsFocusIndicatorShown( UNKNOWN ),
+  mEnableFocusIndicator( ENABLE ),
+  mAlwaysShowIndicator( ALWAYS_SHOW ),
+  mFocusGroupLoopEnabled( false ),
+  mIsWaitingKeyboardFocusChangeCommit( false ),
+  mClearFocusOnTouch( true )
 {
   // TODO: Get FocusIndicatorEnable constant from stylesheet to set mIsFocusIndicatorShown.
 
@@ -142,23 +142,33 @@ void KeyboardFocusManager::OnAdaptorInit()
 {
   if( Adaptor::IsAvailable() )
   {
-    // Retrieve all the existing widnows
-    Dali::WindowContainer windows = Adaptor::Get().GetWindows();
-    for ( auto iter = windows.begin(); iter != windows.end(); ++iter )
+    // Retrieve all the existing scene holders
+    Dali::SceneHolderList sceneHolders = Adaptor::Get().GetSceneHolders();
+    for( auto iter = sceneHolders.begin(); iter != sceneHolders.end(); ++iter )
     {
-      DevelWindow::KeyEventSignal( *iter ).Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
-      DevelWindow::TouchSignal( *iter ).Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch);
+      ( *iter ).KeyEventSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent );
+      ( *iter ).TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
+      Dali::Window window = DevelWindow::DownCast( *iter );
+      if( window )
+      {
+        window.FocusChangeSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnWindowFocusChanged);
+      }
     }
 
-    // Get notified when any new window is created afterwards
-    Adaptor::Get().WindowCreatedSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnWindowCreated);
+    // Get notified when any new scene holder is created afterwards
+    Adaptor::Get().WindowCreatedSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnSceneHolderCreated );
   }
 }
 
-void KeyboardFocusManager::OnWindowCreated( Dali::Window& window )
+void KeyboardFocusManager::OnSceneHolderCreated( Dali::Integration::SceneHolder& sceneHolder )
 {
-  DevelWindow::KeyEventSignal( window ).Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent);
-  DevelWindow::TouchSignal( window ).Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch);
+  sceneHolder.KeyEventSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnKeyEvent );
+  sceneHolder.TouchSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnTouch );
+  Dali::Window window = DevelWindow::DownCast( sceneHolder );
+  if( window )
+  {
+    window.FocusChangeSignal().Connect( mSlotDelegate, &KeyboardFocusManager::OnWindowFocusChanged);
+  }
 }
 
 KeyboardFocusManager::~KeyboardFocusManager()
@@ -171,9 +181,9 @@ void KeyboardFocusManager::GetConfigurationFromStyleManger()
     if( styleManager )
     {
       Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
-      mAlwaysShowIndicator = config["alwaysShowFocus"].Get<bool>();
-      mIsFocusIndicatorShown = static_cast<int>(mAlwaysShowIndicator);
-      mClearFocusOnTouch = mIsFocusIndicatorShown ? false : true;
+      mAlwaysShowIndicator = config["alwaysShowFocus"].Get<bool>() ? ALWAYS_SHOW : NONE;
+      mIsFocusIndicatorShown = ( mAlwaysShowIndicator == ALWAYS_SHOW )? SHOW : HIDE;
+      mClearFocusOnTouch = ( mIsFocusIndicatorShown == SHOW ) ? false : true;
     }
 }
 
@@ -181,7 +191,7 @@ bool KeyboardFocusManager::SetCurrentFocusActor( Actor actor )
 {
   DALI_ASSERT_DEBUG( !mIsWaitingKeyboardFocusChangeCommit && "Calling this function in the PreFocusChangeSignal callback?" );
 
-  if( mIsFocusIndicatorShown == -1 )
+  if( mIsFocusIndicatorShown == UNKNOWN )
   {
     GetConfigurationFromStyleManger();
   }
@@ -192,6 +202,16 @@ bool KeyboardFocusManager::SetCurrentFocusActor( Actor actor )
 bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
 {
   bool success = false;
+  if( actor && actor.IsKeyboardFocusable() && actor.OnStage() )
+  {
+    Integration::SceneHolder currentWindow = Integration::SceneHolder::Get( actor );
+
+    if( currentWindow.GetRootLayer() != mCurrentFocusedWindow.GetHandle())
+    {
+      Layer rootLayer = currentWindow.GetRootLayer();
+      mCurrentFocusedWindow = rootLayer;
+    }
+  }
 
   Actor currentFocusedActor = GetCurrentFocusActor();
 
@@ -208,7 +228,7 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
   // Check whether the actor is in the stage and is keyboard focusable.
   if( actor && actor.IsKeyboardFocusable() && actor.OnStage() )
   {
-    if( mIsFocusIndicatorShown && mEnableFocusIndicator )
+    if( ( mIsFocusIndicatorShown == SHOW ) && ( mEnableFocusIndicator == ENABLE ) )
     {
       actor.Add( GetFocusIndicatorActor() );
     }
@@ -231,6 +251,22 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
 
     // Save the current focused actor
     mCurrentFocusActor = actor;
+
+    bool focusedWindowFound = false;
+    for( unsigned int i = 0; i < mCurrentFocusActors.size(); i++ )
+    {
+      if( mCurrentFocusActors[i].first == mCurrentFocusedWindow )
+      {
+        mCurrentFocusActors[i].second = actor;
+        focusedWindowFound = true;
+        break;
+      }
+    }
+    if( !focusedWindowFound)
+    {
+      // A new window gains the focus, so store the focused actor in that window.
+      mCurrentFocusActors.push_back( std::pair< WeakHandle< Layer>, WeakHandle< Actor > >( mCurrentFocusedWindow , actor ));
+    }
 
     Toolkit::Control newlyFocusedControl = Toolkit::Control::DownCast(actor);
     if( newlyFocusedControl )
@@ -263,13 +299,36 @@ bool KeyboardFocusManager::DoSetCurrentFocusActor( Actor actor )
 Actor KeyboardFocusManager::GetCurrentFocusActor()
 {
   Actor actor = mCurrentFocusActor.GetHandle();
+
   if( actor && ! actor.OnStage() )
   {
     // If the actor has been removed from the stage, then it should not be focused
-
     actor.Reset();
     mCurrentFocusActor.Reset();
   }
+  return actor;
+}
+
+Actor KeyboardFocusManager::GetFocusActorFromCurrentWindow()
+{
+  Actor actor;
+  unsigned int index;
+  for( index = 0; index < mCurrentFocusActors.size(); index++ )
+  {
+    if( mCurrentFocusActors[index].first == mCurrentFocusedWindow )
+    {
+      actor = mCurrentFocusActors[index].second.GetHandle();
+      break;
+    }
+  }
+
+  if( actor && ! actor.OnStage() )
+  {
+    // If the actor has been removed from the window, then the window doesn't have any focused actor
+    actor.Reset();
+    mCurrentFocusActors.erase( mCurrentFocusActors.begin() + index );
+  }
+
   return actor;
 }
 
@@ -329,7 +388,12 @@ Toolkit::Control KeyboardFocusManager::GetParentLayoutControl(Actor actor) const
   Actor parent;
   if(actor)
   {
-    rootActor = Integration::SceneHolder::Get( actor ).GetRootLayer();
+    Integration::SceneHolder window = Integration::SceneHolder::Get( actor );
+    if ( window )
+    {
+      rootActor = window.GetRootLayer();
+    }
+
     parent = actor.GetParent();
   }
 
@@ -411,7 +475,11 @@ bool KeyboardFocusManager::MoveFocus(Toolkit::Control::KeyboardFocus::Direction 
 
           if( !nextFocusableActor )
           {
-            nextFocusableActor = Integration::SceneHolder::Get( currentFocusActor ).GetRootLayer().FindChildById( actorId );
+            Integration::SceneHolder window = Integration::SceneHolder::Get( currentFocusActor );
+            if ( window )
+            {
+              nextFocusableActor = window.GetRootLayer().FindChildById( actorId );
+            }
           }
         }
       }
@@ -585,7 +653,7 @@ void KeyboardFocusManager::ClearFocus()
   }
 
   mCurrentFocusActor.Reset();
-  mIsFocusIndicatorShown = static_cast<int>(mAlwaysShowIndicator);
+  mIsFocusIndicatorShown = ( mAlwaysShowIndicator == ALWAYS_SHOW ) ? SHOW : HIDE;
 }
 
 void KeyboardFocusManager::SetFocusGroupLoop(bool enabled)
@@ -685,7 +753,7 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
   std::string keyName = event.keyPressedName;
 
-  if( mIsFocusIndicatorShown == -1 )
+  if( mIsFocusIndicatorShown == UNKNOWN )
   {
     GetConfigurationFromStyleManger();
   }
@@ -698,10 +766,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     {
       if(!isAccessibilityEnabled)
       {
-        if(!mIsFocusIndicatorShown)
+        if(mIsFocusIndicatorShown == HIDE)
         {
           // Show focus indicator
-          mIsFocusIndicatorShown = 1;
+          mIsFocusIndicatorShown = SHOW;
         }
         else
         {
@@ -721,10 +789,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     {
       if(!isAccessibilityEnabled)
       {
-        if(!mIsFocusIndicatorShown)
+        if( mIsFocusIndicatorShown == HIDE )
         {
           // Show focus indicator
-          mIsFocusIndicatorShown = 1;
+          mIsFocusIndicatorShown = SHOW;
         }
         else
         {
@@ -742,10 +810,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "Up" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if( mIsFocusIndicatorShown == HIDE )
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorShown = SHOW;
       }
       else
       {
@@ -757,10 +825,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "Down" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if( mIsFocusIndicatorShown == HIDE )
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorShown = SHOW;
       }
       else
       {
@@ -772,10 +840,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "Prior" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if( mIsFocusIndicatorShown == HIDE )
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorShown = SHOW;
       }
       else
       {
@@ -787,10 +855,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "Next" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if( mIsFocusIndicatorShown == HIDE )
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorShown = SHOW;
       }
       else
       {
@@ -802,10 +870,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "Tab" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if( mIsFocusIndicatorShown == HIDE )
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorShown = SHOW;
       }
       else
       {
@@ -818,10 +886,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
     else if (keyName == "space" && !isAccessibilityEnabled)
     {
-      if(!mIsFocusIndicatorShown)
+      if( mIsFocusIndicatorShown == HIDE )
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorShown = SHOW;
       }
 
       isFocusStartableKey = true;
@@ -829,10 +897,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     else if (keyName == "" && !isAccessibilityEnabled)
     {
       // Check the fake key event for evas-plugin case
-      if(!mIsFocusIndicatorShown)
+      if( mIsFocusIndicatorShown == HIDE )
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorShown = SHOW;
       }
 
       isFocusStartableKey = true;
@@ -849,10 +917,10 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
   {
     if (keyName == "Return")
     {
-      if(!mIsFocusIndicatorShown && !isAccessibilityEnabled)
+      if((mIsFocusIndicatorShown == HIDE) && !isAccessibilityEnabled)
       {
         // Show focus indicator
-        mIsFocusIndicatorShown = 1;
+        mIsFocusIndicatorShown = SHOW;
       }
       else
       {
@@ -877,12 +945,12 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
     }
   }
 
-  if(isFocusStartableKey && mIsFocusIndicatorShown && !isAccessibilityEnabled)
+  if(isFocusStartableKey && ( mIsFocusIndicatorShown == SHOW ) && !isAccessibilityEnabled)
   {
     Actor actor = GetCurrentFocusActor();
     if( actor )
     {
-      if( mEnableFocusIndicator )
+      if( mEnableFocusIndicator == ENABLE )
       {
         // Make sure the focused actor is highlighted
         actor.Add( GetFocusIndicatorActor() );
@@ -899,9 +967,9 @@ void KeyboardFocusManager::OnKeyEvent(const KeyEvent& event)
 
 void KeyboardFocusManager::OnTouch(const TouchData& touch)
 {
-  // if mIsFocusIndicatorShown is -1, it means Configuration is not loaded.
+  // if mIsFocusIndicatorShown is UNKNOWN, it means Configuration is not loaded.
   // Try to load configuration.
-  if( mIsFocusIndicatorShown == -1 )
+  if( mIsFocusIndicatorShown == UNKNOWN )
   {
     GetConfigurationFromStyleManger();
   }
@@ -912,6 +980,27 @@ void KeyboardFocusManager::OnTouch(const TouchData& touch)
   if( (( touch.GetPointCount() < 1 ) || ( touch.GetState( 0 ) == PointState::DOWN )) && mClearFocusOnTouch )
   {
     ClearFocus();
+  }
+}
+
+void KeyboardFocusManager::OnWindowFocusChanged(Window window, bool focusIn )
+{
+  if( focusIn && mCurrentFocusedWindow.GetHandle() != window.GetRootLayer() )
+  {
+    // Change Current Focused Window
+    Layer rootLayer = window.GetRootLayer();
+    mCurrentFocusedWindow = rootLayer;
+
+    // Get Current Focused Actor from window
+    Actor currentFocusedActor = GetFocusActorFromCurrentWindow();
+    SetCurrentFocusActor( currentFocusedActor );
+
+    if( currentFocusedActor && ( mEnableFocusIndicator == ENABLE ) )
+    {
+      // Make sure the focused actor is highlighted
+      currentFocusedActor.Add( GetFocusIndicatorActor() );
+      mIsFocusIndicatorShown = SHOW;
+    }
   }
 }
 
@@ -979,12 +1068,13 @@ void KeyboardFocusManager::EnableFocusIndicator(bool enable)
     mFocusIndicatorActor.Unparent();
   }
 
-  mEnableFocusIndicator = enable;
+  mEnableFocusIndicator = enable? ENABLE : DISABLE;
+
 }
 
 bool KeyboardFocusManager::IsFocusIndicatorEnabled() const
 {
-  return mEnableFocusIndicator;
+  return ( mEnableFocusIndicator == ENABLE );
 }
 
 } // namespace Internal

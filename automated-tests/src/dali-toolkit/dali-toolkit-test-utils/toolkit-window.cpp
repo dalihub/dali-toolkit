@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include "toolkit-window.h"
+#include "toolkit-window-impl.h"
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
@@ -46,26 +46,16 @@ namespace Internal
 {
 namespace Adaptor
 {
-class Window : public Dali::BaseObject
+
+Window::Window( const PositionSize& positionSize )
+: SceneHolder( positionSize )
 {
-public:
+}
 
-  Window( const PositionSize& positionSize )
-  : mRenderSurface( positionSize ),
-    mScene( Dali::Integration::Scene::New( mRenderSurface ) )
-  {
-  }
-
-  virtual ~Window() = default;
-
-  static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent)
-  {
-    return new Window( positionSize );
-  }
-
-  TestRenderSurface mRenderSurface;
-  Integration::Scene mScene;
-};
+Window* Window::New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent)
+{
+  return new Window( positionSize );
+}
 
 } // Adaptor
 } // Internal
@@ -75,6 +65,13 @@ inline Internal::Adaptor::Window& GetImplementation(Dali::Window& window)
   DALI_ASSERT_ALWAYS( window && "Window handle is empty" );
   BaseObject& object = window.GetBaseObject();
   return static_cast<Internal::Adaptor::Window&>(object);
+}
+
+inline const Internal::Adaptor::Window& GetImplementation(const Dali::Window& window)
+{
+  DALI_ASSERT_ALWAYS( window && "Window handle is empty" );
+  const BaseObject& object = window.GetBaseObject();
+  return static_cast<const Internal::Adaptor::Window&>(object);
 }
 
 Window::Window()
@@ -104,15 +101,13 @@ Dali::Window Window::New( PositionSize windowPosition, const std::string& name, 
 Dali::Window Window::New(PositionSize windowPosition, const std::string& name, const std::string& className, bool isTransparent )
 {
   Internal::Adaptor::Window* window = Internal::Adaptor::Window::New( windowPosition, name, className, isTransparent );
-  Dali::Window newWindow = Window( window );
-  Dali::Adaptor::WindowCreatedSignalType& windowCreatedSignal = AdaptorImpl::Get().WindowCreatedSignal();
-  windowCreatedSignal.Emit( newWindow );
-  return Window( window );
-}
 
-Dali::Layer Window::GetRootLayer() const
-{
-  return Dali::Stage::GetCurrent().GetRootLayer();
+  Dali::Window result( window );
+
+  // This will also emit the window created signals
+  AdaptorImpl::GetImpl( AdaptorImpl::Get() ).AddWindow( window );
+
+  return result;
 }
 
 Window::Window( Internal::Adaptor::Window* window )
@@ -122,12 +117,47 @@ Window::Window( Internal::Adaptor::Window* window )
 
 Integration::Scene Window::GetScene()
 {
-  return GetImplementation( *this ).mScene;
+  return GetImplementation( *this ).GetScene();
 }
 
 Integration::RenderSurface& Window::GetRenderSurface()
 {
-  return GetImplementation( *this ).mRenderSurface;
+  return GetImplementation( *this ).GetRenderSurface();
+}
+
+void Window::Add( Actor actor )
+{
+  GetImplementation( *this ).Add( actor );
+}
+
+void Window::Remove( Actor actor )
+{
+  GetImplementation( *this ).Remove( actor );
+}
+
+Dali::Layer Window::GetRootLayer() const
+{
+  return GetImplementation( *this ).GetRootLayer();
+}
+
+void Window::SetBackgroundColor( const Vector4& color )
+{
+  GetImplementation( *this ).SetBackgroundColor( color );
+}
+
+Vector4 Window::GetBackgroundColor() const
+{
+  return GetImplementation( *this ).GetBackgroundColor();
+}
+
+void Window::Raise()
+{
+  GetImplementation( *this ).mFocusChangeSignal.Emit(*this, true);
+}
+
+FocusChangeSignalType& Window::FocusChangeSignal()
+{
+  return GetImplementation( *this ).mFocusChangeSignal;
 }
 
 namespace DevelWindow
@@ -135,33 +165,51 @@ namespace DevelWindow
 
 Window Get( Actor actor )
 {
-  return Window();
+  Internal::Adaptor::Window* windowImpl = nullptr;
+
+  if ( Dali::Adaptor::IsAvailable() )
+  {
+    windowImpl = static_cast<Internal::Adaptor::Window*>( AdaptorImpl::GetImpl( AdaptorImpl::Get() ).GetWindow( actor ) );
+  }
+
+  return Dali::Window( windowImpl );
+}
+
+Window DownCast( BaseHandle handle )
+{
+  Internal::Adaptor::Window* windowImpl = nullptr;
+  if ( Dali::Adaptor::IsAvailable() )
+  {
+    windowImpl = dynamic_cast<Dali::Internal::Adaptor::Window*>( handle.GetObjectPtr());
+  }
+  return Dali::Window( windowImpl );
 }
 
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window )
 {
-  return GetImplementation( window ).mScene.EventProcessingFinishedSignal();
+  return GetImplementation( window ).GetScene().EventProcessingFinishedSignal();
 }
 
 KeyEventSignalType& KeyEventSignal( Window window )
 {
-  return GetImplementation( window ).mScene.KeyEventSignal();
+  return GetImplementation( window ).KeyEventSignal();
 }
 
 KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Window window )
 {
-  return GetImplementation( window ).mScene.KeyEventGeneratedSignal();
+  return GetImplementation( window ).KeyEventGeneratedSignal();
 }
 
 TouchSignalType& TouchSignal( Window window )
 {
-  return GetImplementation( window ).mScene.TouchSignal();
+  return GetImplementation( window ).TouchSignal();
 }
 
 WheelEventSignalType& WheelEventSignal( Window window )
 {
-  return GetImplementation( window ).mScene.WheelEventSignal();
+  return GetImplementation( window ).WheelEventSignal();
 }
+
 } // namespace DevelWindow
 
 } // Dali

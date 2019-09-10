@@ -44,6 +44,9 @@ class Window;
 }
 }
 
+class Window;
+typedef Signal< void (Window,bool) > FocusChangeSignalType;
+
 class Window : public BaseHandle
 {
 public:
@@ -55,14 +58,23 @@ public:
   ~Window();
   Window(const Window& handle);
   Window& operator=(const Window& rhs);
-  Layer GetRootLayer() const;
 
   Integration::Scene GetScene();
   Integration::RenderSurface& GetRenderSurface();
+  void Add( Dali::Actor actor );
+  void Remove( Dali::Actor actor );
+  Dali::Layer GetRootLayer() const;
+  void SetBackgroundColor( const Vector4& color );
+  Vector4 GetBackgroundColor() const;
+  void Raise();
+  FocusChangeSignalType& FocusChangeSignal();
 
 public:
   explicit Window( Internal::Adaptor::Window* window );
 };
+
+Internal::Adaptor::Window& GetImplementation(Dali::Window& window);
+const Internal::Adaptor::Window& GetImplementation(const Dali::Window& window);
 
 namespace DevelWindow
 {
@@ -73,6 +85,7 @@ typedef Signal< void (const TouchData&) > TouchSignalType;
 typedef Signal< void (const WheelEvent&) > WheelEventSignalType;
 
 Dali::Window Get( Actor actor );
+Dali::Window DownCast(  BaseHandle handle );
 
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window );
 KeyEventSignalType& KeyEventSignal( Dali::Window window );
