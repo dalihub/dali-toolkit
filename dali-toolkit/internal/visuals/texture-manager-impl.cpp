@@ -750,7 +750,7 @@ void TextureManager::ObserveTexture( TextureInfo& textureInfo,
 }
 
 void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingContainer, uint32_t id,
-                                        Devel::PixelBuffer pixelBuffer, bool isMaskTask )
+                                        Devel::PixelBuffer pixelBuffer )
 {
   DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::AsyncLoadComplete( id:%d )\n", id );
 
@@ -771,7 +771,7 @@ void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingCo
 
         if( textureInfo.loadState != CANCELLED )
         {
-          if( isMaskTask )
+          if( textureInfo.maskApplied )
           {
             textureInfo.loadState = MASK_APPLIED;
           }
@@ -890,6 +890,7 @@ void TextureManager::ApplyMask( TextureInfo& textureInfo, TextureId maskTextureI
                    textureInfo.url.GetUrl().c_str(), textureInfo.loadSynchronously?"T":"F" );
 
     textureInfo.loadState = MASK_APPLYING;
+    textureInfo.maskApplied = true;
     auto& loadersContainer = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
     auto loadingHelperIt = loadersContainer.GetNext();
     DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
@@ -1182,10 +1183,9 @@ TextureManager::AsyncLoadingHelper::AsyncLoadingHelper(
 }
 
 void TextureManager::AsyncLoadingHelper::AsyncLoadComplete(uint32_t           id,
-                                                           Devel::PixelBuffer pixelBuffer,
-                                                           bool isMaskTask)
+                                                           Devel::PixelBuffer pixelBuffer )
 {
-  mTextureManager.AsyncLoadComplete(mLoadingInfoContainer, id, pixelBuffer, isMaskTask);
+  mTextureManager.AsyncLoadComplete( mLoadingInfoContainer, id, pixelBuffer );
 }
 
 void TextureManager::SetBrokenImageUrl(const std::string& brokenImageUrl)
