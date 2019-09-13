@@ -66,7 +66,7 @@ void SceneHolder::Add( Dali::Actor actor )
 
 void SceneHolder::Remove( Dali::Actor actor )
 {
-  mScene.Add( actor );
+  mScene.Remove( actor );
 }
 
 Dali::Layer SceneHolder::GetRootLayer() const

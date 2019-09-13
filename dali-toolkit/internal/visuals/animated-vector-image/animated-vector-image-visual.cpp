@@ -242,18 +242,22 @@ void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Prop
     }
     case Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR:
     {
-      int32_t stopBehavior;
-      Scripting::GetEnumerationProperty( value, STOP_BEHAVIOR_TABLE, STOP_BEHAVIOR_TABLE_COUNT, stopBehavior );
-      mStopBehavior = DevelImageVisual::StopBehavior::Type( stopBehavior );
-      mResendFlag |= RESEND_STOP_BEHAVIOR;
+      int32_t stopBehavior = mStopBehavior;
+      if( Scripting::GetEnumerationProperty( value, STOP_BEHAVIOR_TABLE, STOP_BEHAVIOR_TABLE_COUNT, stopBehavior ) )
+      {
+        mStopBehavior = DevelImageVisual::StopBehavior::Type( stopBehavior );
+        mResendFlag |= RESEND_STOP_BEHAVIOR;
+      }
       break;
     }
     case Toolkit::DevelImageVisual::Property::LOOPING_MODE:
     {
-      int32_t loopingMode;
-      Scripting::GetEnumerationProperty( value, LOOPING_MODE_TABLE, LOOPING_MODE_TABLE_COUNT, loopingMode );
-      mLoopingMode = DevelImageVisual::LoopingMode::Type( loopingMode );
-      mResendFlag |= RESEND_LOOPING_MODE;
+      int32_t loopingMode = mLoopingMode;
+      if( Scripting::GetEnumerationProperty( value, LOOPING_MODE_TABLE, LOOPING_MODE_TABLE_COUNT, loopingMode ) )
+      {
+        mLoopingMode = DevelImageVisual::LoopingMode::Type( loopingMode );
+        mResendFlag |= RESEND_LOOPING_MODE;
+      }
       break;
     }
   }
@@ -393,9 +397,13 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
       if( mVectorRasterizeThread.GetPlayState() != DevelImageVisual::PlayState::STOPPED )
       {
         mVectorRasterizeThread.StopAnimation();
-
-        OnAnimationFinished();
       }
+
+      if( mImpl->mRenderer )
+      {
+        mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED );
+      }
+
       mActionStatus = DevelAnimatedVectorImageVisual::Action::STOP;
       break;
     }
@@ -445,12 +453,17 @@ void AnimatedVectorImageVisual::OnUploadCompleted()
 
 void AnimatedVectorImageVisual::OnAnimationFinished()
 {
-  if( mImpl->mEventObserver )
-  {
-    mImpl->mEventObserver->NotifyVisualEvent( *this, DevelAnimatedVectorImageVisual::Signal::ANIMATION_FINISHED );
-  }
+  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnAnimationFinished: action state = %d [%p]\n", mActionStatus, this );
 
-  mActionStatus = DevelAnimatedVectorImageVisual::Action::STOP;
+  if( mActionStatus != DevelAnimatedVectorImageVisual::Action::STOP )
+  {
+    mActionStatus = DevelAnimatedVectorImageVisual::Action::STOP;
+
+    if( mImpl->mEventObserver )
+    {
+      mImpl->mEventObserver->NotifyVisualEvent( *this, DevelAnimatedVectorImageVisual::Signal::ANIMATION_FINISHED );
+    }
+  }
 
   if( mImpl->mRenderer )
   {

@@ -1579,4 +1579,40 @@ int UtcDaliKeyboardFocusManagerCheckConsumedKeyEvent(void)
   END_TEST;
 }
 
+int UtcDaliKeyboardFocusManagerFocusPerWindow(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Ensure Memory focus actors for each window ");
+  KeyboardFocusManager manager = KeyboardFocusManager::Get();
+  DALI_TEST_CHECK( ! manager.GetCurrentFocusActor() );
+
+  Window firstWindow = Window::New(PositionSize(0,0,300,500) ,"", false);
+  DALI_TEST_CHECK( firstWindow );
+  Control first = Control::New();
+  first.SetKeyboardFocusable(true);
+  firstWindow.Add(first);
+
+  Window secondWindow = Window::New(PositionSize(0,0,400,600) ,"", false);
+  DALI_TEST_CHECK( secondWindow );
+  Control second = Control::New();
+  second.SetKeyboardFocusable(true);
+  secondWindow.Add( second );
+
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(first) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+
+  DALI_TEST_CHECK(manager.SetCurrentFocusActor(second) == true);
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == second);
+  firstWindow.Raise();
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() == first);
+
+  secondWindow.Remove( second );
+  secondWindow.Raise();
+  DALI_TEST_CHECK(manager.GetCurrentFocusActor() != second);
+
+  secondWindow.Reset();
+  END_TEST;
+}
+
 

@@ -44,7 +44,8 @@ constexpr auto NANOSECONDS_PER_SECOND( 1e+9 );
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VECTOR_ANIMATION" );
 #endif
 
-inline void ResetValue( bool& updated, uint32_t& value, uint32_t newValue, ConditionalWait& conditionalWait )
+template< typename T >
+inline void ResetValue( bool& updated, T& value, T newValue, ConditionalWait& conditionalWait )
 {
   ConditionalWait::ScopedLock lock( conditionalWait );
   if( !updated )
@@ -78,8 +79,10 @@ VectorRasterizeThread::VectorRasterizeThread( const std::string& url )
   mDestroyThread( false ),
   mResourceReady( false ),
   mCurrentFrameUpdated( false ),
+  mCurrentLoopUpdated( false ),
   mForward( true ),
   mUpdateFrameNumber( false ),
+  mNeedAnimationFinishedTrigger( true ),
   mLogFactory( Dali::Adaptor::Get().GetLogFactory() )
 {
   Initialize();
@@ -158,6 +161,7 @@ void VectorRasterizeThread::StopAnimation()
   if( mPlayState != PlayState::STOPPED && mPlayState != PlayState::STOPPING )
   {
     mNeedRender = true;
+    mNeedAnimationFinishedTrigger = false;
     mPlayState = PlayState::STOPPING;
     mConditionalWait.Notify( lock );
 
@@ -202,6 +206,8 @@ void VectorRasterizeThread::SetLoopCount( int32_t count )
     ConditionalWait::ScopedLock lock( mConditionalWait );
 
     mLoopCount = count;
+    mCurrentLoop = 0;
+    mCurrentLoopUpdated = true;
 
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::SetLoopCount: [%d] [%p]\n", count, this );
   }
@@ -362,9 +368,9 @@ void VectorRasterizeThread::Initialize()
 
 void VectorRasterizeThread::Rasterize()
 {
-  bool stopped = false;
+  bool stopped = false, needAnimationFinishedTrigger;
   uint32_t currentFrame, startFrame, endFrame;
-  int32_t loopCount;
+  int32_t loopCount, currentLoopCount;
 
   {
     ConditionalWait::ScopedLock lock( mConditionalWait );
@@ -384,11 +390,15 @@ void VectorRasterizeThread::Rasterize()
     startFrame = mStartFrame;
     endFrame = mEndFrame;
     loopCount = mLoopCount;
+    currentLoopCount = mCurrentLoop;
+    needAnimationFinishedTrigger = mNeedAnimationFinishedTrigger;
 
     mResourceReady = true;
     mNeedRender = false;
     mCurrentFrameUpdated = false;
+    mCurrentLoopUpdated = false;
     mUpdateFrameNumber = true;
+    mNeedAnimationFinishedTrigger = true;
   }
 
   auto currentFrameStartTime = std::chrono::system_clock::now();
@@ -412,7 +422,7 @@ void VectorRasterizeThread::Rasterize()
       }
       else
       {
-        if( loopCount < 0 || ++mCurrentLoop < loopCount )   // repeat forever or before the last loop
+        if( loopCount < 0 || ++currentLoopCount < loopCount )   // repeat forever or before the last loop
         {
           ResetValue( mCurrentFrameUpdated, mCurrentFrame, startFrame, mConditionalWait );  // If the current frame is changed in the event thread, don't overwrite it.
           mUpdateFrameNumber = false;
@@ -421,11 +431,12 @@ void VectorRasterizeThread::Rasterize()
         {
           animationFinished = true;   // end of animation
         }
+        ResetValue( mCurrentLoopUpdated, mCurrentLoop, currentLoopCount, mConditionalWait );
       }
     }
     else if( currentFrame == startFrame && !mForward )  // first frame
     {
-      if( loopCount < 0 || ++mCurrentLoop < loopCount )   // repeat forever or before the last loop
+      if( loopCount < 0 || ++currentLoopCount < loopCount )   // repeat forever or before the last loop
       {
         mForward = true;
       }
@@ -433,6 +444,7 @@ void VectorRasterizeThread::Rasterize()
       {
         animationFinished = true;   // end of animation
       }
+      ResetValue( mCurrentLoopUpdated, mCurrentLoop, currentLoopCount, mConditionalWait );
     }
 
     if( animationFinished )
@@ -462,7 +474,10 @@ void VectorRasterizeThread::Rasterize()
     mCurrentLoop = 0;
 
     // Animation is finished
-    mAnimationFinishedTrigger->Trigger();
+    if( needAnimationFinishedTrigger )
+    {
+      mAnimationFinishedTrigger->Trigger();
+    }
 
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorRasterizeThread::Rasterize: Animation is finished [current = %d] [%p]\n", currentFrame, this );
   }

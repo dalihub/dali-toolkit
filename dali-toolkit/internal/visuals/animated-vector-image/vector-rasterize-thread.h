@@ -233,8 +233,10 @@ private:
   bool                        mDestroyThread;  ///< Whether the thread be destroyed
   bool                        mResourceReady;
   bool                        mCurrentFrameUpdated;
+  bool                        mCurrentLoopUpdated;
   bool                        mForward;
   bool                        mUpdateFrameNumber;
+  bool                        mNeedAnimationFinishedTrigger;
   const Dali::LogFactoryInterface& mLogFactory; ///< The log factory
 
 };

@@ -40,10 +40,10 @@ namespace Adaptor
 class Window : public SceneHolder
 {
 public:
-
   Window( const PositionSize& positionSize );
   virtual ~Window() = default;
   static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent);
+  FocusChangeSignalType mFocusChangeSignal;
 };
 
 } // namespace Adaptor
