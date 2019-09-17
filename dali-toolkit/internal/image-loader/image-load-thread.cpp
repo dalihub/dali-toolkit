@@ -49,8 +49,7 @@ LoadingTask::LoadingTask( uint32_t id, const VisualUrl& url, ImageDimensions dim
 {
 }
 
-LoadingTask::LoadingTask( uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask,
-                          DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad )
+LoadingTask::LoadingTask( uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::PixelBuffer maskPixelBuffer, float contentScale, bool cropToMask )
 : pixelBuffer( pixelBuffer ),
   url( "" ),
   id( id ),
@@ -58,7 +57,7 @@ LoadingTask::LoadingTask( uint32_t id, Devel::PixelBuffer pixelBuffer, Devel::Pi
   fittingMode(),
   samplingMode(),
   orientationCorrection(),
-  preMultiplyOnLoad( preMultiplyOnLoad ),
+  preMultiplyOnLoad(),
   isMaskTask( true ),
   maskPixelBuffer( maskPixelBuffer ),
   contentScale( contentScale ),
@@ -76,15 +75,7 @@ void LoadingTask::Load()
   {
     pixelBuffer = Dali::DownloadImageSynchronously ( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
   }
-}
 
-void LoadingTask::ApplyMask()
-{
-  pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
-}
-
-void LoadingTask::MultiplyAlpha()
-{
   if( pixelBuffer && Pixel::HasAlpha( pixelBuffer.GetPixelFormat() ) )
   {
     if( preMultiplyOnLoad == DevelAsyncImageLoader::PreMultiplyOnLoad::ON )
@@ -92,6 +83,11 @@ void LoadingTask::MultiplyAlpha()
       pixelBuffer.MultiplyColorByAlpha();
     }
   }
+}
+
+void LoadingTask::ApplyMask()
+{
+  pixelBuffer.ApplyMask( maskPixelBuffer, contentScale, cropToMask );
 }
 
 ImageLoadThread::ImageLoadThread( EventThreadCallback* trigger )
@@ -125,7 +121,6 @@ void ImageLoadThread::Run()
     {
       task->ApplyMask();
     }
-    task->MultiplyAlpha();
 
     AddCompletedTask( task );
   }
