@@ -712,7 +712,7 @@ private:
      * @param[in] samplingMode          The SamplingMode to use
      * @param[in] orientationCorrection Whether to use image metadata to rotate or flip the image,
      *                                  e.g., from portrait to landscape
-     * @param[in] preMultiplyOnLoad     if the image's color should be multiplied by it's alpha.
+     * @param[in] preMultiplyOnLoad     if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
      */
     void Load(TextureId textureId,
               const VisualUrl& url,
@@ -729,12 +729,14 @@ private:
      * @param [in] maskPixelBuffer of the mask image
      * @param [in] contentScale The factor to scale the content
      * @param [in] cropToMask Whether to crop the content to the mask size
+     * @param [in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
      */
     void ApplyMask( TextureId textureId,
                     Devel::PixelBuffer pixelBuffer,
                     Devel::PixelBuffer maskPixelBuffer,
                     float contentScale,
-                    bool cropToMask );
+                    bool cropToMask,
+                    DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
 
   public:
     AsyncLoadingHelper(const AsyncLoadingHelper&) = delete;
