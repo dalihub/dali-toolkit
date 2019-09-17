@@ -31,6 +31,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/model3d-view/obj-loader.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -284,6 +285,11 @@ Model3dView::Model3dView()
   mCameraFOV = Math::PI_OVER_180 * 45.f;
 
   mControlSize = Vector2(100.,100.);
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::IMAGE ) );
+  } );
 }
 
 Model3dView::~Model3dView()

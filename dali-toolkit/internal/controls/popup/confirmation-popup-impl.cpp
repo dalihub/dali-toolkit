@@ -1,4 +1,4 @@
-/*
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>/*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,9 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <cstring>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -99,6 +102,10 @@ ConfirmationPopup::ConfirmationPopup()
   mControlSignals.reserve( MAXIMUM_NUMBER_OF_CONTROLS );
   mControlSignalNames[ Toolkit::ConfirmationPopup::CONTROL_OK ] = DEFAULT_CONNECT_SIGNAL_NAME;
   mControlSignalNames[ Toolkit::ConfirmationPopup::CONTROL_CANCEL ] = DEFAULT_CONNECT_SIGNAL_NAME;
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::DIALOG, true ) );
+  } );
 }
 
 ConfirmationPopup::~ConfirmationPopup()

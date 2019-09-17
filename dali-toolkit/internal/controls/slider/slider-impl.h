@@ -28,6 +28,7 @@
 #include <dali-toolkit/public-api/controls/slider/slider.h>
 #include <dali-toolkit/public-api/controls/text-controls/text-label.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -744,17 +745,29 @@ private:
   Vector2 mTrackRegion;   ///< Size of track region
   Vector2 mHandleSize;    ///< Size of the handle
 
-  float mLowerBound;        ///< Lower bound on value
-  float mUpperBound;        ///< Upper bound on value
-  float mValue;             ///< Current value of slider
+  float mLowerBound = 0.0f;        ///< Lower bound on value
+  float mUpperBound = 1.0f;        ///< Upper bound on value
+  float mValue = 0.0f;             ///< Current value of slider
 
-  float mMarkTolerance;     ///< Tolerance in percentage of slider width for which to snap to marks
+  float mMarkTolerance = 0.05f;     ///< Tolerance in percentage of slider width for which to snap to marks
 
   int mValuePrecision;      ///< The precision to use for outputting the value
 
   bool mShowPopup   : 1,      ///< Show the popup or not
        mShowValue   : 1,      ///< Whether to display the value number or not on the handle
        mSnapToMarks : 1;      ///< Turn on or off snapping to marks
+
+protected:
+  struct AccessibleImpl : public Control::Impl::AccessibleImpl,
+                          public virtual Dali::Accessibility::Value
+  {
+    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    double GetMinimum() override;
+    double GetCurrent() override;
+    double GetMaximum() override;
+    bool SetCurrent( double ) override;
+    double GetMinimumIncrement() override;
+  };
 };
 
 } // namespace Internal

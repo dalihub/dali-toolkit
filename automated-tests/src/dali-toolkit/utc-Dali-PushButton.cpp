@@ -167,7 +167,7 @@ static std::string GetButtonText( Button button )
 
 int UtcDaliPushButtonConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   PushButton button;
 
@@ -177,7 +177,7 @@ int UtcDaliPushButtonConstructorP(void)
 
 int UtcDaliPushButtonCopyConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Initialize an object, ref count == 1
   PushButton button = PushButton::New();
@@ -189,7 +189,7 @@ int UtcDaliPushButtonCopyConstructorP(void)
 
 int UtcDaliPushButtonAssignmentOperatorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   PushButton button = PushButton::New();
 
@@ -202,7 +202,7 @@ int UtcDaliPushButtonAssignmentOperatorP(void)
 
 int UtcDaliPushButtonNewP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   PushButton button = PushButton::New();
 
@@ -212,7 +212,7 @@ int UtcDaliPushButtonNewP(void)
 
 int UtcDaliPushButtonDownCastP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   PushButton button = PushButton::New();
 
@@ -228,7 +228,7 @@ int UtcDaliPushButtonDownCastP(void)
 
 int UtcDaliPushButtonDownCastN(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   BaseHandle unInitializedObject;
 

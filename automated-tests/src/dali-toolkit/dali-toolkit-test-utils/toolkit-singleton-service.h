@@ -18,12 +18,19 @@
  */
 
 #include <dali/devel-api/adaptor-framework/singleton-service.h>
-#include "test-application.h"
+
+
+namespace Dali
+{
+
+class ToolkitTestApplication; 
+
+}
 
 namespace Test
 {
 
-void SetApplication( Dali::SingletonService singletonService, TestApplication& testApplication );
+void SetApplication( Dali::SingletonService singletonService, Dali::ToolkitTestApplication& ToolkitTestApplication );
 
 } // Test
 

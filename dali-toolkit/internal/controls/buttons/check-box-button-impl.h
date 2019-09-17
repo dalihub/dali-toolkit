@@ -77,7 +77,14 @@ private:
 
   // Undefined
   CheckBoxButton& operator=( const CheckBoxButton& );
+protected:
+  struct AccessibleImpl : public Button::AccessibleImpl
+  {
+    using Button::AccessibleImpl::AccessibleImpl;
 
+    Dali::Accessibility::States CalculateStates() override;
+  };
+  void OnStateChange( State newState ) override;
 };
 
 } // namespace Internal

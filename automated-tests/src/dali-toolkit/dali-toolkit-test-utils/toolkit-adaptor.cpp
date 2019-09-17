@@ -31,6 +31,7 @@
 #include <dali/integration-api/scene.h>
 #include <test-application.h>
 #include <test-render-surface.h>
+#include <toolkit-test-application.h>
 
 namespace Dali
 {
@@ -349,6 +350,24 @@ void Adaptor::SceneCreated()
 {
 }
 
+class LogFactory : public LogFactoryInterface
+{
+public:
+  virtual void InstallLogFunction() const
+  {
+    Dali::Integration::Log::LogFunction logFunction(&ToolkitTestApplication::LogMessage);
+    Dali::Integration::Log::InstallLogFunction(logFunction);
+  }
+
+  LogFactory()
+  {
+  }
+  virtual ~LogFactory()
+  {
+  }
+};
+
+LogFactory* gLogFactory = NULL;
 const LogFactoryInterface& Adaptor::GetLogFactory()
 {
   if( gLogFactory == NULL )

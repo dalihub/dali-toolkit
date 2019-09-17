@@ -22,6 +22,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/controls/scrollable/scrollable-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 using namespace Dali;
 
@@ -78,21 +79,6 @@ const Vector2 OVERSHOOT_DEFAULT_SIZE( 720.0f, 42.0f );
 // Scrollable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Scrollable controls are not layout containers so they dont need size negotiation..
-// we dont want size negotiation while scrolling if we can avoid it
-Scrollable::Scrollable()
-: Control( ControlBehaviour( DISABLE_SIZE_NEGOTIATION ) ),
-  mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
-  mOvershootAnimationSpeed ( DEFAULT_OVERSHOOT_ANIMATION_SPEED ),
-  mOvershootSize( OVERSHOOT_DEFAULT_SIZE ),
-  mScrollToAlphaFunction( AlphaFunction::EASE_OUT ),
-  mScrollStartedSignal(),
-  mScrollUpdatedSignal(),
-  mScrollCompletedSignal(),
-  mOvershootEnabled(true)
-{
-}
-
 Scrollable::Scrollable( ControlBehaviour behaviourFlags )
 : Control( ControlBehaviour( behaviourFlags ) ),
   mOvershootEffectColor(  DEFAULT_OVERSHOOT_COLOUR ),
@@ -104,6 +90,10 @@ Scrollable::Scrollable( ControlBehaviour behaviourFlags )
   mScrollCompletedSignal(),
   mOvershootEnabled(true)
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::SCROLL_PANE ) );
+  } );
 }
 
 Scrollable::~Scrollable()

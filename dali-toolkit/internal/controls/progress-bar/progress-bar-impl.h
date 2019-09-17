@@ -24,6 +24,7 @@
 #include <dali/public-api/animation/animation.h>
 #include <dali-toolkit/public-api/controls/progress-bar/progress-bar.h>
 #include <dali-toolkit/devel-api/visual-factory/transition-data.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -256,6 +257,18 @@ private:
   float mProgressValue;                                               ///< Current value of ProgressBar
   float mSecondaryProgressValue;                                      ///< Current loading value of ProgressBar
   bool mIndeterminate;                                                ///< Whether the progress state is determined or not
+
+protected:
+  struct AccessibleImpl : public Control::Impl::AccessibleImpl,
+                          public virtual Dali::Accessibility::Value
+  {
+    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    double GetMinimum() override;
+    double GetCurrent() override;
+    double GetMaximum() override;
+    bool SetCurrent( double ) override;
+    double GetMinimumIncrement() override;
+  };
 };
 
 } // namespace Internal

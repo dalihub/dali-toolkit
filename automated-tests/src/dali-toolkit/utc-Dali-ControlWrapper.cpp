@@ -293,7 +293,7 @@ int UtcDaliControlWrapperConstructor(void)
 
 int UtcDaliControlWrapperDestructor(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   ControlWrapper control = ControlWrapper::New( customControlTypeName, *( new Toolkit::Internal::ControlWrapper( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT ) ) );
 
@@ -312,7 +312,7 @@ int UtcDaliControlWrapperDestructor(void)
 
 int UtcDaliControlWrapperRelayoutRequest(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   DALI_TEST_EQUALS( gOnRelayout, false, TEST_LOCATION );
 
@@ -338,7 +338,7 @@ int UtcDaliControlWrapperRelayoutRequest(void)
 
 int UtcDaliControlWrapperImplGetHeightForWidthBase(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
   ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
@@ -358,7 +358,7 @@ int UtcDaliControlWrapperImplGetHeightForWidthBase(void)
 
 int UtcDaliControlWrapperGetWidthForHeightBase(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
   ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
@@ -378,7 +378,7 @@ int UtcDaliControlWrapperGetWidthForHeightBase(void)
 
 int UtcDaliControlWrapperCalculateChildSizeBase(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
   ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
@@ -399,7 +399,7 @@ int UtcDaliControlWrapperCalculateChildSizeBase(void)
 
 int UtcDaliControlWrapperRelayoutDependentOnChildrenBase(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Impl::TestCustomControl* controlWrapperImpl = new ::Impl::TestCustomControl( Toolkit::Internal::ControlWrapper::CONTROL_BEHAVIOUR_DEFAULT );
   ControlWrapper controlWrapper = ControlWrapper::New( customControlTypeName, *controlWrapperImpl );
@@ -613,7 +613,7 @@ int UtcDaliControlWrapperRegisterUnregisterVisual(void)
 
 int UtcDaliControlWrapperTransitionDataMap1N(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Property::Map map;
   map["target"] = "Actor1";

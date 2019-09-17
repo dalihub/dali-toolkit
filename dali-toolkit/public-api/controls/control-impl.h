@@ -680,7 +680,6 @@ public:
 private:
   Impl* mImpl;
   /// @endcond
-
 };
 
 /**

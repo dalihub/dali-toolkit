@@ -35,6 +35,7 @@
 #include <dali-toolkit/devel-api/controls/bloom-view/bloom-view.h>
 #include <dali-toolkit/internal/controls/gaussian-blur-view/gaussian-blur-view-impl.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -157,6 +158,10 @@ BloomView::BloomView()
   mImageSaturationPropertyIndex(Property::INVALID_INDEX),
   mActivated( false )
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::ANIMATION ) );
+  } );
 }
 
 BloomView::BloomView( const unsigned int blurNumSamples, const float blurBellCurveWidth, const Pixel::Format renderTargetPixelFormat,

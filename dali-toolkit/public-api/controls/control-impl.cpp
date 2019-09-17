@@ -25,9 +25,12 @@
 #include <typeinfo>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/type-registry-helper.h>
+#include <dali/public-api/object/type-info.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+#include <dali/public-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/align-enumerations.h>
@@ -44,6 +47,12 @@
 #include <dali-toolkit/internal/visuals/color/color-visual.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/controls/control/control-data-impl.h>
+#include <dali/devel-api/actors/actor-devel.h>
+#include <dali-toolkit/public-api/controls/image-view/image-view.h>
+
+#include <dali/devel-api/actors/actor-devel.h>
+#include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 namespace Dali
 {
@@ -352,7 +361,11 @@ void Control::KeyboardEnter()
 
 bool Control::OnAccessibilityActivated()
 {
-  return false; // Accessibility activation is not handled by default
+  if( Toolkit::KeyboardFocusManager::Get().SetCurrentFocusActor( Self() ) )
+  {
+    return OnKeyboardEnter();
+  }
+  return false;
 }
 
 bool Control::OnKeyboardEnter()
@@ -467,6 +480,17 @@ void Control::Initialize()
   {
     SetKeyboardNavigationSupport( true );
   }
+
+  Dali::TypeInfo type;
+  Self().GetTypeInfo( type );
+  if (type)
+  {
+    auto typeName = type.GetName();
+    DevelControl::AppendAccessibilityAttribute( Self(), "t", typeName );
+  }
+
+  if (Accessibility::IsUp())
+    mImpl->AccessibilityRegister();
 }
 
 void Control::OnInitialize()
@@ -523,6 +547,17 @@ void Control::EmitKeyInputFocusSignal( bool focusGained )
 {
   Dali::Toolkit::Control handle( GetOwner() );
 
+  if( Accessibility::IsUp() )
+  {
+    auto self = mImpl->GetAccessibilityObject( Self() );
+    self->EmitFocused( focusGained );
+    auto parent = self->GetParent();
+    if( parent && !self->GetStates()[Dali::Accessibility::State::MANAGES_DESCENDANTS] )
+    {
+      parent->EmitActiveDescendantChanged( parent, self );
+    }
+  }
+
   if ( focusGained )
   {
     // signals are allocated dynamically when someone connects
@@ -561,12 +596,19 @@ void Control::OnStageConnection( int depth )
   CreateClippingRenderer( *this );
 
   // Request to be laid out when the control is connected to the Stage.
-  // Signal that a Relayout may be needed
+  if( Accessibility::IsUp() )
+  {
+    mImpl->AccessibilityRegister();
+  }
 }
 
 
 void Control::OnStageDisconnection()
 {
+  if( Accessibility::IsUp() )
+  {
+    mImpl->AccessibilityDeregister();
+  }
   mImpl->OnStageDisconnection();
 }
 
@@ -596,10 +638,49 @@ void Control::OnPropertySet( Property::Index index, Property::Value propertyValu
 {
   // If the clipping mode has been set, we may need to create a renderer.
   // Only do this if we are already on-stage as the OnStageConnection will handle the off-stage clipping controls.
-  if( ( index == Actor::Property::CLIPPING_MODE ) && Self().OnStage() )
+  switch( index )
   {
-    // Note: This method will handle whether creation of the renderer is required.
-    CreateClippingRenderer( *this );
+    case Actor::Property::CLIPPING_MODE:
+    {
+      if( Self().OnStage() )
+      {
+        // Note: This method will handle whether creation of the renderer is required.
+        CreateClippingRenderer( *this );
+      }
+      break;
+    }
+    case Actor::Property::VISIBLE:
+    {
+      if( Dali::Accessibility::IsUp() )
+      {
+        Dali::Accessibility::Accessible::Get(Self())->EmitVisible( Self().GetProperty( Actor::Property::VISIBLE ).Get<bool>() );
+      }
+      break;
+    }
+    case Toolkit::DevelControl::Property::ACCESSIBILITY_NAME:
+    {
+      if( Dali::Accessibility::IsUp() )
+      {
+        Dali::Accessibility::Accessible::Get(Self())->Emit( Dali::Accessibility::ObjectPropertyChangeEvent::NAME );
+      }
+      break;
+    }
+    case Toolkit::DevelControl::Property::ACCESSIBILITY_ROLE:
+    {
+      if( Dali::Accessibility::IsUp() )
+      {
+        Dali::Accessibility::Accessible::Get(Self())->Emit( Dali::Accessibility::ObjectPropertyChangeEvent::ROLE );
+      }
+      break;
+    }
+    case Toolkit::DevelControl::Property::ACCESSIBILITY_DESCRIPTON:
+    {
+      if( Dali::Accessibility::IsUp() )
+      {
+        Dali::Accessibility::Accessible::Get(Self())->Emit( Dali::Accessibility::ObjectPropertyChangeEvent::DESCRIPTION );
+      }
+      break;
+    }
   }
 }
 

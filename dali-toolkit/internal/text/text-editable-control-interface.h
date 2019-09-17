@@ -46,6 +46,21 @@ public:
   {}
 
   /**
+   * @brief Called to signal that text has been inserted.
+   */
+  virtual void TextInserted( unsigned int position, unsigned int length, const std::string &content ) = 0;
+
+  /**
+   * @brief Called to signal that text has been deleted.
+   */
+  virtual void TextDeleted( unsigned int position, unsigned int length, const std::string &content ) = 0;
+
+  /**
+   * @brief Called to signal that caret (cursor position) has been moved.
+   */
+  virtual void CaretMoved( unsigned int position ) = 0;
+
+  /**
    * @brief Called to signal that text has been inserted or deleted.
    */
   virtual void TextChanged() = 0;

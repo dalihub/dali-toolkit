@@ -37,10 +37,10 @@
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/public-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 using namespace Dali;
 
@@ -263,6 +263,10 @@ Popup::Popup()
   mTailRightImage( DEFAULT_TAIL_RIGHT_IMAGE_PATH )
 {
   SetKeyboardNavigationSupport( true );
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::DIALOG, true ) );
+  } );
 }
 
 void Popup::OnInitialize()
@@ -333,6 +337,8 @@ void Popup::OnInitialize()
 
 Popup::~Popup()
 {
+  if( DevelControl::GetBoundAccessibilityObject( Self() ) )
+    Accessibility::Bridge::GetCurrentBridge()->RemovePopup( DevelControl::GetBoundAccessibilityObject( Self() ) );
   mEntryAnimationData.Clear();
   mExitAnimationData.Clear();
 }
@@ -1573,12 +1579,21 @@ bool Popup::OnDialogTouched( Actor actor, const TouchData& touch )
   return true;
 }
 
+void Popup::OnStageDisconnection()
+{
+  auto p = Dali::Accessibility::Accessible::Get(Self());
+  Accessibility::Bridge::GetCurrentBridge()->RemovePopup( p );
+  Control::OnStageDisconnection();
+}
+
 void Popup::OnStageConnection( int depth )
 {
   mLayoutDirty = true;
   RelayoutRequest();
 
   Control::OnStageConnection( depth );
+  auto p = Dali::Accessibility::Accessible::Get(Self());
+  Accessibility::Bridge::GetCurrentBridge()->AddPopup( p );
 }
 
 void Popup::OnChildAdd( Actor& child )

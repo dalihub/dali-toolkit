@@ -28,6 +28,9 @@
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
+
 using namespace Dali;
 
 namespace
@@ -822,6 +825,10 @@ FlexContainer::FlexContainer()
   mAlignContent( Toolkit::FlexContainer::ALIGN_FLEX_START )
 {
   SetKeyboardNavigationSupport( true );
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 void FlexContainer::OnInitialize()
