@@ -587,9 +587,8 @@ private:
    * @param[in] container The Async loading container
    * @param[in] id        This is the async image loaders Id
    * @param[in] pixelBuffer The loaded image data
-   * @param[in] isMaskTask whether this task is for mask or not
    */
-  void AsyncLoadComplete( AsyncLoadingInfoContainerType& container, uint32_t id, Devel::PixelBuffer pixelBuffer, bool isMaskTask );
+  void AsyncLoadComplete( AsyncLoadingInfoContainerType& container, uint32_t id, Devel::PixelBuffer pixelBuffer );
 
   /**
    * @brief Performs Post-Load steps including atlasing.
@@ -748,17 +747,16 @@ private:
     /**
      * @brief Main constructor that used by all other constructors
      */
-    AsyncLoadingHelper(Toolkit::AsyncImageLoader loader,
-                       TextureManager& textureManager,
-                       AsyncLoadingInfoContainerType&& loadingInfoContainer);
+    AsyncLoadingHelper( Toolkit::AsyncImageLoader loader,
+                        TextureManager& textureManager,
+                        AsyncLoadingInfoContainerType&& loadingInfoContainer );
 
     /**
      * @brief Callback to be called when texture loading is complete, it passes the pixel buffer on to texture manager.
      * @param[in] id          Loader id
      * @param[in] pixelBuffer Image data
-     * @param[in] isMaskTask whether this task is for mask or not
      */
-    void AsyncLoadComplete(uint32_t id, Devel::PixelBuffer pixelBuffer, bool isMaskTask);
+    void AsyncLoadComplete( uint32_t id, Devel::PixelBuffer pixelBuffer );
 
   private:
     Toolkit::AsyncImageLoader     mLoader;
