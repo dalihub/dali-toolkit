@@ -107,7 +107,7 @@ void AsyncImageLoader::ProcessLoadedImage()
   {
     if( mPixelBufferLoadedSignal.GetConnectionCount() > 0 )
     {
-      mPixelBufferLoadedSignal.Emit( next->id, next->pixelBuffer, next->isMaskTask );
+      mPixelBufferLoadedSignal.Emit( next->id, next->pixelBuffer );
     }
     else if( mLoadedSignal.GetConnectionCount() > 0 )
     {

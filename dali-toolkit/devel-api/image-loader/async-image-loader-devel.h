@@ -28,7 +28,7 @@ namespace Toolkit
 namespace DevelAsyncImageLoader
 {
 
-typedef Signal< void ( uint32_t, Devel::PixelBuffer, bool ) > PixelBufferLoadedSignalType;
+typedef Signal< void ( uint32_t, Devel::PixelBuffer ) > PixelBufferLoadedSignalType;
 
 /**
  * @brief Whether to multiply alpha into color channels on load
