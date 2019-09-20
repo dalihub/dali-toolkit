@@ -94,9 +94,9 @@ AnimatedVectorImageVisualPtr AnimatedVectorImageVisual::New( VisualFactoryCache&
 
 AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl )
 : Visual::Base( factoryCache, Visual::FittingMode::FILL ),
-  mImageVisualShaderFactory( shaderFactory ),
   mUrl( imageUrl ),
-  mVectorRasterizeThread( imageUrl.GetUrl() ),
+  mVectorAnimationTask( new VectorAnimationTask( factoryCache, imageUrl.GetUrl() ) ),
+  mImageVisualShaderFactory( shaderFactory ),
   mVisualSize(),
   mVisualScale( Vector2::ONE ),
   mPlacementActor(),
@@ -112,10 +112,8 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
   // the rasterized image is with pre-multiplied alpha format
   mImpl->mFlags |= Impl::IS_PREMULTIPLIED_ALPHA;
 
-  mVectorRasterizeThread.UploadCompletedSignal().Connect( this, &AnimatedVectorImageVisual::OnUploadCompleted );
-  mVectorRasterizeThread.SetAnimationFinishedCallback( new EventThreadCallback( MakeCallback( this, &AnimatedVectorImageVisual::OnAnimationFinished ) ) );
-
-  mVectorRasterizeThread.Start();
+  mVectorAnimationTask->UploadCompletedSignal().Connect( this, &AnimatedVectorImageVisual::OnUploadCompleted );
+  mVectorAnimationTask->SetAnimationFinishedCallback( new EventThreadCallback( MakeCallback( this, &AnimatedVectorImageVisual::OnAnimationFinished ) ) );
 }
 
 AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
@@ -131,7 +129,7 @@ void AnimatedVectorImageVisual::GetNaturalSize( Vector2& naturalSize )
   else
   {
     uint32_t width, height;
-    mVectorRasterizeThread.GetDefaultSize( width, height );
+    mVectorAnimationTask->GetDefaultSize( width, height );
     naturalSize.x = width;
     naturalSize.y = height;
   }
@@ -149,14 +147,17 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   }
   map.Insert( Toolkit::DevelImageVisual::Property::LOOP_COUNT, mLoopCount );
 
+  uint32_t startFrame, endFrame;
+  mVectorAnimationTask->GetPlayRange( startFrame, endFrame );
+
   Property::Array playRange;
-  playRange.PushBack( mStartFrame );
-  playRange.PushBack( mEndFrame );
+  playRange.PushBack( static_cast< int32_t >( startFrame ) );
+  playRange.PushBack( static_cast< int32_t >( endFrame ) );
   map.Insert( Toolkit::DevelImageVisual::Property::PLAY_RANGE, playRange );
 
-  map.Insert( Toolkit::DevelImageVisual::Property::PLAY_STATE, static_cast< int >( mVectorRasterizeThread.GetPlayState() ) );
-  map.Insert( Toolkit::DevelImageVisual::Property::CURRENT_FRAME_NUMBER, static_cast< int32_t >( mVectorRasterizeThread.GetCurrentFrameNumber() ) );
-  map.Insert( Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, static_cast< int32_t >( mVectorRasterizeThread.GetTotalFrameNumber() ) );
+  map.Insert( Toolkit::DevelImageVisual::Property::PLAY_STATE, static_cast< int32_t >( mVectorAnimationTask->GetPlayState() ) );
+  map.Insert( Toolkit::DevelImageVisual::Property::CURRENT_FRAME_NUMBER, static_cast< int32_t >( mVectorAnimationTask->GetCurrentFrameNumber() ) );
+  map.Insert( Toolkit::DevelImageVisual::Property::TOTAL_FRAME_NUMBER, static_cast< int32_t >( mVectorAnimationTask->GetTotalFrameNumber() ) );
 
   map.Insert( Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mStopBehavior );
   map.Insert( Toolkit::DevelImageVisual::Property::LOOPING_MODE, mLoopingMode );
@@ -222,7 +223,7 @@ void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Prop
         if( count >= 2 )
         {
           int startFrame, endFrame;
-          int totalFrame = mVectorRasterizeThread.GetTotalFrameNumber();
+          int totalFrame = mVectorAnimationTask->GetTotalFrameNumber();
           array->GetElementAt( 0 ).Get( startFrame );
           array->GetElementAt( 1 ).Get( endFrame );
 
@@ -295,7 +296,7 @@ void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
   // Hold the weak handle of the placement actor and delay the adding of renderer until the rasterization is finished.
   mPlacementActor = actor;
 
-  mVectorRasterizeThread.SetRenderer( mImpl->mRenderer );
+  mVectorAnimationTask->SetRenderer( mImpl->mRenderer );
 
   // Add property notification for scaling & size
   mScaleNotification = actor.AddPropertyNotification( Actor::Property::WORLD_SCALE, StepCondition( 0.1f, 1.0f ) );
@@ -309,7 +310,7 @@ void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
 
 void AnimatedVectorImageVisual::DoSetOffStage( Actor& actor )
 {
-  mVectorRasterizeThread.PauseAnimation();
+  mVectorAnimationTask->PauseAnimation();
 
   mActionStatus = DevelAnimatedVectorImageVisual::Action::PAUSE;
 
@@ -352,14 +353,14 @@ void AnimatedVectorImageVisual::OnSetTransform()
 
     if( mActionStatus == DevelAnimatedVectorImageVisual::Action::PLAY )
     {
-      mVectorRasterizeThread.PlayAnimation();
+      mVectorAnimationTask->PlayAnimation();
 
       mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY );
     }
     else
     {
       // Render one frame
-      mVectorRasterizeThread.RenderFrame();
+      mVectorAnimationTask->RenderFrame();
     }
   }
 }
@@ -373,7 +374,7 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
     {
       if( IsOnStage() && mVisualSize != Vector2::ZERO )
       {
-        mVectorRasterizeThread.PlayAnimation();
+        mVectorAnimationTask->PlayAnimation();
 
         mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY );
       }
@@ -382,7 +383,7 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
     }
     case DevelAnimatedVectorImageVisual::Action::PAUSE:
     {
-      mVectorRasterizeThread.PauseAnimation();
+      mVectorAnimationTask->PauseAnimation();
 
       if( mImpl->mRenderer )
       {
@@ -394,9 +395,9 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
     }
     case DevelAnimatedVectorImageVisual::Action::STOP:
     {
-      if( mVectorRasterizeThread.GetPlayState() != DevelImageVisual::PlayState::STOPPED )
+      if( mVectorAnimationTask->GetPlayState() != DevelImageVisual::PlayState::STOPPED )
       {
-        mVectorRasterizeThread.StopAnimation();
+        mVectorAnimationTask->StopAnimation();
       }
 
       if( mImpl->mRenderer )
@@ -412,11 +413,11 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
       int32_t frameNumber;
       if( attributes.Get( frameNumber ) )
       {
-        mVectorRasterizeThread.SetCurrentFrameNumber( frameNumber );
+        mVectorAnimationTask->SetCurrentFrameNumber( frameNumber );
 
-        if( IsOnStage() && mVectorRasterizeThread.GetPlayState() != DevelImageVisual::PlayState::PLAYING )
+        if( IsOnStage() && mVectorAnimationTask->GetPlayState() != DevelImageVisual::PlayState::PLAYING )
         {
-          mVectorRasterizeThread.RenderFrame();
+          mVectorAnimationTask->RenderFrame();
           Stage::GetCurrent().KeepRendering( 0.0f );    // Trigger rendering
         }
       }
@@ -476,41 +477,41 @@ void AnimatedVectorImageVisual::SendAnimationData()
   if( mResendFlag )
   {
     bool isPlaying = false;
-    if( mVectorRasterizeThread.GetPlayState() == DevelImageVisual::PlayState::PLAYING )
+    if( mVectorAnimationTask->GetPlayState() == DevelImageVisual::PlayState::PLAYING )
     {
-      mVectorRasterizeThread.PauseAnimation();
+      mVectorAnimationTask->PauseAnimation();
       isPlaying = true;
     }
 
     if( mResendFlag & RESEND_LOOP_COUNT )
     {
-      mVectorRasterizeThread.SetLoopCount( mLoopCount );
+      mVectorAnimationTask->SetLoopCount( mLoopCount );
     }
 
     if( mResendFlag & RESEND_PLAY_RANGE )
     {
-      mVectorRasterizeThread.SetPlayRange( mStartFrame, mEndFrame );
+      mVectorAnimationTask->SetPlayRange( mStartFrame, mEndFrame );
     }
 
     if( mResendFlag & RESEND_STOP_BEHAVIOR )
     {
-      mVectorRasterizeThread.SetStopBehavior( mStopBehavior );
+      mVectorAnimationTask->SetStopBehavior( mStopBehavior );
     }
 
     if( mResendFlag & RESEND_LOOPING_MODE )
     {
-      mVectorRasterizeThread.SetLoopingMode( mLoopingMode );
+      mVectorAnimationTask->SetLoopingMode( mLoopingMode );
     }
 
     if( IsOnStage() )
     {
       if( isPlaying )
       {
-        mVectorRasterizeThread.PlayAnimation();
+        mVectorAnimationTask->PlayAnimation();
       }
       else
       {
-        mVectorRasterizeThread.RenderFrame();
+        mVectorAnimationTask->RenderFrame();
         Stage::GetCurrent().KeepRendering( 0.0f );
       }
     }
@@ -524,11 +525,11 @@ void AnimatedVectorImageVisual::SetVectorImageSize()
   uint32_t width = static_cast< uint32_t >( mVisualSize.width * mVisualScale.width );
   uint32_t height = static_cast< uint32_t >( mVisualSize.height * mVisualScale.height );
 
-  mVectorRasterizeThread.SetSize( width, height );
+  mVectorAnimationTask->SetSize( width, height );
 
-  if( IsOnStage() && mVectorRasterizeThread.GetPlayState() != DevelImageVisual::PlayState::PLAYING )
+  if( IsOnStage() && mVectorAnimationTask->GetPlayState() != DevelImageVisual::PlayState::PLAYING )
   {
-    mVectorRasterizeThread.RenderFrame();
+    mVectorAnimationTask->RenderFrame();
     Stage::GetCurrent().KeepRendering( 0.0f );    // Trigger rendering
   }
 }
