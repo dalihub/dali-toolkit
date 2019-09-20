@@ -31,6 +31,26 @@ OPTION(ENABLE_COVERAGE       "Coverage" OFF)
 SET(WITH_STYLE               "480x800" CACHE STRING "Select the style folder to use")
 SET(ENABLE_PROFILE           "UBUNTU" CACHE STRING "Select the variant of tizen")
 
+# Style folder
+SET( STYLE_BASE_DIR ${ROOT_SRC_DIR}/dali-toolkit/styles )
+SET( STYLE_DIR ${STYLE_BASE_DIR}/${dali_style} )
+
+SET( toolkit_styles_base_dir ${STYLE_BASE_DIR} )
+SET( toolkit_styles_dir ${STYLE_DIR} )
+SET( toolkit_style_images_dir ${STYLE_DIR}/images )
+
+IF( ${DALI_DATA_RW_DIR} )
+  SET( dataReadWriteDir ${DALI_DATA_RW_DIR}/ )
+ELSE()
+  SET( dataReadWriteDir ${CMAKE_INSTALL_PREFIX}/share/dali/ )
+ENDIF()
+
+IF( ${DALI_DATA_RO_DIR} )
+  SET( dataReadOnlyDir ${DALI_DATA_RO_DIR}/ )
+ELSE()
+  SET( dataReadOnlyDir ${CMAKE_INSTALL_PREFIX}/share/dali/ )
+ENDIF()
+
 # Set up compiler definitions
 IF(CMAKE_BUILD_TYPE MATCHES Debug)
   MESSAGE( STATUS "CMAKE_BUILD_TYPE: " Debug )
@@ -90,26 +110,6 @@ SET( devel_api_src_dir   ${ROOT_SRC_DIR}/dali-toolkit/devel-api )
 SET( third_party_src_dir ${ROOT_SRC_DIR}/dali-toolkit/third-party )
 SET( package_doxy_dir    ${ROOT_SRC_DIR}/doc )
 
-# Style folder
-SET( STYLE_BASE_DIR ${ROOT_SRC_DIR}/dali-toolkit/styles )
-SET( STYLE_DIR ${STYLE_BASE_DIR}/${dali_style} )
-
-SET( toolkit_styles_base_dir ${STYLE_BASE_DIR} )
-SET( toolkit_styles_dir ${STYLE_DIR} )
-SET( toolkit_style_images_dir ${STYLE_DIR}/images )
-
-IF( ${DALI_DATA_RW_DIR} )
-  SET( dataReadWriteDir ${DALI_DATA_RW_DIR}/ )
-ELSE()
-  SET( dataReadWriteDir ${CMAKE_INSTALL_PREFIX}/share/dali/ )
-ENDIF()
-
-IF( ${DALI_DATA_RO_DIR} )
-  SET( dataReadOnlyDir ${DALI_DATA_RO_DIR}/ )
-ELSE()
-  SET( dataReadOnlyDir ${CMAKE_INSTALL_PREFIX}/share/dali/ )
-ENDIF()
-
 # Set up the include dir
 SET( INCLUDE_DIR $ENV{includedir} )
 IF( NOT INCLUDE_DIR )
@@ -136,6 +136,7 @@ SET( CORE_PKG_CFG_FILE dali-toolkit.pc )
 CONFIGURE_FILE( ${CORE_PKG_CFG_FILE}.in ${CORE_PKG_CFG_FILE} @ONLY )
 
 # Set up compiler flags and warnings
+ADD_COMPILE_OPTIONS( -std=c++11 )
 ADD_COMPILE_OPTIONS( -Wno-ignored-qualifiers )
 
 # TODO: Clang is a lot more strict with warnings, we should address
