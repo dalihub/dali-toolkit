@@ -21,6 +21,9 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/adaptor-framework/accessibility-action-handler.h>
+#include <dali/devel-api/adaptor-framework/accessibility-gesture-handler.h>
+#include <dali/devel-api/adaptor-framework/accessibility-gesture-event.h>
 #include <dali/public-api/object/base-object.h>
 
 // INTERNAL INCLUDES
@@ -41,7 +44,7 @@ class AccessibilityManager;
 /**
  * @copydoc Toolkit::AccessibilityManager
  */
-class AccessibilityManager : public Dali::BaseObject, public Dali::ConnectionTracker
+class AccessibilityManager : public Dali::BaseObject, Dali::AccessibilityActionHandler, Dali::AccessibilityGestureHandler, public Dali::ConnectionTracker
 {
 public:
 
@@ -443,36 +446,299 @@ protected:
   virtual ~AccessibilityManager();
 
 private:
-  AccessibilityActionSignalType mStatusChangedSignal;
-  AccessibilityActionSignalType mActionNextSignal;
-  AccessibilityActionSignalType mActionPreviousSignal;
-  AccessibilityActionSignalType mActionActivateSignal;
-  AccessibilityActionSignalType mActionOverSignal;
-  AccessibilityActionSignalType mActionReadSignal;
-  AccessibilityActionSignalType mActionReadNextSignal;
-  AccessibilityActionSignalType mActionReadPreviousSignal;
-  AccessibilityActionSignalType mActionUpSignal;
-  AccessibilityActionSignalType mActionDownSignal;
-  AccessibilityActionSignalType mActionClearFocusSignal;
-  AccessibilityActionSignalType mActionBackSignal;
-  AccessibilityActionSignalType mActionScrollUpSignal;
-  AccessibilityActionSignalType mActionScrollDownSignal;
-  AccessibilityActionSignalType mActionPageLeftSignal;
-  AccessibilityActionSignalType mActionPageRightSignal;
-  AccessibilityActionSignalType mActionPageUpSignal;
-  AccessibilityActionSignalType mActionPageDownSignal;
-  AccessibilityActionSignalType mActionMoveToFirstSignal;
-  AccessibilityActionSignalType mActionMoveToLastSignal;
-  AccessibilityActionSignalType mActionReadFromTopSignal;
-  AccessibilityActionSignalType mActionReadFromNextSignal;
-  AccessibilityActionSignalType mActionZoomSignal;
-  AccessibilityActionSignalType mActionReadIndicatorInformationSignal;
-  AccessibilityActionSignalType mActionReadPauseResumeSignal;
-  AccessibilityActionSignalType mActionStartStopSignal;
+
+  /**
+   * Get the additional information (e.g. focus order and description) of the given actor.
+   * @param actorID The ID of the actor to be queried
+   * @return The additional information of the actor
+   */
+  ActorAdditionalInfo GetActorAdditionalInfo(const unsigned int actorID) const;
+
+  /**
+   * Synchronize the actor's additional information to reflect its latest focus order
+   * @param actorID The ID of the actor
+   * @param order The focus order of the actor
+   * @return The additional information of the actor
+   */
+  void SynchronizeActorAdditionalInfo(const unsigned int actorID, const unsigned int order);
+
+  /**
+   * Move the focus to the specified actor and send notification for the focus change.
+   * @param actorID The ID of the actor to be queried
+   * @return Whether the focus is successful or not
+   */
+  bool DoSetCurrentFocusActor(const unsigned int actorID);
+
+  /**
+   * Move the focus to the next actor in the focus chain towards the specified direction.
+   * @param focusIDIter The iterator pointing to the current focused actor
+   * @param forward Whether the focus movement is forward or not. The focus movement will be backward if this is false.
+   * @param wrapped Whether the focus shoule be moved wrapped around or not
+   * @return Whether the focus is successful or not
+   */
+  bool DoMoveFocus(FocusIDIter focusIDIter, bool forward, bool wrapped);
+
+  /**
+   * Activate the actor. If the actor is control, call OnAccessibilityActivated virtual function.
+   * This function will emit FocusedActorActivatedSignal.
+   * @param actor The actor to activate
+   */
+  void DoActivate(Actor actor);
+
+  /**
+   * Set whether the actor is focusable or not. A focusable property will be registered for
+   * the actor if not yet.
+   * @param actor The actor to be focused
+   * @param focusable Whether the actor is focusable or not
+   */
+  void SetFocusable(Actor actor, bool focusable);
+
+  /**
+   * Handle the accessibility pan gesture.
+   * @param[in]  panEvent  The pan event to be handled.
+   * @return whether the gesture is handled successfully or not.
+   */
+  virtual bool HandlePanGesture(const AccessibilityGestureEvent& panEvent);
+
+  /**
+   * Change the accessibility status when Accessibility feature(screen-reader) turned on or off.
+   * @return whether the status is changed or not.
+   */
+  virtual bool ChangeAccessibilityStatus();
+
+  /**
+   * Clear the accessibility focus from the current focused actor.
+   * @return whether the focus is cleared or not.
+   */
+  virtual bool ClearAccessibilityFocus();
+
+  /**
+   * Perform the accessibility action associated with a scroll event.
+   * @param touchEvent The touch point (and time) of the event.
+   * @return whether the focus is cleared or not.
+   */
+  virtual bool AccessibilityActionScroll( Dali::TouchEvent& touchEvent );
+
+  /**
+   * Perform the accessibility action to move focus to the previous focusable actor (by one finger flick up).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionPrevious(bool allowEndFeedback);
+
+  /**
+   * Perform the accessibility action to move focus to the next focusable actor (by one finger flick down).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionNext(bool allowEndFeedback);
+
+  /**
+   * Perform the accessibility action to move focus to the previous focusable actor (by one finger flick left).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionReadPrevious(bool allowEndFeedback);
+
+  /**
+   * Perform the accessibility action to move focus to the next focusable actor (by one finger flick right).
+   * @param allowEndFeedback true if end of list feedback should be played when the focus is alread reached to the end
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionReadNext(bool allowEndFeedback);
+
+  /**
+   * Perform the accessibility action to focus and read the actor (by one finger tap or move).
+   * @param allowReadAgain true if the action read again the same object (i.e. read action)
+   *                       false if the action just read when the focus object is changed (i.e. over action)
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionRead(bool allowReadAgain);
+
+  /**
+   * Perform the accessibility action to activate the current focused actor (by one finger double tap).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionActivate();
+
+  /**
+   * Perform the accessibility action to change the value when the current focused actor is a slider
+   * (by double finger down and move up and right).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionUp();
+
+  /**
+   * Perform the accessibility action to change the value when the current focused actor is a slider
+   * (by double finger down and move down and left).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionDown();
+
+  /**
+   * Perform the accessibility action to navigate back (by two fingers circle draw).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionBack();
+
+  /**
+   * Perform the accessibility action to scroll up the list and focus on the first item on the list
+   * after the scrolling and read the item (by two finger swipe up).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionScrollUp();
+
+  /**
+   * Perform the accessibility action to scroll down the list and focus on the first item on the list
+   * after the scrolling and read the item (by two finger swipe down).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionScrollDown();
+
+  /**
+   * Perform the accessibility action to scroll left to the previous page (by two finger swipe left).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionPageLeft();
+
+  /**
+   * Perform the accessibility action to scroll right to the next page (by two finger swipe right).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionPageRight();
+
+  /**
+   * Perform the accessibility action to scroll up to the previous page (by one finger swipe left and right).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionPageUp();
+
+  /**
+   * Perform the accessibility action to scroll down to the next page (by one finger swipe right and left).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionPageDown();
+
+  /**
+   * Perform the accessibility action to move the focus to the first item on the screen
+   * (by one finger swipe up and down).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionMoveToFirst();
+
+  /**
+   * Perform the accessibility action to move the focus to the last item on the screen
+   * (by one finger swipe down and up).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionMoveToLast();
+
+  /**
+   * Perform the accessibility action to move the focus to the first item on the top
+   * and read from the top item continuously (by three fingers single tap).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionReadFromTop();
+
+  /**
+   * Perform the accessibility action to move the focus to and read from the next item
+   * continuously (by three fingers double tap).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionReadFromNext();
+
+  /**
+   * Perform the accessibility action to move the focus to do the zooming (by one finger triple tap).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionZoom();
+
+  /**
+   * Perform the accessibility action to pause/resume the current read out (by two fingers single tap).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionReadPauseResume();
+
+  /**
+   * Perform the accessibility action to start/stop the current action (by two fingers double tap).
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionStartStop();
+
+  /**
+   * Perform the accessibility action to mouse move (by one finger tap & hold and move).
+   * @param touchEvent touch event structure
+   * @return whether the accessibility action is performed or not.
+   */
+  virtual bool AccessibilityActionTouch(const TouchEvent& touchEvent);
+
+  /**
+   * This function is connected to the TtsPlayer StateChangeSignal.
+   * It is called when the TTS players state changes.
+   * @param previousState The previous state of the TTS player (for comparison)
+   * @param currentState  The current state of the TTS player
+   */
+  void TtsStateChanged( const Dali::TtsPlayer::State previousState, const Dali::TtsPlayer::State currentState );
+
+private:
+
+  // Undefined
+  AccessibilityManager(const AccessibilityManager&);
+
+  AccessibilityManager& operator=(const AccessibilityManager& rhs);
+
+private:
+
+  Toolkit::AccessibilityManager::FocusChangedSignalType mFocusChangedSignal; ///< The signal to notify the focus change
+  Toolkit::AccessibilityManager::FocusOvershotSignalType mFocusOvershotSignal; ///< The signal to notify the focus overshooted
+  Toolkit::AccessibilityManager::FocusedActorActivatedSignalType mFocusedActorActivatedSignal; ///< The signal to notify the activation of focused actor
+
+  // Action signals.
+  AccessibilityActionSignalType       mStatusChangedSignal;
+  AccessibilityActionSignalType       mActionNextSignal;
+  AccessibilityActionSignalType       mActionPreviousSignal;
+  AccessibilityActionSignalType       mActionActivateSignal;
+  AccessibilityActionSignalType       mActionOverSignal;
+  AccessibilityActionSignalType       mActionReadSignal;
+  AccessibilityActionSignalType       mActionReadNextSignal;
+  AccessibilityActionSignalType       mActionReadPreviousSignal;
+  AccessibilityActionSignalType       mActionUpSignal;
+  AccessibilityActionSignalType       mActionDownSignal;
+  AccessibilityActionSignalType       mActionClearFocusSignal;
+  AccessibilityActionSignalType       mActionBackSignal;
+  AccessibilityActionSignalType       mActionScrollUpSignal;
+  AccessibilityActionSignalType       mActionScrollDownSignal;
+  AccessibilityActionSignalType       mActionPageLeftSignal;
+  AccessibilityActionSignalType       mActionPageRightSignal;
+  AccessibilityActionSignalType       mActionPageUpSignal;
+  AccessibilityActionSignalType       mActionPageDownSignal;
+  AccessibilityActionSignalType       mActionMoveToFirstSignal;
+  AccessibilityActionSignalType       mActionMoveToLastSignal;
+  AccessibilityActionSignalType       mActionReadFromTopSignal;
+  AccessibilityActionSignalType       mActionReadFromNextSignal;
+  AccessibilityActionSignalType       mActionZoomSignal;
+  AccessibilityActionSignalType       mActionReadIndicatorInformationSignal;
+  AccessibilityActionSignalType       mActionReadPauseResumeSignal;
+  AccessibilityActionSignalType       mActionStartStopSignal;
   AccessibilityActionScrollSignalType mActionScrollSignal;
-  Toolkit::AccessibilityManager::FocusChangedSignalType mFocusChangedSignal;
-  Toolkit::AccessibilityManager::FocusOvershotSignalType mFocusOvershotSignal;
-  Toolkit::AccessibilityManager::FocusedActorActivatedSignalType mFocusedActorActivatedSignal;
+
+  FocusIDContainer mFocusIDContainer;       ///< The container to look up actor ID by focus order
+  IDAdditionalInfoContainer mIDAdditionalInfoContainer; ///< The container to look up additional information by actor ID
+  FocusIDPair mCurrentFocusActor;           ///< The focus order and actor ID of current focused actor
+  Actor mCurrentGesturedActor;              ///< The actor that will handle the gesture
+  Actor mFocusIndicatorActor;               ///< The focus indicator actor shared by all the focusable actors for highlight
+  Vector2 mPreviousPosition;                ///< The previous pan position; useful for calculating velocity for Gesture::Finished events
+  unsigned int mRecursiveFocusMoveCounter;  ///< The counter to count the number of recursive focus movement attempted before the focus movement is successful.
+
+  bool mIsWrapped:1;                        ///< Whether the focus movement is wrapped around or not
+  bool mIsFocusWithinGroup:1;               ///< Whether the focus movement is limited to the current focus group or not
+  bool mIsEndcapFeedbackEnabled:1;          ///< Whether the endcap feedback need to be played when the focus leaves the end or vice versa
+  bool mIsEndcapFeedbackPlayed:1;           ///< Whether the endcap feedback was played or not
+  bool mIsAccessibilityTtsEnabled:1;        ///< Whether accessibility feature(screen-reader) turned on/off
+  bool mTtsCreated:1;                       ///< Whether the TTS Player has been accessed
+  bool mIsFocusIndicatorEnabled:1;          ///< Whether indicator should be shown / hidden. It could be enabled when TTS enabled or 'Tab' key operated.
+  bool mContinuousPlayMode:1;               ///< Keeps track of whether or not we are in continuous play mode
+
 };
 
 } // namespace Internal
