@@ -46,16 +46,26 @@ namespace Internal
 {
 namespace Adaptor
 {
-
-Window::Window( const PositionSize& positionSize )
-: SceneHolder( positionSize )
+class Window : public Dali::BaseObject
 {
-}
+public:
 
-Window* Window::New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent)
-{
-  return new Window( positionSize );
-}
+  Window( const PositionSize& positionSize )
+  : mRenderSurface( positionSize ),
+    mScene( Dali::Integration::Scene::New( mRenderSurface ) )
+  {
+  }
+
+  virtual ~Window() = default;
+
+  static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent)
+  {
+    return new Window( positionSize );
+  }
+
+  TestRenderSurface mRenderSurface;
+  Integration::Scene mScene;
+};
 
 } // Adaptor
 } // Internal
@@ -101,13 +111,10 @@ Dali::Window Window::New( PositionSize windowPosition, const std::string& name, 
 Dali::Window Window::New(PositionSize windowPosition, const std::string& name, const std::string& className, bool isTransparent )
 {
   Internal::Adaptor::Window* window = Internal::Adaptor::Window::New( windowPosition, name, className, isTransparent );
-
-  Dali::Window result( window );
-
-  // This will also emit the window created signals
-  AdaptorImpl::GetImpl( AdaptorImpl::Get() ).AddWindow( window );
-
-  return result;
+  Dali::Window newWindow = Window( window );
+  Dali::Adaptor::WindowCreatedSignalType& windowCreatedSignal = AdaptorImpl::Get().WindowCreatedSignal();
+  windowCreatedSignal.Emit( newWindow );
+  return Window( window );
 }
 
 Window::Window( Internal::Adaptor::Window* window )
@@ -117,12 +124,12 @@ Window::Window( Internal::Adaptor::Window* window )
 
 Integration::Scene Window::GetScene()
 {
-  return GetImplementation( *this ).GetScene();
+  return GetImplementation( *this ).mScene;
 }
 
 Integration::RenderSurface& Window::GetRenderSurface()
 {
-  return GetImplementation( *this ).GetRenderSurface();
+  return GetImplementation( *this ).mRenderSurface;
 }
 
 void Window::Add( Actor actor )
@@ -187,27 +194,27 @@ Window DownCast( BaseHandle handle )
 
 EventProcessingFinishedSignalType& EventProcessingFinishedSignal( Window window )
 {
-  return GetImplementation( window ).GetScene().EventProcessingFinishedSignal();
+  return GetImplementation( window ).mScene.EventProcessingFinishedSignal();
 }
 
 KeyEventSignalType& KeyEventSignal( Window window )
 {
-  return GetImplementation( window ).KeyEventSignal();
+  return GetImplementation( window ).mScene.KeyEventSignal();
 }
 
 KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Window window )
 {
-  return GetImplementation( window ).KeyEventGeneratedSignal();
+  return GetImplementation( window ).mScene.KeyEventGeneratedSignal();
 }
 
 TouchSignalType& TouchSignal( Window window )
 {
-  return GetImplementation( window ).TouchSignal();
+  return GetImplementation( window ).mScene.TouchSignal();
 }
 
 WheelEventSignalType& WheelEventSignal( Window window )
 {
-  return GetImplementation( window ).WheelEventSignal();
+  return GetImplementation( window ).mScene.WheelEventSignal();
 }
 
 } // namespace DevelWindow

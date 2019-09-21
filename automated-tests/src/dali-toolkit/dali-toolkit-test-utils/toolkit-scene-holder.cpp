@@ -15,29 +15,15 @@
  *
  */
 
-#include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/adaptors/scene-holder.h>
-
-#include <toolkit-scene-holder-impl.h>
 
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/base-object.h>
 
-#include <dali/integration-api/adaptors/adaptor.h>
-#include <toolkit-adaptor-impl.h>
-
-using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
-
 namespace Dali
 {
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Dali::Internal::Adaptor::SceneHolder Stub
-//
-///////////////////////////////////////////////////////////////////////////////
 
 namespace Internal
 {
@@ -45,103 +31,20 @@ namespace Internal
 namespace Adaptor
 {
 
-SceneHolder::SceneHolder( const Dali::Rect<int>& positionSize )
-: mRenderSurface( positionSize ),
-  mScene( Dali::Integration::Scene::New( mRenderSurface ) )
+class SceneHolder: public Dali::BaseObject
 {
-}
 
-SceneHolder::~SceneHolder()
-{
-  if ( Dali::Adaptor::IsAvailable() )
-  {
-    AdaptorImpl::GetImpl( AdaptorImpl::Get() ).RemoveWindow( this );
-  }
-}
+};
 
-void SceneHolder::Add( Dali::Actor actor )
-{
-  mScene.Add( actor );
-}
+} // Adaptor
 
-void SceneHolder::Remove( Dali::Actor actor )
-{
-  mScene.Remove( actor );
-}
-
-Dali::Layer SceneHolder::GetRootLayer() const
-{
-  return mScene.GetRootLayer();
-}
-
-void SceneHolder::SetBackgroundColor( Vector4 color )
-{
-  return mScene.SetBackgroundColor( color );
-}
-
-Vector4 SceneHolder::GetBackgroundColor() const
-{
-  return mScene.GetBackgroundColor();
-}
-
-void SceneHolder::FeedTouchPoint( Dali::TouchPoint& point, int timeStamp )
-{
-}
-
-void SceneHolder::FeedWheelEvent( Dali::WheelEvent& wheelEvent )
-{
-}
-
-void SceneHolder::FeedKeyEvent( Dali::KeyEvent& keyEvent )
-{
-}
-
-Dali::Integration::SceneHolder::KeyEventSignalType& SceneHolder::KeyEventSignal()
-{
-  return mScene.KeyEventSignal();
-}
-
-Dali::Integration::SceneHolder::KeyEventGeneratedSignalType& SceneHolder::KeyEventGeneratedSignal()
-{
-  return mScene.KeyEventGeneratedSignal();
-}
-
-Dali::Integration::SceneHolder::TouchSignalType& SceneHolder::TouchSignal()
-{
-  return mScene.TouchSignal();
-}
-
-Dali::Integration::SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()
-{
-  return mScene.WheelEventSignal();
-}
-
-Integration::Scene SceneHolder::GetScene()
-{
-  return mScene;
-}
-
-Integration::RenderSurface& SceneHolder::GetRenderSurface()
-{
-  return mRenderSurface;
-}
-
-} // namespace Adaptor
-
-} // namespace Internal
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Dali::Integration::SceneHolder Stub
-//
-///////////////////////////////////////////////////////////////////////////////
+} // Internal
 
 namespace Integration
 {
 
 SceneHolder::SceneHolder()
 {
-  // Dali::Internal::Adaptor::Adaptor::Get().WindowCreatedSignal().Emit( *this );
 }
 
 SceneHolder::~SceneHolder()
@@ -186,54 +89,30 @@ void SceneHolder::Remove( Actor actor )
   GetImplementation( *this ).Remove( actor );
 }
 
-Dali::Layer SceneHolder::GetRootLayer() const
+Layer SceneHolder::GetRootLayer() const
 {
   return GetImplementation( *this ).GetRootLayer();
 }
 
 void SceneHolder::SetBackgroundColor( Vector4 color )
 {
-  GetImplementation( *this ).SetBackgroundColor( color );
 }
 
 Vector4 SceneHolder::GetBackgroundColor() const
 {
-  return GetImplementation( *this ).GetBackgroundColor();
+  return Dali::Stage::GetCurrent().GetBackgroundColor();
 }
 
 void SceneHolder::FeedTouchPoint( Dali::TouchPoint& point, int timeStamp )
 {
-  GetImplementation( *this ).FeedTouchPoint( point, timeStamp );
 }
 
 void SceneHolder::FeedWheelEvent( Dali::WheelEvent& wheelEvent )
 {
-  GetImplementation( *this ).FeedWheelEvent( wheelEvent );
 }
 
 void SceneHolder::FeedKeyEvent( Dali::KeyEvent& keyEvent )
 {
-  GetImplementation( *this ).FeedKeyEvent( keyEvent );
-}
-
-SceneHolder::KeyEventSignalType& SceneHolder::KeyEventSignal()
-{
-  return GetImplementation( *this ).KeyEventSignal();
-}
-
-SceneHolder::KeyEventGeneratedSignalType& SceneHolder::KeyEventGeneratedSignal()
-{
-  return GetImplementation( *this ).KeyEventGeneratedSignal();
-}
-
-SceneHolder::TouchSignalType& SceneHolder::TouchSignal()
-{
-  return GetImplementation( *this ).TouchSignal();
-}
-
-SceneHolder::WheelEventSignalType& SceneHolder::WheelEventSignal()
-{
-  return GetImplementation( *this ).WheelEventSignal();
 }
 
 } // Integration

@@ -24,7 +24,6 @@
 #include <dali/integration-api/adaptors/adaptor.h>
 
 #include <dali/integration-api/adaptors/scene-holder.h>
-#include <toolkit-scene-holder-impl.h>
 
 #include <toolkit-adaptor-impl.h>
 #include <dali/integration-api/debug.h>
@@ -97,7 +96,11 @@ Adaptor::~Adaptor()
 
 void Adaptor::Start( Dali::Window window )
 {
-  AddWindow( &GetImplementation( window ) );
+  if ( window )
+  {
+    mWindows.push_back( window );
+    mWindowCreatedSignal.Emit( window );
+  }
 }
 
 Integration::Scene Adaptor::GetScene( Dali::Window window )
@@ -149,53 +152,6 @@ Dali::WindowContainer Adaptor::GetWindows()
   }
 
   return windows;
-}
-
-Dali::SceneHolderList Adaptor::GetSceneHolders()
-{
-  Dali::SceneHolderList sceneHolderList;
-
-  for( auto iter = mWindows.begin(); iter != mWindows.end(); ++iter )
-  {
-    sceneHolderList.push_back( Dali::Integration::SceneHolder( *iter ) );
-  }
-
-  return sceneHolderList;
-}
-
-Dali::Internal::Adaptor::SceneHolder* Adaptor::GetWindow( Dali::Actor& actor )
-{
-  Dali::Integration::Scene scene = Dali::Integration::Scene::Get( actor );
-
-  for( auto window : mWindows )
-  {
-    if ( scene == window->GetScene() )
-    {
-      return window;
-    }
-  }
-
-  return nullptr;
-}
-
-void Adaptor::AddWindow( Internal::Adaptor::SceneHolder* window )
-{
-  if ( window )
-  {
-    mWindows.push_back( window );
-
-    Dali::Integration::SceneHolder newWindow( window );
-    mWindowCreatedSignal.Emit( newWindow );
-  }
-}
-
-void Adaptor::RemoveWindow( Internal::Adaptor::SceneHolder* window )
-{
-  auto iter = std::find( mWindows.begin(), mWindows.end(), window );
-  if( iter != mWindows.end() )
-  {
-    mWindows.erase( iter );
-  }
 }
 
 Dali::Adaptor::AdaptorSignalType& Adaptor::ResizedSignal()
@@ -290,11 +246,6 @@ Dali::RenderSurfaceInterface& Adaptor::GetSurface()
 Dali::WindowContainer Adaptor::GetWindows() const
 {
   return mImpl->GetWindows();
-}
-
-Dali::SceneHolderList Adaptor::GetSceneHolders() const
-{
-  return mImpl->GetSceneHolders();
 }
 
 Any Adaptor::GetNativeWindowHandle()

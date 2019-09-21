@@ -30,12 +30,7 @@
 namespace Dali
 {
 
-namespace Integration
-{
-
-class SceneHolder;
-
-} // namespace Integration
+class Window;
 
 namespace Toolkit
 {
@@ -98,10 +93,10 @@ protected:
 
 private:
   /**
-   * This will be called when a new scene holder is created
-   * @param sceneHolder The new scene holder
+   * This will be called when a new window is created
+   * @param window The new window
    */
-  void OnSceneHolderCreated( Dali::Integration::SceneHolder& sceneHolder );
+  void OnWindowCreated( Dali::Window& window );
 
   /**
    * Callback for the key event when no actor in the stage has gained the key input focus

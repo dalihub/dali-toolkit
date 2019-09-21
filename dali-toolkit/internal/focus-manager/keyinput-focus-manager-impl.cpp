@@ -23,8 +23,8 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/common/stage-devel.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/adaptors/adaptor.h>
-#include <dali/integration-api/adaptors/scene-holder.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -53,23 +53,23 @@ KeyInputFocusManager::KeyInputFocusManager()
   mCurrentFocusControl()
 {
   // Retrieve all the existing widnows
-  Dali::SceneHolderList sceneHolders = Adaptor::Get().GetSceneHolders();
-  for( auto iter = sceneHolders.begin(); iter != sceneHolders.end(); ++iter )
+  Dali::WindowContainer windows = Adaptor::Get().GetWindows();
+  for ( auto iter = windows.begin(); iter != windows.end(); ++iter )
   {
-    ( *iter ).KeyEventGeneratedSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnKeyEvent );
+    DevelWindow::KeyEventGeneratedSignal( *iter ).Connect( mSlotDelegate, &KeyInputFocusManager::OnKeyEvent);
   }
 
-  // Get notified when any new scene holder is created afterwards
-  Adaptor::Get().WindowCreatedSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnSceneHolderCreated );
+  // Get notified when any new window is created afterwards
+  Adaptor::Get().WindowCreatedSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnWindowCreated);
 }
 
 KeyInputFocusManager::~KeyInputFocusManager()
 {
 }
 
-void KeyInputFocusManager::OnSceneHolderCreated( Dali::Integration::SceneHolder& sceneHolder )
+void KeyInputFocusManager::OnWindowCreated( Dali::Window& window )
 {
-  sceneHolder.KeyEventGeneratedSignal().Connect( mSlotDelegate, &KeyInputFocusManager::OnKeyEvent );
+  DevelWindow::KeyEventGeneratedSignal( window ).Connect( mSlotDelegate, &KeyInputFocusManager::OnKeyEvent);
 }
 
 void KeyInputFocusManager::SetFocus( Toolkit::Control control )
