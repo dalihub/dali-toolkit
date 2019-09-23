@@ -22,7 +22,6 @@
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/signals/dali-signal.h>
 #include <dali/integration-api/processor-interface.h>
-#include "toolkit-test-application.h"
 
 namespace Dali
 {
@@ -109,9 +108,9 @@ public:
     return object;
   }
 
-  void SetApplication( Dali::ToolkitTestApplication& ToolkitTestApplication )
+  void SetApplication( Dali::TestApplication& testApplication )
   {
-    mTestApplication = &ToolkitTestApplication;
+    mTestApplication = &testApplication;
   }
 
 private:
@@ -146,7 +145,7 @@ private:
   typedef SingletonContainer::const_iterator SingletonConstIter;
 
   SingletonContainer mSingletonContainer; ///< The container to look up singleton by its type name
-  ToolkitTestApplication* mTestApplication;
+  TestApplication* mTestApplication;
 };
 
 } // namespace Adaptor
@@ -212,9 +211,9 @@ SingletonService::SingletonService( Internal::Adaptor::SingletonService* singlet
 namespace Test
 {
 
-void SetApplication( Dali::SingletonService singletonService, ToolkitTestApplication& ToolkitTestApplication )
+void SetApplication( Dali::SingletonService singletonService, TestApplication& testApplication )
 {
-  GetImplementation( singletonService ).SetApplication( ToolkitTestApplication );
+  GetImplementation( singletonService ).SetApplication( testApplication );
 }
 
 } // Test

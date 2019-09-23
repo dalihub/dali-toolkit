@@ -819,31 +819,6 @@ void Controller::UpdateAfterFontChange( const std::string& newDefaultFont )
   }
 }
 
-void Controller::RetrieveSelection( std::string& selectedText ) const
-{
-  mImpl->RetrieveSelection( selectedText, false );
-}
-
-void Controller::SetSelection( int start, int end )
-{
-  mImpl->SetSelection( start, end );
-}
-
-std::pair< int, int > Controller::GetSelectionIndexes() const
-{
-  return mImpl->GetSelectionIndexes();
-}
-
-void Controller::CopyStringToClipboard( const std::string& source )
-{
-  mImpl->CopyStringToClipboard( source );
-}
-
-void Controller::SendSelectionToClipboard( bool deleteAfterSending )
-{
-  mImpl->SendSelectionToClipboard( deleteAfterSending );
-}
-
 // public : Default style & Input style
 
 void Controller::SetDefaultFontFamily( const std::string& defaultFontFamily )
@@ -3564,17 +3539,13 @@ void Controller::InsertText( const std::string& text, Controller::InsertType typ
     // Insert at current cursor position.
     Vector<Character>& modifyText = mImpl->mModel->mLogicalModel->mText;
 
-    auto pos = modifyText.End();
     if( cursorIndex < numberOfCharactersInModel )
     {
-      pos = modifyText.Begin() + cursorIndex;
+      modifyText.Insert( modifyText.Begin() + cursorIndex, utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText );
     }
-    unsigned int realPos = pos - modifyText.Begin();
-    modifyText.Insert( pos, utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText );
-
-    if( NULL != mImpl->mEditableControlInterface )
+    else
     {
-      mImpl->mEditableControlInterface->TextInserted( realPos, maxSizeOfNewText, text );
+      modifyText.Insert( modifyText.End(), utf32Characters.Begin(), utf32Characters.Begin() + maxSizeOfNewText );
     }
 
     // Mark the first paragraph to be updated.
@@ -3733,13 +3704,6 @@ bool Controller::RemoveText( int cursorOffset,
       Vector<Character>::Iterator last  = first + numberOfCharacters;
 
       currentText.Erase( first, last );
-
-      if( NULL != mImpl->mEditableControlInterface )
-      {
-        std::string utf8;
-        Utf32ToUtf8( first, numberOfCharacters, utf8 );
-        mImpl->mEditableControlInterface->TextDeleted( cursorIndex, numberOfCharacters, utf8 );
-      }
 
       // Cursor position retreat
       oldCursorIndex = cursorIndex;
@@ -4337,14 +4301,6 @@ void Controller::ResetCursorPosition( CharacterIndex cursorIndex )
       mImpl->mEventData->mUpdateCursorPosition = true;
     }
   }
-}
-
-CharacterIndex Controller::GetCursorPosition()
-{
-  if( !mImpl->mEventData )
-    return 0;
-
-  return mImpl->mEventData->mPrimaryCursorPosition;
 }
 
 void Controller::ResetScrollPosition()

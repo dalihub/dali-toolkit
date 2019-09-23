@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/alignment/alignment.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {

@@ -31,7 +31,6 @@
 #include <dali-toolkit/internal/text/text-editable-control-interface.h>
 #include <dali-toolkit/internal/text/text-controller.h>
 #include <dali-toolkit/internal/text/rendering/text-renderer.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -109,8 +108,6 @@ public:
    */
   void SelectWholeText();
 
-  Text::ControllerPtr getController();
-
 private: // From Control
 
   /**
@@ -181,21 +178,6 @@ private: // From Control
   virtual void RequestTextRelayout();
 
 // From EditableControlInterface
-
-  /**
-   * @copydoc Text::ControlInterface::TextInserted()
-   */
-  virtual void TextInserted( unsigned int position, unsigned int length, const std::string &content );
-
-  /**
-   * @copydoc Text::ControlInterface::TextDeleted()
-   */
-  virtual void TextDeleted( unsigned int position, unsigned int length, const std::string &content );
-
-  /**
-   * @copydoc Text::ControlInterface::CaretMoved()
-   */
-  virtual void CaretMoved( unsigned int position );
 
   /**
    * @copydoc Text::ControlInterface::TextChanged()
@@ -311,30 +293,6 @@ private: // Data
   int mRenderingBackend;
   int mExceedPolicy;
   bool mHasBeenStaged:1;
-
-protected:
-  struct AccessibleImpl : public Control::Impl::AccessibleImpl,
-                          public virtual Dali::Accessibility::Text,
-                          public virtual Dali::Accessibility::EditableText
-  {
-    using Control::Impl::AccessibleImpl::AccessibleImpl;
-
-    std::string GetName() override;
-    std::string GetText( size_t startOffset, size_t endOffset ) override;
-    size_t GetCharacterCount() override;
-    size_t GetCaretOffset() override;
-    bool SetCaretOffset(size_t offset) override;
-    Dali::Accessibility::Range
-    GetTextAtOffset( size_t offset,
-                     Dali::Accessibility::TextBoundary boundary ) override;
-    Dali::Accessibility::Range GetSelection( size_t selectionNum ) override;
-    bool RemoveSelection( size_t selectionNum ) override;
-    bool SetSelection( size_t selectionNum, size_t startOffset,
-                       size_t endOffset ) override;
-    bool CopyText( size_t startPosition, size_t endPosition ) override;
-    bool CutText( size_t startPosition, size_t endPosition ) override;
-    Dali::Accessibility::States CalculateStates() override;
-  };
 };
 
 } // namespace Internal

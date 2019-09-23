@@ -162,7 +162,7 @@ int UtcDaliVisualSetProperties(void)
 
 int UtcDaliNPatchBufferGetRedOffsetAndMask(void)
 {
-  ToolkitTestApplication application;
+  TestApplication application;
 
   tet_infoline("UtcDaliNPatchBufferGetRedOffsetAndMask");
 

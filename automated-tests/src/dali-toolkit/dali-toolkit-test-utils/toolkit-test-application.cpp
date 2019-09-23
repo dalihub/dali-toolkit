@@ -39,8 +39,6 @@ ToolkitTestApplication::ToolkitTestApplication( size_t surfaceWidth, size_t surf
   // Create Core next
   CreateCore();
 
-  Dali::Accessibility::DBusWrapper::Install(std::unique_ptr<Dali::Accessibility::DBusWrapper>(new Dali::Accessibility::TestDBusWrapper()));
-
   // Override Scene creation in TestApplication by creating a window.
   // The window will create a Scene & surface and set up the scene's surface appropriately.
   *mMainWindow = Window::New( PositionSize( 0, 0, surfaceWidth, surfaceHeight ), "" );

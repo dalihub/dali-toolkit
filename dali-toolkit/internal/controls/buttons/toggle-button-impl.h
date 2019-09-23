@@ -163,8 +163,6 @@ private:
   std::vector<Toolkit::Visual::Base> mToggleDisabledSelectedVisuals;  ///< Save all disabled selected visuals.
   std::vector<std::string> mToggleTooltips;               ///< Toggle tooltips.
   unsigned int             mCurrentToggleIndex;       ///< The index of state.
-protected:
-  void OnStateChange( State newState ) override;
 };
 
 } // namespace Internal

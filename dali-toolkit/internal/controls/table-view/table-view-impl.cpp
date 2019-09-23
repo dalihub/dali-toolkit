@@ -28,9 +28,6 @@
 #include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/debug.h>
 
-// INTERNAL INCLUDES
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
-
 using namespace Dali;
 
 namespace
@@ -1115,10 +1112,6 @@ TableView::TableView( unsigned int initialRows, unsigned int initialColumns )
 {
   SetKeyboardNavigationSupport( true );
   ResizeContainers( initialRows, initialColumns );
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::TABLE ) );
-  } );
 }
 
 void TableView::OnInitialize()

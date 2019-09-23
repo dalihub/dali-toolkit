@@ -85,14 +85,6 @@ private:
 
   // Undefined
   RadioButton& operator=( const RadioButton& origin );
-
-protected:
-  struct AccessibleImpl : public Button::AccessibleImpl
-  {
-    using Button::AccessibleImpl::AccessibleImpl;
-
-    Dali::Accessibility::States CalculateStates() override;
-  };
 };
 
 } // namespace Internal

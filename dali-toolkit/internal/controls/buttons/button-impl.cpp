@@ -1319,22 +1319,6 @@ Padding Button::GetForegroundPadding()
   return mForegroundPadding;
 }
 
-std::string Button::AccessibleImpl::GetNameRaw()
-{
-  auto slf = Toolkit::Button::DownCast( self );
-  return slf.GetProperty<std::string>( Toolkit::Button::Property::LABEL );
-}
-
-Dali::Accessibility::States Button::AccessibleImpl::CalculateStates()
-{
-  auto tmp = Control::Impl::AccessibleImpl::CalculateStates();
-  tmp[Dali::Accessibility::State::SELECTABLE] = true;
-  auto slf = Toolkit::Button::DownCast( self );
-  tmp[Dali::Accessibility::State::ENABLED] = !slf.GetProperty<bool>( Toolkit::Button::Property::DISABLED );
-  tmp[Dali::Accessibility::State::CHECKED] = slf.GetProperty<bool>( Toolkit::Button::Property::SELECTED );
-  return tmp;
-}
-
 } // namespace Internal
 
 } // namespace Toolkit

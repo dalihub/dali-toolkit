@@ -33,7 +33,6 @@
 #include <dali-toolkit/internal/text/shaper.h>
 #include <dali-toolkit/internal/text/text-control-interface.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
-#include <dali-toolkit/internal/text/text-editable-control-interface.h>
 
 namespace
 {
@@ -191,12 +190,6 @@ bool Controller::Impl::ProcessInputEvents()
     // Calculate the cursor position from the new cursor index.
     GetCursorPosition( mEventData->mPrimaryCursorPosition,
                        cursorInfo );
-
-
-    if( NULL != mEditableControlInterface )
-    {
-      mEditableControlInterface->CaretMoved( mEventData->mPrimaryCursorPosition );
-    }
 
     if( mEventData->mUpdateCursorHookPosition )
     {
@@ -1949,18 +1942,6 @@ void Controller::Impl::RetrieveSelection( std::string& selectedText, bool delete
   }
 }
 
-void Controller::Impl::SetSelection( int start, int end )
-{
-  mEventData->mLeftSelectionPosition = start;
-  mEventData->mRightSelectionPosition = end;
-  mEventData->mUpdateCursorPosition = true;
-}
-
-std::pair< int, int > Controller::Impl::GetSelectionIndexes() const
-{
-  return { mEventData->mLeftSelectionPosition, mEventData->mRightSelectionPosition };
-}
-
 void Controller::Impl::ShowClipboard()
 {
   if( mClipboard )
@@ -1982,7 +1963,7 @@ void Controller::Impl::SetClipboardHideEnable(bool enable)
   mClipboardHideEnabled = enable;
 }
 
-bool Controller::Impl::CopyStringToClipboard( const std::string& source )
+bool Controller::Impl::CopyStringToClipboard( std::string& source )
 {
   //Send string to clipboard
   return ( mClipboard && mClipboard.SetItem( source ) );

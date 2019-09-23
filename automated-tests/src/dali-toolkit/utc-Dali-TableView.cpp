@@ -92,7 +92,7 @@ static void SetupTableViewAndActors(TableView& tableView, Actor& actor1, Actor& 
 
 int UtcDaliTableViewCtorCopyP(void)
 {
-  ToolkitTestApplication application;
+  TestApplication application;
 
   TableView actor1 = TableView::New(10,10);
   TableView actor2( actor1 );

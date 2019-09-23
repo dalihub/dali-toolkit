@@ -176,9 +176,9 @@ public: //Signals
 protected:
 
   /**
-   * Removed default constructor.
+   * Construct a new Scrollable.
    */
-  Scrollable() = delete;
+  Scrollable();
 
   /**
    * @brief Construct a new Scrollable.

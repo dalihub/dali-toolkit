@@ -187,9 +187,9 @@ protected:
 protected:
 
   /**
-   * Removed default costructor.
+   * Construct a new ScrollBase.
    */
-  ScrollBase() = delete;
+  ScrollBase();
 
   /**
    * @brief Construct a new ScrollBase.

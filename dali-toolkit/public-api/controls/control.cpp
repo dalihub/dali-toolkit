@@ -30,6 +30,7 @@ namespace Dali
 
 namespace Toolkit
 {
+
 Control Control::New()
 {
   return Internal::Control::New();

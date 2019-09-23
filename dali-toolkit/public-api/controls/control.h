@@ -27,7 +27,6 @@
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/images/image.h>
-#include <dali/public-api/adaptor-framework/accessibility.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
@@ -175,29 +174,6 @@ public:
 
   /// @brief ResourceReady signal type. @SINCE_1_2.60
   typedef Signal<void ( Control ) > ResourceReadySignalType;
-
-  /// @brief AccessibilityActivate signal type.
-  typedef Signal< void ( ) > AccessibilityActivateSignalType;
-
-  /// @brief AccessibilityReadingSkipped signal type.
-  typedef Signal< void ( ) > AccessibilityReadingSkippedSignalType;
-
-  /// @brief AccessibilityReadingCancelled signal type.
-  typedef Signal< void ( ) > AccessibilityReadingCancelledSignalType;
-
-  /// @brief AccessibilityReadingStopped signal type.
-  typedef Signal< void ( ) > AccessibilityReadingStoppedSignalType;
-
-  /// @brief AccessibilityGetName signal type.
-  typedef Signal< void ( std::string& ) > AccessibilityGetNameSignalType;
-
-  /// @brief AccessibilityGetDescription signal type.
-  typedef Signal< void ( std::string& ) > AccessibilityGetDescriptionSignalType;
-
-  /// @brief AccessibilityDoGesture signal type.
-  typedef Signal< void ( std::pair<Dali::Accessibility::GestureInfo, bool>& ) > AccessibilityDoGestureSignalType;
-
-  using RelationsCollection = std::vector<std::vector<Accessibility::Address>>;
 
 public: // Creation & Destruction
 
@@ -474,6 +450,7 @@ public:
    * @note A RelayoutRequest is queued by Control before this signal is emitted
    */
   ResourceReadySignalType& ResourceReadySignal();
+
 public: // Intended for control developers
 
   /**
@@ -546,6 +523,7 @@ public: // Templates for Deriving Classes
       DALI_ASSERT_DEBUG(dynamic_cast<I*>(&CustomActor(internal).GetImplementation()));
     }
   }
+
 };
 
 /**

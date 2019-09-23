@@ -148,7 +148,7 @@ public:
       /**
        * @brief The line vertical alignment.
        * @details Name "verticalAlignment", type Property::STRING type VerticalAlignment::Type (Property::INTEGER)
-       *        Values "TOP", "CENTER", "BOTTOM".
+       *          Values "TOP",   "CENTER", "BOTTOM".
        * @note Return type is Property::STRING
        * @SINCE_1_0.0
        */

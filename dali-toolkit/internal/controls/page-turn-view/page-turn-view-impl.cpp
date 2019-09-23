@@ -32,7 +32,6 @@
 #include <dali-toolkit/internal/controls/page-turn-view/page-turn-book-spine-effect.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 using namespace Dali;
 
@@ -363,10 +362,6 @@ PageTurnView::PageTurnView( PageFactory& pageFactory, const Vector2& viewPageSiz
   mPagePanStartedSignal(),
   mPagePanFinishedSignal()
 {
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::PAGE_TAB_LIST ) );
-  } );
 }
 
 PageTurnView::~PageTurnView()

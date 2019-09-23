@@ -33,7 +33,6 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -139,12 +138,6 @@ VideoView::VideoView()
   mIsUnderlay( true )
 {
   mVideoPlayer = Dali::VideoPlayer::New();
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor )
-    {
-      return std::unique_ptr< Dali::Accessibility::Accessible >(
-        new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::VIDEO, true ) );
-    }
-  );
 }
 
 VideoView::~VideoView()

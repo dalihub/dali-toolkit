@@ -35,7 +35,6 @@
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
-#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace //Unnamed namespace
 {
@@ -138,11 +137,6 @@ SuperBlurView::SuperBlurView( unsigned int blurLevels )
   mGaussianBlurView.assign( blurLevels, Toolkit::GaussianBlurView() );
   mBlurredImage.assign( blurLevels, FrameBuffer() );
   mRenderers.assign( blurLevels+1, Dali::Renderer() );
-
-  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
-    return std::unique_ptr< Dali::Accessibility::Accessible >(
-      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
-  } );
 }
 
 SuperBlurView::~SuperBlurView()
