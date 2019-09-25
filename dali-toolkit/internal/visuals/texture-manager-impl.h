@@ -464,8 +464,7 @@ private:
       cropToMask( cropToMask ),
       orientationCorrection( true ),
       preMultiplyOnLoad( preMultiplyOnLoad ),
-      preMultiplied( false ),
-      maskApplied( false )
+      preMultiplied( false )
     {
     }
 
@@ -498,7 +497,6 @@ private:
     bool orientationCorrection:1;  ///< true if the image should be rotated to match exif orientation data
     bool preMultiplyOnLoad:1;      ///< true if the image's color should be multiplied by it's alpha
     bool preMultiplied:1;          ///< true if the image's color was multiplied by it's alpha
-    bool maskApplied:1;            ///< true if the image's mask is applied
   };
 
   /**
@@ -589,8 +587,9 @@ private:
    * @param[in] container The Async loading container
    * @param[in] id        This is the async image loaders Id
    * @param[in] pixelBuffer The loaded image data
+   * @param[in] isMaskTask whether this task is for mask or not
    */
-  void AsyncLoadComplete( AsyncLoadingInfoContainerType& container, uint32_t id, Devel::PixelBuffer pixelBuffer );
+  void AsyncLoadComplete( AsyncLoadingInfoContainerType& container, uint32_t id, Devel::PixelBuffer pixelBuffer, bool isMaskTask );
 
   /**
    * @brief Performs Post-Load steps including atlasing.
@@ -749,16 +748,17 @@ private:
     /**
      * @brief Main constructor that used by all other constructors
      */
-    AsyncLoadingHelper( Toolkit::AsyncImageLoader loader,
-                        TextureManager& textureManager,
-                        AsyncLoadingInfoContainerType&& loadingInfoContainer );
+    AsyncLoadingHelper(Toolkit::AsyncImageLoader loader,
+                       TextureManager& textureManager,
+                       AsyncLoadingInfoContainerType&& loadingInfoContainer);
 
     /**
      * @brief Callback to be called when texture loading is complete, it passes the pixel buffer on to texture manager.
      * @param[in] id          Loader id
      * @param[in] pixelBuffer Image data
+     * @param[in] isMaskTask whether this task is for mask or not
      */
-    void AsyncLoadComplete( uint32_t id, Devel::PixelBuffer pixelBuffer );
+    void AsyncLoadComplete(uint32_t id, Devel::PixelBuffer pixelBuffer, bool isMaskTask);
 
   private:
     Toolkit::AsyncImageLoader     mLoader;
