@@ -16,8 +16,8 @@
  */
 
 #include <iostream>
-
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/internal/text/text-run-container.h>
@@ -44,6 +44,8 @@ using namespace Text;
 
 namespace
 {
+const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
+
 struct CreateParagraphData
 {
   std::string    description;                    ///< Description of the test.
@@ -87,14 +89,16 @@ struct GetLogicalCharacterIndexData
 
 struct GetLogicalCursorIndexData
 {
-  std::string    description;        ///< Description of the test.
-  std::string    text;               ///< Input text.
-  Size           textArea;           ///< The text area.
-  unsigned int   numberOfIndices;    ///< The number of characters to set.
-  unsigned int*  visualCursorIndex;  ///< The given cursor visual index.
-  unsigned int*  characterIndex;     ///< Index to the first logical character of the line.
-  unsigned int*  logicalCursorIndex; ///< The expected cursor logical index.
-  unsigned int*  cachedBidiLine;     ///< The cached bidi line index for each character.
+  std::string         description;        ///< Description of the test.
+  std::string         text;               ///< Input text.
+  Size                textArea;           ///< The text area.
+  unsigned int        numberOfFonts;      ///< The number of fonts.
+  FontDescriptionRun* fontDescriptions;   ///< The font descriptions.
+  unsigned int        numberOfIndices;    ///< The number of characters to set.
+  unsigned int*       visualCursorIndex;  ///< The given cursor visual index.
+  unsigned int*       characterIndex;     ///< Index to the first logical character of the line.
+  unsigned int*       logicalCursorIndex; ///< The expected cursor logical index.
+  unsigned int*       cachedBidiLine;     ///< The cached bidi line index for each character.
 };
 
 bool CreateParagraphTest( const CreateParagraphData& data )
@@ -298,6 +302,18 @@ bool GetLogicalCharacterIndexTest( const GetLogicalCharacterIndexData& data )
 bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
 {
   std::cout << "  testing : " << data.description << std::endl;
+
+  // Load some fonts.
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 96u, 96u );
+
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
+
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf" );
+
   // Create the model.
   LogicalModelPtr logicalModel;
   VisualModelPtr visualModel;
@@ -305,11 +321,18 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
   Size layoutSize;
 
   // Create the model with the whole text.
-  const Vector<FontDescriptionRun> fontDescriptions;
+  Vector<FontDescriptionRun> fontDescriptionRuns;
+  if( 0u != data.numberOfFonts )
+  {
+    fontDescriptionRuns.Insert( fontDescriptionRuns.End(),
+                                data.fontDescriptions,
+                                data.fontDescriptions + data.numberOfFonts );
+  }
+
   const LayoutOptions options;
   CreateTextModel( data.text,
                    data.textArea,
-                   fontDescriptions,
+                   fontDescriptionRuns,
                    options,
                    layoutSize,
                    logicalModel,
@@ -747,6 +770,11 @@ int UtcDaliGetLogicalCursorIndex(void)
 {
   tet_infoline(" UtcDaliGetLogicalCursorIndex");
 
+  const std::string fontFamily( "TizenSans" );
+  const std::string fontFamilyHebrew( "TizenSansHebrew" );
+
+
+
   unsigned int visualIndex01[] = { 10u };
   unsigned int characterIndex01[] = { 0u };
   unsigned int logicalIndex01[] = { 10u };
@@ -756,11 +784,27 @@ int UtcDaliGetLogicalCursorIndex(void)
   //   Hello world  \n
   // 12    16
   //   demo
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun02;
+  fontDescriptionRun02.characterRun.characterIndex = 0u;
+  fontDescriptionRun02.characterRun.numberOfCharacters = 11u;
+  fontDescriptionRun02.familyLength = fontFamily.size();
+  fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
+  memcpy( fontDescriptionRun02.familyName, fontFamily.c_str(), fontDescriptionRun02.familyLength );
+  fontDescriptionRun02.familyDefined = true;
+  fontDescriptionRun02.weightDefined = false;
+  fontDescriptionRun02.widthDefined = false;
+  fontDescriptionRun02.slantDefined = false;
+  fontDescriptionRun02.sizeDefined = false;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns02;
+  fontDescriptionRuns02.PushBack( fontDescriptionRun02 );
+
   unsigned int visualIndex02[] = { 0u, 16u, 11u, 12u };
   unsigned int characterIndex02[] = { 0u, 0u, 0u, 0u };
   unsigned int logicalIndex02[] = { 0u, 16u, 11u, 12u };
   unsigned int bidirectionalLineIndex02[] = { 0u, 0u, 0u, 0u };
-
 
 // LO     H  e  l  l  o  _  w  o  r  l  d  \n
 //       0  1  2  3  4  5  6  7  8  9 10 11  12
@@ -777,6 +821,79 @@ int UtcDaliGetLogicalCursorIndex(void)
 // LO      ש  ל  ו  ם  _  ע  ו  ל  ם  _  h  e  l  l  o  _  w  o  r   l  d \n
 //       44 45 46 47 48 49 50 51  52 52 54 55 56 57 58 59 60 61 62 63  64 65 66
 // VO      \n h  e  l  l  o  _  w   o  r  l  d  _  ם  ל  ו  ע  _  ם  ו  ל  ש
+
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun0301;
+  fontDescriptionRun0301.characterRun.characterIndex = 0u;
+  fontDescriptionRun0301.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun0301.familyLength = fontFamily.size();
+  fontDescriptionRun0301.familyName = new char[fontDescriptionRun0301.familyLength];
+  memcpy( fontDescriptionRun0301.familyName, fontFamily.c_str(), fontDescriptionRun0301.familyLength );
+  fontDescriptionRun0301.familyDefined = true;
+  fontDescriptionRun0301.weightDefined = false;
+  fontDescriptionRun0301.widthDefined = false;
+  fontDescriptionRun0301.slantDefined = false;
+  fontDescriptionRun0301.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun0302;
+  fontDescriptionRun0302.characterRun.characterIndex = 12u;
+  fontDescriptionRun0302.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun0302.familyLength = fontFamilyHebrew.size();
+  fontDescriptionRun0302.familyName = new char[fontDescriptionRun0302.familyLength];
+  memcpy( fontDescriptionRun0302.familyName, fontFamilyHebrew.c_str(), fontDescriptionRun0302.familyLength );
+  fontDescriptionRun0302.familyDefined = true;
+  fontDescriptionRun0302.weightDefined = false;
+  fontDescriptionRun0302.widthDefined = false;
+  fontDescriptionRun0302.slantDefined = false;
+  fontDescriptionRun0302.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun0303;
+  fontDescriptionRun0303.characterRun.characterIndex = 22u;
+  fontDescriptionRun0303.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun0303.familyLength = fontFamily.size();
+  fontDescriptionRun0303.familyName = new char[fontDescriptionRun0303.familyLength];
+  memcpy( fontDescriptionRun0303.familyName, fontFamily.c_str(), fontDescriptionRun0303.familyLength );
+  fontDescriptionRun0303.familyDefined = true;
+  fontDescriptionRun0303.weightDefined = false;
+  fontDescriptionRun0303.widthDefined = false;
+  fontDescriptionRun0303.slantDefined = false;
+  fontDescriptionRun0303.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun0304;
+  fontDescriptionRun0304.characterRun.characterIndex = 34u;
+  fontDescriptionRun0304.characterRun.numberOfCharacters = 20u;
+  fontDescriptionRun0304.familyLength = fontFamilyHebrew.size();
+  fontDescriptionRun0304.familyName = new char[fontDescriptionRun0304.familyLength];
+  memcpy( fontDescriptionRun0304.familyName, fontFamilyHebrew.c_str(), fontDescriptionRun0304.familyLength );
+  fontDescriptionRun0304.familyDefined = true;
+  fontDescriptionRun0304.weightDefined = false;
+  fontDescriptionRun0304.widthDefined = false;
+  fontDescriptionRun0304.slantDefined = false;
+  fontDescriptionRun0304.sizeDefined = false;
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun0305;
+  fontDescriptionRun0305.characterRun.characterIndex = 54u;
+  fontDescriptionRun0305.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun0305.familyLength = fontFamily.size();
+  fontDescriptionRun0305.familyName = new char[fontDescriptionRun0305.familyLength];
+  memcpy( fontDescriptionRun0305.familyName, fontFamily.c_str(), fontDescriptionRun0305.familyLength );
+  fontDescriptionRun0305.familyDefined = true;
+  fontDescriptionRun0305.weightDefined = false;
+  fontDescriptionRun0305.widthDefined = false;
+  fontDescriptionRun0305.slantDefined = false;
+  fontDescriptionRun0305.sizeDefined = false;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns03;
+  fontDescriptionRuns03.PushBack( fontDescriptionRun0301 );
+  fontDescriptionRuns03.PushBack( fontDescriptionRun0302 );
+  fontDescriptionRuns03.PushBack( fontDescriptionRun0303 );
+  fontDescriptionRuns03.PushBack( fontDescriptionRun0304 );
+  fontDescriptionRuns03.PushBack( fontDescriptionRun0305 );
 
   unsigned int visualIndex03[] = {  0u,  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u, 11u,
                                    13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 22u,
@@ -815,6 +932,74 @@ int UtcDaliGetLogicalCursorIndex(void)
 // LO 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66
 //      h  e  l  l  o  _  w  o  r  l  d  _  ם  ל  ו  ע  _  ם  ו  ל  ש \n
 
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun0401;
+  fontDescriptionRun0401.characterRun.characterIndex = 0u;
+  fontDescriptionRun0401.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun0401.familyLength = fontFamilyHebrew.size();
+  fontDescriptionRun0401.familyName = new char[fontDescriptionRun0401.familyLength];
+  memcpy( fontDescriptionRun0401.familyName, fontFamilyHebrew.c_str(), fontDescriptionRun0401.familyLength );
+  fontDescriptionRun0401.familyDefined = true;
+  fontDescriptionRun0401.weightDefined = false;
+  fontDescriptionRun0401.widthDefined = false;
+  fontDescriptionRun0401.slantDefined = false;
+  fontDescriptionRun0401.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun0402;
+  fontDescriptionRun0402.characterRun.characterIndex = 10u;
+  fontDescriptionRun0402.characterRun.numberOfCharacters = 12u;
+  fontDescriptionRun0402.familyLength = fontFamily.size();
+  fontDescriptionRun0402.familyName = new char[fontDescriptionRun0402.familyLength];
+  memcpy( fontDescriptionRun0402.familyName, fontFamily.c_str(), fontDescriptionRun0402.familyLength );
+  fontDescriptionRun0402.familyDefined = true;
+  fontDescriptionRun0402.weightDefined = false;
+  fontDescriptionRun0402.widthDefined = false;
+  fontDescriptionRun0402.slantDefined = false;
+  fontDescriptionRun0402.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun0403;
+  fontDescriptionRun0403.characterRun.characterIndex = 22u;
+  fontDescriptionRun0403.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun0403.familyLength = fontFamilyHebrew.size();
+  fontDescriptionRun0403.familyName = new char[fontDescriptionRun0403.familyLength];
+  memcpy( fontDescriptionRun0403.familyName, fontFamilyHebrew.c_str(), fontDescriptionRun0403.familyLength );
+  fontDescriptionRun0403.familyDefined = true;
+  fontDescriptionRun0403.weightDefined = false;
+  fontDescriptionRun0403.widthDefined = false;
+  fontDescriptionRun0403.slantDefined = false;
+  fontDescriptionRun0403.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun0404;
+  fontDescriptionRun0404.characterRun.characterIndex = 32u;
+  fontDescriptionRun0404.characterRun.numberOfCharacters = 24u;
+  fontDescriptionRun0404.familyLength = fontFamily.size();
+  fontDescriptionRun0404.familyName = new char[fontDescriptionRun0404.familyLength];
+  memcpy( fontDescriptionRun0404.familyName, fontFamily.c_str(), fontDescriptionRun0404.familyLength );
+  fontDescriptionRun0404.familyDefined = true;
+  fontDescriptionRun0404.weightDefined = false;
+  fontDescriptionRun0404.widthDefined = false;
+  fontDescriptionRun0404.slantDefined = false;
+  fontDescriptionRun0404.sizeDefined = false;
+
+  FontDescriptionRun fontDescriptionRun0405;
+  fontDescriptionRun0405.characterRun.characterIndex = 56u;
+  fontDescriptionRun0405.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun0405.familyLength = fontFamilyHebrew.size();
+  fontDescriptionRun0405.familyName = new char[fontDescriptionRun0405.familyLength];
+  memcpy( fontDescriptionRun0405.familyName, fontFamilyHebrew.c_str(), fontDescriptionRun0405.familyLength );
+  fontDescriptionRun0405.familyDefined = true;
+  fontDescriptionRun0405.weightDefined = false;
+  fontDescriptionRun0405.widthDefined = false;
+  fontDescriptionRun0405.slantDefined = false;
+  fontDescriptionRun0405.sizeDefined = false;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns04;
+  fontDescriptionRuns04.PushBack( fontDescriptionRun0401 );
+  fontDescriptionRuns04.PushBack( fontDescriptionRun0402 );
+  fontDescriptionRuns04.PushBack( fontDescriptionRun0403 );
+  fontDescriptionRuns04.PushBack( fontDescriptionRun0404 );
+  fontDescriptionRuns04.PushBack( fontDescriptionRun0405 );
+
   unsigned int  visualIndex04[] = {  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u,
                                     10u, 12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u,
                                     23u, 24u, 25u, 26u, 27u, 28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u, 37u, 38u, 39u, 40u, 41u, 42u, 43u, 44u,
@@ -835,11 +1020,26 @@ int UtcDaliGetLogicalCursorIndex(void)
                                               1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u, 1u,
                                               2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u, 2u };
 
-
 // LO   A  B  C  D  E  F  G  H  I  J  K
 //     0  1  2  3  4  5  6  7  8  9 10 11
 // LO   L  M  N
 //    11 12 13 14
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun0501;
+  fontDescriptionRun0501.characterRun.characterIndex = 0u;
+  fontDescriptionRun0501.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun0501.familyLength = fontFamily.size();
+  fontDescriptionRun0501.familyName = new char[fontDescriptionRun0501.familyLength];
+  memcpy( fontDescriptionRun0501.familyName, fontFamily.c_str(), fontDescriptionRun0501.familyLength );
+  fontDescriptionRun0501.familyDefined = true;
+  fontDescriptionRun0501.weightDefined = false;
+  fontDescriptionRun0501.widthDefined = false;
+  fontDescriptionRun0501.slantDefined = false;
+  fontDescriptionRun0501.sizeDefined = false;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns05;
+  fontDescriptionRuns05.PushBack( fontDescriptionRun0501 );
 
   unsigned int  visualIndex05[] = {  0u,  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u,
                                     11u, 12u, 13u, 14u };
@@ -861,6 +1061,22 @@ int UtcDaliGetLogicalCursorIndex(void)
 //       11 12 13 14 15 16
 // VO      ל  ח  י  ע  כ
 
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun0601;
+  fontDescriptionRun0601.characterRun.characterIndex = 0u;
+  fontDescriptionRun0601.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun0601.familyLength = fontFamilyHebrew.size();
+  fontDescriptionRun0601.familyName = new char[fontDescriptionRun0601.familyLength];
+  memcpy( fontDescriptionRun0601.familyName, fontFamilyHebrew.c_str(), fontDescriptionRun0601.familyLength );
+  fontDescriptionRun0601.familyDefined = true;
+  fontDescriptionRun0601.weightDefined = false;
+  fontDescriptionRun0601.widthDefined = false;
+  fontDescriptionRun0601.slantDefined = false;
+  fontDescriptionRun0601.sizeDefined = false;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns06;
+  fontDescriptionRuns06.PushBack( fontDescriptionRun0601 );
+
   unsigned int  visualIndex06[] = {  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u, 11u,
                                     11u, 12u, 13u, 14u, 15u, 16u };
 
@@ -879,6 +1095,8 @@ int UtcDaliGetLogicalCursorIndex(void)
       "Zero characters text",
       "",
       Size( 300.f, 300.f ),
+      0u,
+      nullptr,
       1u,
       visualIndex01,
       characterIndex01,
@@ -889,6 +1107,8 @@ int UtcDaliGetLogicalCursorIndex(void)
       "All left to right text 01.",
       "Hello world\ndemo",
       Size( 300.f, 300.f ),
+      1u,
+      fontDescriptionRuns02.Begin(),
       4u,
       visualIndex02,
       characterIndex02,
@@ -899,6 +1119,8 @@ int UtcDaliGetLogicalCursorIndex(void)
       "bidirectional text 01.",
       "Hello world\nשלום עולם\nhello world שלום עולם\nשלום עולם hello world\n",
       Size( 300.f, 300.f ),
+      5u,
+      fontDescriptionRuns03.Begin(),
       65u,
       visualIndex03,
       characterIndex03,
@@ -909,6 +1131,8 @@ int UtcDaliGetLogicalCursorIndex(void)
       "bidirectional text 02.",
       "שלום עולם\nhello world\nשלום עולם hello world\nhello world שלום עולם\n",
       Size( 300.f, 300.f ),
+      5u,
+      fontDescriptionRuns04.Begin(),
       65u,
       visualIndex04,
       characterIndex04,
@@ -919,6 +1143,8 @@ int UtcDaliGetLogicalCursorIndex(void)
       "long line 01.",
       "ABCDEFGHIJKLMN",
       Size( 100.f, 300.f ),
+      1u,
+      fontDescriptionRuns05.Begin(),
       13u,
       visualIndex05,
       characterIndex05,
@@ -929,6 +1155,8 @@ int UtcDaliGetLogicalCursorIndex(void)
       "bidirectional text 03.",
       "קראטוןםפשדגכעיחל",
       Size( 100.f, 300.f ),
+      1u,
+      fontDescriptionRuns06.Begin(),
       15u,
       visualIndex06,
       characterIndex06,
