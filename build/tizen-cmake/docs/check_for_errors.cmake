@@ -1,0 +1,7 @@
+FILE(READ doxygen-errors.txt DOXY_ERROR_VALUE)
+IF( "${DOXY_ERROR_VALUE}" STREQUAL "" )
+    MESSAGE( STATUS "Doxygen complete!")
+ELSE()
+    MESSAGE( "${DOXY_ERROR_VALUE}" )
+    MESSAGE( FATAL_ERROR "Doxygen failed!")
+ENDIF()

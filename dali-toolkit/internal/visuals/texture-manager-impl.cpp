@@ -750,7 +750,7 @@ void TextureManager::ObserveTexture( TextureInfo& textureInfo,
 }
 
 void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingContainer, uint32_t id,
-                                        Devel::PixelBuffer pixelBuffer, bool isMaskTask )
+                                        Devel::PixelBuffer pixelBuffer )
 {
   DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "TextureManager::AsyncLoadComplete( id:%d )\n", id );
 
@@ -771,10 +771,6 @@ void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingCo
 
         if( textureInfo.loadState != CANCELLED )
         {
-          if( isMaskTask )
-          {
-            textureInfo.loadState = MASK_APPLIED;
-          }
           // textureInfo can be invalidated after this call (as the mTextureInfoContainer may be modified)
           PostLoad( textureInfo, pixelBuffer );
         }
@@ -804,8 +800,9 @@ void TextureManager::PostLoad( TextureInfo& textureInfo, Devel::PixelBuffer& pix
       // wait for the mask to finish loading.
       if( textureInfo.maskTextureId != INVALID_TEXTURE_ID )
       {
-        if( textureInfo.loadState == MASK_APPLIED )
+        if( textureInfo.loadState == MASK_APPLYING )
         {
+          textureInfo.loadState = MASK_APPLIED;
           UploadTexture( pixelBuffer, textureInfo );
           NotifyObservers( textureInfo, true );
         }
@@ -1182,10 +1179,9 @@ TextureManager::AsyncLoadingHelper::AsyncLoadingHelper(
 }
 
 void TextureManager::AsyncLoadingHelper::AsyncLoadComplete(uint32_t           id,
-                                                           Devel::PixelBuffer pixelBuffer,
-                                                           bool isMaskTask)
+                                                           Devel::PixelBuffer pixelBuffer )
 {
-  mTextureManager.AsyncLoadComplete(mLoadingInfoContainer, id, pixelBuffer, isMaskTask);
+  mTextureManager.AsyncLoadComplete( mLoadingInfoContainer, id, pixelBuffer );
 }
 
 void TextureManager::SetBrokenImageUrl(const std::string& brokenImageUrl)

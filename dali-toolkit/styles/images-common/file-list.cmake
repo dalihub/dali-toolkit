@@ -1,0 +1,7 @@
+# This file is auto-generated!
+#
+# Files to install here
+SET( dali_toolkit_image_files
+    ${toolkit_images_dir}/*.png
+)
+
