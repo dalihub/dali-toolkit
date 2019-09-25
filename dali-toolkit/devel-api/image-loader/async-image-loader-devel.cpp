@@ -39,10 +39,9 @@ uint32_t ApplyMask( AsyncImageLoader asyncImageLoader,
                     Devel::PixelBuffer pixelBuffer,
                     Devel::PixelBuffer maskPixelBuffer,
                     float contentScale,
-                    bool cropToMask,
-                    DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad )
+                    bool cropToMask )
 {
-  return GetImplementation( asyncImageLoader ).ApplyMask( pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad );
+  return GetImplementation( asyncImageLoader ).ApplyMask( pixelBuffer, maskPixelBuffer, contentScale, cropToMask );
 }
 
 PixelBufferLoadedSignalType& PixelBufferLoadedSignal( AsyncImageLoader asyncImageLoader )
