@@ -5,8 +5,12 @@
 Makefile.in
 Makefile
 CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
 dali.node
 dali.doxy
+install_manifest.txt
+libdali-toolkit.so*
 *~
 *.o
 *.o.d
