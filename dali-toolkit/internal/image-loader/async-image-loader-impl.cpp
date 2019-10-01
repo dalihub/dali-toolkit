@@ -69,14 +69,15 @@ uint32_t AsyncImageLoader::Load( const VisualUrl& url,
 uint32_t AsyncImageLoader::ApplyMask( Devel::PixelBuffer pixelBuffer,
                                       Devel::PixelBuffer maskPixelBuffer,
                                       float contentScale,
-                                      bool cropToMask )
+                                      bool cropToMask,
+                                      DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad)
 {
   if( !mIsLoadThreadStarted )
   {
     mLoadThread.Start();
     mIsLoadThreadStarted = true;
   }
-  mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask ) );
+  mLoadThread.AddTask( new LoadingTask( ++mLoadTaskId, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad ) );
 
   return mLoadTaskId;
 }
