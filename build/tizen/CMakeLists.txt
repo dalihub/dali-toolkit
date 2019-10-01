@@ -36,6 +36,9 @@ SET(ROOT_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../)
 # Make sure the path is absolute
 GET_FILENAME_COMPONENT(ROOT_SRC_DIR ${ROOT_SRC_DIR} ABSOLUTE)
 
+# Set DALi style
+SET( dali_style ${WITH_STYLE} )
+
 # Style folder
 SET( STYLE_BASE_DIR ${ROOT_SRC_DIR}/dali-toolkit/styles )
 SET( STYLE_DIR ${STYLE_BASE_DIR}/${dali_style} )
@@ -96,9 +99,6 @@ ENDIF()
 # Deployment folder should come from spec file or command line:
 SET( PREFIX ${CMAKE_INSTALL_PREFIX})
 SET( EXEC_PREFIX ${CMAKE_INSTALL_PREFIX})
-
-# Set DALi style
-SET( dali_style ${WITH_STYLE} )
 
 # Set paths
 SET( toolkit_images_dir  ${ROOT_SRC_DIR}/dali-toolkit/styles/images-common )
@@ -169,14 +169,14 @@ SET(SOURCES "")
 
 # could use INCLUDE to get the source lists a different way;
 # would then need to specify a build folder somehow...
-INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/sounds/file-list.cmake )
-INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/styles/file-list.cmake )
-INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/styles/images-common/file-list.cmake )
-INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/internal/file-list.cmake )
-INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/public-api/file-list.cmake )
-INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/devel-api/file-list.cmake )
-INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/third-party/file-list.cmake )
-INCLUDE( ${ROOT_SRC_DIR}/doc/file-list.cmake )
+INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/sounds/file.list )
+INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/styles/file.list )
+INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/styles/images-common/file.list )
+INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/internal/file.list )
+INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/public-api/file.list )
+INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/devel-api/file.list )
+INCLUDE( ${ROOT_SRC_DIR}/dali-toolkit/third-party/file.list )
+INCLUDE( ${ROOT_SRC_DIR}/doc/file.list )
 
 SET(LIBTYPE SHARED)
 IF(DEFINED STATIC)
