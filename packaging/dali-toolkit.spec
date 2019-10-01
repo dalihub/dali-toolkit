@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    1.4.38
+Version:    1.4.39
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -9,7 +9,7 @@ Source0:    %{name}-%{version}.tar.gz
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-
+BuildRequires:  cmake
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(dali-core)
@@ -118,41 +118,33 @@ LDFLAGS+=" --coverage "
 
 libtoolize --force
 cd %{_builddir}/dali-toolkit-%{version}/build/tizen
-autoreconf --install
+
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
 
-%configure --enable-profile=TIZEN \
+cmake \
 %if 0%{?enable_debug}
-           --enable-debug \
+      -DCMAKE_BUILD_TYPE=Debug \
 %endif
 %if 0%{?enable_trace}
-      --enable-trace \
+      -DENABLE_TRACE=ON \
 %endif
-           --enable-i18n=yes \
-           --enable-rename-so=no
+      -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+      -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
+      -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir} \
+      -DENABLE_I18N=ON
 
 make %{?jobs:-j%jobs}
-
-pushd %{_builddir}/%{name}-%{version}/build/tizen
-%make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
-popd
-
-pushd %{buildroot}%{_libdir}
-for FILE in libdali-toolkit-cxx11.so*; do mv "$FILE" "%{_builddir}/%{name}-%{version}/build/tizen/$FILE"; done
-mv pkgconfig/dali-toolkit.pc %{_builddir}/%{name}-%{version}/build/tizen/dali-toolkit.pc
-popd
 
 ##############################
 # Installation
 ##############################
 %install
 rm -rf %{buildroot}
-pushd %{_builddir}/%{name}-%{version}/build/tizen
-%make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
+cd build/tizen
 
-for FILE in libdali-toolkit-cxx11.so*; do mv "$FILE" "%{buildroot}%{_libdir}/$FILE"; done
-mv dali-toolkit.pc %{buildroot}%{_libdir}/pkgconfig/dali-toolkit.pc
+pushd %{_builddir}/%{name}-%{version}/build/tizen
+%make_install
 
 # PO
 {
@@ -166,13 +158,11 @@ done
 } &> /dev/null
 popd
 
-#############################
-#rename
-#############################
+# Create links to ensure linking with cxx11 library is preserved
 pushd  %{buildroot}%{_libdir}
-rm -rf libdali-toolkit.so
-rm -rf libdali-toolkit-cxx11.so
-ln -s libdali-toolkit-cxx11.so.0.0.* libdali-toolkit.so
+ln -sf libdali-toolkit.so libdali-toolkit-cxx11.so
+ln -sf libdali-toolkit.so libdali-toolkit-cxx11.so.0
+ln -sf libdali-toolkit.so libdali-toolkit-cxx11.so.0.0.0
 popd
 
 # Remove default style and style images which are for Linux build
@@ -180,6 +170,7 @@ rm -rf %{buildroot}%{dali_toolkit_style_files}/*
 
 # Make folder to contain style and style images
 # After making folder, copy local style and style images to new folder
+pushd %{_builddir}/%{name}-%{version}
 mkdir -p %{buildroot}%{dali_toolkit_style_files}/360x360
 cp -r dali-toolkit/styles/360x360/* %{buildroot}%{dali_toolkit_style_files}/360x360
 mkdir -p %{buildroot}%{dali_toolkit_style_files}/480x800
@@ -191,6 +182,7 @@ cp -r dali-toolkit/styles/1920x1080/* %{buildroot}%{dali_toolkit_style_files}/19
 
 # Copy default feedback theme
 cp dali-toolkit/styles/default-feedback-theme.json %{buildroot}%{dali_toolkit_style_files}
+popd
 
 ##############################
 # Pre Install
@@ -360,8 +352,8 @@ esac
 %manifest dali-toolkit.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/libdali-toolkit-cxx11.so.*
-%{_libdir}/libdali-toolkit.so
+%{_libdir}/libdali-toolkit-cxx11.so*
+%{_libdir}/libdali-toolkit.so*
 %license LICENSE
 
 %files devel

@@ -57,18 +57,15 @@ Testing on desktop
 Building libraries with coverage options
 ----------------------------------------
 
-Building dali core:
+Building dali toolkit:
 
     cd dali-core  # the location of your dali-core repository
     cd build/tizen
     export CC=gcc
     export CXX=g++
     git clean -fxd . # Only do this in the build folder
-    autoreconf --install
-    CXXFLAGS='-g -O0 --coverage' LDFLAGS='--coverage' ./configure --prefix=$DESKTOP_PREFIX --enable-debug
+    CXXFLAGS='-g -O0 --coverage' LDFLAGS='--coverage' cmake -DCMAKE_INSTALL_PREFIX=$DESKTOP_PREFIX -DCMAKE_BUILD_TYPE=Debug
     make -j8 install
-
-Repeat for dali-adaptor and toolkit.
 
 Note, you __must__ use a local build and not a distributed build, and you __must__ also build with debug enabled to allow *DALI_ASSERT_DEBUG* to trigger on wrong behaviour ( Which should always be a test case failure! )
 

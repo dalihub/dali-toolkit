@@ -7,7 +7,7 @@ PROJECT(${name})
 SET(PKG_NAME ${name})
 
 FIND_PACKAGE( PkgConfig REQUIRED )
-FIND_PACKAGE( Doxygen REQUIRED )
+FIND_PACKAGE( Doxygen QUIET )
 
 PKG_CHECK_MODULES(DALICORE REQUIRED dali-core)
 PKG_CHECK_MODULES(DALIADAPTOR REQUIRED dali-adaptor)
@@ -29,7 +29,6 @@ OPTION(ENABLE_COVERAGE       "Coverage" OFF)
 
 # Define non-boolean options to CMake
 SET(WITH_STYLE               "480x800" CACHE STRING "Select the style folder to use")
-SET(ENABLE_PROFILE           "UBUNTU" CACHE STRING "Select the variant of tizen")
 
 # Style folder
 SET( STYLE_BASE_DIR ${ROOT_SRC_DIR}/dali-toolkit/styles )
@@ -39,13 +38,13 @@ SET( toolkit_styles_base_dir ${STYLE_BASE_DIR} )
 SET( toolkit_styles_dir ${STYLE_DIR} )
 SET( toolkit_style_images_dir ${STYLE_DIR}/images )
 
-IF( ${DALI_DATA_RW_DIR} )
+IF( $ENV{DALI_DATA_RW_DIR} )
   SET( dataReadWriteDir ${DALI_DATA_RW_DIR}/ )
 ELSE()
   SET( dataReadWriteDir ${CMAKE_INSTALL_PREFIX}/share/dali/ )
 ENDIF()
 
-IF( ${DALI_DATA_RO_DIR} )
+IF( $ENV{DALI_DATA_RO_DIR} )
   SET( dataReadOnlyDir ${DALI_DATA_RO_DIR}/ )
 ELSE()
   SET( dataReadOnlyDir ${CMAKE_INSTALL_PREFIX}/share/dali/ )
@@ -269,7 +268,7 @@ IF( UNIX )
     ADD_CUSTOM_TARGET( rename_cov_data ./rename-cov-data )
 
     ADD_CUSTOM_TARGET( cov_data ${LCOV_BIN} ${LCOV_OPTS} --base-directory . --directory . -c -o dali.info
-      COMMAND ${LCOV_BIN} ${LCOV_OPTS} --remove dali.info \"*/dali-env/*\" \"/usr/include/*\" \"public-api/shader-effects/*\" \"*/image-actor*\" -o dali.info )
+      COMMAND ${LCOV_BIN} ${LCOV_OPTS} --remove dali.info \"*/dali-env/*\" \"/usr/include/*\" "*/dali-env/*" "*solid-color-actor*" "*/dali-toolkit/third-party/*" -o dali.info )
 
     ADD_CUSTOM_TARGET( coverage genhtml ${LCOV_OPTS} -o ${COVERAGE_OUTPUT_DIR} dali.info
       DEPENDS cov_data )
@@ -313,7 +312,9 @@ IF( UNIX )
 ENDIF( UNIX )
 
 # Build documentation if doxygen tool is available
+SET( doxygenEnabled OFF )
 IF( DOXYGEN_FOUND )
+  SET( doxygenEnabled ON )
   # 'prefix' is used by doxygen in-files.
   SET( prefix ${PREFIX} )
   SET( DOXYGEN_DOCS_DIR ${ROOT_SRC_DIR}/docs )
@@ -351,6 +352,7 @@ MESSAGE( STATUS "Debug build:           " ${ENABLE_DEBUG} )
 MESSAGE( STATUS "Export all symbols:    " ${ENABLE_EXPORTALL} )
 MESSAGE( STATUS "Coverage:              " ${ENABLE_COVERAGE} )
 MESSAGE( STATUS "Trace:                 " ${ENABLE_TRACE} )
+MESSAGE( STATUS "Doxygen:               " ${doxygenEnabled} )
 MESSAGE( STATUS "Data Dir (Read/Write): " ${dataReadWriteDir} )
 MESSAGE( STATUS "Data Dir (Read Only):  " ${dataReadOnlyDir} )
 MESSAGE( STATUS "Style Dir:             " ${STYLE_DIR} )
