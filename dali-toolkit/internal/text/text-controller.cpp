@@ -3775,7 +3775,7 @@ bool Controller::DoRelayout( const Size& size,
     // Make sure the index is not out of bound
     if ( charactersToGlyph.Count() != glyphsPerCharacter.Count() ||
          requestedNumberOfCharacters > charactersToGlyph.Count() ||
-         ( lastIndex >= charactersToGlyph.Count() && charactersToGlyph.Count() > 0u ) )
+         ( lastIndex > charactersToGlyph.Count() && charactersToGlyph.Count() > 0u ) )
     {
       std::string currentText;
       GetText( currentText );
