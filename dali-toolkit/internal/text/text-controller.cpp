@@ -1243,6 +1243,10 @@ void Controller::SetDefaultColor( const Vector4& color )
   {
     mImpl->mModel->mVisualModel->SetTextColor( color );
 
+    mImpl->mModel->mLogicalModel->mColorRuns.Clear();
+
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | COLOR );
+
     mImpl->RequestRelayout();
   }
 }
