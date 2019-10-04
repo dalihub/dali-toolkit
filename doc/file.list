@@ -1,3 +1,5 @@
-package_doxy_files = \
-  $(package_doxy_dir)/dali-toolkit-doc.h
+# Files to install here
+SET( package_doxy_files
+  ${package_doxy_dir}/dali-toolkit-doc.h
+)
 
