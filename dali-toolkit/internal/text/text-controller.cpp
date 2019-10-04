@@ -399,6 +399,13 @@ void Controller::SetHorizontalAlignment( Text::HorizontalAlignment::Type alignme
     if( mImpl->mEventData )
     {
       mImpl->mEventData->mUpdateAlignment = true;
+
+      // Update the cursor if it's in editing mode
+      if( EventData::IsEditingState( mImpl->mEventData->mState ) )
+      {
+        mImpl->ChangeState( EventData::EDITING );
+        mImpl->mEventData->mUpdateCursorPosition = true;
+      }
     }
 
     mImpl->RequestRelayout();
