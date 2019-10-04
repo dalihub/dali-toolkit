@@ -167,6 +167,7 @@ struct EventData
   bool mIsPlaceholderElideEnabled       : 1;   ///< True if the placeholder text's elide is enabled.
   bool mPlaceholderEllipsisFlag         : 1;   ///< True if the text controller sets the placeholder ellipsis.
   bool mShiftSelectionFlag              : 1;   ///< True if the text selection using Shift key is enabled.
+  bool mUpdateAlignment                 : 1;   ///< True if the whole text needs to be full aligned..
 };
 
 struct ModifyEvent
