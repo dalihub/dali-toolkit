@@ -303,41 +303,9 @@ void CreateTextModel( const std::string& text,
 
   bool isAutoScroll = false;
   layoutEngine.LayoutText( layoutParameters,
-                           glyphPositions,
-                           lines,
                            layoutSize,
                            false,
                            isAutoScroll );
-
-  // 10) Reorder the lines
-  if( 0u != bidirectionalInfo.Count() )
-  {
-    Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = logicalModel->mBidirectionalLineInfo;
-
-    // Get the lines
-    const Length numberOfLines = lines.Count();
-
-    // Reorder the lines.
-    bidirectionalLineInfo.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
-    ReorderLines( bidirectionalInfo,
-                  0u,
-                  characterCount,
-                  lines,
-                  bidirectionalLineInfo );
-
-    // Set the bidirectional info per line into the layout parameters.
-    layoutParameters.lineBidirectionalInfoRunsBuffer = bidirectionalLineInfo.Begin();
-    layoutParameters.numberOfBidirectionalInfoRuns = bidirectionalLineInfo.Count();
-
-    if( options.reorder )
-    {
-      // Re-layout the text. Reorder those lines with right to left characters.
-      layoutEngine.ReLayoutRightToLeftLines( layoutParameters,
-                                             0u,
-                                             characterCount,
-                                             glyphPositions );
-    }
-  }
 
   if( options.align )
   {

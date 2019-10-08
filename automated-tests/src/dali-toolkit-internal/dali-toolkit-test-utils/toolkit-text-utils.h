@@ -38,11 +38,9 @@ namespace Text
 struct LayoutOptions
 {
   LayoutOptions()
-  : reorder( true ),
-    align( true )
+  : align{ true }
   {}
 
-  bool reorder : 1; ///< Whether to reorder the bidirectional lines.
   bool align   : 1; ///< Whether to align the lines.
 };
 

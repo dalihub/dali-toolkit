@@ -80,7 +80,6 @@ int ConvertPixelToPint( float pixel )
   return ( pixel * 72.f ) / static_cast< float >( horizontalDpi );
 }
 
-
 } // namespace
 
 namespace Dali
@@ -3825,17 +3824,16 @@ bool Controller::DoRelayout( const Size& size,
       return true;
     }
 
-    const Character* const textBuffer = mImpl->mModel->mLogicalModel->mText.Begin();
-
     // Set the layout parameters.
     Layout::Parameters layoutParameters( size,
-                                         mImpl->mModel );
+                                         mImpl->mModel);
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mModel->mVisualModel->mGlyphPositions;
     glyphPositions.Resize( totalNumberOfGlyphs );
 
     // Whether the last character is a new paragraph character.
+    const Character* const textBuffer = mImpl->mModel->mLogicalModel->mText.Begin();
     mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph =  TextAbstraction::IsNewParagraph( *( textBuffer + ( mImpl->mModel->mLogicalModel->mText.Count() - 1u ) ) );
     layoutParameters.isLastNewParagraph = mImpl->mTextUpdateInfo.mIsLastCharacterNewParagraph;
 
@@ -3871,8 +3869,6 @@ bool Controller::DoRelayout( const Size& size,
     bool isAutoScrollEnabled = mImpl->mIsAutoScrollEnabled;
     Size newLayoutSize;
     viewUpdated = mImpl->mLayoutEngine.LayoutText( layoutParameters,
-                                                   glyphPositions,
-                                                   mImpl->mModel->mVisualModel->mLines,
                                                    newLayoutSize,
                                                    elideTextEnabled,
                                                    isAutoScrollEnabled );
@@ -3889,46 +3885,10 @@ bool Controller::DoRelayout( const Size& size,
         mImpl->mIsTextDirectionRTL = false;
       }
 
-      // Reorder the lines
-      if( NO_OPERATION != ( REORDER & operations ) )
+      if ( ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) ) && !mImpl->mModel->mVisualModel->mLines.Empty() )
       {
-        Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = mImpl->mModel->mLogicalModel->mBidirectionalParagraphInfo;
-        Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = mImpl->mModel->mLogicalModel->mBidirectionalLineInfo;
-
-        // Check first if there are paragraphs with bidirectional info.
-        if( 0u != bidirectionalInfo.Count() )
-        {
-          // Get the lines
-          const Length numberOfLines = mImpl->mModel->mVisualModel->mLines.Count();
-
-          // Reorder the lines.
-          bidirectionalLineInfo.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
-          ReorderLines( bidirectionalInfo,
-                        startIndex,
-                        requestedNumberOfCharacters,
-                        mImpl->mModel->mVisualModel->mLines,
-                        bidirectionalLineInfo );
-
-          // Set the bidirectional info per line into the layout parameters.
-          layoutParameters.lineBidirectionalInfoRunsBuffer = bidirectionalLineInfo.Begin();
-          layoutParameters.numberOfBidirectionalInfoRuns = bidirectionalLineInfo.Count();
-
-          // Re-layout the text. Reorder those lines with right to left characters.
-          mImpl->mLayoutEngine.ReLayoutRightToLeftLines( layoutParameters,
-                                                         startIndex,
-                                                         requestedNumberOfCharacters,
-                                                         glyphPositions );
-
-          if ( ( NO_OPERATION != ( UPDATE_DIRECTION & operations ) ) && ( numberOfLines > 0 ) )
-          {
-            const LineRun* const firstline = mImpl->mModel->mVisualModel->mLines.Begin();
-            if ( firstline )
-            {
-              mImpl->mIsTextDirectionRTL = firstline->direction;
-            }
-          }
-        }
-      } // REORDER
+        mImpl->mIsTextDirectionRTL = mImpl->mModel->mVisualModel->mLines[0u].direction;
+      }
 
       // Sets the layout size.
       if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )

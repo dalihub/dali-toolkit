@@ -582,38 +582,9 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   Size newLayoutSize;
   bool isAutoScrollEnabled = false;
   layoutEngine.LayoutText( layoutParameters,
-                           rendererParameters.positions,
-                           lines,
                            newLayoutSize,
                            textParameters.ellipsisEnabled,
                            isAutoScrollEnabled );
-
-  ////////////////////////////////////////////////////////////////////////////////
-  // Reorder BiDirectional lines.
-  ////////////////////////////////////////////////////////////////////////////////
-
-  if( hasBidirectionalText )
-  {
-    Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = textModel->mLogicalModel->mBidirectionalLineInfo;
-    // Reorder the line.
-    bidirectionalLineInfo.Reserve( 1u );
-
-    ReorderLines( bidirectionalInfo,
-                  0u,
-                  numberOfCharacters,
-                  lines,
-                  bidirectionalLineInfo );
-
-    // Set the bidirectional info per line into the layout parameters.
-    layoutParameters.lineBidirectionalInfoRunsBuffer = bidirectionalLineInfo.Begin();
-    layoutParameters.numberOfBidirectionalInfoRuns = bidirectionalLineInfo.Count();
-
-    // Re-layout the text. Reorder those lines with right to left characters.
-    layoutEngine.ReLayoutRightToLeftLines( layoutParameters,
-                                           0u,
-                                           numberOfCharacters,
-                                           rendererParameters.positions );
-  }
 
   ////////////////////////////////////////////////////////////////////////////////
   // Align the text.

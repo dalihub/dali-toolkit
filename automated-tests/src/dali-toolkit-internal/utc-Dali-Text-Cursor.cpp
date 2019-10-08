@@ -453,7 +453,7 @@ int UtcDaliGetClosestCursorIndex(void)
                                       CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP };
   CharacterIndex logicalIndex05[] = {    0,  10u,  20u,  30u,  40u,  46u,
                                        47u,  52u,  62u,  71u,  82u,  93u,
-                                       95u,  99u, 112u, 122u, 131u, 140u,
+                                       94u,  99u, 112u, 122u, 131u, 140u,
                                       141u, 153u, 162u, 171u, 181u, 187u,
                                       188u, 194u, 201u, 213u, 222u, 234u,
                                       236u, 244u, 254u, 263u, 265u };
@@ -497,7 +497,7 @@ int UtcDaliGetClosestCursorIndex(void)
                                       CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP, CharacterHitTest::TAP };
   CharacterIndex logicalIndex06[] = {    0,  10u,  20u,  30u,  40u,  45u,
                                        46u,  50u,  60u,  70u,  80u,  92u,
-                                       93u, 100u, 110u, 121u, 131u, 138u,
+                                       93u, 100u, 110u, 120u, 130u, 138u,
                                       139u, 150u, 160u, 170u, 180u, 185u,
                                       186u, 190u, 200u, 210u, 220u, 231u,
                                       232u, 240u, 250u, 260u, 265u  };
