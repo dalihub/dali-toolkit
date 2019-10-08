@@ -110,7 +110,8 @@ EventData::EventData( DecoratorPtr decorator, InputMethodContext& inputMethodCon
   mIsPlaceholderPixelSize( false ),
   mIsPlaceholderElideEnabled( false ),
   mPlaceholderEllipsisFlag( false ),
-  mShiftSelectionFlag( true )
+  mShiftSelectionFlag( true ),
+  mUpdateAlignment( false )
 {
 }
 
@@ -814,7 +815,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
   // Check whether the indices for updating the text is valid
   if ( numberOfCharacters > 0u &&
-       ( mTextUpdateInfo.mParagraphCharacterIndex >= numberOfCharacters ||
+       ( mTextUpdateInfo.mParagraphCharacterIndex > numberOfCharacters ||
          mTextUpdateInfo.mRequestedNumberOfCharacters > numberOfCharacters ) )
   {
     std::string currentText;

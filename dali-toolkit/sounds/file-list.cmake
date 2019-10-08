@@ -1,7 +1,0 @@
-# This file is auto-generated!
-#
-# Files to install here
-SET( dali_toolkit_sound_files
-${toolkit_sounds_dir}/*.ogg
-)
-

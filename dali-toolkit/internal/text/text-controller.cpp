@@ -396,6 +396,18 @@ void Controller::SetHorizontalAlignment( Text::HorizontalAlignment::Type alignme
     // Set the flag to redo the alignment operation.
     mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | ALIGN );
 
+    if( mImpl->mEventData )
+    {
+      mImpl->mEventData->mUpdateAlignment = true;
+
+      // Update the cursor if it's in editing mode
+      if( EventData::IsEditingState( mImpl->mEventData->mState ) )
+      {
+        mImpl->ChangeState( EventData::EDITING );
+        mImpl->mEventData->mUpdateCursorPosition = true;
+      }
+    }
+
     mImpl->RequestRelayout();
   }
 }
@@ -1242,6 +1254,10 @@ void Controller::SetDefaultColor( const Vector4& color )
   if( !mImpl->IsShowingPlaceholderText() )
   {
     mImpl->mModel->mVisualModel->SetTextColor( color );
+
+    mImpl->mModel->mLogicalModel->mColorRuns.Clear();
+
+    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending | COLOR );
 
     mImpl->RequestRelayout();
   }
@@ -3775,7 +3791,7 @@ bool Controller::DoRelayout( const Size& size,
     // Make sure the index is not out of bound
     if ( charactersToGlyph.Count() != glyphsPerCharacter.Count() ||
          requestedNumberOfCharacters > charactersToGlyph.Count() ||
-         ( lastIndex >= charactersToGlyph.Count() && charactersToGlyph.Count() > 0u ) )
+         ( lastIndex > charactersToGlyph.Count() && charactersToGlyph.Count() > 0u ) )
     {
       std::string currentText;
       GetText( currentText );
@@ -3941,11 +3957,23 @@ bool Controller::DoRelayout( const Size& size,
     // The laid-out lines.
     Vector<LineRun>& lines = mImpl->mModel->mVisualModel->mLines;
 
+    CharacterIndex alignStartIndex = startIndex;
+    Length alignRequestedNumberOfCharacters = requestedNumberOfCharacters;
+
+    // the whole text needs to be full aligned.
+    // If you do not do a full aligned, only the last line of the multiline input is aligned.
+    if(  mImpl->mEventData && mImpl->mEventData->mUpdateAlignment )
+    {
+      alignStartIndex = 0u;
+      alignRequestedNumberOfCharacters = mImpl->mModel->mLogicalModel->mText.Count();
+      mImpl->mEventData->mUpdateAlignment = false;
+    }
+
     // Need to align with the control's size as the text may contain lines
     // starting either with left to right text or right to left.
     mImpl->mLayoutEngine.Align( size,
-                                startIndex,
-                                requestedNumberOfCharacters,
+                                alignStartIndex,
+                                alignRequestedNumberOfCharacters,
                                 mImpl->mModel->mHorizontalAlignment,
                                 lines,
                                 mImpl->mModel->mAlignmentOffset,

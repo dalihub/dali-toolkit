@@ -53,6 +53,11 @@ const float MAX_FLOAT = std::numeric_limits<float>::max();
 const bool RTL = true;
 const float LINE_SPACING= 0.f;
 
+inline bool isEmptyLineAtLast( const Vector<LineRun>& lines, const Vector<LineRun>::Iterator& line )
+{
+  return ( (*line).characterRun.numberOfCharacters == 0 && line + 1u == lines.End() );
+}
+
 } //namespace
 
 /**
@@ -1042,9 +1047,15 @@ struct Engine::Impl
         continue;
       }
 
-      if( line.characterRun.characterIndex >= lastCharacterPlusOne )
+      if( line.characterRun.characterIndex > lastCharacterPlusOne )
       {
         // Do not align lines beyond the last laid-out character.
+        break;
+      }
+
+      if( line.characterRun.characterIndex == lastCharacterPlusOne && !isEmptyLineAtLast( lines, it ) )
+      {
+        // Do not align lines beyond the last laid-out character unless the line is last and empty.
         break;
       }
 
