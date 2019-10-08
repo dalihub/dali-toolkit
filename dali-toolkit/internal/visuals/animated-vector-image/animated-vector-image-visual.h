@@ -22,6 +22,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/object/property-notification.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -174,6 +175,11 @@ private:
    * @brief Callback when the size changes.
    */
   void OnSizeNotification( PropertyNotification& source );
+
+  /**
+   * @brief Callback when the visibility of the actor is changed.
+   */
+  void OnVisibilityChanged( Actor actor, bool visible, DevelActor::VisibilityChange::Type type );
 
   // Undefined
   AnimatedVectorImageVisual( const AnimatedVectorImageVisual& visual ) = delete;

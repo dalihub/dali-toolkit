@@ -305,6 +305,8 @@ void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
   mSizeNotification = actor.AddPropertyNotification( Actor::Property::SIZE, StepCondition( 3.0f ) );
   mSizeNotification.NotifySignal().Connect( this, &AnimatedVectorImageVisual::OnSizeNotification );
 
+  DevelActor::VisibilityChangedSignal( actor ).Connect( this, &AnimatedVectorImageVisual::OnVisibilityChanged );
+
   DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOnStage [%p]\n", this );
 }
 
@@ -327,6 +329,8 @@ void AnimatedVectorImageVisual::DoSetOffStage( Actor& actor )
   // Remove property notification
   actor.RemovePropertyNotification( mScaleNotification );
   actor.RemovePropertyNotification( mSizeNotification );
+
+  DevelActor::VisibilityChangedSignal( actor ).Connect( this, &AnimatedVectorImageVisual::OnVisibilityChanged );
 
   mPlacementActor.Reset();
 
@@ -561,6 +565,26 @@ void AnimatedVectorImageVisual::OnSizeNotification( PropertyNotification& source
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnSizeNotification: size = %f, %f [%p]\n", mVisualSize.width, mVisualSize.height, this );
 
     SetVectorImageSize();
+  }
+}
+
+void AnimatedVectorImageVisual::OnVisibilityChanged( Actor actor, bool visible, DevelActor::VisibilityChange::Type type )
+{
+  if( !visible )
+  {
+    if( mActionStatus == DevelAnimatedVectorImageVisual::Action::PLAY )
+    {
+      mVectorAnimationTask->PauseAnimation();
+
+      if( mImpl->mRenderer )
+      {
+        mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED );
+      }
+
+      mActionStatus = DevelAnimatedVectorImageVisual::Action::PAUSE;
+
+      DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnVisibilityChanged: invisibile. Pause animation [%p]\n", this );
+    }
   }
 }
 
