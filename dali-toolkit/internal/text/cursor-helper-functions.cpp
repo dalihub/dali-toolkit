@@ -506,11 +506,8 @@ void GetCursorPosition( GetCursorPositionParameters& parameters,
     cursorInfo.primaryCursorHeight = cursorInfo.lineHeight;
 
     // Set the primary cursor's position.
-    cursorInfo.primaryPosition.x = 0.f;
+    cursorInfo.primaryPosition.x = ( LTR == line.direction ) ? newLine.alignmentOffset : parameters.visualModel->mControlSize.width - newLine.alignmentOffset;
     cursorInfo.primaryPosition.y = cursorInfo.lineOffset;
-
-    // Transform the cursor info from line's coords to text's coords.
-    cursorInfo.primaryPosition.x += ( LTR == line.direction ) ? 0.f : parameters.visualModel->mControlSize.width;
   }
   else
   {

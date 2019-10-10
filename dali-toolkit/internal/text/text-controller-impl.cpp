@@ -110,7 +110,8 @@ EventData::EventData( DecoratorPtr decorator, InputMethodContext& inputMethodCon
   mIsPlaceholderPixelSize( false ),
   mIsPlaceholderElideEnabled( false ),
   mPlaceholderEllipsisFlag( false ),
-  mShiftSelectionFlag( true )
+  mShiftSelectionFlag( true ),
+  mUpdateAlignment( false )
 {
 }
 
