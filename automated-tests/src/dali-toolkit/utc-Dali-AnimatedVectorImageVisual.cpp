@@ -297,6 +297,9 @@ int UtcDaliAnimatedVectorImageVisualGetPropertyMap01(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get< int >() == DevelImageVisual::LoopingMode::RESTART );
 
+  value = resultMap.Find( DevelImageVisual::Property::CONTENT_INFO, Property::MAP );
+  DALI_TEST_CHECK( value );
+
   // request AnimatedVectorImageVisual with an URL
   Visual::Base visual2 = factory.CreateVisual( TEST_VECTOR_IMAGE_FILE_NAME, ImageDimensions() );
 
