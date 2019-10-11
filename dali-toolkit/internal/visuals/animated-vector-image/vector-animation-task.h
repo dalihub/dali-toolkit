@@ -169,6 +169,12 @@ public:
   void SetLoopingMode( DevelImageVisual::LoopingMode::Type loopingMode );
 
   /**
+   * @brief Gets the layer information of all the child layers.
+   * @param[out] map The layer information
+   */
+  void GetLayerInfo( Property::Map& map ) const;
+
+  /**
    * @brief Connect to this signal to be notified when the texture upload is completed.
    * @return The signal to connect to.
    */
