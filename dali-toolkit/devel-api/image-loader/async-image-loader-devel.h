@@ -49,7 +49,7 @@ enum class PreMultiplyOnLoad
  * @param[in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter
  * @param[in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size
  * @param[in] orientationCorrection Reorient the image to respect any orientation metadata in its header
- * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
+ * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha
  * @return The loading task id
  */
 DALI_TOOLKIT_API uint32_t Load( AsyncImageLoader asyncImageLoader,
@@ -69,15 +69,13 @@ DALI_TOOLKIT_API uint32_t Load( AsyncImageLoader asyncImageLoader,
  * @param[in] maskPixelBuffer Pointer to raw masking data
  * @param[in] contentScale The factor to scale the content
  * @param[in] cropToMask Whether to crop the content to the mask size
- * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha.
  * @return The masking task id
  */
 DALI_TOOLKIT_API uint32_t ApplyMask( AsyncImageLoader asyncImageLoader,
                                      Devel::PixelBuffer pixelBuffer,
                                      Devel::PixelBuffer maskPixelBuffer,
                                      float contentScale,
-                                     bool cropToMask,
-                                     DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
+                                     bool cropToMask );
 
 /**
  * Connect to this signal if you want to load a PixelBuffer instead of a PixelData.
