@@ -683,6 +683,7 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
         // Don't render outline for other styles
         outlineWidth = 0.0f;
       }
+
       if( style != Typesetter::STYLE_UNDERLINE )
       {
         fontClient.CreateBitmap( glyphInfo->fontId,
@@ -693,15 +694,30 @@ Devel::PixelBuffer Typesetter::CreateImageBuffer( const unsigned int bufferWidth
                                  static_cast<int>( outlineWidth ) );
       }
 
-
       // Sets the glyph's bitmap into the bitmap of the whole text.
       if( NULL != glyphData.glyphBitmap.buffer )
       {
+        if ( style == Typesetter::STYLE_OUTLINE )
+        {
+          // Set the position offset for the current glyph
+          glyphData.horizontalOffset -= glyphData.glyphBitmap.outlineOffsetX;
+          glyphData.verticalOffset -= glyphData.glyphBitmap.outlineOffsetY;
+        }
+
+        // Set the buffer of the glyph's bitmap into the final bitmap's buffer
         TypesetGlyph( glyphData,
                       position,
                       &color,
                       style,
                       pixelFormat);
+
+        if ( style == Typesetter::STYLE_OUTLINE )
+        {
+          // Reset the position offset for the next glyph
+          glyphData.horizontalOffset += glyphData.glyphBitmap.outlineOffsetX;
+          glyphData.verticalOffset += glyphData.glyphBitmap.outlineOffsetY;
+        }
+
         // delete the glyphBitmap.buffer as it is now copied into glyphData.bitmapBuffer
         delete []glyphData.glyphBitmap.buffer;
         glyphData.glyphBitmap.buffer = NULL;
