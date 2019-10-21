@@ -64,6 +64,11 @@ public:
   virtual ~VectorAnimationTask();
 
   /**
+   * @brief Finalizes the task.
+   */
+  void Finalize();
+
+  /**
    * @brief Sets the renderer used to display the result image.
    *
    * @param[in] renderer The renderer used to display the result image
@@ -172,7 +177,7 @@ public:
    * @brief Gets the layer information of all the child layers.
    * @param[out] map The layer information
    */
-  void GetLayerInfo( Property::Map& map ) const;
+  void GetLayerInfo( Property::Map& map );
 
   /**
    * @brief Connect to this signal to be notified when the texture upload is completed.
