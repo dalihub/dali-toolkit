@@ -301,7 +301,7 @@ bool GetLogicalCharacterIndexTest( const GetLogicalCharacterIndexData& data )
 
 bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
 {
-  std::cout << "  testing : " << data.description << std::endl;
+  tet_printf( "  testing : %s\n", data.description.c_str() );
 
   // Load some fonts.
   TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
@@ -346,7 +346,7 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
 
     if( logicalModel->mBidirectionalLineIndex != data.cachedBidiLine[index] )
     {
-      std::cout << "  test : " << index << ", different cached line index : " << logicalModel->mBidirectionalLineIndex << ", expected : " << data.cachedBidiLine[index] << std::endl;
+      tet_printf( "  test : %d, different cached line index : %d, expected : %d\n", index, logicalModel->mBidirectionalLineIndex, data.cachedBidiLine[index] );
       return false;
     }
 
@@ -355,7 +355,7 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
 
     if( logicalCursorIndex != data.logicalCursorIndex[index] )
     {
-      std::cout << "  test : " << index << ", visual index : " << visualCharacterIndex << ", different logical cursor index : " << logicalCursorIndex << ", expected : " << data.logicalCursorIndex[index] << std::endl;
+      tet_printf( "  test : %d, visual index : %d, different logical cursor index :%d, expected : %d", index, visualCharacterIndex, logicalCursorIndex, data.logicalCursorIndex[index] );
       return false;
     }
   }
