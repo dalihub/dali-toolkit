@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/adaptor-framework/window-devel.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -309,21 +310,23 @@ void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
   mSizeNotification = actor.AddPropertyNotification( Actor::Property::SIZE, StepCondition( 3.0f ) );
   mSizeNotification.NotifySignal().Connect( this, &AnimatedVectorImageVisual::OnSizeNotification );
 
-  DevelActor::VisibilityChangedSignal( actor ).Connect( this, &AnimatedVectorImageVisual::OnVisibilityChanged );
+  DevelActor::VisibilityChangedSignal( actor ).Connect( this, &AnimatedVectorImageVisual::OnControlVisibilityChanged );
+
+  Window window = DevelWindow::Get( actor );
+  if( window )
+  {
+    DevelWindow::VisibilityChangedSignal( window ).Connect( this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged );
+  }
 
   DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::DoSetOnStage [%p]\n", this );
 }
 
 void AnimatedVectorImageVisual::DoSetOffStage( Actor& actor )
 {
-  mVectorAnimationTask->PauseAnimation();
-
-  mActionStatus = DevelAnimatedVectorImageVisual::Action::PAUSE;
+  PauseAnimation();
 
   if( mImpl->mRenderer )
   {
-    mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED );
-
     actor.RemoveRenderer( mImpl->mRenderer );
     mImpl->mRenderer.Reset();
 
@@ -334,7 +337,13 @@ void AnimatedVectorImageVisual::DoSetOffStage( Actor& actor )
   actor.RemovePropertyNotification( mScaleNotification );
   actor.RemovePropertyNotification( mSizeNotification );
 
-  DevelActor::VisibilityChangedSignal( actor ).Connect( this, &AnimatedVectorImageVisual::OnVisibilityChanged );
+  DevelActor::VisibilityChangedSignal( actor ).Disconnect( this, &AnimatedVectorImageVisual::OnControlVisibilityChanged );
+
+  Window window = DevelWindow::Get( actor );
+  if( window )
+  {
+    DevelWindow::VisibilityChangedSignal( window ).Disconnect( this, &AnimatedVectorImageVisual::OnWindowVisibilityChanged );
+  }
 
   mPlacementActor.Reset();
 
@@ -542,6 +551,21 @@ void AnimatedVectorImageVisual::SetVectorImageSize()
   }
 }
 
+void AnimatedVectorImageVisual::PauseAnimation()
+{
+  if( mActionStatus == DevelAnimatedVectorImageVisual::Action::PLAY )
+  {
+    mVectorAnimationTask->PauseAnimation();
+
+    mActionStatus = DevelAnimatedVectorImageVisual::Action::PAUSE;
+
+    if( mImpl->mRenderer )
+    {
+      mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED );
+    }
+  }
+}
+
 void AnimatedVectorImageVisual::OnScaleNotification( PropertyNotification& source )
 {
   Actor actor = mPlacementActor.GetHandle();
@@ -572,23 +596,23 @@ void AnimatedVectorImageVisual::OnSizeNotification( PropertyNotification& source
   }
 }
 
-void AnimatedVectorImageVisual::OnVisibilityChanged( Actor actor, bool visible, DevelActor::VisibilityChange::Type type )
+void AnimatedVectorImageVisual::OnControlVisibilityChanged( Actor actor, bool visible, DevelActor::VisibilityChange::Type type )
 {
   if( !visible )
   {
-    if( mActionStatus == DevelAnimatedVectorImageVisual::Action::PLAY )
-    {
-      mVectorAnimationTask->PauseAnimation();
+    PauseAnimation();
 
-      if( mImpl->mRenderer )
-      {
-        mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED );
-      }
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnControlVisibilityChanged: invisibile. Pause animation [%p]\n", this );
+  }
+}
 
-      mActionStatus = DevelAnimatedVectorImageVisual::Action::PAUSE;
+void AnimatedVectorImageVisual::OnWindowVisibilityChanged( Window window, bool visible )
+{
+  if( !visible )
+  {
+    PauseAnimation();
 
-      DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnVisibilityChanged: invisibile. Pause animation [%p]\n", this );
-    }
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnWindowVisibilityChanged: invisibile. Pause animation [%p]\n", this );
   }
 }
 
