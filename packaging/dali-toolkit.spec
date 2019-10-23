@@ -16,6 +16,9 @@ BuildRequires:  pkgconfig(dali-core)
 BuildRequires:  pkgconfig(dali-adaptor)
 BuildRequires:  gettext
 BuildRequires:  pkgconfig(libtzplatform-config)
+Provides: libdali-toolkit-cxx11.so
+Provides: libdali-toolkit-cxx11.so.0
+Provides: libdali-toolkit-cxx11.so.0.0.0
 
 #############################
 # profile setup
