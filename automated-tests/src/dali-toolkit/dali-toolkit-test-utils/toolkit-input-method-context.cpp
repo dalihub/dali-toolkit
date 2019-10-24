@@ -59,6 +59,8 @@ public:
   const std::string& GetSurroundingText() const;
   void ApplyOptions( const InputMethodOptions& options );
   bool FilterEventKey( const Dali::KeyEvent& keyEvent );
+  void SetPreeditStyle( Dali::InputMethodContext::PreeditStyle type );
+  Dali::InputMethodContext::PreeditStyle GetPreeditStyle() const;
 
 public:  // Signals
   ActivatedSignalType& ActivatedSignal() { return mActivatedSignal; }
@@ -85,6 +87,7 @@ private:
   bool mRestoreAfterFocusLost:1;             ///< Whether the keyboard needs to be restored (activated ) after focus regained.
   bool mIdleCallbackConnected:1;             ///< Whether the idle callback is already connected.
   InputMethodOptions        mOptions;
+  Dali::InputMethodContext::PreeditStyle mPreeditStyle;
 
   ActivatedSignalType      mActivatedSignal;
   KeyboardEventSignalType  mEventSignal;
@@ -125,7 +128,8 @@ InputMethodContext::InputMethodContext( /*Ecore_X_Window ecoreXwin*/ )
 : mIMFCursorPosition( 0 ),
   mSurroundingText(),
   mRestoreAfterFocusLost( false ),
-  mIdleCallbackConnected( false )
+  mIdleCallbackConnected( false ),
+  mPreeditStyle( Dali::InputMethodContext::PreeditStyle::NONE )
 {
   CreateContext( /*ecoreXwin*/ );
   ConnectCallbacks();
@@ -211,6 +215,16 @@ void InputMethodContext::ApplyOptions( const InputMethodOptions& options )
 bool InputMethodContext::FilterEventKey( const Dali::KeyEvent& keyEvent )
 {
   return false;
+}
+
+void InputMethodContext::SetPreeditStyle( Dali::InputMethodContext::PreeditStyle type )
+{
+  mPreeditStyle = type;
+}
+
+Dali::InputMethodContext::PreeditStyle InputMethodContext::GetPreeditStyle() const
+{
+  return mPreeditStyle;
 }
 } // Adaptor
 
@@ -308,6 +322,17 @@ bool InputMethodContext::FilterEventKey( const Dali::KeyEvent& keyEvent )
   return Internal::Adaptor::InputMethodContext::GetImplementation(*this).FilterEventKey( keyEvent );
 }
 
+void InputMethodContext::SetPreeditStyle( Dali::InputMethodContext::PreeditStyle type )
+{
+  Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetPreeditStyle( type );
+}
+
+Dali::InputMethodContext::PreeditStyle InputMethodContext::GetPreeditStyle() const
+{
+  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetPreeditStyle();
+}
+
+// Signals
 InputMethodContext::ActivatedSignalType& InputMethodContext::ActivatedSignal()
 {
   return Internal::Adaptor::InputMethodContext::GetImplementation(*this).ActivatedSignal();
