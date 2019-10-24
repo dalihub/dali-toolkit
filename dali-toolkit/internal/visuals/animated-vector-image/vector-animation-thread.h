@@ -18,11 +18,11 @@
  */
 
 // EXTERNAL INCLUDES
+#include <memory>
 #include <dali/public-api/signals/connection-tracker.h>
 #include <dali/devel-api/threading/conditional-wait.h>
 #include <dali/devel-api/threading/thread.h>
-#include <dali/integration-api/adaptors/log-factory-interface.h>
-#include <memory>
+#include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/helpers/round-robin-container-view.h>

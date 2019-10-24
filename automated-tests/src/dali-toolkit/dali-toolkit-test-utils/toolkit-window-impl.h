@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
-#include <dali/integration-api/adaptors/scene-holder.h>
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
 
 // INTERNAL INCLUDES
 #include <toolkit-window.h>

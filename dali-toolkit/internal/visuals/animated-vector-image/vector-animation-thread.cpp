@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
-#include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <thread>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 
 namespace Dali
 {

@@ -18,13 +18,11 @@
  */
 
 // EXTERNAL INCLUDES
-//#include <dali/devel-api/adaptor-framework/event-thread-callback.h>
-#include <dali/devel-api/threading/conditional-wait.h>
-#include <dali/devel-api/threading/thread.h>
-#include <dali/integration-api/adaptors/log-factory-interface.h>
 #include <vector>
 #include <memory>
-//#include <string>
+#include <dali/devel-api/threading/conditional-wait.h>
+#include <dali/devel-api/threading/thread.h>
+#include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-task.h>

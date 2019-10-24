@@ -25,7 +25,7 @@
 #include <dali/public-api/object/base-object.h>
 
 #define DALI_WINDOW_H
-#include <dali/integration-api/adaptors/adaptor.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <toolkit-adaptor-impl.h>
 
 // INTERNAL INCLUDES
