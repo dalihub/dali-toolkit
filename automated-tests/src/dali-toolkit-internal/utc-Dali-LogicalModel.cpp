@@ -343,6 +343,7 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
   for( unsigned int index = 0u; index < data.numberOfIndices; ++index )
   {
     const bool fetched = logicalModel->FetchBidirectionalLineInfo( data.characterIndex[index] );
+    tet_printf("  fetched %d, line index %d, expected line index %d\n", fetched, logicalModel->mBidirectionalLineIndex, data.cachedBidiLine[index] );
 
     if( logicalModel->mBidirectionalLineIndex != data.cachedBidiLine[index] )
     {
@@ -352,10 +353,11 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
 
     const CharacterIndex visualCharacterIndex = data.visualCursorIndex[index];
     const CharacterIndex logicalCursorIndex = fetched ? logicalModel->GetLogicalCursorIndex( visualCharacterIndex ) : visualCharacterIndex;
+    tet_printf("  visual index %d, logical index %d\n", visualCharacterIndex, logicalCursorIndex);
 
     if( logicalCursorIndex != data.logicalCursorIndex[index] )
     {
-      tet_printf( "  test : %d, visual index : %d, different logical cursor index :%d, expected : %d", index, visualCharacterIndex, logicalCursorIndex, data.logicalCursorIndex[index] );
+      tet_printf( "  test : %d, visual index : %d, different logical cursor index :%d, expected : %d\n", index, visualCharacterIndex, logicalCursorIndex, data.logicalCursorIndex[index] );
       return false;
     }
   }
@@ -1053,18 +1055,19 @@ int UtcDaliGetLogicalCursorIndex(void)
   unsigned int bidirectionalLineIndex05[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
                                               0u, 0u, 0u, 0u };
 
-// LO      ק  ר  א  ט  ו  ן  ם  פ  ש  ד  ג
-//        0  1  2  3  4  5  6  7  8  9  10 11
-// VO      ג  ד  ש  פ  ם  ן  ו  ט  א  ר  ק
+// LO      ק  ר  א  ט  ו  ן  ם  פ  ש  ד  ג  כ
+//        0  1  2  3  4  5  6  7  8  9  10 11 12
+// VO      כ  ג  ד  ש  פ  ם  ן  ו  ט  א  ר  ק
 
-// LO      כ  ע  י  ח  ל
-//       11 12 13 14 15 16
-// VO      ל  ח  י  ע  כ
+// LO      ע  י  ח  ל
+//       12 13 14 15 16
+// VO      ל  ח  י  ע
+
 
   // Set a known font description
   FontDescriptionRun fontDescriptionRun0601;
   fontDescriptionRun0601.characterRun.characterIndex = 0u;
-  fontDescriptionRun0601.characterRun.numberOfCharacters = 14u;
+  fontDescriptionRun0601.characterRun.numberOfCharacters = 16u;
   fontDescriptionRun0601.familyLength = fontFamilyHebrew.size();
   fontDescriptionRun0601.familyName = new char[fontDescriptionRun0601.familyLength];
   memcpy( fontDescriptionRun0601.familyName, fontFamilyHebrew.c_str(), fontDescriptionRun0601.familyLength );
@@ -1077,17 +1080,17 @@ int UtcDaliGetLogicalCursorIndex(void)
   Vector<FontDescriptionRun> fontDescriptionRuns06;
   fontDescriptionRuns06.PushBack( fontDescriptionRun0601 );
 
-  unsigned int  visualIndex06[] = {  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u, 11u,
-                                    11u, 12u, 13u, 14u, 15u, 16u };
+  unsigned int  visualIndex06[] = {  0u,  1u,  2u,  3u,  4u,  5u,  6u,  7u,  8u,  9u, 10u, 11u, 12u,
+                                    12u, 13u, 14u, 15u, 16u };
 
-  unsigned int characterIndex06[] = {  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,
-                                      12u, 12u, 12u, 12u, 12u, 12u };
+  unsigned int characterIndex06[] = {  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,  0u,
+                                      12u, 12u, 12u, 12u, 12u };
 
-  unsigned int logicalIndex06[] = { 11u, 10u,  9u,  8u,  7u,  6u,  5u,  4u,  3u,  2u,  1u,
-                                    13u, 16u, 15u, 14u, 13u, 12u };
+  unsigned int logicalIndex06[] = { 12u, 11u, 10u,  9u,  8u,  7u,  6u,  5u,  4u,  3u,  2u,  1u, 0u,
+                                    16u, 15u, 14u, 13u, 12u };
 
-  unsigned int bidirectionalLineIndex06[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
-                                              1u, 1u, 1u, 1u, 1u, 1u };
+  unsigned int bidirectionalLineIndex06[] = { 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u,
+                                              1u, 1u, 1u, 1u, 1u, };
 
   struct GetLogicalCursorIndexData data[] =
   {
@@ -1157,7 +1160,7 @@ int UtcDaliGetLogicalCursorIndex(void)
       Size( 100.f, 300.f ),
       1u,
       fontDescriptionRuns06.Begin(),
-      15u,
+      18u,
       visualIndex06,
       characterIndex06,
       logicalIndex06,
@@ -1171,6 +1174,7 @@ int UtcDaliGetLogicalCursorIndex(void)
     ToolkitTestApplication application;
     if( !GetLogicalCursorIndexTest( data[index] ) )
     {
+      tet_printf("Test %d failed : [%s]\n", index, data[index].description.c_str());
       tet_result(TET_FAIL);
     }
   }
