@@ -1,6 +1,6 @@
 Name:       dali-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    1.4.42
+Version:    1.4.43
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -16,6 +16,9 @@ BuildRequires:  pkgconfig(dali-core)
 BuildRequires:  pkgconfig(dali-adaptor)
 BuildRequires:  gettext
 BuildRequires:  pkgconfig(libtzplatform-config)
+Provides: libdali-toolkit-cxx11.so
+Provides: libdali-toolkit-cxx11.so.0
+Provides: libdali-toolkit-cxx11.so.0.0.0
 
 #############################
 # profile setup
