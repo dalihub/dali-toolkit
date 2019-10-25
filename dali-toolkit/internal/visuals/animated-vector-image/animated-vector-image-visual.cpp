@@ -437,7 +437,7 @@ void AnimatedVectorImageVisual::OnDoAction( const Property::Index actionId, cons
         if( IsOnStage() && mVectorAnimationTask->GetPlayState() != DevelImageVisual::PlayState::PLAYING )
         {
           mVectorAnimationTask->RenderFrame();
-          Stage::GetCurrent().KeepRendering( 0.0f );    // Trigger rendering
+          Stage::GetCurrent().KeepRendering( 16.0f );    // Trigger rendering
         }
       }
       break;
@@ -531,7 +531,7 @@ void AnimatedVectorImageVisual::SendAnimationData()
       else
       {
         mVectorAnimationTask->RenderFrame();
-        Stage::GetCurrent().KeepRendering( 0.0f );
+        Stage::GetCurrent().KeepRendering( 16.0f );
       }
     }
 
@@ -549,7 +549,7 @@ void AnimatedVectorImageVisual::SetVectorImageSize()
   if( IsOnStage() && mVectorAnimationTask->GetPlayState() != DevelImageVisual::PlayState::PLAYING )
   {
     mVectorAnimationTask->RenderFrame();
-    Stage::GetCurrent().KeepRendering( 0.0f );    // Trigger rendering
+    Stage::GetCurrent().KeepRendering( 16.0f );    // Trigger rendering
   }
 }
 
