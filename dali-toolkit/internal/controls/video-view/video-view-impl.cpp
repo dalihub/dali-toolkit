@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/adaptor-framework/native-image-source.h>
-#include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/devel-api/actors/actor-devel.h>
@@ -33,6 +32,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 
 namespace Dali
 {

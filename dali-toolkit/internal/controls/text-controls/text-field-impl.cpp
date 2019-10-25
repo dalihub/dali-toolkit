@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/object/type-registry-helper.h>
-#include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
@@ -45,6 +44,7 @@
 #include <dali-toolkit/internal/text/text-view.h>
 #include <dali-toolkit/internal/styling/style-manager-impl.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 
 using namespace Dali::Toolkit::Text;
 

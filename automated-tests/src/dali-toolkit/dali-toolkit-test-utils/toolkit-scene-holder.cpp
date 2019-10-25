@@ -16,7 +16,7 @@
  */
 
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/integration-api/adaptors/scene-holder.h>
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
 
 #include <toolkit-scene-holder-impl.h>
 
@@ -25,7 +25,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/base-object.h>
 
-#include <dali/integration-api/adaptors/adaptor.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <toolkit-adaptor-impl.h>
 
 using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
