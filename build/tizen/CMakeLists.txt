@@ -47,14 +47,14 @@ SET( toolkit_styles_base_dir ${STYLE_BASE_DIR} )
 SET( toolkit_styles_dir ${STYLE_DIR} )
 SET( toolkit_style_images_dir ${STYLE_DIR}/images )
 
-IF( $ENV{DALI_DATA_RW_DIR} )
-  SET( dataReadWriteDir $ENV{DALI_DATA_RW_DIR}/ )
+IF( DEFINED ENV{DALI_DATA_RW_DIR} )
+  SET( dataReadWriteDir $ENV{DALI_DATA_RW_DIR} )
 ELSE()
   SET( dataReadWriteDir ${CMAKE_INSTALL_PREFIX}/share/dali/ )
 ENDIF()
 
-IF( $ENV{DALI_DATA_RO_DIR} )
-  SET( dataReadOnlyDir $ENV{DALI_DATA_RO_DIR}/ )
+IF( DEFINED ENV{DALI_DATA_RO_DIR} )
+  SET( dataReadOnlyDir $ENV{DALI_DATA_RO_DIR} )
 ELSE()
   SET( dataReadOnlyDir ${CMAKE_INSTALL_PREFIX}/share/dali/ )
 ENDIF()
@@ -184,12 +184,14 @@ IF(DEFINED STATIC)
 ENDIF()
 
 ADD_LIBRARY( ${name} ${LIBTYPE} ${SOURCES} )
-
 TARGET_LINK_LIBRARIES( ${name}
   ${DALICORE_LDFLAGS}
   ${DALIADAPTOR_LDFLAGS}
   ${COVERAGE}
 )
+IF( ANDROID )
+TARGET_LINK_LIBRARIES( ${name} log )
+ENDIF()
 
 SET_TARGET_PROPERTIES( ${name}
   PROPERTIES
@@ -244,10 +246,26 @@ INSTALL( FILES ${ROOT_SRC_DIR}/dali-toolkit/dali-toolkit.h DESTINATION ${DEV_INC
 # package doxygen file (contains doxygen grouping information)
 INSTALL( FILES ${package_doxy_files} DESTINATION ${DEV_INCLUDE_PATH}/dali-toolkit/doc )
 
-COPY_RESOURCES( "${dali_toolkit_style_files}" "${ROOT_SRC_DIR}" "${dataReadOnlyDir}" "./toolkit/styles" )
-COPY_RESOURCES( "${dali_toolkit_image_files}" "${ROOT_SRC_DIR}" "${dataReadOnlyDir}" "./toolkit/images" )
-COPY_RESOURCES( "${dali_toolkit_sound_files}" "${ROOT_SRC_DIR}" "${dataReadOnlyDir}" "./toolkit/sounds" )
-COPY_RESOURCES( "${dali_toolkit_style_images}" "${ROOT_SRC_DIR}" "${dataReadOnlyDir}" "./toolkit/styles/images" )
+# On some platforms we want to install the data files to different location compare to
+# the data location used runtime. For example, on Android we want the toolkit library to load
+# the files from /data/data/com.sec.dali_demo/files but to install the files into ${PREFIX}/files
+# for SDK to pick them up for the archive.
+IF( DEFINED ENV{DALI_DATA_RW_INSTALL_DIR} )
+  SET( dataReadWriteInstallDir $ENV{DALI_DATA_RW_INSTALL_DIR} )
+ELSE()
+  SET( dataReadWriteInstallDir ${dataReadWriteDir} )
+ENDIF()
+
+IF( DEFINED ENV{DALI_DATA_RO_INSTALL_DIR} )
+  SET( dataReadOnlyInstallDir $ENV{DALI_DATA_RO_INSTALL_DIR} )
+ELSE()
+  SET( dataReadOnlyInstallDir ${dataReadOnlyDir} )
+ENDIF()
+
+COPY_RESOURCES( "${dali_toolkit_style_files}" "${ROOT_SRC_DIR}" "${dataReadOnlyInstallDir}" "./toolkit/styles" )
+COPY_RESOURCES( "${dali_toolkit_image_files}" "${ROOT_SRC_DIR}" "${dataReadOnlyInstallDir}" "./toolkit/images" )
+COPY_RESOURCES( "${dali_toolkit_sound_files}" "${ROOT_SRC_DIR}" "${dataReadOnlyInstallDir}" "./toolkit/sounds" )
+COPY_RESOURCES( "${dali_toolkit_style_images}" "${ROOT_SRC_DIR}" "${dataReadOnlyInstallDir}" "./toolkit/styles/images" )
 
 # The DALI_TOOLKIT_PREFIX must be set if this CMakeLists.txt is executed
 # from the top-level CMake script using ADD_SUBDIRECTORY() to avoid
@@ -348,18 +366,20 @@ CONFIGURE_FILE( ${ROOT_SRC_DIR}/automated-tests/CMakeLists.txt.in
 
 # Configuration Messages
 MESSAGE( STATUS "Configuration:\n" )
-MESSAGE( STATUS "Prefix:                " ${PREFIX} )
-MESSAGE( STATUS "Lib Dir:               " ${LIB_DIR} )
-MESSAGE( STATUS "Include Dir:           " ${INCLUDE_DIR} )
-MESSAGE( STATUS "Debug build:           " ${ENABLE_DEBUG} )
-MESSAGE( STATUS "Export all symbols:    " ${ENABLE_EXPORTALL} )
-MESSAGE( STATUS "Coverage:              " ${ENABLE_COVERAGE} )
-MESSAGE( STATUS "Trace:                 " ${ENABLE_TRACE} )
-MESSAGE( STATUS "Doxygen:               " ${doxygenEnabled} )
-MESSAGE( STATUS "Data Dir (Read/Write): " ${dataReadWriteDir} )
-MESSAGE( STATUS "Data Dir (Read Only):  " ${dataReadOnlyDir} )
-MESSAGE( STATUS "Style Dir:             " ${STYLE_DIR} )
-MESSAGE( STATUS "Style:                 " ${dali_style} )
-MESSAGE( STATUS "i18n:                  " ${ENABLE_I18N} )
-MESSAGE( STATUS "CXXFLAGS:              " ${CMAKE_CXX_FLAGS} )
-MESSAGE( STATUS "LDFLAGS:               " ${CMAKE_SHARED_LINKER_FLAGS_INIT}${CMAKE_SHARED_LINKER_FLAGS} )
+MESSAGE( STATUS "Prefix:                        " ${PREFIX} )
+MESSAGE( STATUS "Lib Dir:                       " ${LIB_DIR} )
+MESSAGE( STATUS "Include Dir:                   " ${INCLUDE_DIR} )
+MESSAGE( STATUS "Debug build:                   " ${ENABLE_DEBUG} )
+MESSAGE( STATUS "Export all symbols:            " ${ENABLE_EXPORTALL} )
+MESSAGE( STATUS "Coverage:                      " ${ENABLE_COVERAGE} )
+MESSAGE( STATUS "Trace:                         " ${ENABLE_TRACE} )
+MESSAGE( STATUS "Doxygen:                       " ${doxygenEnabled} )
+MESSAGE( STATUS "Data Dir (Read/Write):         " ${dataReadWriteDir} )
+MESSAGE( STATUS "Data Dir (Read Only):          " ${dataReadOnlyDir} )
+MESSAGE( STATUS "Data Install Dir (Read/Write): " ${dataReadWriteInstallDir} )
+MESSAGE( STATUS "Data Install Dir (Read Only):  " ${dataReadOnlyInstallDir} )
+MESSAGE( STATUS "Style Dir:                     " ${STYLE_DIR} )
+MESSAGE( STATUS "Style:                         " ${dali_style} )
+MESSAGE( STATUS "i18n:                          " ${ENABLE_I18N} )
+MESSAGE( STATUS "CXXFLAGS:                      " ${CMAKE_CXX_FLAGS} )
+MESSAGE( STATUS "LDFLAGS:                       " ${CMAKE_SHARED_LINKER_FLAGS_INIT}${CMAKE_SHARED_LINKER_FLAGS} )
