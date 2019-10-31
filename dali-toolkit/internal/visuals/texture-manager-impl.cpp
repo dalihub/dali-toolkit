@@ -367,6 +367,10 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
       ++( mTextureInfoContainer[ cacheIndex ].referenceCount );
     }
     textureId = mTextureInfoContainer[ cacheIndex ].textureId;
+
+    // Update preMultiplyOnLoad value. It should be changed according to preMultiplied value of the cached info.
+    preMultiplyOnLoad = mTextureInfoContainer[ cacheIndex ].preMultiplied ? TextureManager::MultiplyOnLoad::MULTIPLY_ON_LOAD : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::General, "TextureManager::RequestLoad( url=%s observer=%p ) Using cached texture id@%d, textureId=%d\n",
                    url.GetUrl().c_str(), observer, cacheIndex, textureId );
   }
