@@ -112,8 +112,7 @@ struct GetCharactersDirectionData
 bool SetBidirectionalInfoTest( const SetBidirectionalInfoData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
@@ -126,10 +125,12 @@ bool SetBidirectionalInfoTest( const SetBidirectionalInfoData& data )
                    fontDescriptions,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   // 2) Clear the bidirectional paragraph info data.
   Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = logicalModel->mBidirectionalParagraphInfo;
@@ -219,8 +220,7 @@ void FreeBidirectionalLineInfoResources( Vector<BidirectionalLineInfoRun> bidire
 bool ReorderLinesTest( const ReorderLinesData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(100.f, 300.f);
   Size layoutSize;
@@ -233,10 +233,12 @@ bool ReorderLinesTest( const ReorderLinesData& data )
                    fontDescriptions,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   // 2) Clear the bidirectional line info data.
   uint32_t startRemoveIndex = logicalModel->mBidirectionalLineInfo.Count();
@@ -345,8 +347,7 @@ bool ReorderLinesTest( const ReorderLinesData& data )
 bool GetMirroredTextTest( const GetMirroredTextData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
@@ -359,10 +360,12 @@ bool GetMirroredTextTest( const GetMirroredTextData& data )
                    fontDescriptions,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   // 2) Call the GetMirroredText() function for the whole text
   Vector<Character> mirroredText;
@@ -420,8 +423,7 @@ bool GetMirroredTextTest( const GetMirroredTextData& data )
 bool GetCharactersDirectionTest( const GetCharactersDirectionData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
@@ -434,10 +436,12 @@ bool GetCharactersDirectionTest( const GetCharactersDirectionData& data )
                    fontDescriptions,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    data.markupProcessorEnabled );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = logicalModel->mBidirectionalParagraphInfo;
 

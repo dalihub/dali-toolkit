@@ -104,8 +104,7 @@ struct GetLogicalCursorIndexData
 bool CreateParagraphTest( const CreateParagraphData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
@@ -117,10 +116,12 @@ bool CreateParagraphTest( const CreateParagraphData& data )
                    fontDescriptionRuns,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   // 2) Clear the paragraphs.
   Vector<ParagraphRun>& paragraphs = logicalModel->mParagraphInfo;
@@ -165,8 +166,7 @@ bool CreateParagraphTest( const CreateParagraphData& data )
 bool FindParagraphTest( const FindParagraphData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
@@ -178,10 +178,12 @@ bool FindParagraphTest( const FindParagraphData& data )
                    fontDescriptionRuns,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   // 2) Find the paragraphs.
   Vector<ParagraphRunIndex> paragraphs;
@@ -214,8 +216,7 @@ bool FetchBidirectionalLineInfoTest( const FetchBidirectionalLineInfoData& data 
 {
   std::cout << "  testing : " << data.description << std::endl;
   // Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea( 100.f, 300.f );
   Size layoutSize;
@@ -228,10 +229,12 @@ bool FetchBidirectionalLineInfoTest( const FetchBidirectionalLineInfoData& data 
                    fontDescriptions,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   for( unsigned int index = 0; index < data.numberOfTests; ++index )
   {
@@ -260,8 +263,7 @@ bool GetLogicalCharacterIndexTest( const GetLogicalCharacterIndexData& data )
 {
   std::cout << "  testing : " << data.description << std::endl;
   // Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size layoutSize;
 
@@ -273,10 +275,12 @@ bool GetLogicalCharacterIndexTest( const GetLogicalCharacterIndexData& data )
                    fontDescriptions,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   for( unsigned int index = 0u; index < data.numberOfIndices; ++index )
   {
@@ -315,8 +319,7 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf" );
 
   // Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size layoutSize;
 
@@ -335,10 +338,12 @@ bool GetLogicalCursorIndexTest( const GetLogicalCursorIndexData& data )
                    fontDescriptionRuns,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   for( unsigned int index = 0u; index < data.numberOfIndices; ++index )
   {
