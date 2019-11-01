@@ -32,9 +32,9 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/integration-api/adaptors/adaptor.h>
-#include <dali/integration-api/adaptors/scene-holder.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>

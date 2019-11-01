@@ -19,7 +19,7 @@
 #include "async-image-loader-impl.h"
 
 // EXTERNAL INCLUDES
-#include <dali/integration-api/adaptors/adaptor.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 
 namespace Dali
 {

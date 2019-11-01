@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,10 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/devel-api/common/stage-devel.h>
-#include <dali/integration-api/adaptors/adaptor.h>
-#include <dali/integration-api/adaptors/scene-holder.h>
-
-// INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
 
 namespace Dali
 {

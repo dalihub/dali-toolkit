@@ -21,11 +21,10 @@
 
 // Don't want to include the actual window.h which otherwise will be indirectly included by adaptor.h.
 #define DALI_WINDOW_H
-#include <dali/integration-api/adaptors/adaptor.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
 
-#include <dali/integration-api/adaptors/scene-holder.h>
 #include <toolkit-scene-holder-impl.h>
-
 #include <toolkit-adaptor-impl.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/scene.h>

@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/integration-api/adaptors/render-surface-interface.h>
+#include <dali/integration-api/adaptor-framework/render-surface-interface.h>
 
 namespace Dali
 {

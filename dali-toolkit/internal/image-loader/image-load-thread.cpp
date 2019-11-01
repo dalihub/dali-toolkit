@@ -20,8 +20,8 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/image-loading.h>
-#include <dali/integration-api/adaptors/adaptor.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
+#include <dali/integration-api/adaptor-framework/adaptor.h>
 
 namespace Dali
 {
