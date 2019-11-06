@@ -2459,6 +2459,9 @@ Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
     // Clear the update info. This info will be set the next time the text is updated.
     mImpl->mTextUpdateInfo.Clear();
 
+    // FullRelayoutNeeded should be true because DoRelayout is MAX_FLOAT, MAX_FLOAT.
+    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
+
     mImpl->mUpdateTextDirection = false;
   }
 
