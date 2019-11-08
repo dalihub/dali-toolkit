@@ -65,12 +65,14 @@ public:
    * @param[in] maskPixelBuffer of the mask image
    * @param[in] contentScale The factor to scale the content
    * @param[in] cropToMask Whether to crop the content to the mask size
+   * @param[in] preMultiplyOnLoad ON if the image color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    * @return The loading task id
    */
   uint32_t ApplyMask( Devel::PixelBuffer pixelBuffer,
                       Devel::PixelBuffer maskPixelBuffer,
                       float contentScale,
-                      bool cropToMask );
+                      bool cropToMask,
+                      DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad );
 
   /**
    * @copydoc Toolkit::AsyncImageLoader::ImageLoadedSignal

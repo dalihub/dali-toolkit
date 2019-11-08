@@ -119,6 +119,8 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
 
 AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
 {
+  // Finalize animation task in the main thread
+  mVectorAnimationTask->Finalize();
 }
 
 void AnimatedVectorImageVisual::GetNaturalSize( Vector2& naturalSize )
@@ -462,11 +464,11 @@ void AnimatedVectorImageVisual::OnUploadCompleted()
   {
     actor.AddRenderer( mImpl->mRenderer );
     mRendererAdded = true;
+
+    ResourceReady( Toolkit::Visual::ResourceStatus::READY );
+
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnUploadCompleted: Renderer is added [%p]\n", this );
   }
-
-  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
-
-  DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnUploadCompleted: Renderer is added [%p]\n", this );
 }
 
 void AnimatedVectorImageVisual::OnAnimationFinished()

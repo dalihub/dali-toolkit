@@ -64,6 +64,11 @@ public:
   virtual ~VectorAnimationTask();
 
   /**
+   * @brief Finalizes the task.
+   */
+  void Finalize();
+
+  /**
    * @brief Sets the renderer used to display the result image.
    *
    * @param[in] renderer The renderer used to display the result image
