@@ -37,20 +37,8 @@ public:
     mRenderer(),
     mWidth( 0 ),
     mHeight( 0 ),
-    mPreviousFrame( 0 ),
-    mFrameRate( 60.0f )
+    mPreviousFrame( 0 )
   {
-    mCount++;
-
-    if( mCount == 2 )
-    {
-      mFrameRate = 0.1f;
-    }
-  }
-
-  ~VectorAnimationRenderer()
-  {
-    mCount--;
   }
 
   void SetRenderer( Dali::Renderer renderer )
@@ -99,7 +87,7 @@ public:
 
   float GetFrameRate() const
   {
-    return mFrameRate;
+    return 60.0f;
   }
 
   void GetDefaultSize( uint32_t& width, uint32_t& height ) const
@@ -115,18 +103,13 @@ public:
 
 public:
 
-  static uint32_t mCount;
-
   std::string mUrl;
   Dali::Renderer mRenderer;
   uint32_t mWidth;
   uint32_t mHeight;
   uint32_t mPreviousFrame;
-  float mFrameRate;
   Dali::VectorAnimationRenderer::UploadCompletedSignalType mUploadCompletedSignal;
 };
-
-uint32_t VectorAnimationRenderer::mCount = 0;
 
 inline VectorAnimationRenderer& GetImplementation( Dali::VectorAnimationRenderer& renderer )
 {
