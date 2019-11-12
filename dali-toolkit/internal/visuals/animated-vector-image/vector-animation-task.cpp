@@ -317,11 +317,6 @@ void VectorAnimationTask::SetLoopingMode( DevelImageVisual::LoopingMode::Type lo
   DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetLoopingMode: looping mode = %d [%p]\n", mLoopingMode, this );
 }
 
-void VectorAnimationTask::GetLayerInfo( Property::Map& map ) const
-{
-  mVectorRenderer.GetLayerInfo( map );
-}
-
 VectorAnimationTask::UploadCompletedSignalType& VectorAnimationTask::UploadCompletedSignal()
 {
   return mVectorRenderer.UploadCompletedSignal();
