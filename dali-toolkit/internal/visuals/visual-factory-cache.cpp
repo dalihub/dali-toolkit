@@ -43,7 +43,6 @@ namespace Internal
 
 VisualFactoryCache::VisualFactoryCache( bool preMultiplyOnLoad )
 : mSvgRasterizeThread( NULL ),
-  mVectorAnimationThread(),
   mBrokenImageUrl(""),
   mPreMultiplyOnLoad( preMultiplyOnLoad )
 {
@@ -134,16 +133,6 @@ SvgRasterizeThread* VisualFactoryCache::GetSVGRasterizationThread()
     mSvgRasterizeThread->Start();
   }
   return mSvgRasterizeThread;
-}
-
-VectorAnimationThread& VisualFactoryCache::GetVectorAnimationThread()
-{
-  if( !mVectorAnimationThread )
-  {
-    mVectorAnimationThread = std::unique_ptr< VectorAnimationThread >( new VectorAnimationThread() );
-    mVectorAnimationThread->Start();
-  }
-  return *mVectorAnimationThread;
 }
 
 void VisualFactoryCache::ApplyRasterizedSVGToSampler()

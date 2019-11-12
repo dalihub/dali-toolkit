@@ -28,7 +28,6 @@
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
 #include <dali-toolkit/internal/visuals/texture-manager-impl.h>
-#include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-thread.h>
 
 namespace Dali
 {
@@ -204,12 +203,6 @@ public:
    */
   SvgRasterizeThread* GetSVGRasterizationThread();
 
-  /**
-   * Get the vector animation thread.
-   * @return A raw pointer pointing to the vector animation thread.
-   */
-  VectorAnimationThread& GetVectorAnimationThread();
-
 private: // for svg rasterization thread
 
   /**
@@ -233,13 +226,12 @@ private:
   Geometry mGeometry[GEOMETRY_TYPE_MAX+1];
   Shader mShader[SHADER_TYPE_MAX+1];
 
-  ImageAtlasManagerPtr                     mAtlasManager;
-  TextureManager                           mTextureManager;
-  NPatchLoader                             mNPatchLoader;
-  SvgRasterizeThread*                      mSvgRasterizeThread;
-  std::unique_ptr< VectorAnimationThread > mVectorAnimationThread;
-  std::string                              mBrokenImageUrl;
-  bool                                     mPreMultiplyOnLoad;
+  ImageAtlasManagerPtr mAtlasManager;
+  TextureManager       mTextureManager;
+  NPatchLoader         mNPatchLoader;
+  SvgRasterizeThread*  mSvgRasterizeThread;
+  std::string          mBrokenImageUrl;
+  bool                 mPreMultiplyOnLoad;
 };
 
 } // namespace Internal
