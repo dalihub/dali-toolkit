@@ -703,8 +703,7 @@ void TextureManager::LoadTexture( TextureInfo& textureInfo, TextureUploadObserve
   {
     auto& loadersContainer = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
     auto loadingHelperIt = loadersContainer.GetNext();
-    auto premultiplyOnLoad = ( textureInfo.preMultiplyOnLoad && textureInfo.maskTextureId == INVALID_TEXTURE_ID ) ?
-                               DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
+    auto premultiplyOnLoad = textureInfo.preMultiplyOnLoad? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
     DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
     loadingHelperIt->Load(textureInfo.textureId, textureInfo.url,
                           textureInfo.desiredSize, textureInfo.fittingMode,
@@ -890,9 +889,8 @@ void TextureManager::ApplyMask( TextureInfo& textureInfo, TextureId maskTextureI
     textureInfo.loadState = MASK_APPLYING;
     auto& loadersContainer = textureInfo.url.IsLocalResource() ? mAsyncLocalLoaders : mAsyncRemoteLoaders;
     auto loadingHelperIt = loadersContainer.GetNext();
-    auto premultiplyOnLoad = textureInfo.preMultiplyOnLoad ? DevelAsyncImageLoader::PreMultiplyOnLoad::ON : DevelAsyncImageLoader::PreMultiplyOnLoad::OFF;
     DALI_ASSERT_ALWAYS(loadingHelperIt != loadersContainer.End());
-    loadingHelperIt->ApplyMask( textureInfo.textureId, pixelBuffer, maskPixelBuffer, textureInfo.scaleFactor, textureInfo.cropToMask, premultiplyOnLoad );
+    loadingHelperIt->ApplyMask( textureInfo.textureId, pixelBuffer, maskPixelBuffer, textureInfo.scaleFactor, textureInfo.cropToMask );
   }
 }
 
@@ -1153,14 +1151,13 @@ void TextureManager::AsyncLoadingHelper::Load(TextureId          textureId,
 }
 
 void TextureManager::AsyncLoadingHelper::ApplyMask( TextureId textureId,
-                                                    Devel::PixelBuffer pixelBuffer,
-                                                    Devel::PixelBuffer maskPixelBuffer,
-                                                    float contentScale,
-                                                    bool cropToMask,
-                                                    DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad )
+                                               Devel::PixelBuffer pixelBuffer,
+                                               Devel::PixelBuffer maskPixelBuffer,
+                                               float contentScale,
+                                               bool cropToMask )
 {
   mLoadingInfoContainer.push_back(AsyncLoadingInfo(textureId));
-  auto id = DevelAsyncImageLoader::ApplyMask( mLoader, pixelBuffer, maskPixelBuffer, contentScale, cropToMask, preMultiplyOnLoad );
+  auto id = DevelAsyncImageLoader::ApplyMask( mLoader, pixelBuffer, maskPixelBuffer, contentScale, cropToMask );
   mLoadingInfoContainer.back().loadId = id;
 }
 
