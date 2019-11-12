@@ -258,9 +258,6 @@ int UtcDaliTextControllerImfEvent(void)
   controller->GetText( text );
   DALI_TEST_EQUALS( "Hello ", text, TEST_LOCATION );
 
-  // for coverage
-  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::UNDERLINE );
-
   // Send PRE_EDIT event
   imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "wo", 6, 2 );
   controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );

@@ -1072,35 +1072,21 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       mEventData->mPreEditFlag &&
       ( 0u != mModel->mVisualModel->mCharactersToGlyph.Count() ) )
   {
-    Dali::InputMethodContext::PreeditStyle type = mEventData->mInputMethodContext.GetPreeditStyle();
+    // Add the underline for the pre-edit text.
+    const GlyphIndex* const charactersToGlyphBuffer = mModel->mVisualModel->mCharactersToGlyph.Begin();
+    const Length* const glyphsPerCharacterBuffer = mModel->mVisualModel->mGlyphsPerCharacter.Begin();
 
-    switch( type )
-    {
-      case Dali::InputMethodContext::PreeditStyle::UNDERLINE:
-      {
-        // Add the underline for the pre-edit text.
-        const GlyphIndex* const charactersToGlyphBuffer = mModel->mVisualModel->mCharactersToGlyph.Begin();
-        const Length* const glyphsPerCharacterBuffer = mModel->mVisualModel->mGlyphsPerCharacter.Begin();
+    const GlyphIndex glyphStart = *( charactersToGlyphBuffer + mEventData->mPreEditStartPosition );
+    const CharacterIndex lastPreEditCharacter = mEventData->mPreEditStartPosition + ( ( mEventData->mPreEditLength > 0u ) ? mEventData->mPreEditLength - 1u : 0u );
+    const Length numberOfGlyphsLastCharacter = *( glyphsPerCharacterBuffer + lastPreEditCharacter );
+    const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + lastPreEditCharacter ) + ( numberOfGlyphsLastCharacter > 1u ? numberOfGlyphsLastCharacter - 1u : 0u );
 
-        const GlyphIndex glyphStart = *( charactersToGlyphBuffer + mEventData->mPreEditStartPosition );
-        const CharacterIndex lastPreEditCharacter = mEventData->mPreEditStartPosition + ( ( mEventData->mPreEditLength > 0u ) ? mEventData->mPreEditLength - 1u : 0u );
-        const Length numberOfGlyphsLastCharacter = *( glyphsPerCharacterBuffer + lastPreEditCharacter );
-        const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + lastPreEditCharacter ) + ( numberOfGlyphsLastCharacter > 1u ? numberOfGlyphsLastCharacter - 1u : 0u );
+    GlyphRun underlineRun;
+    underlineRun.glyphIndex = glyphStart;
+    underlineRun.numberOfGlyphs = 1u + glyphEnd - glyphStart;
 
-        GlyphRun underlineRun;
-        underlineRun.glyphIndex = glyphStart;
-        underlineRun.numberOfGlyphs = 1u + glyphEnd - glyphStart;
-
-        mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
-        break;
-      }
-      // TODO :  At this moment, other styles for preedit are not implemented yet.
-      case Dali::InputMethodContext::PreeditStyle::REVERSE:
-      case Dali::InputMethodContext::PreeditStyle::HIGHLIGHT:
-      case Dali::InputMethodContext::PreeditStyle::NONE:
-      default:
-        break;
-    }
+    // TODO: At the moment the underline runs are only for pre-edit.
+    mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
   }
 
   // The estimated number of lines. Used to avoid reallocations when layouting.
