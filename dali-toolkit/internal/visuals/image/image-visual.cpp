@@ -427,8 +427,6 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
         AllocateMaskData();
         // Immediately trigger the alpha mask loading (it may just get a cached value)
         mMaskingData->mAlphaMaskUrl = alphaUrl;
-        TextureManager& textureManager = mFactoryCache.GetTextureManager();
-        mMaskingData->mAlphaMaskId = textureManager.RequestMaskLoad( alphaUrl );
       }
       break;
     }
