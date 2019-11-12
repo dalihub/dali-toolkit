@@ -161,10 +161,6 @@ void AnimatedVectorImageVisual::DoCreatePropertyMap( Property::Map& map ) const
 
   map.Insert( Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mStopBehavior );
   map.Insert( Toolkit::DevelImageVisual::Property::LOOPING_MODE, mLoopingMode );
-
-  Property::Map layerInfo;
-  mVectorAnimationTask->GetLayerInfo( layerInfo );
-  map.Insert( Toolkit::DevelImageVisual::Property::CONTENT_INFO, layerInfo );
 }
 
 void AnimatedVectorImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const

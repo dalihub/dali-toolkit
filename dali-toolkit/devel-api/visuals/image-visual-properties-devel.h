@@ -128,16 +128,7 @@ enum Type
    * @details Name "loopingMode", Type LoopingMode::Type (Property::INTEGER)
    * @note Default value is LoopingMode::RESTART.
    */
-  LOOPING_MODE = ORIENTATION_CORRECTION + 9,
-
-  /**
-   * @brief The content information the AnimatedVectorImageVisual will use.
-   * @details Name "contentInfo", Type Property::MAP.
-   * The map contains the layer name as a key and Property::Array as a value.
-   * And the array contains 2 integer values which are the frame numbers, the start frame number and the end frame number of the layer.
-   * @note This property is read-only.
-   */
-  CONTENT_INFO = ORIENTATION_CORRECTION + 10
+  LOOPING_MODE = ORIENTATION_CORRECTION + 9
 };
 
 } //namespace Property
