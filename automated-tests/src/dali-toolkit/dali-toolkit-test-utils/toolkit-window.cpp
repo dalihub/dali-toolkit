@@ -48,9 +48,7 @@ namespace Adaptor
 {
 
 Window::Window( const PositionSize& positionSize )
-: SceneHolder( positionSize ),
-  mFocusChangeSignal(),
-  mVisibilityChangedSignal()
+: SceneHolder( positionSize )
 {
 }
 
@@ -157,11 +155,6 @@ void Window::Raise()
   GetImplementation( *this ).mFocusChangeSignal.Emit(*this, true);
 }
 
-void Window::Hide()
-{
-  GetImplementation( *this ).mVisibilityChangedSignal.Emit( *this, false );
-}
-
 FocusChangeSignalType& Window::FocusChangeSignal()
 {
   return GetImplementation( *this ).mFocusChangeSignal;
@@ -215,11 +208,6 @@ TouchSignalType& TouchSignal( Window window )
 WheelEventSignalType& WheelEventSignal( Window window )
 {
   return GetImplementation( window ).WheelEventSignal();
-}
-
-VisibilityChangedSignalType& VisibilityChangedSignal( Window window )
-{
-  return GetImplementation( window ).mVisibilityChangedSignal;
 }
 
 } // namespace DevelWindow

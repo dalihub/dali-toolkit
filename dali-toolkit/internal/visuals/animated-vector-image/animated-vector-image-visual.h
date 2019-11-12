@@ -23,7 +23,6 @@
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/public-api/adaptor-framework/window.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
@@ -168,11 +167,6 @@ private:
   void SetVectorImageSize();
 
   /**
-   * @brief Pause the animation.
-   */
-  void PauseAnimation();
-
-  /**
    * @brief Callback when the world scale factor changes.
    */
   void OnScaleNotification( PropertyNotification& source );
@@ -185,12 +179,7 @@ private:
   /**
    * @brief Callback when the visibility of the actor is changed.
    */
-  void OnControlVisibilityChanged( Actor actor, bool visible, DevelActor::VisibilityChange::Type type );
-
-  /**
-   * @brief Callback when the visibility of the window is changed.
-   */
-  void OnWindowVisibilityChanged( Window window, bool visible );
+  void OnVisibilityChanged( Actor actor, bool visible, DevelActor::VisibilityChange::Type type );
 
   // Undefined
   AnimatedVectorImageVisual( const AnimatedVectorImageVisual& visual ) = delete;

@@ -67,7 +67,6 @@ public:
   void SetBackgroundColor( const Vector4& color );
   Vector4 GetBackgroundColor() const;
   void Raise();
-  void Hide();
   FocusChangeSignalType& FocusChangeSignal();
 
 public:
@@ -84,7 +83,6 @@ typedef Signal< void (const KeyEvent&) > KeyEventSignalType;
 typedef Signal< bool (const KeyEvent&) > KeyEventGeneratedSignalType;
 typedef Signal< void (const TouchData&) > TouchSignalType;
 typedef Signal< void (const WheelEvent&) > WheelEventSignalType;
-typedef Signal< void ( Window, bool ) > VisibilityChangedSignalType;
 
 Dali::Window Get( Actor actor );
 Dali::Window DownCast(  BaseHandle handle );
@@ -94,7 +92,6 @@ KeyEventSignalType& KeyEventSignal( Dali::Window window );
 KeyEventGeneratedSignalType& KeyEventGeneratedSignal( Dali::Window window );
 TouchSignalType& TouchSignal( Dali::Window window );
 WheelEventSignalType& WheelEventSignal( Window window );
-VisibilityChangedSignalType& VisibilityChangedSignal( Window window );
 }
 
 } // namespace Dali
