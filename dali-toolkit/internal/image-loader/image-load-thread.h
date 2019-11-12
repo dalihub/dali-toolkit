@@ -26,9 +26,9 @@
 #include <dali/devel-api/threading/thread.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/adaptor-framework/pixel-buffer.h>
-#include <dali/integration-api/adaptors/log-factory-interface.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/devel-api/image-loader/async-image-loader-devel.h>
+#include <dali/integration-api/adaptor-framework/log-factory-interface.h>
 
 namespace Dali
 {
@@ -52,7 +52,7 @@ struct LoadingTask
    * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
    * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
    * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
-   * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha.
+   * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha or if the image need to be applied alpha mask.
    */
   LoadingTask( uint32_t id,
                const VisualUrl& url,
@@ -69,12 +69,14 @@ struct LoadingTask
    * @param [in] maskPixelBuffer of the mask image
    * @param [in] contentScale The factor to scale the content
    * @param [in] cropToMask Whether to crop the content to the mask size
+   * @param [in] preMultiplyOnLoad ON if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
    */
   LoadingTask( uint32_t id,
               Devel::PixelBuffer pixelBuffer,
               Devel::PixelBuffer maskPixelBuffer,
               float contentScale,
-              bool cropToMask );
+              bool cropToMask,
+              DevelAsyncImageLoader::PreMultiplyOnLoad preMultiplyOnLoad);
 
   /**
    * Load the image
@@ -85,6 +87,11 @@ struct LoadingTask
    * Apply mask
    */
   void ApplyMask();
+
+  /**
+   * Multiply alpha
+   */
+  void MultiplyAlpha();
 
 private:
 

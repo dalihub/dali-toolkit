@@ -318,6 +318,55 @@ int UtcDaliImageVisualNoPremultipliedAlpha02(void)
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
+  int srcFactorRgb    = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
+  int destFactorRgb   = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
+  int srcFactorAlpha  = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
+  int destFactorAlpha = renderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
+  DALI_TEST_CHECK( srcFactorRgb == BlendFactor::SRC_ALPHA );
+  DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
+
+  textureTrace.Reset();
+
+  // Make a new visual with the same image
+  Visual::Base newVisual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( newVisual );
+
+  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
+  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+
+  DummyControl newActor = DummyControl::New();
+  DummyControlImpl& newDummyImpl = static_cast< DummyControlImpl& >( newActor.GetImplementation() );
+  newDummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, newVisual );
+
+  newActor.SetSize( 200.f, 200.f );
+  DALI_TEST_EQUALS( newActor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( newActor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( newActor.GetRendererCount(), 1u, TEST_LOCATION );
+  auto newRenderer = newActor.GetRendererAt( 0 );
+  preMultipliedIndex = newRenderer.GetPropertyIndex( "preMultipliedAlpha" );
+  DALI_TEST_CHECK( preMultipliedIndex != Property::INVALID_INDEX );
+  preMultipliedAlpha = newRenderer.GetProperty< bool >( preMultipliedIndex );
+  preMultipliedAlpha2 = newRenderer.GetProperty< bool >( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
+
+  DALI_TEST_EQUALS( preMultipliedAlpha, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( preMultipliedAlpha2, false, TEST_LOCATION );
+
+  srcFactorRgb    = newRenderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_RGB );
+  destFactorRgb   = newRenderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_RGB );
+  srcFactorAlpha  = newRenderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_SRC_ALPHA );
+  destFactorAlpha = newRenderer.GetProperty<int>( Renderer::Property::BLEND_FACTOR_DEST_ALPHA );
+  DALI_TEST_CHECK( srcFactorRgb == BlendFactor::SRC_ALPHA );
+  DALI_TEST_CHECK( destFactorRgb == BlendFactor::ONE_MINUS_SRC_ALPHA );
+  DALI_TEST_CHECK( srcFactorAlpha == BlendFactor::ONE );
+  DALI_TEST_CHECK( destFactorAlpha == BlendFactor::ONE_MINUS_SRC_ALPHA );
+
   Stage::GetCurrent().Remove( actor );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
 

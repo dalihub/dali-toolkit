@@ -1,7 +1,7 @@
 
-#include <dali/integration-api/adaptors/trigger-event-interface.h>
-#include <dali/integration-api/adaptors/trigger-event-factory.h>
 #include <dali/public-api/signals/callback.h>
+#include <dali/integration-api/adaptor-framework/trigger-event-factory.h>
+#include <dali/integration-api/adaptor-framework/trigger-event-interface.h>
 
 namespace Dali
 {

@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
-#include <dali/integration-api/adaptors/scene-holder.h>
+#include <dali/integration-api/adaptor-framework/scene-holder.h>
 
 // INTERNAL INCLUDES
 #include <toolkit-window.h>
@@ -44,6 +44,7 @@ public:
   virtual ~Window() = default;
   static Window* New(const PositionSize& positionSize, const std::string& name, const std::string& className, bool isTransparent);
   FocusChangeSignalType mFocusChangeSignal;
+  DevelWindow::VisibilityChangedSignalType mVisibilityChangedSignal;
 };
 
 } // namespace Adaptor

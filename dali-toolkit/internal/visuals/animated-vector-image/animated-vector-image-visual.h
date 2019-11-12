@@ -22,12 +22,14 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/object/property-notification.h>
+#include <dali/devel-api/actors/actor-devel.h>
+#include <dali/public-api/adaptor-framework/window.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-actions-devel.h>
-#include <dali-toolkit/internal/visuals/animated-vector-image/vector-rasterize-thread.h>
+#include <dali-toolkit/internal/visuals/animated-vector-image/vector-animation-task.h>
 
 namespace Dali
 {
@@ -39,7 +41,6 @@ namespace Internal
 {
 
 class ImageVisualShaderFactory;
-class VectorRasterizeThread;
 class AnimatedVectorImageVisual;
 using AnimatedVectorImageVisualPtr = IntrusivePtr< AnimatedVectorImageVisual >;
 
@@ -167,6 +168,11 @@ private:
   void SetVectorImageSize();
 
   /**
+   * @brief Pause the animation.
+   */
+  void PauseAnimation();
+
+  /**
    * @brief Callback when the world scale factor changes.
    */
   void OnScaleNotification( PropertyNotification& source );
@@ -176,6 +182,16 @@ private:
    */
   void OnSizeNotification( PropertyNotification& source );
 
+  /**
+   * @brief Callback when the visibility of the actor is changed.
+   */
+  void OnControlVisibilityChanged( Actor actor, bool visible, DevelActor::VisibilityChange::Type type );
+
+  /**
+   * @brief Callback when the visibility of the window is changed.
+   */
+  void OnWindowVisibilityChanged( Window window, bool visible );
+
   // Undefined
   AnimatedVectorImageVisual( const AnimatedVectorImageVisual& visual ) = delete;
 
@@ -183,17 +199,17 @@ private:
   AnimatedVectorImageVisual& operator=( const AnimatedVectorImageVisual& visual ) = delete;
 
 private:
-  ImageVisualShaderFactory&                    mImageVisualShaderFactory;
   VisualUrl                                    mUrl;
-  VectorRasterizeThread                        mVectorRasterizeThread;
+  VectorAnimationTaskPtr                       mVectorAnimationTask;
+  ImageVisualShaderFactory&                    mImageVisualShaderFactory;
   PropertyNotification                         mScaleNotification;
   PropertyNotification                         mSizeNotification;
   Vector2                                      mVisualSize;
   Vector2                                      mVisualScale;
   WeakHandle< Actor >                          mPlacementActor;
   int32_t                                      mLoopCount;
-  int32_t                                      mStartFrame;
-  int32_t                                      mEndFrame;
+  uint32_t                                     mStartFrame;
+  uint32_t                                     mEndFrame;
   uint32_t                                     mResendFlag;
   DevelAnimatedVectorImageVisual::Action::Type mActionStatus;
   DevelImageVisual::StopBehavior::Type         mStopBehavior;
