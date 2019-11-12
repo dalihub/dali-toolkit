@@ -92,17 +92,6 @@ VectorAnimationTask::~VectorAnimationTask()
   DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::~VectorAnimationTask: destructor [%p]\n", this );
 }
 
-void VectorAnimationTask::Finalize()
-{
-  // Release some objects in the main thread
-  if( mAnimationFinishedTrigger )
-  {
-    mAnimationFinishedTrigger.reset();
-  }
-
-  mVectorRenderer.Reset();
-}
-
 void VectorAnimationTask::SetRenderer( Renderer renderer )
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
@@ -181,10 +170,7 @@ void VectorAnimationTask::RenderFrame()
 void VectorAnimationTask::SetAnimationFinishedCallback( EventThreadCallback* callback )
 {
   ConditionalWait::ScopedLock lock( mConditionalWait );
-  if( callback )
-  {
-    mAnimationFinishedTrigger = std::unique_ptr< EventThreadCallback >( callback );
-  }
+  mAnimationFinishedTrigger = std::unique_ptr< EventThreadCallback >( callback );
 }
 
 void VectorAnimationTask::SetLoopCount( int32_t count )
@@ -290,7 +276,6 @@ void VectorAnimationTask::SetCurrentFrameNumber( uint32_t frameNumber )
     mCurrentFrame = frameNumber;
     mCurrentFrameUpdated = true;
 
-    mUpdateFrameNumber = false;
     mResourceReady = false;
 
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetCurrentFrameNumber: frame number = %d [%p]\n", mCurrentFrame, this );
@@ -332,7 +317,7 @@ void VectorAnimationTask::SetLoopingMode( DevelImageVisual::LoopingMode::Type lo
   DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetLoopingMode: looping mode = %d [%p]\n", mLoopingMode, this );
 }
 
-void VectorAnimationTask::GetLayerInfo( Property::Map& map )
+void VectorAnimationTask::GetLayerInfo( Property::Map& map ) const
 {
   mVectorRenderer.GetLayerInfo( map );
 }
@@ -449,15 +434,11 @@ bool VectorAnimationTask::Rasterize()
   }
 
   // Rasterize
-  bool renderSuccess = false;
-  if( mVectorRenderer )
+  bool renderSuccess = mVectorRenderer.Render( currentFrame );
+  if( !renderSuccess )
   {
-    renderSuccess = mVectorRenderer.Render( currentFrame );
-    if( !renderSuccess )
-    {
-      DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Rasterize: Rendering failed. Try again later.[%d] [%p]\n", currentFrame, this );
-      mUpdateFrameNumber = false;
-    }
+    DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Rasterize: Rendering failed. Try again later.[%d] [%p]\n", currentFrame, this );
+    mUpdateFrameNumber = false;
   }
 
   if( stopped && renderSuccess )

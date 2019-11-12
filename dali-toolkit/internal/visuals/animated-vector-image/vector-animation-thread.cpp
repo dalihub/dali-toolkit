@@ -119,7 +119,7 @@ void VectorAnimationThread::OnTaskCompleted( VectorAnimationTaskPtr task, bool k
   {
     ConditionalWait::ScopedLock lock( mConditionalWait );
 
-    if( mCompletedTasks.end() == std::find( mCompletedTasks.begin(), mCompletedTasks.end(), task ) )
+    if( mAnimationTasks.end() == std::find( mAnimationTasks.begin(), mAnimationTasks.end(), task ) )
     {
       mCompletedTasks.push_back( task );
 
@@ -192,7 +192,7 @@ void VectorAnimationThread::Rasterize()
   mCompletedTasks.clear();
 
   // pop out the next task from the queue
-  while( !mAnimationTasks.empty() && !mNeedToSleep )
+  if( !mAnimationTasks.empty() && !mNeedToSleep )
   {
     std::vector< VectorAnimationTaskPtr >::iterator next = mAnimationTasks.begin();
     VectorAnimationTaskPtr nextTask = *next;
