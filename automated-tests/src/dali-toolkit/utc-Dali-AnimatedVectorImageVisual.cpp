@@ -28,7 +28,6 @@
 #include <dali-toolkit/devel-api/visuals/image-visual-properties-devel.h>
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-actions-devel.h>
 #include <dali-toolkit/devel-api/visuals/animated-vector-image-visual-signals-devel.h>
-#include <dali/devel-api/rendering/renderer-devel.h>
 #include "dummy-control.h"
 
 using namespace Dali;
@@ -1223,50 +1222,6 @@ int UtcDaliAnimatedVectorImageVisualMultipleInstances(void)
   DALI_TEST_CHECK( actor2.GetRendererCount() == 1u );
   Renderer renderer2 = actor2.GetRendererAt( 0u );
   DALI_TEST_CHECK( renderer2 );
-
-  END_TEST;
-}
-
-int UtcDaliAnimatedVectorImageVisualVisibilityChanged(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline( "UtcDaliAnimatedVectorImageVisualVisibilityChanged" );
-
-  Property::Map propertyMap;
-  propertyMap.Add( Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE )
-             .Add( ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME );
-
-  Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
-  DALI_TEST_CHECK( visual );
-
-  DummyControl actor = DummyControl::New( true );
-  DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
-  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
-
-  Vector2 controlSize( 20.f, 30.f );
-  actor.SetSize( controlSize );
-
-  Stage::GetCurrent().Add( actor );
-
-  application.SendNotification();
-  application.Render();
-
-  Property::Map attributes;
-  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
-
-  // Check rendering behavior
-  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
-  Renderer renderer = actor.GetRendererAt( 0u );
-  DALI_TEST_CHECK( renderer );
-  DALI_TEST_CHECK( renderer.GetProperty< int >( DevelRenderer::Property::RENDERING_BEHAVIOR ) == DevelRenderer::Rendering::CONTINUOUSLY );
-
-  actor.SetVisible( false );
-
-  application.SendNotification();
-  application.Render();
-
-  // Check rendering behavior again
-  DALI_TEST_CHECK( renderer.GetProperty< int >( DevelRenderer::Property::RENDERING_BEHAVIOR ) == DevelRenderer::Rendering::IF_REQUIRED );
 
   END_TEST;
 }
