@@ -46,7 +46,7 @@ YGSize MeasureChild(YGNodeRef child, float width, YGMeasureMode measureModeWidth
   // Get the Node from the YGNodeRef
   Toolkit::Flex::Node* childNode =  static_cast<Toolkit::Flex::Node*>(YGNodeGetContext(child));
 
-  YGSize childSize = YGSize{.width = 1, .height = 1};  // Initialise variable.
+  YGSize childSize{ 1, 1 }; // Initialise variable.
 
   DALI_ASSERT_DEBUG( childNode );
 

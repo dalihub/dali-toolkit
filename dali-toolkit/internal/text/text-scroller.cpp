@@ -301,11 +301,11 @@ void TextScroller::SetParameters( Actor scrollingTextActor, Renderer renderer, T
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::SetParameters horizontalAlign[%f], verticalAlign[%f]\n", horizontalAlign, verticalAlign );
 
-  scrollingTextActor.RegisterProperty( "uTextureSize", textureSize );
-  scrollingTextActor.RegisterProperty( "uHorizontalAlign", horizontalAlign );
-  scrollingTextActor.RegisterProperty( "uVerticalAlign", verticalAlign );
-  scrollingTextActor.RegisterProperty( "uGap", wrapGap );
-  mScrollDeltaIndex = scrollingTextActor.RegisterProperty( "uDelta", 0.0f );
+  shader.RegisterProperty( "uTextureSize", textureSize );
+  shader.RegisterProperty( "uHorizontalAlign", horizontalAlign );
+  shader.RegisterProperty( "uVerticalAlign", verticalAlign );
+  shader.RegisterProperty( "uGap", wrapGap );
+  mScrollDeltaIndex = shader.RegisterProperty( "uDelta", 0.0f );
 
   float scrollAmount = std::max( textureSize.width, controlSize.width );
   float scrollDuration =  scrollAmount / mScrollSpeed;
@@ -336,8 +336,9 @@ void TextScroller::StartScrolling( Actor scrollingTextActor, float scrollAmount,
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "TextScroller::StartScrolling scrollAmount[%f] scrollDuration[%f], loop[%d] speed[%d]\n", scrollAmount, scrollDuration, loopCount, mScrollSpeed );
 
+  Shader shader = mRenderer.GetShader();
   mScrollAnimation = Animation::New( scrollDuration );
-  mScrollAnimation.AnimateTo( Property( scrollingTextActor, mScrollDeltaIndex ), scrollAmount, TimePeriod( mLoopDelay, scrollDuration ) );
+  mScrollAnimation.AnimateTo( Property( shader, mScrollDeltaIndex ), scrollAmount, TimePeriod( mLoopDelay, scrollDuration ) );
   mScrollAnimation.SetEndAction( Animation::Discard );
   mScrollAnimation.SetLoopCount( loopCount );
   mScrollAnimation.FinishedSignal().Connect( this, &TextScroller::AutoScrollAnimationFinished );
