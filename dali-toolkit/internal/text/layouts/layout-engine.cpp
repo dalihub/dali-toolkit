@@ -50,7 +50,8 @@ namespace
 #endif
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
-const bool RTL = true;
+const CharacterDirection LTR = false;
+const CharacterDirection RTL = !LTR;
 const float LINE_SPACING= 0.f;
 
 inline bool isEmptyLineAtLast( const Vector<LineRun>& lines, const Vector<LineRun>::Iterator& line )
@@ -196,8 +197,20 @@ struct Engine::Impl
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->GetLineLayoutForBox\n" );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  initial glyph index : %d\n", lineLayout.glyphIndex );
 
+    const Character* const textBuffer = parameters.textModel->mLogicalModel->mText.Begin();
+    const Length* const charactersPerGlyphBuffer = parameters.textModel->mVisualModel->mCharactersPerGlyph.Begin();
+    const GlyphInfo* const glyphsBuffer = parameters.textModel->mVisualModel->mGlyphs.Begin();
+    const CharacterIndex* const glyphsToCharactersBuffer = parameters.textModel->mVisualModel->mGlyphsToCharacters.Begin();
+    const LineBreakInfo* const lineBreakInfoBuffer = parameters.textModel->mLogicalModel->mLineBreakInfo.Begin();
+
+    const bool hasBidiParagraphs = !parameters.textModel->mLogicalModel->mBidirectionalParagraphInfo.Empty();
+    const CharacterDirection* const characterDirectionBuffer = hasBidiParagraphs ? parameters.textModel->mLogicalModel->mCharacterDirections.Begin() : nullptr;
+
+    const float outlineWidth = static_cast<float>( parameters.textModel->GetOutlineWidth() );
+    const Length totalNumberOfGlyphs = parameters.textModel->mVisualModel->mGlyphs.Count();
+
     const bool isMultiline = mLayout == MULTI_LINE_BOX;
-    const bool isWordLaidOut = parameters.lineWrapMode == Text::LineWrap::WORD;
+    const bool isWordLaidOut = parameters.textModel->mLineWrapMode == Text::LineWrap::WORD;
 
     // The last glyph to be laid-out.
     const GlyphIndex lastGlyphOfParagraphPlusOne = parameters.startGlyphIndex + parameters.numberOfGlyphs;
@@ -209,17 +222,17 @@ struct Engine::Impl
     // Check whether the first glyph comes from a character that is shaped in multiple glyphs.
     const Length numberOfGLyphsInGroup = GetNumberOfGlyphsOfGroup( lineLayout.glyphIndex,
                                                                    lastGlyphOfParagraphPlusOne,
-                                                                   parameters.charactersPerGlyphBuffer );
+                                                                   charactersPerGlyphBuffer );
 
     GlyphMetrics glyphMetrics;
     GetGlyphsMetrics( lineLayout.glyphIndex,
                       numberOfGLyphsInGroup,
                       glyphMetrics,
-                      parameters.glyphsBuffer,
+                      glyphsBuffer,
                       mMetrics );
 
     // Set the direction of the first character of the line.
-    lineLayout.characterIndex = *( parameters.glyphsToCharactersBuffer + lineLayout.glyphIndex );
+    lineLayout.characterIndex = *( glyphsToCharactersBuffer + lineLayout.glyphIndex );
 
     // Stores temporary line layout which has not been added to the final line layout.
     LineLayout tmpLineLayout;
@@ -229,7 +242,7 @@ struct Engine::Impl
     // The initial start point is zero. However it needs a correction according the 'x' bearing of the first glyph.
     // i.e. if the bearing of the first glyph is negative it may exceed the boundaries of the text area.
     // It needs to add as well space for the cursor if the text is in edit mode and extra space in case the text is outlined.
-    tmpLineLayout.penX = -glyphMetrics.xBearing + mCursorWidth + parameters.outlineWidth;
+    tmpLineLayout.penX = -glyphMetrics.xBearing + mCursorWidth + outlineWidth;
 
     // Initialize the advance of the previous glyph.
     tmpLineLayout.previousAdvance = 0.f;
@@ -248,16 +261,16 @@ struct Engine::Impl
       // Check whether this glyph comes from a character that is shaped in multiple glyphs.
       const Length numberOfGLyphsInGroup = GetNumberOfGlyphsOfGroup( glyphIndex,
                                                                      lastGlyphOfParagraphPlusOne,
-                                                                     parameters.charactersPerGlyphBuffer );
+                                                                     charactersPerGlyphBuffer );
 
       GlyphMetrics glyphMetrics;
       GetGlyphsMetrics( glyphIndex,
                         numberOfGLyphsInGroup,
                         glyphMetrics,
-                        parameters.glyphsBuffer,
+                        glyphsBuffer,
                         mMetrics );
 
-      const bool isLastGlyph = glyphIndex + numberOfGLyphsInGroup  == parameters.totalNumberOfGlyphs;
+      const bool isLastGlyph = glyphIndex + numberOfGLyphsInGroup  == totalNumberOfGlyphs;
 
       // Check if the font of the current glyph is the same of the previous one.
       // If it's different the ascender and descender need to be updated.
@@ -270,13 +283,13 @@ struct Engine::Impl
       // Get the character indices for the current glyph. The last character index is needed
       // because there are glyphs formed by more than one character but their break info is
       // given only for the last character.
-      const Length charactersPerGlyph = *( parameters.charactersPerGlyphBuffer + glyphIndex + numberOfGLyphsInGroup - 1u );
+      const Length charactersPerGlyph = *( charactersPerGlyphBuffer + glyphIndex + numberOfGLyphsInGroup - 1u );
       const bool hasCharacters = charactersPerGlyph > 0u;
-      const CharacterIndex characterFirstIndex = *( parameters.glyphsToCharactersBuffer + glyphIndex );
+      const CharacterIndex characterFirstIndex = *( glyphsToCharactersBuffer + glyphIndex );
       const CharacterIndex characterLastIndex = characterFirstIndex + ( hasCharacters ? charactersPerGlyph - 1u : 0u );
 
       // Get the line break info for the current character.
-      const LineBreakInfo lineBreakInfo = hasCharacters ? *( parameters.lineBreakInfoBuffer + characterLastIndex ) : TextAbstraction::LINE_NO_BREAK;
+      const LineBreakInfo lineBreakInfo = hasCharacters ? *( lineBreakInfoBuffer + characterLastIndex ) : TextAbstraction::LINE_NO_BREAK;
 
       // Increase the number of characters.
       tmpLineLayout.numberOfCharacters += charactersPerGlyph;
@@ -285,7 +298,7 @@ struct Engine::Impl
       tmpLineLayout.numberOfGlyphs += numberOfGLyphsInGroup;
 
       // Check whether is a white space.
-      const Character character = *( parameters.textBuffer + characterFirstIndex );
+      const Character character = *( textBuffer + characterFirstIndex );
       const bool isWhiteSpace = TextAbstraction::IsWhiteSpace( character );
 
       // Calculate the length of the line.
@@ -353,9 +366,9 @@ struct Engine::Impl
 
         // Set the next paragraph's direction.
         if( !isLastGlyph &&
-            ( NULL != parameters.characterDirectionBuffer ) )
+            ( nullptr != characterDirectionBuffer ) )
         {
-          paragraphDirection = *( parameters.characterDirectionBuffer + 1u + characterLastIndex );
+          paragraphDirection = *( characterDirectionBuffer + 1u + characterLastIndex );
         }
 
         DALI_LOG_INFO( gLogFilter, Debug::Verbose, "  Must break\n" );
@@ -425,7 +438,7 @@ struct Engine::Impl
                               Length& linesCapacity,
                               bool updateCurrentBuffer )
   {
-    LineRun* linesBuffer = NULL;
+    LineRun* linesBuffer = nullptr;
     // Reserve more space for the next lines.
     linesCapacity *= 2u;
     if( updateCurrentBuffer )
@@ -480,7 +493,7 @@ struct Engine::Impl
       // The last line needs to be completely filled with characters.
       // Part of a word may be used.
 
-      LineRun* lineRun = NULL;
+      LineRun* lineRun = nullptr;
       LineLayout ellipsisLayout;
       if( 0u != numberOfLines )
       {
@@ -514,7 +527,7 @@ struct Engine::Impl
       lineRun->extraLength = std::ceil( ellipsisLayout.wsLengthEndOfLine );
       lineRun->ascender = ellipsisLayout.ascender;
       lineRun->descender = ellipsisLayout.descender;
-      lineRun->direction = !RTL;
+      lineRun->direction = LTR;
       lineRun->ellipsis = true;
 
       layoutSize.width = layoutParameters.boundingBox.width;
@@ -523,9 +536,12 @@ struct Engine::Impl
         layoutSize.height += ( lineRun->ascender + -lineRun->descender ) + lineRun->lineSpacing;
       }
 
-      SetGlyphPositions( layoutParameters.glyphsBuffer + lineRun->glyphRun.glyphIndex,
+      const GlyphInfo* const glyphsBuffer = layoutParameters.textModel->mVisualModel->mGlyphs.Begin();
+      const float outlineWidth = static_cast<float>( layoutParameters.textModel->GetOutlineWidth() );
+
+      SetGlyphPositions( glyphsBuffer + lineRun->glyphRun.glyphIndex,
                          ellipsisLayout.numberOfGlyphs,
-                         layoutParameters.outlineWidth,
+                         outlineWidth,
                          layoutParameters.interGlyphExtraAdvance,
                          glyphPositionsBuffer + lineRun->glyphRun.glyphIndex - layoutParameters.startGlyphIndex );
     }
@@ -586,7 +602,7 @@ struct Engine::Impl
 
     lineRun.ascender = layout.ascender;
     lineRun.descender = layout.descender;
-    lineRun.direction = !RTL;
+    lineRun.direction = LTR;
     lineRun.ellipsis = false;
 
     // Update the actual size.
@@ -615,8 +631,10 @@ struct Engine::Impl
                          LineRun* linesBuffer,
                          Length& numberOfLines )
   {
+    const Vector<GlyphInfo>& glyphs = layoutParameters.textModel->mVisualModel->mGlyphs;
+
     // Need to add a new line with no characters but with height to increase the layoutSize.height
-    const GlyphInfo& glyphInfo = *( layoutParameters.glyphsBuffer + layoutParameters.totalNumberOfGlyphs - 1u );
+    const GlyphInfo& glyphInfo = glyphs[glyphs.Count() - 1u];
 
     Text::FontMetrics fontMetrics;
     if( 0u != glyphInfo.fontId )
@@ -636,7 +654,7 @@ struct Engine::Impl
     lineRun.descender = fontMetrics.descender;
     lineRun.extraLength = 0.f;
     lineRun.alignmentOffset = 0.f;
-    lineRun.direction = !RTL;
+    lineRun.direction = LTR;
     lineRun.ellipsis = false;
     lineRun.lineSpacing = mDefaultLineSpacing;
 
@@ -746,6 +764,7 @@ struct Engine::Impl
     }
 
     const GlyphIndex lastGlyphPlusOne = layoutParameters.startGlyphIndex + layoutParameters.numberOfGlyphs;
+    const Length totalNumberOfGlyphs = layoutParameters.textModel->mVisualModel->mGlyphs.Count();
 
     // In a previous layout, an extra line with no characters may have been added if the text ended with a new paragraph character.
     // This extra line needs to be removed.
@@ -754,22 +773,27 @@ struct Engine::Impl
       Vector<LineRun>::Iterator lastLine = lines.End() - 1u;
 
       if( ( 0u == lastLine->characterRun.numberOfCharacters ) &&
-          ( lastGlyphPlusOne == layoutParameters.totalNumberOfGlyphs ) )
+          ( lastGlyphPlusOne == totalNumberOfGlyphs ) )
       {
         lines.Remove( lastLine );
       }
     }
 
+    // Retrieve BiDi info.
+    const bool hasBidiParagraphs = !layoutParameters.textModel->mLogicalModel->mBidirectionalParagraphInfo.Empty();
+
+    const CharacterDirection* const characterDirectionBuffer = hasBidiParagraphs ? layoutParameters.textModel->mLogicalModel->mCharacterDirections.Begin() : nullptr;
+
     // Set the first paragraph's direction.
-    CharacterDirection paragraphDirection = ( NULL != layoutParameters.characterDirectionBuffer ) ? *layoutParameters.characterDirectionBuffer : !RTL;
+    CharacterDirection paragraphDirection = ( nullptr != characterDirectionBuffer ) ? *characterDirectionBuffer : LTR;
 
     // Whether the layout is being updated or set from scratch.
-    const bool updateCurrentBuffer = layoutParameters.numberOfGlyphs < layoutParameters.totalNumberOfGlyphs;
+    const bool updateCurrentBuffer = layoutParameters.numberOfGlyphs < totalNumberOfGlyphs;
 
-    Vector2* glyphPositionsBuffer = NULL;
+    Vector2* glyphPositionsBuffer = nullptr;
     Vector<Vector2> newGlyphPositions;
 
-    LineRun* linesBuffer = NULL;
+    LineRun* linesBuffer = nullptr;
     Vector<LineRun> newLines;
 
     // Estimate the number of lines.
@@ -792,8 +816,13 @@ struct Engine::Impl
       linesBuffer = lines.Begin();
     }
 
+
+    const GlyphInfo* const glyphsBuffer = layoutParameters.textModel->mVisualModel->mGlyphs.Begin();
+    const float outlineWidth = static_cast<float>( layoutParameters.textModel->GetOutlineWidth() );
+
     float penY = CalculateLineOffset( lines,
                                       layoutParameters.startLineIndex );
+
 
     for( GlyphIndex index = layoutParameters.startGlyphIndex; index < lastGlyphPlusOne; )
     {
@@ -855,7 +884,7 @@ struct Engine::Impl
       else
       {
         // Whether the last line has been laid-out.
-        const bool isLastLine = index + layout.numberOfGlyphs == layoutParameters.totalNumberOfGlyphs;
+        const bool isLastLine = index + layout.numberOfGlyphs == totalNumberOfGlyphs;
 
         if( numberOfLines == linesCapacity )
         {
@@ -877,7 +906,7 @@ struct Engine::Impl
 
         const GlyphIndex nextIndex = index + layout.numberOfGlyphs;
 
-        if( ( nextIndex == layoutParameters.totalNumberOfGlyphs ) &&
+        if( ( nextIndex == totalNumberOfGlyphs ) &&
             layoutParameters.isLastNewParagraph &&
             ( mLayout == MULTI_LINE_BOX ) )
         {
@@ -903,9 +932,9 @@ struct Engine::Impl
         } // whether to add a last line.
 
         // Sets the positions of the glyphs.
-        SetGlyphPositions( layoutParameters.glyphsBuffer + index,
+        SetGlyphPositions( glyphsBuffer + index,
                            layout.numberOfGlyphs,
-                           layoutParameters.outlineWidth,
+                           outlineWidth,
                            layoutParameters.interGlyphExtraAdvance,
                            glyphPositionsBuffer + index - layoutParameters.startGlyphIndex );
 
@@ -922,7 +951,7 @@ struct Engine::Impl
       glyphPositions.Insert( glyphPositions.Begin() + layoutParameters.startGlyphIndex,
                              newGlyphPositions.Begin(),
                              newGlyphPositions.End() );
-      glyphPositions.Resize( layoutParameters.totalNumberOfGlyphs );
+      glyphPositions.Resize( totalNumberOfGlyphs );
 
       newLines.Resize( numberOfLines );
 
@@ -968,6 +997,11 @@ struct Engine::Impl
                                  Length numberOfCharacters,
                                  Vector<Vector2>& glyphPositions )
   {
+    const GlyphInfo* const glyphsBuffer = layoutParameters.textModel->mVisualModel->mGlyphs.Begin();
+    const GlyphIndex* const charactersToGlyphsBuffer = layoutParameters.textModel->mVisualModel->mCharactersToGlyph.Begin();
+    const Length* const glyphsPerCharacterBuffer = layoutParameters.textModel->mVisualModel->mGlyphsPerCharacter.Begin();
+    const float outlineWidth = static_cast<float>( layoutParameters.textModel->GetOutlineWidth() );
+
     const CharacterIndex lastCharacterIndex = startIndex + numberOfCharacters;
 
     // Traverses the paragraphs with right to left characters.
@@ -988,9 +1022,9 @@ struct Engine::Impl
       }
 
       const CharacterIndex characterVisualIndex = bidiLine.characterRun.characterIndex + *bidiLine.visualToLogicalMap;
-      const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) );
+      const GlyphInfo& glyph = *( glyphsBuffer + *( charactersToGlyphsBuffer + characterVisualIndex ) );
 
-      float penX = -glyph.xBearing + layoutParameters.outlineWidth + mCursorWidth;
+      float penX = -glyph.xBearing + outlineWidth + mCursorWidth;
 
       Vector2* glyphPositionsBuffer = glyphPositions.Begin();
 
@@ -1003,16 +1037,16 @@ struct Engine::Impl
         const CharacterIndex characterVisualIndex = bidiLine.characterRun.characterIndex + *( bidiLine.visualToLogicalMap + characterLogicalIndex );
 
         // Get the number of glyphs of the character.
-        const Length numberOfGlyphs = *( layoutParameters.glyphsPerCharacterBuffer + characterVisualIndex );
+        const Length numberOfGlyphs = *( glyphsPerCharacterBuffer + characterVisualIndex );
 
         for( GlyphIndex index = 0u; index < numberOfGlyphs; ++index )
         {
           // Convert the character in the visual order into the glyph in the visual order.
-          const GlyphIndex glyphIndex = *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) + index;
+          const GlyphIndex glyphIndex = *( charactersToGlyphsBuffer + characterVisualIndex ) + index;
 
-          DALI_ASSERT_DEBUG( 0u <= glyphIndex && glyphIndex < layoutParameters.totalNumberOfGlyphs );
+          DALI_ASSERT_DEBUG( 0u <= glyphIndex && glyphIndex < layoutParameters.textModel->mVisualModel->mGlyphs.Count() );
 
-          const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + glyphIndex );
+          const GlyphInfo& glyph = *( glyphsBuffer + glyphIndex );
           Vector2& position = *( glyphPositionsBuffer + glyphIndex );
 
           position.x = std::round( penX + glyph.xBearing );
@@ -1166,7 +1200,7 @@ struct Engine::Impl
     line.descender = 0.f;
     line.extraLength = 0.f;
     line.alignmentOffset = 0.f;
-    line.direction = !RTL;
+    line.direction = LTR;
     line.ellipsis = false;
     line.lineSpacing = mDefaultLineSpacing;
   }
@@ -1179,7 +1213,7 @@ struct Engine::Impl
 };
 
 Engine::Engine()
-: mImpl( NULL )
+: mImpl( nullptr )
 {
   mImpl = new Engine::Impl();
 }

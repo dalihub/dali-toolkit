@@ -2045,7 +2045,6 @@ Vector3 Controller::GetNaturalSize()
                                                                            GET_SCRIPTS       |
                                                                            VALIDATE_FONTS    |
                                                                            GET_LINE_BREAKS   |
-                                                                           GET_WORD_BREAKS   |
                                                                            BIDI_INFO         |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
@@ -2117,7 +2116,6 @@ bool Controller::CheckForTextFit( float pointSize, Size& layoutSize )
                                                                               GET_SCRIPTS |
                                                                            VALIDATE_FONTS |
                                                                           GET_LINE_BREAKS |
-                                                                          GET_WORD_BREAKS |
                                                                                 BIDI_INFO |
                                                                                 SHAPE_TEXT|
                                                                          GET_GLYPH_METRICS );
@@ -2213,7 +2211,6 @@ float Controller::GetHeightForWidth( float width )
                                                                            GET_SCRIPTS       |
                                                                            VALIDATE_FONTS    |
                                                                            GET_LINE_BREAKS   |
-                                                                           GET_WORD_BREAKS   |
                                                                            BIDI_INFO         |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
@@ -2435,7 +2432,6 @@ Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
                                                                            GET_SCRIPTS       |
                                                                            VALIDATE_FONTS    |
                                                                            GET_LINE_BREAKS   |
-                                                                           GET_WORD_BREAKS   |
                                                                            BIDI_INFO         |
                                                                            SHAPE_TEXT        |
                                                                            GET_GLYPH_METRICS );
@@ -3829,32 +3825,11 @@ bool Controller::DoRelayout( const Size& size,
       return true;
     }
 
-    const Vector<LineBreakInfo>& lineBreakInfo = mImpl->mModel->mLogicalModel->mLineBreakInfo;
-    const Vector<WordBreakInfo>& wordBreakInfo = mImpl->mModel->mLogicalModel->mWordBreakInfo;
-    const Vector<CharacterDirection>& characterDirection = mImpl->mModel->mLogicalModel->mCharacterDirections;
-    const Vector<GlyphInfo>& glyphs = mImpl->mModel->mVisualModel->mGlyphs;
-    const Vector<CharacterIndex>& glyphsToCharactersMap = mImpl->mModel->mVisualModel->mGlyphsToCharacters;
-    const Vector<Length>& charactersPerGlyph = mImpl->mModel->mVisualModel->mCharactersPerGlyph;
     const Character* const textBuffer = mImpl->mModel->mLogicalModel->mText.Begin();
-    const float outlineWidth = static_cast<float>( mImpl->mModel->GetOutlineWidth() );
 
     // Set the layout parameters.
     Layout::Parameters layoutParameters( size,
-                                         textBuffer,
-                                         lineBreakInfo.Begin(),
-                                         wordBreakInfo.Begin(),
-                                         ( 0u != characterDirection.Count() ) ? characterDirection.Begin() : NULL,
-                                         glyphs.Begin(),
-                                         glyphsToCharactersMap.Begin(),
-                                         charactersPerGlyph.Begin(),
-                                         charactersToGlyphBuffer,
-                                         glyphsPerCharacterBuffer,
-                                         totalNumberOfGlyphs,
-                                         mImpl->mModel->mHorizontalAlignment,
-                                         mImpl->mModel->mLineWrapMode,
-                                         outlineWidth,
-                                         mImpl->mModel->mIgnoreSpacesAfterText,
-                                         mImpl->mModel->mMatchSystemLanguageDirection );
+                                         mImpl->mModel );
 
     // Resize the vector of positions to have the same size than the vector of glyphs.
     Vector<Vector2>& glyphPositions = mImpl->mModel->mVisualModel->mGlyphPositions;

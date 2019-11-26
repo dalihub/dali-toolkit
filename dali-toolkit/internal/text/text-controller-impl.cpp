@@ -505,11 +505,6 @@ void Controller::Impl::ClearFullModelData( OperationsMask operations )
     mModel->mLogicalModel->mParagraphInfo.Clear();
   }
 
-  if( NO_OPERATION != ( GET_WORD_BREAKS & operations ) )
-  {
-    mModel->mLogicalModel->mLineBreakInfo.Clear();
-  }
-
   if( NO_OPERATION != ( GET_SCRIPTS & operations ) )
   {
     mModel->mLogicalModel->mScriptRuns.Clear();
@@ -582,15 +577,6 @@ void Controller::Impl::ClearCharacterModelData( CharacterIndex startIndex, Chara
     ClearCharacterRuns( startIndex,
                         endIndex,
                         mModel->mLogicalModel->mParagraphInfo );
-  }
-
-  if( NO_OPERATION != ( GET_WORD_BREAKS & operations ) )
-  {
-    // Clear the word break info.
-    WordBreakInfo* wordBreakInfoBuffer = mModel->mLogicalModel->mWordBreakInfo.Begin();
-
-    mModel->mLogicalModel->mWordBreakInfo.Erase( wordBreakInfoBuffer + startIndex,
-                                         wordBreakInfoBuffer + endIndexPlusOne );
   }
 
   if( NO_OPERATION != ( GET_SCRIPTS & operations ) )
@@ -874,19 +860,6 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
     // Create the paragraph info.
     mModel->mLogicalModel->CreateParagraphInfo( startIndex,
                                                 requestedNumberOfCharacters );
-    updated = true;
-  }
-
-  Vector<WordBreakInfo>& wordBreakInfo = mModel->mLogicalModel->mWordBreakInfo;
-  if( NO_OPERATION != ( GET_WORD_BREAKS & operations ) )
-  {
-    // Retrieves the word break info. The word break info is used to layout the text (where to wrap the text in lines).
-    wordBreakInfo.Resize( numberOfCharacters, TextAbstraction::WORD_NO_BREAK );
-
-    SetWordBreakInfo( utf32Characters,
-                      startIndex,
-                      requestedNumberOfCharacters,
-                      wordBreakInfo );
     updated = true;
   }
 

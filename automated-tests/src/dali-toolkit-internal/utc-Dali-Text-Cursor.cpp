@@ -97,8 +97,7 @@ bool GetClosestLineTest( const GetClosestLineData& data )
   std::cout << "  testing : " << data.description << std::endl;
 
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(400.f, 600.f);
   Size layoutSize;
@@ -110,10 +109,12 @@ bool GetClosestLineTest( const GetClosestLineData& data )
                    fontDescriptionRuns,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   for( unsigned int index = 0; index < data.numberOfTests; ++index )
   {
@@ -142,8 +143,7 @@ bool GetClosestCursorIndexTest( const GetClosestCursorIndexData& data )
   std::cout << "  testing : " << data.description << std::endl;
 
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(400.f, 600.f);
   Size layoutSize;
@@ -155,10 +155,12 @@ bool GetClosestCursorIndexTest( const GetClosestCursorIndexData& data )
                    fontDescriptionRuns,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   for( unsigned int index = 0; index < data.numberOfTests; ++index )
   {
@@ -191,8 +193,7 @@ bool GetCursorPositionTest( const GetCursorPositionData& data )
   std::cout << "  testing : " << data.description << std::endl;
 
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(400.f, 600.f);
   Size layoutSize;
@@ -204,10 +205,12 @@ bool GetCursorPositionTest( const GetCursorPositionData& data )
                    fontDescriptionRuns,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   GetCursorPositionParameters parameters;
   parameters.visualModel = visualModel;
@@ -243,8 +246,7 @@ bool FindSelectionIndicesTest( const FindSelectionIndicesData& data )
   std::cout << "  testing : " << data.description << std::endl;
 
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(400.f, 600.f);
   Size layoutSize;
@@ -256,10 +258,12 @@ bool FindSelectionIndicesTest( const FindSelectionIndicesData& data )
                    fontDescriptionRuns,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   for( unsigned int index = 0; index < data.numberOfTests; ++index )
   {

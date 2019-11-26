@@ -65,8 +65,7 @@ struct SetCharacterToGlyphData
 bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
@@ -78,10 +77,12 @@ bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
                    fontDescriptions,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
@@ -148,8 +149,7 @@ bool SetGlyphsPerCharacterTest( const SetGlyphsPerCharacterData& data )
 bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
@@ -161,10 +161,12 @@ bool SetCharacterToGlyphTest( const SetCharacterToGlyphData& data )
                    fontDescriptions,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
   Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;

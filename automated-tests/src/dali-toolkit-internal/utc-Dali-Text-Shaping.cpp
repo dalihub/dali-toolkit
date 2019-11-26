@@ -123,8 +123,7 @@ struct ShapeInfoData
 bool ShapeInfoTest( const ShapeInfoData& data )
 {
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size textArea(100.f, 60.f);
   Size layoutSize;
@@ -136,10 +135,12 @@ bool ShapeInfoTest( const ShapeInfoData& data )
                    data.fontDescriptions,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   // 2) Clear the model.
 

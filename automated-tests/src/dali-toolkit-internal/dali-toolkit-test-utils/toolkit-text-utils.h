@@ -19,10 +19,9 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/metrics.h>
-#include <dali-toolkit/internal/text/visual-model-impl.h>
 #include <dali-toolkit/internal/text/text-controller.h>
+#include <dali-toolkit/internal/text/text-model.h>
 
 namespace Dali
 {
@@ -56,8 +55,7 @@ struct LayoutOptions
  * @param[in] fontDescriptions The fonts to be used.
  * @param[in] options Layout options.
  * @param[out] layoutSize The laid-out size.
- * @param[out] logicalModel Pointer to a logical text model instance.
- * @param[out] visualModel Pointer to a visual text model instance.
+ * @param[out] textModel Pointer to a text model instance.
  * @param[out] metrics Pointer to a wrapper around FontClient used to get metrics.
  * @param[in] markupProcessorEnabled Enable markup processor to use markup text.
  */
@@ -66,8 +64,7 @@ void CreateTextModel( const std::string& text,
                       const Vector<FontDescriptionRun>& fontDescriptions,
                       const LayoutOptions& options,
                       Size& layoutSize,
-                      LogicalModelPtr& logicalModel,
-                      VisualModelPtr& visualModel,
+                      ModelPtr& textModel,
                       MetricsPtr& metrics,
                       bool markupProcessorEnabled );
 

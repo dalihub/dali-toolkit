@@ -87,8 +87,7 @@ bool LayoutTextTest( const LayoutTextData& data )
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHindiRegular.ttf" );
 
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size layoutSize;
 
@@ -108,10 +107,12 @@ bool LayoutTextTest( const LayoutTextData& data )
                    fontDescriptionRuns,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   // 2) Clear the layout.
   Vector<LineRun>& lines = visualModel->mLines;
@@ -158,25 +159,12 @@ bool LayoutTextTest( const LayoutTextData& data )
   engine.SetMetrics( metrics );
   engine.SetLayout( data.layout );
 
-  const Length totalNumberOfGlyphs = visualModel->mGlyphs.Count();
-  float outlineWidth = visualModel->GetOutlineWidth();
-
+  textModel->mHorizontalAlignment = Text::HorizontalAlignment::BEGIN;
+  textModel->mLineWrapMode = LineWrap::WORD;
+  textModel->mIgnoreSpacesAfterText = true;
+  textModel->mMatchSystemLanguageDirection = false;
   Layout::Parameters layoutParameters( data.textArea,
-                                       logicalModel->mText.Begin(),
-                                       logicalModel->mLineBreakInfo.Begin(),
-                                       logicalModel->mWordBreakInfo.Begin(),
-                                       ( 0u != logicalModel->mCharacterDirections.Count() ) ? logicalModel->mCharacterDirections.Begin() : NULL,
-                                       visualModel->mGlyphs.Begin(),
-                                       visualModel->mGlyphsToCharacters.Begin(),
-                                       visualModel->mCharactersPerGlyph.Begin(),
-                                       visualModel->mCharactersToGlyph.Begin(),
-                                       visualModel->mGlyphsPerCharacter.Begin(),
-                                       totalNumberOfGlyphs,
-                                       Text::HorizontalAlignment::BEGIN,
-                                       Text::LineWrap::WORD,
-                                       outlineWidth,
-                                       true,
-                                       false );
+                                       textModel );
 
   layoutParameters.isLastNewParagraph = isLastNewParagraph;
 
@@ -353,8 +341,7 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansArabicRegular.ttf" );
 
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size layoutSize;
 
@@ -374,32 +361,23 @@ bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
                    fontDescriptionRuns,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   // 2) Call the ReLayoutRightToLeftLines() method.
   Layout::Engine engine;
   engine.SetMetrics( metrics );
 
-  float outlineWidth = visualModel->GetOutlineWidth();
+  textModel->mHorizontalAlignment = Text::HorizontalAlignment::BEGIN;
+  textModel->mLineWrapMode = LineWrap::WORD;
+  textModel->mIgnoreSpacesAfterText = true;
+  textModel->mMatchSystemLanguageDirection = false;
   Layout::Parameters layoutParameters( data.textArea,
-                                       logicalModel->mText.Begin(),
-                                       logicalModel->mLineBreakInfo.Begin(),
-                                       logicalModel->mWordBreakInfo.Begin(),
-                                       ( 0u != logicalModel->mCharacterDirections.Count() ) ? logicalModel->mCharacterDirections.Begin() : NULL,
-                                       visualModel->mGlyphs.Begin(),
-                                       visualModel->mGlyphsToCharacters.Begin(),
-                                       visualModel->mCharactersPerGlyph.Begin(),
-                                       visualModel->mCharactersToGlyph.Begin(),
-                                       visualModel->mGlyphsPerCharacter.Begin(),
-                                       visualModel->mGlyphs.Count(),
-                                       Text::HorizontalAlignment::BEGIN,
-                                       Text::LineWrap::WORD,
-                                       outlineWidth,
-                                       true,
-                                       false );
+                                       textModel );
 
   layoutParameters.numberOfBidirectionalInfoRuns = logicalModel->mBidirectionalLineInfo.Count();
   layoutParameters.lineBidirectionalInfoRunsBuffer = logicalModel->mBidirectionalLineInfo.Begin();
@@ -471,8 +449,7 @@ bool AlignTest( const AlignData& data )
   fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansArabicRegular.ttf" );
 
   // 1) Create the model.
-  LogicalModelPtr logicalModel;
-  VisualModelPtr visualModel;
+  ModelPtr textModel;
   MetricsPtr metrics;
   Size layoutSize;
 
@@ -491,10 +468,12 @@ bool AlignTest( const AlignData& data )
                    fontDescriptionRuns,
                    options,
                    layoutSize,
-                   logicalModel,
-                   visualModel,
+                   textModel,
                    metrics,
                    false );
+
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   // Call the Align method.
   Layout::Engine engine;
