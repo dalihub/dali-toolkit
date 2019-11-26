@@ -100,7 +100,6 @@ bool LayoutTextTest( const LayoutTextData& data )
   }
 
   LayoutOptions options;
-  options.reorder = false;
   options.align = false;
   CreateTextModel( data.text,
                    data.textArea,
@@ -178,8 +177,6 @@ bool LayoutTextTest( const LayoutTextData& data )
 
   bool isAutoScroll = false;
   const bool updated = engine.LayoutText( layoutParameters,
-                                          glyphPositions,
-                                          lines,
                                           layoutSize,
                                           data.ellipsis,
                                           isAutoScroll );
@@ -313,110 +310,6 @@ bool LayoutTextTest( const LayoutTextData& data )
 
 //////////////////////////////////////////////////////////
 
-struct ReLayoutRightToLeftLinesData
-{
-  std::string         description;
-  std::string         text;
-  Size                textArea;
-  unsigned int        numberOfFonts;
-  FontDescriptionRun* fontDescriptions;
-  unsigned int        totalNumberOfGlyphs;
-  float*              positions;
-  unsigned int        startIndex;
-  unsigned int        numberOfCharacters;
-};
-
-bool ReLayoutRightToLeftLinesTest( const ReLayoutRightToLeftLinesData& data )
-{
-  // Load some fonts.
-  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
-  fontClient.SetDpi( 96u, 96u );
-
-  char* pathNamePtr = get_current_dir_name();
-  const std::string pathName( pathNamePtr );
-  free( pathNamePtr );
-
-  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
-  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansHebrewRegular.ttf" );
-  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansArabicRegular.ttf" );
-
-  // 1) Create the model.
-  ModelPtr textModel;
-  MetricsPtr metrics;
-  Size layoutSize;
-
-  Vector<FontDescriptionRun> fontDescriptionRuns;
-  if( 0u != data.numberOfFonts )
-  {
-    fontDescriptionRuns.Insert( fontDescriptionRuns.End(),
-                                data.fontDescriptions,
-                                data.fontDescriptions + data.numberOfFonts );
-  }
-
-  LayoutOptions options;
-  options.reorder = false;
-  options.align = false;
-  CreateTextModel( data.text,
-                   data.textArea,
-                   fontDescriptionRuns,
-                   options,
-                   layoutSize,
-                   textModel,
-                   metrics,
-                   false );
-
-  LogicalModelPtr logicalModel = textModel->mLogicalModel;
-  VisualModelPtr visualModel = textModel->mVisualModel;
-
-  // 2) Call the ReLayoutRightToLeftLines() method.
-  Layout::Engine engine;
-  engine.SetMetrics( metrics );
-
-  textModel->mHorizontalAlignment = Text::HorizontalAlignment::BEGIN;
-  textModel->mLineWrapMode = LineWrap::WORD;
-  textModel->mIgnoreSpacesAfterText = true;
-  textModel->mMatchSystemLanguageDirection = false;
-  Layout::Parameters layoutParameters( data.textArea,
-                                       textModel );
-
-  layoutParameters.numberOfBidirectionalInfoRuns = logicalModel->mBidirectionalLineInfo.Count();
-  layoutParameters.lineBidirectionalInfoRunsBuffer = logicalModel->mBidirectionalLineInfo.Begin();
-
-  engine.ReLayoutRightToLeftLines( layoutParameters,
-                                   data.startIndex,
-                                   data.numberOfCharacters,
-                                   visualModel->mGlyphPositions );
-
-  // 3) Compare the results.
-  Vector<Vector2>& glyphPositions = visualModel->mGlyphPositions;
-
-  if( data.totalNumberOfGlyphs != visualModel->mGlyphs.Count() )
-  {
-    std::cout << "  Different number of glyphs : " << visualModel->mGlyphs.Count() << ", expected : " << data.totalNumberOfGlyphs << std::endl;
-    return false;
-  }
-
-  for( unsigned int index = 0u; index < data.totalNumberOfGlyphs; ++index )
-  {
-    const Vector2& position = *( glyphPositions.Begin() + index );
-
-    if( fabsf( position.x - *( data.positions + 2u * index ) ) > Math::MACHINE_EPSILON_1000 )
-    {
-      std::cout << "  Different position for glyph " << index << " x : " << position.x << ", expected : " << *( data.positions + 2u * index ) << std::endl;
-      return false;
-    }
-    if( fabsf( position.y - *( data.positions + 2u * index + 1u ) ) > Math::MACHINE_EPSILON_1000 )
-    {
-      std::cout << "  Different position for glyph " << index << " y : " << position.y << ", expected : " << *( data.positions + 2u * index + 1u ) << std::endl;
-      return false;
-    }
-  }
-
-  return true;
-}
-
-//////////////////////////////////////////////////////////
-
 struct AlignData
 {
   std::string                       description;
@@ -527,6 +420,7 @@ bool AlignTest( const AlignData& data )
 // UtcDaliTextLayoutMultilineText03
 // UtcDaliTextLayoutMultilineText04
 // UtcDaliTextLayoutMultilineText05
+// UtcDaliTextLayoutMultilineText06
 // UtcDaliTextUpdateLayout01
 // UtcDaliTextUpdateLayout02
 // UtcDaliTextUpdateLayout03
@@ -983,12 +877,12 @@ int UtcDaliTextLayoutMultilineText02(void)
   Size layoutSize(78.f, 114.f);
   float positions[] =
   {
-    0.f, -12.f, 10.f,  -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f,  -0.f, 39.f,  -9.f, 50.f,  -9.f, 60.f,  -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
-    0.f, -13.f,  9.f,  -9.f, 18.f,  -9.f, 30.f,  -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f,  -0.f,
-    0.f, -10.f,  8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f,  -0.f,
-    0.f, -13.f,  8.f,  -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f,  -0.f, 37.f,  -9.f, 48.f,  -9.f, 58.f,  -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
-    0.f, -13.f,  9.f,  -9.f, 18.f,  -9.f, 30.f,  -9.f, 39.f, -2.f,
+    0.f, -12.f, 10.f,  -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f,  -0.f, 39.f,  -9.f, 50.f,  -9.f, 60.f,  -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,  //  0 .. 11
+    0.f, -13.f,  9.f,  -9.f, 18.f,  -9.f, 30.f,  -9.f, 39.f, -0.f, 65.f, -10.f, 57.f, -13.f, 52.f, -10.f, 44.f, -10.f, 75.f,  -0.f,                           // 12 .. 21
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 29.f, -2.f, 32.f, -12.f,                                                                                // 22 .. 27
+    59.f, -10.f, 51.f, -13.f, 46.f, -10.f, 38.f, -10.f, 33.f, -0.f, 25.f, -10.f, 20.f, -10.f, 13.f, -13.f, 4.f, -10.f, 0.f,  -0.f,                            // 28 .. 37
+    4.f, -13.f,  12.f,  -9.f, 21.f, -13.f, 25.f, -13.f, 28.f, -9.f, 37.f,  -0.f, 41.f,  -9.f, 52.f,  -9.f, 62.f,  -9.f, 68.f, -13.f, 71.f, -13.f, 0.f, -0.f,  // 38 .. 49
+    3.f, -13.f,  12.f,  -9.f, 21.f,  -9.f, 33.f,  -9.f, 0.f, -2.f,                                                                                            // 50 .. 54
   };
   struct LineRun line0 =
   {
@@ -1007,7 +901,7 @@ int UtcDaliTextLayoutMultilineText02(void)
   {
     { 12u, 10u },
     { 12u, 10u },
-    75.f,
+    74.f,
     15.f,
     -4.f,
     4.f,
@@ -1033,7 +927,7 @@ int UtcDaliTextLayoutMultilineText02(void)
   {
     { 28u, 10u },
     { 28u, 10u },
-    65.f,
+    64.f,
     15.f,
     -4.f,
     4.f,
@@ -1412,6 +1306,197 @@ int UtcDaliTextLayoutMultilineText05(void)
   END_TEST;
 }
 
+int UtcDaliTextLayoutMultilineText06(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLayoutMultilineText06");
+
+  const std::string fontFamily( "TizenSansHebrew" );
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun;
+  fontDescriptionRun.characterRun.characterIndex = 0u;
+  fontDescriptionRun.characterRun.numberOfCharacters = 10u;
+  fontDescriptionRun.familyLength = fontFamily.size();
+  fontDescriptionRun.familyName = new char[fontDescriptionRun.familyLength];
+  memcpy( fontDescriptionRun.familyName, fontFamily.c_str(), fontDescriptionRun.familyLength );
+  fontDescriptionRun.familyDefined = true;
+  fontDescriptionRun.weightDefined = false;
+  fontDescriptionRun.widthDefined = false;
+  fontDescriptionRun.slantDefined = false;
+  fontDescriptionRun.sizeDefined = false;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns;
+  fontDescriptionRuns.PushBack( fontDescriptionRun );
+
+  Size textArea(64.f, 100.f);
+  Size layoutSize(31.f, 38.f);
+  float positions[] =
+  {
+    26.f, -13.f, 17.f, -10.f, 8.f, -10.f, 4.f, -10.f, 0.f, -0.f,
+    22.f, -10.f, 17.f, -10.f, 12.f, -10.f, 4.f, -10.f, 0.f, -10.f
+  };
+  struct LineRun line0 =
+  {
+    { 0u, 5u },
+    { 0u, 5u },
+    30.f,
+    15.f,
+    -4.f,
+    4.f,
+    0.f,
+    0.f,
+    true,
+    false
+  };
+  struct LineRun line1 =
+  {
+    { 5u, 5u },
+    { 5u, 5u },
+    31.f,
+    15.f,
+    -4.f,
+    0.f,
+    0.f,
+    0.f,
+    true,
+    false
+  };
+  Vector<LineRun> lines;
+  lines.PushBack( line0 );
+  lines.PushBack( line1 );
+
+  LayoutTextData data =
+  {
+    "Layout right to left text that doesn't fit in the text area after reordering.",
+    "לכאן שנורו", // If this text is laid-out ltr the width is 64. When reordered, the length is 66. This might cause alignment issues.
+    textArea,
+    1u,
+    fontDescriptionRuns.Begin(),
+    layoutSize,
+    10u,
+    positions,
+    2u,
+    lines.Begin(),
+    Layout::Engine::MULTI_LINE_BOX,
+    0u,
+    10u,
+    false,
+    true
+  };
+
+  if( !LayoutTextTest( data ) )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliTextLayoutMultilineText07(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextLayoutMultilineText07");
+
+  const std::string fontFamily( "TizenSansHebrew" );
+
+  // Set a known font description
+  FontDescriptionRun fontDescriptionRun;
+  fontDescriptionRun.characterRun.characterIndex = 0u;
+  fontDescriptionRun.characterRun.numberOfCharacters = 9u;
+  fontDescriptionRun.familyLength = fontFamily.size();
+  fontDescriptionRun.familyName = new char[fontDescriptionRun.familyLength];
+  memcpy( fontDescriptionRun.familyName, fontFamily.c_str(), fontDescriptionRun.familyLength );
+  fontDescriptionRun.familyDefined = true;
+  fontDescriptionRun.weightDefined = false;
+  fontDescriptionRun.widthDefined = false;
+  fontDescriptionRun.slantDefined = false;
+  fontDescriptionRun.sizeDefined = false;
+
+  Vector<FontDescriptionRun> fontDescriptionRuns;
+  fontDescriptionRuns.PushBack( fontDescriptionRun );
+
+  Size textArea(26.f, 100.f);
+  Size layoutSize(21.f, 57.f);
+  float positions[] =
+  {
+    10.f, -10.f, 5.f, -10.f, 0.f, -10.f,
+    11.f, -10.f, 7.f, -10.f, 0.f, -13.f,
+    13.f, -10.f, 4.f, -10.f, 0.f, -10.f
+  };
+  struct LineRun line0 =
+  {
+    { 0u, 3u },
+    { 0u, 3u },
+    19.f,
+    15.f,
+    -4.f,
+    0.f,
+    0.f,
+    0.f,
+    true,
+    false
+  };
+  struct LineRun line1 =
+  {
+    { 3u, 3u },
+    { 3u, 3u },
+    18.f,
+    15.f,
+    -4.f,
+    0.f,
+    0.f,
+    0.f,
+    true,
+    false
+  };
+  struct LineRun line2 =
+  {
+    { 6u, 3u },
+    { 6u, 3u },
+    21.f,
+    15.f,
+    -4.f,
+    0.f,
+    0.f,
+    0.f,
+    true,
+    false
+  };
+  Vector<LineRun> lines;
+  lines.PushBack( line0 );
+  lines.PushBack( line1 );
+  lines.PushBack( line2 );
+
+  LayoutTextData data =
+  {
+    "Layout a single word of right to left text that doesn't fit in one single line. When layouting ltr a piece of word fits in the line but it doesn't after reordering.",
+    "שנורולכאן", // If a piece of this text is laid-out ltr the width is 26. When reordered, the length is 27. This might cause alignment issues.
+    textArea,
+    1u,
+    fontDescriptionRuns.Begin(),
+    layoutSize,
+    9u,
+    positions,
+    3u,
+    lines.Begin(),
+    Layout::Engine::MULTI_LINE_BOX,
+    0u,
+    9u,
+    false,
+    true
+  };
+
+  if( !LayoutTextTest( data ) )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
 int UtcDaliTextUpdateLayout01(void)
 {
   ToolkitTestApplication application;
@@ -1663,27 +1748,27 @@ int UtcDaliTextUpdateLayout01(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(92.f, 361.f);
+  Size layoutSize(90.f, 361.f);
   float positions[] =
   {
-    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
-    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
-    0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -13.f, 67.f, -9.f, 76.f, -13.f, 80.f, -13.f, 83.f, -9.f, 92.f, -0.f,
-    0.f, -9.f, 11.f, -9.f, 21.f, -9.f, 27.f, -13.f, 30.f, -13.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
-    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
-    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -2.f, 42.f, -12.f,
-    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
-    0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
-    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
-    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
-    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
-    0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,                                                                                                     //   0 ..  11
+    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 65.f, -10.f, 57.f, -13.f, 52.f, -10.f, 44.f, -10.f, 75.f, -0.f,                                                                                                                             //  12 ..  21
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 29.f, -2.f, 32.f, -12.f,                                                                                                                                                                              //  22 ..  27
+    87.f, -8.f, 82.f, -6.f, 75.f, -8.f, 72.f, -7.f, 71.f, -11.f, 67.f, -0.f, 63.f, -7.f, 62.f, -11.f, 57.f, -11.f, 51.f, -8.f, 50.f, -11.f, 45.f, -11.f, 40.f, -8.f, 37.f, -0.f, 4.f, -13.f, 12.f, -9.f, 21.f, -13.f, 25.f, -13.f, 28.f, -9.f, 0.f, -0.f,   //  28 ..  47
+    39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 35.f, -0.f, 25.f, -10.f, 17.f, -13.f, 12.f, -10.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                 //  48 ..  58
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 0.f, -0.f,                                                                                                                                                                                            //  59 ..  63
+    59.f, -10.f, 51.f, -13.f, 46.f, -10.f, 38.f, -10.f, 33.f, -0.f, 25.f, -10.f, 20.f, -10.f, 13.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           //  64 ..  73
+    4.f, -13.f,  12.f, -9.f, 21.f, -13.f, 25.f, -13.f, 28.f, -9.f, 37.f, -0.f, 41.f, -9.f, 52.f, -9.f, 62.f, -9.f, 68.f, -13.f, 71.f, -13.f, 0.f, -0.f,                                                                                                     //  74 ..  85
+    3.f, -13.f,  12.f, -9.f, 21.f, -9.f, 33.f, -9.f, 0.f, -2.f, 0.f, -12.f,                                                                                                                                                                                 //  86 ..  91
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,                                                                                                     //  92 .. 103
+    81.f, -8.f, 76.f, -6.f, 69.f, -8.f, 66.f, -7.f, 65.f, -11.f, 61.f, -0.f, 57.f, -7.f, 56.f, -11.f, 51.f, -11.f, 45.f, -8.f, 44.f, -11.f, 39.f, -11.f, 34.f, -8.f, 31.f, -0.f, 21.f, -10.f, 13.f, -13.f, 8.f, -10.f, 0.f, -10.f, 88.f, -0.f,              // 104 .. 122
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 29.f, -0.f,                                                                                                                                                                                           // 123 .. 127
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,                                                                                                     // 128 .. 139
+    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 65.f, -10.f, 57.f, -13.f, 52.f, -10.f, 44.f, -10.f, 75.f, -0.f,                                                                                                                             // 140 .. 149
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 29.f, -2.f, 32.f, -12.f,                                                                                                                                                                              // 150 .. 155
+    59.f, -10.f, 51.f, -13.f, 46.f, -10.f, 38.f, -10.f, 33.f, -0.f, 25.f, -10.f, 20.f, -10.f, 13.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           // 156 .. 165
+    4.f, -13.f,  12.f, -9.f, 21.f, -13.f, 25.f, -13.f, 28.f, -9.f, 37.f, -0.f, 41.f, -9.f, 52.f, -9.f, 62.f, -9.f, 68.f, -13.f, 71.f, -13.f, 0.f, -0.f,                                                                                                     // 166 .. 177
+    47.f, -8.f, 42.f, -6.f, 35.f, -8.f, 32.f, -7.f, 31.f, -11.f, 27.f, -0.f, 23.f, -7.f, 22.f, -11.f, 17.f, -11.f, 11.f, -8.f, 10.f, -11.f, 5.f, -11.f, 0.f, -8.f, 0.f, -0.f,                                                                               // 178 .. 191
   };
 
   struct LineRun line01 =
@@ -1703,7 +1788,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 12u, 10u },
     { 12u, 10u },
-    75.f,
+    74.f,
     15.f,
     -4.f,
     4.f,
@@ -1729,7 +1814,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 28u, 20u },
     { 28u, 20u },
-    92.f,
+    90.f,
     15.f,
     -4.f,
     4.f,
@@ -1742,7 +1827,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 48u, 11u },
     { 48u, 11u },
-    75.f,
+    74.f,
     15.f,
     -4.f,
     4.f,
@@ -1755,7 +1840,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 59u, 5u },
     { 59u, 5u },
-    29.f,
+    28.f,
     15.f,
     -4.f,
     0.f,
@@ -1768,7 +1853,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 64u, 10u },
     { 64u, 10u },
-    65.f,
+    64.f,
     15.f,
     -4.f,
     4.f,
@@ -1820,7 +1905,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 104u, 19u },
     { 104u, 19u },
-    90.f,
+    88.f,
     15.f,
     -4.f,
     4.f,
@@ -1833,7 +1918,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 123u, 5u },
     { 123u, 5u },
-    29.f,
+    28.f,
     15.f,
     -4.f,
     0.f,
@@ -1859,7 +1944,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 140u, 10u },
     { 140u, 10u },
-    75.f,
+    74.f,
     15.f,
     -4.f,
     4.f,
@@ -1885,7 +1970,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 156u, 10u },
     { 156u, 10u },
-    65.f,
+    64.f,
     15.f,
     -4.f,
     4.f,
@@ -1911,7 +1996,7 @@ int UtcDaliTextUpdateLayout01(void)
   {
     { 178u, 14u },
     { 178u, 14u },
-    56.f,
+    54.f,
     15.f,
     -4.f,
     0.f,
@@ -2238,27 +2323,27 @@ int UtcDaliTextUpdateLayout02(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(92.f, 361.f);
+  Size layoutSize(90.f, 361.f);
   float positions[] =
   {
-    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
-    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
-    0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -13.f, 67.f, -9.f, 76.f, -13.f, 80.f, -13.f, 83.f, -9.f, 92.f, -0.f,
-    0.f, -9.f, 11.f, -9.f, 21.f, -9.f, 27.f, -13.f, 30.f, -13.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
-    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
-    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -2.f, 42.f, -12.f,
-    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
-    0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
-    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
-    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
-    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
-    0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,                                                                                                     //   0 ..  11
+    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 65.f, -10.f, 57.f, -13.f, 52.f, -10.f, 44.f, -10.f, 75.f, -0.f,                                                                                                                             //  12 ..  21
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 29.f, -2.f, 32.f, -12.f,                                                                                                                                                                              //  22 ..  27
+    87.f, -8.f, 82.f, -6.f, 75.f, -8.f, 72.f, -7.f, 71.f, -11.f, 67.f, -0.f, 63.f, -7.f, 62.f, -11.f, 57.f, -11.f, 51.f, -8.f, 50.f, -11.f, 45.f, -11.f, 40.f, -8.f, 37.f, -0.f, 4.f, -13.f, 12.f, -9.f, 21.f, -13.f, 25.f, -13.f, 28.f, -9.f, 0.f, -0.f,   //  28 ..  47
+    39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 35.f, -0.f, 25.f, -10.f, 17.f, -13.f, 12.f, -10.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                 //  48 ..  58
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 0.f, -0.f,                                                                                                                                                                                            //  59 ..  63
+    59.f, -10.f, 51.f, -13.f, 46.f, -10.f, 38.f, -10.f, 33.f, -0.f, 25.f, -10.f, 20.f, -10.f, 13.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           //  64 ..  73
+    4.f, -13.f,  12.f, -9.f, 21.f, -13.f, 25.f, -13.f, 28.f, -9.f, 37.f, -0.f, 41.f, -9.f, 52.f, -9.f, 62.f, -9.f, 68.f, -13.f, 71.f, -13.f, 0.f, -0.f,                                                                                                     //  74 ..  85
+    3.f, -13.f,  12.f, -9.f, 21.f, -9.f, 33.f, -9.f, 0.f, -2.f, 0.f, -12.f,                                                                                                                                                                                 //  86 ..  91
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,                                                                                                     //  92 .. 103
+    81.f, -8.f, 76.f, -6.f, 69.f, -8.f, 66.f, -7.f, 65.f, -11.f, 61.f, -0.f, 57.f, -7.f, 56.f, -11.f, 51.f, -11.f, 45.f, -8.f, 44.f, -11.f, 39.f, -11.f, 34.f, -8.f, 31.f, -0.f, 21.f, -10.f, 13.f, -13.f, 8.f, -10.f, 0.f, -10.f, 88.f, -0.f,              // 104 .. 122
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 29.f, -0.f,                                                                                                                                                                                           // 123 .. 127
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,                                                                                                     // 128 .. 139
+    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 65.f, -10.f, 57.f, -13.f, 52.f, -10.f, 44.f, -10.f, 75.f, -0.f,                                                                                                                             // 140 .. 149
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 29.f, -2.f, 32.f, -12.f,                                                                                                                                                                              // 150 .. 155
+    59.f, -10.f, 51.f, -13.f, 46.f, -10.f, 38.f, -10.f, 33.f, -0.f, 25.f, -10.f, 20.f, -10.f, 13.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           // 156 .. 165
+    4.f, -13.f,  12.f, -9.f, 21.f, -13.f, 25.f, -13.f, 28.f, -9.f, 37.f, -0.f, 41.f, -9.f, 52.f, -9.f, 62.f, -9.f, 68.f, -13.f, 71.f, -13.f, 0.f, -0.f,                                                                                                     // 166 .. 177
+    47.f, -8.f, 42.f, -6.f, 35.f, -8.f, 32.f, -7.f, 31.f, -11.f, 27.f, -0.f, 23.f, -7.f, 22.f, -11.f, 17.f, -11.f, 11.f, -8.f, 10.f, -11.f, 5.f, -11.f, 0.f, -8.f, 0.f, -0.f,                                                                               // 178 .. 191
   };
 
   struct LineRun line01 =
@@ -2278,7 +2363,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 12u, 10u },
     { 12u, 10u },
-    75.f,
+    74.f,
     15.f,
     -4.f,
     4.f,
@@ -2304,7 +2389,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 28u, 20u },
     { 28u, 20u },
-    92.f,
+    90.f,
     15.f,
     -4.f,
     4.f,
@@ -2317,7 +2402,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 48u, 11u },
     { 48u, 11u },
-    75.f,
+    74.f,
     15.f,
     -4.f,
     4.f,
@@ -2330,7 +2415,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 59u, 5u },
     { 59u, 5u },
-    29.f,
+    28.f,
     15.f,
     -4.f,
     0.f,
@@ -2343,7 +2428,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 64u, 10u },
     { 64u, 10u },
-    65.f,
+    64.f,
     15.f,
     -4.f,
     4.f,
@@ -2395,7 +2480,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 104u, 19u },
     { 104u, 19u },
-    90.f,
+    88.f,
     15.f,
     -4.f,
     4.f,
@@ -2408,7 +2493,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 123u, 5u },
     { 123u, 5u },
-    29.f,
+    28.f,
     15.f,
     -4.f,
     0.f,
@@ -2434,7 +2519,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 140u, 10u },
     { 140u, 10u },
-    75.f,
+    74.f,
     15.f,
     -4.f,
     4.f,
@@ -2460,7 +2545,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 156u, 10u },
     { 156u, 10u },
-    65.f,
+    64.f,
     15.f,
     -4.f,
     4.f,
@@ -2486,7 +2571,7 @@ int UtcDaliTextUpdateLayout02(void)
   {
     { 178u, 14u },
     { 178u, 14u },
-    56.f,
+    54.f,
     15.f,
     -4.f,
     0.f,
@@ -2813,27 +2898,27 @@ int UtcDaliTextUpdateLayout03(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun16 );
   fontDescriptionRuns.PushBack( fontDescriptionRun17 );
   Size textArea(100.f, 300.f);
-  Size layoutSize(92.f, 361.f);
+  Size layoutSize(90.f, 361.f);
   float positions[] =
   {
-    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
-    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
-    0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -13.f, 67.f, -9.f, 76.f, -13.f, 80.f, -13.f, 83.f, -9.f, 92.f, -0.f,
-    0.f, -9.f, 11.f, -9.f, 21.f, -9.f, 27.f, -13.f, 30.f, -13.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
-    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
-    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -2.f, 42.f, -12.f,
-    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
-    0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
-    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,
-    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 44.f, -10.f, 55.f, -13.f, 62.f, -10.f, 67.f, -10.f, 75.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -2.f, 32.f, -12.f,
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f,
-    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,
-    0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f,
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,                                                                                                     //   0 ..  11
+    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 65.f, -10.f, 57.f, -13.f, 52.f, -10.f, 44.f, -10.f, 75.f, -0.f,                                                                                                                             //  12 ..  21
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 29.f, -2.f, 32.f, -12.f,                                                                                                                                                                              //  22 ..  27
+    87.f, -8.f, 82.f, -6.f, 75.f, -8.f, 72.f, -7.f, 71.f, -11.f, 67.f, -0.f, 63.f, -7.f, 62.f, -11.f, 57.f, -11.f, 51.f, -8.f, 50.f, -11.f, 45.f, -11.f, 40.f, -8.f, 37.f, -0.f, 4.f, -13.f, 12.f, -9.f, 21.f, -13.f, 25.f, -13.f, 28.f, -9.f, 0.f, -0.f,   //  28 ..  47
+    39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 35.f, -0.f, 25.f, -10.f, 17.f, -13.f, 12.f, -10.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                 //  48 ..  58
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 0.f, -0.f,                                                                                                                                                                                            //  59 ..  63
+    59.f, -10.f, 51.f, -13.f, 46.f, -10.f, 38.f, -10.f, 33.f, -0.f, 25.f, -10.f, 20.f, -10.f, 13.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           //  64 ..  73
+    4.f, -13.f,  12.f, -9.f, 21.f, -13.f, 25.f, -13.f, 28.f, -9.f, 37.f, -0.f, 41.f, -9.f, 52.f, -9.f, 62.f, -9.f, 68.f, -13.f, 71.f, -13.f, 0.f, -0.f,                                                                                                     //  74 ..  85
+    3.f, -13.f,  12.f, -9.f, 21.f, -9.f, 33.f, -9.f, 0.f, -2.f, 0.f, -12.f,                                                                                                                                                                                 //  86 ..  91
+    0.f, -13.f,  8.f, -9.f, 17.f, -13.f, 21.f, -13.f, 24.f, -9.f, 33.f, -0.f, 37.f, -9.f, 48.f, -9.f, 58.f, -9.f, 64.f, -13.f, 67.f, -13.f, 76.f, -0.f,                                                                                                     //  92 .. 103
+    81.f, -8.f, 76.f, -6.f, 69.f, -8.f, 66.f, -7.f, 65.f, -11.f, 61.f, -0.f, 57.f, -7.f, 56.f, -11.f, 51.f, -11.f, 45.f, -8.f, 44.f, -11.f, 39.f, -11.f, 34.f, -8.f, 31.f, -0.f, 21.f, -10.f, 13.f, -13.f, 8.f, -10.f, 0.f, -10.f, 88.f, -0.f,              // 104 .. 122
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 29.f, -0.f,                                                                                                                                                                                           // 123 .. 127
+    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f, 78.f, -0.f,                                                                                                     // 128 .. 139
+    0.f, -13.f,  9.f, -9.f, 18.f, -9.f, 30.f, -9.f, 39.f, -0.f, 65.f, -10.f, 57.f, -13.f, 52.f, -10.f, 44.f, -10.f, 75.f, -0.f,                                                                                                                             // 140 .. 149
+    21.f, -10.f, 16.f, -10.f, 9.f, -13.f, 0.f, -10.f, 29.f, -2.f, 32.f, -12.f,                                                                                                                                                                              // 150 .. 155
+    59.f, -10.f, 51.f, -13.f, 46.f, -10.f, 38.f, -10.f, 33.f, -0.f, 25.f, -10.f, 20.f, -10.f, 13.f, -13.f, 4.f, -10.f, 0.f, -0.f,                                                                                                                           // 156 .. 165
+    4.f, -13.f,  12.f, -9.f, 21.f, -13.f, 25.f, -13.f, 28.f, -9.f, 37.f, -0.f, 41.f, -9.f, 52.f, -9.f, 62.f, -9.f, 68.f, -13.f, 71.f, -13.f, 0.f, -0.f,                                                                                                     // 166 .. 177
+    47.f, -8.f, 42.f, -6.f, 35.f, -8.f, 32.f, -7.f, 31.f, -11.f, 27.f, -0.f, 23.f, -7.f, 22.f, -11.f, 17.f, -11.f, 11.f, -8.f, 10.f, -11.f, 5.f, -11.f, 0.f, -8.f, 0.f, -0.f,                                                                               // 178 .. 191
   };
 
   struct LineRun line01 =
@@ -2853,7 +2938,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 12u, 10u },
     { 12u, 10u },
-    75.f,
+    74.f,
     15.f,
     -4.f,
     4.f,
@@ -2879,7 +2964,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 28u, 20u },
     { 28u, 20u },
-    92.f,
+    90.f,
     15.f,
     -4.f,
     4.f,
@@ -2892,7 +2977,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 48u, 11u },
     { 48u, 11u },
-    75.f,
+    74.f,
     15.f,
     -4.f,
     4.f,
@@ -2905,7 +2990,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 59u, 5u },
     { 59u, 5u },
-    29.f,
+    28.f,
     15.f,
     -4.f,
     0.f,
@@ -2918,7 +3003,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 64u, 10u },
     { 64u, 10u },
-    65.f,
+    64.f,
     15.f,
     -4.f,
     4.f,
@@ -2970,7 +3055,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 104u, 19u },
     { 104u, 19u },
-    90.f,
+    88.f,
     15.f,
     -4.f,
     4.f,
@@ -2983,7 +3068,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 123u, 5u },
     { 123u, 5u },
-    29.f,
+    28.f,
     15.f,
     -4.f,
     0.f,
@@ -3009,7 +3094,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 140u, 10u },
     { 140u, 10u },
-    75.f,
+    74.f,
     15.f,
     -4.f,
     4.f,
@@ -3035,7 +3120,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 156u, 10u },
     { 156u, 10u },
-    65.f,
+    64.f,
     15.f,
     -4.f,
     4.f,
@@ -3061,7 +3146,7 @@ int UtcDaliTextUpdateLayout03(void)
   {
     { 178u, 14u },
     { 178u, 14u },
-    56.f,
+    54.f,
     15.f,
     -4.f,
     0.f,
@@ -3401,7 +3486,7 @@ int UtcDaliTextLayoutEllipsis03(void)
   {
     { 0u, 17u },
     { 0u, 17u },
-    99.f,
+    100.f,
     15.f,
     -4.f,
     0.f,
@@ -3415,7 +3500,7 @@ int UtcDaliTextLayoutEllipsis03(void)
 
   float positions[] =
   {
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
+    91.f, -10.f, 83.f, -13.f, 78.f, -10.f, 70.f, -10.f, 65.f, -0.f, 57.f, -10.f, 52.f, -10.f, 45.f, -13.f, 36.f, -10.f, 31.f, -0.f, 24.f, -8.f, 19.f, -6.f, 12.f, -8.f, 9.f, -7.f, 8.f, -11.f, 4.f, -0.f,
   };
 
   Size textArea( 100.f, 50.f );
@@ -3544,7 +3629,7 @@ int UtcDaliTextLayoutEllipsis04(void)
   {
     { 0u, 16u },
     { 0u, 16u },
-    94.f,
+    92.f,
     15.f,
     -4.f,
     3.f,
@@ -3557,7 +3642,7 @@ int UtcDaliTextLayoutEllipsis04(void)
   {
     { 16u, 18u },
     { 16u, 18u },
-    97.f,
+    95.f,
     15.f,
     -4.f,
     4.f,
@@ -3572,8 +3657,8 @@ int UtcDaliTextLayoutEllipsis04(void)
 
   float positions[] =
   {
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
-    0.f, -7.f, 5.f, -11.f, 6.f, -11.f, 9.f, -8.f, 17.f, -11.f, 18.f, -11.f, 22.f, -8.f, 28.f, -0.f, 32.f, -10.f, 43.f, -13.f, 50.f, -10.f, 55.f, -10.f, 63.f, -0.f, 68.f, -10.f, 76.f, -10.f, 81.f, -13.f, 89.f, -10.f, 97.f, -0.f,
+    86.f, -10.f, 78.f, -13.f, 73.f, -10.f, 65.f, -10.f, 60.f, -0.f, 52.f, -10.f, 47.f, -10.f, 40.f, -13.f, 31.f, -10.f, 26.f, -0.f, 19.f, -8.f, 14.f, -6.f, 7.f, -8.f, 4.f, -7.f, 3.f, -11.f, 0.f, -0.f,
+    95.f, -7.f, 94.f, -11.f, 89.f, -11.f, 83.f, -8.f, 82.f, -11.f, 77.f, -11.f, 72.f, -8.f, 69.f, -0.f, 59.f, -10.f, 51.f, -13.f, 46.f, -10.f, 38.f, -10.f, 33.f, -0.f, 25.f, -10.f, 20.f, -10.f, 13.f, -13.f, 4.f, -10.f, 0.f, -0.f,
   };
 
   Size textArea( 100.f, 50.f );
@@ -3581,7 +3666,7 @@ int UtcDaliTextLayoutEllipsis04(void)
 
   LayoutTextData data =
   {
-    "Layout single-line RTL text with ellipsis.",
+    "Layout multi-line RTL text with ellipsis.",
     "שלום עולם مرحبا بالعالم שלום עולם مرحبا بالعالم שלום עולם مرحبا بالعالم.",
     textArea,
     6u,
@@ -3674,441 +3759,6 @@ int UtcDaliTextLayoutEllipsis05(void)
   };
 
   if( !LayoutTextTest( data ) )
-  {
-    tet_result(TET_FAIL);
-  }
-
-  tet_result(TET_PASS);
-  END_TEST;
-}
-
-int UtcDaliTextReorderLayout01(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextReorderLayout01");
-
-  // Reorder lines. No right to left characters.
-
-  const std::string fontLatin( "TizenSans" );
-
-  // Set a known font description
-  FontDescriptionRun fontDescriptionRun01;
-  fontDescriptionRun01.characterRun.characterIndex = 0u;
-  fontDescriptionRun01.characterRun.numberOfCharacters = 11u;
-  fontDescriptionRun01.familyLength = fontLatin.size();
-  fontDescriptionRun01.familyName = new char[fontDescriptionRun01.familyLength];
-  memcpy( fontDescriptionRun01.familyName, fontLatin.c_str(), fontDescriptionRun01.familyLength );
-  fontDescriptionRun01.familyDefined = true;
-  fontDescriptionRun01.weightDefined = false;
-  fontDescriptionRun01.widthDefined = false;
-  fontDescriptionRun01.slantDefined = false;
-  fontDescriptionRun01.sizeDefined = false;
-
-  Vector<FontDescriptionRun> fontDescriptionRuns;
-  fontDescriptionRuns.PushBack( fontDescriptionRun01 );
-
-  float positions[] =
-  {
-    0.f, -12.f, 10.f, -9.f, 19.f, -13.f, 23.f, -13.f, 26.f, -9.f, 35.f, -0.f, 39.f, -9.f, 50.f, -9.f, 60.f, -9.f, 66.f, -13.f, 69.f, -13.f,
-  };
-
-  Size textArea( 100.f, 300.f );
-
-  ReLayoutRightToLeftLinesData data =
-  {
-    "Text with no right to left text.",
-    "Hello world",
-    textArea,
-    1u,
-    fontDescriptionRuns.Begin(),
-    11u,
-    positions,
-    0u,
-    11u
-  };
-
-  if( !ReLayoutRightToLeftLinesTest( data ) )
-  {
-    tet_result(TET_FAIL);
-  }
-
-  tet_result(TET_PASS);
-  END_TEST;
-}
-
-int UtcDaliTextReorderLayout02(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextReorderLayout02");
-
-  // Reorder lines of the first paragraph.
-
-  const std::string fontHebrew( "TizenSansHebrew" );
-  const std::string fontArabic( "TizenSansArabic" );
-
-  // Set a known font description
-  FontDescriptionRun fontDescriptionRun01;
-  fontDescriptionRun01.characterRun.characterIndex = 0u;
-  fontDescriptionRun01.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun01.familyLength = fontHebrew.size();
-  fontDescriptionRun01.familyName = new char[fontDescriptionRun01.familyLength];
-  memcpy( fontDescriptionRun01.familyName, fontHebrew.c_str(), fontDescriptionRun01.familyLength );
-  fontDescriptionRun01.familyDefined = true;
-  fontDescriptionRun01.weightDefined = false;
-  fontDescriptionRun01.widthDefined = false;
-  fontDescriptionRun01.slantDefined = false;
-  fontDescriptionRun01.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun02;
-  fontDescriptionRun02.characterRun.characterIndex = 10u;
-  fontDescriptionRun02.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun02.familyLength = fontArabic.size();
-  fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
-  memcpy( fontDescriptionRun02.familyName, fontArabic.c_str(), fontDescriptionRun02.familyLength );
-  fontDescriptionRun02.familyDefined = true;
-  fontDescriptionRun02.weightDefined = false;
-  fontDescriptionRun02.widthDefined = false;
-  fontDescriptionRun02.slantDefined = false;
-  fontDescriptionRun02.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun03;
-  fontDescriptionRun03.characterRun.characterIndex = 24u;
-  fontDescriptionRun03.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun03.familyLength = fontArabic.size();
-  fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
-  memcpy( fontDescriptionRun03.familyName, fontArabic.c_str(), fontDescriptionRun03.familyLength );
-  fontDescriptionRun03.familyDefined = true;
-  fontDescriptionRun03.weightDefined = false;
-  fontDescriptionRun03.widthDefined = false;
-  fontDescriptionRun03.slantDefined = false;
-  fontDescriptionRun03.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun04;
-  fontDescriptionRun04.characterRun.characterIndex = 38u;
-  fontDescriptionRun04.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun04.familyLength = fontHebrew.size();
-  fontDescriptionRun04.familyName = new char[fontDescriptionRun04.familyLength];
-  memcpy( fontDescriptionRun04.familyName, fontHebrew.c_str(), fontDescriptionRun04.familyLength );
-  fontDescriptionRun04.familyDefined = true;
-  fontDescriptionRun04.weightDefined = false;
-  fontDescriptionRun04.widthDefined = false;
-  fontDescriptionRun04.slantDefined = false;
-  fontDescriptionRun04.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun05;
-  fontDescriptionRun05.characterRun.characterIndex = 48u;
-  fontDescriptionRun05.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun05.familyLength = fontHebrew.size();
-  fontDescriptionRun05.familyName = new char[fontDescriptionRun05.familyLength];
-  memcpy( fontDescriptionRun05.familyName, fontHebrew.c_str(), fontDescriptionRun05.familyLength );
-  fontDescriptionRun05.familyDefined = true;
-  fontDescriptionRun05.weightDefined = false;
-  fontDescriptionRun05.widthDefined = false;
-  fontDescriptionRun05.slantDefined = false;
-  fontDescriptionRun05.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun06;
-  fontDescriptionRun06.characterRun.characterIndex = 58u;
-  fontDescriptionRun06.characterRun.numberOfCharacters = 15u;
-  fontDescriptionRun06.familyLength = fontArabic.size();
-  fontDescriptionRun06.familyName = new char[fontDescriptionRun06.familyLength];
-  memcpy( fontDescriptionRun06.familyName, fontArabic.c_str(), fontDescriptionRun06.familyLength );
-  fontDescriptionRun06.familyDefined = true;
-  fontDescriptionRun06.weightDefined = false;
-  fontDescriptionRun06.widthDefined = false;
-  fontDescriptionRun06.slantDefined = false;
-  fontDescriptionRun06.sizeDefined = false;
-
-  Vector<FontDescriptionRun> fontDescriptionRuns;
-  fontDescriptionRuns.PushBack( fontDescriptionRun01 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun02 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun03 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun04 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun05 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun06 );
-
-  float positions[] =
-  {
-    87.f, -10.f, 79.f, -13.f, 74.f, -10.f, 66.f, -10.f, 61.f, -0.f, 53.f, -10.f, 48.f, -10.f, 41.f, -13.f, 32.f, -10.f, 27.f, -0.f, 20.f, -8.f, 15.f, -6.f, 8.f, -8.f, 5.f, -7.f, 4.f, -11.f, 0.f, -0.f,
-    23.f, -7.f, 22.f, -11.f, 17.f, -11.f, 11.f, -8.f, 10.f, -11.f, 5.f, -11.f, 0.f, -8.f, 0.f, -0.f,
-    0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
-    0.f, -7.f, 5.f, -11.f, 6.f, -11.f, 9.f, -8.f, 17.f, -11.f, 18.f, -11.f, 22.f, -8.f, 30.f, -2.f,
-  };
-
-  Size textArea( 100.f, 300.f );
-
-  ReLayoutRightToLeftLinesData data =
-  {
-    "Paragraphs with right to left text.",
-    "שלום עולם مرحبا بالعالم\n"
-    "مرحبا بالعالم שלום עולם\n"
-    "שלום עולם مرحبا بالعالم.",
-    textArea,
-    6u,
-    fontDescriptionRuns.Begin(),
-    72u,
-    positions,
-    0u,
-    24u
-  };
-
-  if( !ReLayoutRightToLeftLinesTest( data ) )
-  {
-    tet_result(TET_FAIL);
-  }
-
-  tet_result(TET_PASS);
-  END_TEST;
-}
-
-int UtcDaliTextReorderLayout03(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextReorderLayout03");
-
-  // Reorder lines of the mid paragraph.
-
-  const std::string fontHebrew( "TizenSansHebrew" );
-  const std::string fontArabic( "TizenSansArabic" );
-
-  // Set a known font description
-  FontDescriptionRun fontDescriptionRun01;
-  fontDescriptionRun01.characterRun.characterIndex = 0u;
-  fontDescriptionRun01.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun01.familyLength = fontHebrew.size();
-  fontDescriptionRun01.familyName = new char[fontDescriptionRun01.familyLength];
-  memcpy( fontDescriptionRun01.familyName, fontHebrew.c_str(), fontDescriptionRun01.familyLength );
-  fontDescriptionRun01.familyDefined = true;
-  fontDescriptionRun01.weightDefined = false;
-  fontDescriptionRun01.widthDefined = false;
-  fontDescriptionRun01.slantDefined = false;
-  fontDescriptionRun01.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun02;
-  fontDescriptionRun02.characterRun.characterIndex = 10u;
-  fontDescriptionRun02.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun02.familyLength = fontArabic.size();
-  fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
-  memcpy( fontDescriptionRun02.familyName, fontArabic.c_str(), fontDescriptionRun02.familyLength );
-  fontDescriptionRun02.familyDefined = true;
-  fontDescriptionRun02.weightDefined = false;
-  fontDescriptionRun02.widthDefined = false;
-  fontDescriptionRun02.slantDefined = false;
-  fontDescriptionRun02.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun03;
-  fontDescriptionRun03.characterRun.characterIndex = 24u;
-  fontDescriptionRun03.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun03.familyLength = fontArabic.size();
-  fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
-  memcpy( fontDescriptionRun03.familyName, fontArabic.c_str(), fontDescriptionRun03.familyLength );
-  fontDescriptionRun03.familyDefined = true;
-  fontDescriptionRun03.weightDefined = false;
-  fontDescriptionRun03.widthDefined = false;
-  fontDescriptionRun03.slantDefined = false;
-  fontDescriptionRun03.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun04;
-  fontDescriptionRun04.characterRun.characterIndex = 38u;
-  fontDescriptionRun04.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun04.familyLength = fontHebrew.size();
-  fontDescriptionRun04.familyName = new char[fontDescriptionRun04.familyLength];
-  memcpy( fontDescriptionRun04.familyName, fontHebrew.c_str(), fontDescriptionRun04.familyLength );
-  fontDescriptionRun04.familyDefined = true;
-  fontDescriptionRun04.weightDefined = false;
-  fontDescriptionRun04.widthDefined = false;
-  fontDescriptionRun04.slantDefined = false;
-  fontDescriptionRun04.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun05;
-  fontDescriptionRun05.characterRun.characterIndex = 48u;
-  fontDescriptionRun05.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun05.familyLength = fontHebrew.size();
-  fontDescriptionRun05.familyName = new char[fontDescriptionRun05.familyLength];
-  memcpy( fontDescriptionRun05.familyName, fontHebrew.c_str(), fontDescriptionRun05.familyLength );
-  fontDescriptionRun05.familyDefined = true;
-  fontDescriptionRun05.weightDefined = false;
-  fontDescriptionRun05.widthDefined = false;
-  fontDescriptionRun05.slantDefined = false;
-  fontDescriptionRun05.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun06;
-  fontDescriptionRun06.characterRun.characterIndex = 58u;
-  fontDescriptionRun06.characterRun.numberOfCharacters = 15u;
-  fontDescriptionRun06.familyLength = fontArabic.size();
-  fontDescriptionRun06.familyName = new char[fontDescriptionRun06.familyLength];
-  memcpy( fontDescriptionRun06.familyName, fontArabic.c_str(), fontDescriptionRun06.familyLength );
-  fontDescriptionRun06.familyDefined = true;
-  fontDescriptionRun06.weightDefined = false;
-  fontDescriptionRun06.widthDefined = false;
-  fontDescriptionRun06.slantDefined = false;
-  fontDescriptionRun06.sizeDefined = false;
-
-  Vector<FontDescriptionRun> fontDescriptionRuns;
-  fontDescriptionRuns.PushBack( fontDescriptionRun01 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun02 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun03 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun04 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun05 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun06 );
-
-  float positions[] =
-  {
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
-    0.f, -7.f,  5.f, -11.f, 6.f, -11.f, 9.f, -8.f, 17.f, -11.f, 18.f, -11.f, 22.f, -8.f, 28.f, -0.f,
-    86.f, -8.f, 81.f, -6.f, 74.f, -8.f, 71.f, -7.f, 70.f, -11.f, 66.f, -0.f, 62.f, -7.f, 61.f, -11.f, 56.f, -11.f, 50.f, -8.f, 49.f, -11.f, 44.f, -11.f, 39.f, -8.f, 36.f, -0.f, 26.f, -10.f, 18.f, -13.f, 13.f, -10.f, 5.f, -10.f, 0.f, -0.f,
-    22.f, -10.f, 17.f, -10.f, 10.f, -13.f, 1.f, -10.f, 0.f, -0.f,
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
-    0.f, -7.f, 5.f, -11.f, 6.f, -11.f, 9.f, -8.f, 17.f, -11.f, 18.f, -11.f, 22.f, -8.f, 30.f, -2.f,
-  };
-
-  Size textArea( 100.f, 300.f );
-
-  ReLayoutRightToLeftLinesData data =
-  {
-    "Paragraphs with right to left text.",
-    "שלום עולם مرحبا بالعالم\n"
-    "مرحبا بالعالم שלום עולם\n"
-    "שלום עולם مرحبا بالعالم.",
-    textArea,
-    6u,
-    fontDescriptionRuns.Begin(),
-    72u,
-    positions,
-    24u,
-    24u
-  };
-
-  if( !ReLayoutRightToLeftLinesTest( data ) )
-  {
-    tet_result(TET_FAIL);
-  }
-
-  tet_result(TET_PASS);
-  END_TEST;
-}
-
-int UtcDaliTextReorderLayout04(void)
-{
-  ToolkitTestApplication application;
-  tet_infoline(" UtcDaliTextReorderLayout04");
-
-  // Reorder lines of the last paragraph.
-
-  const std::string fontHebrew( "TizenSansHebrew" );
-  const std::string fontArabic( "TizenSansArabic" );
-
-  // Set a known font description
-  FontDescriptionRun fontDescriptionRun01;
-  fontDescriptionRun01.characterRun.characterIndex = 0u;
-  fontDescriptionRun01.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun01.familyLength = fontHebrew.size();
-  fontDescriptionRun01.familyName = new char[fontDescriptionRun01.familyLength];
-  memcpy( fontDescriptionRun01.familyName, fontHebrew.c_str(), fontDescriptionRun01.familyLength );
-  fontDescriptionRun01.familyDefined = true;
-  fontDescriptionRun01.weightDefined = false;
-  fontDescriptionRun01.widthDefined = false;
-  fontDescriptionRun01.slantDefined = false;
-  fontDescriptionRun01.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun02;
-  fontDescriptionRun02.characterRun.characterIndex = 10u;
-  fontDescriptionRun02.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun02.familyLength = fontArabic.size();
-  fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
-  memcpy( fontDescriptionRun02.familyName, fontArabic.c_str(), fontDescriptionRun02.familyLength );
-  fontDescriptionRun02.familyDefined = true;
-  fontDescriptionRun02.weightDefined = false;
-  fontDescriptionRun02.widthDefined = false;
-  fontDescriptionRun02.slantDefined = false;
-  fontDescriptionRun02.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun03;
-  fontDescriptionRun03.characterRun.characterIndex = 24u;
-  fontDescriptionRun03.characterRun.numberOfCharacters = 14u;
-  fontDescriptionRun03.familyLength = fontArabic.size();
-  fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
-  memcpy( fontDescriptionRun03.familyName, fontArabic.c_str(), fontDescriptionRun03.familyLength );
-  fontDescriptionRun03.familyDefined = true;
-  fontDescriptionRun03.weightDefined = false;
-  fontDescriptionRun03.widthDefined = false;
-  fontDescriptionRun03.slantDefined = false;
-  fontDescriptionRun03.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun04;
-  fontDescriptionRun04.characterRun.characterIndex = 38u;
-  fontDescriptionRun04.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun04.familyLength = fontHebrew.size();
-  fontDescriptionRun04.familyName = new char[fontDescriptionRun04.familyLength];
-  memcpy( fontDescriptionRun04.familyName, fontHebrew.c_str(), fontDescriptionRun04.familyLength );
-  fontDescriptionRun04.familyDefined = true;
-  fontDescriptionRun04.weightDefined = false;
-  fontDescriptionRun04.widthDefined = false;
-  fontDescriptionRun04.slantDefined = false;
-  fontDescriptionRun04.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun05;
-  fontDescriptionRun05.characterRun.characterIndex = 48u;
-  fontDescriptionRun05.characterRun.numberOfCharacters = 10u;
-  fontDescriptionRun05.familyLength = fontHebrew.size();
-  fontDescriptionRun05.familyName = new char[fontDescriptionRun05.familyLength];
-  memcpy( fontDescriptionRun05.familyName, fontHebrew.c_str(), fontDescriptionRun05.familyLength );
-  fontDescriptionRun05.familyDefined = true;
-  fontDescriptionRun05.weightDefined = false;
-  fontDescriptionRun05.widthDefined = false;
-  fontDescriptionRun05.slantDefined = false;
-  fontDescriptionRun05.sizeDefined = false;
-
-  FontDescriptionRun fontDescriptionRun06;
-  fontDescriptionRun06.characterRun.characterIndex = 58u;
-  fontDescriptionRun06.characterRun.numberOfCharacters = 15u;
-  fontDescriptionRun06.familyLength = fontArabic.size();
-  fontDescriptionRun06.familyName = new char[fontDescriptionRun06.familyLength];
-  memcpy( fontDescriptionRun06.familyName, fontArabic.c_str(), fontDescriptionRun06.familyLength );
-  fontDescriptionRun06.familyDefined = true;
-  fontDescriptionRun06.weightDefined = false;
-  fontDescriptionRun06.widthDefined = false;
-  fontDescriptionRun06.slantDefined = false;
-  fontDescriptionRun06.sizeDefined = false;
-
-  Vector<FontDescriptionRun> fontDescriptionRuns;
-  fontDescriptionRuns.PushBack( fontDescriptionRun01 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun02 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun03 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun04 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun05 );
-  fontDescriptionRuns.PushBack( fontDescriptionRun06 );
-
-  float positions[] =
-  {
-    0.f, -10.f, 11.f, -13.f, 18.f, -10.f, 23.f, -10.f, 31.f, -0.f, 36.f, -10.f, 44.f, -10.f, 49.f, -13.f, 57.f, -10.f, 65.f, -0.f, 68.f, -8.f, 75.f, -6.f, 80.f, -8.f, 86.f, -7.f, 91.f, -11.f, 93.f, -0.f,
-    0.f, -7.f, 5.f, -11.f, 6.f, -11.f, 9.f, -8.f, 17.f, -11.f, 18.f, -11.f, 22.f, -8.f, 28.f, -0.f,
-    0.f, -8.f, 7.f, -6.f, 12.f, -8.f, 18.f, -7.f, 23.f, -11.f, 25.f, -0.f, 27.f, -7.f, 32.f, -11.f, 33.f, -11.f, 36.f, -8.f, 44.f, -11.f, 45.f, -11.f, 49.f, -8.f, 55.f, -0.f, 59.f, -10.f, 70.f, -13.f, 77.f, -10.f, 82.f, -10.f, 90.f, -0.f,
-    0.f, -10.f, 8.f, -10.f, 13.f, -13.f, 21.f, -10.f, 29.f, -0.f,
-    87.f, -10.f, 79.f, -13.f, 74.f, -10.f, 66.f, -10.f, 61.f, -0.f, 53.f, -10.f, 48.f, -10.f, 41.f, -13.f, 32.f, -10.f, 27.f, -0.f, 20.f, -8.f, 15.f, -6.f, 8.f, -8.f, 5.f, -7.f, 4.f, -11.f, 0.f, -0.f,
-    26.f, -7.f, 25.f, -11.f, 20.f, -11.f, 14.f, -8.f, 13.f, -11.f, 8.f, -11.f, 3.f, -8.f, 0.f, -2.f,
-  };
-
-  Size textArea( 100.f, 300.f );
-
-  ReLayoutRightToLeftLinesData data =
-  {
-    "Paragraphs with right to left text.",
-    "שלום עולם مرحبا بالعالم\n"
-    "مرحبا بالعالم שלום עולם\n"
-    "שלום עולם مرحبا بالعالم.",
-    textArea,
-    6u,
-    fontDescriptionRuns.Begin(),
-    72u,
-    positions,
-    48u,
-    24u
-  };
-
-  if( !ReLayoutRightToLeftLinesTest( data ) )
   {
     tet_result(TET_FAIL);
   }
@@ -4330,7 +3980,7 @@ int UtcDaliTextAlign02(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 0.f, 0.f, 2.f, 61.f, 0.f, 0.f };
+  float positions[] = { 0.f, 0.f, 4.f, 61.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -4572,7 +4222,7 @@ int UtcDaliTextAlign04(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 11.f, 17.f, 0.f, 0.f, 0.f, 0.f };
+  float positions[] = { 11.f, 18.f, 0.f, 0.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -4693,7 +4343,7 @@ int UtcDaliTextAlign05(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 0.f, 0.f, -1.f, 30.f, 0.f, 0.f };
+  float positions[] = { 0.f, 0.f, 0.f, 30.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -4935,7 +4585,7 @@ int UtcDaliTextAlign07(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 22.f, 35.f, 0.f, 0.f, 0.f, 0.f };
+  float positions[] = { 22.f, 36.f, 0.f, 0.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -5177,7 +4827,7 @@ int UtcDaliTextAlign09(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 0.f, 0.f, 0.f, 0.f, 22.f, 42.f };
+  float positions[] = { 0.f, 0.f, 0.f, 0.f, 22.f, 43.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
@@ -5419,7 +5069,7 @@ int UtcDaliTextAlign11(void)
   fontDescriptionRuns.PushBack( fontDescriptionRun05 );
   fontDescriptionRuns.PushBack( fontDescriptionRun06 );
 
-  float positions[] = { 22.f, 35.f, 2.f, 0.f, 0.f, 0.f };
+  float positions[] = { 22.f, 36.f, 4.f, 0.f, 0.f, 0.f };
 
   Size textArea( 100.f, 300.f );
   AlignData data =
