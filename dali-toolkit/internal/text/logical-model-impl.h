@@ -211,6 +211,7 @@ public:
   Vector<ScriptRun>                     mScriptRuns;
   Vector<FontRun>                       mFontRuns;
   Vector<ColorRun>                      mColorRuns;
+  Vector<ColorRun>                      mBackgroundColorRuns;
   Vector<FontDescriptionRun>            mFontDescriptionRuns;
   Vector<LineBreakInfo>                 mLineBreakInfo;
   Vector<ParagraphRun>                  mParagraphInfo;
