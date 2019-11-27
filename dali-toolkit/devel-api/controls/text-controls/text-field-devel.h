@@ -114,7 +114,29 @@ namespace Property
         * @details Name "enableGrabHandlePopup", type Property::BOOLEAN.
         * @note The default value is true, which means the grab handle popup is enabled by default.
         */
-      ENABLE_GRAB_HANDLE_POPUP = ELLIPSIS + 4
+      ENABLE_GRAB_HANDLE_POPUP = ELLIPSIS + 4,
+
+      /**
+       * @brief The default text background parameters.
+       * @details Name "textBackground", type Property::MAP.
+       * @note Use "textBackground" as property name to avoid conflict with Control's "background" property
+       *
+       * The background map contains the following keys:
+       *
+       * | %Property Name       | Type     | Required | Description                                                                                                        |
+       * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
+       * | enable               | BOOLEAN  | No       | True to enable the background or false to disable (the default value is false)                                     |
+       * | color                | VECTOR4  | No       | The color of the background (the default value is Color::CYAN)                                                     |
+       *
+       * Example Usage:
+       * @code
+       *   Property::Map propertyMap;
+       *   propertyMap["enable"] = true;
+       *   propertyMap["color"] = Color::RED;
+       *   field.SetProperty( DevelTextField::Property::BACKGROUND, propertyMap );
+       * @endcode
+       */
+      BACKGROUND = ELLIPSIS + 5
 
   };
 } // namespace Property

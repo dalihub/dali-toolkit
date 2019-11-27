@@ -136,6 +136,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableShiftSelection",   
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableGrabHandle",               BOOLEAN,   ENABLE_GRAB_HANDLE                   )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "matchSystemLanguageDirection",   BOOLEAN,   MATCH_SYSTEM_LANGUAGE_DIRECTION      )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableGrabHandlePopup",          BOOLEAN,   ENABLE_GRAB_HANDLE_POPUP             )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "textBackground",                 MAP,       BACKGROUND                           )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -769,7 +770,7 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
       }
       case Toolkit::DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP:
       {
-        if (impl.mController)
+        if( impl.mController )
         {
           const bool grabHandlePopupEnabled = value.Get<bool>();
           DALI_LOG_INFO(gLogFilter, Debug::General, "TextField %p ENABLE_GRAB_HANDLE_POPUP %d\n", impl.mController.Get(), grabHandlePopupEnabled);
@@ -777,6 +778,15 @@ void TextField::SetProperty( BaseObject* object, Property::Index index, const Pr
           impl.mController->SetGrabHandlePopupEnabled(grabHandlePopupEnabled);
           break;
         }
+      }
+      case Toolkit::DevelTextField::Property::BACKGROUND:
+      {
+        const bool update = SetBackgroundProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
+        if( update )
+        {
+          impl.mRenderer.Reset();
+        }
+        break;
       }
     } // switch
   } // textfield
@@ -1191,6 +1201,11 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         {
           value = impl.mController->IsGrabHandlePopupEnabled();
         }
+        break;
+      }
+      case Toolkit::DevelTextField::Property::BACKGROUND:
+      {
+        GetBackgroundProperties( impl.mController, value, Text::EffectStyle::DEFAULT );
         break;
       }
     } //switch

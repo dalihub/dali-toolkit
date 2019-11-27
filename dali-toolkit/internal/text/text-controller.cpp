@@ -3714,11 +3714,7 @@ bool Controller::RemoveText( int cursorOffset,
       // it means all texts should be removed and all Preedit variables should be initialized.
       if( ( currentText.Count() - numberOfCharacters == 0 ) && ( cursorIndex == 0 ) )
       {
-        if( mImpl->mEventData )
-        {
-          mImpl->mEventData->mPreEditStartPosition = 0;
-          mImpl->mEventData->mPreEditLength = 0;
-        }
+        mImpl->ClearPreEditFlag();
       }
 
       // Updates the text style runs by removing characters. Runs with no characters are removed.
