@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2019 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public:
   void ApplyOptions( const InputMethodOptions& options );
   bool FilterEventKey( const Dali::KeyEvent& keyEvent );
   void SetPreeditStyle( Dali::InputMethodContext::PreeditStyle type );
-  Dali::InputMethodContext::PreeditStyle GetPreeditStyle() const;
+  void GetPreeditStyle( Vector< Dali::InputMethodContext::PreeditAttributeData >& attrs ) const;
 
 public:  // Signals
   ActivatedSignalType& ActivatedSignal() { return mActivatedSignal; }
@@ -87,7 +87,7 @@ private:
   bool mRestoreAfterFocusLost:1;             ///< Whether the keyboard needs to be restored (activated ) after focus regained.
   bool mIdleCallbackConnected:1;             ///< Whether the idle callback is already connected.
   InputMethodOptions        mOptions;
-  Dali::InputMethodContext::PreeditStyle mPreeditStyle;
+  Vector< Dali::InputMethodContext::PreeditAttributeData > mPreeditAttrs; ///< Stores preedit attr data
 
   ActivatedSignalType      mActivatedSignal;
   KeyboardEventSignalType  mEventSignal;
@@ -128,8 +128,7 @@ InputMethodContext::InputMethodContext( /*Ecore_X_Window ecoreXwin*/ )
 : mIMFCursorPosition( 0 ),
   mSurroundingText(),
   mRestoreAfterFocusLost( false ),
-  mIdleCallbackConnected( false ),
-  mPreeditStyle( Dali::InputMethodContext::PreeditStyle::NONE )
+  mIdleCallbackConnected( false )
 {
   CreateContext( /*ecoreXwin*/ );
   ConnectCallbacks();
@@ -219,12 +218,14 @@ bool InputMethodContext::FilterEventKey( const Dali::KeyEvent& keyEvent )
 
 void InputMethodContext::SetPreeditStyle( Dali::InputMethodContext::PreeditStyle type )
 {
-  mPreeditStyle = type;
+  Dali::InputMethodContext::PreeditAttributeData data;
+  data.preeditType = type;
+  mPreeditAttrs.PushBack( data );
 }
 
-Dali::InputMethodContext::PreeditStyle InputMethodContext::GetPreeditStyle() const
+void InputMethodContext::GetPreeditStyle( Vector< Dali::InputMethodContext::PreeditAttributeData >& attrs ) const
 {
-  return mPreeditStyle;
+  attrs = mPreeditAttrs;
 }
 } // Adaptor
 
@@ -327,9 +328,9 @@ void InputMethodContext::SetPreeditStyle( Dali::InputMethodContext::PreeditStyle
   Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetPreeditStyle( type );
 }
 
-Dali::InputMethodContext::PreeditStyle InputMethodContext::GetPreeditStyle() const
+void InputMethodContext::GetPreeditStyle( Vector< Dali::InputMethodContext::PreeditAttributeData >& attrs ) const
 {
-  return Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetPreeditStyle();
+  Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetPreeditStyle( attrs );
 }
 
 // Signals
