@@ -4297,6 +4297,11 @@ bool Controller::ShouldClearFocusOnEscape() const
   return mImpl->mShouldClearFocusOnEscape;
 }
 
+Actor Controller::CreateBackgroundActor()
+{
+  return mImpl->CreateBackgroundActor();
+}
+
 // private : Private contructors & copy operator.
 
 Controller::Controller()

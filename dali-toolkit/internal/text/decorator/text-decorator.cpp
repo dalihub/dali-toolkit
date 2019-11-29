@@ -1148,9 +1148,7 @@ struct Decorator::Impl : public ConnectionTracker
     {
       mHighlightActor = Actor::New();
 
-#ifdef DECORATOR_DEBUG
       mHighlightActor.SetName( "HighlightActor" );
-#endif
       mHighlightActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
       mHighlightActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
       mHighlightActor.SetColor( mHighlightColor );
