@@ -100,7 +100,7 @@ void VectorAnimationTask::Finalize()
     mAnimationFinishedTrigger.reset();
   }
 
-  mVectorRenderer.Reset();
+  mVectorRenderer.Finalize();
 }
 
 void VectorAnimationTask::SetRenderer( Renderer renderer )

@@ -399,7 +399,7 @@ public:
   Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
   float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
   float                  mShadowBlurRadius;     ///< Blur radius of shadow, 0 indicates no blur.
-  uint16_t           mOutlineWidth;         ///< Width of outline.
+  uint16_t               mOutlineWidth;         ///< Width of outline.
 
 private:
 

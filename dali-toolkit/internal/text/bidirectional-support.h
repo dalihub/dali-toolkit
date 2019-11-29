@@ -59,26 +59,21 @@ void SetBidirectionalInfo( const Vector<Character>& text,
                            Dali::LayoutDirection::Type layoutDirection = LayoutDirection::LEFT_TO_RIGHT );
 
 /**
- * Sets the visual to logical map tables.
+ * @brief Sets the visual to logical map table for a given line.
  *
- * Any map tables previously set are removed.
- * It sets the paragraph's direction to each line.
- *
- * @pre The @p logicalModel needs to have a text set.
- * @pre The @p logicalModel needs to have the bidirectional info indices for each paragraph set.
- * @pre The @p visualModel needs to have the laid-out lines info set.
- *
- * @param[in] bidirectionalInfo Vector with the bidirectional infor for each paragraph.
+ * @param[in] bidirectionalParagraphInfo The paragraph's bidirectional info.
+ * @param[out] lineInfoRuns Line runs with the visual to logical conversion maps.
+ * @param[in] bidiLineIndex Index to the line's bidirectional info.
  * @param[in] startIndex The character from where the bidirectional info is set.
  * @param[in] numberOfCharacters The number of characters.
- * @param[in,out] lineRuns The line runs converted to characters.
- * @param[out] lineInfoRuns line runs with the visual to logical conversion maps.
+ * @param[in] direction The direction of the line.
  */
-void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
-                   CharacterIndex startIndex,
-                   Length numberOfCharacters,
-                   Vector<LineRun>& lineRuns,
-                   Vector<BidirectionalLineInfoRun>& lineInfoRuns );
+void ReorderLine( const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo,
+                  Vector<BidirectionalLineInfoRun>& lineInfoRuns,
+                  BidirectionalLineRunIndex bidiLineIndex,
+                  CharacterIndex startIndex,
+                  Length numberOfCharacters,
+                  CharacterDirection direction );
 
 /**
  * @brief Replaces any character in the right to left paragraphs which could be mirrored.
@@ -100,7 +95,7 @@ bool GetMirroredText( const Vector<Character>& text,
                       Vector<Character>& mirroredText );
 
 /**
- * @brief Retrieves the character's directions.
+ * @brief Retrieves the characters' directions.
  *
  * @pre The @p logicalModel needs to have a text set.
  * @pre The @p logicalModel needs to have the bidirectional info indices for each paragraph set.

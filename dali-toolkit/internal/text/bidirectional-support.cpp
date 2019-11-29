@@ -31,58 +31,6 @@ namespace Toolkit
 namespace Text
 {
 
-namespace
-{
-
-/**
- * @brief Get the lines of a paragraph.
- *
- * @param[in] paragraphInfo The paragraph.
- * @param[in] lines The lines.
- * @param[in] lineIndex Index pointing the first line to be checked.
- * @param[out] firstLine Index to the first line of the paragraph.
- * @param[out] numberOfLines The number of lines.
- */
-void GetLines( const BidirectionalParagraphInfoRun& paragraphInfo,
-               const Vector<LineRun>& lines,
-               unsigned int lineIndex,
-               unsigned int& firstLine,
-               unsigned int& numberOfLines )
-{
-  firstLine = lineIndex;
-  numberOfLines = 0u;
-
-  const CharacterIndex lastCharacterIndex = paragraphInfo.characterRun.characterIndex + paragraphInfo.characterRun.numberOfCharacters;
-  bool firstLineFound = false;
-
-  for( Vector<LineRun>::ConstIterator it = lines.Begin() + lineIndex,
-         endIt = lines.End();
-       it != endIt;
-       ++it )
-  {
-    const LineRun& line = *it;
-
-    if( ( line.characterRun.characterIndex + line.characterRun.numberOfCharacters > paragraphInfo.characterRun.characterIndex ) &&
-        ( lastCharacterIndex > line.characterRun.characterIndex ) )
-    {
-      firstLineFound = true;
-      ++numberOfLines;
-    }
-    else if( lastCharacterIndex <= line.characterRun.characterIndex )
-    {
-      // nothing else to do.
-      break;
-    }
-
-    if( !firstLineFound )
-    {
-      ++firstLine;
-    }
-  }
-}
-
-} // namespace
-
 void SetBidirectionalInfo( const Vector<Character>& text,
                            const Vector<ScriptRun>& scripts,
                            const Vector<LineBreakInfo>& lineBreakInfo,
@@ -171,6 +119,8 @@ void SetBidirectionalInfo( const Vector<Character>& text,
                                                                                    matchSystemLanguageDirection,
                                                                                    layoutDirection );
 
+        bidirectionalRun.direction = bidirectionalSupport.GetParagraphDirection( bidirectionalRun.bidirectionalInfoIndex );
+
         bidirectionalInfo.Insert( bidirectionalInfo.Begin() + bidiInfoIndex, bidirectionalRun );
         ++bidiInfoIndex;
       }
@@ -195,118 +145,49 @@ void SetBidirectionalInfo( const Vector<Character>& text,
   }
 }
 
-void ReorderLines( const Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo,
-                   CharacterIndex startIndex,
-                   Length numberOfCharacters,
-                   Vector<LineRun>& lineRuns,
-                   Vector<BidirectionalLineInfoRun>& lineInfoRuns )
+void ReorderLine( const BidirectionalParagraphInfoRun& bidirectionalParagraphInfo,
+                  Vector<BidirectionalLineInfoRun>& lineInfoRuns,
+                  BidirectionalLineRunIndex bidiLineIndex,
+                  CharacterIndex startIndex,
+                  Length numberOfCharacters,
+                  CharacterDirection direction )
 {
-  // Find where to insert the new paragraphs.
-  BidirectionalLineRunIndex bidiLineInfoIndex = 0u;
-  for( Vector<BidirectionalLineInfoRun>::ConstIterator it = lineInfoRuns.Begin(),
-         endIt = lineInfoRuns.End();
-       it != endIt;
-       ++it )
-  {
-    const BidirectionalLineInfoRun& run = *it;
-
-    if( startIndex < run.characterRun.characterIndex + run.characterRun.numberOfCharacters )
-    {
-      // Found where to insert the bidi line info.
-      break;
-    }
-    ++bidiLineInfoIndex;
-  }
-
   // Handle to the bidirectional info module in text-abstraction.
   TextAbstraction::BidirectionalSupport bidirectionalSupport = TextAbstraction::BidirectionalSupport::Get();
 
-  const CharacterIndex lastCharacter = startIndex + numberOfCharacters;
+  // Creates a bidirectional info for the line run.
+  BidirectionalLineInfoRun lineInfoRun;
+  lineInfoRun.characterRun.characterIndex = startIndex;
+  lineInfoRun.characterRun.numberOfCharacters = numberOfCharacters;
+  lineInfoRun.direction = direction;
+  lineInfoRun.isIdentity = true;
 
-  // Keep an index to the first line to be checked if it's contained inside the paragraph.
-  // Avoids check the lines from the beginning for each paragraph.
-  unsigned int lineIndex = 0u;
+  // Allocate space for the conversion maps.
+  // The memory is freed after the visual to logical to visual conversion tables are built in the logical model.
+  lineInfoRun.visualToLogicalMap = reinterpret_cast<CharacterIndex*>( malloc( numberOfCharacters * sizeof( CharacterIndex ) ) );
 
-  for( Vector<BidirectionalParagraphInfoRun>::ConstIterator it = bidirectionalInfo.Begin(),
-         endIt = bidirectionalInfo.End();
-       it != endIt;
-       ++it )
+  if( nullptr != lineInfoRun.visualToLogicalMap )
   {
-    const BidirectionalParagraphInfoRun& paragraphInfo = *it;
+    // Reorders the line.
+    bidirectionalSupport.Reorder( bidirectionalParagraphInfo.bidirectionalInfoIndex,
+                                  lineInfoRun.characterRun.characterIndex - bidirectionalParagraphInfo.characterRun.characterIndex,
+                                  lineInfoRun.characterRun.numberOfCharacters,
+                                  lineInfoRun.visualToLogicalMap );
 
-    if( paragraphInfo.characterRun.characterIndex < startIndex )
+    // For those LTR lines inside a bidirectional paragraph.
+    // It will save to relayout the line after reordering.
+    for( unsigned int i=0; i<numberOfCharacters; ++i )
     {
-      // Do not process, the paragraph has already been processed.
-      continue;
-    }
-
-    if( lastCharacter <= paragraphInfo.characterRun.characterIndex )
-    {
-      // Do not process paragraphs beyond startIndex + numberOfCharacters.
-      break;
-    }
-
-    const CharacterDirection direction = bidirectionalSupport.GetParagraphDirection( paragraphInfo.bidirectionalInfoIndex );
-
-    // Get the lines for this paragraph.
-    unsigned int firstLine = 0u;
-    unsigned int numberOfLines = 0u;
-
-    // Get an index to the first line and the number of lines of the current paragraph.
-    GetLines( paragraphInfo,
-              lineRuns,
-              lineIndex,
-              firstLine,
-              numberOfLines );
-
-    lineIndex = firstLine + numberOfLines;
-
-    // Traverse the lines and reorder them
-    for( Vector<LineRun>::Iterator lineIt = lineRuns.Begin() + firstLine,
-           endLineIt = lineRuns.Begin() + firstLine + numberOfLines;
-           lineIt != endLineIt;
-         ++lineIt )
-    {
-      LineRun& line = *lineIt;
-
-      // Sets the paragraph's direction.
-      line.direction = direction;
-
-      // Creates a bidirectional info for the line run.
-      BidirectionalLineInfoRun lineInfoRun;
-      lineInfoRun.characterRun.characterIndex = line.characterRun.characterIndex;
-      lineInfoRun.characterRun.numberOfCharacters = line.characterRun.numberOfCharacters;
-      lineInfoRun.direction = direction;
-
-      // Allocate space for the conversion maps.
-      // The memory is freed after the visual to logical to visual conversion tables are built in the logical model.
-      lineInfoRun.visualToLogicalMap = reinterpret_cast<CharacterIndex*>( malloc( line.characterRun.numberOfCharacters * sizeof( CharacterIndex ) ) );
-
-      if( NULL != lineInfoRun.visualToLogicalMap )
+      if( i != *( lineInfoRun.visualToLogicalMap + i ) )
       {
-        // Reorders the line.
-        bidirectionalSupport.Reorder( paragraphInfo.bidirectionalInfoIndex,
-                                      line.characterRun.characterIndex - paragraphInfo.characterRun.characterIndex,
-                                      line.characterRun.numberOfCharacters,
-                                      lineInfoRun.visualToLogicalMap );
+        lineInfoRun.isIdentity = false;
+        break;
       }
-
-      // Push the run into the vector.
-      lineInfoRuns.Insert( lineInfoRuns.Begin() + bidiLineInfoIndex, lineInfoRun );
-      ++bidiLineInfoIndex;
     }
   }
 
-  // Update indices of the bidi runs.
-  for( Vector<BidirectionalLineInfoRun>::Iterator it = lineInfoRuns.Begin() + bidiLineInfoIndex,
-         endIt = lineInfoRuns.End();
-       it != endIt;
-       ++it )
-  {
-    BidirectionalLineInfoRun& run = *it;
-
-    run.characterRun.characterIndex += numberOfCharacters;
-  }
+  // Push the run into the vector.
+  lineInfoRuns.Insert( lineInfoRuns.Begin() + bidiLineIndex, lineInfoRun );
 }
 
 bool GetMirroredText( const Vector<Character>& text,
