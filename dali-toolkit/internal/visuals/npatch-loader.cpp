@@ -157,7 +157,7 @@ void GetRedOffsetAndMask( Dali::Pixel::Format pixelFormat, int& byteOffset, int&
   }
 }
 
-Uint16Pair ParseRange( unsigned int& index, unsigned int width, unsigned char* pixel, unsigned int pixelStride, int testByte, int testBits, int testValue )
+Uint16Pair ParseRange( unsigned int& index, unsigned int width, unsigned char*& pixel, unsigned int pixelStride, int testByte, int testBits, int testValue )
 {
   unsigned int start = 0xFFFF;
   for( ; index < width; ++index, pixel += pixelStride )
