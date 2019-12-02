@@ -103,36 +103,19 @@ public:
   /**
    * @brief Store the visual position of glyphs in the VisualModel.
    *
-   * @param[in] layoutParameters The parameters needed to layout the text.
-   * @param[out] glyphPositions The positions of all the glyphs.
-   * @param[out] lines The laid-out lines.
+   * Builds the bidirectional info and reorders RTL lines.
+   *
+   * @param[in,out] layoutParameters The parameters needed to layout the text.
    * @param[out] layoutSize The size of the text after it has been laid-out.
    * @param[in] elideTextEnabled Whether the text elide is enabled.
    * @param[in,out] isAutoScrollEnabled If the isAutoScrollEnabled is true and the height of the text exceeds the boundaries of the control the text is elided and the isAutoScrollEnabled is set to false to disable the autoscroll
    *
    * @return \e true if the text has been re-laid-out. \e false means the given width is too small to layout even a single character.
    */
-  bool LayoutText( const Parameters& layoutParameters,
-                   Vector<Vector2>& glyphPositions,
-                   Vector<LineRun>& lines,
+  bool LayoutText( Parameters& layoutParameters,
                    Size& layoutSize,
                    bool elideTextEnabled,
                    bool& isAutoScrollEnabled );
-
-  /**
-   * @brief Re-lays out those lines with right to left characters.
-   *
-   * It doesn't change the phisical position of the glyphs in the model but sets their new position.
-   *
-   * @param[in] layoutParameters The parameters needed to layout the text.
-   * @param[in] startIndex Character index of the line from where the lines are reordered.
-   * @param[in] numberOfCharacters The number of characters.
-   * @param[in,out] glyphPositions The positions of all the glyphs.
-   */
-  void ReLayoutRightToLeftLines( const Parameters& layoutParameters,
-                                 CharacterIndex startIndex,
-                                 Length numberOfCharacters,
-                                 Vector<Vector2>& glyphPositions );
 
   /**
    * @brief Aligns the laid out lines.

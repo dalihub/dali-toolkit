@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/adaptor-framework/clipboard.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/public-api/rendering/shader.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/input-style.h>
@@ -724,6 +725,13 @@ struct Controller::Impl
    */
   void ScrollTextToMatchCursor( const CursorInfo& cursorInfo );
 
+  /**
+   * @brief Create an actor that renders the text background color
+   *
+   * @return the created actor or an empty handle if no background color needs to be rendered.
+   */
+  Actor CreateBackgroundActor();
+
 public:
 
   /**
@@ -779,6 +787,8 @@ public:
   bool mFontStyleSetByString:1;            ///< Set when font style is set by string (legacy) instead of map
   bool mShouldClearFocusOnEscape:1;        ///< Whether text control should clear key input focus
   LayoutDirection::Type mLayoutDirection;  ///< Current system language direction
+
+  Shader mShaderBackground;                ///< The shader for text background.
 
   float mTextFitMinSize;                   ///< Minimum Font Size for text fit. Default 10
   float mTextFitMaxSize;                   ///< Maximum Font Size for text fit. Default 100

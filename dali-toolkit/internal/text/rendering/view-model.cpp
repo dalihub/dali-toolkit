@@ -153,6 +153,16 @@ const ColorIndex* const ViewModel::GetColorIndices() const
   return mModel->GetColorIndices();
 }
 
+const Vector4* const ViewModel::GetBackgroundColors() const
+{
+  return mModel->GetBackgroundColors();
+}
+
+const ColorIndex* const ViewModel::GetBackgroundColorIndices() const
+{
+  return mModel->GetBackgroundColorIndices();
+}
+
 const Vector4& ViewModel::GetDefaultColor() const
 {
   return mModel->GetDefaultColor();

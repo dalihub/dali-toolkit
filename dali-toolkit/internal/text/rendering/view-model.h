@@ -139,6 +139,16 @@ public:
   virtual const ColorIndex* const GetColorIndices() const;
 
   /**
+   * @copydoc ModelInterface::GetBackgroundColors()
+   */
+  virtual const Vector4* const GetBackgroundColors() const;
+
+  /**
+   * @copydoc ModelInterface::GetBackgroundColorIndices()
+   */
+  virtual const ColorIndex* const GetBackgroundColorIndices() const;
+
+  /**
    * @copydoc ModelInterface::GetDefaultColor()
    */
   virtual const Vector4& GetDefaultColor() const;

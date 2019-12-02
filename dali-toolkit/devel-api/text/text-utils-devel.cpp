@@ -32,14 +32,13 @@
 #include <dali-toolkit/internal/text/color-segmentation.h>
 #include <dali-toolkit/internal/text/layouts/layout-engine.h>
 #include <dali-toolkit/internal/text/layouts/layout-parameters.h>
-#include <dali-toolkit/internal/text/logical-model-impl.h>
 #include <dali-toolkit/internal/text/markup-processor.h>
 #include <dali-toolkit/internal/text/multi-language-support.h>
 #include <dali-toolkit/internal/text/segmentation.h>
 #include <dali-toolkit/internal/text/shaper.h>
 #include <dali-toolkit/internal/text/text-enumerations-impl.h>
 #include <dali-toolkit/internal/text/text-font-style.h>
-#include <dali-toolkit/internal/text/visual-model-impl.h>
+#include <dali-toolkit/internal/text/text-model.h>
 
 namespace Dali
 {
@@ -133,20 +132,19 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   MultilanguageSupport multilanguageSupport = MultilanguageSupport::Get();
   FontClient fontClient = FontClient::Get();
   MetricsPtr metrics;
-  Text::Layout::Engine layoutEngine;                  ///< The layout engine.
-  LogicalModelPtr logicalModel = LogicalModel::New(); ///< Pointer to the logical model.
-  VisualModelPtr visualModel = VisualModel::New();    ///< Pointer to the visual model.
-  Vector<ColorBlendingMode> blendingMode;             ///< How embedded items and bitmap font glyphs are blended with color text.
-  Vector<bool> isEmoji;                               ///< Whether the glyph is an emoji.
+  Text::Layout::Engine layoutEngine;             ///< The layout engine.
+  Text::ModelPtr textModel = Text::Model::New(); ///< Pointer to the text's model.
+  Vector<ColorBlendingMode> blendingMode;        ///< How embedded items and bitmap font glyphs are blended with color text.
+  Vector<bool> isEmoji;                          ///< Whether the glyph is an emoji.
 
   // Use this to access FontClient i.e. to get down-scaled Emoji metrics.
   metrics = Metrics::New( fontClient );
   layoutEngine.SetMetrics( metrics );
 
-  TextAbstraction::TextRenderer::Parameters rendererParameters( visualModel->mGlyphs,
-                                                                visualModel->mGlyphPositions,
-                                                                visualModel->mColors,
-                                                                visualModel->mColorIndices,
+  TextAbstraction::TextRenderer::Parameters rendererParameters( textModel->mVisualModel->mGlyphs,
+                                                                textModel->mVisualModel->mGlyphPositions,
+                                                                textModel->mVisualModel->mColors,
+                                                                textModel->mVisualModel->mColorIndices,
                                                                 blendingMode,
                                                                 isEmoji );
 
@@ -154,22 +152,22 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   rendererParameters.height = textParameters.textHeight;
   rendererParameters.pixelFormat = TextAbstraction::TextRenderer::Parameters::RGBA8888; // @note: At the moment all textures are generated RGBA8888
 
-  Vector<Character>& utf32Characters = logicalModel->mText;                                             // Characters encoded in utf32.
-  Vector<Character> mirroredUtf32Characters;                                                             // The utf32Characters Characters but mirrored if there are RTL text.
-  Vector<LineBreakInfo>& lineBreakInfo = logicalModel->mLineBreakInfo;                                  // The line break info.
-  Vector<ScriptRun>& scripts = logicalModel->mScriptRuns;                                               // Charactes's script.
-  Vector<FontDescriptionRun>& fontDescriptionRuns = logicalModel->mFontDescriptionRuns;                 // Desired font descriptions.
-  Vector<FontRun>& validFonts = logicalModel->mFontRuns;                                                // Validated fonts.
-  Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = logicalModel->mBidirectionalParagraphInfo; // The bidirectional info per paragraph.
-  Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = logicalModel->mBidirectionalLineInfo;       // The bidirectional info per line.
-  Vector<CharacterDirection>& directions = logicalModel->mCharacterDirections;                          // Character's directions.
-  Vector<ColorRun>& colorRuns = logicalModel->mColorRuns;                                               // colors of the text.
+  Vector<Character>& utf32Characters = textModel->mLogicalModel->mText;                                             // Characters encoded in utf32.
+  Vector<Character> mirroredUtf32Characters;                                                                        // The utf32Characters Characters but mirrored if there are RTL text.
+  Vector<LineBreakInfo>& lineBreakInfo = textModel->mLogicalModel->mLineBreakInfo;                                  // The line break info.
+  Vector<ScriptRun>& scripts = textModel->mLogicalModel->mScriptRuns;                                               // Charactes's script.
+  Vector<FontDescriptionRun>& fontDescriptionRuns = textModel->mLogicalModel->mFontDescriptionRuns;                 // Desired font descriptions.
+  Vector<FontRun>& validFonts = textModel->mLogicalModel->mFontRuns;                                                // Validated fonts.
+  Vector<BidirectionalParagraphInfoRun>& bidirectionalInfo = textModel->mLogicalModel->mBidirectionalParagraphInfo; // The bidirectional info per paragraph.
+  //Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = textModel->mLogicalModel->mBidirectionalLineInfo;     // The bidirectional info per line.
+  Vector<CharacterDirection>& directions = textModel->mLogicalModel->mCharacterDirections;                          // Character's directions.
+  Vector<ColorRun>& colorRuns = textModel->mLogicalModel->mColorRuns;                                               // colors of the text.
 
-  Vector<CharacterIndex>& glyphsToCharacters = visualModel->mGlyphsToCharacters;                        // Glyphs to character map.
-  Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;                              // Characters to glyphs map.
-  Vector<Length>& charactersPerGlyph = visualModel->mCharactersPerGlyph;                                // Number of characters per glyph.
-  Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;                                // The number of glyphs that are shaped.
-  Vector<LineRun>& lines = visualModel->mLines;                                                         // The laid out lines.
+  Vector<CharacterIndex>& glyphsToCharacters = textModel->mVisualModel->mGlyphsToCharacters;                        // Glyphs to character map.
+  Vector<GlyphIndex>& charactersToGlyph = textModel->mVisualModel->mCharactersToGlyph;                              // Characters to glyphs map.
+  Vector<Length>& charactersPerGlyph = textModel->mVisualModel->mCharactersPerGlyph;                                // Number of characters per glyph.
+  Vector<Length>& glyphsPerCharacter = textModel->mVisualModel->mGlyphsPerCharacter;                                // The number of glyphs that are shaped.
+  Vector<LineRun>& lines = textModel->mVisualModel->mLines;                                                         // The laid out lines.
 
   Vector<GlyphIndex> newParagraphGlyphs;                   // Glyphs for the new paragraph characters.
 
@@ -189,7 +187,7 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
 
   MarkupProcessData markupProcessData( colorRuns,
                                        fontDescriptionRuns,
-                                       logicalModel->mEmbeddedItems );
+                                       textModel->mLogicalModel->mEmbeddedItems );
 
   if (textParameters.markupEnabled)
   {
@@ -362,19 +360,19 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
              newParagraphGlyphs );
 
   // Create the 'number of glyphs' per character and the glyph to character conversion tables.
-  visualModel->CreateGlyphsPerCharacterTable( 0u, 0u, numberOfCharacters );
-  visualModel->CreateCharacterToGlyphTable( 0u, 0u, numberOfCharacters );
+  textModel->mVisualModel->CreateGlyphsPerCharacterTable( 0u, 0u, numberOfCharacters );
+  textModel->mVisualModel->CreateCharacterToGlyphTable( 0u, 0u, numberOfCharacters );
 
   const Length numberOfGlyphs = rendererParameters.glyphs.Count();
 
   // Once the text has been shaped and the glyphs created it's possible to replace the font id of those glyphs
   // that represent an image or an item and create the embedded item layout info.
   // Note: the position of the embedded item can't be set until the text is laid-out.
-  embeddedItemLayout.Reserve( logicalModel->mEmbeddedItems.Count() );
-  for( const auto& item : logicalModel->mEmbeddedItems )
+  embeddedItemLayout.Reserve( textModel->mLogicalModel->mEmbeddedItems.Count() );
+  for( const auto& item : textModel->mLogicalModel->mEmbeddedItems )
   {
     // Get the glyph that matches with the character index.
-    const GlyphIndex glyphIndex = visualModel->mCharactersToGlyph[item.characterIndex];
+    const GlyphIndex glyphIndex = textModel->mVisualModel->mCharactersToGlyph[item.characterIndex];
     GlyphInfo& glyph = rendererParameters.glyphs[glyphIndex];
 
     glyph.fontId = 0u;
@@ -421,11 +419,11 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
                             0u,
                             0u,
                             numberOfCharacters,
-                            visualModel->mColors,
-                            visualModel->mColorIndices );
+                            textModel->mVisualModel->mColors,
+                            textModel->mVisualModel->mColorIndices );
 
   // Insert the default color at the beginning of the vector.
-  visualModel->mColors.Insert( visualModel->mColors.Begin(),textParameters.textColor );
+  textModel->mVisualModel->mColors.Insert( textModel->mVisualModel->mColors.Begin(),textParameters.textColor );
 
   // Set how the embedded items are blended with text color.
   blendingMode.Resize( numberOfGlyphs, textParameters.isTextColorSet ? ColorBlendingMode::MULTIPLY : ColorBlendingMode::NONE );
@@ -435,9 +433,9 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
     // Traverse the color runs.
     for( const auto& run : colorRuns )
     {
-      const GlyphIndex firstGlyph = visualModel->mCharactersToGlyph[run.characterRun.characterIndex];
+      const GlyphIndex firstGlyph = textModel->mVisualModel->mCharactersToGlyph[run.characterRun.characterIndex];
       const CharacterIndex lastCharacter = run.characterRun.characterIndex + run.characterRun.numberOfCharacters - 1u;
-      const GlyphIndex lastGlyphPlusOne = visualModel->mCharactersToGlyph[lastCharacter] + visualModel->mGlyphsPerCharacter[lastCharacter];
+      const GlyphIndex lastGlyphPlusOne = textModel->mVisualModel->mCharactersToGlyph[lastCharacter] + textModel->mVisualModel->mGlyphsPerCharacter[lastCharacter];
 
       for( GlyphIndex index = firstGlyph; index < lastGlyphPlusOne; ++index )
       {
@@ -447,9 +445,9 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   }
 
   // Traverse the embedded items and update the blending mode vector.
-  for( const auto& item : logicalModel->mEmbeddedItems )
+  for( const auto& item : textModel->mLogicalModel->mEmbeddedItems )
   {
-    const GlyphIndex glyphIndex = visualModel->mCharactersToGlyph[item.characterIndex];
+    const GlyphIndex glyphIndex = textModel->mVisualModel->mCharactersToGlyph[item.characterIndex];
     blendingMode[glyphIndex] = item.colorBlendingMode;
   }
 
@@ -463,9 +461,9 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   {
     if( run.script == TextAbstraction::Script::EMOJI )
     {
-      const GlyphIndex firstGlyph = visualModel->mCharactersToGlyph[run.characterRun.characterIndex];
+      const GlyphIndex firstGlyph = textModel->mVisualModel->mCharactersToGlyph[run.characterRun.characterIndex];
       const CharacterIndex lastCharacter = run.characterRun.characterIndex + run.characterRun.numberOfCharacters - 1u;
-      const GlyphIndex lastGlyphPlusOne = visualModel->mCharactersToGlyph[lastCharacter] + visualModel->mGlyphsPerCharacter[lastCharacter];
+      const GlyphIndex lastGlyphPlusOne = textModel->mVisualModel->mCharactersToGlyph[lastCharacter] + textModel->mVisualModel->mGlyphsPerCharacter[lastCharacter];
 
       for( GlyphIndex index = firstGlyph; index < lastGlyphPlusOne; ++index )
       {
@@ -560,22 +558,12 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
     textLayoutArea.width = fabs( Radian( Degree( textParameters.incrementAngle ) ) * static_cast<float>( rendererParameters.radius ) );
   }
 
+  textModel->mHorizontalAlignment = isCircularTextLayout ? horizontalCircularAlignment : horizontalAlignment;
+  textModel->mLineWrapMode = LineWrap::WORD;
+  textModel->mIgnoreSpacesAfterText = false;
+  textModel->mMatchSystemLanguageDirection = false;
   Text::Layout::Parameters layoutParameters( textLayoutArea,
-                                       textToShape.Begin(),
-                                       lineBreakInfo.Begin(),
-                                       nullptr,
-                                       ( 0u != directions.Count() ) ? directions.Begin() : nullptr,
-                                       rendererParameters.glyphs.Begin(),
-                                       glyphsToCharacters.Begin(),
-                                       charactersPerGlyph.Begin(),
-                                       charactersToGlyph.Begin(),
-                                       glyphsPerCharacter.Begin(),
-                                       numberOfGlyphs,
-                                       isCircularTextLayout ? horizontalCircularAlignment : horizontalAlignment,
-                                       LineWrap::WORD,
-                                       0.f,
-                                       false,
-                                       false ); // Outline's width
+                                             textModel );
 
   // Resize the vector of positions to have the same size than the vector of glyphs.
   rendererParameters.positions.Resize( numberOfGlyphs );
@@ -594,37 +582,9 @@ Devel::PixelBuffer Render( const RendererParameters& textParameters, Vector<Embe
   Size newLayoutSize;
   bool isAutoScrollEnabled = false;
   layoutEngine.LayoutText( layoutParameters,
-                           rendererParameters.positions,
-                           lines,
                            newLayoutSize,
                            textParameters.ellipsisEnabled,
                            isAutoScrollEnabled );
-
-  ////////////////////////////////////////////////////////////////////////////////
-  // Reorder BiDirectional lines.
-  ////////////////////////////////////////////////////////////////////////////////
-
-  if( hasBidirectionalText )
-  {
-    // Reorder the line.
-    bidirectionalLineInfo.Reserve( 1u );
-
-    ReorderLines( bidirectionalInfo,
-                  0u,
-                  numberOfCharacters,
-                  lines,
-                  bidirectionalLineInfo );
-
-    // Set the bidirectional info per line into the layout parameters.
-    layoutParameters.lineBidirectionalInfoRunsBuffer = bidirectionalLineInfo.Begin();
-    layoutParameters.numberOfBidirectionalInfoRuns = bidirectionalLineInfo.Count();
-
-    // Re-layout the text. Reorder those lines with right to left characters.
-    layoutEngine.ReLayoutRightToLeftLines( layoutParameters,
-                                           0u,
-                                           numberOfCharacters,
-                                           rendererParameters.positions );
-  }
 
   ////////////////////////////////////////////////////////////////////////////////
   // Align the text.

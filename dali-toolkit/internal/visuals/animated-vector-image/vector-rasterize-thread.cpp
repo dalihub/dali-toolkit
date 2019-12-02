@@ -76,14 +76,14 @@ void VectorRasterizeThread::SetCompletedCallback( CallbackBase* callback )
 
 void VectorRasterizeThread::AddTask( VectorAnimationTaskPtr task )
 {
+  // Lock while adding task to the queue
+  ConditionalWait::ScopedLock lock( mConditionalWait );
+
   if( !mIsThreadStarted )
   {
     Start();
     mIsThreadStarted = true;
   }
-
-  // Lock while adding task to the queue
-  ConditionalWait::ScopedLock lock( mConditionalWait );
 
   if( mRasterizeTasks.end() == std::find( mRasterizeTasks.begin(), mRasterizeTasks.end(), task ) )
   {

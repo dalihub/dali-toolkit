@@ -389,6 +389,8 @@ public:
   Vector<GlyphRun>       mUnderlineRuns;        ///< Runs of glyphs that are underlined.
   Vector<Vector4>        mColors;               ///< Colors of the glyphs.
   Vector<ColorIndex>     mColorIndices;         ///< Indices to the vector of colors for each glyphs.
+  Vector<Vector4>        mBackgroundColors;     ///< Background colors of the glyphs.
+  Vector<ColorIndex>     mBackgroundColorIndices; ///< Indices to the vector of background colors for each glyphs.
 
   Vector4                mTextColor;            ///< The text color
   Vector4                mShadowColor;          ///< Color of drop shadow
@@ -399,7 +401,7 @@ public:
   Vector2                mShadowOffset;         ///< Offset for drop shadow, 0 indicates no shadow
   float                  mUnderlineHeight;      ///< Fixed height for underline to override font metrics.
   float                  mShadowBlurRadius;     ///< Blur radius of shadow, 0 indicates no blur.
-  uint16_t           mOutlineWidth;         ///< Width of outline.
+  uint16_t               mOutlineWidth;         ///< Width of outline.
 
 private:
 

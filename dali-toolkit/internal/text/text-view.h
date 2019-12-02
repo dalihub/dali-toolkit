@@ -90,6 +90,16 @@ public:
   virtual const ColorIndex* const GetColorIndices() const;
 
   /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetBackgroundColors()
+   */
+  virtual const Vector4* const GetBackgroundColors() const;
+
+  /**
+   * @copydoc Dali::Toolkit::Text::ViewInterface::GetBackgroundColorIndices()
+   */
+  virtual const ColorIndex* const GetBackgroundColorIndices() const;
+
+  /**
    * @copydoc Dali::Toolkit::Text::ViewInterface::GetTextColor()
    */
   virtual const Vector4& GetTextColor() const;

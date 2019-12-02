@@ -268,6 +268,10 @@ private: // Implementation
   // Connection needed to re-render text, when a Text Field returns to the stage.
   void OnStageConnect( Dali::Actor actor );
 
+public: // For UTC only
+
+  Text::ControllerPtr GetTextController() { return mController; }
+
 private: // Data
 
   // Signals
@@ -285,6 +289,7 @@ private: // Data
 
   Actor mRenderableActor;
   Actor mActiveLayer;
+  Actor mBackgroundActor;
   CallbackBase* mIdleCallback;
 
   float mAlignmentOffset;
