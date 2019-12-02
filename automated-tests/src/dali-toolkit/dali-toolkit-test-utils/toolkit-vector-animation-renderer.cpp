@@ -108,6 +108,10 @@ public:
     height = 100;
   }
 
+  void GetLayerInfo( Property::Map& map ) const
+  {
+  }
+
   Dali::VectorAnimationRenderer::UploadCompletedSignalType& UploadCompletedSignal()
   {
     return mUploadCompletedSignal;
@@ -182,10 +186,6 @@ VectorAnimationRenderer& VectorAnimationRenderer::operator=( const VectorAnimati
   return *this;
 }
 
-void VectorAnimationRenderer::Finalize()
-{
-}
-
 void VectorAnimationRenderer::SetRenderer( Renderer renderer )
 {
   Internal::Adaptor::GetImplementation( *this ).SetRenderer( renderer );
@@ -218,6 +218,7 @@ void VectorAnimationRenderer::GetDefaultSize( uint32_t& width, uint32_t& height 
 
 void VectorAnimationRenderer::GetLayerInfo( Property::Map& map ) const
 {
+  Internal::Adaptor::GetImplementation( *this ).GetLayerInfo( map );
 }
 
 VectorAnimationRenderer::UploadCompletedSignalType& VectorAnimationRenderer::UploadCompletedSignal()
