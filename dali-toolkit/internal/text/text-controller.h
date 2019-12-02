@@ -74,16 +74,15 @@ public: // Enumerated types.
     GET_SCRIPTS        = 0x0002,
     VALIDATE_FONTS     = 0x0004,
     GET_LINE_BREAKS    = 0x0008,
-    GET_WORD_BREAKS    = 0x0010,
-    BIDI_INFO          = 0x0020,
-    SHAPE_TEXT         = 0x0040,
-    GET_GLYPH_METRICS  = 0x0080,
-    LAYOUT             = 0x0100,
-    UPDATE_LAYOUT_SIZE = 0x0200,
-    REORDER            = 0x0400,
-    ALIGN              = 0x0800,
-    COLOR              = 0x1000,
-    UPDATE_DIRECTION   = 0x2000,
+    BIDI_INFO          = 0x0010,
+    SHAPE_TEXT         = 0x0020,
+    GET_GLYPH_METRICS  = 0x0040,
+    LAYOUT             = 0x0080,
+    UPDATE_LAYOUT_SIZE = 0x0100,
+    REORDER            = 0x0200,
+    ALIGN              = 0x0400,
+    COLOR              = 0x0800,
+    UPDATE_DIRECTION   = 0x1000,
     ALL_OPERATIONS     = 0xFFFF
   };
 
@@ -1487,6 +1486,13 @@ public: // Text-input Event Queuing.
    * @return Whether text control should clear key input focus or not when escape key is pressed.
    */
   bool ShouldClearFocusOnEscape() const;
+
+  /**
+   * @brief Create an actor that renders the text background color
+   *
+   * @return the created actor or an empty handle if no background color needs to be rendered.
+   */
+  Actor CreateBackgroundActor();
 
 protected: // Inherit from Text::Decorator::ControllerInterface.
 

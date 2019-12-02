@@ -289,6 +289,14 @@ void LogicalModel::UpdateTextStyleRuns( CharacterIndex index, int numberOfCharac
                                  mColorRuns,
                                  removedColorRuns );
 
+  // Process the background color runs.
+  Vector<ColorRun> removedBackgroundColorRuns;
+  UpdateCharacterRuns<ColorRun>( index,
+                                 numberOfCharacters,
+                                 totalNumberOfCharacters,
+                                 mBackgroundColorRuns,
+                                 removedBackgroundColorRuns );
+
   // Process the font description runs.
   Vector<FontDescriptionRun> removedFontDescriptionRuns;
   UpdateCharacterRuns<FontDescriptionRun>( index,

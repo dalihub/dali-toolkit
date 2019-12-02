@@ -40,6 +40,7 @@ struct BidirectionalParagraphInfoRun
 {
   CharacterRun  characterRun;           ///< The initial character index within the whole text and the number of characters of the run.
   BidiInfoIndex bidirectionalInfoIndex; ///< Index to the table with the bidirectional info per paragraph.
+  CharacterDirection direction;         ///< The paragraph's direction.
 };
 
 } // namespace Text

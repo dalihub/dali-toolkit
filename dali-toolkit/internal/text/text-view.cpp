@@ -326,6 +326,26 @@ const ColorIndex* const View::GetColorIndices() const
   return NULL;
 }
 
+const Vector4* const View::GetBackgroundColors() const
+{
+  if( mImpl->mVisualModel )
+  {
+    return mImpl->mVisualModel->mBackgroundColors.Begin();
+  }
+
+  return nullptr;
+}
+
+const ColorIndex* const View::GetBackgroundColorIndices() const
+{
+  if( mImpl->mVisualModel )
+  {
+    return mImpl->mVisualModel->mBackgroundColorIndices.Begin();
+  }
+
+  return nullptr;
+}
+
 const Vector4& View::GetTextColor() const
 {
   if( mImpl->mVisualModel )

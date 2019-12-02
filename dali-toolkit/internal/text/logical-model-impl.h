@@ -211,9 +211,9 @@ public:
   Vector<ScriptRun>                     mScriptRuns;
   Vector<FontRun>                       mFontRuns;
   Vector<ColorRun>                      mColorRuns;
+  Vector<ColorRun>                      mBackgroundColorRuns;
   Vector<FontDescriptionRun>            mFontDescriptionRuns;
   Vector<LineBreakInfo>                 mLineBreakInfo;
-  Vector<WordBreakInfo>                 mWordBreakInfo;
   Vector<ParagraphRun>                  mParagraphInfo;
   Vector<BidirectionalParagraphInfoRun> mBidirectionalParagraphInfo;
   Vector<CharacterDirection>            mCharacterDirections;              ///< For each character, whether is right to left. ( @e flase is left to right, @e true right to left ).

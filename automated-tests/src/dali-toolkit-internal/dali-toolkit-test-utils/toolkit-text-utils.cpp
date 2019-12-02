@@ -79,7 +79,6 @@ void ClearModelData( CharacterIndex characterIndex,
 
   logicalModel->mScriptRuns.Clear();
   logicalModel->mFontRuns.Clear();
-  logicalModel->mWordBreakInfo.Clear();
   logicalModel->mBidirectionalParagraphInfo.Clear();
   logicalModel->mCharacterDirections.Clear();
   logicalModel->mBidirectionalLineInfo.Clear();
@@ -99,13 +98,13 @@ void CreateTextModel( const std::string& text,
                       const Vector<FontDescriptionRun>& fontDescriptions,
                       const LayoutOptions& options,
                       Size& layoutSize,
-                      LogicalModelPtr& logicalModel,
-                      VisualModelPtr& visualModel,
+                      ModelPtr& textModel,
                       MetricsPtr& metrics,
                       bool markupProcessorEnabled )
 {
-  logicalModel = LogicalModel::New();
-  visualModel = VisualModel::New();
+  textModel = Model::New(); ///< Pointer to the text's model.
+  LogicalModelPtr logicalModel = textModel->mLogicalModel;
+  VisualModelPtr visualModel = textModel->mVisualModel;
 
   MarkupProcessData markupProcessData( logicalModel->mColorRuns,
                                        logicalModel->mFontDescriptionRuns,
@@ -152,15 +151,6 @@ void CreateTextModel( const std::string& text,
     // Nothing else to do if the number of characters is zero.
     return;
   }
-
-  // Retrieves the word break info. The word break info is used to layout the text (where to wrap the text in lines).
-  Vector<WordBreakInfo>& wordBreakInfo = logicalModel->mWordBreakInfo;
-  wordBreakInfo.Resize( characterCount );
-
-  SetWordBreakInfo( utf32Characters,
-                    0u,
-                    characterCount,
-                    wordBreakInfo );
 
   // 3) Set the script info.
   MultilanguageSupport multilanguageSupport = MultilanguageSupport::Get();
@@ -291,25 +281,12 @@ void CreateTextModel( const std::string& text,
   layoutEngine.SetLayout( Layout::Engine::MULTI_LINE_BOX );
 
   // Set the layout parameters.
-  const Vector<GlyphIndex>& charactersToGlyph = visualModel->mCharactersToGlyph;
-  const Vector<Length>& glyphsPerCharacter = visualModel->mGlyphsPerCharacter;
-  float outlineWidth = visualModel->GetOutlineWidth();
+  textModel->mHorizontalAlignment = Text::HorizontalAlignment::BEGIN;
+  textModel->mLineWrapMode = LineWrap::WORD;
+  textModel->mIgnoreSpacesAfterText = true;
+  textModel->mMatchSystemLanguageDirection = false;
   Layout::Parameters layoutParameters( textArea,
-                                       utf32Characters.Begin(),
-                                       lineBreakInfo.Begin(),
-                                       wordBreakInfo.Begin(),
-                                       ( 0u != characterDirections.Count() ) ? characterDirections.Begin() : NULL,
-                                       glyphs.Begin(),
-                                       glyphsToCharactersMap.Begin(),
-                                       charactersPerGlyph.Begin(),
-                                       charactersToGlyph.Begin(),
-                                       glyphsPerCharacter.Begin(),
-                                       numberOfGlyphs,
-                                       Text::HorizontalAlignment::BEGIN,
-                                       Text::LineWrap::WORD,
-                                       outlineWidth,
-                                       true,
-                                       false );
+                                       textModel );
 
   Vector<LineRun>& lines = visualModel->mLines;
 
@@ -326,41 +303,9 @@ void CreateTextModel( const std::string& text,
 
   bool isAutoScroll = false;
   layoutEngine.LayoutText( layoutParameters,
-                           glyphPositions,
-                           lines,
                            layoutSize,
                            false,
                            isAutoScroll );
-
-  // 10) Reorder the lines
-  if( 0u != bidirectionalInfo.Count() )
-  {
-    Vector<BidirectionalLineInfoRun>& bidirectionalLineInfo = logicalModel->mBidirectionalLineInfo;
-
-    // Get the lines
-    const Length numberOfLines = lines.Count();
-
-    // Reorder the lines.
-    bidirectionalLineInfo.Reserve( numberOfLines ); // Reserve because is not known yet how many lines have right to left characters.
-    ReorderLines( bidirectionalInfo,
-                  0u,
-                  characterCount,
-                  lines,
-                  bidirectionalLineInfo );
-
-    // Set the bidirectional info per line into the layout parameters.
-    layoutParameters.lineBidirectionalInfoRunsBuffer = bidirectionalLineInfo.Begin();
-    layoutParameters.numberOfBidirectionalInfoRuns = bidirectionalLineInfo.Count();
-
-    if( options.reorder )
-    {
-      // Re-layout the text. Reorder those lines with right to left characters.
-      layoutEngine.ReLayoutRightToLeftLines( layoutParameters,
-                                             0u,
-                                             characterCount,
-                                             glyphPositions );
-    }
-  }
 
   if( options.align )
   {

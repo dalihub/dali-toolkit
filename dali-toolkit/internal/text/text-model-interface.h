@@ -162,6 +162,20 @@ public:
   virtual const ColorIndex* const GetColorIndices() const = 0;
 
   /**
+   * @brief Retrieves the vector of background colors.
+   *
+   * @return Pointer to the vector of background colors.
+   */
+  virtual const Vector4* const GetBackgroundColors() const = 0;
+
+  /**
+   * @brief Retrieves the vector of indices to the vector of background colors.
+   *
+   * @return Pointer to a vector which stores for each glyph the index to the vector of background colors.
+   */
+  virtual const ColorIndex* const GetBackgroundColorIndices() const = 0;
+
+  /**
    * @brief Retrieves the text's default color.
    *
    * @return The default color.
