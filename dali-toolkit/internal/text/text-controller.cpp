@@ -3712,17 +3712,6 @@ bool Controller::RemoveText( int cursorOffset,
         }
       }
 
-      // If the number of current text and the number of characters to be deleted are same,
-      // it means all texts should be removed and all Preedit variables should be initialized.
-      if( ( currentText.Count() - numberOfCharacters == 0 ) && ( cursorIndex == 0 ) )
-      {
-        if( mImpl->mEventData )
-        {
-          mImpl->mEventData->mPreEditStartPosition = 0;
-          mImpl->mEventData->mPreEditLength = 0;
-        }
-      }
-
       // Updates the text style runs by removing characters. Runs with no characters are removed.
       mImpl->mModel->mLogicalModel->UpdateTextStyleRuns( cursorIndex, -numberOfCharacters );
 
