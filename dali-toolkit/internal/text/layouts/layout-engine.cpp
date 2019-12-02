@@ -229,7 +229,7 @@ struct Engine::Impl
     // The initial start point is zero. However it needs a correction according the 'x' bearing of the first glyph.
     // i.e. if the bearing of the first glyph is negative it may exceed the boundaries of the text area.
     // It needs to add as well space for the cursor if the text is in edit mode and extra space in case the text is outlined.
-    tmpLineLayout.penX = ( 0.f > glyphMetrics.xBearing ) ? -glyphMetrics.xBearing  : 0.f + mCursorWidth + parameters.outlineWidth;
+    tmpLineLayout.penX = -glyphMetrics.xBearing + mCursorWidth + parameters.outlineWidth;
 
     // Initialize the advance of the previous glyph.
     tmpLineLayout.previousAdvance = 0.f;
@@ -303,9 +303,9 @@ struct Engine::Impl
       }
       else
       {
-        tmpLineLayout.previousAdvance = ( glyphMetrics.advance + parameters.interGlyphExtraAdvance );
         tmpLineLayout.penX += tmpLineLayout.previousAdvance + tmpLineLayout.wsLengthEndOfLine;
-        tmpLineLayout.length = tmpLineLayout.penX;
+        tmpLineLayout.previousAdvance = ( glyphMetrics.advance + parameters.interGlyphExtraAdvance );
+        tmpLineLayout.length = tmpLineLayout.penX + glyphMetrics.xBearing + glyphMetrics.width;
 
         // Clear the white space length at the end of the line.
         tmpLineLayout.wsLengthEndOfLine = 0.f;
@@ -396,7 +396,7 @@ struct Engine::Impl
     // so the penX position needs to be moved to the right.
 
     const GlyphInfo& glyph = *glyphsBuffer;
-    float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing : 0.f + mCursorWidth + outlineWidth;
+    float penX = -glyph.xBearing + mCursorWidth + outlineWidth;
 
     for( GlyphIndex i = 0u; i < numberOfGlyphs; ++i )
     {
@@ -990,7 +990,7 @@ struct Engine::Impl
       const CharacterIndex characterVisualIndex = bidiLine.characterRun.characterIndex + *bidiLine.visualToLogicalMap;
       const GlyphInfo& glyph = *( layoutParameters.glyphsBuffer + *( layoutParameters.charactersToGlyphsBuffer + characterVisualIndex ) );
 
-      float penX = ( 0.f > glyph.xBearing ) ? -glyph.xBearing  : 0.f  + layoutParameters.outlineWidth + mCursorWidth;
+      float penX = -glyph.xBearing + layoutParameters.outlineWidth + mCursorWidth;
 
       Vector2* glyphPositionsBuffer = glyphPositions.Begin();
 
