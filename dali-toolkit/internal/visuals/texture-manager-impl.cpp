@@ -182,15 +182,6 @@ TextureSet TextureManager::LoadTexture(
     {
       Devel::PixelBuffer pixelBuffer = LoadImageFromFile( url.GetUrl(), desiredSize, fittingMode, samplingMode,
                                        orientationCorrection  );
-      if( maskInfo )
-      {
-        Devel::PixelBuffer maskPixelBuffer = LoadImageFromFile( maskInfo->mAlphaMaskUrl.GetUrl(), ImageDimensions(),
-                                             FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true  );
-        if( maskPixelBuffer )
-        {
-          pixelBuffer.ApplyMask( maskPixelBuffer, maskInfo->mContentScaleFactor, maskInfo->mCropToMask );
-        }
-      }
       if( pixelBuffer )
       {
         PreMultiply( pixelBuffer, preMultiplyOnLoad );
@@ -252,9 +243,8 @@ TextureSet TextureManager::LoadTexture(
       }
       else
       {
-        TextureId alphaMaskId = RequestMaskLoad( maskInfo->mAlphaMaskUrl );
         textureId = RequestLoad( url,
-                                 alphaMaskId,
+                                 maskInfo->mAlphaMaskId,
                                  maskInfo->mContentScaleFactor,
                                  desiredSize,
                                  fittingMode, samplingMode,
