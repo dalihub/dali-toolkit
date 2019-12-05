@@ -1487,6 +1487,13 @@ public: // Text-input Event Queuing.
    */
   bool ShouldClearFocusOnEscape() const;
 
+  /**
+   * @brief Create an actor that renders the text background color
+   *
+   * @return the created actor or an empty handle if no background color needs to be rendered.
+   */
+  Actor CreateBackgroundActor();
+
 protected: // Inherit from Text::Decorator::ControllerInterface.
 
   /**

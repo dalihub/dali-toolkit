@@ -25,6 +25,7 @@ SET(TC_SOURCES
  utc-Dali-Text-Shaping.cpp
  utc-Dali-Text-Typesetter.cpp
  utc-Dali-Text-ViewModel.cpp
+ utc-Dali-TextField-internal.cpp
  utc-Dali-TextureManager.cpp
  utc-Dali-Visuals-internal.cpp
  utc-Dali-VisualModel.cpp

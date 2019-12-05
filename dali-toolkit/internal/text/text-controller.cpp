@@ -2454,6 +2454,9 @@ Toolkit::DevelText::TextDirection::Type Controller::GetTextDirection()
     // Clear the update info. This info will be set the next time the text is updated.
     mImpl->mTextUpdateInfo.Clear();
 
+    // FullRelayoutNeeded should be true because DoRelayout is MAX_FLOAT, MAX_FLOAT.
+    mImpl->mTextUpdateInfo.mFullRelayoutNeeded = true;
+
     mImpl->mUpdateTextDirection = false;
   }
 
@@ -4295,6 +4298,11 @@ void Controller::SetControlInterface( ControlInterface* controlInterface )
 bool Controller::ShouldClearFocusOnEscape() const
 {
   return mImpl->mShouldClearFocusOnEscape;
+}
+
+Actor Controller::CreateBackgroundActor()
+{
+  return mImpl->CreateBackgroundActor();
 }
 
 // private : Private contructors & copy operator.

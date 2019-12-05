@@ -1082,7 +1082,7 @@ static unsigned int nsvg__parseColorHex(const char* str)
 static unsigned int nsvg__parseColorRGB(const char* str)
 {
 	int r = -1, g = -1, b = -1;
-	char s1[32]="", s2[32]="";
+	char s1[33]="", s2[33]="";
 	/**
 	 * In the original file, the formatted data reading did not specify the string with width limitation.
 	 * To prevent the possible overflow, we replace '%s' with '%32s' here.
@@ -1320,7 +1320,7 @@ static int nsvg__parseUnits(const char* units)
 static NSVGcoordinate nsvg__parseCoordinateRaw(const char* str)
 {
 	NSVGcoordinate coord = {0, NSVG_UNITS_USER};
-	char units[32]="";
+	char units[33]="";
 	/**
 	 * In the original file, the formatted data reading did not specify the string with width limitation.
 	 * To prevent the possible overflow, we replace '%s' with '%32s' here.

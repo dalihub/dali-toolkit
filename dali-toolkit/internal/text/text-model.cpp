@@ -112,6 +112,16 @@ const ColorIndex* const Model::GetColorIndices() const
   return mVisualModel->mColorIndices.Begin();
 }
 
+const Vector4* const Model::GetBackgroundColors() const
+{
+  return mVisualModel->mBackgroundColors.Begin();
+}
+
+const ColorIndex* const Model::GetBackgroundColorIndices() const
+{
+  return mVisualModel->mBackgroundColorIndices.Begin();
+}
+
 const Vector4& Model::GetDefaultColor() const
 {
   return mVisualModel->mTextColor;

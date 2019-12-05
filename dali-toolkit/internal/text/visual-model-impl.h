@@ -389,6 +389,8 @@ public:
   Vector<GlyphRun>       mUnderlineRuns;        ///< Runs of glyphs that are underlined.
   Vector<Vector4>        mColors;               ///< Colors of the glyphs.
   Vector<ColorIndex>     mColorIndices;         ///< Indices to the vector of colors for each glyphs.
+  Vector<Vector4>        mBackgroundColors;     ///< Background colors of the glyphs.
+  Vector<ColorIndex>     mBackgroundColorIndices; ///< Indices to the vector of background colors for each glyphs.
 
   Vector4                mTextColor;            ///< The text color
   Vector4                mShadowColor;          ///< Color of drop shadow
