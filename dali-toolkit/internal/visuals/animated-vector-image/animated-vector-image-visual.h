@@ -206,10 +206,9 @@ private:
   PropertyNotification                         mSizeNotification;
   Vector2                                      mVisualSize;
   Vector2                                      mVisualScale;
+  Property::Array                              mPlayRange;
   WeakHandle< Actor >                          mPlacementActor;
   int32_t                                      mLoopCount;
-  uint32_t                                     mStartFrame;
-  uint32_t                                     mEndFrame;
   uint32_t                                     mResendFlag;
   DevelAnimatedVectorImageVisual::Action::Type mActionStatus;
   DevelImageVisual::StopBehavior::Type         mStopBehavior;

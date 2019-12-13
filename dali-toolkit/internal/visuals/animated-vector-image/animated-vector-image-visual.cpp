@@ -100,10 +100,9 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
   mImageVisualShaderFactory( shaderFactory ),
   mVisualSize(),
   mVisualScale( Vector2::ONE ),
+  mPlayRange(),
   mPlacementActor(),
   mLoopCount( LOOP_FOREVER ),
-  mStartFrame( 0 ),
-  mEndFrame( 0 ),
   mResendFlag( 0 ),
   mActionStatus( DevelAnimatedVectorImageVisual::Action::STOP ),
   mStopBehavior( DevelImageVisual::StopBehavior::CURRENT_FRAME ),
@@ -226,25 +225,8 @@ void AnimatedVectorImageVisual::DoSetProperty( Property::Index index, const Prop
       Property::Array* array = value.GetArray();
       if( array )
       {
-        size_t count = array->Count();
-        if( count >= 2 )
-        {
-          int startFrame, endFrame;
-          int totalFrame = mVectorAnimationTask->GetTotalFrameNumber();
-          array->GetElementAt( 0 ).Get( startFrame );
-          array->GetElementAt( 1 ).Get( endFrame );
-
-          if( startFrame >= 0 && startFrame < totalFrame && endFrame >= 0 && endFrame < totalFrame )
-          {
-            mStartFrame = startFrame;
-            mEndFrame = endFrame;
-            mResendFlag |= RESEND_PLAY_RANGE;
-          }
-          else
-          {
-            DALI_LOG_ERROR( "Invalid play range [%d, %d / %d]\n", startFrame, endFrame, totalFrame );
-          }
-        }
+        mPlayRange = *array;
+        mResendFlag |= RESEND_PLAY_RANGE;
       }
       break;
     }
@@ -509,7 +491,7 @@ void AnimatedVectorImageVisual::SendAnimationData()
 
     if( mResendFlag & RESEND_PLAY_RANGE )
     {
-      mVectorAnimationTask->SetPlayRange( mStartFrame, mEndFrame );
+      mVectorAnimationTask->SetPlayRange( mPlayRange );
     }
 
     if( mResendFlag & RESEND_STOP_BEHAVIOR )

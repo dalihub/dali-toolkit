@@ -18,6 +18,7 @@
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/public-api/object/base-object.h>
 #include <toolkit-application.h>
+#include <toolkit-vector-animation-renderer.h>
 
 namespace Dali
 {
@@ -94,7 +95,7 @@ public:
 
   uint32_t GetTotalFrameNumber() const
   {
-    return 5;
+    return VECTOR_ANIMATION_TOTAL_FRAME_NUMBER;
   }
 
   float GetFrameRate() const
@@ -106,6 +107,25 @@ public:
   {
     width = 100;
     height = 100;
+  }
+
+  bool GetMarkerInfo( const std::string& marker, uint32_t& startFrame, uint32_t& endFrame ) const
+  {
+    if( marker.compare( VECTOR_ANIMATION_MARKER_NAME_1 ) == 0 )
+    {
+      startFrame = VECTOR_ANIMATION_MARKER_START_FRAME_1;
+      endFrame = VECTOR_ANIMATION_MARKER_END_FRAME_1;
+    }
+    else if( marker.compare( VECTOR_ANIMATION_MARKER_NAME_2 ) == 0 )
+    {
+      startFrame = VECTOR_ANIMATION_MARKER_START_FRAME_2;
+      endFrame = VECTOR_ANIMATION_MARKER_END_FRAME_2;
+    }
+    else
+    {
+      return false;
+    }
+    return true;
   }
 
   Dali::VectorAnimationRenderer::UploadCompletedSignalType& UploadCompletedSignal()
@@ -218,6 +238,11 @@ void VectorAnimationRenderer::GetDefaultSize( uint32_t& width, uint32_t& height 
 
 void VectorAnimationRenderer::GetLayerInfo( Property::Map& map ) const
 {
+}
+
+bool VectorAnimationRenderer::GetMarkerInfo( const std::string& marker, uint32_t& startFrame, uint32_t& endFrame ) const
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetMarkerInfo( marker, startFrame, endFrame );
 }
 
 VectorAnimationRenderer::UploadCompletedSignalType& VectorAnimationRenderer::UploadCompletedSignal()

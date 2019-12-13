@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/object/property-array.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
@@ -201,10 +202,60 @@ void VectorAnimationTask::SetLoopCount( int32_t count )
   }
 }
 
-void VectorAnimationTask::SetPlayRange( uint32_t startFrame, uint32_t endFrame )
+void VectorAnimationTask::SetPlayRange( Property::Array& playRange )
 {
+  ConditionalWait::ScopedLock lock( mConditionalWait );
+
+  bool valid = false;
+  uint32_t startFrame = 0, endFrame = 0;
+  size_t count = playRange.Count();
+
+  if( count >= 2 )
+  {
+    int32_t start = 0, end = 0;
+    if( playRange.GetElementAt( 0 ).Get( start ) && playRange.GetElementAt( 1 ).Get( end ) )
+    {
+      startFrame = static_cast< uint32_t >( start );
+      endFrame = static_cast< uint32_t >( end );
+      valid = true;
+    }
+    else
+    {
+      std::string startMarker, endMarker;
+      if( playRange.GetElementAt( 0 ).Get( startMarker ) && playRange.GetElementAt( 1 ).Get( endMarker ) )
+      {
+        if( mVectorRenderer )
+        {
+          uint32_t frame;   // We don't use this later
+          if( mVectorRenderer.GetMarkerInfo( startMarker, startFrame, frame ) && mVectorRenderer.GetMarkerInfo( endMarker, frame, endFrame ) )
+          {
+            valid = true;
+          }
+        }
+      }
+    }
+  }
+  else if( count == 1 )
+  {
+    std::string marker;
+    if( playRange.GetElementAt( 0 ).Get( marker ) )
+    {
+      if( mVectorRenderer )
+      {
+        mVectorRenderer.GetMarkerInfo( marker, startFrame, endFrame );
+        valid = true;
+      }
+    }
+  }
+
+  if( !valid )
+  {
+    DALI_LOG_ERROR( "VectorAnimationTask::SetPlayRange: Invalid range [%p]\n", this );
+    return;
+  }
+
   // Make sure the range specified is between 0 and the total frame number
-  if( ( startFrame < mTotalFrame ) && ( endFrame < mTotalFrame ) )
+  if( startFrame >= 0 && startFrame < mTotalFrame && endFrame >= 0 && endFrame < mTotalFrame )
   {
     // If the range is not in order swap values
     if( startFrame > endFrame )
@@ -216,8 +267,6 @@ void VectorAnimationTask::SetPlayRange( uint32_t startFrame, uint32_t endFrame )
 
     if( startFrame != mStartFrame || endFrame != mEndFrame )
     {
-      ConditionalWait::ScopedLock lock( mConditionalWait );
-
       mStartFrame = startFrame;
       mEndFrame = endFrame;
 
@@ -239,6 +288,11 @@ void VectorAnimationTask::SetPlayRange( uint32_t startFrame, uint32_t endFrame )
 
       DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::SetPlayRange: [%d, %d] [%p]\n", mStartFrame, mEndFrame, this );
     }
+  }
+  else
+  {
+    DALI_LOG_ERROR( "VectorAnimationTask::SetPlayRange: Invalid range (%d, %d) [%p]\n", startFrame, endFrame, this );
+    return;
   }
 }
 
