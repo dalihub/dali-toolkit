@@ -207,6 +207,28 @@ void Control::ClearBackground()
    RelayoutRequest();
 }
 
+void Control::SetShadow( const Property::Map& map )
+{
+  Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  visual.SetName("shadow");
+
+  if( visual )
+  {
+    mImpl->RegisterVisual( Toolkit::DevelControl::Property::SHADOW, visual, DepthIndex::BACKGROUND_EFFECT );
+
+    RelayoutRequest();
+  }
+}
+
+void Control::ClearShadow()
+{
+   mImpl->UnregisterVisual( Toolkit::DevelControl::Property::SHADOW );
+
+   // Trigger a size negotiation request that may be needed when unregistering a visual.
+   RelayoutRequest();
+}
+
+
 void Control::EnableGestureDetection(Gesture::Type type)
 {
   if ( (type & Gesture::Pinch) && !mImpl->mPinchGestureDetector )
