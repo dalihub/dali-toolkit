@@ -311,6 +311,7 @@ const PropertyRegistration Control::Impl::PROPERTY_11( typeRegistration, "leftFo
 const PropertyRegistration Control::Impl::PROPERTY_12( typeRegistration, "rightFocusableActorId", Toolkit::DevelControl::Property::RIGHT_FOCUSABLE_ACTOR_ID,Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_13( typeRegistration, "upFocusableActorId",    Toolkit::DevelControl::Property::UP_FOCUSABLE_ACTOR_ID,   Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 const PropertyRegistration Control::Impl::PROPERTY_14( typeRegistration, "downFocusableActorId",  Toolkit::DevelControl::Property::DOWN_FOCUSABLE_ACTOR_ID, Property::INTEGER, &Control::Impl::SetProperty, &Control::Impl::GetProperty );
+const PropertyRegistration Control::Impl::PROPERTY_15( typeRegistration, "shadow",                Toolkit::DevelControl::Property::SHADOW,                  Property::MAP,     &Control::Impl::SetProperty, &Control::Impl::GetProperty );
 
 Control::Impl::Impl( Control& controlImpl )
 : mControlImpl( controlImpl ),
@@ -985,6 +986,21 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
         break;
       }
 
+      case Toolkit::DevelControl::Property::SHADOW:
+      {
+        const Property::Map* map = value.GetMap();
+        if( map && !map->Empty() )
+        {
+          controlImpl.mImpl->SetShadow( *map );
+        }
+        else
+        {
+          // The shadow is an empty property map, so we should clear the shadow
+          controlImpl.mImpl->ClearShadow();
+        }
+        break;
+      }
+
     }
   }
 }
@@ -1081,6 +1097,19 @@ Property::Value Control::Impl::GetProperty( BaseObject* object, Property::Index 
         {
           controlImpl.mImpl->mTooltip->CreatePropertyMap( map );
         }
+        value = map;
+        break;
+      }
+
+      case Toolkit::DevelControl::Property::SHADOW:
+      {
+        Property::Map map;
+        Toolkit::Visual::Base visual = controlImpl.mImpl->GetVisual( Toolkit::DevelControl::Property::SHADOW );
+        if( visual )
+        {
+          visual.CreatePropertyMap( map );
+        }
+
         value = map;
         break;
       }
@@ -1430,6 +1459,27 @@ void Control::Impl::SetAutofillContainer( Toolkit::AutofillContainer container )
 Toolkit::AutofillContainer Control::Impl::GetAutofillContainer()
 {
   return mAutofillContainer;
+}
+
+void Control::Impl::SetShadow( const Property::Map& map )
+{
+  Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  visual.SetName("shadow");
+
+  if( visual )
+  {
+    mControlImpl.mImpl->RegisterVisual( Toolkit::DevelControl::Property::SHADOW, visual, DepthIndex::BACKGROUND_EFFECT );
+
+    mControlImpl.RelayoutRequest();
+  }
+}
+
+void Control::Impl::ClearShadow()
+{
+   mControlImpl.mImpl->UnregisterVisual( Toolkit::DevelControl::Property::SHADOW );
+
+   // Trigger a size negotiation request that may be needed when unregistering a visual.
+   mControlImpl.RelayoutRequest();
 }
 
 } // namespace Internal

@@ -375,6 +375,17 @@ public:
    */
   Toolkit::AutofillContainer GetAutofillContainer();
 
+  /**
+   * @brief Sets the shadow with a property map.
+   * @param[in] map The shadow property map
+   */
+  void SetShadow(const Property::Map& map);
+
+  /**
+   * @brief Clear the shadow.
+   */
+  void ClearShadow();
+
 private:
 
   /**
@@ -473,6 +484,7 @@ public:
   static const PropertyRegistration PROPERTY_12;
   static const PropertyRegistration PROPERTY_13;
   static const PropertyRegistration PROPERTY_14;
+  static const PropertyRegistration PROPERTY_15;
 };
 
 
