@@ -24,6 +24,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/devel-api/images/texture-set-image.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/adaptor-framework/file-loader.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
@@ -203,8 +204,12 @@ void SvgVisual::ParseFromUrl( const VisualUrl& imageUrl )
   if( mImageUrl.IsLocalResource() )
   {
     Vector2 dpi = Stage::GetCurrent().GetDpi();
-    float meanDpi = (dpi.height + dpi.width) * 0.5f;
-    mParsedImage = nsvgParseFromFile( mImageUrl.GetUrl().c_str(), UNITS, meanDpi );
+    float meanDpi = ( dpi.height + dpi.width ) * 0.5f;
+    Dali::Vector<char> buffer;
+    if ( Dali::FileLoader::ReadFile( mImageUrl.GetUrl(), buffer ) )
+    {
+      mParsedImage = nsvgParse( buffer.Begin(), UNITS, meanDpi );
+    }
   }
 }
 
