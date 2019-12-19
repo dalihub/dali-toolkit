@@ -40,8 +40,6 @@ namespace
 constexpr auto LOOP_FOREVER = -1;
 constexpr auto NANOSECONDS_PER_SECOND( 1e+9 );
 
-#define CLAMP( x, low, high ) ( ( ( x ) > ( high ) ) ? ( high ) : ( ( ( x ) < ( low ) ) ? ( low ) : ( x ) ) )
-
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gVectorAnimationLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_VECTOR_ANIMATION" );
 #endif
@@ -378,7 +376,6 @@ bool VectorAnimationTask::Rasterize()
     if( mPlayState == PlayState::PLAYING && mUpdateFrameNumber )
     {
       mCurrentFrame = mForward ? mCurrentFrame + 1 : mCurrentFrame - 1;
-      mCurrentFrame = CLAMP( mCurrentFrame, mStartFrame, mEndFrame );
     }
 
     currentFrame = mCurrentFrame;
