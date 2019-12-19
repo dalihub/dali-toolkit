@@ -464,8 +464,6 @@ bool VectorAnimationTask::Rasterize()
 
   if( stopped && renderSuccess )
   {
-    ConditionalWait::ScopedLock lock( mConditionalWait );
-
     mPlayState = PlayState::STOPPED;
     mForward = true;
     mCurrentLoop = 0;
