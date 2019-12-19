@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/object/property-array.h>
 #include <dali/devel-api/adaptor-framework/event-thread-callback.h>
 #include <dali/devel-api/adaptor-framework/vector-animation-renderer.h>
 #include <dali/devel-api/threading/conditional-wait.h>
@@ -51,6 +52,49 @@ public:
   using UploadCompletedSignalType = Dali::VectorAnimationRenderer::UploadCompletedSignalType;
 
   /**
+   * Flags for re-sending data to the vector animation thread
+   */
+  enum ResendFlags
+  {
+    RESEND_PLAY_RANGE    = 1 << 0,
+    RESEND_LOOP_COUNT    = 1 << 1,
+    RESEND_STOP_BEHAVIOR = 1 << 2,
+    RESEND_LOOPING_MODE  = 1 << 3,
+    RESEND_CURRENT_FRAME = 1 << 4,
+    RESEND_SIZE          = 1 << 5,
+    RESEND_PLAY_STATE    = 1 << 6
+  };
+
+  /**
+   * @brief Structure used to pass parameters to the vector animation task
+   */
+  struct AnimationData
+  {
+    AnimationData()
+    : resendFlag( 0 ),
+      playRange(),
+      playState(),
+      stopBehavior( DevelImageVisual::StopBehavior::CURRENT_FRAME ),
+      loopingMode( DevelImageVisual::LoopingMode::RESTART ),
+      currentFrame( 0 ),
+      width( 0 ),
+      height( 0 ),
+      loopCount( -1 )
+    {
+    }
+
+    uint32_t                             resendFlag;
+    Property::Array                      playRange;
+    DevelImageVisual::PlayState::Type    playState;
+    DevelImageVisual::StopBehavior::Type stopBehavior;
+    DevelImageVisual::LoopingMode::Type  loopingMode;
+    uint32_t                             currentFrame;
+    uint32_t                             width;
+    uint32_t                             height;
+    int32_t                              loopCount;
+  };
+
+  /**
    * @brief Constructor.
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
@@ -76,51 +120,16 @@ public:
   void SetRenderer( Renderer renderer );
 
   /**
-   * @brief Sets the target image size.
-   *
-   * @param[in] width The target image width
-   * @param[in] height The target image height
+   * @brief Sets data to specify animation playback.
+   * @param[in] data The animation data
    */
-  void SetSize( uint32_t width, uint32_t height );
-
-  /**
-   * @brief Play the vector animation.
-   */
-  void PlayAnimation();
-
-  /**
-   * @brief Stop the vector animation.
-   */
-  void StopAnimation();
-
-  /**
-   * @brief Pause the vector animation.
-   */
-  void PauseAnimation();
-
-  /**
-   * @brief Render one frame. The current frame number will be increased.
-   */
-  void RenderFrame();
+  void SetAnimationData( const AnimationData& data );
 
   /**
    * @brief This callback is called after the animation is finished.
    * @param[in] callback The animation finished callback
    */
   void SetAnimationFinishedCallback( EventThreadCallback* callback );
-
-  /**
-   * @brief Enable looping for 'count' repeats. -1 means to repeat forever.
-   * @param[in] count The number of times to loop
-   */
-  void SetLoopCount( int32_t count );
-
-  /**
-   * @brief Set the playing range in frame number.
-   * @param[in] playRange The array to specify minimum and maximum progress.
-   * The animation will play between those values.
-   */
-  void SetPlayRange( Property::Array& playRange );
 
   /**
    * @brief Gets the playing range in frame number.
@@ -134,12 +143,6 @@ public:
    * @return The play state
    */
   DevelImageVisual::PlayState::Type GetPlayState() const;
-
-  /**
-   * @brief Sets the current frame number of the animation.
-   * @param[in] frameNumber The new frame number between [0, the maximum frame number] or between the play range if specified.
-   */
-  void SetCurrentFrameNumber( uint32_t frameNumber );
 
   /**
    * @brief Retrieves the current frame number of the animation.
@@ -158,19 +161,6 @@ public:
    * @return The default size of the file
    */
   void GetDefaultSize( uint32_t& width, uint32_t& height ) const;
-
-  /**
-   * @brief Sets the stop behavior of the animation. This is performed when the animation is stopped.
-   * @param[in] stopBehavior The stop behavior
-   */
-  void SetStopBehavior( DevelImageVisual::StopBehavior::Type stopBehavior );
-
-  /**
-   * @brief Sets the looping mode.
-   * Animation plays forwards and then restarts from the beginning or runs backwards again.
-   * @param[in] loopingMode The looping mode
-   */
-  void SetLoopingMode( DevelImageVisual::LoopingMode::Type loopingMode );
 
   /**
    * @brief Gets the layer information of all the child layers.
@@ -210,6 +200,66 @@ private:
   void Initialize();
 
   /**
+   * @brief Play the vector animation.
+   */
+  void PlayAnimation();
+
+  /**
+   * @brief Stop the vector animation.
+   */
+  void StopAnimation();
+
+  /**
+   * @brief Pause the vector animation.
+   */
+  void PauseAnimation();
+
+  /**
+   * @brief Render one frame. The current frame number will be increased.
+   */
+  void RenderFrame();
+
+  /**
+   * @brief Sets the target image size.
+   *
+   * @param[in] width The target image width
+   * @param[in] height The target image height
+   */
+  void SetSize( uint32_t width, uint32_t height );
+
+  /**
+   * @brief Enable looping for 'count' repeats. -1 means to repeat forever.
+   * @param[in] count The number of times to loop
+   */
+  void SetLoopCount( int32_t count );
+
+  /**
+   * @brief Set the playing range in frame number.
+   * @param[in] playRange The array to specify minimum and maximum progress.
+   * The animation will play between those values.
+   */
+  void SetPlayRange( const Property::Array& playRange );
+
+  /**
+   * @brief Sets the current frame number of the animation.
+   * @param[in] frameNumber The new frame number between [0, the maximum frame number] or between the play range if specified.
+   */
+  void SetCurrentFrameNumber( uint32_t frameNumber );
+
+  /**
+   * @brief Sets the stop behavior of the animation. This is performed when the animation is stopped.
+   * @param[in] stopBehavior The stop behavior
+   */
+  void SetStopBehavior( DevelImageVisual::StopBehavior::Type stopBehavior );
+
+  /**
+   * @brief Sets the looping mode.
+   * Animation plays forwards and then restarts from the beginning or runs backwards again.
+   * @param[in] loopingMode The looping mode
+   */
+  void SetLoopingMode( DevelImageVisual::LoopingMode::Type loopingMode );
+
+  /**
    * @brief Gets the frame number when the animation is stopped according to the stop behavior.
    */
   uint32_t GetStoppedFrame( uint32_t startFrame, uint32_t endFrame, uint32_t currentFrame );
@@ -235,7 +285,6 @@ private:
   VectorAnimationThread&                 mVectorAnimationThread;
   ConditionalWait                        mConditionalWait;
   std::unique_ptr< EventThreadCallback > mAnimationFinishedTrigger;
-  Vector2                                mPlayRange;
   PlayState                              mPlayState;
   DevelImageVisual::StopBehavior::Type   mStopBehavior;
   DevelImageVisual::LoopingMode::Type    mLoopingMode;
