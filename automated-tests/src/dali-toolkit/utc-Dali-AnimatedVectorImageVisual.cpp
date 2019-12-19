@@ -347,8 +347,6 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
     application.SendNotification();
     application.Render( 16 );
 
-    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );    // wait for one animation loop (16fps, 5frames, need 80ms)
-
     Property::Map map = dummyControl.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
     Property::Value* value = map.Find( DevelImageVisual::Property::PLAY_STATE );
     DALI_TEST_CHECK( value->Get< int >() == DevelImageVisual::PlayState::PLAYING );
@@ -358,8 +356,6 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
 
     application.SendNotification();
     application.Render(16);
-
-    std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
 
     map = dummyControl.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
     value = map.Find( DevelImageVisual::Property::PLAY_STATE );
@@ -566,7 +562,7 @@ int UtcDaliAnimatedVectorImageVisualLoopCount(void)
   application.SendNotification();
   application.Render();
 
-  // Trigger count is 1 - animation finished
+  // Trigger count is 1 - render a frame
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   // renderer is added to actor
@@ -610,6 +606,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   application.SendNotification();
   application.Render();
 
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
+
   // renderer is added to actor
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
   Renderer renderer = actor.GetRendererAt( 0u );
@@ -638,6 +636,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
   application.SendNotification();
   application.Render();
 
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
+
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
 
@@ -657,6 +657,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
 
   application.SendNotification();
   application.Render();
+
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
 
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
@@ -720,6 +722,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
   application.SendNotification();
   application.Render();
 
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
+
   // renderer is added to actor
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
   Renderer renderer = actor.GetRendererAt( 0u );
@@ -748,6 +752,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
   application.SendNotification();
   application.Render();
 
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
+
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
 
@@ -769,6 +775,8 @@ int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
 
   application.SendNotification();
   application.Render();
+
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
 
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
@@ -814,7 +822,7 @@ int UtcDaliAnimatedVectorImageVisualAnimationFinishedSignal(void)
   application.Render();
 
   // Wait for animation finish
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
 
   Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   Property::Value* value = map.Find( DevelImageVisual::Property::PLAY_STATE );
@@ -899,6 +907,8 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
   application.SendNotification();
   application.Render();
 
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
+
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
   DALI_TEST_EQUALS( value->Get< int >(), 3, TEST_LOCATION );
@@ -919,7 +929,7 @@ int UtcDaliAnimatedVectorImageVisualJumpTo(void)
 int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliAnimatedVectorImageVisualJumpToCurrentProgress" );
+  tet_infoline( "UtcDaliAnimatedVectorImageVisualUpdateProperty" );
 
   int startFrame = 1, endFrame = 3;
   Property::Array playRange;
@@ -947,6 +957,8 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   application.SendNotification();
   application.Render();
 
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
+
   Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   Property::Value* value = map.Find( DevelImageVisual::Property::LOOP_COUNT );
   DALI_TEST_EQUALS( value->Get< int >(), 3, TEST_LOCATION );
@@ -973,6 +985,8 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
   application.SendNotification();
   application.Render();
 
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
+
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::LOOP_COUNT );
   DALI_TEST_EQUALS( value->Get< int >(), 5, TEST_LOCATION );
@@ -996,6 +1010,8 @@ int UtcDaliAnimatedVectorImageVisualUpdateProperty(void)
 
   application.SendNotification();
   application.Render();
+
+  std::this_thread::sleep_for( std::chrono::milliseconds( 20 ) );    // wait for next rasterize thread run
 
   map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
@@ -1057,7 +1073,7 @@ int UtcDaliAnimatedVectorImageVisualStopBehavior(void)
   application.Render();
 
   // Trigger count is 1 - animation finished
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
 
   Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   Property::Value* value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
@@ -1152,7 +1168,7 @@ int UtcDaliAnimatedVectorImageVisualLoopingMode(void)
   application.Render();
 
   // Trigger count is 1 - animation finished
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
 
   Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
   Property::Value* value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
@@ -1353,6 +1369,9 @@ int UtcDaliAnimatedVectorImageVisualControlVisibilityChanged(void)
   Property::Map attributes;
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
 
+  application.SendNotification();
+  application.Render();
+
   // Check rendering behavior
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
   Renderer renderer = actor.GetRendererAt( 0u );
@@ -1396,6 +1415,9 @@ int UtcDaliAnimatedVectorImageVisualWindowVisibilityChanged(void)
 
   Property::Map attributes;
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
+
+  application.SendNotification();
+  application.Render();
 
   // Check rendering behavior
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
