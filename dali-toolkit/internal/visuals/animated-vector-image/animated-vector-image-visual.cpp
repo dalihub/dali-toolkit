@@ -119,8 +119,7 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
 
 AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
 {
-  // Finalize animation task and disconnect the signal in the main thread
-  mVectorAnimationTask->UploadCompletedSignal().Disconnect( this, &AnimatedVectorImageVisual::OnUploadCompleted );
+  // Finalize animation task in the main thread
   mVectorAnimationTask->Finalize();
 }
 
