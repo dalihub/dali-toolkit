@@ -94,8 +94,6 @@ VectorAnimationTask::~VectorAnimationTask()
 
 void VectorAnimationTask::Finalize()
 {
-  ConditionalWait::ScopedLock lock( mConditionalWait );
-
   // Release some objects in the main thread
   if( mAnimationFinishedTrigger )
   {
