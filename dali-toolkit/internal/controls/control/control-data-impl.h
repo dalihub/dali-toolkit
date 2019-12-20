@@ -431,6 +431,7 @@ public:
   static const PropertyRegistration PROPERTY_12;
   static const PropertyRegistration PROPERTY_13;
   static const PropertyRegistration PROPERTY_14;
+  static const PropertyRegistration PROPERTY_15;
 };
 
 
