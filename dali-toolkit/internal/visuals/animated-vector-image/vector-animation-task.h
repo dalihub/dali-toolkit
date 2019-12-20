@@ -117,11 +117,10 @@ public:
 
   /**
    * @brief Set the playing range in frame number.
-   * @param[in] startFrame The frame number to specify minimum progress.
-   * @param[in] endFrame The frame number to specify maximum progress.
+   * @param[in] playRange The array to specify minimum and maximum progress.
    * The animation will play between those values.
    */
-  void SetPlayRange( uint32_t startFrame, uint32_t endFrame );
+  void SetPlayRange( Property::Array& playRange );
 
   /**
    * @brief Gets the playing range in frame number.

@@ -86,11 +86,16 @@ enum Type
   /**
    * @brief The playing range the AnimatedVectorImageVisual will use.
    *
-   * Animation will play between the values specified. The array can only have two values, and more will be ignored.
+   * Animation will play between the values specified. The array can have two integer values.
+   * Or it can have one or two strings, which are markers. More will be ignored.
    * Both values should be between 0 and the total frame number, otherwise they will be ignored.
    * If the range provided is not in proper order ( minimum, maximum ), it will be reordered.
    *
-   * @details Name "playRange", Type Property::ARRAY of Property::INTEGER
+   * A marker has its start frame and end frame.
+   * Animation will play between the start frame and the end frame of the marker if one marker is specified.
+   * Or animation will play between the start frame of the first marker and the end frame of the second marker if two markers are specified.
+   *
+   * @details Name "playRange", Type Property::ARRAY of Property::INTEGER or Property::ARRAY of Property::STRING.
    * @note Default 0 and the total frame number.
    */
   PLAY_RANGE = ORIENTATION_CORRECTION + 4,

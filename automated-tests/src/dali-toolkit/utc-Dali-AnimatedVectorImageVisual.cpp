@@ -21,6 +21,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-timer.h>
 #include <toolkit-event-thread-callback.h>
+#include <toolkit-vector-animation-renderer.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
@@ -684,6 +685,100 @@ int UtcDaliAnimatedVectorImageVisualPlayRange(void)
 
   value = map.Find( DevelImageVisual::Property::CURRENT_FRAME_NUMBER );
   DALI_TEST_EQUALS( value->Get< int >(), 2, TEST_LOCATION );    // CURRENT_FRAME_NUMBER should be changed also.
+
+  END_TEST;
+}
+
+int UtcDaliAnimatedVectorImageVisualPlayRangeMarker(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliAnimatedVectorImageVisualPlayRangeMarker" );
+
+  Property::Array array;
+  array.PushBack( VECTOR_ANIMATION_MARKER_NAME_1 );
+
+  Property::Map propertyMap;
+  propertyMap.Add( Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE )
+             .Add( ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME  )
+             .Add( DevelImageVisual::Property::PLAY_RANGE, array  );
+
+  Visual::Base visual = VisualFactory::Get().CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  DummyControl actor = DummyControl::New( true );
+  DummyControlImpl& dummyImpl = static_cast< DummyControlImpl& >( actor.GetImplementation() );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  Vector2 controlSize( 20.f, 30.f );
+  actor.SetSize( controlSize );
+
+  Stage::GetCurrent().Add( actor );
+
+  Property::Map attributes;
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
+
+  application.SendNotification();
+  application.Render();
+
+  // renderer is added to actor
+  DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
+  Renderer renderer = actor.GetRendererAt( 0u );
+  DALI_TEST_CHECK( renderer );
+
+  Property::Map map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  Property::Value* value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
+
+  int resultStartFrame, resultEndFrame;
+  Property::Array* result = value->GetArray();
+  result->GetElementAt( 0 ).Get( resultStartFrame );
+  result->GetElementAt( 1 ).Get( resultEndFrame );
+
+  DALI_TEST_EQUALS( VECTOR_ANIMATION_MARKER_START_FRAME_1, resultStartFrame, TEST_LOCATION );
+  DALI_TEST_EQUALS( VECTOR_ANIMATION_MARKER_END_FRAME_1, resultEndFrame, TEST_LOCATION );
+
+  // Set 2 markers
+  array.Clear();
+  array.PushBack( VECTOR_ANIMATION_MARKER_NAME_1 );
+  array.PushBack( VECTOR_ANIMATION_MARKER_NAME_2 );
+
+  attributes.Clear();
+  attributes.Add( DevelImageVisual::Property::PLAY_RANGE, array );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+
+  application.SendNotification();
+  application.Render();
+
+  map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
+
+  result = value->GetArray();
+  result->GetElementAt( 0 ).Get( resultStartFrame );
+  result->GetElementAt( 1 ).Get( resultEndFrame );
+
+  DALI_TEST_EQUALS( VECTOR_ANIMATION_MARKER_START_FRAME_1, resultStartFrame, TEST_LOCATION );
+  DALI_TEST_EQUALS( VECTOR_ANIMATION_MARKER_END_FRAME_2, resultEndFrame, TEST_LOCATION );
+
+  // Set invalid play range
+  array.Clear();
+  array.PushBack( 1 );
+  array.PushBack( VECTOR_ANIMATION_MARKER_NAME_1 );
+
+  attributes.Clear();
+  attributes.Add( DevelImageVisual::Property::PLAY_RANGE, array );
+  DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::UPDATE_PROPERTY, attributes );
+
+  application.SendNotification();
+  application.Render();
+
+  map = actor.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
+  value = map.Find( DevelImageVisual::Property::PLAY_RANGE );
+
+  result = value->GetArray();
+  result->GetElementAt( 0 ).Get( resultStartFrame );
+  result->GetElementAt( 1 ).Get( resultEndFrame );
+
+  DALI_TEST_EQUALS( VECTOR_ANIMATION_MARKER_START_FRAME_1, resultStartFrame, TEST_LOCATION );  // Should not be changed
+  DALI_TEST_EQUALS( VECTOR_ANIMATION_MARKER_END_FRAME_2, resultEndFrame, TEST_LOCATION );
 
   END_TEST;
 }
