@@ -347,6 +347,8 @@ int UtcDaliVisualSize(void)
   // svg visual
   Visual::Base svgVisual = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
   svgVisual.SetTransformAndSize(DefaultTransform(), controlSize );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
   svgVisual.GetNaturalSize(naturalSize);
   // TEST_SVG_FILE:
   //  <svg width="100" height="100">
@@ -356,6 +358,9 @@ int UtcDaliVisualSize(void)
 
   // svg visual with a size
   Visual::Base svgVisual2 = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions(200, 200) );
+  svgVisual.SetTransformAndSize(DefaultTransform(), controlSize );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
   svgVisual2.GetNaturalSize(naturalSize);
   DALI_TEST_EQUALS( naturalSize, Vector2(100.f, 100.f), TEST_LOCATION ); // Natural size should still be 100, 100
 
@@ -3574,3 +3579,20 @@ int UtcDaliSvgVisualCustomShader(void)
 
   END_TEST;
 }
+
+int UtcDaliSvgVisualDownloadRemoteFile(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Download svg file from remote" );
+
+  VisualFactory factory = VisualFactory::Get();  // svg visual
+  Visual::Base svgVisual1 = factory.CreateVisual( "http://bar.org/foobar.svg", ImageDimensions() );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  DALI_TEST_CHECK( svgVisual1 );
+
+  Visual::Base svgVisual2 = factory.CreateVisual( "http://bar.org/wrong_name.svg", ImageDimensions() );
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+  DALI_TEST_CHECK( svgVisual2 );
+  END_TEST;
+}
+

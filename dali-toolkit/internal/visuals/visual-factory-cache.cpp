@@ -150,7 +150,7 @@ void VisualFactoryCache::ApplyRasterizedSVGToSampler()
 {
   while( RasterizingTaskPtr task = mSvgRasterizeThread->NextCompletedTask() )
   {
-    task->GetSvgVisual()->ApplyRasterizedImage( task->GetPixelData() );
+    task->GetSvgVisual()->ApplyRasterizedImage( task->GetParsedImage(), task->GetPixelData() );
   }
 }
 
