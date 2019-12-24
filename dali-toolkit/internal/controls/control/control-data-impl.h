@@ -336,6 +336,17 @@ public:
    */
   DevelControl::VisualEventSignalType& VisualEventSignal();
 
+  /**
+   * @brief Sets the shadow with a property map.
+   * @param[in] map The shadow property map
+   */
+  void SetShadow(const Property::Map& map);
+
+  /**
+   * @brief Clear the shadow.
+   */
+  void ClearShadow();
+
 private:
 
   /**

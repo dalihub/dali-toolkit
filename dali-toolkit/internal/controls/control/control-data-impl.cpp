@@ -989,12 +989,12 @@ void Control::Impl::SetProperty( BaseObject* object, Property::Index index, cons
         const Property::Map* map = value.GetMap();
         if( map && !map->Empty() )
         {
-          controlImpl.SetShadow( *map );
+          controlImpl.mImpl->SetShadow( *map );
         }
         else
         {
           // The shadow is an empty property map, so we should clear the shadow
-          controlImpl.ClearShadow();
+          controlImpl.mImpl->ClearShadow();
         }
         break;
       }
@@ -1427,6 +1427,27 @@ bool Control::Impl::FilterKeyEvent( const KeyEvent& event )
 DevelControl::VisualEventSignalType& Control::Impl::VisualEventSignal()
 {
   return mVisualEventSignal;
+}
+
+void Control::Impl::SetShadow( const Property::Map& map )
+{
+  Toolkit::Visual::Base visual = Toolkit::VisualFactory::Get().CreateVisual( map );
+  visual.SetName("shadow");
+
+  if( visual )
+  {
+    mControlImpl.mImpl->RegisterVisual( Toolkit::DevelControl::Property::SHADOW, visual, DepthIndex::BACKGROUND_EFFECT );
+
+    mControlImpl.RelayoutRequest();
+  }
+}
+
+void Control::Impl::ClearShadow()
+{
+   mControlImpl.mImpl->UnregisterVisual( Toolkit::DevelControl::Property::SHADOW );
+
+   // Trigger a size negotiation request that may be needed when unregistering a visual.
+   mControlImpl.RelayoutRequest();
 }
 
 } // namespace Internal
