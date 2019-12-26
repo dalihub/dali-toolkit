@@ -96,8 +96,6 @@ VectorAnimationTask::~VectorAnimationTask()
 
 void VectorAnimationTask::Finalize()
 {
-  ConditionalWait::ScopedLock lock( mConditionalWait );
-
   // Release some objects in the main thread
   if( mAnimationFinishedTrigger )
   {
@@ -420,7 +418,7 @@ void VectorAnimationTask::Initialize()
 
 bool VectorAnimationTask::Rasterize()
 {
-  bool stopped = false, needAnimationFinishedTrigger, resourceReady;
+  bool stopped = false, needAnimationFinishedTrigger;
   uint32_t currentFrame, startFrame, endFrame;
   int32_t loopCount, currentLoopCount;
   PlayState playState;
@@ -441,7 +439,6 @@ bool VectorAnimationTask::Rasterize()
     currentLoopCount = mCurrentLoop;
     needAnimationFinishedTrigger = mNeedAnimationFinishedTrigger;
     playState = mPlayState;
-    resourceReady = mResourceReady;
 
     mResourceReady = true;
     mCurrentFrameUpdated = false;
@@ -516,19 +513,11 @@ bool VectorAnimationTask::Rasterize()
     {
       DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Rasterize: Rendering failed. Try again later.[%d] [%p]\n", currentFrame, this );
       mUpdateFrameNumber = false;
-
-      if( !resourceReady )
-      {
-        ConditionalWait::ScopedLock lock( mConditionalWait );
-        mResourceReady = false;
-      }
     }
   }
 
   if( stopped && renderSuccess )
   {
-    ConditionalWait::ScopedLock lock( mConditionalWait );
-
     mPlayState = PlayState::STOPPED;
     mForward = true;
     mCurrentLoop = 0;
