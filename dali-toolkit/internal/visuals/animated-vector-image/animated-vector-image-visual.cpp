@@ -470,16 +470,13 @@ void AnimatedVectorImageVisual::SendAnimationData()
   {
     mVectorAnimationTask->SetAnimationData( mAnimationData );
 
-    if( mImpl->mRenderer )
+    if( mAnimationData.playState == DevelImageVisual::PlayState::PLAYING )
     {
-      if( mAnimationData.playState == DevelImageVisual::PlayState::PLAYING )
-      {
-        mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY );
-      }
-      else
-      {
-        mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED );
-      }
+      mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY );
+    }
+    else
+    {
+      mImpl->mRenderer.SetProperty( DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::IF_REQUIRED );
     }
 
     mAnimationData.resendFlag = 0;
