@@ -115,13 +115,7 @@ enum
    * @details Name "downFocusableActorId", type Property::INTEGER.
    *
    */
-  DOWN_FOCUSABLE_ACTOR_ID = PADDING + 7,
-
-  /**
-   * @brief The shadow of the control.
-   * @details Name "shadow", type Property::MAP.
-   */
-  SHADOW = PADDING + 8
+  DOWN_FOCUSABLE_ACTOR_ID = PADDING + 7
 };
 
 } // namespace Property
