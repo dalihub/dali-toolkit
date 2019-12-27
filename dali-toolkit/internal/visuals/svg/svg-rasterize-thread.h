@@ -28,7 +28,6 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/rendering/texture-set.h>
-#include <dali-toolkit/internal/visuals/visual-url.h>
 
 struct NSVGimage;
 struct NSVGrasterizer;
@@ -66,11 +65,10 @@ public:
    * @param[in] parsedSvg The parsed svg for rasterizing.
    *            Note, after the task is added to the worker thread, the worker thread takes over the ownership.
    *            When the image is to be deleted, delete it in the worker thread by calling SvgRasterizeThread::DeleteImage( parsedSvg ).
-   * @param[in] url The URL to svg resource to use.
    * @param[in] width The rasterization width.
    * @param[in] height The rasterization height.
    */
-  RasterizingTask( SvgVisual* svgRenderer, NSVGimage* parsedSvg, const VisualUrl& url, float dpi, unsigned int width, unsigned int height );
+  RasterizingTask( SvgVisual* svgRenderer, NSVGimage* parsedSvg, unsigned int width, unsigned int height );
 
   /**
    * Do the rasterization with the given rasterizer.
@@ -89,18 +87,8 @@ public:
    */
   PixelData GetPixelData() const;
 
-  /**
-   * Get the parsed data.
-   * @return parsed image data.
-   */
-  NSVGimage* GetParsedImage() const;
-
-  /**
-   * Load svg file
-   */
-  void Load();
-
 private:
+
   // Undefined
   RasterizingTask( const RasterizingTask& task );
 
@@ -108,14 +96,13 @@ private:
   RasterizingTask& operator=( const RasterizingTask& task );
 
 private:
-  SvgVisualPtr    mSvgVisual;
-  NSVGimage*      mParsedSvg;
-  VisualUrl       mUrl;
+  SvgVisualPtr  mSvgVisual;
   PixelData       mPixelData;
-  float           mDpi;
+  NSVGimage*      mParsedSvg;
   unsigned int    mWidth;
   unsigned int    mHeight;
 };
+
 
 /**
  * The worker thread for SVG rasterization.
