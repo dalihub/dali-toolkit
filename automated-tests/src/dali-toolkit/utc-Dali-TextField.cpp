@@ -102,6 +102,7 @@ const char* const PROPERTY_NAME_ENABLE_SHIFT_SELECTION               = "enableSh
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE                   = "enableGrabHandle";
 const char* const PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION      = "matchSystemLanguageDirection";
 const char* const PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP             = "enableGrabHandlePopup";
+const char* const PROPERTY_NAME_BACKGROUND                           = "textBackground";
 
 const Vector4 PLACEHOLDER_TEXT_COLOR( 0.8f, 0.8f, 0.8f, 0.8f );
 const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f ); // The text highlight color.
@@ -470,6 +471,7 @@ int UtcDaliTextFieldGetPropertyP(void)
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE ) == DevelTextField::Property::ENABLE_GRAB_HANDLE );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_MATCH_SYSTEM_LANGUAGE_DIRECTION ) == DevelTextField::Property::MATCH_SYSTEM_LANGUAGE_DIRECTION );
   DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_ENABLE_GRAB_HANDLE_POPUP ) == DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP );
+  DALI_TEST_CHECK( field.GetPropertyIndex( PROPERTY_NAME_BACKGROUND ) == DevelTextField::Property::BACKGROUND );
 
   END_TEST;
 }
@@ -928,6 +930,18 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_CHECK( field.GetProperty<bool>( DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP ) );
   field.SetProperty( DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP, false );
   DALI_TEST_CHECK( !field.GetProperty<bool>( DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP ) );
+
+  // Check the background property
+  Property::Map backgroundMapSet;
+  Property::Map backgroundMapGet;
+
+  backgroundMapSet["enable"] = true;
+  backgroundMapSet["color"] = Color::RED;
+  field.SetProperty( DevelTextField::Property::BACKGROUND, backgroundMapSet );
+
+  backgroundMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::BACKGROUND );
+  DALI_TEST_EQUALS( backgroundMapGet.Count(), backgroundMapSet.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( DaliTestCheckMaps( backgroundMapGet, backgroundMapSet ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
