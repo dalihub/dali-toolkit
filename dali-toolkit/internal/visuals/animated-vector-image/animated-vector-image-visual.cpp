@@ -307,7 +307,7 @@ void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
 
 void AnimatedVectorImageVisual::DoSetOffStage( Actor& actor )
 {
-  StopAnimation();
+  PauseAnimation();
 
   if( mImpl->mRenderer )
   {
@@ -535,13 +535,13 @@ void AnimatedVectorImageVisual::SetVectorImageSize()
   }
 }
 
-void AnimatedVectorImageVisual::StopAnimation()
+void AnimatedVectorImageVisual::PauseAnimation()
 {
-  if( mActionStatus != DevelAnimatedVectorImageVisual::Action::STOP )
+  if( mActionStatus == DevelAnimatedVectorImageVisual::Action::PLAY )
   {
-    mVectorAnimationTask->StopAnimation();
+    mVectorAnimationTask->PauseAnimation();
 
-    mActionStatus = DevelAnimatedVectorImageVisual::Action::STOP;
+    mActionStatus = DevelAnimatedVectorImageVisual::Action::PAUSE;
 
     if( mImpl->mRenderer )
     {
@@ -584,7 +584,7 @@ void AnimatedVectorImageVisual::OnControlVisibilityChanged( Actor actor, bool vi
 {
   if( !visible )
   {
-    StopAnimation();
+    PauseAnimation();
 
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnControlVisibilityChanged: invisibile. Pause animation [%p]\n", this );
   }
@@ -594,7 +594,7 @@ void AnimatedVectorImageVisual::OnWindowVisibilityChanged( Window window, bool v
 {
   if( !visible )
   {
-    StopAnimation();
+    PauseAnimation();
 
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "AnimatedVectorImageVisual::OnWindowVisibilityChanged: invisibile. Pause animation [%p]\n", this );
   }
