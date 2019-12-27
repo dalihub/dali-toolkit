@@ -1353,9 +1353,6 @@ int UtcDaliAnimatedVectorImageVisualControlVisibilityChanged(void)
   Property::Map attributes;
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
 
-  application.SendNotification();
-  application.Render();
-
   // Check rendering behavior
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );
   Renderer renderer = actor.GetRendererAt( 0u );
@@ -1399,9 +1396,6 @@ int UtcDaliAnimatedVectorImageVisualWindowVisibilityChanged(void)
 
   Property::Map attributes;
   DevelControl::DoAction( actor, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );
-
-  application.SendNotification();
-  application.Render();
 
   // Check rendering behavior
   DALI_TEST_CHECK( actor.GetRendererCount() == 1u );

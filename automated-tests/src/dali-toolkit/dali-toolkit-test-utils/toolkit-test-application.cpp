@@ -54,7 +54,6 @@ ToolkitTestApplication::ToolkitTestApplication( size_t surfaceWidth, size_t surf
 
   // This will also emit the window created signals
   AdaptorImpl::GetImpl( *mAdaptor ).Start( *mMainWindow );
-  AdaptorImpl::GetImpl( *mAdaptor ).SetApplication( *this );
 
   Dali::LifecycleController lifecycleController = Dali::LifecycleController::Get();
   lifecycleController.InitSignal().Emit();

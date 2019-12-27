@@ -26,7 +26,6 @@ class EglInterface;
 class DisplayConnection;
 class ThreadSynchronizationInterface;
 class Window;
-class TestApplication;
 
 namespace Integration
 {
@@ -84,11 +83,6 @@ public:
   void AddWindow( Internal::Adaptor::SceneHolder* window );
   void RemoveWindow( Internal::Adaptor::SceneHolder* window );
 
-  void RegisterProcessor( Integration::Processor& processor );
-  void UnregisterProcessor( Integration::Processor& processor );
-
-  void SetApplication( Dali::TestApplication& testApplication );
-
   Dali::Adaptor::AdaptorSignalType& ResizedSignal();
   Dali::Adaptor::AdaptorSignalType& LanguageChangedSignal();
   Dali::Adaptor::WindowCreatedSignalType& WindowCreatedSignal();
@@ -103,7 +97,6 @@ private:
   Dali::Adaptor::AdaptorSignalType mResizedSignal;
   Dali::Adaptor::AdaptorSignalType mLanguageChangedSignal;
   Dali::Adaptor::WindowCreatedSignalType mWindowCreatedSignal;
-  TestApplication* mTestApplication;
 };
 
 } // namespace Adaptor
