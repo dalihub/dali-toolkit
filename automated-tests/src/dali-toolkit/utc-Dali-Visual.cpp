@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2977,8 +2977,11 @@ int UtcDaliVisualSetTransform7(void)
   tet_infoline( "UtcDaliVisualSetTransform: NPatch visual" );
 
   VisualFactory factory = VisualFactory::Get();
-  Image image = ResourceImage::New(TEST_NPATCH_FILE_NAME, ImageDimensions(100, 200));
-  Visual::Base visual = factory.CreateVisual(image);
+  Property::Map propertyMap;
+  propertyMap[Toolkit::Visual::Property::TYPE] = Toolkit::Visual::IMAGE;
+  propertyMap[Toolkit::ImageVisual::Property::URL] = TEST_NPATCH_FILE_NAME;
+  propertyMap[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING] = true;
+  Visual::Base visual = factory.CreateVisual(propertyMap);
   TestTransform( application, visual );
   TestMixColor( visual, Visual::Property::MIX_COLOR, Color::WHITE );
 
@@ -3048,6 +3051,7 @@ int UtcDaliNPatchVisualCustomShader(void)
   properties[Visual::Property::MIX_COLOR] = Color::BLUE;
   properties[Visual::Property::SHADER]=shader;
   properties[ImageVisual::Property::URL] = TEST_NPATCH_FILE_NAME;
+  properties[ImageVisual::Property::SYNCHRONOUS_LOADING] = true;
 
   Visual::Base visual = factory.CreateVisual( properties );
   TestMixColor( visual, Visual::Property::MIX_COLOR, Color::BLUE );

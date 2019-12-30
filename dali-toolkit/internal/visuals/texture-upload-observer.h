@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_TEXTURE_UPLOAD_OBSERVER_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,13 @@
  *
  */
 
-#include <dali-toolkit/public-api/dali-toolkit-common.h>
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
 #include <dali/public-api/signals/dali-signal.h>
+
+// INTERNAL INCLUDES
+#include <dali-toolkit/public-api/dali-toolkit-common.h>
+#include <dali-toolkit/internal/visuals/visual-url.h>
 
 namespace Dali
 {
@@ -65,6 +70,17 @@ public:
    */
   virtual void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing,
                                const Vector4& atlasRect, bool preMultiplied ) = 0;
+
+  /**
+   * The action to be taken once the async load has finished.
+   * This should be overridden by the deriving class.
+   *
+   * @param[in] loadSuccess   True if the image load was successful (i.e. the resource is available). If false, then the resource failed to load.
+   * @param[in] pixelBuffer   The PixelBuffer of the loaded image.
+   * @param[in] url           The url address of the loaded image.
+   * @param[in] preMultiplied True if the image had pre-multiplied alpha applied
+   */
+  virtual void LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const Internal::VisualUrl& url, bool preMultiplied ) = 0;
 
   /**
    * @brief Returns the destruction signal.

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_N_PATCH_VISUAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,10 @@
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/shader.h>
+#include <dali/public-api/object/weak-handle.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/internal/visuals/texture-upload-observer.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
 
@@ -56,7 +58,7 @@ typedef IntrusivePtr< NPatchVisual > NPatchVisualPtr;
  * | auxiliaryImage           | STRING           |
  * | auxiliaryImageAlpha      | FLOAT            |
  */
-class NPatchVisual: public Visual::Base
+class NPatchVisual: public Visual::Base, public TextureUploadObserver
 {
 public:
 
@@ -206,8 +208,32 @@ private:
    */
   Geometry CreateBorderGeometry( Uint16Pair gridSize );
 
+  /**
+   * @brief Creates a renderer by using loaded resource.
+   */
+  void SetResource();
+
 private:
 
+  /**
+   * @copydoc TextureUploadObserver::UploadCompleted
+   *
+   * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
+   * This callback is the place to add the renderer as it would be called once the loading is finished.
+   */
+  void UploadComplete( bool loadSuccess, int32_t textureId, TextureSet textureSet, bool useAtlasing, const Vector4& atlasRect, bool preMultiplied ) override {}
+
+  /**
+   * @copydoc TextureUploadObserver::LoadComplete
+   *
+   * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
+   * This callback is the place to add the renderer as it would be called once the loading is finished.
+   */
+  void LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied ) override;
+
+private:
+
+  WeakHandle<Actor>  mPlacementActor;       ///< Weakhandle to contain Actor during texture loading
   NPatchLoader&      mLoader;               ///< reference to N patch loader for fast access
   VisualUrl          mImageUrl;             ///< The url to the N patch to load
   VisualUrl          mAuxiliaryUrl;         ///< An auxiliary image that can be displayed on top of the N-Patch

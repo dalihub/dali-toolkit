@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ROLLING_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,6 +113,12 @@ protected:
     bool           useAtlasing,
     const Vector4& atlasRect,
     bool           preMultiplied ) override;
+
+  void LoadComplete(
+    bool loadSuccess,
+    Devel::PixelBuffer pixelBuffer,
+    const VisualUrl& url,
+    bool preMultiplied ) override;
 
 private:
   /**
