@@ -84,7 +84,8 @@ VectorAnimationTask::VectorAnimationTask( VisualFactoryCache& factoryCache, cons
   mCurrentLoopUpdated( false ),
   mForward( true ),
   mUpdateFrameNumber( false ),
-  mNeedAnimationFinishedTrigger( true )
+  mNeedAnimationFinishedTrigger( true ),
+  mForceRender( false )
 {
   Initialize();
 }
@@ -308,7 +309,7 @@ void VectorAnimationTask::SetPlayRange( const Property::Array& playRange )
   }
 
   // Make sure the range specified is between 0 and the total frame number
-  if( startFrame >= 0 && startFrame < mTotalFrame && endFrame >= 0 && endFrame < mTotalFrame )
+  if( startFrame < mTotalFrame && endFrame < mTotalFrame )
   {
     // If the range is not in order swap values
     if( startFrame > endFrame )
@@ -561,13 +562,32 @@ bool VectorAnimationTask::Rasterize()
     if( !renderSuccess )
     {
       DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::Rasterize: Rendering failed. Try again later.[%d] [%p]\n", currentFrame, this );
-      mUpdateFrameNumber = false;
 
-      if( !resourceReady )
+      if( mForceRender )
       {
-        ConditionalWait::ScopedLock lock( mConditionalWait );
-        mResourceReady = false;
+        // Ignore previous frames and retry
+        mVectorRenderer.IgnoreRenderedFrames();
+        renderSuccess = mVectorRenderer.Render( currentFrame );
+        mForceRender = false;
       }
+      else
+      {
+        mForceRender = true;
+      }
+
+      if( !renderSuccess )
+      {
+        mUpdateFrameNumber = false;
+        if( !resourceReady )
+        {
+          ConditionalWait::ScopedLock lock( mConditionalWait );
+          mResourceReady = false;
+        }
+      }
+    }
+    else
+    {
+      mForceRender = false;
     }
   }
 

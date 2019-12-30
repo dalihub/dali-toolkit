@@ -245,6 +245,10 @@ bool VectorAnimationRenderer::GetMarkerInfo( const std::string& marker, uint32_t
   return Internal::Adaptor::GetImplementation( *this ).GetMarkerInfo( marker, startFrame, endFrame );
 }
 
+void VectorAnimationRenderer::IgnoreRenderedFrames()
+{
+}
+
 VectorAnimationRenderer::UploadCompletedSignalType& VectorAnimationRenderer::UploadCompletedSignal()
 {
   return Internal::Adaptor::GetImplementation( *this ).UploadCompletedSignal();
