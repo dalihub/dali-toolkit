@@ -2400,3 +2400,28 @@ int UtcDaliImageViewReloadFailedOnResourceReadySignal(void)
 
   END_TEST;
 }
+
+int UtcDaliImageViewLoadRemoteSVG(void)
+{
+  tet_infoline("Test reloading failed image from within signal handler.");
+
+  ToolkitTestApplication application;
+  Toolkit::ImageView mImageView;
+  mImageView = Toolkit::ImageView::New(  );
+  mImageView.SetImage("http://bar.org/foobar.svg");
+  mImageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  mImageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  mImageView.SetSize(300, 300);
+  mImageView.SetPosition( Vector3( 150.0f , 150.0f , 0.0f ) );
+
+  Stage::GetCurrent().Add( mImageView );
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  DALI_TEST_CHECK( mImageView );
+
+  END_TEST;
+}
+
