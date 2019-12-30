@@ -16,7 +16,6 @@
  */
 #include <unistd.h>
 
-#include <toolkit-event-thread-callback.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
@@ -148,8 +147,6 @@ int UtcDaliDebugRenderingGetVisual1(void)
   propertyMap5.Insert( Toolkit::Visual::Property::TYPE, Visual::SVG );
   propertyMap5.Insert( ImageVisual::Property::URL,  TEST_SVG_FILE_NAME );
   Visual::Base svgVisual = factory.CreateVisual( propertyMap5 );
-
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
   DALI_TEST_CHECK( svgVisual );
   TestDebugVisual( svgVisual, Visual::SVG, Vector2(100.f, 100.f) );
 

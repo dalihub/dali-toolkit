@@ -18,19 +18,29 @@
 // CLASS HEADER
 #include "svg-visual.h"
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/images/buffer-image.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/devel-api/images/texture-set-image.h>
+#include <dali/integration-api/debug.h>
+#include <dali/devel-api/adaptor-framework/file-loader.h>
+
 // INTERNAL INCLUDES
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
+#include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/third-party/nanosvg/nanosvg.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
+#include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/stage.h>
-
 namespace
 {
+const char * const UNITS("px");
+
 // property name
 const char * const IMAGE_ATLASING( "atlasing" );
 
@@ -48,7 +58,8 @@ namespace Internal
 
 SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties )
 {
-  SvgVisualPtr svgVisual( new SvgVisual( factoryCache, shaderFactory, imageUrl ) );
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache, shaderFactory ) );
+  svgVisual->ParseFromUrl( imageUrl );
   svgVisual->SetProperties( properties );
 
   return svgVisual;
@@ -56,16 +67,17 @@ SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShader
 
 SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl )
 {
-  SvgVisualPtr svgVisual( new SvgVisual( factoryCache, shaderFactory, imageUrl ) );
+  SvgVisualPtr svgVisual( new SvgVisual( factoryCache, shaderFactory ) );
+  svgVisual->ParseFromUrl( imageUrl );
 
   return svgVisual;
 }
 
-SvgVisual::SvgVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl )
+SvgVisual::SvgVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory )
 : Visual::Base( factoryCache, Visual::FittingMode::FILL ),
   mImageVisualShaderFactory( shaderFactory ),
   mAtlasRect( FULL_TEXTURE_RECT ),
-  mImageUrl( imageUrl ),
+  mImageUrl( ),
   mParsedImage( NULL ),
   mPlacementActor(),
   mVisualSize(Vector2::ZERO),
@@ -186,29 +198,36 @@ void SvgVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
   // Do nothing
 }
 
+void SvgVisual::ParseFromUrl( const VisualUrl& imageUrl )
+{
+  mImageUrl = imageUrl;
+  if( mImageUrl.IsLocalResource() )
+  {
+    Vector2 dpi = Stage::GetCurrent().GetDpi();
+    float meanDpi = ( dpi.height + dpi.width ) * 0.5f;
+    Dali::Vector<char> buffer;
+    if ( Dali::FileLoader::ReadFile( mImageUrl.GetUrl(), buffer ) )
+    {
+      mParsedImage = nsvgParse( buffer.Begin(), UNITS, meanDpi );
+    }
+  }
+}
+
 void SvgVisual::AddRasterizationTask( const Vector2& size )
 {
-  if( mImpl->mRenderer )
+  if( mImpl->mRenderer && mParsedImage )
   {
     unsigned int width = static_cast<unsigned int>(size.width);
     unsigned int height = static_cast<unsigned int>( size.height );
 
-    Vector2 dpi = Stage::GetCurrent().GetDpi();
-    float meanDpi = ( dpi.height + dpi.width ) * 0.5f;
-
-    RasterizingTaskPtr newTask = new RasterizingTask( this, mParsedImage, mImageUrl, meanDpi, width, height );
+    RasterizingTaskPtr newTask = new RasterizingTask( this, mParsedImage, width, height );
     mFactoryCache.GetSVGRasterizationThread()->AddTask( newTask );
   }
 }
 
-void SvgVisual::ApplyRasterizedImage( NSVGimage* parsedSvg, PixelData rasterizedPixelData )
+void SvgVisual::ApplyRasterizedImage( PixelData rasterizedPixelData )
 {
-  if( mParsedImage == NULL)
-  {
-    mParsedImage = parsedSvg;
-  }
-
-  if( IsOnStage() )
+  if( IsOnStage()  )
   {
     TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
     if( mImpl->mFlags |= Impl::IS_ATLASING_APPLIED )
@@ -278,7 +297,7 @@ void SvgVisual::OnSetTransform()
 {
   Vector2 visualSize = mImpl->mTransform.GetVisualSize( mImpl->mControlSize );
 
-  if( IsOnStage() )
+  if( mParsedImage && IsOnStage() )
   {
     if( visualSize != mVisualSize )
     {
