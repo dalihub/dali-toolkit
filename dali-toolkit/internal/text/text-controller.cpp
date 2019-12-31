@@ -23,6 +23,8 @@
 #include <cmath>
 #include <memory.h>
 #include <dali/public-api/adaptor-framework/key.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/common/stage.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/adaptor-framework/clipboard-event-notifier.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
@@ -2475,7 +2477,7 @@ void Controller::SetVerticalLineAlignment( Toolkit::DevelText::VerticalLineAlign
 
 // public : Relayout.
 
-Controller::UpdateTextType Controller::Relayout( const Size& size, Dali::LayoutDirection::Type layoutDirection )
+Controller::UpdateTextType Controller::Relayout( const Size& size )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "-->Controller::Relayout %p size %f,%f, autoScroll[%s]\n", this, size.width, size.height, mImpl->mIsAutoScrollEnabled ?"true":"false"  );
 
@@ -2548,20 +2550,25 @@ Controller::UpdateTextType Controller::Relayout( const Size& size, Dali::LayoutD
     mImpl->mTextUpdateInfo.mCharacterIndex = 0u;
   }
 
-  if( mImpl->mModel->mMatchSystemLanguageDirection  && mImpl->mLayoutDirection != layoutDirection )
+  if( mImpl->mModel->mMatchSystemLanguageDirection )
   {
-    // Clear the update info. This info will be set the next time the text is updated.
-    mImpl->mTextUpdateInfo.mClearAll = true;
-    // Apply modifications to the model
-    // Shape the text again is needed because characters like '()[]{}' have to be mirrored and the glyphs generated again.
-    mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
-                                                             GET_GLYPH_METRICS         |
-                                                             SHAPE_TEXT                |
-                                                             UPDATE_DIRECTION          |
-                                                             LAYOUT                    |
-                                                             BIDI_INFO                 |
-                                                             REORDER );
-    mImpl->mLayoutDirection = layoutDirection;
+    Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( Dali::Stage::GetCurrent().GetRootLayer().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+
+    if( mImpl->mLayoutDirection != layoutDirection )
+    {
+      // Clear the update info. This info will be set the next time the text is updated.
+      mImpl->mTextUpdateInfo.mClearAll = true;
+      // Apply modifications to the model
+      // Shape the text again is needed because characters like '()[]{}' have to be mirrored and the glyphs generated again.
+      mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
+                                                              GET_GLYPH_METRICS         |
+                                                              SHAPE_TEXT                |
+                                                              UPDATE_DIRECTION          |
+                                                              LAYOUT                    |
+                                                              BIDI_INFO                 |
+                                                              REORDER );
+      mImpl->mLayoutDirection = layoutDirection;
+    }
   }
 
   // Make sure the model is up-to-date before layouting.

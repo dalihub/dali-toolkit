@@ -1384,11 +1384,10 @@ public: // Relayout.
    *
    * @note UI Controls are expected to minimize calls to this method e.g. call once after size negotiation.
    * @param[in] size A the size of a bounding box to layout text within.
-   * @param[in] layoutDirection The direction of the system language.
    *
    * @return Whether the text model or decorations were updated.
    */
-  UpdateTextType Relayout( const Size& size, Dali::LayoutDirection::Type layoutDirection = Dali::LayoutDirection::LEFT_TO_RIGHT );
+  UpdateTextType Relayout( const Size& size );
 
   /**
    * @brief Request a relayout using the ControlInterface.

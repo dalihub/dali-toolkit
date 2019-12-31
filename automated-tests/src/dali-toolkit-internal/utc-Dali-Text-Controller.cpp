@@ -1187,3 +1187,25 @@ int UtcDaliTextControllerMaxLengthSetText(void)
 
   END_TEST;
 }
+
+int UtcDaliTextControllerDirectionCoverage(void)
+{
+  tet_infoline(" UtcDaliTextControllerDirectionCoverage");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextLabel(controller);
+
+  controller->SetMatchSystemLanguageDirection( true );
+  controller->SetLayoutDirection( Dali::LayoutDirection::RIGHT_TO_LEFT );
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}

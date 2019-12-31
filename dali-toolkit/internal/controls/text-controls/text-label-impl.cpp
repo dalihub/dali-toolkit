@@ -965,10 +965,7 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
     mController->SetTextFitContentSize( contentSize );
   }
 
-  // Support Right-To-Left
-  Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( Self().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
-
-  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize, layoutDirection );
+  const Text::Controller::UpdateTextType updateTextType = mController->Relayout( contentSize );
 
   if( ( Text::Controller::NONE_UPDATED != ( Text::Controller::MODEL_UPDATED & updateTextType ) )
      || mTextUpdateNeeded )
@@ -979,6 +976,7 @@ void TextLabel::OnRelayout( const Vector2& size, RelayoutContainer& container )
     TextVisual::EnableRendererUpdate( mVisual );
 
     // Support Right-To-Left of padding
+    Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>( Self().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
     if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
     {
       std::swap( padding.start, padding.end );
