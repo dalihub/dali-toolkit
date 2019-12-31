@@ -208,10 +208,12 @@ void VectorAnimationTask::PlayAnimation()
 
 void VectorAnimationTask::StopAnimation()
 {
-  if( mPlayState != PlayState::STOPPED && mPlayState != PlayState::STOPPING )
+  if( mPlayState != PlayState::STOPPING )
   {
     mNeedAnimationFinishedTrigger = false;
     mPlayState = PlayState::STOPPING;
+
+    mVectorAnimationThread.AddTask( this );
 
     DALI_LOG_INFO( gVectorAnimationLogFilter, Debug::Verbose, "VectorAnimationTask::StopAnimation: Stop [%p]\n", this );
   }
