@@ -68,6 +68,7 @@ void RasterizingTask::Load()
       return;
     }
 
+    remoteBuffer.PushBack( '\0' );
     mParsedSvg = nsvgParse( reinterpret_cast<char*>(remoteBuffer.begin()), UNITS, mDpi );
   }
 }

@@ -196,6 +196,7 @@ void SvgVisual::ParseFromUrl( const VisualUrl& imageUrl )
     Dali::Vector<char> buffer;
     if ( Dali::FileLoader::ReadFile( mImageUrl.GetUrl(), buffer ) )
     {
+      buffer.PushBack( '\0' );
       mParsedImage = nsvgParse( buffer.Begin(), UNITS, meanDpi );
     }
   }
