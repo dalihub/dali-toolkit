@@ -1209,3 +1209,45 @@ int UtcDaliTextControllerDirectionCoverage(void)
 
   END_TEST;
 }
+
+int UtcDaliTextControllerRemoveTextChangeEventData(void)
+{
+  tet_infoline(" UtcDaliTextControllerRemoveTextChangeEventData");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextField( controller );
+
+  // Set the text
+  const std::string text( "Hello World!" );
+  controller->SetText( text );
+  controller->SetInputFontPointSize( 1.0f );
+
+  // Get the implementation of the text controller
+  Controller::Impl& mImpl = Controller::Impl::GetImplementation( *controller.Get() );
+
+  DALI_TEST_EQUALS( EventData::INACTIVE, mImpl.mEventData->mState, TEST_LOCATION );
+
+  // Send DELETE_SURROUNDING event
+  InputMethodContext::EventData imfEvent = InputMethodContext::EventData( InputMethodContext::DELETE_SURROUNDING, "", -1, 1 );
+  InputMethodContext inputMethodContext = InputMethodContext::New();
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
+
+  // Force to update the model.
+  controller->GetNaturalSize();
+
+  // Simulate a key event to delete text
+  controller->KeyEvent( GenerateKey( "", "", DALI_KEY_BACKSPACE, 0, 0, Dali::KeyEvent::Down ) );
+
+  DALI_TEST_EQUALS( EventData::EDITING, mImpl.mEventData->mState, TEST_LOCATION );
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout( size );
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}

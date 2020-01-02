@@ -3738,6 +3738,11 @@ bool Controller::RemoveText( int cursorOffset,
 
       mImpl->mEventData->mScrollAfterDelete = true;
 
+      if( EventData::INACTIVE == mImpl->mEventData->mState )
+      {
+        mImpl->ChangeState( EventData::EDITING );
+      }
+
       DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", this, numberOfCharacters );
       removed = true;
     }
