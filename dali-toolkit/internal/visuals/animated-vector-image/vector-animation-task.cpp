@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/object/property-array.h>
+#include <dali/public-api/math/math-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/visuals/image-visual-shader-factory.h>
@@ -428,6 +429,7 @@ bool VectorAnimationTask::Rasterize()
     if( mPlayState == PlayState::PLAYING && mUpdateFrameNumber )
     {
       mCurrentFrame = mForward ? mCurrentFrame + 1 : mCurrentFrame - 1;
+      Dali::ClampInPlace( mCurrentFrame, mStartFrame, mEndFrame );
     }
 
     currentFrame = mCurrentFrame;

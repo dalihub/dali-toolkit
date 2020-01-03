@@ -616,6 +616,42 @@ int UtcDaliControlBackgroundProperties(void)
   END_TEST;
 }
 
+int UtcDaliControlShadowProperties(void)
+{
+  ToolkitTestApplication application;
+  Control control = Control::New();
+
+  DALI_TEST_CHECK( control.GetProperty( DevelControl::Property::SHADOW ).Get< Property::Map >().Empty() );
+
+  Property::Map imageMap;
+  imageMap[ Toolkit::Visual::Property::TYPE ] = Visual::IMAGE;
+  imageMap[ ImageVisual::Property::URL ] = "TestImage";
+  control.SetProperty( DevelControl::Property::SHADOW, imageMap );
+  Property::Value propValue = control.GetProperty( DevelControl::Property::SHADOW );
+  Property::Map* resultMap = propValue.GetMap();
+  DALI_TEST_CHECK( resultMap->Find( Toolkit::Visual::Property::TYPE ) );
+  DALI_TEST_EQUALS( resultMap->Find( Toolkit::Visual::Property::TYPE )->Get<int>(),(int)Visual::IMAGE, TEST_LOCATION );
+  DALI_TEST_CHECK( resultMap->Find( ImageVisual::Property::URL ) );
+  DALI_TEST_EQUALS( resultMap->Find( ImageVisual::Property::URL )->Get<std::string>(), "TestImage", TEST_LOCATION );
+
+  Property::Map colorMap;
+  colorMap[Visual::Property::TYPE] = Visual::COLOR;
+  colorMap[ColorVisual::Property::MIX_COLOR] = Color::CYAN;
+  control.SetProperty( DevelControl::Property::SHADOW, colorMap );
+  propValue = control.GetProperty( DevelControl::Property::SHADOW );
+  resultMap = propValue.GetMap();
+  DALI_TEST_CHECK( resultMap->Find( Toolkit::Visual::Property::TYPE ) );
+  DALI_TEST_EQUALS( resultMap->Find( Toolkit::Visual::Property::TYPE )->Get<int>(), (int)Visual::COLOR, TEST_LOCATION );
+  DALI_TEST_CHECK( resultMap->Find( ColorVisual::Property::MIX_COLOR ) );
+  DALI_TEST_EQUALS( resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get<Vector4>(), Color::CYAN, TEST_LOCATION );
+
+  Property::Map emptyMap;
+  control.SetProperty( DevelControl::Property::SHADOW, emptyMap );
+  DALI_TEST_CHECK( control.GetProperty( DevelControl::Property::SHADOW ).Get< Property::Map >().Empty() );
+
+  END_TEST;
+}
+
 int UtcDaliControlKeyProperties(void)
 {
   ToolkitTestApplication application;
