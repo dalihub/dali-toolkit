@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -236,7 +236,7 @@ void FitBuffer( Dali::Vector<Vector4>& bufferDestination, Dali::Vector<T>& buffe
 template <typename T>
 bool ReadBinFile( Vector<T> &dataBuffer, std::string url, int32_t offset, int32_t count )
 {
-  Dali::FileStream fileStream( url, FileStream::READ || FileStream::BINARY );
+  Dali::FileStream fileStream( url, FileStream::READ | FileStream::BINARY );
   FILE* fp = fileStream.GetFile();
   if( !fp )
   {
