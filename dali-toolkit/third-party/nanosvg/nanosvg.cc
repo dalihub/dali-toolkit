@@ -39,7 +39,7 @@
 #include <math.h>
 
 #define NSVG_PI (3.14159265358979323846264338327f)
-#define NSVG_KAPPA90 (0.5522847493f)    // Lenght proportional to radius of a cubic bezier handle for 90deg arcs.
+#define NSVG_KAPPA90 (0.5522847493f)	// Length proportional to radius of a cubic bezier handle for 90deg arcs.
 
 #define NSVG_ALIGN_MIN 0
 #define NSVG_ALIGN_MID 1
@@ -51,7 +51,17 @@
 #define NSVG_NOTUSED(v) do { (void)(1 ? (void)0 : ( (void)(v) ) ); } while(0)
 #define NSVG_RGB(r, g, b) (((unsigned int)r) | ((unsigned int)g << 8) | ((unsigned int)b << 16))
 
-#define NSVG_INLINE inline
+#ifdef _MSC_VER
+	#pragma warning (disable: 4996) // Switch off security warnings
+	#pragma warning (disable: 4100) // Switch off unreferenced formal parameter warnings
+	#ifdef __cplusplus
+	#define NSVG_INLINE inline
+	#else
+	#define NSVG_INLINE
+	#endif
+#else
+	#define NSVG_INLINE inline
+#endif
 
 
 static int nsvg__isspace(char c)
@@ -839,7 +849,6 @@ static void nsvg__addShape(NSVGparser* p)
 		shape->fill.color = attr->fillColor;
 		shape->fill.color |= (unsigned int)(attr->fillOpacity*255) << 24;
 	} else if (attr->hasFill == 2) {
-		shape->opacity *= attr->fillOpacity;
 		float inv[6], localBounds[4];
 		nsvg__xformInverse(inv, attr->xform);
 		nsvg__getLocalBounds(localBounds, shape, inv);
@@ -957,7 +966,7 @@ static double nsvg__atof(const char* s)
 	// Parse integer part
 	if (nsvg__isdigit(*cur)) {
 		// Parse digit sequence
-		intPart = (double)strtoll(cur, &end, 10);
+		intPart = strtoll(cur, &end, 10);
 		if (cur != end) {
 			res = (double)intPart;
 			hasIntPart = 1;
@@ -985,7 +994,7 @@ static double nsvg__atof(const char* s)
 
 	// Parse optional exponent
 	if (*cur == 'e' || *cur == 'E') {
-		int expPart = 0;
+		long expPart = 0;
 		cur++; // skip 'E'
 		expPart = strtol(cur, &end, 10); // Parse digit sequence with sign
 		if (cur != end) {
@@ -1023,7 +1032,7 @@ static const char* nsvg__parseNumber(const char* s, char* it, const int size)
 		}
 	}
 	// exponent
-	if (*s == 'e' || *s == 'E') {
+	if ((*s == 'e' || *s == 'E') && (s[1] != 'm' && s[1] != 'x')) {
 		if (i < last) it[i++] = *s;
 		s++;
 		if (*s == '-' || *s == '+') {
@@ -1113,6 +1122,10 @@ NSVGNamedColor nsvg__colors[] = {
 	{ "gray", NSVG_RGB(128, 128, 128) },
 	{ "white", NSVG_RGB(255, 255, 255) },
 
+/**
+ * In the original software, it needs to define "NANOSVG_ALL_COLOR_KEYWORDS" in order to support
+ * the following colors. We have removed this because we want to support all the colors.
+ */
 	{ "aliceblue", NSVG_RGB(240, 248, 255) },
 	{ "antiquewhite", NSVG_RGB(250, 235, 215) },
 	{ "aqua", NSVG_RGB( 0, 255, 255) },
@@ -1512,7 +1525,7 @@ static char nsvg__parseLineJoin(const char* str)
 	else if (strcmp(str, "bevel") == 0)
 		return NSVG_JOIN_BEVEL;
 	// TODO: handle inherit.
-	return NSVG_CAP_BUTT;
+	return NSVG_JOIN_MITER;
 }
 
 static char nsvg__parseFillRule(const char* str)
@@ -2356,9 +2369,9 @@ static void nsvg__parseSVG(NSVGparser* p, const char** attr)
 	for (i = 0; attr[i]; i += 2) {
 		if (!nsvg__parseAttr(p, attr[i], attr[i + 1])) {
 			if (strcmp(attr[i], "width") == 0) {
-				p->image->width = nsvg__parseCoordinate(p, attr[i + 1], 0.0f, 1.0f);
+				p->image->width = nsvg__parseCoordinate(p, attr[i + 1], 0.0f, 0.0f);
 			} else if (strcmp(attr[i], "height") == 0) {
-				p->image->height = nsvg__parseCoordinate(p, attr[i + 1], 0.0f, 1.0f);
+				p->image->height = nsvg__parseCoordinate(p, attr[i + 1], 0.0f, 0.0f);
 			} else if (strcmp(attr[i], "viewBox") == 0) {
 				const char *s = attr[i + 1];
 				char buf[64];
@@ -2795,10 +2808,40 @@ error:
 	return NULL;
 }
 
+NSVGpath* nsvgDuplicatePath(NSVGpath* p)
+{
+    NSVGpath* res = NULL;
+
+    if (p == NULL)
+        return NULL;
+
+    res = (NSVGpath*)malloc(sizeof(NSVGpath));
+    if (res == NULL) goto error;
+    memset(res, 0, sizeof(NSVGpath));
+
+    res->pts = (float*)malloc(p->npts*2*sizeof(float));
+    if (res->pts == NULL) goto error;
+    memcpy(res->pts, p->pts, p->npts * sizeof(float) * 2);
+    res->npts = p->npts;
+
+    memcpy(res->bounds, p->bounds, sizeof(p->bounds));
+
+    res->closed = p->closed;
+
+    return res;
+
+error:
+    if (res != NULL) {
+        free(res->pts);
+        free(res);
+    }
+    return NULL;
+}
+
 void nsvgDelete(NSVGimage* image)
 {
-    if (image == NULL) return;
 	NSVGshape *snext, *shape;
+	if (image == NULL) return;
 	shape = image->shapes;
 	while (shape != NULL) {
 		snext = shape->next;
