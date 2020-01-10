@@ -10,7 +10,7 @@
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- * claim that you wrote the original software. If you use this softwarue
+ * claim that you wrote the original software. If you use this software
  * in a product, an acknowledgment in the product documentation would be
  * appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
@@ -31,7 +31,8 @@ typedef struct NSVGrasterizer NSVGrasterizer;
 
 /* Example Usage:
   // Load SVG
-  struct SNVGImage* image = nsvgParseFromFile("test.svg.");
+  NSVGimage* image;
+  image = nsvgParseFromFile("test.svg", "px", 96);
 
   // Create rasterizer (can be used to render multiple images).
   struct NSVGrasterizer* rast = nsvgCreateRasterizer();
@@ -44,7 +45,7 @@ typedef struct NSVGrasterizer NSVGrasterizer;
 // Allocated rasterizer context.
 NSVGrasterizer* nsvgCreateRasterizer();
 
-// Rasterizes SVG image, returns RGBA image (premultiplied alpha)
+// Rasterizes SVG image, returns RGBA image (non-premultiplied alpha)
 //   r - pointer to rasterizer context
 //   image - pointer to image to rasterize
 //   tx,ty - image offset (applied after scaling)
