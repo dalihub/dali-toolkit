@@ -62,14 +62,7 @@ void RasterizingTask::Load()
   {
     Dali::Vector<uint8_t> remoteBuffer;
 
-    if( !Dali::FileLoader::DownloadFileSynchronously( mUrl.GetUrl(), remoteBuffer ))
-    {
-      DALI_LOG_ERROR("Failed to download file!\n");
-      return;
-    }
-
-    remoteBuffer.PushBack( '\0' );
-    mParsedSvg = nsvgParse( reinterpret_cast<char*>(remoteBuffer.begin()), UNITS, mDpi );
+    mParsedSvg = nsvgParseFromFile( mUrl.GetUrl().c_str(), UNITS, mDpi );
   }
 }
 

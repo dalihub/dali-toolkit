@@ -194,11 +194,8 @@ void SvgVisual::ParseFromUrl( const VisualUrl& imageUrl )
     Vector2 dpi = Stage::GetCurrent().GetDpi();
     float meanDpi = ( dpi.height + dpi.width ) * 0.5f;
     Dali::Vector<char> buffer;
-    if ( Dali::FileLoader::ReadFile( mImageUrl.GetUrl(), buffer ) )
-    {
-      buffer.PushBack( '\0' );
-      mParsedImage = nsvgParse( buffer.Begin(), UNITS, meanDpi );
-    }
+
+    mParsedImage = nsvgParseFromFile( mImageUrl.GetUrl().c_str(), UNITS, meanDpi );
   }
 }
 
