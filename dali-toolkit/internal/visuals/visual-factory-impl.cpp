@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -281,11 +281,15 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
                  Scripting::GetEnumerationName<Toolkit::DevelVisual::Type>( visualType,
                                                                             VISUAL_TYPE_TABLE,
                                                                             VISUAL_TYPE_TABLE_COUNT ),
-                 visualType==Toolkit::DevelVisual::IMAGE?"url:":"",
-                 visualType==Toolkit::DevelVisual::IMAGE ?
-                 propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME)->Get<std::string>().c_str()
-                 :"" );
-
+                 ( visualType == Toolkit::DevelVisual::IMAGE ) ? "url:" : "",
+                 ( visualType == Toolkit::DevelVisual::IMAGE ) ?
+                             ( ([&] (){
+                                        // Return URL if present in PropertyMap else return "not found message"
+                                        Property::Value* imageURLValue = propertyMap.Find( Toolkit::ImageVisual::Property::URL, IMAGE_URL_NAME );
+                                        return ( imageURLValue ) ? imageURLValue->Get<std::string>().c_str() : "url not found in PropertyMap";
+                                      })()
+                             )
+                             : "" );
 
   if( !visualPtr )
   {

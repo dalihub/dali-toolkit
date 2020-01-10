@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace Toolkit
 
 const unsigned int TOOLKIT_MAJOR_VERSION = 1;
 const unsigned int TOOLKIT_MINOR_VERSION = 4;
-const unsigned int TOOLKIT_MICRO_VERSION = 52;
+const unsigned int TOOLKIT_MICRO_VERSION = 53;
 const char * const TOOLKIT_BUILD_DATE    = __DATE__ " " __TIME__;
 
 #ifdef DEBUG_ENABLED

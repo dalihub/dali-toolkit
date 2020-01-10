@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -721,7 +721,7 @@ struct Engine::Impl
         // Convert the character in the visual order into the glyph in the visual order.
         const GlyphIndex glyphIndex = *( charactersToGlyphsBuffer + characterVisualIndex ) + index;
 
-        DALI_ASSERT_DEBUG( 0u <= glyphIndex && glyphIndex < layoutParameters.textModel->mVisualModel->mGlyphs.Count() );
+        DALI_ASSERT_DEBUG( glyphIndex < layoutParameters.textModel->mVisualModel->mGlyphs.Count() );
 
         const GlyphInfo& glyph = *( glyphsBuffer + glyphIndex );
         Vector2& position = *( glyphPositionsBuffer + glyphIndex - layoutParameters.startGlyphIndex );
