@@ -20,6 +20,7 @@
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
+#include <dali-toolkit/devel-api/controls/video-view/video-view-devel.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -301,6 +302,9 @@ int UtcDaliVideoViewMethodsForCoverage(void)
   videoView.Stop();
   videoView.Forward(10);
   videoView.Backward(10);
+
+  Toolkit::DevelVideoView::GetMediaPlayer( videoView );
+
   VideoView::VideoViewSignalType& signal = videoView.FinishedSignal();
   DALI_TEST_EQUALS( 0, signal.GetConnectionCount(), TEST_LOCATION );
 
