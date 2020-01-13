@@ -251,6 +251,11 @@ public:
    */
   int GetDisplayMode() const;
 
+  /**
+   * @brief Gets internal media player.
+   */
+  Any GetMediaPlayer();
+
 private: // From Control
 
   /**
