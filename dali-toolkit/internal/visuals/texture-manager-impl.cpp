@@ -207,7 +207,7 @@ TextureSet TextureManager::LoadTexture(
     {
       Devel::PixelBuffer pixelBuffer = LoadImageFromFile( url.GetUrl(), desiredSize, fittingMode, samplingMode,
                                        orientationCorrection  );
-      if( maskInfo )
+      if( maskInfo && maskInfo->mAlphaMaskUrl.IsValid() )
       {
         Devel::PixelBuffer maskPixelBuffer = LoadImageFromFile( maskInfo->mAlphaMaskUrl.GetUrl(), ImageDimensions(),
                                              FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true  );
@@ -269,7 +269,7 @@ TextureSet TextureManager::LoadTexture(
     if( !textureSet ) // big image, no atlasing or atlasing failed
     {
       atlasingStatus = false;
-      if( !maskInfo )
+      if( !maskInfo || !maskInfo->mAlphaMaskUrl.IsValid() )
       {
         textureId = RequestLoad( url, desiredSize, fittingMode, samplingMode, TextureManager::NO_ATLAS,
                                  textureObserver, orientationCorrection, reloadPolicy, preMultiplyOnLoad );
