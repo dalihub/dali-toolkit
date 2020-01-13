@@ -306,6 +306,7 @@ private:
   bool                                   mUpdateFrameNumber;
   bool                                   mNeedAnimationFinishedTrigger;
   bool                                   mForceRender;
+  bool                                   mDestroyTask;
 
 };
 

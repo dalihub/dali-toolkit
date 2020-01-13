@@ -105,6 +105,8 @@ AnimatedVectorImageVisual::AnimatedVectorImageVisual( VisualFactoryCache& factor
 
 AnimatedVectorImageVisual::~AnimatedVectorImageVisual()
 {
+  SendAnimationData();
+
   if( mRasterizationTriggered && Adaptor::IsAvailable() )
   {
     Adaptor::Get().UnregisterProcessor( *this );
