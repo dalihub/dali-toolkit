@@ -307,7 +307,7 @@ void ViewModel::ElideGlyphs()
             // Need to reshape the glyph as the font may be different in size.
             const GlyphInfo& ellipsisGlyph = fontClient.GetEllipsisGlyph( fontClient.GetPointSize( glyphToRemove.fontId ) );
 
-            if( !firstPenSet || glyphToRemove.advance == 0.f )
+            if( !firstPenSet || EqualsZero( glyphToRemove.advance ) )
             {
               const Vector2& position = *( elidedPositionsBuffer + index );
 
@@ -324,7 +324,10 @@ void ViewModel::ElideGlyphs()
 
               removedGlypsWidth = -ellipsisGlyph.xBearing;
 
-              firstPenSet = true;
+              if( !EqualsZero( firstPenX ) )
+              {
+                firstPenSet = true;
+              }
             }
 
             removedGlypsWidth += std::min( glyphToRemove.advance, ( glyphToRemove.xBearing + glyphToRemove.width ) );
