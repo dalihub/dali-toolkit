@@ -371,7 +371,7 @@ void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
     Toolkit::Visual::Base visual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
     if( visual && visual != mVisual )
     {
-      visual.SetTransformAndSize( transformMap, size );
+      visual.SetTransformAndSize( Property::Map(), size );
     }
   }
 }
