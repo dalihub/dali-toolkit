@@ -49,7 +49,7 @@ FixedImageCache::~FixedImageCache()
   {
     for( std::size_t i = 0; i < mImageUrls.size() ; ++i )
     {
-      mTextureManager.Remove( mImageUrls[i].mTextureId );
+      mTextureManager.Remove( mImageUrls[i].mTextureId, this );
     }
   }
 }
