@@ -75,7 +75,7 @@ RollingImageCache::~RollingImageCache()
     while( !mQueue.IsEmpty() )
     {
       ImageFrame imageFrame = mQueue.PopFront();
-      mTextureManager.Remove( mImageUrls[ imageFrame.mUrlIndex ].mTextureId );
+      mTextureManager.Remove( mImageUrls[ imageFrame.mUrlIndex ].mTextureId, this );
     }
   }
 }
@@ -97,7 +97,7 @@ TextureSet RollingImageCache::NextFrame()
   TextureSet textureSet;
 
   ImageFrame imageFrame = mQueue.PopFront();
-  mTextureManager.Remove( mImageUrls[ imageFrame.mUrlIndex ].mTextureId );
+  mTextureManager.Remove( mImageUrls[ imageFrame.mUrlIndex ].mTextureId, this );
   mImageUrls[ imageFrame.mUrlIndex ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
 
   if( IsFrontReady() == true )

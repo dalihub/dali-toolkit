@@ -309,8 +309,9 @@ public:
    * occurrence of a Texture will cause its removal internally.
    *
    * @param[in] textureId The ID of the Texture to remove.
+   * @param[in] textureObserver The texture observer.
    */
-  void Remove( const TextureManager::TextureId textureId );
+  void Remove( const TextureManager::TextureId textureId, TextureUploadObserver* textureObserver );
 
   /**
    * @brief Get the visualUrl associated with the texture id.

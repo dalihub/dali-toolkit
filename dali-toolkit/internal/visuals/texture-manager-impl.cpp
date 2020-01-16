@@ -467,7 +467,7 @@ TextureManager::TextureId TextureManager::RequestLoadInternal(
   return textureId;
 }
 
-void TextureManager::Remove( const TextureManager::TextureId textureId )
+void TextureManager::Remove( const TextureManager::TextureId textureId, TextureUploadObserver* observer )
 {
   int textureInfoIndex = GetCacheIndexFromId( textureId );
   if( textureInfoIndex != INVALID_INDEX )
@@ -475,9 +475,9 @@ void TextureManager::Remove( const TextureManager::TextureId textureId )
     TextureInfo& textureInfo( mTextureInfoContainer[ textureInfoIndex ] );
 
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise,
-                   "TextureManager::Remove(%d) url:%s\n  cacheIdx:%d loadState:%s\n",
+                   "TextureManager::Remove(%d) url:%s\n  cacheIdx:%d loadState:%s reference count = %d\n",
                    textureId, textureInfo.url.GetUrl().c_str(),
-                   textureInfoIndex, GET_LOAD_STATE_STRING( textureInfo.loadState ) );
+                   textureInfoIndex, GET_LOAD_STATE_STRING( textureInfo.loadState ), textureInfo.referenceCount );
 
     // Decrement the reference count and check if this is the last user of this Texture.
     if( --textureInfo.referenceCount <= 0 )
@@ -512,6 +512,19 @@ void TextureManager::Remove( const TextureManager::TextureId textureId )
       {
         // Permanently remove the textureInfo struct.
         mTextureInfoContainer.erase( mTextureInfoContainer.begin() + textureInfoIndex );
+      }
+    }
+
+    if( observer )
+    {
+      // Remove element from the LoadQueue
+      for( auto&& element : mLoadQueue )
+      {
+        if( element.mObserver == observer )
+        {
+          mLoadQueue.Erase( &element );
+          break;
+        }
       }
     }
   }
@@ -791,7 +804,7 @@ void TextureManager::AsyncLoadComplete( AsyncLoadingInfoContainerType& loadingCo
         }
         else
         {
-          Remove( textureInfo.textureId );
+          Remove( textureInfo.textureId, nullptr );
         }
       }
     }
