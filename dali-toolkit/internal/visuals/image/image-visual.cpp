@@ -227,7 +227,7 @@ ImageVisual::~ImageVisual()
       if( mMaskingData->mAlphaMaskId != TextureManager::INVALID_TEXTURE_ID )
       {
         TextureManager& textureManager = mFactoryCache.GetTextureManager();
-        textureManager.Remove( mMaskingData->mAlphaMaskId );
+        textureManager.Remove( mMaskingData->mAlphaMaskId, this );
       }
     }
 
@@ -1012,7 +1012,7 @@ void ImageVisual::RemoveTexture()
 {
   if( mTextureId != TextureManager::INVALID_TEXTURE_ID )
   {
-    mFactoryCache.GetTextureManager().Remove( mTextureId );
+    mFactoryCache.GetTextureManager().Remove( mTextureId, this );
     mTextureId = TextureManager::INVALID_TEXTURE_ID;
   }
   else
