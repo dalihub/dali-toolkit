@@ -586,10 +586,10 @@ int UtcDaliTextViewModelElideText02(void)
   float positions01[] = { 0.f, 8.f, 16.f, 26.f, 33.f, 41.f, 45.f, 54.f, 64.0f };
 
   Size textSize02( 80.f, 100.f );
-  float positions02[] = { 72.f, 63.f, 54.f, 50.f, 43.f, 38.f, 30.f, 10.0f };
+  float positions02[] = { 72.f, 63.f, 54.f, 50.f, 43.f, 38.f, 30.f, 13.0f };
 
   Size textSize03( 80.f, 100.f );
-  float positions03[] = { 74.f, 69.f, 66.f, 61.f, 53.f, 51.f, 47.f, 46.f, 41.f, 31.f, 28.f, 20.f, 7.f };
+  float positions03[] = { 74.f, 69.f, 66.f, 61.f, 53.f, 51.f, 47.f, 46.f, 41.f, 31.f, 28.f, 14.f, 7.f };
 
   Size textSize04( 80.f, 10.f );
   float positions04[] = { 2.f };
@@ -625,7 +625,7 @@ int UtcDaliTextViewModelElideText02(void)
       "<font family='TizenSansArabic'>عل النفط ديسمبر الإمداد بال, بين وترك شعار هو. لمّ من المبرمة النفط بالسيطرة, أم يتم تحرّك وبغطاء, عدم في لإعادة وإقامة رجوعهم.</font>",
       textSize03,
       5u,
-      74u,
+      73u,
       positions03
     },
     {

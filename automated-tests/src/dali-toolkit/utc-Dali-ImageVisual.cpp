@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1362,6 +1362,59 @@ int UtcDaliImageVisualAlphaMask(void)
   END_TEST;
 }
 
+int UtcDaliImageVisualSynchronousLoadAlphaMask(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Request image visual with a Property::Map containing an Alpha mask with synchronous loading" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
+  propertyMap.Insert( ImageVisual::Property::URL,  TEST_LARGE_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::ALPHA_MASK_URL, TEST_MASK_IMAGE_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, true );
+
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  DALI_TEST_CHECK( visual );
+
+  Property::Map testMap;
+  visual.CreatePropertyMap(testMap);
+  DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL),Property::Value(TEST_MASK_IMAGE_FILE_NAME), TEST_LOCATION );
+
+  // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
+  // Image with a size smaller than 512*512 will be uploaded as a part of the atlas.
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+
+  DummyControl actor = DummyControl::New();
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+
+  actor.SetSize( 200.f, 200.f );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+
+  // Do not wait for any EventThreadTrigger in synchronous alpha mask.
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.IsResourceReady(), true, TEST_LOCATION );
+
+  dummyImpl.UnregisterVisual(  Control::CONTROL_PROPERTY_END_INDEX + 1 );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliImageVisualRemoteAlphaMask(void)
 {
   ToolkitTestApplication application;
@@ -1375,13 +1428,14 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE,  Visual::IMAGE );
   propertyMap.Insert( ImageVisual::Property::URL,  TEST_IMAGE_FILE_NAME );
-  propertyMap.Insert( "alphaMaskUrl", MASK_IMAGE );
+  propertyMap.Insert( ImageVisual::Property::ALPHA_MASK_URL, MASK_IMAGE );
 
   Visual::Base visual = factory.CreateVisual( propertyMap );
   DALI_TEST_CHECK( visual );
 
   Property::Map testMap;
   visual.CreatePropertyMap(testMap);
+
   DALI_TEST_EQUALS(*testMap.Find(ImageVisual::Property::ALPHA_MASK_URL),Property::Value(MASK_IMAGE), TEST_LOCATION );
 
   // For tesing the LoadResourceFunc is called, a big image size should be set, so the atlasing is not applied.
@@ -1394,6 +1448,7 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
   DummyControl actor = DummyControl::New();
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
+
   DALI_TEST_EQUALS( actor.IsResourceReady(), false, TEST_LOCATION );
 
   actor.SetSize( 200.f, 200.f );
@@ -1414,7 +1469,6 @@ int UtcDaliImageVisualRemoteAlphaMask(void)
 
   END_TEST;
 }
-
 
 int UtcDaliImageVisualAlphaMaskCrop(void)
 {
