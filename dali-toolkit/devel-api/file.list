@@ -29,6 +29,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/controls/text-controls/text-selection-popup.cpp
   ${devel_api_src_dir}/controls/text-controls/text-selection-toolbar.cpp
   ${devel_api_src_dir}/controls/tool-bar/tool-bar.cpp
+  ${devel_api_src_dir}/controls/video-view/video-view-devel.cpp
   ${devel_api_src_dir}/controls/web-view/web-view.cpp
   ${devel_api_src_dir}/focus-manager/keyinput-focus-manager.cpp
   ${devel_api_src_dir}/focus-manager/keyboard-focus-manager-devel.cpp
@@ -202,6 +203,10 @@ SET( devel_api_gaussian_blur_view_header_files
   ${devel_api_src_dir}/controls/gaussian-blur-view/gaussian-blur-view.h
 )
 
+SET( devel_api_video_view_header_files
+  ${devel_api_src_dir}/controls/video-view/video-view-devel.h
+)
+
 SET( devel_api_web_view_header_files
   ${devel_api_src_dir}/controls/web-view/web-view.h
 )
@@ -242,6 +247,7 @@ SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_tooltip_header_files}
   ${devel_api_transition_effects_header_files}
   ${devel_api_gaussian_blur_view_header_files}
+  ${devel_api_video_view_header_files}
   ${devel_api_web_view_header_files}
   ${devel_api_drag_and_drop_detector_header_files}
 )
