@@ -425,7 +425,6 @@ void ImageVisual::DoSetProperty( Property::Index index, const Property::Value& v
       if( value.Get( alphaUrl ) )
       {
         AllocateMaskData();
-        // Immediately trigger the alpha mask loading (it may just get a cached value)
         mMaskingData->mAlphaMaskUrl = alphaUrl;
       }
       break;
