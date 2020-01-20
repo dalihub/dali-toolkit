@@ -146,7 +146,7 @@ TextureManager::~TextureManager()
 
 TextureSet TextureManager::LoadTexture(
   const VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode,
-  Dali::SamplingMode::Type samplingMode, const MaskingDataPointer& maskInfo,
+  Dali::SamplingMode::Type samplingMode, MaskingDataPointer& maskInfo,
   bool synchronousLoading, TextureManager::TextureId& textureId, Vector4& textureRect,
   Dali::ImageDimensions& textureRectSize, bool& atlasingStatus, bool& loadingStatus,
   Dali::WrapMode::Type wrapModeU, Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
@@ -252,9 +252,9 @@ TextureSet TextureManager::LoadTexture(
       }
       else
       {
-        TextureId alphaMaskId = RequestMaskLoad( maskInfo->mAlphaMaskUrl );
+        maskInfo->mAlphaMaskId = RequestMaskLoad( maskInfo->mAlphaMaskUrl );
         textureId = RequestLoad( url,
-                                 alphaMaskId,
+                                 maskInfo->mAlphaMaskId,
                                  maskInfo->mContentScaleFactor,
                                  desiredSize,
                                  fittingMode, samplingMode,
