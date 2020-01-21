@@ -174,7 +174,7 @@ public:
    * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
    * @param[in] fittingMode           The FittingMode to use
    * @param[in] samplingMode          The SamplingMode to use
-   * @param[in] maskInfo              Mask info structure
+   * @param[in, out] maskInfo         Mask info structure
    * @param[in] synchronousLoading    true if the URL should be loaded synchronously
    * @param[out] textureId,           The textureId of the URL
    * @param[out] textureRect          The rectangle within the texture atlas that this URL occupies,
@@ -204,7 +204,7 @@ public:
                           Dali::ImageDimensions        desiredSize,
                           Dali::FittingMode::Type      fittingMode,
                           Dali::SamplingMode::Type     samplingMode,
-                          const MaskingDataPointer&    maskInfo,
+                          MaskingDataPointer&          maskInfo,
                           bool                         synchronousLoading,
                           TextureManager::TextureId&   textureId,
                           Vector4&                     textureRect,

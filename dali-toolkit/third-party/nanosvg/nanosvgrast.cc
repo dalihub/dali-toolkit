@@ -127,9 +127,9 @@ error:
 
 void nsvgDeleteRasterizer(NSVGrasterizer* r)
 {
-	if (r == NULL) return;
-
 	NSVGmemPage* p;
+
+	if (r == NULL) return;
 
 	p = r->pages;
 	while (p != NULL) {

@@ -808,6 +808,11 @@ int VideoView::GetDisplayMode() const
   return static_cast< int >( mVideoPlayer.GetDisplayMode() );
 }
 
+Any VideoView::GetMediaPlayer()
+{
+  return mVideoPlayer.GetMediaPlayer();
+}
+
 Dali::Shader VideoView::CreateShader()
 {
   std::string fragmentShader = "#extension GL_OES_EGL_image_external:require\n";

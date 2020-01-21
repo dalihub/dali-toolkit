@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -256,7 +256,7 @@ void VectorAnimationTask::SetPlayRange( Property::Array& playRange )
   }
 
   // Make sure the range specified is between 0 and the total frame number
-  if( startFrame >= 0 && startFrame < mTotalFrame && endFrame >= 0 && endFrame < mTotalFrame )
+  if( startFrame < mTotalFrame && endFrame < mTotalFrame )
   {
     // If the range is not in order swap values
     if( startFrame > endFrame )

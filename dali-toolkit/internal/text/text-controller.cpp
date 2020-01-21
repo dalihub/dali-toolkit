@@ -2143,7 +2143,7 @@ bool Controller::CheckForTextFit( float pointSize, Size& layoutSize )
 void Controller::FitPointSizeforLayout( Size layoutSize )
 {
   const OperationsMask operations  = mImpl->mOperationsPending;
-  if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) )
+  if( NO_OPERATION != ( UPDATE_LAYOUT_SIZE & operations ) || mImpl->mTextFitContentSize != layoutSize )
   {
     bool actualellipsis = mImpl->mModel->mElideEnabled;
     float minPointSize = mImpl->mTextFitMinSize;
@@ -3734,6 +3734,11 @@ bool Controller::RemoveText( int cursorOffset,
       oldCursorIndex = cursorIndex;
 
       mImpl->mEventData->mScrollAfterDelete = true;
+
+      if( EventData::INACTIVE == mImpl->mEventData->mState )
+      {
+        mImpl->ChangeState( EventData::EDITING );
+      }
 
       DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::RemoveText %p removed %d\n", this, numberOfCharacters );
       removed = true;

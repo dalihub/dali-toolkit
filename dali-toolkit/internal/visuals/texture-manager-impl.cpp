@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,7 +146,7 @@ TextureManager::~TextureManager()
 
 TextureSet TextureManager::LoadTexture(
   const VisualUrl& url, Dali::ImageDimensions desiredSize, Dali::FittingMode::Type fittingMode,
-  Dali::SamplingMode::Type samplingMode, const MaskingDataPointer& maskInfo,
+  Dali::SamplingMode::Type samplingMode, MaskingDataPointer& maskInfo,
   bool synchronousLoading, TextureManager::TextureId& textureId, Vector4& textureRect,
   Dali::ImageDimensions& textureRectSize, bool& atlasingStatus, bool& loadingStatus,
   Dali::WrapMode::Type wrapModeU, Dali::WrapMode::Type wrapModeV, TextureUploadObserver* textureObserver,
@@ -182,6 +182,15 @@ TextureSet TextureManager::LoadTexture(
     {
       Devel::PixelBuffer pixelBuffer = LoadImageFromFile( url.GetUrl(), desiredSize, fittingMode, samplingMode,
                                        orientationCorrection  );
+      if( maskInfo )
+      {
+        Devel::PixelBuffer maskPixelBuffer = LoadImageFromFile( maskInfo->mAlphaMaskUrl.GetUrl(), ImageDimensions(),
+                                             FittingMode::SCALE_TO_FILL, SamplingMode::NO_FILTER, true  );
+        if( maskPixelBuffer )
+        {
+          pixelBuffer.ApplyMask( maskPixelBuffer, maskInfo->mContentScaleFactor, maskInfo->mCropToMask );
+        }
+      }
       if( pixelBuffer )
       {
         PreMultiply( pixelBuffer, preMultiplyOnLoad );
@@ -243,6 +252,7 @@ TextureSet TextureManager::LoadTexture(
       }
       else
       {
+        maskInfo->mAlphaMaskId = RequestMaskLoad( maskInfo->mAlphaMaskUrl );
         textureId = RequestLoad( url,
                                  maskInfo->mAlphaMaskId,
                                  maskInfo->mContentScaleFactor,
