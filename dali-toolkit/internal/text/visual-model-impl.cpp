@@ -469,7 +469,7 @@ VisualModel::VisualModel()
   mShadowColor( Color::BLACK ),
   mUnderlineColor( Color::BLACK ),
   mOutlineColor( Color::WHITE ),
-  mBackgroundColor( Color::CYAN ),
+  mBackgroundColor( Color::TRANSPARENT ),
   mControlSize(),
   mShadowOffset(),
   mUnderlineHeight( 0.0f ),

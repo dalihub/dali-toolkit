@@ -102,10 +102,24 @@ public:
    */
   enum class PreeditStyle
   {
-    NONE,         ///< None style
-    UNDERLINE,    ///< Underline substring style
-    REVERSE,      ///< Reverse substring style
-    HIGHLIGHT     ///< Highlight substring style
+    NONE,                    ///< None style
+    UNDERLINE,               ///< Underline substring style
+    REVERSE,                 ///< Reverse substring style
+    HIGHLIGHT,               ///< Highlight substring style
+    CUSTOM_PLATFORM_STYLE_1, ///< Custom style for platform
+    CUSTOM_PLATFORM_STYLE_2, ///< Custom style for platform
+    CUSTOM_PLATFORM_STYLE_3, ///< Custom style for platform
+    CUSTOM_PLATFORM_STYLE_4  ///< Custom style for platform
+  };
+
+  /**
+   * @brief This structure is for the preedit style types and indices.
+   */
+  struct PreeditAttributeData
+  {
+    PreeditStyle preeditType; /// The preedit style type
+    unsigned int startIndex;  /// The start index of preedit
+    unsigned int endIndex;    /// The end index of preedit
   };
 
   /**
@@ -309,11 +323,11 @@ public:
   void SetPreeditStyle( PreeditStyle type );
 
   /**
-   * @brief Gets the preedit type.
+   * @brief Gets the preedit attrs data.
    *
-   * @return The preedit style type
+   * @param[out] attrs The preedit attrs data.
    */
-  PreeditStyle GetPreeditStyle() const;
+  void GetPreeditStyle( Vector<PreeditAttributeData>& attrs ) const;
 
 public:
 
