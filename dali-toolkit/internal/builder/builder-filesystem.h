@@ -24,7 +24,6 @@
 #include <sstream>
 
 #include <stdio.h>
-#include <unistd.h>
 
 #include <dali/devel-api/adaptor-framework/file-loader.h>
 
