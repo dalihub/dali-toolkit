@@ -2569,6 +2569,11 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
                                                               REORDER                   |
                                                               ALIGN );
       mImpl->mLayoutDirection = layoutDirection;
+      if( mImpl->mEventData )
+      {
+        mImpl->mEventData->mUpdateAlignment = true;
+        mImpl->mEventData->mUpdateCursorPosition = true;
+      }
     }
   }
 
