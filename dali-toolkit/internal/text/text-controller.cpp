@@ -2566,7 +2566,8 @@ Controller::UpdateTextType Controller::Relayout( const Size& size )
                                                               UPDATE_DIRECTION          |
                                                               LAYOUT                    |
                                                               BIDI_INFO                 |
-                                                              REORDER );
+                                                              REORDER                   |
+                                                              ALIGN );
       mImpl->mLayoutDirection = layoutDirection;
     }
   }
