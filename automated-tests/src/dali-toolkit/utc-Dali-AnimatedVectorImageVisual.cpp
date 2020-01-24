@@ -413,7 +413,7 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
 
     map = dummyControl.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
     value = map.Find( DevelImageVisual::Property::PLAY_STATE );
-    DALI_TEST_CHECK( value->Get< int >() == DevelImageVisual::PlayState::PAUSED );
+    DALI_TEST_CHECK( value->Get< int >() == DevelImageVisual::PlayState::STOPPED );
 
     tet_infoline( "On stage again" );
     Stage::GetCurrent().Add( dummyControl );
@@ -423,7 +423,7 @@ int UtcDaliAnimatedVectorImageVisualPlayback(void)
 
     map = dummyControl.GetProperty< Property::Map >( DummyControl::Property::TEST_VISUAL );
     value = map.Find( DevelImageVisual::Property::PLAY_STATE );
-    DALI_TEST_CHECK( value->Get< int >() == DevelImageVisual::PlayState::PAUSED );
+    DALI_TEST_CHECK( value->Get< int >() == DevelImageVisual::PlayState::STOPPED );
 
     tet_infoline( "Test Play action" );
     DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedVectorImageVisual::Action::PLAY, attributes );

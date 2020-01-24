@@ -289,6 +289,107 @@ int UtcDaliTextControllerImfEvent(void)
   END_TEST;
 }
 
+int UtcDaliTextControllerImfPreeditStyle(void)
+{
+  tet_infoline(" UtcDaliTextControllerImfPreeditStyle");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  std::string text;
+  InputMethodContext::EventData imfEvent;
+
+  DALI_TEST_CHECK( controller );
+
+  // Configures the text controller similarly to the text-field.
+  ConfigureTextField( controller );
+
+  InputMethodContext inputMethodContext = InputMethodContext::New();
+
+  // Send COMMIT event.
+  imfEvent = InputMethodContext::EventData( InputMethodContext::COMMIT, "Hello ", 0, 6 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
+
+  // Force to update the model.
+  controller->GetNaturalSize();
+
+  controller->GetText( text );
+  DALI_TEST_EQUALS( "Hello ", text, TEST_LOCATION );
+
+  // Send PRE_EDIT event
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
+  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::NONE );
+  controller->GetNaturalSize();
+
+  controller->GetText( text );
+  DALI_TEST_EQUALS( "Hello w", text, TEST_LOCATION );
+
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
+
+  // Set the preedit style as REVERSE
+  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::REVERSE );
+  controller->GetNaturalSize();
+
+  controller->GetText( text );
+  DALI_TEST_EQUALS( "Hello w", text, TEST_LOCATION );
+
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
+
+  // Set the preedit style as HIGHLIGHT
+  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::HIGHLIGHT );
+  controller->GetNaturalSize();
+
+  controller->GetText( text );
+  DALI_TEST_EQUALS( "Hello w", text, TEST_LOCATION );
+
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
+
+  // Set the preedit style as CUSTOM_PLATFORM_STYLE_1
+  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_1 );
+  controller->GetNaturalSize();
+
+  controller->GetText( text );
+  DALI_TEST_EQUALS( "Hello w", text, TEST_LOCATION );
+
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
+
+  // Set the preedit style as CUSTOM_PLATFORM_STYLE_2
+  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_2 );
+  controller->GetNaturalSize();
+
+  controller->GetText( text );
+  DALI_TEST_EQUALS( "Hello w", text, TEST_LOCATION );
+
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
+
+  // Set the preedit style as CUSTOM_PLATFORM_STYLE_3
+  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_3 );
+  controller->GetNaturalSize();
+
+  controller->GetText( text );
+  DALI_TEST_EQUALS( "Hello w", text, TEST_LOCATION );
+
+  imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
+  controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
+
+  // Set the preedit style as CUSTOM_PLATFORM_STYLE_4
+  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_4 );
+  controller->GetNaturalSize();
+
+  controller->GetText( text );
+  DALI_TEST_EQUALS( "Hello w", text, TEST_LOCATION );
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
 int UtcDaliTextControllerTextPopupButtonTouched(void)
 {
   tet_infoline(" UtcDaliTextControllerTextPopupButtonTouched");

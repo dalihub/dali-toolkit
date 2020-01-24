@@ -93,6 +93,11 @@ public:
     mDisplyMode = mode;
   }
 
+  Any GetMediaPlayer()
+  {
+    return NULL;
+  }
+
 
 public:
 
@@ -286,6 +291,11 @@ void VideoPlayer::SetDisplayMode( Dali::VideoPlayerPlugin::DisplayMode::Type mod
 Dali::VideoPlayerPlugin::DisplayMode::Type VideoPlayer::GetDisplayMode() const
 {
   return Internal::Adaptor::GetImplementation( *this ).GetDisplayMode();
+}
+
+Any VideoPlayer::GetMediaPlayer()
+{
+  return Internal::Adaptor::GetImplementation( *this ).GetMediaPlayer();
 }
 
 } // namespace Dali;

@@ -168,9 +168,9 @@ private:
   void SetVectorImageSize();
 
   /**
-   * @brief Pause the animation.
+   * @brief Stop the animation.
    */
-  void PauseAnimation();
+  void StopAnimation();
 
   /**
    * @brief Callback when the world scale factor changes.
