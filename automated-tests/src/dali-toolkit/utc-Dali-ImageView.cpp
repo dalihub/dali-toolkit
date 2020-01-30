@@ -2406,21 +2406,28 @@ int UtcDaliImageViewLoadRemoteSVG(void)
   tet_infoline("Test reloading failed image from within signal handler.");
 
   ToolkitTestApplication application;
-  Toolkit::ImageView mImageView;
-  mImageView = Toolkit::ImageView::New(  );
-  mImageView.SetImage("http://bar.org/foobar.svg");
-  mImageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  mImageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mImageView.SetSize(300, 300);
-  mImageView.SetPosition( Vector3( 150.0f , 150.0f , 0.0f ) );
+  Toolkit::ImageView imageView;
+  imageView = Toolkit::ImageView::New(  );
+  imageView.SetImage("https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg");
+  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  imageView.SetSize(300, 300);
+  imageView.SetPosition( Vector3( 150.0f , 150.0f , 0.0f ) );
 
-  Stage::GetCurrent().Add( mImageView );
+  Stage::GetCurrent().Add( imageView );
+
+  DALI_TEST_CHECK( imageView );
+
+  DALI_TEST_EQUALS( imageView.GetRendererCount(), 0u, TEST_LOCATION );
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
-  DALI_TEST_CHECK( mImageView );
+  DALI_TEST_EQUALS( imageView.GetRendererCount(), 1u, TEST_LOCATION );
 
   END_TEST;
 }

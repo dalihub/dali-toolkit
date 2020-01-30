@@ -224,6 +224,11 @@ void SvgVisual::AddRasterizationTask( const Vector2& size )
 
 void SvgVisual::ApplyRasterizedImage( NSVGimage* parsedSvg, PixelData rasterizedPixelData )
 {
+  if( mParsedImage == NULL)
+  {
+    mParsedImage = parsedSvg;
+  }
+
   if( mParsedImage && IsOnStage() )
   {
     TextureSet currentTextureSet = mImpl->mRenderer.GetTextures();
