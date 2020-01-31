@@ -18,10 +18,14 @@
 // CLASS HEADER
 #include "svg-rasterize-thread.h"
 
+// EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/thread-settings.h>
+#include <dali/devel-api/adaptor-framework/file-loader.h>
+#include <dali/integration-api/debug.h>
+
 // INTERNAL INCLUDES
 #include <dali-toolkit/third-party/nanosvg/nanosvgrast.h>
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
-#include <dali/devel-api/adaptor-framework/thread-settings.h>
 
 namespace Dali
 {
@@ -32,20 +36,49 @@ namespace Toolkit
 namespace Internal
 {
 
-RasterizingTask::RasterizingTask( SvgVisual* svgRenderer, NSVGimage* parsedSvg, unsigned int width, unsigned int height )
+namespace
+{
+const char * const UNITS("px");
+}
+
+RasterizingTask::RasterizingTask( SvgVisual* svgRenderer, NSVGimage* parsedSvg, const VisualUrl& url, float dpi, unsigned int width, unsigned int height)
 : mSvgVisual( svgRenderer ),
   mParsedSvg( parsedSvg ),
+  mUrl( url ),
+  mDpi( dpi ),
   mWidth( width ),
   mHeight( height )
 {
 }
 
+void RasterizingTask::Load()
+{
+  if( mParsedSvg != NULL)
+  {
+    return;
+  }
+
+  if( !mUrl.IsLocalResource() )
+  {
+    Dali::Vector<uint8_t> remoteBuffer;
+
+    if( !Dali::FileLoader::DownloadFileSynchronously( mUrl.GetUrl(), remoteBuffer ))
+    {
+      DALI_LOG_ERROR("Failed to download file!\n");
+      return;
+    }
+
+    remoteBuffer.PushBack( '\0' );
+    mParsedSvg = nsvgParse( reinterpret_cast<char*>(remoteBuffer.begin()), UNITS, mDpi );
+  }
+}
+
 void RasterizingTask::Rasterize( NSVGrasterizer* rasterizer )
 {
-  if( mWidth > 0u && mHeight > 0u )
+  if( mParsedSvg != NULL && mWidth > 0u && mHeight > 0u )
   {
-    float scaleX =  static_cast<float>( mWidth ) /  mParsedSvg->width;
-    float scaleY =  static_cast<float>( mHeight ) /  mParsedSvg->height;
+    float scaleX = static_cast<float>( mWidth ) /  mParsedSvg->width;
+    float scaleY = static_cast<float>( mHeight ) /  mParsedSvg->height;
     float scale = scaleX < scaleY ? scaleX : scaleY;
     unsigned int bufferStride = mWidth*Pixel::GetBytesPerPixel( Pixel::RGBA8888 );
     unsigned int bufferSize = bufferStride * mHeight;
@@ -57,6 +90,11 @@ void RasterizingTask::Rasterize( NSVGrasterizer* rasterizer )
 
     mPixelData = Dali::PixelData::New( buffer, bufferSize, mWidth, mHeight, Pixel::RGBA8888, Dali::PixelData::DELETE_ARRAY );
   }
+}
+
+NSVGimage* RasterizingTask::GetParsedImage() const
+{
+  return mParsedSvg;
 }
 
 SvgVisual* RasterizingTask::GetSvgVisual() const
@@ -225,6 +263,7 @@ void SvgRasterizeThread::Run()
   SetThreadName( "SVGThread" );
   while( RasterizingTaskPtr task = NextTaskToProcess() )
   {
+    task->Load( );
     task->Rasterize( mRasterizer );
     AddCompletedTask( task );
   }
