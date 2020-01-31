@@ -290,6 +290,10 @@ void SvgVisual::ApplyRasterizedImage( NSVGimage* parsedSvg, PixelData rasterized
    // Svg loaded and ready to display
    ResourceReady( Toolkit::Visual::ResourceStatus::READY );
   }
+  else if( !mParsedImage )
+  {
+    ResourceReady( Toolkit::Visual::ResourceStatus::FAILED );
+  }
 }
 
 void SvgVisual::OnSetTransform()
@@ -309,6 +313,12 @@ void SvgVisual::OnSetTransform()
   {
     mImpl->mTransform.RegisterUniforms(mImpl->mRenderer, Direction::LEFT_TO_RIGHT);
   }
+}
+
+bool SvgVisual::IsResourceReady() const
+{
+  return ( mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY ||
+           mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::FAILED );
 }
 
 } // namespace Internal
