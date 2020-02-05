@@ -106,8 +106,9 @@ protected:
    *
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] shaderFactory The ImageVisualShaderFactory object
+   * @param[in] imageUrl The URL to svg resource to use
    */
-  SvgVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory );
+  SvgVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl );
 
   /**
    * @brief A reference counted object may only be deleted by calling Unreference().
@@ -134,23 +135,28 @@ protected:
    */
   void OnSetTransform() override;
 
+  /**
+   * @copydoc Visual::Base::IsResourceReady
+   */
+  bool IsResourceReady() const override;
+
 public:
 
   /**
    * @bried Apply the rasterized image to the visual.
    *
+   * @param[in] parsedSvg The data of parsed image.
    * @param[in] rasterizedPixelData The pixel buffer with the rasterized pixels
    */
-  void ApplyRasterizedImage( PixelData rasterizedPixelData );
+  void ApplyRasterizedImage( NSVGimage* parsedSvg, PixelData rasterizedPixelData );
 
 private:
-
   /**
-   * @brief Parses the SVG Image from the set URL.
-   *
-   * @param[in] imageUrl The URL of the image to parse the SVG from.
-   */
-  void ParseFromUrl( const VisualUrl& imageUrl );
+    * @brief Parses the SVG Image from the set URL.
+    *
+    * @param[in] imageUrl The URL of the image to parse the SVG from.
+    */
+   void ParseFromUrl( const VisualUrl& imageUrl );
 
   /**
    * @bried Rasterize the svg with the given size, and add it to the visual.
@@ -165,7 +171,6 @@ private:
    * @param[in] value The value
    */
   void DoSetProperty( Property::Index index, const Property::Value& value );
-
 
   // Undefined
   SvgVisual( const SvgVisual& svgRenderer );

@@ -98,6 +98,12 @@ struct BackgroundMesh
   Vector< unsigned short > mIndices;       ///< container of indices
 };
 
+const Dali::Vector4 LIGHT_BLUE( 0.75f, 0.96f, 1.f, 1.f );
+const Dali::Vector4 BACKGROUND_SUB4( 0.58f, 0.87f, 0.96f, 1.f );
+const Dali::Vector4 BACKGROUND_SUB5( 0.83f, 0.94f, 0.98f, 1.f );
+const Dali::Vector4 BACKGROUND_SUB6( 1.f, 0.5f, 0.5f, 1.f );
+const Dali::Vector4 BACKGROUND_SUB7( 1.f, 0.8f, 0.8f, 1.f );
+
 } // namespace
 
 namespace Dali
@@ -1080,35 +1086,130 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       mEventData->mPreEditFlag &&
       ( 0u != mModel->mVisualModel->mCharactersToGlyph.Count() ) )
   {
-    Dali::InputMethodContext::PreeditStyle type = mEventData->mInputMethodContext.GetPreeditStyle();
+    Vector< Dali::InputMethodContext::PreeditAttributeData > attrs;
+    mEventData->mInputMethodContext.GetPreeditStyle( attrs );
+    Dali::InputMethodContext::PreeditStyle type = Dali::InputMethodContext::PreeditStyle::NONE;
 
-    switch( type )
+    // Check the type of preedit and run it.
+    for( Vector<Dali::InputMethodContext::PreeditAttributeData>::Iterator it = attrs.Begin(), endIt = attrs.End(); it != endIt; it++ )
     {
-      case Dali::InputMethodContext::PreeditStyle::UNDERLINE:
+      Dali::InputMethodContext::PreeditAttributeData attrData = *it;
+      DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::UpdateModel PreeditStyle type : %d  start %d end %d \n", attrData.preeditType, attrData.startIndex, attrData.endIndex  );
+      type =  attrData.preeditType;
+
+      // Check the number of commit characters for the start position.
+      unsigned int numberOfCommit = mEventData->mPrimaryCursorPosition - mEventData->mPreEditLength;
+      Length numberOfIndices = attrData.endIndex - attrData.startIndex;
+
+      switch( type )
       {
-        // Add the underline for the pre-edit text.
-        const GlyphIndex* const charactersToGlyphBuffer = mModel->mVisualModel->mCharactersToGlyph.Begin();
-        const Length* const glyphsPerCharacterBuffer = mModel->mVisualModel->mGlyphsPerCharacter.Begin();
+        case Dali::InputMethodContext::PreeditStyle::UNDERLINE:
+        {
+          // Add the underline for the pre-edit text.
+          GlyphRun underlineRun;
+          underlineRun.glyphIndex = attrData.startIndex + numberOfCommit;
+          underlineRun.numberOfGlyphs = attrData.endIndex - attrData.startIndex;
+          mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
+          break;
+        }
+        case Dali::InputMethodContext::PreeditStyle::REVERSE:
+        {
+          Vector4 textColor = mModel->mVisualModel->GetTextColor();
+          ColorRun backgroundColorRun;
+          backgroundColorRun.characterRun.characterIndex = attrData.startIndex + numberOfCommit;
+          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
+          backgroundColorRun.color = textColor;
+          mModel->mLogicalModel->mBackgroundColorRuns.PushBack( backgroundColorRun );
 
-        const GlyphIndex glyphStart = *( charactersToGlyphBuffer + mEventData->mPreEditStartPosition );
-        const CharacterIndex lastPreEditCharacter = mEventData->mPreEditStartPosition + ( ( mEventData->mPreEditLength > 0u ) ? mEventData->mPreEditLength - 1u : 0u );
-        const Length numberOfGlyphsLastCharacter = *( glyphsPerCharacterBuffer + lastPreEditCharacter );
-        const GlyphIndex glyphEnd = *( charactersToGlyphBuffer + lastPreEditCharacter ) + ( numberOfGlyphsLastCharacter > 1u ? numberOfGlyphsLastCharacter - 1u : 0u );
+          Vector4 backgroundColor = mModel->mVisualModel->GetBackgroundColor();
+          Vector<ColorRun>  colorRuns;
+          colorRuns.Resize( 1u );
+          ColorRun& colorRun = *( colorRuns.Begin() );
+          colorRun.color = backgroundColor;
+          colorRun.characterRun.characterIndex = attrData.startIndex + numberOfCommit;
+          colorRun.characterRun.numberOfCharacters = numberOfIndices;
 
-        GlyphRun underlineRun;
-        underlineRun.glyphIndex = glyphStart;
-        underlineRun.numberOfGlyphs = 1u + glyphEnd - glyphStart;
+          mModel->mLogicalModel->mColorRuns.PushBack( colorRun );
+          break;
+        }
+        case Dali::InputMethodContext::PreeditStyle::HIGHLIGHT:
+        {
+          ColorRun backgroundColorRun;
+          backgroundColorRun.characterRun.characterIndex = attrData.startIndex + numberOfCommit;
+          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
+          backgroundColorRun.color = LIGHT_BLUE;
+          mModel->mLogicalModel->mBackgroundColorRuns.PushBack( backgroundColorRun );
+          break;
+        }
+        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_1:
+        {
+          // CUSTOM_PLATFORM_STYLE_1 should be drawn with background and underline together.
+          ColorRun backgroundColorRun;
+          backgroundColorRun.characterRun.characterIndex = attrData.startIndex + numberOfCommit;
+          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
+          backgroundColorRun.color = BACKGROUND_SUB4;
+          mModel->mLogicalModel->mBackgroundColorRuns.PushBack( backgroundColorRun );
 
-        mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
-        break;
+          GlyphRun underlineRun;
+          underlineRun.glyphIndex = attrData.startIndex + numberOfCommit;
+          underlineRun.numberOfGlyphs = attrData.endIndex - attrData.startIndex;
+          mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
+          break;
+        }
+        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_2:
+        {
+          // CUSTOM_PLATFORM_STYLE_2 should be drawn with background and underline together.
+          ColorRun backgroundColorRun;
+          backgroundColorRun.characterRun.characterIndex = attrData.startIndex + numberOfCommit;
+          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
+          backgroundColorRun.color = BACKGROUND_SUB5;
+          mModel->mLogicalModel->mBackgroundColorRuns.PushBack( backgroundColorRun );
+
+          GlyphRun underlineRun;
+          underlineRun.glyphIndex = attrData.startIndex + numberOfCommit;
+          underlineRun.numberOfGlyphs = attrData.endIndex - attrData.startIndex;
+          mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
+          break;
+        }
+        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_3:
+        {
+          // CUSTOM_PLATFORM_STYLE_3 should be drawn with background and underline together.
+          ColorRun backgroundColorRun;
+          backgroundColorRun.characterRun.characterIndex = attrData.startIndex + numberOfCommit;
+          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
+          backgroundColorRun.color = BACKGROUND_SUB6;
+          mModel->mLogicalModel->mBackgroundColorRuns.PushBack( backgroundColorRun );
+
+          GlyphRun underlineRun;
+          underlineRun.glyphIndex = attrData.startIndex + numberOfCommit;
+          underlineRun.numberOfGlyphs = attrData.endIndex - attrData.startIndex;
+          mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
+          break;
+        }
+        case Dali::InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_4:
+        {
+          // CUSTOM_PLATFORM_STYLE_4 should be drawn with background and underline together.
+          ColorRun backgroundColorRun;
+          backgroundColorRun.characterRun.characterIndex = attrData.startIndex + numberOfCommit;
+          backgroundColorRun.characterRun.numberOfCharacters = numberOfIndices;
+          backgroundColorRun.color = BACKGROUND_SUB7;
+          mModel->mLogicalModel->mBackgroundColorRuns.PushBack( backgroundColorRun );
+
+          GlyphRun underlineRun;
+          underlineRun.glyphIndex = attrData.startIndex + numberOfCommit;
+          underlineRun.numberOfGlyphs = attrData.endIndex - attrData.startIndex;
+          mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
+          break;
+        }
+        case Dali::InputMethodContext::PreeditStyle::NONE:
+        default:
+        {
+          break;
+        }
       }
-      // TODO :  At this moment, other styles for preedit are not implemented yet.
-      case Dali::InputMethodContext::PreeditStyle::REVERSE:
-      case Dali::InputMethodContext::PreeditStyle::HIGHLIGHT:
-      case Dali::InputMethodContext::PreeditStyle::NONE:
-      default:
-        break;
     }
+    attrs.Clear();
+    updated = true;
   }
 
   if( NO_OPERATION != ( COLOR & operations ) )
@@ -3165,6 +3266,7 @@ Actor Controller::Impl::CreateBackgroundActor()
 
     const Vector4* const backgroundColorsBuffer = mView.GetBackgroundColors();
     const ColorIndex* const backgroundColorIndicesBuffer = mView.GetBackgroundColorIndices();
+    const Vector4& defaultBackgroundColor = mModel->mVisualModel->IsBackgroundEnabled() ? mModel->mVisualModel->GetBackgroundColor() : Color::TRANSPARENT;
 
     Vector4 quad;
     uint32_t numberOfQuads = 0u;
@@ -3176,7 +3278,7 @@ Actor Controller::Impl::CreateBackgroundActor()
       // Get the background color of the character.
       // The color index zero is reserved for the default background color (i.e. Color::TRANSPARENT)
       const ColorIndex backgroundColorIndex = ( nullptr == backgroundColorsBuffer ) ? 0u : *( backgroundColorIndicesBuffer + i );
-      const Vector4& backgroundColor = ( 0u == backgroundColorIndex ) ? Color::TRANSPARENT : *( backgroundColorsBuffer + backgroundColorIndex - 1u );
+      const Vector4& backgroundColor = ( 0u == backgroundColorIndex ) ? defaultBackgroundColor : *( backgroundColorsBuffer + backgroundColorIndex - 1u );
 
       // Only create quads for glyphs with a background color
       if ( backgroundColor != Color::TRANSPARENT )

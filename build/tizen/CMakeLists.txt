@@ -13,12 +13,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   endif()
 endif()
 
-FIND_PACKAGE( PkgConfig REQUIRED )
-FIND_PACKAGE( Doxygen QUIET )
-
-PKG_CHECK_MODULES(DALICORE REQUIRED dali-core)
-PKG_CHECK_MODULES(DALIADAPTOR REQUIRED dali-adaptor)
-
 # API VERSION (Not DALi release version)
 SET(${name}_VERSION_MAJOR 0)
 SET(${name}_VERSION_MINOR 0)
@@ -28,11 +22,33 @@ SET(${name}_VERSION ${${name}_VERSION_MAJOR}.${${name}_VERSION_MINOR}.${${name}_
 SET(DALI_TOOLKIT_VERSION ${${name}_VERSION} )
 
 # Define options to CMake
-OPTION(ENABLE_EXPORTALL      "Enable Export all symbols" OFF)
-OPTION(ENABLE_DEBUG          "Enable Debug" OFF)
-OPTION(ENABLE_TRACE          "Enable Trace" OFF)
-OPTION(ENABLE_I18N           "Turns on internationalisation" OFF)
-OPTION(ENABLE_COVERAGE       "Coverage" OFF)
+OPTION(ENABLE_EXPORTALL          "Enable Export all symbols" OFF)
+OPTION(ENABLE_DEBUG              "Enable Debug" OFF)
+OPTION(ENABLE_TRACE              "Enable Trace" OFF)
+OPTION(ENABLE_I18N               "Turns on internationalisation" OFF)
+OPTION(ENABLE_COVERAGE           "Coverage" OFF)
+OPTION(ENABLE_PKG_CONFIGURE      "Use pkgconfig" ON)
+OPTION(ENABLE_LINK_TEST          "Enable the link test" ON)
+OPTION(INSTALL_DOXYGEN_DOC       "Install doxygen doc" ON)
+OPTION(CONFIGURE_AUTOMATED_TESTS "Configure automated tests" ON)
+
+IF( ENABLE_PKG_CONFIGURE )
+  FIND_PACKAGE( PkgConfig REQUIRED )
+
+  PKG_CHECK_MODULES(DALICORE REQUIRED dali-core)
+  PKG_CHECK_MODULES(DALIADAPTOR REQUIRED dali-adaptor)
+ENDIF()
+
+IF( INSTALL_DOXYGEN_DOC )
+  FIND_PACKAGE( Doxygen QUIET )
+ENDIF()
+
+IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
+  FIND_PACKAGE( dali-windows-dependencies REQUIRED)
+  FIND_PACKAGE( dali-core REQUIRED)
+  FIND_PACKAGE( dali-adaptor REQUIRED)
+  FIND_PATH( SYSTEM_INCLUDE_DIR "dali-windows-dependencies.h" )
+ENDIF()
 
 # Define non-boolean options to CMake
 SET(WITH_STYLE               "480x800" CACHE STRING "Select the style folder to use")
@@ -74,29 +90,42 @@ ELSE()
   MESSAGE( STATUS "CMAKE_BUILD_TYPE: " Release )
 ENDIF()
 
-ADD_DEFINITIONS(-DPIC -DSTDC_HEADERS)
-ADD_DEFINITIONS(-DDALI_IMAGE_DIR=\"${dataReadOnlyDir}/toolkit/images/\"
-                -DDALI_SOUND_DIR=\"${dataReadOnlyDir}/toolkit/sounds/\"
-                -DDALI_STYLE_DIR=\"${dataReadOnlyDir}/toolkit/styles/\"
-                -DDALI_STYLE_IMAGE_DIR=\"${dataReadOnlyDir}/toolkit/styles/images/\"
-                -DDALI_DATA_READ_ONLY_DIR=\"${dataReadOnlyDir}\" )
-
-IF("${ARCH}" STREQUAL "arm")
-  ADD_DEFINITIONS("-DTARGET")
-ENDIF("${ARCH}" STREQUAL "arm")
-
 IF( ENABLE_DEBUG )
   ADD_DEFINITIONS( "-DDEBUG_ENABLED" )
   SET( ENABLE_EXPORTALL ON )
 ENDIF( ENABLE_DEBUG )
 
-IF( NOT ${ENABLE_EXPORTALL} )
-  ADD_DEFINITIONS( "-fvisibility=hidden -DHIDE_DALI_INTERNALS" )
-ENDIF( NOT ${ENABLE_EXPORTALL} )
-
 IF( ENABLE_I18N )
   ADD_DEFINITIONS( "-DDGETTEXT_ENABLED" )
 ENDIF( ENABLE_I18N )
+
+IF( SET_VCPKG_INSTALL_PREFIX )
+  ADD_DEFINITIONS( "-DBUILDING_DALI_TOOLKIT" )
+  ADD_DEFINITIONS( -DDALI_IMAGE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/images/\"
+                   -DDALI_SOUND_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/sounds/\"
+                   -DDALI_STYLE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/styles/\"
+                   -DDALI_STYLE_IMAGE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/styles/images/\"
+                   -DDALI_DATA_READ_ONLY_DIR=\"${VCPKG_INSTALLED_DIR}/share/\" )
+ELSE()
+  ADD_DEFINITIONS(-DPIC -DSTDC_HEADERS)
+  ADD_DEFINITIONS(-DDALI_IMAGE_DIR=\"${dataReadOnlyDir}/toolkit/images/\"
+                  -DDALI_SOUND_DIR=\"${dataReadOnlyDir}/toolkit/sounds/\"
+                  -DDALI_STYLE_DIR=\"${dataReadOnlyDir}/toolkit/styles/\"
+                  -DDALI_STYLE_IMAGE_DIR=\"${dataReadOnlyDir}/toolkit/styles/images/\"
+                  -DDALI_DATA_READ_ONLY_DIR=\"${dataReadOnlyDir}\" )
+
+  IF("${ARCH}" STREQUAL "arm")
+    ADD_DEFINITIONS("-DTARGET")
+  ENDIF("${ARCH}" STREQUAL "arm")
+
+  IF( NOT ${ENABLE_EXPORTALL} )
+    ADD_DEFINITIONS( "-fvisibility=hidden -DHIDE_DALI_INTERNALS" )
+  ENDIF( NOT ${ENABLE_EXPORTALL} )
+ENDIF()
+
+IF( ENABLE_TRACE )
+  ADD_DEFINITIONS("-DTRACE_ENABLED")
+ENDIF()
 
 # Platforms with highp shader support can use vector based text
 IF( "${PROFILE}" STREQUAL "UBUNTU" )
@@ -126,44 +155,54 @@ IF( NOT INCLUDE_DIR )
 ENDIF()
 
 # Set up the lib dir
-SET( LIB_DIR $ENV{libdir} )
-IF( NOT LIB_DIR )
-  SET( LIB_DIR ${CMAKE_INSTALL_LIBDIR} )
-ENDIF()
-IF( NOT LIB_DIR )
+IF( SET_VCPKG_INSTALL_PREFIX )
   SET( LIB_DIR ${PREFIX}/lib )
+  SET( BIN_DIR ${PREFIX}/bin )
+ELSE()
+  SET( LIB_DIR $ENV{libdir} )
+  IF( NOT LIB_DIR )
+    SET( LIB_DIR ${CMAKE_INSTALL_LIBDIR} )
+  ENDIF()
+  IF( NOT LIB_DIR )
+    SET( LIB_DIR ${PREFIX}/lib )
+  ENDIF()
 ENDIF()
 
-# Configure the pkg-config file
-# Requires the following variables to be setup:
-# @PREFIX@ @EXEC_PREFIX@ @DALI_VERSION@ @LIB_DIR@ @DEV_INCLUDE_PATH@
-SET( DEV_INCLUDE_PATH ${INCLUDE_DIR} )
-SET( CORE_PKG_CFG_FILE dali-toolkit.pc )
-CONFIGURE_FILE( ${CORE_PKG_CFG_FILE}.in ${CORE_PKG_CFG_FILE} @ONLY )
-
-# Set up compiler flags and warnings
-ADD_COMPILE_OPTIONS( -std=c++11 )
-ADD_COMPILE_OPTIONS( -Wno-ignored-qualifiers )
-
-# TODO: Clang is a lot more strict with warnings, we should address
-# those issues at some point.
-IF( NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
-  ADD_COMPILE_OPTIONS( -Werror )
+IF( ENABLE_PKG_CONFIGURE )
+  # Configure the pkg-config file
+  # Requires the following variables to be setup:
+  # @PREFIX@ @EXEC_PREFIX@ @DALI_VERSION@ @LIB_DIR@ @DEV_INCLUDE_PATH@
+  SET( DEV_INCLUDE_PATH ${INCLUDE_DIR} )
+  SET( CORE_PKG_CFG_FILE dali-toolkit.pc )
+  CONFIGURE_FILE( ${CORE_PKG_CFG_FILE}.in ${CORE_PKG_CFG_FILE} @ONLY )
 ENDIF()
 
-ADD_COMPILE_OPTIONS( -Wall -Wno-unused-parameter -Wno-float-equal -Wno-class-memaccess )
+IF( WIN32 )
+  ADD_COMPILE_OPTIONS( /FIdali-windows-dependencies.h ) # Adds missing definitions.
+  ADD_COMPILE_OPTIONS( /vmg )                           # Avoids a 'reinterpret_cast' compile error while compiling signals and callbacks.
+ELSE()
+  # Set up compiler flags and warnings
+  ADD_COMPILE_OPTIONS( -std=c++11 )
+  ADD_COMPILE_OPTIONS( -Wno-ignored-qualifiers )
 
-IF( ENABLE_COVERAGE OR "$ENV{CXXFLAGS}" MATCHES --coverage )
-  ADD_COMPILE_OPTIONS( --coverage )
-  SET(ENABLE_COVERAGE ON)
-  SET(COVERAGE --coverage)
+  # TODO: Clang is a lot more strict with warnings, we should address
+  # those issues at some point.
+  IF( NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+    ADD_COMPILE_OPTIONS( -Werror )
+  ENDIF()
+
+  ADD_COMPILE_OPTIONS( -Wall -Wno-unused-parameter -Wno-float-equal -Wno-class-memaccess )
+
+  IF( ENABLE_COVERAGE OR "$ENV{CXXFLAGS}" MATCHES --coverage )
+    ADD_COMPILE_OPTIONS( --coverage )
+    SET(ENABLE_COVERAGE ON)
+    SET(COVERAGE --coverage)
+  ENDIF()
 ENDIF()
 
-IF( ENABLE_TRACE )
-  ADD_DEFINITIONS("-DTRACE_ENABLED")
-ENDIF()
 
 INCLUDE_DIRECTORIES(
+  ${SYSTEM_INCLUDE_DIR}
   ${ROOT_SRC_DIR}
   ${DALICORE_INCLUDE_DIRS}
   ${DALIADAPTOR_INCLUDE_DIRS}
@@ -190,14 +229,44 @@ IF(DEFINED STATIC)
   SET(LIBTYPE STATIC)
 ENDIF()
 
+IF( WIN32 )
+  SET( DALICORE_LDFLAGS
+        "${DALICORE_LDFLAGS}"
+        dali-core::dali-core )
+
+  FIND_PACKAGE( pthreads REQUIRED )
+  FIND_PACKAGE( curl REQUIRED )
+  FIND_LIBRARY( GETOPT_LIBRARY NAMES getopt )
+  FIND_LIBRARY( EXIF_LIBRARY NAMES libexif )
+
+  FIND_PACKAGE( png REQUIRED )
+  FIND_PACKAGE( gif REQUIRED )
+  FIND_PACKAGE( jpeg REQUIRED )
+  FIND_LIBRARY( TURBO_JPEG_LIBRARY NAMES turbojpeg )
+
+  FIND_PACKAGE( fontconfig REQUIRED )
+  FIND_PACKAGE( freetype REQUIRED )
+  FIND_PACKAGE( harfbuzz REQUIRED )
+  FIND_LIBRARY( FRIBIDI_LIBRARY NAMES fribidi )
+
+  FIND_PACKAGE( unofficial-angle REQUIRED )
+  FIND_PACKAGE( unofficial-cairo REQUIRED )
+
+  SET( DALIADAPTOR_LDFLAGS
+       "${DALIADAPTOR_LDFLAGS}"
+       dali-adaptor::dali-adaptor )
+ENDIF()
+
+
 ADD_LIBRARY( ${name} ${LIBTYPE} ${SOURCES} )
 TARGET_LINK_LIBRARIES( ${name}
   ${DALICORE_LDFLAGS}
   ${DALIADAPTOR_LDFLAGS}
   ${COVERAGE}
 )
+
 IF( ANDROID )
-TARGET_LINK_LIBRARIES( ${name} log )
+  TARGET_LINK_LIBRARIES( ${name} log )
 ENDIF()
 
 SET_TARGET_PROPERTIES( ${name}
@@ -208,10 +277,34 @@ SET_TARGET_PROPERTIES( ${name}
 )
 
 # Install the library so file and symlinks
-INSTALL( TARGETS ${name} DESTINATION ${LIB_DIR} )
+IF( INSTALL_CMAKE_MODULES )
+  INSTALL( TARGETS ${name}
+    EXPORT ${name}-targets
+    LIBRARY DESTINATION ${LIB_DIR}
+    ARCHIVE DESTINATION ${LIB_DIR}
+    RUNTIME DESTINATION ${BIN_DIR}
+  )
+
+  INSTALL(
+    EXPORT ${name}-targets
+    NAMESPACE ${name}::
+    FILE ${name}-targets.cmake
+    DESTINATION share/${name}
+  )
+
+  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${name}-config.cmake "
+    include(CMakeFindDependencyMacro)
+    include(\${CMAKE_CURRENT_LIST_DIR}/${name}-targets.cmake)
+  ")
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-config.cmake DESTINATION share/${name})
+ELSE()
+  INSTALL( TARGETS ${name} DESTINATION ${LIB_DIR} )
+ENDIF()
 
 # Install the pkg-config file
-INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/${CORE_PKG_CFG_FILE} DESTINATION ${LIB_DIR}/pkgconfig )
+IF( ENABLE_PKG_CONFIGURE )
+  INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/${CORE_PKG_CFG_FILE} DESTINATION ${LIB_DIR}/pkgconfig )
+ENDIF()
 
 # Glob for resources
 MACRO( COPY_RESOURCES FILE_LIST SRC_RELATIVE_DIRECTORY DESTINATION EXPLICIT_DESTINATION )
@@ -248,7 +341,7 @@ INSTALL_HEADERS_WITH_DIRECTORY(INTEGRATION_API_HEADERS ${ROOT_SRC_DIR}/dali-tool
 INSTALL_HEADERS_WITH_DIRECTORY(PACKAGE_DOXY_HEADERS ${PACKAGE_DOXY_SRC_DIR} "dali-toolkit/doc" )
 
 # Install dali-toolkit.h
-INSTALL( FILES ${ROOT_SRC_DIR}/dali-toolkit/dali-toolkit.h DESTINATION ${DEV_INCLUDE_PATH}/dali-toolkit )
+INSTALL( FILES ${ROOT_SRC_DIR}/dali-toolkit/dali-toolkit.h DESTINATION ${INCLUDE_DIR}/dali-toolkit )
 
 # package doxygen file (contains doxygen grouping information)
 INSTALL( FILES ${package_doxy_files} DESTINATION ${DEV_INCLUDE_PATH}/dali-toolkit/doc )
@@ -277,7 +370,7 @@ COPY_RESOURCES( "${dali_toolkit_style_images}" "${ROOT_SRC_DIR}" "${dataReadOnly
 # The DALI_TOOLKIT_PREFIX must be set if this CMakeLists.txt is executed
 # from the top-level CMake script using ADD_SUBDIRECTORY() to avoid
 # target names duplication with other DALi modules.
-IF( UNIX )
+IF( ENABLE_COVERAGE )
   FIND_PROGRAM( LCOV_BIN "lcov" )
   IF( LCOV_BIN )
 
@@ -337,7 +430,7 @@ IF( UNIX )
           )
 
   ENDIF( LCOV_BIN )
-ENDIF( UNIX )
+ENDIF()
 
 # Build documentation if doxygen tool is available
 SET( doxygenEnabled OFF )
@@ -367,9 +460,11 @@ IF( DOXYGEN_FOUND )
 
 ENDIF()
 
-# Configure automated tests
-CONFIGURE_FILE( ${ROOT_SRC_DIR}/automated-tests/CMakeLists.txt.in
-                ${ROOT_SRC_DIR}/automated-tests/CMakeLists.txt @ONLY )
+IF( CONFIGURE_AUTOMATED_TESTS )
+  # Configure automated tests
+  CONFIGURE_FILE( ${ROOT_SRC_DIR}/automated-tests/CMakeLists.txt.in
+                  ${ROOT_SRC_DIR}/automated-tests/CMakeLists.txt @ONLY )
+ENDIF()
 
 # Configuration Messages
 MESSAGE( STATUS "Configuration:\n" )
@@ -388,5 +483,8 @@ MESSAGE( STATUS "Data Install Dir (Read Only):  " ${dataReadOnlyInstallDir} )
 MESSAGE( STATUS "Style Dir:                     " ${STYLE_DIR} )
 MESSAGE( STATUS "Style:                         " ${dali_style} )
 MESSAGE( STATUS "i18n:                          " ${ENABLE_I18N} )
+MESSAGE( STATUS "Use pkg configure:             " ${ENABLE_PKG_CONFIGURE} )
+MESSAGE( STATUS "Enable link test:              " ${ENABLE_LINK_TEST} )
+MESSAGE( STATUS "Configure automated tests:     " ${CONFIGURE_AUTOMATED_TESTS} )
 MESSAGE( STATUS "CXXFLAGS:                      " ${CMAKE_CXX_FLAGS} )
 MESSAGE( STATUS "LDFLAGS:                       " ${CMAKE_SHARED_LINKER_FLAGS_INIT}${CMAKE_SHARED_LINKER_FLAGS} )

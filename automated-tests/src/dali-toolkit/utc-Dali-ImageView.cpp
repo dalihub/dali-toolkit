@@ -2400,3 +2400,135 @@ int UtcDaliImageViewReloadFailedOnResourceReadySignal(void)
 
   END_TEST;
 }
+
+int UtcDaliImageViewLoadRemoteSVG(void)
+{
+  tet_infoline("Test reloading failed image from within signal handler.");
+
+  ToolkitTestApplication application;
+  Toolkit::ImageView imageView;
+  imageView = Toolkit::ImageView::New(  );
+  imageView.SetImage("https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg");
+  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  imageView.SetSize(300, 300);
+  imageView.SetPosition( Vector3( 150.0f , 150.0f , 0.0f ) );
+
+  Stage::GetCurrent().Add( imageView );
+
+  DALI_TEST_CHECK( imageView );
+
+  DALI_TEST_EQUALS( imageView.GetRendererCount(), 0u, TEST_LOCATION );
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( imageView.GetRendererCount(), 1u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewSvgLoadingFailure(void)
+{
+  ToolkitTestApplication application;
+
+  // Local svg file
+  {
+    gResourceReadySignalFired = false;
+
+    ImageView imageView = ImageView::New( TEST_RESOURCE_DIR "/Kid1.svg" );
+    imageView.SetSize( 200.f, 200.f );
+    imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
+
+    DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
+
+    Stage::GetCurrent().Add( imageView );
+
+    application.SendNotification();
+
+    // loading started, this waits for the loader thread
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render(16);
+
+    DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+    DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( imageView.GetVisualResourceStatus( ImageView::Property::IMAGE ), Visual::ResourceStatus::FAILED, TEST_LOCATION );
+  }
+
+  // Remote svg file
+  {
+    gResourceReadySignalFired = false;
+
+    ImageView imageView = ImageView::New( "https://bar.org/foobar.svg" );
+    imageView.SetSize( 200.f, 200.f );
+    imageView.ResourceReadySignal().Connect( &ResourceReadySignal);
+
+    DALI_TEST_EQUALS( imageView.IsResourceReady(), false, TEST_LOCATION );
+
+    Stage::GetCurrent().Add( imageView );
+
+    application.SendNotification();
+
+    // loading started, this waits for the loader thread
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render(16);
+
+    DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+    DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( imageView.GetVisualResourceStatus( ImageView::Property::IMAGE ), Visual::ResourceStatus::FAILED, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+namespace
+{
+
+static int gResourceReadySignalCounter = 0;
+
+void OnResourceReadySignal( Control control )
+{
+  gResourceReadySignalCounter++;
+
+  if( gResourceReadySignalCounter == 1 )
+  {
+    // Set image twice
+    ImageView::DownCast( control ).SetImage( gImage_34_RGBA );
+    ImageView::DownCast( control ).SetImage( gImage_34_RGBA );
+  }
+}
+
+}
+
+int UtcDaliImageViewSetImageOnResourceReadySignal(void)
+{
+  tet_infoline("Test setting image from within signal handler.");
+
+  ToolkitTestApplication application;
+
+  gResourceReadySignalCounter = 0;
+
+  ImageView imageView = ImageView::New( gImage_34_RGBA );
+  imageView.ResourceReadySignal().Connect( &OnResourceReadySignal );
+
+  Stage::GetCurrent().Add( imageView );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( gResourceReadySignalCounter, 2, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( imageView.IsResourceReady(), true, TEST_LOCATION );
+
+  END_TEST;
+}

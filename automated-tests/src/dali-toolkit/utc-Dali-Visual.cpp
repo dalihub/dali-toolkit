@@ -346,7 +346,6 @@ int UtcDaliVisualSize(void)
 
   // svg visual
   Visual::Base svgVisual = factory.CreateVisual( TEST_SVG_FILE_NAME, ImageDimensions() );
-  svgVisual.SetTransformAndSize(DefaultTransform(), controlSize );
   svgVisual.GetNaturalSize(naturalSize);
   // TEST_SVG_FILE:
   //  <svg width="100" height="100">
