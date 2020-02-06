@@ -1159,25 +1159,17 @@ int UtcDaliTextControllerMaxLengthSetText(void)
   // Creates a text controller.
   ControllerPtr controller = Controller::New();
 
-  ConfigureTextLabel(controller);
+  ConfigureTextLabel( controller );
 
   const Length MAX_TEXT_LENGTH = 1024u * 32u;
 
   // make over length world
-  int maxLength = (1024u * 32u) + 10u;
-  char world[maxLength];
-  for( int i = 0; i < maxLength; i++ )
-  {
-    world[i] = 'a';
-  }
+  int maxLength = ( 1024u * 32u ) + 10u;
+  char world[maxLength] = { 'a' };
 
   // Set the text
-  std::string text(world);
+  std::string text( world, maxLength );
   controller->SetText( text );
-
-  // Perform a relayout
-  const Size size( Dali::Stage::GetCurrent().GetSize() );
-  controller->Relayout(size);
 
   // check text length
   controller->GetText( text );
