@@ -48,14 +48,19 @@ IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
   FIND_PACKAGE( dali-windows-dependencies REQUIRED)
   FIND_PACKAGE( dali-core REQUIRED)
   FIND_PACKAGE( dali-adaptor REQUIRED)
-  FIND_PATH( SYSTEM_INCLUDE_DIR "dali-windows-dependencies.h" )
 ENDIF()
+
+SET( VCPKG_INCLUDE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include")
 
 # Define non-boolean options to CMake
 SET(WITH_STYLE               "480x800" CACHE STRING "Select the style folder to use")
 
 # from root/build/tizen, get back to root
 SET(ROOT_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../)
+
+# Deployment folder should come from spec file or command line:
+SET( PREFIX ${CMAKE_INSTALL_PREFIX})
+SET( EXEC_PREFIX ${CMAKE_INSTALL_PREFIX})
 
 # Make sure the path is absolute
 GET_FILENAME_COMPONENT(ROOT_SRC_DIR ${ROOT_SRC_DIR} ABSOLUTE)
@@ -84,32 +89,39 @@ ELSE()
 ENDIF()
 
 # Set up compiler definitions
+
 IF(CMAKE_BUILD_TYPE MATCHES Debug)
-  MESSAGE( STATUS "CMAKE_BUILD_TYPE: " Debug )
   SET( ENABLE_DEBUG ON )
-ELSE()
-  MESSAGE( STATUS "CMAKE_BUILD_TYPE: " Release )
 ENDIF()
 
 IF( ENABLE_DEBUG )
+  MESSAGE( STATUS "CMAKE_BUILD_TYPE: " Debug )
   ADD_DEFINITIONS( "-DDEBUG_ENABLED" )
   SET( ENABLE_EXPORTALL ON )
-ENDIF( ENABLE_DEBUG )
+ELSE()
+  MESSAGE( STATUS "CMAKE_BUILD_TYPE: " Release )
+ENDIF()
 
 IF( ENABLE_I18N )
   ADD_DEFINITIONS( "-DDGETTEXT_ENABLED" )
 ENDIF( ENABLE_I18N )
 
-IF( SET_VCPKG_INSTALL_PREFIX )
+IF( WIN32 )
   ADD_DEFINITIONS( "-DBUILDING_DALI_TOOLKIT" )
+
   IF( USE_DEFAULT_RESOURCE_DIR )
-    ADD_DEFINITIONS( -DDALI_IMAGE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/images/\"
-                     -DDALI_SOUND_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/sounds/\"
-                     -DDALI_STYLE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/styles/\"
-                     -DDALI_STYLE_IMAGE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/styles/images/\"
-                     -DDALI_DATA_READ_ONLY_DIR=\"${VCPKG_INSTALLED_DIR}/share/\" )
+    SET( INSTALL_SHARE_DIR "${PREFIX}/share" )
+    IF( VCPKG_TOOLKIT_BUILD )
+      SET( INSTALL_SHARE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share" )
+    ENDIF()
+
+    ADD_DEFINITIONS( -DDALI_IMAGE_DIR=\"${INSTALL_SHARE_DIR}/dali/toolkit/images/\"
+                     -DDALI_SOUND_DIR=\"${INSTALL_SHARE_DIR}/dali/toolkit/sounds/\"
+                     -DDALI_STYLE_DIR=\"${INSTALL_SHARE_DIR}/dali/toolkit/styles/\"
+                     -DDALI_STYLE_IMAGE_DIR=\"${INSTALL_SHARE_DIR}/dali/toolkit/styles/images/\"
+                     -DDALI_DATA_READ_ONLY_DIR=\"${INSTALL_SHARE_DIR}/\" )
   ENDIF()
-ELSE()
+ELSEIF( UNIX )
   ADD_DEFINITIONS(-DPIC -DSTDC_HEADERS)
   IF( USE_DEFAULT_RESOURCE_DIR )
     ADD_DEFINITIONS( -DDALI_IMAGE_DIR=\"${dataReadOnlyDir}/toolkit/images/\"
@@ -124,7 +136,7 @@ ELSE()
   ENDIF("${ARCH}" STREQUAL "arm")
 
   IF( NOT ${ENABLE_EXPORTALL} )
-    ADD_DEFINITIONS( "-fvisibility=hidden -DHIDE_DALI_INTERNALS" )
+    ADD_DEFINITIONS( "-DHIDE_DALI_INTERNALS" )
   ENDIF( NOT ${ENABLE_EXPORTALL} )
 ENDIF()
 
@@ -145,10 +157,6 @@ IF( "${PROFILE}" STREQUAL "UBUNTU" )
   SET( ENABLE_VECTOR_BASED_TEXT_RENDERING 1 )
 ENDIF()
 
-# Deployment folder should come from spec file or command line:
-SET( PREFIX ${CMAKE_INSTALL_PREFIX})
-SET( EXEC_PREFIX ${CMAKE_INSTALL_PREFIX})
-
 # Set paths
 SET( toolkit_images_dir  ${ROOT_SRC_DIR}/dali-toolkit/styles/images-common )
 SET( toolkit_sounds_dir  ${ROOT_SRC_DIR}/dali-toolkit/sounds )
@@ -168,17 +176,21 @@ IF( NOT INCLUDE_DIR )
 ENDIF()
 
 # Set up the lib dir
-IF( SET_VCPKG_INSTALL_PREFIX )
+SET( LIB_DIR $ENV{libdir} )
+IF( NOT LIB_DIR )
+  SET( LIB_DIR ${CMAKE_INSTALL_LIBDIR} )
+ENDIF()
+IF( NOT LIB_DIR )
   SET( LIB_DIR ${PREFIX}/lib )
+ENDIF()
+
+# Set up the bin dir
+SET( BIN_DIR $ENV{bindir} )
+IF( NOT BIN_DIR )
+  SET( BIN_DIR ${CMAKE_INSTALL_BINDIR} )
+ENDIF()
+IF( NOT BIN_DIR )
   SET( BIN_DIR ${PREFIX}/bin )
-ELSE()
-  SET( LIB_DIR $ENV{libdir} )
-  IF( NOT LIB_DIR )
-    SET( LIB_DIR ${CMAKE_INSTALL_LIBDIR} )
-  ENDIF()
-  IF( NOT LIB_DIR )
-    SET( LIB_DIR ${PREFIX}/lib )
-  ENDIF()
 ENDIF()
 
 IF( ENABLE_PKG_CONFIGURE )
@@ -193,6 +205,7 @@ ENDIF()
 IF( WIN32 )
   ADD_COMPILE_OPTIONS( /FIdali-windows-dependencies.h ) # Adds missing definitions.
   ADD_COMPILE_OPTIONS( /vmg )                           # Avoids a 'reinterpret_cast' compile error while compiling signals and callbacks.
+  ADD_COMPILE_OPTIONS( /wd4251 )                        # Ignores warning C4251: "'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'"
 ELSE()
   # Set up compiler flags and warnings
   ADD_COMPILE_OPTIONS( -std=c++11 )
@@ -211,14 +224,19 @@ ELSE()
     SET(ENABLE_COVERAGE ON)
     SET(COVERAGE --coverage)
   ENDIF()
+
+  IF( NOT ${ENABLE_EXPORTALL} )
+    ADD_COMPILE_OPTIONS( "-fvisibility=hidden" )
+  ENDIF( NOT ${ENABLE_EXPORTALL} )
 ENDIF()
 
 
 INCLUDE_DIRECTORIES(
-  ${SYSTEM_INCLUDE_DIR}
   ${ROOT_SRC_DIR}
   ${DALICORE_INCLUDE_DIRS}
   ${DALIADAPTOR_INCLUDE_DIRS}
+  ${VCPKG_INCLUDE_DIR}
+  ${INCLUDE_DIR}
 )
 
 SET(SOURCE_DIR "${ROOT_SRC_DIR}/dali")
@@ -257,7 +275,7 @@ IF( WIN32 )
   FIND_PACKAGE( jpeg REQUIRED )
   FIND_LIBRARY( TURBO_JPEG_LIBRARY NAMES turbojpeg )
 
-  FIND_PACKAGE( fontconfig REQUIRED )
+  FIND_PACKAGE( unofficial-fontconfig REQUIRED )
   FIND_PACKAGE( freetype REQUIRED )
   FIND_PACKAGE( harfbuzz REQUIRED )
   FIND_LIBRARY( FRIBIDI_LIBRARY NAMES fribidi )
@@ -289,8 +307,13 @@ SET_TARGET_PROPERTIES( ${name}
   CLEAN_DIRECT_OUPUT 1
 )
 
-# Install the library so file and symlinks
 IF( INSTALL_CMAKE_MODULES )
+  IF( ENABLE_DEBUG )
+    SET( BIN_DIR "${BIN_DIR}/debug" )
+    SET( LIB_DIR "${LIB_DIR}/debug" )
+  ENDIF()
+
+  # Install the library files.
   INSTALL( TARGETS ${name}
     EXPORT ${name}-targets
     LIBRARY DESTINATION ${LIB_DIR}
@@ -298,6 +321,7 @@ IF( INSTALL_CMAKE_MODULES )
     RUNTIME DESTINATION ${BIN_DIR}
   )
 
+  # Install the cmake modules.
   INSTALL(
     EXPORT ${name}-targets
     NAMESPACE ${name}::
@@ -310,7 +334,13 @@ IF( INSTALL_CMAKE_MODULES )
     include(\${CMAKE_CURRENT_LIST_DIR}/${name}-targets.cmake)
   ")
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-config.cmake DESTINATION share/${name})
+
+  # Install the pdb file.
+  IF( ENABLE_DEBUG )
+    install( FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/${name}.pdb DESTINATION ${BIN_DIR} )
+  ENDIF()
 ELSE()
+  # Install the library so file and symlinks
   INSTALL( TARGETS ${name} DESTINATION ${LIB_DIR} )
 ENDIF()
 
@@ -501,3 +531,10 @@ MESSAGE( STATUS "Enable link test:              " ${ENABLE_LINK_TEST} )
 MESSAGE( STATUS "Configure automated tests:     " ${CONFIGURE_AUTOMATED_TESTS} )
 MESSAGE( STATUS "CXXFLAGS:                      " ${CMAKE_CXX_FLAGS} )
 MESSAGE( STATUS "LDFLAGS:                       " ${CMAKE_SHARED_LINKER_FLAGS_INIT}${CMAKE_SHARED_LINKER_FLAGS} )
+
+MESSAGE( " Folder       INSTALL_SHARE_DIR : [" ${INSTALL_SHARE_DIR} "]" )
+MESSAGE( " Folder          DALI_IMAGE_DIR : [" ${DALI_IMAGE_DIR} "]" )
+MESSAGE( " Folder          DALI_STYLE_DIR : [" ${DALI_STYLE_DIR} "]" )
+MESSAGE( " Folder    DALI_STYLE_IMAGE_DIR : [" ${DALI_STYLE_IMAGE_DIR} "]" )
+MESSAGE( " Folder          DALI_SOUND_DIR : [" ${DALI_SOUND_DIR} "]" )
+MESSAGE( " Folder DALI_DATA_READ_ONLY_DIR : [" ${DALI_DATA_READ_ONLY_DIR} "]" )
