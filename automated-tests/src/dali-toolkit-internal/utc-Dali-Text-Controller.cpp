@@ -349,8 +349,8 @@ int UtcDaliTextControllerImfPreeditStyle(void)
   imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
   controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
-  // Set the preedit style as HIGHLIGHT_SUB4
-  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::HIGHLIGHT_SUB4 );
+  // Set the preedit style as CUSTOM_PLATFORM_STYLE_1
+  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_1 );
   controller->GetNaturalSize();
 
   controller->GetText( text );
@@ -359,8 +359,8 @@ int UtcDaliTextControllerImfPreeditStyle(void)
   imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
   controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
-  // Set the preedit style as HIGHLIGHT_SUB5
-  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::HIGHLIGHT_SUB5 );
+  // Set the preedit style as CUSTOM_PLATFORM_STYLE_2
+  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_2 );
   controller->GetNaturalSize();
 
   controller->GetText( text );
@@ -369,8 +369,8 @@ int UtcDaliTextControllerImfPreeditStyle(void)
   imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
   controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
-  // Set the preedit style as HIGHLIGHT_SUB6
-  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::HIGHLIGHT_SUB6 );
+  // Set the preedit style as CUSTOM_PLATFORM_STYLE_3
+  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_3 );
   controller->GetNaturalSize();
 
   controller->GetText( text );
@@ -379,8 +379,8 @@ int UtcDaliTextControllerImfPreeditStyle(void)
   imfEvent = InputMethodContext::EventData( InputMethodContext::PRE_EDIT, "w", 6, 1 );
   controller->OnInputMethodContextEvent( inputMethodContext, imfEvent );
 
-  // Set the preedit style as HIGHLIGHT_SUB7
-  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::HIGHLIGHT_SUB7 );
+  // Set the preedit style as CUSTOM_PLATFORM_STYLE_4
+  inputMethodContext.SetPreeditStyle( InputMethodContext::PreeditStyle::CUSTOM_PLATFORM_STYLE_4 );
   controller->GetNaturalSize();
 
   controller->GetText( text );
