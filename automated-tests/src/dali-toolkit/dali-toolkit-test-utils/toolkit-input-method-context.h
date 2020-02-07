@@ -117,9 +117,16 @@ public:
    */
   struct PreeditAttributeData
   {
-    PreeditStyle preeditType; /// The preedit style type
-    unsigned int startIndex;  /// The start index of preedit
-    unsigned int endIndex;    /// The end index of preedit
+    PreeditAttributeData()
+    : preeditType( PreeditStyle::NONE ),
+      startIndex( 0 ),
+      endIndex( 0 )
+    {
+    }
+
+    PreeditStyle preeditType;  /// The preedit style type
+    unsigned int startIndex;   /// The start index of preedit
+    unsigned int endIndex;     /// The end index of preedit
   };
 
   /**
@@ -202,6 +209,8 @@ public:
   typedef Signal< CallbackData ( InputMethodContext&, const EventData& ) > KeyboardEventSignalType; ///< keyboard events
   typedef Signal< void () > VoidSignalType;
   typedef Signal< void (bool) > StatusSignalType;
+
+  using PreEditAttributeDataContainer = Vector< Dali::InputMethodContext::PreeditAttributeData >;
 
 public:
 
@@ -323,11 +332,11 @@ public:
   void SetPreeditStyle( PreeditStyle type );
 
   /**
-   * @brief Gets the preedit attrs data.
+   * @brief Gets the preedit attributes data.
    *
-   * @param[out] attrs The preedit attrs data.
+   * @param[out] attrs The preedit attributes data.
    */
-  void GetPreeditStyle( Vector<PreeditAttributeData>& attrs ) const;
+  void GetPreeditStyle( Dali::InputMethodContext::PreEditAttributeDataContainer& attrs ) const;
 
 public:
 
