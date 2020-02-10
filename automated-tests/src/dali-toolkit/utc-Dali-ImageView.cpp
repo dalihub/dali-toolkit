@@ -2432,6 +2432,122 @@ int UtcDaliImageViewLoadRemoteSVG(void)
   END_TEST;
 }
 
+int UtcDaliImageViewSyncSVGLoading(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing SVG image sync loading");
+
+  // Sync loading, automatic atlasing for small size image
+  {
+    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+    callStack.Reset();
+    callStack.Enable(true);
+
+    ImageView imageView = ImageView::New( );
+
+    // Sync loading is used
+    Property::Map syncLoadingMap;
+    syncLoadingMap.Insert( Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE );
+    syncLoadingMap.Insert( Toolkit::ImageVisual::Property::URL,  TEST_RESOURCE_DIR "/svg1.svg"  );
+    syncLoadingMap.Insert( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING,  true);
+    imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
+
+    Stage::GetCurrent().Add( imageView );
+    DALI_TEST_CHECK( imageView );
+
+    application.SendNotification();
+    application.Render(16);
+    Vector3 naturalSize = imageView.GetNaturalSize();
+
+    DALI_TEST_EQUALS( naturalSize.width, 100.0f, TEST_LOCATION );
+    DALI_TEST_EQUALS( naturalSize.height, 100.0f, TEST_LOCATION );
+
+  }
+  END_TEST;
+}
+
+int UtcDaliImageViewAsyncSVGLoading(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing SVG image async loading");
+
+  // Sync loading, automatic atlasing for small size image
+  {
+    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+    callStack.Reset();
+    callStack.Enable(true);
+
+    ImageView imageView = ImageView::New( );
+
+    // Sync loading is used
+    Property::Map syncLoadingMap;
+    syncLoadingMap.Insert( Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE );
+    syncLoadingMap.Insert( Toolkit::ImageVisual::Property::URL,  TEST_RESOURCE_DIR "/svg1.svg"  );
+    syncLoadingMap.Insert( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING,  false);
+    imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
+
+    Stage::GetCurrent().Add( imageView );
+    DALI_TEST_CHECK( imageView );
+
+    application.SendNotification();
+    application.Render(16);
+    Vector3 naturalSize = imageView.GetNaturalSize();
+
+    DALI_TEST_EQUALS( naturalSize.width, 100.0f, TEST_LOCATION );
+    DALI_TEST_EQUALS( naturalSize.height, 100.0f, TEST_LOCATION );
+  }
+  END_TEST;
+}
+
+int UtcDaliImageViewSVGLoadingSyncSetInvalidValue(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline("ImageView Testing SVG image async loading");
+
+  // Sync loading, automatic atlasing for small size image
+  {
+    TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+    callStack.Reset();
+    callStack.Enable(true);
+
+    ImageView imageView = ImageView::New( );
+
+    // Sync loading is used
+    Property::Map syncLoadingMap;
+    syncLoadingMap.Insert( Toolkit::Visual::Property::TYPE,  Toolkit::Visual::IMAGE );
+    syncLoadingMap.Insert( Toolkit::ImageVisual::Property::URL,  TEST_RESOURCE_DIR "/svg1.svg"  );
+
+    // Check to set invalid value
+    // The SYNCHRONOUS_LOADING property must be set to the bool value.
+    // Check if error log is outputted when setting other value like string.
+    // Even if the wrong value is set, the image will be shown normally, and the synchronous value should be the default value(false).
+    syncLoadingMap.Insert( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, std::to_string(5) );
+    imageView.SetProperty( ImageView::Property::IMAGE, syncLoadingMap );
+
+    Stage::GetCurrent().Add( imageView );
+    DALI_TEST_CHECK( imageView );
+
+    application.SendNotification();
+    application.Render(16);
+    Vector3 naturalSize = imageView.GetNaturalSize();
+    DALI_TEST_EQUALS( naturalSize.width, 100.0f, TEST_LOCATION );
+    DALI_TEST_EQUALS( naturalSize.height, 100.0f, TEST_LOCATION );
+
+    Property::Value value = imageView.GetProperty( ImageView::Property::IMAGE );
+    Property::Map* map = value.GetMap();
+    DALI_TEST_CHECK( map );
+
+    Property::Value* sync = map->Find( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING );
+    DALI_TEST_CHECK( sync );
+    DALI_TEST_EQUALS( false, sync->Get< bool >(), TEST_LOCATION );
+
+  }
+  END_TEST;
+}
+
 int UtcDaliImageViewSvgLoadingFailure(void)
 {
   ToolkitTestApplication application;

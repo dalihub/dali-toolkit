@@ -337,6 +337,7 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   // which is ok, because they have a different key value range.
   map.Insert( Toolkit::Visual::Property::MIX_COLOR, mImpl->mMixColor ); // vec4
   map.Insert( Toolkit::Visual::Property::OPACITY, mImpl->mMixColor.a );
+  map.Insert( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, IsSynchronousLoadingRequired() );
 
   auto fittingModeString = Scripting::GetLinearEnumerationName< FittingMode >(
     mImpl->mFittingMode, VISUAL_FITTING_MODE_TABLE, VISUAL_FITTING_MODE_TABLE_COUNT );
@@ -490,6 +491,11 @@ void Visual::Base::ResourceReady(Toolkit::Visual::ResourceStatus resourceStatus)
 bool Visual::Base::IsResourceReady() const
 {
   return ( mImpl->mResourceStatus == Toolkit::Visual::ResourceStatus::READY );
+}
+
+bool Visual::Base::IsSynchronousLoadingRequired() const
+{
+  return ( mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING );
 }
 
 Toolkit::Visual::ResourceStatus Visual::Base::GetResourceStatus() const

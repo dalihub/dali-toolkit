@@ -663,11 +663,6 @@ void ImageVisual::CreateNativeImageRenderer( NativeImage& nativeImage )
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
-bool ImageVisual::IsSynchronousResourceLoading() const
-{
-  return mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
-}
-
 void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& textures, bool orientationCorrection,
                                TextureManager::ReloadPolicy forceReload )
 {
@@ -688,7 +683,7 @@ void ImageVisual::LoadTexture( bool& atlasing, Vector4& atlasRect, TextureSet& t
     : TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
 
   textures = textureManager.LoadTexture( mImageUrl, mDesiredSize, mFittingMode, mSamplingMode,
-                                         mMaskingData, IsSynchronousResourceLoading(), mTextureId,
+                                         mMaskingData, IsSynchronousLoadingRequired(), mTextureId,
                                          atlasRect, mAtlasRectSize, atlasing, mLoading, mWrapModeU,
                                          mWrapModeV, textureObserver, atlasUploadObserver, atlasManager,
                                          mOrientationCorrection, forceReload, preMultiplyOnLoad);
@@ -829,7 +824,7 @@ void ImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Clear();
   map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
 
-  bool sync = IsSynchronousResourceLoading();
+  bool sync = IsSynchronousLoadingRequired();
   map.Insert( SYNCHRONOUS_LOADING, sync );
   if( mImageUrl.IsValid() )
   {

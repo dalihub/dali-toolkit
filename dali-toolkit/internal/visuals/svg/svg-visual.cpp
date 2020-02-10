@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/third-party/nanosvg/nanosvg.h>
+#include <dali-toolkit/third-party/nanosvg/nanosvgrast.h>
 #include <dali-toolkit/internal/visuals/svg/svg-rasterize-thread.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
@@ -29,6 +30,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -46,7 +48,10 @@ const char * const UNITS("px");
 
 const char * const IMAGE_ATLASING( "atlasing" );
 
+const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
+
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
+
 }
 
 SvgVisualPtr SvgVisual::New( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const VisualUrl& imageUrl, const Property::Map& properties )
@@ -102,6 +107,10 @@ void SvgVisual::DoSetProperties( const Property::Map& propertyMap )
     {
       DoSetProperty( Toolkit::ImageVisual::Property::ATLASING, keyValue.second );
     }
+    else if( keyValue.first == SYNCHRONOUS_LOADING )
+    {
+      DoSetProperty( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, keyValue.second );
+    }
   }
 }
 
@@ -112,6 +121,26 @@ void SvgVisual::DoSetProperty( Property::Index index, const Property::Value& val
     case Toolkit::ImageVisual::Property::ATLASING:
     {
       value.Get( mAttemptAtlasing );
+      break;
+    }
+    case Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING:
+    {
+      bool sync = false;
+      if( value.Get( sync ) )
+      {
+        if( sync )
+        {
+          mImpl->mFlags |= Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+        }
+        else
+        {
+          mImpl->mFlags &= ~Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+        }
+      }
+      else
+      {
+        DALI_LOG_ERROR("ImageVisual: synchronousLoading property has incorrect type\n");
+      }
       break;
     }
   }
@@ -218,7 +247,15 @@ void SvgVisual::AddRasterizationTask( const Vector2& size )
     float meanDpi = ( dpi.height + dpi.width ) * 0.5f;
 
     RasterizingTaskPtr newTask = new RasterizingTask( this, mParsedImage, mImageUrl, meanDpi, width, height );
-    mFactoryCache.GetSVGRasterizationThread()->AddTask( newTask );
+    if ( IsSynchronousLoadingRequired() )
+    {
+      newTask->Rasterize();
+      ApplyRasterizedImage( newTask->GetParsedImage(), newTask->GetPixelData() );
+    }
+    else
+    {
+      mFactoryCache.GetSVGRasterizationThread()->AddTask( newTask );
+    }
   }
 }
 
