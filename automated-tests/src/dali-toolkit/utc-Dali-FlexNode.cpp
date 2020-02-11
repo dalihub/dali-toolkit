@@ -63,6 +63,36 @@ int UtcDaliToolkitFlexNodeConstructorP(void)
   END_TEST;
 }
 
+int UtcDaliToolkitFlexNodeAddChildWithMarginP(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitFlexNodeAddChildWithMarginP");
+  Flex::Node* flexNode = new Flex::Node();
+  DALI_TEST_CHECK( flexNode );
+
+  // Position elements as a Row
+  flexNode->SetFlexDirection(Flex::FlexDirection::ROW);
+
+  // Create two actors and add them to the parent flex node
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK( actor );
+
+  Extents margin( 5,5,5,5);
+  flexNode->AddChild(actor, margin, &MeasureChild, 0);
+
+  DALI_TEST_EQUALS( (int)flexNode->GetFlexDirection(), (int)Flex::FlexDirection::ROW, TEST_LOCATION );
+
+  flexNode->CalculateLayout(480, 800, false);
+
+  Vector4 actorFrame = flexNode->GetNodeFrame(0);
+
+  tet_printf("Actor frame(left:%f,top:%f,right:%f,bottom:%f)\n", actorFrame.x, actorFrame.y, actorFrame.z, actorFrame.w);
+
+  DALI_TEST_EQUALS( actorFrame, Vector4( 5.0f, 5.0f, ITEM_SIZE.width+5, ITEM_SIZE.height+5 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliToolkitFlexNodeAddChildrenRowP(void)
 {
   ToolkitTestApplication application;
@@ -79,8 +109,8 @@ int UtcDaliToolkitFlexNodeAddChildrenRowP(void)
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );
 
-  flexNode->AddChild(actor1, &MeasureChild, 0);
-  flexNode->AddChild(actor2, &MeasureChild, 1);
+  flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
+  flexNode->AddChild(actor2, Extents(0,0,0,0), &MeasureChild, 1);
 
   DALI_TEST_EQUALS( (int)flexNode->GetFlexDirection(), (int)Flex::FlexDirection::ROW, TEST_LOCATION );
 
@@ -114,8 +144,8 @@ int UtcDaliToolkitFlexNodeAddChildrenColumnP(void)
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );
 
-  flexNode->AddChild(actor1, &MeasureChild, 0);
-  flexNode->AddChild(actor2, &MeasureChild, 1);
+  flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
+  flexNode->AddChild(actor2, Extents(0,0,0,0), &MeasureChild, 1);
 
   flexNode->CalculateLayout(480, 800, false);
 
@@ -158,8 +188,8 @@ int UtcDaliToolkitFlexNodeAddChildrenColumnJustify(void)
   DALI_TEST_EQUALS( (int)flexNode->GetFlexJustification(), (int)Flex::Justification::FLEX_START, TEST_LOCATION );
   DALI_TEST_EQUALS( (int)flexNode->GetFlexItemsAlignment(), (int)Flex::Alignment::FLEX_START, TEST_LOCATION );
 
-  flexNode->AddChild(actor1, &MeasureChild, 0);
-  flexNode->AddChild(actor2, &MeasureChild, 1);
+  flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
+  flexNode->AddChild(actor2, Extents(0,0,0,0), &MeasureChild, 1);
 
   flexNode->CalculateLayout(480, 800, false);
 
@@ -256,8 +286,8 @@ int UtcDaliToolkitFlexNodeSizingP(void)
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );
 
-  flexNode->AddChild(actor1, &MeasureChild, 0);
-  flexNode->AddChild(actor2, &MeasureChild, 1);
+  flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
+  flexNode->AddChild(actor2, Extents(0,0,0,0), &MeasureChild, 1);
 
   flexNode->CalculateLayout(480, 800, false);
 
@@ -290,10 +320,10 @@ int UtcDaliToolkitFlexNodeWrapModeP(void)
   DALI_TEST_EQUALS( (int)flexNode->GetFlexAlignment(), (int)Flex::Alignment::FLEX_START, TEST_LOCATION );
   DALI_TEST_EQUALS( (int)flexNode->GetFlexWrap(), (int)Flex::WrapType::NO_WRAP, TEST_LOCATION );
 
-  flexNode->AddChild( actor1, &MeasureChild, 0 );
-  flexNode->AddChild( actor2, &MeasureChild, 1 );
-  flexNode->AddChild( actor2, &MeasureChild, 2 );
-  flexNode->AddChild( actor2, &MeasureChild, 3 );
+  flexNode->AddChild( actor1, Extents(0,0,0,0), &MeasureChild, 0 );
+  flexNode->AddChild( actor2, Extents(0,0,0,0), &MeasureChild, 1 );
+  flexNode->AddChild( actor2, Extents(0,0,0,0), &MeasureChild, 2 );
+  flexNode->AddChild( actor2, Extents(0,0,0,0), &MeasureChild, 3 );
 
   flexNode->CalculateLayout(30, 800, false);
 
@@ -377,8 +407,8 @@ int UtcDaliToolkitFlexNodeRemoveChildP(void)
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );
 
-  flexNode->AddChild(actor1, &MeasureChild, 0);
-  flexNode->AddChild(actor2, &MeasureChild, 1);
+  flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
+  flexNode->AddChild(actor2, Extents(0,0,0,0), &MeasureChild, 1);
 
   flexNode->CalculateLayout(480, 800, false);
 
@@ -420,8 +450,8 @@ int UtcDaliToolkitFlexNodeRemoveAllChildrenP(void)
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );
 
-  flexNode->AddChild(actor1, &MeasureChild, 0);
-  flexNode->AddChild(actor2, &MeasureChild, 1);
+  flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
+  flexNode->AddChild(actor2, Extents(0,0,0,0), &MeasureChild, 1);
 
   flexNode->CalculateLayout(480, 800, false);
 
@@ -462,8 +492,8 @@ int UtcDaliToolkitFlexNodePaddingMarginP(void)
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );
 
-  flexNode->AddChild(actor1, &MeasureChild, 0);
-  flexNode->AddChild(actor2, &MeasureChild, 1);
+  flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
+  flexNode->AddChild(actor2, Extents(0,0,0,0), &MeasureChild, 1);
 
   Extents padding( 5,5,5,5);
   Extents margin( 5,5,5,5);
@@ -509,8 +539,8 @@ int UtcDaliToolkitFlexNodeCallbackTestP(void)
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );
 
-  flexNode->AddChild(actor1, &MeasureChild, 0);
-  flexNode->AddChild(actor2, &MeasureChild, 1);
+  flexNode->AddChild(actor1, Extents(0,0,0,0), &MeasureChild, 0);
+  flexNode->AddChild(actor2, Extents(0,0,0,0), &MeasureChild, 1);
 
   flexNode->CalculateLayout(480, 800, false);
 

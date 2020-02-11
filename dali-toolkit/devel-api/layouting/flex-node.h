@@ -130,10 +130,11 @@ public:
   /**
    * @brief Insert child into the FlexLayout at the given index.
    * @param[in] child Actor to insert.
+   * @param[in] margin of child Actor.
    * @param[in] measureFunction for the child.
    * @param[in] index to insert at.
    */
-  void AddChild( Actor child, MeasureCallback measureFunction, int index );
+  void AddChild( Actor child, Extents margin, MeasureCallback measureFunction, int index );
 
   /**
    * @brief Remove child from the FlexLayout at the given index.
