@@ -22,6 +22,7 @@
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali/devel-api/adaptor-framework/thread-settings.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -75,6 +76,11 @@ void LoadingTask::Load()
   else
   {
     pixelBuffer = Dali::DownloadImageSynchronously ( url.GetUrl(), dimensions, fittingMode, samplingMode, orientationCorrection );
+  }
+
+  if( !pixelBuffer )
+  {
+    DALI_LOG_ERROR( "LoadingTask::Load: Loading is failed: %s\n", url.GetUrl().c_str() );
   }
 }
 
