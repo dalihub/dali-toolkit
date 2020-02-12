@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace Dali
 using AdaptorImpl = Dali::Internal::Adaptor::Adaptor;
 
 ToolkitTestApplication::ToolkitTestApplication( size_t surfaceWidth, size_t surfaceHeight, float  horizontalDpi, float verticalDpi )
-: TestApplication( surfaceWidth, surfaceHeight, horizontalDpi, verticalDpi, ResourcePolicy::DALI_DISCARDS_ALL_DATA, false /* Do not Initialize Core */ ),
+: TestApplication( surfaceWidth, surfaceHeight, horizontalDpi, verticalDpi, false /* Do not Initialize Core */ ),
   mMainWindow( new Dali::Window ),
   mAdaptor( &AdaptorImpl::New() ) // Need to create Adaptor first as many singletons in dali-adaptor need it
 {
