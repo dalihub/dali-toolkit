@@ -124,8 +124,10 @@ struct Base::Impl
   Transform       mTransform;
   Vector4         mMixColor;
   Size            mControlSize;
+  float           mCornerRadius;
   int             mDepthIndex;
   Property::Index mMixColorIndex;
+  Property::Index mCornerRadiusIndex;
   FittingMode     mFittingMode;  //< How the contents should fit the view
   int             mFlags;
   Toolkit::Visual::ResourceStatus  mResourceStatus;

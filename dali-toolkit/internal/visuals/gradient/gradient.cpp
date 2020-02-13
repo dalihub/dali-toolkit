@@ -153,7 +153,7 @@ Dali::Texture Gradient::GenerateLookupTexture()
 
     for( int j = segmentStart; j<segmentEnd; j++ )
     {
-      float ratio = static_cast<float>(j-segmentStart)/segmentWidth;
+      float ratio = static_cast<float>(j-segmentStart)/(segmentWidth - 1);
       Vector4 currentColor = mGradientStops[i].mStopColor * (1.f-ratio) + mGradientStops[i+1].mStopColor * ratio;
       pixels[k*4] = static_cast<unsigned char>( 255.f * Clamp( currentColor.r, 0.f, 1.f ) );
       pixels[k*4+1] = static_cast<unsigned char>( 255.f * Clamp( currentColor.g, 0.f, 1.f ) );

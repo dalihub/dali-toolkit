@@ -444,7 +444,7 @@ void AnimatedImageVisual::CreateRenderer()
 {
   bool defaultWrapMode = mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE;
   bool atlasing = false;
-  Shader shader = mImageVisualShaderFactory.GetShader( mFactoryCache, atlasing, defaultWrapMode );
+  Shader shader = mImageVisualShaderFactory.GetShader( mFactoryCache, atlasing, defaultWrapMode, IsRoundedCornerRequired() );
 
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 

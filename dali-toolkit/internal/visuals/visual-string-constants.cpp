@@ -76,6 +76,9 @@ const char * const OPACITY( "opacity" );
 // Fitting mode
 const char * const VISUAL_FITTING_MODE( "visualFittingMode" );
 
+// Corner radius
+const char * const CORNER_RADIUS( "cornerRadius" );
+
 // Color visual
 const char * const RENDER_IF_TRANSPARENT_NAME( "renderIfTransparent" );
 
