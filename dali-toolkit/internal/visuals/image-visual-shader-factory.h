@@ -55,8 +55,9 @@ public:
    * @param[in] factoryCache A pointer pointing to the VisualFactoryCache object
    * @param[in] atlasing Whether texture atlasing is applied.
    * @param[in] defaultTextureWrapping Whether the default texture wrap mode is applied.
+   * @param[in] roundedCorner Whether the rounded corder is applied.
    */
-  Shader GetShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping );
+  Shader GetShader( VisualFactoryCache& factoryCache, bool atlasing, bool defaultTextureWrapping, bool roundedCorner );
 
   /**
    * Request the default vertex shader source.

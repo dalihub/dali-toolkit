@@ -122,7 +122,7 @@ void SvgVisual::DoSetOnStage( Actor& actor )
   Shader shader;
   if( !mImpl->mCustomShader )
   {
-    shader = mImageVisualShaderFactory.GetShader( mFactoryCache, mAttemptAtlasing, true );
+    shader = mImageVisualShaderFactory.GetShader( mFactoryCache, mAttemptAtlasing, true, false );
   }
   else
   {
