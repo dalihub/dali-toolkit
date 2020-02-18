@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
-#include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/common/singleton-service.h>
 
 namespace
 {
