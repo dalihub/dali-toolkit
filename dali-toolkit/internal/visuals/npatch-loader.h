@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_NPATCH_LOADER_H
 
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,10 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/adaptor-framework/pixel-buffer.h>
+
+// INTERNAL HEADERS
+#include <dali-toolkit/internal/visuals/texture-manager-impl.h>
 
 namespace Dali
 {
@@ -61,6 +65,10 @@ public:
 
   struct Data
   {
+    Data()
+    : loadCompleted( false )
+    {}
+
     std::string url;                              ///< Url of the N-Patch
     TextureSet textureSet;                        ///< Texture containing the cropped image
     StretchRanges stretchPixelsX;                 ///< X stretch pixels
@@ -69,6 +77,7 @@ public:
     uint32_t croppedWidth;                        ///< Width of the cropped middle part of N-patch
     uint32_t croppedHeight;                       ///< Height of the cropped middle part of N-patch
     Rect< int > border;                           ///< The size of the border
+    bool loadCompleted;                           ///< True if the data loading is completed
   };
 
 public:
@@ -86,13 +95,24 @@ public:
   /**
    * @brief Retrieve a texture matching the n-patch url.
    *
+   * @param [in] textureManager that will be used to loading image
+   * @param [in] textureObserver The NPatchVisual that requested loading.
    * @param [in] url to retrieve
    * @param [in] border The border size of the image
    * @param [in,out] preMultiplyOnLoad True if the image color should be multiplied by it's alpha. Set to false if the
    *                                   image has no alpha channel
+   * @param [in] synchronousLoading True if the image will be loaded in synchronous time.
    * @return id of the texture.
    */
-  std::size_t Load( const std::string& url, const Rect< int >& border, bool& preMultiplyOnLoad );
+  std::size_t Load( TextureManager& textureManager, TextureUploadObserver* textureObserver, const std::string& url, const Rect< int >& border, bool& preMultiplyOnLoad, bool synchronousLoading );
+
+  /**
+   * @brief Set loaded PixelBuffer and its information
+   *
+   * @param [in] id cache data id
+   * @param [in] pixelBuffer of loaded image
+   */
+  void SetNPatchData( std::size_t id, Devel::PixelBuffer& pixelBuffer );
 
   /**
    * @brief Retrieve N patch data matching to an id

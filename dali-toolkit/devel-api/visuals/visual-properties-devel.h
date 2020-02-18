@@ -72,6 +72,13 @@ enum Type
    * @note The default is defined by the type of visual (if it's suitable to be stretched or not).
    */
   VISUAL_FITTING_MODE = OPACITY + 1,
+
+  /**
+   * @brief The radius for the rounded corners of the visual
+   * @details Name "cornerRadius", type Property::FLOAT or Property::VECTOR4.
+   * @note Optional.
+   */
+  CORNER_RADIUS = OPACITY + 2,
 };
 
 } // namespace Property

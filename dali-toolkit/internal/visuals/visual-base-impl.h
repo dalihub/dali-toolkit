@@ -344,6 +344,13 @@ protected:
    */
   bool IsOnStage() const;
 
+  /**
+   * @brief Query whether the corners of the visual requires to be rounded.
+   *
+   * @return Returns true if the rounded corner is required, false otherwise.
+   */
+  bool IsRoundedCornerRequired() const;
+
 private:
 
   /**

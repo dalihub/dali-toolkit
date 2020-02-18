@@ -121,8 +121,10 @@ Internal::Visual::Base::Impl::Impl(FittingMode fittingMode)
   mTransform(),
   mMixColor( Color::WHITE ),
   mControlSize( Vector2::ZERO ),
+  mCornerRadius( 0.0f ),
   mDepthIndex( 0.0f ),
   mMixColorIndex( Property::INVALID_INDEX ),
+  mCornerRadiusIndex( Property::INVALID_INDEX ),
   mFittingMode( fittingMode ),
   mFlags( 0 ),
   mResourceStatus( Toolkit::Visual::ResourceStatus::PREPARING )

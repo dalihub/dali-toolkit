@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -229,6 +229,17 @@ void RollingImageCache::UploadComplete(
   }
 
   LOG_CACHE;
+}
+
+void RollingImageCache::LoadComplete(
+  bool loadSuccess,
+  Devel::PixelBuffer pixelBuffer,
+  const VisualUrl& url,
+  bool preMultiplied )
+{
+  // LoadComplete is called if this TextureUploadObserver requested to load
+  // an image that will be returned as a type of PixelBuffer by using a method
+  // TextureManager::LoadPixelBuffer.
 }
 
 } //namespace Internal

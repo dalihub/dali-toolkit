@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_TEXTURE_MANAGER_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,6 +161,36 @@ public:
   ~TextureManager();
 
   // TextureManager Main API:
+
+  /**
+   * @brief Requests an image load of the given URL to get PixelBuffer.
+   *
+   * The parameters are used to specify how the image is loaded.
+   * The observer has the LoadComplete method called when the load is ready.
+   *
+   * @param[in] url                   The URL of the image to load
+   * @param[in] desiredSize           The size the image is likely to appear at. This can be set to 0,0 for automatic
+   * @param[in] fittingMode           The FittingMode to use
+   * @param[in] samplingMode          The SamplingMode to use
+   * @param[in] synchronousLoading    true if the URL should be loaded synchronously
+   * @param[in] textureObserver       The client object should inherit from this and provide the "UploadCompleted" virtual.
+   *                                  This is called when an image load completes (or fails).
+   * @param[in] orientationCorrection Whether to rotate image to match embedded orientation data
+   * @param[in,out] preMultiplyOnLoad True if the image color should be multiplied by it's alpha. Set to false if the
+   *                                  image has no alpha channel
+   *
+   * @return                          The pixel buffer containing the image, or empty if still loading.
+   */
+
+  Devel::PixelBuffer LoadPixelBuffer( const VisualUrl& url,
+                                      Dali::ImageDimensions desiredSize,
+                                      Dali::FittingMode::Type fittingMode,
+                                      Dali::SamplingMode::Type samplingMode,
+                                      bool synchronousLoading,
+                                      TextureUploadObserver* textureObserver,
+                                      bool orientationCorrection,
+                                      TextureManager::MultiplyOnLoad& preMultiplyOnLoad );
+
 
   /**
    * @brief Requests an image load of the given URL.
@@ -415,7 +445,8 @@ private:
     TextureUploadObserver*              observer,
     bool                                orientationCorrection,
     TextureManager::ReloadPolicy        reloadPolicy,
-    MultiplyOnLoad&                     preMultiplyOnLoad );
+    MultiplyOnLoad&                     preMultiplyOnLoad,
+    bool                                loadPixelBuffer );
 
   /**
    * @brief Get the current state of a texture
@@ -446,7 +477,8 @@ private:
                  UseAtlas useAtlas,
                  TextureManager::TextureHash hash,
                  bool orientationCorrection,
-                 bool preMultiplyOnLoad )
+                 bool preMultiplyOnLoad,
+                 bool loadPixelBuffer )
     : url( url ),
       desiredSize( desiredSize ),
       useSize( desiredSize ),
@@ -465,7 +497,8 @@ private:
       cropToMask( cropToMask ),
       orientationCorrection( true ),
       preMultiplyOnLoad( preMultiplyOnLoad ),
-      preMultiplied( false )
+      preMultiplied( false ),
+      loadPixelBuffer( loadPixelBuffer )
     {
     }
 
@@ -498,6 +531,7 @@ private:
     bool orientationCorrection:1;  ///< true if the image should be rotated to match exif orientation data
     bool preMultiplyOnLoad:1;      ///< true if the image's color should be multiplied by it's alpha
     bool preMultiplied:1;          ///< true if the image's color was multiplied by it's alpha
+    bool loadPixelBuffer:1;        ///< true if the image is needed to be returned as PixelBuffer
   };
 
   /**
