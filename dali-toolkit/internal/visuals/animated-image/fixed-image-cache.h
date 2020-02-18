@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_FIXED_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,13 @@ protected:
     TextureSet     textureSet,
     bool           useAtlasing,
     const Vector4& atlasRect,
-    bool           premultiplied) override;
+    bool           premultiplied ) override;
+
+  void LoadComplete(
+    bool loadSuccess,
+    Devel::PixelBuffer pixelBuffer,
+    const VisualUrl& url,
+    bool preMultiplied ) override;
 
 private:
   std::vector<UrlStore>& mImageUrls;

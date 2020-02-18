@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dali/devel-api/adaptor-framework/image-loading.h>
 #include "dummy-control.h"
+
+#include <dali/integration-api/debug.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -80,6 +82,29 @@ void TestVisualRender( ToolkitTestApplication& application,
 
   application.Render();
   application.SendNotification();
+
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
+}
+
+void TestVisualAsynchronousRender( ToolkitTestApplication& application,
+                                   DummyControl& actor,
+                                   Visual::Base& visual )
+{
+  DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  actor.SetSize( 200.f, 200.f );
+  DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION );
 }
@@ -439,10 +464,10 @@ int UtcDaliVisualFactoryDefaultOffsetsGradientVisual(void)
   END_TEST;
 }
 
-int UtcDaliVisualFactoryGetNPatchVisual1(void)
+int UtcDaliVisualFactoryGetNPatchVisualSynchronousLoad1(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual1: Request 9-patch visual with a Property::Map" );
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisualSynchronousLoad1: Request 9-patch visual with a Property::Map" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -453,6 +478,7 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
   Property::Map propertyMap;
   propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
   propertyMap.Insert( ImageVisual::Property::URL, TEST_9_PATCH_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, true );
   {
     tet_infoline( "whole grid" );
     Visual::Base visual = factory.CreateVisual( propertyMap );
@@ -495,10 +521,152 @@ int UtcDaliVisualFactoryGetNPatchVisual1(void)
   END_TEST;
 }
 
+int UtcDaliVisualFactoryGetNPatchVisualSynchronousLoad2(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisualSynchronousLoad2: Request 9-patch visual with a Property::Map including border" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  // Get actual size of test image
+  ImageDimensions imageSize = Dali::GetClosestImageSize( gImage_34_RGBA );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
+  propertyMap.Insert( ImageVisual::Property::URL, gImage_34_RGBA );
+  propertyMap.Insert( ImageVisual::Property::BORDER, Rect< int >( 2, 2, 2, 2 ) );
+  propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, true );
+  {
+    tet_infoline( "whole grid" );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+    TestVisualRender( application, actor, visual );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth(), imageSize.GetHeight() ), TEST_LOCATION );
+  }
+
+  propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
+  {
+    tet_infoline( "border only" );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+    TestVisualRender( application, actor, visual );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth(), imageSize.GetHeight() ), TEST_LOCATION );
+  }
+
+  propertyMap.Clear();
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
+  propertyMap.Insert( ImageVisual::Property::URL, gImage_34_RGBA );
+  propertyMap.Insert( ImageVisual::Property::BORDER, Rect< int >( 1, 1, 1, 1 ) );
+  propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, true );
+  {
+    tet_infoline( "whole grid" );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+    TestVisualRender( application, actor, visual );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth(), imageSize.GetHeight() ), TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetNPatchVisual1(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual1: Request 9-patch visual with a Property::Map" );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  // Get actual size of test image
+  ImageDimensions imageSize = Dali::GetClosestImageSize( TEST_9_PATCH_FILE_NAME );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_9_PATCH_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, false );
+  {
+    tet_infoline( "whole grid" );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth(), imageSize.GetHeight() ), TEST_LOCATION );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+    TestVisualAsynchronousRender( application, actor, visual );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
+  }
+
+  propertyMap.Insert( ImageVisual::Property::BORDER_ONLY,  true );
+  {
+    tet_infoline( "border only" );
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+    TestVisualRender( application, actor, visual );
+
+    DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth() - 2.0f, imageSize.GetHeight() - 2.0f ), TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
 int UtcDaliVisualFactoryGetNPatchVisual2(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual1: Request 9-patch visual with a Property::Map including border" );
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual2: Request 9-patch visual with a Property::Map including border" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -520,7 +688,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
     textureTrace.Enable(true);
 
     DummyControl actor = DummyControl::New(true);
-    TestVisualRender( application, actor, visual );
+    TestVisualAsynchronousRender( application, actor, visual );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
@@ -598,7 +766,7 @@ int UtcDaliVisualFactoryGetNPatchVisual3(void)
     textureTrace.Enable(true);
 
     DummyControl actor = DummyControl::New(true);
-    TestVisualRender( application, actor, visual );
+    TestVisualAsynchronousRender( application, actor, visual );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
@@ -652,9 +820,8 @@ int UtcDaliVisualFactoryGetNPatchVisual4(void)
   TestGlAbstraction& gl = application.GetGlAbstraction();
   TraceCallStack& textureTrace = gl.GetTextureTrace();
   textureTrace.Enable(true);
-
   DummyControl actor = DummyControl::New(true);
-  TestVisualRender( application, actor, visual );
+  TestVisualAsynchronousRender( application, actor, visual );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
@@ -698,7 +865,7 @@ int UtcDaliVisualFactoryGetNPatchVisual5(void)
   textureTrace.Enable(true);
 
   DummyControl actor = DummyControl::New(true);
-  TestVisualRender( application, actor, visual );
+  TestVisualAsynchronousRender( application, actor, visual );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
@@ -733,7 +900,7 @@ int UtcDaliVisualFactoryGetNPatchVisual6(void)
     textureTrace.Enable(true);
 
     DummyControl actor = DummyControl::New(true);
-    TestVisualRender( application, actor, visual );
+    TestVisualAsynchronousRender( application, actor, visual );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
@@ -761,7 +928,7 @@ int UtcDaliVisualFactoryGetNPatchVisual6(void)
     textureTrace.Enable(true);
 
     DummyControl actor = DummyControl::New(true);
-    TestVisualRender( application, actor, visual );
+    TestVisualAsynchronousRender( application, actor, visual );
 
     DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
@@ -810,6 +977,12 @@ int UtcDaliNPatchVisualAuxiliaryImage(void)
   dummy.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   dummy.SetParentOrigin(ParentOrigin::CENTER);
   Stage::GetCurrent().Add(dummy);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 2 ), true, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
 
@@ -839,7 +1012,7 @@ int UtcDaliVisualFactoryGetNPatchVisualN1(void)
   textureTrace.Enable(true);
 
   DummyControl actor = DummyControl::New(true);
-  TestVisualRender( application, actor, visual );
+  TestVisualAsynchronousRender( application, actor, visual );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
@@ -870,7 +1043,7 @@ int UtcDaliVisualFactoryGetNPatchVisualN2(void)
   drawTrace.Enable(true);
 
   DummyControl actor = DummyControl::New(true);
-  TestVisualRender( application, actor, visual );
+  TestVisualAsynchronousRender( application, actor, visual );
 
   DALI_TEST_EQUALS( textureTrace.FindMethod("BindTexture"), true, TEST_LOCATION );
 
