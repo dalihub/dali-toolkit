@@ -22,7 +22,7 @@
 #include <cstring> // for strcmp
 #include <dali/public-api/actors/layer.h>
 #include <dali/devel-api/adaptor-framework/accessibility-adaptor.h>
-#include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/adaptor-framework/lifecycle-controller.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/common/stage.h>

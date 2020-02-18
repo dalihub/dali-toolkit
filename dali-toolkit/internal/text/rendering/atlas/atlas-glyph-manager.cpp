@@ -19,7 +19,7 @@
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager.h>
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/common/singleton-service.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/internal/text/rendering/atlas/atlas-glyph-manager-impl.h>

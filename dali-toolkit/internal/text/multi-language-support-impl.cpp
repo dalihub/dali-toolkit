@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
 
 // INTERNAL INCLUDES
