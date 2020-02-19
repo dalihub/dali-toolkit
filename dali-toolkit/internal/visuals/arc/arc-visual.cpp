@@ -47,102 +47,103 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( DevelArcVisual::Cap, BUTT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( DevelArcVisual::Cap, ROUND )
 DALI_ENUM_TO_STRING_TABLE_END( CAP )
 
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform mediump vec3 uSize;\n
-  \n
-  varying mediump vec2 vPosition;\n
-  \n
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform mediump vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
+const char* VERTEX_SHADER =
+  "INPUT mediump vec2 aPosition;\n"
+  "OUTPUT mediump vec2 vPosition;\n"
 
-  vec4 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    vPosition = aPosition* visualSize;\n
-    return vec4( vPosition + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
-  }\n
+  "uniform highp mat4 uMvpMatrix;\n"
+  "uniform highp vec3 uSize;\n"
 
-  void main()\n
-  {\n
-    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
-  }\n
-);
+  "//Visual size and offset\n"
+  "uniform mediump vec2 offset;\n"
+  "uniform highp vec2 size;\n"
+  "uniform mediump vec4 offsetSizeMode;\n"
+  "uniform mediump vec2 origin;\n"
+  "uniform mediump vec2 anchorPoint;\n"
 
-const char* FRAGMENT_SHADER_BUTT_CAP = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vPosition;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  uniform mediump float thickness;\n
-  uniform mediump float radius;\n
-  uniform mediump float startAngle;\n
-  uniform mediump float sweepAngle;\n
-  \n
-  const mediump float M_PI_OVER_2 = 1.57079632679;\n
-  const mediump float M_PI = 3.14159265359;\n
-  const mediump float M_PI_2 = 6.28318530718;\n
-  \n
-  mediump float GetOpacity()\n
-  {\n
-      mediump float start = radians( mod( startAngle, 360.0 ) );\n
-      mediump float angle = mod( atan( vPosition.y, vPosition.x ) + M_PI_OVER_2 - start, M_PI_2 );\n
-      mediump float dist = length( vPosition );\n
-      if( angle <= radians( sweepAngle ) )\n
-      {\n
-        return smoothstep( -1.0, 1.0, thickness / 2.0 - ( abs( dist - radius ) ) );\n
-      }\n
-      mediump float end = radians( mod( startAngle + sweepAngle, 360.0 ) );\n
-      mediump vec2 q0 = vec2( dist * cos( start - M_PI_OVER_2 ), dist * sin( start - M_PI_OVER_2 ) );\n
-      mediump vec2 q1 = vec2( dist * cos( end - M_PI_OVER_2 ), dist * sin( end - M_PI_OVER_2 ) );\n
-      mediump float opacity = 1.0 - smoothstep( 0.0, 2.0, min( length( vPosition - q0 ), length( vPosition - q1 ) ) );\n
-      opacity *= step( 0.0, thickness / 2.0 - abs( dist - radius ) );\n
-      return opacity;\n
-  }\n
-  void main()\n
-  {\n
-    gl_FragColor = vec4( mixColor, 1.0 ) * uColor;\n
-    gl_FragColor.a *= GetOpacity();\n
-  }\n
-);
+  "vec4 ComputeVertexPosition()\n"
+  "{\n"
+  "  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n"
+  "  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n"
+  "  vPosition = aPosition* visualSize;\n"
+  "  return vec4( vPosition + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n"
+  "}\n"
 
-const char* FRAGMENT_SHADER_ROUND_CAP = DALI_COMPOSE_SHADER(
-  varying mediump vec2 vPosition;\n
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec3 mixColor;\n
-  uniform mediump float thickness;\n
-  uniform mediump float radius;\n
-  uniform mediump float startAngle;\n
-  uniform mediump float sweepAngle;\n
-  \n
-  const mediump float M_PI_OVER_2 = 1.57079632679;\n
-  const mediump float M_PI_2 = 6.28318530718;\n
-  \n
-  mediump float GetOpacity()\n
-  {\n
-      mediump float start = radians( mod( startAngle, 360.0 ) );\n
-      mediump float angle = mod( atan( vPosition.y, vPosition.x ) + M_PI_OVER_2 - start, M_PI_2 );\n
-      mediump float dist = length( vPosition );\n
-      if( angle <= radians( sweepAngle ) )\n
-      {\n
-        return smoothstep( -1.0, 1.0, thickness / 2.0 - ( abs( dist - radius ) ) );\n
-      }\n
-      mediump float end = radians( mod( startAngle + sweepAngle, 360.0 ) );\n
-      mediump vec2 q0 = vec2( radius * cos( start - M_PI_OVER_2 ), radius * sin( start - M_PI_OVER_2 ) );\n
-      mediump vec2 q1 = vec2( radius * cos( end - M_PI_OVER_2 ), radius * sin( end - M_PI_OVER_2 ) );\n
-      return smoothstep( -1.0, 1.0, thickness / 2.0 - min( length( vPosition - q0 ), length( vPosition - q1 ) ) );\n
-  }\n
-  void main()\n
-  {\n
-    gl_FragColor = vec4( mixColor, 1.0 ) * uColor;\n
-    gl_FragColor.a *= GetOpacity();\n
-  }\n
-);
+  "void main()\n"
+  "{\n"
+  "  gl_Position = uMvpMatrix * ComputeVertexPosition();\n"
+  "}\n";
+
+const char* FRAGMENT_SHADER_BUTT_CAP =
+  "INPUT mediump vec2 vPosition;\n"
+
+  "uniform lowp vec4 uColor;\n"
+  "uniform lowp vec3 mixColor;\n"
+  "uniform mediump float thickness;\n"
+  "uniform mediump float radius;\n"
+  "uniform mediump float startAngle;\n"
+  "uniform mediump float sweepAngle;\n"
+
+  "const mediump float M_PI_OVER_2 = 1.57079632679;\n"
+  "const mediump float M_PI = 3.14159265359;\n"
+  "const mediump float M_PI_2 = 6.28318530718;\n"
+
+  "mediump float GetOpacity()\n"
+  "{\n"
+  "  mediump float start = radians( mod( startAngle, 360.0 ) );\n"
+  "  mediump float angle = mod( atan( vPosition.y, vPosition.x ) + M_PI_OVER_2 - start, M_PI_2 );\n"
+  "  mediump float dist = length( vPosition );\n"
+  "  if( angle <= radians( sweepAngle ) )\n"
+  "  {\n"
+  "    return smoothstep( -1.0, 1.0, thickness / 2.0 - ( abs( dist - radius ) ) );\n"
+  "  }\n"
+  "  mediump float end = radians( mod( startAngle + sweepAngle, 360.0 ) );\n"
+  "  mediump vec2 q0 = vec2( dist * cos( start - M_PI_OVER_2 ), dist * sin( start - M_PI_OVER_2 ) );\n"
+  "  mediump vec2 q1 = vec2( dist * cos( end - M_PI_OVER_2 ), dist * sin( end - M_PI_OVER_2 ) );\n"
+  "  mediump float opacity = 1.0 - smoothstep( 0.0, 2.0, min( length( vPosition - q0 ), length( vPosition - q1 ) ) );\n"
+  "  opacity *= step( 0.0, thickness / 2.0 - abs( dist - radius ) );\n"
+  "  return opacity;\n"
+  "}\n"
+
+  "void main()\n"
+  "{\n"
+  "  OUT_COLOR = vec4( mixColor, 1.0 ) * uColor;\n"
+  "  OUT_COLOR.a *= GetOpacity();\n"
+  "}\n";
+
+const char* FRAGMENT_SHADER_ROUND_CAP =
+  "INPUT mediump vec2 vPosition;\n"
+
+  "uniform lowp vec4 uColor;\n"
+  "uniform lowp vec3 mixColor;\n"
+  "uniform mediump float thickness;\n"
+  "uniform mediump float radius;\n"
+  "uniform mediump float startAngle;\n"
+  "uniform mediump float sweepAngle;\n"
+
+  "const mediump float M_PI_OVER_2 = 1.57079632679;\n"
+  "const mediump float M_PI_2 = 6.28318530718;\n"
+
+  "mediump float GetOpacity()\n"
+  "{\n"
+  "  mediump float start = radians( mod( startAngle, 360.0 ) );\n"
+  "  mediump float angle = mod( atan( vPosition.y, vPosition.x ) + M_PI_OVER_2 - start, M_PI_2 );\n"
+  "  mediump float dist = length( vPosition );\n"
+  "  if( angle <= radians( sweepAngle ) )\n"
+  "  {\n"
+  "    return smoothstep( -1.0, 1.0, thickness / 2.0 - ( abs( dist - radius ) ) );\n"
+  "  }\n"
+  "  mediump float end = radians( mod( startAngle + sweepAngle, 360.0 ) );\n"
+  "  mediump vec2 q0 = vec2( radius * cos( start - M_PI_OVER_2 ), radius * sin( start - M_PI_OVER_2 ) );\n"
+  "  mediump vec2 q1 = vec2( radius * cos( end - M_PI_OVER_2 ), radius * sin( end - M_PI_OVER_2 ) );\n"
+  "  return smoothstep( -1.0, 1.0, thickness / 2.0 - min( length( vPosition - q0 ), length( vPosition - q1 ) ) );\n"
+  "}\n"
+
+  "void main()\n"
+  "{\n"
+  "  OUT_COLOR = vec4( mixColor, 1.0 ) * uColor;\n"
+  "  OUT_COLOR.a *= GetOpacity();\n"
+  "}\n";
 
 }
 
@@ -296,7 +297,7 @@ void ArcVisual::InitializeRenderer()
     shader = mFactoryCache.GetShader( VisualFactoryCache::ARC_BUTT_CAP_SHADER );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_BUTT_CAP );
+      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + VERTEX_SHADER, Dali::Shader::GetFragmentShaderPrefix() + FRAGMENT_SHADER_BUTT_CAP );
       mFactoryCache.SaveShader( VisualFactoryCache::ARC_BUTT_CAP_SHADER, shader );
     }
   }
@@ -305,7 +306,7 @@ void ArcVisual::InitializeRenderer()
     shader = mFactoryCache.GetShader( VisualFactoryCache::ARC_ROUND_CAP_SHADER );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER_ROUND_CAP );
+      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + VERTEX_SHADER, Dali::Shader::GetFragmentShaderPrefix() + FRAGMENT_SHADER_ROUND_CAP );
       mFactoryCache.SaveShader( VisualFactoryCache::ARC_ROUND_CAP_SHADER, shader );
     }
   }

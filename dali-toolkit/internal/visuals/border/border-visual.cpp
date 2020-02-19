@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/border-visual-properties.h>
@@ -44,76 +45,73 @@ const char * const POSITION_ATTRIBUTE_NAME("aPosition");
 const char * const DRIFT_ATTRIBUTE_NAME("aDrift");
 const char * const INDEX_NAME("indices");
 
+const char* VERTEX_SHADER =
+  "INPUT mediump vec2 aPosition;\n"
+  "INPUT mediump vec2 aDrift;\n"
 
-const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  attribute mediump vec2 aDrift;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
-  uniform mediump float borderSize;\n
-  \n
+  "uniform highp mat4 uMvpMatrix;\n"
+  "uniform highp vec3 uSize;\n"
+  "uniform mediump float borderSize;\n"
 
-  //Visual size and offset
-  uniform mediump vec2 offset;\n
-  uniform highp   vec2 size;\n
-  uniform mediump vec4 offsetSizeMode;\n
-  uniform mediump vec2 origin;\n
-  uniform mediump vec2 anchorPoint;\n
+  "//Visual size and offset\n"
+  "uniform mediump vec2 offset;\n"
+  "uniform highp vec2 size;\n"
+  "uniform mediump vec4 offsetSizeMode;\n"
+  "uniform mediump vec2 origin;\n"
+  "uniform mediump vec2 anchorPoint;\n"
 
-  vec2 ComputeVertexPosition()\n
-  {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
-    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    return (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy;\n
-  }\n
+  "vec2 ComputeVertexPosition()\n"
+  "{\n"
+  "  vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n"
+  "  vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n"
+  "  return (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy;\n"
+  "}\n"
 
-  void main()\n
-  {\n
-    vec2 position = ComputeVertexPosition() + aDrift*borderSize;\n
-    gl_Position = uMvpMatrix * vec4(position, 0.0, 1.0);\n
-  }\n
-);
+  "void main()\n"
+  "{\n"
+  "  vec2 position = ComputeVertexPosition() + aDrift*borderSize;\n"
+  "  gl_Position = uMvpMatrix * vec4(position, 0.0, 1.0);\n"
+  "}\n";
 
-const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec4 borderColor;\n
-  uniform lowp vec3 mixColor;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = vec4(mixColor, 1.0)*borderColor*uColor;\n
-  }\n
-);
+const char* FRAGMENT_SHADER =
+  "uniform lowp vec4 uColor;\n"
+  "uniform lowp vec4 borderColor;\n"
+  "uniform lowp vec3 mixColor;\n"
 
-const char* VERTEX_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
-  attribute mediump vec2 aPosition;\n
-  attribute mediump vec2 aDrift;\n
-  uniform highp   mat4 uMvpMatrix;\n
-  uniform highp   vec3 uSize;\n
-  uniform mediump float borderSize;\n
-  varying mediump float vAlpha;\n
-  \n
-  void main()\n
-  {\n
-    vec2 position = aPosition*(uSize.xy+vec2(0.75)) + aDrift*(borderSize+1.5);\n
-    gl_Position = uMvpMatrix * vec4(position, 0.0, 1.0);\n
-    vAlpha = min( abs(aDrift.x), abs(aDrift.y) )*(borderSize+1.5);
-  }\n
-);
+  "void main()\n"
+  "{\n"
+  "  OUT_COLOR = vec4(mixColor, 1.0) * borderColor * uColor;\n"
+  "}\n";
 
-const char* FRAGMENT_SHADER_ANTI_ALIASING = DALI_COMPOSE_SHADER(
-  uniform lowp vec4 uColor;\n
-  uniform lowp vec4 borderColor;\n
-  uniform lowp vec3 mixColor;\n
-  uniform mediump float borderSize;\n
-  varying mediump float vAlpha;\n
-  \n
-  void main()\n
-  {\n
-    gl_FragColor = vec4(mixColor, 1.0)*borderColor*uColor;\n
-    gl_FragColor.a *= smoothstep(0.0, 1.5, vAlpha)*smoothstep( borderSize+1.5, borderSize, vAlpha );\n
-  }\n
-);
+const char* VERTEX_SHADER_ANTI_ALIASING =
+  "INPUT mediump vec2 aPosition;\n"
+  "INPUT mediump vec2 aDrift;\n"
+  "OUTPUT mediump float vAlpha;\n"
+
+  "uniform highp mat4 uMvpMatrix;\n"
+  "uniform highp vec3 uSize;\n"
+  "uniform mediump float borderSize;\n"
+
+  "void main()\n"
+  "{\n"
+  "  vec2 position = aPosition*(uSize.xy+vec2(0.75)) + aDrift*(borderSize+1.5);\n"
+  "  gl_Position = uMvpMatrix * vec4(position, 0.0, 1.0);\n"
+  "  vAlpha = min( abs(aDrift.x), abs(aDrift.y) )*(borderSize+1.5);"
+  "}\n";
+
+const char* FRAGMENT_SHADER_ANTI_ALIASING =
+  "INPUT mediump float vAlpha;\n"
+
+  "uniform lowp vec4 uColor;\n"
+  "uniform lowp vec4 borderColor;\n"
+  "uniform lowp vec3 mixColor;\n"
+  "uniform mediump float borderSize;\n"
+
+  "void main()\n"
+  "{\n"
+  "  OUT_COLOR = vec4(mixColor, 1.0) * borderColor * uColor;\n"
+  "  OUT_COLOR.a *= smoothstep(0.0, 1.5, vAlpha) * smoothstep( borderSize + 1.5, borderSize, vAlpha );\n"
+  "}\n";
 }
 
 BorderVisualPtr BorderVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
@@ -201,7 +199,7 @@ void BorderVisual::DoSetOnScene( Actor& actor )
   InitializeRenderer();
 
   mBorderColorIndex = mImpl->mRenderer.RegisterProperty( Toolkit::BorderVisual::Property::COLOR, COLOR_NAME, mBorderColor );
-  if( mBorderColor.a < 1.f || mAntiAliasing)
+  if( ( mBorderColor.a < 1.f || mAntiAliasing ) || IsAdvancedBlendEquationApplied() )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }
@@ -259,7 +257,7 @@ Shader BorderVisual::GetBorderShader()
     shader = mFactoryCache.GetShader( VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER_ANTI_ALIASING, FRAGMENT_SHADER_ANTI_ALIASING );
+      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + VERTEX_SHADER_ANTI_ALIASING, Dali::Shader::GetFragmentShaderPrefix() + FRAGMENT_SHADER_ANTI_ALIASING );
       mFactoryCache.SaveShader( VisualFactoryCache::BORDER_SHADER_ANTI_ALIASING, shader );
     }
   }
@@ -268,7 +266,7 @@ Shader BorderVisual::GetBorderShader()
     shader = mFactoryCache.GetShader( VisualFactoryCache::BORDER_SHADER );
     if( !shader )
     {
-      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+      shader = Shader::New( Dali::Shader::GetVertexShaderPrefix() + VERTEX_SHADER, Dali::Shader::GetFragmentShaderPrefix() + FRAGMENT_SHADER );
       mFactoryCache.SaveShader( VisualFactoryCache::BORDER_SHADER, shader );
     }
   }
