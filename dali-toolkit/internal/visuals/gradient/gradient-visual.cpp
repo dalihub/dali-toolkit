@@ -48,19 +48,6 @@ namespace Internal
 
 namespace
 {
-// properties: linear gradient
-const char * const START_POSITION_NAME("startPosition"); // Property::VECTOR2
-const char * const END_POSITION_NAME("endPosition"); // Property::VECTOR2
-
-// properties: radial gradient
-const char * const CENTER_NAME("center"); // Property::VECTOR2
-const char * const RADIUS_NAME("radius"); // Property::FLOAT
-
-// properties: linear&radial gradient
-const char * const STOP_OFFSET_NAME("stopOffset"); // Property::Array FLOAT
-const char * const STOP_COLOR_NAME("stopColor"); // Property::Array VECTOR4
-const char * const UNITS_NAME("units"); // Property::String  "userSpaceOnUse | objectBoundingBox"
-const char * const SPREAD_METHOD_NAME("spreadMethod"); // Property::String  "pad | reflect | repeat"
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN( UNITS )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::GradientVisual::Units, OBJECT_BOUNDING_BOX )

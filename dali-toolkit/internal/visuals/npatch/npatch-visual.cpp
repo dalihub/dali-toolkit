@@ -48,11 +48,6 @@ namespace Internal
 
 namespace
 {
-const char * const BORDER_ONLY( "borderOnly" );
-const char * const BORDER( "border" );
-const char * const AUXILIARY_IMAGE_NAME( "auxiliaryImage" );
-const char * const AUXILIARY_IMAGE_ALPHA_NAME( "auxiliaryImageAlpha" );
-
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying mediump vec2 vTexCoord;\n

@@ -49,21 +49,6 @@ namespace Internal
 
 namespace
 {
-
-// Property names - common properties defined in visual-string-constants.h/cpp
-const char * const FONT_FAMILY_PROPERTY( "fontFamily" );
-const char * const FONT_STYLE_PROPERTY( "fontStyle" );
-const char * const POINT_SIZE_PROPERTY( "pointSize" );
-const char * const MULTI_LINE_PROPERTY( "multiLine" );
-const char * const HORIZONTAL_ALIGNMENT_PROPERTY( "horizontalAlignment" );
-const char * const VERTICAL_ALIGNMENT_PROPERTY( "verticalAlignment" );
-const char * const TEXT_COLOR_PROPERTY( "textColor" );
-const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
-const char * const SHADOW_PROPERTY( "shadow" );
-const char * const UNDERLINE_PROPERTY( "underline" );
-const char * const OUTLINE_PROPERTY( "outline" );
-const char * const BACKGROUND_PROPERTY( "textBackground" );
-
 const Vector4 FULL_TEXTURE_RECT( 0.f, 0.f, 1.f, 1.f );
 
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(

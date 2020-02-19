@@ -109,9 +109,106 @@ const char * const CURRENT_FRAME_NUMBER_NAME( "currentFrameNumber" );
 const char * const TOTAL_FRAME_NUMBER_NAME( "totalFrameNumber" );
 const char * const STOP_BEHAVIOR_NAME( "stopBehavior" );
 const char * const LOOPING_MODE_NAME( "loopingMode" );
+const char * const IMAGE_ATLASING( "atlasing" );
+const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
+const char * const IMAGE_FITTING_MODE( "fittingMode" );
+const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
+const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
+const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
+const char * const ALPHA_MASK_URL("alphaMaskUrl");
 
 // Text visual
 const char * const TEXT_PROPERTY( "text" );
+const char * const FONT_FAMILY_PROPERTY( "fontFamily" );
+const char * const FONT_STYLE_PROPERTY( "fontStyle" );
+const char * const POINT_SIZE_PROPERTY( "pointSize" );
+const char * const MULTI_LINE_PROPERTY( "multiLine" );
+const char * const HORIZONTAL_ALIGNMENT_PROPERTY( "horizontalAlignment" );
+const char * const VERTICAL_ALIGNMENT_PROPERTY( "verticalAlignment" );
+const char * const TEXT_COLOR_PROPERTY( "textColor" );
+const char * const ENABLE_MARKUP_PROPERTY( "enableMarkup" );
+const char * const SHADOW_PROPERTY( "shadow" );
+const char * const UNDERLINE_PROPERTY( "underline" );
+const char * const OUTLINE_PROPERTY( "outline" );
+const char * const BACKGROUND_PROPERTY( "textBackground" );
+
+
+//NPatch visual
+const char * const BORDER_ONLY( "borderOnly" );
+const char * const BORDER( "border" );
+
+// non-animated property
+const char* const GRADIENT_TYPE_NAME("gradientType");
+const char* const UNIT_TYPE_NAME("unitType");
+const char* const SPREAD_TYPE_NAME("spreadType");
+
+// animated property
+const char* const START_POSITION_NAME("startPosition");
+const char* const START_COLOR_NAME("startColor");
+const char* const END_POSITION_NAME("endPosition");
+const char* const END_COLOR_NAME("endColor");
+const char* const ROTATE_CENTER_NAME("rotateCenter");
+const char* const ROTATE_AMOUNT_NAME("rotateAmount");
+const char* const OFFSET_NAME("offset");
+
+// animation parameter property
+const char* const START_VALUE_NAME("startValue");
+const char* const TARGET_VALUE_NAME("targetValue");
+const char* const DIRECTION_TYPE_NAME("directionType");
+const char* const DURATION_NAME("duration");
+const char* const DELAY_NAME("delay");
+const char* const REPEAT_NAME("repeat");
+const char* const REPEAT_DELAY_NAME("repeatDelay");
+const char* const MOTION_TYPE_NAME("motionType");
+const char* const EASING_TYPE_NAME("easingType");
+
+// common shader property
+const char* const UNIFORM_START_POINT_NAME("start_point");
+const char* const UNIFORM_START_COLOR_NAME("start_color");
+const char* const UNIFORM_END_POINT_NAME("end_point");
+const char* const UNIFORM_END_COLOR_NAME("end_color");
+const char* const UNIFORM_ROTATE_CENTER_NAME("rotate_center");
+const char* const UNIFORM_ROTATE_ANGLE_NAME("rotate_angle");
+const char* const UNIFORM_OFFSET_NAME("gradient_offset");
+
+// Border visual
+const char * const COLOR_NAME("borderColor");
+const char * const SIZE_NAME("borderSize");
+const char * const ANTI_ALIASING("antiAliasing");
+
+// properties: radial gradient
+const char * const CENTER_NAME("center"); // Property::VECTOR2
+const char * const RADIUS_NAME("radius"); // Property::FLOAT
+
+// properties: linear&radial gradient
+const char * const STOP_OFFSET_NAME("stopOffset"); // Property::Array FLOAT
+const char * const STOP_COLOR_NAME("stopColor"); // Property::Array VECTOR4
+const char * const UNITS_NAME("units"); // Property::String  "userSpaceOnUse | objectBoundingBox"
+const char * const SPREAD_METHOD_NAME("spreadMethod"); // Property::String  "pad | reflect | repeat"
+
+//mesh visual
+const char * const OBJECT_URL_NAME( "objectUrl" );
+const char * const MATERIAL_URL_NAME( "materialUrl" );
+const char * const TEXTURES_PATH_NAME( "texturesPath" );
+const char * const SHADING_MODE_NAME( "shadingMode" );
+const char * const USE_MIPMAPPING_NAME( "useMipmapping" );
+const char * const USE_SOFT_NORMALS_NAME( "useSoftNormals" );
+const char * const LIGHT_POSITION_NAME( "lightPosition" );
+
+
+//Primitive properties
+const char * const PRIMITIVE_SHAPE( "shape" );
+const char * const SLICES( "slices" );
+const char * const STACKS( "stacks" );
+const char * const SCALE_TOP_RADIUS( "scaleTopRadius" );
+const char * const SCALE_BOTTOM_RADIUS( "scaleBottomRadius" );
+const char * const SCALE_HEIGHT( "scaleHeight" );
+const char * const SCALE_RADIUS( "scaleRadius" );
+const char * const SCALE_DIMENSIONS( "scaleDimensions" );
+const char * const BEVEL_PERCENTAGE( "bevelPercentage" );
+const char * const BEVEL_SMOOTHNESS( "bevelSmoothness" );
+const char * const LIGHT_POSITION_UNIFORM_NAME( "lightPosition" );
+
 
 } // namespace Internal
 
