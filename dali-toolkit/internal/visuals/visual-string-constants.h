@@ -94,9 +94,105 @@ extern const char * const CURRENT_FRAME_NUMBER_NAME;
 extern const char * const TOTAL_FRAME_NUMBER_NAME;
 extern const char * const STOP_BEHAVIOR_NAME;
 extern const char * const LOOPING_MODE_NAME;
+extern const char * const IMAGE_ATLASING;
+extern const char * const SYNCHRONOUS_LOADING;
+extern const char * const IMAGE_FITTING_MODE;
+extern const char * const IMAGE_SAMPLING_MODE;
+extern const char * const IMAGE_DESIRED_WIDTH;
+extern const char * const IMAGE_DESIRED_HEIGHT;
+extern const char * const ALPHA_MASK_URL;
 
 // Text visual
 extern const char * const TEXT_PROPERTY;
+extern const char * const FONT_FAMILY_PROPERTY;
+extern const char * const FONT_STYLE_PROPERTY;
+extern const char * const POINT_SIZE_PROPERTY;
+extern const char * const MULTI_LINE_PROPERTY;
+extern const char * const HORIZONTAL_ALIGNMENT_PROPERTY;
+extern const char * const VERTICAL_ALIGNMENT_PROPERTY;
+extern const char * const TEXT_COLOR_PROPERTY;
+extern const char * const ENABLE_MARKUP_PROPERTY;
+extern const char * const SHADOW_PROPERTY;
+extern const char * const UNDERLINE_PROPERTY;
+extern const char * const OUTLINE_PROPERTY;
+extern const char * const BACKGROUND_PROPERTY;
+
+//NPatch visual
+extern const char * const BORDER_ONLY;
+extern const char * const BORDER;
+extern const char * const AUXILIARY_IMAGE_NAME;
+extern const char * const AUXILIARY_IMAGE_ALPHA_NAME;
+
+// non-animated property
+extern const char* const GRADIENT_TYPE_NAME;
+extern const char* const UNIT_TYPE_NAME;
+extern const char* const SPREAD_TYPE_NAME;
+
+// animated property
+extern const char* const START_POSITION_NAME;
+extern const char* const START_COLOR_NAME;
+extern const char* const END_POSITION_NAME;
+extern const char* const END_COLOR_NAME;
+extern const char* const ROTATE_CENTER_NAME;
+extern const char* const ROTATE_AMOUNT_NAME;
+extern const char* const OFFSET_NAME;
+
+// animation parameter property
+extern const char* const START_VALUE_NAME;
+extern const char* const TARGET_VALUE_NAME;
+extern const char* const DIRECTION_TYPE_NAME;
+extern const char* const DURATION_NAME;
+extern const char* const DELAY_NAME;
+extern const char* const REPEAT_NAME;
+extern const char* const REPEAT_DELAY_NAME;
+extern const char* const MOTION_TYPE_NAME;
+extern const char* const EASING_TYPE_NAME;
+
+// common shader property
+extern const char* const UNIFORM_START_POINT_NAME;
+extern const char* const UNIFORM_START_COLOR_NAME;
+extern const char* const UNIFORM_END_POINT_NAME;
+extern const char* const UNIFORM_END_COLOR_NAME;
+extern const char* const UNIFORM_ROTATE_CENTER_NAME;
+extern const char* const UNIFORM_ROTATE_ANGLE_NAME;
+extern const char* const UNIFORM_OFFSET_NAME;
+
+// Border visual
+extern const char * const COLOR_NAME;
+extern const char * const SIZE_NAME;
+extern const char * const ANTI_ALIASING;
+
+// properties: radial gradient
+extern const char * const CENTER_NAME; // Property::VECTOR2
+extern const char * const RADIUS_NAME; // Property::FLOAT
+
+// properties: linear&radial gradient
+extern const char * const STOP_OFFSET_NAME; // Property::Array FLOAT
+extern const char * const STOP_COLOR_NAME; // Property::Array VECTOR4
+extern const char * const UNITS_NAME; // Property::String  "userSpaceOnUse | objectBoundingBox"
+extern const char * const SPREAD_METHOD_NAME; // Property::String  "pad | reflect | repeat"
+
+//mesh visual
+extern const char * const OBJECT_URL_NAME;
+extern const char * const MATERIAL_URL_NAME;
+extern const char * const TEXTURES_PATH_NAME;
+extern const char * const SHADING_MODE_NAME;
+extern const char * const USE_MIPMAPPING_NAME;
+extern const char * const USE_SOFT_NORMALS_NAME;
+extern const char * const LIGHT_POSITION_NAME;
+
+//Primitive properties
+extern const char * const PRIMITIVE_SHAPE;
+extern const char * const SLICES;
+extern const char * const STACKS;
+extern const char * const SCALE_TOP_RADIUS;
+extern const char * const SCALE_BOTTOM_RADIUS;
+extern const char * const SCALE_HEIGHT;
+extern const char * const SCALE_RADIUS;
+extern const char * const SCALE_DIMENSIONS;
+extern const char * const BEVEL_PERCENTAGE;
+extern const char * const BEVEL_SMOOTHNESS;
+extern const char * const LIGHT_POSITION_UNIFORM_NAME;
 
 } // namespace Internal
 

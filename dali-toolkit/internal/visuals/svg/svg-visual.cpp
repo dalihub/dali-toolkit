@@ -46,10 +46,6 @@ namespace
 // property name
 const char * const UNITS("px");
 
-const char * const IMAGE_ATLASING( "atlasing" );
-
-const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
-
 const Dali::Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
 
 }

@@ -56,15 +56,6 @@ namespace Internal
 namespace
 {
 
-// property names
-const char * const IMAGE_FITTING_MODE( "fittingMode" );
-const char * const IMAGE_SAMPLING_MODE( "samplingMode" );
-const char * const IMAGE_DESIRED_WIDTH( "desiredWidth" );
-const char * const IMAGE_DESIRED_HEIGHT( "desiredHeight" );
-const char * const SYNCHRONOUS_LOADING( "synchronousLoading" );
-const char * const IMAGE_ATLASING("atlasing");
-const char * const ALPHA_MASK_URL("alphaMaskUrl");
-
 // fitting modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN( FITTING_MODE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::FittingMode, SHRINK_TO_FIT )

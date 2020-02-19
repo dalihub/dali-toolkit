@@ -82,14 +82,6 @@ enum TextureIndex
   GLOSS_INDEX = 2u
 };
 
-//Property names
-const char * const OBJECT_URL_NAME( "objectUrl" );
-const char * const MATERIAL_URL_NAME( "materialUrl" );
-const char * const TEXTURES_PATH_NAME( "texturesPath" );
-const char * const SHADING_MODE_NAME( "shadingMode" );
-const char * const USE_MIPMAPPING_NAME( "useMipmapping" );
-const char * const USE_SOFT_NORMALS_NAME( "useSoftNormals" );
-const char * const LIGHT_POSITION_NAME( "lightPosition" );
 
 //Shading mode
 DALI_ENUM_TO_STRING_TABLE_BEGIN( SHADING_MODE )
