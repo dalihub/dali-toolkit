@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_COLOR_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,16 @@ enum
    * @note By default it's false, i.e. ColorVisual will not render if the MIX_COLOR is transparent.
    */
   RENDER_IF_TRANSPARENT = MIX_COLOR + 1,
+
+  /**
+   * @brief The blur radius of the visual.
+   * @details Name "blurRadius", type Property::FLOAT.
+   *          If the value is 0, the edge is sharp. Otherwise, the larger the value, the more the edge is blurred.
+   * @note Optional.
+   * @note The default is 0.
+   * @note The visual size increases by the blur radius.
+   */
+  BLUR_RADIUS = MIX_COLOR + 2,
 };
 
 } // namespace Property
