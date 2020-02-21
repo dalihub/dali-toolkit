@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -508,6 +508,7 @@ int UtcDaliVisualGetPropertyMap1(void)
   Property::Map propertyMap;
   propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
   propertyMap.Insert(Visual::Property::MIX_COLOR,  Color::BLUE);
+  propertyMap.Insert( DevelVisual::Property::CORNER_RADIUS, 10.0f );
   Visual::Base colorVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -520,6 +521,10 @@ int UtcDaliVisualGetPropertyMap1(void)
   Property::Value* colorValue = resultMap.Find( ColorVisual::Property::MIX_COLOR,  Property::VECTOR4 );
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::BLUE );
+
+  Property::Value* radiusValue = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::FLOAT );
+  DALI_TEST_CHECK( radiusValue );
+  DALI_TEST_CHECK( radiusValue->Get< float >() == 10.0f );
 
   // change the blend color
   propertyMap[ColorVisual::Property::MIX_COLOR] = Color::CYAN;
@@ -2977,8 +2982,11 @@ int UtcDaliVisualSetTransform7(void)
   tet_infoline( "UtcDaliVisualSetTransform: NPatch visual" );
 
   VisualFactory factory = VisualFactory::Get();
-  Image image = ResourceImage::New(TEST_NPATCH_FILE_NAME, ImageDimensions(100, 200));
-  Visual::Base visual = factory.CreateVisual(image);
+  Property::Map propertyMap;
+  propertyMap[Toolkit::Visual::Property::TYPE] = Toolkit::Visual::IMAGE;
+  propertyMap[Toolkit::ImageVisual::Property::URL] = TEST_NPATCH_FILE_NAME;
+  propertyMap[Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING] = true;
+  Visual::Base visual = factory.CreateVisual(propertyMap);
   TestTransform( application, visual );
   TestMixColor( visual, Visual::Property::MIX_COLOR, Color::WHITE );
 
@@ -3048,6 +3056,7 @@ int UtcDaliNPatchVisualCustomShader(void)
   properties[Visual::Property::MIX_COLOR] = Color::BLUE;
   properties[Visual::Property::SHADER]=shader;
   properties[ImageVisual::Property::URL] = TEST_NPATCH_FILE_NAME;
+  properties[ImageVisual::Property::SYNCHRONOUS_LOADING] = true;
 
   Visual::Base visual = factory.CreateVisual( properties );
   TestMixColor( visual, Visual::Property::MIX_COLOR, Color::BLUE );
@@ -3570,6 +3579,76 @@ int UtcDaliSvgVisualCustomShader(void)
 
   Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
   DALI_TEST_EQUALS( vertexShader, vertex->Get< std::string >(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliVisualRoundedCorner(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualRoundedCorner" );
+
+  // image visual
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float cornerRadius = 30.0f;
+
+    properties[Visual::Property::TYPE] = Visual::IMAGE;
+    properties[ImageVisual::Property::URL] = TEST_IMAGE_FILE_NAME;
+    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetSize( 200.f, 200.f );
+    dummy.SetParentOrigin( ParentOrigin::CENTER );
+    Stage::GetCurrent().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+  }
+
+  // color visual
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float cornerRadius = 30.0f;
+
+    properties[Visual::Property::TYPE] = Visual::COLOR;
+    properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+    properties["cornerRadius"] = cornerRadius;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetSize( 200.f, 200.f );
+    dummy.SetParentOrigin( ParentOrigin::CENTER );
+    Stage::GetCurrent().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+  }
 
   END_TEST;
 }

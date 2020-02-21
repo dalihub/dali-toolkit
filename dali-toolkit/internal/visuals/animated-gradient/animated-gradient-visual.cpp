@@ -37,37 +37,6 @@ namespace Internal
 
 namespace
 {
-// non-animated property
-const char* const GRADIENT_TYPE_NAME("gradientType");
-const char* const UNIT_TYPE_NAME("unitType");
-const char* const SPREAD_TYPE_NAME("spreadType");
-// animated property
-const char* const START_POSITION_NAME("startPosition");
-const char* const START_COLOR_NAME("startColor");
-const char* const END_POSITION_NAME("endPosition");
-const char* const END_COLOR_NAME("endColor");
-const char* const ROTATE_CENTER_NAME("rotateCenter");
-const char* const ROTATE_AMOUNT_NAME("rotateAmount");
-const char* const OFFSET_NAME("offset");
-// animation parameter property
-const char* const START_VALUE_NAME("startValue");
-const char* const TARGET_VALUE_NAME("targetValue");
-const char* const DIRECTION_TYPE_NAME("directionType");
-const char* const DURATION_NAME("duration");
-const char* const DELAY_NAME("delay");
-const char* const REPEAT_NAME("repeat");
-const char* const REPEAT_DELAY_NAME("repeatDelay");
-const char* const MOTION_TYPE_NAME("motionType");
-const char* const EASING_TYPE_NAME("easingType");
-// common shader property
-const char* const UNIFORM_START_POINT_NAME("start_point");
-const char* const UNIFORM_START_COLOR_NAME("start_color");
-const char* const UNIFORM_END_POINT_NAME("end_point");
-const char* const UNIFORM_END_COLOR_NAME("end_color");
-const char* const UNIFORM_ROTATE_CENTER_NAME("rotate_center");
-const char* const UNIFORM_ROTATE_ANGLE_NAME("rotate_angle");
-const char* const UNIFORM_OFFSET_NAME("gradient_offset");
-
 DALI_ENUM_TO_STRING_TABLE_BEGIN( GRADIENT_TYPE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelAnimatedGradientVisual::GradientType, LINEAR )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelAnimatedGradientVisual::GradientType, RADIAL )

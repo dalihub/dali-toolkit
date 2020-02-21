@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -271,6 +271,14 @@ public:
 private:
 
   /**
+   * @copydoc TextureUploadObserver::LoadComplete
+   *
+   * To avoid rendering garbage pixels, renderer should be added to actor after the resources are ready.
+   * This callback is the place to add the renderer as it would be called once the PixelBuffer loading is finished.
+   */
+  void LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied ) override {}
+
+  /**
    * Allocate the mask data when a masking property is defined in the property map
    */
   void AllocateMaskData();
@@ -321,12 +329,6 @@ private:
    * @param NativeImageRenderer
    */
   void CreateNativeImageRenderer( NativeImage& nativeImage );
-
-  /**
-   * @brief Query whether resources requires to be loaded synchronously.
-   * @return Returns true if synchronous resource loading is required, false otherwise.
-   */
-  bool IsSynchronousResourceLoading() const;
 
   /**
    * Creates the texture set and adds the texture to it

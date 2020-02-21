@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,11 +48,6 @@ namespace Internal
 
 namespace
 {
-const char * const BORDER_ONLY( "borderOnly" );
-const char * const BORDER( "border" );
-const char * const AUXILIARY_IMAGE_NAME( "auxiliaryImage" );
-const char * const AUXILIARY_IMAGE_ALPHA_NAME( "auxiliaryImageAlpha" );
-
 const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   varying mediump vec2 vTexCoord;\n
@@ -288,20 +283,28 @@ NPatchVisualPtr NPatchVisual::New( VisualFactoryCache& factoryCache, NinePatchIm
 
 void NPatchVisual::LoadImages()
 {
+  TextureManager& textureManager = mFactoryCache.GetTextureManager();
+  bool synchronousLoading = mImpl->mFlags & Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+
   if( NPatchLoader::UNINITIALIZED_ID == mId && mImageUrl.IsLocalResource() )
   {
     bool preMultiplyOnLoad = IsPreMultipliedAlphaEnabled() && !mImpl->mCustomShader ? true : false;
+    mId = mLoader.Load( textureManager, this, mImageUrl.GetUrl(), mBorder, preMultiplyOnLoad, synchronousLoading );
 
-    mId = mLoader.Load( mImageUrl.GetUrl(), mBorder, preMultiplyOnLoad );
-
-    EnablePreMultipliedAlpha( preMultiplyOnLoad );
+    const NPatchLoader::Data* data;
+    if( mLoader.GetNPatchData( mId, data ) && data->loadCompleted )
+    {
+      EnablePreMultipliedAlpha( preMultiplyOnLoad );
+    }
   }
 
-  if( ! mAuxiliaryPixelBuffer && mAuxiliaryUrl.IsValid() && mAuxiliaryUrl.IsLocalResource() )
+  if( !mAuxiliaryPixelBuffer && mAuxiliaryUrl.IsValid() && mAuxiliaryUrl.IsLocalResource() )
   {
-    // Load the auxiliary image synchronously
-    mAuxiliaryPixelBuffer = Dali::LoadImageFromFile( mAuxiliaryUrl.GetUrl(), ImageDimensions(),
-                                                     FittingMode::DEFAULT, SamplingMode::BOX_THEN_LINEAR, true );
+    // Load the auxiliary image
+    auto preMultiplyOnLoading = TextureManager::MultiplyOnLoad::LOAD_WITHOUT_MULTIPLY;
+    mAuxiliaryPixelBuffer = textureManager.LoadPixelBuffer( mAuxiliaryUrl, Dali::ImageDimensions(), FittingMode::DEFAULT,
+                                                            SamplingMode::BOX_THEN_LINEAR, synchronousLoading,
+                                                            this, true, preMultiplyOnLoading );
   }
 }
 
@@ -311,13 +314,23 @@ void NPatchVisual::GetNaturalSize( Vector2& naturalSize )
   naturalSize.y = 0u;
 
   // load now if not already loaded
-  LoadImages();
-
   const NPatchLoader::Data* data;
-  if( mLoader.GetNPatchData( mId, data ) )
+  if( mLoader.GetNPatchData( mId, data ) && data->loadCompleted )
   {
     naturalSize.x = data->croppedWidth;
     naturalSize.y = data->croppedHeight;
+  }
+  else
+  {
+    if( mImageUrl.IsValid() )
+    {
+      ImageDimensions dimensions = Dali::GetOriginalImageSize( mImageUrl.GetUrl() );
+      if( dimensions != ImageDimensions( 0, 0 ) )
+      {
+        naturalSize.x = dimensions.GetWidth();
+        naturalSize.y = dimensions.GetHeight();
+      }
+    }
   }
 
   if( mAuxiliaryPixelBuffer )
@@ -366,6 +379,21 @@ void NPatchVisual::DoSetProperties( const Property::Map& propertyMap )
   {
     auxImageAlpha->Get( mAuxiliaryImageAlpha );
   }
+
+  Property::Value* synchronousLoading = propertyMap.Find( Toolkit::ImageVisual::Property::SYNCHRONOUS_LOADING, SYNCHRONOUS_LOADING );
+  if( synchronousLoading )
+  {
+    bool sync = false;
+    synchronousLoading->Get( sync );
+    if( sync )
+    {
+      mImpl->mFlags |= Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+    }
+    else
+    {
+      mImpl->mFlags &= ~Impl::IS_SYNCHRONOUS_RESOURCE_LOADING;
+    }
+  }
 }
 
 void NPatchVisual::DoSetOnStage( Actor& actor )
@@ -373,22 +401,32 @@ void NPatchVisual::DoSetOnStage( Actor& actor )
   // load when first go on stage
   LoadImages();
 
-  Geometry geometry = CreateGeometry();
-  Shader shader = CreateShader();
-  mImpl->mRenderer = Renderer::New( geometry, shader );
+  const NPatchLoader::Data* data;
+  if( mLoader.GetNPatchData( mId, data ) )
+  {
+    Geometry geometry = CreateGeometry();
+    Shader shader = CreateShader();
 
-  ApplyTextureAndUniforms();
+    mImpl->mRenderer = Renderer::New( geometry, shader );
 
-  actor.AddRenderer( mImpl->mRenderer );
+    mPlacementActor = actor;
+    if( data->loadCompleted )
+    {
+      ApplyTextureAndUniforms();
+      actor.AddRenderer( mImpl->mRenderer );
+      mPlacementActor.Reset();
 
-  // npatch loaded and ready to display
-  ResourceReady( Toolkit::Visual::ResourceStatus::READY );
+      // npatch loaded and ready to display
+      ResourceReady( Toolkit::Visual::ResourceStatus::READY );
+    }
+  }
 }
 
 void NPatchVisual::DoSetOffStage( Actor& actor )
 {
   actor.RemoveRenderer( mImpl->mRenderer );
   mImpl->mRenderer.Reset();
+  mPlacementActor.Reset();
 }
 
 void NPatchVisual::OnSetTransform()
@@ -425,6 +463,7 @@ void NPatchVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
 
 NPatchVisual::NPatchVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+  mPlacementActor(),
   mLoader( factoryCache.GetNPatchLoader() ),
   mImageUrl(),
   mAuxiliaryUrl(),
@@ -444,7 +483,7 @@ Geometry NPatchVisual::CreateGeometry()
 {
   Geometry geometry;
   const NPatchLoader::Data* data;
-  if( mLoader.GetNPatchData( mId, data ) )
+  if( mLoader.GetNPatchData( mId, data ) && data->loadCompleted )
   {
     if( data->stretchPixelsX.Size() == 1 && data->stretchPixelsY.Size() == 1 )
     {
@@ -556,7 +595,7 @@ void NPatchVisual::ApplyTextureAndUniforms()
   const NPatchLoader::Data* data;
   TextureSet textureSet;
 
-  if( mLoader.GetNPatchData( mId, data ) )
+  if( mLoader.GetNPatchData( mId, data ) && data->loadCompleted )
   {
     textureSet = data->textureSet;
 
@@ -771,6 +810,56 @@ Geometry NPatchVisual::CreateBorderGeometry( Uint16Pair gridSize )
   }
 
   return GenerateGeometry( vertices, indices );
+}
+
+void NPatchVisual::SetResource()
+{
+  const NPatchLoader::Data* data;
+  if( mLoader.GetNPatchData( mId, data ) )
+  {
+    Geometry geometry = CreateGeometry();
+    Shader shader = CreateShader();
+
+    mImpl->mRenderer.SetGeometry( geometry );
+    mImpl->mRenderer.SetShader( shader );
+
+    Actor actor = mPlacementActor.GetHandle();
+    if( actor )
+    {
+      ApplyTextureAndUniforms();
+      actor.AddRenderer( mImpl->mRenderer );
+      mPlacementActor.Reset();
+
+      // npatch loaded and ready to display
+      ResourceReady( Toolkit::Visual::ResourceStatus::READY );
+    }
+  }
+}
+
+void NPatchVisual::LoadComplete( bool loadSuccess, Devel::PixelBuffer pixelBuffer, const VisualUrl& url, bool preMultiplied )
+{
+  if( url.GetUrl() == mAuxiliaryUrl.GetUrl() )
+  {
+    mAuxiliaryPixelBuffer = pixelBuffer;
+    const NPatchLoader::Data* data;
+    if( mLoader.GetNPatchData( mId, data ) && data->loadCompleted )
+    {
+      SetResource();
+    }
+  }
+  else
+  {
+    if( loadSuccess )
+    {
+      mLoader.SetNPatchData( mId, pixelBuffer );
+      EnablePreMultipliedAlpha( preMultiplied );
+    }
+
+    if( mAuxiliaryPixelBuffer || !mAuxiliaryUrl.IsValid() )
+    {
+      SetResource();
+    }
+  }
 }
 
 } // namespace Internal

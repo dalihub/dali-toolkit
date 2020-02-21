@@ -266,6 +266,12 @@ public:
    */
   virtual Base& GetVisualObject();
 
+  /**
+   * @brief Query whether resources requires to be loaded synchronously.
+   * @return Returns true if synchronous resource loading is required, false otherwise.
+   */
+  bool IsSynchronousLoadingRequired() const;
+
  protected:
 
   /**
@@ -343,6 +349,13 @@ protected:
    * @return Returns true if this Visual is on stage, false if it is off the stage
    */
   bool IsOnStage() const;
+
+  /**
+   * @brief Query whether the corners of the visual requires to be rounded.
+   *
+   * @return Returns true if the rounded corner is required, false otherwise.
+   */
+  bool IsRoundedCornerRequired() const;
 
 private:
 

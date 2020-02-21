@@ -55,19 +55,6 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, BEVELLED_CUBE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::PrimitiveVisual::Shape, CONICAL_FRUSTUM )
 DALI_ENUM_TO_STRING_TABLE_END( SHAPE_TYPE )
 
-//Property names
-const char * const PRIMITIVE_SHAPE( "shape" );
-const char * const SLICES( "slices" );
-const char * const STACKS( "stacks" );
-const char * const SCALE_TOP_RADIUS( "scaleTopRadius" );
-const char * const SCALE_BOTTOM_RADIUS( "scaleBottomRadius" );
-const char * const SCALE_HEIGHT( "scaleHeight" );
-const char * const SCALE_RADIUS( "scaleRadius" );
-const char * const SCALE_DIMENSIONS( "scaleDimensions" );
-const char * const BEVEL_PERCENTAGE( "bevelPercentage" );
-const char * const BEVEL_SMOOTHNESS( "bevelSmoothness" );
-const char * const LIGHT_POSITION_UNIFORM_NAME( "lightPosition" );
-
 //Primitive property defaults
 const int     DEFAULT_SLICES =              128; ///< For spheres and conics
 const int     DEFAULT_STACKS =              128; ///< For spheres and conics

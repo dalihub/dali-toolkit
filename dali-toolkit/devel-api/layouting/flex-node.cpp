@@ -101,7 +101,7 @@ Node::~Node()
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Destructor() <<\n");
 }
 
-void Node::AddChild( Actor child, MeasureCallback measureFunction, int index )
+void Node::AddChild( Actor child, Extents margin, MeasureCallback measureFunction, int index )
 {
   if( child )
   {
@@ -115,10 +115,16 @@ void Node::AddChild( Actor child, MeasureCallback measureFunction, int index )
     childNode->mImpl->mActor = child;
     Vector2 minumumSize = child.GetMinimumSize();
     Vector2 maximumSize = child.GetMaximumSize();
+
     YGNodeStyleSetMaxWidth( childNode->mImpl->mYogaNode, maximumSize.width );
     YGNodeStyleSetMaxHeight( childNode->mImpl->mYogaNode, maximumSize.height );
     YGNodeStyleSetMinWidth( childNode->mImpl->mYogaNode, minumumSize.width );
     YGNodeStyleSetMinHeight( childNode->mImpl->mYogaNode, minumumSize.height );
+
+    YGNodeStyleSetMargin( childNode->mImpl->mYogaNode, YGEdgeLeft, margin.start );
+    YGNodeStyleSetMargin( childNode->mImpl->mYogaNode, YGEdgeTop, margin.top );
+    YGNodeStyleSetMargin( childNode->mImpl->mYogaNode, YGEdgeRight, margin.end );
+    YGNodeStyleSetMargin( childNode->mImpl->mYogaNode, YGEdgeBottom, margin.bottom );
 
     YGNodeSetMeasureFunc( childNode->mImpl->mYogaNode, &MeasureChild );
 
