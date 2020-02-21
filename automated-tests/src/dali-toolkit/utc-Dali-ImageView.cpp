@@ -94,6 +94,8 @@ static const char* gImage_600_RGB = TEST_RESOURCE_DIR "/test-image-600.jpg";
 // resolution: 50*50, frame count: 4, frame delay: 0.2 second for each frame
 const char* TEST_GIF_FILE_NAME = TEST_RESOURCE_DIR "/anim.gif";
 
+const char* TEST_VECTOR_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR  "/insta_camera.json";
+
 void TestImage( ImageView imageView, BufferImage image )
 {
   Property::Value value = imageView.GetProperty( imageView.GetPropertyIndex( "image" ) );
@@ -2120,7 +2122,6 @@ int UtcDaliImageViewFillMode(void)
   ToolkitTestApplication application;
 
   tet_infoline( "Create an ImageVisual without padding and set the fill-mode to fill" );
-  tet_infoline( "  There should be no need to change the transform, our size-policy should be relative and size should be [1,1]");
 
   ImageView imageView = ImageView::New();
   Property::Map imageMap;
@@ -2145,7 +2146,702 @@ int UtcDaliImageViewFillMode(void)
   Property::Map* map = value->GetMap();
   DALI_TEST_CHECK( map );
 
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2::ONE, TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get< int >() == Toolkit::Visual::Transform::Policy::RELATIVE );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModeFitKeepAspectRatio(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Create an ImageVisual using FitKeepAspectRatio ( image: [600,600], view: [600,700] )" );
+  tet_infoline( "  There should be need to change the transform, offset is adjusted to fit inside");
+
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  imageMap.Add( Toolkit::ImageVisual::Property::URL, gImage_600_RGB ); // 600x600 image
+  imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE , Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO );
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(600,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
   // If there's
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 600, 600 ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 0, 50 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModesFill(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Create an ImageVisual using Fill ( image: [600,600], view: [600,700] )" );
+  tet_infoline( "  There should be no need to change the transform, only size is changed to fit view");
+
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  imageMap.Add( Toolkit::ImageVisual::Property::URL, gImage_600_RGB ); // 600x600 image
+  imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE , Toolkit::DevelVisual::FILL );
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(600,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2::ONE, TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_CHECK( value->Get< int >() == Toolkit::Visual::Transform::Policy::RELATIVE );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 0, 0 ), TEST_LOCATION ); // OFFSET is zero
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModesOverfitKeepAspectRatio(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Create an ImageVisual using OverFitKeepAspectRatio ( image: [600,600], view: [600,500] )" );
+  tet_infoline( "  offset or size is the same as view, but adjust internally using pixelArea ");
+
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  imageMap.Add( Toolkit::ImageVisual::Property::URL, gImage_600_RGB ); // 600x600 image
+  imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE , Toolkit::DevelVisual::OVER_FIT_KEEP_ASPECT_RATIO );
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(600,500);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  // If there's
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 600, 500 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 0, 0 ), TEST_LOCATION ); // OFFSET is zero
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModesCenter01(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Create an ImageVisual using Center ( image: [600,600], view: [700,700] )" );
+  tet_infoline( "  There should be need to change the transform, offset is adjusted to fit inside");
+
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  imageMap.Add( Toolkit::ImageVisual::Property::URL, gImage_600_RGB ); // 600x600 image
+  imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::CENTER);
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(700,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 600, 600 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 50, 50 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModesCenter02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Create an ImageVisual using Center ( image: [600,600], view: [500,500] )" );
+  tet_infoline( "  There should be need to change the transform, offset is adjusted to fit inside");
+
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  imageMap.Add( Toolkit::ImageVisual::Property::URL, gImage_600_RGB ); // 600x600 image
+  imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::CENTER);
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(700,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 600, 600 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 50, 50 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModesFitHeight01(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Create an ImageVisual using FitHeight ( image: [600,600], view: [600,700] )" );
+
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  imageMap.Add( Toolkit::ImageVisual::Property::URL, gImage_600_RGB ); // 600x600 image
+  imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FIT_HEIGHT);
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(600,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 600, 700 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 0, 0 ), TEST_LOCATION ); // OFFSET is zero
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModesFitHeight02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Create an ImageVisual using FitHeight ( image: [600,600], view: [700,600] )" );
+
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  imageMap.Add( Toolkit::ImageVisual::Property::URL, gImage_600_RGB ); // 249x169 image
+  imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FIT_HEIGHT);
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(700,600);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 600, 600 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 50, 0 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModesFitWidth01(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Create an ImageVisual using FitWidth ( image: [600,600], view: [600,700] )" );
+
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  imageMap.Add( Toolkit::ImageVisual::Property::URL, gImage_600_RGB ); // 600x600 image
+  imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FIT_WIDTH);
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(600,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 600, 600 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 0, 50 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModesFitWidth02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Create an ImageVisual using FitWidth ( image: [600,600], view:[700,600] )" );
+
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap.Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::IMAGE );
+  imageMap.Add( Toolkit::ImageVisual::Property::URL, gImage_600_RGB ); // 249x169 image
+  imageMap.Add( DevelVisual::Property::VISUAL_FITTING_MODE, Toolkit::DevelVisual::FIT_WIDTH);
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(700,600);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 700, 600 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 0, 0 ), TEST_LOCATION ); // OFFSET is zero
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModesChangeFittingMode01(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliImageViewFittingModesChangeFittingMode, image: [600,600], view:[800,700]" );
+
+  ImageView imageView = ImageView::New();
+
+  // 1. Render using FittingMode::SHRINK_TO_FIT
+  Property::Map imageMap;
+  imageMap[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imageMap[ Toolkit::ImageVisual::Property::URL ] = gImage_600_RGB;
+  imageMap[ DevelVisual::Property::VISUAL_FITTING_MODE ] =  Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(800,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 700, 700 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 50, 0 ), TEST_LOCATION );
+
+  // 2. Render again using DevelVisaul::CENTER
+  Property::Map imageMap2;
+  imageMap2[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imageMap2[ Toolkit::ImageVisual::Property::URL ] = gImage_600_RGB;
+  imageMap2[ DevelVisual::Property::VISUAL_FITTING_MODE ] = Toolkit::DevelVisual::CENTER;
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap2 );
+  imageView.SetSize(800,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  returnedMap.Clear();
+  visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+
+  visual.CreatePropertyMap( returnedMap );
+
+  value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 600, 600 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 100, 50 ), TEST_LOCATION );
+
+  // 3. Render again using before fittingMode
+  Property::Map imageMap3;
+  imageMap3[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imageMap3[ Toolkit::ImageVisual::Property::URL ] = gImage_600_RGB;
+  imageMap3[ DevelVisual::Property::VISUAL_FITTING_MODE ] =  Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap3 );
+  imageView.SetSize(800,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  returnedMap.Clear();
+  visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  visual.CreatePropertyMap( returnedMap );
+
+  value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 700, 700 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 50, 0 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModesChangeFittingMode02(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "UtcDaliImageViewFittingModesChangeFittingMode, image: [600,600], view:[800,700]" );
+
+  ImageView imageView = ImageView::New();
+
+  // 1. Render using FittingMode::OVER_FIT_KEEP_ASPECT_RATIO
+  Property::Map imageMap;
+  imageMap[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imageMap[ Toolkit::ImageVisual::Property::URL ] = gImage_600_RGB;
+  imageMap[ DevelVisual::Property::VISUAL_FITTING_MODE ] =  Toolkit::DevelVisual::OVER_FIT_KEEP_ASPECT_RATIO;
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(800,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 800, 700 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 0, 0 ), TEST_LOCATION );
+
+  // 2. Render again using DevelVisaul::CENTER
+  Property::Map imageMap2;
+  imageMap2[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imageMap2[ Toolkit::ImageVisual::Property::URL ] = gImage_600_RGB;
+  imageMap2[ DevelVisual::Property::VISUAL_FITTING_MODE ] = Toolkit::DevelVisual::CENTER;
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap2 );
+  imageView.SetSize(800,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  returnedMap.Clear();
+  visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+
+  visual.CreatePropertyMap( returnedMap );
+
+  value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 600, 600 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 100, 50 ), TEST_LOCATION );
+
+  // 3. Render again using before fittingMode
+  Property::Map imageMap3;
+  imageMap3[ Toolkit::Visual::Property::TYPE ] = Toolkit::Visual::IMAGE;
+  imageMap3[ Toolkit::ImageVisual::Property::URL ] = gImage_600_RGB;
+  imageMap3[ DevelVisual::Property::VISUAL_FITTING_MODE ] =  Toolkit::DevelVisual::OVER_FIT_KEEP_ASPECT_RATIO;
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap3 );
+  imageView.SetSize(800,700);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  returnedMap.Clear();
+  visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  visual.CreatePropertyMap( returnedMap );
+
+  value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 800, 700 ), TEST_LOCATION ); // Change the internal size according to the image view size
+
+  value = map->Find( Toolkit::Visual::Transform::Property::SIZE_POLICY );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ), TEST_LOCATION );
+
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 0, 0 ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliImageViewFittingModesWithAnimatedVectorImageVisual(void)
+{
+  ToolkitTestApplication application;
+
+  tet_infoline( "Create an ImageVisual using ScaleToFill and animated vector image ( image: [600,600], view:[600,600] )" );
+
+  ImageView imageView = ImageView::New();
+  Property::Map imageMap;
+  imageMap.Add( Toolkit::Visual::Property::TYPE, DevelVisual::ANIMATED_VECTOR_IMAGE );
+  imageMap.Add( Toolkit::ImageVisual::Property::URL, TEST_VECTOR_IMAGE_FILE_NAME ); // 249x169 image
+
+  imageView.SetProperty( Toolkit::ImageView::Property::IMAGE, imageMap );
+  imageView.SetSize(600,600);
+
+  Stage::GetCurrent().Add( imageView );
+
+  // Trigger a potential relayout
+  application.SendNotification();
+  application.Render();
+
+  Toolkit::Visual::Base visual = DevelControl::GetVisual( Toolkit::Internal::GetImplementation( imageView ), Toolkit::ImageView::Property::IMAGE );
+  Property::Map returnedMap;
+  visual.CreatePropertyMap( returnedMap );
+
+  Property::Value* value = returnedMap.Find( Toolkit::Visual::Property::TRANSFORM );
+  DALI_TEST_CHECK( value );
+  Property::Map* map = value->GetMap();
+  DALI_TEST_CHECK( map );
+
   value = map->Find( Toolkit::Visual::Transform::Property::SIZE );
   DALI_TEST_CHECK( value );
   DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2::ONE, TEST_LOCATION ); // Relative size so will take up 100%
@@ -2154,8 +2850,13 @@ int UtcDaliImageViewFillMode(void)
   DALI_TEST_CHECK( value );
   DALI_TEST_CHECK( value->Get< int >() == Toolkit::Visual::Transform::Policy::RELATIVE );
 
+  value = map->Find( Toolkit::Visual::Transform::Property::OFFSET );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( value->Get< Vector2 >(), Vector2( 0, 0 ), TEST_LOCATION ); // OFFSET is zero
+
   END_TEST;
 }
+
 
 int UtcDaliImageViewCustomShader(void)
 {

@@ -858,7 +858,7 @@ int UtcDaliVisualGetPropertyMap5(void)
 
   value = resultMap.Find( ImageVisual::Property::FITTING_MODE,   Property::INTEGER );
   DALI_TEST_CHECK( value );
-  DALI_TEST_CHECK( value->Get<int>() == FittingMode::SHRINK_TO_FIT );
+  DALI_TEST_CHECK( value->Get<int>() == FittingMode::DEFAULT );
 
   value = resultMap.Find( ImageVisual::Property::SAMPLING_MODE,   Property::INTEGER );
   DALI_TEST_CHECK( value );
