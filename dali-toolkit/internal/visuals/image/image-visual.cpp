@@ -212,7 +212,8 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFac
   mLoading( false ),
   mOrientationCorrection( true )
 {
-  EnablePreMultipliedAlpha( mFactoryCache.GetPreMultiplyOnLoad() );
+  // PreMultiplied alpha should be disabled when the Image is used.
+  EnablePreMultipliedAlpha( false );
 }
 
 ImageVisual::~ImageVisual()
