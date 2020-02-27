@@ -932,16 +932,8 @@ int UtcDaliTextFieldSetPropertyP(void)
   DALI_TEST_CHECK( !field.GetProperty<bool>( DevelTextField::Property::ENABLE_GRAB_HANDLE_POPUP ) );
 
   // Check the background property
-  Property::Map backgroundMapSet;
-  Property::Map backgroundMapGet;
-
-  backgroundMapSet["enable"] = true;
-  backgroundMapSet["color"] = Color::RED;
-  field.SetProperty( DevelTextField::Property::BACKGROUND, backgroundMapSet );
-
-  backgroundMapGet = field.GetProperty<Property::Map>( DevelTextField::Property::BACKGROUND );
-  DALI_TEST_EQUALS( backgroundMapGet.Count(), backgroundMapSet.Count(), TEST_LOCATION );
-  DALI_TEST_EQUALS( DaliTestCheckMaps( backgroundMapGet, backgroundMapSet ), true, TEST_LOCATION );
+  field.SetProperty( DevelTextField::Property::BACKGROUND, Color::RED );
+  DALI_TEST_EQUALS( field.GetProperty<Vector4>( DevelTextField::Property::BACKGROUND ), Color::RED, TEST_LOCATION );
 
   application.SendNotification();
   application.Render();

@@ -118,23 +118,9 @@ namespace Property
 
       /**
        * @brief The default text background parameters.
-       * @details Name "textBackground", type Property::MAP.
-       * @note Use "textBackground" as property name to avoid conflict with Control's "background" property
-       *
-       * The background map contains the following keys:
-       *
-       * | %Property Name       | Type     | Required | Description                                                                                                        |
-       * |----------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------|
-       * | enable               | BOOLEAN  | No       | True to enable the background or false to disable (the default value is false)                                     |
-       * | color                | VECTOR4  | No       | The color of the background (the default value is Color::CYAN)                                                     |
-       *
-       * Example Usage:
-       * @code
-       *   Property::Map propertyMap;
-       *   propertyMap["enable"] = true;
-       *   propertyMap["color"] = Color::RED;
-       *   field.SetProperty( DevelTextField::Property::BACKGROUND, propertyMap );
-       * @endcode
+       * @details Name "textBackground", type Property::VECTOR4.
+       * @note Use "textBackground" as property name to avoid conflict with Control's "background" property.
+       * @note The default value is Color::TRANSPARENT.
        */
       BACKGROUND = ELLIPSIS + 5
 

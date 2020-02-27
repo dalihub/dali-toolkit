@@ -33,6 +33,8 @@ namespace
   const static uint8_t U2 = 2u;
   const static uint8_t U3 = 3u;
   const static uint8_t U4 = 4u;
+  const static uint8_t U5 = 5u;
+  const static uint8_t U6 = 6u;
   const static uint8_t U0 = 0u;
   const static uint8_t UTF8_LENGTH[256] = {
     U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
@@ -66,8 +68,11 @@ namespace
 
     U4, U4, U4, U4, U4, U4, U4, U4,         // lead byte = 1111 0xxx (U+10000 - U+1FFFFF)
 
-    U0, U0, U0, U0,                         // Non valid.
-    U0, U0, U0, U0,                         // Non valid.
+    U5, U5, U5, U5,                         // lead byte = 1111 10xx (U+200000 - U+3FFFFFF)
+
+    U6, U6,                                 // lead byte = 1111 110x (U+4000000 - U+7FFFFFFF)
+
+    U0, U0,                                 // Non valid.
   };
 
   const uint8_t CR = 0xd;
@@ -117,6 +122,14 @@ uint32_t GetNumberOfUtf8Bytes( const uint32_t* const utf32, uint32_t numberOfCha
     else if( code < 0x200000u )
     {
       numberOfBytes += U4;
+    }
+    else if( code < 0x4000000u )
+    {
+      numberOfBytes += U5;
+    }
+    else if( code < 0x80000000u )
+    {
+      numberOfBytes += U6;
     }
   }
 
@@ -197,6 +210,40 @@ uint32_t Utf8ToUtf32( const uint8_t* const utf8, uint32_t length, uint32_t* utf3
         break;
       }
 
+      case U5:
+      {
+        uint32_t& code = *utf32++;
+        code = leadByte & 0x03u;
+        begin++;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        break;
+      }
+
+      case U6:
+      {
+        uint32_t& code = *utf32++;
+        code = leadByte & 0x01u;
+        begin++;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        code <<= 6u;
+        code |= *begin++ & 0x3fu;
+        break;
+      }
+
       case U0:    // Invalid case
       {
         begin++;
@@ -231,13 +278,30 @@ uint32_t Utf32ToUtf8( const uint32_t* const utf32, uint32_t numberOfCharacters, 
     }
     else if( code < 0x10000u )
     {
-      *utf8++ = static_cast<uint8_t>(   code >> 12u )          | 0xe0u; // lead byte for 2 byte sequence
+      *utf8++ = static_cast<uint8_t>(   code >> 12u )          | 0xe0u; // lead byte for 3 byte sequence
       *utf8++ = static_cast<uint8_t>( ( code >> 6u )  & 0x3f ) | 0x80u; // continuation byte
       *utf8++ = static_cast<uint8_t>(   code          & 0x3f ) | 0x80u; // continuation byte
     }
     else if( code < 0x200000u )
     {
-      *utf8++ = static_cast<uint8_t>(   code >> 18u )          | 0xf0u; // lead byte for 2 byte sequence
+      *utf8++ = static_cast<uint8_t>(   code >> 18u )          | 0xf0u; // lead byte for 4 byte sequence
+      *utf8++ = static_cast<uint8_t>( ( code >> 12u ) & 0x3f ) | 0x80u; // continuation byte
+      *utf8++ = static_cast<uint8_t>( ( code >> 6u )  & 0x3f ) | 0x80u; // continuation byte
+      *utf8++ = static_cast<uint8_t>(   code          & 0x3f ) | 0x80u; // continuation byte
+    }
+    else if( code < 0x4000000u )
+    {
+      *utf8++ = static_cast<uint8_t>(   code >> 24u )          | 0xf8u; // lead byte for 5 byte sequence
+      *utf8++ = static_cast<uint8_t>( ( code >> 18u ) & 0x3f ) | 0x80u; // continuation byte
+      *utf8++ = static_cast<uint8_t>( ( code >> 12u ) & 0x3f ) | 0x80u; // continuation byte
+      *utf8++ = static_cast<uint8_t>( ( code >> 6u )  & 0x3f ) | 0x80u; // continuation byte
+      *utf8++ = static_cast<uint8_t>(   code          & 0x3f ) | 0x80u; // continuation byte
+    }
+    else if( code < 0x80000000u )
+    {
+      *utf8++ = static_cast<uint8_t>(   code >> 30u )          | 0xfcu; // lead byte for 6 byte sequence
+      *utf8++ = static_cast<uint8_t>( ( code >> 24u ) & 0x3f ) | 0x80u; // continuation byte
+      *utf8++ = static_cast<uint8_t>( ( code >> 18u ) & 0x3f ) | 0x80u; // continuation byte
       *utf8++ = static_cast<uint8_t>( ( code >> 12u ) & 0x3f ) | 0x80u; // continuation byte
       *utf8++ = static_cast<uint8_t>( ( code >> 6u )  & 0x3f ) | 0x80u; // continuation byte
       *utf8++ = static_cast<uint8_t>(   code          & 0x3f ) | 0x80u; // continuation byte
