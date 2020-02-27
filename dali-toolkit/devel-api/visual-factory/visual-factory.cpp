@@ -19,7 +19,7 @@
 #include "visual-factory.h"
 
 // EXTERNAL INCLUDES
-#include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/common/singleton-service.h>
 #include <dali/devel-api/adaptor-framework/environment-variable.h>
 
 // INTERNAL INCLUDES
