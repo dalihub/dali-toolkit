@@ -134,6 +134,8 @@ int UtcDaliTextCharacterSetConversionGetUtf8Length(void)
   const static uint8_t U2 = 2u;
   const static uint8_t U3 = 3u;
   const static uint8_t U4 = 4u;
+  const static uint8_t U5 = 5u;
+  const static uint8_t U6 = 6u;
   const static uint8_t U0 = 0u;
   const static uint8_t UTF8_LENGTH[256] = {
     U1, U1, U1, U1, U1, U1, U1, U1, U1, U1, //
@@ -167,8 +169,11 @@ int UtcDaliTextCharacterSetConversionGetUtf8Length(void)
 
     U4, U4, U4, U4, U4, U4, U4, U4,         // lead byte = 1111 0xxx (U+10000 - U+1FFFFF)
 
-    U0, U0, U0, U0,                         // Non valid.
-    U0, U0, U0, U0,                         // Non valid.
+    U5, U5, U5, U5,                         // lead byte = 1111 10xx (U+200000 - U+3FFFFFF)
+
+    U6, U6,                                 // lead byte = 1111 110x (U+4000000 - U+7FFFFFFF)
+
+    U0, U0,                                 // Non valid.
   };
 
   for( unsigned int index = 0; index < 256u; ++index )
@@ -211,8 +216,18 @@ int UtcDaliTextCharacterSetConversionGetNumberOfUtf8Characters(void)
       "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84",
       7u,
     },
+    {
+      "5 bytes test",
+      "\xF8\xA0\x80\x80\x80",
+      1u,
+    },
+    {
+      "6 bytes test",
+      "\xFC\x84\x80\x80\x80\x80",
+      1u,
+    },
   };
-  const unsigned int numberOfTests = 4u;
+  const unsigned int numberOfTests = 6u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
@@ -235,6 +250,8 @@ int UtcDaliTextCharacterSetConversionGetNumberOfUtf8Bytes(void)
   unsigned int utf32_02[] = { 0x645, 0x631, 0x62D, 0x628, 0x627, 0x20, 0x628, 0x627, 0x644, 0x639, 0x627, 0x644, 0x645 }; // مرحبا بالعالم
   unsigned int utf32_03[] = { 0x939, 0x948, 0x932, 0x94B, 0x20, 0x935, 0x930, 0x94D, 0x932, 0x94D, 0x921 }; // हैलो वर्ल्ड
   unsigned int utf32_04[] = { 0x1F601, 0x20, 0x1F602, 0x20, 0x1F603, 0x20, 0x1F604 }; // Emojis
+  unsigned int utf32_05[] = { 0x800000 };
+  unsigned int utf32_06[] = { 0x4000000 };
 
   const GetNumberOfUtf8BytesData data[] =
   {
@@ -262,8 +279,20 @@ int UtcDaliTextCharacterSetConversionGetNumberOfUtf8Bytes(void)
       7u,
       19u,
     },
+    {
+      "5 bytes test",
+      utf32_05,
+      1u,
+      5u,
+    },
+    {
+      "6 bytes test",
+      utf32_06,
+      1u,
+      6u
+    },
   };
-  const unsigned int numberOfTests = 4u;
+  const unsigned int numberOfTests = 6u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
@@ -282,14 +311,16 @@ int UtcDaliTextCharacterSetConversionUtf8ToUtf32(void)
   ToolkitTestApplication application;
   tet_infoline(" UtcDaliTextCharacterSetConversionGetNumberOfUtf8Bytes");
 
-  char utf8_06[] = { -8, -7, -6, -5, -4, -3, -2, -1 }; // Invalid string
+  char utf8_06[] = { -2, -1 }; // Invalid string
 
   unsigned int utf32_01[] = { 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64 }; // Hello World
   unsigned int utf32_02[] = { 0xA, 0x20, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0xA, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64 }; // Hello World + CR and CR+LF
   unsigned int utf32_03[] = { 0x645, 0x631, 0x62D, 0x628, 0x627, 0x20, 0x628, 0x627, 0x644, 0x639, 0x627, 0x644, 0x645 }; // مرحبا بالعالم
   unsigned int utf32_04[] = { 0x939, 0x948, 0x932, 0x94B, 0x20, 0x935, 0x930, 0x94D, 0x932, 0x94D, 0x921 }; // हैलो वर्ल्ड
   unsigned int utf32_05[] = { 0x1F601, 0x20, 0x1F602, 0x20, 0x1F603, 0x20, 0x1F604 }; // Emojis
-  unsigned int utf32_06[] = { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 }; // Invalid string
+  unsigned int utf32_06[] = { 0x800000 };
+  unsigned int utf32_07[] = { 0x4000000 };
+  unsigned int utf32_08[] = { 0x20, 0x20 }; // Invalid string
 
   const Utf8ToUtf32Data data[] =
   {
@@ -319,12 +350,22 @@ int UtcDaliTextCharacterSetConversionUtf8ToUtf32(void)
       utf32_05,
     },
     {
-      "Invalid text",
-      utf8_06,
+      "5 bytes test",
+      "\xF8\xA0\x80\x80\x80",
       utf32_06,
     },
+    {
+      "6 bytes test",
+      "\xFC\x84\x80\x80\x80\x80",
+      utf32_07,
+    },
+    {
+      "Invalid text",
+      utf8_06,
+      utf32_08,
+    },
   };
-  const unsigned int numberOfTests = 6u;
+  const unsigned int numberOfTests = 8u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
@@ -347,6 +388,8 @@ int UtcDaliTextCharacterSetConversionUtf32ToUtf8(void)
   unsigned int utf32_02[] = { 0x645, 0x631, 0x62D, 0x628, 0x627, 0x20, 0x628, 0x627, 0x644, 0x639, 0x627, 0x644, 0x645 }; // مرحبا بالعالم
   unsigned int utf32_03[] = { 0x939, 0x948, 0x932, 0x94B, 0x20, 0x935, 0x930, 0x94D, 0x932, 0x94D, 0x921 }; // हैलो वर्ल्ड
   unsigned int utf32_04[] = { 0x1F601, 0x20, 0x1F602, 0x20, 0x1F603, 0x20, 0x1F604 }; // Emojis
+  unsigned int utf32_05[] = { 0x800000 };
+  unsigned int utf32_06[] = { 0x4000000 };
 
   struct Utf32ToUtf8Data data[] =
   {
@@ -374,9 +417,21 @@ int UtcDaliTextCharacterSetConversionUtf32ToUtf8(void)
       7u,
       "\xF0\x9F\x98\x81 \xF0\x9F\x98\x82 \xF0\x9F\x98\x83 \xF0\x9F\x98\x84",
     },
+    {
+      "5 bytes test",
+      utf32_05,
+      1u,
+      "\xF8\xA0\x80\x80\x80",
+    },
+    {
+      "6 bytes test",
+      utf32_06,
+      1u,
+      "\xFC\x84\x80\x80\x80\x80",
+    },
   };
 
-  const unsigned int numberOfTests = 4u;
+  const unsigned int numberOfTests = 6u;
 
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {

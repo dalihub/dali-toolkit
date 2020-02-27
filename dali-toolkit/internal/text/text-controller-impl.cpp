@@ -1086,16 +1086,16 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
       mEventData->mPreEditFlag &&
       ( 0u != mModel->mVisualModel->mCharactersToGlyph.Count() ) )
   {
-    Vector< Dali::InputMethodContext::PreeditAttributeData > attrs;
+    Dali::InputMethodContext::PreEditAttributeDataContainer attrs;
     mEventData->mInputMethodContext.GetPreeditStyle( attrs );
     Dali::InputMethodContext::PreeditStyle type = Dali::InputMethodContext::PreeditStyle::NONE;
 
     // Check the type of preedit and run it.
-    for( Vector<Dali::InputMethodContext::PreeditAttributeData>::Iterator it = attrs.Begin(), endIt = attrs.End(); it != endIt; it++ )
+    for( Dali::InputMethodContext::PreEditAttributeDataContainer::Iterator it = attrs.Begin(), endIt = attrs.End(); it != endIt; it++ )
     {
       Dali::InputMethodContext::PreeditAttributeData attrData = *it;
       DALI_LOG_INFO( gLogFilter, Debug::General, "Controller::UpdateModel PreeditStyle type : %d  start %d end %d \n", attrData.preeditType, attrData.startIndex, attrData.endIndex  );
-      type =  attrData.preeditType;
+      type = attrData.preeditType;
 
       // Check the number of commit characters for the start position.
       unsigned int numberOfCommit = mEventData->mPrimaryCursorPosition - mEventData->mPreEditLength;
@@ -1108,7 +1108,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
           // Add the underline for the pre-edit text.
           GlyphRun underlineRun;
           underlineRun.glyphIndex = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = attrData.endIndex - attrData.startIndex;
+          underlineRun.numberOfGlyphs = numberOfIndices;
           mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
           break;
         }
@@ -1152,7 +1152,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
           GlyphRun underlineRun;
           underlineRun.glyphIndex = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = attrData.endIndex - attrData.startIndex;
+          underlineRun.numberOfGlyphs = numberOfIndices;
           mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
           break;
         }
@@ -1167,7 +1167,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
           GlyphRun underlineRun;
           underlineRun.glyphIndex = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = attrData.endIndex - attrData.startIndex;
+          underlineRun.numberOfGlyphs = numberOfIndices;
           mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
           break;
         }
@@ -1182,7 +1182,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
           GlyphRun underlineRun;
           underlineRun.glyphIndex = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = attrData.endIndex - attrData.startIndex;
+          underlineRun.numberOfGlyphs = numberOfIndices;
           mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
           break;
         }
@@ -1197,7 +1197,7 @@ bool Controller::Impl::UpdateModel( OperationsMask operationsRequired )
 
           GlyphRun underlineRun;
           underlineRun.glyphIndex = attrData.startIndex + numberOfCommit;
-          underlineRun.numberOfGlyphs = attrData.endIndex - attrData.startIndex;
+          underlineRun.numberOfGlyphs = numberOfIndices;
           mModel->mVisualModel->mUnderlineRuns.PushBack( underlineRun );
           break;
         }
