@@ -60,7 +60,7 @@ public:
   void ApplyOptions( const InputMethodOptions& options );
   bool FilterEventKey( const Dali::KeyEvent& keyEvent );
   void SetPreeditStyle( Dali::InputMethodContext::PreeditStyle type );
-  void GetPreeditStyle( Vector< Dali::InputMethodContext::PreeditAttributeData >& attrs ) const;
+  void GetPreeditStyle( Dali::InputMethodContext::PreEditAttributeDataContainer& attrs ) const;
 
 public:  // Signals
   ActivatedSignalType& ActivatedSignal() { return mActivatedSignal; }
@@ -87,7 +87,7 @@ private:
   bool mRestoreAfterFocusLost:1;             ///< Whether the keyboard needs to be restored (activated ) after focus regained.
   bool mIdleCallbackConnected:1;             ///< Whether the idle callback is already connected.
   InputMethodOptions        mOptions;
-  Vector< Dali::InputMethodContext::PreeditAttributeData > mPreeditAttrs; ///< Stores preedit attr data
+  Dali::InputMethodContext::PreEditAttributeDataContainer mPreeditAttrs; ///< Stores preedit attribute data
 
   ActivatedSignalType      mActivatedSignal;
   KeyboardEventSignalType  mEventSignal;
@@ -223,7 +223,7 @@ void InputMethodContext::SetPreeditStyle( Dali::InputMethodContext::PreeditStyle
   mPreeditAttrs.PushBack( data );
 }
 
-void InputMethodContext::GetPreeditStyle( Vector< Dali::InputMethodContext::PreeditAttributeData >& attrs ) const
+void InputMethodContext::GetPreeditStyle( Dali::InputMethodContext::PreEditAttributeDataContainer& attrs ) const
 {
   attrs = mPreeditAttrs;
 }
@@ -328,7 +328,7 @@ void InputMethodContext::SetPreeditStyle( Dali::InputMethodContext::PreeditStyle
   Internal::Adaptor::InputMethodContext::GetImplementation(*this).SetPreeditStyle( type );
 }
 
-void InputMethodContext::GetPreeditStyle( Vector< Dali::InputMethodContext::PreeditAttributeData >& attrs ) const
+void InputMethodContext::GetPreeditStyle( Dali::InputMethodContext::PreEditAttributeDataContainer& attrs ) const
 {
   Internal::Adaptor::InputMethodContext::GetImplementation(*this).GetPreeditStyle( attrs );
 }

@@ -551,7 +551,7 @@ struct Engine::Impl
         tmpLineLayout.penX += tmpLineLayout.previousAdvance + tmpLineLayout.whiteSpaceLengthEndOfLine;
         tmpLineLayout.previousAdvance = ( glyphMetrics.advance + parameters.interGlyphExtraAdvance );
 
-        tmpLineLayout.length = tmpLineLayout.penX + glyphMetrics.xBearing + glyphMetrics.width;
+        tmpLineLayout.length = std::max( tmpLineLayout.length, tmpLineLayout.penX + glyphMetrics.xBearing + glyphMetrics.width );
 
         // Clear the white space length at the end of the line.
         tmpLineLayout.whiteSpaceLengthEndOfLine = 0.f;

@@ -86,7 +86,6 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/toolkit-orientation.cpp
   dali-toolkit-test-utils/toolkit-physical-keyboard.cpp
   dali-toolkit-test-utils/toolkit-style-monitor.cpp
-  dali-toolkit-test-utils/toolkit-singleton-service.cpp
   dali-toolkit-test-utils/toolkit-test-application.cpp
   dali-toolkit-test-utils/toolkit-timer.cpp
   dali-toolkit-test-utils/toolkit-trigger-event-factory.cpp
