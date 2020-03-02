@@ -73,10 +73,14 @@ public:
   RasterizingTask( SvgVisual* svgRenderer, NSVGimage* parsedSvg, const VisualUrl& url, float dpi, unsigned int width, unsigned int height );
 
   /**
-   * Do the rasterization with the given rasterizer.
-   *@param[in] rasterizer The rasterizer that rasterize the SVG to a buffer image
+   * Destructor.
    */
-  void Rasterize( NSVGrasterizer* rasterizer );
+  ~RasterizingTask();
+
+  /**
+   * Do the rasterization with the mRasterizer.
+   */
+  void Rasterize( );
 
   /**
    * Get the svg visual
@@ -115,6 +119,7 @@ private:
   float           mDpi;
   unsigned int    mWidth;
   unsigned int    mHeight;
+  NSVGrasterizer* mRasterizer;
 };
 
 /**
@@ -216,7 +221,6 @@ private:
   Dali::Mutex                mMutex;
   EventThreadCallback*       mTrigger;
 
-  NSVGrasterizer*            mRasterizer;
   bool                       mIsThreadWaiting;
 };
 

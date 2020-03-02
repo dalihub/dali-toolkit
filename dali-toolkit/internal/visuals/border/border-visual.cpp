@@ -41,10 +41,6 @@ namespace Internal
 
 namespace
 {
-const char * const COLOR_NAME("borderColor");
-const char * const SIZE_NAME("borderSize");
-const char * const ANTI_ALIASING("antiAliasing");
-
 const char * const POSITION_ATTRIBUTE_NAME("aPosition");
 const char * const DRIFT_ATTRIBUTE_NAME("aDrift");
 const char * const INDEX_NAME("indices");

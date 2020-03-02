@@ -22,7 +22,7 @@
 #include <dali/devel-api/text-abstraction/segmentation.h>
 #include <dali/devel-api/text-abstraction/shaping.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/devel-api/adaptor-framework/singleton-service.h>
+#include <dali/devel-api/common/singleton-service.h>
 #include <cstring>
 
 using namespace Dali;

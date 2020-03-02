@@ -266,6 +266,12 @@ public:
    */
   virtual Base& GetVisualObject();
 
+  /**
+   * @brief Query whether resources requires to be loaded synchronously.
+   * @return Returns true if synchronous resource loading is required, false otherwise.
+   */
+  bool IsSynchronousLoadingRequired() const;
+
  protected:
 
   /**

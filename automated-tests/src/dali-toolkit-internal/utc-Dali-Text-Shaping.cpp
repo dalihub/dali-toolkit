@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <dali-toolkit/internal/text/shaper.h>
 #include <dali-toolkit-test-suite-utils.h>
@@ -44,6 +45,7 @@ using namespace Text;
 
 namespace
 {
+const std::string DEFAULT_FONT_DIR( "/resources/fonts" );
 
 struct GlyphInfoData
 {
@@ -130,6 +132,7 @@ bool ShapeInfoTest( const ShapeInfoData& data )
 
   const Vector<FontDescriptionRun> fontDescriptions;
   const LayoutOptions options;
+
   CreateTextModel( data.text,
                    textArea,
                    data.fontDescriptions,
@@ -236,6 +239,33 @@ bool ShapeInfoTest( const ShapeInfoData& data )
     if( !IsEqualGlyph( data.glyphs[index], glyphs[index] ) )
     {
       std::cout << "  different glyph info, index : " << index << std::endl;
+
+      const GlyphInfo& glyphInfo = glyphs[index];
+      std::cout << "            fontId : " << glyphInfo.fontId << std::endl;
+      std::cout << "             index : " << glyphInfo.index << std::endl;
+      std::cout << "             width : " << glyphInfo.width << std::endl;
+      std::cout << "            height : " << glyphInfo.height << std::endl;
+      std::cout << "          xBearing : " << glyphInfo.xBearing << std::endl;
+      std::cout << "          yBearing : " << glyphInfo.yBearing << std::endl;
+      std::cout << "           advance : " << glyphInfo.advance << std::endl;
+      std::cout << "       scaleFactor : " << glyphInfo.scaleFactor << std::endl;
+      std::cout << "  isItalicRequired : " << glyphInfo.isItalicRequired << std::endl;
+      std::cout << "    isBoldRequired : " << glyphInfo.isBoldRequired << std::endl;
+
+      std::cout << "  Expected : " << std::endl;
+      const GlyphInfoData& expectedGlyphInfo = data.glyphs[index];
+      std::cout << "            fontId : " << expectedGlyphInfo.fontId << std::endl;
+      std::cout << "             index : " << expectedGlyphInfo.index << std::endl;
+      std::cout << "             width : " << expectedGlyphInfo.width << std::endl;
+      std::cout << "            height : " << expectedGlyphInfo.height << std::endl;
+      std::cout << "          xBearing : " << expectedGlyphInfo.xBearing << std::endl;
+      std::cout << "          yBearing : " << expectedGlyphInfo.yBearing << std::endl;
+      std::cout << "           advance : " << expectedGlyphInfo.advance << std::endl;
+      std::cout << "       scaleFactor : " << expectedGlyphInfo.scaleFactor << std::endl;
+      std::cout << "  isItalicRequired : " << expectedGlyphInfo.isItalicRequired << std::endl;
+      std::cout << "    isBoldRequired : " << expectedGlyphInfo.isBoldRequired << std::endl;
+
+
       return false;
     }
   }
@@ -276,6 +306,34 @@ bool ShapeInfoTest( const ShapeInfoData& data )
   return true;
 }
 
+void LoadTextShapeFonts()
+{
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 96u, 96u );
+
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
+
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/tizen/TizenSansRegular.ttf" );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/noto/NotoSansMalayalam-Regular.ttf" );
+}
+
+void LoadSoftwareStylingFonts()
+{
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.SetDpi( 96u, 96u );
+
+  char* pathNamePtr = get_current_dir_name();
+  const std::string pathName( pathNamePtr );
+  free( pathNamePtr );
+
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/roboto/Roboto-Regular.ttf" );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/roboto/Roboto-Bold.ttf" );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/roboto/Roboto-Italic.ttf" );
+  fontClient.GetFontId( pathName + DEFAULT_FONT_DIR + "/roboto/Roboto-BoldItalic.ttf" );
+}
+
 } // namespace
 
 //////////////////////////////////////////////////////////
@@ -286,17 +344,17 @@ int UtcDaliTextShape(void)
 
   struct GlyphInfoData glyphs02[] =
   {
-    { 1u, 43u, 0.f, 0.f, 0.f, 0.f, 12.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 79u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 79u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 82u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 90u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f },
-    { 1u, 82u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 85u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
-    { 1u, 79u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 71u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
+    { 1u, 276u, 0.f, 0.f, 0.f, 0.f, 11.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 306u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 306u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 309u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u,   3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 317u, 0.f, 0.f, 0.f, 0.f, 11.f, 0.f },
+    { 1u, 309u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 312u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
+    { 1u, 306u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 298u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
   };
 
   CharacterIndex characterIndices02[] = { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u };
@@ -304,23 +362,23 @@ int UtcDaliTextShape(void)
 
   struct GlyphInfoData glyphs03[] =
   {
-    { 1u, 43u, 0.f, 0.f, 0.f, 0.f, 12.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 79u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 79u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 82u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 90u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f },
-    { 1u, 82u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 85u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
-    { 1u, 79u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 71u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u,  0u, 0.f, 0.f, 0.f, 0.f,  0.f, 0.f },
-    { 1u, 71u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 80u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f },
-    { 1u, 82u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u,  0u, 0.f, 0.f, 0.f, 0.f,  0.f, 0.f },
+    { 1u, 276u, 0.f, 0.f, 0.f, 0.f, 11.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 306u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 306u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 309u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u,   3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 317u, 0.f, 0.f, 0.f, 0.f, 11.f, 0.f },
+    { 1u, 309u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 312u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
+    { 1u, 306u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 298u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u,   0u, 0.f, 0.f, 0.f, 0.f,  0.f, 0.f },
+    { 1u, 298u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f },
+    { 1u, 309u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u,   0u, 0.f, 0.f, 0.f, 0.f,  0.f, 0.f },
   };
 
   CharacterIndex characterIndices03[] = { 0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u, 13u, 14u, 15u, 16u };
@@ -329,18 +387,18 @@ int UtcDaliTextShape(void)
 
   struct GlyphInfoData glyphs04[] =
   {
-    { 2u, 1733u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 2u, 1693u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f },
-    { 2u, 1725u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 2u, 1733u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 2u, 1721u, 0.f, 0.f, 0.f, 0.f, 20.f, 0.f },
-    { 2u, 1725u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 2u, 1733u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 2u, 1722u, 0.f, 0.f, 0.f, 0.f, 18.f, 0.f },
-    { 2u, 1725u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 2u, 1733u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 2u, 1718u, 0.f, 0.f, 0.f, 0.f, 14.f, 0.f },
-    { 2u, 1725u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 2u, 67u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 2u, 27u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f },
+    { 2u, 59u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 2u, 67u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 2u, 55u, 0.f, 0.f, 0.f, 0.f, 19.f, 0.f },
+    { 2u, 59u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 2u, 67u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 2u, 56u, 0.f, 0.f, 0.f, 0.f, 19.f, 0.f },
+    { 2u, 59u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 2u, 67u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 2u, 52u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f },
+    { 2u, 59u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
   };
 
   CharacterIndex characterIndices04[] = { 0u, 0u, 0u, 2u, 2u, 2u, 4u, 4u, 4u, 6u, 6u, 6u };
@@ -348,79 +406,79 @@ int UtcDaliTextShape(void)
 
   struct GlyphInfoData glyphs05[] =
   {
-    { 1u, 47u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 1u, 82u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 85u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 80u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 76u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 83u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 86u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 1u, 88u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 80u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 71u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 82u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 79u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 82u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 85u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 86u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 1u, 76u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 87u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 68u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 80u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 87u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
+    { 1u, 280u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 309u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 312u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f },
+    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 303u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 310u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 313u, 0.f, 0.f, 0.f, 0.f,  7.f, 0.f },
+    { 1u, 315u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f },
+    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 298u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 309u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 306u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 309u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 312u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
+    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 313u, 0.f, 0.f, 0.f, 0.f,  7.f, 0.f },
+    { 1u, 303u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 314u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
+    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 295u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 314u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
     { 1u,  0u, 0.f, 0.f, 0.f, 0.f,  0.f, 0.f },
-    { 1u, 68u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 84u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 88u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 71u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 5039u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 81u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 76u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 69u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 68u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 86u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 68u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 80u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 76u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 295u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 311u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 315u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 298u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 403u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 308u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 303u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 296u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 295u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 313u, 0.f, 0.f, 0.f, 0.f,  7.f, 0.f },
+    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 295u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 303u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
     { 1u,  0u, 0.f, 0.f, 0.f, 0.f,  0.f, 0.f },
-    { 1u, 83u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 82u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 86u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 1u, 86u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 76u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 85u, 0.f, 0.f, 0.f, 0.f,  6.f, 0.f },
-    { 1u, 68u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u, 70u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 1u, 88u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 81u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 71u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 76u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
-    { 1u, 68u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 81u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 72u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
-    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
-    { 1u, 70u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
-    { 1u, 88u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f },
-    { 1u, 80u, 0.f, 0.f, 0.f, 0.f, 15.f, 0.f },
-    { 1u, 17u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
+    { 1u, 310u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 309u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 313u, 0.f, 0.f, 0.f, 0.f,  7.f, 0.f },
+    { 1u, 313u, 0.f, 0.f, 0.f, 0.f,  7.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 303u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 312u, 0.f, 0.f, 0.f, 0.f,  5.f, 0.f },
+    { 1u, 295u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 297u, 0.f, 0.f, 0.f, 0.f,  7.f, 0.f },
+    { 1u, 315u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 308u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 298u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 303u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 295u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 308u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f },
+    { 1u, 299u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u,  3u, 0.f, 0.f, 0.f, 0.f,  4.f, 0.f },
+    { 1u, 297u, 0.f, 0.f, 0.f, 0.f,  7.f, 0.f },
+    { 1u, 315u, 0.f, 0.f, 0.f, 0.f,  8.f, 0.f },
+    { 1u, 307u, 0.f, 0.f, 0.f, 0.f, 13.f, 0.f },
+    { 1u,  4u, 0.f, 0.f, 0.f, 0.f,  3.f, 0.f },
     { 1u,  0u, 0.f, 0.f, 0.f, 0.f,  0.f, 0.f },
   };
 
@@ -444,6 +502,160 @@ int UtcDaliTextShape(void)
   CharacterIndex newParagraphGlyphs06[] = { 49u };
   CharacterIndex newParagraphGlyphs07[] = { 73u };
 
+  Vector<FontDescriptionRun> fontDescriptions01;
+  Vector<FontDescriptionRun> fontDescriptions02;
+  Vector<FontDescriptionRun> fontDescriptions03;
+  Vector<FontDescriptionRun> fontDescriptions04;
+  Vector<FontDescriptionRun> fontDescriptions05;
+  Vector<FontDescriptionRun> fontDescriptions06;
+
+  const std::string fontFamily( "TizenSans" );
+  const std::string fontFamilyMalayalam( "Noto Sans Malayalam" );
+
+  FontDescriptionRun fontDescriptionRun01 =
+  {
+    {
+      0u,
+      11u
+    },
+    nullptr,
+    0u,
+    TextAbstraction::FontWeight::NONE,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::NONE,
+    TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+    true,
+    false,
+    false,
+    false,
+    false
+  };
+  fontDescriptionRun01.familyLength = fontFamily.size();
+  fontDescriptionRun01.familyName = new char[fontDescriptionRun01.familyLength];
+  memcpy( fontDescriptionRun01.familyName, fontFamily.c_str(), fontDescriptionRun01.familyLength );
+
+  fontDescriptions01.PushBack( fontDescriptionRun01 );
+
+  FontDescriptionRun fontDescriptionRun02 =
+  {
+    {
+      0u,
+      17u
+    },
+    nullptr,
+    0u,
+    TextAbstraction::FontWeight::NONE,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::NONE,
+    TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+    true,
+    false,
+    false,
+    false,
+    false
+  };
+  fontDescriptionRun02.familyLength = fontFamily.size();
+  fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
+  memcpy( fontDescriptionRun02.familyName, fontFamily.c_str(), fontDescriptionRun02.familyLength );
+
+  fontDescriptions02.PushBack( fontDescriptionRun02 );
+
+  FontDescriptionRun fontDescriptionRun03 =
+  {
+    {
+      0u,
+      8u
+    },
+    nullptr,
+    0u,
+    TextAbstraction::FontWeight::NONE,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::NONE,
+    TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+    true,
+    false,
+    false,
+    false,
+    false
+  };
+  fontDescriptionRun03.familyLength = fontFamilyMalayalam.size();
+  fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
+  memcpy( fontDescriptionRun03.familyName, fontFamilyMalayalam.c_str(), fontDescriptionRun03.familyLength );
+
+  fontDescriptions03.PushBack( fontDescriptionRun03 );
+
+  FontDescriptionRun fontDescriptionRun04 =
+  {
+    {
+      0u,
+      75u
+    },
+    nullptr,
+    0u,
+    TextAbstraction::FontWeight::NONE,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::NONE,
+    TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+    true,
+    false,
+    false,
+    false,
+    false
+  };
+  fontDescriptionRun04.familyLength = fontFamily.size();
+  fontDescriptionRun04.familyName = new char[fontDescriptionRun04.familyLength];
+  memcpy( fontDescriptionRun04.familyName, fontFamily.c_str(), fontDescriptionRun04.familyLength );
+
+  fontDescriptions04.PushBack( fontDescriptionRun04 );
+
+  FontDescriptionRun fontDescriptionRun05 =
+  {
+    {
+      0u,
+      75u
+    },
+    nullptr,
+    0u,
+    TextAbstraction::FontWeight::NONE,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::NONE,
+    TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+    true,
+    false,
+    false,
+    false,
+    false
+  };
+  fontDescriptionRun05.familyLength = fontFamily.size();
+  fontDescriptionRun05.familyName = new char[fontDescriptionRun05.familyLength];
+  memcpy( fontDescriptionRun05.familyName, fontFamily.c_str(), fontDescriptionRun05.familyLength );
+
+  fontDescriptions05.PushBack( fontDescriptionRun05 );
+
+  FontDescriptionRun fontDescriptionRun06 =
+  {
+    {
+      0u,
+      75u
+    },
+    nullptr,
+    0u,
+    TextAbstraction::FontWeight::NONE,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::NONE,
+    TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+    true,
+    false,
+    false,
+    false,
+    false
+  };
+  fontDescriptionRun06.familyLength = fontFamily.size();
+  fontDescriptionRun06.familyName = new char[fontDescriptionRun06.familyLength];
+  memcpy( fontDescriptionRun06.familyName, fontFamily.c_str(), fontDescriptionRun06.familyLength );
+
+  fontDescriptions06.PushBack( fontDescriptionRun06 );
+
   struct ShapeInfoData data[] =
   {
     {
@@ -452,11 +664,11 @@ int UtcDaliTextShape(void)
       0u,
       0u,
       0u,
-      NULL,
-      NULL,
-      NULL,
+      nullptr,
+      nullptr,
+      nullptr,
       0u,
-      NULL
+      nullptr
     },
     {
       "Latin script",
@@ -468,7 +680,8 @@ int UtcDaliTextShape(void)
       characterIndices02,
       charactersPerGlyph02,
       0u,
-      NULL
+      nullptr,
+      fontDescriptions01
     },
     {
       "Latin script. Some paragraphs.",
@@ -480,7 +693,8 @@ int UtcDaliTextShape(void)
       characterIndices03,
       charactersPerGlyph03,
       2u,
-      newParagraphGlyphs03
+      newParagraphGlyphs03,
+      fontDescriptions02
     },
     {
       "Malayalam script. More glyphs than characters.",
@@ -492,7 +706,8 @@ int UtcDaliTextShape(void)
       characterIndices04,
       charactersPerGlyph04,
       0u,
-      NULL
+      nullptr,
+      fontDescriptions03
     },
     {
       "Latin script with some paragraphs. Update initial paragraph.",
@@ -504,7 +719,8 @@ int UtcDaliTextShape(void)
       characterIndices05,
       charactersPerGlyph05,
       1u,
-      newParagraphGlyphs05
+      newParagraphGlyphs05,
+      fontDescriptions04
     },
     {
       "Latin script with some paragraphs. Update mid paragraph.",
@@ -516,7 +732,8 @@ int UtcDaliTextShape(void)
       characterIndices05,
       charactersPerGlyph05,
       1u,
-      newParagraphGlyphs06
+      newParagraphGlyphs06,
+      fontDescriptions05
     },
     {
       "Latin script with some paragraphs. Update final paragraph.",
@@ -528,7 +745,8 @@ int UtcDaliTextShape(void)
       characterIndices05,
       charactersPerGlyph05,
       1u,
-      newParagraphGlyphs07
+      newParagraphGlyphs07,
+      fontDescriptions06
     },
   };
   const unsigned int numberOfTests = 7u;
@@ -536,6 +754,8 @@ int UtcDaliTextShape(void)
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
     ToolkitTestApplication application;
+    LoadTextShapeFonts();
+
     if( !ShapeInfoTest( data[index] ) )
     {
       tet_result(TET_FAIL);
@@ -552,41 +772,49 @@ int UtcDaliTextSoftwareStyling(void)
 
   struct GlyphInfoData glyphs01[] =
   {
-    { 2u, 21154u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
-    { 2u, 12298u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
-    { 2u, 17828u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true, true },
+    { 4u, 38u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f, true, true },
+    { 4u, 39u, 0.f, 0.f, 0.f, 0.f,  9.f, 0.f, true, true },
+    { 4u, 40u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f, true, true },
+    { 4u, 41u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f, true, true },
   };
   struct GlyphInfoData glyphs02[] =
   {
-    { 2u, 21154u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, false, false },
-    { 2u, 12298u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, false, true },
-    { 2u, 17828u, 0.f, 0.f, 0.f, 0.f, 16.f, 0.f, true,  false },
+    { 1u, 38u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f, false, false },
+    { 2u, 39u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f, false,  true },
+    { 3u, 40u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f, true,  false },
+    { 4u, 41u, 0.f, 0.f, 0.f, 0.f, 10.f, 0.f, true,   true },
   };
 
-  CharacterIndex characterIndices[] = { 0u, 1u, 2u };
-  Length charactersPerGlyph[] = { 1u, 1u, 1u };
+  CharacterIndex characterIndices[] = { 0u, 1u, 2u, 3u };
+  Length charactersPerGlyph[] = { 1u, 1u, 1u, 1u };
 
   Vector<FontDescriptionRun> fontDescriptions01;
   Vector<FontDescriptionRun> fontDescriptions02;
+
+  const std::string fontFamily( "Roboto" );
 
   FontDescriptionRun fontDescriptionRun01 =
   {
     {
       0u,
-      3u
+      4u
     },
-    NULL,
+    nullptr,
     0u,
     TextAbstraction::FontWeight::BOLD,
     TextAbstraction::FontWidth::NONE,
     TextAbstraction::FontSlant::ITALIC,
     TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-    false,
+    true,
     true,
     false,
     true,
     false
   };
+  fontDescriptionRun01.familyLength = fontFamily.size();
+  fontDescriptionRun01.familyName = new char[fontDescriptionRun01.familyLength];
+  memcpy( fontDescriptionRun01.familyName, fontFamily.c_str(), fontDescriptionRun01.familyLength );
+
   fontDescriptions01.PushBack(fontDescriptionRun01);
 
   FontDescriptionRun fontDescriptionRun02 =
@@ -595,86 +823,120 @@ int UtcDaliTextSoftwareStyling(void)
       0u,
       1u
     },
-    NULL,
+    nullptr,
     0u,
     TextAbstraction::FontWeight::NONE,
     TextAbstraction::FontWidth::NONE,
     TextAbstraction::FontSlant::NONE,
     TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-    false,
+    true,
     false,
     false,
     false,
     false
   };
+  fontDescriptionRun02.familyLength = fontFamily.size();
+  fontDescriptionRun02.familyName = new char[fontDescriptionRun02.familyLength];
+  memcpy( fontDescriptionRun02.familyName, fontFamily.c_str(), fontDescriptionRun02.familyLength );
+
   FontDescriptionRun fontDescriptionRun03 =
   {
     {
       1u,
       1u
     },
-    NULL,
+    nullptr,
     0u,
     TextAbstraction::FontWeight::BOLD,
     TextAbstraction::FontWidth::NONE,
     TextAbstraction::FontSlant::NONE,
     TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-    false,
+    true,
     true,
     false,
     false,
     false
   };
+  fontDescriptionRun03.familyLength = fontFamily.size();
+  fontDescriptionRun03.familyName = new char[fontDescriptionRun03.familyLength];
+  memcpy( fontDescriptionRun03.familyName, fontFamily.c_str(), fontDescriptionRun03.familyLength );
+
   FontDescriptionRun fontDescriptionRun04 =
   {
     {
       2u,
       1u
     },
-    NULL,
+    nullptr,
     0u,
     TextAbstraction::FontWeight::NONE,
     TextAbstraction::FontWidth::NONE,
     TextAbstraction::FontSlant::ITALIC,
     TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
-    false,
+    true,
     false,
     false,
     true,
     false
   };
+  fontDescriptionRun04.familyLength = fontFamily.size();
+  fontDescriptionRun04.familyName = new char[fontDescriptionRun04.familyLength];
+  memcpy( fontDescriptionRun04.familyName, fontFamily.c_str(), fontDescriptionRun04.familyLength );
+
+  FontDescriptionRun fontDescriptionRun05 =
+  {
+    {
+      3u,
+      1u
+    },
+    nullptr,
+    0u,
+    TextAbstraction::FontWeight::BOLD,
+    TextAbstraction::FontWidth::NONE,
+    TextAbstraction::FontSlant::ITALIC,
+    TextAbstraction::FontClient::DEFAULT_POINT_SIZE,
+    true,
+    true,
+    false,
+    true,
+    false
+  };
+  fontDescriptionRun05.familyLength = fontFamily.size();
+  fontDescriptionRun05.familyName = new char[fontDescriptionRun05.familyLength];
+  memcpy( fontDescriptionRun05.familyName, fontFamily.c_str(), fontDescriptionRun05.familyLength );
 
   fontDescriptions02.PushBack(fontDescriptionRun02);
   fontDescriptions02.PushBack(fontDescriptionRun03);
   fontDescriptions02.PushBack(fontDescriptionRun04);
+  fontDescriptions02.PushBack(fontDescriptionRun05);
 
 
   struct ShapeInfoData data[] =
   {
     {
-      "Chiness script. Characters have same font description",
-      "未取得",
+      "Latin script. Characters have same font description",
+      "ABCD",
       0u,
-      3u,
-      3u,
+      4u,
+      4u,
       glyphs01,
       characterIndices,
       charactersPerGlyph,
       0u,
-      NULL,
+      nullptr,
       fontDescriptions01
     },
     {
-      "Chiness script. Each character has different font description.",
-      "未取得",
+      "Latin script. Each character has different font description.",
+      "ABCD",
       0u,
-      3u,
-      3u,
+      4u,
+      4u,
       glyphs02,
       characterIndices,
       charactersPerGlyph,
       0u,
-      NULL,
+      nullptr,
       fontDescriptions02
     }
   };
@@ -684,6 +946,8 @@ int UtcDaliTextSoftwareStyling(void)
   for( unsigned int index = 0u; index < numberOfTests; ++index )
   {
     ToolkitTestApplication application;
+    LoadSoftwareStylingFonts();
+
     if( !ShapeInfoTest( data[index] ) )
     {
       tet_result(TET_FAIL);

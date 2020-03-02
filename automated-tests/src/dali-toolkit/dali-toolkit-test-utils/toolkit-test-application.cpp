@@ -23,7 +23,6 @@
 #include <dali/devel-api/text-abstraction/font-client.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
 #include <toolkit-adaptor-impl.h>
-#include <toolkit-singleton-service.h>
 #include <toolkit-lifecycle-controller.h>
 
 namespace Dali
@@ -48,9 +47,6 @@ ToolkitTestApplication::ToolkitTestApplication( size_t surfaceWidth, size_t surf
 
   // Core needs to be initialized next before we start the adaptor
   InitializeCore();
-
-  auto singletonService = SingletonService::Get();
-  Test::SetApplication( singletonService, *this );
 
   // This will also emit the window created signals
   AdaptorImpl::GetImpl( *mAdaptor ).Start( *mMainWindow );

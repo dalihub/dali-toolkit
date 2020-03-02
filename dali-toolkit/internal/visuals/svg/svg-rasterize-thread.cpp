@@ -49,6 +49,12 @@ RasterizingTask::RasterizingTask( SvgVisual* svgRenderer, NSVGimage* parsedSvg, 
   mWidth( width ),
   mHeight( height )
 {
+  mRasterizer = nsvgCreateRasterizer();
+}
+
+RasterizingTask::~RasterizingTask()
+{
+  nsvgDeleteRasterizer( mRasterizer );
 }
 
 void RasterizingTask::Load()
@@ -73,7 +79,7 @@ void RasterizingTask::Load()
   }
 }
 
-void RasterizingTask::Rasterize( NSVGrasterizer* rasterizer )
+void RasterizingTask::Rasterize( )
 {
   if( mParsedSvg != NULL && mWidth > 0u && mHeight > 0u )
   {
@@ -84,7 +90,7 @@ void RasterizingTask::Rasterize( NSVGrasterizer* rasterizer )
     unsigned int bufferSize = bufferStride * mHeight;
 
     unsigned char* buffer = new unsigned char [bufferSize];
-    nsvgRasterize(rasterizer, mParsedSvg, 0.f,0.f,scale,
+    nsvgRasterize(mRasterizer, mParsedSvg, 0.f,0.f,scale,
         buffer, mWidth, mHeight,
         bufferStride );
 
@@ -111,13 +117,10 @@ SvgRasterizeThread::SvgRasterizeThread( EventThreadCallback* trigger )
 : mTrigger( trigger ),
   mIsThreadWaiting( false )
 {
-  mRasterizer = nsvgCreateRasterizer();
 }
 
 SvgRasterizeThread::~SvgRasterizeThread()
 {
-
-  nsvgDeleteRasterizer( mRasterizer );
   delete mTrigger;
 }
 
@@ -264,7 +267,7 @@ void SvgRasterizeThread::Run()
   while( RasterizingTaskPtr task = NextTaskToProcess() )
   {
     task->Load( );
-    task->Rasterize( mRasterizer );
+    task->Rasterize( );
     AddCompletedTask( task );
   }
 }

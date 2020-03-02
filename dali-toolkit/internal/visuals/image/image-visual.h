@@ -331,12 +331,6 @@ private:
   void CreateNativeImageRenderer( NativeImage& nativeImage );
 
   /**
-   * @brief Query whether resources requires to be loaded synchronously.
-   * @return Returns true if synchronous resource loading is required, false otherwise.
-   */
-  bool IsSynchronousResourceLoading() const;
-
-  /**
    * Creates the texture set and adds the texture to it
    * @param[out] textureRect The texture area of the texture in the atlas.
    * @param[in] url The URL of the image resource to use.
