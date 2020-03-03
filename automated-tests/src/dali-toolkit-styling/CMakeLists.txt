@@ -14,7 +14,6 @@ SET(TC_SOURCES
 LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-harness.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-adaptor.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-application.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-color-controller.cpp

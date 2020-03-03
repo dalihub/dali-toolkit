@@ -96,6 +96,10 @@ ToggleButton::ToggleButton()
 {
   DALI_LOG_INFO( gLogButtonFilter, Debug::General, "ToggleButton::Constructor\n" );
   SetTogglableButton( false );
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::TOGGLE_BUTTON ) );
+  } );
 }
 
 ToggleButton::~ToggleButton()
@@ -370,6 +374,17 @@ void ToggleButton::OnPressed()
   }
 
   RelayoutRequest();
+}
+
+void ToggleButton::OnStateChange( State newState )
+{
+  // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
+  if (Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  {
+    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
+      Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0
+    );
+  }
 }
 
 } // namespace Internal

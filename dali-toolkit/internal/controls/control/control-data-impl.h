@@ -20,7 +20,9 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/property-notification.h>
 #include <dali-toolkit/devel-api/controls/control-devel.h>
+#include <dali/devel-api/adaptor-framework/accessibility.h>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -28,10 +30,14 @@
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-base.h>
-#include <dali-toolkit/internal/controls/tooltip/tooltip.h>
-#include <dali-toolkit/internal/builder/style.h>
 #include <dali-toolkit/internal/builder/dictionary.h>
+#include <dali-toolkit/internal/builder/style.h>
+#include <dali-toolkit/internal/controls/tooltip/tooltip.h>
+#include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali/devel-api/common/owner-container.h>
+#include <dali/integration-api/debug.h>
+#include <memory>
 
 namespace Dali
 {
@@ -332,6 +338,44 @@ public:
   bool FilterKeyEvent( const KeyEvent& event );
 
   /**
+   * @brief Adds accessibility attribute
+   * @param[in] key Attribute name to set
+   * @param[in] value Attribute value to set
+   *
+   * Attribute is added if not existed previously or updated
+   * if existed.
+   */
+  void AppendAccessibilityAttribute( const std::string& key,
+                                  const std::string value );
+
+  /**
+   * @brief Removes accessibility attribute
+   * @param[in] key Attribute name to remove
+   *
+   * Function does nothing if attribute doesn't exist.
+   */
+  void RemoveAccessibilityAttribute( const std::string& key );
+
+  /**
+   * @brief Removes all accessibility attributes
+   */
+  void ClearAccessibilityAttributes();
+
+  /**
+   * @brief Sets reading info type attributes
+   * @param[in] types info type attributes to set
+   *
+   * This function sets, which part of object will be read out
+   * by screen-reader.
+   */
+  void SetAccessibilityReadingInfoType( const Dali::Accessibility::ReadingInfoTypes types );
+
+  /**
+   * @brief Gets currently active reading info type attributes
+   */
+  Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType() const;
+
+  /**
    * @copydoc DevelControl::VisualEventSignal()
    */
   DevelControl::VisualEventSignalType& VisualEventSignal();
@@ -401,6 +445,7 @@ public:
   Control& mControlImpl;
   DevelControl::State mState;
   std::string mSubStateName;
+  Property::Map mAccessibilityAttributes;
 
   int mLeftFocusableActorId;       ///< Actor ID of Left focusable control.
   int mRightFocusableActorId;      ///< Actor ID of Right focusable control.
@@ -418,6 +463,31 @@ public:
   Toolkit::Control::KeyInputFocusSignalType mKeyInputFocusLostSignal;
   Toolkit::Control::ResourceReadySignalType mResourceReadySignal;
   DevelControl::VisualEventSignalType mVisualEventSignal;
+  Toolkit::DevelControl::AccessibilityActivateSignalType mAccessibilityActivateSignal;
+  Toolkit::DevelControl::AccessibilityReadingSkippedSignalType mAccessibilityReadingSkippedSignal;
+  Toolkit::DevelControl::AccessibilityReadingCancelledSignalType mAccessibilityReadingCancelledSignal;
+  Toolkit::DevelControl::AccessibilityReadingStoppedSignalType mAccessibilityReadingStoppedSignal;
+
+  Toolkit::DevelControl::AccessibilityGetNameSignalType mAccessibilityGetNameSignal;
+  Toolkit::DevelControl::AccessibilityGetDescriptionSignalType mAccessibilityGetDescriptionSignal;
+  Toolkit::DevelControl::AccessibilityDoGestureSignalType mAccessibilityDoGestureSignal;
+
+  std::string mAccessibilityName;
+  bool mAccessibilityNameSet = false;
+
+  std::string mAccessibilityDescription;
+  bool mAccessibilityDescriptionSet = false;
+
+  std::string mAccessibilityTranslationDomain;
+  bool mAccessibilityTranslationDomainSet = false;
+
+  bool mAccessibilityHighlightable = false;
+  bool mAccessibilityHighlightableSet = false;
+
+  Dali::Accessibility::Role mAccessibilityRole = Dali::Accessibility::Role::UNKNOWN;
+
+  std::vector<std::vector<Accessibility::Address>> mAccessibilityRelations;
+  bool mAccessibilityAnimated = false;
 
   // Gesture Detection
   PinchGestureDetector mPinchGestureDetector;
@@ -456,6 +526,74 @@ public:
   static const PropertyRegistration PROPERTY_13;
   static const PropertyRegistration PROPERTY_14;
   static const PropertyRegistration PROPERTY_15;
+  static const PropertyRegistration PROPERTY_16;
+  static const PropertyRegistration PROPERTY_17;
+  static const PropertyRegistration PROPERTY_18;
+  static const PropertyRegistration PROPERTY_19;
+  static const PropertyRegistration PROPERTY_20;
+  static const PropertyRegistration PROPERTY_21;
+  static const PropertyRegistration PROPERTY_22;
+
+  /**
+   * The method acquires Accessible handle from Actor object
+   * @param  actor Actor object
+   * @return       handle to Accessible object
+   */
+  static Dali::Accessibility::Accessible *GetAccessibilityObject(Dali::Actor actor);
+  Dali::Accessibility::Accessible *GetAccessibilityObject();
+
+  void AccessibilityRegister();
+  void AccessibilityDeregister();
+
+  struct AccessibleImpl : public virtual Dali::Accessibility::Accessible,
+                          public virtual Dali::Accessibility::Component,
+                          public virtual Dali::Accessibility::Collection,
+                          public virtual Dali::Accessibility::Action
+  {
+    Dali::Actor self;
+    bool modal = false, root = false;
+
+    AccessibleImpl(Dali::Actor self, Dali::Accessibility::Role role, bool modal = false);
+
+    std::string GetName() override;
+    virtual std::string GetNameRaw();
+    std::string GetDescription() override;
+    virtual std::string GetDescriptionRaw();
+    Dali::Accessibility::Accessible* GetParent() override;
+    size_t GetChildCount() override;
+    Dali::Accessibility::Accessible* GetChildAtIndex( size_t index ) override;
+    size_t GetIndexInParent() override;
+    Dali::Accessibility::Role GetRole() override;
+    Dali::Accessibility::States GetStates() override;
+    Dali::Accessibility::Attributes GetAttributes() override;
+    Dali::Rect<> GetExtents( Dali::Accessibility::CoordType ctype ) override;
+    Dali::Accessibility::ComponentLayer GetLayer() override;
+    int16_t GetMdiZOrder() override;
+    bool GrabFocus() override;
+    double GetAlpha() override;
+    bool GrabHighlight() override;
+    bool ClearHighlight() override;
+    int GetHighlightIndex() override;
+
+    std::string GetActionName( size_t index ) override;
+    std::string GetLocalizedActionName( size_t index ) override;
+    std::string GetActionDescription( size_t index ) override;
+    size_t GetActionCount() override;
+    std::string GetActionKeyBinding(size_t index) override;
+    bool DoAction(size_t index) override;
+    bool DoAction(const std::string& name) override;
+    bool DoGesture(const Dali::Accessibility::GestureInfo &gestureInfo) override;
+    std::vector<Dali::Accessibility::Relation> GetRelationSet() override;
+
+    virtual Dali::Accessibility::States CalculateStates();
+  };
+
+  std::function< std::unique_ptr< Dali::Accessibility::Accessible >( Actor ) > accessibilityConstructor;
+  std::unique_ptr< Dali::Accessibility::Accessible > accessibilityObject;
+  Dali::PropertyNotification accessibilityNotificationPosition, accessibilityNotificationSize, accessibilityNotificationCulled;
+  bool accessibilityNotificationSet = false;
+  static void PositionOrSizeChangedCallback( PropertyNotification& );
+  static void CulledChangedCallback( PropertyNotification& );
 };
 
 

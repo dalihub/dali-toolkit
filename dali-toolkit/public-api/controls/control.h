@@ -456,7 +456,6 @@ public:
    * @note A RelayoutRequest is queued by Control before this signal is emitted
    */
   ResourceReadySignalType& ResourceReadySignal();
-
 public: // Intended for control developers
   /**
    * @brief Creates an initialized Control.

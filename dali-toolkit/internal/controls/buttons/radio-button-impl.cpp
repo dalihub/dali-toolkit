@@ -66,6 +66,10 @@ Dali::Toolkit::RadioButton RadioButton::New()
 RadioButton::RadioButton()
 {
   SetTogglableButton(true);
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::RADIO_BUTTON ) );
+  } );
 }
 
 RadioButton::~RadioButton()
@@ -103,6 +107,23 @@ void RadioButton::OnStateChange( State newState )
       }
     }
   }
+  // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
+  if (Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  {
+    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
+      Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0
+    );
+  }
+}
+
+Dali::Accessibility::States RadioButton::AccessibleImpl::CalculateStates()
+{
+  auto tmp = Button::AccessibleImpl::CalculateStates();
+  auto slf = Toolkit::Button::DownCast( self );
+  if( slf.GetProperty<bool>( Toolkit::Button::Property::SELECTED ) )
+    tmp[Dali::Accessibility::State::CHECKED] = true;
+  tmp[Dali::Accessibility::State::SELECTABLE] = true;
+  return tmp;
 }
 
 } // namespace Internal

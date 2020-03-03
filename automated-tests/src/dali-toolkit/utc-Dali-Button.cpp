@@ -143,7 +143,7 @@ Dali::Integration::Point GetPointUpOutside()
 
 int UtcDaliButtonConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Button button;
 
@@ -153,7 +153,7 @@ int UtcDaliButtonConstructorP(void)
 
 int UtcDaliButtonCopyConstructorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   // Initialize an object, ref count == 1
   Button button = PushButton::New();
@@ -184,7 +184,7 @@ int UtcDaliButtonMoveConstructor(void)
 
 int UtcDaliButtonAssignmentOperatorP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Button button = PushButton::New();
 
@@ -217,7 +217,7 @@ int UtcDaliButtonMoveAssignment(void)
 
 int UtcDaliButtonDownCastP(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   Button button = PushButton::New();
 
@@ -233,7 +233,7 @@ int UtcDaliButtonDownCastP(void)
 
 int UtcDaliButtonDownCastN(void)
 {
-  TestApplication application;
+  ToolkitTestApplication application;
 
   BaseHandle unInitializedObject;
 

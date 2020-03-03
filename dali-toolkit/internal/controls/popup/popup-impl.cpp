@@ -39,10 +39,10 @@
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
-#include <dali-toolkit/devel-api/accessibility-manager/accessibility-manager.h>
 #include <dali-toolkit/public-api/visuals/color-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 using namespace Dali;
 
@@ -271,6 +271,11 @@ Popup::Popup()
   mTailDownImage = imageDirPath + DEFAULT_TAIL_DOWN_IMAGE_FILE_NAME;
   mTailLeftImage = imageDirPath + DEFAULT_TAIL_LEFT_IMAGE_FILE_NAME;
   mTailRightImage = imageDirPath + DEFAULT_TAIL_RIGHT_IMAGE_FILE_NAME;
+
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::DIALOG, true ) );
+  } );
 }
 
 void Popup::OnInitialize()
@@ -342,6 +347,8 @@ void Popup::OnInitialize()
 
 Popup::~Popup()
 {
+  if( DevelControl::GetBoundAccessibilityObject( Self() ) )
+    Accessibility::Bridge::GetCurrentBridge()->RemovePopup( DevelControl::GetBoundAccessibilityObject( Self() ) );
   mEntryAnimationData.Clear();
   mExitAnimationData.Clear();
 }
@@ -1565,12 +1572,21 @@ bool Popup::OnDialogTouched( Actor actor, const TouchEvent& touch )
   return false;
 }
 
+void Popup::OnSceneDisconnection()
+{
+  auto p = Dali::Accessibility::Accessible::Get(Self());
+  Accessibility::Bridge::GetCurrentBridge()->RemovePopup( p );
+  Control::OnSceneDisconnection();
+}
+
 void Popup::OnSceneConnection( int depth )
 {
   mLayoutDirty = true;
   RelayoutRequest();
 
   Control::OnSceneConnection( depth );
+  auto p = Dali::Accessibility::Accessible::Get(Self());
+  Accessibility::Bridge::GetCurrentBridge()->AddPopup( p );
 }
 
 void Popup::OnChildAdd( Actor& child )

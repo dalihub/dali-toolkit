@@ -18,6 +18,7 @@
  *
  */
 // EXTERNAL INCLUDES
+#include <dali/devel-api/adaptor-framework/accessibility-impl.h>
 #include <dali/devel-api/adaptor-framework/input-method-context.h>
 
 // INTERNAL INCLUDES
@@ -37,6 +38,27 @@ class Base;
 
 namespace DevelControl
 {
+/// @brief AccessibilityActivate signal type.
+typedef Signal< void ( ) > AccessibilityActivateSignalType;
+
+/// @brief AccessibilityReadingSkipped signal type.
+typedef Signal< void ( ) > AccessibilityReadingSkippedSignalType;
+
+/// @brief AccessibilityReadingCancelled signal type.
+typedef Signal< void ( ) > AccessibilityReadingCancelledSignalType;
+
+/// @brief AccessibilityReadingStopped signal type.
+typedef Signal< void ( ) > AccessibilityReadingStoppedSignalType;
+
+/// @brief AccessibilityGetName signal type.
+typedef Signal< void ( std::string& ) > AccessibilityGetNameSignalType;
+
+/// @brief AccessibilityGetDescription signal type.
+typedef Signal< void ( std::string& ) > AccessibilityGetDescriptionSignalType;
+
+/// @brief AccessibilityDoGesture signal type.
+typedef Signal< void ( std::pair<Dali::Accessibility::GestureInfo, bool>& ) > AccessibilityDoGestureSignalType;
+
 enum State
 {
   NORMAL,
@@ -115,7 +137,52 @@ enum
    * @brief The shadow of the control.
    * @details Name "shadow", type Property::MAP.
    */
-  SHADOW = PADDING + 8
+  SHADOW = PADDING + 8,
+
+  /**
+   * @brief The name of object visible in accessibility tree.
+   * @details Name "accessibilityName", type Property::STRING.
+   */
+  ACCESSIBILITY_NAME,
+
+  /**
+   * @brief The description of object visible in accessibility tree.
+   * @details Name "accessibilityDescription", type Property::STRING.
+   */
+  ACCESSIBILITY_DESCRIPTION,
+
+  /**
+   * @brief Current translation domain for accessibility clients.
+   * @details Name "accessibilityTranslationDomain", type Property::STRING.
+   */
+  ACCESSIBILITY_TRANSLATION_DOMAIN,
+
+  /**
+   * @brief Role being performed in accessibility hierarchy.
+   * @details Name "accessibilityRole", type Property::INTEGER.
+   * @note Property is stored as INTEGER, however its interpretaton
+   * depend on enumeration Dali::Accessibility::Role and should be read and written
+   * with usage of enumerated values.
+   * @see Dali::Accessibility::Role
+   */
+  ACCESSIBILITY_ROLE,
+  /**
+   * @brief Mark of able to highlight object.
+   * @details Name "accessibilityHighlightable", type Property::BOOLEAN.
+   */
+  ACCESSIBILITY_HIGHLIGHTABLE,
+  /**
+   * @brief Set of accessibility attributes describing object in accessibility hierarchy
+   * @details Name "accessibilityAttributes", type Property::MAP
+   */
+  ACCESSIBILITY_ATTRIBUTES,
+
+  /**
+   * @brief Boolean flag describing object as animated
+   * @details Name "accessibilityAnimated", type Property::BOOLEAN
+   * @note Flag set to true will prevent BoundChanged accessibility signal from emiting
+   */
+  ACCESSIBILITY_ANIMATED
 };
 
 } // namespace Property
@@ -283,6 +350,200 @@ using VisualEventSignalType = Signal<void(Control, Dali::Property::Index, Dali::
  * @return The signal to connect to
  */
 DALI_TOOLKIT_API VisualEventSignalType& VisualEventSignal(Control control);
+
+/**
+ * @brief The signal is emmited as a succession of "activate" signal send by accessibility client.
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API AccessibilityActivateSignalType &AccessibilityActivateSignal( Toolkit::Control control );
+
+/**
+ * @brief The signal is emmited when text send via Dali::Accessibility::Bridge::Say
+ * was placed in TTS queue but other text with higher priority prevented it from being read.
+ *
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API AccessibilityReadingSkippedSignalType &AccessibilityReadingSkippedSignal( Toolkit::Control control );
+
+/**
+ * @brief The signal is emmited when text send via Dali::Accessibility::Bridge::Say
+ * was placed in TTS queue and reading was started but other text with higher priority cancelled it.
+ *
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API AccessibilityReadingCancelledSignalType &AccessibilityReadingCancelledSignal( Toolkit::Control control );
+
+/**
+ * @brief The signal is emmited when text send via Dali::Accessibility::Bridge::Say
+ * was fully read by TTS module.
+ *
+ * @return The signal to connect to
+ */
+DALI_TOOLKIT_API AccessibilityReadingStoppedSignalType &AccessibilityReadingStoppedSignal( Toolkit::Control control );
+
+/**
+ * @brief The signal is emmited when accessibility client asks for object's name.
+ *
+ * Connected callback should assign name to std::string call parameter.
+ * Accessibility name can be stored in two ways:
+ *     this signal,
+ *     ACCESSIBILITY_NAME property,
+ * Priority is as above. If none is used, default implementation is provided.
+ * @return [description]
+ */
+DALI_TOOLKIT_API AccessibilityGetNameSignalType &AccessibilityGetNameSignal( Toolkit::Control control );
+
+/**
+ * @brief The signal is emmited when accessibility client asks for object's description.
+ *
+ * Connected callback should assign description to std::string call parameter.
+ * Accessibility description can be stored in two ways:
+ *     this signal,
+ *     ACCESSIBILITY_DESCRIPTION property,
+ * Priority is as above. If none is used, default implementation is provided.
+ * @return signal handler
+ */
+DALI_TOOLKIT_API AccessibilityGetDescriptionSignalType &AccessibilityGetDescriptionSignal( Toolkit::Control control );
+
+/**
+ * @brief The signal is emitted when accessibility client call "DoGesture" method via IPC mechanism.
+ *
+ * This signal allows developers to serve incoming gesture in specific way.
+ * @return signal handler
+ */
+DALI_TOOLKIT_API AccessibilityDoGestureSignalType &AccessibilityDoGestureSignal( Toolkit::Control control );
+
+/**
+ * @brief The method allows connection with other actor with usage of concrete accessibility relation type.
+ *
+ * @param control object to append attribute to
+ * @param destination Actor object
+ * @param relation    enumerated value describing relation
+ */
+DALI_TOOLKIT_API void AppendAccessibilityRelation( Dali::Actor control, Actor destination, Dali::Accessibility::RelationType relation );
+
+/**
+ * @brief The method allows removing relation
+ *
+ * @param control object to append attribute to
+ * @param destination Actor object
+ * @param relation    enumerated value describing relation
+ */
+DALI_TOOLKIT_API void RemoveAccessibilityRelation( Dali::Actor control, Actor destination, Dali::Accessibility::RelationType relation );
+
+/**
+ * @brief The method returns collection accessibility addresses representing objects connected with current object
+ *
+ * @param control object to append attribute to
+ * @return std::vector, where index is casted value of Accessibility::RelationType and value is std::vector of type Accessibility::Address
+ */
+DALI_TOOLKIT_API std::vector<std::vector<Accessibility::Address>> GetAccessibilityRelations( Dali::Actor control );
+
+/**
+ * @brief The method removes all previously appended relations
+ *
+ * @param control object to append attribute to
+ */
+DALI_TOOLKIT_API void ClearAccessibilityRelations( Dali::Actor control );
+
+/**
+ * @brief The method allows to add or modify value matched with given key.
+ * Modification take place if key was previously set.
+ *
+ * @param control object to append attribute to
+ * @param key   std::string value
+ * @param value std::string value
+ */
+DALI_TOOLKIT_API void AppendAccessibilityAttribute( Dali::Actor control, const std::string& key, const std::string value );
+
+/**
+ * @brief The method erases key with its value from accessibility attributes
+ * @param control object to append attribute to
+ * @param key std::string value
+ */
+DALI_TOOLKIT_API void RemoveAccessibilityAttribute( Dali::Actor control, const std::string& key );
+
+/**
+ * @brief The method clears accessibility attributes
+ *
+ * @param control object to append attribute to
+ */
+DALI_TOOLKIT_API void ClearAccessibilityAttributes( Dali::Actor control );
+
+/**
+ * @brief The method inserts reading information of an accessible object into attributes
+ *
+ * @param control object to append attribute to
+ * @param types Reading information types
+ */
+DALI_TOOLKIT_API void SetAccessibilityReadingInfoType( Dali::Actor control, const Dali::Accessibility::ReadingInfoTypes types );
+
+/**
+ * @brief The method returns reading information of an accessible object
+ *
+ * @param control object to append attribute to
+ * @return Reading information types
+ */
+DALI_TOOLKIT_API Dali::Accessibility::ReadingInfoTypes GetAccessibilityReadingInfoType( Dali::Actor control );
+
+/**
+ * @brief The method erases highlight.
+ *
+ * @param control object to append attribute to
+ * @return bool value, false when it is not possible or something went wrong, at the other way true.
+ */
+DALI_TOOLKIT_API bool ClearAccessibilityHighlight( Dali::Actor control );
+
+/**
+ * @brief The method grabs highlight.
+ *
+ * @param control object to append attribute to
+ * @return bool value, false when it is not possible or something went wrong, at the other way true.
+ */
+DALI_TOOLKIT_API bool GrabAccessibilityHighlight( Dali::Actor control );
+
+/**
+ * @brief The metod presents bitset of control's states.
+ *
+ * @param control object to append attribute to
+ * @return Dali::Accessibility::States is vector of enumerated State.
+ */
+DALI_TOOLKIT_API Dali::Accessibility::States GetAccessibilityStates( Dali::Actor control );
+
+/**
+ * @brief The method force sending notifications about current states to accessibility clients
+ *
+ * @param control object to append attribute to
+ * @param states      mask with states expected to broadcast
+ * @param doRecursive flag pointing if notifications of children's state would be sent
+ */
+DALI_TOOLKIT_API void NotifyAccessibilityStateChange( Dali::Actor control, Dali::Accessibility::States states, bool doRecursive );
+
+/**
+ * The method allows to set specific constructor for creating accessibility structure
+ *
+ * Thank to this method hierarchy of accessibility objects can be based on internal hierarchy of Actors.
+ * It prevents from necessity of keeping two trees synchronized.
+ * The method should be called inside constructors of all classes inheriting from Control.
+ *
+ * Possible usage can be as follows:
+ * @code
+ *   SetAccessibilityConstructor( []( Dali::Actor actor ) {
+       return std::unique_ptr< Dali::Accessibility::Accessible >(
+       new AccessibleImpl( actor, Dali::Accessibility::Role::DIALOG, true ) );
+      } );
+  * @endcode
+  *
+  * param constructor callback creating Accessible object
+  */
+DALI_TOOLKIT_API void SetAccessibilityConstructor( Dali::Actor control, std::function<std::unique_ptr<Dali::Accessibility::Accessible>(Dali::Actor)> constructor);
+
+/**
+ * Returns accessibility object bound to actor, if any
+ *
+ * This method won't bound new accessibility object. Use Dali::Accessibility::Accessible::Get in that case.
+ */
+DALI_TOOLKIT_API Dali::Accessibility::Accessible *GetBoundAccessibilityObject( Dali::Actor control );
 
 } // namespace DevelControl
 

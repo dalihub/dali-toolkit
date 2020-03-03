@@ -42,6 +42,7 @@
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
 #include <dali-toolkit/internal/helpers/color-conversion.h>
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -856,6 +857,10 @@ TextSelectionPopup::TextSelectionPopup( TextSelectionPopupCallbackInterface* cal
   mPopupShowing( false ),
   mButtonsChanged( false )
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::DIALOG, true ) );
+  } );
 }
 
 TextSelectionPopup::~TextSelectionPopup()

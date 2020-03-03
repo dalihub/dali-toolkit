@@ -29,6 +29,7 @@
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 #include <dali-toolkit/devel-api/controls/control-depth-index-ranges.h>
 #include <dali-toolkit/internal/helpers/color-conversion.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -384,6 +385,12 @@ TextSelectionToolbar::TextSelectionToolbar()
   mDividerIndexes(),
   mFirstScrollEnd( false )
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor )
+    {
+      return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::TOOL_BAR, true ) );
+    }
+  );
 }
 
 TextSelectionToolbar::~TextSelectionToolbar()

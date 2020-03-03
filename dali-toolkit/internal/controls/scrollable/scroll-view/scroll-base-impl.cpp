@@ -33,13 +33,6 @@ namespace Internal
 // ScrollBase
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-ScrollBase::ScrollBase()
-: Scrollable(),
-  mParent(NULL),
-  mDelay(0.0f)
-{
-}
-
 ScrollBase::ScrollBase( ControlBehaviour behaviourFlags )
 : Scrollable( behaviourFlags ),
   mParent(NULL),

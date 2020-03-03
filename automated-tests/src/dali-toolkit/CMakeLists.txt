@@ -47,7 +47,6 @@ SET(TC_SOURCES
   utc-Dali-Button.cpp
   utc-Dali-Control.cpp
   utc-Dali-ControlImpl.cpp
-  utc-Dali-AccessibilityManager.cpp
   utc-Dali-ItemLayout.cpp
   utc-Dali-ItemView.cpp
   utc-Dali-KeyboardFocusManager.cpp
@@ -77,7 +76,6 @@ SET(TC_SOURCES
 # Append list of test harness files (Won't get parsed for test cases)
 LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/toolkit-adaptor.cpp
-  dali-toolkit-test-utils/toolkit-accessibility-adaptor.cpp
   dali-toolkit-test-utils/toolkit-application.cpp
   dali-toolkit-test-utils/toolkit-clipboard.cpp
   dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp

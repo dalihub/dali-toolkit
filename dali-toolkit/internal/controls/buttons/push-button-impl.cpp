@@ -86,6 +86,10 @@ PushButton::PushButton()
 : Button(),
   mIconAlignment( RIGHT )
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::PUSH_BUTTON ) );
+  } );
 }
 
 PushButton::~PushButton()
@@ -192,6 +196,25 @@ Property::Value PushButton::GetProperty( BaseObject* object, Property::Index pro
   }
 
   return value;
+}
+
+Dali::Accessibility::States PushButton::AccessibleImpl::CalculateStates()
+{
+  auto tmp = Button::AccessibleImpl::CalculateStates();
+  auto slf = Toolkit::Button::DownCast( self );
+  tmp[Dali::Accessibility::State::PRESSED] = slf.GetProperty<bool>( Toolkit::Button::Property::SELECTED );
+  return tmp;
+}
+
+void PushButton::OnStateChange( State newState )
+{
+  // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
+  if (Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  {
+    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
+      Dali::Accessibility::State::PRESSED, newState == SELECTED_STATE ? 1 : 0, 0
+    );
+  }
 }
 
 } // namespace Internal

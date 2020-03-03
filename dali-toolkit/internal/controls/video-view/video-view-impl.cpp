@@ -33,6 +33,7 @@
 #include <dali-toolkit/public-api/controls/video-view/video-view.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali/integration-api/adaptor-framework/adaptor.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -139,6 +140,12 @@ VideoView::VideoView( Dali::VideoSyncMode syncMode )
   mIsUnderlay( true ),
   mSyncMode( syncMode )
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor )
+    {
+      return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::VIDEO, true ) );
+    }
+  );
 }
 
 VideoView::~VideoView()

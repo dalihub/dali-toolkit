@@ -31,6 +31,7 @@
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 #include <dali-toolkit/internal/visuals/visual-base-impl.h>
 #include <dali-toolkit/internal/visuals/visual-base-data-impl.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -69,6 +70,10 @@ ImageView::ImageView()
   mImageVisualPaddingSetByTransform( false ),
   mImageViewPixelAreaSetByFittingMode( false )
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::IMAGE ) );
+  } );
 }
 
 ImageView::~ImageView()

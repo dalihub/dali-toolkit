@@ -34,6 +34,7 @@
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
 #include <dali-toolkit/internal/controls/shadow-view/shadow-view-impl.h>
 #include <dali-toolkit/internal/filters/blur-two-pass-filter.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 // TODO:
 // pixel format / size - set from JSON
@@ -131,6 +132,10 @@ ShadowView::ShadowView( float downsampleWidthScale, float downsampleHeightScale 
   mDownsampleWidthScale(downsampleWidthScale),
   mDownsampleHeightScale(downsampleHeightScale)
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 ShadowView::~ShadowView()

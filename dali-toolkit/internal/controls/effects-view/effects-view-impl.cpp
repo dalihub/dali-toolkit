@@ -36,6 +36,7 @@
 #include <dali-toolkit/internal/filters/emboss-filter.h>
 #include <dali-toolkit/internal/filters/spread-filter.h>
 #include <dali-toolkit/internal/controls/control/control-renderers.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -147,6 +148,10 @@ EffectsView::EffectsView()
   mEnabled( false ),
   mRefreshOnDemand( EFFECTS_VIEW_REFRESH_ON_DEMAND )
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
 }
 
 EffectsView::~EffectsView()

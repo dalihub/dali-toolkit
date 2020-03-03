@@ -158,6 +158,10 @@ ProgressBar::ProgressBar()
   mSecondaryProgressValue( DEFAULT_VALUE ),
   mIndeterminate( false )
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::PROGRESS_BAR ) );
+  } );
 }
 
 ProgressBar::~ProgressBar()
@@ -669,6 +673,29 @@ void ProgressBar::OnSceneConnection( int depth )
     PlayIndeterminateVisualTransition();
   }
 }
+
+double ProgressBar::AccessibleImpl::GetMinimum() { return DEFAULT_LOWER_BOUND; }
+
+double ProgressBar::AccessibleImpl::GetCurrent()
+{
+  auto p = Toolkit::ProgressBar::DownCast( self );
+  return p.GetProperty( Toolkit::ProgressBar::Property::PROGRESS_VALUE )
+      .Get< float >();
+}
+
+double ProgressBar::AccessibleImpl::GetMaximum() { return DEFAULT_UPPER_BOUND; }
+
+bool ProgressBar::AccessibleImpl::SetCurrent( double current )
+{
+  if( current < GetMinimum() || current > GetMaximum() )
+    return false;
+  auto p = Toolkit::ProgressBar::DownCast( self );
+  p.SetProperty( Toolkit::ProgressBar::Property::PROGRESS_VALUE,
+                 static_cast< float >( current ) );
+  return true;
+}
+
+double ProgressBar::AccessibleImpl::GetMinimumIncrement() { return 0.001; }
 
 } // namespace Internal
 

@@ -159,6 +159,10 @@ Slider::Slider()
   mShowValue( false ),
   mSnapToMarks( false )
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::SLIDER ) );
+  } );
 }
 
 Slider::~Slider()
@@ -1407,6 +1411,39 @@ Property::Value Slider::GetProperty( BaseObject* object, Property::Index propert
   }
 
   return value;
+}
+
+double Slider::AccessibleImpl::GetMinimum()
+{
+  auto p = Toolkit::Slider::DownCast( self );
+  return p.GetProperty( Toolkit::Slider::Property::LOWER_BOUND ).Get< float >();
+}
+
+double Slider::AccessibleImpl::GetCurrent()
+{
+  auto p = Toolkit::Slider::DownCast( self );
+  return p.GetProperty( Toolkit::Slider::Property::VALUE ).Get< float >();
+}
+
+double Slider::AccessibleImpl::GetMaximum()
+{
+  auto p = Toolkit::Slider::DownCast( self );
+  return p.GetProperty( Toolkit::Slider::Property::UPPER_BOUND ).Get< float >();
+}
+
+bool Slider::AccessibleImpl::SetCurrent( double current )
+{
+  if( current < GetMinimum() || current > GetMaximum() )
+    return false;
+  auto p = Toolkit::Slider::DownCast( self );
+  p.SetProperty( Toolkit::Slider::Property::VALUE, static_cast< float >( current ) );
+  return true;
+}
+
+double Slider::AccessibleImpl::GetMinimumIncrement()
+{
+  auto p = Toolkit::Slider::DownCast( self );
+  return p.GetProperty( Toolkit::Slider::Property::MARK_TOLERANCE ).Get< float >();
 }
 
 } // namespace Internal

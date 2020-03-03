@@ -656,13 +656,17 @@ struct Controller::Impl
    */
   void RetrieveSelection( std::string& selectedText, bool deleteAfterRetrieval );
 
+  void SetSelection( int start, int end );
+
+  std::pair< int, int > GetSelectionIndexes() const;
+
   void ShowClipboard();
 
   void HideClipboard();
 
   void SetClipboardHideEnable(bool enable);
 
-  bool CopyStringToClipboard( std::string& source );
+  bool CopyStringToClipboard( const std::string& source );
 
   void SendSelectionToClipboard( bool deleteAfterSending );
 

@@ -32,6 +32,7 @@
 #include <dali-toolkit/devel-api/visual-factory/visual-factory.h>
 #include <dali-toolkit/internal/visuals/visual-factory-impl.h>
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -147,6 +148,11 @@ Magnifier::Magnifier()
   mActorSize(Vector3::ZERO),
   mMagnificationFactor(1.0f)
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+      new Control::Impl::AccessibleImpl( actor, Dali::Accessibility::Role::FILLER ) );
+  } );
+
 }
 
 void Magnifier::SetSourceActor(Actor actor)

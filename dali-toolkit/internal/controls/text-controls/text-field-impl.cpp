@@ -1372,6 +1372,8 @@ void TextField::OnRelayout( const Vector2& size, RelayoutContainer& container )
   }
 }
 
+Text::ControllerPtr TextField::getController() { return mController; }
+
 void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
 {
   Actor renderableActor;
@@ -1603,6 +1605,30 @@ void TextField::SetEditable( bool editable )
   }
 }
 
+void TextField::TextInserted( unsigned int position, unsigned int length, const std::string &content )
+{
+  if( Accessibility::IsUp() )
+  {
+    Control::Impl::GetAccessibilityObject( Self() )->EmitTextInserted( position, length, content );
+  }
+}
+
+void TextField::TextDeleted( unsigned int position, unsigned int length, const std::string &content )
+{
+  if( Accessibility::IsUp() )
+  {
+    Control::Impl::GetAccessibilityObject( Self() )->EmitTextDeleted( position, length, content );
+  }
+}
+
+void TextField::CaretMoved( unsigned int position )
+{
+  if( Accessibility::IsUp() )
+  {
+    Control::Impl::GetAccessibilityObject( Self() )->EmitTextCaretMoved( position );
+  }
+}
+
 void TextField::TextChanged()
 {
   Dali::Toolkit::TextField handle( GetOwner() );
@@ -1786,6 +1812,10 @@ TextField::TextField()
   mExceedPolicy( Dali::Toolkit::TextField::EXCEED_POLICY_CLIP ),
   mHasBeenStaged( false )
 {
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::ENTRY ) );
+  } );
 }
 
 TextField::~TextField()
@@ -1796,6 +1826,210 @@ TextField::~TextField()
   {
     Adaptor::Get().RemoveIdle( mIdleCallback );
   }
+}
+
+std::string TextField::AccessibleImpl::GetName()
+{
+  auto slf = Toolkit::TextField::DownCast( self );
+  return slf.GetProperty( Toolkit::TextField::Property::TEXT ).Get< std::string >();
+}
+
+std::string TextField::AccessibleImpl::GetText( size_t startOffset,
+                                                size_t endOffset )
+{
+  if( endOffset <= startOffset )
+    return {};
+
+  auto slf = Toolkit::TextField::DownCast( self );
+  auto txt =
+      slf.GetProperty( Toolkit::TextField::Property::TEXT ).Get< std::string >();
+
+  if( startOffset > txt.size() || endOffset > txt.size() )
+    return {};
+
+  return txt.substr( startOffset, endOffset - startOffset );
+}
+
+size_t TextField::AccessibleImpl::GetCharacterCount()
+{
+  auto slf = Toolkit::TextField::DownCast( self );
+  auto txt =
+      slf.GetProperty( Toolkit::TextField::Property::TEXT ).Get< std::string >();
+
+  return txt.size();
+}
+
+size_t TextField::AccessibleImpl::GetCaretOffset()
+{
+  auto slf = Toolkit::TextField::DownCast( self );
+  return Dali::Toolkit::GetImpl( slf ).getController()->GetCursorPosition();
+}
+
+bool TextField::AccessibleImpl::SetCaretOffset(size_t offset)
+{
+  auto slf = Toolkit::TextField::DownCast( self );
+  auto txt = slf.GetProperty( Toolkit::TextField::Property::TEXT ).Get< std::string >();
+  if (offset > txt.size())
+    return false;
+
+  auto& slfImpl = Dali::Toolkit::GetImpl( slf );
+  slfImpl.getController()->ResetCursorPosition( offset );
+  slfImpl.RequestTextRelayout();
+  return true;
+}
+
+Dali::Accessibility::Range TextField::AccessibleImpl::GetTextAtOffset(
+    size_t offset, Dali::Accessibility::TextBoundary boundary )
+{
+  auto slf = Toolkit::TextField::DownCast( self );
+  auto txt = slf.GetProperty( Toolkit::TextField::Property::TEXT ).Get< std::string >();
+  auto txt_size = txt.size();
+
+  auto range = Dali::Accessibility::Range{};
+
+  switch(boundary)
+  {
+    case Dali::Accessibility::TextBoundary::CHARACTER:
+      {
+        if (offset < txt_size)
+        {
+          range.content = txt[offset];
+          range.startOffset = offset;
+          range.endOffset = offset + 1;
+        }
+      }
+      break;
+    case Dali::Accessibility::TextBoundary::WORD:
+    case Dali::Accessibility::TextBoundary::LINE:
+      {
+        auto txt_c_string = txt.c_str();
+        auto breaks = std::vector< char >( txt_size, 0 );
+        if(boundary == Dali::Accessibility::TextBoundary::WORD)
+          Accessibility::Accessible::FindWordSeparationsUtf8((const utf8_t *) txt_c_string, txt_size, "", breaks.data());
+        else
+          Accessibility::Accessible::FindLineSeparationsUtf8((const utf8_t *) txt_c_string, txt_size, "", breaks.data());
+        auto index = 0u;
+        auto counter = 0u;
+        while( index < txt_size && counter <= offset )
+        {
+          auto start = index;
+          if(breaks[index])
+          {
+            while(breaks[index])
+              index++;
+            counter++;
+          }
+          else
+          {
+            if (boundary == Dali::Accessibility::TextBoundary::WORD)
+              index++;
+            if (boundary == Dali::Accessibility::TextBoundary::LINE)
+              counter++;
+          }
+          if ((counter - 1) == offset)
+          {
+            range.content = txt.substr(start, index - start + 1);
+            range.startOffset = start;
+            range.endOffset = index + 1;
+          }
+          if (boundary == Dali::Accessibility::TextBoundary::LINE)
+              index++;
+        }
+      }
+      break;
+    case Dali::Accessibility::TextBoundary::SENTENCE:
+      {
+        /* not supported by efl */
+      }
+      break;
+    case Dali::Accessibility::TextBoundary::PARAGRAPH:
+      {
+        /* Paragraph is not supported by libunibreak library */
+      }
+      break;
+    default:
+      break;
+  }
+
+  return range;
+}
+
+Dali::Accessibility::Range
+TextField::AccessibleImpl::GetSelection( size_t selectionNum )
+{
+  // Since DALi supports only one selection indexes higher than 0 are ignored
+  if( selectionNum > 0 )
+    return {};
+
+  auto slf = Toolkit::TextField::DownCast( self );
+  auto ctrl = Dali::Toolkit::GetImpl( slf ).getController();
+  std::string ret;
+  ctrl->RetrieveSelection( ret );
+  auto r = ctrl->GetSelectionIndexes();
+
+  return { static_cast<size_t>(r.first), static_cast<size_t>(r.second), ret };
+}
+
+bool TextField::AccessibleImpl::RemoveSelection( size_t selectionNum )
+{
+  // Since DALi supports only one selection indexes higher than 0 are ignored
+  if( selectionNum > 0 )
+    return false;
+
+  auto slf = Toolkit::TextField::DownCast( self );
+  Dali::Toolkit::GetImpl( slf ).getController()->SetSelection( 0, 0 );
+  return true;
+}
+
+bool TextField::AccessibleImpl::SetSelection( size_t selectionNum,
+                                              size_t startOffset,
+                                              size_t endOffset )
+{
+  // Since DALi supports only one selection indexes higher than 0 are ignored
+  if( selectionNum > 0 )
+    return false;
+
+  auto slf = Toolkit::TextField::DownCast( self );
+  Dali::Toolkit::GetImpl( slf ).getController()->SetSelection( startOffset,
+                                                               endOffset );
+  return true;
+}
+
+bool TextField::AccessibleImpl::CopyText( size_t startPosition,
+                                           size_t endPosition )
+{
+  if( endPosition <= startPosition )
+    return false;
+
+  auto slf = Toolkit::TextField::DownCast( self );
+  auto txt = slf.GetProperty( Toolkit::TextField::Property::TEXT ).Get<std::string>();
+  Dali::Toolkit::GetImpl( slf ).getController()->CopyStringToClipboard( txt.substr(startPosition, endPosition - startPosition) );
+
+  return true;
+}
+
+bool TextField::AccessibleImpl::CutText( size_t startPosition,
+                                          size_t endPosition )
+{
+  if( endPosition <= startPosition )
+    return false;
+
+  auto slf = Toolkit::TextField::DownCast( self );
+  auto txt = slf.GetProperty( Toolkit::TextField::Property::TEXT ).Get<std::string>();
+  Dali::Toolkit::GetImpl( slf ).getController()->CopyStringToClipboard( txt.substr(startPosition, endPosition - startPosition) );
+
+  slf.SetProperty( Toolkit::TextField::Property::TEXT,
+                   txt.substr( 0, startPosition ) + txt.substr( endPosition - startPosition, txt.size()));
+
+  return true;
+}
+
+Dali::Accessibility::States TextField::AccessibleImpl::CalculateStates()
+{
+  auto states = Control::Impl::AccessibleImpl::CalculateStates();
+  using namespace Dali::Accessibility;
+  states[State::EDITABLE] = true;
+  return states;
 }
 
 } // namespace Internal

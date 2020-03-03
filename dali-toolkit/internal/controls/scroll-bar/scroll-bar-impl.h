@@ -29,6 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/devel-api/controls/scroll-bar/scroll-bar.h>
+#include <dali-toolkit/internal/controls/control/control-data-impl.h>
 
 namespace Dali
 {
@@ -285,9 +286,9 @@ private:
 
   WeakHandle<Handle> mScrollableObject;                              ///< Object to be scrolled
 
-  Property::Index mPropertyScrollPosition;                           ///< Index of scroll position property owned by the object to be scrolled
-  Property::Index mPropertyMinScrollPosition;                        ///< Index of minimum scroll position property owned by the object to be scrolled
-  Property::Index mPropertyMaxScrollPosition;                        ///< Index of maximum scroll position property owned by the object to be scrolled
+  Property::Index mPropertyScrollPosition = 0;                       ///< Index of scroll position property owned by the object to be scrolled
+  Property::Index mPropertyMinScrollPosition = 0;                    ///< Index of minimum scroll position property owned by the object to be scrolled
+  Property::Index mPropertyMaxScrollPosition = 1;                    ///< Index of maximum scroll position property owned by the object to be scrolled
   Property::Index mPropertyScrollContentSize;                        ///< Index of scroll content size property owned by the object to be scrolled
 
   float mIndicatorShowDuration;                                      ///< The duration of scroll indicator show animation
@@ -319,6 +320,18 @@ private:
 
   bool mIsPanning                 : 1;                               ///< Whether the scroll bar is being panned.
   bool mIndicatorFirstShow        : 1;                               ///< True if the indicator has never been shown
+
+protected:
+  struct AccessibleImpl : public Control::Impl::AccessibleImpl,
+                          public virtual Dali::Accessibility::Value
+  {
+    using Control::Impl::AccessibleImpl::AccessibleImpl;
+    double GetMinimum() override;
+    double GetCurrent() override;
+    double GetMaximum() override;
+    bool SetCurrent( double ) override;
+    double GetMinimumIncrement() override;
+  };
 };
 
 } // namespace Internal

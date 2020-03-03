@@ -74,6 +74,10 @@ CheckBoxButton::CheckBoxButton()
 : Button()
 {
   SetTogglableButton( true );
+  DevelControl::SetAccessibilityConstructor( Self(), []( Dali::Actor actor ) {
+    return std::unique_ptr< Dali::Accessibility::Accessible >(
+        new AccessibleImpl( actor, Dali::Accessibility::Role::CHECK_BOX ) );
+  } );
 }
 
 CheckBoxButton::~CheckBoxButton()
@@ -85,6 +89,25 @@ void CheckBoxButton::OnInitialize()
   Button::OnInitialize();
 }
 
+Dali::Accessibility::States CheckBoxButton::AccessibleImpl::CalculateStates()
+{
+  auto tmp = Button::AccessibleImpl::CalculateStates();
+  auto slf = Toolkit::Button::DownCast( self );
+  if( slf.GetProperty<bool>( Toolkit::Button::Property::SELECTED ) )
+    tmp[Dali::Accessibility::State::CHECKED] = true;
+  return tmp;
+}
+
+void CheckBoxButton::OnStateChange( State newState )
+{
+  // TODO: replace it with OnPropertySet hook once Button::Property::SELECTED will be consistently used
+  if (Dali::Accessibility::IsUp() && (newState == SELECTED_STATE || newState == UNSELECTED_STATE))
+  {
+    Dali::Accessibility::Accessible::Get(Self())->EmitStateChanged(
+      Dali::Accessibility::State::CHECKED, newState == SELECTED_STATE ? 1 : 0, 0
+    );
+  }
+}
 
 } // namespace Internal
 

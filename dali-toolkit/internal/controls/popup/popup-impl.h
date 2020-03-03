@@ -438,6 +438,7 @@ private:
    * Called when the popup is directly or indirectly parented to the stage.
    */
   void OnSceneConnection( int depth ) override;
+  void OnSceneDisconnection() override;
 
   /**
    * From Control; called after a child has been added to the owning actor.

@@ -29,33 +29,10 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/scene.h>
 #include <test-application.h>
+#include <toolkit-test-application.h>
 
 namespace Dali
 {
-
-namespace
-{
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// LogFactoryStub
-//
-///////////////////////////////////////////////////////////////////////////////
-
-class LogFactory : public LogFactoryInterface
-{
-public:
-  LogFactory() = default;
-  virtual ~LogFactory() = default;
-
-private:
-  void InstallLogFunction() const override
-  {
-    Dali::Integration::Log::InstallLogFunction( &TestApplication::LogMessage );
-  }
-};
-LogFactory* gLogFactory = NULL; // For some reason, destroying this when the Adaptor is destroyed causes a crash in some test cases when running all of them.
-} //unnamed namespace
 
 namespace Internal
 {
@@ -364,6 +341,24 @@ void Adaptor::SceneCreated()
 {
 }
 
+class LogFactory : public LogFactoryInterface
+{
+public:
+  virtual void InstallLogFunction() const
+  {
+    Dali::Integration::Log::LogFunction logFunction(&ToolkitTestApplication::LogMessage);
+    Dali::Integration::Log::InstallLogFunction(logFunction);
+  }
+
+  LogFactory()
+  {
+  }
+  virtual ~LogFactory()
+  {
+  }
+};
+
+LogFactory* gLogFactory = NULL;
 const LogFactoryInterface& Adaptor::GetLogFactory()
 {
   if( gLogFactory == NULL )
