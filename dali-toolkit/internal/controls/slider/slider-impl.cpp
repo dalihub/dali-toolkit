@@ -25,9 +25,10 @@
 #include <dali/public-api/events/touch-data.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/type-registry-helper.h>
-#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
+#include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
@@ -87,11 +88,11 @@ const float DEFAULT_HIT_HEIGHT = 72.0f;
 const float DEFAULT_HANDLE_HEIGHT = DEFAULT_HIT_HEIGHT;
 const float POPUP_TEXT_PADDING = 10.0f;
 
-const char* SKINNED_TRACK_VISUAL = DALI_IMAGE_DIR "slider-skin.9.png";
-const char* SKINNED_HANDLE_VISUAL = DALI_IMAGE_DIR "slider-skin-handle.png";
-const char* SKINNED_PROGRESS_VISUAL = DALI_IMAGE_DIR "slider-skin-progress.9.png";
-const char* SKINNED_POPUP_VISUAL = DALI_IMAGE_DIR "slider-popup.9.png";
-const char* SKINNED_POPUP_ARROW_VISUAL = DALI_IMAGE_DIR "slider-popup-arrow.png";
+const char* SKINNED_TRACK_VISUAL_FILE_NAME = "slider-skin.9.png";
+const char* SKINNED_HANDLE_VISUAL_FILE_NAME = "slider-skin-handle.png";
+const char* SKINNED_PROGRESS_VISUAL_FILE_NAME = "slider-skin-progress.9.png";
+const char* SKINNED_POPUP_VISUAL_FILE_NAME = "slider-popup.9.png";
+const char* SKINNED_POPUP_ARROW_VISUAL_FILE_NAME = "slider-popup-arrow.png";
 
 const Vector2 DEFAULT_HIT_REGION( DEFAULT_WIDTH, DEFAULT_HIT_HEIGHT );
 const Vector2 DEFAULT_TRACK_REGION( DEFAULT_WIDTH, DEFAULT_HEIGHT );
@@ -176,11 +177,12 @@ void Slider::OnInitialize()
   SetTrackRegion(   DEFAULT_TRACK_REGION   );
   SetHandleSize(    DEFAULT_HANDLE_SIZE    );
 
-  SetTrackVisual(            SKINNED_TRACK_VISUAL             );
-  SetHandleVisual(           SKINNED_HANDLE_VISUAL            );
-  SetProgressVisual(         SKINNED_PROGRESS_VISUAL          );
-  SetPopupVisual(            SKINNED_POPUP_VISUAL             );
-  SetPopupArrowVisual(       SKINNED_POPUP_ARROW_VISUAL       );
+  const std::string imageDirPath = AssetManager::GetDaliImagePath();
+  SetTrackVisual(            imageDirPath + SKINNED_TRACK_VISUAL_FILE_NAME             );
+  SetHandleVisual(           imageDirPath + SKINNED_HANDLE_VISUAL_FILE_NAME            );
+  SetProgressVisual(         imageDirPath + SKINNED_PROGRESS_VISUAL_FILE_NAME          );
+  SetPopupVisual(            imageDirPath + SKINNED_POPUP_VISUAL_FILE_NAME             );
+  SetPopupArrowVisual(       imageDirPath + SKINNED_POPUP_ARROW_VISUAL_FILE_NAME       );
 
   SetShowPopup( DEFAULT_SHOW_POPUP );
   SetShowValue( DEFAULT_SHOW_VALUE );

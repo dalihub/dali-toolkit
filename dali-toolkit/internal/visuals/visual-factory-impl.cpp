@@ -26,6 +26,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/public-api/visuals/image-visual-properties.h>
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
@@ -73,7 +74,7 @@ BaseHandle Create()
 
 DALI_TYPE_REGISTRATION_BEGIN_CREATE( Toolkit::VisualFactory, Dali::BaseHandle, Create, true )
 DALI_TYPE_REGISTRATION_END()
-const char * const  BROKEN_IMAGE_URL( DALI_IMAGE_DIR "broken.png" ); ///< URL For the broken image
+const char* const BROKEN_IMAGE_FILE_NAME = "broken.png"; ///< The file name of the broken image.
 
 } // namespace
 
@@ -94,7 +95,8 @@ void VisualFactory::OnStyleChangedSignal( Toolkit::StyleManager styleManager, St
 {
   if( type == StyleChange::THEME_CHANGE )
   {
-    std::string brokenImageUrl(BROKEN_IMAGE_URL);
+    const std::string imageDirPath = AssetManager::GetDaliImagePath();
+    std::string brokenImageUrl = imageDirPath + BROKEN_IMAGE_FILE_NAME;
 
     Property::Map config = Toolkit::DevelStyleManager::GetConfigurations( styleManager );
     config["brokenImageUrl"].Get( brokenImageUrl );
@@ -403,7 +405,9 @@ Internal::VisualFactoryCache& VisualFactory::GetFactoryCache()
   {
     mFactoryCache = std::unique_ptr<VisualFactoryCache>( new VisualFactoryCache( mPreMultiplyOnLoad ) );
 
-    std::string brokenImageUrl(BROKEN_IMAGE_URL);
+    const std::string imageDirPath = AssetManager::GetDaliImagePath();
+    std::string brokenImageUrl = imageDirPath + BROKEN_IMAGE_FILE_NAME;
+
     Toolkit::StyleManager styleManager = Toolkit::StyleManager::Get();
     if( styleManager )
     {
