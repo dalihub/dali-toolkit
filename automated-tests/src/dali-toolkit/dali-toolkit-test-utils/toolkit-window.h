@@ -2,7 +2,7 @@
 #define TOOLKIT_WINDOW_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ namespace Dali
 
 class Actor;
 class Layer;
+class RenderSurfaceInterface;
 struct KeyEvent;
 class TouchData;
 struct WheelEvent;
@@ -60,7 +61,7 @@ public:
   Window& operator=(const Window& rhs);
 
   Integration::Scene GetScene();
-  Integration::RenderSurface& GetRenderSurface();
+  Dali::RenderSurfaceInterface& GetRenderSurface();
   void Add( Dali::Actor actor );
   void Remove( Dali::Actor actor );
   Dali::Layer GetRootLayer() const;
