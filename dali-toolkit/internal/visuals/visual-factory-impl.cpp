@@ -42,6 +42,7 @@
 #include <dali-toolkit/internal/visuals/text/text-visual.h>
 #include <dali-toolkit/internal/visuals/animated-image/animated-image-visual.h>
 #include <dali-toolkit/internal/visuals/animated-vector-image/animated-vector-image-visual.h>
+#include <dali-toolkit/internal/visuals/arc/arc-visual.h>
 #include <dali-toolkit/internal/visuals/wireframe/wireframe-visual.h>
 #include <dali-toolkit/internal/visuals/visual-factory-cache.h>
 #include <dali-toolkit/internal/visuals/visual-url.h>
@@ -273,6 +274,12 @@ Toolkit::Visual::Base VisualFactory::CreateVisual( const Property::Map& property
       {
         visualPtr = AnimatedVectorImageVisual::New( GetFactoryCache(),  GetImageVisualShaderFactory(), imageUrl, propertyMap );
       }
+      break;
+    }
+
+    case Toolkit::DevelVisual::ARC:
+    {
+      visualPtr = ArcVisual::New( GetFactoryCache(), propertyMap );
       break;
     }
   }

@@ -49,6 +49,7 @@ enum Type
 
   ANIMATED_GRADIENT     = ANIMATED_IMAGE + 1,  ///< Renders an animated gradient.
   ANIMATED_VECTOR_IMAGE = ANIMATED_IMAGE + 2,  ///< Renders an animated vector image.
+  ARC                   = ANIMATED_IMAGE + 3,  ///< Renders an arc.
 };
 
 /**

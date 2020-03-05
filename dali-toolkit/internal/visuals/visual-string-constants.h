@@ -194,6 +194,12 @@ extern const char * const BEVEL_PERCENTAGE;
 extern const char * const BEVEL_SMOOTHNESS;
 extern const char * const LIGHT_POSITION_UNIFORM_NAME;
 
+// Arc visual
+extern const char * const THICKNESS_NAME;
+extern const char * const START_ANGLE_NAME;
+extern const char * const SWEEP_ANGLE_NAME;
+extern const char * const CAP_NAME;
+
 } // namespace Internal
 
 } // namespace Toolkit

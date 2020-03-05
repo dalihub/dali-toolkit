@@ -45,6 +45,7 @@ DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, ANIMATED_IMAGE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::Visual, WIREFRAME )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, ANIMATED_GRADIENT )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, ANIMATED_VECTOR_IMAGE )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Toolkit::DevelVisual, ARC )
 DALI_ENUM_TO_STRING_TABLE_END( VISUAL_TYPE )
 
 // Visual Type
@@ -209,6 +210,11 @@ const char * const BEVEL_PERCENTAGE( "bevelPercentage" );
 const char * const BEVEL_SMOOTHNESS( "bevelSmoothness" );
 const char * const LIGHT_POSITION_UNIFORM_NAME( "lightPosition" );
 
+// Arc visual
+const char * const THICKNESS_NAME( "thickness" );
+const char * const START_ANGLE_NAME( "startAngle" );
+const char * const SWEEP_ANGLE_NAME( "sweepAngle" );
+const char * const CAP_NAME( "cap" );
 
 } // namespace Internal
 

@@ -22,6 +22,7 @@ SET( toolkit_src_files
    ${toolkit_src_dir}/visuals/animated-vector-image/vector-animation-task.cpp
    ${toolkit_src_dir}/visuals/animated-vector-image/vector-animation-thread.cpp
    ${toolkit_src_dir}/visuals/animated-vector-image/vector-rasterize-thread.cpp
+   ${toolkit_src_dir}/visuals/arc/arc-visual.cpp
    ${toolkit_src_dir}/visuals/border/border-visual.cpp
    ${toolkit_src_dir}/visuals/color/color-visual.cpp
    ${toolkit_src_dir}/visuals/gradient/gradient-visual.cpp
