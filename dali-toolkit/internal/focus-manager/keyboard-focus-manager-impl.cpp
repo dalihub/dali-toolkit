@@ -37,6 +37,7 @@
 #include <dali/integration-api/adaptor-framework/scene-holder.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
@@ -63,7 +64,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_KEY
 
 const char* const IS_FOCUS_GROUP_PROPERTY_NAME = "isKeyboardFocusGroup"; // This property will be replaced by a flag in Control.
 
-const char* const FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "keyboard_focus.9.png";
+const char* const FOCUS_BORDER_IMAGE_FILE_NAME = "keyboard_focus.9.png";
 
 BaseHandle Create()
 {
@@ -731,7 +732,8 @@ Actor KeyboardFocusManager::GetFocusIndicatorActor()
   if( ! mFocusIndicatorActor )
   {
     // Create the default if it hasn't been set and one that's shared by all the keyboard focusable actors
-    mFocusIndicatorActor = Toolkit::ImageView::New( FOCUS_BORDER_IMAGE_PATH );
+    const std::string imageDirPath = AssetManager::GetDaliImagePath();
+    mFocusIndicatorActor = Toolkit::ImageView::New( imageDirPath + FOCUS_BORDER_IMAGE_FILE_NAME );
 
     // Apply size constraint to the focus indicator
     mFocusIndicatorActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );

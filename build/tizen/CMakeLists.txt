@@ -31,6 +31,7 @@ OPTION(ENABLE_PKG_CONFIGURE      "Use pkgconfig" ON)
 OPTION(ENABLE_LINK_TEST          "Enable the link test" ON)
 OPTION(INSTALL_DOXYGEN_DOC       "Install doxygen doc" ON)
 OPTION(CONFIGURE_AUTOMATED_TESTS "Configure automated tests" ON)
+OPTION(USE_DEFAULT_RESOURCE_DIR  "Whether to use the default resource folders. Otherwise set environment variables for DALI_IMAGE_DIR, DALI_SOUND_DIR, DALI_STYLE_DIR, DALI_STYLE_IMAGE_DIR and DALI_DATA_READ_ONLY_DIR" ON)
 
 IF( ENABLE_PKG_CONFIGURE )
   FIND_PACKAGE( PkgConfig REQUIRED )
@@ -101,18 +102,22 @@ ENDIF( ENABLE_I18N )
 
 IF( SET_VCPKG_INSTALL_PREFIX )
   ADD_DEFINITIONS( "-DBUILDING_DALI_TOOLKIT" )
-  ADD_DEFINITIONS( -DDALI_IMAGE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/images/\"
-                   -DDALI_SOUND_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/sounds/\"
-                   -DDALI_STYLE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/styles/\"
-                   -DDALI_STYLE_IMAGE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/styles/images/\"
-                   -DDALI_DATA_READ_ONLY_DIR=\"${VCPKG_INSTALLED_DIR}/share/\" )
+  IF( USE_DEFAULT_RESOURCE_DIR )
+    ADD_DEFINITIONS( -DDALI_IMAGE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/images/\"
+                     -DDALI_SOUND_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/sounds/\"
+                     -DDALI_STYLE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/styles/\"
+                     -DDALI_STYLE_IMAGE_DIR=\"${VCPKG_INSTALLED_DIR}/share/dali/toolkit/styles/images/\"
+                     -DDALI_DATA_READ_ONLY_DIR=\"${VCPKG_INSTALLED_DIR}/share/\" )
+  ENDIF()
 ELSE()
   ADD_DEFINITIONS(-DPIC -DSTDC_HEADERS)
-  ADD_DEFINITIONS(-DDALI_IMAGE_DIR=\"${dataReadOnlyDir}/toolkit/images/\"
-                  -DDALI_SOUND_DIR=\"${dataReadOnlyDir}/toolkit/sounds/\"
-                  -DDALI_STYLE_DIR=\"${dataReadOnlyDir}/toolkit/styles/\"
-                  -DDALI_STYLE_IMAGE_DIR=\"${dataReadOnlyDir}/toolkit/styles/images/\"
-                  -DDALI_DATA_READ_ONLY_DIR=\"${dataReadOnlyDir}\" )
+  IF( USE_DEFAULT_RESOURCE_DIR )
+    ADD_DEFINITIONS( -DDALI_IMAGE_DIR=\"${dataReadOnlyDir}/toolkit/images/\"
+                     -DDALI_SOUND_DIR=\"${dataReadOnlyDir}/toolkit/sounds/\"
+                     -DDALI_STYLE_DIR=\"${dataReadOnlyDir}/toolkit/styles/\"
+                     -DDALI_STYLE_IMAGE_DIR=\"${dataReadOnlyDir}/toolkit/styles/images/\"
+                     -DDALI_DATA_READ_ONLY_DIR=\"${dataReadOnlyDir}\" )
+  ENDIF()
 
   IF("${ARCH}" STREQUAL "arm")
     ADD_DEFINITIONS("-DTARGET")
@@ -121,6 +126,14 @@ ELSE()
   IF( NOT ${ENABLE_EXPORTALL} )
     ADD_DEFINITIONS( "-fvisibility=hidden -DHIDE_DALI_INTERNALS" )
   ENDIF( NOT ${ENABLE_EXPORTALL} )
+ENDIF()
+
+IF( NOT USE_DEFAULT_RESOURCE_DIR )
+  ADD_DEFINITIONS( -DDALI_IMAGE_DIR=0
+                   -DDALI_SOUND_DIR=0
+                   -DDALI_STYLE_DIR=0
+                   -DDALI_STYLE_IMAGE_DIR=0
+                   -DDALI_DATA_READ_ONLY_DIR=0 )
 ENDIF()
 
 IF( ENABLE_TRACE )

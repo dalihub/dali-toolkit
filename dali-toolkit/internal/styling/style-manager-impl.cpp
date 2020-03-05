@@ -25,6 +25,7 @@
 #include <dali/public-api/adaptor-framework/application.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/internal/builder/builder-impl.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
@@ -38,12 +39,12 @@ namespace
 const char* PORTRAIT_QUALIFIER  = "portrait";
 const char* FONT_SIZE_QUALIFIER = "fontsize";
 
-const char* DEFAULT_THEME = DALI_STYLE_DIR "dali-toolkit-default-theme.json";
+const char* DEFAULT_THEME_FILE_NAME = "dali-toolkit-default-theme.json";
 
 const char* PACKAGE_PATH_KEY = "PACKAGE_PATH";
 const char* APPLICATION_RESOURCE_PATH_KEY = "APPLICATION_RESOURCE_PATH";
 
-const char* DEFAULT_PACKAGE_PATH = DALI_DATA_READ_ONLY_DIR "/toolkit/";
+const char* DEFAULT_TOOLKIT_PACKAGE_PATH = "/toolkit/";
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_STYLE");
@@ -108,10 +109,12 @@ Toolkit::StyleManager StyleManager::Get()
 StyleManager::StyleManager()
 : mDefaultFontSize( -1 ),
   mDefaultFontFamily(""),
-  mFeedbackStyle( NULL )
+  mDefaultThemeFilePath(),
+  mFeedbackStyle( nullptr )
 {
   // Add theme builder constants
-  mThemeBuilderConstants[ PACKAGE_PATH_KEY ] = DEFAULT_PACKAGE_PATH;
+  const std::string dataReadOnlyDir = AssetManager::GetDaliDataReadOnlyPath();
+  mThemeBuilderConstants[ PACKAGE_PATH_KEY ] = dataReadOnlyDir + DEFAULT_TOOLKIT_PACKAGE_PATH;
   mThemeBuilderConstants[ APPLICATION_RESOURCE_PATH_KEY ] = Application::GetResourcePath();
 
   mStyleMonitor = StyleMonitor::Get();
@@ -120,6 +123,10 @@ StyleManager::StyleManager()
     mStyleMonitor.StyleChangeSignal().Connect( this, &StyleManager::StyleMonitorChange );
     mDefaultFontSize = mStyleMonitor.GetDefaultFontSize();
   }
+
+  // Set the full path for the default style theme.
+  const std::string styleDirPath = AssetManager::GetDaliStylePath();
+  mDefaultThemeFilePath = styleDirPath + DEFAULT_THEME_FILE_NAME;
 
   // Sound & haptic style
   mFeedbackStyle = new FeedbackStyle();
@@ -137,7 +144,7 @@ void StyleManager::ApplyTheme( const std::string& themeFile )
 
 void StyleManager::ApplyDefaultTheme()
 {
-  SetTheme( DEFAULT_THEME );
+  SetTheme(mDefaultThemeFilePath);
 }
 
 const std::string& StyleManager::GetDefaultFontFamily() const
@@ -240,10 +247,10 @@ void StyleManager::SetTheme( const std::string& themeFile )
   {
     loading = true;
     mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
-    themeLoaded = LoadJSON( mThemeBuilder, DEFAULT_THEME ); // Sets themeLoaded to true if theme exists
+    themeLoaded = LoadJSON( mThemeBuilder, mDefaultThemeFilePath ); // Sets themeLoaded to true if theme exists
   }
 
-  if( themeFile.compare(DEFAULT_THEME) != 0 )
+  if( themeFile.compare(mDefaultThemeFilePath) != 0 )
   {
     // The theme is different to the default: Merge it
     loading = true;
@@ -291,8 +298,8 @@ const Property::Map StyleManager::GetConfigurations()
     mThemeBuilder = CreateBuilder( mThemeBuilderConstants );
 
     // Load default theme because this is first try to load stylesheet.
-    themeLoaded = LoadJSON( mThemeBuilder, DEFAULT_THEME );
-    mThemeFile = DEFAULT_THEME;
+    themeLoaded = LoadJSON( mThemeBuilder, mDefaultThemeFilePath );
+    mThemeFile = mDefaultThemeFilePath;
 
     if( themeLoaded )
     {

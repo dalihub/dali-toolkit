@@ -11,6 +11,7 @@ SET(TC_SOURCES
  utc-Dali-ColorConversion.cpp
  utc-Dali-Control-internal.cpp
  utc-Dali-DebugRendering.cpp
+ utc-Dali-FeedbackStyle.cpp
  utc-Dali-ItemView-internal.cpp
  utc-Dali-LogicalModel.cpp
  utc-Dali-PropertyHelper.cpp
@@ -41,6 +42,7 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-clipboard-event-notifier.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-event-thread-callback.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-environment-variable.cpp
+   ../dali-toolkit/dali-toolkit-test-utils/toolkit-feedback-player.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-context.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-input-method-options.cpp
    ../dali-toolkit/dali-toolkit-test-utils/toolkit-lifecycle-controller.cpp

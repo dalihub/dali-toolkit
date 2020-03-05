@@ -29,6 +29,7 @@
 #include <dali/integration-api/debug.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/public-api/controls/control.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
@@ -58,10 +59,10 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_FOC
 const char* const ACTOR_FOCUSABLE("focusable");
 const char* const IS_FOCUS_GROUP("isFocusGroup");
 
-const char* FOCUS_BORDER_IMAGE_PATH = DALI_IMAGE_DIR "B16-8_TTS_focus.9.png";
+const char* FOCUS_BORDER_IMAGE_FILE_NAME = "B16-8_TTS_focus.9.png";
 
-const char* FOCUS_SOUND_FILE = DALI_SOUND_DIR "Focus.ogg";
-const char* FOCUS_CHAIN_END_SOUND_FILE = DALI_SOUND_DIR "End_of_List.ogg";
+const char* FOCUS_SOUND_FILE_NAME = "Focus.ogg";
+const char* FOCUS_CHAIN_END_SOUND_FILE_NAME = "End_of_List.ogg";
 
 /**
  * The function to be used in the hit-test algorithm to check whether the actor is hittable.
@@ -112,6 +113,8 @@ AccessibilityManager::AccessibilityManager()
   mFocusIndicatorActor(),
   mPreviousPosition( 0.0f, 0.0f ),
   mRecursiveFocusMoveCounter(0),
+  mFocusSoundFilePath(),
+  mFocusChainEndSoundFilePath(),
   mIsWrapped(false),
   mIsFocusWithinGroup(false),
   mIsEndcapFeedbackEnabled(false),
@@ -119,7 +122,9 @@ AccessibilityManager::AccessibilityManager()
   mIsAccessibilityTtsEnabled(false),
   mTtsCreated(false),
   mIsFocusIndicatorEnabled(false),
-  mContinuousPlayMode(false)
+  mContinuousPlayMode(false),
+  mIsFocusSoundFilePathSet(false),
+  mIsFocusChainEndSoundFilePathSet(false)
 {
 }
 
@@ -357,7 +362,13 @@ bool AccessibilityManager::DoSetCurrentFocusActor(const unsigned int actorID)
         Dali::SoundPlayer soundPlayer = Dali::SoundPlayer::Get();
         if(soundPlayer)
         {
-          soundPlayer.PlaySound(FOCUS_SOUND_FILE);
+          if (!mIsFocusSoundFilePathSet)
+          {
+            const std::string soundDirPath = AssetManager::GetDaliSoundPath();
+            mFocusSoundFilePath = soundDirPath + FOCUS_SOUND_FILE_NAME;
+            mIsFocusSoundFilePathSet = true;
+          }
+          soundPlayer.PlaySound(mFocusSoundFilePath);
         }
 
         // Play the accessibility attributes with the TTS player.
@@ -595,7 +606,10 @@ Actor AccessibilityManager::GetFocusIndicatorActor()
   if( ! mFocusIndicatorActor )
   {
     // Create the default if it hasn't been set and one that's shared by all the keyboard focusable actors
-    mFocusIndicatorActor = Toolkit::ImageView::New( FOCUS_BORDER_IMAGE_PATH );
+    const std::string imageDirPath = AssetManager::GetDaliImagePath();
+    const std::string focusBorderImagePath = imageDirPath + FOCUS_BORDER_IMAGE_FILE_NAME;
+
+    mFocusIndicatorActor = Toolkit::ImageView::New(focusBorderImagePath);
     mFocusIndicatorActor.SetParentOrigin( ParentOrigin::CENTER );
     mFocusIndicatorActor.SetZ( 1.0f );
 
@@ -622,7 +636,13 @@ bool AccessibilityManager::DoMoveFocus(FocusIDIter focusIDIter, bool forward, bo
         Dali::SoundPlayer soundPlayer = Dali::SoundPlayer::Get();
         if(soundPlayer)
         {
-          soundPlayer.PlaySound(FOCUS_CHAIN_END_SOUND_FILE);
+          if (!mIsFocusChainEndSoundFilePathSet)
+          {
+            const std::string soundDirPath = AssetManager::GetDaliSoundPath();
+            mFocusChainEndSoundFilePath = soundDirPath + FOCUS_CHAIN_END_SOUND_FILE_NAME;
+            mIsFocusChainEndSoundFilePathSet = true;
+          }
+          soundPlayer.PlaySound(mFocusChainEndSoundFilePath);
         }
 
         mIsEndcapFeedbackPlayed = true;
