@@ -376,7 +376,7 @@ struct Engine::Impl
           }
           else
           {
-            lineLayout.length = length;
+            lineLayout.length = std::max( length, lineLayout.length );
           }
         }
       }
