@@ -2403,12 +2403,14 @@ int UtcDaliImageViewReloadFailedOnResourceReadySignal(void)
 
 int UtcDaliImageViewLoadRemoteSVG(void)
 {
-  tet_infoline("Test reloading failed image from within signal handler.");
+  tet_infoline("Test load from a remote server.");
 
   ToolkitTestApplication application;
   Toolkit::ImageView imageView;
   imageView = Toolkit::ImageView::New(  );
   imageView.SetImage("https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg");
+  // Victor. Temporary (or permanent?) update as the url above seems not to work from time to time ...
+  imageView.SetImage("https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/SVG_logo.svg/64px-SVG_logo.svg.png");
   imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
   imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   imageView.SetSize(300, 300);
