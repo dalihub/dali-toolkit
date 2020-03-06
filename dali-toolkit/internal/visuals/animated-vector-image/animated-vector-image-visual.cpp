@@ -264,7 +264,7 @@ void AnimatedVectorImageVisual::DoSetOnStage( Actor& actor )
   }
   else
   {
-    shader = mImageVisualShaderFactory.GetShader( mFactoryCache, false, true );
+    shader = mImageVisualShaderFactory.GetShader( mFactoryCache, false, true, false );
   }
 
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );

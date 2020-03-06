@@ -121,6 +121,10 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
       {
         matchKey = Property::Key( Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE );
       }
+      else if( matchKey == CORNER_RADIUS )
+      {
+        matchKey = Property::Key( Toolkit::DevelVisual::Property::CORNER_RADIUS );
+      }
     }
 
     switch( matchKey.indexKey )
@@ -186,6 +190,15 @@ void Visual::Base::SetProperties( const Property::Map& propertyMap )
       {
         Scripting::GetEnumerationProperty< Visual::FittingMode >(
           value, VISUAL_FITTING_MODE_TABLE, VISUAL_FITTING_MODE_TABLE_COUNT, mImpl->mFittingMode );
+        break;
+      }
+      case Toolkit::DevelVisual::Property::CORNER_RADIUS:
+      {
+        float radius;
+        if( value.Get( radius ) )
+        {
+          mImpl->mCornerRadius = radius;
+        }
         break;
       }
     }
@@ -279,6 +292,13 @@ void Visual::Base::SetOnStage( Actor& actor )
     {
       RegisterMixColor();
 
+      if( IsRoundedCornerRequired() )
+      {
+        mImpl->mCornerRadiusIndex = mImpl->mRenderer.RegisterProperty( CORNER_RADIUS, mImpl->mCornerRadius );
+
+        mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
+      }
+
       mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, IsPreMultipliedAlphaEnabled());
       mImpl->mRenderer.SetProperty( Renderer::Property::DEPTH_INDEX, mImpl->mDepthIndex );
       mImpl->mFlags |= Impl::IS_ON_STAGE; // Only sets the flag if renderer exists
@@ -292,6 +312,7 @@ void Visual::Base::SetOffStage( Actor& actor )
   {
     DoSetOffStage( actor );
     mImpl->mMixColorIndex = Property::INVALID_INDEX;
+    mImpl->mCornerRadiusIndex = Property::INVALID_INDEX;
     mImpl->mFlags &= ~Impl::IS_ON_STAGE;
   }
 }
@@ -320,6 +341,8 @@ void Visual::Base::CreatePropertyMap( Property::Map& map ) const
   auto fittingModeString = Scripting::GetLinearEnumerationName< FittingMode >(
     mImpl->mFittingMode, VISUAL_FITTING_MODE_TABLE, VISUAL_FITTING_MODE_TABLE_COUNT );
   map.Insert( Toolkit::DevelVisual::Property::VISUAL_FITTING_MODE, fittingModeString );
+
+  map.Insert( Toolkit::DevelVisual::Property::CORNER_RADIUS, mImpl->mCornerRadius );
 }
 
 void Visual::Base::CreateInstancePropertyMap( Property::Map& map ) const
@@ -368,6 +391,11 @@ void Visual::Base::DoSetOffStage( Actor& actor )
 bool Visual::Base::IsOnStage() const
 {
   return mImpl->mFlags & Impl::IS_ON_STAGE;
+}
+
+bool Visual::Base::IsRoundedCornerRequired() const
+{
+  return !EqualsZero( mImpl->mCornerRadius );
 }
 
 void Visual::Base::OnDoAction( const Property::Index actionId, const Property::Value& attributes )

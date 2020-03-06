@@ -568,7 +568,8 @@ void ImageVisual::CreateRenderer( TextureSet& textureSet )
 
     shader = mImageVisualShaderFactory.GetShader( mFactoryCache,
                              mImpl->mFlags & Impl::IS_ATLASING_APPLIED,
-                             mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE );
+                             mWrapModeU <= WrapMode::CLAMP_TO_EDGE && mWrapModeV <= WrapMode::CLAMP_TO_EDGE,
+                             IsRoundedCornerRequired() );
   }
   else
   {

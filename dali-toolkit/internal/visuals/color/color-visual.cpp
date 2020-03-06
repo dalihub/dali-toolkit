@@ -78,6 +78,53 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
     gl_FragColor = vec4(mixColor, 1.0)*uColor;\n
   }\n
 );
+
+const char* VERTEX_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  uniform highp   mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  varying mediump vec2 vPosition;\n
+  varying mediump vec2 vRectSize;\n
+  \n
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+  uniform mediump float cornerRadius;\n
+  \n
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    vRectSize = visualSize / 2.0 - cornerRadius;\n
+    vPosition = aPosition* visualSize;\n
+    return vec4( vPosition + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+  \n
+  void main()\n
+  {\n
+    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
+  }\n
+);
+
+//float distance = length( max( abs( position - center ), size ) - size ) - radius;
+const char* FRAGMENT_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vPosition;\n
+  varying mediump vec2 vRectSize;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform mediump float cornerRadius;\n
+  \n
+  void main()\n
+  {\n
+      mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - cornerRadius;\n
+      gl_FragColor = uColor * vec4( mixColor, 1.0 );\n
+      gl_FragColor.a *= smoothstep( 1.0, -1.0, dist );\n
+  }\n
+);
+
 }
 
 ColorVisualPtr ColorVisual::New( VisualFactoryCache& factoryCache, const Property::Map& properties )
@@ -175,11 +222,24 @@ void ColorVisual::InitializeRenderer()
 {
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 
-  Shader shader = mFactoryCache.GetShader( VisualFactoryCache::COLOR_SHADER );
-  if( !shader )
+  Shader shader;
+  if( !IsRoundedCornerRequired() )
   {
-    shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
-    mFactoryCache.SaveShader( VisualFactoryCache::COLOR_SHADER, shader );
+    shader = mFactoryCache.GetShader( VisualFactoryCache::COLOR_SHADER );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER, FRAGMENT_SHADER );
+      mFactoryCache.SaveShader( VisualFactoryCache::COLOR_SHADER, shader );
+    }
+  }
+  else
+  {
+    shader = mFactoryCache.GetShader( VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER_ROUNDED_CORNER, FRAGMENT_SHADER_ROUNDED_CORNER );
+      mFactoryCache.SaveShader( VisualFactoryCache::COLOR_SHADER_ROUNDED_CORNER, shader );
+    }
   }
 
   mImpl->mRenderer = Renderer::New( geometry, shader );
