@@ -66,7 +66,13 @@ public:
   struct Data
   {
     Data()
-    : loadCompleted( false )
+    : url(),
+      textureSet(),
+      hash( 0 ),
+      croppedWidth( 0 ),
+      croppedHeight( 0 ),
+      border( 0, 0, 0, 0 ),
+      loadCompleted( false )
     {}
 
     std::string url;                              ///< Url of the N-Patch
