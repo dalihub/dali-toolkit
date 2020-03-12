@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_IMAGE_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ enum Type
   TOTAL_FRAME_NUMBER = ORIENTATION_CORRECTION + 7,
 
   /**
-   * @brief  The stop behavior the AnimatedVectorImageVisual will use.
+   * @brief  The stop behavior the AnimatedImageVisual and AnimatedVectorImageVisual will use.
    * @details Name "stopBehavior", Type StopBehavior::Type (Property::INTEGER)
    * @note Default value is StopBehavior::CURRENT_FRAME.
    */
