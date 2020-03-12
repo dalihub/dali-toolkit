@@ -80,16 +80,55 @@ RollingImageCache::~RollingImageCache()
   }
 }
 
-TextureSet RollingImageCache::FirstFrame()
+TextureSet RollingImageCache::Frame( uint32_t frameIndex )
 {
-  TextureSet textureSet = GetFrontTextureSet();
+  // If a frame of frameIndex is not loaded, clear the queue and remove all loaded textures.
+  if( mImageUrls[ frameIndex ].mTextureId == TextureManager::INVALID_TEXTURE_ID )
+  {
+    mUrlIndex = frameIndex;
+    while( !mQueue.IsEmpty() )
+    {
+      ImageFrame imageFrame = mQueue.PopFront();
+      mTextureManager.Remove( mImageUrls[ imageFrame.mUrlIndex ].mTextureId, this );
+      mImageUrls[ imageFrame.mUrlIndex ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+    }
+    LoadBatch();
+  }
+  // If the frame is already loaded, remove previous frames of the frame in the queue
+  // and load new frames amount of removed frames.
+  else
+  {
+    bool popExist = false;
+    while( !mQueue.IsEmpty() && mQueue.Front().mUrlIndex != frameIndex )
+    {
+      ImageFrame imageFrame = mQueue.PopFront();
+      mTextureManager.Remove( mImageUrls[ imageFrame.mUrlIndex ].mTextureId, this );
+      mImageUrls[ imageFrame.mUrlIndex ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+      popExist = true;
+    }
+    if( popExist )
+    {
+      mUrlIndex = ( mQueue.Back().mUrlIndex + 1 ) % mImageUrls.size();
+      LoadBatch();
+    }
+  }
 
-  if( ! textureSet )
+  TextureSet textureSet;
+  if( IsFrontReady() == true )
+  {
+    textureSet = GetFrontTextureSet();
+  }
+  else
   {
     mWaitingForReadyFrame = true;
   }
 
   return textureSet;
+}
+
+TextureSet RollingImageCache::FirstFrame()
+{
+  return Frame( 0u );
 }
 
 TextureSet RollingImageCache::NextFrame()
@@ -100,6 +139,8 @@ TextureSet RollingImageCache::NextFrame()
   mTextureManager.Remove( mImageUrls[ imageFrame.mUrlIndex ].mTextureId, this );
   mImageUrls[ imageFrame.mUrlIndex ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
 
+  LoadBatch();
+
   if( IsFrontReady() == true )
   {
     textureSet = GetFrontTextureSet();
@@ -108,8 +149,6 @@ TextureSet RollingImageCache::NextFrame()
   {
     mWaitingForReadyFrame = true;
   }
-
-  LoadBatch();
 
   return textureSet;
 }
@@ -124,7 +163,7 @@ void RollingImageCache::LoadBatch()
   // Try and load up to mBatchSize images, until the cache is filled.
   // Once the cache is filled, as frames progress, the old frame is
   // cleared, but not erased, and another image is loaded
-  bool frontFrameReady = IsFrontReady();;
+  bool frontFrameReady = IsFrontReady();
 
   for( unsigned int i=0; i< mBatchSize && !mQueue.IsFull(); ++i )
   {

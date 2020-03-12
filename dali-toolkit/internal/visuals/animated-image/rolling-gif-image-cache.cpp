@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,16 +84,49 @@ RollingGifImageCache::~RollingGifImageCache()
   }
 }
 
+TextureSet RollingGifImageCache::Frame( uint32_t frameIndex )
+{
+  // If a frame of frameIndex is not loaded, clear the queue and remove all loaded textures.
+  if( mImageUrls[ frameIndex ].mTextureId == TextureManager::INVALID_TEXTURE_ID )
+  {
+    mFrameIndex = frameIndex;
+    while( !mQueue.IsEmpty() )
+    {
+      ImageFrame imageFrame = mQueue.PopFront();
+      Dali::Toolkit::TextureManager::RemoveTexture( mImageUrls[ imageFrame.mFrameNumber ].mUrl );
+      mImageUrls[ imageFrame.mFrameNumber ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+    }
+    LoadBatch();
+  }
+  // If the frame is already loaded, remove previous frames of the frame in the queue
+  // and load new frames amount of removed frames.
+  else
+  {
+    bool popExist = false;
+    while( !mQueue.IsEmpty() && mQueue.Front().mFrameNumber != frameIndex )
+    {
+      ImageFrame imageFrame = mQueue.PopFront();
+      Dali::Toolkit::TextureManager::RemoveTexture( mImageUrls[ imageFrame.mFrameNumber ].mUrl );
+      mImageUrls[ imageFrame.mFrameNumber ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
+      popExist = true;
+    }
+    if( popExist )
+    {
+      mFrameIndex = ( mQueue.Back().mFrameNumber + 1 ) % mFrameCount;
+      LoadBatch();
+    }
+  }
+
+  return GetFrontTextureSet();
+}
 
 TextureSet RollingGifImageCache::FirstFrame()
 {
-  return GetFrontTextureSet();
+  return Frame( 0u );
 }
 
 TextureSet RollingGifImageCache::NextFrame()
 {
-  TextureSet textureSet;
-
   ImageFrame imageFrame = mQueue.PopFront();
   Dali::Toolkit::TextureManager::RemoveTexture( mImageUrls[ imageFrame.mFrameNumber ].mUrl );
   mImageUrls[ imageFrame.mFrameNumber ].mTextureId = TextureManager::INVALID_TEXTURE_ID;
@@ -120,7 +153,7 @@ void RollingGifImageCache::LoadBatch()
   int batchSize = std::min( std::size_t(mBatchSize), mCacheSize - mQueue.Count() );
   DALI_LOG_INFO( gAnimImgLogFilter, Debug::Concise, "RollingGifImageCache::LoadBatch() mFrameIndex:%d  batchSize:%d\n", mFrameIndex, batchSize );
 
-  if( mGifLoading.LoadNextNFrames(  mFrameIndex, batchSize, pixelDataList) )
+  if( mGifLoading.LoadNextNFrames( mFrameIndex, batchSize, pixelDataList) )
   {
     unsigned int pixelDataListCount = pixelDataList.size();
 
