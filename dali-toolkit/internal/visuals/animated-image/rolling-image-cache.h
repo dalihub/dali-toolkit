@@ -60,6 +60,12 @@ public:
   virtual ~RollingImageCache();
 
   /**
+   * Get the Nth frame. If it's not ready, this will trigger the
+   * sending of FrameReady() when the image becomes ready.
+   */
+  TextureSet Frame( uint32_t frameIndex ) override;
+
+  /**
    * Get the first frame. If it's not ready, this will trigger the
    * sending of FrameReady() when the image becomes ready.
    */
