@@ -109,20 +109,6 @@ protected:
    */
   void DoSetOnStage( Actor& actor ) override;
 
-public:
-
-  /**
-   * Declare whether a texture map should be used for the object, if it's present. Defaults to true.
-   * @param[in] useTexture boolean declaration.
-   */
-  void SetUseTexture( bool useTexture );
-
-  /**
-   * Declare whether a normal map should be used for the object, if it's present. Defaults to true.
-   * @param[in] useNormalMap boolean declaration.
-   */
-  void SetUseNormalMap( bool useNormalMap );
-
 private:
 
   /**

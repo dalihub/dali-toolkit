@@ -252,47 +252,6 @@ void BorderVisual::InitializeRenderer()
   mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
 }
 
-void BorderVisual::SetBorderColor(const Vector4& color)
-{
-  mBorderColor = color;
-
-  if( mImpl->mRenderer )
-  {
-    (mImpl->mRenderer).SetProperty( mBorderColorIndex, color );
-    if( color.a < 1.f )
-    {
-      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-    }
-  }
-}
-
-void BorderVisual::SetBorderSize( float size )
-{
-  mBorderSize = size;
-
-  if( mImpl->mRenderer )
-  {
-    (mImpl->mRenderer).SetProperty( mBorderSizeIndex, size );
-  }
-}
-
-void BorderVisual::RequireAntiAliasing( bool antiAliasing )
-{
-  if( mAntiAliasing != antiAliasing )
-  {
-    mAntiAliasing = antiAliasing;
-    if( mImpl->mRenderer )
-    {
-      Shader borderShader( GetBorderShader() );
-      mImpl->mRenderer.SetShader( borderShader );
-      if( mAntiAliasing )
-      {
-        mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
-      }
-    }
-  }
-}
-
 Shader BorderVisual::GetBorderShader()
 {
   Shader shader;
