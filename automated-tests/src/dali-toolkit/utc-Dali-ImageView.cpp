@@ -354,7 +354,7 @@ int UtcDaliImageViewSetGetProperty03(void)
   Property::Value value = renderer.GetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA );
   bool enable;
   DALI_TEST_CHECK( value.Get( enable ) );
-  DALI_TEST_CHECK( enable );
+  DALI_TEST_CHECK( !enable );
 
   // pre-multiplied alpha blending
   imageView.SetProperty( Toolkit::ImageView::Property::PRE_MULTIPLIED_ALPHA, true );

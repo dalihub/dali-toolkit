@@ -100,26 +100,6 @@ protected:
    */
   void OnSetTransform() override;
 
-public:
-
-  /**
-   * Set the color of the border.
-   * @param[in] color The border color.
-   */
-  void SetBorderColor( const Vector4& color);
-
-  /**
-   * Set the size of the border.
-   * @param[in] size The border size.
-   */
-  void SetBorderSize( float size );
-
-  /**
-   * Enable/Disable the anti-aliasing.
-   * @param[in] enable Whether the anti-aliasing be enabled or not.
-   */
-  void RequireAntiAliasing( bool antiAliasing );
-
 private:
 
   /**
