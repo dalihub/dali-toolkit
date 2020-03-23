@@ -128,6 +128,11 @@ private: // From Control
   void OnInitialize();
 
   /**
+   * @copydoc CustomActorImpl::OnStageConnection()
+   */
+  virtual void OnStageConnection( int depth );
+
+  /**
    * @copydoc Toolkit::Control::GetNaturalSize
    */
   virtual Vector3 GetNaturalSize();
