@@ -330,7 +330,6 @@ void GaussianBlurView::OnInitialize()
   //////////////////////////////////////////////////////
   // Connect to actor tree
   Self().Add( mChildrenRoot );
-  Self().Add( mInternalRoot );
   mInternalRoot.Add( mHorizBlurActor );
   mInternalRoot.Add( mVertBlurActor );
   mInternalRoot.Add( mRenderDownsampledCamera );
@@ -534,6 +533,7 @@ void GaussianBlurView::RemoveRenderTasks()
 void GaussianBlurView::Activate()
 {
   // make sure resources are allocated and start the render tasks processing
+  Self().Add( mInternalRoot );
   AllocateResources();
   CreateRenderTasks();
   mActivated = true;
@@ -550,6 +550,7 @@ void GaussianBlurView::Deactivate()
 {
   // stop render tasks processing
   // Note: render target resources are automatically freed since we set the Image::Unused flag
+  mInternalRoot.Unparent();
   RemoveRenderTasks();
   mRenderTargetForRenderingChildren.Reset();
   mRenderTarget1.Reset();
