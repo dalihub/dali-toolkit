@@ -570,7 +570,7 @@ void TestLoopCount( ToolkitTestApplication &application, DummyControl &dummyCont
   tet_infoline( "Test that a timer has been created" );
   DALI_TEST_EQUALS( Test::GetTimerCount(), 1, TEST_INNER_LOCATION( location ) );
 
-  for ( uint16_t i = 0; i <= loopCount; i++ )
+  for ( uint16_t i = 0; i < loopCount; i++ )
   {
     for ( uint16_t j = 0; j < frameCount; j++ )
     {
