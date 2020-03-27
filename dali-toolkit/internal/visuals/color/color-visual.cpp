@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,7 +121,52 @@ const char* FRAGMENT_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
   {\n
       mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - cornerRadius;\n
       gl_FragColor = uColor * vec4( mixColor, 1.0 );\n
-      gl_FragColor.a *= smoothstep( 1.0, -1.0, dist );\n
+      gl_FragColor.a *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
+  }\n
+);
+
+const char* VERTEX_SHADER_BLUR_EDGE = DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  uniform highp   mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  varying mediump vec2 vPosition;\n
+  varying mediump vec2 vRectSize;\n
+  \n
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+  uniform mediump float blurRadius;\n
+  \n
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + blurRadius * 2.0;\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    vRectSize = visualSize / 2.0;\n
+    vPosition = aPosition* visualSize;\n
+    return vec4( vPosition + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+  \n
+  void main()\n
+  {\n
+    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
+  }\n
+);
+
+const char* FRAGMENT_SHADER_BLUR_EDGE = DALI_COMPOSE_SHADER(
+  varying mediump vec2 vPosition;\n
+  varying mediump vec2 vRectSize;\n
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform mediump float blurRadius;\n
+  \n
+  void main()\n
+  {\n
+      mediump vec2 blur = 1.0 - smoothstep( vRectSize - blurRadius * 2.0, vRectSize, abs( vPosition ) );\n
+      gl_FragColor = uColor * vec4( mixColor, 1.0 );\n
+      gl_FragColor.a *= blur.x * blur.y;\n
   }\n
 );
 
@@ -136,6 +181,7 @@ ColorVisualPtr ColorVisual::New( VisualFactoryCache& factoryCache, const Propert
 
 ColorVisual::ColorVisual( VisualFactoryCache& factoryCache )
 : Visual::Base( factoryCache, Visual::FittingMode::FILL ),
+  mBlurRadius( 0.0f ),
   mRenderIfTransparent( false )
 {
 }
@@ -179,6 +225,15 @@ void ColorVisual::DoSetProperties( const Property::Map& propertyMap )
       DALI_LOG_ERROR( "ColorVisual: renderIfTransparent property has incorrect type: %d\n", renderIfTransparentValue->GetType() );
     }
   }
+
+  Property::Value* blurRadiusValue = propertyMap.Find( Toolkit::DevelColorVisual::Property::BLUR_RADIUS, BLUR_RADIUS_NAME );
+  if( blurRadiusValue )
+  {
+    if( !blurRadiusValue->Get( mBlurRadius ) )
+    {
+      DALI_LOG_ERROR( "ColorVisual:DoSetProperties:: BLUR_RADIUS property has incorrect type: %d\n", blurRadiusValue->GetType() );
+    }
+  }
 }
 
 void ColorVisual::DoSetOnStage( Actor& actor )
@@ -202,6 +257,7 @@ void ColorVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR );
   map.Insert( Toolkit::ColorVisual::Property::MIX_COLOR, mImpl->mMixColor );
   map.Insert( Toolkit::DevelColorVisual::Property::RENDER_IF_TRANSPARENT, mRenderIfTransparent );
+  map.Insert( Toolkit::DevelColorVisual::Property::BLUR_RADIUS, mBlurRadius );
 }
 
 void ColorVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -223,7 +279,16 @@ void ColorVisual::InitializeRenderer()
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 
   Shader shader;
-  if( !IsRoundedCornerRequired() )
+  if( !EqualsZero( mBlurRadius ) )
+  {
+    shader = mFactoryCache.GetShader( VisualFactoryCache::COLOR_SHADER_BLUR_EDGE );
+    if( !shader )
+    {
+      shader = Shader::New( VERTEX_SHADER_BLUR_EDGE, FRAGMENT_SHADER_BLUR_EDGE );
+      mFactoryCache.SaveShader( VisualFactoryCache::COLOR_SHADER_BLUR_EDGE, shader );
+    }
+  }
+  else if( !IsRoundedCornerRequired() )
   {
     shader = mFactoryCache.GetShader( VisualFactoryCache::COLOR_SHADER );
     if( !shader )
@@ -249,7 +314,9 @@ void ColorVisual::InitializeRenderer()
   // String keys will get to this property.
   mImpl->mMixColorIndex = DevelHandle::RegisterProperty( mImpl->mRenderer, Toolkit::ColorVisual::Property::MIX_COLOR, MIX_COLOR, Vector3(mImpl->mMixColor) );
 
-  if( mImpl->mMixColor.a < 1.f )
+  mImpl->mRenderer.RegisterProperty( BLUR_RADIUS_NAME, mBlurRadius );
+
+  if( mImpl->mMixColor.a < 1.f || !EqualsZero( mBlurRadius ) )
   {
     mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON );
   }

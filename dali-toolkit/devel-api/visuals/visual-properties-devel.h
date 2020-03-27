@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_VISUAL_PROPERTIES_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ enum Type
 
   /**
    * @brief The radius for the rounded corners of the visual
-   * @details Name "cornerRadius", type Property::FLOAT or Property::VECTOR4.
+   * @details Name "cornerRadius", type Property::FLOAT.
    * @note Optional.
    */
   CORNER_RADIUS = OPACITY + 2,

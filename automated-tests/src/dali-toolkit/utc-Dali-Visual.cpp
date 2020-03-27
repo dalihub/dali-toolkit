@@ -509,6 +509,7 @@ int UtcDaliVisualGetPropertyMap1(void)
   propertyMap.Insert(Visual::Property::TYPE,  Visual::COLOR);
   propertyMap.Insert(Visual::Property::MIX_COLOR,  Color::BLUE);
   propertyMap.Insert( DevelVisual::Property::CORNER_RADIUS, 10.0f );
+  propertyMap.Insert( DevelColorVisual::Property::BLUR_RADIUS, 20.0f );
   Visual::Base colorVisual = factory.CreateVisual( propertyMap );
 
   Property::Map resultMap;
@@ -522,9 +523,13 @@ int UtcDaliVisualGetPropertyMap1(void)
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::BLUE );
 
-  Property::Value* radiusValue = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::FLOAT );
-  DALI_TEST_CHECK( radiusValue );
-  DALI_TEST_CHECK( radiusValue->Get< float >() == 10.0f );
+  Property::Value* cornerRadiusValue = resultMap.Find( DevelVisual::Property::CORNER_RADIUS, Property::FLOAT );
+  DALI_TEST_CHECK( cornerRadiusValue );
+  DALI_TEST_CHECK( cornerRadiusValue->Get< float >() == 10.0f );
+
+  Property::Value* blurRadiusValue = resultMap.Find( DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT );
+  DALI_TEST_CHECK( blurRadiusValue );
+  DALI_TEST_CHECK( blurRadiusValue->Get< float >() == 20.0f );
 
   // change the blend color
   propertyMap[ColorVisual::Property::MIX_COLOR] = Color::CYAN;
@@ -534,6 +539,16 @@ int UtcDaliVisualGetPropertyMap1(void)
   colorValue = resultMap.Find( ColorVisual::Property::MIX_COLOR,  Property::VECTOR4 );
   DALI_TEST_CHECK( colorValue );
   DALI_TEST_CHECK( colorValue->Get<Vector4>() == Color::CYAN );
+
+  // Test wrong values
+  propertyMap[DevelColorVisual::Property::BLUR_RADIUS] = "3.0f";
+
+  colorVisual = factory.CreateVisual( propertyMap  );
+  colorVisual.CreatePropertyMap( resultMap );
+
+  blurRadiusValue = resultMap.Find( DevelColorVisual::Property::BLUR_RADIUS, Property::FLOAT );
+  DALI_TEST_CHECK( blurRadiusValue );
+  DALI_TEST_CHECK( blurRadiusValue->Get< float >() == 0.0f );
 
   END_TEST;
 }
@@ -3649,6 +3664,41 @@ int UtcDaliVisualRoundedCorner(void)
 
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
   }
+
+  END_TEST;
+}
+
+int UtcDaliColorVisualBlurRadius(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliColorVisualBlurRadius" );
+
+  VisualFactory factory = VisualFactory::Get();
+  Property::Map properties;
+  float blurRadius = 20.0f;
+
+  properties[Visual::Property::TYPE] = Visual::COLOR;
+  properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+  properties["blurRadius"] = blurRadius;
+
+  Visual::Base visual = factory.CreateVisual( properties );
+
+  // trigger creation through setting on stage
+  DummyControl dummy = DummyControl::New( true );
+  Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+  dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+  dummy.SetSize( 200.f, 200.f );
+  dummy.SetParentOrigin( ParentOrigin::CENTER );
+  Stage::GetCurrent().Add( dummy );
+
+  application.SendNotification();
+  application.Render();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "blurRadius", blurRadius ), true, TEST_LOCATION );
 
   END_TEST;
 }
