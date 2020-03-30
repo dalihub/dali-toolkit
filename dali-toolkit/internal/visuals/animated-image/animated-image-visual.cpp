@@ -615,7 +615,7 @@ bool AnimatedImageVisual::DisplayNextFrame()
     // Wrap the frame index
     ++mCurrentFrameIndex;
 
-    if( mLoopCount < 0 || mCurrentLoopIndex <= mLoopCount)
+    if( mLoopCount < 0 || mCurrentLoopIndex < mLoopCount)
     {
       mCurrentFrameIndex %= mFrameCount;
       if( mCurrentFrameIndex == 0 )
