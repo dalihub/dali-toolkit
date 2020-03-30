@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace Adaptor
 
 SceneHolder::SceneHolder( const Dali::Rect<int>& positionSize )
 : mRenderSurface( positionSize ),
-  mScene( Dali::Integration::Scene::New( mRenderSurface ) )
+  mScene( Dali::Integration::Scene::New( Dali::Size( static_cast<float>( positionSize.width ), static_cast<float>( positionSize.height ) ) ) )
 {
 }
 
@@ -121,7 +121,7 @@ Integration::Scene SceneHolder::GetScene()
   return mScene;
 }
 
-Integration::RenderSurface& SceneHolder::GetRenderSurface()
+Dali::RenderSurfaceInterface& SceneHolder::GetRenderSurface()
 {
   return mRenderSurface;
 }
