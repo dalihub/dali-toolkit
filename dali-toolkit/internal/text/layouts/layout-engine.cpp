@@ -923,24 +923,9 @@ struct Engine::Impl
     lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
     lineRun.lineSpacing = mDefaultLineSpacing;
 
-    if( isLastLine && !layoutParameters.isLastNewParagraph )
-    {
-      lineRun.width = layout.length;
-      if( LTR == layout.direction )
-      {
-        lineRun.width += layout.whiteSpaceLengthEndOfLine;
-        lineRun.extraLength = 0.f;
-      }
-      else
-      {
-        lineRun.extraLength = layout.whiteSpaceLengthEndOfLine;
-      }
-    }
-    else
-    {
-      lineRun.width = layout.length;
-      lineRun.extraLength = std::ceil( layout.whiteSpaceLengthEndOfLine );
-    }
+    lineRun.width = layout.length;
+    lineRun.extraLength = std::ceil( layout.whiteSpaceLengthEndOfLine );
+
 
     // Rounds upward to avoid a non integer size.
     lineRun.width = std::ceil( lineRun.width );
