@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,13 @@ namespace Internal
 
 namespace
 {
+// stop behavior
+DALI_ENUM_TO_STRING_TABLE_BEGIN( STOP_BEHAVIOR )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::DevelImageVisual::StopBehavior, CURRENT_FRAME )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::DevelImageVisual::StopBehavior, FIRST_FRAME )
+DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::Toolkit::DevelImageVisual::StopBehavior, LAST_FRAME )
+DALI_ENUM_TO_STRING_TABLE_END( STOP_BEHAVIOR )
+
 // wrap modes
 DALI_ENUM_TO_STRING_TABLE_BEGIN( WRAP_MODE )
 DALI_ENUM_TO_STRING_WITH_SCOPE( Dali::WrapMode, DEFAULT )
@@ -182,7 +189,9 @@ AnimatedImageVisual::AnimatedImageVisual( VisualFactoryCache& factoryCache, Imag
   mWrapModeU( WrapMode::DEFAULT ),
   mWrapModeV( WrapMode::DEFAULT ),
   mActionStatus( DevelAnimatedImageVisual::Action::PLAY ),
-  mStartFirstFrame(false)
+  mStopBehavior( DevelImageVisual::StopBehavior::CURRENT_FRAME ),
+  mStartFirstFrame(false),
+  mIsJumpTo( false )
 {}
 
 AnimatedImageVisual::~AnimatedImageVisual()
@@ -238,6 +247,8 @@ void AnimatedImageVisual::DoCreatePropertyMap( Property::Map& map ) const
   map.Insert( Toolkit::ImageVisual::Property::CACHE_SIZE, static_cast<int>(mCacheSize) );
   map.Insert( Toolkit::ImageVisual::Property::FRAME_DELAY, static_cast<int>(mFrameDelay) );
   map.Insert( Toolkit::DevelImageVisual::Property::LOOP_COUNT, static_cast<int>(mLoopCount) );
+
+  map.Insert( Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, mStopBehavior );
 }
 
 void AnimatedImageVisual::DoCreateInstancePropertyMap( Property::Map& map ) const
@@ -270,8 +281,32 @@ void AnimatedImageVisual::OnDoAction( const Dali::Property::Index actionId, cons
     {
       // STOP reset functionality will actually be done in a future change
       // Stop will be executed on next timer tick
-      mCurrentFrameIndex = 0;
       mActionStatus = DevelAnimatedImageVisual::Action::STOP;
+      if( IsOnStage() )
+      {
+        DisplayNextFrame();
+      }
+      break;
+    }
+    case DevelAnimatedImageVisual::Action::JUMP_TO:
+    {
+      int32_t frameNumber;
+      if( attributes.Get( frameNumber ) )
+      {
+        if( frameNumber < 0 || frameNumber >= static_cast<int32_t>( mFrameCount ) )
+        {
+          DALI_LOG_ERROR( "Invalid frame index used.\n" );
+        }
+        else
+        {
+          mIsJumpTo = true;
+          mCurrentFrameIndex = frameNumber;
+          if( IsOnStage() )
+          {
+            DisplayNextFrame();
+          }
+        }
+      }
       break;
     }
   }
@@ -317,6 +352,10 @@ void AnimatedImageVisual::DoSetProperties( const Property::Map& propertyMap )
       else if( keyValue.first == LOOP_COUNT_NAME )
       {
         DoSetProperty( Toolkit::DevelImageVisual::Property::LOOP_COUNT, keyValue.second );
+      }
+      else if( keyValue.first == STOP_BEHAVIOR_NAME )
+      {
+         DoSetProperty( Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR, keyValue.second );
       }
     }
   }
@@ -395,6 +434,16 @@ void AnimatedImageVisual::DoSetProperty( Property::Index index,
       if( value.Get( loopCount ) )
       {
         mLoopCount = loopCount;
+      }
+      break;
+    }
+
+    case Toolkit::DevelImageVisual::Property::STOP_BEHAVIOR:
+    {
+      int32_t stopBehavior = mStopBehavior;
+      if( Scripting::GetEnumerationProperty( value, STOP_BEHAVIOR_TABLE, STOP_BEHAVIOR_TABLE_COUNT, stopBehavior ) )
+      {
+        mStopBehavior = DevelImageVisual::StopBehavior::Type( stopBehavior );
       }
       break;
     }
@@ -518,7 +567,7 @@ void AnimatedImageVisual::LoadFirstBatch()
 
   if (!mImageCache)
   {
-    DALI_LOG_ERROR("mImageCache is null");
+    DALI_LOG_ERROR("mImageCache is null\n");
   }
 }
 
@@ -606,45 +655,75 @@ void AnimatedImageVisual::FrameReady( TextureSet textureSet )
 
 bool AnimatedImageVisual::DisplayNextFrame()
 {
-  if( mActionStatus == DevelAnimatedImageVisual::Action::STOP || mActionStatus == DevelAnimatedImageVisual::Action::PAUSE )
+  if( mIsJumpTo )
+  {
+    mIsJumpTo = false;
+  }
+  else if( mActionStatus == DevelAnimatedImageVisual::Action::PAUSE )
   {
     return false;
   }
-  if( mFrameCount > 1 )
+  else if( mActionStatus == DevelAnimatedImageVisual::Action::STOP )
   {
-    // Wrap the frame index
-    ++mCurrentFrameIndex;
-
-    if( mLoopCount < 0 || mCurrentLoopIndex < mLoopCount)
+    mCurrentLoopIndex = 0;
+    if( mStopBehavior == DevelImageVisual::StopBehavior::FIRST_FRAME )
     {
-      mCurrentFrameIndex %= mFrameCount;
-      if( mCurrentFrameIndex == 0 )
-      {
-        ++mCurrentLoopIndex;
-      }
+      mCurrentFrameIndex = 0;
+    }
+    else if( mStopBehavior == DevelImageVisual::StopBehavior::LAST_FRAME )
+    {
+      mCurrentFrameIndex = mFrameCount - 1;
     }
     else
     {
-      // This will stop timer
-      return false;
+      return false; // Do not draw already rendered scene twice.
     }
   }
-  DALI_LOG_INFO( gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::DisplayNextFrame(this:%p) FrameCount:%d\n", this, mCurrentFrameIndex);
-
-  if( mFrameDelayContainer.Count() > 0 )
+  else
   {
-    unsigned int delay = mFrameDelayContainer[mCurrentFrameIndex];
-
-    if( mFrameDelayTimer.GetInterval() != delay )
+    if( mFrameCount > 1 )
     {
-      mFrameDelayTimer.SetInterval( delay );
+      // Wrap the frame index
+      bool finished = false;
+      ++mCurrentFrameIndex;
+      if( mCurrentFrameIndex >= mFrameCount )
+      {
+        ++mCurrentLoopIndex;
+        finished = true;
+      }
+
+      if( mLoopCount < 0 || mCurrentLoopIndex < mLoopCount)
+      {
+        if( finished )
+        {
+          mCurrentFrameIndex = 0; // Back to the first frame
+        }
+      }
+      else
+      {
+        // This will stop timer
+        mActionStatus = DevelAnimatedImageVisual::Action::STOP;
+        return DisplayNextFrame();
+      }
+    }
+
+    if( mFrameDelayContainer.Count() > 0 )
+    {
+      unsigned int delay = mFrameDelayContainer[mCurrentFrameIndex];
+
+      if( mFrameDelayTimer.GetInterval() != delay )
+      {
+        mFrameDelayTimer.SetInterval( delay );
+      }
     }
   }
+
+  DALI_LOG_INFO( gAnimImgLogFilter,Debug::Concise,"AnimatedImageVisual::DisplayNextFrame(this:%p) CurrentFrameIndex:%d\n", this, mCurrentFrameIndex);
 
   TextureSet textureSet;
   if( mImageCache )
   {
-    textureSet = mImageCache->NextFrame();
+    textureSet = mImageCache->Frame( mCurrentFrameIndex );
     if( textureSet )
     {
       SetImageSize( textureSet );
@@ -652,8 +731,7 @@ bool AnimatedImageVisual::DisplayNextFrame()
     }
   }
 
-  // Keep timer ticking
-  return true;
+  return ( mActionStatus == DevelAnimatedImageVisual::Action::PLAY ) ? true : false;
 }
 
 

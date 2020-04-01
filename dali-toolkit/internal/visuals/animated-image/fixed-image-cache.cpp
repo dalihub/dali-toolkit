@@ -54,6 +54,27 @@ FixedImageCache::~FixedImageCache()
   }
 }
 
+TextureSet FixedImageCache::Frame( uint32_t frameIndex )
+{
+  while( frameIndex > mFront )
+  {
+    NextFrame();
+  }
+  mFront = frameIndex;
+
+  TextureSet textureSet;
+  if( IsFrontReady() == true )
+  {
+    textureSet = GetFrontTextureSet();
+  }
+  else
+  {
+    mWaitingForReadyFrame = true;
+  }
+
+  return textureSet;
+}
+
 TextureSet FixedImageCache::FirstFrame()
 {
   TextureSet textureSet = GetFrontTextureSet();
@@ -80,7 +101,6 @@ TextureSet FixedImageCache::NextFrame()
   {
     mWaitingForReadyFrame = true;
   }
-
   LoadBatch();
 
   return textureSet;
@@ -96,7 +116,7 @@ void FixedImageCache::LoadBatch()
   // Try and load up to mBatchSize images, until the cache is filled.
   // Once the cache is filled, mUrlIndex exceeds mImageUrls size and
   // no more images are loaded.
-  bool frontFrameReady = IsFrontReady();;
+  bool frontFrameReady = IsFrontReady();
 
   for( unsigned int i=0; i< mBatchSize && mUrlIndex < mImageUrls.size(); ++i )
   {
