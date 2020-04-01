@@ -178,11 +178,14 @@ int UtcDaliGaussianBlurActivateDeactivate(void)
 
   RenderTaskList taskList2 = Stage::GetCurrent().GetRenderTaskList();
   DALI_TEST_CHECK( 1u != taskList2.GetTaskCount() );
+  DALI_TEST_CHECK( 2u == view.GetChildCount() );
 
   view.Deactivate();
 
   RenderTaskList taskList3 = Stage::GetCurrent().GetRenderTaskList();
   DALI_TEST_CHECK( 1u == taskList3.GetTaskCount() );
+  DALI_TEST_CHECK( 1u == view.GetChildCount() );
+
   END_TEST;
 }
 

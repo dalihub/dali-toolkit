@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_SCENE_HOLDER_IMPL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  *
  */
 
-#include <test-render-surface.h>
+#include <dali/integration-api/adaptor-framework/render-surface-interface.h>
 
 #include <dali/integration-api/scene.h>
 #include <dali/public-api/actors/layer.h>
@@ -26,6 +26,51 @@
 
 namespace Dali
 {
+
+class TestRenderSurface : public Dali::RenderSurfaceInterface
+{
+public:
+
+  TestRenderSurface( PositionSize positionSize ) {};
+
+  virtual PositionSize GetPositionSize() const { PositionSize size; return size; };
+
+  virtual void GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVertical ) { dpiHorizontal = dpiVertical = 96; }
+
+  virtual void InitializeGraphics() {};
+
+  virtual void CreateSurface() {};
+
+  virtual void DestroySurface() {};
+
+  virtual bool ReplaceGraphicsSurface() { return false; };
+
+  virtual void MoveResize( Dali::PositionSize positionSize ) {};
+
+  virtual void StartRender() {};
+
+  virtual bool PreRender( bool resizingSurface ) { return false; };
+
+  virtual void PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface ) {};
+
+  virtual void StopRender() {};
+
+  virtual void ReleaseLock() {};
+
+  virtual void SetThreadSynchronization( ThreadSynchronizationInterface& threadSynchronization ) {};
+
+  virtual RenderSurfaceInterface::Type GetSurfaceType() { return RenderSurfaceInterface::WINDOW_RENDER_SURFACE; };
+
+  virtual void MakeContextCurrent() {};
+
+  virtual Integration::DepthBufferAvailable GetDepthBufferRequired() { return Integration::DepthBufferAvailable::FALSE; };
+
+  virtual Integration::StencilBufferAvailable GetStencilBufferRequired() { return Integration::StencilBufferAvailable::FALSE; };
+
+  virtual void SetBackgroundColor( Vector4 color ) {};
+
+  virtual Vector4 GetBackgroundColor() { return Color::WHITE; };
+};
 
 namespace Internal
 {
@@ -67,7 +112,7 @@ public:
 
   Integration::Scene GetScene();
 
-  Integration::RenderSurface& GetRenderSurface();
+  Dali::RenderSurfaceInterface& GetRenderSurface();
 
 private:
 

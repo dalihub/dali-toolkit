@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,6 +159,191 @@ int UtcDaliAnimatedImageVisualGetPropertyMap02(void)
 }
 
 
+int UtcDaliAnimatedImageVisualJumpToAction(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  Property::Array urls;
+  CopyUrlsIntoArray( urls );
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::IMAGE );
+    propertyMap.Insert( ImageVisual::Property::URL, Property::Value(urls) );
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 4);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 12);
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 20);
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+
+    DummyControl dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    Stage::GetCurrent().Add( dummyControl );
+    application.SendNotification();
+    application.Render(20);
+
+    tet_infoline( "Ready the visual after the visual is on stage" );
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 4 ), true, TEST_LOCATION );
+
+    tet_infoline( "Test that a timer has been started" );
+    DALI_TEST_EQUALS( Test::GetTimerCount(), 1, TEST_LOCATION );
+
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS( gl.GetLastGenTextureId(), 4, TEST_LOCATION );
+
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::STOP, Property::Map() );
+
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 4, TEST_LOCATION );
+
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::JUMP_TO, 20 );
+
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 4, TEST_LOCATION );
+
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::JUMP_TO, 6 );
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 6 ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 4, TEST_LOCATION );
+
+    dummyControl.Unparent();
+  }
+  tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliAnimatedImageVisualStopBehavior(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  Property::Array urls;
+  CopyUrlsIntoArray( urls );
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert( Visual::Property::TYPE, Visual::IMAGE );
+    propertyMap.Insert( ImageVisual::Property::URL, Property::Value(urls) );
+    propertyMap.Insert( DevelImageVisual::Property::STOP_BEHAVIOR, DevelImageVisual::StopBehavior::FIRST_FRAME);
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 4);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 8);
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 20);
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+
+    // Expect that a batch of 4 textures has been requested. These will be serially loaded
+    // below.
+
+    DummyControl dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    Stage::GetCurrent().Add( dummyControl );
+    application.SendNotification();
+    application.Render(20);
+
+    tet_infoline( "Ready the visual after the visual is on stage" );
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 4 ), true, TEST_LOCATION );
+
+    tet_infoline( "Test that a timer has been started" );
+    DALI_TEST_EQUALS( Test::GetTimerCount(), 1, TEST_LOCATION );
+
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS( gl.GetLastGenTextureId(), 4, TEST_LOCATION );
+
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::STOP, Property::Map() );
+
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 4, TEST_LOCATION );
+
+    DevelControl::DoAction( dummyControl, DummyControl::Property::TEST_VISUAL, Dali::Toolkit::DevelAnimatedImageVisual::Action::JUMP_TO, 1 );
+
+    // Expect the second batch has been requested
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 4 ), true, TEST_LOCATION );
+
+    DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 4, TEST_LOCATION );
+
+    dummyControl.Unparent();
+  }
+  tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliAnimatedImageVisualGif01(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert(Visual::Property::TYPE, Visual::ANIMATED_IMAGE );
+    propertyMap.Insert( ImageVisual::Property::URL, TEST_GIF_FILE_NAME );
+    propertyMap.Insert( ImageVisual::Property::BATCH_SIZE, 2);
+    propertyMap.Insert( ImageVisual::Property::CACHE_SIZE, 4);
+    propertyMap.Insert( ImageVisual::Property::FRAME_DELAY, 20);
+
+    VisualFactory factory = VisualFactory::Get();
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+
+    // Expect that a batch of 4 textures has been requested. These will be serially loaded
+    // below.
+
+    DummyControl dummyControl = DummyControl::New(true);
+    Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummyControl.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummyControl.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
+    Stage::GetCurrent().Add( dummyControl );
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS( gl.GetLastGenTextureId(), 2, TEST_LOCATION );
+
+    tet_infoline( "Test that a timer has been started" );
+
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    Test::EmitGlobalTimerSignal();
+
+    application.SendNotification();
+    application.Render(20);
+
+    DALI_TEST_EQUALS( gl.GetLastGenTextureId(), 4, TEST_LOCATION );
+
+    dummyControl.Unparent();
+  }
+  tet_infoline("Test that removing the visual from stage deletes all textures");
+  application.SendNotification();
+  application.Render(20);
+  DALI_TEST_EQUALS( gl.GetNumGeneratedTextures(), 0, TEST_LOCATION );
+
+  END_TEST;
+}
 
 
 int UtcDaliAnimatedImageVisualMultiImage01(void)
@@ -570,10 +755,14 @@ void TestLoopCount( ToolkitTestApplication &application, DummyControl &dummyCont
   tet_infoline( "Test that a timer has been created" );
   DALI_TEST_EQUALS( Test::GetTimerCount(), 1, TEST_INNER_LOCATION( location ) );
 
-  for ( uint16_t i = 0; i <= loopCount; i++ )
+  for ( uint16_t i = 0; i < loopCount; i++ )
   {
     for ( uint16_t j = 0; j < frameCount; j++ )
     {
+      if( i == 0 && j == 0 )
+      {
+        continue; // Because first frame is already showed and we call 2nd frame at the first time of timer animation.
+      }
       tet_printf( "Test that after %u ticks, and we have %u frame \n", j + 1u, j + 1u );
       Test::EmitGlobalTimerSignal();
       application.SendNotification();

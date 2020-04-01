@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_VISUAL_FACTORY_CACHE_H
 
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ public:
   {
     COLOR_SHADER,
     COLOR_SHADER_ROUNDED_CORNER,
+    COLOR_SHADER_BLUR_EDGE,
     BORDER_SHADER,
     BORDER_SHADER_ANTI_ALIASING,
     GRADIENT_SHADER_LINEAR_USER_SPACE,

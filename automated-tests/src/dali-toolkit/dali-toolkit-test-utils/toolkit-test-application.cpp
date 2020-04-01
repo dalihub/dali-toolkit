@@ -42,7 +42,6 @@ ToolkitTestApplication::ToolkitTestApplication( size_t surfaceWidth, size_t surf
   // The window will create a Scene & surface and set up the scene's surface appropriately.
   *mMainWindow = Window::New( PositionSize( 0, 0, surfaceWidth, surfaceHeight ), "" );
   mScene = AdaptorImpl::GetScene( *mMainWindow );
-  mRenderSurface = dynamic_cast< TestRenderSurface* >( mScene.GetSurface() );
   mScene.SetDpi( Vector2( horizontalDpi, verticalDpi ) );
 
   // Core needs to be initialized next before we start the adaptor
@@ -67,9 +66,6 @@ ToolkitTestApplication::~ToolkitTestApplication()
   // Need to delete core before we delete the adaptor.
   delete mCore;
   mCore = NULL;
-
-  // Set mRenderSurface to null, it will be deleted by the window that owns it
-  mRenderSurface = nullptr;
 }
 
 void ToolkitTestApplication::RunIdles()

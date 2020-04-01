@@ -1,5 +1,5 @@
  /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,7 @@ const char * const CORNER_RADIUS( "cornerRadius" );
 
 // Color visual
 const char * const RENDER_IF_TRANSPARENT_NAME( "renderIfTransparent" );
+const char * const BLUR_RADIUS_NAME( "blurRadius" );
 
 // Image visual
 const char * const IMAGE_URL_NAME( "url" );

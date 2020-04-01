@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_VISUAL_STRING_CONSTANTS_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,7 @@ extern const char * const CORNER_RADIUS;
 
 // Color visual
 extern const char * const RENDER_IF_TRANSPARENT_NAME;
+extern const char * const BLUR_RADIUS_NAME;
 
 // Image visual
 extern const char * const IMAGE_URL_NAME;

@@ -110,7 +110,6 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/test-gl-sync-abstraction.cpp
   dali-toolkit-test-utils/test-platform-abstraction.cpp
   dali-toolkit-test-utils/test-render-controller.cpp
-  dali-toolkit-test-utils/test-render-surface.cpp
   dali-toolkit-test-utils/test-trace-call-stack.cpp
   dali-toolkit-test-utils/test-native-image.cpp
 )

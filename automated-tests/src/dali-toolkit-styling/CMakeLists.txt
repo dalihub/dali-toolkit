@@ -48,7 +48,6 @@ LIST(APPEND TC_SOURCES
    ../dali-toolkit/dali-toolkit-test-utils/test-gl-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-gl-sync-abstraction.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-render-controller.cpp
-   ../dali-toolkit/dali-toolkit-test-utils/test-render-surface.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-trace-call-stack.cpp
    ../dali-toolkit/dali-toolkit-test-utils/test-native-image.cpp
 )
