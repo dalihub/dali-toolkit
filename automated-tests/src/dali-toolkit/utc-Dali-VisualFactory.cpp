@@ -746,7 +746,7 @@ int UtcDaliVisualFactoryGetNPatchVisual2(void)
 int UtcDaliVisualFactoryGetNPatchVisual3(void)
 {
   ToolkitTestApplication application;
-  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual2: Request n-patch visual with a Property::Map" );
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual3: Request n-patch visual with a Property::Map" );
 
   VisualFactory factory = VisualFactory::Get();
   DALI_TEST_CHECK( factory );
@@ -938,6 +938,58 @@ int UtcDaliVisualFactoryGetNPatchVisual6(void)
 
     Stage::GetCurrent().Remove( actor );
     DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVisualFactoryGetNPatchVisual7(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliVisualFactoryGetNPatchVisual7: Add 9-patch visual on stage and instantly remove it." );
+
+  VisualFactory factory = VisualFactory::Get();
+  DALI_TEST_CHECK( factory );
+
+  // Get actual size of test image
+  ImageDimensions imageSize = Dali::GetClosestImageSize( TEST_9_PATCH_FILE_NAME );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( Toolkit::Visual::Property::TYPE, Visual::N_PATCH );
+  propertyMap.Insert( ImageVisual::Property::URL, TEST_9_PATCH_FILE_NAME );
+  propertyMap.Insert( ImageVisual::Property::SYNCHRONOUS_LOADING, false );
+  {
+    Visual::Base visual = factory.CreateVisual( propertyMap );
+    DALI_TEST_CHECK( visual );
+
+    Vector2 naturalSize( 0.0f, 0.0f );
+    visual.GetNaturalSize( naturalSize );
+    DALI_TEST_EQUALS( naturalSize, Vector2( imageSize.GetWidth(), imageSize.GetHeight() ), TEST_LOCATION );
+
+    TestGlAbstraction& gl = application.GetGlAbstraction();
+    TraceCallStack& textureTrace = gl.GetTextureTrace();
+    textureTrace.Enable(true);
+
+    DummyControl actor = DummyControl::New(true);
+
+    DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    actor.SetSize( 200.f, 200.f );
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
+
+    Stage::GetCurrent().Add( actor );
+    actor.Unparent();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger(1 ), true, TEST_LOCATION );
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( actor.GetRendererCount(), 0u, TEST_LOCATION );
   }
 
   END_TEST;

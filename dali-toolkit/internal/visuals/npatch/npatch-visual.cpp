@@ -815,7 +815,7 @@ Geometry NPatchVisual::CreateBorderGeometry( Uint16Pair gridSize )
 void NPatchVisual::SetResource()
 {
   const NPatchLoader::Data* data;
-  if( mLoader.GetNPatchData( mId, data ) )
+  if( mImpl->mRenderer && mLoader.GetNPatchData( mId, data ) )
   {
     Geometry geometry = CreateGeometry();
     Shader shader = CreateShader();
