@@ -729,6 +729,8 @@ private:
   Actor mFocusIndicatorActor;               ///< The focus indicator actor shared by all the focusable actors for highlight
   Vector2 mPreviousPosition;                ///< The previous pan position; useful for calculating velocity for Gesture::Finished events
   unsigned int mRecursiveFocusMoveCounter;  ///< The counter to count the number of recursive focus movement attempted before the focus movement is successful.
+  std::string mFocusSoundFilePath;          ///< The path of the focus sound file
+  std::string mFocusChainEndSoundFilePath;  ///< The path of the focus chain end sound file
 
   bool mIsWrapped:1;                        ///< Whether the focus movement is wrapped around or not
   bool mIsFocusWithinGroup:1;               ///< Whether the focus movement is limited to the current focus group or not
@@ -738,6 +740,8 @@ private:
   bool mTtsCreated:1;                       ///< Whether the TTS Player has been accessed
   bool mIsFocusIndicatorEnabled:1;          ///< Whether indicator should be shown / hidden. It could be enabled when TTS enabled or 'Tab' key operated.
   bool mContinuousPlayMode:1;               ///< Keeps track of whether or not we are in continuous play mode
+  bool mIsFocusSoundFilePathSet:1;          ///< Whether the path of the focus sound file has been set
+  bool mIsFocusChainEndSoundFilePathSet:1;  ///< Whether the path of the focus chain end sound file has been set
 
 };
 

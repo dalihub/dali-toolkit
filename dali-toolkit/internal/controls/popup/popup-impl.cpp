@@ -34,6 +34,7 @@
 #include <dali/public-api/size-negotiation/relayout-container.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/internal/focus-manager/keyboard-focus-manager-impl.h>
 #include <dali-toolkit/public-api/controls/control-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
@@ -177,29 +178,29 @@ const Scripting::StringEnum ContextualModeTable[] = {
 }; const unsigned int ContextualModeTableCount = sizeof( ContextualModeTable ) / sizeof( ContextualModeTable[0] );
 
 // Popup defaults.
-const Vector3 DEFAULT_POPUP_PARENT_RELATIVE_SIZE( 0.75f, 1.0f, 1.0f );                      ///< Default size percentage of parent.
-const float   DEFAULT_POPUP_ANIMATION_DURATION =  0.6f;                                     ///< Duration of hide/show animations.
-const float   POPUP_OUT_MARGIN_WIDTH =            16.f;                                     ///< Space between the screen edge and the popup edge in the horizontal dimension.
-const float   POPUP_OUT_MARGIN_HEIGHT =           36.f;                                     ///< Space between the screen edge and the popup edge in the vertical dimension.
-const Vector3 DEFAULT_TAIL_POSITION( 0.5f, 1.0f, 0.0f );                                    ///< Position the tail will be displayed when enabled without setting the position.
+const Vector3 DEFAULT_POPUP_PARENT_RELATIVE_SIZE( 0.75f, 1.0f, 1.0f );            ///< Default size percentage of parent.
+const float   DEFAULT_POPUP_ANIMATION_DURATION =  0.6f;                           ///< Duration of hide/show animations.
+const float   POPUP_OUT_MARGIN_WIDTH =            16.f;                           ///< Space between the screen edge and the popup edge in the horizontal dimension.
+const float   POPUP_OUT_MARGIN_HEIGHT =           36.f;                           ///< Space between the screen edge and the popup edge in the vertical dimension.
+const Vector3 DEFAULT_TAIL_POSITION( 0.5f, 1.0f, 0.0f );                          ///< Position the tail will be displayed when enabled without setting the position.
 
 // Contextual defaults.
-const Vector2 DEFAULT_CONTEXTUAL_ADJACENCY_MARGIN( 10.0f, 10.0f );                          ///< How close the Popup will be to it's contextual parent.
-const Vector2 DEFAULT_CONTEXTUAL_STAGE_BORDER( 15.0f, 15.0f );                              ///< How close the Popup can be to the stage edges.
+const Vector2 DEFAULT_CONTEXTUAL_ADJACENCY_MARGIN( 10.0f, 10.0f );                ///< How close the Popup will be to it's contextual parent.
+const Vector2 DEFAULT_CONTEXTUAL_STAGE_BORDER( 15.0f, 15.0f );                    ///< How close the Popup can be to the stage edges.
 
 // Popup style defaults.
-const char*   DEFAULT_BACKGROUND_IMAGE_PATH =     DALI_IMAGE_DIR "00_popup_bg.9.png";       ///< Background image.
-const char*   DEFAULT_TAIL_UP_IMAGE_PATH =        DALI_IMAGE_DIR "popup_tail_up.png";       ///< Tail up image.
-const char*   DEFAULT_TAIL_DOWN_IMAGE_PATH =      DALI_IMAGE_DIR "popup_tail_down.png";     ///< Tail down image.
-const char*   DEFAULT_TAIL_LEFT_IMAGE_PATH =      DALI_IMAGE_DIR "popup_tail_left.png";     ///< Tail left image.
-const char*   DEFAULT_TAIL_RIGHT_IMAGE_PATH =     DALI_IMAGE_DIR "popup_tail_right.png";    ///< Tail right image.
+const char*   DEFAULT_BACKGROUND_IMAGE_FILE_NAME =     "00_popup_bg.9.png";       ///< Background image.
+const char*   DEFAULT_TAIL_UP_IMAGE_FILE_NAME =        "popup_tail_up.png";       ///< Tail up image.
+const char*   DEFAULT_TAIL_DOWN_IMAGE_FILE_NAME =      "popup_tail_down.png";     ///< Tail down image.
+const char*   DEFAULT_TAIL_LEFT_IMAGE_FILE_NAME =      "popup_tail_left.png";     ///< Tail left image.
+const char*   DEFAULT_TAIL_RIGHT_IMAGE_FILE_NAME =     "popup_tail_right.png";    ///< Tail right image.
 
-const Vector4 DEFAULT_BACKING_COLOR( 0.0f, 0.0f, 0.0f, 0.5f );                              ///< Color of the dimmed backing.
-const Rect<int> DEFAULT_BACKGROUND_BORDER( 17, 17, 13, 13 );                                ///< Default border of the background.
-const Rect<float>  DEFAULT_TITLE_PADDING( 20.0f, 20.0f, 20.0f, 20.0f );                     ///< Title padding used on popups with content and/or controls (from Tizen GUI UX).
-const Rect<float>  DEFAULT_TITLE_ONLY_PADDING( 8.0f, 8.0f, 8.0f, 8.0f );                    ///< Title padding used on popups with a title only (like toast popups).
-const Vector3 FOOTER_SIZE( 620.0f, 96.0f,0.0f );                                            ///< Default size of the bottom control area.
-const float   DEFAULT_RELATIVE_PARENT_WIDTH =     0.75f;                                    ///< If width is not fixed, relative size to parent is used by default.
+const Vector4 DEFAULT_BACKING_COLOR( 0.0f, 0.0f, 0.0f, 0.5f );                    ///< Color of the dimmed backing.
+const Rect<int> DEFAULT_BACKGROUND_BORDER( 17, 17, 13, 13 );                      ///< Default border of the background.
+const Rect<float>  DEFAULT_TITLE_PADDING( 20.0f, 20.0f, 20.0f, 20.0f );           ///< Title padding used on popups with content and/or controls (from Tizen GUI UX).
+const Rect<float>  DEFAULT_TITLE_ONLY_PADDING( 8.0f, 8.0f, 8.0f, 8.0f );          ///< Title padding used on popups with a title only (like toast popups).
+const Vector3 FOOTER_SIZE( 620.0f, 96.0f,0.0f );                                  ///< Default size of the bottom control area.
+const float   DEFAULT_RELATIVE_PARENT_WIDTH =     0.75f;                          ///< If width is not fixed, relative size to parent is used by default.
 
 } // Unnamed namespace
 
@@ -257,12 +258,18 @@ Popup::Popup()
   mPopupBackgroundImage(),
   mBackgroundBorder( DEFAULT_BACKGROUND_BORDER ),
   mMargin(),
-  mTailUpImage( DEFAULT_TAIL_UP_IMAGE_PATH ),
-  mTailDownImage( DEFAULT_TAIL_DOWN_IMAGE_PATH ),
-  mTailLeftImage( DEFAULT_TAIL_LEFT_IMAGE_PATH ),
-  mTailRightImage( DEFAULT_TAIL_RIGHT_IMAGE_PATH )
+  mTailUpImage(),
+  mTailDownImage(),
+  mTailLeftImage(),
+  mTailRightImage()
 {
   SetKeyboardNavigationSupport( true );
+
+  const std::string imageDirPath = AssetManager::GetDaliImagePath();
+  mTailUpImage = imageDirPath + DEFAULT_TAIL_UP_IMAGE_FILE_NAME;
+  mTailDownImage = imageDirPath + DEFAULT_TAIL_DOWN_IMAGE_FILE_NAME;
+  mTailLeftImage = imageDirPath + DEFAULT_TAIL_LEFT_IMAGE_FILE_NAME;
+  mTailRightImage = imageDirPath + DEFAULT_TAIL_RIGHT_IMAGE_FILE_NAME;
 }
 
 void Popup::OnInitialize()
@@ -308,7 +315,8 @@ void Popup::OnInitialize()
   mPopupLayout = Toolkit::TableView::New( 3, 1 );
 
   // Adds the default background image.
-  SetPopupBackgroundImage( Toolkit::ImageView::New( DEFAULT_BACKGROUND_IMAGE_PATH ) );
+  const std::string imageDirPath = AssetManager::GetDaliImagePath();
+  SetPopupBackgroundImage( Toolkit::ImageView::New( imageDirPath + DEFAULT_BACKGROUND_IMAGE_FILE_NAME ) );
 
   mPopupLayout.SetName( "popupLayoutTable" );
   mPopupLayout.SetParentOrigin( ParentOrigin::CENTER );

@@ -229,6 +229,7 @@ private:
 
   int mDefaultFontSize;               ///< Logical size, not a point-size
   std::string mDefaultFontFamily;
+  std::string mDefaultThemeFilePath;  ///< The full path of the default theme file
   std::string mThemeFile;             ///< The full path of the current theme file
 
   Property::Map mThemeBuilderConstants;   ///< Contants to give the theme builder
