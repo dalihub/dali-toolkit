@@ -30,6 +30,7 @@
 #include <dali/devel-api/object/property-helper-devel.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/internal/controls/scrollable/item-view/item-view-impl.h>
 #include <dali-toolkit/public-api/controls/image-view/image-view.h>
 
@@ -38,7 +39,7 @@ using namespace Dali;
 namespace
 {
 
-const char* DEFAULT_INDICATOR_IMAGE_PATH = DALI_IMAGE_DIR "popup_scroll.9.png";
+const char* DEFAULT_INDICATOR_IMAGE_FILE_NAME = "popup_scroll.9.png";
 const float DEFAULT_SLIDER_DEPTH(1.0f);
 const float DEFAULT_INDICATOR_SHOW_DURATION(0.5f);
 const float DEFAULT_INDICATOR_HIDE_DURATION(0.5f);
@@ -240,7 +241,8 @@ void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index property
 
 void ScrollBar::CreateDefaultIndicatorActor()
 {
-  Toolkit::ImageView indicator = Toolkit::ImageView::New( DEFAULT_INDICATOR_IMAGE_PATH );
+  const std::string imageDirPath = AssetManager::GetDaliImagePath();
+  Toolkit::ImageView indicator = Toolkit::ImageView::New( imageDirPath + DEFAULT_INDICATOR_IMAGE_FILE_NAME );
   indicator.SetParentOrigin( ParentOrigin::TOP_LEFT );
   indicator.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   indicator.SetStyleName( "ScrollBarIndicator" );

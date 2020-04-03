@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ROLLING_GIF_IMAGE_CACHE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,12 @@ public:
    * Destructor
    */
   virtual ~RollingGifImageCache();
+
+  /**
+   * Get the Nth frame. If it's not ready, this will trigger the
+   * sending of FrameReady() when the image becomes ready.
+   */
+  TextureSet Frame( uint32_t frameIndex ) override;
 
   /**
    * Get the first frame. If it's not ready, this will trigger the

@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_INTERNAL_ANIMATED_IMAGE_VISUAL_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,7 +265,9 @@ private:
   Dali::WrapMode::Type mWrapModeU:3;
   Dali::WrapMode::Type mWrapModeV:3;
   DevelAnimatedImageVisual::Action::Type mActionStatus:3;
+  DevelImageVisual::StopBehavior::Type   mStopBehavior:2;
   bool mStartFirstFrame:1;
+  bool mIsJumpTo:1;
 };
 
 } // namespace Internal

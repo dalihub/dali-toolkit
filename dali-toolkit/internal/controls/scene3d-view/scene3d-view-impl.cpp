@@ -21,6 +21,9 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
+// INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
+
 namespace Dali
 {
 
@@ -32,6 +35,8 @@ namespace Internal
 
 namespace
 {
+
+const char* const IMAGE_BRDF_FILE_NAME = "brdfLUT.png";
 
 // glTF file extension
 const std::string GLTF_EXT( ".gltf" );
@@ -208,7 +213,8 @@ void Scene3dView::SetCubeMap( const std::string& diffuseTexturePath, const std::
   mLightType = Toolkit::Scene3dView::LightType::IMAGE_BASED_LIGHT;
 
   // BRDF texture
-  std::string imageBrdfUrl = DALI_IMAGE_DIR "brdfLUT.png";
+  const std::string imageDirPath = AssetManager::GetDaliImagePath();
+  const std::string imageBrdfUrl = imageDirPath + IMAGE_BRDF_FILE_NAME;
   mBRDFTexture = LoadTexture( imageBrdfUrl.c_str(), true );
   if( !mBRDFTexture )
   {

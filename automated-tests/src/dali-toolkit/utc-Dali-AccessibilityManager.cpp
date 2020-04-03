@@ -550,6 +550,7 @@ int UtcDaliAccessibilityManagerMoveFocusForward(void)
   Dali::AccessibilityAdaptor accAdaptor = Dali::AccessibilityAdaptor::Get();
   Test::AccessibilityAdaptor::SetEnabled( accAdaptor, true );
   accAdaptor.HandleActionEnableEvent();
+  accAdaptor.HandleActionNextEvent(true);
 
   Actor first = Actor::New();
   Stage::GetCurrent().Add(first);

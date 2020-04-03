@@ -10,6 +10,7 @@ SET(TC_SOURCES
   utc-Dali-Alignment.cpp
   utc-Dali-AnimatedImageVisual.cpp
   utc-Dali-AnimatedVectorImageVisual.cpp
+  utc-Dali-ArcVisual.cpp
   utc-Dali-BloomView.cpp
   utc-Dali-BubbleEmitter.cpp
   utc-Dali-Builder.cpp
@@ -110,7 +111,6 @@ LIST(APPEND TC_SOURCES
   dali-toolkit-test-utils/test-gl-sync-abstraction.cpp
   dali-toolkit-test-utils/test-platform-abstraction.cpp
   dali-toolkit-test-utils/test-render-controller.cpp
-  dali-toolkit-test-utils/test-render-surface.cpp
   dali-toolkit-test-utils/test-trace-call-stack.cpp
   dali-toolkit-test-utils/test-native-image.cpp
 )

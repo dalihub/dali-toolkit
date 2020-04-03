@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_DEVEL_API_VISUALS_ANIMATED_IMAGE_VISUAL_ACTIONS_DEVEL_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,8 @@ enum Type
 {
   PLAY,        ///< Play the animated GIF. This is also Default playback mode.
   PAUSE,       ///< Pause the animated GIF.
-  STOP         ///< Stop the animated GIF.
+  STOP,        ///< Stop the animated GIF.
+  JUMP_TO      ///< Jump to the specified frame. Property::INTEGER value should be passed.
 };
 
 } // namespace Action

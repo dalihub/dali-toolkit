@@ -3,6 +3,7 @@ SET( devel_api_src_dir ${ROOT_SRC_DIR}/dali-toolkit/devel-api )
 
 # Add local source files here
 SET( devel_api_src_files
+  ${devel_api_src_dir}/asset-manager/asset-manager.cpp
   ${devel_api_src_dir}/builder/base64-encoding.cpp
   ${devel_api_src_dir}/builder/builder.cpp
   ${devel_api_src_dir}/builder/json-parser.cpp
@@ -125,6 +126,7 @@ SET( devel_api_visuals_header_files
   ${devel_api_src_dir}/visuals/animated-image-visual-actions-devel.h
   ${devel_api_src_dir}/visuals/animated-vector-image-visual-actions-devel.h
   ${devel_api_src_dir}/visuals/animated-vector-image-visual-signals-devel.h
+  ${devel_api_src_dir}/visuals/arc-visual-properties-devel.h
   ${devel_api_src_dir}/visuals/color-visual-properties-devel.h
   ${devel_api_src_dir}/visuals/image-visual-properties-devel.h
   ${devel_api_src_dir}/visuals/image-visual-actions-devel.h

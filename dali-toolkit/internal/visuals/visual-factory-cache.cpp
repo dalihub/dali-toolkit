@@ -26,12 +26,6 @@
 #include <dali-toolkit/internal/visuals/svg/svg-visual.h>
 #include <dali-toolkit/internal/visuals/image-atlas-manager.h>
 
-
-namespace
-{
-const char * const BROKEN_VISUAL_IMAGE_URL( DALI_IMAGE_DIR "broken.png");
-}
-
 namespace Dali
 {
 
