@@ -29,6 +29,7 @@
 #include <dali-toolkit/internal/visuals/npatch-loader.h>
 #include <dummy-visual.h>
 #include <../dali-toolkit/dali-toolkit-test-utils/dummy-control.h>
+#include <dali-toolkit/devel-api/visuals/arc-visual-properties-devel.h>
 
 using namespace Dali;
 using namespace Toolkit;
@@ -366,6 +367,29 @@ int UtcDaliAnimatedVectorImageVisualSetProperties(void)
 
   actor.Unparent( );
   DALI_TEST_CHECK( actor.GetRendererCount() == 0u );
+
+  END_TEST;
+}
+
+int UtcDaliArcVisualCreateInstancePropertyMap(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "UtcDaliArcVisualCreateInstancePropertyMap" );
+
+  Property::Map propertyMap;
+  propertyMap.Add( Toolkit::Visual::Property::TYPE, DevelVisual::ARC )
+             .Add( DevelArcVisual::Property::THICKNESS, 20.0f );
+
+  // request ArcVisual with a property map
+  VisualFactory factory = VisualFactory::Get();
+  Visual::Base visual = factory.CreateVisual( propertyMap );
+  Toolkit::Internal::Visual::Base& visualImpl = GetImplementation( visual );
+
+  Property::Map resultMap;
+  visualImpl.CreateInstancePropertyMap( resultMap );
+
+  // check the property values from the returned map from a visual
+  DALI_TEST_CHECK( resultMap.Empty() );   // Now the map is empty
 
   END_TEST;
 }

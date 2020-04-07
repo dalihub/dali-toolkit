@@ -26,10 +26,9 @@
 #include <dali/devel-api/adaptor-framework/style-monitor.h>
 
 // INTERNAL INCLUDES
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/devel-api/builder/json-parser.h>
 #include <dali-toolkit/internal/feedback/feedback-ids.h>
-
-using std::string;
 
 namespace // unnamed namespace
 {
@@ -38,7 +37,7 @@ namespace // unnamed namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::General, false, "LOG_FEEDBACK");
 #endif
 
-const char* DEFAULT_FEEDBACK_THEME_PATH = DALI_STYLE_DIR"default-feedback-theme.json";
+const char* DEFAULT_FEEDBACK_THEME_FILE_NAME = "default-feedback-theme.json";
 
 // Sets bool and string if the node has a child "name"
 void GetIfString(const Dali::Toolkit::TreeNode& node, const std::string& name, bool& exists, std::string& str)
@@ -76,11 +75,11 @@ struct SignalFeedbackInfo
 
   bool mHasHapticFeedbackInfo;
   bool mHasSoundFeedbackInfo;
-  string mSignalName;
-  string mHapticFeedbackPattern;
-  string mSoundFeedbackPattern;
-  string mHapticFeedbackFile;
-  string mSoundFeedbackFile;
+  std::string mSignalName;
+  std::string mHapticFeedbackPattern;
+  std::string mSoundFeedbackPattern;
+  std::string mHapticFeedbackFile;
+  std::string mSoundFeedbackFile;
 };
 
 typedef std::vector<SignalFeedbackInfo> SignalFeedbackInfoContainer;
@@ -95,7 +94,7 @@ struct FeedbackStyleInfo
   {
   }
 
-  string mTypeName;
+  std::string mTypeName;
 
   SignalFeedbackInfoContainer mSignalFeedbackInfoList;
 };
@@ -106,17 +105,20 @@ FeedbackStyle::FeedbackStyle()
 {
   mFeedback = Dali::FeedbackPlayer::Get();
 
-  string defaultTheme;
+  const std::string styleDirPath = AssetManager::GetDaliStylePath();
+  const std::string defaultThemeFilePath = styleDirPath + DEFAULT_FEEDBACK_THEME_FILE_NAME;
 
-  if( mFeedback && mFeedback.LoadFile( DEFAULT_FEEDBACK_THEME_PATH, defaultTheme ) )
+  std::string defaultTheme;
+
+  if( mFeedback && mFeedback.LoadFile( defaultThemeFilePath, defaultTheme ) )
   {
     LoadTheme( defaultTheme );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "ResourceLoader::LoadTheme(%s) - loaded %d bytes\n",
-                   DEFAULT_FEEDBACK_THEME_PATH, defaultTheme.size() );
+                   defaultThemeFilePath.c_str(), defaultTheme.size() );
   }
   else
   {
-    DALI_LOG_ERROR("ResourceLoader::LoadTheme(%s) - failed to load\n", DEFAULT_FEEDBACK_THEME_PATH);
+    DALI_LOG_ERROR("ResourceLoader::LoadTheme(%s) - failed to load\n", defaultThemeFilePath.c_str());
   }
 
 }
@@ -127,7 +129,7 @@ FeedbackStyle::~FeedbackStyle()
 
 struct PlayFeedbackFromSignal
 {
-  PlayFeedbackFromSignal( FeedbackStyle& controller, const string& typeName, const string& signalName )
+  PlayFeedbackFromSignal( FeedbackStyle& controller, const std::string& typeName, const std::string& signalName )
   : mController( controller ),
     mTypeName( typeName ),
     mSignalName( signalName )
@@ -140,18 +142,16 @@ struct PlayFeedbackFromSignal
   }
 
   FeedbackStyle& mController;
-  string mTypeName;
-  string mSignalName;
+  std::string mTypeName;
+  std::string mSignalName;
 };
 
 
 void FeedbackStyle::ObjectCreated( BaseHandle handle )
 {
-  std::string typeName = handle.GetTypeName();
-
   if( handle )
   {
-    string type = handle.GetTypeName();
+    const std::string& type = handle.GetTypeName();
 
     const FeedbackStyleInfo styleInfo = GetStyleInfo( type );
 
@@ -180,9 +180,9 @@ void FeedbackStyle::ObjectCreated( BaseHandle handle )
   }
 }
 
-const FeedbackStyleInfo& FeedbackStyle::GetStyleInfo( const string& type ) const
+const FeedbackStyleInfo& FeedbackStyle::GetStyleInfo( const std::string& type ) const
 {
-  std::map<const string, FeedbackStyleInfo>::const_iterator iter( mStyleInfoLut.find( type ) );
+  std::map<const std::string, FeedbackStyleInfo>::const_iterator iter( mStyleInfoLut.find( type ) );
   if( iter != mStyleInfoLut.end() )
   {
     return iter->second;
@@ -197,7 +197,7 @@ void FeedbackStyle::StyleChanged( const std::string& userDefinedThemePath, Dali:
 {
   if( styleChange == StyleChange::THEME_CHANGE )
   {
-    string userDefinedTheme;
+    std::string userDefinedTheme;
 
     if( mFeedback && mFeedback.LoadFile( userDefinedThemePath, userDefinedTheme ) )
     {
@@ -205,8 +205,11 @@ void FeedbackStyle::StyleChanged( const std::string& userDefinedThemePath, Dali:
       {
         DALI_LOG_ERROR("FeedbackStyle::StyleChanged() User defined theme failed to load! \n");
 
+        const std::string styleDirPath = AssetManager::GetDaliStylePath();
+        const std::string defaultThemeFilePath = styleDirPath + DEFAULT_FEEDBACK_THEME_FILE_NAME;
+
         //If there is any problem is using the user defined theme, then fall back to default theme
-        if( !LoadTheme( DEFAULT_FEEDBACK_THEME_PATH ) )
+        if( !LoadTheme( defaultThemeFilePath ) )
         {
           //If the default theme fails, Then No luck!
           DALI_LOG_ERROR("FeedbackStyle::StyleChanged() Default theme failed to load! \n");
@@ -225,7 +228,7 @@ void FeedbackStyle::StyleChanged( const std::string& userDefinedThemePath, Dali:
   }
 }
 
-bool FeedbackStyle::LoadTheme( const string& data )
+bool FeedbackStyle::LoadTheme( const std::string& data )
 {
   bool result = false;
 
@@ -244,7 +247,7 @@ bool FeedbackStyle::LoadTheme( const string& data )
   return result;
 }
 
-void FeedbackStyle::LoadFromString( const string& data )
+void FeedbackStyle::LoadFromString( const std::string& data )
 {
   Toolkit::JsonParser parser = Toolkit::JsonParser::New();
   const Toolkit::TreeNode* root = NULL;
@@ -348,7 +351,7 @@ void FeedbackStyle::AddSignalInfo( FeedbackStyleInfo& styleInfo, SignalFeedbackI
   }
 }
 
-void FeedbackStyle::PlayFeedback(const string& type, const string& signalName)
+void FeedbackStyle::PlayFeedback(const std::string& type, const std::string& signalName)
 {
   const FeedbackStyleInfo styleInfo = GetStyleInfo(type);
   SignalFeedbackInfoConstIter iter;
@@ -394,7 +397,7 @@ void FeedbackStyle::PlayFeedback(const string& type, const string& signalName)
   }
 }
 
-FeedbackPattern FeedbackStyle::GetFeedbackPattern( const string &pattern )
+FeedbackPattern FeedbackStyle::GetFeedbackPattern( const std::string &pattern )
 {
   if( 0 == mFeedbackPatternLut.size() )
   {
@@ -450,7 +453,7 @@ FeedbackPattern FeedbackStyle::GetFeedbackPattern( const string &pattern )
     mFeedbackPatternLut["FEEDBACK_PATTERN_SLIDER_SWEEP"]        = Dali::FEEDBACK_PATTERN_SLIDER_SWEEP;
   }
 
-  std::map<const string, FeedbackPattern>::const_iterator iter( mFeedbackPatternLut.find( pattern ) );
+  std::map<const std::string, FeedbackPattern>::const_iterator iter( mFeedbackPatternLut.find( pattern ) );
 
   if( iter != mFeedbackPatternLut.end() )
   {

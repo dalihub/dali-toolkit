@@ -35,6 +35,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/controls/control.h>
+#include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
 #include <dali-toolkit/devel-api/builder/json-parser.h>
 
 #include <dali-toolkit/internal/builder/builder-declarations.h>
@@ -155,10 +156,10 @@ Builder::Builder()
   mParser = Dali::Toolkit::JsonParser::New();
 
   Property::Map defaultDirs;
-  defaultDirs[ TOKEN_STRING(DALI_IMAGE_DIR) ]       = DALI_IMAGE_DIR;
-  defaultDirs[ TOKEN_STRING(DALI_SOUND_DIR) ]       = DALI_SOUND_DIR;
-  defaultDirs[ TOKEN_STRING(DALI_STYLE_DIR) ]       = DALI_STYLE_DIR;
-  defaultDirs[ TOKEN_STRING(DALI_STYLE_IMAGE_DIR) ] = DALI_STYLE_IMAGE_DIR;
+  defaultDirs[TOKEN_STRING(DALI_IMAGE_DIR)]       = AssetManager::GetDaliImagePath();
+  defaultDirs[TOKEN_STRING(DALI_SOUND_DIR)]       = AssetManager::GetDaliSoundPath();
+  defaultDirs[TOKEN_STRING(DALI_STYLE_DIR)]       = AssetManager::GetDaliStylePath();
+  defaultDirs[TOKEN_STRING(DALI_STYLE_IMAGE_DIR)] = AssetManager::GetDaliStyleImagePath();
 
   AddConstants( defaultDirs );
 }

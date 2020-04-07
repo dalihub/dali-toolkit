@@ -69,7 +69,7 @@ public:
   /*
    * Iterator to iterate through children
    */
-  class ConstIterator
+  class DALI_TOOLKIT_API ConstIterator
   {
   public:
     typedef KeyNodePair          value_type;

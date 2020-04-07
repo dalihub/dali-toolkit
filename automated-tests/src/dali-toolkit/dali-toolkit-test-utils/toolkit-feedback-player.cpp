@@ -85,11 +85,17 @@ public:
 
   bool LoadFile(const std::string& filename, std::string& data)
   {
-    return true;
+    return mLoadFileReturn;
+  }
+
+  void SetLoadFileReturnValue(bool value)
+  {
+    mLoadFileReturn = value;
   }
 
 private:
   FeedbackPlayer()
+  : mLoadFileReturn{true}
   {
   }
 
@@ -105,6 +111,8 @@ private:
   {
     return *this;
   }
+
+  bool mLoadFileReturn;
 };
 
 } // Adaptor
@@ -176,5 +184,18 @@ FeedbackPlayer::FeedbackPlayer( Internal::Adaptor::FeedbackPlayer* player )
 : BaseHandle( player )
 {
 }
+
+namespace Internal
+{
+namespace Adaptor
+{
+
+void SetLoadFileReturnValue(Dali::FeedbackPlayer feedbackPlayer, bool returnValue)
+{
+  GetImplementation(feedbackPlayer).SetLoadFileReturnValue( returnValue );
+}
+
+} // Adaptor
+} // Internal
 
 } // Dali
