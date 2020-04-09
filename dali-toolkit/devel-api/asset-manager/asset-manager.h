@@ -29,13 +29,35 @@ namespace Dali
 namespace Toolkit
 {
 
+/**
+ * @brief Retrieves the file system path of the assets.
+ */
 class AssetManager
 {
 public:
+  /**
+   * @return The file system path of the images.
+   */
   static const std::string GetDaliImagePath();
+
+  /**
+   * @return The file system path of the sounds.
+   */
   static const std::string GetDaliSoundPath();
+
+  /**
+   * @return The file system path of the styles.
+   */
   static const std::string GetDaliStylePath();
+
+  /**
+   * @return The file system path of the images in the styles.
+   */
   static const std::string GetDaliStyleImagePath();
+
+  /**
+   * @return The file system path of the DALi's read only data.
+   */
   static const std::string GetDaliDataReadOnlyPath();
 };
 
