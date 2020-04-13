@@ -1151,35 +1151,6 @@ int UtcDaliTextControllerSelectEvent(void)
 }
 
 
-int UtcDaliTextControllerMaxLengthSetText(void)
-{
-  tet_infoline(" UtcDaliTextControllerMaxLengthSetText");
-  ToolkitTestApplication application;
-
-  // Creates a text controller.
-  ControllerPtr controller = Controller::New();
-
-  ConfigureTextLabel( controller );
-
-  const Length MAX_TEXT_LENGTH = 1024u * 32u;
-
-  // make over length world
-  int maxLength = ( 1024u * 32u ) + 10u;
-  char world[maxLength] = { 'a' };
-
-  // Set the text
-  std::string text( world, maxLength );
-  controller->SetText( text );
-
-  // check text length
-  controller->GetText( text );
-  Length textSize = text.size();
-
-  DALI_TEST_EQUALS( MAX_TEXT_LENGTH, textSize, TEST_LOCATION );
-
-  END_TEST;
-}
-
 int UtcDaliTextControllerRemoveTextChangeEventData(void)
 {
   tet_infoline(" UtcDaliTextControllerRemoveTextChangeEventData");
