@@ -55,10 +55,11 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
+  uniform mediump vec2 extraSize;\n
 
   vec4 ComputeVertexPosition()\n
   {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;\n
     vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
     return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
   }\n
@@ -89,6 +90,7 @@ const char* VERTEX_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
   //Visual size and offset
   uniform mediump vec2 offset;\n
   uniform mediump vec2 size;\n
+  uniform mediump vec2 extraSize;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
@@ -96,7 +98,7 @@ const char* VERTEX_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
   \n
   vec4 ComputeVertexPosition()\n
   {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;\n
     vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
     vRectSize = visualSize / 2.0 - cornerRadius;\n
     vPosition = aPosition* visualSize;\n
@@ -135,6 +137,7 @@ const char* VERTEX_SHADER_BLUR_EDGE = DALI_COMPOSE_SHADER(
   //Visual size and offset
   uniform mediump vec2 offset;\n
   uniform mediump vec2 size;\n
+  uniform mediump vec2 extraSize;\n
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
@@ -142,7 +145,7 @@ const char* VERTEX_SHADER_BLUR_EDGE = DALI_COMPOSE_SHADER(
   \n
   vec4 ComputeVertexPosition()\n
   {\n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + blurRadius * 2.0;\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize + blurRadius * 2.0;\n
     vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
     vRectSize = visualSize / 2.0;\n
     vPosition = aPosition* visualSize;\n
