@@ -64,15 +64,21 @@
     },
     "TextField":
     {
-      "pointSize":18,
-      "primaryCursorColor":[0.0,0.72,0.9,1.0],
-      "secondaryCursorColor":[0.0,0.72,0.9,1.0],
+      "pointSize":10,
+      "primaryCursorColor":[0.07,0.70,1.0,1.0],
+      "secondaryCursorColor":[0.07,0.70,1.0,1.0],
       "cursorWidth":3,
       "selectionHighlightColor":[0.75,0.96,1.0,1.0],
       "grabHandleImage" : "{DALI_STYLE_IMAGE_DIR}cursor_handler_drop_center.png",
       "selectionHandleImageLeft" : {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_left.png" },
       "selectionHandleImageRight": {"filename":"{DALI_STYLE_IMAGE_DIR}selection_handle_drop_right.png" },
-      "enableSelection":true
+      "enableSelection":true,
+      "textColor":[0.99,0.99,0.99,1.0],
+      "background": {
+        "visualType": "COLOR",
+        "mixColor":[0.0,0.0,0.0,1.0]
+        },
+      "textBackground":[0.0,0.0,0.0,1.0]
     },
 
     "TextFieldFontSize0":
