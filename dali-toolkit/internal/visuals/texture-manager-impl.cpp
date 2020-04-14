@@ -1016,6 +1016,12 @@ void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
     DALI_LOG_INFO( gTextureManagerLogFilter, Debug::Concise, "NotifyObservers() url:%s loadState:%s\n",
                    textureInfo.url.GetUrl().c_str(), GET_LOAD_STATE_STRING(textureInfo.loadState ) );
 
+    // It is possible for the observer to be deleted.
+    // Disconnect and remove the observer first.
+    observer->DestructionSignal().Disconnect( this, &TextureManager::ObserverDestroyed );
+
+    info->observerList.Erase( info->observerList.begin() );
+
     if( info->loadPixelBuffer )
     {
       observer->LoadComplete( success, info->pixelBuffer, info->url, info->preMultiplied );
@@ -1026,8 +1032,6 @@ void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
                                 info->preMultiplied );
     }
 
-    observer->DestructionSignal().Disconnect( this, &TextureManager::ObserverDestroyed );
-
     // Get the textureInfo from the container again as it may have been invalidated.
     int textureInfoIndex = GetCacheIndexFromId( textureId );
     if( textureInfoIndex == INVALID_CACHE_INDEX)
@@ -1035,16 +1039,6 @@ void TextureManager::NotifyObservers( TextureInfo& textureInfo, bool success )
       break; // texture has been removed - can stop.
     }
     info = &mTextureInfoContainer[ textureInfoIndex ];
-
-    // remove the observer that was just triggered if it's still in the list
-    for( TextureInfo::ObserverListType::Iterator j = info->observerList.Begin(); j != info->observerList.End(); ++j )
-    {
-      if( *j == observer )
-      {
-        info->observerList.Erase( j );
-        break;
-      }
-    }
   }
 
   mQueueLoadFlag = false;

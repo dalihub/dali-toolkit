@@ -74,6 +74,7 @@ static void TestKeyInputFocusCallback( Control control )
 
 const char* TEST_LARGE_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/tbcol.png";
 const char* TEST_IMAGE_FILE_NAME =  TEST_RESOURCE_DIR "/gallery-small-1.jpg";
+const char* TEST_SVG_FILE_NAME = TEST_RESOURCE_DIR "/Kid1.svg";
 
 Vector4 GetControlBackgroundColor( Control& control )
 {
@@ -85,6 +86,20 @@ Vector4 GetControlBackgroundColor( Control& control )
   resultMap->Find( ColorVisual::Property::MIX_COLOR )->Get( color );
 
   return color;
+}
+
+bool gResourceReadySignalFired = false;
+
+void ResourceReadySignal( Control control )
+{
+  if( control.GetVisualResourceStatus( Control::Property::BACKGROUND ) == Visual::ResourceStatus::FAILED )
+  {
+    Property::Map propertyMap;
+    propertyMap.Insert( ImageVisual::Property::URL, TEST_SVG_FILE_NAME );
+    control.SetProperty( Control::Property::BACKGROUND, propertyMap );
+  }
+
+  gResourceReadySignalFired = true;
 }
 
 } // namespace
@@ -982,6 +997,38 @@ int UtcDaliControlResourcesReady(void)
 
   resourceStatus = actor.GetVisualResourceStatus(DummyControl::Property::TEST_VISUAL2);
   DALI_TEST_EQUALS( static_cast<int>(resourceStatus), static_cast<int>(Toolkit::Visual::ResourceStatus::READY), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliControlResourcesReady02(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline( "Change a resource during ResourceReady callback" );
+
+  gResourceReadySignalFired = false;
+
+  Control control = Control::New();
+  control.SetSize( 200.f, 200.f );
+  control.ResourceReadySignal().Connect( &ResourceReadySignal );
+
+  Property::Map propertyMap;
+  propertyMap.Insert( ImageVisual::Property::URL, "invalid.jpg" );
+  control.SetProperty( Control::Property::BACKGROUND, propertyMap );
+
+  Stage::GetCurrent().Add( control );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( control.IsResourceReady(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gResourceReadySignalFired, true, TEST_LOCATION );
+  gResourceReadySignalFired = false;
 
   END_TEST;
 }
