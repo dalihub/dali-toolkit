@@ -1,5 +1,5 @@
- /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+/*
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@ const char* VERTEX_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
   {\n
     vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;\n
     vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
-    vRectSize = visualSize / 2.0 - cornerRadius;\n
+    vRectSize = visualSize * 0.5 - cornerRadius;\n
     vPosition = aPosition* visualSize;\n
     return vec4( vPosition + anchorPoint*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
   }\n
@@ -164,12 +164,15 @@ const char* FRAGMENT_SHADER_ROUNDED_CORNER = DALI_COMPOSE_SHADER(
   uniform lowp vec4 uColor;\n
   uniform lowp vec3 mixColor;\n
   uniform mediump float cornerRadius;\n
+  uniform lowp float preMultipliedAlpha;\n
   \n
   void main()\n
   {\n
       mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - cornerRadius;\n
+      mediump float opacity = 1.0 - smoothstep( -1.0, 1.0, dist );\n
       gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor * vec4( mixColor, 1.0 );\n
-      gl_FragColor.a *= smoothstep( 1.0, -1.0, dist );\n
+      gl_FragColor.a *= opacity;\n
+      gl_FragColor.rgb *= mix( 1.0, opacity, preMultipliedAlpha );\n
   }\n
 );
 
