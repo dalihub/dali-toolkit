@@ -27,6 +27,9 @@
 #include <dali-toolkit/public-api/enums.h>
 #include <dali-toolkit/public-api/controls/control.h>
 
+#undef min
+#undef max
+
 namespace Dali
 {
 
