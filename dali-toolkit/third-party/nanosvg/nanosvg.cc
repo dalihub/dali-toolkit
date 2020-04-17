@@ -103,6 +103,14 @@ static void nsvg__parseElement(char* s,
 	int end = 0;
 	char quote;
 
+	/**
+	 * In the original file, 's' is not compared to NULL value before it is dereferenced.
+	 */
+	if (!s)
+	{
+		return;
+	}
+
 	// Skip white space after the '<'
 	while (*s && nsvg__isspace(*s)) s++;
 
@@ -800,7 +808,12 @@ static void nsvg__addShape(NSVGparser* p)
 		return;
 
 	shape = (NSVGshape*)malloc(sizeof(NSVGshape));
-	if (shape == NULL) goto error;
+
+	/**
+	 * In the original file, if shape is NULL it goto error below 'return' and free shape memory.
+	 * But, the error is only visited when shape is NULL, so there is not needed to free it.
+	 */
+	if (shape == NULL) return;
 	memset(shape, 0, sizeof(NSVGshape));
 
 	memcpy(shape->id, attr->id, sizeof shape->id);
@@ -876,9 +889,6 @@ static void nsvg__addShape(NSVGparser* p)
 	p->shapesTail = shape;
 
 	return;
-
-error:
-	if (shape) free(shape);
 }
 
 static void nsvg__addPath(NSVGparser* p, char closed)
@@ -2791,7 +2801,10 @@ NSVGimage* nsvgParseFromFile(const char* filename, const char* units, float dpi)
 error:
 	if (fp) fclose(fp);
 	if (data) free(data);
-	if (image) nsvgDelete(image);
+	/**
+	 * In the original file, image has null check and free it here. But because image has data after all of the 'goto error',
+	 * 'free(image)' was unreachable. So, we removed it.
+	 */
 	return NULL;
 }
 

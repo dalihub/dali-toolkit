@@ -404,7 +404,11 @@ YGNode::YGNode()
       nextChild_(nullptr),
       config_(nullptr),
       isDirty_(false),
-      resolvedDimensions_({{YGValueUndefined, YGValueUndefined}}) {}
+      resolvedDimensions_(std::array<YGValue, 2>{YGValueUndefined, YGValueUndefined}) {}
+      /**
+       * In the original file, to initialize resolvedDimensions_ above, we usee { { YGValueUndefined, YGValueUndefined } }.
+       * But it is not well work, so we modified it.
+       */
 
 YGNode::YGNode(const YGNode& node)
     : context_(node.context_),

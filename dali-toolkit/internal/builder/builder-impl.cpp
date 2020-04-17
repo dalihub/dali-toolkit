@@ -1336,7 +1336,10 @@ void Builder::RecordTransitionData(
     Dali::Property::Value property(Property::ARRAY);
     if( DeterminePropertyFromNode( keyValue.second, Property::ARRAY, property, replacements ) )
     {
-      transitionData = Toolkit::TransitionData::New( *property.GetArray() );
+      if( property.GetArray() )
+      {
+        transitionData = Toolkit::TransitionData::New( *property.GetArray() );
+      }
     }
   }
   else if( node.GetType() == TreeNode::OBJECT )
@@ -1344,7 +1347,10 @@ void Builder::RecordTransitionData(
     Dali::Property::Value property(Property::MAP);
     if( DeterminePropertyFromNode( keyValue.second, Property::MAP, property, replacements ) )
     {
-      transitionData = Toolkit::TransitionData::New( *property.GetMap() );
+      if( property.GetMap() )
+      {
+        transitionData = Toolkit::TransitionData::New( *property.GetMap() );
+      }
     }
   }
 }
