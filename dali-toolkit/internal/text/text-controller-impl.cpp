@@ -221,6 +221,11 @@ bool Controller::Impl::ProcessInputEvents()
           OnSelectAllEvent();
           break;
         }
+        case Event::SELECT_NONE:
+        {
+          OnSelectNoneEvent();
+          break;
+        }
       }
     }
   }
@@ -2012,6 +2017,27 @@ void Controller::Impl::OnSelectAllEvent()
 
     mEventData->mLeftSelectionPosition = 0u;
     mEventData->mRightSelectionPosition = mModel->mLogicalModel->mText.Count();
+  }
+}
+
+void Controller::Impl::OnSelectNoneEvent()
+{
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "OnSelectNoneEvent mEventData->mSelectionEnabled%s \n", mEventData->mSelectionEnabled?"true":"false");
+
+  if( NULL == mEventData )
+  {
+    // Nothing to do if there is no text.
+    return;
+  }
+
+  if( mEventData->mSelectionEnabled && mEventData->mState == EventData::SELECTING)
+  {
+    mEventData->mPrimaryCursorPosition = 0u;
+    mEventData->mLeftSelectionPosition = mEventData->mRightSelectionPosition = mEventData->mPrimaryCursorPosition;
+    ChangeState( EventData::INACTIVE );
+    mEventData->mUpdateCursorPosition = true;
+    mEventData->mUpdateInputStyle = true;
+    mEventData->mScrollAfterUpdatePosition = true;
   }
 }
 
