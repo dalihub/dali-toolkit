@@ -2726,6 +2726,11 @@ int UtcDaliVisualGetTransform(void)
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_CHECK( (Toolkit::Align::Type)typeValue->Get<int>() == Toolkit::Align::TOP_BEGIN );
   }
+  {
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE );
+    DALI_TEST_CHECK( typeValue );
+    DALI_TEST_CHECK( typeValue->Get<Vector2>() == Vector2(0.0f,0.0f) );
+  }
 
   END_TEST;
 }
@@ -2738,6 +2743,7 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   transform.Insert( Visual::Transform::Property::OFFSET_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) );
   transform.Insert( Visual::Transform::Property::ORIGIN, "CENTER" );
   transform.Insert( Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::BOTTOM_END );
+  transform.Insert( DevelVisual::Transform::Property::EXTRA_SIZE, Vector2(50.0f, 50.0f) );
 
   visual.SetTransformAndSize( transform, Vector2(100, 100) );
 
@@ -2776,6 +2782,11 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
     Property::Value* typeValue = map->Find( Toolkit::Visual::Transform::Property::ANCHOR_POINT );
     DALI_TEST_CHECK( typeValue );
     DALI_TEST_EQUALS( (Toolkit::Align::Type)typeValue->Get<int>(), Toolkit::Align::BOTTOM_END, TEST_LOCATION );
+  }
+  {
+    Property::Value* typeValue = map->Find( Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE );
+    DALI_TEST_CHECK( typeValue );
+    DALI_TEST_EQUALS( typeValue->Get<Vector2>(),Vector2(50.0f,50.0f), TEST_LOCATION );
   }
 
   //Put the visual on the stage
@@ -2818,12 +2829,18 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
   Vector2 anchorPoint = renderer.GetProperty<Vector2>( index );
   DALI_TEST_EQUALS( anchorPoint, Vector2(-0.5f,-0.5f), TEST_LOCATION );
 
+  index = renderer.GetPropertyIndex( "extraSize" );
+  DALI_TEST_CHECK( index != Property::INVALID_INDEX );
+  Vector2 extraSize = renderer.GetProperty<Vector2>( index );
+  DALI_TEST_EQUALS( extraSize, Vector2(50.0f,50.0f), TEST_LOCATION );
+
   //Set a new transform
   transform.Clear();
   transform = DefaultTransform();
   transform.Insert( Visual::Transform::Property::OFFSET, Vector2(20.0f, 20.0f) );
   transform.Insert( Visual::Transform::Property::SIZE, Vector2(100.0f, 100.0f) );
   transform.Insert( Visual::Transform::Property::SIZE_POLICY, Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) );
+  transform.Insert( DevelVisual::Transform::Property::EXTRA_SIZE, Vector2(0.5f, 0.5f) );
   visual.SetTransformAndSize( transform, Vector2(100, 100) );
   application.SendNotification();
   application.Render(0);
@@ -2844,6 +2861,9 @@ static void TestTransform( ToolkitTestApplication& application, Visual::Base vis
 
   anchorPoint = renderer.GetProperty<Vector2>( renderer.GetPropertyIndex( "anchorPoint" ) );
   DALI_TEST_EQUALS( anchorPoint, Vector2(0.5f,0.5f), TEST_LOCATION );
+
+  extraSize = renderer.GetProperty<Vector2>( renderer.GetPropertyIndex( "extraSize" ) );
+  DALI_TEST_EQUALS( extraSize, Vector2(0.5f,0.5f), TEST_LOCATION );
 }
 
 int UtcDaliVisualSetTransform0(void)
@@ -3065,6 +3085,7 @@ int UtcDaliNPatchVisualCustomShader(void)
   transformMap["offsetPolicy"] = Vector2( Visual::Transform::Policy::ABSOLUTE, Visual::Transform::Policy::ABSOLUTE );
   transformMap["anchorPoint"] = Align::CENTER;
   transformMap["origin"] = Align::CENTER;
+  transformMap["extraSize"] = Vector2( 0.0f, 50.0f );
   properties[Visual::Property::TRANSFORM] = transformMap;
 
   properties[Visual::Property::TYPE] = Visual::IMAGE;
@@ -3100,6 +3121,9 @@ int UtcDaliNPatchVisualCustomShader(void)
 
   Property::Value* vertex = map->Find( "vertex" ); // vertex key name from shader-impl.cpp
   DALI_TEST_EQUALS( vertexShader, vertex->Get<std::string>(), TEST_LOCATION );
+
+  Vector2 extraSize = renderer.GetProperty<Vector2>( renderer.GetPropertyIndex( "extraSize" ) );
+  DALI_TEST_EQUALS( extraSize, Vector2(0.0f, 50.0f), TEST_LOCATION );
 
   END_TEST;
 }

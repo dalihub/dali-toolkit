@@ -50,6 +50,7 @@ extern const char * const OFFSET;
 extern const char * const OFFSET_SIZE_MODE;
 extern const char * const ORIGIN;
 extern const char * const ANCHOR_POINT;
+extern const char * const EXTRA_SIZE;
 
 // Premultiplied alpha
 extern const char * const PREMULTIPLIED_ALPHA;

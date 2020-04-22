@@ -64,6 +64,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
   uniform mediump vec4 offsetSizeMode;\n
   uniform mediump vec2 origin;\n
   uniform mediump vec2 anchorPoint;\n
+  uniform mediump vec2 extraSize;\n
 
   void main()\n
   {\n
@@ -73,7 +74,7 @@ const char* VERTEX_SHADER = DALI_COMPOSE_SHADER(
     mediump vec2 fixedTotal   = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].x, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].x );\n
     mediump vec2 stretchTotal = vec2( uNinePatchFactorsX[ FACTOR_SIZE_X - 1 ].y, uNinePatchFactorsY[ FACTOR_SIZE_Y - 1 ].y );\n
     \n
-    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;\n
     vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
     \n
     mediump vec4 gridPosition = vec4( fixedFactor + ( visualSize.xy - fixedTotal ) * stretch / stretchTotal, 0.0, 1.0 );\n
@@ -104,10 +105,11 @@ const char* VERTEX_SHADER_3X3 = DALI_COMPOSE_SHADER(
     uniform mediump vec4 offsetSizeMode;\n
     uniform mediump vec2 origin;\n
     uniform mediump vec2 anchorPoint;\n
+    uniform mediump vec2 extraSize;\n
     \n
     void main()\n
     {\n
-      vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+      vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw ) + extraSize;\n
       vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
       \n
       mediump vec2 size         = visualSize.xy;\n

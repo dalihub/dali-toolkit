@@ -66,6 +66,7 @@ const char * const OFFSET( "offset" );
 const char * const OFFSET_SIZE_MODE( "offsetSizeMode" );
 const char * const ORIGIN( "origin" );
 const char * const ANCHOR_POINT( "anchorPoint" );
+const char * const EXTRA_SIZE( "extraSize" );
 
 // Premultipled alpha
 const char * const PREMULTIPLIED_ALPHA( "premultipliedAlpha" );

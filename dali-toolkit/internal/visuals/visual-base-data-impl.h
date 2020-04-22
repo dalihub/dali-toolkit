@@ -111,6 +111,7 @@ struct Base::Impl
 
     Vector2 mOffset;
     Vector2 mSize;
+    Vector2 mExtraSize;
     Vector4 mOffsetSizeMode;
     Toolkit::Align::Type mOrigin;
     Toolkit::Align::Type mAnchorPoint;

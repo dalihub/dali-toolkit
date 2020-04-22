@@ -26,6 +26,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
+#include <dali-toolkit/devel-api/visuals/visual-properties-devel.h>
 #include <dali-toolkit/internal/helpers/property-helper.h>
 #include <dali-toolkit/internal/visuals/visual-string-constants.h>
 
@@ -242,6 +243,7 @@ void Internal::Visual::Base::Impl::CustomShader::CreatePropertyMap( Property::Ma
 Internal::Visual::Base::Impl::Transform::Transform()
 : mOffset( 0.0f,0.0f ),
   mSize( 1.0f,1.0f ),
+  mExtraSize( 0.0f,0.0f ),
   mOffsetSizeMode( 0.0f,0.0f,0.0f,0.0f ),
   mOrigin( Toolkit::Align::TOP_BEGIN ),
   mAnchorPoint( Toolkit::Align::TOP_BEGIN )
@@ -253,6 +255,7 @@ void Internal::Visual::Base::Impl::Transform::SetPropertyMap( const Property::Ma
   // Set default values
   mOffset = Vector2( 0.0f,0.0f );
   mSize = Vector2( 1.0f,1.0f );
+  mExtraSize = Vector2( 0.0f,0.0f );
   mOffsetSizeMode = Vector4( 0.0f,0.0f,0.0f,0.0f );
   mOrigin = Toolkit::Align::TOP_BEGIN;
   mAnchorPoint = Toolkit::Align::TOP_BEGIN;
@@ -309,6 +312,11 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap( const Property:
           }
           break;
         }
+        case Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE:
+        {
+          keyValue.second.Get( mExtraSize );
+          break;
+        }
       }
     }
     else  // Key type is STRING
@@ -347,6 +355,10 @@ void Internal::Visual::Base::Impl::Transform::UpdatePropertyMap( const Property:
           mOffsetSizeMode.w = policy.y;
         }
       }
+      else if( keyValue.first == "extraSize" )
+      {
+        keyValue.second.Get( mExtraSize );
+      }
     }
   }
 }
@@ -359,7 +371,8 @@ void Internal::Visual::Base::Impl::Transform::GetPropertyMap( Property::Map& map
      .Add( Toolkit::Visual::Transform::Property::ORIGIN, mOrigin )
      .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, mAnchorPoint )
      .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY, Vector2( mOffsetSizeMode.x, mOffsetSizeMode.y ) )
-     .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( mOffsetSizeMode.z, mOffsetSizeMode.w ) );
+     .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY, Vector2( mOffsetSizeMode.z, mOffsetSizeMode.w ) )
+     .Add( Toolkit::DevelVisual::Transform::Property::EXTRA_SIZE, mExtraSize );
 }
 
 void Internal::Visual::Base::Impl::Transform::RegisterUniforms( Dali::Renderer renderer, Toolkit::Direction::Type direction )
@@ -369,14 +382,14 @@ void Internal::Visual::Base::Impl::Transform::RegisterUniforms( Dali::Renderer r
   renderer.RegisterProperty( OFFSET_SIZE_MODE, mOffsetSizeMode );
   renderer.RegisterProperty( ORIGIN, PointToVector2( mOrigin, direction ) - Vector2(0.5,0.5) );
   renderer.RegisterProperty( ANCHOR_POINT, Vector2(0.5,0.5) - PointToVector2( mAnchorPoint, direction ) );
+  renderer.RegisterProperty( EXTRA_SIZE, mExtraSize );
 }
 
 Vector2 Internal::Visual::Base::Impl::Transform::GetVisualSize( const Vector2& controlSize )
 {
-  return Vector2( Lerp( mOffsetSizeMode.x, mSize.x * controlSize.x, mSize.x ),
-                  Lerp( mOffsetSizeMode.y, mSize.y * controlSize.y, mSize.y ) );
+  return Vector2( Lerp( mOffsetSizeMode.z, mSize.x * controlSize.x, mSize.x ) ,
+                  Lerp( mOffsetSizeMode.w, mSize.y * controlSize.y, mSize.y ) ) + mExtraSize;
 }
-
 
 } // namespace Internal
 

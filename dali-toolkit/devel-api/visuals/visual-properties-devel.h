@@ -84,6 +84,7 @@ enum Type
 
 } // namespace Property
 
+
 /**
  * @brief The values of this enum determine how the visual should be fit to the view
  */
@@ -92,6 +93,44 @@ enum FittingMode
   FIT_KEEP_ASPECT_RATIO,  ///< The visual should be scaled to fit, preserving aspect ratio
   FILL,                   ///< The visual should be stretched to fill, not preserving aspect ratio
 };
+
+/**
+ * @brief Devel Visual Transform for the offset or size.
+ */
+namespace Transform
+{
+
+/**
+ * @brief Visual Transform Property.
+ */
+namespace Property
+{
+
+/**
+ * @brief Enumeration for the type of Transform Property.
+ */
+enum Type
+{
+  SIZE_POLICY = Dali::Toolkit::Visual::Transform::Property::SIZE_POLICY,
+
+  /**
+   * @brief Extra size value that will be added to the computed visual size.
+   * @details Name "extraSize", type Vector2.
+   *
+   * @note It is an absolute value.
+   *       The property can be used when a user want to set a visual size as a combined value of `relative` and `absolute`.
+   *       For example, when a user want to set a visual size to (ControlSize * 2 + 10),
+   *       The transform map will be,
+   *       transformMap.Add( Transform::Property::SIZE, Vector2( 2.0f, 2.0f ) )
+   *                   .Add( Transform::Property::SIZE_POLICY, Vector2( Transform::Policy::Relative, Transform::Policy::Relative ) )
+   *                   .Add( Transform::Property::EXTRA_SIZE, Vector2( 10.0f, 10.0f ) );
+   */
+  EXTRA_SIZE = SIZE_POLICY + 1,
+};
+
+} // namespace Property
+
+} // namespace Transform
 
 } // namespace DevelVisual
 
