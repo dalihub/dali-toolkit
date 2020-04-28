@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 CMAKE_POLICY(SET CMP0012 NEW) # Prevent dereferencing of OFF/ON as variables
 
-SET(name "dali-toolkit")
+SET(name "dali2-toolkit")
 
 PROJECT(${name})
 SET(PKG_NAME ${name})
@@ -14,7 +14,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 # API VERSION (Not DALi release version)
-SET(${name}_VERSION_MAJOR 0)
+SET(${name}_VERSION_MAJOR 2)
 SET(${name}_VERSION_MINOR 0)
 SET(${name}_VERSION_PATCH 0)
 SET(${name}_VERSION ${${name}_VERSION_MAJOR}.${${name}_VERSION_MINOR}.${${name}_VERSION_PATCH} )
@@ -36,8 +36,8 @@ OPTION(USE_DEFAULT_RESOURCE_DIR  "Whether to use the default resource folders. O
 IF( ENABLE_PKG_CONFIGURE )
   FIND_PACKAGE( PkgConfig REQUIRED )
 
-  PKG_CHECK_MODULES(DALICORE REQUIRED dali-core)
-  PKG_CHECK_MODULES(DALIADAPTOR REQUIRED dali-adaptor)
+  PKG_CHECK_MODULES(DALICORE REQUIRED dali2-core)
+  PKG_CHECK_MODULES(DALIADAPTOR REQUIRED dali2-adaptor)
 ENDIF()
 
 IF( INSTALL_DOXYGEN_DOC )
@@ -46,8 +46,8 @@ ENDIF()
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
   FIND_PACKAGE( dali-windows-dependencies REQUIRED)
-  FIND_PACKAGE( dali-core REQUIRED)
-  FIND_PACKAGE( dali-adaptor REQUIRED)
+  FIND_PACKAGE( dali2-core REQUIRED)
+  FIND_PACKAGE( dali2-adaptor REQUIRED)
 ENDIF()
 
 SET( VCPKG_INCLUDE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include")
@@ -198,7 +198,7 @@ IF( ENABLE_PKG_CONFIGURE )
   # Requires the following variables to be setup:
   # @PREFIX@ @EXEC_PREFIX@ @DALI_VERSION@ @LIB_DIR@ @DEV_INCLUDE_PATH@
   SET( DEV_INCLUDE_PATH ${INCLUDE_DIR} )
-  SET( CORE_PKG_CFG_FILE dali-toolkit.pc )
+  SET( CORE_PKG_CFG_FILE dali2-toolkit.pc )
   CONFIGURE_FILE( ${CORE_PKG_CFG_FILE}.in ${CORE_PKG_CFG_FILE} @ONLY )
 ENDIF()
 
@@ -263,7 +263,7 @@ ENDIF()
 IF( WIN32 )
   SET( DALICORE_LDFLAGS
         "${DALICORE_LDFLAGS}"
-        dali-core::dali-core )
+        dali2-core::dali2-core )
 
   FIND_PACKAGE( pthreads REQUIRED )
   FIND_PACKAGE( curl REQUIRED )
@@ -285,7 +285,7 @@ IF( WIN32 )
 
   SET( DALIADAPTOR_LDFLAGS
        "${DALIADAPTOR_LDFLAGS}"
-       dali-adaptor::dali-adaptor )
+       dali2-adaptor::dali2-adaptor )
 ENDIF()
 
 
