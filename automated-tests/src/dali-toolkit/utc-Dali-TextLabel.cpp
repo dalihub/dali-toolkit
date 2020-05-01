@@ -26,6 +26,7 @@
 #include <dali-toolkit/devel-api/text/text-enumerations-devel.h>
 #include <dali/devel-api/text-abstraction/bitmap-font.h>
 #include <dali/devel-api/text-abstraction/font-client.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
 #include <dali-toolkit/devel-api/text/bitmap-font.h>
 
 using namespace Dali;
@@ -1532,6 +1533,51 @@ int UtcDaliToolkitTextlabelTextFit(void)
   application.Render();
 
   DALI_TEST_EQUALS( EXPECTED_NATURAL_SIZE, label.GetNaturalSize(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliToolkitTextlabelMaxTextureSet(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelMaxTextureSet");
+
+  DevelText::BitmapFontDescription fontDescription;
+  fontDescription.name = "Digits";
+  fontDescription.glyphs.push_back( { TEST_RESOURCE_DIR "/fonts/bitmap/u0030.png", ":", 200.f, 0.f } );
+
+  TextAbstraction::BitmapFont bitmapFont;
+  DevelText::CreateBitmapFont( fontDescription, bitmapFont );
+
+  TextAbstraction::FontClient fontClient = TextAbstraction::FontClient::Get();
+  fontClient.GetFontId( bitmapFont );
+
+  TextLabel label = TextLabel::New();
+  label.SetProperty( TextLabel::Property::FONT_FAMILY, "Digits" );
+  label.SetProperty( TextLabel::Property::ENABLE_MARKUP, true );
+  label.SetProperty( TextLabel::Property::TEXT, ":This is a long sample text made to allow max texture size to be exceeded." );
+  label.SetProperty( TextLabel::Property::POINT_SIZE, 200.f );
+  label.SetProperty( TextLabel::Property::MULTI_LINE, true );
+
+  Property::Map underlineMapSet;
+  underlineMapSet.Clear();
+  underlineMapSet.Insert( "enable", true );
+  underlineMapSet.Insert( "color", Color::RED );
+  underlineMapSet.Insert( "height", 1 );
+  label.SetProperty( TextLabel::Property::UNDERLINE, underlineMapSet );
+  label.SetProperty( Toolkit::TextLabel::Property::TEXT_COLOR, Color::BLUE );
+
+  Stage::GetCurrent().Add( label );
+
+  application.SendNotification();
+  application.Render();
+
+  const int maxTextureSize = Dali::GetMaxTextureSize();
+  // Whether the rendered text is greater than maxTextureSize
+  DALI_TEST_CHECK( label.GetCurrentSize().height > maxTextureSize );
+
+  // Check if the number of renderers is greater than 1.
+  DALI_TEST_CHECK( label.GetRendererCount() > 1u );
 
   END_TEST;
 }

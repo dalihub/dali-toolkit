@@ -182,6 +182,48 @@ protected:
   void OnSetTransform() override;
 
 private:
+
+  struct TilingInfo
+  {
+    unsigned char* textBuffer;
+    unsigned char* styleBuffer;
+    unsigned char* maskBuffer;
+    int width;
+    int height;
+    Pixel::Format textPixelFormat;
+    int offsetPosition;
+    Vector2 offSet;
+
+    TilingInfo( int width, int height, Pixel::Format textPixelFormat )
+    : textBuffer( NULL ),
+      styleBuffer( NULL ),
+      maskBuffer( NULL ),
+      width( width ),
+      height( height ),
+      textPixelFormat( textPixelFormat ),
+      offsetPosition( 0 ),
+      offSet( 0.f, 0.f )
+    {
+    }
+
+    ~TilingInfo()
+    {
+      if( textBuffer )
+      {
+        free( textBuffer );
+      }
+      if( styleBuffer )
+      {
+        free( styleBuffer );
+      }
+      if( maskBuffer )
+      {
+        free( maskBuffer );
+      }
+    }
+
+  };
+
   /**
    * @brief Set the individual property to the given value.
    *
@@ -197,9 +239,50 @@ private:
   void UpdateRenderer();
 
   /**
-   * @brief Removes the texture set from the renderer.
+   * @brief Removes the text's renderer.
    */
-  void RemoveTextureSet();
+  void RemoveRenderer( Actor& actor );
+
+  /**
+   * @brief Create a texture in textureSet and add it.
+   * @param[in] textureSet The textureSet to which the texture will be added.
+   * @param[in] data The PixelData to be uploaded to texture
+   * @param[in] sampler The sampler.
+   * @param[in] textureSetIndex The Index of TextureSet.
+   */
+  void AddTexture( TextureSet& textureSet, PixelData& data, Sampler& sampler, unsigned int textureSetIndex );
+
+  /**
+   * @brief Convert the buffer to pixelData.
+   * @param[in] buffer The Buffer to be converted to pixelData.
+   * @param[in] width The width of pixel data.
+   * @param[in] height The height of pixel data.
+   * @param[in] offsetPosition The The buffer's start position.
+   * @param[in] textPixelFormat The PixelForma of text.
+   */
+  PixelData ConvertToPixelData( unsigned char* buffer, int width, int height, int offsetPosition, const Pixel::Format textPixelFormat );
+
+  /**
+   * @brief Create the text's texture.
+   * @param[in] info This is the information you need to create a Tiling.
+   * @param[in] renderer The renderer to which the TextureSet will be added.
+   * @param[in] sampler The sampler.
+   * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
+   * @param[in] containsColorGlyph Whether the text contains color glyph.
+   * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
+   */
+  void CreateTextureSet( TilingInfo& info, Renderer& renderer, Sampler& sampler,  bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled );
+
+  /**
+   * Create renderer of the text for rendering.
+   * @param[in] actor The actor.
+   * @param[in] size The texture size.
+   * @param[in] hasMultipleTextColors Whether the text contains multiple colors.
+   * @param[in] containsColorGlyph Whether the text contains color glyph.
+   * @param[in] styleEnabled Whether the text contains any styles (e.g. shadow, underline, etc.).
+   */
+  void AddRenderer( Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled );
+
 
   /**
    * Get the texture of the text for rendering.
@@ -231,6 +314,8 @@ private:
 
 private:
 
+  typedef std::vector< Renderer > RendererContainer;
+
   /**
    * Used as an alternative to boolean so that it is obvious whether the text contains single or multiple text colors, and emoji and styles.
    */
@@ -247,12 +332,14 @@ private:
     };
   };
 
+
 private:
   Text::ControllerPtr mController;                        ///< The text's controller.
   Text::TypesetterPtr mTypesetter;                        ///< The text's typesetter.
   WeakHandle<Actor>   mControl;                           ///< The control where the renderer is added.
   Property::Index     mAnimatableTextColorPropertyIndex;  ///< The index of animatable text color property registered by the control.
   bool                mRendererUpdateNeeded:1;            ///< The flag to indicate whether the renderer needs to be updated.
+  RendererContainer   mRendererList;
 };
 
 } // namespace Internal

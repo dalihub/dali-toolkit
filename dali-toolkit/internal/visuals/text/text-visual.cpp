@@ -22,6 +22,9 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/text-abstraction/text-abstraction-definitions.h>
+#include <dali/devel-api/adaptor-framework/image-loading.h>
+#include <dali/devel-api/images/pixel-data-devel.h>
+#include <string.h>
 
 // INTERNAL HEADER
 #include <dali-toolkit/public-api/visuals/text-visual-properties.h>
@@ -453,21 +456,32 @@ void TextVisual::DoSetOnStage( Actor& actor )
   // Renderer needs textures and to be added to control
   mRendererUpdateNeeded = true;
 
+  mRendererList.push_back( mImpl->mRenderer );
+
   UpdateRenderer();
+}
+
+void TextVisual::RemoveRenderer( Actor& actor )
+{
+  for( RendererContainer::iterator iter = mRendererList.begin(); iter != mRendererList.end(); ++iter)
+  {
+    Renderer renderer = (*iter);
+    if( renderer )
+    {
+      // Removes the renderer from the actor.
+      actor.RemoveRenderer( renderer );
+    }
+  }
+  // Clear the renderer list
+  mRendererList.clear();
 }
 
 void TextVisual::DoSetOffStage( Actor& actor )
 {
-  if( mImpl->mRenderer )
-  {
-    // Removes the renderer from the actor.
-    actor.RemoveRenderer( mImpl->mRenderer );
+  RemoveRenderer( actor );
 
-    RemoveTextureSet();
-
-    // Resets the renderer.
-    mImpl->mRenderer.Reset();
-  }
+  // Resets the renderer.
+  mImpl->mRenderer.Reset();
 
   // Resets the control handle.
   mControl.Reset();
@@ -597,14 +611,8 @@ void TextVisual::UpdateRenderer()
 
   if( ( fabsf( relayoutSize.width ) < Math::MACHINE_EPSILON_1000 ) || ( fabsf( relayoutSize.height ) < Math::MACHINE_EPSILON_1000 ) || text.empty() )
   {
-    // Removes the texture set.
-    RemoveTextureSet();
-
-    // Remove any renderer previously set.
-    if( mImpl->mRenderer )
-    {
-      control.RemoveRenderer( mImpl->mRenderer );
-    }
+    // Remove the texture set and any renderer previously set.
+    RemoveRenderer( control );
 
     // Nothing else to do if the relayout size is zero.
     ResourceReady( Toolkit::Visual::ResourceStatus::READY );
@@ -620,14 +628,8 @@ void TextVisual::UpdateRenderer()
   {
     mRendererUpdateNeeded = false;
 
-    // Removes the texture set.
-    RemoveTextureSet();
-
-    // Remove any renderer previously set.
-    if( mImpl->mRenderer )
-    {
-      control.RemoveRenderer( mImpl->mRenderer );
-    }
+    // Remove the texture set and any renderer previously set.
+    RemoveRenderer( control );
 
     if( ( relayoutSize.width > Math::MACHINE_EPSILON_1000 ) &&
         ( relayoutSize.height > Math::MACHINE_EPSILON_1000 ) )
@@ -670,22 +672,8 @@ void TextVisual::UpdateRenderer()
 
       const bool styleEnabled = ( shadowEnabled || underlineEnabled || outlineEnabled || backgroundEnabled );
 
-      TextureSet textureSet = GetTextTexture( relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled );
-      mImpl->mRenderer.SetTextures( textureSet );
 
-      Shader shader = GetTextShader( mFactoryCache, hasMultipleTextColors, containsColorGlyph, styleEnabled );
-      mImpl->mRenderer.SetShader(shader);
-
-      mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
-
-      mImpl->mRenderer.RegisterProperty( "uHasMultipleTextColors", static_cast<float>( hasMultipleTextColors ) );
-
-      mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON);
-
-      //Register transform properties
-      mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
-
-      control.AddRenderer( mImpl->mRenderer );
+      AddRenderer( control, relayoutSize, hasMultipleTextColors, containsColorGlyph, styleEnabled );
 
       // Text rendered and ready to display
       ResourceReady( Toolkit::Visual::ResourceStatus::READY );
@@ -693,24 +681,186 @@ void TextVisual::UpdateRenderer()
   }
 }
 
-void TextVisual::RemoveTextureSet()
+void TextVisual::AddTexture( TextureSet& textureSet, PixelData& data, Sampler& sampler, unsigned int textureSetIndex )
 {
-  if( mImpl->mFlags & Impl::IS_ATLASING_APPLIED )
+  Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
+                                  data.GetPixelFormat(),
+                                  data.GetWidth(),
+                                  data.GetHeight() );
+  texture.Upload( data );
+
+  textureSet.SetTexture( textureSetIndex, texture );
+  textureSet.SetSampler( textureSetIndex, sampler );
+}
+
+PixelData TextVisual::ConvertToPixelData( unsigned char* buffer, int width, int height, int offsetPosition, const Pixel::Format textPixelFormat )
+{
+  int bpp = Pixel::GetBytesPerPixel( textPixelFormat );
+  unsigned int bufferSize = width * height * bpp;
+  unsigned char* dstBuffer = static_cast<unsigned char*>( malloc ( bufferSize ) );
+  memcpy( dstBuffer, buffer + offsetPosition * bpp, bufferSize );
+  PixelData pixelData = Dali::PixelData::New( dstBuffer,
+                                              bufferSize,
+                                              width,
+                                              height,
+                                              textPixelFormat,
+                                              Dali::PixelData::FREE );
+  return pixelData;
+}
+
+void TextVisual::CreateTextureSet( TilingInfo& info, Renderer& renderer, Sampler& sampler, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled )
+{
+
+  TextureSet textureSet = TextureSet::New();
+  unsigned int textureSetIndex = 0u;
+
+  // Convert the buffer to pixel data to make it a texture.
+  if( info.textBuffer )
   {
-    // Removes the text's image from the texture atlas.
-    Vector4 atlasRect;
+    PixelData data = ConvertToPixelData( info.textBuffer, info.width, info.height, info.offsetPosition, info.textPixelFormat );
+    AddTexture( textureSet, data, sampler, textureSetIndex );
+    ++textureSetIndex;
+  }
 
-    const Property::Index index = mImpl->mRenderer.GetPropertyIndex( ATLAS_RECT_UNIFORM_NAME );
-    if( index != Property::INVALID_INDEX )
+  if( styleEnabled && info.styleBuffer )
+  {
+    PixelData styleData = ConvertToPixelData( info.styleBuffer, info.width, info.height, info.offsetPosition, Pixel::RGBA8888 );
+    AddTexture( textureSet, styleData, sampler, textureSetIndex );
+    ++textureSetIndex;
+  }
+
+  if( containsColorGlyph && !hasMultipleTextColors && info.maskBuffer )
+  {
+    PixelData maskData = ConvertToPixelData( info.maskBuffer, info.width, info.height, info.offsetPosition, Pixel::L8 );
+    AddTexture( textureSet, maskData, sampler, textureSetIndex );
+  }
+
+  renderer.SetTextures( textureSet );
+
+  //Register transform properties
+  mImpl->mTransform.RegisterUniforms( renderer, Direction::LEFT_TO_RIGHT );
+
+  // Enable the pre-multiplied alpha to improve the text quality
+  renderer.SetProperty( Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true );
+  renderer.RegisterProperty( PREMULTIPLIED_ALPHA, 1.0f );
+
+  // Set size and offset for the tiling.
+  renderer.RegisterProperty( SIZE, Vector2( info.width, info.height ) );
+  renderer.RegisterProperty( OFFSET, Vector2( info.offSet.x, info.offSet.y ) );
+  renderer.RegisterProperty( "uHasMultipleTextColors", static_cast<float>( hasMultipleTextColors ) );
+  renderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON);
+
+  mRendererList.push_back( renderer );
+}
+
+
+void TextVisual::AddRenderer( Actor& actor, const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled )
+{
+  Shader shader = GetTextShader( mFactoryCache, hasMultipleTextColors, containsColorGlyph, styleEnabled );
+  mImpl->mRenderer.SetShader( shader );
+
+  // Get the maximum size.
+  const int maxTextureSize = Dali::GetMaxTextureSize();
+
+  // No tiling required. Use the default renderer.
+  if( size.height < maxTextureSize )
+  {
+    TextureSet textureSet = GetTextTexture( size, hasMultipleTextColors, containsColorGlyph, styleEnabled );
+
+    mImpl->mRenderer.SetTextures( textureSet );
+    //Register transform properties
+    mImpl->mTransform.RegisterUniforms( mImpl->mRenderer, Direction::LEFT_TO_RIGHT );
+    mImpl->mRenderer.RegisterProperty( "uHasMultipleTextColors", static_cast<float>( hasMultipleTextColors ) );
+    mImpl->mRenderer.SetProperty( Renderer::Property::BLEND_MODE, BlendMode::ON);
+
+    mRendererList.push_back( mImpl->mRenderer );
+  }
+  // If the pixel data exceeds the maximum size, tiling is required.
+  else
+  {
+    // Filter mode needs to be set to linear to produce better quality while scaling.
+    Sampler sampler = Sampler::New();
+    sampler.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
+
+    // Create RGBA texture if the text contains emojis or multiple text colors, otherwise L8 texture
+    Pixel::Format textPixelFormat = ( containsColorGlyph || hasMultipleTextColors ) ? Pixel::RGBA8888 : Pixel::L8;
+
+    // Check the text direction
+    Toolkit::DevelText::TextDirection::Type textDirection = mController->GetTextDirection();
+
+    // Create a texture for the text without any styles
+    PixelData data = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_NO_STYLES, false, textPixelFormat );
+
+    int verifiedWidth = data.GetWidth();
+    int verifiedHeight = data.GetHeight();
+
+    // Set information for creating textures.
+    TilingInfo info( verifiedWidth, maxTextureSize, textPixelFormat );
+
+    // Get the buffer of text.
+    Dali::DevelPixelData::PixelDataBuffer textPixelData = Dali::DevelPixelData::ReleasePixelDataBuffer( data );
+    info.textBuffer = textPixelData.buffer;
+
+    if( styleEnabled )
     {
-      const Property::Value& atlasRectValue = mImpl->mRenderer.GetProperty( index );
-      atlasRectValue.Get( atlasRect );
+      // Create RGBA texture for all the text styles (without the text itself)
+      PixelData styleData = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888 );
+      Dali::DevelPixelData::PixelDataBuffer stylePixelData = Dali::DevelPixelData::ReleasePixelDataBuffer( styleData );
+      info.styleBuffer = stylePixelData.buffer;
+    }
 
-      const TextureSet& textureSet = mImpl->mRenderer.GetTextures();
-      mFactoryCache.GetAtlasManager()->Remove( textureSet, atlasRect );
+    if ( containsColorGlyph && !hasMultipleTextColors )
+    {
+      // Create a L8 texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
+      PixelData maskData = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_MASK, false, Pixel::L8 );
+      Dali::DevelPixelData::PixelDataBuffer maskPixelData = Dali::DevelPixelData::ReleasePixelDataBuffer( maskData );
+      info.maskBuffer = maskPixelData.buffer;
+    }
+
+    // Get the current offset for recalculate the offset when tiling.
+    Property::Map retMap;
+    mImpl->mTransform.GetPropertyMap( retMap );
+    Vector2 offSet = retMap.Find( Dali::Toolkit::Visual::Transform::Property::OFFSET )->Get< Vector2 >();
+    info.offSet = offSet;
+
+    // Create a textureset in the default renderer.
+    CreateTextureSet( info, mImpl->mRenderer, sampler, hasMultipleTextColors, containsColorGlyph, styleEnabled );
+
+    verifiedHeight -= maxTextureSize;
+
+    Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
+
+    int offsetPosition = verifiedWidth * maxTextureSize;
+    // Create a renderer by cutting maxTextureSize.
+    while( verifiedHeight > 0 )
+    {
+      Renderer tilingRenderer = Renderer::New( geometry, shader );
+      tilingRenderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, Toolkit::DepthIndex::CONTENT );
+      // New offset position of buffer for tiling.
+      info.offsetPosition += offsetPosition;
+      // New height for tiling.
+      info.height = ( verifiedHeight - maxTextureSize ) > 0 ? maxTextureSize : verifiedHeight;
+      // New offset for tiling.
+      info.offSet.y += maxTextureSize;
+      // Create a textureset int the new tiling renderer.
+      CreateTextureSet( info, tilingRenderer, sampler, hasMultipleTextColors, containsColorGlyph, styleEnabled );
+
+      verifiedHeight -= maxTextureSize;
+    }
+  }
+
+  mImpl->mFlags &= ~Impl::IS_ATLASING_APPLIED;
+
+  for( RendererContainer::iterator iter = mRendererList.begin(); iter != mRendererList.end(); ++iter)
+  {
+    Renderer renderer = (*iter);
+    if( renderer )
+    {
+      actor.AddRenderer( renderer );
     }
   }
 }
+
 
 TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleTextColors, bool containsColorGlyph, bool styleEnabled )
 {
@@ -731,31 +881,18 @@ TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleText
 
   // It may happen the image atlas can't handle a pixel data it exceeds the maximum size.
   // In that case, create a texture. TODO: should tile the text.
+  unsigned int textureSetIndex = 0u;
 
-  Texture texture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                  data.GetPixelFormat(),
-                                  data.GetWidth(),
-                                  data.GetHeight() );
-
-  texture.Upload( data );
-
-  textureSet.SetTexture( 0u, texture );
-  textureSet.SetSampler( 0u, sampler );
+  AddTexture( textureSet, data, sampler, textureSetIndex );
+  ++textureSetIndex;
 
   if ( styleEnabled )
   {
     // Create RGBA texture for all the text styles (without the text itself)
     PixelData styleData = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_NO_TEXT, false, Pixel::RGBA8888 );
 
-    Texture styleTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                         styleData.GetPixelFormat(),
-                                         styleData.GetWidth(),
-                                         styleData.GetHeight() );
-
-    styleTexture.Upload( styleData );
-
-    textureSet.SetTexture( 1u, styleTexture );
-    textureSet.SetSampler( 1u, sampler );
+    AddTexture( textureSet, styleData, sampler, textureSetIndex );
+    ++textureSetIndex;
   }
 
   if ( containsColorGlyph && !hasMultipleTextColors )
@@ -763,23 +900,7 @@ TextureSet TextVisual::GetTextTexture( const Vector2& size, bool hasMultipleText
     // Create a L8 texture as a mask to avoid color glyphs (e.g. emojis) to be affected by text color animation
     PixelData maskData = mTypesetter->Render( size, textDirection, Text::Typesetter::RENDER_MASK, false, Pixel::L8 );
 
-    Texture maskTexture = Texture::New( Dali::TextureType::TEXTURE_2D,
-                                        maskData.GetPixelFormat(),
-                                        maskData.GetWidth(),
-                                        maskData.GetHeight() );
-
-    maskTexture.Upload( maskData );
-
-    if ( !styleEnabled )
-    {
-      textureSet.SetTexture( 1u, maskTexture );
-      textureSet.SetSampler( 1u, sampler );
-    }
-    else
-    {
-      textureSet.SetTexture( 2u, maskTexture );
-      textureSet.SetSampler( 2u, sampler );
-    }
+    AddTexture( textureSet, maskData, sampler, textureSetIndex );
   }
 
   return textureSet;
