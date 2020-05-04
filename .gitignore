@@ -10,7 +10,7 @@ cmake_install.cmake
 dali.node
 dali.doxy
 install_manifest.txt
-libdali-toolkit.so*
+libdali2-toolkit.so*
 *~
 *.o
 *.o.d
