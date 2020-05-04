@@ -61,7 +61,8 @@ struct Event
     LEFT_SELECTION_HANDLE_EVENT,
     RIGHT_SELECTION_HANDLE_EVENT,
     SELECT,
-    SELECT_ALL
+    SELECT_ALL,
+    SELECT_NONE,
   };
 
   union Param
@@ -618,6 +619,8 @@ struct Controller::Impl
   void OnSelectEvent( const Event& event );
 
   void OnSelectAllEvent();
+
+  void OnSelectNoneEvent();
 
   /**
    * @brief Retrieves the selected text. It removes the text if the @p deleteAfterRetrieval parameter is @e true.

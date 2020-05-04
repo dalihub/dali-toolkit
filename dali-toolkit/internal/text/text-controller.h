@@ -47,6 +47,16 @@ class EditableControlInterface;
 class View;
 class RenderingController;
 
+  /**
+   * @brief Text selection operations .
+   */
+  enum SelectionType
+  {
+    INTERACTIVE        = 0x0000,
+    ALL                = 0x0001,
+    NONE               = 0x0002
+  };
+
 typedef IntrusivePtr<Controller> ControllerPtr;
 
 /**
@@ -1462,9 +1472,9 @@ public: // Text-input Event Queuing.
    *
    * @param[in] x The x position relative to the top-left of the parent control.
    * @param[in] y The y position relative to the top-left of the parent control.
-   * @param[in] selectAll Whether the whole text is selected.
+   * @param[in] selection type like the whole text is selected or unselected.
    */
-  void SelectEvent( float x, float y, bool selectAll );
+  void SelectEvent( float x, float y, SelectionType selection );
 
   /**
    * @brief Event received from input method context
@@ -1493,6 +1503,13 @@ public: // Text-input Event Queuing.
    * @return the created actor or an empty handle if no background color needs to be rendered.
    */
   Actor CreateBackgroundActor();
+
+  /**
+   * @brief Retrive Selected text.
+   *
+   * @return The seleced text.
+   */
+  std::string GetSelectedText();
 
 protected: // Inherit from Text::Decorator::ControllerInterface.
 

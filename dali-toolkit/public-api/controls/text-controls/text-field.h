@@ -472,7 +472,7 @@ public:
        * @SINCE_1_2.60
        * @note PLACEHOLDER map is used to add ellipsis to placeholder text.
        */
-      ELLIPSIS,
+      ELLIPSIS
     };
   };
 
