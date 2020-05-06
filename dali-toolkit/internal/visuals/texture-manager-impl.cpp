@@ -200,7 +200,6 @@ TextureSet TextureManager::LoadTexture(
     if( !data )
     {
       // use broken image
-      textureSet = TextureSet::New();
       Devel::PixelBuffer pixelBuffer = LoadImageFromFile( mBrokenImageUrl );
       if( pixelBuffer )
       {
