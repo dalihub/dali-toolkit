@@ -507,9 +507,12 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
     if( textureSet )
     {
       auto texture = textureSet.GetTexture(0);
-      naturalSize.x = texture.GetWidth();
-      naturalSize.y = texture.GetHeight();
-      return;
+      if( texture )
+      {
+        naturalSize.x = texture.GetWidth();
+        naturalSize.y = texture.GetHeight();
+        return;
+      }
     }
   }
 
