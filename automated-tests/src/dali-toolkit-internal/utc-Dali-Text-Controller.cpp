@@ -1124,7 +1124,7 @@ int UtcDaliTextControllerSelectEvent(void)
   controller->SetText( text );
 
   // Select the whole text.
-  controller->SelectEvent( 0.f, 0.f, false );
+  controller->SelectEvent( 0.f, 0.f, SelectionType::INTERACTIVE );
 
   // Perform a relayout
   const Size size( Dali::Stage::GetCurrent().GetSize() );
@@ -1139,7 +1139,7 @@ int UtcDaliTextControllerSelectEvent(void)
   DALI_TEST_EQUALS( "Hello", retrieved_text, TEST_LOCATION );
 
   // Select the whole text.
-  controller->SelectEvent( 0.f, 0.f, true );
+  controller->SelectEvent( 0.f, 0.f, SelectionType::ALL );
 
   // Perform a relayout
   controller->Relayout( size );
@@ -1150,35 +1150,6 @@ int UtcDaliTextControllerSelectEvent(void)
   END_TEST;
 }
 
-
-int UtcDaliTextControllerMaxLengthSetText(void)
-{
-  tet_infoline(" UtcDaliTextControllerMaxLengthSetText");
-  ToolkitTestApplication application;
-
-  // Creates a text controller.
-  ControllerPtr controller = Controller::New();
-
-  ConfigureTextLabel( controller );
-
-  const Length MAX_TEXT_LENGTH = 1024u * 32u;
-
-  // make over length world
-  int maxLength = ( 1024u * 32u ) + 10u;
-  char world[maxLength] = { 'a' };
-
-  // Set the text
-  std::string text( world, maxLength );
-  controller->SetText( text );
-
-  // check text length
-  controller->GetText( text );
-  Length textSize = text.size();
-
-  DALI_TEST_EQUALS( MAX_TEXT_LENGTH, textSize, TEST_LOCATION );
-
-  END_TEST;
-}
 
 int UtcDaliTextControllerRemoveTextChangeEventData(void)
 {

@@ -116,9 +116,9 @@ LIST(APPEND TC_SOURCES
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
-  dali-core
-  dali-adaptor
-  dali-toolkit
+  dali2-core
+  dali2-adaptor
+  dali2-toolkit
 )
 
 ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -DDEBUG_ENABLED)

@@ -62,7 +62,6 @@ const char * const PLACEHOLDER_FONT_STYLE = "fontStyle";
 const char * const PLACEHOLDER_POINT_SIZE = "pointSize";
 const char * const PLACEHOLDER_PIXEL_SIZE = "pixelSize";
 const char * const PLACEHOLDER_ELLIPSIS = "ellipsis";
-const unsigned int MAX_TEXT_LENGTH = 1024u * 32u;
 
 float ConvertToEven( float value )
 {
@@ -321,7 +320,7 @@ bool Controller::IsSmoothHandlePanEnabled() const
 
 void Controller::SetMaximumNumberOfCharacters( Length maxCharacters )
 {
-  mImpl->mMaximumNumberOfCharacters = std::min( maxCharacters, MAX_TEXT_LENGTH );
+  mImpl->mMaximumNumberOfCharacters = maxCharacters;
 }
 
 int Controller::GetMaximumNumberOfCharacters()
@@ -700,13 +699,6 @@ void Controller::SetText( const std::string& text )
 
       // This is a bit horrible but std::string returns a (signed) char*
       utf8 = reinterpret_cast<const uint8_t*>( text.c_str() );
-    }
-
-    // Limit the text size. If the text size is too large, crash or deadlock will occur.
-    if( textSize > MAX_TEXT_LENGTH )
-    {
-      DALI_LOG_WARNING( "The text size is too large(%d), limit the length to 32,768u\n", textSize );
-      textSize = MAX_TEXT_LENGTH;
     }
 
     //  Convert text into UTF-32
@@ -3041,15 +3033,20 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
   }
 }
 
-void Controller::SelectEvent( float x, float y, bool selectAll )
+void Controller::SelectEvent( float x, float y, SelectionType selectType )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SelectEvent\n" );
 
   if( NULL != mImpl->mEventData )
   {
-    if( selectAll )
+    if( selectType == SelectionType::ALL )
     {
       Event event( Event::SELECT_ALL );
+      mImpl->mEventData->mEventQueue.push_back( event );
+    }
+    else if( selectType == SelectionType::NONE )
+    {
+      Event event( Event::SELECT_NONE );
       mImpl->mEventData->mEventQueue.push_back( event );
     }
     else
@@ -3334,14 +3331,14 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
       if( mImpl->mEventData->mSelectionEnabled )
       {
         // Creates a SELECT event.
-        SelectEvent( currentCursorPosition.x, currentCursorPosition.y, false );
+        SelectEvent( currentCursorPosition.x, currentCursorPosition.y, SelectionType::INTERACTIVE );
       }
       break;
     }
     case Toolkit::TextSelectionPopup::SELECT_ALL:
     {
       // Creates a SELECT_ALL event
-      SelectEvent( 0.f, 0.f, true );
+      SelectEvent( 0.f, 0.f, SelectionType::ALL );
       break;
     }
     case Toolkit::TextSelectionPopup::CLIPBOARD:
@@ -3761,6 +3758,16 @@ bool Controller::RemoveSelectedText()
   }
 
   return textRemoved;
+}
+
+std::string Controller::GetSelectedText()
+{
+  std::string text;
+  if( EventData::SELECTING == mImpl->mEventData->mState )
+  {
+    mImpl->RetrieveSelection( text, false );
+  }
+  return text;
 }
 
 // private : Relayout.

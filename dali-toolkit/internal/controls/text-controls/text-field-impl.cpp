@@ -135,6 +135,7 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableGrabHandle",       
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "matchSystemLanguageDirection",   BOOLEAN,   MATCH_SYSTEM_LANGUAGE_DIRECTION      )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "enableGrabHandlePopup",          BOOLEAN,   ENABLE_GRAB_HANDLE_POPUP             )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit, TextField, "textBackground",                 VECTOR4,   BACKGROUND                           )
+DALI_DEVEL_PROPERTY_REGISTRATION_READ_ONLY( Toolkit, TextField, "selectedText",         STRING,    SELECTED_TEXT                        )
 
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "textChanged",        SIGNAL_TEXT_CHANGED )
 DALI_SIGNAL_REGISTRATION( Toolkit, TextField, "maxLengthReached",   SIGNAL_MAX_LENGTH_REACHED )
@@ -1212,6 +1213,14 @@ Property::Value TextField::GetProperty( BaseObject* object, Property::Index inde
         }
         break;
       }
+      case Toolkit::DevelTextField::Property::SELECTED_TEXT:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetSelectedText( );
+        }
+        break;
+      }
     } //switch
   }
 
@@ -1222,7 +1231,16 @@ void TextField::SelectWholeText()
 {
   if( mController && mController->IsShowingRealText() )
   {
-    mController->SelectEvent( 0.f, 0.f, true );
+    mController->SelectEvent( 0.f, 0.f, SelectionType::ALL );
+    SetKeyInputFocus();
+  }
+}
+
+void TextField::SelectNone()
+{
+  if( mController && mController->IsShowingRealText() )
+  {
+    mController->SelectEvent( 0.f, 0.f, SelectionType::NONE );
     SetKeyInputFocus();
   }
 }
