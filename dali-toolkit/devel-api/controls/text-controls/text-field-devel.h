@@ -122,7 +122,15 @@ namespace Property
        * @note Use "textBackground" as property name to avoid conflict with Control's "background" property.
        * @note The default value is Color::TRANSPARENT.
        */
-      BACKGROUND = ELLIPSIS + 5
+      BACKGROUND = ELLIPSIS + 5,
+
+
+      /**
+       * @brief The selected text in UTF-8 format.
+       * @details Name "selectedText", type Property::STRING.
+       * @note This property is read-only.
+       */
+      SELECTED_TEXT = ELLIPSIS + 6
 
   };
 } // namespace Property
@@ -139,9 +147,23 @@ DALI_TOOLKIT_API InputMethodContext GetInputMethodContext( TextField textField )
  * @brief Select the whole text of TextField.
  *
  * @param[in] textField The instance of TextField.
- * @return InputMethodContext instance.
  */
 DALI_TOOLKIT_API void SelectWholeText( TextField textField );
+
+/**
+ * @brief Unselect the whole text of TextField.
+ *
+ * @param[in] textField The instance of TextField.
+ */
+DALI_TOOLKIT_API void SelectNone( TextField textField );
+
+/**
+ * @brief Get the selected text of TextField.
+ *
+ * @param[in] textField The instance of TextField.
+ * @return Selected text in the TextField.
+ */
+DALI_TOOLKIT_API std::string SelectedText( TextField textField );
 
 } // namespace DevelText
 

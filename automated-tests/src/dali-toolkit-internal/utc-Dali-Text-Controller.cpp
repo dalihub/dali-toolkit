@@ -1124,7 +1124,7 @@ int UtcDaliTextControllerSelectEvent(void)
   controller->SetText( text );
 
   // Select the whole text.
-  controller->SelectEvent( 0.f, 0.f, false );
+  controller->SelectEvent( 0.f, 0.f, SelectionType::INTERACTIVE );
 
   // Perform a relayout
   const Size size( Dali::Stage::GetCurrent().GetSize() );
@@ -1139,7 +1139,7 @@ int UtcDaliTextControllerSelectEvent(void)
   DALI_TEST_EQUALS( "Hello", retrieved_text, TEST_LOCATION );
 
   // Select the whole text.
-  controller->SelectEvent( 0.f, 0.f, true );
+  controller->SelectEvent( 0.f, 0.f, SelectionType::ALL );
 
   // Perform a relayout
   controller->Relayout( size );

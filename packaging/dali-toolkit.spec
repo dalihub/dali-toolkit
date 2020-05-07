@@ -1,6 +1,6 @@
-Name:       dali-toolkit
+Name:       dali2-toolkit
 Summary:    Dali 3D engine Toolkit
-Version:    1.9.10
+Version:    1.9.11
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -12,13 +12,10 @@ Requires(postun): /sbin/ldconfig
 BuildRequires:  cmake
 BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(dlog)
-BuildRequires:  pkgconfig(dali-core)
-BuildRequires:  pkgconfig(dali-adaptor)
+BuildRequires:  pkgconfig(dali2-core)
+BuildRequires:  pkgconfig(dali2-adaptor)
 BuildRequires:  gettext
 BuildRequires:  pkgconfig(libtzplatform-config)
-Provides: libdali-toolkit-cxx11.so
-Provides: libdali-toolkit-cxx11.so.0
-Provides: libdali-toolkit-cxx11.so.0.0.0
 
 #############################
 # profile setup
@@ -98,7 +95,7 @@ Application development package for Dali 3D engine toolkit - headers and package
 
 # PO
 {
-cd %{_builddir}/dali-toolkit-%{version}/dali-toolkit/po
+cd %{_builddir}/dali2-toolkit-%{version}/dali-toolkit/po
 for language in *.po
 do
   language=${language%.po}
@@ -120,7 +117,7 @@ LDFLAGS+=" --coverage "
 %endif
 
 libtoolize --force
-cd %{_builddir}/dali-toolkit-%{version}/build/tizen
+cd %{_builddir}/dali2-toolkit-%{version}/build/tizen
 
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}" ; export DALI_DATA_RW_DIR
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ; export DALI_DATA_RO_DIR
@@ -151,7 +148,7 @@ pushd %{_builddir}/%{name}-%{version}/build/tizen
 
 # PO
 {
-cd %{_builddir}/dali-toolkit-%{version}/dali-toolkit/po
+cd %{_builddir}/dali2-toolkit-%{version}/dali-toolkit/po
 for language in *.mo
 do
   language=${language%.mo}
@@ -159,13 +156,6 @@ do
   cp ${language}.mo %{buildroot}/%{_datadir}/locale/${language}/LC_MESSAGES/dali-toolkit.mo
 done
 } &> /dev/null
-popd
-
-# Create links to ensure linking with cxx11 library is preserved
-pushd  %{buildroot}%{_libdir}
-ln -sf libdali-toolkit.so libdali-toolkit-cxx11.so
-ln -sf libdali-toolkit.so libdali-toolkit-cxx11.so.0
-ln -sf libdali-toolkit.so libdali-toolkit-cxx11.so.0.0.0
 popd
 
 # Remove default style and style images which are for Linux build
@@ -355,14 +345,13 @@ esac
 %manifest dali-toolkit.manifest
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/libdali-toolkit-cxx11.so*
-%{_libdir}/libdali-toolkit.so*
+%{_libdir}/libdali2-toolkit.so*
 %license LICENSE
 
 %files devel
 %defattr(-,root,root,-)
 %{dev_include_path}/dali-toolkit/*
-%{_libdir}/pkgconfig/dali-toolkit.pc
+%{_libdir}/pkgconfig/dali2-toolkit.pc
 
 %files resources_360x360
 %manifest dali-toolkit-resources.manifest

@@ -38,6 +38,11 @@ void SelectWholeText( TextField textField )
   GetImpl( textField ).SelectWholeText();
 }
 
+void SelectNone( TextField textField )
+{
+  GetImpl( textField ).SelectNone();
+}
+
 } // namespace DevelText
 
 } // namespace Toolkit

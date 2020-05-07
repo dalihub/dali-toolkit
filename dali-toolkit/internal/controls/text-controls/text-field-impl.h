@@ -107,6 +107,17 @@ public:
    */
   void SelectWholeText();
 
+    /**
+   * @brief Called to unselect the whole texts.
+   */
+  void SelectNone();
+
+    /**
+   * @brief Called to get selected text.
+   * @return Selected text in the TextField.
+   */
+  std::string SelectedText();
+
 private: // From Control
 
   /**

@@ -2872,3 +2872,52 @@ int UtcDaliTextFieldSelectWholeText(void)
 
   END_TEST;
 }
+
+int UtcDaliTextFieldSelectNone(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliTextFieldSelectWholeText ");
+
+  TextField textField = TextField::New();
+
+  Stage::GetCurrent().Add( textField );
+
+  textField.SetSize( 300.f, 50.f );
+  textField.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  textField.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  application.SendNotification();
+  application.Render();
+
+  textField.SetProperty( TextField::Property::TEXT, "Hello world" );
+
+  application.SendNotification();
+  application.Render();
+
+  // Nothing is selected
+  std::string selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "", selectedText, TEST_LOCATION );
+
+  DevelTextField::SelectWholeText( textField );
+
+  application.SendNotification();
+  application.Render();
+
+  // whole text is selected
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "Hello world", selectedText, TEST_LOCATION );
+
+  DevelTextField::SelectNone( textField );
+
+  application.SendNotification();
+  application.Render();
+
+  // Nothing is selected
+  selectedText = textField.GetProperty( DevelTextField::Property::SELECTED_TEXT ).Get<std::string>();
+  DALI_TEST_EQUALS( "", selectedText, TEST_LOCATION );
+
+  END_TEST;
+}

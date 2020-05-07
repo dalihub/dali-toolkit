@@ -3033,15 +3033,20 @@ void Controller::LongPressEvent( Gesture::State state, float x, float y  )
   }
 }
 
-void Controller::SelectEvent( float x, float y, bool selectAll )
+void Controller::SelectEvent( float x, float y, SelectionType selectType )
 {
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Controller::SelectEvent\n" );
 
   if( NULL != mImpl->mEventData )
   {
-    if( selectAll )
+    if( selectType == SelectionType::ALL )
     {
       Event event( Event::SELECT_ALL );
+      mImpl->mEventData->mEventQueue.push_back( event );
+    }
+    else if( selectType == SelectionType::NONE )
+    {
+      Event event( Event::SELECT_NONE );
       mImpl->mEventData->mEventQueue.push_back( event );
     }
     else
@@ -3326,14 +3331,14 @@ void Controller::TextPopupButtonTouched( Dali::Toolkit::TextSelectionPopup::Butt
       if( mImpl->mEventData->mSelectionEnabled )
       {
         // Creates a SELECT event.
-        SelectEvent( currentCursorPosition.x, currentCursorPosition.y, false );
+        SelectEvent( currentCursorPosition.x, currentCursorPosition.y, SelectionType::INTERACTIVE );
       }
       break;
     }
     case Toolkit::TextSelectionPopup::SELECT_ALL:
     {
       // Creates a SELECT_ALL event
-      SelectEvent( 0.f, 0.f, true );
+      SelectEvent( 0.f, 0.f, SelectionType::ALL );
       break;
     }
     case Toolkit::TextSelectionPopup::CLIPBOARD:
@@ -3753,6 +3758,16 @@ bool Controller::RemoveSelectedText()
   }
 
   return textRemoved;
+}
+
+std::string Controller::GetSelectedText()
+{
+  std::string text;
+  if( EventData::SELECTING == mImpl->mEventData->mState )
+  {
+    mImpl->RetrieveSelection( text, false );
+  }
+  return text;
 }
 
 // private : Relayout.
