@@ -112,12 +112,6 @@ public:
    */
   void SelectNone();
 
-    /**
-   * @brief Called to get selected text.
-   * @return Selected text in the TextField.
-   */
-  std::string SelectedText();
-
 private: // From Control
 
   /**
