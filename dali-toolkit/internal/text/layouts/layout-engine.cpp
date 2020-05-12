@@ -52,7 +52,8 @@ namespace
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const CharacterDirection LTR = false;
 const CharacterDirection RTL = !LTR;
-const float LINE_SPACING= 0.f;
+const float LINE_SPACING = 0.f;
+const float MIN_LINE_SIZE = 0.f;
 
 inline bool isEmptyLineAtLast( const Vector<LineRun>& lines, const Vector<LineRun>::Iterator& line )
 {
@@ -130,7 +131,8 @@ struct Engine::Impl
   Impl()
   : mLayout{ Layout::Engine::SINGLE_LINE_BOX },
     mCursorWidth{ 0.f },
-    mDefaultLineSpacing{ LINE_SPACING }
+    mDefaultLineSpacing{ LINE_SPACING },
+    mDefaultLineSize{ MIN_LINE_SIZE }
   {
   }
 
@@ -162,8 +164,12 @@ struct Engine::Impl
     // Sets the minimum descender.
     lineLayout.descender = std::min( lineLayout.descender, fontMetrics.descender );
 
-    // set the line spacing
-    lineLayout.lineSpacing = mDefaultLineSpacing;
+    // Sets the line size
+    lineLayout.lineSpacing = mDefaultLineSize - ( lineLayout.ascender + -lineLayout.descender );
+    lineLayout.lineSpacing = lineLayout.lineSpacing < 0.f ? 0.f : lineLayout.lineSpacing;
+
+    // Add the line spacing
+    lineLayout.lineSpacing += mDefaultLineSpacing;
   }
 
   /**
@@ -921,8 +927,6 @@ struct Engine::Impl
     lineRun.glyphRun.numberOfGlyphs = layout.numberOfGlyphs;
     lineRun.characterRun.characterIndex = layout.characterIndex;
     lineRun.characterRun.numberOfCharacters = layout.numberOfCharacters;
-    lineRun.lineSpacing = mDefaultLineSpacing;
-
     lineRun.width = layout.length;
     lineRun.extraLength = std::ceil( layout.whiteSpaceLengthEndOfLine );
 
@@ -934,6 +938,12 @@ struct Engine::Impl
     lineRun.descender = layout.descender;
     lineRun.direction = layout.direction;
     lineRun.ellipsis = false;
+
+    lineRun.lineSpacing = mDefaultLineSize - ( lineRun.ascender + -lineRun.descender );
+    lineRun.lineSpacing = lineRun.lineSpacing < 0.f ? 0.f : lineRun.lineSpacing;
+
+    lineRun.lineSpacing += mDefaultLineSpacing;
+
 
     // Update the actual size.
     if( lineRun.width > layoutSize.width )
@@ -986,7 +996,11 @@ struct Engine::Impl
     lineRun.alignmentOffset = 0.f;
     lineRun.direction = LTR;
     lineRun.ellipsis = false;
-    lineRun.lineSpacing = mDefaultLineSpacing;
+
+    lineRun.lineSpacing = mDefaultLineSize - ( lineRun.ascender + -lineRun.descender );
+    lineRun.lineSpacing = lineRun.lineSpacing < 0.f ? 0.f : lineRun.lineSpacing;
+
+    lineRun.lineSpacing += mDefaultLineSpacing;
 
     layoutSize.height += ( lineRun.ascender + -lineRun.descender ) + lineRun.lineSpacing;
   }
@@ -1551,6 +1565,7 @@ struct Engine::Impl
   Type mLayout;
   float mCursorWidth;
   float mDefaultLineSpacing;
+  float mDefaultLineSize;
 
   IntrusivePtr<Metrics> mMetrics;
 };
@@ -1630,6 +1645,16 @@ void Engine::SetDefaultLineSpacing( float lineSpacing )
 float Engine::GetDefaultLineSpacing() const
 {
   return mImpl->mDefaultLineSpacing;
+}
+
+void Engine::SetDefaultLineSize( float lineSize )
+{
+  mImpl->mDefaultLineSize = lineSize;
+}
+
+float Engine::GetDefaultLineSize() const
+{
+  return mImpl->mDefaultLineSize;
 }
 
 } // namespace Layout

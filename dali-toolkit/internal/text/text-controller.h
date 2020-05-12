@@ -1055,6 +1055,22 @@ public: // Default style & Input style
   float GetDefaultLineSpacing() const;
 
   /**
+   * @brief Sets the default line size.
+   *
+   * @param[in] lineSize The line size.
+   *
+   * @return True if lineSize has been updated, false otherwise
+   */
+  bool SetDefaultLineSize( float lineSize );
+
+  /**
+   * @brief Retrieves the default line size.
+   *
+   * @return The line size.
+   */
+  float GetDefaultLineSize() const;
+
+  /**
    * @brief Sets the input text's color.
    *
    * @param[in] color The input text's color.
