@@ -3689,6 +3689,51 @@ int UtcDaliVisualRoundedCorner(void)
     DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
   }
 
+  // gradient visual
+  {
+    VisualFactory factory = VisualFactory::Get();
+    Property::Map properties;
+    float cornerRadius = 30.0f;
+
+    properties[Visual::Property::TYPE] = Visual::GRADIENT;
+    properties[ColorVisual::Property::MIX_COLOR] = Color::BLUE;
+    properties[DevelVisual::Property::CORNER_RADIUS] = cornerRadius;
+    properties[GradientVisual::Property::START_POSITION] = Vector2( 0.5f, 0.5f );
+    properties[GradientVisual::Property::END_POSITION] = Vector2( -0.5f, -0.5f );
+    properties[GradientVisual::Property::UNITS] = GradientVisual::Units::USER_SPACE;
+
+    Property::Array stopOffsets;
+    stopOffsets.PushBack( 0.0f );
+    stopOffsets.PushBack( 0.6f );
+    stopOffsets.PushBack( 1.0f );
+    properties[GradientVisual::Property::STOP_OFFSET] = stopOffsets;
+
+    Property::Array stopColors;
+    stopColors.PushBack( Color::RED );
+    stopColors.PushBack( Color::YELLOW );
+    stopColors.PushBack( Color::GREEN );
+    properties[GradientVisual::Property::STOP_COLOR] = stopColors;
+
+    Visual::Base visual = factory.CreateVisual( properties );
+
+    // trigger creation through setting on stage
+    DummyControl dummy = DummyControl::New( true );
+    Impl::DummyControl& dummyImpl = static_cast< Impl::DummyControl& >( dummy.GetImplementation() );
+    dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
+
+    dummy.SetSize( 200.f, 200.f );
+    dummy.SetParentOrigin( ParentOrigin::CENTER );
+    Stage::GetCurrent().Add( dummy );
+
+    application.SendNotification();
+    application.Render();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue< float >( "cornerRadius", cornerRadius ), true, TEST_LOCATION );
+  }
+
   END_TEST;
 }
 

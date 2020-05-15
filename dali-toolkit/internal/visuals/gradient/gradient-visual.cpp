@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,28 +67,26 @@ const char * const UNIFORM_ALIGNMENT_MATRIX_NAME( "uAlignmentMatrix" );
 const unsigned int DEFAULT_OFFSET_MINIMUM = 0.0f;
 const unsigned int DEFAULT_OFFSET_MAXIMUM = 1.0f;
 
-VisualFactoryCache::ShaderType GetShaderType( GradientVisual::Type type, Toolkit::GradientVisual::Units::Type units )
+VisualFactoryCache::ShaderType SHADER_TYPE_TABLE[][4] =
 {
-  if( type == GradientVisual::LINEAR )
   {
-   if( units == Toolkit::GradientVisual::Units::USER_SPACE )
-   {
-     return VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE;
-   }
-   return VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX;
-  }
-  else if( units == Toolkit::GradientVisual::Units::USER_SPACE )
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE,
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX,
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_USER_SPACE_ROUNDED_CORNER,
+    VisualFactoryCache::GRADIENT_SHADER_LINEAR_BOUNDING_BOX_ROUNDED_CORNER
+  },
   {
-    return VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE;
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE,
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX,
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_USER_SPACE_ROUNDED_CORNER,
+    VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX_ROUNDED_CORNER
   }
-
-  return VisualFactoryCache::GRADIENT_SHADER_RADIAL_BOUNDING_BOX;
-}
+};
 
 const char* VERTEX_SHADER[] =
 {
 // vertex shader for gradient units as OBJECT_BOUNDING_BOX
- DALI_COMPOSE_SHADER(
+DALI_COMPOSE_SHADER(
   attribute mediump vec2 aPosition;\n
   uniform highp   mat4 uMvpMatrix;\n
   uniform mediump vec3 uSize;\n
@@ -150,6 +148,79 @@ DALI_COMPOSE_SHADER(
     \n
     vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
   }\n
+),
+
+// vertex shader for gradient units as OBJECT_BOUNDING_BOX with corner radius
+DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  uniform highp   mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  uniform mediump mat3 uAlignmentMatrix;\n
+  varying mediump vec2 vTexCoord;\n
+  varying mediump vec2 vPosition;\n
+  varying mediump vec2 vRectSize;\n
+  \n
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+  uniform mediump float cornerRadius;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    vRectSize = visualSize * 0.5 - cornerRadius;\n
+    vPosition = aPosition * visualSize;\n
+    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
+    vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
+    \n
+    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
+  }\n
+),
+
+// vertex shader for gradient units as USER_SPACE with corner radius
+DALI_COMPOSE_SHADER(
+  attribute mediump vec2 aPosition;\n
+  uniform highp   mat4 uMvpMatrix;\n
+  uniform mediump vec3 uSize;\n
+  uniform mediump mat3 uAlignmentMatrix;\n
+  varying mediump vec2 vTexCoord;\n
+  varying mediump vec2 vPosition;\n
+  varying mediump vec2 vRectSize;\n
+  \n
+  //Visual size and offset
+  uniform mediump vec2 offset;\n
+  uniform mediump vec2 size;\n
+  uniform mediump vec4 offsetSizeMode;\n
+  uniform mediump vec2 origin;\n
+  uniform mediump vec2 anchorPoint;\n
+  uniform mediump float cornerRadius;\n
+
+  vec4 ComputeVertexPosition()\n
+  {\n
+    vec2 visualSize = mix(uSize.xy*size, size, offsetSizeMode.zw );\n
+    vec2 visualOffset = mix( offset, offset/uSize.xy, offsetSizeMode.xy);\n
+    vRectSize = visualSize * 0.5 - cornerRadius;\n
+    vPosition = aPosition * visualSize;\n
+    return vec4( (aPosition + anchorPoint)*visualSize + (visualOffset + origin)*uSize.xy, 0.0, 1.0 );\n
+  }\n
+
+  void main()\n
+  {\n
+    mediump vec4 vertexPosition = vec4(aPosition, 0.0, 1.0);\n
+    vertexPosition.xyz *= uSize;\n
+    gl_Position = uMvpMatrix * ComputeVertexPosition();\n
+    \n
+    vTexCoord = (uAlignmentMatrix*vertexPosition.xyw).xy;\n
+  }\n
 )
 };
 
@@ -178,6 +249,42 @@ DALI_COMPOSE_SHADER(
   void main()\n
   {\n
     gl_FragColor = texture2D( sTexture, vec2( length(vTexCoord), 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
+  }\n
+),
+
+// fragment shader for linear gradient with corner radius
+DALI_COMPOSE_SHADER(
+  uniform sampler2D sTexture;\n // sampler1D?
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform mediump float cornerRadius;\n
+  varying mediump vec2 vTexCoord;\n
+  varying mediump vec2 vPosition;\n
+  varying mediump vec2 vRectSize;\n
+  \n
+  void main()\n
+  {\n
+    mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - cornerRadius;\n
+    gl_FragColor = texture2D( sTexture, vec2( vTexCoord.y, 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
+    gl_FragColor *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
+  }\n
+),
+
+// fragment shader for radial gradient with corner radius
+DALI_COMPOSE_SHADER(
+  uniform sampler2D sTexture;\n // sampler1D?
+  uniform lowp vec4 uColor;\n
+  uniform lowp vec3 mixColor;\n
+  uniform mediump float cornerRadius;\n
+  varying mediump vec2 vTexCoord;\n
+  varying mediump vec2 vPosition;\n
+  varying mediump vec2 vRectSize;\n
+  \n
+  void main()\n
+  {\n
+    mediump float dist = length( max( abs( vPosition ), vRectSize ) - vRectSize ) - cornerRadius;\n
+    gl_FragColor = texture2D( sTexture, vec2( length(vTexCoord), 0.5 ) ) * vec4(mixColor, 1.0) * uColor;\n
+    gl_FragColor *= 1.0 - smoothstep( -1.0, 1.0, dist );\n
   }\n
 )
 };
@@ -321,11 +428,12 @@ void GradientVisual::InitializeRenderer()
   Geometry geometry = mFactoryCache.GetGeometry( VisualFactoryCache::QUAD_GEOMETRY );
 
   Toolkit::GradientVisual::Units::Type gradientUnits = mGradient->GetGradientUnits();
-  VisualFactoryCache::ShaderType shaderType = GetShaderType( mGradientType, gradientUnits );
+  int roundedCorner = IsRoundedCornerRequired() ? 1 : 0;
+  VisualFactoryCache::ShaderType shaderType = SHADER_TYPE_TABLE[mGradientType][gradientUnits + roundedCorner * 2];
   Shader shader = mFactoryCache.GetShader( shaderType );
   if( !shader )
   {
-    shader = Shader::New( VERTEX_SHADER[gradientUnits], FRAGMENT_SHADER[ mGradientType ] );
+    shader = Shader::New( VERTEX_SHADER[gradientUnits + roundedCorner * 2], FRAGMENT_SHADER[ mGradientType + roundedCorner * 2 ] );
     mFactoryCache.SaveShader( shaderType, shader );
   }
 
