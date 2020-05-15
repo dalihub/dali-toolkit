@@ -1192,3 +1192,43 @@ int UtcDaliTextControllerRemoveTextChangeEventData(void)
 
   END_TEST;
 }
+
+int UtcDaliTextControllerCheckInputFontPointSizeUpdated(void)
+{
+  tet_infoline(" UtcDaliTextControllerCheckInputFontPointSizeUpdated");
+  ToolkitTestApplication application;
+
+  // Creates a text controller.
+  ControllerPtr controller = Controller::New();
+
+  ConfigureTextField(controller);
+
+  // Set the text
+  const std::string text("Hello World!");
+  controller->SetText( text );
+  controller->SetInputFontPointSize( 1.0f );
+  controller->KeyboardFocusGainEvent();
+
+  application.SendNotification();
+  application.Render();
+
+  // Perform a relayout
+  const Size size( Dali::Stage::GetCurrent().GetSize() );
+  controller->Relayout(size);
+
+  // simulate a key event.
+  controller->KeyEvent( GenerateKey( "a", "a", 38, 0, 0, Dali::KeyEvent::Down ) );
+
+  // change the input font point size
+  controller->SetInputFontPointSize( 20.f );
+
+  application.SendNotification();
+  application.Render();
+
+  // Perform a relayout
+  controller->Relayout(size);
+
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
