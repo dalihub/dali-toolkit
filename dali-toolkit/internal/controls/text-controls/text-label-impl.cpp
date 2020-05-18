@@ -140,7 +140,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "verticalLineAlignment
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textBackground",            MAP,     BACKGROUND                 )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "ignoreSpacesAfterText",     BOOLEAN, IGNORE_SPACES_AFTER_TEXT   )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "matchSystemLanguageDirection", BOOLEAN, MATCH_SYSTEM_LANGUAGE_DIRECTION )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textFit",                   MAP,     TEXT_FIT                 )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textFit",                   MAP,     TEXT_FIT                   )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "minLineSize",               FLOAT,   MIN_LINE_SIZE              )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -553,6 +554,19 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::MIN_LINE_SIZE:
+      {
+        if( impl.mController )
+        {
+          const float lineSize = value.Get<float>();
+
+          if( impl.mController->SetDefaultLineSize( lineSize ) )
+          {
+            impl.mTextUpdateNeeded = true;
+          }
+        }
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -832,6 +846,14 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         map.Insert( TEXT_FIT_FONT_SIZE_TYPE_KEY, "pointSize" );
 
         value = map;
+        break;
+      }
+      case Toolkit::DevelTextLabel::Property::MIN_LINE_SIZE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultLineSize();
+        }
         break;
       }
     }

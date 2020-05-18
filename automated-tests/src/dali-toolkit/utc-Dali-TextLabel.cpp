@@ -637,6 +637,11 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
   DALI_TEST_EQUALS( label.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
 
+  // Check the line size property
+  DALI_TEST_EQUALS( label.GetProperty<float>( DevelTextLabel::Property::MIN_LINE_SIZE ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  label.SetProperty( DevelTextLabel::Property::MIN_LINE_SIZE, 50.f );
+  DALI_TEST_EQUALS( label.GetProperty<float>( DevelTextLabel::Property::MIN_LINE_SIZE ), 50.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
 

@@ -152,6 +152,20 @@ public:
    */
   float GetDefaultLineSpacing() const;
 
+  /**
+   * @brief Sets the default line size.
+   *
+   * @param[in] lineSize The line size.
+   */
+  void SetDefaultLineSize( float lineSize );
+
+  /**
+   * @brief Retrieves the default line size.
+   *
+   * @return The line size.
+   */
+  float GetDefaultLineSize() const;
+
 private:
 
   // Undefined
