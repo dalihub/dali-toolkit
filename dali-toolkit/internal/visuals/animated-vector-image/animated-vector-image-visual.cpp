@@ -570,7 +570,7 @@ void AnimatedVectorImageVisual::OnSizeNotification( PropertyNotification& source
   Actor actor = mPlacementActor.GetHandle();
   if( actor )
   {
-    Vector3 size = actor.GetCurrentSize();
+    Vector3 size = actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
     mVisualSize.width = size.width;
     mVisualSize.height = size.height;
 

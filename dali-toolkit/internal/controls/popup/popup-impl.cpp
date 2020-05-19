@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
 #include <dali/devel-api/adaptor-framework/physical-keyboard.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/adaptor-framework/key.h>
@@ -98,8 +99,8 @@ BaseHandle CreateToast()
   popup.SetProperty( Toolkit::Popup::Property::AUTO_HIDE_DELAY, DEFAULT_TOAST_AUTO_HIDE_DELAY );
 
   // Align to the bottom of the screen.
-  popup.SetParentOrigin( DEFAULT_TOAST_BOTTOM_PARENT_ORIGIN );
-  popup.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+  popup.SetProperty( Actor::Property::PARENT_ORIGIN, DEFAULT_TOAST_BOTTOM_PARENT_ORIGIN );
+  popup.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER );
 
   // Let events pass through the toast popup.
   popup.SetProperty( Toolkit::Popup::Property::TOUCH_TRANSPARENT, true );
@@ -275,11 +276,11 @@ Popup::Popup()
 void Popup::OnInitialize()
 {
   Actor self = Self();
-  self.SetName( "popup" );
+  self.SetProperty( Dali::Actor::Property::NAME, "popup" );
 
   // Apply some default resizing rules.
-  self.SetParentOrigin( ParentOrigin::CENTER );
-  self.SetAnchorPoint( AnchorPoint::CENTER );
+  self.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  self.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   self.SetSizeModeFactor( DEFAULT_POPUP_PARENT_RELATIVE_SIZE );
   self.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::WIDTH );
@@ -287,15 +288,15 @@ void Popup::OnInitialize()
 
   // Create a new layer so all Popup components can appear above all other actors.
   mLayer = Layer::New();
-  mLayer.SetName( "popupLayer" );
+  mLayer.SetProperty( Dali::Actor::Property::NAME, "popupLayer" );
 
-  mLayer.SetParentOrigin( ParentOrigin::CENTER );
-  mLayer.SetAnchorPoint( AnchorPoint::CENTER );
+  mLayer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  mLayer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   mLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   // Important to set as invisible as otherwise, if the popup is parented,
   // but not shown yet it will appear statically on the screen.
-  mLayer.SetVisible( false );
+  mLayer.SetProperty( Actor::Property::VISIBLE, false );
 
   // Add the layer to the hierarchy.
   self.Add( mLayer );
@@ -305,9 +306,9 @@ void Popup::OnInitialize()
   mLayer.Add( mBacking );
 
   mPopupContainer = Actor::New();
-  mPopupContainer.SetName( "popupContainer" );
-  mPopupContainer.SetParentOrigin( ParentOrigin::CENTER );
-  mPopupContainer.SetAnchorPoint( AnchorPoint::CENTER );
+  mPopupContainer.SetProperty( Dali::Actor::Property::NAME, "popupContainer" );
+  mPopupContainer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  mPopupContainer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   mPopupContainer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
   mLayer.Add( mPopupContainer );
 
@@ -318,9 +319,9 @@ void Popup::OnInitialize()
   const std::string imageDirPath = AssetManager::GetDaliImagePath();
   SetPopupBackgroundImage( Toolkit::ImageView::New( imageDirPath + DEFAULT_BACKGROUND_IMAGE_FILE_NAME ) );
 
-  mPopupLayout.SetName( "popupLayoutTable" );
-  mPopupLayout.SetParentOrigin( ParentOrigin::CENTER );
-  mPopupLayout.SetAnchorPoint( AnchorPoint::CENTER );
+  mPopupLayout.SetProperty( Dali::Actor::Property::NAME, "popupLayoutTable" );
+  mPopupLayout.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  mPopupLayout.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   mPopupLayout.SetResizePolicy( ResizePolicy::USE_ASSIGNED_SIZE, Dimension::WIDTH );
   mPopupLayout.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
@@ -360,7 +361,7 @@ void Popup::LayoutAnimation()
     case Toolkit::Popup::FADE:
     {
       // Fade animations start transparent.
-      mPopupContainer.SetOpacity( 0.0f );
+      mPopupContainer.SetProperty( DevelActor::Property::OPACITY, 0.0f );
       break;
     }
 
@@ -455,7 +456,7 @@ void Popup::StartTransitionAnimation( bool transitionIn, bool instantaneous /* f
       }
       else
       {
-        mPopupContainer.SetOpacity( transitionIn ? 1.0f : 0.0f );
+        mPopupContainer.SetProperty( DevelActor::Property::OPACITY, transitionIn ? 1.0f : 0.0f );
       }
       break;
     }
@@ -537,8 +538,8 @@ void Popup::DisplayStateChangeComplete()
   {
     mDisplayState = Toolkit::Popup::HIDDEN;
 
-    mLayer.SetVisible( false );
-    mPopupLayout.SetSensitive( false );
+    mLayer.SetProperty( Actor::Property::VISIBLE, false );
+    mPopupLayout.SetProperty( Actor::Property::SENSITIVE, false );
 
     // Guard against destruction during signal emission.
     Toolkit::Popup handle( GetOwner() );
@@ -588,9 +589,9 @@ void Popup::SetPopupBackgroundImage( Actor image )
 
   // Adds new background to the dialog.
   mPopupBackgroundImage = image;
-  mPopupBackgroundImage.SetName( "popupBackgroundImage" );
-  mPopupBackgroundImage.SetAnchorPoint( AnchorPoint::CENTER );
-  mPopupBackgroundImage.SetParentOrigin( ParentOrigin::CENTER );
+  mPopupBackgroundImage.SetProperty( Dali::Actor::Property::NAME, "popupBackgroundImage" );
+  mPopupBackgroundImage.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  mPopupBackgroundImage.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   // OnDialogTouched only consumes the event. It prevents the touch event to be caught by the backing.
   mPopupBackgroundImage.TouchSignal().Connect( this, &Popup::OnDialogTouched );
@@ -661,7 +662,7 @@ void Popup::SetContent( Actor content )
 
   if( mContent )
   {
-    mContent.SetName( "popupContent" );
+    mContent.SetProperty( Dali::Actor::Property::NAME, "popupContent" );
 
     mPopupLayout.AddChild( mContent, Toolkit::TableView::CellPosition( 1, 0 ) );
   }
@@ -728,7 +729,7 @@ void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
 
     // We are displaying so bring the popup layer to the front, and set it visible so it is rendered.
     mLayer.RaiseToTop();
-    mLayer.SetVisible( true );
+    mLayer.SetProperty( Actor::Property::VISIBLE, true );
 
     // Set up the layout if this is the first display or the layout has become dirty.
     if( mLayoutDirty )
@@ -738,7 +739,7 @@ void Popup::SetDisplayState( Toolkit::Popup::DisplayState displayState )
     }
 
     // Allow the popup to catch events.
-    mPopupLayout.SetSensitive( true );
+    mPopupLayout.SetProperty( Actor::Property::SENSITIVE, true );
 
     // Handle the keyboard focus when popup is shown.
     Dali::Toolkit::KeyboardFocusManager keyboardFocusManager = Dali::Toolkit::KeyboardFocusManager::Get();
@@ -814,8 +815,8 @@ void Popup::LayoutPopup()
    *       |                       |````
    *       |                       |
    */
-  mPopupContainer.SetParentOrigin( Self().GetCurrentParentOrigin() );
-  mPopupContainer.SetAnchorPoint( Self().GetCurrentAnchorPoint() );
+  mPopupContainer.SetProperty( Actor::Property::PARENT_ORIGIN, Self().GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ) );
+  mPopupContainer.SetProperty( Actor::Property::ANCHOR_POINT, Self().GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ) );
 
   // If there is only a title, use less padding.
   if( mTitle )
@@ -834,7 +835,7 @@ void Popup::LayoutPopup()
   OnLayoutSetup();
 
   // Update background visibility.
-  mPopupContainer.SetVisible( !( !mFooter && mPopupLayout.GetChildCount() == 0 ) );
+  mPopupContainer.SetProperty( Actor::Property::VISIBLE, !( !mFooter && mPopupLayout.GetChildCount() == 0 ) );
 
   // Create / destroy / position the tail as needed.
   LayoutTail();
@@ -894,9 +895,9 @@ void Popup::LayoutTail()
   {
     // Adds the tail actor.
     mTailImage = Toolkit::ImageView::New( image );
-    mTailImage.SetName( "tailImage" );
-    mTailImage.SetParentOrigin( parentOrigin );
-    mTailImage.SetAnchorPoint( anchorPoint );
+    mTailImage.SetProperty( Dali::Actor::Property::NAME, "tailImage" );
+    mTailImage.SetProperty( Actor::Property::PARENT_ORIGIN, parentOrigin );
+    mTailImage.SetProperty( Actor::Property::ANCHOR_POINT, anchorPoint );
     mTailImage.SetPosition( position );
 
     if( mPopupBackgroundImage )
@@ -923,17 +924,17 @@ Toolkit::Control Popup::CreateBacking()
   backing.SetProperty( Toolkit::Control::Property::BACKGROUND,
                        Property::Map().Add( Toolkit::Visual::Property::TYPE, Toolkit::Visual::COLOR )
                                       .Add( Toolkit::ColorVisual::Property::MIX_COLOR, Vector4( mBackingColor.r, mBackingColor.g, mBackingColor.b, 1.0f ) ) );
-  backing.SetName( "popupBacking" );
+  backing.SetProperty( Dali::Actor::Property::NAME, "popupBacking" );
 
   // Must always be positioned top-left of stage, regardless of parent.
-  backing.SetInheritPosition(false);
+  backing.SetProperty( Actor::Property::INHERIT_POSITION, false );
 
   // Always the full size of the stage.
   backing.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   backing.SetSize( Stage::GetCurrent().GetSize() );
 
   // Catch events.
-  backing.SetSensitive( true );
+  backing.SetProperty( Actor::Property::SENSITIVE, true );
 
   // Default to being transparent.
   backing.SetProperty( Actor::Property::COLOR_ALPHA, 0.0f );
@@ -1615,14 +1616,14 @@ void Popup::LayoutContext( const Vector2& size )
     return;
   }
 
-  mPopupContainer.SetParentOrigin( ParentOrigin::CENTER );
+  mPopupContainer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   // We always anchor to the CENTER, rather than a different anchor point for each contextual
   // mode to allow code-reuse of the bound checking code (for maintainability).
-  mPopupContainer.SetAnchorPoint( AnchorPoint::CENTER );
+  mPopupContainer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   // Setup with some pre-calculations for speed.
   Vector3 halfStageSize( Stage().GetCurrent().GetSize() / 2.0f );
-  Vector3 parentPosition( parent.GetCurrentPosition() );
+  Vector3 parentPosition( parent.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) );
   Vector2 halfSize( size / 2.0f );
   Vector2 halfParentSize( parent.GetRelayoutSize( Dimension::WIDTH ) / 2.0f, parent.GetRelayoutSize( Dimension::HEIGHT ) / 2.0f );
   Vector3 newPosition( Vector3::ZERO );
@@ -1871,7 +1872,7 @@ Actor Popup::GetNextKeyboardFocusableActor( Actor currentFocusedActor, Toolkit::
   std::string currentStr;
   if( currentFocusedActor )
   {
-    currentStr = currentFocusedActor.GetName();
+    currentStr = currentFocusedActor.GetProperty< std::string >( Dali::Actor::Property::NAME );
   }
 
   Actor nextFocusableActor( currentFocusedActor );

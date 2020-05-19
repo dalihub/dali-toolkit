@@ -640,7 +640,7 @@ int UtcDaliImageVisualCustomWrapModePixelArea(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetSize(2000, 2000);
-  actor.SetParentOrigin(ParentOrigin::CENTER);
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Stage::GetCurrent().Add( actor );
 
   // loading started
@@ -718,7 +718,7 @@ int UtcDaliImageVisualCustomWrapModeNoAtlas(void)
   DummyControlImpl& dummyImpl = static_cast<DummyControlImpl&>(actor.GetImplementation());
   dummyImpl.RegisterVisual( Control::CONTROL_PROPERTY_END_INDEX + 1, visual );
   actor.SetSize(2000, 2000);
-  actor.SetParentOrigin(ParentOrigin::CENTER);
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Stage::GetCurrent().Add( actor );
 
   // loading started
@@ -776,8 +776,8 @@ int UtcDaliImageVisualAnimateMixColor(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   actor.SetSize(2000, 2000);
-  actor.SetParentOrigin(ParentOrigin::CENTER);
-  actor.SetColor(Color::BLACK);
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+  actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
   Stage::GetCurrent().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
@@ -824,7 +824,7 @@ int UtcDaliImageVisualAnimateMixColor(void)
 
   application.Render(2000u); // Halfway point between blue and white
 
-  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::WHITE, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), Color::WHITE, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector4>( "uColor", Vector4( 1.0f, 1.0f, 1.0f, 0.5f ) ), true, TEST_LOCATION );
   DALI_TEST_EQUALS( application.GetGlAbstraction().CheckUniformValue<Vector3>( "mixColor", Vector3( TARGET_MIX_COLOR ) ), true, TEST_LOCATION );
 
@@ -856,8 +856,8 @@ int UtcDaliImageVisualAnimateOpacity(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   actor.SetSize(2000, 2000);
-  actor.SetParentOrigin(ParentOrigin::CENTER);
-  actor.SetColor(Color::BLACK);
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+  actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
   Stage::GetCurrent().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
@@ -968,8 +968,8 @@ int UtcDaliImageVisualAnimateOpacity02(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   actor.SetSize(2000, 2000);
-  actor.SetParentOrigin(ParentOrigin::CENTER);
-  actor.SetColor(Color::BLACK);
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+  actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
 
   tet_infoline( "Test that the opacity doesn't animate when actor not staged" );
 
@@ -1055,8 +1055,8 @@ int UtcDaliImageVisualAnimatePixelArea(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   actor.SetSize(2000, 2000);
-  actor.SetParentOrigin(ParentOrigin::CENTER);
-  actor.SetColor(Color::BLACK);
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+  actor.SetProperty( Actor::Property::COLOR,Color::BLACK);
   Stage::GetCurrent().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetRendererCount(), 1u, TEST_LOCATION);
@@ -2240,7 +2240,7 @@ int UtcDaliImageVisualCustomShader(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   dummy.SetSize( 200.f, 200.f );
-  dummy.SetParentOrigin( ParentOrigin::CENTER );
+  dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( dummy );
 
   application.SendNotification();
@@ -2272,7 +2272,7 @@ int UtcDaliImageVisualCustomShader(void)
   Impl::DummyControl& dummyImpl1 = static_cast< Impl::DummyControl& >( dummy1.GetImplementation() );
   dummyImpl1.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual1 );
   dummy1.SetSize( 200, 200 );
-  dummy1.SetParentOrigin( ParentOrigin::CENTER );
+  dummy1.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( dummy1 );
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();

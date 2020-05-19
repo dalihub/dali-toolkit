@@ -66,7 +66,7 @@ void PrintArray( Array2d<Dali::Toolkit::Internal::TableView::CellData>& array )
       if( data.actor )
       {
         actor = 'A';
-        actorName = data.actor.GetName();
+        actorName = data.actor.GetProperty< std::string >( Dali::Actor::Property::NAME );
       }
       TV_LOG("Array[%d,%d]=%c %s %d,%d,%d,%d  ", i, j, actor, actorName.c_str(),
           data.position.rowIndex, data.position.columnIndex,
@@ -831,9 +831,9 @@ void TableView::OnRelayout( const Vector2& size, RelayoutContainer& container )
         // Anchor actor to top left of the cell
         if( actor.GetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >() )
         {
-          actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+          actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
         }
-        actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+        actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
 
         Padding padding;
         actor.GetPadding( padding );

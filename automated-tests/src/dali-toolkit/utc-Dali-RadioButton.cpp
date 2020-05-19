@@ -186,8 +186,8 @@ int UtcDaliRadioButtonSelectedProperty(void)
   // Create the RadioButton actor
   RadioButton radioButton = RadioButton::New();
   Stage::GetCurrent().Add( radioButton );
-  radioButton.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  radioButton.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  radioButton.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  radioButton.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   radioButton.SetPosition( 0.0f, 0.0f );
 
   // Default selected
@@ -207,19 +207,19 @@ int UtcDaliRadioButtonSelectedProperty(void)
 
   // Test selecting radio buttons
   RadioButton radioButton2 = RadioButton::New( "label" );
-  radioButton2.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  radioButton2.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  radioButton2.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  radioButton2.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   radioButton2.SetPosition( 0.0f, 0.0f );
 
   RadioButton radioButton3 = RadioButton::New( "label" );
-  radioButton3.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  radioButton3.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  radioButton3.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  radioButton3.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   radioButton3.SetPosition( 0.0f, 40.0f );
 
   Actor radioGroup = Actor::New();
   Stage::GetCurrent().Add( radioGroup );
-  radioGroup.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  radioGroup.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  radioGroup.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  radioGroup.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   radioGroup.SetPosition( 0.0f, 0.0f );
   radioGroup.SetSize( 400.0f, 400.0 );
 

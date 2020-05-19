@@ -199,8 +199,8 @@ int UtcDaliBubbleEmitterSetBubbleScale(void)
   Actor root = emitter.GetRootActor();
   Stage::GetCurrent().Add( root );
   root.SetPosition( Vector3::ZERO );
-  root.SetParentOrigin( ParentOrigin::CENTER );
-  root.SetAnchorPoint( AnchorPoint::CENTER );
+  root.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  root.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -322,8 +322,8 @@ int UtcDaliBubbleEmitterRestore(void)
   Actor root = emitter.GetRootActor();
   Stage::GetCurrent().Add( root );
   root.SetPosition( Vector3::ZERO );
-  root.SetParentOrigin( ParentOrigin::CENTER );
-  root.SetAnchorPoint( AnchorPoint::CENTER );
+  root.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  root.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   Renderer renderer = root.GetRendererAt( 0 );
   DALI_TEST_CHECK( renderer );

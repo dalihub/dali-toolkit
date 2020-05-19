@@ -1555,7 +1555,7 @@ void TextField::RenderText( Text::Controller::UpdateTextType updateTextType )
       self.Add( *it );
       it->LowerToBottom();
 
-      if ( it->GetName() == "HighlightActor" )
+      if ( it->GetProperty< std::string >( Dali::Actor::Property::NAME ) == "HighlightActor" )
       {
         highlightActor = *it;
       }
@@ -1770,8 +1770,8 @@ void TextField::AddDecoration( Actor& actor, bool needsClipping )
     }
     else
     {
-      actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-      actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+      actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       Self().Add( actor );
       mActiveLayer = actor;
     }
@@ -1817,8 +1817,8 @@ void TextField::EnableClipping()
   {
     // Creates an extra control to be used as stencil buffer.
     mStencil = Control::New();
-    mStencil.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-    mStencil.SetParentOrigin( ParentOrigin::TOP_LEFT );
+    mStencil.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+    mStencil.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
 
     // Creates a background visual. Even if the color is transparent it updates the stencil.
     mStencil.SetProperty( Toolkit::Control::Property::BACKGROUND,

@@ -13,9 +13,9 @@ An example actor hierachy is shown below, in which one of the actors is being an
 
 <h2 class="pg">Reading an animated value</h2>
 
-When a property is animatable, it can only be modified in the rendering thread.  The value returned from a getter method, is the value used when the previous frame was rendered.
+When a property is animatable, it can only be modified in the rendering thread.  The value returned from the property, is the value used when the previous frame was rendered.
 
-For example \ref Dali::Actor::GetCurrentPosition "Dali::Actor::GetCurrentPosition" returns the position at which the Actor was last rendered.  Since \ref Dali::Actor::SetPosition "Dali::Actor::SetPosition" is asynchronous, a call to \ref Dali::Actor::GetCurrentPosition "Dali::Actor::GetCurrentPosition" won't immediately return the same value.
+For example \ref Dali::Actor::Property::POSITION "Dali::Actor::Property::POSITION" returns the position at which the Actor was last rendered.  Since \ref Dali::Actor::SetPosition "Dali::Actor::SetPosition" is asynchronous, a call to \ref Dali::Actor::Property::POSITION "Dali::Actor::Property::POSITION" won't immediately return the same value.
 
 @code
 // Whilst handling an event...
@@ -26,14 +26,14 @@ Stage::GetCurrent().Add(actor); // initial position is 0,0,0
 actor.SetPosition(Vector3(10,10,10));
 
 Vector3 current;
-current = actor.GetCurrentPosition();
+current = actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 std::cout << "Current position: " << current.x << ", " << current.y << ", " << current.z << std::endl;
 
 std::cout << "..." << std::endl;
 
 // Whilst handling another event...
 
-current = actor.GetCurrentPosition();
+current = actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 std::cout << "Current position: " << current.x << ", " << current.y << ", " << current.z << std::endl;
 
 @endcode

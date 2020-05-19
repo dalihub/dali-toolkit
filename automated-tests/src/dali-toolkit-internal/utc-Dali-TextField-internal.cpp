@@ -37,8 +37,8 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   // Create a text field
   TextField textField = TextField::New();
   textField.SetSize( 400.f, 60.f );
-  textField.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  textField.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Add the text field to the stage
   Stage::GetCurrent().Add( textField );
@@ -86,7 +86,7 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   // Check that the background is created
   Actor backgroundActor = renderableActor.GetChildAt( 0u );
   DALI_TEST_CHECK( backgroundActor );
-  DALI_TEST_CHECK( backgroundActor.GetName() == "TextBackgroundColorActor" );
+  DALI_TEST_CHECK( backgroundActor.GetProperty< std::string >( Dali::Actor::Property::NAME ) == "TextBackgroundColorActor" );
 
   // Change the text to contain more characters
   controller->SetText( "Text Multiple Background Test" );
@@ -108,7 +108,7 @@ int UtcDaliTextFieldMultipleBackgroundText(void)
   // The background should now be lowered below the highlight
   backgroundActor = stencil.GetChildAt( 0u );
   DALI_TEST_CHECK( backgroundActor );
-  DALI_TEST_CHECK( backgroundActor.GetName() == "TextBackgroundColorActor" );
+  DALI_TEST_CHECK( backgroundActor.GetProperty< std::string >( Dali::Actor::Property::NAME ) == "TextBackgroundColorActor" );
 
   END_TEST;
 }

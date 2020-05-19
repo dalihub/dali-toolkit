@@ -543,7 +543,7 @@ void ItemView::DoRefresh(float currentLayoutPosition, bool cacheExtra)
   {
     ItemRange range = GetItemRange(*mActiveLayout, mActiveLayoutTargetSize, currentLayoutPosition, cacheExtra/*reserve extra*/);
     RemoveActorsOutsideRange( range );
-    AddActorsWithinRange( range, Self().GetCurrentSize() );
+    AddActorsWithinRange( range, Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) );
 
     mScrollUpdatedSignal.Emit( Vector2(0.0f, currentLayoutPosition) );
   }
@@ -660,7 +660,7 @@ unsigned int ItemView::GetItemId( Actor actor ) const
 void ItemView::InsertItem( Item newItem, float durationSeconds )
 {
   mAddingItems = true;
-  Vector3 layoutSize = Self().GetCurrentSize();
+  Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
 
   Actor displacedActor;
   ItemIter afterDisplacedIter = mItemPool.end();
@@ -724,7 +724,7 @@ void ItemView::InsertItem( Item newItem, float durationSeconds )
 void ItemView::InsertItems( const ItemContainer& newItems, float durationSeconds )
 {
   mAddingItems = true;
-  Vector3 layoutSize = Self().GetCurrentSize();
+  Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
 
   // Insert from lowest id to highest
   ItemContainer sortedItems(newItems);
@@ -867,7 +867,7 @@ bool ItemView::RemoveActor(unsigned int itemId)
 void ItemView::ReplaceItem( Item replacementItem, float durationSeconds )
 {
   mAddingItems = true;
-  Vector3 layoutSize = Self().GetCurrentSize();
+  Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
 
   SetupActor( replacementItem, layoutSize );
   Self().Add( replacementItem.second );
@@ -938,7 +938,7 @@ void ItemView::AddActorsWithinRange( ItemRange range, const Vector3& layoutSize 
 
   // Total number of items may change dynamically.
   // Always recalculate the domain size to reflect that.
-  CalculateDomainSize(Self().GetCurrentSize());
+  CalculateDomainSize(Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 }
 
 void ItemView::AddNewActor( unsigned int itemId, const Vector3& layoutSize )
@@ -965,8 +965,8 @@ void ItemView::AddNewActor( unsigned int itemId, const Vector3& layoutSize )
 
 void ItemView::SetupActor( Item item, const Vector3& layoutSize )
 {
-  item.second.SetParentOrigin( mItemsParentOrigin );
-  item.second.SetAnchorPoint( mItemsAnchorPoint );
+  item.second.SetProperty( Actor::Property::PARENT_ORIGIN, mItemsParentOrigin );
+  item.second.SetProperty( Actor::Property::ANCHOR_POINT, mItemsAnchorPoint );
 
   if( mActiveLayout )
   {
@@ -1028,7 +1028,7 @@ bool ItemView::OnWheelEvent(const WheelEvent& event)
   if (mActiveLayout)
   {
     Actor self = Self();
-    const Vector3 layoutSize = Self().GetCurrentSize();
+    const Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
     float layoutPositionDelta = GetCurrentLayoutPosition(0) - (event.z * mWheelScrollDistanceStep * mActiveLayout->GetScrollSpeedFactor());
     float firstItemScrollPosition = ClampFirstItemPosition(layoutPositionDelta, layoutSize, *mActiveLayout);
 
@@ -1075,7 +1075,7 @@ bool ItemView::OnWheelEventFinished()
 
 void ItemView::ReapplyAllConstraints()
 {
-  Vector3 layoutSize = Self().GetCurrentSize();
+  Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
 
   for (ConstItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
   {
@@ -1089,12 +1089,12 @@ void ItemView::ReapplyAllConstraints()
 
 void ItemView::OnItemsRemoved()
 {
-  CalculateDomainSize(Self().GetCurrentSize());
+  CalculateDomainSize(Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   // Adjust scroll-position after an item is removed
   if( mActiveLayout )
   {
-    float firstItemScrollPosition = ClampFirstItemPosition(GetCurrentLayoutPosition(0), Self().GetCurrentSize(), *mActiveLayout);
+    float firstItemScrollPosition = ClampFirstItemPosition(GetCurrentLayoutPosition(0), Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ), *mActiveLayout);
     Self().SetProperty( Toolkit::ItemView::Property::LAYOUT_POSITION, firstItemScrollPosition );
   }
 }
@@ -1148,7 +1148,7 @@ bool ItemView::OnTouch( Actor actor, const TouchData& touch )
 void ItemView::OnPan( const PanGesture& gesture )
 {
   Actor self = Self();
-  const Vector3 layoutSize = Self().GetCurrentSize();
+  const Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
 
   RemoveAnimation(mScrollAnimation);
 
@@ -1323,7 +1323,7 @@ Actor ItemView::GetNextKeyboardFocusableActor(Actor actor, Toolkit::Control::Key
       }
     }
     float layoutPosition = mActiveLayout->GetClosestAnchorPosition( GetCurrentLayoutPosition(0) );
-    Vector3 layoutSize = Self().GetCurrentSize();
+    Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
     if(!nextFocusActor)
     {
       // likely the current item is not buffered, so not in our item pool, probably best to get first viewable item
@@ -1342,7 +1342,7 @@ void ItemView::OnKeyboardFocusChangeCommitted(Actor commitedFocusableActor)
   {
     int nextItemID = GetItemId(commitedFocusableActor);
     float layoutPosition = GetCurrentLayoutPosition(0);
-    Vector3 layoutSize = Self().GetCurrentSize();
+    Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
 
     float scrollTo = mActiveLayout->GetClosestOnScreenLayoutPosition(nextItemID, layoutPosition, layoutSize);
     ScrollTo(Vector2(0.0f, scrollTo), DEFAULT_KEYBOARD_FOCUS_SCROLL_DURATION);
@@ -1417,7 +1417,7 @@ void ItemView::OnOvershootOnFinished(Animation& animation)
 void ItemView::ScrollToItem(unsigned int itemId, float durationSeconds)
 {
   Actor self = Self();
-  const Vector3 layoutSize = Self().GetCurrentSize();
+  const Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
   float firstItemScrollPosition = ClampFirstItemPosition(mActiveLayout->GetItemScrollToPosition(itemId), layoutSize, *mActiveLayout);
 
   if(durationSeconds > 0.0f)
@@ -1503,7 +1503,7 @@ float ItemView::GetScrollPosition(float layoutPosition, const Vector3& layoutSiz
 
 Vector2 ItemView::GetCurrentScrollPosition() const
 {
-  return Vector2(0.0f, GetScrollPosition(GetCurrentLayoutPosition(0), Self().GetCurrentSize()));
+  return Vector2(0.0f, GetScrollPosition(GetCurrentLayoutPosition(0), Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE )));
 }
 
 void ItemView::AddOverlay(Actor actor)
@@ -1520,7 +1520,7 @@ void ItemView::RemoveOverlay(Actor actor)
 void ItemView::ScrollTo(const Vector2& position, float duration)
 {
   Actor self = Self();
-  const Vector3 layoutSize = Self().GetCurrentSize();
+  const Vector3 layoutSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
 
   float firstItemScrollPosition = ClampFirstItemPosition(position.y, layoutSize, *mActiveLayout);
 
@@ -1559,7 +1559,7 @@ void ItemView::SetOvershootEffectColor( const Vector4& color )
   mOvershootEffectColor = color;
   if( mOvershootOverlay )
   {
-    mOvershootOverlay.SetColor( color );
+    mOvershootOverlay.SetProperty( Actor::Property::COLOR, color );
   }
 }
 
@@ -1572,9 +1572,9 @@ void ItemView::EnableScrollOvershoot( bool enable )
     {
       Property::Index effectOvershootPropertyIndex = Property::INVALID_INDEX;
       mOvershootOverlay = CreateBouncingEffectActor( effectOvershootPropertyIndex );
-      mOvershootOverlay.SetColor(mOvershootEffectColor);
-      mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
-      mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+      mOvershootOverlay.SetProperty( Actor::Property::COLOR,mOvershootEffectColor);
+      mOvershootOverlay.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT );
+      mOvershootOverlay.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
       mOvershootOverlay.SetDrawMode( DrawMode::OVERLAY_2D );
       self.Add(mOvershootOverlay);
 
@@ -1623,7 +1623,7 @@ float ItemView::CalculateScrollOvershoot()
     Actor self = Self();
     float scrollDistance = CalculateScrollDistance(mTotalPanDisplacement, *mActiveLayout) * mActiveLayout->GetScrollSpeedFactor();
     float positionDelta = GetCurrentLayoutPosition(0) + scrollDistance;
-    float minLayoutPosition = mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), Self().GetCurrentSize());
+    float minLayoutPosition = mActiveLayout->GetMinimumLayoutPosition(mItemFactory.GetNumberOfItems(), Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
     self.SetProperty(Toolkit::Scrollable::Property::SCROLL_POSITION_MAX, Vector2(0.0f, -minLayoutPosition));
     float clamppedPosition = std::min(0.0f, std::max(minLayoutPosition, positionDelta));
     overshoot = positionDelta - clamppedPosition;
@@ -1654,7 +1654,7 @@ void ItemView::AnimateScrollOvershoot(float overshootAmount, bool animateBack)
 
     if (mOvershootOverlay)
     {
-      duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot)) / mOvershootAnimationSpeed;
+      duration = mOvershootOverlay.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).height * (animatingOn ? (1.0f - fabsf(currentOvershoot)) : fabsf(currentOvershoot)) / mOvershootAnimationSpeed;
     }
 
     // Mark the animation as in progress to prevent manual property sets overwriting it.
@@ -1679,7 +1679,7 @@ void ItemView::SetItemsParentOrigin( const Vector3& parentOrigin )
     mItemsParentOrigin = parentOrigin;
     for (ItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
     {
-      iter->second.SetParentOrigin(parentOrigin);
+      iter->second.SetProperty( Actor::Property::PARENT_ORIGIN,parentOrigin );
     }
   }
 }
@@ -1696,7 +1696,7 @@ void ItemView::SetItemsAnchorPoint( const Vector3& anchorPoint )
     mItemsAnchorPoint = anchorPoint;
     for (ItemIter iter = mItemPool.begin(); iter != mItemPool.end(); ++iter)
     {
-      iter->second.SetAnchorPoint(anchorPoint);
+      iter->second.SetProperty( Actor::Property::ANCHOR_POINT,anchorPoint);
     }
   }
 }

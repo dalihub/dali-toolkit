@@ -1119,8 +1119,8 @@ int UtcDaliToolkitTextlabelEllipsis(void)
   Stage::GetCurrent().Add( label );
 
   // Turn on all the effects
-  label.SetAnchorPoint( AnchorPoint::CENTER );
-  label.SetParentOrigin( ParentOrigin::CENTER );
+  label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  label.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   label.SetSize( 360.0f, 10.f );
 
   try
@@ -1481,7 +1481,7 @@ int UtcDaliToolkitTextLabelBitmapFont(void)
   application.Render();
 
   // The text has been rendered if the height of the text-label is the height of the line.
-  DALI_TEST_EQUALS( label.GetCurrentSize().height, 34.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).height, 34.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1579,7 +1579,7 @@ int UtcDaliToolkitTextlabelMaxTextureSet(void)
 
   const int maxTextureSize = Dali::GetMaxTextureSize();
   // Whether the rendered text is greater than maxTextureSize
-  DALI_TEST_CHECK( label.GetCurrentSize().height > maxTextureSize );
+  DALI_TEST_CHECK( label.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).height > maxTextureSize );
 
   // Check if the number of renderers is greater than 1.
   DALI_TEST_CHECK( label.GetRendererCount() > 1u );

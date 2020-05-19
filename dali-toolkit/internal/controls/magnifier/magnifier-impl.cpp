@@ -172,7 +172,7 @@ void Magnifier::Initialize()
   // and what is not.
   mSourceActor = Actor::New();
   Stage().GetCurrent().Add(mSourceActor);
-  mSourceActor.SetParentOrigin(ParentOrigin::CENTER);
+  mSourceActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
   Constraint constraint = Constraint::New<Vector3>( mSourceActor, Actor::Property::POSITION, EqualToConstraint() );
   constraint.AddSource( Source( self, Toolkit::Magnifier::Property::SOURCE_POSITION ) );
   constraint.Apply();
@@ -259,8 +259,8 @@ void Magnifier::SetFrameVisibility(bool visible)
     Actor self(Self());
 
     mFrame = Actor::New( );
-    mFrame.SetInheritPosition(false);
-    mFrame.SetInheritScale(true);
+    mFrame.SetProperty( Actor::Property::INHERIT_POSITION, false );
+    mFrame.SetProperty( Actor::Property::INHERIT_SCALE, true );
     mFrame.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
     Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
     mFrame.SetSizeModeFactor( sizeOffset );
@@ -317,7 +317,7 @@ void Magnifier::Update()
   // should be updated when:
   // Magnifier's world size/scale changes.
   Actor self(Self());
-  Vector3 worldSize = mActorSize * self.GetCurrentWorldScale();
+  Vector3 worldSize = mActorSize * self.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_SCALE );
 
   // Adjust field of view to scale content
 

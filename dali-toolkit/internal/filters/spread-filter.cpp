@@ -84,7 +84,7 @@ void SpreadFilter::Enable()
 {
   // create actor to render input with applied emboss effect
   mActorForInput = Actor::New();
-  mActorForInput.SetParentOrigin( ParentOrigin::CENTER );
+  mActorForInput.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   mActorForInput.SetSize(mTargetSize);
   // register properties as shader uniforms
   mActorForInput.RegisterProperty( SPREAD_UNIFORM_NAME, mSpread );
@@ -101,7 +101,7 @@ void SpreadFilter::Enable()
 
   // create an actor to render mImageForHorz for vertical blur pass
   mActorForHorz = Actor::New();
-  mActorForHorz.SetParentOrigin( ParentOrigin::CENTER );
+  mActorForHorz.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   mActorForHorz.SetSize(mTargetSize);
   // register properties as shader uniforms
   mActorForHorz.RegisterProperty( SPREAD_UNIFORM_NAME, mSpread );

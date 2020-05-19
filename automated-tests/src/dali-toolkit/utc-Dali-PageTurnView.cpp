@@ -404,7 +404,7 @@ int UtcDaliPageTurnPortraitViewSignals(void)
   TestPageFactory factory;
   Vector2 size = Stage::GetCurrent().GetSize();
   PageTurnView portraitView = PageTurnPortraitView::New( factory, size );
-  portraitView.SetParentOrigin( ParentOrigin::CENTER );
+  portraitView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( portraitView );
 
   // Render and notify
@@ -542,7 +542,7 @@ int UtcDaliPageTurnLanscapeViewSignals(void)
   TestPageFactory factory;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   PageTurnView landscapeView = PageTurnLandscapeView::New( factory, Vector2(stageSize.x*0.5f, stageSize.x*0.8f) );
-  landscapeView.SetParentOrigin( ParentOrigin::CENTER );
+  landscapeView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( landscapeView );
 
   // Render and notify
@@ -670,7 +670,7 @@ int UtcDaliPageTurnEmptyTextureHandle(void)
   try
   {
     PageTurnView portraitView = PageTurnPortraitView::New( factory, size );
-    portraitView.SetParentOrigin( ParentOrigin::CENTER );
+    portraitView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
     Stage::GetCurrent().Add( portraitView );
 
     tet_result(TET_FAIL);

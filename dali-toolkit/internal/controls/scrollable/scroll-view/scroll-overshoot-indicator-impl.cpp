@@ -133,10 +133,10 @@ ScrollOvershootEffectRipple::ScrollOvershootEffectRipple( bool vertical, Scrolla
     mAnimationStateFlags(0)
 {
   mOvershootOverlay = CreateBouncingEffectActor(mEffectOvershootProperty);
-  mOvershootOverlay.SetColor(mAttachedScrollView.GetOvershootEffectColor());
-  mOvershootOverlay.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  mOvershootOverlay.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  mOvershootOverlay.SetVisible(false);
+  mOvershootOverlay.SetProperty( Actor::Property::COLOR,mAttachedScrollView.GetOvershootEffectColor());
+  mOvershootOverlay.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT );
+  mOvershootOverlay.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
+  mOvershootOverlay.SetProperty( Actor::Property::VISIBLE,false);
 
 }
 
@@ -174,7 +174,7 @@ void ScrollOvershootEffectRipple::Remove( Scrollable& scrollable )
 
 void ScrollOvershootEffectRipple::Reset()
 {
-  mOvershootOverlay.SetVisible(false);
+  mOvershootOverlay.SetProperty( Actor::Property::VISIBLE,false);
   mOvershootOverlay.SetProperty( mEffectOvershootProperty, 0.f);
 }
 
@@ -224,13 +224,13 @@ void ScrollOvershootEffectRipple::SetOvershootEffectColor( const Vector4& color 
 {
   if(mOvershootOverlay)
   {
-    mOvershootOverlay.SetColor(color);
+    mOvershootOverlay.SetProperty( Actor::Property::COLOR,color);
   }
 }
 
 void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
 {
-  mOvershootOverlay.SetVisible(visible);
+  mOvershootOverlay.SetProperty( Actor::Property::VISIBLE,visible);
   // make sure overshoot image is correctly placed
   if( visible )
   {
@@ -238,9 +238,9 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
     if(mOvershoot > 0.0f)
     {
       // positive overshoot
-      const Vector3 size = mOvershootOverlay.GetCurrentSize();
+      const Vector3 size = mOvershootOverlay.GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
       Vector3 relativeOffset;
-      const Vector3 parentSize = self.GetCurrentSize();
+      const Vector3 parentSize = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
       if(IsVertical())
       {
         mOvershootOverlay.SetOrientation( Quaternion( Radian( 0.0f ), Vector3::ZAXIS ) );
@@ -257,9 +257,9 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
     else
     {
       // negative overshoot
-      const Vector3 size = mOvershootOverlay.GetCurrentSize();
+      const Vector3 size = mOvershootOverlay.GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
       Vector3 relativeOffset;
-      const Vector3 parentSize = self.GetCurrentSize();
+      const Vector3 parentSize = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
       if(IsVertical())
       {
         mOvershootOverlay.SetOrientation( Quaternion( Radian( Math::PI ), Vector3::ZAXIS ) );
@@ -320,7 +320,7 @@ void ScrollOvershootEffectRipple::SetOvershoot(float amount, bool animate)
   if( animate && overshootAnimationSpeed > Math::MACHINE_EPSILON_0 )
   {
     float currentOvershoot = fabsf( mOvershootOverlay.GetProperty( mEffectOvershootProperty ).Get<float>() );
-    float duration = mOvershootOverlay.GetCurrentSize().height * (animatingOn ? (1.0f - currentOvershoot) : currentOvershoot) / overshootAnimationSpeed;
+    float duration = mOvershootOverlay.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).height * (animatingOn ? (1.0f - currentOvershoot) : currentOvershoot) / overshootAnimationSpeed;
 
     if( duration > Math::MACHINE_EPSILON_0 )
     {
@@ -349,7 +349,7 @@ void ScrollOvershootEffectRipple::OnOvershootAnimFinished(Animation& animation)
   if( mAnimationStateFlags & AnimatingOut )
   {
     // should now be offscreen
-    mOvershootOverlay.SetVisible(false);
+    mOvershootOverlay.SetProperty( Actor::Property::VISIBLE,false);
   }
   if( (mAnimationStateFlags & AnimateBack) )
   {

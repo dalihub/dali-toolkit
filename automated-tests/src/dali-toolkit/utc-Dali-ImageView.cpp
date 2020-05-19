@@ -645,7 +645,7 @@ int UtcDaliImageViewAsyncLoadingWithoutAltasing(void)
   // By default, Aysnc loading is used
   Stage::GetCurrent().Add( imageView );
   imageView.SetSize(100, 100);
-  imageView.SetParentOrigin( ParentOrigin::CENTER );
+  imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   DALI_TEST_EQUALS( Test::WaitForEventThreadTrigger( 1 ), true, TEST_LOCATION );
 
@@ -880,8 +880,8 @@ int UtcDaliImageViewSizeWithBackground(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( imageView.GetCurrentSize().width, (float)width, TEST_LOCATION );
-  DALI_TEST_EQUALS( imageView.GetCurrentSize().height, (float)height, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, (float)width, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).height, (float)height, TEST_LOCATION );
 
   END_TEST;
 }
@@ -913,8 +913,8 @@ int UtcDaliImageViewSizeWithBackgroundAndImage(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( imageView.GetCurrentSize().width, (float)width, TEST_LOCATION );
-  DALI_TEST_EQUALS( imageView.GetCurrentSize().height, (float)height, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, (float)width, TEST_LOCATION );
+  DALI_TEST_EQUALS( imageView.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).height, (float)height, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1873,8 +1873,8 @@ int UtcDaliImageViewPaddingProperty(void)
   imagePropertyMap[ ImageVisual::Property::DESIRED_WIDTH ] = 128;
   imagePropertyMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 128;
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE , imagePropertyMap );
-  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
   Stage::GetCurrent().Add( imageView );
 
@@ -1923,8 +1923,8 @@ int UtcDaliImageViewPaddingProperty02(void)
   imagePropertyMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 128;
   imagePropertyMap[ DevelVisual::Property::VISUAL_FITTING_MODE ] = Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE , imagePropertyMap );
-  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
   Stage::GetCurrent().Add( imageView );
 
@@ -1964,8 +1964,8 @@ int UtcDaliImageViewPaddingProperty03(void)
   imagePropertyMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 128;
   imagePropertyMap[ DevelVisual::Property::VISUAL_FITTING_MODE ] = Toolkit::DevelVisual::FIT_KEEP_ASPECT_RATIO;
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE , imagePropertyMap );
-  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
   Stage::GetCurrent().Add( imageView );
 
@@ -2012,8 +2012,8 @@ int UtcDaliImageViewPaddingProperty04(void)
   imagePropertyMap[ ImageVisual::Property::DESIRED_HEIGHT ] = 128;
   imagePropertyMap[ DevelVisual::Property::VISUAL_FITTING_MODE ] = Toolkit::DevelVisual::FILL;
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE , imagePropertyMap );
-  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   imageView.SetProperty( Control::Property::PADDING, Extents( 15, 10, 5, 10 ) );
   Stage::GetCurrent().Add( imageView );
 
@@ -2065,8 +2065,8 @@ int UtcDaliImageViewTransformTest01(void)
                                        .Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2( 8, 8 ) ) );
 
   imageView.SetProperty( Toolkit::ImageView::Property::IMAGE , imagePropertyMap );
-  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   Stage::GetCurrent().Add( imageView );
 
   application.SendNotification();
@@ -2411,8 +2411,8 @@ int UtcDaliImageViewLoadRemoteSVG(void)
   imageView.SetImage("https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/check.svg");
   // Victor. Temporary (or permanent?) update as the url above seems not to work from time to time ...
   imageView.SetImage("https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/SVG_logo.svg/64px-SVG_logo.svg.png");
-  imageView.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  imageView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  imageView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   imageView.SetSize(300, 300);
   imageView.SetPosition( Vector3( 150.0f , 150.0f , 0.0f ) );
 

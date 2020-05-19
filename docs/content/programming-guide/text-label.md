@@ -19,7 +19,7 @@ Note *CR+LF* new line characters are replaced by a *LF* one.
 
 TextLabel label = TextLabel::New();
 label.SetProperty( TextLabel::Property::TEXT, "Hello World" );
-label.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 Stage::GetCurrent().Add( label );
 ~~~
 
@@ -115,7 +115,7 @@ Therefore in this example the same result would be displayed, regardless of the 
 // C++
 
 TextLabel label = TextLabel::New( "Hello World" );
-label.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 label.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 label.SetBackgroundColor( Color::BLUE );
 Stage::GetCurrent().Add( label );
@@ -136,11 +136,11 @@ Here is an example of this behavior using TableView as the parent:
 TableView parent = TableView::New( 3, 1 );
 parent.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 parent.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
-parent.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+parent.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 Stage::GetCurrent().Add( parent );
 
 TextLabel label = TextLabel::New( "Hello World" );
-label.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 label.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 label.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 label.SetBackgroundColor( Color::BLUE );
@@ -148,7 +148,7 @@ parent.AddChild( label, TableView::CellPosition( 0, 0 ) );
 parent.SetFitHeight( 0 );
 
 label = TextLabel::New( "A Quick Brown Fox Jumps Over The Lazy Dog" );
-label.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 label.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 label.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 label.SetBackgroundColor( Color::GREEN );
@@ -157,7 +157,7 @@ parent.AddChild( label, TableView::CellPosition( 1, 0 ) );
 parent.SetFitHeight( 1 );
 
 label = TextLabel::New( "لإعادة ترتيب الشاشات، يجب تغيير نوع العرض إلى شبكة قابلة للتخصيص." );
-label.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 label.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 label.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
 label.SetBackgroundColor( Color::BLUE );

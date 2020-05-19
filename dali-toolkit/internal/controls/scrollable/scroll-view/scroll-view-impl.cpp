@@ -145,9 +145,9 @@ float VectorInDomain(float a, float b, float start, float end, Dali::Toolkit::Di
  */
 Vector3 GetPositionOfAnchor(Actor &actor, const Vector3 &anchor)
 {
-  Vector3 childPosition = actor.GetCurrentPosition();
-  Vector3 childAnchor = - actor.GetCurrentAnchorPoint() + anchor;
-  Vector3 childSize = actor.GetCurrentSize();
+  Vector3 childPosition = actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
+  Vector3 childAnchor = - actor.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ) + anchor;
+  Vector3 childSize = actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
 
   return childPosition + childAnchor * childSize;
 }
@@ -676,8 +676,8 @@ void ScrollView::OnInitialize()
   mInternalActor = Actor::New();
   self.Add(mInternalActor);
 
-  mInternalActor.SetParentOrigin(ParentOrigin::CENTER);
-  mInternalActor.SetAnchorPoint(AnchorPoint::CENTER);
+  mInternalActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
+  mInternalActor.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
   mInternalActor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   mAlterChild = true;
@@ -1321,8 +1321,8 @@ void ScrollView::ScrollTo(Actor &actor, float duration)
   DALI_ASSERT_ALWAYS(actor.GetParent() == Self());
 
   Actor self = Self();
-  Vector3 size = self.GetCurrentSize();
-  Vector3 position = actor.GetCurrentPosition();
+  Vector3 size = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
+  Vector3 position = actor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
   Vector2 prePosition = GetPropertyPrePosition();
   position.GetVectorXY() -= prePosition;
 
@@ -1332,7 +1332,7 @@ void ScrollView::ScrollTo(Actor &actor, float duration)
 Actor ScrollView::FindClosestActor()
 {
   Actor self = Self();
-  Vector3 size = self.GetCurrentSize();
+  Vector3 size = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
 
   return FindClosestActorToPosition(Vector3(size.width * 0.5f,size.height * 0.5f,0.0f));
 }
@@ -1524,7 +1524,7 @@ bool ScrollView::SnapWithVelocity(Vector2 velocity)
 
   if(mActorAutoSnapEnabled)
   {
-    Vector3 size = Self().GetCurrentSize();
+    Vector3 size = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
 
     Actor child = FindClosestActorToPosition( Vector3(size.width * 0.5f,size.height * 0.5f,0.0f), horizontal, vertical );
 
@@ -1968,7 +1968,7 @@ void ScrollView::OnChildAdd(Actor& child)
   if( scrollBar )
   {
     mScrollBar = scrollBar;
-    scrollBar.SetName("ScrollBar");
+    scrollBar.SetProperty( Dali::Actor::Property::NAME,"ScrollBar");
 
     mInternalActor.Add( scrollBar );
     if( scrollBar.GetScrollDirection() == Toolkit::ScrollBar::Horizontal )
@@ -2494,7 +2494,7 @@ void ScrollView::OnPan( const PanGesture& gesture )
       Toolkit::ScrollBar scrollBar = mScrollBar.GetHandle();
       if( scrollBar && mTransientScrollBar )
       {
-        Vector3 size = Self().GetCurrentSize();
+        Vector3 size = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
         const Toolkit::RulerDomain& rulerDomainX = mRulerX->GetDomain();
         const Toolkit::RulerDomain& rulerDomainY = mRulerY->GetDomain();
 
@@ -2635,7 +2635,7 @@ void ScrollView::FinishTransform()
 
 Vector2 ScrollView::GetOvershoot(Vector2& position) const
 {
-  Vector3 size = Self().GetCurrentSize();
+  Vector3 size = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
   Vector2 overshoot;
 
   const RulerDomain rulerDomainX = mRulerX->GetDomain();
@@ -2690,7 +2690,7 @@ void ScrollView::ClampPosition(Vector2& position) const
 
 void ScrollView::ClampPosition(Vector2& position, ClampState2D &clamped) const
 {
-  Vector3 size = Self().GetCurrentSize();
+  Vector3 size = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
 
   position.x = -mRulerX->Clamp(-position.x, size.width, 1.0f, clamped.x);    // NOTE: X & Y rulers think in -ve coordinate system.
   position.y = -mRulerY->Clamp(-position.y, size.height, 1.0f, clamped.y);   // That is scrolling RIGHT (e.g. 100.0, 0.0) means moving LEFT.

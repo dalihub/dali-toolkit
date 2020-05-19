@@ -358,8 +358,8 @@ int UtcDaliButtonAutoRepeatingP(void)
   const float AUTO_REPEATING_DELAY = 0.15f;
 
   Button button = PushButton::New();
-  button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  button.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  button.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   button.SetPosition( 240, 400 );
   button.SetSize( 100, 100 );
   Stage::GetCurrent().Add( button );
@@ -588,8 +588,8 @@ int UtcDaliButtonPressedSignalP(void)
   tet_infoline(" UtcDaliButtonPressedSignalP");
 
   Button button = PushButton::New();
-  button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  button.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  button.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   button.SetPosition( 240, 400 );
   button.SetSize( 100, 100 );
 
@@ -695,8 +695,8 @@ int UtcDaliButtonClickedSignalP(void)
   tet_infoline(" UtcDaliButtonClickedSignalP");
 
   Button button = PushButton::New();
-  button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  button.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  button.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   button.SetPosition( 240, 400 );
   button.SetSize( 100, 100 );
 
@@ -848,14 +848,14 @@ int UtcDaliButtonEventConsumption(void)
   ToolkitTestApplication application;
 
   Button parentButton = PushButton::New();
-  parentButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  parentButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  parentButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  parentButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   parentButton.SetSize( 20, 20 );
   Stage::GetCurrent().Add( parentButton );
 
   Button childButton = PushButton::New();
-  childButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  childButton.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
+  childButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  childButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT );
   childButton.SetSize( 20, 20 );
   parentButton.Add( childButton );
 
@@ -902,8 +902,8 @@ int UtcDaliButtonRelease(void)
   ToolkitTestApplication application;
 
   Button parentButton = PushButton::New();
-  parentButton.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  parentButton.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  parentButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  parentButton.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   parentButton.SetSize( 20, 20 );
   Stage::GetCurrent().Add( parentButton );
   parentButton.ReleasedSignal().Connect( &ButtonCallback );
@@ -947,8 +947,8 @@ int UtcDaliButtonMultiTouch(void)
   Button button = PushButton::New();
   button.SetProperty( Button::Property::TOGGLABLE, true);
 
-  button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  button.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  button.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   button.SetSize( 20, 20 );
   Stage::GetCurrent().Add( button );
   button.ReleasedSignal().Connect( &ButtonCallback );

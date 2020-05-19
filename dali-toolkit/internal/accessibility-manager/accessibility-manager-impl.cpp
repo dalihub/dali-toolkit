@@ -76,8 +76,8 @@ bool IsActorFocusableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType 
     case Dali::HitTestAlgorithm::CHECK_ACTOR:
     {
       // Check whether the actor is visible and not fully transparent.
-      if( actor.IsVisible()
-       && actor.GetCurrentWorldColor().a > 0.01f) // not FULLY_TRANSPARENT
+      if( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE )
+       && actor.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ).a > 0.01f) // not FULLY_TRANSPARENT
       {
         // Check whether the actor is focusable
         Property::Index propertyActorFocusable = actor.GetPropertyIndex(ACTOR_FOCUSABLE);
@@ -90,7 +90,7 @@ bool IsActorFocusableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType 
     }
     case Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE:
     {
-      if( actor.IsVisible() ) // Actor is visible, if not visible then none of its children are visible.
+      if( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) ) // Actor is visible, if not visible then none of its children are visible.
       {
         hittable = true;
       }
@@ -331,16 +331,16 @@ bool AccessibilityManager::DoSetCurrentFocusActor(const unsigned int actorID)
     }
 
     // Go through the actor's hierarchy to check whether the actor is visible
-    bool actorVisible = actor.IsVisible();
+    bool actorVisible = actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE );
     Actor parent = actor.GetParent();
     while (actorVisible && parent && parent != rootActor)
     {
-      actorVisible = parent.IsVisible();
+      actorVisible = parent.GetCurrentProperty< bool >( Actor::Property::VISIBLE );
       parent = parent.GetParent();
     }
 
     // Check whether the actor is fully transparent
-    bool actorOpaque = actor.GetCurrentWorldColor().a > 0.01f;
+    bool actorOpaque = actor.GetCurrentProperty< Vector4 >( Actor::Property::WORLD_COLOR ).a > 0.01f;
 
     // Set the focus only when the actor is focusable and visible and not fully transparent
     if(actorVisible && actorFocusable && actorOpaque)
@@ -610,7 +610,7 @@ Actor AccessibilityManager::GetFocusIndicatorActor()
     const std::string focusBorderImagePath = imageDirPath + FOCUS_BORDER_IMAGE_FILE_NAME;
 
     mFocusIndicatorActor = Toolkit::ImageView::New(focusBorderImagePath);
-    mFocusIndicatorActor.SetParentOrigin( ParentOrigin::CENTER );
+    mFocusIndicatorActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
     mFocusIndicatorActor.SetZ( 1.0f );
 
     // Apply size constraint to the focus indicator

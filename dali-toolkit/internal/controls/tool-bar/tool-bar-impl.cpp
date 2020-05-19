@@ -300,9 +300,9 @@ void ToolBar::OnInitialize()
 
   // Layout
   mLayout = Toolkit::TableView::New( 1, 1 );
-  mLayout.SetName( "TOOLBAR_LAYOUT" );
+  mLayout.SetProperty( Dali::Actor::Property::NAME, "TOOLBAR_LAYOUT" );
   mLayout.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
-  mLayout.SetParentOrigin( ParentOrigin::CENTER );
+  mLayout.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   Self().Add( mLayout );
 

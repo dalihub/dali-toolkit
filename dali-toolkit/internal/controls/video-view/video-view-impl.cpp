@@ -737,8 +737,8 @@ void VideoView::UpdateDisplayArea( Dali::PropertyNotification& source )
   Actor self( Self() );
 
   bool positionUsesAnchorPoint = self.GetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >();
-  Vector3 actorSize = self.GetCurrentSize() * self.GetCurrentScale();
-  Vector3 anchorPointOffSet = actorSize * ( positionUsesAnchorPoint ? self.GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT );
+  Vector3 actorSize = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) * self.GetCurrentProperty< Vector3 >( Actor::Property::SCALE );
+  Vector3 anchorPointOffSet = actorSize * ( positionUsesAnchorPoint ? self.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ) : AnchorPoint::TOP_LEFT );
 
   Vector2 screenPosition = self.GetProperty( DevelActor::Property::SCREEN_POSITION ).Get< Vector2 >();
 

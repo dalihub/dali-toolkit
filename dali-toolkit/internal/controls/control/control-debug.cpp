@@ -287,7 +287,7 @@ std::string DumpControl( const Internal::Control& control )
 
   std::ostringstream oss;
   oss << "{\n  ";
-  const std::string& name = control.Self().GetName();
+  const std::string& name = control.Self().GetProperty< std::string >( Dali::Actor::Property::NAME );
   if( ! name.empty() )
   {
     oss << "\"name\":\"" << name << "\",\n";
@@ -306,7 +306,7 @@ std::string DumpActor( Actor actor )
 {
   std::ostringstream oss;
   oss << "{\n  ";
-  const std::string& name = actor.GetName();
+  const std::string& name = actor.GetProperty< std::string >( Dali::Actor::Property::NAME );
   if( ! name.empty() )
   {
     oss << "\"name\":\"" << name << "\",\n";

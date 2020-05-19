@@ -25,6 +25,7 @@
 #include <dali.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali-toolkit/dali-toolkit.h>
 #include <dali-toolkit/devel-api/controls/popup/popup.h>
@@ -636,8 +637,8 @@ int UtcDaliPopupOnTouchedOutsideSignal(void)
 
   // Create the Popup actor
   Popup popup = Popup::New();
-  popup.SetParentOrigin( ParentOrigin::CENTER );
-  popup.SetAnchorPoint( ParentOrigin::CENTER );
+  popup.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  popup.SetProperty( Actor::Property::ANCHOR_POINT, ParentOrigin::CENTER );
   popup.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   popup.SetSize( 50.0f, 50.0f );
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
@@ -916,8 +917,8 @@ int UtcDaliPopupPropertyContextualMode(void)
 
   // Placement actor to parent the popup from so the popup's contextual position can be relative to it.
   Actor placement = Actor::New();
-  placement.SetParentOrigin( ParentOrigin::CENTER );
-  placement.SetAnchorPoint( AnchorPoint::CENTER );
+  placement.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  placement.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   placement.SetSize( 1.0f, 1.0f );
   placement.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   Stage::GetCurrent().Add( placement );
@@ -946,7 +947,7 @@ int UtcDaliPopupPropertyContextualMode(void)
     application.Render();
 
     // Check the position of the label within the popup.
-    DALI_TEST_EQUALS( contentLabel.GetCurrentWorldPosition().GetVectorXY(), offsetValues[i], TEST_LOCATION );
+    DALI_TEST_EQUALS( contentLabel.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ).GetVectorXY(), offsetValues[i], TEST_LOCATION );
 
     popup.SetDisplayState( Popup::HIDDEN );
     application.SendNotification();
@@ -969,20 +970,20 @@ int UtcDaliPopupPropertyBacking(void)
   Actor backing = popup.FindChildByName( "popupBacking" );
   DALI_TEST_CHECK( backing );
 
-  DALI_TEST_EQUALS( backing.GetCurrentOpacity(), 1.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 1.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   // Check enabled property.
   popup.SetDisplayState( Popup::SHOWN );
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( backing.GetCurrentOpacity(), 0.5f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.5f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   popup.SetDisplayState( Popup::HIDDEN );
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( backing.GetCurrentOpacity(), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   popup.SetProperty( Popup::Property::BACKING_ENABLED, false );
   bool propertyResult;
@@ -993,13 +994,13 @@ int UtcDaliPopupPropertyBacking(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( backing.GetCurrentOpacity(), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   popup.SetDisplayState( Popup::HIDDEN );
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( backing.GetCurrentOpacity(), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+  DALI_TEST_EQUALS( backing.GetCurrentProperty< float >( DevelActor::Property::OPACITY ), 0.0f, Math::MACHINE_EPSILON_0, TEST_LOCATION );
 
   // Check color property.
   popup.SetProperty( Popup::Property::BACKING_ENABLED, true );
@@ -1096,7 +1097,7 @@ int UtcDaliPopupPropertyCustomAnimation(void)
   }
 
   // Test the popup has animated to it's entry-transition destination.
-  DALI_TEST_EQUALS( popupContainer.GetCurrentWorldPosition(), entryAnimationDestination, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( popupContainer.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), entryAnimationDestination, 0.1f, TEST_LOCATION );
 
   popup.SetDisplayState( Popup::HIDDEN );
 
@@ -1106,7 +1107,7 @@ int UtcDaliPopupPropertyCustomAnimation(void)
     application.Render( RENDER_FRAME_INTERVAL );
   }
 
-  DALI_TEST_EQUALS( popupContainer.GetCurrentWorldPosition(), exitAnimationDestination, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( popupContainer.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ), exitAnimationDestination, 0.1f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1128,15 +1129,15 @@ int UtcDaliPopupPropertyTouchTransparent(void)
   TextLabel content = TextLabel::New( "text" );
   popup.SetContent( content );
   popup.SetProperty( Popup::Property::ANIMATION_DURATION, 0.0f );
-  popup.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  popup.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  popup.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  popup.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   popup.SetSize( 100, 100 );
   popup.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
 
   // Create a button (to go underneath the popup).
   PushButton button = Toolkit::PushButton::New();
-  button.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  button.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  button.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   button.SetSize( 100, 100 );
   button.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
 
@@ -1199,8 +1200,8 @@ int UtcDaliPopupPropertyTail(void)
 
   // Create the Popup actor
   Popup popup = Popup::New();
-  popup.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  popup.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  popup.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  popup.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   popup.SetSize( 100, 100 );
   popup.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   TextLabel content = TextLabel::New( "text" );
@@ -1243,9 +1244,9 @@ int UtcDaliPopupPropertyTail(void)
   tailActor = popup.FindChildByName( "tailImage" );
   DALI_TEST_CHECK( tailActor );
 
-  float baseValX = tailActor.GetCurrentWorldPosition().x;
+  float baseValX = tailActor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ).x;
 
-  DALI_TEST_GREATER( baseValX, tailActor.GetCurrentWorldPosition().y, TEST_LOCATION );
+  DALI_TEST_GREATER( baseValX, tailActor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ).y, TEST_LOCATION );
 
   popup.SetDisplayState( Popup::HIDDEN );
   application.SendNotification();
@@ -1260,8 +1261,8 @@ int UtcDaliPopupPropertyTail(void)
   tailActor = popup.FindChildByName( "tailImage" );
   DALI_TEST_CHECK( tailActor );
 
-  float baseValY = tailActor.GetCurrentWorldPosition().y;
-  DALI_TEST_GREATER( baseValX, tailActor.GetCurrentWorldPosition().x, TEST_LOCATION );
+  float baseValY = tailActor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ).y;
+  DALI_TEST_GREATER( baseValX, tailActor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ).x, TEST_LOCATION );
 
   popup.SetDisplayState( Popup::HIDDEN );
   application.SendNotification();
@@ -1275,8 +1276,8 @@ int UtcDaliPopupPropertyTail(void)
   application.Render();
   tailActor = popup.FindChildByName( "tailImage" );
   DALI_TEST_CHECK( tailActor );
-  DALI_TEST_EQUALS( tailActor.GetCurrentWorldPosition().x, baseValX, TEST_LOCATION );
-  DALI_TEST_GREATER( tailActor.GetCurrentWorldPosition().y, baseValY, TEST_LOCATION );
+  DALI_TEST_EQUALS( tailActor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ).x, baseValX, TEST_LOCATION );
+  DALI_TEST_GREATER( tailActor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ).y, baseValY, TEST_LOCATION );
 
   popup.SetDisplayState( Popup::HIDDEN );
   application.SendNotification();
@@ -1290,8 +1291,8 @@ int UtcDaliPopupPropertyTail(void)
   application.Render();
   tailActor = popup.FindChildByName( "tailImage" );
   DALI_TEST_CHECK( tailActor );
-  DALI_TEST_GREATER( tailActor.GetCurrentWorldPosition().x, baseValX, TEST_LOCATION );
-  DALI_TEST_EQUALS( tailActor.GetCurrentWorldPosition().y, baseValY, TEST_LOCATION );
+  DALI_TEST_GREATER( tailActor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ).x, baseValX, TEST_LOCATION );
+  DALI_TEST_EQUALS( tailActor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ).y, baseValY, TEST_LOCATION );
 
   popup.SetDisplayState( Popup::HIDDEN );
   application.SendNotification();

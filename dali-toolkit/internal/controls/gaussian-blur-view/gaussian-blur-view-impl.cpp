@@ -32,6 +32,7 @@
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/integration-api/debug.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/public-api/visuals/visual-properties.h>
@@ -259,8 +260,8 @@ Vector4 GaussianBlurView::GetBackgroundColor() const
 void GaussianBlurView::OnInitialize()
 {
   // root actor to parent all user added actors, needed to allow us to set that subtree as exclusive for our child render task
-  mChildrenRoot.SetParentOrigin(ParentOrigin::CENTER);
-  mInternalRoot.SetParentOrigin(ParentOrigin::CENTER);
+  mChildrenRoot.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
+  mInternalRoot.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
 
   //////////////////////////////////////////////////////
   // Create shaders
@@ -275,13 +276,13 @@ void GaussianBlurView::OnInitialize()
 
   // Create an actor for performing a horizontal blur on the texture
   mHorizBlurActor = Actor::New();
-  mHorizBlurActor.SetParentOrigin(ParentOrigin::CENTER);
+  mHorizBlurActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
   Renderer renderer = CreateRenderer( BASIC_VERTEX_SOURCE, fragmentSource.c_str() );
   mHorizBlurActor.AddRenderer( renderer );
 
   // Create an actor for performing a vertical blur on the texture
   mVertBlurActor = Actor::New();
-  mVertBlurActor.SetParentOrigin(ParentOrigin::CENTER);
+  mVertBlurActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
   renderer = CreateRenderer( BASIC_VERTEX_SOURCE, fragmentSource.c_str() );
   mVertBlurActor.AddRenderer( renderer );
 
@@ -293,8 +294,8 @@ void GaussianBlurView::OnInitialize()
   if(!mBlurUserImage)
   {
     mCompositingActor = Actor::New();
-    mCompositingActor.SetParentOrigin(ParentOrigin::CENTER);
-    mCompositingActor.SetOpacity(GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
+    mCompositingActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
+    mCompositingActor.SetProperty( DevelActor::Property::OPACITY,GAUSSIAN_BLUR_VIEW_DEFAULT_BLUR_STRENGTH); // ensure alpha is enabled for this object and set default value
     renderer = CreateRenderer( BASIC_VERTEX_SOURCE, BASIC_FRAGMENT_SOURCE );
     mCompositingActor.AddRenderer( renderer );
 
@@ -304,7 +305,7 @@ void GaussianBlurView::OnInitialize()
 
     // Create an image view for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
     mTargetActor = Actor::New();
-    mTargetActor.SetParentOrigin(ParentOrigin::CENTER);
+    mTargetActor.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
     renderer = CreateRenderer( BASIC_VERTEX_SOURCE, BASIC_FRAGMENT_SOURCE );
     mTargetActor.AddRenderer( renderer );
 
@@ -312,7 +313,7 @@ void GaussianBlurView::OnInitialize()
     // Create cameras for the renders corresponding to the view size
     mRenderFullSizeCamera = CameraActor::New();
     mRenderFullSizeCamera.SetInvertYAxis( true );
-    mRenderFullSizeCamera.SetParentOrigin(ParentOrigin::CENTER);
+    mRenderFullSizeCamera.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
 
     //////////////////////////////////////////////////////
     // Connect to actor tree
@@ -325,7 +326,7 @@ void GaussianBlurView::OnInitialize()
   // Create camera for the renders corresponding to the (potentially downsampled) render targets' size
   mRenderDownsampledCamera = CameraActor::New();
   mRenderDownsampledCamera.SetInvertYAxis( true );
-  mRenderDownsampledCamera.SetParentOrigin(ParentOrigin::CENTER);
+  mRenderDownsampledCamera.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
 
   //////////////////////////////////////////////////////
   // Connect to actor tree

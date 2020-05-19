@@ -369,8 +369,8 @@ struct AtlasRenderer::Impl
     {
       // Create a container actor to act as a common parent for text and shadow, to avoid color inheritence issues.
       mActor = Actor::New();
-      mActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-      mActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      mActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+      mActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       mActor.SetSize( textSize );
       mActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
     }
@@ -403,7 +403,7 @@ struct AtlasRenderer::Impl
 
         Actor shadowActor = CreateMeshActor(textControl, animatablePropertyIndex, color, meshRecord, textSize, STYLE_DROP_SHADOW );
 #if defined(DEBUG_ENABLED)
-        shadowActor.SetName( "Text Shadow renderable actor" );
+        shadowActor.SetProperty( Dali::Actor::Property::NAME, "Text Shadow renderable actor" );
 #endif
         // Offset shadow in x and y
         shadowActor.RegisterProperty("uOffset", shadowOffset );
@@ -736,12 +736,12 @@ struct AtlasRenderer::Impl
 
     Actor actor = Actor::New();
 #if defined(DEBUG_ENABLED)
-    actor.SetName( "Text renderable actor" );
+    actor.SetProperty( Dali::Actor::Property::NAME, "Text renderable actor" );
 #endif
     actor.AddRenderer( renderer );
     // Keep all of the origins aligned
-    actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+    actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
     actor.SetSize( actorSize );
     actor.RegisterProperty("uOffset", Vector2::ZERO );
     actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );

@@ -454,30 +454,30 @@ int UtcDaliCubeTransitionWaveEffectStartTransition(void)
   //check the cube rotation value and color values just before the end of different transitions
   waveEffect.SetTargetTexture( texture );
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
   waveEffect.SetTargetTexture( texture );
   waveEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
   waveEffect.SetTargetTexture( texture );
   waveEffect.StartTransition(false);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
   waveEffect.SetTargetTexture( texture );
   waveEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -512,36 +512,36 @@ int UtcDaliCubeTransitionCrossEffectStartTransition(void)
 
   //check the cube rotation value and color values just before the end of different transitions
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::XAXIS), EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_90,  Vector3::XAXIS), EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
 
   crossEffect.SetTargetTexture( texture );
   crossEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::XAXIS), EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_90,  Vector3::XAXIS), EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
 
   crossEffect.SetTargetTexture( texture );
   crossEffect.StartTransition(false);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::XAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( -Dali::ANGLE_90,  Vector3::XAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
   crossEffect.SetTargetTexture( texture );
   crossEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::XAXIS), EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( -Dali::ANGLE_90,  Vector3::XAXIS), EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -570,35 +570,35 @@ int UtcDaliCubeTransitionFoldEffectStartTransition(void)
 
   //check the cube rotation value and color values just before the end of different transitions
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
   foldEffect.SetTargetTexture( texture );
   foldEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
 
   foldEffect.SetTargetTexture( texture );
   foldEffect.StartTransition(false);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(),FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ),FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
 
   foldEffect.SetTargetTexture( texture );
   foldEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
   Wait( application, TRANSITION_BEFORE_END_DURATION );
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( -Dali::ANGLE_90,  Vector3::YAXIS), EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, EPISILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -829,9 +829,9 @@ int UtcDaliCubeTransitionWaveEffectStopTransition(void)
   waveEffect.StopTransition();
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
   waveEffect.SetTargetTexture( firstTexture );
   waveEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
@@ -839,9 +839,9 @@ int UtcDaliCubeTransitionWaveEffectStopTransition(void)
   waveEffect.StopTransition();
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
   waveEffect.SetTargetTexture( secondTexture );
   waveEffect.StartTransition(false);
@@ -849,9 +849,9 @@ int UtcDaliCubeTransitionWaveEffectStopTransition(void)
   waveEffect.StopTransition();
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
   waveEffect.SetTargetTexture( firstTexture );
   waveEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
@@ -859,9 +859,9 @@ int UtcDaliCubeTransitionWaveEffectStopTransition(void)
   waveEffect.StopTransition();
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  DALI_TEST_EQUALS( cube.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -896,10 +896,10 @@ int UtcDaliCubeTransitionCrossEffectStopTransition(void)
   crossEffect.StopTransition();
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
   crossEffect.SetTargetTexture( firstTexture );
   crossEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
@@ -907,10 +907,10 @@ int UtcDaliCubeTransitionCrossEffectStopTransition(void)
   crossEffect.StopTransition();
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
   crossEffect.SetTargetTexture( secondTexture );
   crossEffect.StartTransition(false);
@@ -918,10 +918,10 @@ int UtcDaliCubeTransitionCrossEffectStopTransition(void)
   crossEffect.StopTransition();
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::ZERO), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
   crossEffect.SetTargetTexture( firstTexture );
   crossEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
@@ -929,10 +929,10 @@ int UtcDaliCubeTransitionCrossEffectStopTransition(void)
   crossEffect.StopTransition();
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::XAXIS), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::XAXIS), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -967,10 +967,10 @@ int UtcDaliCubeTransitionFoldEffectStopTransition(void)
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
 
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::XAXIS), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::XAXIS), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
   foldEffect.SetTargetTexture( firstTexture );
   foldEffect.StartTransition(PAN_POSITION1, PAN_DISPLACEMENT1);
@@ -978,10 +978,10 @@ int UtcDaliCubeTransitionFoldEffectStopTransition(void)
   foldEffect.StopTransition();
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::XAXIS), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::XAXIS), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
   foldEffect.SetTargetTexture( secondTexture );
   foldEffect.StartTransition(false);
@@ -989,10 +989,10 @@ int UtcDaliCubeTransitionFoldEffectStopTransition(void)
   foldEffect.StopTransition();
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::XAXIS), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::XAXIS), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
 
   foldEffect.SetTargetTexture( firstTexture );
   foldEffect.StartTransition(PAN_POSITION2, PAN_DISPLACEMENT2);
@@ -1000,9 +1000,9 @@ int UtcDaliCubeTransitionFoldEffectStopTransition(void)
   foldEffect.StopTransition();
   application.SendNotification();
   application.Render(RENDER_FRAME_INTERVAL);
-  DALI_TEST_EQUALS( cube1.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetCurrentOrientation(), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
-  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentColor(), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
-  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentColor(), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube1.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetCurrentProperty< Quaternion >( Actor::Property::ORIENTATION ), Quaternion( Dali::ANGLE_0,  Vector3::YAXIS), FLT_EPISILON, TEST_LOCATION  );
+  DALI_TEST_EQUALS( cube0.GetChildAt(0).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), FULL_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( cube0.GetChildAt(1).GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), HALF_BRIGHTNESS, FLT_EPISILON, TEST_LOCATION );
   END_TEST;
 }

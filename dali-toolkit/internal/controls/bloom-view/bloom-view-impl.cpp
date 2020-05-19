@@ -222,40 +222,40 @@ Toolkit::BloomView BloomView::New(const unsigned int blurNumSamples, const float
 void BloomView::OnInitialize()
 {
   // root actor to parent all user added actors, needed to allow us to set that subtree as exclusive for our child render task
-  mChildrenRoot.SetParentOrigin( ParentOrigin::CENTER );
-  mInternalRoot.SetParentOrigin( ParentOrigin::CENTER );
+  mChildrenRoot.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  mInternalRoot.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   //////////////////////////////////////////////////////
   // Create actors
 
   // Create an image view for rendering from the scene texture to the bloom texture
   mBloomExtractActor = Actor::New();
-  mBloomExtractActor.SetParentOrigin( ParentOrigin::CENTER );
+  mBloomExtractActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   // Create an image view for compositing the result (scene and bloom textures) to output
   mCompositeActor = Actor::New();
-  mCompositeActor.SetParentOrigin( ParentOrigin::CENTER );
+  mCompositeActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   // Create an image view for holding final result, i.e. the blurred image. This will get rendered to screen later, via default / user render task
   mTargetActor = Actor::New();
-  mTargetActor.SetParentOrigin( ParentOrigin::CENTER );
+  mTargetActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   // Create the Gaussian Blur object + render tasks
   // Note that we use mBloomExtractTarget as the source image and also re-use this as the gaussian blur final render target. This saves the gaussian blur code from creating it
   // render targets etc internally, so we make better use of resources
   // Note, this also internally creates the render tasks used by the Gaussian blur, this must occur after the bloom extraction and before the compositing
   mGaussianBlurView = Dali::Toolkit::GaussianBlurView::New(mBlurNumSamples, mBlurBellCurveWidth, mPixelFormat, mDownsampleWidthScale, mDownsampleHeightScale, true);
-  mGaussianBlurView.SetParentOrigin( ParentOrigin::CENTER );
+  mGaussianBlurView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
 
   //////////////////////////////////////////////////////
   // Create cameras for the renders corresponding to the (potentially downsampled) render targets' size
   mRenderDownsampledCamera = CameraActor::New();
-  mRenderDownsampledCamera.SetParentOrigin(ParentOrigin::CENTER);
+  mRenderDownsampledCamera.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
   mRenderDownsampledCamera.SetInvertYAxis( true );
 
   mRenderFullSizeCamera = CameraActor::New();
-  mRenderFullSizeCamera.SetParentOrigin(ParentOrigin::CENTER);
+  mRenderFullSizeCamera.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
   mRenderFullSizeCamera.SetInvertYAxis( true );
 
 
@@ -355,7 +355,7 @@ void BloomView::AllocateResources()
     mGaussianBlurView.SetSize(mTargetSize);
     GetImpl(mGaussianBlurView).AllocateResources();
 
-    mGaussianBlurView.SetVisible( true );
+    mGaussianBlurView.SetProperty( Actor::Property::VISIBLE, true );
 
     //////////////////////////////////////////////////////
     // Create render targets
@@ -473,7 +473,7 @@ void BloomView::Deactivate()
   mTargetActor.RemoveRenderer( 0u );
   mCompositeActor.RemoveRenderer( 0u );
 
-  mGaussianBlurView.SetVisible( false );
+  mGaussianBlurView.SetProperty( Actor::Property::VISIBLE, false );
 
   mActivated = false;
 }

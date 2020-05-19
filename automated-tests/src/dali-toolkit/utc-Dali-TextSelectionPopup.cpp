@@ -153,7 +153,7 @@ int UtcDaliToolkitTextSelectionToolBarP(void)
   toolbar.SetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE, Size( 100.0f, 60.0f) );
 
   Toolkit::PushButton option = Toolkit::PushButton::New();
-  option.SetName( "test-option" );
+  option.SetProperty( Dali::Actor::Property::NAME, "test-option" );
   option.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   toolbar.AddOption( option );
 
@@ -163,7 +163,7 @@ int UtcDaliToolkitTextSelectionToolBarP(void)
   toolbar.AddDivider( divider );
 
   Toolkit::PushButton option2 = Toolkit::PushButton::New();
-  option2.SetName( "test-option-2" );
+  option2.SetProperty( Dali::Actor::Property::NAME, "test-option-2" );
   option2.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   toolbar.AddOption( option2 );
 
@@ -184,7 +184,7 @@ int UtcDaliToolkitTextSelectionToolBarScrollBarP(void)
   toolbar.SetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE, Size( 100.0f, 60.0f) );
 
   Toolkit::PushButton option = Toolkit::PushButton::New();
-  option.SetName( "test-option" );
+  option.SetProperty( Dali::Actor::Property::NAME, "test-option" );
   option.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   toolbar.AddOption( option );
 

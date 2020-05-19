@@ -1279,8 +1279,8 @@ void TextEditor::OnInitialize()
 
   // Creates an extra control to be used as stencil buffer.
   mStencil = Control::New();
-  mStencil.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  mStencil.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  mStencil.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  mStencil.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
 
   // Creates a background visual. Even if the color is transparent it updates the stencil.
   mStencil.SetProperty( Toolkit::Control::Property::BACKGROUND,
@@ -1646,8 +1646,8 @@ void TextEditor::AddDecoration( Actor& actor, bool needsClipping )
     }
     else
     {
-      actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-      actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+      actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       Self().Add( actor );
       mActiveLayer = actor;
     }
@@ -1678,8 +1678,8 @@ void TextEditor::UpdateScrollBar()
   {
     mScrollBar = Toolkit::ScrollBar::New( Toolkit::ScrollBar::Vertical );
     mScrollBar.SetIndicatorHeightPolicy( Toolkit::ScrollBar::Variable );
-    mScrollBar.SetParentOrigin( ParentOrigin::TOP_RIGHT );
-    mScrollBar.SetAnchorPoint( AnchorPoint::TOP_RIGHT );
+    mScrollBar.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT );
+    mScrollBar.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT );
     mScrollBar.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
     mScrollBar.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::WIDTH );
 
@@ -1733,7 +1733,7 @@ void TextEditor::UpdateScrollBar()
   {
     mAnimation = Animation::New( mAnimationPeriod.durationSeconds );
   }
-  indicator.SetOpacity(1.0f);
+  indicator.SetProperty( DevelActor::Property::OPACITY,1.0f);
   mAnimation.AnimateTo( Property( indicator, Actor::Property::COLOR_ALPHA ), 0.0f, AlphaFunction::EASE_IN, mAnimationPeriod );
   mAnimation.Play();
   mAnimation.FinishedSignal().Connect( this, &TextEditor::OnScrollIndicatorAnimationFinished );

@@ -155,9 +155,9 @@ void ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
   mShadowPlaneBg = shadowPlaneBackground;
 
   mShadowPlane = Actor::New();
-  mShadowPlane.SetName( "SHADOW_PLANE" );
-  mShadowPlane.SetParentOrigin( ParentOrigin::CENTER );
-  mShadowPlane.SetAnchorPoint( AnchorPoint::CENTER );
+  mShadowPlane.SetProperty( Actor::Property::NAME, "SHADOW_PLANE" );
+  mShadowPlane.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  mShadowPlane.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   Renderer shadowRenderer = CreateRenderer( RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE, Shader::Hint::OUTPUT_IS_TRANSPARENT, Uint16Pair(20,20) );
   TextureSet textureSet = shadowRenderer.GetTextures();
   textureSet.SetTexture( 0u, mOutputFrameBuffer.GetColorTexture() );
@@ -168,7 +168,7 @@ void ShadowView::SetShadowPlaneBackground(Actor shadowPlaneBackground)
   // Rather than parent the shadow plane drawable and have constraints to move it to the same
   // position, instead parent the shadow plane drawable on the shadow plane passed in.
   mShadowPlaneBg.Add( mShadowPlane );
-  mShadowPlane.SetParentOrigin( ParentOrigin::CENTER );
+  mShadowPlane.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   mShadowPlane.SetZ( 1.0f );
 
   ConstrainCamera();
@@ -232,13 +232,13 @@ void ShadowView::Deactivate()
 void ShadowView::OnInitialize()
 {
   // root actor to parent all user added actors. Used as source actor for shadow render task.
-  mChildrenRoot.SetParentOrigin( ParentOrigin::CENTER );
+  mChildrenRoot.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   mChildrenRoot.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   mCameraActor = CameraActor::New(stageSize);
 
-  mCameraActor.SetParentOrigin( ParentOrigin::CENTER );
+  mCameraActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   // Target is constrained to point at the shadow plane origin
   mCameraActor.SetNearClippingPlane( 1.0f );
@@ -268,13 +268,13 @@ void ShadowView::OnInitialize()
   mBlurFilter.SetPixelFormat( Pixel::RGBA8888 );
 
   mBlurRootActor = Actor::New();
-  mBlurRootActor.SetName( "BLUR_ROOT_ACTOR" );
+  mBlurRootActor.SetProperty( Actor::Property::NAME, "BLUR_ROOT_ACTOR" );
 
   // Turn off inheritance to ensure filter renders properly
-  mBlurRootActor.SetParentOrigin( ParentOrigin::CENTER );
-  mBlurRootActor.SetInheritPosition( false );
-  mBlurRootActor.SetInheritOrientation( false );
-  mBlurRootActor.SetInheritScale( false );
+  mBlurRootActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  mBlurRootActor.SetProperty( Actor::Property::INHERIT_POSITION, false );
+  mBlurRootActor.SetProperty( Actor::Property::INHERIT_ORIENTATION, false );
+  mBlurRootActor.SetProperty( Actor::Property::INHERIT_SCALE, false );
   mBlurRootActor.SetColorMode( USE_OWN_COLOR );
 
   Self().Add( mBlurRootActor );

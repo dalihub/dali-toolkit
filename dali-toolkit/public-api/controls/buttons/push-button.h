@@ -53,7 +53,7 @@ class PushButton;
  * void HelloWorldExample::Create( Application& application )
  * {
  *   PushButton button = PushButton::New();
- *   button.SetParentOrigin( ParentOrigin::CENTER );
+ *   button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
  *   button.SetProperty( Button::Property::LABEL, "Press" );
  *   Stage::GetCurrent().Add( button );
  *
