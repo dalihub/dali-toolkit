@@ -245,7 +245,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    *
    * e.g.
    *   Property::Map map;
-   *   map["ACTOR"] = actor.GetName();       // replaces '{ACTOR} in the template
+   *   map["ACTOR"] = actor.GetProperty< std::string >( Dali::Actor::Property::NAME );       // replaces '{ACTOR} in the template
    *   Animation a = builder.CreateAnimation( "wobble");
    *
    * @pre The Builder has been initialized.
@@ -281,7 +281,7 @@ class DALI_TOOLKIT_API Builder : public BaseHandle
    * The animation is applied to a specific actor.
    * e.g.
    *   Property::Map map;
-   *   map["ACTOR"] = actor.GetName();       // replaces '{ACTOR} in the template
+   *   map["ACTOR"] = actor.GetProperty< std::string >( Dali::Actor::Property::NAME );       // replaces '{ACTOR} in the template
    *   Actor myInstance = builder.Create( "templateActorTree" )
    *   Animation a = builder.CreateAnimation( "wobble", myInstance);
    *

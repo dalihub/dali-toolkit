@@ -246,8 +246,8 @@ void Scene3dView::SetCubeMap( const std::string& diffuseTexturePath, const std::
 
 bool Scene3dView::SetDefaultCamera( const Dali::Camera::Type type, const float nearPlane, const Vector3 cameraPosition )
 {
-  mDefaultCamera.SetParentOrigin( ParentOrigin::CENTER );
-  mDefaultCamera.SetAnchorPoint( AnchorPoint::CENTER );
+  mDefaultCamera.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  mDefaultCamera.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   mDefaultCamera.SetType( type );
   mDefaultCamera.SetNearClippingPlane( nearPlane );
   mDefaultCamera.SetPosition( cameraPosition );
@@ -352,19 +352,19 @@ Texture Scene3dView::LoadTexture( const char *imageUrl, bool generateMipmaps )
 
 void Scene3dView::OnInitialize()
 {
-  mRoot.SetParentOrigin( ParentOrigin::CENTER );
-  mRoot.SetAnchorPoint( AnchorPoint::CENTER );
+  mRoot.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  mRoot.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   Layer layer = Layer::New();
   layer.SetBehavior( Layer::LAYER_3D );
-  layer.SetParentOrigin( ParentOrigin::CENTER );
-  layer.SetAnchorPoint( AnchorPoint::CENTER );
+  layer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  layer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   layer.Add( mRoot );
 
   Actor self = Self();
   // Apply some default resizing rules.
-  self.SetParentOrigin( ParentOrigin::CENTER );
-  self.SetAnchorPoint( AnchorPoint::CENTER );
+  self.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  self.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   self.Add( layer );
 
   CreateScene();

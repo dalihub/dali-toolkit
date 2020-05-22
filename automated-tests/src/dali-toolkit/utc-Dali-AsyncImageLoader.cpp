@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <dali/dali.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali-toolkit-test-suite-utils.h>
 #include <toolkit-event-thread-callback.h>
 #include <dali-toolkit/dali-toolkit.h>

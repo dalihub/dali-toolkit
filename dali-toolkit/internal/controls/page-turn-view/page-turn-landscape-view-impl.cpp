@@ -69,12 +69,12 @@ void PageTurnLandscapeView::OnPageTurnViewInitialize()
 
   mControlSize = Vector2( mPageSize.width * 2.f,  mPageSize.height  );
   Self().SetSize( mControlSize );
-  mTurningPageLayer.SetParentOrigin( ParentOrigin::CENTER );
+  mTurningPageLayer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 }
 
 void PageTurnLandscapeView::OnAddPage( Actor newPage, bool isLeftSide )
 {
-  newPage.SetParentOrigin( ParentOrigin::CENTER );
+  newPage.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 }
 
 Vector2 PageTurnLandscapeView::SetPanPosition( const Vector2& gesturePosition )

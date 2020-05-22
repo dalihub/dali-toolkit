@@ -138,8 +138,8 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
 
   ScrollView scrollView = ScrollView::New();
   scrollView.SetSize(size);
-  scrollView.SetAnchorPoint(AnchorPoint::CENTER);
-  scrollView.SetParentOrigin(ParentOrigin::CENTER);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
 
   constraint = Constraint::New<Dali::Vector3>( scrollView, Dali::Actor::Property::SIZE, Dali::EqualToConstraint() );
   constraint.AddSource( Dali::ParentSource( Dali::Actor::Property::SIZE ) );
@@ -174,8 +174,8 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
   Stage::GetCurrent().Add( scrollView );
 
   Actor container = Actor::New();
-  container.SetParentOrigin(ParentOrigin::CENTER);
-  container.SetAnchorPoint(AnchorPoint::CENTER);
+  container.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
+  container.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::CENTER);
   container.SetSize( size );
   scrollView.Add( container );
 
@@ -193,8 +193,8 @@ ScrollView SetupTestScrollView(int rows, int columns, Vector2 size)
       constraint = Constraint::New<Vector3>( page, Actor::Property::SIZE, EqualToConstraint() );
       constraint.AddSource( Dali::ParentSource( Dali::Actor::Property::SIZE ) );
       constraint.Apply();
-      page.SetParentOrigin( ParentOrigin::CENTER );
-      page.SetAnchorPoint( AnchorPoint::CENTER );
+      page.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+      page.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
       page.SetPosition( column * size.x, row * size.y );
       container.Add(page);
 
@@ -289,7 +289,7 @@ int UtcDaliScrollViewPagePathEffectTest(void)
   }
 
   // test that the test page has reached centre of screen
-  Vector3 pagePos = testPage.GetCurrentPosition();
+  Vector3 pagePos = testPage.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
   DALI_TEST_EQUALS(pagePos, Vector3::ZERO, Math::MACHINE_EPSILON_0, TEST_LOCATION);
 
   CleanupTest();

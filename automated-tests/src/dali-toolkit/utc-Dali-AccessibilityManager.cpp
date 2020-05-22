@@ -359,7 +359,7 @@ int UtcDaliAccessibilityManagerSetAndGetCurrentFocusActor(void)
   Stage::GetCurrent().Add(third);
 
   // make the third actor invisible
-  third.SetVisible(false);
+  third.SetProperty( Actor::Property::VISIBLE,false);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -368,7 +368,7 @@ int UtcDaliAccessibilityManagerSetAndGetCurrentFocusActor(void)
   DALI_TEST_CHECK(manager.SetCurrentFocusActor(third) == false);
 
   // Make the third actor visible
-  third.SetVisible(true);
+  third.SetProperty( Actor::Property::VISIBLE,true);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -631,7 +631,7 @@ int UtcDaliAccessibilityManagerMoveFocusForward(void)
   DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // Make the first actor invisible
-  first.SetVisible(false);
+  first.SetProperty( Actor::Property::VISIBLE,false);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -644,7 +644,7 @@ int UtcDaliAccessibilityManagerMoveFocusForward(void)
   DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "third");
 
   // Make the third actor invisible so that no actor can be focused.
-  third.SetVisible(false);
+  third.SetProperty( Actor::Property::VISIBLE,false);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -748,7 +748,7 @@ int UtcDaliAccessibilityManagerMoveFocusBackward(void)
   DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Make the third actor invisible
-  third.SetVisible(false);
+  third.SetProperty( Actor::Property::VISIBLE,false);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -761,7 +761,7 @@ int UtcDaliAccessibilityManagerMoveFocusBackward(void)
   DALI_TEST_CHECK(manager.GetAccessibilityAttribute(manager.GetCurrentFocusActor(), AccessibilityManager::ACCESSIBILITY_LABEL) == "first");
 
   // Make the first actor invisible so that no actor can be focused.
-  first.SetVisible(false);
+  first.SetProperty( Actor::Property::VISIBLE,false);
   // flush the queue and render once
   application.SendNotification();
   application.Render();

@@ -1123,8 +1123,8 @@ int utcDaliTextFieldInputStyleChanged01(void)
 
 
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
   field.SetProperty( TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>" );
@@ -1331,8 +1331,8 @@ int utcDaliTextFieldInputStyleChanged02(void)
   DALI_TEST_CHECK( field );
 
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   field.SetProperty( TextField::Property::ENABLE_MARKUP, true );
   field.SetProperty( TextField::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='blue'> l</color><color value='green'>lo</color> <font weight='bold'>world</font> demo</font>" );
@@ -1527,8 +1527,8 @@ int utcDaliTextFieldEvent01(void)
   Stage::GetCurrent().Add( field );
 
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Render and notify
   application.SendNotification();
@@ -1576,8 +1576,8 @@ int utcDaliTextFieldEvent01(void)
   // Create a second text field and send key events to it.
   TextField field2 = TextField::New();
 
-  field2.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field2.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field2.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field2.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   field2.SetSize( 100.f, 100.0f );
   field2.SetPosition( 100.0f, 100.0f );
 
@@ -1623,8 +1623,8 @@ int utcDaliTextFieldEvent02(void)
   Stage::GetCurrent().Add( field );
 
   field.SetSize( 300.0f, 50.0f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1676,14 +1676,14 @@ int utcDaliTextFieldEvent02(void)
   }
 
   // Move the cursor and check the position changes.
-  Vector3 position1 = cursor.GetCurrentPosition();
+  Vector3 position1 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  Vector3 position2 = cursor.GetCurrentPosition();
+  Vector3 position2 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
   DALI_TEST_CHECK( position2.x < position1.x );
 
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_RIGHT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
@@ -1692,7 +1692,7 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 position3 = cursor.GetCurrentPosition();
+  Vector3 position3 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
   DALI_TEST_EQUALS( position1, position3, TEST_LOCATION ); // Should be in the same position1.
 
 
@@ -1704,7 +1704,7 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 position4 = cursor.GetCurrentPosition();
+  Vector3 position4 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   // Send some taps and check the cursor positions.
 
@@ -1716,7 +1716,7 @@ int utcDaliTextFieldEvent02(void)
   application.Render();
 
   // Cursor position should be the same than position1.
-  Vector3 position5 = cursor.GetCurrentPosition();
+  Vector3 position5 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   DALI_TEST_EQUALS( position4, position5, TEST_LOCATION ); // Should be in the same position2.
 
@@ -1727,7 +1727,7 @@ int utcDaliTextFieldEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 position6 = cursor.GetCurrentPosition();
+  Vector3 position6 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   DALI_TEST_CHECK( position6.x > position5.x );
 
@@ -1741,7 +1741,7 @@ int utcDaliTextFieldEvent02(void)
   application.Render();
 
   // Cursor position should be the same than position2.
-  Vector3 position7 = cursor.GetCurrentPosition();
+  Vector3 position7 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   DALI_TEST_EQUALS( position4, position7, TEST_LOCATION );// Should be in the same position2.
 
@@ -1776,8 +1776,8 @@ int utcDaliTextFieldEvent03(void)
   field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   field.SetSize( 30.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1837,8 +1837,8 @@ int utcDaliTextFieldEvent04(void)
   field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1890,8 +1890,8 @@ int utcDaliTextFieldEvent05(void)
   field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1941,8 +1941,8 @@ int utcDaliTextFieldEvent06(void)
   field.SetProperty( TextField::Property::TEXT, "Thisisalongtextforthesizeofthetextfield." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1992,8 +1992,8 @@ int utcDaliTextFieldEvent07(void)
   field.SetProperty( TextField::Property::TEXT, "Thisisalongtextforthesizeofthetextfield." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Property::Map propertyMap;
   propertyMap["PANEL_LAYOUT"] = InputMethod::PanelLayout::PASSWORD;
   field.SetProperty( TextField::Property::INPUT_METHOD_SETTINGS, propertyMap );
@@ -2035,8 +2035,8 @@ int utcDaliTextFieldEvent08(void)
   field.SetProperty( TextField::Property::PLACEHOLDER_TEXT, "Setting Placeholder Text" );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2069,7 +2069,7 @@ int utcDaliTextFieldEvent08(void)
 
   if (actor)
   {
-    Vector3 worldPosition = actor.GetCurrentWorldPosition();
+    Vector3 worldPosition = actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION );
     Vector2 halfStageSize = stage.GetSize() / 2.0f;
     Vector2 position(worldPosition.x + halfStageSize.width, worldPosition.y + halfStageSize.height);
 
@@ -2103,8 +2103,8 @@ int utcDaliTextFieldEvent09(void)
   field.SetProperty( TextField::Property::TEXT, "Hello" );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2190,8 +2190,8 @@ int utcDaliTextFieldStyleWhilstSelected(void)
   field.SetProperty( TextField::Property::TEXT, "This is a long text for the size of the text-field." );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2292,8 +2292,8 @@ int utcDaliTextFieldEscKeyLoseFocus(void)
   Stage::GetCurrent().Add( field );
 
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2374,8 +2374,8 @@ int utcDaliTextFieldSomeSpecialKeys(void)
   field.SetProperty( TextField::Property::TEXT, longText );
   field.SetProperty( TextField::Property::POINT_SIZE, 10.f );
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2455,8 +2455,8 @@ int utcDaliTextFieldSizeUpdate(void)
   field.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY , Dimension::HEIGHT );
 
   field.SetProperty( TextField::Property::TEXT, "ኢ");
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   field.SetKeyboardFocusable(true);
   KeyboardFocusManager::Get().SetCurrentFocusActor( field );
@@ -2490,8 +2490,8 @@ int utcDaliTextFieldExtremlyLargePointSize(void)
 
   field.SetProperty( TextField::Property::TEXT, "Text" );
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
 
   try
@@ -2620,8 +2620,8 @@ int UtcDaliTextFieldSetPaddingProperty(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
   field.SetSize( 300.f, 50.f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
 
   application.SendNotification();
@@ -2653,8 +2653,8 @@ int UtcDaliTextFieldEnableShiftSelectionProperty(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
   field.SetSize( 300.0f, 50.0f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
 
   application.SendNotification();
@@ -2681,8 +2681,8 @@ int UtcDaliTextFieldEnableGrabHandleProperty(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
   field.SetSize( 300.0f, 50.0f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
 
   application.SendNotification();
@@ -2709,8 +2709,8 @@ int UtcDaliTextFieldMatchSystemLanguageDirectionProperty(void)
   TextField field = TextField::New();
   DALI_TEST_CHECK( field );
   field.SetSize( 300.0f, 50.0f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( field );
 
   application.SendNotification();
@@ -2742,8 +2742,8 @@ int utcDaliTextFieldLayoutDirectionCoverage(void)
   Stage::GetCurrent().Add( field );
 
   field.SetSize( 300.0f, 50.0f );
-  field.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  field.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  field.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  field.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2831,8 +2831,8 @@ int UtcDaliTextFieldSelectWholeText(void)
   Stage::GetCurrent().Add( textField );
 
   textField.SetSize( 300.f, 50.f );
-  textField.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  textField.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2883,8 +2883,8 @@ int UtcDaliTextFieldSelectNone(void)
   Stage::GetCurrent().Add( textField );
 
   textField.SetSize( 300.f, 50.f );
-  textField.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  textField.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  textField.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  textField.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );

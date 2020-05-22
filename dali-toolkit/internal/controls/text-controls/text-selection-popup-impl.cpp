@@ -676,7 +676,7 @@ std::string TextSelectionPopup::GetPressedImage() const
    DALI_LOG_INFO( gLogFilter, Debug::General, "TextSelectionPopup::AddOption\n" );
 
    Toolkit::PushButton option = Toolkit::PushButton::New();
-   option.SetName( button.name );
+   option.SetProperty( Dali::Actor::Property::NAME, button.name );
    option.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 
    switch( button.id )
@@ -763,7 +763,7 @@ std::string TextSelectionPopup::GetPressedImage() const
 
      Toolkit::Control divider = Toolkit::Control::New();
 #ifdef DECORATOR_DEBUG
-     divider.SetName("Text's popup divider");
+     divider.SetProperty( Dali::Actor::Property::NAME,"Text's popup divider");
 #endif
      divider.SetSize( size );
      divider.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::HEIGHT );
@@ -804,9 +804,9 @@ std::string TextSelectionPopup::GetPressedImage() const
      {
        mToolbar.SetProperty( Toolkit::TextSelectionToolbar::Property::MAX_SIZE, mPopupMaxSize );
      }
-     mToolbar.SetParentOrigin( ParentOrigin::CENTER );
+     mToolbar.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 #ifdef DECORATOR_DEBUG
-     mToolbar.SetName("TextSelectionToolbar");
+     mToolbar.SetProperty( Dali::Actor::Property::NAME,"TextSelectionToolbar");
 #endif
      self.Add( mToolbar );
    }

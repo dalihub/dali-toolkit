@@ -190,11 +190,11 @@ Actor VectorBasedRenderer::Render( Text::ViewInterface& view,
   UnparentAndReset( mImpl->mActor );
 
   mImpl->mActor = Actor::New();
-  mImpl->mActor.SetParentOrigin( ParentOrigin::CENTER );
+  mImpl->mActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   mImpl->mActor.SetSize( view.GetControlSize() );
-  mImpl->mActor.SetColor( Color::WHITE );
+  mImpl->mActor.SetProperty( Actor::Property::COLOR, Color::WHITE );
 #if defined(DEBUG_ENABLED)
-  mImpl->mActor.SetName( "Text renderable actor" );
+  mImpl->mActor.SetProperty( Dali::Actor::Property::NAME, "Text renderable actor" );
 #endif
 
   Length numberOfGlyphs = view.GetNumberOfGlyphs();

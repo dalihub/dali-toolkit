@@ -118,7 +118,7 @@ int UtcDaliShadowViewAddRemove(void)
   DALI_TEST_CHECK( !actor.OnStage() );
 
 
-  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   view.SetSize(Stage::GetCurrent().GetSize());
   view.Add(actor);
   Stage::GetCurrent().Add(view);
@@ -143,7 +143,7 @@ int UtcDaliShadowViewActivateDeactivate(void)
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
 
-  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   view.SetSize(Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);

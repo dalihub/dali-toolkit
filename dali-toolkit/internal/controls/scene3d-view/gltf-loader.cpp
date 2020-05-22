@@ -1291,8 +1291,8 @@ void Loader::LoadCamera( Scene3dView& scene3dView )
     }
 
     CameraActor cameraActor = CameraActor::New();
-    cameraActor.SetParentOrigin( ParentOrigin::CENTER );
-    cameraActor.SetAnchorPoint( AnchorPoint::CENTER );
+    cameraActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    cameraActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
     if( cameraInfo.type == "orthographic" )
     {
@@ -1428,7 +1428,7 @@ bool Loader::LoadSceneNodes( Scene3dView& scene3dView )
   for( auto nodeIter = tempNode->CBegin(), end = tempNode->CEnd(); nodeIter != end; ++nodeIter )
   {
     Actor actor = AddNode( scene3dView, ( ( *nodeIter ).second ).GetInteger() );
-    actor.SetParentOrigin( ParentOrigin::CENTER );
+    actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
     scene3dView.GetRoot().Add( actor );
   }
 
@@ -1581,7 +1581,7 @@ Actor Loader::AddNode( Scene3dView& scene3dView, uint32_t index )
     renderer.SetTextures( textureSet );
 
     anchorPoint = meshInfo.pivot;
-    actor.SetAnchorPoint( anchorPoint );
+    actor.SetProperty( Actor::Property::ANCHOR_POINT, anchorPoint );
 
     actor.SetSize( Vector3( meshInfo.size.x, meshInfo.size.y, meshInfo.size.z ) );
     actor.AddRenderer( renderer );
@@ -1648,7 +1648,7 @@ Actor Loader::AddNode( Scene3dView& scene3dView, uint32_t index )
   }
   else
   {
-    actor.SetAnchorPoint( AnchorPoint::CENTER );
+    actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
     actor.SetPosition( translation );
     actor.RotateBy( orientation );
     actor.SetSize( actorSize );
@@ -1670,7 +1670,7 @@ Actor Loader::AddNode( Scene3dView& scene3dView, uint32_t index )
   {
     std::string nameString;
     ReadString( tempNode, nameString );
-    actor.SetName( nameString );
+    actor.SetProperty( Dali::Actor::Property::NAME, nameString );
   }
 
   SetActorCache( actor, index );
@@ -1679,7 +1679,7 @@ Actor Loader::AddNode( Scene3dView& scene3dView, uint32_t index )
     for( auto childIter = tempNode->CBegin(), end = tempNode->CEnd(); childIter != end; ++childIter )
     {
       Actor childActor = AddNode( scene3dView, ( ( *childIter ).second ).GetInteger() );
-      childActor.SetParentOrigin( anchorPoint );
+      childActor.SetProperty( Actor::Property::PARENT_ORIGIN, anchorPoint );
       actor.Add( childActor );
     }
   }

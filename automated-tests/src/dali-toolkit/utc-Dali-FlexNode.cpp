@@ -44,7 +44,7 @@ const Flex::SizeTuple ITEM_SIZE_CALLBACK_TEST = Flex::SizeTuple{ 15.0f, 15.0f };
 Flex::SizeTuple MeasureChild( Actor child, float width, int measureModeWidth, float height, int measureModeHeight)
 {
   Flex::SizeTuple childSize = ITEM_SIZE;
-  if (child.GetName() == "callbackTest")
+  if (child.GetProperty< std::string >( Dali::Actor::Property::NAME ) == "callbackTest")
   {
     childSize = ITEM_SIZE_CALLBACK_TEST;
   }
@@ -401,8 +401,8 @@ int UtcDaliToolkitFlexNodeRemoveChildP(void)
   // Create two actors and add them to the parent flex node
   Actor actor1 = Actor::New();
   Actor actor2 = Actor::New();
-  actor1.SetName("Actor1");
-  actor2.SetName("Actor2");
+  actor1.SetProperty( Dali::Actor::Property::NAME,"Actor1");
+  actor2.SetProperty( Dali::Actor::Property::NAME,"Actor2");
 
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );
@@ -444,8 +444,8 @@ int UtcDaliToolkitFlexNodeRemoveAllChildrenP(void)
   // Create two actors and add them to the parent flex node
   Actor actor1 = Actor::New();
   Actor actor2 = Actor::New();
-  actor1.SetName("Actor1");
-  actor2.SetName("Actor2");
+  actor1.SetProperty( Dali::Actor::Property::NAME,"Actor1");
+  actor2.SetProperty( Dali::Actor::Property::NAME,"Actor2");
 
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );
@@ -534,7 +534,7 @@ int UtcDaliToolkitFlexNodeCallbackTestP(void)
   Actor actor1 = Actor::New();
   Actor actor2 = Actor::New();
 
-  actor1.SetName("callbackTest");
+  actor1.SetProperty( Dali::Actor::Property::NAME,"callbackTest");
 
   DALI_TEST_CHECK( actor1 );
   DALI_TEST_CHECK( actor2 );

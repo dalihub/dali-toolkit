@@ -263,9 +263,9 @@ PageTurnView::Page::Page()
 : isTurnBack( false )
 {
   actor = Actor::New();
-  actor.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
-  actor.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  actor.SetVisible( false );
+  actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  actor.SetProperty( Actor::Property::VISIBLE, false );
 
   propertyPanDisplacement = actor.RegisterProperty( PROPERTY_PAN_DISPLACEMENT, 0.f );
   propertyPanCenter = actor.RegisterProperty(PROPERTY_PAN_CENTER, Vector2::ZERO);
@@ -394,7 +394,7 @@ void PageTurnView::OnInitialize()
 
   // create the layer for turning pages
   mTurningPageLayer = Layer::New();
-  mTurningPageLayer.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  mTurningPageLayer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
   mTurningPageLayer.SetBehavior(Layer::LAYER_3D);
   mTurningPageLayer.Raise();
 
@@ -410,7 +410,7 @@ void PageTurnView::OnInitialize()
     AddPage( i );
     mPages[i].actor.SetZ( -static_cast<float>( i )*STATIC_PAGE_INTERVAL_DISTANCE );
   }
-  mPages[0].actor.SetVisible(true);
+  mPages[0].actor.SetProperty( Actor::Property::VISIBLE,true);
 
   // enable the pan gesture which is attached to the control
   EnableGestureDetection(Gesture::Type(Gesture::Pan));
@@ -448,21 +448,21 @@ Shader PageTurnView::CreateShader( const Property::Map& shaderMap )
 void PageTurnView::SetupShadowView()
 {
   mShadowView = Toolkit::ShadowView::New( 0.25f, 0.25f );
-  Vector3 origin = mTurningPageLayer.GetCurrentParentOrigin();
-  mShadowView.SetParentOrigin( origin );
-  mShadowView.SetAnchorPoint( origin );
+  Vector3 origin = mTurningPageLayer.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN );
+  mShadowView.SetProperty( Actor::Property::PARENT_ORIGIN, origin );
+  mShadowView.SetProperty( Actor::Property::ANCHOR_POINT, origin );
   mShadowView.SetPointLightFieldOfView( Math::PI / 2.0f);
   mShadowView.SetShadowColor(DEFAULT_SHADOW_COLOR);
 
   mShadowPlaneBackground = Actor::New();
-  mShadowPlaneBackground.SetParentOrigin( ParentOrigin::CENTER );
+  mShadowPlaneBackground.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   mShadowPlaneBackground.SetSize( mControlSize );
   Self().Add( mShadowPlaneBackground );
   mShadowView.SetShadowPlaneBackground( mShadowPlaneBackground );
 
   mPointLight = Actor::New();
-  mPointLight.SetAnchorPoint( origin );
-  mPointLight.SetParentOrigin( origin );
+  mPointLight.SetProperty( Actor::Property::ANCHOR_POINT, origin );
+  mPointLight.SetProperty( Actor::Property::PARENT_ORIGIN, origin );
   mPointLight.SetPosition( 0.f, 0.f, mPageSize.width*POINT_LIGHT_HEIGHT_RATIO );
   Self().Add( mPointLight );
   mShadowView.SetPointLight( mPointLight );
@@ -557,10 +557,10 @@ void PageTurnView::GoToPage( unsigned int pageId )
     AddPage( i );
   }
 
-  mPages[pageId%NUMBER_OF_CACHED_PAGES].actor.SetVisible(true);
+  mPages[pageId%NUMBER_OF_CACHED_PAGES].actor.SetProperty( Actor::Property::VISIBLE,true);
   if( pageId > 0 )
   {
-    mPages[(pageId-1)%NUMBER_OF_CACHED_PAGES].actor.SetVisible(true);
+    mPages[(pageId-1)%NUMBER_OF_CACHED_PAGES].actor.SetProperty( Actor::Property::VISIBLE,true);
   }
   // set ordered depth to the stacked pages
   OrganizePageDepth();
@@ -590,7 +590,7 @@ void PageTurnView::AddPage( int pageIndex )
 
     float degree = isLeftSide ? 180.f :0.f;
     mPages[index].actor.SetOrientation( Degree( degree ), Vector3::YAXIS );
-    mPages[index].actor.SetVisible( false );
+    mPages[index].actor.SetProperty( Actor::Property::VISIBLE, false );
     mPages[index].UseEffect( mSpineEffectShader, mGeometry );
     mPages[index].SetTexture( newPage );
 
@@ -605,7 +605,7 @@ void PageTurnView::RemovePage( int pageIndex )
   if( pageIndex > -1 && pageIndex < mTotalPageCount)
   {
     int index = pageIndex % NUMBER_OF_CACHED_PAGES;
-    mPages[index].actor.SetVisible(false);
+    mPages[index].actor.SetProperty( Actor::Property::VISIBLE,false);
   }
 }
 
@@ -712,7 +712,7 @@ void PageTurnView::PanContinuing( const Vector2& gesturePosition )
       int id = mTurningPageIndex + (mPages[mIndex].isTurnBack ? -1 : 1);
       if( id >=0 && id < mTotalPageCount )
       {
-        mPages[id%NUMBER_OF_CACHED_PAGES].actor.SetVisible(true);
+        mPages[id%NUMBER_OF_CACHED_PAGES].actor.SetProperty( Actor::Property::VISIBLE,true);
       }
 
       mShadowView.RemoveConstraints();
@@ -910,7 +910,7 @@ void PageTurnView::TurnedOver( Animation& animation )
   int id = pageId + (mPages[index].isTurnBack ? -1 : 1);
   if( id >=0 && id < mTotalPageCount )
   {
-    mPages[id%NUMBER_OF_CACHED_PAGES].actor.SetVisible(false);
+    mPages[id%NUMBER_OF_CACHED_PAGES].actor.SetProperty( Actor::Property::VISIBLE,false);
   }
 
   OnTurnedOver( mPages[index].actor, mPages[index].isTurnBack );
@@ -934,7 +934,7 @@ void PageTurnView::SliddenBack( Animation& animation )
   int id = pageId + (mPages[index].isTurnBack ? -1 : 1);
   if( id >=0 && id < mTotalPageCount )
   {
-    mPages[id%NUMBER_OF_CACHED_PAGES].actor.SetVisible(false);
+    mPages[id%NUMBER_OF_CACHED_PAGES].actor.SetProperty( Actor::Property::VISIBLE,false);
   }
 
   // Guard against destruction during signal emission

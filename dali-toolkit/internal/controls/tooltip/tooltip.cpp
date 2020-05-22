@@ -286,7 +286,7 @@ void Tooltip::SetContent( Toolkit::Control& control, const Property::Value& valu
   if( connectSignals && ! mSignalsConnected )
   {
     control.HoveredSignal().Connect( this, &Tooltip::OnHovered );
-    control.SetLeaveRequired( true );
+    control.SetProperty( Actor::Property::LEAVE_REQUIRED, true );
     mSignalsConnected = true;
   }
 }
@@ -478,8 +478,8 @@ bool Tooltip::OnTimeout()
     mPopup.SetProperty( Toolkit::Popup::Property::ANIMATION_MODE, "NONE" );
     mPopup.SetProperty( Toolkit::Popup::Property::BACKING_ENABLED, false ); // Disable the dimmed backing.
     mPopup.SetProperty( Toolkit::Popup::Property::TOUCH_TRANSPARENT, true ); // Let events pass through the popup
-    mPopup.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    mPopup.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    mPopup.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+    mPopup.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
     // Background
     mPopup.SetProperty( Toolkit::Popup::Property::POPUP_BACKGROUND_IMAGE, mBackgroundImage );
@@ -605,7 +605,7 @@ void Tooltip::OnRelayout( Actor actor )
         Toolkit::Control control = mControl.GetHandle();
         if( control )
         {
-          Vector3 worldPos = control.GetCurrentWorldPosition();
+          Vector3 worldPos = control.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION );
           float height = control.GetRelayoutSize( Dimension::HEIGHT );
 
           position.x = stageSize.width * 0.5f + worldPos.x - popupWidth * 0.5f;
@@ -619,7 +619,7 @@ void Tooltip::OnRelayout( Actor actor )
         Toolkit::Control control = mControl.GetHandle();
         if( control )
         {
-          Vector3 worldPos = control.GetCurrentWorldPosition();
+          Vector3 worldPos = control.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION );
           float height = control.GetRelayoutSize( Dimension::HEIGHT );
 
           position.x = stageSize.width * 0.5f + worldPos.x - popupWidth * 0.5f;
@@ -655,7 +655,7 @@ void Tooltip::OnRelayout( Actor actor )
     if( yPosChanged && tail )
     {
       // If we change the y position, then the tail may be shown pointing to the wrong control so just hide it.
-      tail.SetVisible( false );
+      tail.SetProperty( Actor::Property::VISIBLE, false );
     }
 
     mPopup.SetPosition( position );

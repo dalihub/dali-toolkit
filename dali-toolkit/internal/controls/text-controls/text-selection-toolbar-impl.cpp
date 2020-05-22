@@ -187,8 +187,8 @@ void TextSelectionToolbar::SetPopupMaxSize( const Size& maxSize )
   mMaxSize = maxSize;
   if (mScrollView && mToolbarLayer )
   {
-    mScrollView.SetMaximumSize( mMaxSize );
-    mToolbarLayer.SetMaximumSize( mMaxSize );
+    mScrollView.SetProperty( Actor::Property::MAXIMUM_SIZE, mMaxSize );
+    mToolbarLayer.SetProperty( Actor::Property::MAXIMUM_SIZE, mMaxSize );
   }
 }
 
@@ -199,10 +199,10 @@ const Dali::Vector2& TextSelectionToolbar::GetPopupMaxSize() const
 
 void TextSelectionToolbar::SetUpScrollView()
 {
-  mScrollView.SetName("TextSelectionScrollView");
+  mScrollView.SetProperty( Dali::Actor::Property::NAME,"TextSelectionScrollView");
   mScrollView.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-  mScrollView.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  mScrollView.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  mScrollView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  mScrollView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
 
   mScrollView.SetScrollingDirection( PanGestureDetector::DIRECTION_HORIZONTAL, Degree( 40.0f ) );
   mScrollView.SetAxisAutoLock( true );
@@ -228,8 +228,8 @@ void TextSelectionToolbar::SetUp()
   // Create Layer to house the toolbar.
   mToolbarLayer = Layer::New();
   mToolbarLayer.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS );
-  mToolbarLayer.SetAnchorPoint( AnchorPoint::CENTER );
-  mToolbarLayer.SetParentOrigin( ParentOrigin::CENTER );
+  mToolbarLayer.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  mToolbarLayer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   if( !mScrollView )
   {
@@ -240,8 +240,8 @@ void TextSelectionToolbar::SetUp()
   // Toolbar must start with at least one option, adding further options with increase it's size
   mTableOfButtons = Dali::Toolkit::TableView::New( 1, 1 );
   mTableOfButtons.SetFitHeight( 0 );
-  mTableOfButtons.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  mTableOfButtons.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  mTableOfButtons.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  mTableOfButtons.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
 
   mScrollView.Add( mTableOfButtons );
   mToolbarLayer.Add( mScrollView );
@@ -256,15 +256,15 @@ void TextSelectionToolbar::SetUpScrollBar( bool enable )
     if( ! mScrollBar )
     {
       Toolkit::ImageView indicator = Toolkit::ImageView::New();
-      indicator.SetParentOrigin( ParentOrigin::TOP_LEFT );
-      indicator.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      indicator.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+      indicator.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       indicator.SetStyleName( "TextSelectionScrollIndicator" );
 
       mScrollBar = Toolkit::ScrollBar::New( Toolkit::ScrollBar::Horizontal );
-      mScrollBar.SetName( "Text popup scroll bar" );
+      mScrollBar.SetProperty( Dali::Actor::Property::NAME, "Text popup scroll bar" );
       mScrollBar.SetStyleName( "TextSelectionScrollBar" );
-      mScrollBar.SetParentOrigin( ParentOrigin::BOTTOM_LEFT );
-      mScrollBar.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      mScrollBar.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT );
+      mScrollBar.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       mScrollBar.SetPosition( mScrollBarPadding.x, -mScrollBarPadding.y );
       mScrollBar.SetResizePolicy( Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH );
       mScrollBar.SetOrientation( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) );
@@ -285,13 +285,13 @@ void TextSelectionToolbar::OnScrollStarted( const Vector2& position )
   {
     mScrollView.SetOvershootEnabled( true );
   }
-  mTableOfButtons.SetSensitive( false );
+  mTableOfButtons.SetProperty( Actor::Property::SENSITIVE, false );
 }
 
 void TextSelectionToolbar::OnScrollCompleted( const Vector2& position )
 {
   mFirstScrollEnd = true;
-  mTableOfButtons.SetSensitive( true );
+  mTableOfButtons.SetProperty( Actor::Property::SENSITIVE, true );
 }
 
 void TextSelectionToolbar::AddOption( Actor& option )

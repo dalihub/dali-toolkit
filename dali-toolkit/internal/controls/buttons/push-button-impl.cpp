@@ -112,7 +112,7 @@ void PushButton::OnInitialize()
 
   // Push button requires the Leave event.
   Actor self = Self();
-  self.SetLeaveRequired( true );
+  self.SetProperty( Actor::Property::LEAVE_REQUIRED, true );
 }
 
 void PushButton::SetIconAlignment( const PushButton::IconAlignment iconAlignment )

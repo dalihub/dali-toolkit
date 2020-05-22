@@ -79,7 +79,7 @@ void PageTurnPortraitView::OnPageTurnViewInitialize()
 
   mControlSize = mPageSize;
   Self().SetSize( mPageSize );
-  mTurningPageLayer.SetParentOrigin( ParentOrigin::CENTER_LEFT );
+  mTurningPageLayer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
 }
 
 Vector2 PageTurnPortraitView::SetPanPosition( const Vector2& gesturePosition )
@@ -125,7 +125,7 @@ void PageTurnPortraitView::OnPossibleOutwardsFlick( const Vector2& panPosition, 
     OrganizePageDepth();
     mPageUpdated = true;
 
-    actor.SetVisible(true);
+    actor.SetProperty( Actor::Property::VISIBLE,true);
 
     // Add the page to tuning page layer and set up PageTurnEffect
     mShadowView.Add( actor );
@@ -154,7 +154,7 @@ void PageTurnPortraitView::OnTurnedOver( Actor actor, bool isLeftSide )
 {
   if( isLeftSide )
   {
-    actor.SetVisible( false );
+    actor.SetProperty( Actor::Property::VISIBLE, false );
   }
 }
 

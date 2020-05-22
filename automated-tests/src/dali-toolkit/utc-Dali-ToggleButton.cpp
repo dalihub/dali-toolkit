@@ -172,8 +172,8 @@ int UtcDaliToggleButtonToggleStatesProperty(void)
   // Create the ToggleButton actor
   ToggleButton toggleButton = ToggleButton::New();
   Stage::GetCurrent().Add( toggleButton );
-  toggleButton.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  toggleButton.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  toggleButton.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  toggleButton.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   toggleButton.SetPosition( 0.0f, 0.0f );
 
   {// Check empty array
@@ -253,8 +253,8 @@ int UtcDaliToggleButtonToggleTipsProperty( void )
   // Create the ToggleButton actor
   ToggleButton toggleButton = ToggleButton::New();
   Stage::GetCurrent().Add( toggleButton );
-  toggleButton.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  toggleButton.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  toggleButton.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  toggleButton.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   toggleButton.SetPosition( 0.0f, 0.0f );
 
   { // Check empty tip array
@@ -312,8 +312,8 @@ int UtcDaliToggleButtonStateChange(void)
   // Create the ToggleButton actor
   ToggleButton toggleButton = ToggleButton::New();
   Stage::GetCurrent().Add( toggleButton );
-  toggleButton.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  toggleButton.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  toggleButton.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  toggleButton.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   toggleButton.SetPosition( BUTTON_POSITON_TO_GET_INSIDE_TOUCH_EVENTS );
   toggleButton.SetSize( BUTTON_SIZE_TO_GET_INSIDE_TOUCH_EVENTS );
 

@@ -49,7 +49,7 @@ These overridden methods in our factory will be called by the Item View.
 MyFactory factory; // Should store this as a member variable
 Dali::Toolkit::ItemView itemView = Dali::Toolkit::ItemView::New( factory ); // Pass in our factory
 itemView.SetParentOrigin( ParentOrigin::CENTER );
-itemView.SetAnchorPoint( AnchorPoint::CENTER );
+itemView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
 // Now create a layout
 Dali::Toolkit::ItemLayoutPtr spiralLayout = Dali::Toolkit::DefaultItemLayout::New( Dali::Toolkit::DefaultItemLayout::SPIRAL );

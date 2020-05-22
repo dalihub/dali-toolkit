@@ -17,6 +17,7 @@
 
 #include <dali-toolkit-test-suite-utils.h>
 #include <dali-toolkit/dali-toolkit.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 using namespace Dali;
 using namespace Dali::Toolkit;
@@ -122,8 +123,8 @@ int UtcDaliProgressBarSignals(void)
   // Create the ProgressBar actor
   ProgressBar progressBar = ProgressBar::New();
   Stage::GetCurrent().Add( progressBar );
-  progressBar.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  progressBar.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  progressBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  progressBar.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   progressBar.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
   progressBar.SetPosition( 0.0f, 0.0f );
   progressBar.ValueChangedSignal().Connect( &OnProgressBarValueChanged );
@@ -152,8 +153,8 @@ int UtcDaliProgressBarSetPropertyP(void)
   tet_infoline( "UtcDaliProgressBarSetPropertyP" );
 
   ProgressBar progressBar = ProgressBar::New();
-  progressBar.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  progressBar.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  progressBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  progressBar.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   progressBar.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
   progressBar.SetPosition( 0.0f, 0.0f );
   progressBar.ValueChangedSignal().Connect( &OnProgressBarValueChanged );
@@ -299,8 +300,8 @@ int UtcDaliProgressBarSetPropertyP1(void)
   tet_infoline( "UtcDaliProgressBarSetPropertyP1" );
 
   ProgressBar progressBar = ProgressBar::New();
-  progressBar.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  progressBar.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  progressBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  progressBar.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   progressBar.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
   progressBar.SetPosition( 0.0f, 0.0f );
   progressBar.ValueChangedSignal().Connect( &OnProgressBarValueChanged );
@@ -372,8 +373,8 @@ int UtcDaliProgressBarSetPropertyP2(void)
   tet_infoline( "UtcDaliProgressBarSetPropertyP2" );
 
   ProgressBar progressBar = ProgressBar::New();
-  progressBar.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  progressBar.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  progressBar.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  progressBar.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   progressBar.SetPosition( 0.0f, 0.0f );
   progressBar.SetProperty(ProgressBar::Property::LABEL_VISUAL, "test");
   progressBar.SetProperty(ProgressBar::Property::INDETERMINATE, true);

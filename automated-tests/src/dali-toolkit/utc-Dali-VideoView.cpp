@@ -405,14 +405,14 @@ int UtcDaliVideoViewMethodsForCoverage2(void)
 
   Vector3 vector(100.0f, 100.0f, 0.0f);
 
-  DALI_TEST_CHECK(vector != videoView.GetCurrentSize());
+  DALI_TEST_CHECK(vector != videoView.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
   videoView.SetSize( vector );
 
   application.SendNotification();
   application.Render();
 
   // Check the size in the new frame
-  DALI_TEST_CHECK(vector == videoView.GetCurrentSize());
+  DALI_TEST_CHECK(vector == videoView.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ));
 
   END_TEST;
 }

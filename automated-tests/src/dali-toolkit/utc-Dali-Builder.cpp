@@ -744,7 +744,7 @@ int UtcDaliBuilderChildActionP(void)
   Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("subActor");
   DALI_TEST_CHECK( actor );
 
-  DALI_TEST_CHECK( !actor.IsVisible() );
+  DALI_TEST_CHECK( !actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) );
 
   END_TEST;
 }
@@ -801,7 +801,7 @@ int UtcDaliBuilderSetPropertyActionP(void)
   Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("subActor");
   DALI_TEST_CHECK( actor );
 
-  DALI_TEST_CHECK( !actor.IsVisible() );
+  DALI_TEST_CHECK( !actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) );
 
   END_TEST;
 }
@@ -855,7 +855,7 @@ int UtcDaliBuilderGenericActionP(void)
   Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("actor");
   DALI_TEST_CHECK( actor );
 
-  DALI_TEST_CHECK( !actor.IsVisible() );
+  DALI_TEST_CHECK( !actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) );
 
   END_TEST;
 }
@@ -944,7 +944,7 @@ int UtcDaliBuilderPropertyNotificationP(void)
   Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("actor");
   DALI_TEST_CHECK( actor );
 
-  DALI_TEST_CHECK( actor.IsVisible() );
+  DALI_TEST_CHECK( actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) );
 
   END_TEST;
 }
@@ -1199,7 +1199,7 @@ int UtcDaliBuilderAddActorsP(void)
   Actor actor = Stage::GetCurrent().GetRootLayer().FindChildByName("subActor");
   DALI_TEST_CHECK( actor );
 
-  DALI_TEST_CHECK( !actor.IsVisible() );
+  DALI_TEST_CHECK( !actor.GetCurrentProperty< bool >( Actor::Property::VISIBLE ) );
 
   END_TEST;
 }
@@ -1631,10 +1631,10 @@ int UtcDaliBuilderTypeCasts(void)
   application.Render();
 
   Actor createdActor = rootActor.GetChildAt( 0 );
-  DALI_TEST_EQUALS( createdActor.GetMaximumSize(), Vector2(100.0f,15.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( createdActor.GetCurrentPosition(), Vector3(100.0f,10.0f,1.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( createdActor.GetCurrentColor(), Vector4(0.5f,0.5f,0.5f,1.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( createdActor.IsSensitive(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( createdActor.GetProperty< Vector2 >( Actor::Property::MAXIMUM_SIZE ), Vector2(100.0f,15.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( createdActor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(100.0f,10.0f,1.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( createdActor.GetCurrentProperty< Vector4 >( Actor::Property::COLOR ), Vector4(0.5f,0.5f,0.5f,1.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( createdActor.GetProperty< bool >( Actor::Property::SENSITIVE ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( createdActor.GetColorMode(), USE_OWN_MULTIPLY_PARENT_COLOR, TEST_LOCATION );
 
   END_TEST;

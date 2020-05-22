@@ -141,9 +141,9 @@ int UtcDaliTableViewMetricsPadding(void)
   application.Render();
 
   DALI_TEST_EQUALS( tableView.GetCellPadding(), Size(0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
 
   // 1. check that padding works. some padding:
   tableView.SetCellPadding(Size(5.0f, 10.0f));
@@ -151,7 +151,7 @@ int UtcDaliTableViewMetricsPadding(void)
   application.Render();
 
   DALI_TEST_EQUALS( tableView.GetCellPadding(), Size(5.0f, 10.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(5.0f, 10.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(5.0f, 10.0f, 0.0f), TEST_LOCATION );
   END_TEST;
 }
 
@@ -172,9 +172,9 @@ int UtcDaliTableViewMetricsFit(void)
   application.Render();
 
   // 1. check that with no fixed width/heights, actors are in default position.
-  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
 
   // 2. check that with a fixed width & height, actors to the right and below are offsetted.
   tableView.SetFitHeight(0);
@@ -185,25 +185,25 @@ int UtcDaliTableViewMetricsFit(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
 
   tableView.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION,  Dali::LayoutDirection::RIGHT_TO_LEFT );
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(90.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(80.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(90.0f, 10.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(90.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(80.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(90.0f, 10.0f, 0.0f), TEST_LOCATION );
 
   tableView.SetProperty( Dali::Actor::Property::LAYOUT_DIRECTION,  Dali::LayoutDirection::LEFT_TO_RIGHT );
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
 
   END_TEST;
 }
@@ -225,9 +225,9 @@ int UtcDaliTableViewMetricsFixed(void)
   application.Render();
 
   // 1. check that with no fixed width/heights, actors are in default position.
-  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
 
   // 2. check that with a fixed width & height, actors to the right and below are offsetted.
   tableView.SetFixedWidth(0, 20.0f);
@@ -238,9 +238,9 @@ int UtcDaliTableViewMetricsFixed(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(20.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 50.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(20.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 50.0f, 0.0f), TEST_LOCATION );
   END_TEST;
 }
 
@@ -261,9 +261,9 @@ int UtcDaliTableViewMetricsRelative(void)
   application.Render();
 
   // 1. check that with no relative width/heights, actors are in default position.
-  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(10.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 10.0f, 0.0f), TEST_LOCATION );
 
   // 2. check that with a relative width & height, actors to the right and below are offsetted.
   tableView.SetRelativeWidth(0, 0.3f); // cell 0,0 occupies 30%x50% of the grid (i.e. 30x50 pixels)
@@ -274,9 +274,9 @@ int UtcDaliTableViewMetricsRelative(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor1.GetCurrentPosition(), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetCurrentPosition(), Vector3(30.0f, 0.0f, 0.0f), TEST_LOCATION );
-  DALI_TEST_EQUALS( actor3.GetCurrentPosition(), Vector3(0.0f, 50.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(30.0f, 0.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor3.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(0.0f, 50.0f, 0.0f), TEST_LOCATION );
   END_TEST;
 }
 
@@ -375,9 +375,9 @@ int UtcDaliTableViewCells(void)
   Actor actor1 = Actor::New();
   Actor actor2 = Actor::New();
   Actor actor3 = Actor::New();
-  actor1.SetName("Actor1");
-  actor2.SetName("Actor2");
-  actor3.SetName("Actor3");
+  actor1.SetProperty( Dali::Actor::Property::NAME,"Actor1");
+  actor2.SetProperty( Dali::Actor::Property::NAME,"Actor2");
+  actor3.SetProperty( Dali::Actor::Property::NAME,"Actor3");
 
   // note: positions are specified in reversed cartesian coords - row,col (i.e. y,x)
   tableView.AddChild(actor1, TableView::CellPosition(0,0));
@@ -417,7 +417,7 @@ int UtcDaliTableViewCells(void)
   std::vector<Actor> actorsRemoved;
   tableView.DeleteRow(0, actorsRemoved);
   tet_printf("Row Delete >> Actors Removed: %d {", actorsRemoved.size());
-  for(size_t i = 0;i<actorsRemoved.size();i++) tet_printf("%d => %s, ", i, actorsRemoved[i].GetName().c_str());
+  for(size_t i = 0;i<actorsRemoved.size();i++) tet_printf("%d => %s, ", i, actorsRemoved[i].GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str());
   tet_printf("}\n");
   DALI_TEST_EQUALS( static_cast<int>(actorsRemoved.size()), 1, TEST_LOCATION );
   DALI_TEST_CHECK( actorsRemoved[0] == actor1 );
@@ -425,7 +425,7 @@ int UtcDaliTableViewCells(void)
   actorsRemoved.clear();
   tableView.DeleteColumn(3, actorsRemoved);
   tet_printf("Column Delete >> Actors Removed: %d {", actorsRemoved.size());
-  for(size_t i = 0;i<actorsRemoved.size();i++) tet_printf("%d => %s, ", i, actorsRemoved[i].GetName().c_str());
+  for(size_t i = 0;i<actorsRemoved.size();i++) tet_printf("%d => %s, ", i, actorsRemoved[i].GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str());
   tet_printf("}\n");
   DALI_TEST_EQUALS( static_cast<int>(actorsRemoved.size()), 1, TEST_LOCATION );
   DALI_TEST_CHECK( actorsRemoved[0] == actor3 );
@@ -751,9 +751,9 @@ int UtcDaliTableViewChildProperties(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( child3.GetCurrentAnchorPoint(), AnchorPoint::TOP_LEFT, TEST_LOCATION );
-  DALI_TEST_EQUALS( child3.GetCurrentParentOrigin(), ParentOrigin::TOP_LEFT, TEST_LOCATION );
-  DALI_TEST_EQUALS( child3.GetCurrentPosition(), Vector3(2.5f, 5.0f, 0.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( child3.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ), AnchorPoint::TOP_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( child3.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ), ParentOrigin::TOP_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( child3.GetCurrentProperty< Vector3 >( Actor::Property::POSITION ), Vector3(2.5f, 5.0f, 0.0f), TEST_LOCATION );
 
   END_TEST;
 }
@@ -858,7 +858,7 @@ int UtcDaliTableViewKeyboardFocus(void)
 
   TableView tableView = TableView::New(4,4);
   tableView.SetKeyboardFocusable( true );
-  tableView.SetName( "TableView");
+  tableView.SetProperty( Dali::Actor::Property::NAME, "TableView");
 
   for ( int row = 0; row < 4; ++row )
   {
@@ -867,7 +867,7 @@ int UtcDaliTableViewKeyboardFocus(void)
       Control control = Control::New();
       std::ostringstream str;
       str << row << "-" << col;
-      control.SetName( str.str() );
+      control.SetProperty( Dali::Actor::Property::NAME, str.str() );
       control.SetKeyboardFocusable( true );
       tableView.AddChild( control, TableView::CellPosition( row, col ) );
     }
@@ -880,55 +880,55 @@ int UtcDaliTableViewKeyboardFocus(void)
 
   Actor firstFocusActor = Toolkit::Internal::GetImplementation( tableView ).GetNextKeyboardFocusableActor( Actor(), Control::KeyboardFocus::RIGHT, true );
   DALI_TEST_CHECK( firstFocusActor );
-  DALI_TEST_CHECK( firstFocusActor.GetName() == "0-0" );
+  DALI_TEST_CHECK( firstFocusActor.GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-0" );
 
   KeyboardFocusManager manager = KeyboardFocusManager::Get();
   manager.SetFocusGroupLoop( true );
   manager.SetCurrentFocusActor( firstFocusActor );
 
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-0" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-1" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-2" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-2" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-3" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-3" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-0" );
 
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-3" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-3" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-2" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-2" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-1" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-0" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "3-3" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "3-3" );
 
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-0" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-1" );
 
   manager.MoveFocus( Control::KeyboardFocus::DOWN );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1" );
   manager.MoveFocus( Control::KeyboardFocus::DOWN );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "2-1" );
   manager.MoveFocus( Control::KeyboardFocus::DOWN );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "3-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "3-1" );
   manager.MoveFocus( Control::KeyboardFocus::DOWN );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-1" );
 
   manager.MoveFocus( Control::KeyboardFocus::UP );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "3-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "3-1" );
   manager.MoveFocus( Control::KeyboardFocus::UP );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "2-1" );
   manager.MoveFocus( Control::KeyboardFocus::UP );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1" );
   manager.MoveFocus( Control::KeyboardFocus::UP );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-1" );
 
   END_TEST;
 }
@@ -939,7 +939,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
 
   TableView tableView = TableView::New(3, 3);
   tableView.SetKeyboardFocusable( true );
-  tableView.SetName( "TableView");
+  tableView.SetProperty( Dali::Actor::Property::NAME, "TableView");
 
   for ( int row = 0; row < 3; ++row )
   {
@@ -952,7 +952,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
       {
         // Add a nested 2x2 table view in the middle cell of the parent table view
         TableView childTableView = TableView::New(2, 2);
-        childTableView.SetName( str.str() );
+        childTableView.SetProperty( Dali::Actor::Property::NAME, str.str() );
 
         for(int childRow = 0; childRow < 2; childRow++)
         {
@@ -961,7 +961,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
             Control control = Control::New();
             std::ostringstream nameStr;
             nameStr << row << "-" << col << "-" << childRow << "-" << childCol;
-            control.SetName( nameStr.str() );
+            control.SetProperty( Dali::Actor::Property::NAME, nameStr.str() );
             control.SetKeyboardFocusable( true );
             childTableView.AddChild( control, TableView::CellPosition( childRow, childCol ) );
           }
@@ -971,7 +971,7 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
       else
       {
         Control control = Control::New();
-        control.SetName( str.str() );
+        control.SetProperty( Dali::Actor::Property::NAME, str.str() );
         control.SetKeyboardFocusable( true );
         tableView.AddChild( control, TableView::CellPosition( row, col ) );
       }
@@ -985,74 +985,74 @@ int UtcDaliTableViewKeyboardFocusInNestedTableView(void)
 
   Actor firstFocusActor = Toolkit::Internal::GetImplementation( tableView ).GetNextKeyboardFocusableActor( Actor(), Control::KeyboardFocus::RIGHT, true );
   DALI_TEST_CHECK( firstFocusActor );
-  DALI_TEST_CHECK( firstFocusActor.GetName() == "0-0" );
+  DALI_TEST_CHECK( firstFocusActor.GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-0" );
 
   KeyboardFocusManager manager = KeyboardFocusManager::Get();
   manager.SetFocusGroupLoop( false );
   manager.SetCurrentFocusActor( firstFocusActor );
 
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-0" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-1" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-2" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-2" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-0" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-0-0" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-0-1" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-1-0" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-1-1" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-2" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-2" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "2-0" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "2-1" );
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-2" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "2-2" );
 
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "2-1" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "2-0" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-2" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-2" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-1-1" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-1-0" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-0-1" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-0-0" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-0" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-2" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-2" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-1" );
   manager.MoveFocus( Control::KeyboardFocus::LEFT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-0" );
 
   manager.MoveFocus( Control::KeyboardFocus::RIGHT );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-1" );
   manager.MoveFocus( Control::KeyboardFocus::DOWN );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-0-0" );
   manager.MoveFocus( Control::KeyboardFocus::DOWN );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-0" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-1-0" );
   manager.MoveFocus( Control::KeyboardFocus::DOWN );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "2-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "2-1" );
 
   manager.MoveFocus( Control::KeyboardFocus::UP );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-1-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-1-1" );
   manager.MoveFocus( Control::KeyboardFocus::UP );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "1-1-0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "1-1-0-1" );
   manager.MoveFocus( Control::KeyboardFocus::UP );
-  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetName() == "0-1" );
+  DALI_TEST_CHECK( manager.GetCurrentFocusActor().GetProperty< std::string >( Dali::Actor::Property::NAME ) == "0-1" );
 
   END_TEST;
 }

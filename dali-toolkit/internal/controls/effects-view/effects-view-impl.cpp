@@ -265,7 +265,7 @@ int EffectsView::GetEffectSize()
 void EffectsView::OnInitialize()
 {
   CustomActor self = Self();
-  mChildrenRoot.SetParentOrigin( ParentOrigin::CENTER );
+  mChildrenRoot.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   self.Add( mChildrenRoot );
 }
 
@@ -450,7 +450,7 @@ void EffectsView::SetupCameras()
   {
     // Create a camera for the children render, corresponding to its render target size
     mCameraForChildren = CameraActor::New(mTargetSize);
-    mCameraForChildren.SetParentOrigin(ParentOrigin::CENTER);
+    mCameraForChildren.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER );
     mCameraForChildren.SetInvertYAxis( true );
     Self().Add( mCameraForChildren );
   }

@@ -1462,6 +1462,22 @@ float Controller::GetDefaultLineSpacing() const
   return mImpl->mLayoutEngine.GetDefaultLineSpacing();
 }
 
+bool Controller::SetDefaultLineSize( float lineSize )
+{
+  if( std::fabs( lineSize - mImpl->mLayoutEngine.GetDefaultLineSize() ) > Math::MACHINE_EPSILON_1000 )
+  {
+    mImpl->mLayoutEngine.SetDefaultLineSize(lineSize);
+    mImpl->mRecalculateNaturalSize = true;
+    return true;
+  }
+  return false;
+}
+
+float Controller::GetDefaultLineSize() const
+{
+  return mImpl->mLayoutEngine.GetDefaultLineSize();
+}
+
 void Controller::SetInputColor( const Vector4& color )
 {
   if( NULL != mImpl->mEventData )

@@ -273,7 +273,7 @@ int UtcDaliMagnifierOnSizeSet(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( view.GetCurrentSize(), size, TEST_LOCATION );
+  DALI_TEST_EQUALS( view.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ), size, TEST_LOCATION );
 
   END_TEST;
 }

@@ -950,8 +950,8 @@ int utcDaliTextEditorInputStyleChanged01(void)
 
 
   editor.SetSize( 300.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   editor.SetProperty( TextEditor::Property::ENABLE_MARKUP, true );
   editor.SetProperty( TextEditor::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='green'>llo</color> <font weight='bold'>world</font> demo</font>" );
@@ -1164,8 +1164,8 @@ int utcDaliTextEditorInputStyleChanged02(void)
 
 
   editor.SetSize( 300.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   editor.SetProperty( TextEditor::Property::ENABLE_MARKUP, true );
   editor.SetProperty( TextEditor::Property::TEXT, "<font family='DejaVuSerif' size='18'>He<color value='blue'> l</color><color value='green'>lo</color> <font weight='bold'>world</font> demo</font>" );
@@ -1401,8 +1401,8 @@ int utcDaliTextEditorEvent01(void)
   Stage::GetCurrent().Add( editor );
 
   editor.SetSize( 300.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1440,8 +1440,8 @@ int utcDaliTextEditorEvent01(void)
   // Create a second text editor and send key events to it.
   TextEditor editor2 = TextEditor::New();
 
-  editor2.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor2.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor2.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor2.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   editor2.SetSize( 100.f, 100.f );
   editor2.SetPosition( 100.f, 100.f );
 
@@ -1486,8 +1486,8 @@ int utcDaliTextEditorEvent02(void)
   Stage::GetCurrent().Add( editor );
 
   editor.SetSize( 300.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1538,7 +1538,7 @@ int utcDaliTextEditorEvent02(void)
   }
 
   // Move the cursor and check the position changes.
-  Vector3 position1 = cursor.GetCurrentPosition();
+  Vector3 position1 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
   application.ProcessEvent( GenerateKey( "", "", "", DALI_KEY_CURSOR_LEFT, 0, 0, Integration::KeyEvent::Down, "", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE ) );
@@ -1547,7 +1547,7 @@ int utcDaliTextEditorEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 position2 = cursor.GetCurrentPosition();
+  Vector3 position2 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   DALI_TEST_CHECK( position2.x < position1.x );
 
@@ -1558,7 +1558,7 @@ int utcDaliTextEditorEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 position3 = cursor.GetCurrentPosition();
+  Vector3 position3 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   DALI_TEST_EQUALS( position1, position3, TEST_LOCATION ); // Should be in the same position1.
 
@@ -1572,7 +1572,7 @@ int utcDaliTextEditorEvent02(void)
   application.Render();
 
   // Cursor position should be the same than position1.
-  Vector3 position4 = cursor.GetCurrentPosition();
+  Vector3 position4 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   DALI_TEST_EQUALS( position2, position4, TEST_LOCATION ); // Should be in the same position2.
 
@@ -1583,7 +1583,7 @@ int utcDaliTextEditorEvent02(void)
   application.SendNotification();
   application.Render();
 
-  Vector3 position5 = cursor.GetCurrentPosition();
+  Vector3 position5 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   DALI_TEST_CHECK( position5.x > position4.x );
 
@@ -1597,7 +1597,7 @@ int utcDaliTextEditorEvent02(void)
   application.Render();
 
   // Cursor position should be the same than position2.
-  Vector3 position6 = cursor.GetCurrentPosition();
+  Vector3 position6 = cursor.GetCurrentProperty< Vector3 >( Actor::Property::POSITION );
 
   DALI_TEST_EQUALS( position2, position6, TEST_LOCATION );// Should be in the same position2.
 
@@ -1622,8 +1622,8 @@ int utcDaliTextEditorEvent03(void)
   editor.SetProperty( TextEditor::Property::TEXT, "This is a long text for the size of the text-editor." );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   editor.SetSize( 30.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1715,8 +1715,8 @@ int utcDaliTextEditorEvent04(void)
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworl" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   editor.SetSize( 100.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1804,8 +1804,8 @@ int utcDaliTextEditorEvent05(void)
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworl" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   editor.SetSize( 50.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   editor.SetProperty( TextEditor::Property::SMOOTH_SCROLL, true );
   editor.SetProperty( TextEditor::Property::SMOOTH_SCROLL_DURATION, 0.2f );
   editor.SetProperty( TextEditor::Property::ENABLE_SCROLL_BAR, true );
@@ -1886,8 +1886,8 @@ int utcDaliTextEditorEvent06(void)
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   editor.SetSize( 100.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -1976,8 +1976,8 @@ int utcDaliTextEditorEvent07(void)
   editor.SetProperty( TextEditor::Property::TEXT, "Hello\nworld\nHello world" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   editor.SetSize( 100.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2120,8 +2120,8 @@ int utcDaliTextEditorEvent08(void)
   editor.SetProperty( TextEditor::Property::TEXT, "DALi" );
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   editor.SetSize( 100.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2327,8 +2327,8 @@ int utcDaliTextEditorHandles(void)
   editor.SetProperty( TextEditor::Property::SELECTION_HANDLE_PRESSED_IMAGE_RIGHT, imagePropertyMap );
 
   editor.SetSize( 30.f, 500.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
 
   // Avoid a crash when core load gl resources.
   application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
@@ -2546,8 +2546,8 @@ int utcDaliTextEditorScrollStateChangedSignalTest(void)
 
   editor.SetProperty( TextEditor::Property::POINT_SIZE, 10.f );
   editor.SetSize( 50.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   editor.SetProperty( TextEditor::Property::ENABLE_SCROLL_BAR, true );
   editor.SetKeyboardFocusable(true);
 
@@ -2634,8 +2634,8 @@ int UtcDaliTextEditorSetPaddingProperty(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
   editor.SetSize( 300.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( editor );
 
   application.SendNotification();
@@ -2667,8 +2667,8 @@ int UtcDaliTextEditorEnableShiftSelectionProperty(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
   editor.SetSize( 300.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( editor );
 
   application.SendNotification();
@@ -2695,8 +2695,8 @@ int UtcDaliTextEditorEnableGrabHandleProperty(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
   editor.SetSize( 300.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( editor );
 
   application.SendNotification();
@@ -2723,8 +2723,8 @@ int UtcDaliTextEditorMatchSystemLanguageDirectionProperty(void)
   TextEditor editor = TextEditor::New();
   DALI_TEST_CHECK( editor );
   editor.SetSize( 300.f, 50.f );
-  editor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  editor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  editor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  editor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   Stage::GetCurrent().Add( editor );
 
   application.SendNotification();

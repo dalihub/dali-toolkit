@@ -145,13 +145,13 @@ int UtcDaliNavigationViewPop(void)
 
   // 2 Push initial Actor
   Actor testParentActor1 = Actor::New();
-  testParentActor1.SetName("TestParentActor1");
+  testParentActor1.SetProperty( Dali::Actor::Property::NAME,"TestParentActor1");
   naviView.Push( testParentActor1 );
   DALI_TEST_EQUALS( naviView.GetChildCount(), 1 ,  TEST_LOCATION );
 
   // 3 Push Second Actor which contains a child actor
   Actor testParentActor2 = Actor::New();
-  testParentActor2.SetName("TestParentActor2");
+  testParentActor2.SetProperty( Dali::Actor::Property::NAME,"TestParentActor2");
   Actor testChildActor1 = Actor::New();
   testParentActor2.Add( testChildActor1 );
   naviView.Push( testParentActor2 );
@@ -159,7 +159,7 @@ int UtcDaliNavigationViewPop(void)
 
   // 4 Pop head actor, it should be TestParentActor2
   Actor poppedActor = naviView.Pop();
-  DALI_TEST_EQUALS( poppedActor.GetName() ,  "TestParentActor2", TEST_LOCATION );
+  DALI_TEST_EQUALS( poppedActor.GetProperty< std::string >( Dali::Actor::Property::NAME ) ,  "TestParentActor2", TEST_LOCATION );
 
   // 5 Navigation View child count should be 1
   DALI_TEST_EQUALS( naviView.GetChildCount(), 1 ,  TEST_LOCATION );
@@ -180,31 +180,31 @@ int UtcDaliNavigationViewPushAndPop(void)
 
   // 2 Push initial Actor
   Actor testParentActor1 = Actor::New();
-  testParentActor1.SetName("TestParentActor1");
+  testParentActor1.SetProperty( Dali::Actor::Property::NAME,"TestParentActor1");
   naviView.Push( testParentActor1 );
   DALI_TEST_EQUALS( naviView.GetChildCount(), 1 ,  TEST_LOCATION );
 
   // 3 Push Second Actor which contains a child actor
   Actor testParentActor2 = Actor::New();
-  testParentActor2.SetName("TestParentActor2");
+  testParentActor2.SetProperty( Dali::Actor::Property::NAME,"TestParentActor2");
   Actor testChildActor1 = Actor::New();
   testParentActor2.Add( testChildActor1 );
   naviView.Push( testParentActor2 );
 
   // 3 Push third Actor which contains a child actor
   Actor testParentActor3 = Actor::New();
-  testParentActor3.SetName("TestParentActor3");
+  testParentActor3.SetProperty( Dali::Actor::Property::NAME,"TestParentActor3");
   Actor testChildActor2 = Actor::New();
   testParentActor2.Add( testChildActor2 );
   naviView.Push( testParentActor3 );
 
   // 4 Pop head actor,  it should be TestParentActor3
   Actor poppedActor = naviView.Pop();
-  DALI_TEST_EQUALS( poppedActor.GetName() ,  "TestParentActor3", TEST_LOCATION );
+  DALI_TEST_EQUALS( poppedActor.GetProperty< std::string >( Dali::Actor::Property::NAME ) ,  "TestParentActor3", TEST_LOCATION );
 
   // 5 Pop head actor,  it should be TestParentActor2
   Actor poppedActor2 = naviView.Pop();
-  DALI_TEST_EQUALS( poppedActor2.GetName() ,  "TestParentActor2", TEST_LOCATION );
+  DALI_TEST_EQUALS( poppedActor2.GetProperty< std::string >( Dali::Actor::Property::NAME ) ,  "TestParentActor2", TEST_LOCATION );
 
 
   END_TEST;
@@ -222,20 +222,20 @@ int UtcDaliNavigationViewPreventLastPop(void)
 
   // 2 Push initial Actor
   Actor testParentActor1 = Actor::New();
-  testParentActor1.SetName("TestParentActor1");
+  testParentActor1.SetProperty( Dali::Actor::Property::NAME,"TestParentActor1");
   naviView.Push( testParentActor1 );
   DALI_TEST_EQUALS( naviView.GetChildCount(), 1 ,  TEST_LOCATION );
 
   // 3 Push Second Actor which contains a child actor
   Actor testParentActor2 = Actor::New();
-  testParentActor2.SetName("TestParentActor2");
+  testParentActor2.SetProperty( Dali::Actor::Property::NAME,"TestParentActor2");
   Actor testChildActor1 = Actor::New();
   testParentActor2.Add( testChildActor1 );
   naviView.Push( testParentActor2 );
 
   // 4 Pop head actor, it should be TestParentActor2
   Actor poppedActor1 = naviView.Pop();
-  DALI_TEST_EQUALS( poppedActor1.GetName() ,  "TestParentActor2", TEST_LOCATION );
+  DALI_TEST_EQUALS( poppedActor1.GetProperty< std::string >( Dali::Actor::Property::NAME ) ,  "TestParentActor2", TEST_LOCATION );
 
 
   // 5 Try to Pop head actor, Should be empty hence can not get name of Actor
@@ -243,7 +243,7 @@ int UtcDaliNavigationViewPreventLastPop(void)
 
   try
   {
-    const std::string hasNoName = poppedActorEmpty.GetName();
+    const std::string hasNoName = poppedActorEmpty.GetProperty< std::string >( Dali::Actor::Property::NAME );
     tet_infoline( hasNoName.c_str() );
     DALI_TEST_CHECK( false ); // should not get here
   }

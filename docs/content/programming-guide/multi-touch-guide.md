@@ -12,10 +12,10 @@ For C++ API see Dali::Actor::TouchSignal() and Dali::Actor::HoveredSignal() for 
 
  - An actor is only hittable if the actor's touch signal has a connection.
  - An actor is only hittable when it is between the camera's near and far planes.
- - If an actor is made insensitive, then the actor and its children are not hittable; see Dali::Actor::IsSensitive()
- - If an actor's visibility flag is unset, then none of its children are hittable either; see Dali::Actor::IsVisible()
+ - If an actor is made insensitive, then the actor and its children are not hittable; see Dali::Actor:.Property::SENSITIVE
+ - If an actor's visibility flag is unset, then none of its children are hittable either; see Dali::Actor::Property::VISIBLE
  - To be hittable, an actor must have a non-zero size.
- - If an actor's world color is fully transparent, then it is not hittable; see GetCurrentWorldColor()
+ - If an actor's world color is fully transparent, then it is not hittable; see Dali::Actor::Property::WORLD_COLOR
 
 ### Hit Test Algorithm:
 

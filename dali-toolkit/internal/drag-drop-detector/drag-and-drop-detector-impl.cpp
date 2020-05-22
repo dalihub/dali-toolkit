@@ -141,8 +141,8 @@ void DragAndDropDetector::OnPan(Dali::Actor actor, const PanGesture& gesture)
     mShadowControl.SetPosition(actorPos);
     mShadowControl.SetSize(width, height);
     mShadowControl.SetBackgroundColor(Vector4(0.3f, 0.3f, 0.3f, 0.7f));
-    mShadowControl.SetParentOrigin(control.GetCurrentParentOrigin());
-    mShadowControl.SetAnchorPoint(control.GetCurrentAnchorPoint());
+    mShadowControl.SetProperty( Actor::Property::PARENT_ORIGIN, control.GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ) );
+    mShadowControl.SetProperty( Actor::Property::ANCHOR_POINT,control.GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ));
     control.GetParent().Add(mShadowControl);
     SetPosition(gesture.screenPosition);
     EmitStartedSignal(control);
@@ -199,7 +199,7 @@ bool DragAndDropDetector::OnDrag(Dali::Actor actor, const Dali::TouchData& data)
     {
       SetPosition(data.GetScreenPosition(0));
       ClearContent();
-      SetContent(mDragControl.GetName());
+      SetContent(mDragControl.GetProperty< std::string >( Dali::Actor::Property::NAME ));
       EmitDroppedSignal(control);
     }
 

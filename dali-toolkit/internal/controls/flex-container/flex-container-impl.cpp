@@ -517,9 +517,9 @@ void FlexContainer::OnRelayout( const Vector2& size, RelayoutContainer& containe
       // Anchor actor to top left of the container
       if( child.GetProperty( DevelActor::Property::POSITION_USES_ANCHOR_POINT ).Get< bool >() )
       {
-        child.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+        child.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       }
-      child.SetParentOrigin( ParentOrigin::TOP_LEFT );
+      child.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
 
       float negotiatedWidth = child.GetRelayoutSize(Dimension::WIDTH);
       float negotiatedHeight = child.GetRelayoutSize(Dimension::HEIGHT);
@@ -618,10 +618,10 @@ void FlexContainer::ComputeLayout()
       Actor childActor = mChildrenNodes[i].actor.GetHandle();
 
       // Intialize the style of the child.
-      YGNodeStyleSetMinWidth( childNode, childActor.GetMinimumSize().x );
-      YGNodeStyleSetMinHeight( childNode, childActor.GetMinimumSize().y );
-      YGNodeStyleSetMaxWidth( childNode, childActor.GetMaximumSize().x );
-      YGNodeStyleSetMaxHeight( childNode, childActor.GetMaximumSize().y );
+      YGNodeStyleSetMinWidth( childNode, childActor.GetProperty< Vector2 >( Actor::Property::MINIMUM_SIZE ).x );
+      YGNodeStyleSetMinHeight( childNode, childActor.GetProperty< Vector2 >( Actor::Property::MINIMUM_SIZE ).y );
+      YGNodeStyleSetMaxWidth( childNode, childActor.GetProperty< Vector2 >( Actor::Property::MAXIMUM_SIZE ).x );
+      YGNodeStyleSetMaxHeight( childNode, childActor.GetProperty< Vector2 >( Actor::Property::MAXIMUM_SIZE ).y );
 
       // Check child properties on the child for how to layout it.
       // These properties should be dynamically registered to the child which
@@ -687,7 +687,7 @@ void FlexContainer::ComputeLayout()
 #if defined(FLEX_CONTAINER_DEBUG)
     YGNodePrint( mRootNode.node, (YGPrintOptions)( YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren ) );
 #endif
-    YGNodeCalculateLayout( mRootNode.node, Self().GetMaximumSize().x, Self().GetMaximumSize().y, nodeLayoutDirection );
+    YGNodeCalculateLayout( mRootNode.node, Self().GetProperty< Vector2 >( Actor::Property::MAXIMUM_SIZE ).x, Self().GetProperty< Vector2 >( Actor::Property::MAXIMUM_SIZE ).y, nodeLayoutDirection );
 #if defined(FLEX_CONTAINER_DEBUG)
     YGNodePrint( mRootNode.node, (YGPrintOptions)( YGPrintOptionsLayout | YGPrintOptionsStyle | YGPrintOptionsChildren ) );
 #endif

@@ -72,7 +72,7 @@ The example below shows how an application can be notified of a pinch gesture:
 void OnPinch( Dali::Actor actor, const Dali::PinchGesture& pinch )
 {
   // Scale your actor according to the pinch scale
-  Vector3 newSize = actor.GetCurrentSize() * pinch.scale;
+  Vector3 newSize = actor.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) * pinch.scale;
   actor.SetSize(newSize);
 }
 

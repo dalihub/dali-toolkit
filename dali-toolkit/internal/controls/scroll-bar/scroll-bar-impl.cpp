@@ -28,6 +28,7 @@
 #include <dali/public-api/object/type-registry-helper.h>
 #include <dali/integration-api/debug.h>
 #include <dali/devel-api/object/property-helper-devel.h>
+#include <dali/devel-api/actors/actor-devel.h>
 
 // INTERNAL INCLUDES
 #include <dali-toolkit/devel-api/asset-manager/asset-manager.h>
@@ -243,8 +244,8 @@ void ScrollBar::CreateDefaultIndicatorActor()
 {
   const std::string imageDirPath = AssetManager::GetDaliImagePath();
   Toolkit::ImageView indicator = Toolkit::ImageView::New( imageDirPath + DEFAULT_INDICATOR_IMAGE_FILE_NAME );
-  indicator.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  indicator.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  indicator.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  indicator.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   indicator.SetStyleName( "ScrollBarIndicator" );
   indicator.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
   SetScrollIndicator(indicator);
@@ -306,7 +307,7 @@ void ScrollBar::ApplyConstraints()
     // Set indicator height according to the indicator's height policy
     if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
     {
-      mIndicator.SetSize(Self().GetCurrentSize().width, mIndicatorFixedHeight);
+      mIndicator.SetSize(Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, mIndicatorFixedHeight);
     }
     else
     {
@@ -378,7 +379,7 @@ void ScrollBar::ShowIndicator()
   if( mIndicatorFirstShow )
   {
     // Preserve the alpha value from the stylesheet
-    mIndicatorShowAlpha = Self().GetCurrentColor().a;
+    mIndicatorShowAlpha = Self().GetCurrentProperty< Vector4 >( Actor::Property::COLOR ).a;
     mIndicatorFirstShow = false;
   }
 
@@ -390,7 +391,7 @@ void ScrollBar::ShowIndicator()
   }
   else
   {
-    mIndicator.SetOpacity(mIndicatorShowAlpha);
+    mIndicator.SetProperty( DevelActor::Property::OPACITY,mIndicatorShowAlpha);
   }
 }
 
@@ -411,7 +412,7 @@ void ScrollBar::HideIndicator()
   }
   else
   {
-    mIndicator.SetOpacity(0.0f);
+    mIndicator.SetProperty( DevelActor::Property::OPACITY,0.0f);
   }
 }
 
@@ -432,7 +433,7 @@ void ScrollBar::ShowTransientIndicator()
   }
   else
   {
-    mIndicator.SetOpacity(mIndicatorShowAlpha);
+    mIndicator.SetProperty( DevelActor::Property::OPACITY,mIndicatorShowAlpha);
   }
   mAnimation.AnimateTo( Property( mIndicator, Actor::Property::COLOR_ALPHA ),
                         0.0f, AlphaFunction::EASE_IN, TimePeriod((mIndicatorShowDuration + mTransientIndicatorDuration), mIndicatorHideDuration) );
@@ -488,7 +489,7 @@ void ScrollBar::OnPan( const PanGesture& gesture )
 
         // The domain size is the internal range
         float domainSize = maxScrollPosition - minScrollPosition;
-        float logicalSize = Self().GetCurrentSize().y - ( mIndicator.GetCurrentSize().y + mIndicatorStartPadding + mIndicatorEndPadding );
+        float logicalSize = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).y - ( mIndicator.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).y + mIndicatorStartPadding + mIndicatorEndPadding );
 
         mCurrentScrollPosition = mScrollStart - ( ( mGestureDisplacement.y * domainSize ) / logicalSize );
         mCurrentScrollPosition = -std::min( maxScrollPosition, std::max( -mCurrentScrollPosition, minScrollPosition ) );
@@ -567,7 +568,7 @@ void ScrollBar::SetIndicatorFixedHeight( float height )
 
   if(mIndicatorHeightPolicy == Toolkit::ScrollBar::Fixed)
   {
-    mIndicator.SetSize(Self().GetCurrentSize().width, mIndicatorFixedHeight);
+    mIndicator.SetSize(Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).width, mIndicatorFixedHeight);
   }
 }
 

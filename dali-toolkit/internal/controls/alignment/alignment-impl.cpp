@@ -215,8 +215,8 @@ void Alignment::OnRelayout( const Vector2& size, RelayoutContainer& container )
   {
     Actor child = Self().GetChildAt(i);
 
-    child.SetAnchorPoint( anchorPointAndParentOrigin );
-    child.SetParentOrigin( anchorPointAndParentOrigin );
+    child.SetProperty( Actor::Property::ANCHOR_POINT, anchorPointAndParentOrigin );
+    child.SetProperty( Actor::Property::PARENT_ORIGIN, anchorPointAndParentOrigin );
 
     Vector2 currentChildSize( child.GetTargetSize().GetVectorXY() );
     if( currentChildSize == Vector2::ZERO )

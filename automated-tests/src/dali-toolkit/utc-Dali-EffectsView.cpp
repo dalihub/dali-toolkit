@@ -109,7 +109,7 @@ int UtcDaliEffectsViewAddRemoveDropShadow(void)
   DALI_TEST_CHECK( !actor.OnStage() );
 
 
-  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   view.SetSize(Stage::GetCurrent().GetSize());
   view.Add(actor);
   Stage::GetCurrent().Add(view);
@@ -155,7 +155,7 @@ int UtcDaliEffectsViewAddRemoveEmboss(void)
   actor.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   DALI_TEST_CHECK( !actor.OnStage() );
 
-  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
 
   view.Add(actor);
   view.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
@@ -505,7 +505,7 @@ int UtcDaliEffectsViewSizeSet(void)
     stage.Add( view );
     application.SendNotification();
     application.Render();
-    DALI_TEST_EQUALS( view.GetCurrentSize(), Vector3( 200.0f, 200.0f, 0.0f ), TEST_LOCATION );
+    DALI_TEST_EQUALS( view.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ), Vector3( 200.0f, 200.0f, 0.0f ), TEST_LOCATION );
   }
 
   {
@@ -515,7 +515,7 @@ int UtcDaliEffectsViewSizeSet(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( view.GetCurrentSize(), Vector3( 200.0f, 200.0f, 0.0f ), TEST_LOCATION );
+    DALI_TEST_EQUALS( view.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ), Vector3( 200.0f, 200.0f, 0.0f ), TEST_LOCATION );
   }
 
   {
@@ -529,7 +529,7 @@ int UtcDaliEffectsViewSizeSet(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( view.GetCurrentSize(), Vector3( 200.0f, 200.0f, 0.0f ), TEST_LOCATION );
+    DALI_TEST_EQUALS( view.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ), Vector3( 200.0f, 200.0f, 0.0f ), TEST_LOCATION );
   }
 
   END_TEST;

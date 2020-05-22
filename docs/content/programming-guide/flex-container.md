@@ -335,7 +335,7 @@ Firstly, we create a flex container as the whole view and set its resize policy 
 // Create the main flex container
 Dali::Toolkit::FlexContainer flexContainer = Dali::Toolkit::FlexContainer::New();
 flexContainer.SetParentOrigin( Dali::ParentOrigin::TOP_LEFT );
-flexContainer.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
+flexContainer.SetProperty( Dali::Actor::Property::ANCHOR_POINT, Dali::AnchorPoint::TOP_LEFT );
 flexContainer.SetResizePolicy( Dali::ResizePolicy::FILL_TO_PARENT, Dali::Dimension::ALL_DIMENSIONS );
 flexContainer.SetBackgroundColor( Dali::Color::WHITE ); // set the background color to be white
 
@@ -361,7 +361,7 @@ Now we create a flex container as the toolbar and add it to the main container. 
 // Create the toolbar
 Dali::Toolkit::FlexContainer toolBar = Dali::Toolkit::FlexContainer::New();
 toolBar.SetParentOrigin( Dali::ParentOrigin::TOP_LEFT );
-toolBar.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
+toolBar.SetProperty( Dali::Actor::Property::ANCHOR_POINT, Dali::AnchorPoint::TOP_LEFT );
 toolBar.SetBackgroundColor( Dali::Color::CYAN ); // Set the background color for the toolbar
 
 // Add it to the main container
@@ -389,7 +389,7 @@ We want the item inside it to be horizontally and vertically centered, so that t
 // Create the content area
 Dali::Toolkit::FlexContainer content = Dali::Toolkit::FlexContainer::New();
 content.SetParentOrigin( Dali::ParentOrigin::TOP_LEFT );
-content.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
+content.SetProperty( Dali::Actor::Property::ANCHOR_POINT, Dali::AnchorPoint::TOP_LEFT );
 content.SetProperty( Dali::Toolkit::FlexContainer::Property::FLEX_DIRECTION, Dali::Toolkit::FlexContainer::ROW ); // display items horizontally
 content.SetProperty( Dali::Toolkit::FlexContainer::Property::JUSTIFY_CONTENT, Dali::Toolkit::FlexContainer::JUSTIFY_CENTER ); // align items horizontally center
 content.SetProperty( Dali::Toolkit::FlexContainer::Property::ALIGN_ITEMS, Dali::Toolkit::FlexContainer::ALIGN_CENTER ); // align items vertically center
@@ -409,8 +409,8 @@ We will also add some space around the items so that the layout looks nicer.
 // Add a button to the left of the toolbar
 Dali::Toolkit::PushButton prevButton = Dali::Toolkit::PushButton::New();
 prevButton.SetParentOrigin( Dali::ParentOrigin::TOP_LEFT );
-prevButton.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
-prevButton.SetMinimumSize( Dali::Vector2( 100.0f, 60.0f ) ); // this is the minimum size the button should keep
+prevButton.SetProperty( Dali::Actor::Property::ANCHOR_POINT, Dali::AnchorPoint::TOP_LEFT );
+prevButton.SetProperty( Dali::Actor::Property::MINIMUM_SIZE, Dali::Vector2( 100.0f, 60.0f ) ); // this is the minimum size the button should keep
 prevButton.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN, Dali::Vector4(10.0f, 10.0f, 10.0f, 10.0f) ); // set 10 pixel margin around the button
 toolBar.Add( prevButton );
 
@@ -423,7 +423,7 @@ prevButton.SetProperty( Dali::Toolkit::Button::Property::LABEL, labelMap );
 // Add a title to the center of the toolbar
 Dali::Toolkit::TextLabel title = Dali::Toolkit::TextLabel::New( "Gallery" );
 title.SetParentOrigin( Dali::ParentOrigin::TOP_LEFT );
-title.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
+title.SetProperty( Dali::Actor::Property::ANCHOR_POINT, Dali::AnchorPoint::TOP_LEFT );
 title.SetResizePolicy( Dali::ResizePolicy::USE_NATURAL_SIZE, Dali::Dimension::ALL_DIMENSIONS );
 title.SetProperty( Dali::Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
 title.SetProperty( Dali::Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
@@ -434,8 +434,8 @@ toolBar.Add( title );
 // Add a button to the right of the toolbar
 Dali::Toolkit::PushButton nextButton = Dali::Toolkit::PushButton::New();
 nextButton.SetParentOrigin( Dali::ParentOrigin::TOP_LEFT );
-nextButton.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
-nextButton.SetMinimumSize( Dali::Vector2( 100.0f, 60.0f ) ); // this is the minimum size the button should keep
+nextButton.SetProperty( Dali::Actor::Property::ANCHOR_POINT, Dali::AnchorPoint::TOP_LEFT );
+nextButton.SetProperty( Dali::Actor::Property::MINIMUM_SIZE, Dali::Vector2( 100.0f, 60.0f ) ); // this is the minimum size the button should keep
 nextButton.SetProperty( Dali::Toolkit::FlexContainer::ChildProperty::FLEX_MARGIN, Dali::Vector4(10.0f, 10.0f, 10.0f, 10.0f) ); // set 10 pixel margin around the button
 toolBar.Add( nextButton );
 
@@ -454,7 +454,7 @@ Finally, we will add the image to the content area.
 // Add an image to the center of the content area
 Dali::Toolkit::ImageView imageView = Dali::Toolkit::ImageView::New( "image.jpg" );
 imageView.SetParentOrigin( Dali::ParentOrigin::TOP_LEFT );
-imageView.SetAnchorPoint( Dali::AnchorPoint::TOP_LEFT );
+imageView.SetProperty( Dali::Actor::Property::ANCHOR_POINT, Dali::AnchorPoint::TOP_LEFT );
 content.Add( imageView );
 ~~~
 

@@ -1027,7 +1027,7 @@ int UtcDaliNPatchVisualAuxiliaryImage(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
   dummyImpl.SetLayout( DummyControl::Property::TEST_VISUAL, transformMap );
   dummy.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  dummy.SetParentOrigin(ParentOrigin::CENTER);
+  dummy.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   Stage::GetCurrent().Add(dummy);
 
   application.SendNotification();

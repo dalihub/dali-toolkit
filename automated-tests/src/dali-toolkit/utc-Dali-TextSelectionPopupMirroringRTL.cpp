@@ -96,9 +96,9 @@ int UtcDaliToolkitTextSelectionPopupMirroringRTL(void)
   }
 
   // The order should be PASTE, CUT, COPY
-  DALI_TEST_EQUALS( PASTE, tableOfButtons.GetChildAt( 0 ).GetName(), TEST_LOCATION );
-  DALI_TEST_EQUALS( CUT, tableOfButtons.GetChildAt( 2 ).GetName(), TEST_LOCATION );
-  DALI_TEST_EQUALS( COPY, tableOfButtons.GetChildAt( 4 ).GetName(), TEST_LOCATION );
+  DALI_TEST_EQUALS( PASTE, tableOfButtons.GetChildAt( 0 ).GetProperty< std::string >( Dali::Actor::Property::NAME ), TEST_LOCATION );
+  DALI_TEST_EQUALS( CUT, tableOfButtons.GetChildAt( 2 ).GetProperty< std::string >( Dali::Actor::Property::NAME ), TEST_LOCATION );
+  DALI_TEST_EQUALS( COPY, tableOfButtons.GetChildAt( 4 ).GetProperty< std::string >( Dali::Actor::Property::NAME ), TEST_LOCATION );
 
   tet_result(TET_PASS);
   END_TEST;

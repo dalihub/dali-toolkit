@@ -144,8 +144,8 @@ int UtcDaliWebViewPageNavigation(void)
   ToolkitTestApplication application;
 
   WebView view = WebView::New();
-  view.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  view.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   view.SetPosition( 0, 0 );
   view.SetSize( 800, 600 );
   Stage::GetCurrent().Add( view );
@@ -215,8 +215,8 @@ int UtcDaliWebViewTouchAndKeys(void)
   ToolkitTestApplication application;
 
   WebView view = WebView::New();
-  view.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-  view.SetParentOrigin( ParentOrigin::TOP_LEFT );
+  view.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   view.SetPosition( 0, 0 );
   view.SetSize( 800, 600 );
 

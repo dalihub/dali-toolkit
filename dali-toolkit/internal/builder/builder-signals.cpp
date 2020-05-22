@@ -636,7 +636,7 @@ void SetActionOnSignal(const TreeNode &root, const TreeNode &child, Actor actor,
   {
     // no named actor; presume self
     GenericAction action;
-    action.actorName       = actor.GetName();
+    action.actorName       = actor.GetProperty< std::string >( Dali::Actor::Property::NAME );
     action.actionName      = *actionName;
     GetParameters(child, action.parameters);
     connector.Connect( action );
@@ -711,7 +711,7 @@ Actor SetupSignalAction(ConnectionTracker* tracker, const TreeNode &root, const 
     {
       const TreeNode::KeyNodePair& key_child = *iter;
 
-      DALI_SCRIPT_INFO("  Creating Signal for: %s\n", actor.GetName().c_str());
+      DALI_SCRIPT_INFO("  Creating Signal for: %s\n", actor.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str());
 
       OptionalString name( IsString( IsChild( key_child.second, "name")) );
       DALI_ASSERT_ALWAYS(name && "Signal must have a name");

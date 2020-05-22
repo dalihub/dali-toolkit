@@ -379,8 +379,8 @@ bool Slider::GetSnapToMarks() const
 Actor Slider::CreateHitRegion()
 {
   Actor hitRegion = Actor::New();
-  hitRegion.SetParentOrigin( ParentOrigin::CENTER );
-  hitRegion.SetAnchorPoint( AnchorPoint::CENTER );
+  hitRegion.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  hitRegion.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   hitRegion.TouchSignal().Connect( this, &Slider::OnTouch );
 
   return hitRegion;
@@ -389,9 +389,9 @@ Actor Slider::CreateHitRegion()
 Toolkit::ImageView Slider::CreateTrack()
 {
   Toolkit::ImageView track = Toolkit::ImageView::New();
-  track.SetName("SliderTrack");
-  track.SetParentOrigin( ParentOrigin::CENTER );
-  track.SetAnchorPoint( AnchorPoint::CENTER );
+  track.SetProperty( Dali::Actor::Property::NAME,"SliderTrack");
+  track.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  track.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   return track;
 }
 
@@ -451,9 +451,9 @@ std::string Slider::GetTrackVisual()
 Toolkit::ImageView Slider::CreateProgress()
 {
   Toolkit::ImageView progress = Toolkit::ImageView::New();
-  progress.SetName("SliderProgress");
-  progress.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  progress.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
+  progress.SetProperty( Dali::Actor::Property::NAME,"SliderProgress");
+  progress.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  progress.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT );
 
   return progress;
 }
@@ -577,9 +577,9 @@ void Slider::ResizeProgressRegion( const Vector2& region )
 Toolkit::ImageView Slider::CreateHandle()
 {
   Toolkit::ImageView handle = Toolkit::ImageView::New();
-  handle.SetName("SliderHandle");
-  handle.SetParentOrigin( ParentOrigin::CENTER_LEFT );
-  handle.SetAnchorPoint( AnchorPoint::CENTER );
+  handle.SetProperty( Dali::Actor::Property::NAME,"SliderHandle");
+  handle.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT );
+  handle.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   return handle;
 }
@@ -588,9 +588,9 @@ Toolkit::ImageView Slider::CreatePopupArrow()
 {
   Toolkit::ImageView arrow = Toolkit::ImageView::New();
   arrow.SetStyleName("SliderPopupArrow");
-  arrow.SetName("SliderPopupArrow");
-  arrow.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
-  arrow.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+  arrow.SetProperty( Dali::Actor::Property::NAME,"SliderPopupArrow");
+  arrow.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER );
+  arrow.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER );
 
   return arrow;
 }
@@ -598,10 +598,10 @@ Toolkit::ImageView Slider::CreatePopupArrow()
 Toolkit::TextLabel Slider::CreatePopupText()
 {
   Toolkit::TextLabel textLabel = Toolkit::TextLabel::New();
-  textLabel.SetName( "SliderPopupTextLabel" );
+  textLabel.SetProperty( Dali::Actor::Property::NAME, "SliderPopupTextLabel" );
   textLabel.SetStyleName( "SliderPopupTextLabel" );
-  textLabel.SetParentOrigin( ParentOrigin::CENTER );
-  textLabel.SetAnchorPoint( AnchorPoint::CENTER );
+  textLabel.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  textLabel.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   textLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   textLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
   textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
@@ -612,9 +612,9 @@ Toolkit::TextLabel Slider::CreatePopupText()
 Toolkit::ImageView Slider::CreatePopup()
 {
   Toolkit::ImageView popup = Toolkit::ImageView::New();
-  popup.SetName( "SliderPopup" );
-  popup.SetParentOrigin( ParentOrigin::TOP_CENTER );
-  popup.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+  popup.SetProperty( Dali::Actor::Property::NAME, "SliderPopup" );
+  popup.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER );
+  popup.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER );
   popup.SetResizePolicy( ResizePolicy::FIT_TO_CHILDREN, Dimension::WIDTH );
 
   mValueTextLabel = CreatePopupText();
@@ -683,10 +683,10 @@ void Slider::CreateHandleValueDisplay()
   if( mHandle && !mHandleValueTextLabel )
   {
     mHandleValueTextLabel = Toolkit::TextLabel::New();
-    mHandleValueTextLabel.SetName("SliderHandleTextLabel");
+    mHandleValueTextLabel.SetProperty( Dali::Actor::Property::NAME,"SliderHandleTextLabel");
     mHandleValueTextLabel.SetStyleName("SliderHandleTextLabel");
-    mHandleValueTextLabel.SetParentOrigin( ParentOrigin::CENTER );
-    mHandleValueTextLabel.SetAnchorPoint( AnchorPoint::CENTER );
+    mHandleValueTextLabel.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+    mHandleValueTextLabel.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
     mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
     mHandleValueTextLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
     mHandle.Add( mHandleValueTextLabel );
@@ -701,8 +701,8 @@ void Slider::DestroyHandleValueDisplay()
 Actor Slider::CreateValueDisplay()
 {
   Actor popup = Actor::New();
-  popup.SetParentOrigin( ParentOrigin::TOP_CENTER );
-  popup.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+  popup.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER );
+  popup.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER );
 
   mPopupArrow = CreatePopupArrow();
   popup.Add( mPopupArrow );
@@ -735,17 +735,17 @@ void Slider::UpdateSkin()
   {
     case NORMAL:
     {
-      mTrack.SetColor( Color::WHITE );
-      mHandle.SetColor( Color::WHITE );
-      mProgress.SetColor( Color::WHITE );
+      mTrack.SetProperty( Actor::Property::COLOR, Color::WHITE );
+      mHandle.SetProperty( Actor::Property::COLOR, Color::WHITE );
+      mProgress.SetProperty( Actor::Property::COLOR, Color::WHITE );
       break;
     }
     case DISABLED:
     {
       Vector4 disabledColor = GetDisabledColor();
-      mTrack.SetColor( disabledColor );
-      mHandle.SetColor( disabledColor );
-      mProgress.SetColor( disabledColor );
+      mTrack.SetProperty( Actor::Property::COLOR, disabledColor );
+      mHandle.SetProperty( Actor::Property::COLOR, disabledColor );
+      mProgress.SetProperty( Actor::Property::COLOR, disabledColor );
       break;
     }
     case PRESSED:
@@ -803,7 +803,7 @@ void Slider::AddPopup()
   if( !mValueDisplay )
   {
     mValueDisplay = CreateValueDisplay();
-    mValueDisplay.SetVisible( false );
+    mValueDisplay.SetProperty( Actor::Property::VISIBLE, false );
     mHandle.Add( mValueDisplay );
 
     CreatePopupImage( GetPopupVisual() );
@@ -918,7 +918,7 @@ bool Slider::HideValueView()
 {
   if( mValueDisplay )
   {
-    mValueDisplay.SetVisible( false );
+    mValueDisplay.SetProperty( Actor::Property::VISIBLE, false );
   }
 
   return false;
@@ -1121,7 +1121,7 @@ void Slider::DisplayPopup( float value )
 
     if( mValueDisplay )
     {
-      mValueDisplay.SetVisible( true );
+      mValueDisplay.SetProperty( Actor::Property::VISIBLE, true );
 
       mValueTimer.SetInterval( VALUE_VIEW_SHOW_DURATION );
     }

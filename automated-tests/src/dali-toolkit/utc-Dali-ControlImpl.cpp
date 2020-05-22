@@ -219,7 +219,7 @@ int UtcDaliControlImplOnGestureMethods(void)
     DummyControl dummy = DummyControl::New(true);
     dummy.SetSize( Vector2(100.0f, 100.0f ) );
 
-    dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
     // Render and notify a couple of times
@@ -382,7 +382,7 @@ int UtcDaliControlImplSizeSetP(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( size, dummy.GetCurrentSize().GetVectorXY(), TEST_LOCATION );
+    DALI_TEST_EQUALS( size, dummy.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).GetVectorXY(), TEST_LOCATION );
     DALI_TEST_EQUALS( dummyImpl.sizeSetCalled, true, TEST_LOCATION );
 
     Stage::GetCurrent().Remove(dummy);
@@ -400,7 +400,7 @@ int UtcDaliControlImplSizeSet2P(void)
     Stage::GetCurrent().Add(dummy);
 
     Vector2 size(100.0f, 200.0f);
-    DALI_TEST_CHECK( size != dummy.GetCurrentSize().GetVectorXY() );
+    DALI_TEST_CHECK( size != dummy.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).GetVectorXY() );
 
     application.SendNotification();
     application.Render();
@@ -410,7 +410,7 @@ int UtcDaliControlImplSizeSet2P(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS(size, dummy.GetCurrentSize().GetVectorXY(), TEST_LOCATION);
+    DALI_TEST_EQUALS(size, dummy.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).GetVectorXY(), TEST_LOCATION);
 
     Stage::GetCurrent().Remove(dummy);
   }
@@ -474,7 +474,7 @@ int UtcDaliControlImplTouchEvent(void)
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
-    dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
     application.Render();
@@ -500,7 +500,7 @@ int UtcDaliControlImplTouchEvent(void)
     DummyControl dummy = DummyControl::New();
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
-    dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
     application.Render();
@@ -530,7 +530,7 @@ int UtcDaliControlImplHoverEvent(void)
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
-    dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
     application.Render();
@@ -556,7 +556,7 @@ int UtcDaliControlImplHoverEvent(void)
     DummyControl dummy = DummyControl::New();
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
-    dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
     application.Render();
@@ -727,7 +727,7 @@ int UtcDaliControlImplWheelEvent(void)
     Impl::DummyControl& dummyImpl = static_cast<Impl::DummyControl&>(dummy.GetImplementation());
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
-    dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
     dummy.WheelEventSignal().Connect(&WheelEventCallback);
@@ -753,7 +753,7 @@ int UtcDaliControlImplWheelEvent(void)
     DummyControl dummy = DummyControl::New();
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
-    dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
     dummy.WheelEventSignal().Connect(&WheelEventCallback);
@@ -781,7 +781,7 @@ int UtcDaliControlImplSetStyleName(void)
     DummyControl dummy = DummyControl::New( true );
 
     dummy.SetSize( Vector2( 100.0f, 100.0f ) );
-    dummy.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+    dummy.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
     Stage::GetCurrent().Add(dummy);
 
     dummy.SetStyleName("TestStyle");

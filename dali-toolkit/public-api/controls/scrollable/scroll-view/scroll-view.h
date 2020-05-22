@@ -875,7 +875,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] sensitive @c true to enable scroll, @c false to disable scrolling
-   * @note Unlike Actor::SetSensitive(), this determines whether this ScrollView
+   * @note Unlike Actor::Property::SENSITIVE, this determines whether this ScrollView
    * should react (e.g. pan), without disrupting the sensitivity of its children.
    *
    */

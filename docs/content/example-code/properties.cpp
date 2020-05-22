@@ -83,8 +83,8 @@ public:
 
     // Create text label
     mTagText = Toolkit::TextLabel::New( "0" );
-    mTagText.SetParentOrigin( ParentOrigin::BOTTOM_CENTER );
-    mTagText.SetAnchorPoint( AnchorPoint::BOTTOM_CENTER );
+    mTagText.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER );
+    mTagText.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER );
     mTagText.SetProperty( TextLabel::Property::TEXT_COLOR, Color::WHITE );
     mTagText.SetProperty( TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
     stage.Add( mTagText );
