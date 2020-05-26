@@ -466,6 +466,11 @@ void GaussianBlurView::CreateRenderTasks()
 
     mRenderChildrenTask.SetCameraActor(mRenderFullSizeCamera);
     mRenderChildrenTask.SetFrameBuffer( mRenderTargetForRenderingChildren );
+
+    if( mRenderOnce )
+    {
+      mRenderChildrenTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+    }
   }
 
   // perform a horizontal blur targeting the second buffer
@@ -477,7 +482,7 @@ void GaussianBlurView::CreateRenderTasks()
   mHorizBlurTask.SetClearColor( mBackgroundColor );
   mHorizBlurTask.SetCameraActor(mRenderDownsampledCamera);
   mHorizBlurTask.SetFrameBuffer( mRenderTarget2 );
-  if( mRenderOnce && mBlurUserImage )
+  if( mRenderOnce || ( mRenderOnce && mBlurUserImage ) )
   {
     mHorizBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   }
@@ -498,7 +503,7 @@ void GaussianBlurView::CreateRenderTasks()
   {
     mVertBlurTask.SetFrameBuffer( mRenderTarget1 );
   }
-  if( mRenderOnce && mBlurUserImage )
+  if( mRenderOnce || ( mRenderOnce && mBlurUserImage ) )
   {
     mVertBlurTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
     mVertBlurTask.FinishedSignal().Connect( this, &GaussianBlurView::OnRenderTaskFinished );
@@ -514,6 +519,11 @@ void GaussianBlurView::CreateRenderTasks()
 
     mCompositeTask.SetCameraActor(mRenderFullSizeCamera);
     mCompositeTask.SetFrameBuffer( mRenderTargetForRenderingChildren );
+
+    if( mRenderOnce )
+    {
+      mCompositeTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+    }
   }
 }
 
@@ -541,7 +551,7 @@ void GaussianBlurView::Activate()
 
 void GaussianBlurView::ActivateOnce()
 {
-  DALI_ASSERT_ALWAYS(mBlurUserImage); // Only works with blurring image mode.
+  Deactivate();
   mRenderOnce = true;
   Activate();
 }
