@@ -122,6 +122,7 @@ Geometry CreateGeometry( VisualFactoryCache& factoryCache, ImageDimensions gridS
 
 } // unnamed namespace
 
+
 ImageVisualPtr ImageVisual::New( VisualFactoryCache& factoryCache,
                                  ImageVisualShaderFactory& shaderFactory,
                                  const VisualUrl& imageUrl,
@@ -182,7 +183,7 @@ ImageVisual::ImageVisual( VisualFactoryCache& factoryCache,
 }
 
 ImageVisual::ImageVisual( VisualFactoryCache& factoryCache, ImageVisualShaderFactory& shaderFactory, const Image& image )
-: Visual::Base( factoryCache, Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ),
+: Visual::Base( factoryCache, Visual::FittingMode::FILL ),
   mImage( image ),
   mPixelArea( FULL_TEXTURE_RECT ),
   mPlacementActor(),
@@ -544,7 +545,6 @@ void ImageVisual::GetNaturalSize( Vector2& naturalSize )
       return;
     }
   }
-
   naturalSize = Vector2::ZERO;
 }
 
