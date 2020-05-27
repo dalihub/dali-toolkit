@@ -243,7 +243,7 @@ void ShadowView::OnInitialize()
   // Target is constrained to point at the shadow plane origin
   mCameraActor.SetNearClippingPlane( 1.0f );
   mCameraActor.SetType( Dali::Camera::FREE_LOOK ); // Camera orientation constrained to point at shadow plane world position
-  mCameraActor.SetOrientation(Radian(Degree(180)), Vector3::YAXIS);
+  mCameraActor.SetProperty( Actor::Property::ORIENTATION, Quaternion(Radian(Degree(180)), Vector3::YAXIS) );
   mCameraActor.SetPosition(DEFAULT_LIGHT_POSITION);
 
   // Create render targets needed for rendering from light's point of view
@@ -275,7 +275,7 @@ void ShadowView::OnInitialize()
   mBlurRootActor.SetProperty( Actor::Property::INHERIT_POSITION, false );
   mBlurRootActor.SetProperty( Actor::Property::INHERIT_ORIENTATION, false );
   mBlurRootActor.SetProperty( Actor::Property::INHERIT_SCALE, false );
-  mBlurRootActor.SetColorMode( USE_OWN_COLOR );
+  mBlurRootActor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_COLOR );
 
   Self().Add( mBlurRootActor );
 

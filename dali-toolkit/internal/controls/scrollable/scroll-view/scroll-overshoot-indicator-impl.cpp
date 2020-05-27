@@ -243,12 +243,12 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
       const Vector3 parentSize = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
       if(IsVertical())
       {
-        mOvershootOverlay.SetOrientation( Quaternion( Radian( 0.0f ), Vector3::ZAXIS ) );
+        mOvershootOverlay.SetProperty( Actor::Property::ORIENTATION, Quaternion( Quaternion( Radian( 0.0f ), Vector3::ZAXIS ) ) );
         mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width, mOvershootSize.height), size.depth);
       }
       else
       {
-        mOvershootOverlay.SetOrientation( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) );
+        mOvershootOverlay.SetProperty( Actor::Property::ORIENTATION, Quaternion( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) ) );
         mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height, mOvershootSize.height), size.depth);
         relativeOffset = Vector3(0.0f, 1.0f, 0.0f);
       }
@@ -262,13 +262,13 @@ void ScrollOvershootEffectRipple::UpdateVisibility( bool visible )
       const Vector3 parentSize = self.GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
       if(IsVertical())
       {
-        mOvershootOverlay.SetOrientation( Quaternion( Radian( Math::PI ), Vector3::ZAXIS ) );
+        mOvershootOverlay.SetProperty( Actor::Property::ORIENTATION, Quaternion( Quaternion( Radian( Math::PI ), Vector3::ZAXIS ) ) );
         mOvershootOverlay.SetSize(parentSize.width, GetBounceActorHeight(parentSize.width, mOvershootSize.height), size.depth);
         relativeOffset = Vector3(1.0f, 1.0f, 0.0f);
       }
       else
       {
-        mOvershootOverlay.SetOrientation( Quaternion( Radian( 0.5f * Math::PI ), Vector3::ZAXIS ) );
+        mOvershootOverlay.SetProperty( Actor::Property::ORIENTATION, Quaternion( Quaternion( Radian( 0.5f * Math::PI ), Vector3::ZAXIS ) ) );
         mOvershootOverlay.SetSize(parentSize.height, GetBounceActorHeight(parentSize.height, mOvershootSize.height), size.depth);
         relativeOffset = Vector3(1.0f, 0.0f, 0.0f);
       }

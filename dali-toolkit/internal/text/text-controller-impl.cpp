@@ -3406,7 +3406,7 @@ Actor Controller::Impl::CreateBackgroundActor()
       actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
       actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       actor.SetSize( textSize );
-      actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+      actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR );
       actor.AddRenderer( renderer );
     }
   }

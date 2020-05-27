@@ -249,7 +249,7 @@ okButton.SetLabelText( "OK" );
 okButton.SetParentOrigin( ParentOrigin::CENTER );
 okButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 okButton.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
-okButton.SetSizeModeFactor( Vector3( -20.0f, -20.0f, 0.0 ) );
+okButton.SetProperty( Actor::Property::SIZE_MODE_FACTOR, Vector3( -20.0f, -20.0f, 0.0 ) );
 okButton.ClickedSignal().Connect( this, &MyExample::OnOKButtonClicked );
 
 Toolkit::PushButton cancelButton = Toolkit::PushButton::New();
@@ -257,7 +257,7 @@ cancelButton.SetLabelText( "Cancel" );
 cancelButton.SetParentOrigin( ParentOrigin::CENTER );
 cancelButton.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 cancelButton.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
-cancelButton.SetSizeModeFactor( Vector3( -20.0f, -20.0f, 0.0 ) );
+cancelButton.SetProperty( Actor::Property::SIZE_MODE_FACTOR, Vector3( -20.0f, -20.0f, 0.0 ) );
 cancelButton.ClickedSignal().Connect( this, &MyExample::OnCancelButtonClicked );
 
 // Set up the footer's layout.

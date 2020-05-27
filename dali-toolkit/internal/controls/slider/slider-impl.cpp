@@ -605,7 +605,7 @@ Toolkit::TextLabel Slider::CreatePopupText()
   textLabel.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   textLabel.SetProperty( Toolkit::TextLabel::Property::HORIZONTAL_ALIGNMENT, "CENTER" );
   textLabel.SetProperty( Toolkit::TextLabel::Property::VERTICAL_ALIGNMENT, "CENTER" );
-  textLabel.SetPadding( Padding( POPUP_TEXT_PADDING, POPUP_TEXT_PADDING, 0.0f, 0.0f ) );
+  textLabel.SetProperty( Actor::Property::PADDING, Padding( POPUP_TEXT_PADDING, POPUP_TEXT_PADDING, 0.0f, 0.0f ) );
   return textLabel;
 }
 

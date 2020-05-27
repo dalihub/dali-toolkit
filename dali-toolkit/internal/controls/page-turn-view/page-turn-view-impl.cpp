@@ -589,7 +589,7 @@ void PageTurnView::AddPage( int pageIndex )
     }
 
     float degree = isLeftSide ? 180.f :0.f;
-    mPages[index].actor.SetOrientation( Degree( degree ), Vector3::YAXIS );
+    mPages[index].actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( degree ), Vector3::YAXIS ) );
     mPages[index].actor.SetProperty( Actor::Property::VISIBLE, false );
     mPages[index].UseEffect( mSpineEffectShader, mGeometry );
     mPages[index].SetTexture( newPage );
@@ -904,7 +904,7 @@ void PageTurnView::TurnedOver( Animation& animation )
   mAnimationPageIdPair.erase( animation );
 
   float degree = mPages[index].isTurnBack ? 180.f : 0.f;
-  mPages[index].actor.SetOrientation( Degree(degree), Vector3::YAXIS );
+  mPages[index].actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree(degree), Vector3::YAXIS ) );
   mPages[index].UseEffect( mSpineEffectShader );
 
   int id = pageId + (mPages[index].isTurnBack ? -1 : 1);
@@ -969,7 +969,7 @@ void PageTurnView::StopTurning()
     mPages[ index ].actor.RemoveConstraints();
     mPages[ index ].UseEffect( mSpineEffectShader );
     float degree = mTurningPageIndex==mCurrentPageIndex ? 0.f :180.f;
-    mPages[index].actor.SetOrientation( Degree(degree), Vector3::YAXIS );
+    mPages[index].actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree(degree), Vector3::YAXIS ) );
     mPageUpdated = true;
   }
 

@@ -267,7 +267,7 @@ void TextSelectionToolbar::SetUpScrollBar( bool enable )
       mScrollBar.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       mScrollBar.SetPosition( mScrollBarPadding.x, -mScrollBarPadding.y );
       mScrollBar.SetResizePolicy( Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::WIDTH );
-      mScrollBar.SetOrientation( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) );
+      mScrollBar.SetProperty( Actor::Property::ORIENTATION, Quaternion( Quaternion( Radian( 1.5f * Math::PI ), Vector3::ZAXIS ) ) );
       mScrollBar.SetScrollIndicator( indicator );
       mScrollBar.GetPanGestureDetector().DetachAll();
       mScrollView.Add( mScrollBar );
