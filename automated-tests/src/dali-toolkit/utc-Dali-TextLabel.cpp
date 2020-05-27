@@ -1105,6 +1105,51 @@ int UtcDaliToolkitTextlabelScrollingN(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextlabelScrollingWithEllipsis(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelScrollingWithEllipsis");
+
+  TextLabel label = TextLabel::New("Some text to scroll");
+  DALI_TEST_CHECK( label );
+
+  Stage::GetCurrent().Add( label );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Turn on all the effects.
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+
+  try
+  {
+    // Enable the auto scrolling effect.
+    label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    label.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
+
+    // Disable the ellipsis
+    label.SetProperty( TextLabel::Property::ELLIPSIS, false );
+
+    // Render the text.
+    application.SendNotification();
+    application.Render();
+
+    // Stop auto scrolling
+    label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+
+    // Check the ellipsis property
+    DALI_TEST_CHECK( !label.GetProperty<bool>( TextLabel::Property::ELLIPSIS ) );
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextlabelEllipsis(void)
 {
   ToolkitTestApplication application;

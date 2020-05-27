@@ -1076,6 +1076,7 @@ void TextLabel::SetUpAutoScrolling()
   const int maxTextureSize = Dali::GetMaxTextureSize();
 
   //if the texture size width exceed maxTextureSize, modify the visual model size and enabled the ellipsis
+  bool actualellipsis = mController->IsTextElideEnabled();
   if( verifiedSize.width > maxTextureSize )
   {
     verifiedSize.width = maxTextureSize;
@@ -1108,6 +1109,7 @@ void TextLabel::SetUpAutoScrolling()
   // Set parameters for scrolling
   Renderer renderer = static_cast<Internal::Visual::Base&>( GetImplementation( mVisual ) ).GetRenderer();
   mTextScroller->SetParameters( Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment() );
+  mController->SetTextElideEnabled( actualellipsis );
 }
 
 void TextLabel::ScrollingFinished()
@@ -1115,7 +1117,6 @@ void TextLabel::ScrollingFinished()
   // Pure Virtual from TextScroller Interface
   DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::ScrollingFinished\n");
   mController->SetAutoScrollEnabled( false );
-  mController->SetTextElideEnabled( true );
   RequestTextRelayout();
 }
 
