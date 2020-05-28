@@ -521,7 +521,7 @@ private:
     float scaleFactor;             ///< The scale factor to apply to the Texture when masking
     int16_t referenceCount;        ///< The reference count of clients using this Texture
     LoadState loadState:4;         ///< The load state showing the load progress of the Texture
-    FittingMode::Type fittingMode:2; ///< The requested FittingMode
+    FittingMode::Type fittingMode:3; ///< The requested FittingMode
     Dali::SamplingMode::Type samplingMode:3; ///< The requested SamplingMode
     StorageType storageType:2;     ///< CPU storage / GPU upload;
     bool loadSynchronously:1;      ///< True if synchronous loading was requested

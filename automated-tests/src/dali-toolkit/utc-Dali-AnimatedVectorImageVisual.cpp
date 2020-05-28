@@ -477,7 +477,7 @@ int UtcDaliAnimatedVectorImageVisualCustomShader(void)
   dummyImpl.RegisterVisual( DummyControl::Property::TEST_VISUAL, visual );
 
   dummy.SetSize( 200.f, 200.f );
-  dummy.SetParentOrigin( ParentOrigin::CENTER );
+  dummy.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   Stage::GetCurrent().Add( dummy );
 
   application.SendNotification();
@@ -1359,7 +1359,7 @@ int UtcDaliAnimatedVectorImageVisualControlVisibilityChanged(void)
   DALI_TEST_CHECK( renderer );
   DALI_TEST_CHECK( renderer.GetProperty< int >( DevelRenderer::Property::RENDERING_BEHAVIOR ) == DevelRenderer::Rendering::CONTINUOUSLY );
 
-  actor.SetVisible( false );
+  actor.SetProperty( Actor::Property::VISIBLE, false );
 
   application.SendNotification();
   application.Render();

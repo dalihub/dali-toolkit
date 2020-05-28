@@ -121,7 +121,7 @@ void ImageFilter::SetupCamera()
   {
     // create a camera for the render task, corresponding to its render target size
     mCameraActor = CameraActor::New(mTargetSize);
-    mCameraActor.SetParentOrigin(ParentOrigin::CENTER);
+    mCameraActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
     mCameraActor.SetInvertYAxis( true );
     mRootActor.Add( mCameraActor );
   }

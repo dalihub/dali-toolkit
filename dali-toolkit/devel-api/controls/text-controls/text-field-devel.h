@@ -157,14 +157,6 @@ DALI_TOOLKIT_API void SelectWholeText( TextField textField );
  */
 DALI_TOOLKIT_API void SelectNone( TextField textField );
 
-/**
- * @brief Get the selected text of TextField.
- *
- * @param[in] textField The instance of TextField.
- * @return Selected text in the TextField.
- */
-DALI_TOOLKIT_API std::string SelectedText( TextField textField );
-
 } // namespace DevelText
 
 } // namespace Toolkit

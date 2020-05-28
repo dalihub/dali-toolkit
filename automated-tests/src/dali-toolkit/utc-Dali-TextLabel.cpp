@@ -637,6 +637,11 @@ int UtcDaliToolkitTextLabelSetPropertyP(void)
   label.SetProperty( Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT );
   DALI_TEST_EQUALS( label.GetProperty< int >( Actor::Property::LAYOUT_DIRECTION ), static_cast< int >( LayoutDirection::RIGHT_TO_LEFT ), TEST_LOCATION );
 
+  // Check the line size property
+  DALI_TEST_EQUALS( label.GetProperty<float>( DevelTextLabel::Property::MIN_LINE_SIZE ), 0.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  label.SetProperty( DevelTextLabel::Property::MIN_LINE_SIZE, 50.f );
+  DALI_TEST_EQUALS( label.GetProperty<float>( DevelTextLabel::Property::MIN_LINE_SIZE ), 50.0f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
   application.SendNotification();
   application.Render();
 
@@ -1100,6 +1105,51 @@ int UtcDaliToolkitTextlabelScrollingN(void)
   END_TEST;
 }
 
+int UtcDaliToolkitTextlabelScrollingWithEllipsis(void)
+{
+  ToolkitTestApplication application;
+  tet_infoline(" UtcDaliToolkitTextlabelScrollingWithEllipsis");
+
+  TextLabel label = TextLabel::New("Some text to scroll");
+  DALI_TEST_CHECK( label );
+
+  Stage::GetCurrent().Add( label );
+
+  // Avoid a crash when core load gl resources.
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+
+  // Turn on all the effects.
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_GAP, 50.0f );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_LOOP_COUNT, 3 );
+  label.SetProperty( TextLabel::Property::AUTO_SCROLL_SPEED, 80.0f );
+
+  try
+  {
+    // Enable the auto scrolling effect.
+    label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, true );
+    label.SetProperty( TextLabel::Property::AUTO_SCROLL_STOP_MODE, TextLabel::AutoScrollStopMode::IMMEDIATE );
+
+    // Disable the ellipsis
+    label.SetProperty( TextLabel::Property::ELLIPSIS, false );
+
+    // Render the text.
+    application.SendNotification();
+    application.Render();
+
+    // Stop auto scrolling
+    label.SetProperty( TextLabel::Property::ENABLE_AUTO_SCROLL, false );
+
+    // Check the ellipsis property
+    DALI_TEST_CHECK( !label.GetProperty<bool>( TextLabel::Property::ELLIPSIS ) );
+  }
+  catch( ... )
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliToolkitTextlabelEllipsis(void)
 {
   ToolkitTestApplication application;
@@ -1114,8 +1164,8 @@ int UtcDaliToolkitTextlabelEllipsis(void)
   Stage::GetCurrent().Add( label );
 
   // Turn on all the effects
-  label.SetAnchorPoint( AnchorPoint::CENTER );
-  label.SetParentOrigin( ParentOrigin::CENTER );
+  label.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
+  label.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   label.SetSize( 360.0f, 10.f );
 
   try
@@ -1476,7 +1526,7 @@ int UtcDaliToolkitTextLabelBitmapFont(void)
   application.Render();
 
   // The text has been rendered if the height of the text-label is the height of the line.
-  DALI_TEST_EQUALS( label.GetCurrentSize().height, 34.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( label.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).height, 34.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
   END_TEST;
 }
@@ -1574,7 +1624,7 @@ int UtcDaliToolkitTextlabelMaxTextureSet(void)
 
   const int maxTextureSize = Dali::GetMaxTextureSize();
   // Whether the rendered text is greater than maxTextureSize
-  DALI_TEST_CHECK( label.GetCurrentSize().height > maxTextureSize );
+  DALI_TEST_CHECK( label.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ).height > maxTextureSize );
 
   // Check if the number of renderers is greater than 1.
   DALI_TEST_CHECK( label.GetRendererCount() > 1u );

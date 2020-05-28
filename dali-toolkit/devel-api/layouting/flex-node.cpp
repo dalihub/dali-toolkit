@@ -105,7 +105,7 @@ void Node::AddChild( Actor child, Extents margin, MeasureCallback measureFunctio
 {
   if( child )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "AddChild[%s] to node[%p] at index:%d\n", child.GetName().c_str(), mImpl->mYogaNode, index );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "AddChild[%s] to node[%p] at index:%d\n", child.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str(), mImpl->mYogaNode, index );
 
     NodePtr childNode( new Node() );
 
@@ -113,8 +113,8 @@ void Node::AddChild( Actor child, Extents margin, MeasureCallback measureFunctio
     childNode->mImpl->mMeasureCallback = measureFunction;
 
     childNode->mImpl->mActor = child;
-    Vector2 minumumSize = child.GetMinimumSize();
-    Vector2 maximumSize = child.GetMaximumSize();
+    Vector2 minumumSize = child.GetProperty< Vector2 >( Actor::Property::MINIMUM_SIZE );
+    Vector2 maximumSize = child.GetProperty< Vector2 >( Actor::Property::MAXIMUM_SIZE );
 
     YGNodeStyleSetMaxWidth( childNode->mImpl->mYogaNode, maximumSize.width );
     YGNodeStyleSetMaxHeight( childNode->mImpl->mYogaNode, maximumSize.height );
@@ -136,7 +136,7 @@ void Node::AddChild( Actor child, Extents margin, MeasureCallback measureFunctio
 
 void Node::RemoveChild( Actor child )
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "RemoveChild child:[%s] from internal nodeCount[%d] childCount[%d]\n", child.GetName().c_str(), YGNodeGetChildCount( mImpl->mYogaNode ), mImpl->mChildNodes.size()  );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "RemoveChild child:[%s] from internal nodeCount[%d] childCount[%d]\n", child.GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str(), YGNodeGetChildCount( mImpl->mYogaNode ), mImpl->mChildNodes.size()  );
 
   auto iterator = std::find_if( mImpl->mChildNodes.begin(),mImpl->mChildNodes.end(),
                                 [&child]( NodePtr& childNode ){ return childNode->mImpl->mActor.GetHandle() == child;});
@@ -158,7 +158,7 @@ SizeTuple Node::MeasureNode( float width, int widthMode, float height, int heigh
   Toolkit::Flex::SizeTuple nodeSize{8,8}; // Default size set to 8,8 to aid bug detection.
   if( mImpl->mMeasureCallback && mImpl->mActor.GetHandle() )
   {
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "MeasureNode MeasureCallback executing on %s\n", mImpl->mActor.GetHandle().GetName().c_str() );
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "MeasureNode MeasureCallback executing on %s\n", mImpl->mActor.GetHandle().GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() );
     nodeSize = mImpl->mMeasureCallback( mImpl->mActor.GetHandle(), width, widthMode, height, heightMode );
   }
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "MeasureNode nodeSize width:%f height:%f\n", nodeSize.width, nodeSize.height );

@@ -1462,6 +1462,22 @@ float Controller::GetDefaultLineSpacing() const
   return mImpl->mLayoutEngine.GetDefaultLineSpacing();
 }
 
+bool Controller::SetDefaultLineSize( float lineSize )
+{
+  if( std::fabs( lineSize - mImpl->mLayoutEngine.GetDefaultLineSize() ) > Math::MACHINE_EPSILON_1000 )
+  {
+    mImpl->mLayoutEngine.SetDefaultLineSize(lineSize);
+    mImpl->mRecalculateNaturalSize = true;
+    return true;
+  }
+  return false;
+}
+
+float Controller::GetDefaultLineSize() const
+{
+  return mImpl->mLayoutEngine.GetDefaultLineSize();
+}
+
 void Controller::SetInputColor( const Vector4& color )
 {
   if( NULL != mImpl->mEventData )
@@ -1520,17 +1536,32 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
-      FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mModel->mLogicalModel,
-                                                                            startOfSelectedText,
-                                                                            lengthOfSelectedText );
 
-      fontDescriptionRun.familyLength = fontFamily.size();
-      fontDescriptionRun.familyName = new char[fontDescriptionRun.familyLength];
-      memcpy( fontDescriptionRun.familyName, fontFamily.c_str(), fontDescriptionRun.familyLength );
-      fontDescriptionRun.familyDefined = true;
+      if( EventData::SELECTING == mImpl->mEventData->mState )
+      {
+        // Update a font description run for the selecting state.
+        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
+                                                                              mImpl->mModel->mLogicalModel,
+                                                                              startOfSelectedText,
+                                                                              lengthOfSelectedText );
 
-      // The memory allocated for the font family name is freed when the font description is removed from the logical model.
+        fontDescriptionRun.familyLength = fontFamily.size();
+        fontDescriptionRun.familyName = new char[fontDescriptionRun.familyLength];
+        memcpy( fontDescriptionRun.familyName, fontFamily.c_str(), fontDescriptionRun.familyLength );
+        fontDescriptionRun.familyDefined = true;
+
+        // The memory allocated for the font family name is freed when the font description is removed from the logical model.
+
+        mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
+      }
+      else
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
+      }
 
       // Request to relayout.
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
@@ -1543,10 +1574,6 @@ void Controller::SetInputFontFamily( const std::string& fontFamily )
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
       mImpl->RequestRelayout();
-
-      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
 
       // As the font changes, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
@@ -1579,13 +1606,28 @@ void Controller::SetInputFontWeight( FontWeight weight )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
-      FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mModel->mLogicalModel,
-                                                                            startOfSelectedText,
-                                                                            lengthOfSelectedText );
 
-      fontDescriptionRun.weight = weight;
-      fontDescriptionRun.weightDefined = true;
+      if( EventData::SELECTING == mImpl->mEventData->mState )
+      {
+        // Update a font description run for the selecting state.
+        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
+                                                                              mImpl->mModel->mLogicalModel,
+                                                                              startOfSelectedText,
+                                                                              lengthOfSelectedText );
+
+        fontDescriptionRun.weight = weight;
+        fontDescriptionRun.weightDefined = true;
+
+        mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
+      }
+      else
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
+      }
 
       // Request to relayout.
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
@@ -1598,10 +1640,6 @@ void Controller::SetInputFontWeight( FontWeight weight )
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
       mImpl->RequestRelayout();
-
-      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
 
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
@@ -1645,13 +1683,28 @@ void Controller::SetInputFontWidth( FontWidth width )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
-      FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mModel->mLogicalModel,
-                                                                            startOfSelectedText,
-                                                                            lengthOfSelectedText );
 
-      fontDescriptionRun.width = width;
-      fontDescriptionRun.widthDefined = true;
+      if( EventData::SELECTING == mImpl->mEventData->mState )
+      {
+        // Update a font description run for the selecting state.
+        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
+                                                                              mImpl->mModel->mLogicalModel,
+                                                                              startOfSelectedText,
+                                                                              lengthOfSelectedText );
+
+        fontDescriptionRun.width = width;
+        fontDescriptionRun.widthDefined = true;
+
+        mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
+      }
+      else
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
+      }
 
       // Request to relayout.
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
@@ -1664,10 +1717,6 @@ void Controller::SetInputFontWidth( FontWidth width )
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
       mImpl->RequestRelayout();
-
-      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
 
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
@@ -1711,13 +1760,28 @@ void Controller::SetInputFontSlant( FontSlant slant )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
-      FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mModel->mLogicalModel,
-                                                                            startOfSelectedText,
-                                                                            lengthOfSelectedText );
 
-      fontDescriptionRun.slant = slant;
-      fontDescriptionRun.slantDefined = true;
+      if( EventData::SELECTING == mImpl->mEventData->mState )
+      {
+        // Update a font description run for the selecting state.
+        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
+                                                                              mImpl->mModel->mLogicalModel,
+                                                                              startOfSelectedText,
+                                                                              lengthOfSelectedText );
+
+        fontDescriptionRun.slant = slant;
+        fontDescriptionRun.slantDefined = true;
+
+        mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
+      }
+      else
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
+      }
 
       // Request to relayout.
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
@@ -1730,10 +1794,6 @@ void Controller::SetInputFontSlant( FontSlant slant )
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
       mImpl->RequestRelayout();
-
-      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
 
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;
@@ -1777,13 +1837,28 @@ void Controller::SetInputFontPointSize( float size )
     {
       CharacterIndex startOfSelectedText = 0u;
       Length lengthOfSelectedText = 0u;
-      FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
-                                                                            mImpl->mModel->mLogicalModel,
-                                                                            startOfSelectedText,
-                                                                            lengthOfSelectedText );
 
-      fontDescriptionRun.size = static_cast<PointSize26Dot6>( size * 64.f );
-      fontDescriptionRun.sizeDefined = true;
+      if( EventData::SELECTING == mImpl->mEventData->mState )
+      {
+        // Update a font description run for the selecting state.
+        FontDescriptionRun& fontDescriptionRun = UpdateSelectionFontStyleRun( mImpl->mEventData,
+                                                                              mImpl->mModel->mLogicalModel,
+                                                                              startOfSelectedText,
+                                                                              lengthOfSelectedText );
+
+        fontDescriptionRun.size = static_cast<PointSize26Dot6>( size * 64.f );
+        fontDescriptionRun.sizeDefined = true;
+
+        mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
+      }
+      else
+      {
+        mImpl->mTextUpdateInfo.mCharacterIndex = 0;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = mImpl->mTextUpdateInfo.mPreviousNumberOfCharacters;
+        mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = mImpl->mModel->mLogicalModel->mText.Count();
+      }
 
       // Request to relayout.
       mImpl->mOperationsPending = static_cast<OperationsMask>( mImpl->mOperationsPending |
@@ -1796,10 +1871,6 @@ void Controller::SetInputFontPointSize( float size )
                                                                ALIGN );
       mImpl->mRecalculateNaturalSize = true;
       mImpl->RequestRelayout();
-
-      mImpl->mTextUpdateInfo.mCharacterIndex = startOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToRemove = lengthOfSelectedText;
-      mImpl->mTextUpdateInfo.mNumberOfCharactersToAdd = lengthOfSelectedText;
 
       // As the font might change, recalculate the handle positions is needed.
       mImpl->mEventData->mUpdateLeftSelectionPosition = true;

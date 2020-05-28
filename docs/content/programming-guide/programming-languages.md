@@ -10,7 +10,7 @@ DALi applications can be written in several different programming languages.
 ~~~{.cpp}
 Dali::Actor actor = Dali::Actor::New();
 actor.SetParentOrigin( Dali::ParentOrigin::CENTER );
-actor.SetAnchorPoint( Dali::AnchorPoint::CENTER );
+actor.SetProperty( Dali::Actor::Property::ANCHOR_POINT, Dali::AnchorPoint::CENTER );
 Dali::Stage::GetCurrent().Add( actor );
 ...
 bool OnPressed( Dali::Actor, const TouchData& touch )

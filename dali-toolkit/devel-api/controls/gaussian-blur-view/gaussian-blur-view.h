@@ -2,7 +2,7 @@
 #define DALI_TOOLKIT_GAUSSIAN_BLUR_EFFECT_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -226,7 +226,6 @@ public:
    * @brief Render the GaussianBlurView once.
    *
    * Must be called after you Add() it to the stage.
-   * Only works with a gaussian blur view created with blurUserImage = true.
    * Listen to the Finished signal to determine when the rendering has completed.
    * @SINCE_1_0.0
    */

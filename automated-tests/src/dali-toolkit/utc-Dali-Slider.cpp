@@ -129,8 +129,8 @@ int UtcDaliSliderSignals1(void)
   // Create the Popup actor
   Slider slider = Slider::New();
   Stage::GetCurrent().Add( slider );
-  slider.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  slider.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   slider.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
   slider.SetPosition( 0.0f, 0.0f );
 
@@ -226,8 +226,8 @@ int UtcDaliSliderSignals2(void)
   // Create the Popup actor
   Slider slider = Slider::New();
   Stage::GetCurrent().Add( slider );
-  slider.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  slider.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   slider.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
   slider.SetPosition( 0.0f, 0.0f );
 
@@ -289,8 +289,8 @@ int UtcDaliSetPropertyP(void)
   tet_infoline( "UtcDaliSetPropertyP" );
 
   Slider slider = Slider::New();
-  slider.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  slider.SetAnchorPoint(ParentOrigin::TOP_LEFT);
+  slider.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  slider.SetProperty( Actor::Property::ANCHOR_POINT,ParentOrigin::TOP_LEFT);
   slider.SetSize( Vector2( Stage::GetCurrent().GetSize().x, 20.0f ) );
   slider.SetPosition( 0.0f, 0.0f );
 

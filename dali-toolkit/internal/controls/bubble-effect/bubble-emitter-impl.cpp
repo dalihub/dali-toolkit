@@ -238,7 +238,7 @@ void BubbleEmitter::OnInitialize()
 
   // Create a cameraActor for the off screen render task.
   mCameraActor = CameraActor::New(mMovementArea);
-  mCameraActor.SetParentOrigin(ParentOrigin::CENTER);
+  mCameraActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
 
   Stage stage = Stage::GetCurrent();
 
@@ -259,7 +259,7 @@ void BubbleEmitter::SetBackground( Texture bgTexture, const Vector3& hsvDelta )
   //Create RenderTask source actor
   Actor sourceActor = Actor::New();
   sourceActor.SetSize( mMovementArea );
-  sourceActor.SetParentOrigin(ParentOrigin::CENTER);
+  sourceActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   sourceActor.RegisterProperty( "uHSVDelta", hsvDelta );
   Stage::GetCurrent().Add( sourceActor );
 

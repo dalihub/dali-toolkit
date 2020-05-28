@@ -132,7 +132,7 @@ void CubeTransitionFoldEffect::SetupAnimation( unsigned int actorIndex, unsigned
 
   float delta = (float)x * mTileSize.x * ( 1.4142f - 1.0f );
 
-  Vector3 position( mBoxes[ actorIndex ].GetCurrentPosition() );
+  Vector3 position( mBoxes[ actorIndex ].GetCurrentProperty< Vector3 >( Actor::Property::POSITION ) );
   mAnimation.AnimateTo( Property( mBoxes[ actorIndex ], Actor::Property::ORIENTATION ), Quaternion( Radian( angle ), Vector3::YAXIS ), AlphaFunction::LINEAR );
   mAnimation.AnimateTo( Property( mBoxes[ actorIndex ], Actor::Property::POSITION_X ), position.x + delta, AlphaFunction::BOUNCE );
 

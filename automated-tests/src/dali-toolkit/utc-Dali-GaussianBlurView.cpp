@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,7 +145,7 @@ int UtcDaliGaussianBlurViewAddRemove(void)
   DALI_TEST_CHECK( !actor.OnStage() );
 
 
-  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   view.SetSize(Stage::GetCurrent().GetSize());
   view.Add(actor);
   Stage::GetCurrent().Add(view);
@@ -170,7 +170,7 @@ int UtcDaliGaussianBlurActivateDeactivate(void)
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
 
-  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   view.SetSize(Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);
@@ -185,6 +185,46 @@ int UtcDaliGaussianBlurActivateDeactivate(void)
   RenderTaskList taskList3 = Stage::GetCurrent().GetRenderTaskList();
   DALI_TEST_CHECK( 1u == taskList3.GetTaskCount() );
   DALI_TEST_CHECK( 1u == view.GetChildCount() );
+
+  END_TEST;
+}
+
+// Positive test case for a method
+int UtcDaliGaussianBlurActivateDeactivateRepeat(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+  tet_infoline("UtcDaliGaussianBlurActivateDeactivateRepeat");
+
+  Toolkit::GaussianBlurView view = Toolkit::GaussianBlurView::New();
+  DALI_TEST_CHECK( view );
+
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  view.SetSize(Stage::GetCurrent().GetSize());
+  view.Add(Actor::New());
+  Stage::GetCurrent().Add(view);
+  view.Activate();
+
+  application.SendNotification();
+  application.Render(20);
+
+  DALI_TEST_CHECK( gl.GetLastGenTextureId() == 3 );
+
+  view.Deactivate();
+
+  application.SendNotification();
+  application.Render(20);
+
+  DALI_TEST_CHECK( gl.GetLastGenTextureId() == 3 );
+
+  view.Activate();
+
+  application.SendNotification();
+  application.Render(20);
+
+  DALI_TEST_CHECK( gl.GetLastGenTextureId() == 6 );
 
   END_TEST;
 }
@@ -213,7 +253,7 @@ int UtcDaliGaussianBlurViewSetGetRenderTarget(void)
   Toolkit::GaussianBlurView view = Toolkit::GaussianBlurView::New(5, 1.5f, Pixel::RGB888, 0.5f, 0.5f, true);
   DALI_TEST_CHECK( view );
 
-  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   view.SetSize(Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);
@@ -229,10 +269,10 @@ int UtcDaliGaussianBlurViewSetGetRenderTarget(void)
   END_TEST;
 }
 
-int UtcDaliGaussianBlurViewActivateOnce(void)
+int UtcDaliGaussianBlurViewActivateOnce1(void)
 {
   ToolkitTestApplication application;
-  tet_infoline("UtcDaliGaussianBlurActivateOnce");
+  tet_infoline("UtcDaliGaussianBlurActivateOnce1");
 
   Toolkit::GaussianBlurView view = Toolkit::GaussianBlurView::New(5, 1.5f, Pixel::RGB888, 0.5f, 0.5f, true);
   DALI_TEST_CHECK( view );
@@ -240,7 +280,7 @@ int UtcDaliGaussianBlurViewActivateOnce(void)
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
   DALI_TEST_CHECK( 1u == taskList.GetTaskCount() );
 
-  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   view.SetSize(Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);
@@ -253,6 +293,39 @@ int UtcDaliGaussianBlurViewActivateOnce(void)
   END_TEST;
 }
 
+// Positive test case for a method
+int UtcDaliGaussianBlurActivateOnce2(void)
+{
+  ToolkitTestApplication application;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = gl.GetTextureTrace();
+  textureTrace.Enable(true);
+  tet_infoline("UtcDaliGaussianBlurActivateOnce2");
+
+  Toolkit::GaussianBlurView view = Toolkit::GaussianBlurView::New();
+  DALI_TEST_CHECK( view );
+
+  view.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  view.SetSize(Stage::GetCurrent().GetSize());
+  view.Add(Actor::New());
+  Stage::GetCurrent().Add(view);
+  view.ActivateOnce();
+
+  application.SendNotification();
+  application.Render(20);
+
+  DALI_TEST_CHECK( gl.GetLastGenTextureId() == 3 );
+
+  view.ActivateOnce();
+
+  application.SendNotification();
+  application.Render(20);
+
+  DALI_TEST_CHECK( gl.GetLastGenTextureId() == 6 );
+
+  END_TEST;
+}
+
 int UtcDaliGaussianBlurViewFinishedSignalN(void)
 {
   ToolkitTestApplication application;
@@ -261,7 +334,7 @@ int UtcDaliGaussianBlurViewFinishedSignalN(void)
   Toolkit::GaussianBlurView view = Toolkit::GaussianBlurView::New(5, 1.5f, Pixel::RGB888, 0.5f, 0.5f, true);
   DALI_TEST_CHECK( view );
 
-  view.SetParentOrigin(ParentOrigin::CENTER);
+  view.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::CENTER);
   view.SetSize(Stage::GetCurrent().GetSize());
   view.Add(Actor::New());
   Stage::GetCurrent().Add(view);

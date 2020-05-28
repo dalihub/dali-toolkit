@@ -537,7 +537,7 @@ int UtcDaliItemViewScrollToItem(void)
   Vector3 vec(480.0f, 800.0f, 0.0f);
   ItemLayoutPtr layout = DefaultItemLayout::New( DefaultItemLayout::DEPTH );
 
-  view.SetName("view actor");
+  view.SetProperty( Dali::Actor::Property::NAME,"view actor");
   view.AddLayout(*layout);
   view.SetSize(vec);
 
@@ -706,7 +706,7 @@ int UtcDaliItemViewInsertItemsP(void)
   {
     Actor child = view.GetChildAt( i );
     Actor newActor = Actor::New();
-    newActor.SetName("Inserted");
+    newActor.SetProperty( Dali::Actor::Property::NAME,"Inserted");
     insertList.push_back( Item( view.GetItemId(child), newActor ) );
   }
 
@@ -727,7 +727,7 @@ int UtcDaliItemViewInsertItemsP(void)
   {
     Actor child = view.GetChildAt( i );
 
-    if( child.GetName() == "Inserted" )
+    if( child.GetProperty< std::string >( Dali::Actor::Property::NAME ) == "Inserted" )
     {
       removeList.push_back( view.GetItemId(child) );
     }
@@ -795,7 +795,7 @@ int UtcDaliItemViewReplaceItemsP(void)
   {
     Actor child = view.GetItem( i );
     Actor newActor = Actor::New();
-    newActor.SetName("Replaced");
+    newActor.SetProperty( Dali::Actor::Property::NAME,"Replaced");
 
     replaceList.push_back( Item( i, newActor ) );
   }
@@ -805,8 +805,8 @@ int UtcDaliItemViewReplaceItemsP(void)
     view.ReplaceItems( replaceList, 0.5f );
   }
 
-  DALI_TEST_CHECK(view.GetItem(0).GetName() == "Replaced");
-  DALI_TEST_CHECK(view.GetItem(8).GetName() == "Replaced");
+  DALI_TEST_CHECK(view.GetItem(0).GetProperty< std::string >( Dali::Actor::Property::NAME ) == "Replaced");
+  DALI_TEST_CHECK(view.GetItem(8).GetProperty< std::string >( Dali::Actor::Property::NAME ) == "Replaced");
   END_TEST;
 }
 
@@ -857,7 +857,7 @@ int UtcDaliItemViewSetItemsAnchorPointP(void)
   view.SetItemsAnchorPoint(anchorPoint);
 
   DALI_TEST_CHECK(view.GetItemsAnchorPoint() == anchorPoint);
-  DALI_TEST_CHECK(view.GetItem(0).GetCurrentAnchorPoint() == anchorPoint);
+  DALI_TEST_CHECK(view.GetItem(0).GetCurrentProperty< Vector3 >( Actor::Property::ANCHOR_POINT ) == anchorPoint);
   END_TEST;
 }
 
@@ -882,7 +882,7 @@ int UtcDaliItemViewSetItemsParentOriginP(void)
   view.SetItemsParentOrigin(parentOrigin);
 
   DALI_TEST_CHECK(view.GetItemsParentOrigin() == parentOrigin);
-  DALI_TEST_CHECK(view.GetItem(0).GetCurrentParentOrigin() == parentOrigin);
+  DALI_TEST_CHECK(view.GetItem(0).GetCurrentProperty< Vector3 >( Actor::Property::PARENT_ORIGIN ) == parentOrigin);
   END_TEST;
 }
 

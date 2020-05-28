@@ -3402,9 +3402,9 @@ Actor Controller::Impl::CreateBackgroundActor()
       renderer.SetProperty( Dali::Renderer::Property::DEPTH_INDEX, DepthIndex::CONTENT );
 
       actor = Actor::New();
-      actor.SetName( "TextBackgroundColorActor" );
-      actor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-      actor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+      actor.SetProperty( Dali::Actor::Property::NAME, "TextBackgroundColorActor" );
+      actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+      actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       actor.SetSize( textSize );
       actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
       actor.AddRenderer( renderer );

@@ -99,8 +99,8 @@ If only one dimension is FIXED then the other value in the size parameter will b
 
 To constrain the final negotiated size of an actor, set the following for minimum and maximum sizes respectively.
 @code
-void SetMinimumSize( const Vector2& size )
-void SetMaximumSize( const Vector2& size )
+actor.SetProperty( Actor::Property::MINIMUM_SIZE, minSize );
+actor.SetProperty( Actor::Property::MAXIMUM_SIZE, maxSize );
 @endcode
 
 <h3>Altering Negotiated Size</h3>

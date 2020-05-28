@@ -967,7 +967,7 @@ int UtcDaliAlignmentOnTouchEvent(void)
 
   Alignment alignment = Alignment::New();
   alignment.SetSize(100.0f, 100.0f);
-  alignment.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  alignment.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   Stage::GetCurrent().Add(alignment);
 
   alignment.TouchSignal().Connect(&TouchCallback);

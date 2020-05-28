@@ -501,7 +501,7 @@ void Control::OnPinch(const PinchGesture& pinch)
 
   if( pinch.state == Gesture::Started )
   {
-    *( mImpl->mStartingPinchScale ) = Self().GetCurrentScale();
+    *( mImpl->mStartingPinchScale ) = Self().GetCurrentProperty< Vector3 >( Actor::Property::SCALE );
   }
 
   Self().SetScale( *( mImpl->mStartingPinchScale ) * pinch.scale );
@@ -686,7 +686,7 @@ void Control::OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dime
 
 Vector3 Control::GetNaturalSize()
 {
-  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::GetNaturalSize for %s\n", Self().GetName().c_str() );
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Control::GetNaturalSize for %s\n", Self().GetProperty< std::string >( Dali::Actor::Property::NAME ).c_str() );
   Toolkit::Visual::Base visual = mImpl->GetVisual( Toolkit::Control::Property::BACKGROUND );
   if( visual )
   {

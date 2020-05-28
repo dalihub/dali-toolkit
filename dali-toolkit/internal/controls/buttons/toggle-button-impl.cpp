@@ -110,7 +110,7 @@ void ToggleButton::OnInitialize()
 
   // Toggle button requires the Leave event.
   Actor self = Self();
-  self.SetLeaveRequired( true );
+  self.SetProperty( Actor::Property::LEAVE_REQUIRED, true );
 }
 
 void ToggleButton::SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )

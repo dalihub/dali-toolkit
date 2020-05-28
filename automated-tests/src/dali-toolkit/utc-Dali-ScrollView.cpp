@@ -591,8 +591,8 @@ int UtcDaliToolkitScrollModeP1(void)
   Vector2 viewPageSize( 720.0f, 1280.0f );
   scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   scrollView.SetSize( viewPageSize );
-  scrollView.SetParentOrigin( ParentOrigin::CENTER );
-  scrollView.SetAnchorPoint( AnchorPoint::CENTER );
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
 
   // Position rulers.
@@ -648,8 +648,8 @@ int UtcDaliToolkitScrollModeP2(void)
   Vector2 viewPageSize( 720.0f, 1280.0f );
   scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   scrollView.SetSize( viewPageSize );
-  scrollView.SetParentOrigin( ParentOrigin::CENTER );
-  scrollView.SetAnchorPoint( AnchorPoint::CENTER );
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
 
   // Position rulers.
@@ -706,8 +706,8 @@ int UtcDaliToolkitScrollModeP3(void)
   Vector2 viewPageSize( 720.0f, 1280.0f );
   scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   scrollView.SetSize( viewPageSize );
-  scrollView.SetParentOrigin( ParentOrigin::CENTER );
-  scrollView.SetAnchorPoint( AnchorPoint::CENTER );
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
 
   // Position rulers.
@@ -763,8 +763,8 @@ int UtcDaliToolkitScrollModeP4(void)
   Vector2 viewPageSize( 720.0f, 1280.0f );
   scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   scrollView.SetSize( viewPageSize );
-  scrollView.SetParentOrigin( ParentOrigin::TOP_LEFT );
-  scrollView.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
 
   // Position rulers - expect Default rulers to be used which don't snap
@@ -1055,8 +1055,8 @@ int UtcDaliToolkitScrollViewSignalsUpdate01(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1071,8 +1071,8 @@ int UtcDaliToolkitScrollViewSignalsUpdate01(void)
 
   Actor image = Actor::New();
   image.SetSize(stageSize);
-  image.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  image.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  image.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  image.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   scrollView.Add(image);
 
   Wait(application);
@@ -1117,8 +1117,8 @@ int UtcDaliToolkitScrollViewSignalsUpdate02(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1137,8 +1137,8 @@ int UtcDaliToolkitScrollViewSignalsUpdate02(void)
 
   Actor image = Actor::New();
   image.SetSize(stageSize);
-  image.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  image.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  image.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  image.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
   scrollView.Add(image);
 
   Wait(application);
@@ -1184,8 +1184,8 @@ int UtcDaliToolkitScrollViewScrollSensitive(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1231,8 +1231,8 @@ int UtcDaliToolkitScrollViewAxisAutoLock(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1336,8 +1336,8 @@ int UtcDaliToolkitScrollViewConstraints(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1381,8 +1381,8 @@ int UtcDaliToolkitScrollViewBind(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1442,8 +1442,8 @@ int UtcDaliToolkitScrollViewOvershoot(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1574,8 +1574,8 @@ int UtcDaliToolkitScrollViewSnapStartedSignalP(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1644,8 +1644,8 @@ int UtcDaliToolkitScrollViewSetMaxOvershootP(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -1735,8 +1735,8 @@ int UtcDaliToolkitScrollViewSetScrollingDirectionP(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   Vector2 START_POSITION = Vector2(10.0f, 10.0f);
 
@@ -1821,8 +1821,8 @@ int UtcDaliToolkitScrollViewRemoveScrollingDirectionP(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   Vector2 START_POSITION = Vector2(10.0f, 10.0f);
   uint32_t time = 0;
@@ -2644,8 +2644,8 @@ int UtcDaliToolkitScrollViewConstraintsMove(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -2689,8 +2689,8 @@ int UtcDaliToolkitScrollViewConstraintsWrap(void)
   Stage::GetCurrent().Add( scrollView );
   Vector2 stageSize = Stage::GetCurrent().GetSize();
   scrollView.SetSize(stageSize);
-  scrollView.SetParentOrigin(ParentOrigin::TOP_LEFT);
-  scrollView.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT);
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
 
   // Position rulers.
   RulerPtr rulerX = new DefaultRuler();
@@ -2745,8 +2745,8 @@ int UtcDaliToolkitScrollViewGesturePageLimit(void)
   Vector2 viewPageSize( 720.0f, 1280.0f );
   scrollView.SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
   scrollView.SetSize( viewPageSize );
-  scrollView.SetParentOrigin( ParentOrigin::CENTER );
-  scrollView.SetAnchorPoint( AnchorPoint::CENTER );
+  scrollView.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  scrollView.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   scrollView.SetPosition( 0.0f, 0.0f, 0.0f );
 
   // Position rulers.

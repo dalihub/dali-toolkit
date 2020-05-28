@@ -43,7 +43,7 @@ Clips the contents of the layer to a rectangle.
 ~~~{.cpp}
 // C++
 
-layer1.SetAnchorPoint( AnchorPoint::CENTER );
+layer1.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 layer1.SetParentOrigin( ParentOrigin::CENTER );
 layer1.SetClipping( true );
 layer1.SetClippingBox( 20, 20, 100, 100 ); // X, Y, Width, Height

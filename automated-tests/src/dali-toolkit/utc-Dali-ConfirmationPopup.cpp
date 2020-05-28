@@ -163,11 +163,11 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationP(void)
   // The confirmation popup can use any control type for the ok or cancel buttons.
   // It requires that the name is "controlOk" to provide the "controlSignalOk" signal.
   PushButton buttonOK = PushButton::New();
-  buttonOK.SetName( "controlOk" );
+  buttonOK.SetProperty( Dali::Actor::Property::NAME, "controlOk" );
   footerActor.Add( buttonOK );
 
   PushButton buttonCancel = PushButton::New();
-  buttonCancel.SetName( "controlCancel" );
+  buttonCancel.SetProperty( Dali::Actor::Property::NAME, "controlCancel" );
   footerActor.Add( buttonCancel );
 
   popup.SetFooter( footerActor );
@@ -233,7 +233,7 @@ int UtcDaliConfirmationPopupDynamicSignalGenerationN(void)
    Actor footerActor = Actor::New();
 
    PushButton buttonOK = PushButton::New();
-   buttonOK.SetName( "controlOkMisnamed" );
+   buttonOK.SetProperty( Dali::Actor::Property::NAME, "controlOkMisnamed" );
    popup.SetFooter( buttonOK );
 
    // Tell the confirmation popup to connect to the signal in our button called "onStage".

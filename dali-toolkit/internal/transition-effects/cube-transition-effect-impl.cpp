@@ -82,7 +82,7 @@ const char* FRAGMENT_SHADER = DALI_COMPOSE_SHADER(
 Actor CreateTile( const Vector4& samplerRect )
 {
  Actor tile = Actor::New();
-  tile.SetAnchorPoint( AnchorPoint::CENTER );
+  tile.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
   tile.RegisterProperty( "uTextureRect", samplerRect );
   return tile;
 }
@@ -113,7 +113,7 @@ void CubeTransitionEffect::SetTargetRight( unsigned int idx )
 
   mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.x * 0.5f );
 
-  mTargetTiles[ idx ].SetParentOrigin( Vector3( 1.f, 0.5f, 0.5f) );
+  mTargetTiles[ idx ].SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 1.f, 0.5f, 0.5f) );
   mTargetTiles[ idx ].SetOrientation( Degree( 90.f ), Vector3::YAXIS );
 }
 
@@ -123,7 +123,7 @@ void CubeTransitionEffect::SetTargetLeft( unsigned int idx )
 
   mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.x * 0.5f );
 
-  mTargetTiles[ idx ].SetParentOrigin( Vector3( 0.f, 0.5f, 0.5f) );
+  mTargetTiles[ idx ].SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.f, 0.5f, 0.5f) );
   mTargetTiles[ idx ].SetOrientation( Degree( -90.f ), Vector3::YAXIS );
 }
 
@@ -133,7 +133,7 @@ void CubeTransitionEffect::SetTargetBottom( unsigned int idx )
 
   mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.y * 0.5f );
 
-  mTargetTiles[ idx ].SetParentOrigin( Vector3( 0.5f, 0.f, 0.5f) );
+  mTargetTiles[ idx ].SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, 0.f, 0.5f) );
   mTargetTiles[ idx ].SetOrientation( Degree( 90.f ), Vector3::XAXIS );
 }
 
@@ -143,7 +143,7 @@ void CubeTransitionEffect::SetTargetTop( unsigned int idx )
 
   mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.y * 0.5f );
 
-  mTargetTiles[ idx ].SetParentOrigin( Vector3( 0.5f, 1.f, 0.5f) );
+  mTargetTiles[ idx ].SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, 1.f, 0.5f) );
   mTargetTiles[ idx ].SetOrientation( Degree( -90.f ), Vector3::XAXIS );
 }
 
@@ -199,8 +199,8 @@ void CubeTransitionEffect::Initialize()
 
   //create the box parents
   mBoxRoot = Actor::New();
-  mBoxRoot.SetParentOrigin( ParentOrigin::CENTER );
-  mBoxRoot.SetAnchorPoint( AnchorPoint::CENTER );
+  mBoxRoot.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
+  mBoxRoot.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
   mCurrentTiles.clear();
   mTargetTiles.clear();
@@ -221,7 +221,7 @@ void CubeTransitionEffect::Initialize()
 
       Actor currentTile = CreateTile( textureRect );
       currentTile.SetProperty( Actor::Property::COLOR, FULL_BRIGHTNESS );
-      currentTile.SetParentOrigin( ParentOrigin::CENTER );
+      currentTile.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
       mCurrentTiles.push_back( currentTile );
 
       Actor targetTile = CreateTile( textureRect );
@@ -229,8 +229,8 @@ void CubeTransitionEffect::Initialize()
       mTargetTiles.push_back( targetTile );
 
       Actor box = Actor::New();
-      box.SetParentOrigin( anchor + offset );
-      box.SetAnchorPoint( AnchorPoint::CENTER );
+      box.SetProperty( Actor::Property::PARENT_ORIGIN, anchor + offset );
+      box.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
       box.Add( currentTile );
       box.Add( targetTile );
@@ -338,7 +338,7 @@ void CubeTransitionEffect::SetTargetTexture( Texture texture )
 
 void CubeTransitionEffect::StartTransition( bool toNextImage )
 {
-  Vector3 size = Self().GetCurrentSize();
+  Vector3 size = Self().GetCurrentProperty< Vector3 >( Actor::Property::SIZE );
   if( toNextImage )
   {
     StartTransition( Vector2(size.x* 0.5f, size.y*0.5f), Vector2( -10.f, 0.f ) );
@@ -378,7 +378,7 @@ void CubeTransitionEffect::StartTransition( Vector2 panPosition, Vector2 panDisp
 
   for( ActorArray::iterator it = mCurrentTiles.begin(); it != mCurrentTiles.end(); ++it )
   {
-    it->SetParentOrigin( Vector3( 0.5f, 0.5f, 1.0f) );
+    it->SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, 0.5f, 1.0f) );
     it->SetProperty( Actor::Property::ORIENTATION, Quaternion( Radian( 0.0f ), Vector3::XAXIS ) );
     it->AddRenderer( mCurrentRenderer );
   }
@@ -440,7 +440,7 @@ void CubeTransitionEffect::ResetToInitialState()
 
   for( ActorArray::iterator it = mCurrentTiles.begin(); it != mCurrentTiles.end(); ++it )
   {
-    it->SetParentOrigin( Vector3( 0.5f, 0.5f, 1.0f) );
+    it->SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, 0.5f, 1.0f) );
     it->SetProperty( Actor::Property::ORIENTATION, Quaternion( Radian( 0.0f ), Vector3::XAXIS ) );
     it->SetProperty( Actor::Property::COLOR, FULL_BRIGHTNESS );
   }

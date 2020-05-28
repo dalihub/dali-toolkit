@@ -300,7 +300,7 @@ struct Decorator::Impl : public ConnectionTracker
                                     cursor.position.y );
         mPrimaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
       }
-      mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
+      mPrimaryCursor.SetProperty( Actor::Property::VISIBLE, mPrimaryCursorVisible && mCursorBlinkStatus );
     }
     if( mSecondaryCursor )
     {
@@ -315,7 +315,7 @@ struct Decorator::Impl : public ConnectionTracker
                                       cursor.position.y );
         mSecondaryCursor.SetSize( Size( mCursorWidth, cursor.cursorHeight ) );
       }
-      mSecondaryCursor.SetVisible( mSecondaryCursorVisible && mCursorBlinkStatus );
+      mSecondaryCursor.SetProperty( Actor::Property::VISIBLE, mSecondaryCursorVisible && mCursorBlinkStatus );
     }
 
     // Show or hide the grab handle
@@ -346,7 +346,7 @@ struct Decorator::Impl : public ConnectionTracker
 
       if( grabHandle.actor )
       {
-        grabHandle.actor.SetVisible( isVisible );
+        grabHandle.actor.SetProperty( Actor::Property::VISIBLE, isVisible );
       }
     }
     else if( grabHandle.actor )
@@ -405,11 +405,11 @@ struct Decorator::Impl : public ConnectionTracker
 
       if( primary.actor )
       {
-        primary.actor.SetVisible( primaryVisible );
+        primary.actor.SetProperty( Actor::Property::VISIBLE, primaryVisible );
       }
       if( secondary.actor )
       {
-        secondary.actor.SetVisible( secondaryVisible );
+        secondary.actor.SetProperty( Actor::Property::VISIBLE, secondaryVisible );
       }
 
     }
@@ -499,7 +499,7 @@ struct Decorator::Impl : public ConnectionTracker
     if( primaryHandle.active || secondaryHandle.active )
     {
       // The origin of the decorator's coordinate system in world coords.
-      const Vector3 originWorldCoords = mActiveLayer.GetCurrentWorldPosition() - mActiveLayer.GetCurrentSize() * ACTIVE_LAYER_ANCHOR_POINT;
+      const Vector3 originWorldCoords = mActiveLayer.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ) - mActiveLayer.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) * ACTIVE_LAYER_ANCHOR_POINT;
 
       if( preferBelow )
       {
@@ -584,7 +584,7 @@ struct Decorator::Impl : public ConnectionTracker
     // Check first the horizontal dimension. If is not within the boundaries, it calculates the offset.
 
     // The origin of the decorator's coordinate system in world coords.
-    const Vector3 originWorldCoords = mActiveLayer.GetCurrentWorldPosition() - mActiveLayer.GetCurrentSize() * ACTIVE_LAYER_ANCHOR_POINT;
+    const Vector3 originWorldCoords = mActiveLayer.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION ) - mActiveLayer.GetCurrentProperty< Vector3 >( Actor::Property::SIZE ) * ACTIVE_LAYER_ANCHOR_POINT;
 
     // The popup's position in world coords.
     Vector3 popupPositionWorldCoords = originWorldCoords + mCopyPastePopup.position;
@@ -659,8 +659,8 @@ struct Decorator::Impl : public ConnectionTracker
   {
     cursor = Control::New();
     cursor.SetBackgroundColor( color );
-    cursor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-    cursor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
+    cursor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+    cursor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   }
 
   // Add or Remove cursor(s) from parent
@@ -687,7 +687,7 @@ struct Decorator::Impl : public ConnectionTracker
         {
           CreateCursor( mPrimaryCursor, mCursor[PRIMARY_CURSOR].color );
 #ifdef DECORATOR_DEBUG
-          mPrimaryCursor.SetName( "PrimaryCursorActor" );
+          mPrimaryCursor.SetProperty( Dali::Actor::Property::NAME, "PrimaryCursorActor" );
 #endif
         }
 
@@ -703,7 +703,7 @@ struct Decorator::Impl : public ConnectionTracker
         {
           CreateCursor( mSecondaryCursor, mCursor[SECONDARY_CURSOR].color );
 #ifdef DECORATOR_DEBUG
-          mSecondaryCursor.SetName( "SecondaryCursorActor" );
+          mSecondaryCursor.SetProperty( Dali::Actor::Property::NAME, "SecondaryCursorActor" );
 #endif
         }
 
@@ -729,11 +729,11 @@ struct Decorator::Impl : public ConnectionTracker
       // Cursor blinking
       if ( mPrimaryCursor )
       {
-        mPrimaryCursor.SetVisible( mPrimaryCursorVisible && mCursorBlinkStatus );
+        mPrimaryCursor.SetProperty( Actor::Property::VISIBLE, mPrimaryCursorVisible && mCursorBlinkStatus );
       }
       if ( mSecondaryCursor )
       {
-        mSecondaryCursor.SetVisible( mSecondaryCursorVisible && mCursorBlinkStatus );
+        mSecondaryCursor.SetProperty( Actor::Property::VISIBLE, mSecondaryCursorVisible && mCursorBlinkStatus );
       }
 
       mCursorBlinkStatus = !mCursorBlinkStatus;
@@ -769,10 +769,10 @@ struct Decorator::Impl : public ConnectionTracker
     {
       mActiveLayer = Layer::New();
 #ifdef DECORATOR_DEBUG
-      mActiveLayer.SetName ( "ActiveLayerActor" );
+      mActiveLayer.SetProperty( Actor::Property::NAME, "ActiveLayerActor" );
 #endif
 
-      mActiveLayer.SetParentOrigin( ParentOrigin::CENTER );
+      mActiveLayer.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
       mActiveLayer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
 
       // Add the active layer telling the controller it doesn't need clipping.
@@ -799,33 +799,33 @@ struct Decorator::Impl : public ConnectionTracker
       {
         grabHandle.actor = ImageView::New( mHandleImages[GRAB_HANDLE][HANDLE_IMAGE_RELEASED] );
         GetImpl( grabHandle.actor).SetDepthIndex( DepthIndex::DECORATION );
-        grabHandle.actor.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+        grabHandle.actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
 
         // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
-        grabHandle.actor.SetName( "GrabHandleActor" );
+        grabHandle.actor.SetProperty( Dali::Actor::Property::NAME, "GrabHandleActor" );
         if ( Dali::Internal::gLogFilter->IsEnabledFor( Debug::Verbose ) )
         {
           grabHandle.grabArea = Control::New();
           Toolkit::Control control = Toolkit::Control::DownCast( grabHandle.grabArea );
           control.SetBackgroundColor( Vector4( 1.0f, 1.0f, 1.0f, 0.5f ) );
-          grabHandle.grabArea.SetName( "GrabArea" );
+          grabHandle.grabArea.SetProperty( Dali::Actor::Property::NAME, "GrabArea" );
         }
         else
         {
           grabHandle.grabArea = Actor::New();
-          grabHandle.grabArea.SetName( "GrabArea" );
+          grabHandle.grabArea.SetProperty( Dali::Actor::Property::NAME, "GrabArea" );
         }
 #else
         grabHandle.grabArea = Actor::New();
 #endif
 
-        grabHandle.grabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
-        grabHandle.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+        grabHandle.grabArea.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER );
+        grabHandle.grabArea.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
         grabHandle.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
         grabHandle.grabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
         grabHandle.actor.Add( grabHandle.grabArea );
-        grabHandle.actor.SetColor( mHandleColor );
+        grabHandle.actor.SetProperty( Actor::Property::COLOR, mHandleColor );
 
         grabHandle.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnGrabHandleTouched );
 
@@ -853,20 +853,20 @@ struct Decorator::Impl : public ConnectionTracker
     if( image )
     {
       handle.markerActor = ImageView::New( image );
-      handle.markerActor.SetColor( mHandleColor );
+      handle.markerActor.SetProperty( Actor::Property::COLOR, mHandleColor );
       handle.actor.Add( handle.markerActor );
 
       handle.markerActor.SetResizePolicy ( ResizePolicy::FIXED, Dimension::HEIGHT );
 
       if( LEFT_SELECTION_HANDLE == handleType )
       {
-        handle.markerActor.SetAnchorPoint( AnchorPoint::BOTTOM_RIGHT );
-        handle.markerActor.SetParentOrigin( ParentOrigin::TOP_RIGHT );
+        handle.markerActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT );
+        handle.markerActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT );
       }
       else if( RIGHT_SELECTION_HANDLE == handleType )
       {
-        handle.markerActor.SetAnchorPoint( AnchorPoint::BOTTOM_LEFT );
-        handle.markerActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
+        handle.markerActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT );
+        handle.markerActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
       }
     }
   }
@@ -880,19 +880,19 @@ struct Decorator::Impl : public ConnectionTracker
       {
         primary.actor = ImageView::New( mHandleImages[LEFT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
-        primary.actor.SetName("SelectionHandleOne");
+        primary.actor.SetProperty( Dali::Actor::Property::NAME,"SelectionHandleOne");
 #endif
-        primary.actor.SetAnchorPoint( AnchorPoint::TOP_RIGHT ); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
+        primary.actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT ); // Change to BOTTOM_RIGHT if Look'n'Feel requires handle above text.
         GetImpl( primary.actor ).SetDepthIndex( DepthIndex::DECORATION );
-        primary.actor.SetColor( mHandleColor );
+        primary.actor.SetProperty( Actor::Property::COLOR, mHandleColor );
 
         primary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
-        primary.grabArea.SetName("SelectionHandleOneGrabArea");
+        primary.grabArea.SetProperty( Dali::Actor::Property::NAME,"SelectionHandleOneGrabArea");
 #endif
         primary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
-        primary.grabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
-        primary.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+        primary.grabArea.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER );
+        primary.grabArea.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
         primary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
         primary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
@@ -924,19 +924,19 @@ struct Decorator::Impl : public ConnectionTracker
       {
         secondary.actor = ImageView::New( mHandleImages[RIGHT_SELECTION_HANDLE][HANDLE_IMAGE_RELEASED] );
 #ifdef DECORATOR_DEBUG
-        secondary.actor.SetName("SelectionHandleTwo");
+        secondary.actor.SetProperty( Dali::Actor::Property::NAME,"SelectionHandleTwo");
 #endif
-        secondary.actor.SetAnchorPoint( AnchorPoint::TOP_LEFT ); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
+        secondary.actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT ); // Change to BOTTOM_LEFT if Look'n'Feel requires handle above text.
         GetImpl( secondary.actor ).SetDepthIndex( DepthIndex::DECORATION );
-        secondary.actor.SetColor( mHandleColor );
+        secondary.actor.SetProperty( Actor::Property::COLOR, mHandleColor );
 
         secondary.grabArea = Actor::New(); // Area that Grab handle responds to, larger than actual handle so easier to move
 #ifdef DECORATOR_DEBUG
-        secondary.grabArea.SetName("SelectionHandleTwoGrabArea");
+        secondary.grabArea.SetProperty( Dali::Actor::Property::NAME,"SelectionHandleTwoGrabArea");
 #endif
         secondary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
-        secondary.grabArea.SetParentOrigin( ParentOrigin::TOP_CENTER );
-        secondary.grabArea.SetAnchorPoint( AnchorPoint::TOP_CENTER );
+        secondary.grabArea.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER );
+        secondary.grabArea.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
         secondary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
         secondary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
@@ -965,7 +965,7 @@ struct Decorator::Impl : public ConnectionTracker
   void CalculateHandleWorldCoordinates( HandleImpl& handle, Vector2& position )
   {
     // Gets the world position of the active layer. The active layer is where the handles are added.
-    const Vector3 parentWorldPosition = mActiveLayer.GetCurrentWorldPosition();
+    const Vector3 parentWorldPosition = mActiveLayer.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION );
 
     // The grab handle position in world coords.
     // The active layer's world position is the center of the active layer. The origin of the
@@ -980,9 +980,9 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& grabHandle = mHandle[GRAB_HANDLE];
 
     // Transforms the handle position into world coordinates.
-    // @note This is not the same value as grabHandle.actor.GetCurrentWorldPosition()
+    // @note This is not the same value as grabHandle.actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION )
     // as it's transforming the handle's position set by the text-controller and not
-    // the final position set to the actor. Another difference is the GetCurrentWorldPosition()
+    // the final position set to the actor. Another difference is the.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION )
     // retrieves the position of the center of the actor but the handle's position set
     // by the text controller is not the center of the actor.
     Vector2 grabHandleWorldPosition;
@@ -1016,9 +1016,9 @@ struct Decorator::Impl : public ConnectionTracker
     HandleImpl& handle = mHandle[type];
 
     // Transforms the handle position into world coordinates.
-    // @note This is not the same value as handle.actor.GetCurrentWorldPosition()
+    // @note This is not the same value as handle.actor.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION )
     // as it's transforming the handle's position set by the text-controller and not
-    // the final position set to the actor. Another difference is the GetCurrentWorldPosition()
+    // the final position set to the actor. Another difference is the.GetCurrentProperty< Vector3 >( Actor::Property::WORLD_POSITION )
     // retrieves the position of the center of the actor but the handle's position set
     // by the text controller is not the center of the actor.
     Vector2 handleWorldPosition;
@@ -1067,7 +1067,7 @@ struct Decorator::Impl : public ConnectionTracker
       if( handle.actor && !handle.horizontallyFlipped )
       {
         // Change the anchor point to flip the image.
-        handle.actor.SetAnchorPoint( isPrimaryHandle ? AnchorPoint::TOP_LEFT : AnchorPoint::TOP_RIGHT );
+        handle.actor.SetProperty( Actor::Property::ANCHOR_POINT, isPrimaryHandle ? AnchorPoint::TOP_LEFT : AnchorPoint::TOP_RIGHT );
 
         handle.horizontallyFlipped = true;
       }
@@ -1077,7 +1077,7 @@ struct Decorator::Impl : public ConnectionTracker
       if( handle.actor && handle.horizontallyFlipped )
       {
         // Reset the anchor point.
-        handle.actor.SetAnchorPoint( isPrimaryHandle ? AnchorPoint::TOP_RIGHT : AnchorPoint::TOP_LEFT );
+        handle.actor.SetProperty( Actor::Property::ANCHOR_POINT, isPrimaryHandle ? AnchorPoint::TOP_RIGHT : AnchorPoint::TOP_LEFT );
 
         handle.horizontallyFlipped = false;
       }
@@ -1148,10 +1148,10 @@ struct Decorator::Impl : public ConnectionTracker
     {
       mHighlightActor = Actor::New();
 
-      mHighlightActor.SetName( "HighlightActor" );
-      mHighlightActor.SetParentOrigin( ParentOrigin::TOP_LEFT );
-      mHighlightActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
-      mHighlightActor.SetColor( mHighlightColor );
+      mHighlightActor.SetProperty( Dali::Actor::Property::NAME, "HighlightActor" );
+      mHighlightActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
+      mHighlightActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
+      mHighlightActor.SetProperty( Actor::Property::COLOR, mHighlightColor );
       mHighlightActor.SetColorMode( USE_OWN_COLOR );
     }
 
@@ -2268,9 +2268,9 @@ void Decorator::SetEnabledPopupButtons( TextSelectionPopup::Buttons& enabledButt
   {
     mImpl->mCopyPastePopup.actor = TextSelectionPopup::New( &mImpl->mTextSelectionPopupCallbackInterface );
 #ifdef DECORATOR_DEBUG
-    mImpl->mCopyPastePopup.actor.SetName("mCopyPastePopup");
+    mImpl->mCopyPastePopup.actor.SetProperty( Dali::Actor::Property::NAME,"mCopyPastePopup");
 #endif
-    mImpl->mCopyPastePopup.actor.SetAnchorPoint( AnchorPoint::CENTER );
+    mImpl->mCopyPastePopup.actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
     mImpl->mCopyPastePopup.actor.OnRelayoutSignal().Connect( mImpl, &Decorator::Impl::SetPopupPosition ); // Position popup after size negotiation
   }
 

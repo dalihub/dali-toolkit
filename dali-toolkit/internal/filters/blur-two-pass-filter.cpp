@@ -140,7 +140,7 @@ void BlurTwoPassFilter::Enable()
 
   // create actor to render input with applied emboss effect
   mActorForInput = Actor::New();
-  mActorForInput.SetParentOrigin( ParentOrigin::CENTER );
+  mActorForInput.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   mActorForInput.SetSize( mTargetSize );
   Renderer rendererForInput = CreateRenderer( BASIC_VERTEX_SOURCE, fragmentSource.c_str() );
   SetRendererTexture( rendererForInput, mInputTexture );
@@ -153,7 +153,7 @@ void BlurTwoPassFilter::Enable()
 
   // create an actor to render mImageForHorz for vertical blur pass
   mActorForHorz = Actor::New();
-  mActorForHorz.SetParentOrigin( ParentOrigin::CENTER );
+  mActorForHorz.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   mActorForHorz.SetSize( mTargetSize );
   Renderer rendererForHorz = CreateRenderer( BASIC_VERTEX_SOURCE, fragmentSource.c_str() );
   SetRendererTexture( rendererForHorz, textureForHorz );
@@ -170,7 +170,7 @@ void BlurTwoPassFilter::Enable()
   textureSetForBlending.SetTexture( 0u, blurredTexture );
   textureSetForBlending.SetTexture( 1u, mInputTexture );
   mActorForBlending.AddRenderer( rendererForBlending );
-  mActorForBlending.SetParentOrigin( ParentOrigin::CENTER );
+  mActorForBlending.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   mActorForBlending.SetSize( mTargetSize );
 
   for( int i = 0; i < kernelSize; ++i )

@@ -64,7 +64,7 @@ class RadioButton;
  *
  * // Create a group to bind two or more RadioButtons together
  * Actor radioGroup = Actor::New();
- * radioGroup.SetParentOrigin( ParentOrigin::CENTER );
+ * radioGroup.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
  * Stage::GetCurrent().Add( radioGroup );
  *
  * // Make the first RadioButton and add it to its parent

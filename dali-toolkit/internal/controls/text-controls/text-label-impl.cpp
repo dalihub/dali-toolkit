@@ -140,7 +140,8 @@ DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "verticalLineAlignment
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textBackground",            MAP,     BACKGROUND                 )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "ignoreSpacesAfterText",     BOOLEAN, IGNORE_SPACES_AFTER_TEXT   )
 DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "matchSystemLanguageDirection", BOOLEAN, MATCH_SYSTEM_LANGUAGE_DIRECTION )
-DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textFit",                   MAP,     TEXT_FIT                 )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "textFit",                   MAP,     TEXT_FIT                   )
+DALI_DEVEL_PROPERTY_REGISTRATION( Toolkit,     TextLabel, "minLineSize",               FLOAT,   MIN_LINE_SIZE              )
 DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT( Toolkit, TextLabel, "textColor",      Color::BLACK,     TEXT_COLOR     )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorRed",   TEXT_COLOR_RED,   TEXT_COLOR, 0  )
 DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( Toolkit,    TextLabel, "textColorGreen", TEXT_COLOR_GREEN, TEXT_COLOR, 1  )
@@ -553,6 +554,19 @@ void TextLabel::SetProperty( BaseObject* object, Property::Index index, const Pr
         }
         break;
       }
+      case Toolkit::DevelTextLabel::Property::MIN_LINE_SIZE:
+      {
+        if( impl.mController )
+        {
+          const float lineSize = value.Get<float>();
+
+          if( impl.mController->SetDefaultLineSize( lineSize ) )
+          {
+            impl.mTextUpdateNeeded = true;
+          }
+        }
+        break;
+      }
     }
 
     // Request relayout when text update is needed. It's necessary to call it
@@ -834,6 +848,14 @@ Property::Value TextLabel::GetProperty( BaseObject* object, Property::Index inde
         value = map;
         break;
       }
+      case Toolkit::DevelTextLabel::Property::MIN_LINE_SIZE:
+      {
+        if( impl.mController )
+        {
+          value = impl.mController->GetDefaultLineSize();
+        }
+        break;
+      }
     }
   }
 
@@ -1054,6 +1076,7 @@ void TextLabel::SetUpAutoScrolling()
   const int maxTextureSize = Dali::GetMaxTextureSize();
 
   //if the texture size width exceed maxTextureSize, modify the visual model size and enabled the ellipsis
+  bool actualellipsis = mController->IsTextElideEnabled();
   if( verifiedSize.width > maxTextureSize )
   {
     verifiedSize.width = maxTextureSize;
@@ -1086,6 +1109,7 @@ void TextLabel::SetUpAutoScrolling()
   // Set parameters for scrolling
   Renderer renderer = static_cast<Internal::Visual::Base&>( GetImplementation( mVisual ) ).GetRenderer();
   mTextScroller->SetParameters( Self(), renderer, textureSet, controlSize, verifiedSize, wrapGap, direction, mController->GetHorizontalAlignment(), mController->GetVerticalAlignment() );
+  mController->SetTextElideEnabled( actualellipsis );
 }
 
 void TextLabel::ScrollingFinished()
@@ -1093,7 +1117,6 @@ void TextLabel::ScrollingFinished()
   // Pure Virtual from TextScroller Interface
   DALI_LOG_INFO( gLogFilter, Debug::General, "TextLabel::ScrollingFinished\n");
   mController->SetAutoScrollEnabled( false );
-  mController->SetTextElideEnabled( true );
   RequestTextRelayout();
 }
 

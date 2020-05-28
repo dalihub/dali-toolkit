@@ -59,7 +59,7 @@ class CheckBoxButton;
  * void HelloWorldExample::Create( Application& application )
  * {
  *   CheckBoxButton button = CheckBoxButton::New();
- *   button.SetParentOrigin( ParentOrigin::CENTER );
+ *   button.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
  *   button.SetProperty( Button::Property::LABEL, "Check" );
  *   button.SetSize( 200, 40 );
  *   button.SetBackgroundColor( Color::WHITE );

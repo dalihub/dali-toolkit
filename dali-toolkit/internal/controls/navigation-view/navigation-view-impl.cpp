@@ -73,7 +73,7 @@ Toolkit::NavigationView NavigationView::New()
 
 void NavigationView::OnStageConnection( int depth )
 {
-  Self().SetSensitive(true);
+  Self().SetProperty( Actor::Property::SENSITIVE,true);
 
   Control::OnStageConnection( depth );
 }

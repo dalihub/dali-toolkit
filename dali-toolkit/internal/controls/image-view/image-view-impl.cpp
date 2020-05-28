@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ namespace Internal
 namespace
 {
 
+const Vector4 FULL_TEXTURE_RECT(0.f, 0.f, 1.f, 1.f);
+
 BaseHandle Create()
 {
   return Toolkit::ImageView::New();
@@ -66,7 +68,8 @@ using namespace Dali;
 ImageView::ImageView()
 : Control( ControlBehaviour( CONTROL_BEHAVIOUR_DEFAULT ) ),
   mImageSize(),
-  mImageVisualPaddingSetByTransform( false )
+  mImageVisualPaddingSetByTransform( false ),
+  mImageViewPixelAreaSetByFittingMode( false )
 {
 }
 
@@ -286,67 +289,29 @@ float ImageView::GetWidthForHeight( float height )
 void ImageView::OnRelayout( const Vector2& size, RelayoutContainer& container )
 {
   Control::OnRelayout( size, container );
-
   if( mVisual )
   {
     Property::Map transformMap = Property::Map();
 
     Extents padding = Self().GetProperty<Extents>( Toolkit::Control::Property::PADDING );
-    const Visual::FittingMode fittingMode = Toolkit::GetImplementation(mVisual).GetFittingMode();
 
     bool zeroPadding = ( padding == Extents() );
-    if( ( !zeroPadding ) || // If padding is not zero
-        ( fittingMode == Visual::FittingMode::FIT_KEEP_ASPECT_RATIO ) )
+
+    Vector2 naturalSize;
+    mVisual.GetNaturalSize( naturalSize );
+
+    Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(
+          Self().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
+    if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
     {
-      Dali::LayoutDirection::Type layoutDirection = static_cast<Dali::LayoutDirection::Type>(
-            Self().GetProperty( Dali::Actor::Property::LAYOUT_DIRECTION ).Get<int>() );
-
-      if( Dali::LayoutDirection::RIGHT_TO_LEFT == layoutDirection )
-      {
-        std::swap( padding.start, padding.end );
-      }
-
-      auto finalOffset = Vector2( padding.start, padding.top );
-      mImageVisualPaddingSetByTransform = true;
-
-      // remove padding from the size to know how much is left for the visual
-      auto finalSize = size - Vector2( padding.start + padding.end, padding.top + padding.bottom );
-
-      // Should provide a transform that handles aspect ratio according to image size
-      if( fittingMode == Visual::FittingMode::FIT_KEEP_ASPECT_RATIO )
-      {
-        auto availableVisualSize = finalSize;
-
-        Vector2 naturalSize;
-        mVisual.GetNaturalSize( naturalSize );
-
-        // scale to fit the padded area
-        finalSize = naturalSize * std::min( ( naturalSize.width  ? ( availableVisualSize.width  / naturalSize.width  ) : 0 ),
-                                            ( naturalSize.height ? ( availableVisualSize.height / naturalSize.height ) : 0 ) );
-
-        // calculate final offset within the padded area
-        finalOffset += ( availableVisualSize - finalSize ) * .5f;
-      }
-
-      // populate the transform map
-      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, finalOffset )
-                  .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY,
-                      Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
-                  .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
-                  .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN )
-                  .Add( Toolkit::Visual::Transform::Property::SIZE, finalSize )
-                  .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY,
-                      Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) );
-    }
-    else if ( mImageVisualPaddingSetByTransform && zeroPadding )  // Reset offset to zero only if padding applied previously
-    {
-      mImageVisualPaddingSetByTransform = false;
-      // Reset the transform map
-      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2::ZERO )
-                  .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY,
-                        Vector2( Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE ) );
+      std::swap( padding.start, padding.end );
     }
 
+    // remove padding from the size to know how much is left for the visual
+    Vector2 finalSize = size - Vector2( padding.start + padding.end, padding.top + padding.bottom );
+    Vector2 finalOffset = Vector2( padding.start, padding.top );
+
+    ApplyFittingMode( finalSize, naturalSize, finalOffset, zeroPadding , transformMap );
 
     mVisual.SetTransformAndSize( transformMap, size );
 
@@ -365,6 +330,132 @@ void ImageView::OnResourceReady( Toolkit::Control control )
   // Visual ready so update visual attached to this ImageView, following call to RelayoutRequest will use this visual.
   mVisual = DevelControl::GetVisual( *this, Toolkit::ImageView::Property::IMAGE );
   // Signal that a Relayout may be needed
+}
+
+void ImageView::SetTransformMapForFittingMode( Vector2 finalSize, Vector2 naturalSize, Vector2 finalOffset, Visual::FittingMode fittingMode, Property::Map& transformMap )
+{
+  switch(fittingMode)
+  {
+    case Visual::FittingMode::FIT_KEEP_ASPECT_RATIO:
+    {
+      auto availableVisualSize = finalSize;
+
+      // scale to fit the padded area
+      finalSize = naturalSize * std::min( ( naturalSize.width  ? ( availableVisualSize.width  / naturalSize.width  ) : 0 ),
+                                            ( naturalSize.height ? ( availableVisualSize.height / naturalSize.height ) : 0 ) );
+
+      // calculate final offset within the padded area
+      finalOffset += ( availableVisualSize - finalSize ) * .5f;
+
+      // populate the transform map
+      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, finalOffset )
+                  .Add( Toolkit::Visual::Transform::Property::SIZE, finalSize );
+      break;
+    }
+    case Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO:
+    {
+      mImageViewPixelAreaSetByFittingMode = true;
+      auto availableVisualSize = finalSize;
+      finalSize = naturalSize * std::max( ( naturalSize.width  ? ( availableVisualSize.width  / naturalSize.width  ) : 0 ),
+                                          ( naturalSize.height ? ( availableVisualSize.height / naturalSize.height ) : 0 ) );
+
+      auto originalOffset = finalOffset;
+      finalOffset += ( availableVisualSize - finalSize ) * .5f;
+
+      float x = abs( (availableVisualSize.width - finalSize.width ) / finalSize.width )* .5f;
+      float y = abs( (availableVisualSize.height - finalSize.height ) / finalSize.height ) * .5f;
+      float widthRatio = 1.f - abs( (availableVisualSize.width - finalSize.width ) / finalSize.width );
+      float heightRatio = 1.f - abs( (availableVisualSize.height - finalSize.height ) / finalSize.height );
+      Vector4 pixelArea = Vector4( x, y, widthRatio, heightRatio);
+      Self().SetProperty( Toolkit::ImageView::Property::PIXEL_AREA, pixelArea );
+
+      // populate the transform map
+      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, originalOffset )
+                  .Add( Toolkit::Visual::Transform::Property::SIZE, availableVisualSize );
+      break;
+    }
+    case Visual::FittingMode::CENTER:
+    {
+      auto availableVisualSize = finalSize;
+      if( availableVisualSize.width > naturalSize.width && availableVisualSize.height > naturalSize.height )
+      {
+        finalSize = naturalSize;
+      }
+      else
+      {
+        finalSize = naturalSize * std::min( ( naturalSize.width  ? ( availableVisualSize.width  / naturalSize.width  ) : 0 ),
+                                          ( naturalSize.height ? ( availableVisualSize.height / naturalSize.height ) : 0 ) );
+      }
+
+      finalOffset += ( availableVisualSize - finalSize ) * .5f;
+
+      // populate the transform map
+      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, finalOffset )
+                  .Add( Toolkit::Visual::Transform::Property::SIZE, finalSize );
+      break;
+    }
+    case Visual::FittingMode::FILL:
+    {
+      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, finalOffset )
+                  .Add( Toolkit::Visual::Transform::Property::SIZE, finalSize );
+      break;
+    }
+    case Visual::FittingMode::FIT_WIDTH:
+    case Visual::FittingMode::FIT_HEIGHT:
+    {
+      // This FittingMode already converted
+      break;
+    }
+  }
+}
+
+void ImageView::ApplyFittingMode( Vector2 finalSize, Vector2 naturalSize, Vector2 finalOffset, bool zeroPadding , Property::Map& transformMap )
+{
+    Visual::FittingMode fittingMode = Toolkit::GetImplementation(mVisual).GetFittingMode();
+
+    // Reset PIXEL_AREA after using OVER_FIT_KEEP_ASPECT_RATIO
+    if( mImageViewPixelAreaSetByFittingMode )
+    {
+      Self().SetProperty( Toolkit::ImageView::Property::PIXEL_AREA, FULL_TEXTURE_RECT );
+      mImageViewPixelAreaSetByFittingMode = false;
+    }
+
+    if( ( !zeroPadding ) || // If padding is not zero
+        ( fittingMode != Visual::FittingMode::FILL ) )
+    {
+      mImageVisualPaddingSetByTransform = true;
+
+      // If FittingMode use FIT_WIDTH or FIT_HEIGTH, it need to change proper fittingMode
+      if( fittingMode == Visual::FittingMode::FIT_WIDTH )
+      {
+        fittingMode = ( finalSize.height  / naturalSize.height ) < ( finalSize.width / naturalSize.width ) ? Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO : Visual::FittingMode::FIT_KEEP_ASPECT_RATIO;
+      }
+      else if( fittingMode == Visual::FittingMode::FIT_HEIGHT )
+      {
+        fittingMode = ( finalSize.height  / naturalSize.height ) < ( finalSize.width / naturalSize.width ) ? Visual::FittingMode::FIT_KEEP_ASPECT_RATIO : Visual::FittingMode::OVER_FIT_KEEP_ASPECT_RATIO;
+      }
+
+      SetTransformMapForFittingMode( finalSize, naturalSize, finalOffset, fittingMode, transformMap );
+
+      // Set extra value for applying transformMap
+      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY,
+                        Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) )
+                  .Add( Toolkit::Visual::Transform::Property::ORIGIN, Toolkit::Align::TOP_BEGIN )
+                  .Add( Toolkit::Visual::Transform::Property::ANCHOR_POINT, Toolkit::Align::TOP_BEGIN )
+                  .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY,
+                        Vector2( Toolkit::Visual::Transform::Policy::ABSOLUTE, Toolkit::Visual::Transform::Policy::ABSOLUTE ) );
+    }
+    else if ( mImageVisualPaddingSetByTransform && zeroPadding )  // Reset offset to zero only if padding applied previously
+    {
+      mImageVisualPaddingSetByTransform = false;
+      // Reset the transform map
+      transformMap.Add( Toolkit::Visual::Transform::Property::OFFSET, Vector2::ZERO )
+                  .Add( Toolkit::Visual::Transform::Property::OFFSET_POLICY,
+                        Vector2( Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE ) )
+                  .Add( Toolkit::Visual::Transform::Property::SIZE, Vector2::ONE )
+                  .Add( Toolkit::Visual::Transform::Property::SIZE_POLICY,
+                        Vector2( Toolkit::Visual::Transform::Policy::RELATIVE, Toolkit::Visual::Transform::Policy::RELATIVE ) );
+    }
 }
 
 ///////////////////////////////////////////////////////////
