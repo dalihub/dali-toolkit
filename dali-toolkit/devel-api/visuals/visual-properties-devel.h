@@ -90,8 +90,12 @@ enum Type
  */
 enum FittingMode
 {
-  FIT_KEEP_ASPECT_RATIO,  ///< The visual should be scaled to fit, preserving aspect ratio
-  FILL,                   ///< The visual should be stretched to fill, not preserving aspect ratio
+  FIT_KEEP_ASPECT_RATIO,     ///< The visual should be scaled to fit, preserving aspect ratio
+  FILL,                      ///< The visual should be stretched to fill, not preserving aspect ratio
+  OVER_FIT_KEEP_ASPECT_RATIO,///< The visual should be scaled to fit, preserving aspect ratio. The visual will be filled without empty area, and outside is cropped away.
+  CENTER,                    ///< The visual should keep original size of image. It is not scaled and not strecthed.
+  FIT_HEIGHT,                ///< The visual should be scaled to fit, preserving aspect ratio. Height is scaled proportionately to maintain aspect ratio. It will be deprecated.
+  FIT_WIDTH                  ///< The visual should be scaled to fit, preserving aspect ratio. Width is scaled proportionately to maintain aspect ratio. It will be deprecated.
 };
 
 /**

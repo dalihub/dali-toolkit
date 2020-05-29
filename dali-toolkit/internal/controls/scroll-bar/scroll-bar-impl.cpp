@@ -215,7 +215,7 @@ ScrollBar::~ScrollBar()
 void ScrollBar::OnInitialize()
 {
   CreateDefaultIndicatorActor();
-  Self().SetDrawMode(DrawMode::OVERLAY_2D);
+  Self().SetProperty( Actor::Property::DRAW_MODE,DrawMode::OVERLAY_2D);
 }
 
 void ScrollBar::SetScrollPropertySource( Handle handle, Property::Index propertyScrollPosition, Property::Index propertyMinScrollPosition, Property::Index propertyMaxScrollPosition, Property::Index propertyScrollContentSize )
@@ -247,7 +247,7 @@ void ScrollBar::CreateDefaultIndicatorActor()
   indicator.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
   indicator.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
   indicator.SetStyleName( "ScrollBarIndicator" );
-  indicator.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+  indicator.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR );
   SetScrollIndicator(indicator);
 }
 

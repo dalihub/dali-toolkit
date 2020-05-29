@@ -73,11 +73,12 @@ public:
   };
 
   /**
-   * Whether the pixel data should be kept in TextureManager, or uploaded for rendering
+   * Whether the pixel data should be kept in TextureManager, returned with pixelBuffer or uploaded for rendering
    */
   enum StorageType
   {
     KEEP_PIXEL_BUFFER,
+    RETURN_PIXEL_BUFFER,
     UPLOAD_TO_TEXTURE
   };
 
@@ -445,8 +446,7 @@ private:
     TextureUploadObserver*              observer,
     bool                                orientationCorrection,
     TextureManager::ReloadPolicy        reloadPolicy,
-    MultiplyOnLoad&                     preMultiplyOnLoad,
-    bool                                loadPixelBuffer );
+    MultiplyOnLoad&                     preMultiplyOnLoad );
 
   /**
    * @brief Get the current state of a texture
@@ -477,8 +477,7 @@ private:
                  UseAtlas useAtlas,
                  TextureManager::TextureHash hash,
                  bool orientationCorrection,
-                 bool preMultiplyOnLoad,
-                 bool loadPixelBuffer )
+                 bool preMultiplyOnLoad )
     : url( url ),
       desiredSize( desiredSize ),
       useSize( desiredSize ),
@@ -497,8 +496,7 @@ private:
       cropToMask( cropToMask ),
       orientationCorrection( true ),
       preMultiplyOnLoad( preMultiplyOnLoad ),
-      preMultiplied( false ),
-      loadPixelBuffer( loadPixelBuffer )
+      preMultiplied( false )
     {
     }
 
@@ -521,7 +519,7 @@ private:
     float scaleFactor;             ///< The scale factor to apply to the Texture when masking
     int16_t referenceCount;        ///< The reference count of clients using this Texture
     LoadState loadState:4;         ///< The load state showing the load progress of the Texture
-    FittingMode::Type fittingMode:2; ///< The requested FittingMode
+    FittingMode::Type fittingMode:3; ///< The requested FittingMode
     Dali::SamplingMode::Type samplingMode:3; ///< The requested SamplingMode
     StorageType storageType:2;     ///< CPU storage / GPU upload;
     bool loadSynchronously:1;      ///< True if synchronous loading was requested
@@ -531,7 +529,6 @@ private:
     bool orientationCorrection:1;  ///< true if the image should be rotated to match exif orientation data
     bool preMultiplyOnLoad:1;      ///< true if the image's color should be multiplied by it's alpha
     bool preMultiplied:1;          ///< true if the image's color was multiplied by it's alpha
-    bool loadPixelBuffer:1;        ///< true if the image is needed to be returned as PixelBuffer
   };
 
   /**
@@ -704,13 +701,15 @@ private:
   /**
    * @brief Looks up a cached texture by its hash.
    * If found, the given parameters are used to check there is no hash-collision.
-   * @param[in] hash          The hash to look up
-   * @param[in] url           The URL of the image to load
-   * @param[in] size          The image size
-   * @param[in] fittingMode   The FittingMode to use
-   * @param[in] samplingMode  The SamplingMode to use
-   * @param[in] useAtlas      True if atlased
-   * @param[in] maskTextureId Optional texture ID to use to mask this image
+   * @param[in] hash              The hash to look up
+   * @param[in] url               The URL of the image to load
+   * @param[in] size              The image size
+   * @param[in] fittingMode       The FittingMode to use
+   * @param[in] samplingMode      The SamplingMode to use
+   * @param[in] useAtlas          True if atlased
+   * @param[in] maskTextureId     Optional texture ID to use to mask this image
+   * @param[in] preMultiplyOnLoad if the image's color should be multiplied by it's alpha. Set to OFF if there is no alpha.
+   * @param[in] storageType       Whether the pixel data is stored in the cache, returned with PixelBuffer or uploaded to the GPU
    * @return A TextureId of a cached Texture if found. Or INVALID_TEXTURE_ID if not found.
    */
   TextureManager::TextureId FindCachedTexture(
@@ -721,7 +720,8 @@ private:
     const Dali::SamplingMode::Type samplingMode,
     const bool useAtlas,
     TextureId maskTextureId,
-    MultiplyOnLoad preMultiplyOnLoad);
+    MultiplyOnLoad preMultiplyOnLoad,
+    StorageType storageType );
 
 private:
 

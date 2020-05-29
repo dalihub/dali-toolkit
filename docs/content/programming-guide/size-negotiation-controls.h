@@ -67,7 +67,7 @@ The popup control is added to the layer and a background image is specified to f
 @code
 mBackgroundImage.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
 Vector3 border( mPopupStyle->backgroundOuterBorder.x, mPopupStyle->backgroundOuterBorder.z, 0.0f );
-mBackgroundImage.SetSizeModeFactor( border );
+mBackgroundImage.SetProperty( Actor::Property::SIZE_MODE_FACTOR, border );
 @endcode
 A table view is added to the popup to specify layout. It will fill to the width of the popup and expand/contract around its children cell heights.
 @code

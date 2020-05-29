@@ -114,7 +114,7 @@ void CubeTransitionEffect::SetTargetRight( unsigned int idx )
   mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.x * 0.5f );
 
   mTargetTiles[ idx ].SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 1.f, 0.5f, 0.5f) );
-  mTargetTiles[ idx ].SetOrientation( Degree( 90.f ), Vector3::YAXIS );
+  mTargetTiles[ idx ].SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( 90.f ), Vector3::YAXIS ) );
 }
 
 void CubeTransitionEffect::SetTargetLeft( unsigned int idx )
@@ -124,7 +124,7 @@ void CubeTransitionEffect::SetTargetLeft( unsigned int idx )
   mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.x * 0.5f );
 
   mTargetTiles[ idx ].SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.f, 0.5f, 0.5f) );
-  mTargetTiles[ idx ].SetOrientation( Degree( -90.f ), Vector3::YAXIS );
+  mTargetTiles[ idx ].SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( -90.f ), Vector3::YAXIS ) );
 }
 
 void CubeTransitionEffect::SetTargetBottom( unsigned int idx )
@@ -134,7 +134,7 @@ void CubeTransitionEffect::SetTargetBottom( unsigned int idx )
   mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.y * 0.5f );
 
   mTargetTiles[ idx ].SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, 0.f, 0.5f) );
-  mTargetTiles[ idx ].SetOrientation( Degree( 90.f ), Vector3::XAXIS );
+  mTargetTiles[ idx ].SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( 90.f ), Vector3::XAXIS ) );
 }
 
 void CubeTransitionEffect::SetTargetTop( unsigned int idx )
@@ -144,7 +144,7 @@ void CubeTransitionEffect::SetTargetTop( unsigned int idx )
   mBoxes[ idx ].SetProperty(Actor::Property::PARENT_ORIGIN_Z, 1.0f - mTileSize.y * 0.5f );
 
   mTargetTiles[ idx ].SetProperty( Actor::Property::PARENT_ORIGIN, Vector3( 0.5f, 1.f, 0.5f) );
-  mTargetTiles[ idx ].SetOrientation( Degree( -90.f ), Vector3::XAXIS );
+  mTargetTiles[ idx ].SetProperty( Actor::Property::ORIENTATION, Quaternion( Degree( -90.f ), Vector3::XAXIS ) );
 }
 
 void CubeTransitionEffect::OnRelayout( const Vector2& size, RelayoutContainer& container )

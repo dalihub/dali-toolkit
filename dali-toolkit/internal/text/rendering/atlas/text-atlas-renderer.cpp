@@ -372,7 +372,7 @@ struct AtlasRenderer::Impl
       mActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
       mActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       mActor.SetSize( textSize );
-      mActor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+      mActor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR );
     }
 
     for( std::vector< MeshRecord >::const_iterator it = meshContainer.begin(),
@@ -744,7 +744,7 @@ struct AtlasRenderer::Impl
     actor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
     actor.SetSize( actorSize );
     actor.RegisterProperty("uOffset", Vector2::ZERO );
-    actor.SetColorMode( USE_OWN_MULTIPLY_PARENT_COLOR );
+    actor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_COLOR );
 
     return actor;
   }

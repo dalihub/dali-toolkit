@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -464,6 +464,44 @@ int UtcDaliPopupSetControlFooterMultiple(void)
   popup.SetDisplayState( Popup::SHOWN );
   DALI_TEST_CHECK( HasAncestor( button1, popup ) );
   DALI_TEST_CHECK( HasAncestor( button2, popup ) );
+  END_TEST;
+}
+
+int UtcDaliPopupSetTitleAndFooter(void)
+{
+  ToolkitTestApplication application;  // Exceptions require ToolkitTestApplication
+  tet_infoline( " UtcDaliPopupSetTitleAndFooter" );
+
+  // Create the Popup actor
+  Popup popup = Popup::New();
+
+  // Put in show state so it's layer is connected to popup (for ancestor check).
+  popup.SetDisplayState( Popup::SHOWN );
+
+  // Add the title
+  TextLabel titleActor = TextLabel::New();
+  titleActor.SetProperty( Toolkit::TextLabel::Property::TEXT, "title" );
+
+  DALI_TEST_CHECK( !popup.GetTitle() );
+  popup.SetTitle( titleActor );
+  TextLabel textActor = TextLabel::DownCast( popup.GetTitle() );
+  DALI_TEST_CHECK( textActor == titleActor );
+
+  std::string resultText;
+  DALI_TEST_CHECK( textActor.GetProperty( Toolkit::TextLabel::Property::TEXT ).Get( resultText ) );
+  DALI_TEST_CHECK( ( popup.GetTitle() ) && ( resultText == "title" ) );
+  // verify titleActor is actually inside popup, and not elsewhere on stage, or off even.
+  DALI_TEST_CHECK( HasAncestor( titleActor, popup ) );
+
+  // Add the footer
+  PushButton button = PushButton::New();
+  DALI_TEST_CHECK( !HasAncestor(button, popup) );
+  popup.SetFooter( button );
+  // Hide and then re-show popup to cause button to be rearranged and added to popup.
+  popup.SetDisplayState( Popup::HIDDEN );
+  popup.SetDisplayState( Popup::SHOWN );
+  DALI_TEST_CHECK( HasAncestor( button, popup ) );
+
   END_TEST;
 }
 

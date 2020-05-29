@@ -155,6 +155,26 @@ private:
    */
   void OnResourceReady( Toolkit::Control control );
 
+  /**
+   * @brief Set TransformMap for fittingMode
+   * param[in] finalSize The size for fittingMode
+   * param[in] textureSize The size of texture
+   * param[in] offset The offset for fittingMode
+   * param[in] fittingMode The mode for fitting image
+   * param[in] transformMap  The map for fitting image
+   */
+  void SetTransformMapForFittingMode ( Vector2 finalSize, Vector2 textureSize, Vector2 offset, Visual::FittingMode fittingMode, Property::Map& transformMap );
+
+  /**
+   * @brief Apply fittingMode
+   * param[in] finalSize The size for fittingMode
+   * param[in] textureSize The size of texture
+   * param[in] offset The offset for fittingMode
+   * param[in] zeroPadding whether padding is zero
+   * param[in] transformMap  The map for fitting image
+   */
+  void ApplyFittingMode( Vector2 finalSize, Vector2 textureSize, Vector2 offset, bool zeroPadding , Property::Map& transformMap);
+
 private:
   // Undefined
   ImageView( const ImageView& );
@@ -170,6 +190,7 @@ private:
   ImageDimensions  mImageSize;    ///< the image size
 
   bool mImageVisualPaddingSetByTransform :1; //< Flag to indicate Padding was set using a transform.
+  bool mImageViewPixelAreaSetByFittingMode:1; //< Flag to indicate pixel area was set by fitting Mode
 };
 
 } // namespace Internal

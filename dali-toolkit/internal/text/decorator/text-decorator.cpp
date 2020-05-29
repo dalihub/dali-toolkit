@@ -823,7 +823,7 @@ struct Decorator::Impl : public ConnectionTracker
         grabHandle.grabArea.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER );
         grabHandle.grabArea.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
         grabHandle.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
-        grabHandle.grabArea.SetSizeModeFactor( DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
+        grabHandle.grabArea.SetProperty( Actor::Property::SIZE_MODE_FACTOR, DEFAULT_GRAB_HANDLE_RELATIVE_SIZE );
         grabHandle.actor.Add( grabHandle.grabArea );
         grabHandle.actor.SetProperty( Actor::Property::COLOR, mHandleColor );
 
@@ -893,7 +893,7 @@ struct Decorator::Impl : public ConnectionTracker
         primary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
         primary.grabArea.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER );
         primary.grabArea.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
-        primary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
+        primary.grabArea.SetProperty( Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
         primary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleOneTouched );
 
@@ -937,7 +937,7 @@ struct Decorator::Impl : public ConnectionTracker
         secondary.grabArea.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS );
         secondary.grabArea.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER );
         secondary.grabArea.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER );
-        secondary.grabArea.SetSizeModeFactor( DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
+        secondary.grabArea.SetProperty( Actor::Property::SIZE_MODE_FACTOR, DEFAULT_SELECTION_HANDLE_RELATIVE_SIZE );
 
         secondary.grabArea.TouchSignal().Connect( this, &Decorator::Impl::OnHandleTwoTouched );
 
@@ -1138,7 +1138,7 @@ struct Decorator::Impl : public ConnectionTracker
     // Whether to flip the handle vertically.
     if( handle.actor )
     {
-      handle.actor.SetOrientation( handle.verticallyFlipped ? ANGLE_180 : ANGLE_0, Vector3::XAXIS );
+      handle.actor.SetProperty( Actor::Property::ORIENTATION, Quaternion( handle.verticallyFlipped ? ANGLE_180 : ANGLE_0, Vector3::XAXIS ) );
     }
   }
 
@@ -1152,7 +1152,7 @@ struct Decorator::Impl : public ConnectionTracker
       mHighlightActor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT );
       mHighlightActor.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT );
       mHighlightActor.SetProperty( Actor::Property::COLOR, mHighlightColor );
-      mHighlightActor.SetColorMode( USE_OWN_COLOR );
+      mHighlightActor.SetProperty( Actor::Property::COLOR_MODE, USE_OWN_COLOR );
     }
 
     // Add the highlight box telling the controller it needs clipping.

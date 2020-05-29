@@ -263,7 +263,7 @@ void Magnifier::SetFrameVisibility(bool visible)
     mFrame.SetProperty( Actor::Property::INHERIT_SCALE, true );
     mFrame.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
     Vector3 sizeOffset(IMAGE_BORDER_INDENT*2.f - 2.f, IMAGE_BORDER_INDENT*2.f - 2.f, 0.0f);
-    mFrame.SetSizeModeFactor( sizeOffset );
+    mFrame.SetProperty( Actor::Property::SIZE_MODE_FACTOR, sizeOffset );
 
     Toolkit::VisualFactory visualFactory = Toolkit::VisualFactory::Get();
 
