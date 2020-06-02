@@ -104,7 +104,7 @@ void ToolBar::AddControl( Actor control, float relativeSize, Toolkit::Alignment:
 
   // Create an alignment container where to place the control.
   Toolkit::Alignment alignmentContainer = Toolkit::Alignment::New( alignment );
-  alignmentContainer.SetSizeScalePolicy( SizeScalePolicy::FIT_WITH_ASPECT_RATIO );
+  alignmentContainer.SetProperty( Actor::Property::SIZE_SCALE_POLICY, SizeScalePolicy::FIT_WITH_ASPECT_RATIO );
   alignmentContainer.SetPadding( padding );
   alignmentContainer.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS );
   alignmentContainer.Add( control );

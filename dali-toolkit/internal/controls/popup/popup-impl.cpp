@@ -82,7 +82,7 @@ BaseHandle CreateToast()
   Toolkit::Popup popup = Toolkit::Popup::New();
 
   // Setup for Toast Popup type.
-  popup.SetSizeModeFactor( DEFAULT_TOAST_WIDTH_OF_STAGE_RATIO );
+  popup.SetProperty( Actor::Property::SIZE_MODE_FACTOR, DEFAULT_TOAST_WIDTH_OF_STAGE_RATIO );
   popup.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::WIDTH );
   popup.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
   popup.SetProperty( Toolkit::Popup::Property::CONTEXTUAL_MODE, Toolkit::Popup::NON_CONTEXTUAL );
@@ -282,7 +282,7 @@ void Popup::OnInitialize()
   self.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   self.SetProperty( Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER );
 
-  self.SetSizeModeFactor( DEFAULT_POPUP_PARENT_RELATIVE_SIZE );
+  self.SetProperty( Actor::Property::SIZE_MODE_FACTOR, DEFAULT_POPUP_PARENT_RELATIVE_SIZE );
   self.SetResizePolicy( ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::WIDTH );
   self.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
 
@@ -636,7 +636,7 @@ void Popup::SetTitle( Actor titleActor )
   {
     // Set up padding to give sensible default behaviour
     // (an application developer can later override this if they wish).
-    mTitle.SetPadding( DEFAULT_TITLE_PADDING );
+    mTitle.SetProperty( Actor::Property::PADDING, DEFAULT_TITLE_PADDING );
 
     mPopupLayout.AddChild( mTitle, Toolkit::TableView::CellPosition( 0, 0 ) );
   }
@@ -823,11 +823,11 @@ void Popup::LayoutPopup()
   {
     if( !mContent && !mFooter )
     {
-      mTitle.SetPadding( DEFAULT_TITLE_ONLY_PADDING );
+      mTitle.SetProperty( Actor::Property::PADDING, DEFAULT_TITLE_ONLY_PADDING );
     }
     else
     {
-      mTitle.SetPadding( DEFAULT_TITLE_PADDING );
+      mTitle.SetProperty( Actor::Property::PADDING, DEFAULT_TITLE_PADDING );
     }
   }
 
@@ -1029,7 +1029,7 @@ void Popup::UpdateBackgroundPositionAndSize()
   if( mPopupBackgroundImage )
   {
     mPopupBackgroundImage.SetResizePolicy( ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS );
-    mPopupBackgroundImage.SetSizeModeFactor( Vector3( mBackgroundBorder.left + mBackgroundBorder.right, mBackgroundBorder.top + mBackgroundBorder.bottom, 0.0f ) );
+    mPopupBackgroundImage.SetProperty( Actor::Property::SIZE_MODE_FACTOR, Vector3( mBackgroundBorder.left + mBackgroundBorder.right, mBackgroundBorder.top + mBackgroundBorder.bottom, 0.0f ) );
 
     // Adjust the position of the background so the transparent areas are set appropriately
     mPopupBackgroundImage.SetPosition( ( mBackgroundBorder.right - mBackgroundBorder.left ) * 0.5f, ( mBackgroundBorder.bottom - mBackgroundBorder.top ) * 0.5f );

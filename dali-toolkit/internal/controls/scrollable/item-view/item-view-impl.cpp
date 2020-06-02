@@ -1508,7 +1508,7 @@ Vector2 ItemView::GetCurrentScrollPosition() const
 
 void ItemView::AddOverlay(Actor actor)
 {
-  actor.SetDrawMode( DrawMode::OVERLAY_2D );
+  actor.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
   Self().Add(actor);
 }
 
@@ -1575,7 +1575,7 @@ void ItemView::EnableScrollOvershoot( bool enable )
       mOvershootOverlay.SetProperty( Actor::Property::COLOR,mOvershootEffectColor);
       mOvershootOverlay.SetProperty( Actor::Property::PARENT_ORIGIN,ParentOrigin::TOP_LEFT );
       mOvershootOverlay.SetProperty( Actor::Property::ANCHOR_POINT,AnchorPoint::TOP_LEFT);
-      mOvershootOverlay.SetDrawMode( DrawMode::OVERLAY_2D );
+      mOvershootOverlay.SetProperty( Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D );
       self.Add(mOvershootOverlay);
 
       ApplyOvershootSizeConstraint( mOvershootOverlay, mOvershootSize.height );

@@ -109,13 +109,13 @@ When an actor is required to maintain the aspect ratio of its natural size the f
 to ensure they maintain their aspect ratio while still fitting within the bounds they have been allocated. This can be one of SizeScalePolicy::USE_SIZE_SET, SizeScalePolicy::FIT_WITH_ASPECT_RATIO
 or SizeScalePolicy::FILL_WITH_ASPECT_RATIO. The first is the default. The second will fit the actor within the bounds it has been allocated while maintaining aspect ratio. The
 third will fill all available space, potentially overflowing its bounds, while maintaining apsect ratio.
-@code void SetSizeScalePolicy( SizeScalePolicy::Type policy ) @endcode
+@code actor.SetProperty( Actor::Property::SIZE_SCALE_POLICY, policy ); @endcode
 
 <h3>Using Actors in Containers</h3>
 
 When laying out actors in containers such as TableView it is useful to be able to specify padding that surrounds the actor. E.g. You may
 want some white space around an image actor placed in a table cell. The padding specifies the left, right, bottom and top padding values.
-@code void SetPadding( const Padding& padding ) @endcode
+@code actor.SetProperty( Actor::Property::PADDING, padding ); @endcode
 
 <h2 class="pg">An Example</h2>
 
@@ -131,7 +131,7 @@ content.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 content.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
 content.SetFitHeight( 0 );
 content.SetFitHeight( 1 );
-content.SetPadding( Padding( 20.0f, 20.0f, 20.0f, 0.0f ) );
+content.SetProperty( Actor::Property::PADDING, Padding( 20.0f, 20.0f, 20.0f, 0.0f ) );
 
 // Text
 Toolkit::TextLabel text = Toolkit::TextLabel::New( "Do you really want to quit?" );
@@ -144,7 +144,7 @@ content.AddChild( text, Toolkit::TableView::CellPosition( 0, 0 ) );
 Toolkit::ImageView image = Toolkit::ImageView::New( IMAGE_PATH );
 image.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 image.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
-image.SetPadding( Padding( 20.0f, 0.0f, 0.0f, 0.0f ) );
+image.SetProperty( Actor::Property::PADDING, Padding( 20.0f, 0.0f, 0.0f, 0.0f ) );
 content.AddChild( image, Toolkit::TableView::CellPosition( 0, 1 ) );
 
 // Checkbox and text
@@ -153,7 +153,7 @@ root.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 root.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
 root.SetFitHeight( 0 );
 root.SetFitWidth( 0 );
-root.SetPadding( Padding( 0.0f, 0.0f, 0.0f, 20.0f ) );
+root.SetProperty( Actor::Property::PADDING, Padding( 0.0f, 0.0f, 0.0f, 20.0f ) );
 
 Dali::Image unchecked = Dali::ResourceImage::New( CHECKBOX_UNCHECKED_IMAGE );
 Dali::Image checked = Dali::ResourceImage::New( CHECKBOX_CHECKED_IMAGE );
@@ -165,7 +165,7 @@ checkBox.SetSize( Vector2( 48, 48 ) );
 root.AddChild( checkBox, Toolkit::TableView::CellPosition( 0, 0 ) );
 
 Toolkit::TextLabel text2 = Toolkit::TextLabel::New( "Don't show again" );
-text2.SetPadding( Padding( 20.0f, 0.0f, 0.0f, 10.0f ) );
+text2.SetProperty( Actor::Property::PADDING, Padding( 20.0f, 0.0f, 0.0f, 10.0f ) );
 
 root.AddChild( text2, Toolkit::TableView::CellPosition( 0, 1 ) );
 
@@ -187,7 +187,7 @@ content.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::HEIGHT );
 @endcode
 To add a little space around the left, right and bottom of the table view, some padding is added.
 @code
-content.SetPadding( Padding( 20.0f, 20.0f, 20.0f, 0.0f ) );
+content.SetProperty( Actor::Property::PADDING, Padding( 20.0f, 20.0f, 20.0f, 0.0f ) );
 @endcode
 The first text view has its width set to ResizePolicy::FILL_TO_PARENT and its height has a dimension dependency on its width. This
 will result in a text view that fills up its width to available space in the table cell and then then calculates its
@@ -201,7 +201,7 @@ width. Some padding is added to the left of it as well to center it more.
 @code
 image.SetResizePolicy( ResizePolicy::FILL_TO_PARENT, Dimension::WIDTH );
 image.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
-image.SetPadding( Padding( 20.0f, 0.0f, 0.0f, 0.0f ) );
+image.SetProperty( Actor::Property::PADDING, Padding( 20.0f, 0.0f, 0.0f, 0.0f ) );
 @endcode
 The sub table view is similar as well in that it expands its width to the size of its cell. When it is added to the table view it
 will span two columns. Its height is set to natural size so that it will grow or shrink based on its children cells. Note that for
