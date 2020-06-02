@@ -237,22 +237,6 @@ void ImageView::SetDepthIndex( int depthIndex )
   }
 }
 
-void ImageView::OnStageConnection( int depth )
-{
-  if( mImage )
-  {
-    mImage.UploadedSignal().Emit( mImage );
-  }
-
-  Dali::ResourceImage resourceImage = Dali::ResourceImage::DownCast( mImage );
-  if( resourceImage )
-  {
-    resourceImage.LoadingFinishedSignal().Emit( resourceImage );
-  }
-
-  Control::OnStageConnection( depth ); // Enabled visuals will be put on stage
-}
-
 Vector3 ImageView::GetNaturalSize()
 {
   if( mVisual )
